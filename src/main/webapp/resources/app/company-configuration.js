@@ -1,0 +1,245 @@
+// Create a TaskExecutionSaveOffline object only if one does not already exist. We create the
+// methods in a closure to avoid creating global variables.
+
+if (!this.CompanyConfiguration) {
+	this.CompanyConfiguration = {};
+}
+
+(function() {
+	'use strict';
+
+	$(document).ready(function() {
+		$('#companysModal').on('click', function() {
+			$("#assignCompanyConfigurationsModal").modal("show");
+		});
+		$('#btnSaveCompanyConfigurations').on('click', function() {
+			saveCompanyConfiguration();
+		});
+
+		$('#dbCompany').on('change', function() {
+			getCompanyConfigurationConfig();
+		});
+
+		$('#btnDelete').on('click', function() {
+			deleteCompanyConfiguration();
+		});
+	});
+
+	var contextPath = location.protocol + '//' + location.host
+			+ location.pathname;
+
+	function saveCompanyConfiguration() {
+		if ($("#dbCompany").val() == -1) {
+			alert("Please select company");
+			return;
+		}
+
+		var distanceTraveled = $("#distanceTraveled").is(":checked");
+		var locationVariance = $("#locationVariance").is(":checked");
+		var interimSave = $("#interimSave").is(":checked");
+		var refreshProductGroupProduct = $("#refreshProductGroupProduct").is(":checked");
+		var stageChangeAccountingVoucher = $("#stageChangeAccountingVoucher").is(":checked");
+		$.ajax({
+			url : contextPath,
+			method : 'POST',
+			data : {
+				companyPid : $("#dbCompany").val(),
+				distanceTraveled : distanceTraveled,
+				locationVariance : locationVariance,
+				interimSave:interimSave,
+				refreshProductGroupProduct:refreshProductGroupProduct,
+				stageChangeAccountingVoucher:stageChangeAccountingVoucher
+			},
+			success : function(data) {
+				onSaveSuccess(data);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+	}
+
+	function getCompanyConfigurationConfig() {
+		$('input[type="checkbox"]:checked').prop('checked', false);
+		$.ajax({
+			url : contextPath + "/" + $("#dbCompany").val(),
+			method : 'GET',
+			success : function(data) {
+					$('#distanceTraveled').prop("checked", data.distanceTraveled);
+					$('#locationVariance').prop("checked", data.locationVariance);
+					$('#interimSave').prop("checked", data.interimSave);
+					$('#refreshProductGroupProduct').prop("checked", data.refreshProductGroupProduct);
+					$('#stageChangeAccountingVoucher').prop("checked", data.stageChangeAccountingVoucher);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+	}
+	var companyPid = "";
+	CompanyConfiguration.deletes = function(pid) {
+		companyPid = pid;
+		$('#alertMessage').html("Are You Sure...?");
+		$('#alertBox').modal("show");
+	}
+
+	function deleteCompanyConfiguration() {
+
+		$.ajax({
+			url : contextPath + "/delete/" + companyPid,
+			method : 'DELETE',
+			success : function(data) {
+				onSaveSuccess(data);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+	}
+
+	function onSaveSuccess(result) {
+		// reloading page to see the updated data
+		window.location = contextPath;
+	}
+
+	function onError(httpResponse, exception) {
+		var i;
+		switch (httpResponse.status) {
+		// connection refused, server not reachable
+		case 0:
+			addErrorAlert('Server not reachable', 'error.server.not.reachable');
+			break;
+		case 400:
+			var errorHeader = httpResponse
+					.getResponseHeader('X-orderfleetwebApp-error');
+			var entityKey = httpResponse
+					.getResponseHeader('X-orderfleetwebApp-params');
+			if (errorHeader) {
+				var entityName = entityKey;
+				addErrorAlert(errorHeader, errorHeader, {
+					entityName : entityName
+				});
+			} else if (httpResponse.responseText) {
+				var data = JSON.parse(httpResponse.responseText);
+				if (data && data.fieldErrors) {
+					for (i = 0; i < data.fieldErrors.length; i++) {
+						var fieldError = data.fieldErrors[i];
+						var convertedField = fieldError.field.replace(
+								/\[\d*\]/g, '[]');
+						var fieldName = convertedField.charAt(0).toUpperCase()
+								+ convertedField.slice(1);
+						addErrorAlert(
+								'Field ' + fieldName + ' cannot be empty',
+								'error.' + fieldError.message, {
+									fieldName : fieldName
+								});
+					}
+				} else if (data && data.message) {
+					addErrorAlert(data.message, data.message, data);
+				} else {
+					addErrorAlert(data);
+				}
+			} else {
+				addErrorAlert(exception);
+			}
+			break;
+		default:
+			if (httpResponse.responseText) {
+				var data = JSON.parse(httpResponse.responseText);
+				if (data && data.description) {
+					addErrorAlert(data.description);
+				} else if (data && data.message) {
+					addErrorAlert(data.message);
+				} else {
+					addErrorAlert(data);
+				}
+			} else {
+				addErrorAlert(exception);
+			}
+		}
+	}
+
+	function onSaveSuccess(result) {
+		// reloading page to see the updated data
+		window.location = contextPath;
+	}
+
+	function onDeleteSuccess(result) {
+		// reloading page to see the updated data
+		window.location = contextPath;
+	}
+
+	CompanyConfiguration.closeModalPopup = function(el) {
+		el.modal('hide');
+	}
+
+	function resetForm() {
+		$('.alert').hide();
+		createEditForm.trigger("reset"); // clear form fields
+		createEditForm.validate().resetForm(); // clear validation messages
+		createEditForm.attr('method', 'POST'); // set default method
+		syncOperationModel.pid = null; // reset syncOperation model;
+	}
+
+	function addErrorAlert(message, key, data) {
+		$(".alert > p").html(message);
+		$('.alert').show();
+	}
+
+	function onError(httpResponse, exception) {
+		var i;
+		switch (httpResponse.status) {
+		// connection refused, server not reachable
+		case 0:
+			addErrorAlert('Server not reachable', 'error.server.not.reachable');
+			break;
+		case 400:
+			var errorHeader = httpResponse
+					.getResponseHeader('X-orderfleetwebApp-error');
+			var entityKey = httpResponse
+					.getResponseHeader('X-orderfleetwebApp-params');
+			if (errorHeader) {
+				var entityName = entityKey;
+				addErrorAlert(errorHeader, errorHeader, {
+					entityName : entityName
+				});
+			} else if (httpResponse.responseText) {
+				var data = JSON.parse(httpResponse.responseText);
+				if (data && data.fieldErrors) {
+					for (i = 0; i < data.fieldErrors.length; i++) {
+						var fieldError = data.fieldErrors[i];
+						var convertedField = fieldError.field.replace(
+								/\[\d*\]/g, '[]');
+						var fieldName = convertedField.charAt(0).toUpperCase()
+								+ convertedField.slice(1);
+						addErrorAlert(
+								'Field ' + fieldName + ' cannot be empty',
+								'error.' + fieldError.message, {
+									fieldName : fieldName
+								});
+					}
+				} else if (data && data.message) {
+					addErrorAlert(data.message, data.message, data);
+				} else {
+					addErrorAlert(data);
+				}
+			} else {
+				addErrorAlert(exception);
+			}
+			break;
+		default:
+			if (httpResponse.responseText) {
+				var data = JSON.parse(httpResponse.responseText);
+				if (data && data.description) {
+					addErrorAlert(data.description);
+				} else if (data && data.message) {
+					addErrorAlert(data.message);
+				} else {
+					addErrorAlert(data);
+				}
+			} else {
+				addErrorAlert(exception);
+			}
+		}
+	}
+})();

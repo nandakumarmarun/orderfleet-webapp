@@ -1,0 +1,266 @@
+.tile-aqua .tile-content .table_ .head .first, .tile-green-top .tile-content .table_ .head .first,
+	.tile-red-top .tile-content .table_ .head .first {
+	width: 30%;
+}
+
+.tile-aqua .tile-content .table_ .head .second, .tile-green-top .tile-content .table_ .head .second,
+	.tile-red-top .tile-content .table_ .head .second {
+	width: 70%;
+}
+
+.tile-aqua .tile-content .table_ .head .first, .tile-aqua .tile-content .table_ .head .second,
+	.tile-green-top .tile-content .table_ .head .first, .tile-green-top .tile-content .table_ .head .second,
+	.tile-red-top .tile-content .table_ .head .first, .tile-red-top .tile-content .table_ .head .second
+	{
+	float: left;
+}
+
+.tile-aqua .tile-content .table_ .head .second div p, .tile-green-top .tile-content .table_ .head .second div p,
+	.tile-red-top .tile-content .table_ .head .second div p {
+	float: left;
+	width: 50%
+}
+
+.tile-aqua .tile-content .table_ .body .first p, .tile-aqua .tile-content .table_ .body .second p,
+	.tile-aqua .tile-content .table_ .body .third p, .tile-green-top .tile-content .table_ .body .first p,
+	.tile-green-top .tile-content .table_ .body .second p, .tile-green-top .tile-content .table_ .body .third p,
+	.tile-red-top .tile-content .table_ .body .first p, .tile-red-top .tile-content .table_ .body .second p,
+	.tile-red-top .tile-content .table_ .body .third p {
+	float: left;
+	width: 32%;
+	text-align: center;
+}
+
+.tile-aqua .tile-content .table_ .body .first, .tile-aqua .tile-content .table_ .body .second,
+	.tile-aqua .tile-content .table_ .body .third, .tile-aqua .tile-content .table_,
+	.tile-aqua .tile-content .table_ .body, .tile-aqua .tile-footer,
+	.tile-aqua .tile-content, .tile-green-top .tile-content .table_ .body .first,
+	.tile-green-top .tile-content .table_ .body .second, .tile-green-top .tile-content .table_ .body .third,
+	.tile-green-top .tile-content .table_, .tile-green-top .tile-content .table_ .body,
+	.tile-green-top .tile-footer, .tile-green-top .tile-content,
+	.tile-red-top .tile-content .table_ .body .first, .tile-red-top .tile-content .table_ .body .second,
+	.tile-red-top .tile-content .table_ .body .third, .tile-red-top .tile-content .table_,
+	.tile-red-top .tile-content .table_ .body, .tile-red-top .tile-footer,
+	.tile-red-top .tile-content {
+	float: left;
+	width: 100%;
+}
+
+/************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*bg colors section of tiles*/
+
+/*for aqua*/
+.tile-aqua .tile-content .table_ .body {
+	background: #15a3c5;
+	padding-top: 2%;
+}
+
+.tile-aqua .tile-content .table_ .head {
+	background: #0696b9;
+	float: left;
+	width: 100%;
+	padding-top: 3%;
+}
+
+/*for green-top*/
+.tile-green-top{
+	background: #689f38!important; 
+	height: auto;
+}
+.tile-green-top .tile-content .table_ .body {
+	/*background: #0b9053;*/
+	background: #5a7d3b;
+	padding-top: 2%;
+}
+
+.tile-green-top .tile-content .table_ .head {
+	/*background: #048047;*/
+	background: #4c732a;
+	float: left;
+	width: 100%;
+	padding-top: 3%;
+}
+
+/*for red-top*/
+.tile-red-top{
+	background: #02a094!important;
+    height: auto;
+}
+.tile-red-top .tile-content .table_ .body {
+	/*background: #ea5342;*/
+	background: #059086;
+	padding-top: 2%;
+}
+
+.tile-red-top .tile-content .table_ .head {
+	/*background: #ed4533;*/
+	background: #057f76;
+	float: left;
+	width: 100%;
+	padding-top: 3%;
+}
+
+/*for colr yellow*/
+.tile-yellow {
+	background: #ffff00;
+	color: black;
+}
+
+.tile-yellow span, .tile-yellow a, .tile-yellow p {
+	color: black !important;
+}
+
+.tile-yellow .tile-content .table_ .head {
+	background: #d9d900;
+	float: left;
+	width: 100%;
+	padding-top: 3%;
+}
+
+.tile-yellow .tile-content .table_ .body {
+	background: #e2e200;
+	padding-top: 2%;
+}
+
+.tile-yellow .tile-header i {
+	color: black;
+}
+
+/*for red*/
+.tile-red .tile-content .table_ .head {
+	background: #ed4533;
+	float: left;
+	width: 100%;
+	padding-top: 3%;
+}
+
+.tile-red .tile-content .table_ .body {
+	background: #ea5342;
+	padding-top: 2%;
+}
+/*for green*/
+.tile-green .tile-content .table_ .head {
+	background: #048047;
+	float: left;
+	width: 100%;
+	padding-top: 3%;
+}
+
+.tile-green .tile-content .table_ .body {
+	background: #0b9053;
+	padding-top: 2%;
+}
+
+/************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.height_tiles .tile-content .table_ .head .first {
+	float: left;
+	width: 30%;
+}
+
+.height_tiles .tile-content .table_ .head .second {
+	float: left;
+	width: 70%;
+}
+
+.height_tiles .tile-content .table_ .head .second div p {
+	float: left;
+	width: 50%
+}
+
+.height_tiles .tile-content .table_ .body  .first p, .height_tiles .tile-content .table_ .body  .second p,
+	.height_tiles .tile-content .table_ .body  .third p {
+	width: 32%;
+	float: left;
+	text-align: center;
+}
+
+.height_tiles .tile-content, .height_tiles .tile-footer, .height_tiles .tile-content .table_ .body  .first,
+	.height_tiles .tile-content .table_ .body  .second, .height_tiles .tile-content .table_ .body  .third,
+	.height_tiles, .height_tiles .tile-content .table_ .body {
+	width: 100%;
+	float: left;
+}
+
+.height_tiles .tile-footer .address {
+	width: 70%;
+	float: left;
+	overflow: hidden;
+	height: 18px;
+}
+
+.height_tiles .tile-footer a i {
+	font-size: 27px;
+}
+
+.height_tiles .tile-footer a {
+	float: left;
+	width: 20%;
+	text-align: center;
+	margin-top: -2%;
+}
+
+.height_tiles .tile-footer .icon-container {
+	float: left;
+	width: 30%;
+	margin-top: 0%;
+	margin-bottom: 2%;
+}
+
+.height_tiles .tile-footer .time {
+	float: left;
+	text-align: center;
+	width: 30%;
+}
+
+.height_tiles .tile-footer, .height_tiles .tile-header {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.tile-aqua .tile-header, .tile-green-top .tile-header, .tile-red-top .tile-header
+	{
+	padding-bottom: 5px;
+	padding-top: 14px;
+}
+
+.tile-menu {
+	width: 290px;
+	float: left;
+	margin-left: 1%;
+	margin-right: 1%;
+	/*height: 290px;*/
+	height: auto;
+	margin-top: 1%;
+	
+}
+.tile-gray{background-color: #39ac73;}
+.tile-menu .height_tiles {
+	/*height: 267px;*/
+	
+}
+.hdrc{color: #3d423f;
+padding: 10px 15px;
+font-size: 14px; }
+
+.error_status_number {
+	margin-top: -34px !important;
+	margin-left: 19px !important;
+	font-size: 15px !important;
+	text-align: center !important;
+}
+
+.tile-content_pad {
+	padding: 0px 8px !important;
+}
+
+.padding_btm {
+	padding-bottom: 5px !important;
+}
+
+.font-size-14 {
+	font-size: 14px !important;
+}
+
+.font-size-14 i {
+	font-size: 17px !important;
+}

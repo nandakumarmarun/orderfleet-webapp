@@ -1,0 +1,65 @@
+package com.orderfleet.webapp.repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.orderfleet.webapp.domain.File;
+import com.orderfleet.webapp.domain.FilledForm;
+import com.orderfleet.webapp.domain.FilledFormDetail;
+
+/**
+ * Spring Data JPA repository for the FilledForm entity.
+ * 
+ * @author Muhammed Riyas T
+ * @since August 01, 2016
+ */
+public interface FilledFormRepository extends JpaRepository<FilledForm, Long> {
+
+	Optional<FilledForm> findOneByPid(String pid);
+
+	Optional<FilledForm> findOneByDynamicDocumentHeaderExecutiveTaskExecutionPidAndImageRefNo(
+			String executiveTaskExecutionPid, String imageRefNo);
+
+	@Query("SELECT f FROM FilledForm AS f WHERE f.dynamicDocumentHeader.document.pid = ?1 and f.form.pid = ?2")
+	List<FilledForm> findFilledFormsByDocumentAndFormPid(String documentPid, String formPid);
+
+	@Query("select filledForm.filledFormDetails from FilledForm filledForm where filledForm.dynamicDocumentHeader.document.pid = ?1 and filledForm.form.pid = ?2")
+	List<FilledFormDetail> findFilledFormDetailsByDocumentAndFormPid(String documentPid, String formPid);
+
+	List<FilledForm> findByDynamicDocumentHeaderPid(String dynamicDocumentPid);
+	
+	List<FilledForm> findByDynamicDocumentHeaderPidIn(Set<String> dynamicDocumentPids);
+
+	List<FilledForm> findByDynamicDocumentHeaderDocumentPid(String documentPid);
+
+	Optional<FilledForm> findOneByDynamicDocumentHeaderExecutiveTaskExecutionPidAndFormPid(
+			String executiveTaskExecutionPid, String formPid);
+	
+	@Query("SELECT f FROM FilledForm AS f WHERE f.dynamicDocumentHeader.document.pid = ?1 and f.form.pid = ?2 and f.dynamicDocumentHeader.createdDate between ?3 and ?4")
+	List<FilledForm> findFilledFormsByDocumentAndFormPidAndCreatedDateBetween(String documentPid, String formPid,LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Query("SELECT f FROM FilledForm AS f WHERE f.dynamicDocumentHeader.document.pid = ?1 and f.form.pid = ?2 and f.dynamicDocumentHeader.createdBy.pid = ?3 and f.dynamicDocumentHeader.createdDate between ?4 and ?5")
+	List<FilledForm> findFilledFormsByDocumentAndFormPidAndCreatedByAndCreatedDateBetween(String documentPid, String formPid,String userPid,LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Query(value = "SELECT count(f.id) > 0 FROM tbl_filled_form f cross join tbl_dynamic_document_header dh WHERE f.dynamic_document_header_id = dh.id and dh.pid = ?1 and (f.id IN (select files.filled_form_id from tbl_filled_form_file files where f.id=files.filled_form_id))", nativeQuery = true)
+	boolean existsByHeaderPidIfFiles(String headerPid);
+	
+	// New AccountProfile Creation
+	@Query("select filledForm.filledFormDetails from FilledForm filledForm where filledForm.dynamicDocumentHeader.document.pid = ?1 and filledForm.form.pid = ?2 and filledForm.dynamicDocumentHeader.executiveTaskExecution.pid = ?3")
+	List<FilledFormDetail> findFilledFormDetailsByDocumentAndFormPidAndExecutiveTaskExecution(String documentPid, String formPid,String exePid);
+	
+	@Query("SELECT f.files FROM FilledForm AS f WHERE f.dynamicDocumentHeader.document.pid = ?1")
+	Set<File> findFilesByDynamicDocumentHeaderPid(String dynamicDocumentPid);
+	
+	@Query("SELECT f FROM FilledForm AS f WHERE f.dynamicDocumentHeader.document.pid = ?1 and f.form.pid = ?2 and f.dynamicDocumentHeader.createdBy.pid IN ?3 and f.dynamicDocumentHeader.createdDate between ?4 and ?5")
+	List<FilledForm> findFilledFormsByDocumentAndFormPidAndAndCreatedDateBetween(String documentPid, String formPid,List<String> userPids,LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Query(value = "select ff.pid as formFieldPid,ddh.pid from tbl_filled_form ff,tbl_dynamic_document_header ddh where " + 
+			"ff.dynamic_document_header_id = ddh.id and ddh.pid IN ?1 ",nativeQuery = true)
+	List<Object[]> findFilleFormPidAndDynamicDocumentHeaderPidByCompany(Set<String> dynamicDocHeaderPid);
+}

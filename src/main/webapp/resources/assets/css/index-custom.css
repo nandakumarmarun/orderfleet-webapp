@@ -1,0 +1,61 @@
+/*===================================================================
+Apply the custom style here
+
+color Highlight  =  #098edb
+used fonts = [Code_light.otf], [Hijrnotes], [Josefinsans.ttf]
+
+
+===================================================================*/
+
+
+.navbar-default
+{
+	background: url(../images/index/claud.png) no-repeat white !important;
+	border-color: white !important;
+}
+
+.navbar-collapse ul li a
+{
+	font-size: 19px;
+}
+
+.btn-primary
+{
+	background: none;
+	border: none !important;
+	color: #52c8f4 !important;
+}
+.btn-primary:hover
+{
+	background: none;
+	border: none !important;
+	color: #2671ce !important;
+}
+#first_page
+{
+	margin-top: 90px;
+}
+
+#third_page, #fifth_page
+{
+	background: #efefed;
+}
+.arrow-down
+{
+	margin-top: 37%;
+    float: left;
+    position: absolute;
+    margin-left: 50%;
+}
+@media (max-width: 991px){
+	.arrow-down
+	{
+		margin-top: -6%;
+	}
+}
+@media (max-width: 768px){
+	.arrow-down
+	{
+		margin-top: -11%;
+	}
+}

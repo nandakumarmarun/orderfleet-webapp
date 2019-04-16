@@ -1,0 +1,457 @@
+/**
+ *
+ * Apply Here your Custom CSS
+ *
+*/
+.dataTables_wrapper .dataTables_paginate {
+	border: none !important;
+}
+
+.pagination {
+	margin: 0px 0px 0px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+	padding: 0em 0em !important;
+}
+
+.dataTables_wrapper .dataTables_info {
+	padding-top: 0px !important;
+	font-size: 13px;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+	margin: 0px !important;
+}
+
+/**
+ *
+ * Apply Here your Custom CSS
+ *
+*/
+.icon-user {
+	color: rgba(0, 0, 0, 0.1);
+	position: absolute;
+	right: 5px;
+	bottom: 10px;
+	z-index: 1;
+}
+
+.icon-user i {
+	font-size: 100px;
+	line-height: 0;
+	margin: 0;
+	padding: 0;
+	vertical-align: bottom;
+}
+
+
+
+/* btns */
+.btn-fb
+{
+	background-color: #3B5998;
+    border-color: #3B5998;
+    color: white;
+}
+.btn-fb:hover
+{
+	background-color: rgba(59, 89, 152, 0.94);
+	border-color: rgba(59, 89, 152, 0.94);
+	color: white;
+}
+.table
+{
+	color: rgb(59, 89, 152) !important;
+}
+/* .table th
+{
+	color: #ffffff5989152!important;
+} */
+
+
+
+.border-bottom-green {
+	border-bottom: groove #0DB769 1px;
+}
+
+.table-border-green {
+	/*border: 1px solid #0DB769;*/
+	
+}
+
+.border-bottom-red {
+	border-bottom: groove #CF5947 1px;
+}
+
+.table-border-red {
+	/*border: 1px solid #CF5947;*/
+	
+}
+
+.border-bottom-yellow {
+	border-bottom: groove #FED68A 1px;
+}
+
+.table-border-yellow {
+	/*border: 1px solid #FED68A;*/
+	
+}
+
+.border-table-green td {
+	text-align: justify !important;
+}
+
+/*bg*/
+.alert-green {
+	background-color: #00a65a;
+	border-color: #00a65a;
+	color: White;
+}
+
+.alert-red {
+	background-color: #f56954;
+	border-color: #f56954;
+	color: white;
+}
+
+.alert-yellow {
+	background-color: #f6e73f;
+	border-color: #ffd78a;
+	color: #2b303a;
+}
+
+.min-height-jq {
+	min-height: 152px !important;
+}
+
+/*test*/
+test {
+	text-align: right;
+}
+
+.hide_for_click {
+	max-height: 150px;
+	height: 127px;
+	overflow-y: auto;
+	margin-top: 10px;
+}
+
+/*
+some clases*/
+.a {
+	border: 2px solid black;
+}
+
+.dashboard-first-tile {
+	height: 200px;
+}
+
+.dashboard-second-tiles {
+	min-height: 100px;
+	max-height: 233px;
+}
+
+/*buttons*/
+.btn-variety {
+	background: rgba(138, 138, 138, 0.18);
+	border: 1px solid #EBEBEB;
+	border-radius: 5px;
+}
+
+.btn-variety:hover {
+	background: rgba(138, 138, 138, 0.18);
+	border: 1px solid #ebebeb;
+}
+
+.btn-variety-transparent {
+	background: transparent;
+	border: 1px solid rgba(138, 138, 138, 0.18);
+}
+
+/*border-properties*/
+.no-border {
+	border: transparent !important;
+	border-color: transparent !important;
+	border-bottom: transparent !important;
+	border-radius: 0px solid transparent !important;
+}
+
+.border-top {
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid #ebebeb;
+}
+
+.border-demo {
+	border: 2px solid black;
+}
+
+.width-100 {
+	width: 100%;
+}
+
+/*important*/
+.min-height {
+	min-height: 152px !important;
+}
+
+ul li {
+	list-style: none;
+	margin-top: 10px;
+}
+
+/*external clases*/
+.no-padding {
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+/*media Querieeeeeeeeeees*/
+@media screen and (min-width: 100px) and (max-width: 768px) {
+	.pull-no-xs {
+		float: none !important;
+	}
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1350px) {
+	.detail-btn {
+		width: 29%;
+	}
+}
+
+@media screen and (min-width: 1008px) and (max-width: 1164px) {
+	.dashboard-second-tiles {
+		max-height: 250px;
+	}
+}
+
+@media screen and (min-width: 768px) and (max-width: 784px) {
+	.m-query-768-784 {
+		width: 50% !important;
+	}
+}
+/*@media screen and (min-width: 784px) and (max-width: 900px){
+	.m-query-768-784
+	{
+		width: 33% !important;
+	}
+}*/
+
+/*custom clases*/
+.map-bar {
+	position: static;
+	margin-top: 22px;
+}
+
+.overflow-y {
+	height: 90px;
+	max-height: 90px;
+	overflow-y: auto;
+}
+
+.bg-head {
+	text-align: center;
+	color: #2b303a;
+}
+
+.head-bg-th {
+	background: rgb(224, 224, 225) !important;
+}
+
+.u-name {
+	width: 85%;
+	float: left;
+	/*border-right: medium none;
+	border-radius: 3px 0px 0px 3px;*/
+}
+
+.detail-btn {
+	width: 20%;
+	border-left: medium none;
+	border-radius: 0px 3px 3px 0px;
+}
+
+.width-100 {
+	width: 100%;
+}
+
+.route-details-li {
+	background: rgb(216, 218, 219) none repeat scroll 0% 0%;
+	color: rgb(43, 48, 58);
+	font-weight: bold;
+}
+
+/*font sizes*/
+.f-s-15 {
+	font-size: 15px;
+}
+
+.f-s-18 {
+	font-size: 18px
+}
+
+.f-s-15 {
+	font-size: 15px;
+}
+
+.f-s-15-b {
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.f-s-32 {
+	font-size: 32px;;
+	font-weight: bold;
+}
+
+.f-s-18 {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.f-sz-35 {
+	font-size: 35px !important;
+}
+
+/*color*/
+.color-black {
+	color: black !important;
+}
+
+.color-black-light {
+	color: #5f5e5e !important;
+}
+
+.table-db-activity {
+	color: white !important;
+	font-size: 12px !important;
+	line-height: 1.5;
+	font-weight: bold;
+}
+
+/*paragraph style none*/
+.para-s-none {
+	margin: 0px auto;
+}
+
+/*style of add route expand collapse*/
+#btn-collapse-table {
+	width: 2%;
+	float: left;
+}
+
+.icon-expand-collapse {
+	height: 444px;
+	border-radius: 4px 0 0 4px;
+}
+
+#icon-left-media {
+	margin-top: 200px;
+}
+
+#div_for_hide {
+	border-radius: 0 4px 4px 0;
+	border-left: 0px;
+}
+
+.panel-heading>.panel-options>a {
+	margin-top: 0px;
+}
+
+.form-padding {
+	padding-left: 0px;
+}
+
+/*style of assign route expand collapse*/
+#btn-collapse-table {
+	width: 2%;
+	float: left;
+}
+
+.icon-expand-collapse-asn-rte {
+	height: 371px;
+	border-radius: 4px 0 0 4px;
+}
+
+#icon-left-media-asn-rte {
+	margin-top: 167px;
+}
+
+#div_for_hide {
+	border-radius: 0 4px 4px 0;
+	border-left: 0px;
+}
+
+.panel-heading>.panel-options>a {
+	margin-top: 0px;
+}
+
+.form-padding {
+	padding-left: 0px;
+}
+
+/*styling of tile hover color change*/
+.alert-green:hover {
+	background-color: #0B8E52;
+	border-color: #0B8E52;
+}
+
+.alert-red:hover {
+	background-color: #f4543c;;
+	border-color: #f4543c;;
+}
+
+.alert-yellow:hover {
+	background-color: #E7D726;
+	border-color: #E7D726;
+}
+
+/*style for livetracking expand xollapse*/
+.panel-height {
+	height: 406px;
+}
+
+/*style for nestable table*/
+.tittle-color {
+	color: black !important;
+}
+
+.dealing-products {
+	border: 2px solid #97949A;
+}
+
+.nestable-table-list {
+	background: rgb(249, 249, 249) none repeat scroll 0% 0% !important;
+	font-family: "Helvetica Neue", Helvetica, "Noto Sans",
+		sans-serif !important;
+	color: #949494 !important;
+}
+
+.nestable-table-list span {
+	
+}
+
+.ui-widget-content {
+	border: none !important;
+}
+
+.table-check-box {
+	color: #949494 !important;
+}
+
+.width-of-exicutives {
+	width: 4% !important;
+}
+
+.terittory {
+	background-color: #edeaea;
+	padding: 3% 0 3% 0;
+	font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
+	font-size: 1.1em;
+}
+
+/*this section for data table styles*/
+#table-1_wrapper div:nth-child(2) {
+	overflow-x: scroll;
+}

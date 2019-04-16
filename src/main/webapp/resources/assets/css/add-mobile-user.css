@@ -1,0 +1,109 @@
+.text {
+			display: block;
+			width: 100px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+	
+		/**THE SAME CSS IS USED IN ALL 3 DEMOS**/
+		/**gallery margins**/
+		.zoom {
+			-webkit-transition: all 0.35s ease-in-out;
+			-moz-transition: all 0.35s ease-in-out;
+			transition: all 0.35s ease-in-out;
+		}
+		
+		.zoom:hover, .zoom:active, .zoom:focus {
+			/**adjust scale to desired size, add browser prefixes**/
+			-ms-transform: scale(10);
+			-moz-transform: scale(10);
+			-webkit-transform: scale(10);
+			-o-transform: scale(10);
+			transform: scale(10);
+			position: relative;
+			z-index: 100;
+		}
+		
+		.number-circle {
+			border-radius: 50%;
+			behavior: url(PIE.htc); /* remove if you don't care about IE8 */
+			padding: 5px;
+			background: #fff;
+			border: 1px solid #666;
+			color: #666;
+			text-align: center;
+			font: 14px Arial, sans-serif;
+		}
+		.fah {
+			min-height: 20px;
+			padding: 19px;
+			margin-bottom: 20px;
+			background-color: white;
+			border: 1px solid #e3e3e3;
+			border-radius: 3px;
+			-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+			box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+			color: black;
+		}
+		
+		.inputTextBox {
+			display: block;
+			width: 100%;
+			height: 34px;
+			padding: 6px 12px;
+			font-size: 12px;
+			line-height: 1.42857143;
+			color: #555555;
+			background-color: #fff;
+			background-image: none;
+			border: 1px solid #ebebeb;
+			border-radius: 3px;
+			-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+			box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+			-webkit-transition: border-color ease-in-out .15s, box-shadow
+				ease-in-out .15s;
+			-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out
+				.15s;
+			transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+		}
+		
+		.tabs-left {
+			border-bottom: none;
+			padding-top: 2px;
+			border-right: 1px solid #ddd;
+		}
+		
+		.tabs-left>li {
+			float: none;
+			margin-bottom: 2px;
+			margin-right: -1px;
+		}
+		
+		.tabs-left>li>a {
+			border-radius: 4px 0 0 4px;
+			margin-right: 0;
+			display: block;
+		}
+		
+		.tabs-left>li.active>a, .tabs-left>li.active>a:hover, .tabs-left>li.active>a:focus
+			{
+			border-bottom-color: #ddd;
+			border-right-color: transparent;
+		}
+		
+		#loadingDiv{
+	  		position:absolute;
+	  		top:0px;
+	  		right:0px;
+	  		width:100%;
+	  		height:100%;
+	  		background-color:#363636;
+	  		background-image:url('/resources/assets/images/Spinner.gif');
+	  		background-size: 80px 80px;
+	  		background-repeat:no-repeat;
+	 		background-position:center;
+	  		z-index:10000000;
+	  		opacity: 0.6;
+		}
+		

@@ -1,0 +1,295 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	margin: 0 auto;
+	background-color: #ebebeb;
+	font-family: 'Open Sans', sans-serif;
+}
+
+.navbar {
+	border-radius: 0;
+}
+
+.navbar-default .navbar-brand {
+	color: #FFFFFF;
+	margin-right: 100px;
+	font-weight: bold;
+}
+
+.col-md-12 {
+	margin: 0;
+	padding: 0;
+}
+/*footer
+{
+	width:100%;
+	height:50px;
+	background-color:#28314e;
+}*/
+/*----------------------------Home Page Start----------------------------*/
+.tileview {
+	background-color: #f2f5fa;
+	height: 500px;
+	width: 100%;
+	margin-top: 10px;
+	padding: 20px;
+}
+
+.tileview .btn {
+	width: 100%;
+	padding: 10px 12px;
+	background-color: #2969b0;
+	border: none;
+	color: #FFFFFF;
+	margin-bottom: 40px;
+	font-weight: bold;
+}
+
+.tileview ul li {
+	list-style-type: none;
+	margin: 0 auto;
+}
+
+.tileview ul li span {
+	float: left;
+}
+
+.rightbadge {
+	right: 20px;
+	top: -4px;
+	position: relative;
+}
+
+.leftbadge {
+	left: 20px;
+	top: -4px;
+	position: relative;
+	z-index: 2;
+}
+
+.hiddenbadge {
+	visibility: hidden;
+}
+
+.tileview .green, .tileview .default, .tileview .red {
+	padding: 6px 14px;
+	background-color: #61bc6d;
+	font-size: 13px;
+	border: none;
+	border-radius: 4px;
+	color: #FFFFFF;
+	float: left;
+	margin: 0 5px 10px 5px;
+}
+
+.tileview .default {
+	background-color: #979694;
+}
+
+.tileview .red {
+	background-color: #e14a39;
+}
+
+.redbagde {
+	background-color: #e04938;
+}
+
+.greenbagde {
+	background-color: #61bc6d;
+}
+/*----------------------------Home Page End----------------------------*/
+
+/*----------------------------Add User Page Start----------------------------*/
+#addRoute .rightside {
+	padding-top: 50px;
+}
+
+#addRoute .leftside .btn {
+	width: 100%;
+	padding: 10px 12px;
+	background-color: #e14a39;
+	border: none;
+	color: #FFFFFF;
+	margin-bottom: 40px;
+	font-weight: bold;
+}
+
+#addRoute .leftside .btn:last-child {
+	width: 60%;
+	background-color: #00a885;
+	margin-top: 40px;
+}
+/*----------------------------Add User Page End----------------------------*/
+
+/*----------------------------Assign Route Page Start----------------------------*/
+#assignRoute .rightside {
+	padding-top: 50px;
+}
+
+#assignRoute .leftside .btn {
+	width: 100%;
+	padding: 10px 12px;
+	background-color: #e86419;
+	border: none;
+	color: #FFFFFF;
+	margin-bottom: 40px;
+	font-weight: bold;
+}
+
+#assignRoute .leftside .btn:last-child {
+	width: 60%;
+	background-color: #553983;
+	margin-top: 40px;
+}
+/*----------------------------Assign Route Page End----------------------------*/
+
+/*----------------------------Drive User Page Start----------------------------*/
+#driveUser iframe {
+	margin-top: 20px;
+}
+
+#driveUser .leftside .btn {
+	width: 100%;
+	padding: 10px 12px;
+	background-color: #2969b0;
+	border: none;
+	color: #FFFFFF;
+	margin-bottom: 40px;
+	font-weight: bold;
+}
+
+#driveUser .leftside ul li {
+	list-style-type: none;
+	margin: 0 auto;
+	padding: 3px 0 3px 6px;
+}
+
+#driveUser .leftside ul li span {
+	float: left;
+}
+
+.col-xs-9 {
+	padding: 0;
+	margin: 0;
+}
+
+.green, .default, .red {
+	/*	width:60%;*/
+	padding: 6px 14px;
+	background-color: #61bc6d;
+	font-size: 13px;
+	border: none;
+	border-radius: 4px;
+	color: #FFFFFF;
+	float: left;
+	margin: 5px;
+}
+
+.default {
+	background-color: #979694;
+}
+
+.red {
+	background-color: #e14a39;
+}
+
+#driveUser .rightside .btn {
+	background-color: #553983;
+	color: #FFF;
+	padding: 10px 18px;
+	margin-left: 10px;
+}
+
+#driveUser .rightside span {
+	padding: 10px 0 10px 0;
+}
+/*----------------------------Drive User Page End----------------------------*/
+#newForm .btn {
+	background-color: #553983;
+	color: #FFF;
+	margin-bottom: 20px;
+}
+
+.modal-body {
+	padding: 10px;
+}
+
+.routereport {
+	width: 220px;
+	height: auto;
+	color: #000000;
+	background-color: #f6f6f6;
+	position: relative;
+}
+
+.routereport h4 {
+	background: #553983;
+	padding: 10px;
+	color: #FFFFFF;
+	margin: 0;
+	text-align: center;
+}
+
+.routereport ul li {
+	list-style-type: none;
+	background-color: #FFFFFF;
+	margin: 12px;
+	padding: 5px !important;
+	text-align: left;
+	line-height: 18px;
+}
+
+.routereport ul li span {
+	font-weight: bold;
+	color: #686868;
+}
+
+.routereport ul li img, .routereport ul li i {
+	float: right;
+	width: 30px;
+	height: 30px;
+	padding: 7px 5px 5px;
+}
+
+.fa-caret-right {
+	color: red;
+	font-size: 23px;
+}
+
+.fa-caret-left {
+	color: #00FF15;
+	font-size: 23px;
+}
+
+.leftside ul li.active {
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+.clear {
+	clear: both;
+}
+
+.idle {
+	position: relative;
+}
+
+.idle:before {
+	content: "\f192";
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	text-decoration: inherit;
+	color: #FFCC00;
+	font-size: 18px;
+	padding-right: 0.5em;
+	position: absolute;
+	top: 10px;
+	left: 0;
+}
+.btnfa{
+	background-color: none;
+	border : none;
+}

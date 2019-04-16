@@ -1,0 +1,121 @@
+# ===================================================================
+# Spring Boot configuration for the "prod" profile.
+#
+# This configuration overrides the application.yml file.
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+
+spring:
+    devtools:
+        restart:
+            enabled: false
+        livereload:
+            enabled: false
+    datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:postgresql://localhost:5432/awsnrich
+        name:
+        username: postgres
+        password: pass@sales
+        hikari:
+            data-source-properties:
+                cachePrepStmts: true
+                prepStmtCacheSize: 250
+                prepStmtCacheSqlLimit: 2048
+                useServerPrepStmts: true
+    jpa:
+        database-platform: com.orderfleet.webapp.domain.util.FixedPostgreSQL82Dialect
+        database: POSTGRESQL
+        show-sql: false
+        properties:
+            hibernate.default_schema: public
+            hibernate.id.new_generator_mappings: true
+            hibernate.cache.use_second_level_cache: true
+            hibernate.cache.use_query_cache: false
+            hibernate.generate_statistics: false
+            hibernate.cache.region.factory_class: com.orderfleet.webapp.config.jcache.NoDefaultJCacheRegionFactory
+            #Batch
+            hibernate.jdbc.batch_size: 100
+            hibernate.order_inserts: true
+            hibernate.order_updates: true
+            hibernate.jdbc.batch_versioned_data: true
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: aitrichtech@gmail.com
+        password: password@aitrich
+        protocol: smtp
+        tls: true
+        properties.mail.smtp:
+            auth: true
+            starttls.enable: true
+            ssl.trust: smtp.gmail.com
+    thymeleaf:
+        cache: true
+
+server:
+    port: 80
+    compression:
+        enabled: true
+        mime-types: text/html,text/xml,text/plain,text/css, application/javascript, application/json
+        min-response-size: 1024
+
+# ===================================================================
+# Orderfleet specific properties
+# ===================================================================
+
+orderfleet:
+    http:
+        version: V_1_1 # To use HTTP/2 you will need SSL support (see above the "server.ssl" configuration)
+        cache: # Used by the CachingHttpHeadersFilter
+            timeToLiveInDays: 1461
+    cache: # Cache configuration
+        ehcache: # Ehcache configuration
+            time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
+            max-entries: 1000 # Number of objects in each cache entry
+    security:
+        rememberMe:
+            key: 5c37379956bd1242f5636c8cb322c2966ad81277
+        authentication:
+            jwt:
+                secret: 042e7d536354d3cdfab490925c55022efcb42bae
+                # Token is valid 24 hours
+                token-validity-in-seconds: 2592000
+                token-validity-in-seconds-for-remember-me: 2592000
+    mail: # specific Orderfleet mail property, for standard properties see MailProperties
+        from: orderfleetweb@localhost
+        baseUrl: http://my-server-url-to-change # Modify according to your server's URL
+    metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
+        jmx.enabled: true
+        graphite:
+            enabled: false
+            host: localhost
+            port: 2003
+            prefix: orderfleetweb
+        prometheus:
+            enabled: false
+            endpoint: /prometheusMetrics
+        logs: # Reports Dropwizard metrics in the logs
+            enabled: false
+            reportFrequency: 60 # in seconds
+    logging:
+        logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
+            enabled: false
+            host: localhost
+            port: 5000
+            queueSize: 512
+            
+# ===================================================================
+# Application specific properties
+# Add your own application properties here, see the ApplicationProperties class
+# to have type-safe configuration, like in the OrderfleetProperties above
+# ===================================================================
+
+application:
+  logoPath: resources/assets/images/logo.png
