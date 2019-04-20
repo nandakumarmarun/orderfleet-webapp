@@ -76,6 +76,7 @@ public class FormElementServiceImpl implements FormElementService {
 		formElementDTO.setPid(FormElementService.PID_PREFIX + RandomUtil.generatePid());
 		FormElement formElement = formElementMapper.formElementDTOToFormElement(formElementDTO);
 		// set company
+		System.out.println(formElement.getFormLoadFromMobile() + "+++++++++++++" + formElement.getFormLoadMobileData());
 		formElement.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		formElement = formElementRepository.save(formElement);
 		FormElementDTO result = formElementMapper.formElementToFormElementDTO(formElement);
@@ -112,6 +113,8 @@ public class FormElementServiceImpl implements FormElementService {
 				formElementValue.setFormElement(formElement);
 				newFormElementValues.add(formElementValue);
 			}
+			formElement.setFormLoadFromMobile(formElementDTO.getFormLoadFromMobile());
+			formElement.setFormLoadMobileData(formElementDTO.getFormLoadMobileData());
 			formElement.setFormElementValues(newFormElementValues);
 			formElement = formElementRepository.save(formElement);
 			formElementValueRepository.deleteByFormElementIdIsNull();

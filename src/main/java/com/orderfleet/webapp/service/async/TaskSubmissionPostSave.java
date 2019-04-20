@@ -77,7 +77,6 @@ import com.orderfleet.webapp.geolocation.model.TowerLocation;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
-import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentApprovalLevelRepository;
 import com.orderfleet.webapp.repository.DocumentApprovalRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
@@ -101,7 +100,6 @@ import com.orderfleet.webapp.repository.UserDeviceRepository;
 import com.orderfleet.webapp.repository.UserTaskAssignmentRepository;
 import com.orderfleet.webapp.repository.UserTaskExecutionLogRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.DashboardItemService;
 import com.orderfleet.webapp.service.DocumentApprovalService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
@@ -241,9 +239,6 @@ public class TaskSubmissionPostSave {
 
 	@Inject
 	private GeoLocationService geoLocationService;
-
-	@Inject
-	private CompanyRepository companyRepository;
 
 	private FirebaseRequest firebaseRequest;
 	private List<UserDevice> userDevices;
@@ -974,12 +969,13 @@ public class TaskSubmissionPostSave {
 
 					}
 				} else if (document.getDocumentType().equals(DocumentType.ACCOUNTING_VOUCHER)) {
-					// company configuration for stage change of accounting vouchers
 
 					long companyId = SecurityUtils.getCurrentUsersCompanyId();
 					Optional<CompanyConfiguration> optStageChangeAccountingVoucher = companyConfigurationRepository
 							.findByCompanyIdAndName(companyId, CompanyConfig.STAGE_CHANGES_FOR_ACCOUNTING_VOUCHER);
+					// company configuration for stage change of accounting vouchers
 					if (optStageChangeAccountingVoucher.isPresent()) {
+
 						if (Boolean.valueOf(optStageChangeAccountingVoucher.get().getValue())) {
 							if (taskSetting.getScript().indexOf("customerJourneyStage") != -1 ? Boolean.TRUE
 									: Boolean.FALSE) {

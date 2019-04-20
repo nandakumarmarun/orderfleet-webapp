@@ -61,9 +61,9 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setHasPostDatedVoucherEnabled(mobileConfigurationDTO.getHasPostDatedVoucher());
 		configuration.setPromptVehicleMaster(mobileConfigurationDTO.getPromptVehicleMaster());
 		configuration.setAddNewCustomer(mobileConfigurationDTO.getAddNewCustomer());
-		configuration.setRefreshProductProductGroup(mobileConfigurationDTO.getRefreshProductProductGroup());
+		configuration.setPreventNegativeStock(mobileConfigurationDTO.getPreventNegativeStock());
 		configuration.setVoucherNumberGenerationType(mobileConfigurationDTO.getVoucherNumberGenerationType());
-		
+
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -89,9 +89,9 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setHasPostDatedVoucherEnabled(mobileConfigurationDTO.getHasPostDatedVoucher());
 			configuration.setPromptVehicleMaster(mobileConfigurationDTO.getPromptVehicleMaster());
 			configuration.setAddNewCustomer(mobileConfigurationDTO.getAddNewCustomer());
-			configuration.setRefreshProductProductGroup(mobileConfigurationDTO.getRefreshProductProductGroup());
+			configuration.setPreventNegativeStock(mobileConfigurationDTO.getPreventNegativeStock());
 			configuration.setVoucherNumberGenerationType(mobileConfigurationDTO.getVoucherNumberGenerationType());
-			
+
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

@@ -54,7 +54,7 @@ public class MobileSettingsDTO {
 
 	private boolean addNewCustomer;
 
-	private boolean refreshProductProductGroup;
+	private boolean preventNegativeStock;
 
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 
@@ -80,7 +80,7 @@ public class MobileSettingsDTO {
 		this.hasPostDatedVoucher = mobileConfigurationDTO.getHasPostDatedVoucher();
 		this.promptVehicleMaster = mobileConfigurationDTO.getPromptVehicleMaster();
 		this.addNewCustomer = mobileConfigurationDTO.getAddNewCustomer();
-		this.refreshProductProductGroup = mobileConfigurationDTO.getRefreshProductProductGroup();
+		this.preventNegativeStock = mobileConfigurationDTO.getPreventNegativeStock();
 		this.voucherNumberGenerationType = mobileConfigurationDTO.getVoucherNumberGenerationType();
 	}
 
@@ -243,13 +243,13 @@ public class MobileSettingsDTO {
 	public void setAddNewCustomer(boolean addNewCustomer) {
 		this.addNewCustomer = addNewCustomer;
 	}
-	
-	public boolean isRefreshProductProductGroup() {
-		return refreshProductProductGroup;
+
+	public boolean getPreventNegativeStock() {
+		return preventNegativeStock;
 	}
 
-	public void setRefreshProductProductGroup(boolean refreshProductProductGroup) {
-		this.refreshProductProductGroup = refreshProductProductGroup;
+	public void setPreventNegativeStock(boolean preventNegativeStock) {
+		this.preventNegativeStock = preventNegativeStock;
 	}
 
 	public VoucherNumberGenerationType getVoucherNumberGenerationType() {

@@ -53,7 +53,7 @@
 						<th>Has Post Dated Voucher</th>
 						<th>Prompt Vehicle</th>
 						<th>Add Customer</th>
-						<th>Refresh Product ProductGroup Association</th>
+						<th>Prevent Negative Stock</th>
 						<th>Vch.No Generation Type
 						<th>Action</th>
 					</tr>
@@ -79,7 +79,7 @@
 							<td>${mobileConfiguration.hasPostDatedVoucher}</td>
 							<td>${mobileConfiguration.promptVehicleMaster}</td>
 							<td>${mobileConfiguration.addNewCustomer}</td>
-							<td>${mobileConfiguration.refreshProductProductGroup}</td>
+							<td>${mobileConfiguration.preventNegativeStock}</td>
 							<td>${mobileConfiguration.voucherNumberGenerationType}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
@@ -248,9 +248,9 @@
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Refresh Product-ProductGroup</label>
-														 <input id="refreshProductProductGroup"
-														name='refreshProductProductGroup' type='checkbox'
+													<label class="control-label">Prevent Negative Stock</label>
+														 <input id="preventNegativeStock"
+														name='preventNegativeStock' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

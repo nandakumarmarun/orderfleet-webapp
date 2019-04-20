@@ -1,5 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.enums.LoadMobileData;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.service.EmployeeProfileService;
@@ -34,13 +37,13 @@ public class InventoryResource {
 	private final Logger log = LoggerFactory.getLogger(InventoryResource.class);
 
 	private EmployeeProfileService employeeProfileService;
-	
+
 	private UserActivityService userActivityService;
-	
+
 	private AccountProfileRepository accountProfileRepository;
-	
+
 	private DocumentRepository documentRepository;
-	
+
 	@Inject
 	public InventoryResource(EmployeeProfileService employeeProfileService, UserActivityService userActivityService,
 			AccountProfileRepository accountProfileRepository, DocumentRepository documentRepository) {
@@ -64,22 +67,21 @@ public class InventoryResource {
 		model.addAttribute("documents", documentRepository.findAllByCompanyId());
 		return "company/inventory";
 	}
-	
-	 /**
-     * GET  /activities-by-employee/:employeePid : get activity of an employee.
-     *
-     * @param employeePid the id of the employee 
-     * @return the ResponseEntity with status 200 (OK) and the list of activities in body
-     */
-    @RequestMapping(value = "/activities-by-employee/{employeePid}",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @Timed
-    public List<ActivityDTO> getActivityByEmployee(@PathVariable String employeePid) {
-    	log.debug("Web request to get Activity by employeePid : {}", employeePid);
-        return userActivityService.findActivitiesByUserPid(employeePid);
-    }
 
+	/**
+	 * GET /activities-by-employee/:employeePid : get activity of an employee.
+	 *
+	 * @param employeePid
+	 *            the id of the employee
+	 * @return the ResponseEntity with status 200 (OK) and the list of activities in
+	 *         body
+	 */
+	@RequestMapping(value = "/activities-by-employee/{employeePid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	@Timed
+	public List<ActivityDTO> getActivityByEmployee(@PathVariable String employeePid) {
+		log.debug("Web request to get Activity by employeePid : {}", employeePid);
+		return userActivityService.findActivitiesByUserPid(employeePid);
+	}
 
 }

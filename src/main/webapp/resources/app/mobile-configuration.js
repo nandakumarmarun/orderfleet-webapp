@@ -28,7 +28,7 @@ if (!this.MobileConfiguration) {
 		hasPostDatedVoucher : false,
 		promptVehicleMaster : false,
 		addNewCustomer : true,
-		refreshProductProductGroup : false,
+		preventNegativeStock : false,
 		voucherNumberGenerationType : 'TYPE_1'
 	};
 
@@ -91,7 +91,7 @@ if (!this.MobileConfiguration) {
 		mobileConfigurationDTO.hasPostDatedVoucher = $("#hasPostDatedVoucher").is(":checked");
 		mobileConfigurationDTO.promptVehicleMaster = $("#promptVehicleMaster").is(":checked");
 		mobileConfigurationDTO.addNewCustomer = $("#addNewCustomer").is(":checked");
-		mobileConfigurationDTO.refreshProductProductGroup = $("#refreshProductProductGroup").is(":checked");
+		mobileConfigurationDTO.preventNegativeStock = $("#preventNegativeStock").is(":checked");
 		mobileConfigurationDTO.voucherNumberGenerationType = $("#voucherNumberGenerationType").val();
 		
 		
@@ -146,7 +146,7 @@ if (!this.MobileConfiguration) {
 					$('#hasPostDatedVoucher').prop("checked",data.hasPostDatedVoucher);
 					$('#promptVehicleMaster').prop("checked",data.promptVehicleMaster);
 					$('#addNewCustomer').prop("checked",data.addNewCustomer);
-					$('#refreshProductProductGroup').prop("checked",data.refreshProductProductGroup);
+					$('#preventNegativeStock').prop("checked",data.preventNegativeStock);
 					$('#voucherNumberGenerationType').val(data.voucherNumberGenerationType);
 				}
 				

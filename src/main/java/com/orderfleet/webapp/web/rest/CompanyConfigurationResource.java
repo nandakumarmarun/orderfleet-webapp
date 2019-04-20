@@ -114,6 +114,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String interimSave, @RequestParam String refreshProductGroupProduct,
 			@RequestParam String stageChangeAccountingVoucher) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
+		System.out.println(stageChangeAccountingVoucher);
 		Company company = null;
 		Optional<Company> optionalCompany = companyRepository.findOneByPid(companyPid);
 		if (optionalCompany.isPresent()) {
@@ -180,7 +181,6 @@ public class CompanyConfigurationResource {
 			refreshProductGroupProductCompany.setName(CompanyConfig.REFRESH_PRODUCT_GROUP_PRODUCT);
 			refreshProductGroupProductCompany.setValue(refreshProductGroupProduct);
 		}
-		companyConfigurationRepository.save(refreshProductGroupProductCompany);
 
 		if (optStageChangeAccountingVoucher.isPresent()) {
 			stageChangeAccountingVoucherCompany = optStageChangeAccountingVoucher.get();
@@ -236,7 +236,6 @@ public class CompanyConfigurationResource {
 			companyConfigurationDTO
 					.setStageChangeAccountingVoucher(Boolean.valueOf(optStageChangeAccountingVoucher.get().getValue()));
 		}
-
 		return companyConfigurationDTO;
 	}
 

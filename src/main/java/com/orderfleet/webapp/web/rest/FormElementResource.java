@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.FormElementMasterType;
+import com.orderfleet.webapp.domain.enums.LoadMobileData;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.FormElementMasterRepository;
@@ -83,9 +85,9 @@ public class FormElementResource {
 	 *
 	 * @param formElementDTO
 	 *            the formElementDTO to create
-	 * @return the ResponseEntity with status 201 (Created) and with body the
-	 *         new formElementDTO, or with status 400 (Bad Request) if the
-	 *         formElement has already an ID
+	 * @return the ResponseEntity with status 201 (Created) and with body the new
+	 *         formElementDTO, or with status 400 (Bad Request) if the formElement
+	 *         has already an ID
 	 * @throws URISyntaxException
 	 *             if the Location URI syntax is incorrect
 	 */
@@ -95,6 +97,9 @@ public class FormElementResource {
 	public ResponseEntity<FormElementDTO> createFormElement(@Valid @RequestBody FormElementDTO formElementDTO)
 			throws URISyntaxException {
 		log.debug("Web request to save FormElement : {}", formElementDTO);
+
+		System.out.println(
+				formElementDTO.getFormLoadFromMobile() + "----------------" + formElementDTO.getFormLoadMobileData());
 		if (formElementDTO.getPid() != null) {
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("formElement", "idexists",
 					"A new formElement cannot already have an ID")).body(null);
@@ -127,6 +132,8 @@ public class FormElementResource {
 	public ResponseEntity<FormElementDTO> updateFormElement(@Valid @RequestBody FormElementDTO formElementDTO)
 			throws URISyntaxException {
 		log.debug("Web request to update FormElement : {}", formElementDTO);
+		System.out.println(
+				formElementDTO.getFormLoadFromMobile() + "************" + formElementDTO.getFormLoadMobileData());
 		if (formElementDTO.getPid() == null) {
 			return ResponseEntity.badRequest()
 					.headers(HeaderUtil.createFailureAlert("formElement", "idNotexists", "FormElement must have an ID"))
@@ -154,8 +161,8 @@ public class FormElementResource {
 	 *
 	 * @param pageable
 	 *            the pagination information
-	 * @return the ResponseEntity with status 200 (OK) and the list of
-	 *         formElements in body
+	 * @return the ResponseEntity with status 200 (OK) and the list of formElements
+	 *         in body
 	 * @throws URISyntaxException
 	 *             if there is an error to generate the pagination HTTP headers
 	 */
@@ -165,8 +172,10 @@ public class FormElementResource {
 	public String getAllFormElements(Pageable pageable, Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of FormElements");
 		List<FormElementDTO> formElements = formElementService.findAllByCompanyAndDeactivatedFormElement(true);
+
 		model.addAttribute("formElements", formElements);
 		model.addAttribute("formElementTypes", formElementTypeRepository.findAll());
+		model.addAttribute("loadMobileDataList", LoadMobileData.values());
 		model.addAttribute("deactivatedFormElements",
 				formElementService.findAllByCompanyAndDeactivatedFormElement(false));
 		return "company/formElements";
@@ -285,8 +294,8 @@ public class FormElementResource {
 	 * @author Fahad
 	 * @since Feb 15, 2017
 	 * 
-	 *        Activate STATUS /formElements/activateFormElement : activate
-	 *        status of FormElement.
+	 *        Activate STATUS /formElements/activateFormElement : activate status of
+	 *        FormElement.
 	 * 
 	 * @param formelements
 	 * @return the ResponseEntity with status 200 (OK)

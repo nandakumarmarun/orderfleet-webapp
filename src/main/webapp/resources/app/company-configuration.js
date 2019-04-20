@@ -37,8 +37,10 @@ if (!this.CompanyConfiguration) {
 		var distanceTraveled = $("#distanceTraveled").is(":checked");
 		var locationVariance = $("#locationVariance").is(":checked");
 		var interimSave = $("#interimSave").is(":checked");
-		var refreshProductGroupProduct = $("#refreshProductGroupProduct").is(":checked");
-		var stageChangeAccountingVoucher = $("#stageChangeAccountingVoucher").is(":checked");
+		var refreshProductGroupProduct = $("#refreshProductGroupProduct").is(
+				":checked");
+		var stageChangeAccountingVoucher = $('#stageChangeAccountingVoucher')
+				.is(":checked");
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -46,9 +48,9 @@ if (!this.CompanyConfiguration) {
 				companyPid : $("#dbCompany").val(),
 				distanceTraveled : distanceTraveled,
 				locationVariance : locationVariance,
-				interimSave:interimSave,
-				refreshProductGroupProduct:refreshProductGroupProduct,
-				stageChangeAccountingVoucher:stageChangeAccountingVoucher
+				interimSave : interimSave,
+				refreshProductGroupProduct : refreshProductGroupProduct,
+				stageChangeAccountingVoucher : stageChangeAccountingVoucher
 			},
 			success : function(data) {
 				onSaveSuccess(data);
@@ -65,11 +67,13 @@ if (!this.CompanyConfiguration) {
 			url : contextPath + "/" + $("#dbCompany").val(),
 			method : 'GET',
 			success : function(data) {
-					$('#distanceTraveled').prop("checked", data.distanceTraveled);
-					$('#locationVariance').prop("checked", data.locationVariance);
-					$('#interimSave').prop("checked", data.interimSave);
-					$('#refreshProductGroupProduct').prop("checked", data.refreshProductGroupProduct);
-					$('#stageChangeAccountingVoucher').prop("checked", data.stageChangeAccountingVoucher);
+				$('#distanceTraveled').prop("checked", data.distanceTraveled);
+				$('#locationVariance').prop("checked", data.locationVariance);
+				$('#interimSave').prop("checked", data.interimSave);
+				$('#refreshProductGroupProduct').prop("checked",
+						data.refreshProductGroupProduct);
+				$("#stageChangeAccountingVoucher").prop("checked",
+						data.stageChangeAccountingVoucher);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);

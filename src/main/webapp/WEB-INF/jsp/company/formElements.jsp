@@ -135,6 +135,19 @@
 											Options</button>
 									</div>
 									<div class="form-group">
+										<label class="control-label">Load From Mobile</label> <input
+											id="loadFromMobile" name='loadFromMobile'
+											type='checkbox' class="form-control" />
+									</div>
+									<div class="form-group">
+										<label class="control-label" for="field_type">Load Mobile Data</label> <select
+											id="loadMobileData" name="loadMobileData" class="form-control">
+											<c:forEach items="${loadMobileDataList}" var="loadMobileData">
+												<option value="${loadMobileData}">${loadMobileData}</option>
+											</c:forEach>
+										</select>
+									</div>
+									<div class="form-group">
 										<label class="control-label" for="field_name">Options</label>
 										<br> <input type="text" class="form-control"
 											id="field_option" maxlength="400" placeholder="Option"

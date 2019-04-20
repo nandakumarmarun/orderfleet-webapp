@@ -69,7 +69,7 @@ public class CompanyConfigDTO {
 		this.refreshProductGroupProduct = refreshProductGroupProduct;
 	}
 
-	public boolean isStageChangeAccountingVoucher() {
+	public boolean getStageChangeAccountingVoucher() {
 		return stageChangeAccountingVoucher;
 	}
 

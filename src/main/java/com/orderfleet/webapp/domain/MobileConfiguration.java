@@ -90,8 +90,8 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "add_new_customer", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
 	private boolean addNewCustomer;
 
-	@Column(name = "refresh_product_product_group", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
-	private boolean refreshProductProductGroup;//delete all product group before insert
+	@Column(name = "prevent_negative_stock", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean preventNegativeStock;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -258,12 +258,12 @@ public class MobileConfiguration implements Serializable {
 		this.addNewCustomer = addNewCustomer;
 	}
 
-	public boolean getRefreshProductProductGroup() {
-		return refreshProductProductGroup;
+	public boolean getPreventNegativeStock() {
+		return preventNegativeStock;
 	}
 
-	public void setRefreshProductProductGroup(boolean refreshProductProductGroup) {
-		this.refreshProductProductGroup = refreshProductProductGroup;
+	public void setPreventNegativeStock(boolean preventNegativeStock) {
+		this.preventNegativeStock = preventNegativeStock;
 	}
 
 	public VoucherNumberGenerationType getVoucherNumberGenerationType() {

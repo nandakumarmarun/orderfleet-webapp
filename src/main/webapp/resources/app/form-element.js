@@ -13,7 +13,9 @@ if (!this.FormElement) {
 		pid : null,
 		name : null,
 		formElementTypeId : null,
-		formElementValues : []
+		formElementValues : [],
+		formLoadFromMobile : false,
+		formLoadMobileData : null
 
 	};
 
@@ -195,6 +197,9 @@ if (!this.FormElement) {
 		formElementModel.name = $('#field_name').val();
 		formElementModel.formElementTypeId = $('#field_type').val();
 		formElementModel.formElementValues = [];
+		formElementModel.formLoadFromMobile=$("#loadFromMobile").is(":checked");
+		formElementModel.formLoadMobileData= $('#loadMobileData').val();
+		console.log(formElementModel);
 		$('#tblOptions tr td:first-child').each(function() {
 			var optionObj = {};
 			optionObj["id"] = null;
@@ -251,6 +256,8 @@ if (!this.FormElement) {
 			success : function(data) {
 				$('#field_name').val(data.name);
 				$('#field_type').val(data.formElementTypeId);
+				$('#loadFromMobile').prop("checked",data.formLoadFromMobile);
+				$('#loadMobileData').val(data.formLoadMobileData);
 				if (data.formElementTypeName == "dropdown"
 						|| data.formElementTypeName == "checkBox") {
 					$('#divMasterTable').show();

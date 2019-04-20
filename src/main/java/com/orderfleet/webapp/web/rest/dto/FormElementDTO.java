@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.orderfleet.webapp.domain.FormElement;
+import com.orderfleet.webapp.domain.enums.LoadMobileData;
 
 /**
  * A DTO for the FormElement entity.
@@ -35,6 +36,10 @@ public class FormElementDTO {
 
 	private LocalDateTime lastModifiedDate;
 
+	private boolean formLoadFromMobile;
+
+	private LoadMobileData formLoadMobileData;
+
 	public FormElementDTO() {
 		super();
 	}
@@ -46,6 +51,8 @@ public class FormElementDTO {
 		this.formElementTypeName = formElement.getFormElementType().getName();
 		this.defaultValue = formElement.getDefaultValue();
 		this.lastModifiedDate = formElement.getLastModifiedDate();
+		this.formLoadFromMobile = formElement.getFormLoadFromMobile();
+		this.formLoadMobileData = formElement.getFormLoadMobileData();
 	}
 
 	public FormElementDTO(String pid, String name) {
@@ -115,6 +122,22 @@ public class FormElementDTO {
 
 	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public boolean getFormLoadFromMobile() {
+		return formLoadFromMobile;
+	}
+
+	public void setFormLoadFromMobile(boolean formLoadFromMobile) {
+		this.formLoadFromMobile = formLoadFromMobile;
+	}
+
+	public LoadMobileData getFormLoadMobileData() {
+		return formLoadMobileData;
+	}
+
+	public void setFormLoadMobileData(LoadMobileData formLoadMobileData) {
+		this.formLoadMobileData = formLoadMobileData;
 	}
 
 	@Override

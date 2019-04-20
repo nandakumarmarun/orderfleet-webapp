@@ -7,6 +7,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.orderfleet.webapp.domain.enums.LoadMobileData;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -53,6 +55,14 @@ public class FormElement implements Serializable, Cloneable {
 	@JoinColumn(name = "form_element_id")
 	@OrderBy("id")
 	private Set<FormElementValue> formElementValues;
+
+	@Column(name = "load_from_mobile", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean formLoadFromMobile;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "load_mobile_data", nullable = false, columnDefinition = "character varying DEFAULT 'DEFAULT'")
+	private LoadMobileData formLoadMobileData = LoadMobileData.DEFAULT;
 
 	@NotNull
 	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
@@ -146,11 +156,29 @@ public class FormElement implements Serializable, Cloneable {
 		return lastModifiedDate;
 	}
 
+	public boolean getFormLoadFromMobile() {
+		return formLoadFromMobile;
+	}
+
+	public void setFormLoadFromMobile(boolean formLoadFromMobile) {
+		this.formLoadFromMobile = formLoadFromMobile;
+	}
+
+	public LoadMobileData getFormLoadMobileData() {
+		return formLoadMobileData;
+	}
+
+	public void setFormLoadMobileData(LoadMobileData formLoadMobileData) {
+		this.formLoadMobileData = formLoadMobileData;
+	}
+
 	@Override
 	public String toString() {
 		return "FormElement [id=" + id + ", pid=" + pid + ", name=" + name + ", formElementType=" + formElementType
-				+ ", company=" + company + ", formElementValues=" + formElementValues + ", activated=" + activated
-				+ "]";
+				+ ", company=" + company + ", formElementValues=" + formElementValues + ", formLoadFromMobile="
+				+ formLoadFromMobile + ", formLoadMobileData=" + formLoadMobileData + ", activated=" + activated
+				+ ", defaultValue=" + defaultValue + ", createdDate=" + createdDate + ", lastModifiedDate="
+				+ lastModifiedDate + "]";
 	}
 
 	@Override
