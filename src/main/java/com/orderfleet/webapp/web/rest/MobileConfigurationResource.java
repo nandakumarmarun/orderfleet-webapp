@@ -102,7 +102,7 @@ public class MobileConfigurationResource {
 	@Transactional
 	@RequestMapping(value = "/mobile-configuration/delete/{pid}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> deleteMobileConfiguration(@PathVariable String pid) throws URISyntaxException {
-		log.debug("Web request to delete Mobile Configuration compantPid : {}", pid);
+		log.debug("Web request to delete Mobile Configuration By compantPid : {}", pid);
 		mobileConfigurationService.deleteByPid(pid);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("mobileConfiguration", pid.toString()))
 				.build();

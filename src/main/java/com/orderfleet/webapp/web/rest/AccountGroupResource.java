@@ -107,7 +107,7 @@ public class AccountGroupResource {
 	@Timed
 	public ResponseEntity<AccountGroupDTO> updateAccountGroup(@Valid @RequestBody AccountGroupDTO accountGroupDTO)
 			throws URISyntaxException {
-		log.debug("Web request to update AccountGroup : {}", accountGroupDTO);
+		log.debug("Web request to update AccountGroups : {}", accountGroupDTO);
 		if (accountGroupDTO.getPid() == null) {
 			return ResponseEntity.badRequest().headers(
 					HeaderUtil.createFailureAlert("accountGroup", "idNotexists", "AccountGroup must have an ID"))
