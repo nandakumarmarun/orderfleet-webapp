@@ -93,6 +93,25 @@ if (!this.OpeningStock) {
 		
 	});
 	
+	$('#btnDownload')
+	.on(
+			'click',
+			function() {
+				var tblOpeningStocks = $("#tblOpeningStocks tbody");
+				if (tblOpeningStocks
+						.children().length == 0) {
+					alert("no values available");
+					return;
+				}
+				if (tblOpeningStocks[0].textContent == "No data available") {
+					alert("no values available");
+					return;
+				}
+
+				downloadXls();
+				$("#tblOpeningStocks th:last-child, #tblOpeningStocks td:last-child").show();
+			});
+	
 	function searchTable(inputVal) {
 		var table = $('#tbodyOpeningStocks');
 		table.find('tr').each(function(index, row) {
@@ -114,6 +133,35 @@ if (!this.OpeningStock) {
 					$(row).hide();
 			}
 		});
+	}
+	
+	function downloadXls() {
+		
+		window.location.href = openingStockContextPath
+		+ "/download-openingStock-xls";
+		
+		
+//		// Avoid last column in each row
+//		$("#tblProductProfile th:last-child, #tblProductProfile td:last-child").hide();
+//		var excelName = "productProfile";
+//		 var table2excel = new Table2Excel();
+//		     table2excel.export(document.getElementById('tblProductProfile'),excelName);
+//		     $("#tblProductProfile th:last-child, #tblProductProfile td:last-child").show();
+	}
+	
+	OpeningStock.checkboxChange = function(e) {
+		if (e.checked) {
+			$('#tbodyOpeningStocks').find(
+					'tr:visible td input[type="checkbox"]').each(function() {
+				$(this).prop('checked', true);
+			});
+		} else {
+			$('#tbodyOpeningStocks').find(
+					'tr:visible td input[type="checkbox"]').each(function() {
+				$(this).prop('checked', false);
+			});
+		}
+
 	}
 
 	function activateAssignedOpeningStock() {

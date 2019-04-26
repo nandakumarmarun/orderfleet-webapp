@@ -37,21 +37,30 @@
 						OpeningStock</button>
 				</div>
 			</div>
+			<br> <br>
+			<div class="row col-xs-12">
+				<div class="pull-right">
+					<button type="button" class="btn btn-orange" id="btnDownload"
+						title="download xlsx">
+						<i class="entypo-download"></i> Download
+					</button>
+				</div>
+			</div>
 			<form class="form-inline">
-						<div class="form-group">
-							<div class="input-group">
-								<input type="text" id="search" placeholder="Search..."
-									class="form-control" style="width: 200px;"><span
-									class="input-group-btn">
-									<button type="button" class="btn btn-info"
-										id="btnSearch" style="float: right;">Search</button>
-								</span>
-							</div>
-						</div>
-					</form>
+				<div class="form-group">
+					<div class="input-group">
+						<input type="text" id="search" placeholder="Search..."
+							class="form-control" style="width: 200px;"><span
+							class="input-group-btn">
+							<button type="button" class="btn btn-info" id="btnSearch"
+								style="float: right;">Search</button>
+						</span>
+					</div>
+				</div>
+			</form>
 			<div class="clearfix"></div>
 			<hr />
-			<table class="table  table-striped table-bordered">
+			<table id="tblOpeningStocks" class="table  table-striped table-bordered">
 				<thead>
 					<tr>
 						<th>Product Profile</th>
@@ -72,11 +81,12 @@
 							<td>${openingStock.batchNumber}</td>
 							<td>${openingStock.stockLocationName}</td>
 							<td>${openingStock.quantity}</td>
-							<td><javatime:format value="${openingStock.openingStockDate}" style="MS" /></td>
-							<td><span class="label ${openingStock.activated?'label-success':'label-danger' }" 
-							onclick="OpeningStock.setActive('${openingStock.pid}','${!openingStock.activated }')"
-							style="cursor: pointer;"
-							>${openingStock.activated ?"Activated":"Deactivated"}</span></td>
+							<td><javatime:format
+									value="${openingStock.openingStockDate}" style="MS" /></td>
+							<td><span
+								class="label ${openingStock.activated?'label-success':'label-danger' }"
+								onclick="OpeningStock.setActive('${openingStock.pid}','${!openingStock.activated }')"
+								style="cursor: pointer;">${openingStock.activated ?"Activated":"Deactivated"}</span></td>
 							<td>
 								<button type="button" class="btn btn-blue"
 									onclick="OpeningStock.showModalPopup($('#viewModal'),'${openingStock.pid}',0);">View</button>
@@ -269,7 +279,7 @@
 				<!-- /.Model Container-->
 			</form>
 
-		<div class="modal fade container" id="enableOpeningStockModal">
+			<div class="modal fade container" id="enableOpeningStockModal">
 				<!-- model Dialog -->
 				<div class="modal-dialog">
 					<div class="modal-content">
@@ -319,6 +329,10 @@
 		</div>
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
+	
+	<spring:url value="/resources/assets/js/table2excel.js"
+		var="table2excel"></spring:url>
+	<script type="text/javascript" src="${table2excel}"></script>
 
 	<spring:url value="/resources/app/openingStock.js" var="openingStockJs"></spring:url>
 	<script type="text/javascript" src="${openingStockJs}"></script>
