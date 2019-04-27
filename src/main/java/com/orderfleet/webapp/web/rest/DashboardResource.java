@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -465,7 +466,9 @@ public class DashboardResource {
 			}
 			dashboardChartDTO.setBarChartDtos(loadDashboardSummaryBarChart(from, to, dashboardItem));
 		} else {
-			dashboardChartDTO.setFunnelChartDtos(makeDashboardSummaryFunnelChart(from.minusMonths(3), to, funnels));
+//			dashboardChartDTO.setFunnelChartDtos(makeDashboardSummaryFunnelChart(from.minusMonths(3), to, funnels));
+			from =  LocalDate.of(2018, Month.JANUARY, 1).atTime(0,0);
+			dashboardChartDTO.setFunnelChartDtos(makeDashboardSummaryFunnelChart(from, to, funnels));
 			dashboardChartDTO.setChartLabel("Sales Funnel");
 		}
 		return dashboardChartDTO;

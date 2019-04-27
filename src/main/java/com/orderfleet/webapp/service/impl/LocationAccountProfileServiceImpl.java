@@ -19,10 +19,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.orderfleet.webapp.domain.AccountNameTextSettings;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
+import com.orderfleet.webapp.domain.OpeningStock;
+import com.orderfleet.webapp.domain.ProductNameTextSettings;
+import com.orderfleet.webapp.repository.AccountNameTextSettingsRepository;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
@@ -32,6 +36,7 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 /**
@@ -62,6 +67,9 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 
 	@Inject
 	private CompanyRepository companyRepository;
+	
+	@Inject
+	private AccountNameTextSettingsRepository accountNameTextSettingsRepository;
 
 	@Override
 	public void save(String locationPid, String assignedAccountProfile) {
@@ -184,6 +192,31 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 							new PageRequest(page, count));
 			result = accountProfiles.getContent().stream().map(la -> la.getAccountProfile())
 					.collect(Collectors.toList());
+			
+		}
+//appending alias configurable
+		List<AccountNameTextSettings> accountNameTextSettings = accountNameTextSettingsRepository
+				.findAllByCompanyIdAndEnabledTrue(SecurityUtils.getCurrentUsersCompanyId());
+		if (accountNameTextSettings.size() > 0) {
+			for (AccountProfile  accountProfile : result) {
+				String name = " (";
+				for (AccountNameTextSettings accountNameText : accountNameTextSettings) {
+					
+					if (accountNameText.getName().equals("ALIAS")) {
+						if (accountProfile.getAlias() != null && !accountProfile.getAlias().isEmpty()) {
+							name += accountProfile.getAlias() + ",";
+						}
+							
+					} /*else if (accountNameText.getName().equals("MRP")) {
+						name += accountProfile.getMrp() + ",";
+					} */
+				}
+				name = name.substring(0, name.length() - 1);
+				if (name.length() > 1) {
+					name += ")";
+				}
+				accountProfile.setName(accountProfile.getName() + name);
+			}
 		}
 		System.out.println("===============================================================");
 		return new PageImpl<>(accountProfileMapper.accountProfilesToAccountProfileDTOs(result));
