@@ -9,7 +9,33 @@ if (!this.PostDatedVoucher) {
 			+ location.pathname;
 	$(document).ready(function() {
 		PostDatedVoucher.loadData();
+		
+		$('#btnDownload')
+		.on(
+				'click',
+				function() {
+					var tblPostDatedVoucher = $("#tBodyPostDatedVoucher tbody");
+					if (tblPostDatedVoucher
+							.children().length == 0) {
+						alert("no values available");
+						return;
+					}
+					if (tblPostDatedVoucher[0].textContent == "No data available") {
+						alert("no values available");
+						return;
+					}
+
+					downloadXls();
+					$("#tBodyPostDatedVoucher th:last-child, #tBodyPostDatedVoucher td:last-child").show();
+				});
 	});
+	
+	function downloadXls() {
+		var accPid = $('#dbAccount').val();
+		console.log(status);
+		window.location.href = postDatedVoucherContextPath
+		+ "/download-post-dated-vouchers-xls?accountPid="+ accPid;
+	}
 
 	PostDatedVoucher.loadData = function() {
 		$('#tBodyPostDatedVoucher').html(
@@ -35,7 +61,7 @@ if (!this.PostDatedVoucher) {
 										function(accountProfilePid,
 												postDatedVouchers) {
 											var pdc = postDatedVouchers[0];
-											console.log(accountProfilePid);
+											//console.log(accountProfilePid);
 											$('#tBodyPostDatedVoucher')
 													.append(
 															"<tr data-toggle='collapse' data-target='#"

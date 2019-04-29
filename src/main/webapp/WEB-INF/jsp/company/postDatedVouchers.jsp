@@ -42,6 +42,12 @@
 								<button type="button" class="btn btn-info"
 									onclick="PostDatedVoucher.loadData()">Apply</button>
 							</div>
+							<div class="col-sm-1">
+								<button type="button" class="btn btn-orange" id="btnDownload"
+									title="download xlsx">
+									<i class="entypo-download"></i> Download
+								</button>
+							</div>
 						</div>
 					</form>
 				</div>

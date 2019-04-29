@@ -45,7 +45,7 @@
 							<div class="col-sm-1">
 								<button type="button" class="btn btn-orange" id="btnDownload"
 									title="download xlsx">
-									<i class="entypo-download"></i> download
+									<i class="entypo-download"></i> Download
 								</button>
 							</div>
 						</div>
