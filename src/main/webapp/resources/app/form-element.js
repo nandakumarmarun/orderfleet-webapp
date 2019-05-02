@@ -99,6 +99,9 @@ if (!this.FormElement) {
 									'tbody tr td input[type="checkbox"]').prop(
 									'checked', $(this).prop('checked'));
 						});
+				$('#divLoadFromMobileData').hide();
+				$('#divLoadMobileData').hide();
+				
 			});
 
 	
@@ -261,9 +264,21 @@ if (!this.FormElement) {
 				if (data.formElementTypeName == "dropdown"
 						|| data.formElementTypeName == "checkBox") {
 					$('#divMasterTable').show();
+					$('#divLoadFromMobileData').show();
 				} else {
 					$('#divMasterTable').hide();
+					$('#divLoadFromMobileData').hide();
+					$('#divLoadMobileData').hide();
 				}
+				
+				if (data.formLoadFromMobile==true) {
+			    	$('#divLoadMobileData').show();
+			    	$('#divMasterTable').hide();
+			    }else{
+			    	$('#divLoadMobileData').hide();
+			    	$('#divMasterTable').show();
+			    }
+				
 				createOptionsTableView(data.formElementValues);
 				// set pid
 				formElementModel.pid = data.pid;
@@ -347,10 +362,23 @@ if (!this.FormElement) {
 		var type = $('#field_type option:selected').text()
 		if (type == "dropdown" || type == "checkBox") {
 			$('#divMasterTable').show();
+			$('#divLoadFromMobileData').show();
 		} else {
 			$('#divMasterTable').hide();
+			$('#divLoadFromMobileData').hide();
+			$('#divLoadMobileData').hide();
 		}
 	}
+	
+	$('#loadFromMobile').change(function () {
+	    if ($(this).prop("checked")) {
+	    	$('#divLoadMobileData').show();
+	    	$('#divMasterTable').hide();
+	    }else{
+	    	$('#divLoadMobileData').hide();
+	    	$('#divMasterTable').show();
+	    }
+	});
 
 	function showSelectedMasterTableData() {
 		var selectedMaster = $('#field_master').val()
