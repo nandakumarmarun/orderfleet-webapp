@@ -212,8 +212,6 @@ public class AccountProfileCsvUploadService {
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}
-			
-			
 
 			// Optional<AccountType> optionalAccountType = accountTypes.stream()
 			// .filter(atn ->
@@ -335,6 +333,7 @@ public class AccountProfileCsvUploadService {
 		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
 		List<AccountProfile> accountProfiles = accountProfileService.findAllAccountProfileByCompanyId(companyId);
 		List<Location> locations = locationService.findAllLocationByCompanyId(companyId);
+
 		List<Long> locationAccountProfilesIds = new ArrayList<>();
 
 		for (LocationAccountProfileDTO locAccDto : locationAccountProfileDTOs) {
@@ -342,24 +341,15 @@ public class AccountProfileCsvUploadService {
 			LocationAccountProfile profile = new LocationAccountProfile();
 			// find location
 
-			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getAlias()))
-					.findFirst();
 			// find accountprofile
 			// System.out.println(loc.get()+"===Location");
 
 			Optional<AccountProfile> acc = accountProfiles.stream()
 					.filter(ap -> locAccDto.getAccountProfileName().equals(ap.getAlias())).findFirst();
 
-			if (loc.isPresent() && acc.isPresent()) {
+			if (acc.isPresent()) {
 
-				List<Long> locationAccountProfileIds = locationAccountProfiles.stream()
-						.filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
-						.map(lap -> lap.getId()).collect(Collectors.toList());
-				if (locationAccountProfileIds.size() != 0) {
-					locationAccountProfilesIds.addAll(locationAccountProfileIds);
-				}
-
-				profile.setLocation(loc.get());
+				profile.setLocation(locations.get(0));
 				profile.setAccountProfile(acc.get());
 				profile.setCompany(company);
 				newLocationAccountProfiles.add(profile);
@@ -389,33 +379,35 @@ public class AccountProfileCsvUploadService {
 		final Company company = syncOperation.getCompany();
 		Set<ReceivablePayable> saveReceivablePayable = new HashSet<>();
 		// find all exist account profiles
-		List<String> apNames = receivablePayableDTOs.stream().map(rp -> rp.getAccountName().toUpperCase())
+		List<String> apAliases = receivablePayableDTOs.stream().map(rp -> rp.getAccountName())
 				.collect(Collectors.toList());
+		System.out.println(apAliases.size() + "---------------Alias Size");
 		List<AccountProfile> accountProfiles = accountProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), apNames);
+				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), apAliases);
+		System.out.println(accountProfiles.size() + "---------------Acc Alias Sizes");
 		// delete all receivable payable
 		receivablePayableRepository.deleteByCompanyId(company.getId());
 		for (ReceivablePayableDTO rpDto : receivablePayableDTOs) {
 			// only save if account profile exist
-			accountProfiles.stream().filter(a -> a.getName().equals(rpDto.getAccountName())).findAny().ifPresent(ap -> {
-				ReceivablePayable receivablePayable = new ReceivablePayable();
-				if (receivablePayable.getReceivablePayableType() == null) {
-					receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
-				}
-				receivablePayable.setReceivablePayableType(rpDto.getReceivablePayableType());
-				receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
-				receivablePayable.setAccountProfile(ap);
-				receivablePayable.setCompany(company);
-				receivablePayable.setBillOverDue(Long.valueOf(rpDto.getBillOverDue()));
-				receivablePayable.setReferenceDocumentAmount(rpDto.getReferenceDocumentAmount());
-				receivablePayable.setReferenceDocumentBalanceAmount(rpDto.getReferenceDocumentBalanceAmount());
-				receivablePayable.setReferenceDocumentDate(rpDto.getReferenceDocumentDate());
-				receivablePayable.setReferenceDocumentNumber(rpDto.getReferenceDocumentNumber());
-				receivablePayable.setReferenceDocumentType(rpDto.getReferenceDocumentType());
-				receivablePayable.setRemarks(rpDto.getRemarks());
-				saveReceivablePayable.add(receivablePayable);
-			});
+			accountProfiles.stream().filter(a -> a.getAlias().equals(rpDto.getAccountName())).findAny()
+					.ifPresent(ap -> {
+						ReceivablePayable receivablePayable = new ReceivablePayable();
+
+						receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
+						receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
+						receivablePayable.setAccountProfile(ap);
+						receivablePayable.setCompany(company);
+						receivablePayable.setBillOverDue(Long.valueOf(rpDto.getBillOverDue()));
+						receivablePayable.setReferenceDocumentAmount(rpDto.getReferenceDocumentAmount());
+						receivablePayable.setReferenceDocumentBalanceAmount(rpDto.getReferenceDocumentBalanceAmount());
+						receivablePayable.setReferenceDocumentDate(rpDto.getReferenceDocumentDate());
+						receivablePayable.setReferenceDocumentNumber(rpDto.getReferenceDocumentNumber());
+						receivablePayable.setReferenceDocumentType(rpDto.getReferenceDocumentType());
+						receivablePayable.setRemarks(rpDto.getRemarks());
+						saveReceivablePayable.add(receivablePayable);
+					});
 		}
+		System.out.println(saveReceivablePayable.size() + "----Before Saving");
 		bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -549,5 +541,31 @@ public class AccountProfileCsvUploadService {
 			return false;
 		}
 		return true;
+	}
+
+	public void locationAccountProfileAssociation(List<String> newAccountProfileAliasList, Company company) {
+		List<LocationAccountProfile> locationAccountProfiles = new ArrayList<>();
+		List<AccountProfile> newAccountProfiles = new ArrayList<>();
+		List<AccountProfile> existingAccountProfiles = accountProfileRepository.findAllByCompanyId(company.getId());
+
+		for (String newAccountProfileAlias : newAccountProfileAliasList) {
+			Optional<AccountProfile> accountProfileExist = existingAccountProfiles.stream()
+					.filter(aProfile -> aProfile.getAlias() != null ? aProfile.getAlias().equals(newAccountProfileAlias)
+							: false)
+					.findAny();
+			if (accountProfileExist.isPresent()) {
+				newAccountProfiles.add(accountProfileExist.get());
+			}
+		}
+		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
+		for (Location location : locations) {
+			for (AccountProfile accountProfile : newAccountProfiles) {
+				locationAccountProfiles.add(new LocationAccountProfile(location, accountProfile, company));
+			}
+		}
+		System.out.println(locationAccountProfiles.size()+"----------");
+		locationAccountProfileRepository.save(locationAccountProfiles);
+		System.out.println("----------Success");
+
 	}
 }

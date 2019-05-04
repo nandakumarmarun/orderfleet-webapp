@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.vendor.orderpro.api;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -18,26 +19,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.enums.SyncOperationType;
+import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.EcomProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.EcomProductProfileProductDTO;
-import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelListDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductCategoryDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupEcomProductDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.StockLocationDTO;
 import com.orderfleet.webapp.web.rest.dto.TaxMasterDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.GSTProductGroupDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductProfileCustomDTO;
 import com.orderfleet.webapp.web.rest.tallypartner.DocumentUserWiseUpdateController;
-import com.orderfleet.webapp.web.vendor.excel.service.ProductProfileUploadService;
 import com.orderfleet.webapp.web.vendor.orderpro.service.ProductProfileCsvUploadService;
 
 @RestController
@@ -57,6 +57,9 @@ public class ProductProfileCsv {
 
 	@Inject
 	private DocumentUserWiseUpdateController documentUserWiseUpdateController;
+	
+	@Inject
+	private ProductProfileRepository productProfileRepository;
 
 	@RequestMapping(value = "/product-categories.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -129,8 +132,19 @@ public class ProductProfileCsv {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					productProfileCsvUploadService.saveUpdateProductGroupProductExcel(productProfileDTOs, so);
+					//productProfileCsvUploadService.saveUpdateProductGroupProductExcel(productProfileDTOs, so);
+					//productProfileCsvUploadService.saveUpdateProductProfiles(productProfileDTOs, so);
+					
+					List<ProductProfile> existingProductProfiles = productProfileRepository
+							.findAllByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
 					productProfileCsvUploadService.saveUpdateProductProfiles(productProfileDTOs, so);
+					for (ProductProfile productProfile : existingProductProfiles) {
+						productProfileDTOs.removeIf(pProfile -> pProfile.getAlias().equals(productProfile.getAlias()));
+					}
+					List<String> newProductProfileAlias = productProfileDTOs.stream()
+							.map(aProfile -> aProfile.getAlias()).collect(Collectors.toList());
+					System.out.println("-----------------"+newProductProfileAlias.size());
+					productProfileCsvUploadService.productGroupProductProfileAssociation(newProductProfileAlias, so.getCompany());
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Product-Profile sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));

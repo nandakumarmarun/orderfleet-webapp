@@ -1,8 +1,6 @@
 package com.orderfleet.webapp.web.vendor.orderpro.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SalesOrderCsvDTO {

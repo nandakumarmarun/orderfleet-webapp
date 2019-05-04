@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.vendor.orderpro.api;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -18,11 +19,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.enums.SyncOperationType;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.async.TPAccountProfileManagementService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
@@ -30,7 +32,7 @@ import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelAccountProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
 import com.orderfleet.webapp.web.rest.tallypartner.DocumentUserWiseUpdateController;
-import com.orderfleet.webapp.web.vendor.excel.service.AccountProfileUploadService;
+import com.orderfleet.webapp.web.vendor.orderpro.service.AccountProfileCsvUploadService;
 
 @RestController
 @RequestMapping(value = "/api/orderpro/v1")
@@ -42,10 +44,10 @@ public class AccountProfileCsv {
 	private SyncOperationRepository syncOperationRepository;
 
 	@Inject
-	private TPAccountProfileManagementService tpAccountProfileManagementService;
-	
+	private AccountProfileRepository accountProfileRepository;
+
 	@Inject
-	private AccountProfileUploadService accountProfileUploadService;;
+	private AccountProfileCsvUploadService accountProfileCsvUploadService;;
 
 	@Inject
 	private DocumentUserWiseUpdateController documentUserWiseUpdateController;
@@ -62,7 +64,17 @@ public class AccountProfileCsv {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					accountProfileUploadService.saveUpdateAccountProfiles(accountProfileDTOs, so);
+
+					List<AccountProfile> existingAccountProfiles = accountProfileRepository
+							.findAllByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
+					accountProfileCsvUploadService.saveUpdateAccountProfiles(accountProfileDTOs, so);
+					for (AccountProfile accountProfile : existingAccountProfiles) {
+						accountProfileDTOs.removeIf(aProfile -> aProfile.getAlias().equals(accountProfile.getAlias()));
+					}
+					List<String> newAccountProfileAlias = accountProfileDTOs.stream()
+							.map(aProfile -> aProfile.getAlias()).collect(Collectors.toList());
+					System.out.println("-----------------"+newAccountProfileAlias.size());
+					accountProfileCsvUploadService.locationAccountProfileAssociation(newAccountProfileAlias, so.getCompany());
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Account-Profile sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
@@ -79,7 +91,7 @@ public class AccountProfileCsv {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					accountProfileUploadService.saveUpdateLocations(locationDTOs, so);
+					accountProfileCsvUploadService.saveUpdateLocations(locationDTOs, so);
 
 					if (so.getUser()) {
 						documentUserWiseUpdateController.assignSaveUserLocations();
@@ -105,7 +117,7 @@ public class AccountProfileCsv {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					accountProfileUploadService.saveUpdateLocationHierarchy(locationHierarchyDTOs, so);
+					accountProfileCsvUploadService.saveUpdateLocationHierarchy(locationHierarchyDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Location-Hierarchy sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
@@ -120,7 +132,7 @@ public class AccountProfileCsv {
 				SyncOperationType.LOCATION_ACCOUNT_PROFILE).map(so -> {
 
 					Optional<SyncOperation> opSyncLO = syncOperationRepository.findOneByCompanyIdAndOperationType(
-							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.LOCATION);
+							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.LOCATION_ACCOUNT_PROFILE);
 
 					if (!opSyncLO.get().getCompleted()) {
 						return new ResponseEntity<>("location save processing try after some time.",
@@ -140,7 +152,7 @@ public class AccountProfileCsv {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					accountProfileUploadService.saveUpdateLocationAccountProfiles(locationAccountProfileDTOs, so);
+					accountProfileCsvUploadService.saveUpdateLocationAccountProfiles(locationAccountProfileDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				})
 				.orElse(new ResponseEntity<>("Location-Account-Profile sync operation not registered for this company",
@@ -168,7 +180,7 @@ public class AccountProfileCsv {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					accountProfileUploadService.saveUpdateReceivablePayables(receivablePayableDTOs, so);
+					accountProfileCsvUploadService.saveUpdateReceivablePayables(receivablePayableDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Receivable-Payable sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
@@ -192,7 +204,7 @@ public class AccountProfileCsv {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					accountProfileUploadService.saveUpdateAccountProfileClosingBalances(accountProfileDTOs, so);
+					accountProfileCsvUploadService.saveUpdateAccountProfileClosingBalances(accountProfileDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				})
 				.orElse(new ResponseEntity<>(
@@ -222,7 +234,7 @@ public class AccountProfileCsv {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					accountProfileUploadService
+					accountProfileCsvUploadService
 							.saveUpdatePriceLevelAccountProductGroups(priceLevelAccountProductGroupDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				})

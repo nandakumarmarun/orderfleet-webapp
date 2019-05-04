@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
@@ -30,9 +28,6 @@ import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.SyncOperation;
-import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.enums.AccountStatus;
-import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
@@ -49,13 +44,11 @@ import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
-import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.OpeningStockService;
 import com.orderfleet.webapp.service.PriceLevelAccountProductGroupService;
-import com.orderfleet.webapp.service.PriceLevelService;
 import com.orderfleet.webapp.service.ReceivablePayableService;
 import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.util.RandomUtil;
@@ -89,8 +82,6 @@ public class OpeningStockCsvUploadService {
 
 	private final AccountProfileService accountProfileService;
 
-	private final AccountTypeRepository accountTypeRepository;
-
 	private final LocationRepository locationRepository;
 
 	private final LocationHierarchyRepository locationHierarchyRepository;
@@ -101,8 +92,6 @@ public class OpeningStockCsvUploadService {
 
 	private final LocationAccountProfileService locationAccountProfileService;
 
-	private final UserRepository userRepository;
-
 	private final ProductGroupRepository productGroupRepository;
 
 	private final PriceLevelAccountProductGroupRepository priceLevelAccountProductGroupRepository;
@@ -112,8 +101,6 @@ public class OpeningStockCsvUploadService {
 	private final StockLocationRepository stockLocationRepository;
 
 	private final StockLocationService stockLocationService;
-
-	private final OpeningStockRepository openingStockRepository;
 
 	private final ProductProfileRepository productProfileRepository;
 
@@ -135,20 +122,17 @@ public class OpeningStockCsvUploadService {
 		this.syncOperationRepository = syncOperationRepository;
 		this.priceLevelRepository = priceLevelRepository;
 		this.accountProfileRepository = accountProfileRepository;
-		this.accountTypeRepository = accountTypeRepository;
 		this.locationRepository = locationRepository;
 		this.locationHierarchyRepository = locationHierarchyRepository;
 		this.locationAccountProfileRepository = locationAccountProfileRepository;
 		this.receivablePayableRepository = receivablePayableRepository;
 		this.accountProfileService = accountProfileService;
 		this.locationAccountProfileService = locationAccountProfileService;
-		this.userRepository = userRepository;
 		this.productGroupRepository = productGroupRepository;
 		this.priceLevelAccountProductGroupRepository = priceLevelAccountProductGroupRepository;
 		this.locationService = locationService;
 		this.stockLocationRepository = stockLocationRepository;
 		this.stockLocationService = stockLocationService;
-		this.openingStockRepository = openingStockRepository;
 		this.productProfileRepository=productProfileRepository;
 	}
 
@@ -500,24 +484,5 @@ public class OpeningStockCsvUploadService {
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
-	}
-
-	private static boolean isValidEmail(String email) {
-		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
-				+ "A-Z]{2,7}$";
-		Pattern pat = Pattern.compile(emailRegex);
-		if (email == null)
-			return false;
-		return pat.matcher(email).matches();
-	}
-
-	private static boolean isValidPhone(String phone) {
-		if (phone == null || phone.isEmpty()) {
-			return false;
-		}
-		if (phone.length() > 20) {
-			return false;
-		}
-		return true;
 	}
 }

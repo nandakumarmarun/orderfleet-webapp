@@ -5,8 +5,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,31 +24,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
-import com.orderfleet.webapp.domain.AccountingVoucherDetail;
-import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
-import com.orderfleet.webapp.domain.InventoryVoucherBatchDetail;
-import com.orderfleet.webapp.domain.InventoryVoucherDetail;
-import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.SnrichPartnerCompany;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.SnrichPartnerCompanyRepository;
-import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.util.RandomUtil;
-import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherBatchDetailDTO;
-import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
-import com.orderfleet.webapp.web.rest.dto.ReceiptVendorDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesOrderDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesOrderItemDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesOrderVenderDTO;
-import com.orderfleet.webapp.web.rest.dto.VatLedgerDTO;
 import com.orderfleet.webapp.web.vendor.excel.dto.SalesOrderExcelDTO;
 import com.orderfleet.webapp.web.vendor.integre.dto.SalesOrderPid;
 import com.orderfleet.webapp.web.vendor.integre.dto.SalesPidDTO;
@@ -73,9 +54,6 @@ public class SalesDatasDownloadController {
 	@Inject
 	private CompanyRepository companyRepository;
 
-	@Inject
-	private UserRepository userRepository;
-
 	@RequestMapping(value = "/get-sales-orders.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
@@ -90,8 +68,6 @@ public class SalesDatasDownloadController {
 				.getSalesOrderForExcel(company.getId());
 
 		log.debug("REST request to download sales orders : " + inventoryVoucherHeaders.size());
-
-		double taxAmount = 0.0;
 
 		for (Object[] obj : inventoryVoucherHeaders) {
 			SalesOrderExcelDTO salesOrderDTO = new SalesOrderExcelDTO();
@@ -140,9 +116,6 @@ public class SalesDatasDownloadController {
 			salesOrderDTO.setCGSTAmt(cgst);
 			salesOrderDTO.setSGSTAmt(sgst);
 			salesOrderDTO.setInventoryPid(obj[9] != null ? obj[9].toString() : "");
-
-			String uniquString = RandomUtil.generateServerDocumentNo().substring(0,
-					RandomUtil.generateServerDocumentNo().length() - 10);
 
 			salesOrderDTO.setBillNo(obj[0].toString());
 			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
