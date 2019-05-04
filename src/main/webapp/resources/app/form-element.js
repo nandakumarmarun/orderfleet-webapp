@@ -522,8 +522,10 @@ if (!this.FormElement) {
 		formElementModel.pid = null; // reset formElement model;
 		formElementModel.formElementValues = [];
 		$('#tblOptions').html("");
-
+		
 		$('#divMasterTable').hide();
+		$('#divLoadFromMobileData').hide();
+		$('#divLoadMobileData').hide();
 	}
 
 	function addErrorAlert(message, key, data) {
