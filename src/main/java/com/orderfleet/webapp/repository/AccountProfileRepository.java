@@ -121,6 +121,9 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.dataSourceType = ?1")
 	List<AccountProfile> findAllByCompanyAndDataSourceType(DataSourceType dataSourceType);
 	
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.dataSourceType = ?1 order by accountProfile.createdDate desc ")
+	List<AccountProfile> findAllByCompanyAndDataSourceTypeAndCreatedDate(DataSourceType dataSourceType);
+	
 	@Query("select accountProfile.pid from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId}")
 	Set<String> findPidsByCompanyId();
 	

@@ -24,12 +24,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
@@ -65,14 +68,17 @@ public class AccountProfileController {
 
 	private final CompanyRepository companyRepository;
 
+	private final CompanyConfigurationRepository companyConfigurationRepository;
+
 	private final UserRepository userRepository;
-	
+
 	private final FileManagerService fileManagerService;
 
 	public AccountProfileController(AccountProfileRepository accountProfileRepository,
 			LocationRepository locationRepository, LocationAccountProfileRepository locationAccountProfileRepository,
 			AccountProfileMapper accountProfileMapper, CompanyRepository companyRepository,
-			UserRepository userRepository, FileManagerService fileManagerService) {
+			UserRepository userRepository, FileManagerService fileManagerService,
+			CompanyConfigurationRepository companyConfigurationRepository) {
 		super();
 		this.accountProfileRepository = accountProfileRepository;
 		this.locationRepository = locationRepository;
@@ -81,6 +87,7 @@ public class AccountProfileController {
 		this.companyRepository = companyRepository;
 		this.userRepository = userRepository;
 		this.fileManagerService = fileManagerService;
+		this.companyConfigurationRepository = companyConfigurationRepository;
 	}
 
 	/**
@@ -90,40 +97,72 @@ public class AccountProfileController {
 	 *            the accountProfileDTO to create
 	 * @param pid
 	 *            territory pid
-	 * @return the ResponseEntity with status 201 (Created) and with body the
-	 *         new accountProfileDTO
+	 * @return the ResponseEntity with status 201 (Created) and with body the new
+	 *         accountProfileDTO
 	 */
 	@RequestMapping(value = "/account-profile/{pid}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<AccountProfileDTO> createExecutiveTaskPlan(@RequestBody AccountProfileDTO accountProfileDTO,
 			@PathVariable String pid) {
 		log.debug("Rest request to save AccountProfile : {} under location with pid {}", accountProfileDTO, pid);
-		Optional<AccountProfile> exisitingAccountProfile = accountProfileRepository
-				.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), accountProfileDTO.getName());
-		if(exisitingAccountProfile.isPresent() && (accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty())) {
+		Optional<AccountProfile> exisitingAccountProfile = accountProfileRepository.findByCompanyIdAndNameIgnoreCase(
+				SecurityUtils.getCurrentUsersCompanyId(), accountProfileDTO.getName());
+		if (exisitingAccountProfile.isPresent()
+				&& (accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty())) {
 			return ResponseEntity.badRequest().headers(
 					HeaderUtil.createFailureAlert("accountProfile", "nameexists", "Account Profile already in use"))
 					.body(null);
-		} else if((exisitingAccountProfile.isPresent() && !accountProfileDTO.getPid().isEmpty())) {
-			if(!exisitingAccountProfile.get().getPid().equals(accountProfileDTO.getPid())) {
+		} else if ((exisitingAccountProfile.isPresent() && !accountProfileDTO.getPid().isEmpty())) {
+			if (!exisitingAccountProfile.get().getPid().equals(accountProfileDTO.getPid())) {
 				return ResponseEntity.badRequest().headers(
 						HeaderUtil.createFailureAlert("accountProfile", "nameexists", "Account Profile already in use"))
 						.body(null);
 			}
 		}
 		if (!locationRepository.findOneByPid(pid).isPresent()) {
-			return ResponseEntity.badRequest().headers(
-					HeaderUtil.createFailureAlert("location", "location not found", "location not found"))
+			return ResponseEntity.badRequest()
+					.headers(HeaderUtil.createFailureAlert("location", "location not found", "location not found"))
 					.body(null);
 		}
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
-		
+
 		AccountProfile newAccountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
-		if(accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty()) {
+		if (accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty()) {
 			newAccountProfile.setAccountStatus(AccountStatus.Unverified);
 			newAccountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
 			newAccountProfile.setDataSourceType(DataSourceType.MOBILE);
+			Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository.findByCompanyPidAndName(
+					companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid(),
+					CompanyConfig.NEW_CUSTOMER_ALIAS);
+			if (optNewCustomerAlias.isPresent()) {
+				if (optNewCustomerAlias.get().getValue().equalsIgnoreCase("true")) {
+					List<AccountProfile> listAccountProfiles = accountProfileRepository
+							.findAllByCompanyAndDataSourceTypeAndCreatedDate(DataSourceType.MOBILE);
+					if (listAccountProfiles.size() > 0) {
+						String alias = listAccountProfiles.get(0).getAlias();
+						if (alias.startsWith("N_")) {
+							String[] stringArray = alias.split("_");
+
+							int i = Integer.parseInt(stringArray[1]);
+
+							i++;
+
+							newAccountProfile.setAlias("N_" + i);
+						}else {
+							newAccountProfile.setAlias("N_1");
+						}
+					} else {
+						newAccountProfile.setAlias("N_1");
+					}
+				} else {
+					newAccountProfile.setAlias("N_1");
+				}
+
+			} else {
+				newAccountProfile.setAlias("N_1");
+			}
+
 		} else {
 			newAccountProfile.setId(exisitingAccountProfile.get().getId());
 			newAccountProfile.setDataSourceType(DataSourceType.MOBILE);
@@ -131,34 +170,40 @@ public class AccountProfileController {
 		// set company
 		newAccountProfile.setCompany(company);
 		newAccountProfile.setUser(user);
-		
-		log.debug("Saving new account profile from mobile user {} with account name {} and accountPid {}", user.getLogin(), newAccountProfile.getName(), newAccountProfile.getPid());
+
+		log.debug("Saving new account profile from mobile user {} with account name {} and accountPid {}",
+				user.getLogin(), newAccountProfile.getName(), newAccountProfile.getPid());
 		AccountProfile accountProfile = accountProfileRepository.save(newAccountProfile);
-		
-		//test to remove
-		//System.out.println("==============//// 1. Total AP :  "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
-		
+
+		// test to remove
+		// System.out.println("==============//// 1. Total AP :
+		// "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
+
 		// Associate account profile to territory
-		if(accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty()) {
+		if (accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty()) {
 			locationRepository.findOneByPid(pid).ifPresent(loc -> {
 				LocationAccountProfile locationAccount = new LocationAccountProfile(loc, accountProfile, company);
 				locationAccountProfileRepository.save(locationAccount);
-				//test to remove
-				//System.out.println("==============//// 2. Total AP :  "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
+				// test to remove
+				// System.out.println("==============//// 2. Total AP :
+				// "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
 			});
-			//test to remove
-			//System.out.println("==============//// 3. Total AP :  "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
+			// test to remove
+			// System.out.println("==============//// 3. Total AP :
+			// "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
 		}
-		//test to remove
-				//System.out.println("==============//// 4.  Total AP :  "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
+		// test to remove
+		// System.out.println("==============//// 4. Total AP :
+		// "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
 		AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
 		return new ResponseEntity<>(result, HttpStatus.CREATED);
 	}
-	
+
 	@Timed
 	@Transactional
 	@RequestMapping(value = "/account-profile/upload", method = RequestMethod.POST)
-	public ResponseEntity<List<String>> uploadGeoLocationImage(@RequestParam("accountProfilePid") String accountProfilePid, @RequestParam("file") MultipartFile file) {
+	public ResponseEntity<List<String>> uploadGeoLocationImage(
+			@RequestParam("accountProfilePid") String accountProfilePid, @RequestParam("file") MultipartFile file) {
 		log.debug("Rest request to upload accountProfile geo location image with pid {}", accountProfilePid);
 		if (file.isEmpty()) {
 			return ResponseEntity.badRequest()
@@ -186,8 +231,7 @@ public class AccountProfileController {
 			} catch (FileManagerException | IOException ex) {
 				log.debug("File upload exception : {}", ex);
 				return ResponseEntity.badRequest()
-						.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage()))
-						.body(null);
+						.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage())).body(null);
 			}
 		} else {
 			return ResponseEntity.badRequest().headers(
