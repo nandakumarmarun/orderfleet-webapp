@@ -23,7 +23,7 @@ import com.orderfleet.webapp.domain.enums.StageType;
 
 @Entity
 @Table(name = "tbl_stage")
-public class Stage implements Serializable{
+public class Stage implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -49,7 +49,7 @@ public class Stage implements Serializable{
 
 	@Column(name = "description")
 	private String description;
-	
+
 	@NotNull
 	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
 	private boolean activated;
@@ -58,18 +58,21 @@ public class Stage implements Serializable{
 	@Enumerated(EnumType.STRING)
 	@Column(name = "stage_type", nullable = false)
 	private StageType stageType;
-	
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(name = "stage_name_type", nullable = false ,columnDefinition = "character varying DEFAULT 'GENERAL'")
+	@Column(name = "stage_name_type", nullable = false, columnDefinition = "character varying DEFAULT 'GENERAL'")
 	private StageNameType stageNameType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@NotNull
 	private Company company;
-	
+
 	@Column(name = "sort_order", nullable = false, columnDefinition = "int DEFAULT 0")
 	private int sortOrder;
+
+	@Column(name = "target", nullable = false, columnDefinition = "bigint DEFAULT 0")
+	private Long target;
 
 	public Long getId() {
 		return id;
@@ -142,13 +145,25 @@ public class Stage implements Serializable{
 	public void setSortOrder(int sortOrder) {
 		this.sortOrder = sortOrder;
 	}
-	
+
 	public StageNameType getStageNameType() {
 		return stageNameType;
 	}
 
 	public void setStageNameType(StageNameType stageNameType) {
 		this.stageNameType = stageNameType;
+	}
+
+	public Long getTarget() {
+		return target;
+	}
+
+	public void setTarget(Long target) {
+		this.target = target;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	@Override

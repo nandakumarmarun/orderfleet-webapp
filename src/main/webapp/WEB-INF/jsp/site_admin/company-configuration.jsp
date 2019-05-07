@@ -42,6 +42,7 @@
 						<th>Interim Save</th>
 						<th>Refresh ProductGroup Product</th>
 						<th>Stage Change For Accounting Voucher</th>
+						<th>New Customer Alias</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -55,6 +56,7 @@
 							<td>${companyConfiguration.interimSave}</td>
 							<td>${companyConfiguration.refreshProductGroupProduct}</td>
 							<td>${companyConfiguration.stageChangeAccountingVoucher}</td>
+							<td>${companyConfiguration.newCustomerAlias}</td>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
 						</tr>
@@ -131,6 +133,13 @@
 														id="stageChangeAccountingVoucher"
 														name='checksStageChangeAccountingVoucher' type='checkbox'
 														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">New Customer Alias</label> <input
+														id="newCustomerAlias" name='checksNewCustomerAlias'
+														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
 

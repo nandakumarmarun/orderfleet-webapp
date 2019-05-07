@@ -97,6 +97,10 @@ public class CompanyConfigurationResource {
 					mcDto.setStageChangeAccountingVoucher(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.NEW_CUSTOMER_ALIAS)) {
+					mcDto.setNewCustomerAlias(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 			}
 			if (anyValueExist) {
@@ -112,9 +116,10 @@ public class CompanyConfigurationResource {
 	public ResponseEntity<String> saveCompanyConfiguration(@RequestParam String companyPid,
 			@RequestParam String distanceTraveled, @RequestParam String locationVariance,
 			@RequestParam String interimSave, @RequestParam String refreshProductGroupProduct,
-			@RequestParam String stageChangeAccountingVoucher) throws URISyntaxException {
+			@RequestParam String stageChangeAccountingVoucher, @RequestParam String newCustomerAlias)
+			throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
-		System.out.println(stageChangeAccountingVoucher);
+
 		Company company = null;
 		Optional<Company> optionalCompany = companyRepository.findOneByPid(companyPid);
 		if (optionalCompany.isPresent()) {
@@ -132,12 +137,15 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.REFRESH_PRODUCT_GROUP_PRODUCT);
 		Optional<CompanyConfiguration> optStageChangeAccountingVoucher = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STAGE_CHANGES_FOR_ACCOUNTING_VOUCHER);
+		Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.NEW_CUSTOMER_ALIAS);
 
 		CompanyConfiguration saveOfflineConfiguration = null;
 		CompanyConfiguration promptAttendance = null;
 		CompanyConfiguration interimSaveComapny = null;
 		CompanyConfiguration refreshProductGroupProductCompany = null;
 		CompanyConfiguration stageChangeAccountingVoucherCompany = null;
+		CompanyConfiguration newCustomerAliasCompany = null;
 
 		if (optDistanceTraveled.isPresent()) {
 			saveOfflineConfiguration = optDistanceTraveled.get();
@@ -181,6 +189,7 @@ public class CompanyConfigurationResource {
 			refreshProductGroupProductCompany.setName(CompanyConfig.REFRESH_PRODUCT_GROUP_PRODUCT);
 			refreshProductGroupProductCompany.setValue(refreshProductGroupProduct);
 		}
+		companyConfigurationRepository.save(refreshProductGroupProductCompany);
 
 		if (optStageChangeAccountingVoucher.isPresent()) {
 			stageChangeAccountingVoucherCompany = optStageChangeAccountingVoucher.get();
@@ -192,6 +201,18 @@ public class CompanyConfigurationResource {
 			stageChangeAccountingVoucherCompany.setValue(stageChangeAccountingVoucher);
 		}
 		companyConfigurationRepository.save(stageChangeAccountingVoucherCompany);
+
+		if (optNewCustomerAlias.isPresent()) {
+			newCustomerAliasCompany = optNewCustomerAlias.get();
+			newCustomerAliasCompany.setValue(newCustomerAlias);
+		} else {
+			newCustomerAliasCompany = new CompanyConfiguration();
+			newCustomerAliasCompany.setCompany(company);
+			newCustomerAliasCompany.setName(CompanyConfig.NEW_CUSTOMER_ALIAS);
+			newCustomerAliasCompany.setValue(newCustomerAlias);
+		}
+		companyConfigurationRepository.save(newCustomerAliasCompany);
+
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -217,6 +238,9 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optStageChangeAccountingVoucher = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STAGE_CHANGES_FOR_ACCOUNTING_VOUCHER);
 
+		Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.NEW_CUSTOMER_ALIAS);
+
 		CompanyConfigDTO companyConfigurationDTO = new CompanyConfigDTO();
 
 		if (optDistanceTraveled.isPresent()) {
@@ -235,6 +259,9 @@ public class CompanyConfigurationResource {
 		if (optStageChangeAccountingVoucher.isPresent()) {
 			companyConfigurationDTO
 					.setStageChangeAccountingVoucher(Boolean.valueOf(optStageChangeAccountingVoucher.get().getValue()));
+		}
+		if (optNewCustomerAlias.isPresent()) {
+			companyConfigurationDTO.setNewCustomerAlias(Boolean.valueOf(optNewCustomerAlias.get().getValue()));
 		}
 		return companyConfigurationDTO;
 	}
@@ -255,6 +282,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.REFRESH_PRODUCT_GROUP_PRODUCT);
 		Optional<CompanyConfiguration> optStageChangeAccountingVoucher = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STAGE_CHANGES_FOR_ACCOUNTING_VOUCHER);
+		Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.NEW_CUSTOMER_ALIAS);
 
 		if (optDistanceTraveled.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optDistanceTraveled.get().getCompany().getId(),
@@ -277,6 +306,10 @@ public class CompanyConfigurationResource {
 			companyConfigurationRepository.deleteByCompanyIdAndName(
 					optStageChangeAccountingVoucher.get().getCompany().getId(),
 					CompanyConfig.STAGE_CHANGES_FOR_ACCOUNTING_VOUCHER);
+		}
+		if (optNewCustomerAlias.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optNewCustomerAlias.get().getCompany().getId(),
+					CompanyConfig.NEW_CUSTOMER_ALIAS);
 		}
 		return ResponseEntity.ok()
 				.headers(HeaderUtil.createEntityDeletionAlert("companyConfiguration", companyPid.toString())).build();

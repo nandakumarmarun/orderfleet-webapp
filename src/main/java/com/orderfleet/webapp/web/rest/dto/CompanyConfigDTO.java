@@ -16,6 +16,7 @@ public class CompanyConfigDTO {
 	private boolean interimSave;
 	private boolean refreshProductGroupProduct;
 	private boolean stageChangeAccountingVoucher;
+	private boolean newCustomerAlias;
 
 	public CompanyConfigDTO() {
 		super();
@@ -75,6 +76,14 @@ public class CompanyConfigDTO {
 
 	public void setStageChangeAccountingVoucher(boolean stageChangeAccountingVoucher) {
 		this.stageChangeAccountingVoucher = stageChangeAccountingVoucher;
+	}
+
+	public boolean getNewCustomerAlias() {
+		return newCustomerAlias;
+	}
+
+	public void setNewCustomerAlias(boolean newCustomerAlias) {
+		this.newCustomerAlias = newCustomerAlias;
 	}
 
 }

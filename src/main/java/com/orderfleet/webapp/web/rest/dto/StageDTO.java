@@ -19,16 +19,19 @@ public class StageDTO {
 	private String alias;
 
 	private String description;
-	
+
 	private int sortOrder;
 
 	private boolean activated;
 
+	private long target;
+
 	private StageType stageType;
-	
+
 	private StageNameType stageNameType;
-	
-	public StageDTO() {}
+
+	public StageDTO() {
+	}
 
 	public StageDTO(Stage stage) {
 		super();
@@ -40,6 +43,7 @@ public class StageDTO {
 		this.activated = stage.getActivated();
 		this.stageType = stage.getStageType();
 		this.stageNameType = stage.getStageNameType();
+		this.target = stage.getTarget();
 	}
 
 	public String getPid() {
@@ -90,6 +94,14 @@ public class StageDTO {
 		this.activated = activated;
 	}
 
+	public long getTarget() {
+		return target;
+	}
+
+	public void setTarget(long target) {
+		this.target = target;
+	}
+
 	public StageType getStageType() {
 		return stageType;
 	}
@@ -105,5 +117,5 @@ public class StageDTO {
 	public void setStageNameType(StageNameType stageNameType) {
 		this.stageNameType = stageNameType;
 	}
-	
+
 }

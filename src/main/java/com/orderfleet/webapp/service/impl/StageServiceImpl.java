@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.StageService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.StageDTO;
+import com.orderfleet.webapp.web.rest.dto.StageTargetReportDTO;
 
 @Service
 @Transactional
@@ -38,6 +40,7 @@ public class StageServiceImpl implements StageService {
 		stage.setActivated(stageDto.getActivated());
 		stage.setStageType(StageType.CUSTOMER_JOURNEY);
 		stage.setStageNameType(stageDto.getStageNameType());
+		stage.setTarget(stageDto.getTarget());
 		// set company
 		stage.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		stage = stageRepository.save(stage);
@@ -52,6 +55,7 @@ public class StageServiceImpl implements StageService {
 			stage.setDescription(stageDto.getDescription());
 			stage.setSortOrder(stageDto.getSortOrder());
 			stage.setStageNameType(stageDto.getStageNameType());
+			stage.setTarget(stageDto.getTarget());
 			stage = stageRepository.save(stage);
 			return new StageDTO(stage);
 		}).orElse(null);
@@ -80,7 +84,7 @@ public class StageServiceImpl implements StageService {
 	public void delete(String pid) {
 		stageRepository.findOneByPid(pid).ifPresent(stage -> stageRepository.delete(stage.getId()));
 	}
-	
+
 	@Override
 	public StageDTO updateStageStatus(String pid, boolean activate) {
 		return stageRepository.findOneByPid(pid).map(stage -> {
@@ -89,7 +93,7 @@ public class StageServiceImpl implements StageService {
 			return new StageDTO(stage);
 		}).orElse(null);
 	}
-	
+
 	@Override
 	public List<Stage> findAllByCompany() {
 		return stageRepository.findAllByCompanyId();
@@ -103,6 +107,43 @@ public class StageServiceImpl implements StageService {
 	@Override
 	public List<Stage> findAllByCompanyAndActivated(boolean activated) {
 		return stageRepository.findAllByCompanyIdAndActivated(activated);
+	}
+
+	@Override
+	public List<StageTargetReportDTO> findAllStageTargetReports() {
+
+		List<Object[]> objects = stageRepository.findAllStageTargetReports();
+
+		List<StageTargetReportDTO> stageTargetReportDTOs = new ArrayList<>();
+
+		for (Object[] obj : objects) {
+			StageTargetReportDTO stageTargetReportDTO = new StageTargetReportDTO();
+
+			String stagename = obj[1].toString();
+
+			long achieved = Long.parseLong(obj[0].toString());
+
+			long target = Long.parseLong(obj[2].toString());
+
+			double percentage = 0.0;
+
+			if (achieved > target) {
+				percentage = 100.0;
+			} else if (target == 0) {
+				percentage = 0.0;
+			} else {
+				percentage = Math.round((((double) achieved / (double) target) * 100.0) * 100.0) / 100.0;
+			}
+
+			stageTargetReportDTO.setStageName(stagename);
+			stageTargetReportDTO.setAchieved(achieved);
+			stageTargetReportDTO.setTarget(target);
+			stageTargetReportDTO.setPercentage(percentage);
+
+			stageTargetReportDTOs.add(stageTargetReportDTO);
+
+		}
+		return stageTargetReportDTOs;
 	}
 
 }

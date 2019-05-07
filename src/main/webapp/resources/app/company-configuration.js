@@ -41,6 +41,7 @@ if (!this.CompanyConfiguration) {
 				":checked");
 		var stageChangeAccountingVoucher = $('#stageChangeAccountingVoucher')
 				.is(":checked");
+		var newCustomerAlias = $('#newCustomerAlias').is(":checked");
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -50,7 +51,8 @@ if (!this.CompanyConfiguration) {
 				locationVariance : locationVariance,
 				interimSave : interimSave,
 				refreshProductGroupProduct : refreshProductGroupProduct,
-				stageChangeAccountingVoucher : stageChangeAccountingVoucher
+				stageChangeAccountingVoucher : stageChangeAccountingVoucher,
+				newCustomerAlias : newCustomerAlias
 			},
 			success : function(data) {
 				onSaveSuccess(data);
@@ -74,6 +76,7 @@ if (!this.CompanyConfiguration) {
 						data.refreshProductGroupProduct);
 				$("#stageChangeAccountingVoucher").prop("checked",
 						data.stageChangeAccountingVoucher);
+				$("#newCustomerAlias").prop("checked", data.newCustomerAlias);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);

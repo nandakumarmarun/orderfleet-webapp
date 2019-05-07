@@ -72,7 +72,7 @@ public class SalesDatasDownloadController {
 		for (Object[] obj : inventoryVoucherHeaders) {
 			SalesOrderExcelDTO salesOrderDTO = new SalesOrderExcelDTO();
 
-			String pattern = "dd-MMM-yy";
+			String pattern = "dd-MMM-yyyy";
 			DateFormat df = new SimpleDateFormat(pattern);
 			String dateAsString = df.format(obj[1]);
 

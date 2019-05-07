@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.orderfleet.webapp.domain.Stage;
 import com.orderfleet.webapp.web.rest.dto.StageDTO;
+import com.orderfleet.webapp.web.rest.dto.StageTargetReportDTO;
 
 public interface StageService {
 
@@ -29,4 +30,6 @@ public interface StageService {
 	List<Stage> findAllByCompanyAndActivatedTrue();
 	
 	List<Stage> findAllByCompanyAndActivated(boolean activated);
+
+	List<StageTargetReportDTO> findAllStageTargetReports();
 }
