@@ -71,9 +71,6 @@ public class Stage implements Serializable {
 	@Column(name = "sort_order", nullable = false, columnDefinition = "int DEFAULT 0")
 	private int sortOrder;
 
-	@Column(name = "target", nullable = false, columnDefinition = "bigint DEFAULT 0")
-	private Long target;
-
 	public Long getId() {
 		return id;
 	}
@@ -154,13 +151,6 @@ public class Stage implements Serializable {
 		this.stageNameType = stageNameType;
 	}
 
-	public Long getTarget() {
-		return target;
-	}
-
-	public void setTarget(Long target) {
-		this.target = target;
-	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;

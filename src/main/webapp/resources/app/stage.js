@@ -16,7 +16,6 @@ if (!this.Stage) {
 		alias : null,
 		description : null,
 		sortOrder : 0,
-		target : 0,
 		stageNameType :null
 	};
 
@@ -71,7 +70,6 @@ if (!this.Stage) {
 		stageModel.alias = $('#field_alias').val();
 		stageModel.description = $('#field_description').val();
 		stageModel.sortOrder = $('#field_sortOrder').val();
-		stageModel.target = $('#field_target').val();
 		stageModel.stageNameType = $('#field_stageNameType').val();
 		
 		$.ajax({
@@ -98,7 +96,6 @@ if (!this.Stage) {
 				$('#lbl_description').text((data.description == null ? "" : data.description));
 				$('#lbl_sortOrder').text(data.sortOrder);
 				$('#lbl_stageNameType').text(data.stageNameType);
-				$('#lbl_target').text(data.target);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -116,7 +113,6 @@ if (!this.Stage) {
 				$('#field_description').val((data.description == null ? "" : data.description));
 				$('#field_sortOrder').val((data.sortOrder));
 				$('#field_stageNameType').val((data.stageNameType));
-				$('#field_target').val((data.target));
 				// set pid
 				stageModel.pid = data.pid;
 			},

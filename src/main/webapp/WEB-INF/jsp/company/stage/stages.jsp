@@ -35,7 +35,6 @@
 						<th>Description</th>
 						<th>Sort Order</th>
 						<th>Stage Name Type</th>
-						<th>Target</th>
 						<th>Status</th>
 						<th>Actions</th>
 					</tr>
@@ -49,7 +48,6 @@
 							<td>${stage.description == null ? "" : stage.description}</td>
 							<td>${stage.sortOrder}</td>
 							<td>${stage.stageNameType}</td>
-							<td>${stage.target}</td>
 							<td><span
 								class="label ${stage.activated?'label-success':'label-danger' }"
 								onclick="Stage.setActive('${stage.name }','${stage.pid}','${!stage.activated }')"
@@ -125,11 +123,6 @@
 										</c:forEach>
 									</select>
 								</div>
-								<div class="form-group">
-									<label class="control-label" for="field_target">Target</label> <input
-										type="number" min="0" class="form-control" name="target" id="field_target" value="0" />
-								</div>
-
 								
 							</div>
 							<div class="modal-footer">
@@ -203,12 +196,6 @@
 										</dt>
 										<dd>
 											<span id="lbl_stageNameType"></span>
-										</dd>
-										<dt>
-											<span>Target</span>
-										</dt>
-										<dd>
-											<span id="lbl_target"></span>
 										</dd>
 									</dl>
 								</div>

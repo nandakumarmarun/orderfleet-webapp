@@ -1,6 +1,5 @@
 package com.orderfleet.webapp.web.rest;
 
-
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,29 +43,29 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class UserOnPremiseImportResource {
 
 	private final Logger log = LoggerFactory.getLogger(UserOnPremiseImportResource.class);
-	
+
 	@Inject
 	private CompanyService companyService;
-	
+
 	@Inject
 	private CompanyRepository companyRepository;
-	
+
 	@Inject
 	private UserOnPremiseRepository userOnPremiseRepository;
-	
+
 	@Inject
 	private UserRepository userRepository;
-	
+
 	@RequestMapping(value = "/userOnPremiseImport", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
-	@Secured({ AuthoritiesConstants.SITE_ADMIN})
-	public String getAllCompaniesUserOnPremiseImport(Model model) throws URISyntaxException{
+	@Secured({ AuthoritiesConstants.SITE_ADMIN })
+	public String getAllCompaniesUserOnPremiseImport(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of Companies");
 		model.addAttribute("companies", companyRepository.findAllByOnPremiseTrue());
 		return "site_admin/user-on-premise-import";
 	}
-	
+
 	@RequestMapping(value = "/userOnPremiseImport/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<CompanyViewDTO> getCompanyUrl(@PathVariable String pid) {
@@ -74,16 +73,16 @@ public class UserOnPremiseImportResource {
 		Optional<CompanyViewDTO> company = companyService.findOneByPid(pid);
 		return new ResponseEntity<>(company.get(), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/userOnPremiseImport/load-user/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<String>> getUsersForCompany(@PathVariable String pid) {
 		log.debug("Web request to get Company Users by pid : {}", pid);
-		
-		 List<String> userList = userOnPremiseRepository.findAllfullNamesByCompanyPid(pid);
+
+		List<String> userList = userOnPremiseRepository.findAllfullNamesByCompanyPid(pid);
 		return new ResponseEntity<>(userList, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/userOnPremiseImport/import-users/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<UserOnPremise> importUsersOnpremise(@PathVariable String pid) {
@@ -91,30 +90,30 @@ public class UserOnPremiseImportResource {
 		String apiBaseUrl = companyRepository.findApiUrlByCompanyPid(pid);
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-		ResponseEntity<UserDTO[]> response = restTemplate.getForEntity(apiBaseUrl + "/api/onpremise-users/" + pid, UserDTO[].class);
+		ResponseEntity<UserDTO[]> response = restTemplate.getForEntity(apiBaseUrl + "/api/onpremise-users/" + pid,
+				UserDTO[].class);
 		if (response.getStatusCode().equals(HttpStatus.OK)) {
 			UserDTO[] userArrays = response.getBody();
 			if (userArrays.length > 0) {
 				List<UserDTO> userDtos = Arrays.asList(userArrays);
 				List<String> userLogins = userDtos.stream().map(user -> user.getLogin()).collect(Collectors.toList());
 				List<String> usersExisting = userRepository.findAllUserByLogin(userLogins);
-				if(usersExisting.size()==0){
-					//insert into db
+				if (usersExisting.size() == 0) {
+					// insert into db
 					userOnPremiseRepository.save(convertUserDTOsToUserOnPremise(userDtos));
-				}else{
-					return ResponseEntity.badRequest()
-							.headers(HeaderUtil.createFailureAlert("company", "Users Already Exist : "+usersExisting, "Users Exist"))
-							.body(null);
+				} else {
+
+					return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("company",
+							"Users Already Exist : " + usersExisting, "Users Exist")).body(null);
 				}
 			}
 		}
 		return new ResponseEntity<UserOnPremise>(HttpStatus.CREATED);
 	}
-	
+
 	@RequestMapping(value = "/userOnPremiseImport/companyUpdate", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<CompanyViewDTO> updateCompanyApi(
-			@Valid @RequestBody CompanyViewDTO companyDTO) {
+	public ResponseEntity<CompanyViewDTO> updateCompanyApi(@Valid @RequestBody CompanyViewDTO companyDTO) {
 		log.debug("Web request to update Company with API : {}", companyDTO);
 		if (companyDTO.getPid() == null) {
 			return ResponseEntity.badRequest()
@@ -128,25 +127,26 @@ public class UserOnPremiseImportResource {
 					.body(null);
 		}
 		companyRepository.updateCompanyUrlByPid(companyDTO.getApiUrl(), companyDTO.getPid());
-		/*company.get().setApiUrl(companyDTO.getApiUrl());
-		CompanyViewDTO result = companyService.update(company.get());
-		if (result == null) {
-			return ResponseEntity.badRequest()
-					.headers(HeaderUtil.createFailureAlert("company", "idNotexists", "Invalid Company ID")).body(null);
-		}*/
+		/*
+		 * company.get().setApiUrl(companyDTO.getApiUrl()); CompanyViewDTO result =
+		 * companyService.update(company.get()); if (result == null) { return
+		 * ResponseEntity.badRequest() .headers(HeaderUtil.createFailureAlert("company",
+		 * "idNotexists", "Invalid Company ID")).body(null); }
+		 */
 		return ResponseEntity.ok()
-				.headers(HeaderUtil.createEntityUpdateAlert("company", companyDTO.getPid().toString())).body(companyDTO);
+				.headers(HeaderUtil.createEntityUpdateAlert("company", companyDTO.getPid().toString()))
+				.body(companyDTO);
 	}
-	
-	
+
 	private List<UserOnPremise> convertUserDTOsToUserOnPremise(List<UserDTO> userDtos) {
+		System.out.println(userDtos.size() + "-----");
 		List<UserOnPremise> userPremiseList = new ArrayList<>();
-		for(UserDTO userDto : userDtos) {
+		for (UserDTO userDto : userDtos) {
 			UserOnPremise userOnPremise = new UserOnPremise();
 			userOnPremise.setCompanyName(userDto.getCompanyName());
 			userOnPremise.setCompanyPid(userDto.getCompanyPid());
 			userOnPremise.setCreatedDate(Instant.now());
-			userOnPremise.setFullName(userDto.getFirstName()+" "+userDto.getLastName());
+			userOnPremise.setFullName(userDto.getFirstName() + " " + userDto.getLastName());
 			userOnPremise.setLogin(userDto.getLogin());
 			userPremiseList.add(userOnPremise);
 		}

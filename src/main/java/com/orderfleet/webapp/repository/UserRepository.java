@@ -115,7 +115,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	
 	Long countByCompanyPidAndAuthoritiesIn(String companyPid, Set<Authority> authorities);
 	
-	@Query("select user.login from User user where user.login in ?1")
+	@Query("select user.login from User user where user.login in ?1 and user.company.id=?#{principal.companyId}")
 	List<String> findAllUserByLogin(List<String> logins);
 	
 }

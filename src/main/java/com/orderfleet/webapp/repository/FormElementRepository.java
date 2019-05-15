@@ -44,4 +44,7 @@ public interface FormElementRepository extends JpaRepository<FormElement, Long> 
 	
 	@Query("select formElement from FormElement formElement where formElement.company.id = ?#{principal.companyId} and formElement.pid IN ?1")
 	List<FormElement> findAllByCompanyIdAndFormElementPidIn(List<String> formElementPids);
+	
+	@Query("select formElement from FormElement formElement where formElement.company.id = ?1 and formElement.formLoadFromMobile = TRUE")
+	List<FormElement> findAllByCompanyIdAndLoadFromMobile(long companyId);
 }

@@ -24,8 +24,6 @@ public class StageDTO {
 
 	private boolean activated;
 
-	private long target;
-
 	private StageType stageType;
 
 	private StageNameType stageNameType;
@@ -43,7 +41,6 @@ public class StageDTO {
 		this.activated = stage.getActivated();
 		this.stageType = stage.getStageType();
 		this.stageNameType = stage.getStageNameType();
-		this.target = stage.getTarget();
 	}
 
 	public String getPid() {
@@ -92,14 +89,6 @@ public class StageDTO {
 
 	public void setActivated(boolean activated) {
 		this.activated = activated;
-	}
-
-	public long getTarget() {
-		return target;
-	}
-
-	public void setTarget(long target) {
-		this.target = target;
 	}
 
 	public StageType getStageType() {
