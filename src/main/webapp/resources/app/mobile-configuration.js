@@ -29,7 +29,8 @@ if (!this.MobileConfiguration) {
 		promptVehicleMaster : false,
 		addNewCustomer : true,
 		preventNegativeStock : false,
-		voucherNumberGenerationType : 'TYPE_1'
+		voucherNumberGenerationType : 'TYPE_1',
+		inventoryVoucherUIType : 'TYPE_1'
 	};
 
 	$(document).ready(function() {
@@ -87,14 +88,20 @@ if (!this.MobileConfiguration) {
 		mobileConfigurationDTO.realTimeProductPriceEnabled = $(
 				"#realTimeProductPriceEnabled").is(":checked");
 		mobileConfigurationDTO.hasGeoTag = $("#hasGeoTag").is(":checked");
-		
-		mobileConfigurationDTO.hasPostDatedVoucher = $("#hasPostDatedVoucher").is(":checked");
-		mobileConfigurationDTO.promptVehicleMaster = $("#promptVehicleMaster").is(":checked");
-		mobileConfigurationDTO.addNewCustomer = $("#addNewCustomer").is(":checked");
-		mobileConfigurationDTO.preventNegativeStock = $("#preventNegativeStock").is(":checked");
-		mobileConfigurationDTO.voucherNumberGenerationType = $("#voucherNumberGenerationType").val();
-		
-		
+
+		mobileConfigurationDTO.hasPostDatedVoucher = $("#hasPostDatedVoucher")
+				.is(":checked");
+		mobileConfigurationDTO.promptVehicleMaster = $("#promptVehicleMaster")
+				.is(":checked");
+		mobileConfigurationDTO.addNewCustomer = $("#addNewCustomer").is(
+				":checked");
+		mobileConfigurationDTO.preventNegativeStock = $("#preventNegativeStock")
+				.is(":checked");
+		mobileConfigurationDTO.voucherNumberGenerationType = $(
+				"#voucherNumberGenerationType").val();
+		mobileConfigurationDTO.inventoryVoucherUIType = $(
+				"#inventoryVoucherUIType").val();
+
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -111,51 +118,60 @@ if (!this.MobileConfiguration) {
 
 	function getMobileConfigurationConfig() {
 		$('input[type="checkbox"]:checked').prop('checked', false);
-		$.ajax({
-			url : contextPath + "/" + $("#dbCompany").val(),
-			method : 'GET',
-			success : function(data) {
-				if (data == "") {
-					$('#saveOffline').prop("checked", true);
-					$('#addNewCustomer').prop("checked",true);
-					$('#voucherNumberGenerationType').val("TYPE_1");
-				} else {
-					$('#saveOffline').prop("checked",
-							data.taskExecutionSaveOfflineValue);
-					$('#promptAttendance').prop("checked",
-						data.promptAttendanceMarkingvalue);
-					$('#promptDayPlanUpdate').prop("checked",
-						data.promptDayPlanUpdate);
-					$('#promptMasterDataUpdate').prop("checked",
-						data.promptMasterDataUpdate);
-					$('#attendanceMarkingRequired').prop("checked",
-						data.attendanceMarkingRequired);
-					$("#dayPlanDownloadRequired").prop("checked",
-						data.dayPlanDownloadRequired);
-					$('#masterDataUpdateRequired').prop("checked",
-						data.masterDataUpdateRequired);
-					$('#buildDueDetails').prop("checked", data.buildDueDetail);
-					$('#includeAddressInAccountList').prop("checked",
-						data.includeAddressInAccountList);
-					$('#showAllActivityCount').prop("checked",
-						data.showAllActivityCount);
-					$('#createTerritory').prop("checked", data.createTerritory);
-					$('#realTimeProductPriceEnabled').prop("checked",
-							data.realTimeProductPriceEnabled);
-					$('#hasGeoTag').prop("checked",data.hasGeoTag);
-					$('#hasPostDatedVoucher').prop("checked",data.hasPostDatedVoucher);
-					$('#promptVehicleMaster').prop("checked",data.promptVehicleMaster);
-					$('#addNewCustomer').prop("checked",data.addNewCustomer);
-					$('#preventNegativeStock').prop("checked",data.preventNegativeStock);
-					$('#voucherNumberGenerationType').val(data.voucherNumberGenerationType);
-				}
-				
-				
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			}
-		});
+		$
+				.ajax({
+					url : contextPath + "/" + $("#dbCompany").val(),
+					method : 'GET',
+					success : function(data) {
+						if (data == "") {
+							$('#saveOffline').prop("checked", true);
+							$('#addNewCustomer').prop("checked", true);
+							$('#voucherNumberGenerationType').val("TYPE_1");
+						} else {
+							$('#saveOffline').prop("checked",
+									data.taskExecutionSaveOfflineValue);
+							$('#promptAttendance').prop("checked",
+									data.promptAttendanceMarkingvalue);
+							$('#promptDayPlanUpdate').prop("checked",
+									data.promptDayPlanUpdate);
+							$('#promptMasterDataUpdate').prop("checked",
+									data.promptMasterDataUpdate);
+							$('#attendanceMarkingRequired').prop("checked",
+									data.attendanceMarkingRequired);
+							$("#dayPlanDownloadRequired").prop("checked",
+									data.dayPlanDownloadRequired);
+							$('#masterDataUpdateRequired').prop("checked",
+									data.masterDataUpdateRequired);
+							$('#buildDueDetails').prop("checked",
+									data.buildDueDetail);
+							$('#includeAddressInAccountList').prop("checked",
+									data.includeAddressInAccountList);
+							$('#showAllActivityCount').prop("checked",
+									data.showAllActivityCount);
+							$('#createTerritory').prop("checked",
+									data.createTerritory);
+							$('#realTimeProductPriceEnabled').prop("checked",
+									data.realTimeProductPriceEnabled);
+							$('#hasGeoTag').prop("checked", data.hasGeoTag);
+							$('#hasPostDatedVoucher').prop("checked",
+									data.hasPostDatedVoucher);
+							$('#promptVehicleMaster').prop("checked",
+									data.promptVehicleMaster);
+							$('#addNewCustomer').prop("checked",
+									data.addNewCustomer);
+							$('#preventNegativeStock').prop("checked",
+									data.preventNegativeStock);
+							$('#voucherNumberGenerationType').val(
+									data.voucherNumberGenerationType);
+							$('#inventoryVoucherUIType').val(
+									data.inventoryVoucherUIType);
+						}
+
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
 	}
 	var mobileConfigPid = "";
 	MobileConfiguration.deleteConfig = function(pid) {
@@ -188,7 +204,7 @@ if (!this.MobileConfiguration) {
 	function onSaveSuccess(result) {
 		// reloading page to see the updated data
 		window.location = contextPath;
-		
+
 	}
 
 	function onError(httpResponse, exception) {

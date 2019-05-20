@@ -54,7 +54,8 @@
 						<th>Prompt Vehicle</th>
 						<th>Add Customer</th>
 						<th>Prevent Negative Stock</th>
-						<th>Vch.No Generation Type
+						<th>Vch.No Generation Type</th>
+						<th>Inventory Vch UI Type</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -81,6 +82,7 @@
 							<td>${mobileConfiguration.addNewCustomer}</td>
 							<td>${mobileConfiguration.preventNegativeStock}</td>
 							<td>${mobileConfiguration.voucherNumberGenerationType}</td>
+							<td>${mobileConfiguration.inventoryVoucherUIType}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -249,7 +251,7 @@
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Prevent Negative Stock</label>
-														 <input id="preventNegativeStock"
+													<input id="preventNegativeStock"
 														name='preventNegativeStock' type='checkbox'
 														class="form-control" />
 												</div></td>
@@ -259,6 +261,17 @@
 													<label class="control-label">Vchr.No Generation
 														type</label> <select id="voucherNumberGenerationType"
 														name='voucherNumberGenerationType' class="form-control">
+														<option value="TYPE_1" selected="selected">Type_1</option>
+														<option value="TYPE_2">Type_2</option>
+													</select>
+												</div></td>
+										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Inventory Voucher UI
+														Type</label> <select id="inventoryVoucherUIType"
+														name='inventoryVoucherUIType' class="form-control">
 														<option value="TYPE_1" selected="selected">Type_1</option>
 														<option value="TYPE_2">Type_2</option>
 													</select>
