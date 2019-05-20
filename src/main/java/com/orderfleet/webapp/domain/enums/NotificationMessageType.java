@@ -7,5 +7,5 @@ package com.orderfleet.webapp.domain.enums;
  * @since November 02, 2016
  */
 public enum NotificationMessageType {
-	INFO, APPROVAL, TASK, TASK_SKIPPED, PLAN, ATT_SG_APPROVAL, ACCOUNT_TASK
+	INFO, APPROVAL, TASK, TASK_SKIPPED, PLAN, ATT_SG_APPROVAL, ACCOUNT_TASK, CHAT_REPLY
 }

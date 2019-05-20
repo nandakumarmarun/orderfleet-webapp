@@ -17,6 +17,7 @@ public class CompanyConfigDTO {
 	private boolean refreshProductGroupProduct;//for refreshing product - product group association
 	private boolean stageChangeAccountingVoucher;//for changing stage even if document in accounting voucher type  for geologic
 	private boolean newCustomerAlias;//devsoft if new customer is added alias will be filled with N_1, N_2 etc
+	private boolean chatReply;//settings to reply for a firebase notification
 
 	public CompanyConfigDTO() {
 		super();
@@ -85,5 +86,15 @@ public class CompanyConfigDTO {
 	public void setNewCustomerAlias(boolean newCustomerAlias) {
 		this.newCustomerAlias = newCustomerAlias;
 	}
+
+	public boolean getChatReply() {
+		return chatReply;
+	}
+
+	public void setChatReply(boolean chatReply) {
+		this.chatReply = chatReply;
+	}
+	
+	
 
 }

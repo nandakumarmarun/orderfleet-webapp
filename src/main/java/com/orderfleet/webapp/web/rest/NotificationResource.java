@@ -31,15 +31,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.Notification;
 import com.orderfleet.webapp.domain.NotificationDetail;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.MessageStatus;
 import com.orderfleet.webapp.domain.enums.NotificationMessageType;
 import com.orderfleet.webapp.domain.model.FirebaseData;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.NotificationDetailRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.NotificationService;
@@ -70,6 +75,9 @@ public class NotificationResource {
 	private UserDeviceService userDeviceService;
 
 	private EmployeeHierarchyService employeeHierarchyService;
+
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	@Inject
 	private EmployeeProfileService employeeProfileService;
@@ -151,7 +159,17 @@ public class NotificationResource {
 		data.setTitle(notification.getTitle() == null ? "Message" : notification.getTitle());
 		data.setMessage(notification.getMessage() + "\n\ncreated by : " + createdUser.getFirstName() + " "
 				+ createdUser.getLastName());
-		data.setMessageType(NotificationMessageType.INFO);
+
+		String companyPid = notification.getCompany().getPid();
+		Optional<CompanyConfiguration> optChatReply = companyConfigurationRepository.findByCompanyPidAndName(companyPid,
+				CompanyConfig.CHAT_REPLY);
+
+		if (optChatReply.isPresent()) {
+			data.setMessageType(NotificationMessageType.CHAT_REPLY);
+		} else {
+			data.setMessageType(NotificationMessageType.INFO);
+		}
+
 		data.setPidUrl(notification.getPid());
 		data.setNotificationPid("");
 		data.setSentDate(LocalDateTime.now().toString());
@@ -188,9 +206,8 @@ public class NotificationResource {
 
 	@RequestMapping(value = "/notifications-report/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<List<NotificationDTO>> filterNotifications(
-			@RequestParam("employeePids") String employeePids, @RequestParam("status") MessageStatus status,
-			@RequestParam("filterBy") String filterBy,
+	public ResponseEntity<List<NotificationDTO>> filterNotifications(@RequestParam("employeePids") String employeePids,
+			@RequestParam("status") MessageStatus status, @RequestParam("filterBy") String filterBy,
 			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 			@RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
 		log.debug("Web request to filter notifications report");
@@ -226,9 +243,9 @@ public class NotificationResource {
 		if (employeeProfiles.isEmpty()) {
 			return Collections.emptyList();
 		}
-		List<Long> userIds = employeeProfiles.stream().filter(ep -> ep.getUser() != null)
-				.map(e -> e.getUser().getId()).collect(Collectors.toList());
-		
+		List<Long> userIds = employeeProfiles.stream().filter(ep -> ep.getUser() != null).map(e -> e.getUser().getId())
+				.collect(Collectors.toList());
+
 		List<MessageStatus> msgStatus;
 		if (MessageStatus.NONE.equals(status)) {
 			msgStatus = Arrays.asList(MessageStatus.NONE, MessageStatus.SUCCESS, MessageStatus.FAILED);
