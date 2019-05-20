@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest.dto;
 
 import com.orderfleet.webapp.domain.MobileConfiguration;
+import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 
 /**
@@ -33,6 +34,7 @@ public class MobileConfigurationDTO {
 	private boolean addNewCustomer;
 	private boolean preventNegativeStock;
 	private VoucherNumberGenerationType voucherNumberGenerationType;
+	private InventoryVoucherUIType inventoryVoucherUIType;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -61,6 +63,7 @@ public class MobileConfigurationDTO {
 		this.addNewCustomer = mobileConfiguration.getAddNewCustomer();
 		this.preventNegativeStock = mobileConfiguration.getPreventNegativeStock();
 		this.voucherNumberGenerationType = mobileConfiguration.getVoucherNumberGenerationType();
+		this.inventoryVoucherUIType = mobileConfiguration.getInventoryVoucherUIType();
 	}
 
 	public String getPid() {
@@ -229,6 +232,14 @@ public class MobileConfigurationDTO {
 
 	public void setVoucherNumberGenerationType(VoucherNumberGenerationType voucherNumberGenerationType) {
 		this.voucherNumberGenerationType = voucherNumberGenerationType;
+	}
+
+	public InventoryVoucherUIType getInventoryVoucherUIType() {
+		return inventoryVoucherUIType;
+	}
+
+	public void setInventoryVoucherUIType(InventoryVoucherUIType inventoryVoucherUIType) {
+		this.inventoryVoucherUIType = inventoryVoucherUIType;
 	}
 
 }

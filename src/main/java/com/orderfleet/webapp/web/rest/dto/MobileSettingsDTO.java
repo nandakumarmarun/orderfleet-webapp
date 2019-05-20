@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.dto;
 
 import java.util.List;
 
+import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 import com.orderfleet.webapp.web.rest.api.dto.ActivityNotificationDTO;
 
@@ -58,6 +59,8 @@ public class MobileSettingsDTO {
 
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 
+	private InventoryVoucherUIType inventoryVoucherUIType;
+
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -82,6 +85,7 @@ public class MobileSettingsDTO {
 		this.addNewCustomer = mobileConfigurationDTO.getAddNewCustomer();
 		this.preventNegativeStock = mobileConfigurationDTO.getPreventNegativeStock();
 		this.voucherNumberGenerationType = mobileConfigurationDTO.getVoucherNumberGenerationType();
+		this.inventoryVoucherUIType = mobileConfigurationDTO.getInventoryVoucherUIType();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -258,6 +262,14 @@ public class MobileSettingsDTO {
 
 	public void setVoucherNumberGenerationType(VoucherNumberGenerationType voucherNumberGenerationType) {
 		this.voucherNumberGenerationType = voucherNumberGenerationType;
+	}
+
+	public InventoryVoucherUIType getInventoryVoucherUIType() {
+		return inventoryVoucherUIType;
+	}
+
+	public void setInventoryVoucherUIType(InventoryVoucherUIType inventoryVoucherUIType) {
+		this.inventoryVoucherUIType = inventoryVoucherUIType;
 	}
 
 }

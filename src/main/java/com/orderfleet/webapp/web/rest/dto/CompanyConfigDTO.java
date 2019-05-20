@@ -13,10 +13,10 @@ public class CompanyConfigDTO {
 	private String companyPid;
 	private boolean distanceTraveled;
 	private boolean locationVariance;
-	private boolean interimSave;
-	private boolean refreshProductGroupProduct;
-	private boolean stageChangeAccountingVoucher;
-	private boolean newCustomerAlias;
+	private boolean interimSave;//save is equal to send
+	private boolean refreshProductGroupProduct;//for refreshing product - product group association
+	private boolean stageChangeAccountingVoucher;//for changing stage even if document in accounting voucher type  for geologic
+	private boolean newCustomerAlias;//devsoft if new customer is added alias will be filled with N_1, N_2 etc
 
 	public CompanyConfigDTO() {
 		super();

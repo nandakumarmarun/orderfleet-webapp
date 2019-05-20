@@ -40,7 +40,6 @@ public class StageServiceImpl implements StageService {
 		stage.setActivated(stageDto.getActivated());
 		stage.setStageType(StageType.CUSTOMER_JOURNEY);
 		stage.setStageNameType(stageDto.getStageNameType());
-		stage.setTarget(stageDto.getTarget());
 		// set company
 		stage.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		stage = stageRepository.save(stage);
@@ -55,7 +54,6 @@ public class StageServiceImpl implements StageService {
 			stage.setDescription(stageDto.getDescription());
 			stage.setSortOrder(stageDto.getSortOrder());
 			stage.setStageNameType(stageDto.getStageNameType());
-			stage.setTarget(stageDto.getTarget());
 			stage = stageRepository.save(stage);
 			return new StageDTO(stage);
 		}).orElse(null);
@@ -111,7 +109,6 @@ public class StageServiceImpl implements StageService {
 
 	@Override
 	public List<StageTargetReportDTO> findAllStageTargetReports() {
-
 		List<Object[]> objects = stageRepository.findAllStageTargetReports();
 
 		List<StageTargetReportDTO> stageTargetReportDTOs = new ArrayList<>();

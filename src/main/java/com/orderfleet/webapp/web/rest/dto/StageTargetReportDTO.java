@@ -1,11 +1,5 @@
 package com.orderfleet.webapp.web.rest.dto;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import com.orderfleet.webapp.domain.Stage;
-import com.orderfleet.webapp.domain.enums.StageNameType;
-import com.orderfleet.webapp.domain.enums.StageType;
 
 public class StageTargetReportDTO {
 
@@ -14,7 +8,7 @@ public class StageTargetReportDTO {
 	private String stageName;
 
 	private long achieved;
-
+	
 	private long target;
 
 	private double percentage;
@@ -42,7 +36,7 @@ public class StageTargetReportDTO {
 	public void setAchieved(long achieved) {
 		this.achieved = achieved;
 	}
-
+	
 	public long getTarget() {
 		return target;
 	}

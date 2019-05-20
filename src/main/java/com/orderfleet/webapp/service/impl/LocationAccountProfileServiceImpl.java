@@ -194,32 +194,29 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 					.collect(Collectors.toList());
 			
 		}
-//appending alias configurable
 		List<AccountNameTextSettings> accountNameTextSettings = accountNameTextSettingsRepository
 				.findAllByCompanyIdAndEnabledTrue(SecurityUtils.getCurrentUsersCompanyId());
-		if (accountNameTextSettings.size() > 0) {
-			for (AccountProfile  accountProfile : result) {
+		Page<AccountProfileDTO> accountProfileDtoPage = new PageImpl<>(accountProfileMapper.accountProfilesToAccountProfileDTOs(result));
+		if (accountNameTextSettings.size() > 0) {	
+			for(AccountProfileDTO dto : accountProfileDtoPage) {
 				String name = " (";
 				for (AccountNameTextSettings accountNameText : accountNameTextSettings) {
-					
 					if (accountNameText.getName().equals("ALIAS")) {
-						if (accountProfile.getAlias() != null && !accountProfile.getAlias().isEmpty()) {
-							name += accountProfile.getAlias() + ",";
+						if (dto.getAlias() != null && !dto.getAlias().isEmpty()) {
+							name += dto.getAlias() + ",";
 						}
-							
-					} /*else if (accountNameText.getName().equals("MRP")) {
-						name += accountProfile.getMrp() + ",";
-					} */
+					}
 				}
 				name = name.substring(0, name.length() - 1);
 				if (name.length() > 1) {
 					name += ")";
 				}
-				accountProfile.setName(accountProfile.getName() + name);
+				dto.setName(dto.getName()+name);
 			}
 		}
+				
 		System.out.println("===============================================================");
-		return new PageImpl<>(accountProfileMapper.accountProfilesToAccountProfileDTOs(result));
+		return accountProfileDtoPage;
 	}
 
 	/**

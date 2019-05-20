@@ -40,8 +40,10 @@ import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
 import com.orderfleet.webapp.domain.FilledFormDetail;
+import com.orderfleet.webapp.domain.FormElement;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.Location;
+import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.SalesTargetGroupUserTarget;
 import com.orderfleet.webapp.domain.Stage;
@@ -62,6 +64,7 @@ import com.orderfleet.webapp.domain.enums.ApprovalStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DashboardItemType;
 import com.orderfleet.webapp.domain.enums.DocumentType;
+import com.orderfleet.webapp.domain.enums.LoadMobileData;
 import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.domain.enums.NotificationMessageType;
 import com.orderfleet.webapp.domain.enums.PriorityStatus;
@@ -82,8 +85,11 @@ import com.orderfleet.webapp.repository.DocumentApprovalRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskPlanRepository;
+import com.orderfleet.webapp.repository.FormElementRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
+import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
+import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.SalesTargetGroupDocumentRepository;
 import com.orderfleet.webapp.repository.SalesTargetGroupProductRepository;
 import com.orderfleet.webapp.repository.SalesTargetGroupUserTargetRepository;
@@ -236,6 +242,15 @@ public class TaskSubmissionPostSave {
 
 	@Inject
 	private AttendanceRepository attendanceRepository;
+	
+	@Inject
+	private FormElementRepository formElementRepository;
+	
+	@Inject
+	private ProductGroupRepository productGroupRepository;
+	
+	@Inject
+	private LocationRepository locationRepository;
 
 	@Inject
 	private GeoLocationService geoLocationService;
@@ -950,6 +965,28 @@ public class TaskSubmissionPostSave {
 	private void processStageScript(TaskSetting taskSetting, ExecutiveTaskExecution executiveTaskExecution,
 			Document document, String refTransactionPid, List<FilledFormDetailDTO> filledFormDetailDTOs,
 			EmployeeProfile employee) throws TaskSubmissionPostSaveException {
+		long companyId = document.getCompany().getId();
+		List<FormElement> formElementsLoadFromMobile = formElementRepository.findAllByCompanyIdAndLoadFromMobile(companyId);
+		if(formElementsLoadFromMobile !=null && formElementsLoadFromMobile.size()!=0) {	
+			for(FilledFormDetailDTO dto : filledFormDetailDTOs) {
+				for(FormElement fe : formElementsLoadFromMobile) {
+					if(dto.getFormElementPid().equals(fe.getPid())) {
+						if(fe.getFormLoadMobileData()==LoadMobileData.PRODUCT_GROUP) {
+							Optional<ProductGroup> opProductGroup = productGroupRepository.findByCompanyIdAndNameIgnoreCase(companyId, dto.getValue());
+							if(opProductGroup.isPresent()) {
+								dto.setValue(opProductGroup.get().getPid());
+							}
+						}else if(fe.getFormLoadMobileData()==LoadMobileData.TERRITORY) {
+							Optional<Location> opLocation = locationRepository.findByCompanyIdAndNameIgnoreCase(companyId, dto.getValue());
+							if(opLocation.isPresent()) {
+								dto.setValue(opLocation.get().getPid());
+							}
+								
+						}
+					}
+				}
+			}
+		}
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 		log.info("Js code Workging....");
 		try {
@@ -959,7 +996,7 @@ public class TaskSubmissionPostSave {
 				HashMap<String, String> customerJourneyMap = new HashMap<>();
 				if (document.getDocumentType().equals(DocumentType.DYNAMIC_DOCUMENT)) {
 					if (taskSetting.getScript().indexOf("customerJourneyStage") != -1 ? Boolean.TRUE : Boolean.FALSE) {
-
+						
 						customerJourneyMap = (HashMap<String, String>) invocable.invokeFunction("customerJourneyStage",
 								executiveTaskExecution.getActivity().getName(), document.getName(), "",
 								filledFormDetailDTOs);
@@ -969,8 +1006,7 @@ public class TaskSubmissionPostSave {
 
 					}
 				} else if (document.getDocumentType().equals(DocumentType.ACCOUNTING_VOUCHER)) {
-
-					long companyId = SecurityUtils.getCurrentUsersCompanyId();
+					log.info("Accounting voucher stage changing");
 					Optional<CompanyConfiguration> optStageChangeAccountingVoucher = companyConfigurationRepository
 							.findByCompanyIdAndName(companyId, CompanyConfig.STAGE_CHANGES_FOR_ACCOUNTING_VOUCHER);
 					// company configuration for stage change of accounting vouchers

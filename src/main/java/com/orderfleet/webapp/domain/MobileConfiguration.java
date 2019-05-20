@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 
 /**
@@ -97,6 +98,11 @@ public class MobileConfiguration implements Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "voucher_number_generation_type", nullable = false, columnDefinition = "character varying DEFAULT 'TYPE_1'")
 	private VoucherNumberGenerationType voucherNumberGenerationType;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "inventory_voucher_ui_type", nullable = false, columnDefinition = "character varying DEFAULT 'TYPE_1'")
+	private InventoryVoucherUIType inventoryVoucherUIType;
 
 	@NotNull
 	@ManyToOne
@@ -272,6 +278,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setVoucherNumberGenerationType(VoucherNumberGenerationType voucherNumberGenerationType) {
 		this.voucherNumberGenerationType = voucherNumberGenerationType;
+	}
+
+	public InventoryVoucherUIType getInventoryVoucherUIType() {
+		return inventoryVoucherUIType;
+	}
+
+	public void setInventoryVoucherUIType(InventoryVoucherUIType inventoryVoucherUIType) {
+		this.inventoryVoucherUIType = inventoryVoucherUIType;
 	}
 
 	@Override
