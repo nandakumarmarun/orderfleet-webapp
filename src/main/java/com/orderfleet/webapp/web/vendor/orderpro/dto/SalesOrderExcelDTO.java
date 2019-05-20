@@ -3,7 +3,7 @@ package com.orderfleet.webapp.web.vendor.orderpro.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SalesOrderCsvDTO {
+public class SalesOrderExcelDTO {
 
 	private String billNo;
 	private String date;
@@ -18,8 +18,9 @@ public class SalesOrderCsvDTO {
 	private Double CGSTAmt;
 	private Double SGSTAmt;
 	private String inventoryPid;
+	private String employeeName;
 
-	public SalesOrderCsvDTO() {
+	public SalesOrderExcelDTO() {
 
 	}
 
@@ -125,6 +126,14 @@ public class SalesOrderCsvDTO {
 
 	public void setDiscPrice(Double discPrice) {
 		this.discPrice = discPrice;
+	}
+
+	public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
 	}
 
 }

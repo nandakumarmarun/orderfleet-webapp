@@ -32,9 +32,9 @@ import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.SnrichPartnerCompanyRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.web.vendor.excel.dto.SalesOrderExcelDTO;
 import com.orderfleet.webapp.web.vendor.integre.dto.SalesOrderPid;
 import com.orderfleet.webapp.web.vendor.integre.dto.SalesPidDTO;
+import com.orderfleet.webapp.web.vendor.orderpro.dto.SalesOrderExcelDTO;
 
 @RestController
 @RequestMapping(value = "/api/orderpro/v1")
@@ -116,6 +116,7 @@ public class SalesDatasDownloadController {
 			salesOrderDTO.setCGSTAmt(cgst);
 			salesOrderDTO.setSGSTAmt(sgst);
 			salesOrderDTO.setInventoryPid(obj[9] != null ? obj[9].toString() : "");
+			salesOrderDTO.setEmployeeName(obj[10] != null ? obj[10].toString() : "");
 
 			salesOrderDTO.setBillNo(obj[0].toString());
 			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
