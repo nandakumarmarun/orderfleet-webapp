@@ -43,6 +43,7 @@
 						<th>Refresh ProductGroup Product</th>
 						<th>Stage Change For Accounting Voucher</th>
 						<th>New Customer Alias</th>
+						<th>Chat Reply</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -57,6 +58,7 @@
 							<td>${companyConfiguration.refreshProductGroupProduct}</td>
 							<td>${companyConfiguration.stageChangeAccountingVoucher}</td>
 							<td>${companyConfiguration.newCustomerAlias}</td>
+							<td>${companyConfiguration.chatReply}</td>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
 						</tr>
@@ -139,6 +141,13 @@
 											<td><div class="form-group">
 													<label class="control-label">New Customer Alias</label> <input
 														id="newCustomerAlias" name='checksNewCustomerAlias'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Chat Reply</label> <input
+														id="chatReply" name='checksChatReply'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>

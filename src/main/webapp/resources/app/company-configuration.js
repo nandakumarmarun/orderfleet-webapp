@@ -42,6 +42,7 @@ if (!this.CompanyConfiguration) {
 		var stageChangeAccountingVoucher = $('#stageChangeAccountingVoucher')
 				.is(":checked");
 		var newCustomerAlias = $('#newCustomerAlias').is(":checked");
+		var chatReply = $('#chatReply').is(":checked");
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -52,7 +53,8 @@ if (!this.CompanyConfiguration) {
 				interimSave : interimSave,
 				refreshProductGroupProduct : refreshProductGroupProduct,
 				stageChangeAccountingVoucher : stageChangeAccountingVoucher,
-				newCustomerAlias : newCustomerAlias
+				newCustomerAlias : newCustomerAlias,
+				chatReply : chatReply
 			},
 			success : function(data) {
 				onSaveSuccess(data);
@@ -77,6 +79,7 @@ if (!this.CompanyConfiguration) {
 				$("#stageChangeAccountingVoucher").prop("checked",
 						data.stageChangeAccountingVoucher);
 				$("#newCustomerAlias").prop("checked", data.newCustomerAlias);
+				$("#chatReply").prop("checked", data.chatReply);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);

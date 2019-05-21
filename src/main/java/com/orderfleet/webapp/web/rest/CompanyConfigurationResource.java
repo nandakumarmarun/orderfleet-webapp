@@ -101,6 +101,10 @@ public class CompanyConfigurationResource {
 					mcDto.setNewCustomerAlias(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.CHAT_REPLY)) {
+					mcDto.setChatReply(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 			}
 			if (anyValueExist) {
@@ -116,8 +120,8 @@ public class CompanyConfigurationResource {
 	public ResponseEntity<String> saveCompanyConfiguration(@RequestParam String companyPid,
 			@RequestParam String distanceTraveled, @RequestParam String locationVariance,
 			@RequestParam String interimSave, @RequestParam String refreshProductGroupProduct,
-			@RequestParam String stageChangeAccountingVoucher, @RequestParam String newCustomerAlias)
-			throws URISyntaxException {
+			@RequestParam String stageChangeAccountingVoucher, @RequestParam String newCustomerAlias,
+			@RequestParam String chatReply) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 
 		Company company = null;
@@ -139,6 +143,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STAGE_CHANGES_FOR_ACCOUNTING_VOUCHER);
 		Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.NEW_CUSTOMER_ALIAS);
+		Optional<CompanyConfiguration> optChatReply = companyConfigurationRepository.findByCompanyPidAndName(companyPid,
+				CompanyConfig.CHAT_REPLY);
 
 		CompanyConfiguration saveOfflineConfiguration = null;
 		CompanyConfiguration promptAttendance = null;
@@ -146,6 +152,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration refreshProductGroupProductCompany = null;
 		CompanyConfiguration stageChangeAccountingVoucherCompany = null;
 		CompanyConfiguration newCustomerAliasCompany = null;
+		CompanyConfiguration chatReplyCompany = null;
 
 		if (optDistanceTraveled.isPresent()) {
 			saveOfflineConfiguration = optDistanceTraveled.get();
@@ -213,6 +220,17 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(newCustomerAliasCompany);
 
+		if (optChatReply.isPresent()) {
+			chatReplyCompany = optChatReply.get();
+			chatReplyCompany.setValue(chatReply);
+		} else {
+			chatReplyCompany = new CompanyConfiguration();
+			chatReplyCompany.setCompany(company);
+			chatReplyCompany.setName(CompanyConfig.CHAT_REPLY);
+			chatReplyCompany.setValue(chatReply);
+		}
+		companyConfigurationRepository.save(chatReplyCompany);
+
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -241,6 +259,9 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.NEW_CUSTOMER_ALIAS);
 
+		Optional<CompanyConfiguration> optChatReply = companyConfigurationRepository.findByCompanyPidAndName(companyPid,
+				CompanyConfig.CHAT_REPLY);
+
 		CompanyConfigDTO companyConfigurationDTO = new CompanyConfigDTO();
 
 		if (optDistanceTraveled.isPresent()) {
@@ -263,6 +284,9 @@ public class CompanyConfigurationResource {
 		if (optNewCustomerAlias.isPresent()) {
 			companyConfigurationDTO.setNewCustomerAlias(Boolean.valueOf(optNewCustomerAlias.get().getValue()));
 		}
+		if (optChatReply.isPresent()) {
+			companyConfigurationDTO.setChatReply(Boolean.valueOf(optChatReply.get().getValue()));
+		}
 		return companyConfigurationDTO;
 	}
 
@@ -284,6 +308,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STAGE_CHANGES_FOR_ACCOUNTING_VOUCHER);
 		Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.NEW_CUSTOMER_ALIAS);
+		Optional<CompanyConfiguration> optChatReply = companyConfigurationRepository.findByCompanyPidAndName(companyPid,
+				CompanyConfig.CHAT_REPLY);
 
 		if (optDistanceTraveled.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optDistanceTraveled.get().getCompany().getId(),
@@ -310,6 +336,10 @@ public class CompanyConfigurationResource {
 		if (optNewCustomerAlias.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optNewCustomerAlias.get().getCompany().getId(),
 					CompanyConfig.NEW_CUSTOMER_ALIAS);
+		}
+		if (optChatReply.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optChatReply.get().getCompany().getId(),
+					CompanyConfig.CHAT_REPLY);
 		}
 		return ResponseEntity.ok()
 				.headers(HeaderUtil.createEntityDeletionAlert("companyConfiguration", companyPid.toString())).build();
