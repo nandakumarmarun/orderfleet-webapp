@@ -24,6 +24,7 @@ import com.orderfleet.webapp.domain.ProductNameTextSettings;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.enums.StockAvailabilityStatus;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.DocumentStockLocationSourceRepository;
 import com.orderfleet.webapp.repository.EcomProductProfileProductRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.ProductGroupEcomProductsRepository;
@@ -85,6 +86,9 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	
 	@Inject
 	private EcomProductProfileProductRepository ecomProductProfileProductRepository;
+	
+	@Inject
+	private DocumentStockLocationSourceRepository documentStockLocationSourceRepository;
 
 	@Override
 	public void save(String productGroupPid, String assignedProducts) {
@@ -389,6 +393,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 			// set description to productProfile
 			List<ProductNameTextSettings> productNameTextSettings = productNameTextSettingsRepository
 					.findAllByCompanyIdAndEnabledTrue(SecurityUtils.getCurrentUsersCompanyId());
+			Set<Long> sLocationIds = documentStockLocationSourceRepository.findStockLocationIdsByCompanyId();
 			if (productNameTextSettings.size() > 0) {
 				for (ProductProfileDTO productProfileDTO : productProfileDTOs) {
 					String name = " (";
@@ -410,13 +415,31 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 							List<OpeningStock> openingStocks = new ArrayList<>();
 							 openingStocks = openingStockRepository
 									.findByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
-							double quantity = 0.0;
-							if(!openingStocks.isEmpty() ) {
-								quantity = openingStocks.stream().mapToDouble(op -> op.getQuantity()).sum();
+							//double quantity = 0.0;
+							
+							if (sLocationIds.isEmpty()) {
+								OpeningStock openingStock = openingStockRepository
+										.findTop1ByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
+								if (openingStock != null) {
+									name +="STK:"+ openingStock.getQuantity() + ",";
+								}
+							} else {
+								Double sum = openingStockRepository.findSumOpeningStockByProductPidAndStockLocationIdIn(
+										productProfileDTO.getPid(), sLocationIds);
+								name +="STK:"+ sum + ",";
 							}
-							if (quantity != 0.0) {
-								name +="STK:"+ quantity + ",";
-							}
+							
+//							
+//							
+//							
+//							if(!openingStocks.isEmpty() ) {
+//								quantity = openingStocks.stream().mapToDouble(op -> op.getQuantity()).sum();
+//							}
+//							
+//							
+//							if (quantity != 0.0) {
+//								name +="STK:"+ quantity + ",";
+//							}
 						}
 					}
 					name = name.substring(0, name.length() - 1);
