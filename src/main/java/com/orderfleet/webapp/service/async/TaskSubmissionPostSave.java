@@ -301,11 +301,13 @@ public class TaskSubmissionPostSave {
 					log.info("Update Distance travelled");
 					// saveUpdate distance
 					updateDistance(executiveTaskExecution);
+					log.info("Updated Distance travelled =============");
 				}
 			}
+			log.info("Test log msg =======================");
 			if (optLocationVariance.isPresent()) {
 				if (Boolean.valueOf(optLocationVariance.get().getValue())) {
-					log.info("Update Location variance start");
+					log.info("Update Location variance start ==========");
 					// saveUpdate distance
 					updateLocationVariance(executiveTaskExecution);
 				}
