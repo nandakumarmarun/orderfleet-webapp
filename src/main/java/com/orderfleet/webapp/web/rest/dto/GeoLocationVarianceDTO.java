@@ -13,6 +13,7 @@ import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
  */
 public class GeoLocationVarianceDTO {
 
+	private String executionPid;
 	private String accountProfileName;
 	private String accountProfilePid;
 	private String activityName;
@@ -32,6 +33,7 @@ public class GeoLocationVarianceDTO {
 
 	public GeoLocationVarianceDTO(ExecutiveTaskExecution execution) {
 		super();
+		this.executionPid = execution.getPid();
 		this.accountProfileName = execution.getAccountProfile().getName();
 		this.accountProfilePid = execution.getAccountProfile().getPid();
 		this.activityName = execution.getActivity().getName();
@@ -40,13 +42,40 @@ public class GeoLocationVarianceDTO {
 		this.actualLocation = execution.getAccountProfile().getLocation() == null ? ""
 				: execution.getAccountProfile().getLocation();
 		this.actualLocationLat = execution.getAccountProfile().getLatitude() != null
-				? execution.getAccountProfile().getLatitude().doubleValue() : 0;
+				? execution.getAccountProfile().getLatitude().doubleValue()
+				: 0;
 		this.actualLocationLng = execution.getAccountProfile().getLongitude() != null
-				? execution.getAccountProfile().getLongitude().doubleValue() : 0;
+				? execution.getAccountProfile().getLongitude().doubleValue()
+				: 0;
 		this.reportedLocation = execution.getLocation() == null ? "" : execution.getLocation();
 		this.reportedLocationLat = execution.getLatitude() != null ? execution.getLatitude().doubleValue() : 0;
 		this.reportedLocationLng = execution.getLongitude() != null ? execution.getLongitude().doubleValue() : 0;
-		this.variation = execution.getLocationVariance() != null ? execution.getLocationVariance() : "";
+
+		if (execution.getLatitude() != null && execution.getAccountProfile().getLatitude() != null
+				&& execution.getLatitude().doubleValue() != 0
+				&& execution.getAccountProfile().getLatitude().doubleValue() != 0) {
+			this.variation = execution.getLocationVariance() != null ? execution.getLocationVariance() : "Button";
+		} else if (execution.getAccountProfile().getLatitude() == null
+				|| execution.getAccountProfile().getLatitude().doubleValue() == 0) {
+			if (execution.getLocation() == null || execution.getLocation().equalsIgnoreCase("No Location")
+					|| execution.getLocation().isEmpty()) {
+				this.variation = "-";
+			} else {
+				this.variation = "Customer Not Geo Tagged";
+			}
+		} else {
+			this.variation = "-";
+
+		}
+
+	}
+
+	public String getExecutionPid() {
+		return executionPid;
+	}
+
+	public void setExecutionPid(String executionPid) {
+		this.executionPid = executionPid;
 	}
 
 	public String getAccountProfileName() {
@@ -60,7 +89,7 @@ public class GeoLocationVarianceDTO {
 	public String getAccountProfilePid() {
 		return accountProfilePid;
 	}
-	
+
 	public void setAccountProfilePid(String accoountProfilePid) {
 		this.accountProfilePid = accoountProfilePid;
 	}
@@ -144,7 +173,6 @@ public class GeoLocationVarianceDTO {
 	public void setVariation(String variation) {
 		this.variation = variation;
 	}
-
 
 	@Override
 	public String toString() {

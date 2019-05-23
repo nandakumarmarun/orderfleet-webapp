@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
@@ -63,6 +64,9 @@ public class GeoLocationVarianceReportResource {
 
 	@Inject
 	private LocationAccountProfileService locationAccountProfileService;
+
+	@Inject
+	private GeoLocationService geoLocationService;
 
 	@RequestMapping(value = "/geo-location-variance-report", method = RequestMethod.GET)
 	@Timed
@@ -121,6 +125,45 @@ public class GeoLocationVarianceReportResource {
 
 		return new ResponseEntity<>(geoLocationVarianceDTOs, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/geo-location-variance-report/calculateVariance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Boolean> calculateVariance(@RequestParam("executionPid") String executionPid) {
+		log.debug("Web request to update geo location variance report by executionPid " + executionPid);
+
+		ExecutiveTaskExecution execution = executiveTaskExecutionRepository.findByExecutionPid(executionPid);
+
+		if (execution.getLatitude() != null && execution.getAccountProfile().getLatitude() != null
+				&& execution.getLatitude().doubleValue() != 0
+				&& execution.getAccountProfile().getLatitude().doubleValue() != 0) {
+			String variance = "";
+			double accLocLat = execution.getAccountProfile().getLatitude().doubleValue();
+			double accLocLng = execution.getAccountProfile().getLongitude().doubleValue();
+
+			double exeLocLat = execution.getLatitude().doubleValue();
+			double exeLocLng = execution.getLongitude().doubleValue();
+
+			String origin = accLocLat + "," + accLocLng;
+			String destination = exeLocLat + "," + exeLocLng;
+
+			if (!origin.equals(destination)) {
+				double distance = geoLocationService.computeDistanceBetween(accLocLat, accLocLng, exeLocLat, exeLocLng);
+				variance = distance + " KM";
+			}else {
+				variance = "0 KM";
+			}
+			execution.setLocationVariance(variance);
+			// update
+			executiveTaskExecutionRepository.save(execution);
+
+			return new ResponseEntity<>(true, HttpStatus.OK);
+		} else {
+
+			return new ResponseEntity<>(false, HttpStatus.OK);
+		}
+	}
+
+	// calculateVariance
 
 	private List<GeoLocationVarianceDTO> getFilterData(String userPid, String accountProfilePid, LocalDate fDate,
 			LocalDate tDate) {

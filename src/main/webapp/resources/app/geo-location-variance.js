@@ -122,8 +122,20 @@ if (!this.GeoLocationVariance) {
 								.each(
 										data,
 										function(index, geoLocVariance) {
+											var variance="";
+											
+											var executionPid="'" + geoLocVariance.executionPid + "'";
+											
+											if(geoLocVariance.variation=="Button"){
+												
+												variance='<button class="btn btn-success" onclick="GeoLocationVariance.calculateVariance('+executionPid+')">Calculate Variance</button>';
+																									
+											}else{
+													variance=geoLocVariance.variation;
+											}
 											$('#tBodyGeoLocationVariance')
 													.append(
+										
 															"<tr><td>"
 																	+ geoLocVariance.accountProfileName
 																	+ "</td><td>"
@@ -135,10 +147,31 @@ if (!this.GeoLocationVariance) {
 																	+ "</td><td>"
 																	+ geoLocVariance.reportedLocation
 																	+ "</td><td>"
-																	+ geoLocVariance.variation
+																	+ variance
 																	+ "</td></tr>");
 										});
 
+					}
+				});
+	}
+	
+	GeoLocationVariance.calculateVariance = function(executionPid) {
+		
+		console.log(executionPid);
+		
+		$
+				.ajax({
+					url : geoLocationVarianceContextPath + "/calculateVariance",
+					type : 'GET',
+					data : {
+						executionPid : executionPid
+					},
+					success : function(status) {
+						
+						if(status){
+							GeoLocationVariance.filter();
+						}
+						
 					}
 				});
 	}

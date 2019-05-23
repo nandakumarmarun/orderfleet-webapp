@@ -1606,6 +1606,8 @@ public class TaskSubmissionPostSave {
 			if (!origin.equals(destination)) {
 				double distance = geoLocationService.computeDistanceBetween(accLocLat, accLocLng, exeLocLat, exeLocLng);
 				variance = distance + " KM";
+			}else {
+				variance = "0 KM";
 			}
 			execution.setLocationVariance(variance);
 			// update

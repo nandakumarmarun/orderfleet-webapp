@@ -225,4 +225,7 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	@Query("select ete.id, ep.name from ExecutiveTaskExecution ete inner join EmployeeProfile ep on ete.user.id=ep.user.id where ete.user.id in ?1 and ete.date between ?2 and ?3 Order By ep.name ASC")
 	List<Object[]> findByUserIdInAndDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
 
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.pid = ?1")
+	ExecutiveTaskExecution findByExecutionPid(String executionPid);
+
 }
