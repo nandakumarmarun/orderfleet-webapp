@@ -13,24 +13,13 @@ import com.orderfleet.webapp.domain.enums.NotificationType;
 public class ChatReplyNotificationDTO {
 
 	private String message;
+	
+	private String notificationPid;
 
 	public ChatReplyNotificationDTO() {
 		super();
 	}
 
-//	public ActivityNotificationDTO(long id, NotificationType notificationType, String activityPid, String activityName,
-//			String documentName, String documentPid, boolean sendCustomer, boolean other, String phoneNumbers) {
-//		super();
-//		this.id = id;
-//		this.notificationType = notificationType;
-//		this.activityPid = activityPid;
-//		this.activityName = activityName;
-//		this.documentName = documentName;
-//		this.documentPid = documentPid;
-//		this.sendCustomer = sendCustomer;
-//		this.other = other;
-//		this.phoneNumbers = phoneNumbers;
-//	}
 
 	public String getMessage() {
 		return message;
@@ -40,4 +29,13 @@ public class ChatReplyNotificationDTO {
 		this.message = message;
 	}
 
+	public String getNotificationPid() {
+		return notificationPid;
+	}
+
+	public void setNotificationPid(String notificationPid) {
+		this.notificationPid = notificationPid;
+	}
+	
+	
 }
