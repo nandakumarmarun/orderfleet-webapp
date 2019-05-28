@@ -54,11 +54,11 @@ public class SalesDatasDownloadController {
 	@Inject
 	private CompanyRepository companyRepository;
 
-	@RequestMapping(value = "/get-sales-orders.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/get-sales-orders-excel.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
 	public List<SalesOrderExcelDTO> getSalesOrderJSON() throws URISyntaxException {
-		log.debug("REST request to download sales orders : {}");
+		log.debug("REST request to download sales orders : {} ");
 		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
 		List<String> inventoryHeaderPid = new ArrayList<String>();
 
@@ -68,7 +68,7 @@ public class SalesDatasDownloadController {
 				.getSalesOrderForExcel(company.getId());
 
 		log.debug("REST request to download sales orders : " + inventoryVoucherHeaders.size());
-
+		
 		for (Object[] obj : inventoryVoucherHeaders) {
 			SalesOrderExcelDTO salesOrderDTO = new SalesOrderExcelDTO();
 
@@ -84,14 +84,15 @@ public class SalesDatasDownloadController {
 			salesOrderDTO.setDiscPer(obj[6] != null ? Double.parseDouble(obj[6].toString()) : 0.0);
 			salesOrderDTO.setTaxPer(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
 			/*
-			 * salesOrderDTO.setTotal(obj[8] != null ?
-			 * Double.parseDouble(obj[8].toString()) : 0.0);
+			 * salesOrderDTO.setTotal(obj[8] != null ? Double.parseDouble(obj[8].toString())
+			 * : 0.0);
 			 */
 
 			double qty = Double.parseDouble(obj[4].toString());
 			double rate = Double.parseDouble(obj[5].toString());
 			double dis = Double.parseDouble(obj[6].toString());
 			double taxPer = Double.parseDouble(obj[7].toString());
+			
 
 			double amountValue = qty * rate;
 			double discountValue = amountValue * dis / 100;
@@ -120,6 +121,13 @@ public class SalesDatasDownloadController {
 
 			salesOrderDTO.setBillNo(obj[0].toString());
 			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
+
+			salesOrderDTO.setRefDocNo(obj[11] != null ? obj[11].toString() : "0");
+			
+			double freeQuantity = Double.parseDouble(obj[12].toString());
+			
+			salesOrderDTO.setFreeQuantity(freeQuantity);
+			
 			salesOrderDTOs.add(salesOrderDTO);
 
 		}

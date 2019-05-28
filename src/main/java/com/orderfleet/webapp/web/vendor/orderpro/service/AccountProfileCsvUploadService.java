@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jayway.jsonpath.internal.function.numeric.Sum;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
@@ -409,6 +410,22 @@ public class AccountProfileCsvUploadService {
 		}
 		System.out.println(saveReceivablePayable.size() + "----Before Saving");
 		bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);
+
+		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
+
+		for (AccountProfile ap : accountProfiles) {
+			double closingBalance = saveReceivablePayable.stream()
+					.filter(rp -> rp.getAccountProfile().getAlias().equals(ap.getAlias()))
+					.mapToDouble(ReceivablePayable::getReferenceDocumentBalanceAmount).sum();
+
+			ap.setClosingBalance(closingBalance);
+
+			saveUpdateAccountProfiles.add(ap);
+
+		}
+
+		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -563,7 +580,7 @@ public class AccountProfileCsvUploadService {
 				locationAccountProfiles.add(new LocationAccountProfile(location, accountProfile, company));
 			}
 		}
-		System.out.println(locationAccountProfiles.size()+"----------");
+		System.out.println(locationAccountProfiles.size() + "----------");
 		locationAccountProfileRepository.save(locationAccountProfiles);
 		System.out.println("----------Success");
 

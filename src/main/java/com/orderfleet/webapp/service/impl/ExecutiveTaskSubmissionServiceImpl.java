@@ -1,11 +1,18 @@
 package com.orderfleet.webapp.service.impl;
 
 import java.math.BigDecimal;
+
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,12 +21,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
+import org.apache.catalina.security.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.annotation.JsonFormat.Value;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
@@ -323,10 +333,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		executiveTaskExecution.setStartLocationType(startLocationType);
 		executiveTaskExecution.setStartLatitude(executiveTaskExecutionDTO.getStartLatitude());
 		executiveTaskExecution.setStartLongitude(executiveTaskExecutionDTO.getStartLongitude());
-		if (locationType.equals(LocationType.TowerLocation) || (executiveTaskExecutionDTO.getMcc()!= null &&
-																executiveTaskExecutionDTO.getMnc()!= null &&
-																executiveTaskExecutionDTO.getCellId()!= null &&
-																executiveTaskExecutionDTO.getLac()!= null) ) {
+		if (locationType.equals(LocationType.TowerLocation) || (executiveTaskExecutionDTO.getMcc() != null
+				&& executiveTaskExecutionDTO.getMnc() != null && executiveTaskExecutionDTO.getCellId() != null
+				&& executiveTaskExecutionDTO.getLac() != null)) {
 			executiveTaskExecution.setMcc(executiveTaskExecutionDTO.getMcc());
 			executiveTaskExecution.setMnc(executiveTaskExecutionDTO.getMnc());
 			executiveTaskExecution.setCellId(executiveTaskExecutionDTO.getCellId());
@@ -335,10 +344,10 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			executiveTaskExecution.setLocation("No Location");
 		}
 		if (startLocationType != null) {
-			if (startLocationType.equals(LocationType.TowerLocation) || (executiveTaskExecutionDTO.getStartMcc()!= null &&
-																		executiveTaskExecutionDTO.getStartMnc()!= null &&
-																		executiveTaskExecutionDTO.getStartCellId()!= null &&
-																		executiveTaskExecutionDTO.getStartLac()!= null)) {
+			if (startLocationType.equals(LocationType.TowerLocation) || (executiveTaskExecutionDTO.getStartMcc() != null
+					&& executiveTaskExecutionDTO.getStartMnc() != null
+					&& executiveTaskExecutionDTO.getStartCellId() != null
+					&& executiveTaskExecutionDTO.getStartLac() != null)) {
 				executiveTaskExecution.setStartMcc(executiveTaskExecutionDTO.getStartMcc());
 				executiveTaskExecution.setStartMnc(executiveTaskExecutionDTO.getStartMnc());
 				executiveTaskExecution.setStartCellId(executiveTaskExecutionDTO.getStartCellId());
@@ -350,6 +359,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		} else {
 			executiveTaskExecution.setStartLocation("No Location");
 		}
+
 		// set company
 		executiveTaskExecution.setCompany(company);
 		executiveTaskExecution = executiveTaskExecutionRepository.save(executiveTaskExecution);
@@ -389,6 +399,52 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				inventoryVoucherHeader.setDocumentVolume(inventoryVoucherDTO.getDocumentVolume());
 				inventoryVoucherHeader.setDocDiscountAmount(inventoryVoucherDTO.getDocDiscountAmount());
 				inventoryVoucherHeader.setDocDiscountPercentage(inventoryVoucherDTO.getDocDiscountPercentage());
+
+				InventoryVoucherHeader lastInventoryVoucher = inventoryVoucherHeaderRepository
+						.findTop1ByCreatedByLoginOrderByCreatedDateDesc(SecurityUtils.getCurrentUserLogin());
+
+				if (lastInventoryVoucher != null) {
+					Date lastInventoryVoucherDate = Date
+							.from(lastInventoryVoucher.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant());
+
+					DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+					Date today = new Date();
+
+					Date currentDate = new Date();
+					Date previousDate = new Date();
+
+					try {
+						currentDate = formatter.parse(formatter.format(today));
+						previousDate = formatter.parse(formatter.format(lastInventoryVoucherDate));
+
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+
+					String referenceDocNo = lastInventoryVoucher.getReferenceDocumentNumber();
+
+					int refDocNo = 0;
+
+					if (referenceDocNo == null || referenceDocNo.isEmpty()) {
+						refDocNo = 1;
+					} else {
+
+						refDocNo = Integer.parseInt(referenceDocNo);
+					}
+
+					log.info(previousDate + "--------------" + currentDate);
+					if (previousDate.compareTo(currentDate) == 0) {
+						refDocNo++;
+					} else {
+						refDocNo = 1;
+					}
+					log.info("Reference Document Number =" + refDocNo + "----------");
+					inventoryVoucherHeader.setReferenceDocumentNumber(String.valueOf(refDocNo));
+				} else {
+					inventoryVoucherHeader.setReferenceDocumentNumber("1");
+				}
+
 				if (inventoryVoucherDTO.getStatus() != null && inventoryVoucherDTO.getStatus()) {
 					inventoryVoucherHeader.setStatus(true);
 				}

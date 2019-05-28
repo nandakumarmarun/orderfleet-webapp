@@ -165,17 +165,43 @@ if(lat!=""){
 	}
 	// get the name of the location on click event
 	function getLocationNameByLatLng(lat, lng) {
-		var latlng = new google.maps.LatLng(lat, lng);
-		geocoder.geocode({
-			latLng : latlng
-		}, function(results, status) {
-			if (status == google.maps.GeocoderStatus.OK) {
-				var locationName = results[0].formatted_address;
+		
+				/*var locationName = geocode(lat+","+lng);
 				$("#newLocation").text(
-					locationName + "( " + lat + "," + lng + " )");
-			}
-		});
+					locationName + "( " + lat + "," + lng + " )");*/
+					var query=lat+","+lng;
+				
+				 $.ajax({
+				        url: 'https://api.opencagedata.com/geocode/v1/json',
+				        method: 'GET',
+				        data: {
+				          'key': 'b4db375213e547a28ed3cd4e9e1ad7ed',
+				          'q': query,
+				          'no_annotations': 1
+				          // see other optional params:
+				          // https://opencagedata.com/api#forward-opt
+				        },
+				        dataType: 'json',
+				        statusCode: {
+				          200: function(response){  // success
+				            console.log(response.results[0].formatted);
+				            
+				            var locationName = response.results[0].formatted;
+							$("#newLocation").text(
+								locationName + "( " + lat + "," + lng + " )");
+				          },
+				          402: function(){
+				            console.log('hit free-trial daily limit');
+				            console.log('become a customer: https://opencagedata.com/pricing');
+				          }
+				          // other possible response codes:
+				          // https://opencagedata.com/api#codes
+				        }
+				      });
+			
 	}
+	
+	
 
 	function saveLocationToAccountProfile() {
 		var apLocSaveUrl = location.protocol + '//' + location.host

@@ -19,6 +19,8 @@ public class SalesOrderExcelDTO {
 	private Double SGSTAmt;
 	private String inventoryPid;
 	private String employeeName;
+	private String refDocNo;
+	private Double freeQuantity;
 
 	public SalesOrderExcelDTO() {
 
@@ -136,4 +138,21 @@ public class SalesOrderExcelDTO {
 		this.employeeName = employeeName;
 	}
 
+	public String getRefDocNo() {
+		return refDocNo;
+	}
+
+	public void setRefDocNo(String refDocNo) {
+		this.refDocNo = refDocNo;
+	}
+
+	public Double getFreeQuantity() {
+		return freeQuantity;
+	}
+
+	public void setFreeQuantity(Double freeQuantity) {
+		this.freeQuantity = freeQuantity;
+	}
+
+	
 }
