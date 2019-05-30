@@ -80,13 +80,13 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 
 	@Inject
 	private OpeningStockRepository openingStockRepository;
-	
+
 	@Inject
 	private ProductGroupEcomProductsRepository productGroupEcomProductsRepository;
-	
+
 	@Inject
 	private EcomProductProfileProductRepository ecomProductProfileProductRepository;
-	
+
 	@Inject
 	private DocumentStockLocationSourceRepository documentStockLocationSourceRepository;
 
@@ -109,8 +109,8 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	@Transactional(readOnly = true)
 	public List<ProductProfileDTO> findProductByProductGroupPid(String productGroupPid) {
 		log.debug("Request to get all Products under in a productGroups");
-		List<ProductProfile> productList =new ArrayList<>();
-			 productList = productGroupProductRepository.findProductByProductGroupPid(productGroupPid);
+		List<ProductProfile> productList = new ArrayList<>();
+		productList = productGroupProductRepository.findProductByProductGroupPid(productGroupPid);
 		List<ProductProfileDTO> result = productMapper.productProfilesToProductProfileDTOs(productList);
 		return result;
 	}
@@ -190,10 +190,8 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	 *
 	 *        find ProductProfile by ProductGroupPids, CategoryPids And
 	 *        ActivatedProductProfile.
-	 * @param categoryPids
-	 *            the categoryPids of the entity
-	 * @param groupPids
-	 *            the groupPids of the entity
+	 * @param categoryPids the categoryPids of the entity
+	 * @param groupPids    the groupPids of the entity
 	 * @return the list
 	 */
 	@Override
@@ -238,8 +236,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	 * @since Feb 17, 2017
 	 *
 	 *        find ProductProfile by ProductGroupPids And Activated
-	 * @param groupPids
-	 *            the groupPids of the entity
+	 * @param groupPids the groupPids of the entity
 	 * @return the list
 	 */
 	@Override
@@ -283,8 +280,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	 * @since Feb 28, 2017
 	 *
 	 *        find ProductGroupProduct by CompanyId And Activated
-	 * @param active
-	 *            the active of the entity
+	 * @param active the active of the entity
 	 * @return the list of ProductGroupProduct
 	 */
 	@Override
@@ -300,8 +296,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	 * @since Mar 3, 2017
 	 *
 	 *        find ProductGroupProduct by ProductCategoryPids
-	 * @param categoryPids
-	 *            the categoryPids of the entity
+	 * @param categoryPids the categoryPids of the entity
 	 * @return the list
 	 */
 	@Override
@@ -317,8 +312,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	 * @since Mar 3, 2017
 	 *
 	 *        find ProductGroupProduct by ProductGroupPids
-	 * @param groupPids
-	 *            the groupPids of the entity
+	 * @param groupPids the groupPids of the entity
 	 * @return the list
 	 */
 	@Override
@@ -333,10 +327,8 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	 * @since Mar 3, 2017
 	 *
 	 *        find ProductGroupProduct by ProductGroupPids And CategoryPids
-	 * @param groupPids
-	 *            the groupPids of the entity
-	 * @param categoryPids
-	 *            the categoryPids of the entity
+	 * @param groupPids    the groupPids of the entity
+	 * @param categoryPids the categoryPids of the entity
 	 * @return the list
 	 */
 	@Override
@@ -388,12 +380,17 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 			List<ProductProfile> productProfiles = productGroupProductRepository
 					.findProductByProductGroupPidAndActivated(productGroup.getPid(), true);
 
-			List<ProductProfileDTO> productProfileDTOs =productProfiles.stream().map(ProductProfileDTO::new).collect(Collectors.toList());
-			
+			List<ProductProfileDTO> productProfileDTOs = productProfiles.stream().map(ProductProfileDTO::new)
+					.collect(Collectors.toList());
+
 			// set description to productProfile
 			List<ProductNameTextSettings> productNameTextSettings = productNameTextSettingsRepository
 					.findAllByCompanyIdAndEnabledTrue(SecurityUtils.getCurrentUsersCompanyId());
 			Set<Long> sLocationIds = documentStockLocationSourceRepository.findStockLocationIdsByCompanyId();
+
+			List<OpeningStock> openingStocks = openingStockRepository
+					.findOpeningStocksAndStockLocationIdIn(sLocationIds);
+			log.info("Caluclationg op Stock");
 			if (productNameTextSettings.size() > 0) {
 				for (ProductProfileDTO productProfileDTO : productProfileDTOs) {
 					String name = " (";
@@ -401,34 +398,42 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 						if (productNameText.getName().equals("DESCRIPTION")) {
 							if (productProfileDTO.getDescription() != null
 									&& !productProfileDTO.getDescription().isEmpty())
-								name +="DES:"+ productProfileDTO.getDescription() + ",";
+								name += "DES:" + productProfileDTO.getDescription() + ",";
 						} else if (productNameText.getName().equals("MRP")) {
-							name +="MRP:"+ productProfileDTO.getMrp() + ",";
+							name += "MRP:" + productProfileDTO.getMrp() + ",";
 						} else if (productNameText.getName().equals("SELLING RATE")) {
-							name +="SRATE:"+ productProfileDTO.getPrice() + ",";
+							name += "SRATE:" + productProfileDTO.getPrice() + ",";
 						} else if (productNameText.getName().equals("STOCK")) {
 //							OpeningStock openingStock = openingStockRepository
 //									.findTop1ByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
 //							if (openingStock != null) {
 //								name +="STK:"+ openingStock.getQuantity() + ",";
 //							}
-							List<OpeningStock> openingStocks = new ArrayList<>();
-							 openingStocks = openingStockRepository
-									.findByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
-							//double quantity = 0.0;
-							
+							/*
+							 * List<OpeningStock> openingStocks = new ArrayList<>(); openingStocks =
+							 * openingStockRepository
+							 * .findByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
+							 */
+							// double quantity = 0.0;
+
 							if (sLocationIds.isEmpty()) {
 								OpeningStock openingStock = openingStockRepository
 										.findTop1ByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
 								if (openingStock != null) {
-									name +="STK:"+ openingStock.getQuantity() + ",";
+									name += "STK:" + openingStock.getQuantity() + ",";
 								}
 							} else {
-								Double sum = openingStockRepository.findSumOpeningStockByProductPidAndStockLocationIdIn(
-										productProfileDTO.getPid(), sLocationIds);
-								name +="STK:"+ sum + ",";
+								Double sum = openingStocks.stream().filter(
+										op -> op.getProductProfile().getPid().equals(productProfileDTO.getPid()))
+										.mapToDouble(OpeningStock::getQuantity).sum();
+								/*
+								 * Double sum =
+								 * openingStockRepository.findSumOpeningStockByProductPidAndStockLocationIdIn(
+								 * productProfileDTO.getPid(), sLocationIds);
+								 */
+								name += "STK:" + sum + ",";
 							}
-							
+
 //							
 //							
 //							
@@ -449,6 +454,8 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 					productProfileDTO.setName(productProfileDTO.getName() + name);
 				}
 			}
+			
+			log.info("Caluclationg op Stock Completed");
 
 			productGroupProductDTO.setProductProfiles(productProfileDTOs);
 			if (!productProfiles.isEmpty()) {
@@ -467,7 +474,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 		// get user productGroups
 		List<ProductGroup> productGroups = userProductGroupRepository
 				.findProductGroupsByUserIsCurrentUserAndProductGroupsActivated(activted);
-		if(productGroups.isEmpty()) {
+		if (productGroups.isEmpty()) {
 			return productGroupProducts;
 		}
 		List<String> groupPids = productGroups.stream().map(ProductGroup::getPid).collect(Collectors.toList());
@@ -528,18 +535,23 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	public List<ProductProfileDTO> findProductByProductGroupPidAndActivatedAndStockAvailabilityStatus(
 			String productGroupPid, boolean activated, StockAvailabilityStatus status) {
 		log.debug("Request to get all Products by productGroupPid and activated and StockAvailabilityStatus");
-		
-		List<ProductProfile> productList =new ArrayList<>();
-		List<EcomProductProfile> ecomProductProfiles = productGroupEcomProductsRepository.findEcomProductByProductGroupPid(productGroupPid);
+
+		List<ProductProfile> productList = new ArrayList<>();
+		List<EcomProductProfile> ecomProductProfiles = productGroupEcomProductsRepository
+				.findEcomProductByProductGroupPid(productGroupPid);
 		if (ecomProductProfiles.isEmpty()) {
-			 productList = productGroupProductRepository
-						.findProductByProductGroupPidAndActivatedAndStockAvailabilityStatus(productGroupPid, activated, status);
+			productList = productGroupProductRepository
+					.findProductByProductGroupPidAndActivatedAndStockAvailabilityStatus(productGroupPid, activated,
+							status);
 		} else {
-			//if ecom productgroup, then find productprofiles from ecomProductProfileProduct
-			Set<String> ecomProductProfilesPids = ecomProductProfiles.stream().map(EcomProductProfile::getPid).collect(Collectors.toSet());
-			 productList = ecomProductProfileProductRepository.findProductByEcomProductProfilePidInAndActivatedAndStatus(ecomProductProfilesPids, activated, status);
+			// if ecom productgroup, then find productprofiles from
+			// ecomProductProfileProduct
+			Set<String> ecomProductProfilesPids = ecomProductProfiles.stream().map(EcomProductProfile::getPid)
+					.collect(Collectors.toSet());
+			productList = ecomProductProfileProductRepository.findProductByEcomProductProfilePidInAndActivatedAndStatus(
+					ecomProductProfilesPids, activated, status);
 		}
-		
+
 		List<ProductProfileDTO> result = productMapper.productProfilesToProductProfileDTOs(productList);
 		return result;
 	}
@@ -556,14 +568,18 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 
 	@Override
 	public List<ProductProfileDTO> findEcomProductProfileByProductGroupPid(String productGroupPid) {
-		List<ProductProfile> productList =new ArrayList<>();
-		List<EcomProductProfile> ecomProductProfiles = productGroupEcomProductsRepository.findEcomProductByProductGroupPid(productGroupPid);
+		List<ProductProfile> productList = new ArrayList<>();
+		List<EcomProductProfile> ecomProductProfiles = productGroupEcomProductsRepository
+				.findEcomProductByProductGroupPid(productGroupPid);
 		if (ecomProductProfiles.isEmpty()) {
-			 productList = productGroupProductRepository.findProductByProductGroupPid(productGroupPid);
+			productList = productGroupProductRepository.findProductByProductGroupPid(productGroupPid);
 		} else {
-			//if ecom productgroup, then find productprofiles from ecomProductProfileProduct
-			Set<String> ecomProductProfilesPids = ecomProductProfiles.stream().map(EcomProductProfile::getPid).collect(Collectors.toSet());
-			productList = ecomProductProfileProductRepository.findProductByEcomProductProfilePidIn(ecomProductProfilesPids);
+			// if ecom productgroup, then find productprofiles from
+			// ecomProductProfileProduct
+			Set<String> ecomProductProfilesPids = ecomProductProfiles.stream().map(EcomProductProfile::getPid)
+					.collect(Collectors.toSet());
+			productList = ecomProductProfileProductRepository
+					.findProductByEcomProductProfilePidIn(ecomProductProfilesPids);
 		}
 		List<ProductProfileDTO> result = productMapper.productProfilesToProductProfileDTOs(productList);
 		return result;
@@ -573,26 +589,31 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	public List<String> findProductByProductProfilePidAndProductGroupPidAndProductCategoryPidAndActivated(
 			List<String> productProfilePids, List<String> productGroupPids, List<String> productCategoryPids) {
 		List<String> productList = productGroupProductRepository
-					.findProductByProductPidInAndProductGroupPidInAndProductProductCategoryPidInAndActivated(productProfilePids, productGroupPids, productCategoryPids, true);
-		//List<ProductProfileDTO> result = productMapper.productProfilesToProductProfileDTOs(productList);
+				.findProductByProductPidInAndProductGroupPidInAndProductProductCategoryPidInAndActivated(
+						productProfilePids, productGroupPids, productCategoryPids, true);
+		// List<ProductProfileDTO> result =
+		// productMapper.productProfilesToProductProfileDTOs(productList);
 		return productList;
 	}
 
 	@Override
-	public List<String> findProductByProductProfilePidAndProductCategoryPidAndActivated(
-			List<String> productProfilePids, List<String> productCategoryPids) {
+	public List<String> findProductByProductProfilePidAndProductCategoryPidAndActivated(List<String> productProfilePids,
+			List<String> productCategoryPids) {
 		List<String> productList = productGroupProductRepository
-				.findProductByProductPidInAndProductProductCategoryPidInAndActivated(productProfilePids, productCategoryPids, true);
-		//List<ProductProfileDTO> result = productMapper.productProfilesToProductProfileDTOs(productList);
+				.findProductByProductPidInAndProductProductCategoryPidInAndActivated(productProfilePids,
+						productCategoryPids, true);
+		// List<ProductProfileDTO> result =
+		// productMapper.productProfilesToProductProfileDTOs(productList);
 		return productList;
 	}
 
 	@Override
-	public List<String> findProductByProductProfilePidAndProductGroupPidAndActivated(
-			List<String> productProfilePids, List<String> productGroupPids) {
+	public List<String> findProductByProductProfilePidAndProductGroupPidAndActivated(List<String> productProfilePids,
+			List<String> productGroupPids) {
 		List<String> productList = productGroupProductRepository
 				.findProductByProductPidInAndProductGroupPidInAndActivated(productProfilePids, productGroupPids, true);
-		//List<ProductProfileDTO> result = productMapper.productProfilesToProductProfileDTOs(productList);
+		// List<ProductProfileDTO> result =
+		// productMapper.productProfilesToProductProfileDTOs(productList);
 		return productList;
 	}
 
