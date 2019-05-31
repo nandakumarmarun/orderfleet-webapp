@@ -244,32 +244,28 @@ public class ProductProfileCsvUploadService {
 	@Transactional
 	public void saveUpdateProductProfiles(final List<ProductProfileDTO> productProfileDTOs,
 			final SyncOperation syncOperation) {
-		long start = System.nanoTime();
+		Long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
 		// find all exist product profiles
-		Set<String> ppAlias = productProfileDTOs.stream().map(p -> p.getAlias()).collect(Collectors.toSet());
-		// List<ProductProfile> productProfiles =
-		// productProfileRepository.findByCompanyIdAndNameIn(company.getId(),
-		// ppNames);
-		List<ProductProfile> productProfiles = productProfileRepository
-				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
-
-		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
+		Set<String> ppNames = productProfileDTOs.stream().map(p -> p.getName()).collect(Collectors.toSet());
+		List<ProductProfile> productProfiles = productProfileRepository.findByCompanyIdAndNameIn(company.getId(),
+				ppNames);
 
 		// All product must have a division/category, if not, set a default one
 		Division defaultDivision = divisionRepository.findFirstByCompanyId(company.getId());
-		String cat = productCategorys.get(0).getName();
+		System.out.print("******************************************************\n");
 		Optional<ProductCategory> defaultCategory = productCategoryRepository
-				.findByCompanyIdAndNameIgnoreCase(company.getId(), cat);
+				.findByCompanyIdAndNameIgnoreCase(company.getId(), "Not Applicable");
 		ProductCategory productCategory = new ProductCategory();
 		if (!defaultCategory.isPresent()) {
-			productCategory = new ProductCategory();
-			productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
-			productCategory.setName("Not Applicable");
-			productCategory.setDataSourceType(DataSourceType.TALLY);
-			productCategory.setCompany(company);
-			productCategory = productCategoryRepository.save(productCategory);
+			System.out.print("+++++++++++++++++++++++++++\n");
+			ProductCategory newProductCategory = new ProductCategory();
+			newProductCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
+			newProductCategory.setName("Not Applicable");
+			newProductCategory.setDataSourceType(DataSourceType.TALLY);
+			newProductCategory.setCompany(company);
+			productCategory = productCategoryRepository.save(newProductCategory);
 		} else {
 			productCategory = defaultCategory.get();
 		}
@@ -302,6 +298,7 @@ public class ProductProfileCsvUploadService {
 			productProfile.setActivated(ppDto.getActivated());
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
+			productProfile.setProductCategory(productCategory);
 			if (ppDto.getUnitQty() != null) {
 				productProfile.setUnitQty(ppDto.getUnitQty());
 			}
@@ -312,7 +309,6 @@ public class ProductProfileCsvUploadService {
 			// if (optionalCategory.isPresent()) {
 			// productProfile.setProductCategory(optionalCategory.get());
 			// } else {
-			productProfile.setProductCategory(defaultCategory.get());
 			// }
 			saveUpdateProductProfiles.add(productProfile);
 
@@ -1054,12 +1050,27 @@ public class ProductProfileCsvUploadService {
 				newProductProfiles.add(productProfileExist.get());
 			}
 		}
-		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
-		for (ProductGroup productGroup : productGroups) {
-			for (ProductProfile productProfile : newProductProfiles) {
-				productGroupProducts.add(new ProductGroupProduct(productProfile, productGroup, company));
-			}
+		// List<ProductGroup> productGroups =
+		// productGroupRepository.findByCompanyId(company.getId());
+
+		ProductGroup productGroup = productGroupRepository.findFirstByCompanyId(company.getId());
+
+		if (productGroup == null) {
+			ProductGroup newproductGroup = new ProductGroup();
+			newproductGroup.setName("General");
+			newproductGroup.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
+			newproductGroup.setDataSourceType(DataSourceType.TALLY);
+			newproductGroup.setCompany(company);
+			newproductGroup.setAlias("General");
+			newproductGroup.setDescription("General");
+			newproductGroup.setActivated(true);
+			productGroup = productGroupRepository.save(newproductGroup);
 		}
+
+		for (ProductProfile productProfile : newProductProfiles) {
+			productGroupProducts.add(new ProductGroupProduct(productProfile, productGroup, company));
+		}
+
 		System.out.println(productGroupProducts.size() + "----------");
 		productGroupProductRepository.save(productGroupProducts);
 		System.out.println("----------Success");
