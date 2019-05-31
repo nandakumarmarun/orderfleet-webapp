@@ -59,6 +59,9 @@ public class ExecutiveTaskExecution implements Serializable {
 	@Column(name = "date", nullable = false)
 	private LocalDateTime date;
 
+	@Column(name = "send_date")
+	private LocalDateTime sendDate;
+	
 	// start time of order taking
 	@Column(name = "start_time")
 	private LocalDateTime startTime;
@@ -236,6 +239,14 @@ public class ExecutiveTaskExecution implements Serializable {
 
 	public void setDate(LocalDateTime date) {
 		this.date = date;
+	}
+	
+	public LocalDateTime getSendDate() {
+		return sendDate;
+	}
+
+	public void setSendDate(LocalDateTime sendDate) {
+		this.sendDate = sendDate;
 	}
 
 	public LocalDateTime getStartTime() {

@@ -31,6 +31,7 @@ public class SalesOrderDTO {
 	private double docDiscountAmount;
 	private double docDiscountPercentage;
 	private String trimChar;
+	private String employeeAlias;
 
 	private AccountProfileDTO accountProfileDTO;
 	private List<SalesOrderItemDTO> salesOrderItemDTOs;
@@ -61,6 +62,10 @@ public class SalesOrderDTO {
 		this.inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO(inventoryVoucherHeader);
 		this.ledgerState = inventoryVoucherHeader.getReceiverAccount().getStateName();
 		this.ledgerCountry = inventoryVoucherHeader.getReceiverAccount().getCountryName();
+		if(inventoryVoucherHeader.getEmployee() != null) {
+			this.employeeAlias = inventoryVoucherHeader.getEmployee().getAlias();
+		}
+		
 	}
 
 	public Long getId() {
@@ -229,6 +234,14 @@ public class SalesOrderDTO {
 
 	public void setLedgerCountry(String ledgerCountry) {
 		this.ledgerCountry = ledgerCountry;
+	}
+
+	public String getEmployeeAlias() {
+		return employeeAlias;
+	}
+
+	public void setEmployeeAlias(String employeeAlias) {
+		this.employeeAlias = employeeAlias;
 	}
 
 	@Override

@@ -23,6 +23,8 @@ public class ExecutiveTaskExecutionDTO {
 	private LocalDateTime createdDate;
 
 	private LocalDateTime date;
+	
+	private LocalDateTime sendDate;
 
 	private LocalDateTime startTime;
 
@@ -114,7 +116,7 @@ public class ExecutiveTaskExecutionDTO {
 		this(executiveTaskExecution.getPid(), executiveTaskExecution.getClientTransactionKey(),
 				executiveTaskExecution.getLatitude(), executiveTaskExecution.getLongitude(),
 				executiveTaskExecution.getTowerLatitude(), executiveTaskExecution.getTowerLongitude(),
-				executiveTaskExecution.getCreatedDate(), executiveTaskExecution.getDate(),
+				executiveTaskExecution.getCreatedDate(), executiveTaskExecution.getDate(),executiveTaskExecution.getSendDate(),
 				executiveTaskExecution.getRemarks(), executiveTaskExecution.getUser().getPid(),
 				executiveTaskExecution.getUser().getFirstName(), executiveTaskExecution.getActivity().getPid(),
 				executiveTaskExecution.getActivity().getName(), executiveTaskExecution.getAccountType().getPid(),
@@ -134,7 +136,7 @@ public class ExecutiveTaskExecutionDTO {
 	}
 
 	public ExecutiveTaskExecutionDTO(String pid, String clientTransactionKey, BigDecimal latitude, BigDecimal longitude,
-			BigDecimal towerLatitude, BigDecimal towerLongitude, LocalDateTime createdDate, LocalDateTime date, 
+			BigDecimal towerLatitude, BigDecimal towerLongitude, LocalDateTime createdDate, LocalDateTime date, LocalDateTime sendDate,
 			String remarks, String userPid, String userName, String activityPid, String activityName, 
 			String accountTypePid, String accountTypeName, String accountProfilePid, String accountProfileName, 
 			String accountLocation, String location, String towerLocation, LocationType locationType, boolean isGpsOff, boolean isMobileDataOff, 
@@ -150,6 +152,7 @@ public class ExecutiveTaskExecutionDTO {
 		this.towerLongitude = towerLongitude;
 		this.createdDate = createdDate;
 		this.date = date;
+		this.sendDate = sendDate;
 		this.remarks = remarks;
 		this.userPid = userPid;
 		this.userName = userName;
@@ -280,6 +283,14 @@ public class ExecutiveTaskExecutionDTO {
 
 	public void setDate(LocalDateTime date) {
 		this.date = date;
+	}
+	
+	public LocalDateTime getSendDate() {
+		return sendDate;
+	}
+
+	public void setSendDate(LocalDateTime sendDate) {
+		this.sendDate = sendDate;
 	}
 
 	public LocalDateTime getStartTime() {

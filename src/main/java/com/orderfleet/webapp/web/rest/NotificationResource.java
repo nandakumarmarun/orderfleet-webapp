@@ -189,6 +189,8 @@ public class NotificationResource {
 		}
 		return null;
 	}
+	
+
 
 	@RequestMapping("/notifications-report")
 	@Timed
@@ -204,6 +206,7 @@ public class NotificationResource {
 		return "company/notification-report";
 	}
 
+	
 	@RequestMapping(value = "/notifications-report/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<NotificationDTO>> filterNotifications(@RequestParam("employeePids") String employeePids,
@@ -258,6 +261,7 @@ public class NotificationResource {
 		List<NotificationDTO> notificationDtos = new ArrayList<>();
 		for (NotificationDetail notificationDetail : notificationDetails) {
 			Notification notification = notificationDetail.getNotification();
+			employeeProfiles.removeIf(emp -> emp.getUser()==null);//remove employees without users
 			Optional<EmployeeProfile> opEmployee = employeeProfiles.stream()
 					.filter(e -> e.getUser().getPid().equals(notificationDetail.getUserPid())).findAny();
 			if (opEmployee.isPresent()) {

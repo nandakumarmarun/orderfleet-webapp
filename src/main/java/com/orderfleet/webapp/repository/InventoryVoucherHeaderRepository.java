@@ -145,6 +145,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and tallyDownloadStatus='PENDING' Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
+	
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and tallyDownloadStatus='PENDING' and inventoryVoucher.employee.id IN ?1 Order By inventoryVoucher.createdDate desc")
+	List<InventoryVoucherHeader> findAllByCompanyIdAndTallyStatusAndEmployeeOrderByCreatedDateDesc(List<Long> employeeIds);
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.executiveTaskExecution.pid=?1 Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByExecutiveTaskExecutionPid(String executiveTaskExecutionPid);

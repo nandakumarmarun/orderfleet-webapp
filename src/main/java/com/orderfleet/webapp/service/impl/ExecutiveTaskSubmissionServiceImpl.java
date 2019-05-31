@@ -304,6 +304,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		executiveTaskExecution
 				.setActivity(activityRepository.findOneByPid(executiveTaskExecutionDTO.getActivityPid()).get());
 		executiveTaskExecution.setDate(executiveTaskExecutionDTO.getDate());
+		executiveTaskExecution.setSendDate(executiveTaskExecutionDTO.getSendDate());
 		executiveTaskExecution.setRemarks(executiveTaskExecutionDTO.getRemarks());
 		executiveTaskExecution.setUser(user);
 		executiveTaskExecution.setActivityStatus(ActivityStatus.RECEIVED);

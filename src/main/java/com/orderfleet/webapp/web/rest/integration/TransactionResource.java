@@ -4,6 +4,8 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +31,7 @@ import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Document;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.GstLedger;
 import com.orderfleet.webapp.domain.InventoryVoucherBatchDetail;
@@ -42,6 +46,7 @@ import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.GstLedgerRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
@@ -76,6 +81,7 @@ import com.orderfleet.webapp.web.rest.dto.SalesOrderItemDTO;
 import com.orderfleet.webapp.web.rest.dto.VatLedgerDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.tally.dto.GstLedgerDTO;
+
 
 /**
  * REST controller for managing order data for third party application.
@@ -142,6 +148,9 @@ public class TransactionResource {
 	
 	@Inject
 	private GstLedgerRepository gstLedgerRepository;
+	
+	@Inject
+	private EmployeeProfileRepository employeeProfileRepository;
 
 	// @Inject
 	// private DocumentStockLocationSourceRepository
@@ -266,7 +275,7 @@ public class TransactionResource {
 	 * @throws URISyntaxException
 	 *             if the Location URI syntax is incorrect
 	 */
-	//Method used for getting sales order (aquatech)
+	//Method used for getting sales order (aquatech, and new companies)
 	@RequestMapping(value = "/v2/get-sales-orders.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
@@ -366,6 +375,115 @@ public class TransactionResource {
 	}
 	
 	
+	
+	//Method used for getting sales grouped by employee
+	@RequestMapping(value = "/v2/get-sales.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	@Transactional
+	public List<SalesOrderDTO> getSalesJsonData(@RequestParam("employeeVoucher") String employeeVoucher) throws URISyntaxException {
+		log.debug("REST request to download sales : {}");
+		log.info("REST request to download sales  ***** : {}"+employeeVoucher);
+
+		if(employeeVoucher == null) {
+			log.info("REST request to download sales Failed : {}"+employeeVoucher);
+			return Collections.emptyList();
+		}
+		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyId(true);
+		List<Long> empId =new ArrayList<>();
+		if("All".equalsIgnoreCase(employeeVoucher)) {
+			empId = employeeProfiles.stream().map(emp -> emp.getId()).collect(Collectors.toList());
+		}else {
+			empId = employeeProfiles.stream().filter(emp -> emp.getName().trim().equals(employeeVoucher))
+					.map(emp -> emp.getId()).collect(Collectors.toList());
+		}
+		
+		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
+		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
+		List<String> inventoryHeaderPid = new ArrayList<String>();
+		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+				.findAllByCompanyIdAndTallyStatusAndEmployeeOrderByCreatedDateDesc(empId);
+		log.debug("IVH size : {}",inventoryVoucherHeaders.size());
+		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
+			
+			String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
+
+			// seting inventory heder to salesOrderDTO
+			SalesOrderDTO salesOrderDTO = new SalesOrderDTO(inventoryVoucherHeader);
+			salesOrderDTO.setAccountProfileDTO(accountProfileMapper
+					.accountProfileToAccountProfileDTO(inventoryVoucherHeader.getReceiverAccount()));
+
+			List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
+
+			for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader.getInventoryVoucherDetails()) {
+				SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
+				if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
+					rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
+							.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
+				}
+				List<InventoryVoucherBatchDetailDTO> inventoryVoucherBatchDetailsDTOs = new ArrayList<>();
+
+				List<OpeningStockDTO> openingStockDTOs = new ArrayList<>();
+				for (InventoryVoucherBatchDetail inventoryVoucherBatchDetail : inventoryVoucherDetail
+						.getInventoryVoucherBatchDetails()) {
+					openingStockDTOs = openingStockRepository
+							.findByCompanyIdAndProductProfilePidAndBatchNumber(
+									inventoryVoucherBatchDetail.getProductProfile().getPid(),
+									inventoryVoucherBatchDetail.getBatchNumber())
+							.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
+				}
+
+				salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
+				salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(inventoryVoucherBatchDetailsDTOs);
+				salesOrderItemDTOs.add(salesOrderItemDTO);
+			}
+			List<VatLedgerDTO> vatLedgerDTOs = new ArrayList<>();
+			for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
+				VatLedgerDTO vatLedgerDTO = new VatLedgerDTO();
+				vatLedgerDTO.setName(accountProfileDTO.getName());
+				String vatledgerArray[] = accountProfileDTO.getAlias().split("\\,");
+				vatLedgerDTO.setPercentageOfCalculation(vatledgerArray[1]);
+				vatLedgerDTO.setVatClass(vatledgerArray[0]);
+				vatLedgerDTOs.add(vatLedgerDTO);
+			}
+			salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
+			salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
+			List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
+
+			if (!rferenceInventoryVoucherHeaderExecutiveExecutionPid.equalsIgnoreCase("")) {
+
+				DynamicDocumentHeaderDTO documentHeaderDTOAditonal = dynamicDocumentHeaderService
+						.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
+								rferenceInventoryVoucherHeaderExecutiveExecutionPid, dynamicDocumentAditional);
+				DynamicDocumentHeaderDTO dynamicDocumentHeadersDespatch = dynamicDocumentHeaderService
+						.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
+								inventoryVoucherHeader.getExecutiveTaskExecution().getPid(), dynamicDocumentDespach);
+
+				if (documentHeaderDTOAditonal.getDocumentPid() != null) {
+					documentHeaderDTOs.add(documentHeaderDTOAditonal);
+				}
+				if (dynamicDocumentHeadersDespatch.getDocumentPid() != null) {
+					documentHeaderDTOs.add(dynamicDocumentHeadersDespatch);
+				}
+			}
+			salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
+			List<GstLedger> gstLedgerList = new ArrayList<>();
+			gstLedgerList = gstLedgerRepository.findAllByCompanyIdAndActivated(inventoryVoucherHeader.getCompany().getId(),true);
+			if(gstLedgerList != null && gstLedgerList.size()!=0) {
+				List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst)).collect(Collectors.toList());
+				salesOrderDTO.setGstLedgerDtos(gstLedgerDtos);
+			}
+			inventoryHeaderPid.add(inventoryVoucherHeader.getPid());
+			
+			salesOrderDTOs.add(salesOrderDTO);
+		}
+		if(!salesOrderDTOs.isEmpty()) {
+			int updated = inventoryVoucherHeaderRepository.
+								updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
+			log.debug("updated "+updated+" to PROCESSING");
+		}
+		
+		return salesOrderDTOs;
+	}
 	
 	/**
 	 * POST /sales-order.json : Create new salesOrders.

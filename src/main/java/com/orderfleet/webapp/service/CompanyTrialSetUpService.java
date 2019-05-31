@@ -77,6 +77,7 @@ import com.orderfleet.webapp.domain.enums.DashboardUIType;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.Industry;
+import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.PartnerIntegrationSystem;
 import com.orderfleet.webapp.domain.enums.StockLocationType;
 import com.orderfleet.webapp.domain.enums.TaskPlanType;
@@ -870,6 +871,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setShowAllActivityCount(false);
 		mobileConfiguration.setTaskExecutionOfflineSave(true);
 		mobileConfiguration.setVoucherNumberGenerationType(VoucherNumberGenerationType.TYPE_1);
+		mobileConfiguration.setInventoryVoucherUIType(InventoryVoucherUIType.TYPE_1);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 

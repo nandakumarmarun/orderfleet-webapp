@@ -29,12 +29,11 @@ public class NotificationDTO {
 	private LocalDateTime createdDate;
 	private String sendUserName;
 	private String sendExecutiveName;
-	
 	private MessageStatus msgStatus;
-	
 	private String errorCode;
-	
 	private String failedReason;
+	
+	
 	
 	public NotificationDTO() {
 		super();
@@ -47,6 +46,7 @@ public class NotificationDTO {
 		this.isImportant = notification.getIsImportant();
 		this.resendTime = notification.getResendTime();
 		this.createdDate = notification.getCreatedDate();
+		this.title = notification.getTitle();
 	}
 
 	public String getPid() {

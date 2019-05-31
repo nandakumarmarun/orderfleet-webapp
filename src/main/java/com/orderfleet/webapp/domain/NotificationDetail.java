@@ -166,5 +166,7 @@ public class NotificationDetail implements Serializable {
 	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}
+
+	
 	
 }

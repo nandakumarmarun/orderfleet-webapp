@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.NotificationMessageRecipient;
+import com.orderfleet.webapp.domain.NotificationReply;
 import com.orderfleet.webapp.domain.Task;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserDevice;
@@ -33,16 +34,19 @@ import com.orderfleet.webapp.domain.enums.MessageStatus;
 import com.orderfleet.webapp.domain.enums.PriorityStatus;
 import com.orderfleet.webapp.domain.model.FirebaseData;
 import com.orderfleet.webapp.repository.NotificationMessageRecipientRepository;
+import com.orderfleet.webapp.repository.NotificationReplyRepository;
 import com.orderfleet.webapp.repository.TaskRepository;
 import com.orderfleet.webapp.repository.UserDeviceRepository;
 import com.orderfleet.webapp.repository.UserTaskAssignmentRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.service.NotificationReplyService;
 import com.orderfleet.webapp.service.UserTaskAssignmentService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.api.dto.ChatReplyNotificationDTO;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
 import com.orderfleet.webapp.web.rest.api.dto.TaskSubmissionResponse;
+import com.orderfleet.webapp.web.rest.dto.NotificationReplyDTO;
 
 /**
  * REST controller for managing Notification.
@@ -65,6 +69,9 @@ public class NotificationController {
 
 	@Inject
 	private UserTaskAssignmentRepository userTaskAssignmentRepository;
+	
+	@Inject
+	private NotificationReplyService notificationReplyService;
 
 	@Inject
 	public NotificationController(NotificationMessageRecipientRepository notificationMessageRecipientRepository,
@@ -120,17 +127,21 @@ public class NotificationController {
 	@Timed
 	@RequestMapping(value = "/chat-reply-notifications", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> chatReplyNotification(
-			@Valid @RequestBody ChatReplyNotificationDTO chatReplyNotificationDTO) {
-		log.debug("Web request to save ExecutiveTaskExecution start");
+			@Valid @RequestBody NotificationReplyDTO notificationReplyDTO) {
+		log.debug("Web request to save NotificationReply start");
 
-		if (chatReplyNotificationDTO != null) {
-			System.out.println(chatReplyNotificationDTO.getMessage() + "************"
-					+ chatReplyNotificationDTO.getNotificationPid());
-			return new ResponseEntity<>("Chat Reply Success", HttpStatus.OK);
-		} else {
-
+		if (notificationReplyDTO == null) {
 			return new ResponseEntity<>("Chat Reply Failed", HttpStatus.OK);
 		}
+		log.info(notificationReplyDTO.getMessage() + "************"+ notificationReplyDTO.getNotificationPid());
+		NotificationReply notificationReply = 
+				notificationReplyService.saveNotificationReply(notificationReplyDTO);
+		if(notificationReply != null) {
+			return new ResponseEntity<>("Chat Reply Success", HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>("Chat Reply Failed", HttpStatus.OK);
+		}
+			
 	}
 
 	private void assignTaskToUser(Task task, User user, LocalDate startDate) {

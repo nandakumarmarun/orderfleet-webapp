@@ -18,4 +18,6 @@ public interface NotificationDetailRepository extends JpaRepository<Notification
 	@Query("select nd from NotificationDetail nd where nd.company.id = ?#{principal.companyId} and nd.userId in ?1 and nd.messageStatus in ?2 and nd.createdDate between ?3 and ?4 order by nd.createdDate DESC")
 	List<NotificationDetail> findByCompanyIdAndUserIdInAndMessageStatusInAndDateBetweenOrderByCreatedDateDesc(List<Long> userIds, List<MessageStatus> status, LocalDateTime fromDate, LocalDateTime toDate);
 	
+	@Query("select nd from NotificationDetail nd where nd.company.id = ?#{principal.companyId} and nd.createdDate between ?1 and ?2 order by nd.createdDate DESC")
+	List<NotificationDetail> findByCompanyIdAndDateBetweenOrderByCreatedDateDesc(LocalDateTime fromDate, LocalDateTime toDate);
 }
