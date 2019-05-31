@@ -15,6 +15,8 @@ public class ExecutiveTaskExecutionView {
 	private LocalDateTime createdDate;
 
 	private LocalDateTime plannedDate;
+	
+	private LocalDateTime sendDate;
 
 	private LocalDateTime startTime;
 
@@ -76,7 +78,7 @@ public class ExecutiveTaskExecutionView {
 		super();
 	}
 
-	public ExecutiveTaskExecutionView(String pid, LocalDateTime createdDate, LocalDateTime plannedDate, String remarks,
+	public ExecutiveTaskExecutionView(String pid, LocalDateTime createdDate, LocalDateTime plannedDate,LocalDateTime sendDate, String remarks,
 			String userName, String activityName, String accountTypeName, String accountProfileName,
 			LocationType locationType, String location, boolean isGpsOff, boolean isMobileDataOff,
 			LocalDateTime startTime, LocalDateTime endTime, boolean startIsGpsOff, boolean startIsMobileDataOff,
@@ -86,6 +88,7 @@ public class ExecutiveTaskExecutionView {
 		this.pid = pid;
 		this.createdDate = createdDate;
 		this.plannedDate = plannedDate;
+		this.sendDate = sendDate;
 		this.remarks = remarks;
 		this.userName = userName;
 		this.activityName = activityName;
@@ -112,6 +115,7 @@ public class ExecutiveTaskExecutionView {
 		this.pid = executiveTaskExecution.getPid();
 		this.createdDate = executiveTaskExecution.getCreatedDate();
 		this.plannedDate = executiveTaskExecution.getDate();
+		this.sendDate = executiveTaskExecution.getSendDate()!= null?executiveTaskExecution.getSendDate():executiveTaskExecution.getDate();
 		this.remarks = executiveTaskExecution.getRemarks();
 		this.userName = executiveTaskExecution.getUser().getFirstName();
 		this.activityName = executiveTaskExecution.getActivity().getName();
@@ -153,6 +157,14 @@ public class ExecutiveTaskExecutionView {
 
 	public void setPlannedDate(LocalDateTime plannedDate) {
 		this.plannedDate = plannedDate;
+	}
+	
+	public LocalDateTime getSendDate() {
+		return sendDate;
+	}
+
+	public void setSendDate(LocalDateTime sendDate) {
+		this.sendDate = sendDate;
 	}
 
 	public LocalDateTime getCreatedDate() {

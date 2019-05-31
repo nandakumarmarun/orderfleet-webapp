@@ -146,8 +146,8 @@ if (!this.ExecutiveTaskExecution) {
 								}
 								
 								let end = moment(executiveTaskExecution.createdDate);
-								let startTime = moment(executiveTaskExecution.plannedDate);
-								let duration = moment.duration(end.diff(startTime));
+								let sendTime = moment(executiveTaskExecution.sendDate);
+								let duration = moment.duration(end.diff(sendTime));
 								let rowColor = "";
 								if(duration.asMinutes() > 10){
 									rowColor = "background-color:yellow";
@@ -163,7 +163,7 @@ if (!this.ExecutiveTaskExecution) {
 										+ "</td><td>"
 										+ executiveTaskExecution.activityName
 										+ "</td><td class='tableexport-string target'>"
-										+ formatDate(executiveTaskExecution.plannedDate, 'MMM DD YYYY, h:mm:ss a')
+										+ formatDate(executiveTaskExecution.sendDate, 'MMM DD YYYY, h:mm:ss a')
 										+ "</td><td class='tableexport-string target'>"
 										+ formatDate(executiveTaskExecution.createdDate, 'MMM DD YYYY, h:mm:ss a' )
 										+ "</td><td><label>GPS Location : </label> <i>"
