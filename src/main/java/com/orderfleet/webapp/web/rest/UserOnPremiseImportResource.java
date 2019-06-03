@@ -121,7 +121,7 @@ public class UserOnPremiseImportResource {
 						userOnPremiseRepository.save(convertUserDTOsToUserOnPremise(newUserDtos));
 
 					} else {
-						System.out.println(userLogins.size() + "++++++++++++++++++++");
+						//System.out.println(userLogins.size() + "++++++++++++++++++++");
 						userOnPremiseRepository.save(convertUserDTOsToUserOnPremise(userDtos));
 					}
 				} else {
@@ -162,7 +162,7 @@ public class UserOnPremiseImportResource {
 	}
 
 	private List<UserOnPremise> convertUserDTOsToUserOnPremise(List<UserDTO> userDtos) {
-		System.out.println(userDtos.size() + "-----");
+		//System.out.println(userDtos.size() + "-----");
 		List<UserOnPremise> userPremiseList = new ArrayList<>();
 		for (UserDTO userDto : userDtos) {
 			UserOnPremise userOnPremise = new UserOnPremise();
