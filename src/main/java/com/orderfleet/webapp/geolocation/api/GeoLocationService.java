@@ -72,7 +72,7 @@ public class GeoLocationService {
 	 * @throws UnsupportedEncodingException
 	 */
 	public String findAddressFromLatLng(String latLng) {
-		log.debug("Reverse geocode using lalLan {} " , latLng);
+		log.info("Reverse geocode using lalLan {} " , latLng);
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<GoogleLocation> results = restTemplate.getForEntity(GEOCODE_API_URL, GoogleLocation.class,
 				latLng);
@@ -120,7 +120,7 @@ public class GeoLocationService {
 	 * @return TowerLocation object contains lat,lon and address.
 	 */
 	public TowerLocation findAddressFromCellTower(String mcc, String mnc, String cellId, String lac) {
-		log.debug("Cell tower details using mcc {} , mnc {}, cellId {} , lac {} ", mcc , mnc, cellId, lac);
+		log.info("Cell tower details using mcc {} , mnc {}, cellId {} , lac {} ", mcc , mnc, cellId, lac);
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new CustomErrorHandler());
 		GTowerRequest request = new GTowerRequest();
