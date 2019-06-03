@@ -98,9 +98,32 @@ public class UserOnPremiseImportResource {
 				List<UserDTO> userDtos = Arrays.asList(userArrays);
 				List<String> userLogins = userDtos.stream().map(user -> user.getLogin()).collect(Collectors.toList());
 				List<String> usersExisting = userRepository.findAllUserByLogin(userLogins);
+				List<String> usersExistingOnPremise = userOnPremiseRepository.findAllUserByLogin(userLogins, pid);
 				if (usersExisting.size() == 0) {
-					// insert into db
-					userOnPremiseRepository.save(convertUserDTOsToUserOnPremise(userDtos));
+
+					if (usersExistingOnPremise.size() != 0) {
+
+						userLogins.removeAll(usersExistingOnPremise);
+
+						List<UserDTO> newUserDtos = new ArrayList<UserDTO>();
+
+						// System.out.println(userLogins.size() + "******************UserLogins");
+
+						for (UserDTO userDto : userDtos) {
+
+							if (userLogins.stream().filter(u -> u.equals(userDto.getLogin())).findAny().isPresent()) {
+								newUserDtos.add(userDto);
+							}
+						}
+
+						// System.out.println(newUserDtos.size() + "******************NewUserDtos");
+
+						userOnPremiseRepository.save(convertUserDTOsToUserOnPremise(newUserDtos));
+
+					} else {
+						System.out.println(userLogins.size() + "++++++++++++++++++++");
+						userOnPremiseRepository.save(convertUserDTOsToUserOnPremise(userDtos));
+					}
 				} else {
 
 					return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("company",
