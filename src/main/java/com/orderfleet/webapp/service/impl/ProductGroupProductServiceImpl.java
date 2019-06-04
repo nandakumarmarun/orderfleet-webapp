@@ -387,7 +387,9 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 			List<ProductNameTextSettings> productNameTextSettings = productNameTextSettingsRepository
 					.findAllByCompanyIdAndEnabledTrue(SecurityUtils.getCurrentUsersCompanyId());
 			Set<Long> sLocationIds = documentStockLocationSourceRepository.findStockLocationIdsByCompanyId();
-
+			if(sLocationIds == null || sLocationIds.size() == 0) {
+				throw new IllegalArgumentException("Document Stock Location not assigned");
+			}
 			List<OpeningStock> openingStocks = openingStockRepository
 					.findOpeningStocksAndStockLocationIdIn(sLocationIds);
 			log.info("Caluclationg op Stock");
