@@ -16,29 +16,29 @@ import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Stage;
 import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.UserStage;
+import com.orderfleet.webapp.domain.UserCustomerGroup;
 import com.orderfleet.webapp.repository.AccountGroupAccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountGroupRepository;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.StageRepository;
 import com.orderfleet.webapp.repository.UserRepository;
-import com.orderfleet.webapp.repository.UserStageRepository;
+import com.orderfleet.webapp.repository.UserCustomerGroupRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.UserStageService;
+import com.orderfleet.webapp.service.UserCustomerGroupService;
 import com.orderfleet.webapp.web.rest.dto.StageDTO;
-import com.orderfleet.webapp.web.rest.dto.UserStageDTO;
+import com.orderfleet.webapp.web.rest.dto.UserCustomerGroupDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 /**
- * Service Interface for managing UserStage.
+ * Service Interface for managing UserCustomerGroup.
  * 
  * @author Muhammed Riyas T
  * @since August 29, 2016
  */
 
 @Service
-public class UserStageServiceImpl implements UserStageService {
+public class UserCustomerGroupServiceImpl implements UserCustomerGroupService {
 
 	private final Logger log = LoggerFactory.getLogger(AccountGroupAccountProfileServiceImpl.class);
 
@@ -49,7 +49,7 @@ public class UserStageServiceImpl implements UserStageService {
 	private StageRepository stageRepository;
 
 	@Inject
-	private UserStageRepository userStageRepository;
+	private UserCustomerGroupRepository userCustomerGroupRepository;
 
 	@Inject
 	private CompanyRepository companyRepository;
@@ -61,42 +61,42 @@ public class UserStageServiceImpl implements UserStageService {
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		User user = userRepository.findOneByPid(userPid).get();
 		String[] stages = assignedStages.split(",");
-		List<UserStage> userStages = new ArrayList<>();
+		List<UserCustomerGroup> userCustomerGroups = new ArrayList<>();
 
 		for (String stagePid : stages) {
 			Stage stage = stageRepository.findOneByPid(stagePid).get();
-			userStages.add(new UserStage(user, stage, company));
+			userCustomerGroups.add(new UserCustomerGroup(user, stage, company));
 		}
 
-		List<UserStage> existingUserStages = userStageRepository.findUserStagesByUserPid(userPid);
-		if (existingUserStages.size() > 0) {
+		List<UserCustomerGroup> existingUserCustomerGroups = userCustomerGroupRepository.findUserCustomerGroupsByUserPid(userPid);
+		if (existingUserCustomerGroups.size() > 0) {
 
-			List<Long> userStageIds = new ArrayList<>();
+			List<Long> userCustomerGroupIds = new ArrayList<>();
 
-			for (UserStage userStage : existingUserStages) {
-				userStageIds.add(userStage.getId());
+			for (UserCustomerGroup userCustomerGroup : existingUserCustomerGroups) {
+				userCustomerGroupIds.add(userCustomerGroup.getId());
 			}
 
-			userStageRepository.deleteByIdIn(userStageIds);
+			userCustomerGroupRepository.deleteByIdIn(userCustomerGroupIds);
 		}
-		userStageRepository.save(userStages);
+		userCustomerGroupRepository.save(userCustomerGroups);
 
 	}
 
 	@Override
-	public List<UserStageDTO> findUserStagesByUserPid(String userPid) {
+	public List<UserCustomerGroupDTO> findUserCustomerGroupsByUserPid(String userPid) {
 
-		List<UserStage> userStages = userStageRepository.findUserStagesByUserPid(userPid);
+		List<UserCustomerGroup> userCustomerGroups = userCustomerGroupRepository.findUserCustomerGroupsByUserPid(userPid);
 
-		List<UserStageDTO> userStageDTOs = new ArrayList<>();
+		List<UserCustomerGroupDTO> userCustomerGroupDTOs = new ArrayList<>();
 
-		for (UserStage userStage : userStages) {
+		for (UserCustomerGroup userCustomerGroup : userCustomerGroups) {
 
-			userStageDTOs.add(new UserStageDTO(userStage.getStage().getPid(), userStage.getStage().getName(), userPid,
-					userStage.getUser().getFirstName() + " " + userStage.getUser().getLastName()));
+			userCustomerGroupDTOs.add(new UserCustomerGroupDTO(userCustomerGroup.getStage().getPid(), userCustomerGroup.getStage().getName(), userPid,
+					userCustomerGroup.getUser().getFirstName() + " " + userCustomerGroup.getUser().getLastName()));
 
 		}
-		return userStageDTOs;
+		return userCustomerGroupDTOs;
 	}
 
 }

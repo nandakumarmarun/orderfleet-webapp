@@ -36,13 +36,13 @@ import com.orderfleet.webapp.service.PriceLevelService;
 import com.orderfleet.webapp.service.StageService;
 import com.orderfleet.webapp.service.UserPriceLevelService;
 import com.orderfleet.webapp.service.UserService;
-import com.orderfleet.webapp.service.UserStageService;
+import com.orderfleet.webapp.service.UserCustomerGroupService;
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountTypeDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelDTO;
-import com.orderfleet.webapp.web.rest.dto.UserStageDTO;
+import com.orderfleet.webapp.web.rest.dto.UserCustomerGroupDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 import javassist.expr.NewArray;
@@ -55,7 +55,7 @@ import javassist.expr.NewArray;
  */
 @Controller
 @RequestMapping("/web")
-public class UserStageResource {
+public class UserCustomerGroupResource {
 
 	private final Logger log = LoggerFactory.getLogger(UserPriceLevelResource.class);
 
@@ -63,7 +63,7 @@ public class UserStageResource {
 	private UserPriceLevelService userPriceLevelService;
 
 	@Inject
-	private UserStageService userStageService;
+	private UserCustomerGroupService userStageService;
 
 	@Inject
 	private StageService stageService;
@@ -111,9 +111,9 @@ public class UserStageResource {
 
 	@RequestMapping(value = "/user-customerGroups/{userPid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<List<UserStageDTO>> getUserPriceLevels(@PathVariable String userPid) {
+	public ResponseEntity<List<UserCustomerGroupDTO>> getUserPriceLevels(@PathVariable String userPid) {
 		log.debug("Web request to get get Stages by user pid : {}", userPid);
-		return new ResponseEntity<>(userStageService.findUserStagesByUserPid(userPid), HttpStatus.OK);
+		return new ResponseEntity<>(userStageService.findUserCustomerGroupsByUserPid(userPid), HttpStatus.OK);
 
 	}
 }

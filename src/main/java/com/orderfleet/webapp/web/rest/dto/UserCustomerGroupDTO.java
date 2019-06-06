@@ -1,23 +1,19 @@
 package com.orderfleet.webapp.web.rest.dto;
 
-import java.time.LocalDateTime;
+import com.orderfleet.webapp.domain.UserCustomerGroup;
 
-import com.orderfleet.webapp.domain.AccountGroupAccountProfile;
-import com.orderfleet.webapp.domain.UserStage;
-
-public class UserStageDTO {
+public class UserCustomerGroupDTO {
 
 	private String stagePid;
 	private String stageName;
 	private String userPid;
 	private String userName;
-	private LocalDateTime lastModifiedDate;
 
-	public UserStageDTO() {
+	public UserCustomerGroupDTO() {
 		super();
 	}
 
-	public UserStageDTO(String stagePid, String stageName, String userPid, String userName) {
+	public UserCustomerGroupDTO(String stagePid, String stageName, String userPid, String userName) {
 		super();
 		this.stagePid = stagePid;
 		this.stageName = stageName;
@@ -26,12 +22,11 @@ public class UserStageDTO {
 
 	}
 
-	public UserStageDTO(UserStage userStage) {
+	public UserCustomerGroupDTO(UserCustomerGroup userStage) {
 		this.stagePid = userStage.getStage().getPid();
 		this.stageName = userStage.getStage().getName();
 		this.userPid = userStage.getUser().getPid();
 		this.userName = userStage.getUser().getFirstName() + " " + userStage.getUser().getLastName();
-		this.lastModifiedDate = userStage.getLastModifiedDate();
 	}
 
 	public String getStagePid() {
@@ -66,12 +61,5 @@ public class UserStageDTO {
 		this.userName = userName;
 	}
 
-	public LocalDateTime getLastModifiedDate() {
-		return lastModifiedDate;
-	}
-
-	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-		this.lastModifiedDate = lastModifiedDate;
-	}
 
 }

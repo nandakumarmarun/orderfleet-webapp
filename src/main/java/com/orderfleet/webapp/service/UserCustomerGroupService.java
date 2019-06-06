@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.orderfleet.webapp.web.rest.dto.StageDTO;
-import com.orderfleet.webapp.web.rest.dto.UserStageDTO;
+import com.orderfleet.webapp.web.rest.dto.UserCustomerGroupDTO;
 
 /**
  * Service Interface for managing UserStage.
@@ -13,7 +13,7 @@ import com.orderfleet.webapp.web.rest.dto.UserStageDTO;
  * @since August 29, 2016
  */
 
-public interface UserStageService {
+public interface UserCustomerGroupService {
 
 	/**
 	 * Save a UserStage.
@@ -23,6 +23,6 @@ public interface UserStageService {
 	 */
 	void save(String userPid, String assignedStages);
 
-	List<UserStageDTO> findUserStagesByUserPid(String userPid);
+	List<UserCustomerGroupDTO> findUserCustomerGroupsByUserPid(String userPid);
 
 }
