@@ -27,7 +27,11 @@ public interface UserCustomerGroupTargetRepository extends JpaRepository<UserCus
 	
 	@Query("select distinct userCustomerGroupTarget from UserCustomerGroupTarget userCustomerGroupTarget where userCustomerGroupTarget.user.login = ?#{principal.username} and startDate >= ?1 and endDate <= ?2")
 	List<UserCustomerGroupTarget> findByUserIsCurrentUserAndDateBetween(LocalDate startDate, LocalDate endDate);
+	
+	@Query("select userCustomerGroupTarget from UserCustomerGroupTarget userCustomerGroupTarget where userCustomerGroupTarget.user.id = ?1 and startDate >= ?2 and endDate <= ?3")
+	List<UserCustomerGroupTarget> findByUserIdAndDateBetween(Long userId,LocalDate startDate, LocalDate endDate);
 
+	
 	@Query("select userCustomerGroupTarget from UserCustomerGroupTarget userCustomerGroupTarget where userCustomerGroupTarget.company.id = ?#{principal.companyId}")
 	Page<UserCustomerGroupTarget> findAllByCompanyId(Pageable pageable);
 
