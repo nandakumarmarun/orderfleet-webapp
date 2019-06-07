@@ -128,15 +128,21 @@ public class Company extends AbstractAuditingEntity implements Serializable {
 
 	@Column(name = "period_end_date")
 	private LocalDate periodEndDate;
-	
+
 	@Column(name = "on_premise", columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean onPremise;
-	
+
 	@Column(name = "api_url")
 	private String apiUrl;
-	
-	@Column(name="gst_number")
+
+	@Column(name = "gst_number")
 	private String gstNo;
+
+	@Column(name = "sms_username")
+	private String smsUsername;
+
+	@Column(name = "sms_password")
+	private String smsPassword;
 
 	public Long getId() {
 		return id;
@@ -305,7 +311,6 @@ public class Company extends AbstractAuditingEntity implements Serializable {
 	public void setPeriodEndDate(LocalDate periodEndDate) {
 		this.periodEndDate = periodEndDate;
 	}
-	
 
 	public Boolean getActivated() {
 		return activated;
@@ -337,6 +342,22 @@ public class Company extends AbstractAuditingEntity implements Serializable {
 
 	public void setGstNo(String gstNo) {
 		this.gstNo = gstNo;
+	}
+
+	public String getSmsUsername() {
+		return smsUsername;
+	}
+
+	public void setSmsUsername(String smsUsername) {
+		this.smsUsername = smsUsername;
+	}
+
+	public String getSmsPassword() {
+		return smsPassword;
+	}
+
+	public void setSmsPassword(String smsPassword) {
+		this.smsPassword = smsPassword;
 	}
 
 	@Override

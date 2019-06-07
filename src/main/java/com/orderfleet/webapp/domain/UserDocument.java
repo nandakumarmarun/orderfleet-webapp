@@ -48,16 +48,20 @@ public class UserDocument implements Serializable {
 	@Column(name = "image_option", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean imageOption;
 
+	@Column(name = "sms_option", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean smsOption;
+
 	public UserDocument() {
 		super();
 	}
 
-	public UserDocument(User user, Document document, Company company, boolean imageOption) {
+	public UserDocument(User user, Document document, Company company, boolean imageOption, boolean smsOption) {
 		super();
 		this.user = user;
 		this.document = document;
 		this.company = company;
 		this.imageOption = imageOption;
+		this.smsOption = smsOption;
 	}
 
 	public Long getId() {
@@ -98,6 +102,14 @@ public class UserDocument implements Serializable {
 
 	public void setImageOption(boolean imageOption) {
 		this.imageOption = imageOption;
+	}
+
+	public boolean getSmsOption() {
+		return smsOption;
+	}
+
+	public void setSmsOption(boolean smsOption) {
+		this.smsOption = smsOption;
 	}
 
 	public static long getSerialversionuid() {

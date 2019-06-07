@@ -238,6 +238,16 @@
 										<input id="field_on_premise" name='onPremise'type='checkbox' 
 										class="form-group" />
 									</div>
+									<div class="form-group">
+										<label class="control-label" for="field_smsUsername">SMS Username</label> <input
+											type="text" class="form-control" name="smsUsername"
+											id="field_smsUsername" maxlength="55" placeholder="SMS Username" />
+									</div>
+									<div class="form-group">
+										<label class="control-label" for="field_smsPassword">SMS password</label> <input
+											type="text" class="form-control" name="smsPassword"
+											id="field_smsPassword" maxlength="55" placeholder="SMS Password" />
+									</div>
 								</div>
 
 							</div>
@@ -336,6 +346,14 @@
 										<tr>
 											<td>WebSite</td>
 											<td><span id="lbl_website"></span></td>
+										</tr>
+										<tr>
+											<td>SMS Username</td>
+											<td><span id="lbl_smsUsername"></span></td>
+										</tr>
+										<tr>
+											<td>SMS Password</td>
+											<td><span id="lbl_smsPassword"></span></td>
 										</tr>
 									</table>
 

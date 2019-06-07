@@ -32,7 +32,8 @@ public interface EmployeeHierarchyRepository extends JpaRepository<EmployeeHiera
 
 	EmployeeHierarchy findByEmployeePidAndActivatedTrue(String employeePid);
 	
-	@Query(value = "WITH RECURSIVE children AS (SELECT activated,employee_id, parent_id FROM tbl_employee_hierarchy WHERE employee_id = ?1 UNION SELECT e.activated,e.employee_id, e.parent_id FROM tbl_employee_hierarchy e INNER JOIN children s ON s.employee_id = e.parent_id) SELECT COALESCE(employee_id, 0 ) FROM children WHERE activated = TRUE", nativeQuery = true)
+//	@Query(value = "WITH RECURSIVE children AS (SELECT activated,employee_id, parent_id FROM tbl_employee_hierarchy WHERE employee_id = ?1 UNION SELECT e.activated,e.employee_id, e.parent_id FROM tbl_employee_hierarchy e INNER JOIN children s ON s.employee_id = e.parent_id) SELECT COALESCE(employee_id, 0 ) FROM children WHERE activated = TRUE", nativeQuery = true)
+	@Query(value = "WITH RECURSIVE children AS (SELECT activated,employee_id, parent_id FROM tbl_employee_hierarchy WHERE employee_id = ?1 UNION SELECT e.activated,e.employee_id, e.parent_id FROM tbl_employee_hierarchy e INNER JOIN children s ON s.employee_id = e.parent_id and e.activated = true) SELECT COALESCE(employee_id, 0 ) FROM children WHERE activated = TRUE", nativeQuery = true)
 	List<Object> findChildrenByEmployeeIdAndActivatedTrue(Long employeeId);
 
 	@Query("select empHierarchy from EmployeeHierarchy empHierarchy where empHierarchy.company.id = ?#{principal.companyId} and empHierarchy.activated = 'TRUE' and empHierarchy.parent.id = null")

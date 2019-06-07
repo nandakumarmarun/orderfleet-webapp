@@ -34,7 +34,9 @@ if (!this.Company) {
 		logoContentType : null,
 		website : null,
 		activated : null,
-		onPremise : null
+		onPremise : null,
+		smsUsername : null,
+		smsPassword : null
 	};
 
 	// Specify the validation rules
@@ -144,6 +146,8 @@ if (!this.Company) {
 		companyModel.location = $('#field_location').val();
 		companyModel.website = $('#field_website').val();
 		companyModel.onPremise = $('#field_on_premise').is(":checked")
+		companyModel.smsUsername = $('#field_smsUsername').val();
+		companyModel.smsPassword = $('#field_smsPassword').val();
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -200,6 +204,17 @@ if (!this.Company) {
 				$('#lbl_pincode').text(data.pincode);
 				$('#lbl_location').text(data.location);
 				$('#lbl_website').text(data.website);
+				if(data.smsUsername!= null){
+					$('#lbl_smsUsername').text(data.smsUsername);
+				}else{
+					$('#lbl_smsUsername').text("-");
+				}
+				
+				if(data.smsPassword!= null){
+					$('#lbl_smsPassword').text(data.smsPassword);
+				}else{
+					$('#lbl_smsPassword').text("-");
+				}
 
 				if (data.logo != null) {
 					$('#profileImageView').attr('src',
@@ -241,6 +256,8 @@ if (!this.Company) {
 				$('#field_location').val(data.location);
 				$('#field_website').val(data.website);
 				$('#field_on_premise').prop("checked", data.onPremise);
+				$('#field_smsUsername').val(data.smsUsername);
+				$('#field_smsPassword').val(data.smsPassword);
 				
 				if (data.logo != null) {
 					$('#previewImage').attr('src',

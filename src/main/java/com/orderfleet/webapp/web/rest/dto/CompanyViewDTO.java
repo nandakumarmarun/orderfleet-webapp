@@ -33,6 +33,8 @@ public class CompanyViewDTO {
 	private LocalDate periodEndDate;
 	private String apiUrl;
 	private boolean onPremise;
+	private String smsUsername;
+	private String smsPassword;
 
 	public CompanyViewDTO() {
 		super();
@@ -65,6 +67,8 @@ public class CompanyViewDTO {
 		this.apiUrl = company.getApiUrl();
 		this.onPremise = company.isOnPremise();
 		this.gstNo = company.getGstNo();
+		this.smsUsername = company.getSmsUsername();
+		this.smsPassword = company.getSmsPassword();
 
 	}
 
@@ -266,6 +270,22 @@ public class CompanyViewDTO {
 
 	public void setOnPremise(boolean onPremise) {
 		this.onPremise = onPremise;
+	}
+
+	public String getSmsUsername() {
+		return smsUsername;
+	}
+
+	public void setSmsUsername(String smsUsername) {
+		this.smsUsername = smsUsername;
+	}
+
+	public String getSmsPassword() {
+		return smsPassword;
+	}
+
+	public void setSmsPassword(String smsPassword) {
+		this.smsPassword = smsPassword;
 	}
 
 	@Override

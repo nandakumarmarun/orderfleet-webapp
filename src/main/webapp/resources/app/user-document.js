@@ -42,6 +42,8 @@ if (!this.UserDocument) {
 								"checked", true);
 						$("#imageOption" + document.documentPid).prop(
 								"checked", document.imageOption);
+						$("#smsOption" + document.documentPid).prop(
+								"checked", document.smsOption);
 
 					});
 				}
@@ -59,9 +61,12 @@ if (!this.UserDocument) {
 			var documentpid = $(this).val();
 			var selectedimageOption = $("#imageOption" + $(this).val()).prop(
 					"checked");
+			var selectedsmsOption = $("#smsOption" + $(this).val()).prop(
+			"checked");
 			assignedDocuments.push({
 				documentPid : documentpid,
 				imageOption : selectedimageOption,
+				smsOption : selectedsmsOption
 			});
 		});
 		if (assignedDocuments == "") {

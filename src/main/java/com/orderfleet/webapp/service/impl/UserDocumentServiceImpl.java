@@ -73,6 +73,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 					userDocument.setCompany(company);
 					userDocument.setUser(user.get());
 					userDocument.setImageOption(userDocumentDTO.getImageOption());
+					userDocument.setSmsOption(userDocumentDTO.getSmsOption());
 					userDocuments.add(userDocument);
 				}
 			}
@@ -106,8 +107,8 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 		if (userDocuments != null && !userDocuments.isEmpty()) {
 			List<User> users = userRepository.findByUserPidIn(toUserPids);
 			for (User user : users) {
-				List<UserDocument> newUserDocuments = userDocuments.stream()
-						.map(ud -> new UserDocument(user, ud.getDocument(), ud.getCompany(), ud.getImageOption()))
+				List<UserDocument> newUserDocuments = userDocuments.stream().map(ud -> new UserDocument(user,
+						ud.getDocument(), ud.getCompany(), ud.getImageOption(), ud.getSmsOption()))
 						.collect(Collectors.toList());
 				userDocumentRepository.save(newUserDocuments);
 			}
@@ -128,7 +129,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 		}
 		return dynamicDocuments;
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<DocumentDTO> findDocumentsByUserIdsAndDocumentType(List<Long> userIds, DocumentType documentType) {
@@ -141,7 +142,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 			}
 		}
 		Set<String> deptSet = new HashSet<>();
-        // directly removing the elements from list if already existed in set
+		// directly removing the elements from list if already existed in set
 		dynamicDocuments.removeIf(p -> !deptSet.add(p.getName()));
 		return dynamicDocuments;
 	}

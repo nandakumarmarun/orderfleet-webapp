@@ -16,6 +16,7 @@ public class UserDocumentDTO {
 	private String documentPid;
 	private String documentName;
 	private boolean imageOption;
+	private boolean smsOption;
 
 	public UserDocumentDTO() {
 		super();
@@ -28,6 +29,7 @@ public class UserDocumentDTO {
 		this.documentPid = userDocument.getDocument().getPid();
 		this.documentName = userDocument.getDocument().getName();
 		this.imageOption = userDocument.getImageOption();
+		this.smsOption = userDocument.getSmsOption();
 	}
 
 	public String getUserPid() {
@@ -68,6 +70,14 @@ public class UserDocumentDTO {
 
 	public void setImageOption(boolean imageOption) {
 		this.imageOption = imageOption;
+	}
+
+	public boolean getSmsOption() {
+		return smsOption;
+	}
+
+	public void setSmsOption(boolean smsOption) {
+		this.smsOption = smsOption;
 	}
 
 }

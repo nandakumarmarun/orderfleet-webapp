@@ -73,6 +73,7 @@
 												<th></th>
 												<th>Document</th>
 												<th>Image Option</th>
+												<th>SMS Option</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -83,6 +84,8 @@
 													<td>${document.name}</td>
 													<td><input id="imageOption${document.pid}"
 														name='imageOption' type='checkbox' /></td>
+													<td><input id="smsOption${document.pid}"
+														name='smsOption' type='checkbox' /></td>
 												</tr>
 											</c:forEach>
 										</tbody>
