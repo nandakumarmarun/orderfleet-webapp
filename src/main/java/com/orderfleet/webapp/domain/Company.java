@@ -138,11 +138,8 @@ public class Company extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "gst_number")
 	private String gstNo;
 
-	@Column(name = "sms_username")
-	private String smsUsername;
-
-	@Column(name = "sms_password")
-	private String smsPassword;
+	@Column(name = "sms_api_key")
+	private String smsApiKey;
 
 	public Long getId() {
 		return id;
@@ -344,20 +341,12 @@ public class Company extends AbstractAuditingEntity implements Serializable {
 		this.gstNo = gstNo;
 	}
 
-	public String getSmsUsername() {
-		return smsUsername;
+	public String getSmsApiKey() {
+		return smsApiKey;
 	}
 
-	public void setSmsUsername(String smsUsername) {
-		this.smsUsername = smsUsername;
-	}
-
-	public String getSmsPassword() {
-		return smsPassword;
-	}
-
-	public void setSmsPassword(String smsPassword) {
-		this.smsPassword = smsPassword;
+	public void setSmsApiKey(String smsApiKey) {
+		this.smsApiKey = smsApiKey;
 	}
 
 	@Override

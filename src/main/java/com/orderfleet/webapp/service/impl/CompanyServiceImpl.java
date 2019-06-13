@@ -98,8 +98,8 @@ public class CompanyServiceImpl implements CompanyService {
 		company.setWebsite(companyDTO.getWebsite());
 		company.setIsActivated(false);
 		company.setOnPremise(companyDTO.isOnPremise());
-		company.setSmsUsername(companyDTO.getSmsUsername());
-		company.setSmsPassword(companyDTO.getSmsPassword());
+		company.setSmsApiKey(companyDTO.getSmsApiKey());
+		
 		// company = companyRepository.save(company);
 		// CompanyViewDTO result = new CompanyViewDTO(company);
 		return companyRepository.save(company);
@@ -146,8 +146,8 @@ public class CompanyServiceImpl implements CompanyService {
 			company.setPincode(companyDTO.getPincode());
 			company.setWebsite(companyDTO.getWebsite());
 			company.setOnPremise(companyDTO.isOnPremise());
-			company.setSmsUsername(companyDTO.getSmsUsername());
-			company.setSmsPassword(companyDTO.getSmsPassword());
+			company.setSmsApiKey(companyDTO.getSmsApiKey());
+
 			company = companyRepository.save(company);
 			CompanyViewDTO result = new CompanyViewDTO(company);
 			return result;

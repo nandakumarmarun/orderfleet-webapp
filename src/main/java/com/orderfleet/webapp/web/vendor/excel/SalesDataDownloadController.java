@@ -33,11 +33,14 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.InventoryVoucherBatchDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
+import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.SnrichPartnerCompany;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.SnrichPartnerCompanyRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -76,6 +79,9 @@ public class SalesDataDownloadController {
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
+
 	@RequestMapping(value = "/get-sales-orders.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
@@ -90,6 +96,75 @@ public class SalesDataDownloadController {
 				.getSalesOrderForExcel(company.getId());
 
 		log.debug("REST request to download sales orders : " + inventoryVoucherHeaders.size());
+
+		salesOrderDTOs = getInventoryVoucherList(inventoryVoucherHeaders);
+
+		return salesOrderDTOs;
+	}
+
+	@RequestMapping(value = "/get-primary-sales.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	@Transactional
+	public List<SalesOrderExcelDTO> getPrimarySalesJSON() throws URISyntaxException {
+		log.debug("REST request to download primary sales  : {}");
+		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
+		List<String> inventoryHeaderPid = new ArrayList<String>();
+
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
+				company.getId());
+		if (primarySecDoc.isEmpty()) {
+			log.debug("........No PrimarySecondaryDocument configuration Available...........");
+			return salesOrderDTOs;
+		}
+		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
+				.collect(Collectors.toList());
+
+		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+				.getPrimarySalesForExcel(company.getId(), documentIds);
+
+		log.debug("REST request to download primary sales : " + inventoryVoucherHeaders.size());
+
+		salesOrderDTOs = getInventoryVoucherList(inventoryVoucherHeaders);
+
+		return salesOrderDTOs;
+	}
+
+	@RequestMapping(value = "/get-primary-sales-orders.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	@Transactional
+	public List<SalesOrderExcelDTO> getPrimarySalesOrderJSON() throws URISyntaxException {
+		log.debug("REST request to download primary sales orders : {}");
+		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
+
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_ORDER,
+				company.getId());
+		if (primarySecDoc.isEmpty()) {
+			log.debug("........No PrimarySecondaryDocument configuration Available...........");
+			return salesOrderDTOs;
+		}
+		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
+				.collect(Collectors.toList());
+
+		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+				.getPrimarySalesOrderForExcel(company.getId(), documentIds);
+
+		log.debug("REST request to download primary sales orders : " + inventoryVoucherHeaders.size());
+		salesOrderDTOs = getInventoryVoucherList(inventoryVoucherHeaders);
+
+		return salesOrderDTOs;
+
+	}
+
+	private List<SalesOrderExcelDTO> getInventoryVoucherList(List<Object[]> inventoryVoucherHeaders) {
+
+		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
+		List<String> inventoryHeaderPid = new ArrayList<String>();
 
 		double taxAmount = 0.0;
 
@@ -108,8 +183,8 @@ public class SalesDataDownloadController {
 			salesOrderDTO.setDiscPer(obj[6] != null ? Double.parseDouble(obj[6].toString()) : 0.0);
 			salesOrderDTO.setTaxPer(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
 			/*
-			 * salesOrderDTO.setTotal(obj[8] != null ?
-			 * Double.parseDouble(obj[8].toString()) : 0.0);
+			 * salesOrderDTO.setTotal(obj[8] != null ? Double.parseDouble(obj[8].toString())
+			 * : 0.0);
 			 */
 
 			double qty = Double.parseDouble(obj[4].toString());

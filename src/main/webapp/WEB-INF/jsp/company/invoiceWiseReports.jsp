@@ -217,7 +217,6 @@
 							<th>Server Date</th>
 							<th>GPS Location</th>
 							<th>Tower Location</th>
-							<th>Verification</th>
 							<th>Sales Order Amount Total</th>
 							<th>Receipt Amount Total</th>
 							<th>Remarks</th>

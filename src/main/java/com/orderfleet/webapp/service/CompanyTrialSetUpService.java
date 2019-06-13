@@ -304,16 +304,16 @@ public class CompanyTrialSetUpService {
 
 	@Inject
 	private StaticFormJSCodeRepository staticFormJSCodeRepository;
-	
+
 	@Inject
 	private DocumentProductCategoryRepository documentProductCategoryRepository;
-	
+
 	@Inject
 	private DocumentProductGroupRepository documentProductGroupRepository;
-	
+
 	@Inject
 	private SnrichProductCompanyRepository snrichProductCompanyRepository;
-	
+
 	@Inject
 	private MobileConfigurationRepository mobileConfigurationRepository;
 
@@ -334,7 +334,7 @@ public class CompanyTrialSetUpService {
 		Activity activity = createActivity(company);
 		assignDocumentToActivity(company, activity);
 	}
-	
+
 	public void setUpOrderActivityCompanyData(Company company) {
 		Activity activity = createActivity(company);
 		assignOrderProDocumentToActivity(company, activity);
@@ -362,7 +362,7 @@ public class CompanyTrialSetUpService {
 		primarySecondaryDocument(company);
 	}
 
-	public Company createCompany(String companyName, String shortName, String email, String country,String gstNo) {
+	public Company createCompany(String companyName, String shortName, String email, String country, String gstNo) {
 
 		// save company
 		Company company = new Company();
@@ -403,7 +403,7 @@ public class CompanyTrialSetUpService {
 //			} else if (user.getFirstName().equals("aitrich")) {
 //				createEmployee(user);
 //			} else {
-				createEmployee(user);
+			createEmployee(user);
 //			}
 		}
 	}
@@ -476,15 +476,15 @@ public class CompanyTrialSetUpService {
 			}
 		}
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public void assignCustomMenuItemToUsers(String name, Company company) {
 
 		List<User> users = userRepository.findAllByCompanyPid(company.getPid());
 		for (User user : users) {
-			 if (user.getFirstName().equals("Admin")) {
-				if(userMenuItemRepository.findByUserPid(user.getPid()).size() == 0){
-					//assignMenuItemToUser(user, MenuItemUtil.employeeUserMenuItemIds());
+			if (user.getFirstName().equals("Admin")) {
+				if (userMenuItemRepository.findByUserPid(user.getPid()).size() == 0) {
+					// assignMenuItemToUser(user, MenuItemUtil.employeeUserMenuItemIds());
 					assignMenuItemToUser(user, MenuItemUtil.customMenuItemIds());
 				}
 			} else {
@@ -492,8 +492,8 @@ public class CompanyTrialSetUpService {
 			}
 		}
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public void assignCustomMenuItemToAdditionalUsers(Company company, int userCount) {
 		List<User> users = userRepository.findAllByCompanyPidSortedById(company.getPid());
 		for (int i = 0; i < userCount; i++) {
@@ -518,7 +518,7 @@ public class CompanyTrialSetUpService {
 			}
 		}
 	}
-	
+
 	public void assignMobileMenuItemToAdditionalUsers(Company company, int userCount) {
 		List<User> users = userRepository.findAllByCompanyPidSortedById(company.getPid());
 		for (int i = 0; i < userCount; i++) {
@@ -526,16 +526,16 @@ public class CompanyTrialSetUpService {
 			assignMobileMenuItemToUser(user);
 		}
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public void assignCustomMobileMenuItemToUsers(String name, Company company) {
 		List<User> users = userRepository.findAllByCompanyPid(company.getPid());
 		for (User user : users) {
 			assignCustomMobileMenuItemToUser(user);
 		}
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public void assignCustomMobileMenuItemToAdditionalUsers(Company company, int userCount) {
 		List<User> users = userRepository.findAllByCompanyPidSortedById(company.getPid());
 		for (int i = 0; i < userCount; i++) {
@@ -543,7 +543,6 @@ public class CompanyTrialSetUpService {
 			assignCustomMobileMenuItemToUser(user);
 		}
 	}
-
 
 	public void assignToUsers(String name, Company company) {
 
@@ -570,18 +569,18 @@ public class CompanyTrialSetUpService {
 			}
 		}
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public void assignToOrderProUsers(String name, Company company, int userCount) {
 		PartnerIntegrationSystem partnerIntergrationSystem = snrichProductCompanyRepository
 				.findPartnerIntegrationSystemByCompanyId(company.getId());
 		List<User> users = userRepository.findAllByCompanyPidSortedById(company.getPid());
 		for (int i = 0; i < userCount; i++) {
 			User user = users.get(i);
-			
+
 			assignUserToActivity(company, user);
-			//custom user-stocklocation and user-pricelevel for tally partners
-			if(partnerIntergrationSystem.equals(PartnerIntegrationSystem.TALLY)){
+			// custom user-stocklocation and user-pricelevel for tally partners
+			if (partnerIntergrationSystem.equals(PartnerIntegrationSystem.TALLY)) {
 				assignNewUserToPriceLevel(company, user);
 				assignNewUserToStockLocation(company, user);
 			} else {
@@ -658,23 +657,23 @@ public class CompanyTrialSetUpService {
 		return admin;
 
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public User createOrderProAdminUser(Company company, RegistrationDto registrationDto) {
 		User admin = new User();
 		admin.setPid(UserService.PID_PREFIX + RandomUtil.generatePid());
 		admin.setCompany(company); // set company
 		Authority authority = authorityRepository.findOne(AuthoritiesConstants.ORDERPRO_ADMIN);
 		Set<Authority> authorities = new HashSet<>();
-		//admin.setLogin("admin" + "@" + company.getAlias().toLowerCase());
+		// admin.setLogin("admin" + "@" + company.getAlias().toLowerCase());
 		admin.setLogin(registrationDto.getUserName());
 		// new user gets initially a generated password
-		//admin.setPassword("admin" + "@" + company.getAlias().toLowerCase());
+		// admin.setPassword("admin" + "@" + company.getAlias().toLowerCase());
 		admin.setPassword(registrationDto.getPassword());
 		admin.setFirstName("Admin");
 		admin.setLastName(company.getAlias());
 		admin.setEmail("admin@" + company.getAlias().toLowerCase());
-		//admin.setEmail(registrationDto.getEmail());
+		// admin.setEmail(registrationDto.getEmail());
 		// Change Later
 		admin.setMobile("99999999999");
 		admin.setLangKey("en");
@@ -746,8 +745,8 @@ public class CompanyTrialSetUpService {
 		}
 		return executiveUsers;
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public List<User> createExecutiveUsers(String companyShortName, Company company, int userCount,
 			Long userStartNumber) {
 		List<User> executiveUsers = new ArrayList<>();
@@ -816,8 +815,8 @@ public class CompanyTrialSetUpService {
 		userMobileMenuItemGroup.setUser(user);
 		userMobileMenuItemGroupRepository.save(userMobileMenuItemGroup);
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	private void assignCustomMobileMenuItemToUser(User user) {
 		MobileMenuItemGroup mobileMenuItemGroup = mobileMenuItemGroupRepository.findByAlias("OMM").get();
 		UserMobileMenuItemGroup userMobileMenuItemGroup = new UserMobileMenuItemGroup();
@@ -849,7 +848,7 @@ public class CompanyTrialSetUpService {
 		locationHierarchyRepository.insertTrialLocationHierarchyWithNoParent(1L, location.getCompany().getId(),
 				location.getId());
 	}
-	
+
 	private void createMobileConfiguration(Company company) {
 		MobileConfiguration mobileConfiguration = new MobileConfiguration();
 		mobileConfiguration.setAddNewCustomer(true);
@@ -862,7 +861,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setHasPostDatedVoucherEnabled(false);
 		mobileConfiguration.setIncludeAddressInAccountlist(true);
 		mobileConfiguration.setMasterDataUpdateRequired(false);
-		mobileConfiguration.setPid(MobileConfigurationService.PID_PREFIX+RandomUtil.generatePid());
+		mobileConfiguration.setPid(MobileConfigurationService.PID_PREFIX + RandomUtil.generatePid());
 		mobileConfiguration.setPromptAttendanceMarking(false);
 		mobileConfiguration.setPromptDayPlanUpdate(false);
 		mobileConfiguration.setPromptMasterdataUpdate(false);
@@ -1124,9 +1123,9 @@ public class CompanyTrialSetUpService {
 					DocumentInventoryVoucherColumn documentInventoryVoucherColumn = new DocumentInventoryVoucherColumn();
 					documentInventoryVoucherColumn.setCompany(company);
 					documentInventoryVoucherColumn.setDocument(document);
-					if(inventoryVoucherColumn.getName().equals("MRP")){
+					if (inventoryVoucherColumn.getName().equals("MRP")) {
 						documentInventoryVoucherColumn.setEnabled(false);
-					}else{
+					} else {
 						documentInventoryVoucherColumn.setEnabled(true);
 					}
 					documentInventoryVoucherColumn.setInventoryVoucherColumn(inventoryVoucherColumn);
@@ -1137,9 +1136,9 @@ public class CompanyTrialSetUpService {
 			}
 
 		}
-	}	
-	
-	//save static js code
+	}
+
+	// save static js code
 	private void saveCompanyStaticJsCode(Company company, Document document) {
 		String jsCode = "function calculateTotal(inElements) { var totalRate,discount,amount,tax,total,outElements; outElements = {}; totalRate = inElements.selling_rate * inElements.quantity; if (inElements.discount_percentage === undefined || inElements.discount_percentage === null) { discount = 0; } else { discount = (totalRate * inElements.discount_percentage)/100; } amount = totalRate - discount; if (inElements.tax_percentage === undefined || inElements.tax_percentage === null) { tax = 0; } else { tax = (amount * inElements.tax_percentage)/100; } total = amount + tax;  outElements.total = total; return outElements; }";
 		StaticFormJSCode staticFormJSCode = new StaticFormJSCode(jsCode, "Calculate Total", document, company);
@@ -1244,8 +1243,8 @@ public class CompanyTrialSetUpService {
 		}
 		activityDocumentRepository.save(listDocuments);
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	private void assignOrderProDocumentToActivity(Company company, Activity activity) {
 		List<ActivityDocument> listDocuments = new ArrayList<>();
 		List<Document> documents = documentRepository.findAllDocumentsByCompanyPid(company.getPid());
@@ -1265,7 +1264,7 @@ public class CompanyTrialSetUpService {
 				activityDocument.setSortOrder(2);
 				listDocuments.add(activityDocument);
 			} else {
-				
+
 			}
 		}
 		activityDocumentRepository.save(listDocuments);
@@ -1344,8 +1343,8 @@ public class CompanyTrialSetUpService {
 		}
 		userFavouriteDocumentRepository.save(userFavouriteDocuments);
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	private void assignOrderProUserToFavouriteDocument(User user) {
 		List<UserFavouriteDocument> userFavouriteDocuments = new ArrayList<>();
 		List<ActivityDocument> activityDocuments = activityDocumentRepository
@@ -1368,7 +1367,7 @@ public class CompanyTrialSetUpService {
 				userFavouriteDocument.setUser(user);
 				userFavouriteDocuments.add(userFavouriteDocument);
 			} else {
-				
+
 			}
 		}
 		userFavouriteDocumentRepository.save(userFavouriteDocuments);
@@ -1464,6 +1463,7 @@ public class CompanyTrialSetUpService {
 		accountProfile.setName(company.getLegalName());
 		accountProfile.setAlias(company.getLegalName());
 		accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+		accountProfile.setUser(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
 		return accountProfileRepository.save(accountProfile);
 
 	}
@@ -1504,8 +1504,8 @@ public class CompanyTrialSetUpService {
 		}
 		userProductGroupRepository.save(userProductGroups);
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public void assignDefaultProductGroups(String companyPid, int userCount) {
 		List<ProductGroup> productGroups = productGroupRepository.findAllByCompanyPid(companyPid);
 		List<UserProductGroup> userProductGroups = new ArrayList<>();
@@ -1513,14 +1513,14 @@ public class CompanyTrialSetUpService {
 		for (int i = 0; i < userCount; i++) {
 			User user = users.get(i);
 			for (ProductGroup productGroup : productGroups) {
-				UserProductGroup userProductGroup = new UserProductGroup(userRepository.findOneByPid(user.getPid()).get(),
-						productGroup, productGroup.getCompany());
+				UserProductGroup userProductGroup = new UserProductGroup(
+						userRepository.findOneByPid(user.getPid()).get(), productGroup, productGroup.getCompany());
 				userProductGroups.add(userProductGroup);
 			}
 		}
 		userProductGroupRepository.save(userProductGroups);
 	}
-	
+
 	public void assignProductCategories(String companyPid, String userPidss, String categoryPids) {
 		String[] userPids = userPidss.split(",");
 		List<ProductCategory> productCategories = productCategoryRepository
@@ -1536,24 +1536,24 @@ public class CompanyTrialSetUpService {
 		}
 		userProductCategoryRepository.save(userProductCategories);
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public void assignDefaultProductCategories(String companyPid, int userCount) {
 		List<ProductCategory> productCategories = productCategoryRepository.findAllByCompanyPid(companyPid);
 		List<UserProductCategory> userProductCategories = new ArrayList<>();
 		List<User> users = userRepository.findAllByCompanyPidSortedById(companyPid);
 		for (int i = 0; i < userCount; i++) {
 			User user = users.get(i);
-				for (ProductCategory productCategory : productCategories) {
-					UserProductCategory userProductCategory = new UserProductCategory(
-							userRepository.findOneByPid(user.getPid()).get(), productCategory, productCategory.getCompany());
-					userProductCategories.add(userProductCategory);
-				}
+			for (ProductCategory productCategory : productCategories) {
+				UserProductCategory userProductCategory = new UserProductCategory(
+						userRepository.findOneByPid(user.getPid()).get(), productCategory,
+						productCategory.getCompany());
+				userProductCategories.add(userProductCategory);
 			}
+		}
 		userProductCategoryRepository.save(userProductCategories);
 	}
-	
-	
+
 	public void createDefaultProductCategory(Company company) {
 		ProductCategory productCategory = new ProductCategory();
 		productCategory.setActivated(true);
@@ -1566,7 +1566,7 @@ public class CompanyTrialSetUpService {
 		productCategory.setThirdpartyUpdate(false);
 		productCategoryRepository.save(productCategory);
 	}
-	
+
 	public void createDefaultProductGroup(Company company) {
 		ProductGroup productGroup = new ProductGroup();
 		productGroup.setActivated(true);
@@ -1579,7 +1579,7 @@ public class CompanyTrialSetUpService {
 //		productGroup.setTaxMastersList(taxMastersList);
 		productGroupRepository.save(productGroup);
 	}
-	
+
 	private void createDivision(Company company) {
 		Division division = new Division();
 		division.setActivated(true);
@@ -1588,32 +1588,32 @@ public class CompanyTrialSetUpService {
 		division.setPid(DivisionService.PID_PREFIX + RandomUtil.generatePid());
 		divisionRepository.save(division);
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public void assignDocumentProductCategory(Company company) {
 		List<Document> documents = documentRepository.findAllDocumentsByCompanyPid(company.getPid());
 		List<ProductCategory> productCatagories = productCategoryRepository.findAllByCompanyPid(company.getPid());
 		List<DocumentProductCategory> documentProductCategories = new ArrayList<>();
-		for(Document document : documents){
-			if(document.getDocumentType() == DocumentType.INVENTORY_VOUCHER){
-				for(ProductCategory productCategory : productCatagories){
+		for (Document document : documents) {
+			if (document.getDocumentType() == DocumentType.INVENTORY_VOUCHER) {
+				for (ProductCategory productCategory : productCatagories) {
 					documentProductCategories.add(new DocumentProductCategory(document, productCategory, company));
 				}
 			}
 		}
 		documentProductCategoryRepository.save(documentProductCategories);
 	}
-	
-	//for orderpro users
+
+	// for orderpro users
 	public void assignDocumentProductGroup(Company company) {
 		List<Document> documents = documentRepository.findAllDocumentsByCompanyPid(company.getPid());
 		List<ProductGroup> productGroups = productGroupRepository.findAllByCompanyPid(company.getPid());
 		List<DocumentProductGroup> documentProductGroups = new ArrayList<>();
 		int sortOrder = 1;
-		for(Document document : documents){
-			if(document.getDocumentType() == DocumentType.INVENTORY_VOUCHER){
-				for(ProductGroup productGroup : productGroups){
-					documentProductGroups.add(new DocumentProductGroup(document, productGroup, company,sortOrder));
+		for (Document document : documents) {
+			if (document.getDocumentType() == DocumentType.INVENTORY_VOUCHER) {
+				for (ProductGroup productGroup : productGroups) {
+					documentProductGroups.add(new DocumentProductGroup(document, productGroup, company, sortOrder));
 					sortOrder++;
 				}
 			}
@@ -1623,16 +1623,18 @@ public class CompanyTrialSetUpService {
 
 	public void assignEmployeeToLocationsForTally(Company company) {
 		List<EmployeeProfileLocation> employeeProfileLocations = new ArrayList<>();
-		//List<String> userPids = userRepository.findUserPidByCompanyId(company.getId());
+		// List<String> userPids =
+		// userRepository.findUserPidByCompanyId(company.getId());
 		List<EmployeeProfile> employees = employeeProfileRepository.findAllByCompanyId(company.getId());
-		List<String> existingEmpLocPids = employeeProfileLocationRepository.findEmployeeProfilePidByEmployeeProfileIn(employees);
+		List<String> existingEmpLocPids = employeeProfileLocationRepository
+				.findEmployeeProfilePidByEmployeeProfileIn(employees);
 		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
-		
+
 		for (EmployeeProfile employee : employees) {
-			Optional<String> opEmpLoc = existingEmpLocPids.stream()
-					.filter(emp ->emp.equals(employee.getPid())).findAny();
-			if(!opEmpLoc.isPresent()){
-				for(Location location : locations){
+			Optional<String> opEmpLoc = existingEmpLocPids.stream().filter(emp -> emp.equals(employee.getPid()))
+					.findAny();
+			if (!opEmpLoc.isPresent()) {
+				for (Location location : locations) {
 					EmployeeProfileLocation employeeProfileLocation = new EmployeeProfileLocation();
 					employeeProfileLocation.setEmployeeProfile(employee);
 					employeeProfileLocation.setLocation(location);
@@ -1642,45 +1644,44 @@ public class CompanyTrialSetUpService {
 		}
 		employeeProfileLocationRepository.save(employeeProfileLocations);
 	}
-	
+
 	// for orderpro Tally
 	private void assignNewUserToStockLocation(Company company, User user) {
-		
+
 		List<UserStockLocation> userStockLocations = new ArrayList<>();
 		List<StockLocation> stockLocations = stockLocationRepository.findAllByCompanyId(company.getId());
-		if(stockLocations.size() > 1){
-			for(StockLocation stockLocation : stockLocations){
-				if(!stockLocation.getName().equals("Main Location")){
+		if (stockLocations.size() > 1) {
+			for (StockLocation stockLocation : stockLocations) {
+				if (!stockLocation.getName().equals("Main Location")) {
 					userStockLocations.add(new UserStockLocation(user, stockLocation, company));
 				}
 			}
 		} else {
 			stockLocationRepository.findByCompanyIdAndNameIgnoreCase(company.getId(), "Main Location")
-			.ifPresent(mainLocation -> {
-				userStockLocations.add(new UserStockLocation(user, mainLocation, company));
-			});
+					.ifPresent(mainLocation -> {
+						userStockLocations.add(new UserStockLocation(user, mainLocation, company));
+					});
 		}
 		userStockLocationRepository.save(userStockLocations);
 	}
-	
+
 	// for orderpro tally
 	private void assignNewUserToPriceLevel(Company company, User user) {
-		
+
 		List<UserPriceLevel> userPriceLevels = new ArrayList<>();
 		List<PriceLevel> priceLevels = priceLevelRepository.findByCompanyId(company.getId());
-		if(priceLevels.size() > 1){
-			for(PriceLevel priceLevel : priceLevels){
-				if(!priceLevel.getName().equals("General")){
+		if (priceLevels.size() > 1) {
+			for (PriceLevel priceLevel : priceLevels) {
+				if (!priceLevel.getName().equals("General")) {
 					userPriceLevels.add(new UserPriceLevel(user, priceLevel, company));
 				}
 			}
 		} else {
-			priceLevelRepository.findByCompanyIdAndNameIgnoreCase(company.getId(), "General")
-			.ifPresent(general -> {
+			priceLevelRepository.findByCompanyIdAndNameIgnoreCase(company.getId(), "General").ifPresent(general -> {
 				userPriceLevels.add(new UserPriceLevel(user, general, company));
 			});
 		}
 		userPriceLevelRepository.save(userPriceLevels);
 	}
-	
+
 }

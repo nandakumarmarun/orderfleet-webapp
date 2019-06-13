@@ -174,7 +174,6 @@ if (!this.InvoiceWiseReport) {
 										+ "<td>"
 										+ (invoiceWiseReport.towerLocation == null ? "" :  invoiceWiseReport.towerLocation)
 										+ "</td>"
-										+ activityStatusTd
 										+"<td>"+invoiceWiseReport.totalSalesOrderAmount+"</td>"
 										+"<td>"+invoiceWiseReport.totalRecieptAmount+"</td><td>"
 										+ (invoiceWiseReport.remarks == null ? "" : invoiceWiseReport.remarks)

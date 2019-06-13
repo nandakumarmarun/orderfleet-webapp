@@ -116,6 +116,7 @@ import com.orderfleet.webapp.service.TaskService;
 import com.orderfleet.webapp.service.UserDistanceService;
 import com.orderfleet.webapp.service.UserTaskAssignmentService;
 import com.orderfleet.webapp.service.exception.TaskSubmissionPostSaveException;
+import com.orderfleet.webapp.service.impl.ExecutiveTaskExecutionSmsService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
@@ -254,6 +255,9 @@ public class TaskSubmissionPostSave {
 
 	@Inject
 	private GeoLocationService geoLocationService;
+	
+	@Inject
+	private ExecutiveTaskExecutionSmsService executiveTaskExecutionSmsService;
 
 	private FirebaseRequest firebaseRequest;
 	private List<UserDevice> userDevices;
@@ -312,6 +316,9 @@ public class TaskSubmissionPostSave {
 					updateLocationVariance(executiveTaskExecution);
 				}
 			}
+			
+			
+			
 		} catch (TaskSubmissionPostSaveException ex) {
 			log.debug("Exception while processing doPostSaveExecutivetaskSubmission method {}", ex);
 			sendErrorEmail("Error while saving executive order submission asynchronously", ex);
@@ -1064,7 +1071,9 @@ public class TaskSubmissionPostSave {
 		stageHeader.setCreatedDate(LocalDateTime.now());
 		stageHeader.setCreatedBy(executiveTaskExecution.getUser());
 		stageHeader.setCompany(company);
+
 		StageHeader savedHeader = stageHeaderRepository.save(stageHeader);
+
 		StageDetail stageDetail = new StageDetail();
 		stageDetail.setExecutiveTaskExecution(executiveTaskExecution);
 		stageDetail.setDynamicDocumentHeaderPid(dynamicDocPid);

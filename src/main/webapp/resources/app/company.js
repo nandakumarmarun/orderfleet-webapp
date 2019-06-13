@@ -35,8 +35,8 @@ if (!this.Company) {
 		website : null,
 		activated : null,
 		onPremise : null,
-		smsUsername : null,
-		smsPassword : null
+		smsApiKey : null,
+
 	};
 
 	// Specify the validation rules
@@ -146,8 +146,8 @@ if (!this.Company) {
 		companyModel.location = $('#field_location').val();
 		companyModel.website = $('#field_website').val();
 		companyModel.onPremise = $('#field_on_premise').is(":checked")
-		companyModel.smsUsername = $('#field_smsUsername').val();
-		companyModel.smsPassword = $('#field_smsPassword').val();
+		companyModel.smsApiKey = $('#field_smsApiKey').val();
+
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -190,10 +190,9 @@ if (!this.Company) {
 				$('#lbl_alias').text(data.alias);
 				$('#lbl_companyType').text(data.companyType);
 				$('#lbl_industry').text(data.industry);
-				if(data.gstNo!=null)
-				{
+				if (data.gstNo != null) {
 					$('#lbl_gstNo').text(data.gstNo);
-				}else{
+				} else {
 					$('#lbl_gstNo').text("-");
 				}
 				$('#lbl_address').text(data.address1 + "\n" + data.address2);
@@ -204,16 +203,10 @@ if (!this.Company) {
 				$('#lbl_pincode').text(data.pincode);
 				$('#lbl_location').text(data.location);
 				$('#lbl_website').text(data.website);
-				if(data.smsUsername!= null){
-					$('#lbl_smsUsername').text(data.smsUsername);
-				}else{
-					$('#lbl_smsUsername').text("-");
-				}
-				
-				if(data.smsPassword!= null){
-					$('#lbl_smsPassword').text(data.smsPassword);
-				}else{
-					$('#lbl_smsPassword').text("-");
+				if (data.smsApiKey != null) {
+					$('#lbl_smsApiKey').text(data.smsApiKey);
+				} else {
+					$('#lbl_smsApiKey').text("-");
 				}
 
 				if (data.logo != null) {
@@ -256,9 +249,8 @@ if (!this.Company) {
 				$('#field_location').val(data.location);
 				$('#field_website').val(data.website);
 				$('#field_on_premise').prop("checked", data.onPremise);
-				$('#field_smsUsername').val(data.smsUsername);
-				$('#field_smsPassword').val(data.smsPassword);
-				
+				$('#field_smsApiKey').val(data.smsApiKey);
+
 				if (data.logo != null) {
 					$('#previewImage').attr('src',
 							'data:image/png;base64,' + data.logo);
