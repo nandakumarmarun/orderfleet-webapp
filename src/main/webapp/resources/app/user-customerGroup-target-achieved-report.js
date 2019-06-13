@@ -123,19 +123,12 @@ if (!this.UserCustomerGroupTargetAchievedReport) {
 				
 				var tVolume = targets[i].targetNumber;
 				var tAmount = 0;
-				if(tAmount != 0){
-//					targetTotal += tAmount;
-//					 var tAmount1 = (tAmount).toFixed(2);
-//					targetRow += "<td>"+ tAmount1 +"</td>";
-//					
-				}else{
-					targetTotal += tVolume;
-					 var tVolume1 = (tVolume).toFixed(2);
-					targetRow += "<td>"+ tVolume1 +"</td>";
-				}
+
+				targetTotal += tVolume;
+				var tVolume1 = (tVolume).toFixed(2);
+				targetRow += "<td>"+ tVolume1 +"</td>";
 				
-				//var aAmount = targets[i].achievedAmount;
-				var aAmount = 0;
+				var aAmount = targets[i].achivedNumber;
 				achivedTotal += aAmount;
 				var aAmount1 = (aAmount).toFixed(2);
 				achivedRow += "<td>"+ aAmount1 +"</td>";

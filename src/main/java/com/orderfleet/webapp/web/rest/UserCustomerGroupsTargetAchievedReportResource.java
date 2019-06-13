@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import com.orderfleet.webapp.domain.SalesSummaryAchievment;
 import com.orderfleet.webapp.domain.SalesTargetGroup;
 import com.orderfleet.webapp.domain.SalesTargetGroupUserTarget;
 import com.orderfleet.webapp.domain.Stage;
+import com.orderfleet.webapp.domain.StageHeader;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserCustomerGroup;
 import com.orderfleet.webapp.domain.UserCustomerGroupTarget;
@@ -48,6 +50,7 @@ import com.orderfleet.webapp.repository.SalesSummaryAchievmentRepository;
 import com.orderfleet.webapp.repository.SalesTargetGroupDocumentRepository;
 import com.orderfleet.webapp.repository.SalesTargetGroupProductRepository;
 import com.orderfleet.webapp.repository.SalesTargetGroupUserTargetRepository;
+import com.orderfleet.webapp.repository.StageHeaderRepository;
 import com.orderfleet.webapp.repository.UserCustomerGroupRepository;
 import com.orderfleet.webapp.repository.UserCustomerGroupTargetRepository;
 import com.orderfleet.webapp.repository.UserRepository;
@@ -70,18 +73,6 @@ import com.orderfleet.webapp.web.rest.mapper.SalesTargetGroupUserTargetMapper;
 public class UserCustomerGroupsTargetAchievedReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(UserCustomerGroupsTargetAchievedReportResource.class);
-
-	@Inject
-	private SalesTargetGroupUserTargetRepository salesTargetGroupUserTargetRepository;
-
-	@Inject
-	private SalesTargetGroupUserTargetMapper salesTargetGroupUserTargetMapper;
-
-	@Inject
-	private SalesTargetGroupDocumentRepository salesTargetGroupDocumentRepository;
-
-	@Inject
-	private SalesTargetGroupProductRepository salesTargetGroupProductRepository;
 
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
@@ -109,9 +100,6 @@ public class UserCustomerGroupsTargetAchievedReportResource {
 
 	@Inject
 	private ProductGroupSalesTargetGroupService productGroupSalesTargetGroupService;
-
-	@Inject
-	private ProductGroupSalesTargetGrouprepository productGroupSalesTargetGrouprepository;
 	
 	@Inject
 	private UserCustomerGroupRepository userCustomerGroupRepository;
@@ -121,6 +109,9 @@ public class UserCustomerGroupsTargetAchievedReportResource {
 	
 	@Inject
 	private UserRepository userRepository;
+	
+	@Inject
+	private StageHeaderRepository stageHeaderRepository;
 
 	/**
 	 * GET /sales-target-vs-achieved-report
@@ -155,8 +146,12 @@ public class UserCustomerGroupsTargetAchievedReportResource {
 		List<Stage> customerGroup = customerGroupList.stream().map(UserCustomerGroup::getStage).collect(Collectors.toList());
 		Optional<User> user = userRepository.findOneByPid(userPid);
 		List<UserCustomerGroupTarget> userTargetList = userCustomerGroupTargetRepository.findByUserIdAndDateBetween(user.get().getId(),fromDate, toDate);
-		
-		
+		LocalDateTime fromDateTime = fromDate.atTime(0,0);
+		LocalDateTime toDateTime = toDate.atTime(23,59);
+//		findByUserIdIn
+		Set<Long> sHeaderds = stageHeaderRepository.findCustomerGroupIdByCreatedDateBetween(fromDateTime, toDateTime);
+		List<Long> stageHeadIds = new ArrayList<>(sHeaderds);
+		List<StageHeader> stageHeaders = stageHeaderRepository.findByUserIdIn(employeePid, stageHeadIds);
 	
 		if (!userTargetList.isEmpty()) {
 			CustomerGropuPerformaceDTO customerGropuPerformaceDTO = new CustomerGropuPerformaceDTO();
@@ -185,9 +180,20 @@ public class UserCustomerGroupsTargetAchievedReportResource {
 					if (userTarget != null) {
 						customerGroupUserTargetByMonth = userTarget.stream()
 								.collect(Collectors.groupingBy(a -> a. getStartDate().getMonth().toString()));
+						log.info("=====================*******===========================");
 						if (customerGroupUserTargetByMonth != null
 								&& customerGroupUserTargetByMonth.get(month) != null) {
 							userCustomerGroupTargetDTO = customerGroupUserTargetByMonth.get(month).get(0);
+							log.info("============================================================");
+							log.info("Stage Header Size : "+stageHeaders.size());
+							List<Stage> stages = stageHeaders.stream().filter(sh ->
+									sh.getCreatedDate().isAfter(fromDateTime) &&
+									sh.getCreatedDate().isBefore(toDateTime))
+									.map(StageHeader::getStage).collect(Collectors.toList());
+							log.info("Stage  Size : "+stages.size());
+							long achivedNumber =  stages.stream().filter(s -> s.getName().equals(groupName)).count();
+							log.info("Count : "+achivedNumber);
+							userCustomerGroupTargetDTO.setAchivedNumber(achivedNumber);
 						}
 					}
 					// no target saved, add a default one
@@ -196,8 +202,14 @@ public class UserCustomerGroupsTargetAchievedReportResource {
 						userCustomerGroupTargetDTO.setStageName(groupName);
 						userCustomerGroupTargetDTO.setStagePid(userTargetGroup.getPid());
 						userCustomerGroupTargetDTO.setTargetNumber(0L);
+						userCustomerGroupTargetDTO.setAchivedNumber(0L);
 					}
-
+					if(userCustomerGroupTargetDTO.getAchivedNumber()==null) {
+						userCustomerGroupTargetDTO.setAchivedNumber(0L);
+					}
+					if(userCustomerGroupTargetDTO.getTargetNumber()==null) {
+						userCustomerGroupTargetDTO.setTargetNumber(0L);
+					}
 					customerGroupUserTargetList.add(userCustomerGroupTargetDTO);
 				}
 				customerGroupUserTargetMap.put(groupName, customerGroupUserTargetList);

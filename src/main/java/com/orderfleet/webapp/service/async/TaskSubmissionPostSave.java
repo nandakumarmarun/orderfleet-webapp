@@ -1064,9 +1064,7 @@ public class TaskSubmissionPostSave {
 		stageHeader.setCreatedDate(LocalDateTime.now());
 		stageHeader.setCreatedBy(executiveTaskExecution.getUser());
 		stageHeader.setCompany(company);
-
 		StageHeader savedHeader = stageHeaderRepository.save(stageHeader);
-
 		StageDetail stageDetail = new StageDetail();
 		stageDetail.setExecutiveTaskExecution(executiveTaskExecution);
 		stageDetail.setDynamicDocumentHeaderPid(dynamicDocPid);

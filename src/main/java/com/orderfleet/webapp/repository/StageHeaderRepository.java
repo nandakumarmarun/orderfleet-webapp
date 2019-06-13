@@ -62,6 +62,9 @@ public interface StageHeaderRepository extends JpaRepository<StageHeader, Long> 
 	
 	@Query(value = "SELECT sh.id from StageHeader sh where sh.createdDate IN (SELECT max(a.createdDate) from StageHeader a where a.company.id = ?#{principal.companyId} and a.createdDate BETWEEN ?1 and ?2 group by a.accountProfile.id)")
 	Set<Long> findIdByCreatedDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Query(value = "SELECT sh.id from StageHeader sh where sh.company.id = ?#{principal.companyId} and sh.createdDate BETWEEN ?1 and ?2 ")
+	Set<Long> findCustomerGroupIdByCreatedDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Query("select stageHeader from StageHeader stageHeader where stageHeader.employeeProfile.pid = ?1 and stageHeader.id in ?2")
 	List<StageHeader> findByUserIdIn(String employeePid,List<Long> stageHeaderId);
