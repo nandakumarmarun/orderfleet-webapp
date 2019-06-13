@@ -243,19 +243,19 @@ public class TaskSubmissionPostSave {
 
 	@Inject
 	private AttendanceRepository attendanceRepository;
-	
+
 	@Inject
 	private FormElementRepository formElementRepository;
-	
+
 	@Inject
 	private ProductGroupRepository productGroupRepository;
-	
+
 	@Inject
 	private LocationRepository locationRepository;
 
 	@Inject
 	private GeoLocationService geoLocationService;
-	
+
 	@Inject
 	private ExecutiveTaskExecutionSmsService executiveTaskExecutionSmsService;
 
@@ -316,9 +316,9 @@ public class TaskSubmissionPostSave {
 					updateLocationVariance(executiveTaskExecution);
 				}
 			}
-			
-			
-			
+
+			executiveTaskExecutionSmsService.sendSms(tsTransactionWrapper);s
+
 		} catch (TaskSubmissionPostSaveException ex) {
 			log.debug("Exception while processing doPostSaveExecutivetaskSubmission method {}", ex);
 			sendErrorEmail("Error while saving executive order submission asynchronously", ex);
@@ -975,22 +975,25 @@ public class TaskSubmissionPostSave {
 			Document document, String refTransactionPid, List<FilledFormDetailDTO> filledFormDetailDTOs,
 			EmployeeProfile employee) throws TaskSubmissionPostSaveException {
 		long companyId = document.getCompany().getId();
-		List<FormElement> formElementsLoadFromMobile = formElementRepository.findAllByCompanyIdAndLoadFromMobile(companyId);
-		if(formElementsLoadFromMobile !=null && formElementsLoadFromMobile.size()!=0) {	
-			for(FilledFormDetailDTO dto : filledFormDetailDTOs) {
-				for(FormElement fe : formElementsLoadFromMobile) {
-					if(dto.getFormElementPid().equals(fe.getPid())) {
-						if(fe.getFormLoadMobileData()==LoadMobileData.PRODUCT_GROUP) {
-							Optional<ProductGroup> opProductGroup = productGroupRepository.findByCompanyIdAndNameIgnoreCase(companyId, dto.getValue());
-							if(opProductGroup.isPresent()) {
+		List<FormElement> formElementsLoadFromMobile = formElementRepository
+				.findAllByCompanyIdAndLoadFromMobile(companyId);
+		if (formElementsLoadFromMobile != null && formElementsLoadFromMobile.size() != 0) {
+			for (FilledFormDetailDTO dto : filledFormDetailDTOs) {
+				for (FormElement fe : formElementsLoadFromMobile) {
+					if (dto.getFormElementPid().equals(fe.getPid())) {
+						if (fe.getFormLoadMobileData() == LoadMobileData.PRODUCT_GROUP) {
+							Optional<ProductGroup> opProductGroup = productGroupRepository
+									.findByCompanyIdAndNameIgnoreCase(companyId, dto.getValue());
+							if (opProductGroup.isPresent()) {
 								dto.setValue(opProductGroup.get().getPid());
 							}
-						}else if(fe.getFormLoadMobileData()==LoadMobileData.TERRITORY) {
-							Optional<Location> opLocation = locationRepository.findByCompanyIdAndNameIgnoreCase(companyId, dto.getValue());
-							if(opLocation.isPresent()) {
+						} else if (fe.getFormLoadMobileData() == LoadMobileData.TERRITORY) {
+							Optional<Location> opLocation = locationRepository
+									.findByCompanyIdAndNameIgnoreCase(companyId, dto.getValue());
+							if (opLocation.isPresent()) {
 								dto.setValue(opLocation.get().getPid());
 							}
-								
+
 						}
 					}
 				}
@@ -1005,7 +1008,7 @@ public class TaskSubmissionPostSave {
 				HashMap<String, String> customerJourneyMap = new HashMap<>();
 				if (document.getDocumentType().equals(DocumentType.DYNAMIC_DOCUMENT)) {
 					if (taskSetting.getScript().indexOf("customerJourneyStage") != -1 ? Boolean.TRUE : Boolean.FALSE) {
-						
+
 						customerJourneyMap = (HashMap<String, String>) invocable.invokeFunction("customerJourneyStage",
 								executiveTaskExecution.getActivity().getName(), document.getName(), "",
 								filledFormDetailDTOs);
@@ -1613,7 +1616,7 @@ public class TaskSubmissionPostSave {
 			if (!origin.equals(destination)) {
 				double distance = geoLocationService.computeDistanceBetween(accLocLat, accLocLng, exeLocLat, exeLocLng);
 				variance = distance + " KM";
-			}else {
+			} else {
 				variance = "0 KM";
 			}
 			execution.setLocationVariance(variance);
