@@ -317,7 +317,7 @@ public class TaskSubmissionPostSave {
 				}
 			}
 
-			executiveTaskExecutionSmsService.sendSms(tsTransactionWrapper);s
+			executiveTaskExecutionSmsService.sendSms(tsTransactionWrapper);
 
 		} catch (TaskSubmissionPostSaveException ex) {
 			log.debug("Exception while processing doPostSaveExecutivetaskSubmission method {}", ex);
