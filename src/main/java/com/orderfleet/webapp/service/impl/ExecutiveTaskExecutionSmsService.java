@@ -57,21 +57,28 @@ public class ExecutiveTaskExecutionSmsService {
 
 		Document inventoryVocherDocument = new Document();
 		Document accountingVocherDocument = new Document();
-		String mobileNumber = "";
+		String mobileNumber = executiveTaskExecution.getAccountProfile().getPhone1();
 		String mobile = executiveTaskExecution.getAccountProfile().getPhone1();
 
 		// String mobileNumber = "9387007657";
 
-		if (mobile.isEmpty() || mobile == null) {
+		if (mobile == null) {
 			return;
 		} else {
-
+			if (mobile.isEmpty()) {
+				return;
+			}
 			int mobilelength = mobile.length();
-			log.info(mobilelength + "-----");
+			log.info("Mobile Number Length =" + mobilelength);
 			if (mobilelength > 10) {
 				mobileNumber = mobile.substring(mobilelength - 10);
 			}
-			log.info(mobileNumber);
+			if (mobilelength < 10) {
+
+				log.info("Failed !!!! Mobile Number Length < 10 -> " + mobilelength);
+				return;
+			}
+			log.info("Mobile Number ->  " + mobileNumber);
 		}
 
 		if (inventoryVouchers != null && inventoryVouchers.size() > 0) {

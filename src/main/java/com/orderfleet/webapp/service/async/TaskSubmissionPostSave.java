@@ -316,8 +316,13 @@ public class TaskSubmissionPostSave {
 					updateLocationVariance(executiveTaskExecution);
 				}
 			}
+			User user = executiveTaskExecution.getUser();
 
-			executiveTaskExecutionSmsService.sendSms(tsTransactionWrapper);
+			Company company = user.getCompany();
+
+			if (company.getSmsApiKey() != null && !company.getSmsApiKey().isEmpty()) {
+				executiveTaskExecutionSmsService.sendSms(tsTransactionWrapper);
+			}
 
 		} catch (TaskSubmissionPostSaveException ex) {
 			log.debug("Exception while processing doPostSaveExecutivetaskSubmission method {}", ex);
