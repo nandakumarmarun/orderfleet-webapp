@@ -180,9 +180,15 @@ public class ExecutiveTaskExecutionSmsService {
 
 			log.info(sender + "\n \n" + message);
 
-			String requestUrl = "http://api.msg91.com/api/sendhttp.php?authkey=" + authkey + "&mobiles=+91"
-					+ mobileNumber + "&message=" + URLEncoder.encode(message, "UTF-8") + "&sender=" + sender
-					+ "&route=4";
+			String requestUrl = " https://api.msg91.com/api/sendhttp.php?mobiles=" + mobileNumber + "&authkey="
+					+ authkey + "&route=4&sender=" + sender + "&message=" + URLEncoder.encode(message, "UTF-8")
+					+ "&country=91";
+
+			/*
+			 * String requestUrl = "http://api.msg91.com/api/sendhttp.php?authkey=" +
+			 * authkey + "&mobiles=+91" + mobileNumber + "&message=" +
+			 * URLEncoder.encode(message, "UTF-8") + "&sender=" + sender + "&route=4";
+			 */
 			URL url = new URL(requestUrl);
 			HttpURLConnection uc = (HttpURLConnection) url.openConnection();
 			log.info("ResponseMessage :- " + uc.getResponseMessage());
