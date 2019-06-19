@@ -114,7 +114,7 @@ public class StockCalculationController {
 	@Timed
 	public ResponseEntity<List<LiveStockDTO>> getStockList(@RequestParam String documentPid, @RequestParam List<String> productPids) {
 		//user stock location
-		System.out.println("In /stock-list");
+//		System.out.println("In /stock-list");
 		List<StockLocation> userStockLocations = userStockLocationRepository.findStockLocationsByUserIsCurrentUser();
 		if (userStockLocations.isEmpty()) {
 			System.out.println("User Stock Location Empty");
@@ -209,36 +209,36 @@ public class StockCalculationController {
 		Optional<DocumentStockCalculation> optionalStockCalculation = documentStockCalculationRepository
 				.findOneByDocumentPid(documentPid);
 		if (optionalStockCalculation.isPresent()) {
-			System.out.println("optional Stock calculation present");
+//			System.out.println("optional Stock calculation present");
 			DocumentStockCalculation sc = optionalStockCalculation.get();
 			
 			Set<Long> stockLocationIds = stockLocations.stream().map(StockLocation::getId).collect(Collectors.toSet());
-			System.out.println("Size of stocklocationIds : "+stockLocationIds.size());
+//			System.out.println("Size of stocklocationIds : "+stockLocationIds.size());
 			stockLocationIds.forEach(System.out::println);
 			List<OpeningStock> openingStocks = openingStockRepository.findOpeningStocksAndStockLocationIdIn(stockLocationIds);
 			
 			Map<String, List<OpeningStock>> productOpeningStockMap = 
 					openingStocks.stream().collect(Collectors.groupingBy(op -> op.getProductProfile().getPid()));
-			System.out.println(productOpeningStockMap.size());
+//			System.out.println(productOpeningStockMap.size());
 			for(String pid : productPids) {
 				LiveStockDTO liveStock = new LiveStockDTO();
 				List<OpeningStock> openingStockList = productOpeningStockMap.get(pid);
-				System.out.println("1 *******************"+openingStockList);
+//				System.out.println("1 *******************"+openingStockList);
 				if(openingStockList == null) {
-					System.out.println("2 *******************");
+//					System.out.println("2 *******************");
 					continue;
 				}
 				Optional<OpeningStock> opOpeningStockDate = openingStockList.stream().max(Comparator.comparing(OpeningStock::getCreatedDate));
-				System.out.println("3 *******************");
+//				System.out.println("3 *******************");
 				LocalDateTime from = null;
 				if(opOpeningStockDate.isPresent()) {
 					from = opOpeningStockDate.get().getCreatedDate();
 				}else {
 					from =  LocalDate.now().atTime(0, 0);
 				}
-				System.out.println("4 *******************");
+//				System.out.println("4 *******************");
 				Double openingStock = openingStockList.stream().collect(Collectors.summingDouble(OpeningStock::getQuantity));
-				System.out.println("5 *******************");
+//				System.out.println("5 *******************");
 				LocalDateTime currentDate = LocalDate.now().atTime(23, 59);
 				if (sc.getOpening()) {
 					stock = openingStock;
@@ -249,7 +249,7 @@ public class StockCalculationController {
 				} else if (sc.getClosingActual() && !sc.getClosingLogical()) {
 					stock = calculateClosingStockActual(openingStock, pid, actualStockLocations, from, currentDate);
 				}
-				System.out.println("6 *******************");
+//				System.out.println("6 *******************");
 				liveStock.setProductPid(pid);
 				liveStock.setStock(stock);
 				liveStockDtos.add(liveStock);
