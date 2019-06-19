@@ -142,10 +142,12 @@ public class ExecutiveTaskExecutionSmsService {
 			String companyName = company.getAlias();
 
 			if (!companyName.isEmpty() || companyName != null) {
-				if (companyName.length() <= 6) {
+				if (companyName.length() > 6) {
+					sender = companyName.substring(0, 6).toUpperCase();
+				} else if (companyName.length() == 6) {
 					sender = companyName.toUpperCase();
 				} else {
-					sender = companyName.substring(0, 6).toUpperCase();
+					sender = "SNRICH";
 				}
 
 			}
@@ -214,10 +216,12 @@ public class ExecutiveTaskExecutionSmsService {
 			String companyName = company.getAlias();
 
 			if (!companyName.isEmpty() || companyName != null) {
-				if (companyName.length() <= 6) {
+				if (companyName.length() > 6) {
+					sender = companyName.substring(0, 6).toUpperCase();
+				} else if (companyName.length() == 6) {
 					sender = companyName.toUpperCase();
 				} else {
-					sender = companyName.substring(0, 6).toUpperCase();
+					sender = "SNRICH";
 				}
 
 			}
@@ -262,9 +266,9 @@ public class ExecutiveTaskExecutionSmsService {
 
 			log.info(sender + "\n \n" + message);
 
-			String requestUrl = "http://api.msg91.com/api/sendhttp.php?authkey=" + authkey + "&mobiles=+91"
-					+ mobileNumber + "&message=" + URLEncoder.encode(message, "UTF-8") + "&sender=" + sender
-					+ "&route=4";
+			String requestUrl = " https://api.msg91.com/api/sendhttp.php?mobiles=" + mobileNumber + "&authkey="
+					+ authkey + "&route=4&sender=" + sender + "&message=" + URLEncoder.encode(message, "UTF-8")
+					+ "&country=91";
 			URL url = new URL(requestUrl);
 			HttpURLConnection uc = (HttpURLConnection) url.openConnection();
 			log.info("ResponseMessage :- " + uc.getResponseMessage());
