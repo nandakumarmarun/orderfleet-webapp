@@ -80,7 +80,6 @@ public class StockCalculationController {
 	@Timed
 	public ResponseEntity<Double> getStock(@RequestParam String documentPid, @RequestParam String productPid) {
 		//user stock location
-		System.out.println("In /stock");
 		List<StockLocation> userStockLocations = userStockLocationRepository.findStockLocationsByUserIsCurrentUser();
 		if (userStockLocations.isEmpty()) {
 			return ResponseEntity.ok().body(0.0);
@@ -98,6 +97,27 @@ public class StockCalculationController {
 		// calculate stock
 		Double stock = calculateStock(documentPid, productPid, stockLocations, actualStockLocations,
 				logicalStockLocations);
+		return ResponseEntity.ok().body(stock);
+	}
+	
+	/**
+	 * GET /stock : get opening stock.
+	 * 
+	 * @return
+	 *
+	 * @return the ResponseEntity with status 200 (OK) and the list of opening
+	 *         stock in body
+	 */
+	@RequestMapping(value = "/ecom-stock", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Double> getEcomStock(@RequestParam String productPid) {
+		//user opening stock for ecom
+		List<OpeningStock> openingStocks = openingStockRepository.findByCompanyIdAndProductProfilePid(productPid);
+		
+		if (openingStocks.isEmpty()) {
+			return ResponseEntity.ok().body(0.0);
+		}
+		Double stock = openingStocks.stream().mapToDouble(op -> op.getQuantity()).sum();
 		return ResponseEntity.ok().body(stock);
 	}
 	

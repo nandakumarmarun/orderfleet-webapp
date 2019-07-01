@@ -224,7 +224,7 @@ public class AccountingVoucherResource {
 		fillReport(worksheet, createAccountingVoucherxmlDTO(accountingVoucherHeaderDTOs));
 
 		// 6. Set the response properties
-		String fileName = "SalesOrder" + ".xls";
+		String fileName = "Receipt" + ".xls";
 		response.setHeader("Content-Disposition", "inline; filename=" + fileName);
 		// Make sure to set the correct content type
 		response.setContentType("application/vnd.ms-excel");

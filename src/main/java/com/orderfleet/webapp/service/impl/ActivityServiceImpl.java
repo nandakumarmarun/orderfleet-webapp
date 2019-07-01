@@ -23,6 +23,7 @@ import com.orderfleet.webapp.domain.ActivityStage;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.Stage;
+import com.orderfleet.webapp.domain.enums.ContactManagement;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.StageRepository;
@@ -92,6 +93,10 @@ public class ActivityServiceImpl implements ActivityService {
 		// set pid
 		activityDTO.setPid(ActivityService.PID_PREFIX + RandomUtil.generatePid());
 		Activity activity = activityMapper.activityDTOToActivity(activityDTO);
+		//code added to fix issue of modern sales uploading
+		if(activity.getContactManagement()==null) {
+			activity.setContactManagement(ContactManagement.ENABLED);
+		}
 		// set company
 		activity.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		activity = activityRepository.save(activity);
