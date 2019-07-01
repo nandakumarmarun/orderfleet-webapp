@@ -123,10 +123,10 @@
 								<button type="button" class="btn btn-info"
 									onclick="AccountVoucher.filter()">Apply</button>
 							</div>
-							<!-- <div class="col-sm-1">
+							<div class="col-sm-1">
 								<br>
 								<button type="button" class="btn btn-success" id="downloadXls">Download</button>
-							</div> -->
+							</div> 
 						</div>
 					</form>
 				</div>
@@ -135,6 +135,7 @@
 					<div class="col-sm-2"><label>Count : </label>&nbsp;&nbsp;&nbsp;<label id="lblCounts">0.00</label></div>
 					<!-- <div class="col-sm-3"> <label>Total By Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalByAmount">0.00</label></div>
 					<div class="col-sm-3"> <label>Total To Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalToAmount" >0.00</label></div> -->
+					<div class="col-sm-3"> <label>Total Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalAmount">0.00</label></div>
 					<div class="col-sm-3"> <label>Total Cheque Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalChequeAmount">0.00</label></div>
 					<div class="col-sm-3"> <label>Total Cash Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalCashAmount">0.00</label></div>
 				</div>
@@ -146,7 +147,7 @@
 						<tr>
 							<th><input type="checkbox" id="selectAll"/>&nbsp;&nbsp;Select All</th>
 							<th>Employee</th>
-							<th>Receiver</th>
+							<th>Account</th>
 							<th>Document</th>
 							<th>Amount<p id="totalDocument" style="float: right;"></p></th>
 <!-- 							<th>Volume<p id="totalVolume" style="float: right;"></p></th>

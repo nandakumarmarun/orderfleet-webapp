@@ -141,6 +141,7 @@ public class TaskListServiceImpl implements TaskListService {
 	public List<TaskListDTO> findAllByCompany() {
 		log.debug("Request to get all TaskLists");
 		List<TaskList> taskListList = taskListRepository.findAllByCompanyId();
+		log.debug("Convert to DTo");
 		List<TaskListDTO> result = taskListMapper.taskListsToTaskListDTOs(taskListList);
 		return result;
 	}

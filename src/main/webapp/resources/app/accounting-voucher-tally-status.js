@@ -172,6 +172,7 @@ if (!this.AccountVoucher) {
 		$("#lblCounts").text(0.00);
 		$('#lblTotalChequeAmount').text(0.00);
 		$('#lblTotalCashAmount').text(0.00);
+		$('#lblTotalAmount').text(0.00);
 		$
 				.ajax({
 					url : accountVoucherContextPath + "/filter",
@@ -190,7 +191,6 @@ if (!this.AccountVoucher) {
 						$("#lblCounts").text("0");
 						$('#tBodyAccountVoucher').html("");
 						if (accountVouchers.length == 0) {
-							$("#totalDocument").html("");
 							$('#tBodyAccountVoucher')
 									.html(
 											"<tr><td colspan='9' align='center'>No data available</td></tr>");
@@ -198,7 +198,6 @@ if (!this.AccountVoucher) {
 						}
 						var counts = 0;
 						let totAmount = 0;
-						let totVolume = 0;
 						var chequeTotal = 0.00;
 						var cashTotal = 0.00;
 						$
@@ -209,7 +208,6 @@ if (!this.AccountVoucher) {
 											totAmount += accountVoucher.totalAmount;
 											chequeTotal += accountVoucher.chequeAmount
 											cashTotal += accountVoucher.cashAmount
-											/*totVolume += accountVoucher.totalVolume;*/
 											$('#tBodyAccountVoucher')
 													.append(
 															"<tr><td><input type='checkbox' class='check-one' value='"
@@ -234,11 +232,10 @@ if (!this.AccountVoucher) {
 						$("#lblCounts").text(counts);
 						$('#lblTotalChequeAmount').text(chequeTotal);
 						$('#lblTotalCashAmount').text(cashTotal);
+						
 						if(totAmount != 0){
-							$("#totalDocument").html("(" + totAmount.toFixed(2) + ")");
-						}
-						if(totVolume != 0){
-							$("#totalVolume").html("(" + totVolume.toFixed(2) + ")");
+							//$("#totalDocument").html("(" + totAmount.toFixed(2) + ")");
+							$('#lblTotalAmount').text(totAmount.toFixed(2));
 						}
 					}
 				});
@@ -356,7 +353,7 @@ if (!this.AccountVoucher) {
 			alert("please select inventory vouchers");
 		} else {
 			window.location.href = accountVoucherContextPath
-					+ "/download-inventory-xls?accountVoucherHeaderPids="
+					+ "/download-accounting-xls?accountVoucherHeaderPids="
 					+ accountVoucherHeaderPids;
 			console.log("sucess.......");
 		}

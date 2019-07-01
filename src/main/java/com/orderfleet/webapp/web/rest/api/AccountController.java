@@ -247,6 +247,8 @@ public class AccountController {
 		CompanyUrlConfigDTO companyUrlConfigDTO = new CompanyUrlConfigDTO();
 		companyUrlConfigDTO.setBaseUrl("http://salesnrich.com/api/");
 		companyUrlConfigDTO.setWebLoginUrl("http://salesnrich.com/login");
+//		companyUrlConfigDTO.setBaseUrl("http://192.168.100.61:8050/api/");
+//		companyUrlConfigDTO.setWebLoginUrl("http://192.168.100.61:8050/login");
 		if(optionalUser.isPresent()) {
 			if(optionalUser.get().getExpireDate().isBefore(Instant.now())) {
 				companyUrlConfigDTO.setValidUser(Boolean.FALSE);
