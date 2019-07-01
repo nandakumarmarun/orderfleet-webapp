@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
+import com.orderfleet.webapp.web.rest.dto.DashboardUserDTO;
 
 /**
  * Service Interface for managing DashboardUser.
@@ -22,7 +23,7 @@ public interface DashboardUserService {
 	 *            the entity to save
 	 * @return the persisted entity
 	 */
-	void save(List<String> usersPids);
+	void save(List<DashboardUserDTO> dashboardUserDTOs);
 
 	/**
 	 * Get all the dashboardUsers.
@@ -43,5 +44,7 @@ public interface DashboardUserService {
 	Page<UserDTO> findUsersByCompanyId(Pageable pageable);
 
 	Long countByCompanyId();
+
+	List<DashboardUserDTO> findDashboardUsersByCompanyIdAndSordOrder();
 
 }

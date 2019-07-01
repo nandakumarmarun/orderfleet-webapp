@@ -60,16 +60,22 @@
 							<div class="form-group">
 								<div id="divUsers">
 									<table class='table table-striped table-bordered'>
+										<tr>
+										<th>Select</th>
+										<th>User</th>
+										<th>Sort Order</th>
+										</tr>
 										<c:forEach items="${users}" var="user">
 											<tr>
 												<td><input name='user' type='checkbox'
 													value="${user.pid}" /></td>
 												<td>${user.firstName}</td>
+												<td><input type="number" min="0" class="form-control"
+													name="sortOrder" id="field_sortOrder_${user.pid}" value="0" /></td>
 											</tr>
 										</c:forEach>
 									</table>
-								</div>
-							</div>
+								</div> 
 							<label class="error-msg" style="color: red;"></label>
 						</div>
 						<div class="modal-footer">

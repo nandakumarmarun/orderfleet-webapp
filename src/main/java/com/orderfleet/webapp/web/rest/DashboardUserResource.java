@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.service.DashboardUserService;
 import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
+import com.orderfleet.webapp.web.rest.dto.DashboardUserDTO;
 
 /**
  * Web controller for managing DashboardUser.
@@ -54,9 +55,9 @@ public class DashboardUserResource {
 	@RequestMapping(value = "/dashboard-users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed
-	public ResponseEntity<Void> createDashboardUser(@RequestBody List<String> usersPids) throws URISyntaxException {
-		log.debug("Web request to save DashboardUser : {}", usersPids);
-		dashboardUserService.save(usersPids);
+	public ResponseEntity<Void> createDashboardUser(@RequestBody List<DashboardUserDTO> dashboardUserDTOs) throws URISyntaxException {
+		log.debug("Web request to save DashboardUser : {}", dashboardUserDTOs);
+		dashboardUserService.save(dashboardUserDTOs);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
@@ -88,9 +89,10 @@ public class DashboardUserResource {
 	 */
 	@RequestMapping(value = "/dashboard-users/edit", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<List<UserDTO>> getDashboardUser() {
+	public ResponseEntity<List<DashboardUserDTO>> getDashboardUser() {
 		log.debug("Web request to get DashboardUser");
-		List<UserDTO> userDTOs = dashboardUserService.findUsersByCompanyId();
+		
+		List<DashboardUserDTO> userDTOs = dashboardUserService.findDashboardUsersByCompanyIdAndSordOrder();
 		return new ResponseEntity<>(userDTOs, HttpStatus.OK);
 	}
 

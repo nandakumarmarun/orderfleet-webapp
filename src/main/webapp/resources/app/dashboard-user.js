@@ -16,6 +16,12 @@ if (!this.DashboardUser) {
 			saveAssignedUsers();
 		});
 	});
+	
+	var dashboardUserModel = {
+			userPid : null,
+			sortOrder : null
+			
+		};
 
 	DashboardUser.assignUsers = function() {
 		// clear all check box
@@ -23,10 +29,11 @@ if (!this.DashboardUser) {
 		$.ajax({
 			url : dashboardUserContextPath + "/edit",
 			type : "GET",
-			success : function(users) {
-				$.each(users, function(index, user) {
-					$("#divUsers input:checkbox[value=" + user.pid + "]").prop(
+			success : function(dashboardUsers) {
+				$.each(dashboardUsers, function(index, dashboardUser) {
+					$("#divUsers input:checkbox[value=" + dashboardUser.userPid + "]").prop(
 							"checked", true);
+					$('#field_sortOrder_'+dashboardUser.userPid).val(dashboardUser.sortOrder);
 				});
 			},
 			error : function(xhr, error) {
@@ -40,6 +47,8 @@ if (!this.DashboardUser) {
 
 		$(".error-msg").html("");
 		var selectedUsers = [];
+		
+		var selectUserWithSortOrder=[];
 
 		$.each($("input[name='user']:checked"), function() {
 			selectedUsers.push($(this).val());
@@ -48,12 +57,23 @@ if (!this.DashboardUser) {
 			$(".error-msg").html("Please select users");
 			return;
 		}
+		
+		$.each(selectedUsers, function(index, userPid) {
+			dashboardUserModel={};
+			dashboardUserModel.userPid = userPid
+			dashboardUserModel.sortOrder = $('#field_sortOrder_'+userPid).val();
+			selectUserWithSortOrder.push(dashboardUserModel);
+		});
+		
+		console.log(JSON.stringify(selectUserWithSortOrder));
+		
+		
 		$(".error-msg").html("Please wait.....");
 		$.ajax({
 			url : dashboardUserContextPath,
 			type : "POST",
 			contentType : "application/json; charset=utf-8",
-			data : JSON.stringify(selectedUsers),
+			data : JSON.stringify(selectUserWithSortOrder),
 			success : function(status) {
 				$("#assignUsersModal").modal("hide");
 				onSaveSuccess(status);

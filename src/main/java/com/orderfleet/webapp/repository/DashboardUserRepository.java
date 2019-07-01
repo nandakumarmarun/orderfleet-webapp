@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.orderfleet.webapp.domain.DashboardUser;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.web.rest.dto.DashboardUserDTO;
 
 /**
  * Spring Data JPA repository for the DashboardUser entity.
@@ -24,7 +25,7 @@ public interface DashboardUserRepository extends JpaRepository<DashboardUser, Lo
 
 	Optional<DashboardUser> findByUserLogin(String login);
 	
-	@Query("select dashboardUser.user from DashboardUser dashboardUser where dashboardUser.company.id = ?#{principal.companyId} order by dashboardUser.user.firstName")
+	@Query("select dashboardUser.user from DashboardUser dashboardUser where dashboardUser.company.id = ?#{principal.companyId} order by dashboardUser.sortOrder ASC")
 	List<User> findUsersByCompanyId();
 	
 	@Query("select dashboardUser.user from DashboardUser dashboardUser where dashboardUser.company.id = ?#{principal.companyId}")
@@ -48,5 +49,8 @@ public interface DashboardUserRepository extends JpaRepository<DashboardUser, Lo
 	
 	@Query("select dashboardUser.user.id from DashboardUser dashboardUser where dashboardUser.company.id = ?#{principal.companyId}")
 	Set<Long> findUserIdsByCompanyId();
+
+	@Query("select dashboardUser from DashboardUser dashboardUser where dashboardUser.company.id = ?#{principal.companyId}")
+	List<DashboardUser> findDashboardUsersByCompanyIdAndSordOrder();
 
 }

@@ -22,7 +22,10 @@ import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.DashboardUserService;
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
+import com.orderfleet.webapp.web.rest.dto.DashboardUserDTO;
 import com.orderfleet.webapp.web.rest.mapper.UserMapper;
+
+import javassist.expr.NewArray;
 
 /**
  * Service Implementation for managing DashboardUser.
@@ -51,19 +54,19 @@ public class DashboardUserServiceImpl implements DashboardUserService {
 	/**
 	 * Save a dashboardUser.
 	 * 
-	 * @param usersPids
-	 *            the entity to save
+	 * @param usersPids the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
-	public void save(List<String> usersPids) {
-		log.debug("Request to save DashboardUser : {}", usersPids);
+	public void save(List<DashboardUserDTO> dashboardUserDTOs) {
+		log.debug("Request to save DashboardUser : {}", dashboardUserDTOs);
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		List<DashboardUser> dashboardUsers = new ArrayList<>();
-		for (String userPid : usersPids) {
+		for (DashboardUserDTO dashboardUserDTO : dashboardUserDTOs) {
 			DashboardUser dashboardUser = new DashboardUser();
-			dashboardUser.setUser(userRepository.findOneByPid(userPid).get());
+			dashboardUser.setUser(userRepository.findOneByPid(dashboardUserDTO.getUserPid()).get());
 			dashboardUser.setCompany(company);
+			dashboardUser.setSortOrder(dashboardUserDTO.getSortOrder());
 			dashboardUsers.add(dashboardUser);
 		}
 		dashboardUserRepository.deleteDashboardUsers();
@@ -77,7 +80,7 @@ public class DashboardUserServiceImpl implements DashboardUserService {
 		List<User> dashboardUserList = dashboardUserRepository.findUsersByCompanyId();
 		return userMapper.usersToUserDTOs(dashboardUserList);
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<UserDTO> findUsersByUserIdIn(List<Long> userIds) {
@@ -89,8 +92,7 @@ public class DashboardUserServiceImpl implements DashboardUserService {
 	/**
 	 * Get all the dashboardUsers.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -106,6 +108,21 @@ public class DashboardUserServiceImpl implements DashboardUserService {
 	@Transactional(readOnly = true)
 	public Long countByCompanyId() {
 		return dashboardUserRepository.countByCompanyId();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<DashboardUserDTO> findDashboardUsersByCompanyIdAndSordOrder() {
+
+		List<DashboardUserDTO> dashboardUserDTOs = new ArrayList<>();
+
+		List<DashboardUser> usersDtos = dashboardUserRepository.findDashboardUsersByCompanyIdAndSordOrder();
+
+		for (DashboardUser user : usersDtos) {
+			dashboardUserDTOs.add(new DashboardUserDTO(user));
+		}
+		return dashboardUserDTOs;
+
 	}
 
 }

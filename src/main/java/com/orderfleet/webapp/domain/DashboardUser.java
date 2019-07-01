@@ -41,6 +41,9 @@ public class DashboardUser implements Serializable {
 	@ManyToOne
 	private Company company;
 
+	@Column(name = "sort_order", nullable = false, columnDefinition = "int DEFAULT 0")
+	private int sortOrder;
+
 	public Long getId() {
 		return id;
 	}
@@ -63,6 +66,14 @@ public class DashboardUser implements Serializable {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public int getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(int sortOrder) {
+		this.sortOrder = sortOrder;
 	}
 
 	@Override

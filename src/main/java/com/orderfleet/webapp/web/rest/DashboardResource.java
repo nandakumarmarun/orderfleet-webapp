@@ -233,23 +233,24 @@ public class DashboardResource {
 
 	@Inject
 	private DashboardChartItemRepository dashboardChartItemRepository;
-	
+
 	@Inject
 	private DashboardItemGroupRepository dashboardItemGroupRepository;
-	
+
 	@Inject
 	private DashboardGroupDashboardItemRepository dashboardGroupDashboardItemRepository;
-	
+
 	@Inject
 	private DashboardItemGroupUserRepository dashboardItemGroupUserRepository;
-	
+
 	@Inject
 	private UserRepository userRepository;
-	
+
 	/**
 	 * GET /web/dashboard : get dashboard page.
-	 * @throws JsonProcessingException 
-	 * @throws JSONException 
+	 * 
+	 * @throws JsonProcessingException
+	 * @throws JSONException
 	 */
 	@RequestMapping(value = { "/", "/dashboard" }, method = RequestMethod.GET)
 	public String dashboard(Model model) throws JSONException {
@@ -270,7 +271,7 @@ public class DashboardResource {
 			servletContext.setAttribute("currentcss", "white.css");
 		}
 		List<DashboardItemGroup> dbItemGroups = dashboardItemGroupRepository.findAllByCompanyId();
-		if(!dbItemGroups.isEmpty()) {
+		if (!dbItemGroups.isEmpty()) {
 			JSONArray jsonArr = new JSONArray();
 			for (DashboardItemGroup dashboardItemGroup : dbItemGroups) {
 				JSONObject jo = new JSONObject();
@@ -280,19 +281,19 @@ public class DashboardResource {
 			}
 			model.addAttribute("dbItemGroups", jsonArr.toString());
 		}
-		
+
 		Set<Authority> authorities = new HashSet<>();
 		authorities.add(new Authority("ROLE_EXECUTIVE"));
-		Long userCount = userRepository.countByCompanyPidAndAuthoritiesIn(companyRepository
-				.findOne(companyId).getPid(), authorities);
-		
-		if(SecurityUtils.isCurrentUserInRole("ROLE_OP_ADMIN")){
-			if(userCount > 0){
+		Long userCount = userRepository.countByCompanyPidAndAuthoritiesIn(companyRepository.findOne(companyId).getPid(),
+				authorities);
+
+		if (SecurityUtils.isCurrentUserInRole("ROLE_OP_ADMIN")) {
+			if (userCount > 0) {
 				return "redirect:/web/orderpro/dashboard";
-			}else{
+			} else {
 				return "redirect:/web/orderpro/add-mobile-users";
 			}
-		}else{
+		} else {
 			return "company/dashboard";
 		}
 	}
@@ -322,7 +323,7 @@ public class DashboardResource {
 			} else {
 				List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 				Set<Long> dbUserIds = dashboardUserRepository.findUserIdsByUserIdIn(userIds);
-				totalUsers = dbUserIds.size(); 
+				totalUsers = dbUserIds.size();
 				attendedUsers = attendanceRepository.countByUserIdInAndDateBetween(dbUserIds, date.atTime(0, 0),
 						date.atTime(23, 59));
 			}
@@ -362,11 +363,11 @@ public class DashboardResource {
 		log.info("Web request to get dashboard user wise data");
 		return new ResponseEntity<>(loadDashboardUserWiseData(date, territoryId), HttpStatus.OK);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@RequestMapping(value = "/dashboard/users-summary/dashboarditem-group/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<DashboardUserDataDTO<DashboardSummaryDTO>>> getDashboardUsersDataByDashboardItemGroup(@PathVariable Long id,
-			@RequestParam(value = "date", required = false) LocalDate date) {
+	public ResponseEntity<List<DashboardUserDataDTO<DashboardSummaryDTO>>> getDashboardUsersDataByDashboardItemGroup(
+			@PathVariable Long id, @RequestParam(value = "date", required = false) LocalDate date) {
 		return new ResponseEntity<>(loadDashboardUserWiseDataByDashboardItemGroup(date, id), HttpStatus.OK);
 	}
 
@@ -390,7 +391,7 @@ public class DashboardResource {
 		companySettingRepository.save(companySetting);
 		return 0;
 	}
-	
+
 	private DashboardHeaderSummaryDTO loadDashboardHeaderSummary(LocalDateTime from, LocalDateTime to) {
 		// dash board item configured to user
 		List<DashboardItem> dashboardItems = dashboardItemUserRepository
@@ -407,8 +408,9 @@ public class DashboardResource {
 		List<DashboardSummaryDTO> monthSummaryDatas = new ArrayList<>();
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 		for (DashboardItem dashboardItem : dashboardItems) {
-			//for removing target row from Dash board UI summary, because it takes long time when a full month data loading
-			if("Target".equals(dashboardItem.getName())) {
+			// for removing target row from Dash board UI summary, because it takes long
+			// time when a full month data loading
+			if ("Target".equals(dashboardItem.getName())) {
 				continue;
 			}
 			daySummaryDatas.add(makeDashboardSummaryTile(dashboardItem, from, to, userIds, null));
@@ -422,7 +424,8 @@ public class DashboardResource {
 		return dashboardDTO;
 	}
 
-	private DashboardSummaryDTO makeDashboardSummaryTile(DashboardItem dashboardItem, LocalDateTime from, LocalDateTime to,List<Long> userIds, String userPid) {
+	private DashboardSummaryDTO makeDashboardSummaryTile(DashboardItem dashboardItem, LocalDateTime from,
+			LocalDateTime to, List<Long> userIds, String userPid) {
 		DashboardSummaryDTO dashboardSummaryDto = new DashboardSummaryDTO();
 		dashboardSummaryDto.setDashboardItemPid(dashboardItem.getPid());
 		dashboardSummaryDto.setLabel(dashboardItem.getName());
@@ -435,9 +438,9 @@ public class DashboardResource {
 			if (dashboardItem.getDocumentType().equals(DocumentType.INVENTORY_VOUCHER)) {
 				assignInventoryCountAndAmount(dashboardItem, dashboardSummaryDto, from, to, userIds, userPid);
 			} else if (dashboardItem.getDocumentType().equals(DocumentType.ACCOUNTING_VOUCHER)) {
-				assignAccountingVoucherCountAndAmount(dashboardItem, dashboardSummaryDto, from, to,userIds, userPid);
+				assignAccountingVoucherCountAndAmount(dashboardItem, dashboardSummaryDto, from, to, userIds, userPid);
 			} else if (dashboardItem.getDocumentType().equals(DocumentType.DYNAMIC_DOCUMENT)) {
-				assignDynamicVoucherCountAndAmount(dashboardItem, dashboardSummaryDto, from, to,userIds, userPid);
+				assignDynamicVoucherCountAndAmount(dashboardItem, dashboardSummaryDto, from, to, userIds, userPid);
 			}
 		} else if (dashboardItem.getDashboardItemType().equals(DashboardItemType.PRODUCT)) {
 			assignProductAmountAndVolume(dashboardItem, dashboardSummaryDto, from, to, userIds, userPid);
@@ -462,12 +465,14 @@ public class DashboardResource {
 			} else {
 				dashboardItem = dashboardItemRepository
 						.findTopByCompanyIdOrderBySortOrderAsc(SecurityUtils.getCurrentUsersCompanyId());
-				dashboardChartDTO.setChartLabel(dashboardItem.getName());
+				if (dashboardItem != null) {
+					dashboardChartDTO.setChartLabel(dashboardItem.getName());
+				}
 			}
 			dashboardChartDTO.setBarChartDtos(loadDashboardSummaryBarChart(from, to, dashboardItem));
 		} else {
 //			dashboardChartDTO.setFunnelChartDtos(makeDashboardSummaryFunnelChart(from.minusMonths(3), to, funnels));
-			from =  LocalDate.of(2018, Month.JANUARY, 1).atTime(0,0);
+			from = LocalDate.of(2018, Month.JANUARY, 1).atTime(0, 0);
 			dashboardChartDTO.setFunnelChartDtos(makeDashboardSummaryFunnelChart(from, to, funnels));
 			dashboardChartDTO.setChartLabel("Sales Funnel");
 		}
@@ -478,10 +483,12 @@ public class DashboardResource {
 			DashboardItem dashboardItem) {
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 		List<LocalDate> monthDates = getMonthsBetween(from.minusMonths(5).toLocalDate(), to.toLocalDate());
-		if (dashboardItem.getDashboardItemType().equals(DashboardItemType.ACTIVITY)) {
-			return makeActivityBasedBarChart(dashboardItem, monthDates, userIds);
-		} else if (dashboardItem.getDashboardItemType().equals(DashboardItemType.DOCUMENT)) {
-			return makeDocumentBasedBarChart(dashboardItem, monthDates, userIds);
+		if (dashboardItem != null) {
+			if (dashboardItem.getDashboardItemType().equals(DashboardItemType.ACTIVITY)) {
+				return makeActivityBasedBarChart(dashboardItem, monthDates, userIds);
+			} else if (dashboardItem.getDashboardItemType().equals(DashboardItemType.DOCUMENT)) {
+				return makeDocumentBasedBarChart(dashboardItem, monthDates, userIds);
+			}
 		}
 		return Collections.emptyList();
 	}
@@ -519,7 +526,8 @@ public class DashboardResource {
 				Object[] countAndAmount = (Object[]) getInventoryCountAndAmount(dashboardItem, start.atTime(0, 0),
 						end.atTime(23, 59), userIds, null);
 				if (countAndAmount != null) {
-					barChartDtos.add(new BarChartDTO(localDate.getMonth().name().substring(0, 3), String.valueOf(countAndAmount[1] == null ? 0 : (double) countAndAmount[1])));
+					barChartDtos.add(new BarChartDTO(localDate.getMonth().name().substring(0, 3),
+							String.valueOf(countAndAmount[1] == null ? 0 : (double) countAndAmount[1])));
 				} else {
 					barChartDtos.add(new BarChartDTO(localDate.getMonth().name().substring(0, 3), ""));
 				}
@@ -529,11 +537,11 @@ public class DashboardResource {
 					Set<Document> userDocuments = accountingVoucherHeaderService.findDocumentsByUserIdIn(userIds);
 					dashboardItem.getDocuments().retainAll(userDocuments);
 				}
-				Object[] countAndAmount = (Object[]) getAccountingVoucherCountAndAmount(dashboardItem, start.atTime(0, 0),
-						end.atTime(23, 59), userIds, null);
+				Object[] countAndAmount = (Object[]) getAccountingVoucherCountAndAmount(dashboardItem,
+						start.atTime(0, 0), end.atTime(23, 59), userIds, null);
 				if (countAndAmount != null) {
-					barChartDtos
-					.add(new BarChartDTO(localDate.getMonth().name().substring(0, 3), String.valueOf(countAndAmount[1] == null ? 0 : (double) countAndAmount[1])));	
+					barChartDtos.add(new BarChartDTO(localDate.getMonth().name().substring(0, 3),
+							String.valueOf(countAndAmount[1] == null ? 0 : (double) countAndAmount[1])));
 				} else {
 					barChartDtos.add(new BarChartDTO(localDate.getMonth().name().substring(0, 3), ""));
 				}
@@ -543,7 +551,8 @@ public class DashboardResource {
 					Set<Document> userDocuments = dynamicDocumentHeaderService.findDocumentsByUserIdIn(userIds);
 					dashboardItem.getDocuments().retainAll(userDocuments);
 				}
-				long count = getDynamicDocumentCount(dashboardItem, start.atTime(0, 0), end.atTime(23, 59), userIds, null);
+				long count = getDynamicDocumentCount(dashboardItem, start.atTime(0, 0), end.atTime(23, 59), userIds,
+						null);
 				barChartDtos.add(new BarChartDTO(localDate.getMonth().name().substring(0, 3), String.valueOf(count)));
 			}
 		}
@@ -555,27 +564,32 @@ public class DashboardResource {
 		List<FunnelChartDTO> funnelChartDtos = new ArrayList<>();
 		List<Object[]> fNameAndCounts = stageHeaderRepository.findFunnelByDateBetween(from, to);
 		for (Funnel funnel : funnels) {
-			Optional<Object[]> opFNameAndCount = fNameAndCounts.stream().filter(fc -> funnel.getName().equals(fc[0].toString())).findFirst();
-			if(opFNameAndCount.isPresent()) {
-				String amount = opFNameAndCount.get()[2] == null ? "0" : ((BigDecimal)opFNameAndCount.get()[2]).toBigInteger().toString();
-				funnelChartDtos.add(new FunnelChartDTO(funnel.getName() + "("+ opFNameAndCount.get()[1].toString() +")", amount));
+			Optional<Object[]> opFNameAndCount = fNameAndCounts.stream()
+					.filter(fc -> funnel.getName().equals(fc[0].toString())).findFirst();
+			if (opFNameAndCount.isPresent()) {
+				String amount = opFNameAndCount.get()[2] == null ? "0"
+						: ((BigDecimal) opFNameAndCount.get()[2]).toBigInteger().toString();
+				funnelChartDtos.add(
+						new FunnelChartDTO(funnel.getName() + "(" + opFNameAndCount.get()[1].toString() + ")", amount));
 			} else {
 				funnelChartDtos.add(new FunnelChartDTO(funnel.getName() + "(0)", "0"));
 			}
 		}
 		return funnelChartDtos;
 	}
-	
-	private List<DashboardUserDataDTO<DashboardSummaryDTO>> loadDashboardUserWiseDataByDashboardItemGroup(LocalDate date,
-			Long dbItemGroupId) {
+
+	private List<DashboardUserDataDTO<DashboardSummaryDTO>> loadDashboardUserWiseDataByDashboardItemGroup(
+			LocalDate date, Long dbItemGroupId) {
 		List<DashboardItem> dashboardItems = dashboardGroupDashboardItemRepository
 				.findDashboardItemByDashboardGroupId(dbItemGroupId);
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 		List<Object[]> dbItemGroupUsers;
-		if(userIds.isEmpty()) {
-			dbItemGroupUsers = dashboardItemGroupUserRepository.findUserByDashboardItemGroupIdAndUserIdIn(dbItemGroupId);
+		if (userIds.isEmpty()) {
+			dbItemGroupUsers = dashboardItemGroupUserRepository
+					.findUserByDashboardItemGroupIdAndUserIdIn(dbItemGroupId);
 		} else {
-			dbItemGroupUsers = dashboardItemGroupUserRepository.findUserByDashboardItemGroupIdAndUserIdIn(dbItemGroupId, userIds);	
+			dbItemGroupUsers = dashboardItemGroupUserRepository.findUserByDashboardItemGroupIdAndUserIdIn(dbItemGroupId,
+					userIds);
 		}
 		List<DashboardUserDataDTO<DashboardSummaryDTO>> dashboardUserDatas = new ArrayList<>();
 		for (Object[] userObj : dbItemGroupUsers) {
@@ -602,23 +616,25 @@ public class DashboardResource {
 		}
 		return dashboardUserDatas;
 	}
-	
-	private DashboardUserDataDTO<DashboardSummaryDTO> makeDashboardUserDataDTO(LocalDate date, UserDTO user, List<DashboardItem> dashboardItems) {
-		DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData = new DashboardUserDataDTO<>(attendanceService, employeeProfileRepository, customerTimeSpentRepository);
+
+	private DashboardUserDataDTO<DashboardSummaryDTO> makeDashboardUserDataDTO(LocalDate date, UserDTO user,
+			List<DashboardItem> dashboardItems) {
+		DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData = new DashboardUserDataDTO<>(attendanceService,
+				employeeProfileRepository, customerTimeSpentRepository);
 		dashboardUserData.setUserPid(user.getPid());
 		dashboardUserData.setEmployeeData(dashboardUserData, user.getPid());
 		dashboardUserData.setAttendanceStatus(dashboardUserData, user.getPid(), date);
 		dashboardUserData.setCustomerTimeSpent(dashboardUserData, user.getPid());
 		ExecutiveTaskExecution executiveTaskExecution = executiveTaskExecutionRepository
-						.findTop1ByUserPidAndDateBetweenOrderByDateDesc(user.getPid(), date.atTime(0, 0), date.atTime(23, 59));
+				.findTop1ByUserPidAndDateBetweenOrderByDateDesc(user.getPid(), date.atTime(0, 0), date.atTime(23, 59));
 		dashboardUserData.setLastExecutionDetails(dashboardUserData, executiveTaskExecution);
 		// set user dash board item wise summary
-		dashboardUserData.setUserSummaryData(createSingleUserSummaryData(dashboardItems, date.atTime(0, 0), date.atTime(23, 59),
-				user.getPid(), executiveTaskExecution));
+		dashboardUserData.setUserSummaryData(createSingleUserSummaryData(dashboardItems, date.atTime(0, 0),
+				date.atTime(23, 59), user.getPid(), executiveTaskExecution));
 		Long count = dashboardNotificationRepository.countByCreatedByAndReadFalseAndCreatedDateBetween(user.getLogin(),
 				date.atTime(0, 0), date.atTime(23, 59));
 		dashboardUserData.setNotificationCount(count == null ? 0 : count.intValue());
-		
+
 		return dashboardUserData;
 	}
 
@@ -643,7 +659,7 @@ public class DashboardResource {
 		}
 		return dashboardUsers;
 	}
-	
+
 	/**
 	 * User wise Activities,Sales Order and Receipts summary in a date
 	 * 
@@ -652,33 +668,38 @@ public class DashboardResource {
 	 * @param userPid
 	 * @return
 	 */
-	private List<DashboardSummaryDTO> createSingleUserSummaryData(List<DashboardItem> dashboardItems, LocalDateTime from,
-			LocalDateTime to, String userPid, ExecutiveTaskExecution executiveTaskExecution) {
+	private List<DashboardSummaryDTO> createSingleUserSummaryData(List<DashboardItem> dashboardItems,
+			LocalDateTime from, LocalDateTime to, String userPid, ExecutiveTaskExecution executiveTaskExecution) {
 		List<DashboardSummaryDTO> dashboardSummaryDatas = new ArrayList<>();
 		List<Long> userIds = Collections.emptyList();
 		for (DashboardItem dashboardItem : dashboardItems) {
-			DashboardSummaryDTO dashboardItemSummary = makeDashboardSummaryTile(dashboardItem, from, to,userIds, userPid);
+			DashboardSummaryDTO dashboardItemSummary = makeDashboardSummaryTile(dashboardItem, from, to, userIds,
+					userPid);
 			// check if it is in last transaction (for number circle)
 			putNumberCircle(dashboardItem, dashboardItemSummary, executiveTaskExecution);
 			dashboardSummaryDatas.add(dashboardItemSummary);
 		}
 		return dashboardSummaryDatas;
 	}
-	
+
 	private void putNumberCircle(DashboardItem dashboardItem, DashboardSummaryDTO dashboardItemSummary,
 			ExecutiveTaskExecution executiveTaskExecution) {
 		if (dashboardItem.getDashboardItemType().equals(DashboardItemType.DOCUMENT) && executiveTaskExecution != null) {
 			if (dashboardItem.getDocumentType().equals(DocumentType.INVENTORY_VOUCHER)) {
-				putNumberCircleOnInventoryDocItem(dashboardItem.getDocuments(), dashboardItemSummary, executiveTaskExecution.getPid());
+				putNumberCircleOnInventoryDocItem(dashboardItem.getDocuments(), dashboardItemSummary,
+						executiveTaskExecution.getPid());
 			} else if (dashboardItem.getDocumentType().equals(DocumentType.ACCOUNTING_VOUCHER)) {
-				putNumberCircleOnAccountingDocItem(dashboardItem.getDocuments(), dashboardItemSummary, executiveTaskExecution.getPid());
+				putNumberCircleOnAccountingDocItem(dashboardItem.getDocuments(), dashboardItemSummary,
+						executiveTaskExecution.getPid());
 			} else if (dashboardItem.getDocumentType().equals(DocumentType.DYNAMIC_DOCUMENT)) {
-				putNumberCircleOnDynamicDocItem(dashboardItem.getDocuments(), dashboardItemSummary, executiveTaskExecution.getPid());
+				putNumberCircleOnDynamicDocItem(dashboardItem.getDocuments(), dashboardItemSummary,
+						executiveTaskExecution.getPid());
 			}
 		}
 	}
-	
-	private void putNumberCircleOnInventoryDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary, String taskExecutionPid) {
+
+	private void putNumberCircleOnInventoryDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary,
+			String taskExecutionPid) {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(taskExecutionPid);
 		if (!inventoryVoucherHeaders.isEmpty()) {
@@ -690,8 +711,9 @@ public class DashboardResource {
 			}
 		}
 	}
-	
-	private void putNumberCircleOnAccountingDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary, String taskExecutionPid) {
+
+	private void putNumberCircleOnAccountingDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary,
+			String taskExecutionPid) {
 		List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(taskExecutionPid);
 		if (!accountingVoucherHeaders.isEmpty()) {
@@ -703,8 +725,9 @@ public class DashboardResource {
 			}
 		}
 	}
-	
-	private void putNumberCircleOnDynamicDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary, String taskExecutionPid) {
+
+	private void putNumberCircleOnDynamicDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary,
+			String taskExecutionPid) {
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(taskExecutionPid);
 		if (!dynamicDocumentHeaders.isEmpty()) {
@@ -716,9 +739,10 @@ public class DashboardResource {
 			}
 		}
 	}
-	
+
 	private void assignActivityAchievedAndScheduled(DashboardItem dashboardItem,
-			DashboardSummaryDTO dashboardSummaryDto, LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
+			DashboardSummaryDTO dashboardSummaryDto, LocalDateTime from, LocalDateTime to, List<Long> userIds,
+			String userPid) {
 		if (!userIds.isEmpty()) {
 			// filter activities by user activities
 			Set<Activity> userActivities = userActivityService.findActivitiesByActivatedTrueAndUserIdIn(userIds);
@@ -796,16 +820,16 @@ public class DashboardResource {
 				achieved = executiveTaskExecutionRepository
 						.countByDateBetweenAndActivitiesAndUserIdInAndTaskPlanIsNull(from, to, activities, userIds);
 			} else {
-				achieved = executiveTaskExecutionRepository.countByDateBetweenAndActivitiesAndTaskPlanIsNull(from,
-						to, activities);
+				achieved = executiveTaskExecutionRepository.countByDateBetweenAndActivitiesAndTaskPlanIsNull(from, to,
+						activities);
 			}
 		} else {
-			achieved = executiveTaskExecutionRepository
-					.countByDateBetweenAndActivitiesAndUserAndTaskPlanIsNull(from, to, activities, userPid);
+			achieved = executiveTaskExecutionRepository.countByDateBetweenAndActivitiesAndUserAndTaskPlanIsNull(from,
+					to, activities, userPid);
 		}
 		return new long[] { achieved, scheduled };
 	}
-	
+
 	private void assignInventoryCountAndAmount(DashboardItem dashboardItem, DashboardSummaryDTO dashboardSummaryDto,
 			LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
 		if (!userIds.isEmpty()) {
@@ -815,8 +839,8 @@ public class DashboardResource {
 		}
 		Object[] countAndAmount = (Object[]) getInventoryCountAndAmount(dashboardItem, from, to, userIds, userPid);
 		if (countAndAmount != null) {
-			dashboardSummaryDto.setCount(countAndAmount[0] == null ? 0L : (long)countAndAmount[0]);
-			dashboardSummaryDto.setAmount(countAndAmount[1] == null ? 0d : (double)countAndAmount[1]);
+			dashboardSummaryDto.setCount(countAndAmount[0] == null ? 0L : (long) countAndAmount[0]);
+			dashboardSummaryDto.setAmount(countAndAmount[1] == null ? 0d : (double) countAndAmount[1]);
 		}
 	}
 
@@ -848,24 +872,23 @@ public class DashboardResource {
 		}
 		return obj;
 	}
-	
+
 	private Object getPlannedInventoryCountAndAmount(List<Document> documents, LocalDateTime from, LocalDateTime to,
 			List<Long> userIds, String userPid) {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
 				obj = inventoryVoucherHeaderRepository
-						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNotNull(
-								documents, from, to, userIds);
+						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNotNull(documents,
+								from, to, userIds);
 			} else {
 				obj = inventoryVoucherHeaderRepository
-						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndTaskPlanIsNotNull(documents, from,
-								to);
+						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndTaskPlanIsNotNull(documents, from, to);
 			}
 		} else {
 			obj = inventoryVoucherHeaderRepository
-					.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserAndTaskPlanIsNotNull(documents,
-							from, to, userPid);
+					.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserAndTaskPlanIsNotNull(documents, from, to,
+							userPid);
 		}
 		return obj;
 	}
@@ -876,36 +899,38 @@ public class DashboardResource {
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
 				obj = inventoryVoucherHeaderRepository
-						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNull(documents,
-								from, to, userIds);
+						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNull(documents, from,
+								to, userIds);
 			} else {
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndTaskPlanIsNull(documents, from, to);
 			}
 		} else {
 			obj = inventoryVoucherHeaderRepository
-					.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserAndTaskPlanIsNull(documents, from,
-							to, userPid);
+					.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserAndTaskPlanIsNull(documents, from, to,
+							userPid);
 		}
 		return obj;
 	}
-	
+
 	private void assignAccountingVoucherCountAndAmount(DashboardItem dashboardItem,
-			DashboardSummaryDTO dashboardSummaryDto, LocalDateTime from, LocalDateTime to,List<Long> userIds, String userPid) {
+			DashboardSummaryDTO dashboardSummaryDto, LocalDateTime from, LocalDateTime to, List<Long> userIds,
+			String userPid) {
 		if (!userIds.isEmpty()) {
 			// filter documents by user documents
 			Set<Document> userDocuments = accountingVoucherHeaderService.findDocumentsByUserIdIn(userIds);
 			dashboardItem.getDocuments().retainAll(userDocuments);
 		}
-		Object[] countAndAmount = (Object[]) getAccountingVoucherCountAndAmount(dashboardItem, from, to, userIds, userPid);
+		Object[] countAndAmount = (Object[]) getAccountingVoucherCountAndAmount(dashboardItem, from, to, userIds,
+				userPid);
 		if (countAndAmount != null) {
-			dashboardSummaryDto.setCount(countAndAmount[0] == null ? 0L : (long)countAndAmount[0]);
-			dashboardSummaryDto.setAmount(countAndAmount[1] == null ? 0d : (double)countAndAmount[1]);
+			dashboardSummaryDto.setCount(countAndAmount[0] == null ? 0L : (long) countAndAmount[0]);
+			dashboardSummaryDto.setAmount(countAndAmount[1] == null ? 0d : (double) countAndAmount[1]);
 		}
 	}
 
-	private Object getAccountingVoucherCountAndAmount(DashboardItem dashboardItem, LocalDateTime from,
-			LocalDateTime to, List<Long> userIds, String userPid) {
+	private Object getAccountingVoucherCountAndAmount(DashboardItem dashboardItem, LocalDateTime from, LocalDateTime to,
+			List<Long> userIds, String userPid) {
 		Object obj = null;
 		List<Document> documents = new ArrayList<>(dashboardItem.getDocuments());
 		if (!documents.isEmpty()) {
@@ -923,21 +948,22 @@ public class DashboardResource {
 							from, to, userPid);
 				}
 			} else if (dashboardItem.getTaskPlanType().equals(TaskPlanType.PLANNED)) {
-				obj = getPlannedAccountingCountAndAmount(documents, from, to, userIds, userPid);				
+				obj = getPlannedAccountingCountAndAmount(documents, from, to, userIds, userPid);
 			} else if (dashboardItem.getTaskPlanType().equals(TaskPlanType.UN_PLANNED)) {
 				obj = getUnPlannedAccountingCountAndAmount(documents, from, to, userIds, userPid);
 			}
 		}
 		return obj;
 	}
-	
-	private Object getPlannedAccountingCountAndAmount(List<Document> documents, LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
+
+	private Object getPlannedAccountingCountAndAmount(List<Document> documents, LocalDateTime from, LocalDateTime to,
+			List<Long> userIds, String userPid) {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
 				obj = accountingVoucherHeaderRepository
-						.getCountAndAmountByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNotNull(documents,
-								from, to, userIds);
+						.getCountAndAmountByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNotNull(documents, from, to,
+								userIds);
 			} else {
 				obj = accountingVoucherHeaderRepository
 						.getCountAndAmountByDocumentsAndDateBetweenAndTaskPlanIsNotNull(documents, from, to);
@@ -949,28 +975,29 @@ public class DashboardResource {
 		}
 		return obj;
 	}
-	
-	private Object getUnPlannedAccountingCountAndAmount(List<Document> documents, LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
+
+	private Object getUnPlannedAccountingCountAndAmount(List<Document> documents, LocalDateTime from, LocalDateTime to,
+			List<Long> userIds, String userPid) {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
 				obj = accountingVoucherHeaderRepository
-						.getCountAndAmountByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNull(documents, from,
-								to, userIds);
+						.getCountAndAmountByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNull(documents, from, to,
+								userIds);
 			} else {
 				obj = accountingVoucherHeaderRepository
 						.getCountAndAmountByDocumentsAndDateBetweenAndTaskPlanIsNull(documents, from, to);
 			}
 		} else {
 			obj = accountingVoucherHeaderRepository
-					.getCountAndAmountByDocumentsAndDateBetweenAndUserAndTaskPlanIsNull(documents, from, to,
-							userPid);
+					.getCountAndAmountByDocumentsAndDateBetweenAndUserAndTaskPlanIsNull(documents, from, to, userPid);
 		}
 		return obj;
 	}
-	
+
 	private void assignDynamicVoucherCountAndAmount(DashboardItem dashboardItem,
-			DashboardSummaryDTO dashboardSummaryDto, LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
+			DashboardSummaryDTO dashboardSummaryDto, LocalDateTime from, LocalDateTime to, List<Long> userIds,
+			String userPid) {
 		if (!userIds.isEmpty()) {
 			// filter documents by user documents
 			Set<Document> userDocuments = dynamicDocumentHeaderService.findDocumentsByUserIdIn(userIds);
@@ -979,9 +1006,9 @@ public class DashboardResource {
 		long count = getDynamicDocumentCount(dashboardItem, from, to, userIds, userPid);
 		dashboardSummaryDto.setCount(count);
 	}
-	
-	private long getDynamicDocumentCount(DashboardItem dashboardItem, LocalDateTime from,
-			LocalDateTime to, List<Long> userIds, String userPid) {
+
+	private long getDynamicDocumentCount(DashboardItem dashboardItem, LocalDateTime from, LocalDateTime to,
+			List<Long> userIds, String userPid) {
 		Long count = 0L;
 		List<Document> documents = new ArrayList<>(dashboardItem.getDocuments());
 		if (!documents.isEmpty()) {
@@ -1007,9 +1034,9 @@ public class DashboardResource {
 		}
 		return count;
 	}
-	
-	private long getPlannedDynamicDocumentCount(List<Document> documents, LocalDateTime from,
-			LocalDateTime to, List<Long> userIds, String userPid) {
+
+	private long getPlannedDynamicDocumentCount(List<Document> documents, LocalDateTime from, LocalDateTime to,
+			List<Long> userIds, String userPid) {
 		long count;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
@@ -1018,8 +1045,8 @@ public class DashboardResource {
 								from, to, documents, userIds);
 			} else {
 				count = dynamicDocumentHeaderRepository
-						.countByCreatedDateBetweenAndDocumentInAndExecutiveTaskExecutionExecutiveTaskPlanIsNotNull(
-								from, to, documents);
+						.countByCreatedDateBetweenAndDocumentInAndExecutiveTaskExecutionExecutiveTaskPlanIsNotNull(from,
+								to, documents);
 			}
 		} else {
 			count = dynamicDocumentHeaderRepository
@@ -1028,9 +1055,9 @@ public class DashboardResource {
 		}
 		return count;
 	}
-	
-	private long getUnPlannedDynamicDocumentCount(List<Document> documents, LocalDateTime from,
-			LocalDateTime to, List<Long> userIds, String userPid) {
+
+	private long getUnPlannedDynamicDocumentCount(List<Document> documents, LocalDateTime from, LocalDateTime to,
+			List<Long> userIds, String userPid) {
 		long count;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
@@ -1039,8 +1066,8 @@ public class DashboardResource {
 								from, to, documents, userIds);
 			} else {
 				count = dynamicDocumentHeaderRepository
-						.countByCreatedDateBetweenAndDocumentInAndExecutiveTaskExecutionExecutiveTaskPlanIsNull(
-								from, to, documents);
+						.countByCreatedDateBetweenAndDocumentInAndExecutiveTaskExecutionExecutiveTaskPlanIsNull(from,
+								to, documents);
 			}
 		} else {
 			count = dynamicDocumentHeaderRepository
@@ -1049,7 +1076,7 @@ public class DashboardResource {
 		}
 		return count;
 	}
-	
+
 	private void assignProductAmountAndVolume(DashboardItem dashboardItem, DashboardSummaryDTO dashboardSummaryDto,
 			LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
 		if (!userIds.isEmpty()) {
@@ -1062,16 +1089,17 @@ public class DashboardResource {
 		if (!documents.isEmpty() && !dashboardItem.getProductGroups().isEmpty()) {
 			Set<Long> productIds = productGroupProductRepository
 					.findProductIdByProductGroupIn(dashboardItem.getProductGroups());
-			Object[] amountAndVolume = (Object[]) getProductAmountAndVolume(dashboardItem.getTaskPlanType(), documents, productIds, from, to, userIds, userPid);
+			Object[] amountAndVolume = (Object[]) getProductAmountAndVolume(dashboardItem.getTaskPlanType(), documents,
+					productIds, from, to, userIds, userPid);
 			if (amountAndVolume != null) {
 				dashboardSummaryDto.setAmount(amountAndVolume[0] == null ? 0d : (double) amountAndVolume[0]);
 				dashboardSummaryDto.setVolume(amountAndVolume[1] == null ? 0d : (double) amountAndVolume[1]);
 			}
 		}
 	}
-	
-	private Object getProductAmountAndVolume(TaskPlanType taskPlanType, List<Document> documents, Set<Long> productIds, LocalDateTime from, LocalDateTime to,
-			List<Long> userIds, String userPid) {
+
+	private Object getProductAmountAndVolume(TaskPlanType taskPlanType, List<Document> documents, Set<Long> productIds,
+			LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
 		Object obj = null;
 		if (taskPlanType.equals(TaskPlanType.BOTH)) {
 			if (userPid == null) {
@@ -1095,9 +1123,9 @@ public class DashboardResource {
 		}
 		return obj;
 	}
-	
-	private Object getPlannedProductAmountVolume(List<Document> documents, Set<Long> productIds, LocalDateTime from, LocalDateTime to,
-			List<Long> userIds, String userPid) {
+
+	private Object getPlannedProductAmountVolume(List<Document> documents, Set<Long> productIds, LocalDateTime from,
+			LocalDateTime to, List<Long> userIds, String userPid) {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
@@ -1116,9 +1144,9 @@ public class DashboardResource {
 		}
 		return obj;
 	}
-	
-	private Object getUnPlannedProductAmountVolume(List<Document> documents, Set<Long> productIds, LocalDateTime from, LocalDateTime to,
-			List<Long> userIds, String userPid) {
+
+	private Object getUnPlannedProductAmountVolume(List<Document> documents, Set<Long> productIds, LocalDateTime from,
+			LocalDateTime to, List<Long> userIds, String userPid) {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
@@ -1132,17 +1160,18 @@ public class DashboardResource {
 			}
 		} else {
 			obj = inventoryVoucherDetailRepository
-					.getAmountAndVolumeByDocumentsInAndProductsInAndDateBetweenAndUserIdInAndTaskPlanIsNull(
-							documents, productIds, from, to, userPid);
+					.getAmountAndVolumeByDocumentsInAndProductsInAndDateBetweenAndUserIdInAndTaskPlanIsNull(documents,
+							productIds, from, to, userPid);
 		}
 		return obj;
 	}
-	
+
 	private void assignTargetBlockAchievedAndPlanned(DashboardItem dashboardItem,
-			DashboardSummaryDTO dashboardSummaryDto, LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
+			DashboardSummaryDTO dashboardSummaryDto, LocalDateTime from, LocalDateTime to, List<Long> userIds,
+			String userPid) {
 		// get target type
 		List<TargetType> targetTypes = salesTargetReportSettingSalesTargetBlockRepository
-						.findTargetTypeBySalesTargetBlockId(dashboardItem.getSalesTargetBlock().getId());
+				.findTargetTypeBySalesTargetBlockId(dashboardItem.getSalesTargetBlock().getId());
 		List<SalesTargetGroupUserTarget> salesTargetGroupUserTargetList = Collections.emptyList();
 		if (!targetTypes.isEmpty()) {
 			if (userPid == null) {
@@ -1166,7 +1195,8 @@ public class DashboardResource {
 		if (!salesTargetGroupUserTargetList.isEmpty()) {
 			TargetType targetType = targetTypes.get(0);
 			dashboardSummaryDto.setTargetType(targetTypes.get(0));
-			String[] targetAchieved = getTargetBlockAchievedAndPlanned(dashboardItem, from, to,salesTargetGroupUserTargetList, targetType, userPid);
+			String[] targetAchieved = getTargetBlockAchievedAndPlanned(dashboardItem, from, to,
+					salesTargetGroupUserTargetList, targetType, userPid);
 			if (targetType.equals(TargetType.AMOUNT)) {
 				double roundedTrgtAmt = new BigDecimal(targetAchieved[0]).setScale(2, RoundingMode.HALF_UP)
 						.doubleValue();
@@ -1174,7 +1204,7 @@ public class DashboardResource {
 						.doubleValue();
 				dashboardSummaryDto.setTargetAmount(roundedTrgtAmt);
 				dashboardSummaryDto.setTargetAchievedAmount(roundedAchdAmt);
-			} 
+			}
 			if (targetType.equals(TargetType.VOLUME)) {
 				double roundedTrgtVlm = new BigDecimal(targetAchieved[1]).setScale(2, RoundingMode.HALF_UP)
 						.doubleValue();
@@ -1188,7 +1218,7 @@ public class DashboardResource {
 			}
 		}
 	}
-	
+
 	private String[] getTargetBlockAchievedAndPlanned(DashboardItem dashboardItem, LocalDateTime from, LocalDateTime to,
 			List<SalesTargetGroupUserTarget> salesTargetGroupUserTargetList, TargetType targetType, String userPid) {
 		Double targetAmount = 0d;
@@ -1207,12 +1237,14 @@ public class DashboardResource {
 			if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
 				// get achieved amount
 				if (targetType.equals(TargetType.AMOUNT)) {
-					 Double amount = getAchievedAmount(salesTargetGroupUserTarget.getUser().getId(),documentIds, productProfileIds, from, to, userPid);
-					 achievedAmount += amount;
+					Double amount = getAchievedAmount(salesTargetGroupUserTarget.getUser().getId(), documentIds,
+							productProfileIds, from, to, userPid);
+					achievedAmount += amount;
 				}
 				// get achieved volume
 				if (targetType.equals(TargetType.VOLUME)) {
-					 Double volume = getAchievedVolume(salesTargetGroupUserTarget.getUser().getId(),documentIds, productProfileIds, from, to, userPid);
+					Double volume = getAchievedVolume(salesTargetGroupUserTarget.getUser().getId(), documentIds,
+							productProfileIds, from, to, userPid);
 					if (volume != null) {
 						achievedVolume += volume;
 						targetAvg += (volume / salesTargetGroupUserTarget.getVolume());
@@ -1223,34 +1255,29 @@ public class DashboardResource {
 		return new String[] { targetAmount.toString(), targetVolume.toString(), achievedAmount.toString(),
 				achievedVolume.toString(), targetAvg.toString() };
 	}
-	
+
 	private Double getAchievedAmount(Long targetUserId, Set<Long> documentIds, Set<Long> productProfileIds,
 			LocalDateTime from, LocalDateTime to, String userPid) {
 		Double amount;
 		if (userPid == null) {
-			amount = inventoryVoucherDetailRepository
-					.sumOfAmountByUserIdAndDocumentsAndProductsAndCreatedDateBetween(
-							targetUserId, documentIds, productProfileIds, from,
-							to);
+			amount = inventoryVoucherDetailRepository.sumOfAmountByUserIdAndDocumentsAndProductsAndCreatedDateBetween(
+					targetUserId, documentIds, productProfileIds, from, to);
 		} else {
-			amount = inventoryVoucherDetailRepository
-					.sumOfAmountByUserPidAndDocumentsAndProductsAndCreatedDateBetween(userPid, documentIds,
-							productProfileIds, from, to);
+			amount = inventoryVoucherDetailRepository.sumOfAmountByUserPidAndDocumentsAndProductsAndCreatedDateBetween(
+					userPid, documentIds, productProfileIds, from, to);
 		}
 		return amount;
 	}
-	
+
 	private Double getAchievedVolume(Long targetUserId, Set<Long> documentIds, Set<Long> productProfileIds,
 			LocalDateTime from, LocalDateTime to, String userPid) {
 		Double volume;
 		if (userPid == null) {
-			volume = inventoryVoucherDetailRepository
-					.sumOfVolumeByUserIdAndDocumentsAndProductsAndCreatedDateBetween(
-							targetUserId, documentIds, productProfileIds, from, to);
+			volume = inventoryVoucherDetailRepository.sumOfVolumeByUserIdAndDocumentsAndProductsAndCreatedDateBetween(
+					targetUserId, documentIds, productProfileIds, from, to);
 		} else {
-			volume = inventoryVoucherDetailRepository
-					.sumOfVolumeByUserPidAndDocumentsAndProductsAndCreatedDateBetween(userPid, documentIds,
-							productProfileIds, from, to);
+			volume = inventoryVoucherDetailRepository.sumOfVolumeByUserPidAndDocumentsAndProductsAndCreatedDateBetween(
+					userPid, documentIds, productProfileIds, from, to);
 		}
 		return volume;
 	}
