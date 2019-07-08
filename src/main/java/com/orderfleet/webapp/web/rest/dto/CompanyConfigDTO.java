@@ -18,6 +18,7 @@ public class CompanyConfigDTO {
 	private boolean stageChangeAccountingVoucher;//for changing stage even if document in accounting voucher type  for geologic
 	private boolean newCustomerAlias;//devsoft if new customer is added alias will be filled with N_1, N_2 etc
 	private boolean chatReply;//settings to reply for a firebase notification
+	private boolean salesPdfDownload;//setting for download as pdf button in sales order
 
 	public CompanyConfigDTO() {
 		super();
@@ -94,6 +95,15 @@ public class CompanyConfigDTO {
 	public void setChatReply(boolean chatReply) {
 		this.chatReply = chatReply;
 	}
+
+	public boolean getSalesPdfDownload() {
+		return salesPdfDownload;
+	}
+
+	public void setSalesPdfDownload(boolean salesPdfDownload) {
+		this.salesPdfDownload = salesPdfDownload;
+	}
+	
 	
 	
 

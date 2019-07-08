@@ -44,6 +44,7 @@
 						<th>Stage Change For Accounting Voucher</th>
 						<th>New Customer Alias</th>
 						<th>Chat Reply</th>
+						<th>Sales Pdf Download</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -59,6 +60,7 @@
 							<td>${companyConfiguration.stageChangeAccountingVoucher}</td>
 							<td>${companyConfiguration.newCustomerAlias}</td>
 							<td>${companyConfiguration.chatReply}</td>
+							<td>${companyConfiguration.salesPdfDownload}</td>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
 						</tr>
@@ -148,6 +150,13 @@
 											<td><div class="form-group">
 													<label class="control-label">Chat Reply</label> <input
 														id="chatReply" name='checksChatReply'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Sales Pdf Download</label> <input
+														id="salesPdfDownload" name='checksSalesPdfDownload'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>

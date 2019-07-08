@@ -27,6 +27,7 @@ public class ReceiptDTO {
 	private String chequeDate;
 	private PaymentMode mode;
 	private AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
+	private String employeeName;
 
 	public ReceiptDTO() {
 		super();
@@ -49,6 +50,7 @@ public class ReceiptDTO {
 				accountingVoucherDetail.getAccountingVoucherHeader());
 		this.trimChar = accountingVoucherDetail.getBy().getTrimChar();
 		this.chequeDate = accountingVoucherDetail.getInstrumentDate()==null?"":accountingVoucherDetail.getInstrumentDate().toString();
+		this.employeeName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
 	}
 
 	public ReceiptDTO(AccountingVoucherAllocation accountingVoucherAllocation) {
@@ -70,6 +72,7 @@ public class ReceiptDTO {
 				accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader());
 		this.chequeDate = accountingVoucherAllocation.getAccountingVoucherDetail()
 				.getInstrumentDate()==null?"":accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate().toString();
+		this.employeeName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader().getEmployee().getName();
 	}
 
 	public String getParticularsName() {
@@ -190,6 +193,14 @@ public class ReceiptDTO {
 
 	public void setChequeDate(String chequeDate) {
 		this.chequeDate = chequeDate;
+	}
+
+	public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
 	}
 	
 }

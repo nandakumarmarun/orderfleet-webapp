@@ -33,7 +33,7 @@ if (!this.CompanyConfiguration) {
 			alert("Please select company");
 			return;
 		}
-
+		console.log("H..............");
 		var distanceTraveled = $("#distanceTraveled").is(":checked");
 		var locationVariance = $("#locationVariance").is(":checked");
 		var interimSave = $("#interimSave").is(":checked");
@@ -43,6 +43,8 @@ if (!this.CompanyConfiguration) {
 				.is(":checked");
 		var newCustomerAlias = $('#newCustomerAlias').is(":checked");
 		var chatReply = $('#chatReply').is(":checked");
+		var salesPdfDownload = $('#salesPdfDownload').is(":checked");
+		console.log(salesPdfDownload+" status pdf");
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -54,7 +56,8 @@ if (!this.CompanyConfiguration) {
 				refreshProductGroupProduct : refreshProductGroupProduct,
 				stageChangeAccountingVoucher : stageChangeAccountingVoucher,
 				newCustomerAlias : newCustomerAlias,
-				chatReply : chatReply
+				chatReply : chatReply,
+				salesPdfDownload : salesPdfDownload
 			},
 			success : function(data) {
 				onSaveSuccess(data);
@@ -80,6 +83,7 @@ if (!this.CompanyConfiguration) {
 						data.stageChangeAccountingVoucher);
 				$("#newCustomerAlias").prop("checked", data.newCustomerAlias);
 				$("#chatReply").prop("checked", data.chatReply);
+				$("#salesPdfDownload").prop("checked", data.salesPdfDownload);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
