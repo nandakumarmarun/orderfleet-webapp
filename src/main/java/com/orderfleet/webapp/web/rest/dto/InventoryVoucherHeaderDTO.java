@@ -81,6 +81,11 @@ public class InventoryVoucherHeaderDTO {
 	
 	//status for tally download
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
+	
+	private long orderNumber;
+	private String customeraddress;
+	private String customerEmail;
+	private String customerPhone;
 
 	public InventoryVoucherHeaderDTO() {
 		super();
@@ -134,6 +139,11 @@ public class InventoryVoucherHeaderDTO {
 		if (inventoryVoucherHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = inventoryVoucherHeader.getTallyDownloadStatus();
 		}
+		this.orderNumber = inventoryVoucherHeader.getOrderNumber();
+		this.customeraddress = inventoryVoucherHeader.getReceiverAccount().getAddress();
+		this.customerEmail = inventoryVoucherHeader.getReceiverAccount().getEmail1();
+		this.customerPhone = inventoryVoucherHeader.getReceiverAccount().getPhone1();
+		
 	}
 
 	public InventoryVoucherHeaderDTO(InventoryVoucherHeaderHistory inventoryVoucherHeader) {
@@ -438,6 +448,38 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setTallyDownloadStatus(TallyDownloadStatus tallyDownloadStatus) {
 		this.tallyDownloadStatus = tallyDownloadStatus;
+	}
+	
+	public long getOrderNumber() {
+		return orderNumber;
+	}
+
+	public void setOrderNumber(long orderNumber) {
+		this.orderNumber = orderNumber;
+	}
+
+	public String getCustomeraddress() {
+		return customeraddress;
+	}
+
+	public void setCustomeraddress(String customeraddress) {
+		this.customeraddress = customeraddress;
+	}
+
+	public String getCustomerEmail() {
+		return customerEmail;
+	}
+
+	public void setCustomerEmail(String customerEmail) {
+		this.customerEmail = customerEmail;
+	}
+
+	public String getCustomerPhone() {
+		return customerPhone;
+	}
+
+	public void setCustomerPhone(String customerPhone) {
+		this.customerPhone = customerPhone;
 	}
 
 	@Override

@@ -26,7 +26,8 @@ if (!this.Document) {
 		promptStockLocation : false,
 		photoMandatory:false,
 		isTakeImageFromGallery:false,
-		qrCodeEnabled :false
+		qrCodeEnabled :false,
+		orderNoEnabled : false
 
 	};
 
@@ -188,7 +189,8 @@ if (!this.Document) {
 		documentModel.photoMandatory = $('#field_photoMandatory').prop('checked');
 		documentModel.isTakeImageFromGallery = $('#field_isTakeImageFromGallery').prop('checked');
 		documentModel.qrCodeEnabled = $('#field_qrCodeEnabled').prop('checked');
-		
+		documentModel.orderNoEnabled = $('#field_orderNoEnabled').prop('checked');
+		console.log(documentModel);
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -244,8 +246,10 @@ if (!this.Document) {
 						data.singleVoucherMode);
 				$('#field_photoMandatory').prop("checked",data.photoMandatory);
 				$('#field_isTakeImageFromGallery').prop("checked",data.isTakeImageFromGallery);
-				$("#field_qrCodeEnabled").prop("checked",data.qrCodeEnabled);
-				
+				$('#field_qrCodeEnabled').prop("checked",data.qrCodeEnabled);
+				$('#field_orderNoEnabled').prop("checked",data.orderNoEnabled);
+				console.log("===========")
+				console.log(data.orderNoEnabled);
 				documentModel.pid = data.pid;
 			},
 			error : function(xhr, error) {

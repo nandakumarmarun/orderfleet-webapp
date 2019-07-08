@@ -79,6 +79,8 @@ public class DocumentDTO implements Cloneable {
 	
 	private boolean qrCodeEnabled;
 	
+	private boolean orderNoEnabled;
+	
 
 	public DocumentDTO() {
 
@@ -106,7 +108,7 @@ public class DocumentDTO implements Cloneable {
 		this.mode = document.getMode();
 		this.stockFlow = document.getStockFlow() == null ? StockFlow.NONE : document.getStockFlow();
 		this.qrCodeEnabled = document.getQrCodeEnabled();
-		
+		this.orderNoEnabled = document.getOrderNoEnabled();
 	}
 
 	public DocumentDTO(Document document, boolean activityDocRequired, int activityDocSortOrder) {
@@ -133,6 +135,7 @@ public class DocumentDTO implements Cloneable {
 		this.mode = document.getMode();
 		this.stockFlow = document.getStockFlow() == null ? StockFlow.NONE : document.getStockFlow();
 		this.qrCodeEnabled = document.getQrCodeEnabled();
+		this.orderNoEnabled = document.getOrderNoEnabled();
 	}
 
 	public String getPid() {
@@ -351,7 +354,14 @@ public class DocumentDTO implements Cloneable {
 	public void setQrCodeEnabled(boolean qrCodeEnabled) {
 		this.qrCodeEnabled = qrCodeEnabled;
 	}
-	
+
+	public boolean getOrderNoEnabled() {
+		return orderNoEnabled;
+	}
+
+	public void setOrderNoEnabled(boolean orderNoEnabled) {
+		this.orderNoEnabled = orderNoEnabled;
+	}
 
 	@Override
 	public boolean equals(Object o) {

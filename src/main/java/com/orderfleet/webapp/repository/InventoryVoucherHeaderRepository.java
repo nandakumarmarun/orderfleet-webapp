@@ -68,7 +68,8 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3) and iv.created_date IN "
 			+ "(select MAX(ivh.created_date) from tbl_inventory_voucher_header ivh where "
 			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id)";
-
+	
+	
 	Optional<InventoryVoucherHeader> findOneByPid(String pid);
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} Order By inventoryVoucher.createdDate desc")
@@ -414,6 +415,10 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	// userPid, List<String> documentPids);
 	@Query(value = DOCUMENT_NUMBER, nativeQuery = true)
 	List<Object[]> getLastNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
+	
+	@Query(value = "select count(iv.document_id) ,doc.pid ,iv.document_id from tbl_inventory_voucher_header iv " + 
+				   "INNER JOIN tbl_document doc on iv.document_id = doc.id where iv.company_id = ?1 group by iv.document_id,doc.pid	", nativeQuery = true)
+	List<Object[]> findCountOfInventoryVoucherHeader(long company_id);
 
 	@Query(value = SALES_ORDER_DOWNLOAD, nativeQuery = true)
 	List<Object[]> findInventoryVouchersByPidIn(List<String> pids);

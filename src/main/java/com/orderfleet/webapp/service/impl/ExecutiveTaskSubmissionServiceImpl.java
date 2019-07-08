@@ -38,6 +38,7 @@ import com.orderfleet.webapp.domain.AccountingVoucherHeaderHistory;
 import com.orderfleet.webapp.domain.ActivityUserTarget;
 import com.orderfleet.webapp.domain.Bank;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.DocumentApproval;
 import com.orderfleet.webapp.domain.DynamicDocumentHeader;
@@ -60,6 +61,7 @@ import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.domain.enums.TaskPlanStatus;
@@ -71,6 +73,7 @@ import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.ActivityRepository;
 import com.orderfleet.webapp.repository.ActivityUserTargetRepository;
 import com.orderfleet.webapp.repository.BankRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DocumentApprovalRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderHistoryRepository;
@@ -225,6 +228,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	@Override
 	public ExecutiveTaskSubmissionTransactionWrapper executiveTaskSubmission(
@@ -381,17 +387,34 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
 			List<InventoryVoucherHeaderDTO> inventoryVoucherDTOs) {
 		if (inventoryVoucherDTOs != null && inventoryVoucherDTOs.size() > 0) {
-
-			List<OrderStatus> orderStatus = orderStatusRepository.findAllByCompanyId();
-
+				//Optional<CompanyConfiguration> companyConfiguration = companyConfigurationRepository.findByCompanyPidAndName(company.getPid(), CompanyConfig.SALES_PDF_DOWNLOAD);
+				//not required
+				
+				
+				List<Object[]> documentWiseCount = new ArrayList<Object[]>();  //count ,pid ,document_id
+				documentWiseCount = inventoryVoucherHeaderRepository.findCountOfInventoryVoucherHeader(SecurityUtils.getCurrentUsersCompanyId());
+				List<OrderStatus> orderStatus = orderStatusRepository.findAllByCompanyId();
+			
 			List<InventoryVoucherHeader> inventoryVouchers = new ArrayList<>();
 			for (InventoryVoucherHeaderDTO inventoryVoucherDTO : inventoryVoucherDTOs) {
+				
 				InventoryVoucherHeader inventoryVoucherHeader = new InventoryVoucherHeader();
 				// set pid
 				inventoryVoucherHeader.setPid(InventoryVoucherHeaderService.PID_PREFIX + RandomUtil.generatePid());
 				inventoryVoucherHeader.setCreatedBy(user);
-				inventoryVoucherHeader
-						.setDocument(documentRepository.findOneByPid(inventoryVoucherDTO.getDocumentPid()).get());
+				Document document = documentRepository.findOneByPid(inventoryVoucherDTO.getDocumentPid()).get();
+				if(document.getOrderNoEnabled()) {
+					long count = 0;
+					for(Object[] obj : documentWiseCount) {
+						if(document.getPid().equals(obj[1].toString())) {
+							count = obj[0] != null ? Long.parseLong(obj[0].toString()) : 0;
+								count = count + 1; //Finding count of total inventory vouchers incrementing one
+								inventoryVoucherHeader.setOrderNumber(count);
+								break;
+						}
+					}
+				}
+				inventoryVoucherHeader.setDocument(document);
 				inventoryVoucherHeader.setDocumentDate(inventoryVoucherDTO.getDocumentDate());
 				// set unique server and local number
 				inventoryVoucherHeader.setDocumentNumberLocal(inventoryVoucherDTO.getDocumentNumberLocal());
@@ -400,7 +423,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				inventoryVoucherHeader.setDocumentVolume(inventoryVoucherDTO.getDocumentVolume());
 				inventoryVoucherHeader.setDocDiscountAmount(inventoryVoucherDTO.getDocDiscountAmount());
 				inventoryVoucherHeader.setDocDiscountPercentage(inventoryVoucherDTO.getDocDiscountPercentage());
-
+				
+				
+				
 				InventoryVoucherHeader lastInventoryVoucher = inventoryVoucherHeaderRepository
 						.findTop1ByCreatedByLoginOrderByCreatedDateDesc(SecurityUtils.getCurrentUserLogin());
 

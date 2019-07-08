@@ -131,6 +131,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setMode(documentDTO.getMode());
 			document.setStockFlow(documentDTO.getStockFlow());
 			document.setQrCodeEnabled(documentDTO.getQrCodeEnabled());
+			document.setOrderNoEnabled(documentDTO.getOrderNoEnabled());
 			document = documentRepository.save(document);
 			DocumentDTO result = documentMapper.documentToDocumentDTO(document);
 			return result;

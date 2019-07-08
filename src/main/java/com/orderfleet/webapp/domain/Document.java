@@ -118,6 +118,8 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "qrcode_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean qrCodeEnabled;
 
+	@Column(name = "order_no_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean orderNoEnabled;
 	@PreUpdate
 	public void preUpdate() {
 		this.lastModifiedDate = LocalDateTime.now();
@@ -282,6 +284,14 @@ public class Document implements Serializable, Cloneable {
 
 	public void setQrCodeEnabled(boolean qrCodeEnabled) {
 		this.qrCodeEnabled = qrCodeEnabled;
+	}
+	
+	public boolean getOrderNoEnabled() {
+		return orderNoEnabled;
+	}
+
+	public void setOrderNoEnabled(boolean orderNoEnabled) {
+		this.orderNoEnabled = orderNoEnabled;
 	}
 
 	@Override

@@ -128,6 +128,9 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "reference_document_number", updatable = false)
 	private String referenceDocumentNumber;
+	
+	@Column(name = "order_number")//for increment order number
+	private Long orderNumber;
 
 	@Column(name = "reference_document_type", updatable = false)
 	private String referenceDocumentType;
@@ -323,6 +326,14 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setReferenceDocumentNumber(String referenceDocumentNumber) {
 		this.referenceDocumentNumber = referenceDocumentNumber;
+	}
+	
+	public Long getOrderNumber() {
+		return orderNumber;
+	}
+
+	public void setOrderNumber(Long orderNumber) {
+		this.orderNumber = orderNumber;
 	}
 
 	public String getReferenceDocumentType() {

@@ -213,6 +213,11 @@
 											type="checkbox" id="field_qrCodeEnabled" /> &nbsp;<span>QR-code Enable</span>
 										</label>
 									</div>
+									<div class="form-group" id="orderNoEnabled">
+										<label for="orderNoEnabled"> <input
+											type="checkbox" id="field_orderNoEnabled" /> &nbsp;<span>Enable Order No:</span>
+										</label>
+									</div>
 								</div>
 							</div>
 							<div class="modal-footer">
