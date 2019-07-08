@@ -38,15 +38,17 @@ public class SalesPerformanceDTO {
 	private String userName;
 
 	private double documentTotal;
-	
+
 	private double documentVolume;
-	
+
 	private double totalVolume;
-	
+
+	private boolean pdfDownloadStatus;
+
 	private Boolean status;
-	
+
 	private TallyDownloadStatus tallyDownloadStatus;
-	
+
 	private String visitRemarks;
 
 	public String getPid() {
@@ -209,7 +211,12 @@ public class SalesPerformanceDTO {
 		this.visitRemarks = visitRemarks;
 	}
 
-	
-	
-	
+	public boolean getPdfDownloadStatus() {
+		return pdfDownloadStatus;
+	}
+
+	public void setPdfDownloadStatus(boolean pdfDownloadStatus) {
+		this.pdfDownloadStatus = pdfDownloadStatus;
+	}
+
 }

@@ -12,8 +12,12 @@ if (!this.InventoryVoucher) {
 			+ location.pathname;
 
 	$(document).ready(function() {
-		$("#txtToDate").datepicker({ dateFormat: "dd-mm-yy" });
-		$("#txtFromDate").datepicker({ dateFormat: "dd-mm-yy" });
+		$("#txtToDate").datepicker({
+			dateFormat : "dd-mm-yy"
+		});
+		$("#txtFromDate").datepicker({
+			dateFormat : "dd-mm-yy"
+		});
 		// load today data
 		InventoryVoucher.filter();
 
@@ -23,7 +27,7 @@ if (!this.InventoryVoucher) {
 		$('#downloadXls').on('click', function() {
 			downloadXls();
 		});
-		if($("#dbDocumentType").val!="no"){
+		if ($("#dbDocumentType").val != "no") {
 			loadAllDocumentByDocumentType();
 		}
 		$("#dbDocumentType").change(function() {
@@ -31,7 +35,7 @@ if (!this.InventoryVoucher) {
 		});
 	});
 
-	function loadAllDocumentByDocumentType(){
+	function loadAllDocumentByDocumentType() {
 		if ($('#dbDocumentType').val() == "no") {
 			$("#dbDocument").html("<option>All</option>");
 			alert("Please Select Document Type");
@@ -40,15 +44,13 @@ if (!this.InventoryVoucher) {
 		var documentType = $('#dbDocumentType').val();
 		$("#dbDocument").html("<option>Documents loading...</option>")
 		$.ajax({
-			url : inventoryVoucherContextPath
-					+ "/load-document",
+			url : inventoryVoucherContextPath + "/load-document",
 			type : 'GET',
 			data : {
 				voucherType : documentType,
 			},
 			success : function(documents) {
-				$("#dbDocument").html(
-						"<option value='no'>All</option>")
+				$("#dbDocument").html("<option value='no'>All</option>")
 				$.each(documents, function(key, document) {
 					$("#dbDocument").append(
 							"<option value='" + document.pid + "'>"
@@ -56,8 +58,8 @@ if (!this.InventoryVoucher) {
 				});
 			}
 		});
-}
-	
+	}
+
 	function showInventoryVoucher(pid) {
 		$
 				.ajax({
@@ -84,10 +86,11 @@ if (!this.InventoryVoucher) {
 										data.inventoryVoucherDetails,
 										function(index, voucherDetail) {
 											let unitQty = 1;
-											if(voucherDetail.productUnitQty){
+											if (voucherDetail.productUnitQty) {
 												unitQty = voucherDetail.productUnitQty;
 											}
-											let totQty = Math.round((voucherDetail.quantity * unitQty) * 100) / 100;
+											let totQty = Math
+													.round((voucherDetail.quantity * unitQty) * 100) / 100;
 											$('#tblVoucherDetails')
 													.append(
 															"<tr data-id='"
@@ -153,22 +156,22 @@ if (!this.InventoryVoucher) {
 				return;
 			}
 		}
-		if($("#dbDocumentType").val()=="no"){
+		if ($("#dbDocumentType").val() == "no") {
 			alert("Please Select Document Type")
 			return;
 		}
-		
+
 		let docPids = $('#dbDocument').val();
 		let empPids = $('#dbEmployee').val();
-		if("no" == docPids){
+		if ("no" == docPids) {
 			docPids = $('#dbDocument option').map(function() {
-		        return $(this).val();
-		    }).get().join(',');
+				return $(this).val();
+			}).get().join(',');
 		}
-		if("no" == empPids){
+		if ("no" == empPids) {
 			empPids = $('#dbEmployee option').map(function() {
-		        return $(this).val();
-		    }).get().join(',');
+				return $(this).val();
+			}).get().join(',');
 		}
 		$('#tBodyInventoryVoucher').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
@@ -205,6 +208,17 @@ if (!this.InventoryVoucher) {
 											counts += 1;
 											totAmount += inventoryVoucher.documentTotal;
 											totVolume += inventoryVoucher.totalVolume;
+
+											var button = "";
+
+											if (inventoryVoucher.pdfDownloadStatus) {
+
+												button = "<br><br><button type='button' class='btn btn-primary' onclick='InventoryVoucher.downloadSalesorderPdf(\""
+														+ inventoryVoucher.pid
+														+ "\");'>Packing Slip</button>";
+
+											}
+
 											$('#tBodyInventoryVoucher')
 													.append(
 															"<tr><td><input type='checkbox' class='check-one' value='"
@@ -225,81 +239,117 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ convertDateTimeFromServer(inventoryVoucher.createdDate)
 																	+ "</td><td>"
-																	+ spanStatus(inventoryVoucher.pid,inventoryVoucher.tallyDownloadStatus)
+																	+ spanStatus(
+																			inventoryVoucher.pid,
+																			inventoryVoucher.tallyDownloadStatus)
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='InventoryVoucher.showModalPopup($(\"#viewModal\"),\""
 																	+ inventoryVoucher.pid
 																	+ "\",0);'>View Details</button>"
-																	+ "</td><td>" 
-																	+ inventoryVoucher.visitRemarks+"</td></tr>");
+																	+ button
+																	+ "</td><td>"
+																	+ inventoryVoucher.visitRemarks
+																	+ "</td></tr>");
 										});
 						$("#lblCounts").text(counts);
-						if(totAmount != 0){
-							$("#totalDocument").html("(" + totAmount.toFixed(2) + ")");
+						if (totAmount != 0) {
+							$("#totalDocument").html(
+									"(" + totAmount.toFixed(2) + ")");
 						}
-						if(totVolume != 0){
-							$("#totalVolume").html("(" + totVolume.toFixed(2) + ")");
+						if (totVolume != 0) {
+							$("#totalVolume").html(
+									"(" + totVolume.toFixed(2) + ")");
 						}
 					}
 				});
 	}
-	function spanStatus(inventoryVoucherPid,status) {
-		
-		var pending ="'" + 'PENDING' + "'" ;
-		var processing = "'" + 'PROCESSING' + "'" ;
-		var completed = "'" + 'COMPLETED' + "'" ;
+
+	InventoryVoucher.downloadSalesorderPdf = function(inventoryPid) {
+
+		if (confirm("Are you sure?")) {
+			window.location.href = inventoryVoucherContextPath
+					+ "/downloadPdf?inventoryPid=" + inventoryPid;
+
+		}
+
+	}
+
+	function spanStatus(inventoryVoucherPid, status) {
+
+		var pending = "'" + 'PENDING' + "'";
+		var processing = "'" + 'PROCESSING' + "'";
+		var completed = "'" + 'COMPLETED' + "'";
 		var spanStatus = "";
 		var pid = "'" + inventoryVoucherPid + "'";
-		switch(status){
+		switch (status) {
 		case 'PENDING':
 			spanStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-						+'PENDING<span class="caret"></span></span>'
-						+'<ul class="dropdown-menu">'
-						+'<li onclick="InventoryVoucher.setStatus('+pid+','+processing+')" style="cursor: pointer;"><a>PROCESSING</a></li>'
-						+'<li onclick="InventoryVoucher.setStatus('+pid+','+completed+')" style="cursor: pointer;"><a>COMPLETED</a></li>'
-						+'</ul></div>';
+					+ 'PENDING<span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ processing
+					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ completed
+					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+					+ '</ul></div>';
 			break;
 		case 'PROCESSING':
 			spanStatus = '<div class="dropdown"><span class="label label-warning dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-						+'PROCESSING <span class="caret"></span></span>'
-						+'<ul class="dropdown-menu">'
-						+'<li onclick="InventoryVoucher.setStatus('+pid+','+pending+')"  style="cursor: pointer;"><a>PENDING</a></li>'
-						+'<li onclick="InventoryVoucher.setStatus('+pid+','+completed+')" style="cursor: pointer;"><a>COMPLETED</a></li>'
-						+'</ul></div>';
+					+ 'PROCESSING <span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ pending
+					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ completed
+					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+					+ '</ul></div>';
 			break;
 		case 'COMPLETED':
 			spanStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-						+'COMPLETED <span class="caret"></span></span>'
-						+'<ul class="dropdown-menu">'
-						+'<li onclick="InventoryVoucher.setStatus('+pid+','+pending+')"  style="cursor: pointer;"><a>PENDING</a></li>'
-						+'<li onclick="InventoryVoucher.setStatus('+pid+','+processing+')" style="cursor: pointer;"><a>PROCESSING</a></li>'
-						+'</ul></div>';
-			break;
-		}
-		
-		
-		
-		/*if (status) {
-			spanStatus = '<span class="label label-success" style="cursor: pointer;">Processed</span>';
-		} else {
-			spanStatus = '<span class="label label-default" onclick="InventoryVoucher.setStatus('
+					+ 'COMPLETED <span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="InventoryVoucher.setStatus('
 					+ pid
 					+ ','
-					+ !status
-					+ ')" style="cursor: pointer;">Pending</span>';
-		}*/
+					+ pending
+					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ processing
+					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
+					+ '</ul></div>';
+			break;
+		}
+
+		/*
+		 * if (status) { spanStatus = '<span class="label label-success"
+		 * style="cursor: pointer;">Processed</span>'; } else { spanStatus = '<span
+		 * class="label label-default" onclick="InventoryVoucher.setStatus(' +
+		 * pid + ',' + !status + ')" style="cursor: pointer;">Pending</span>'; }
+		 */
 		return spanStatus;
 	}
-	
+
 	function onSaveSuccess(result) {
 		// reloading page to see the updated data
 		window.location = inventoryVoucherContextPath;
 	}
-	
-	InventoryVoucher.setStatus = function(pid,tallyDownloadStatus) {
-		
+
+	InventoryVoucher.setStatus = function(pid, tallyDownloadStatus) {
+
 		if (confirm("Are you sure?")) {
 			// update status;changeStatus
-			
+
 			$.ajax({
 				url : inventoryVoucherContextPath + "/changeStatus",
 				method : 'GET',
@@ -309,7 +359,7 @@ if (!this.InventoryVoucher) {
 				},
 				success : function(data) {
 					InventoryVoucher.filter();
-					//onSaveSuccess(data);
+					// onSaveSuccess(data);
 				},
 				error : function(xhr, error) {
 					onError(xhr, error);

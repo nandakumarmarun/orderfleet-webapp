@@ -1,6 +1,8 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,9 +48,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.codec.Base64.OutputStream;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.ProductGroup;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
@@ -58,6 +74,7 @@ import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
+import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
@@ -118,19 +135,24 @@ public class SalesPerformanceReportTallyStatusResource {
 
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
-	
+
 	@Inject
 	private ProductGroupProductRepository productGroupProductRepository;
+
+	@Inject
+	private CompanyRepository CompanyRepository;
+
+	@Inject
+	private CompanyConfigurationRepository CompanyConfigurationRepository;
 
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of inventory
 	 *         vouchers in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/primary-sales-performance-download-status", method = RequestMethod.GET)
 	@Timed
@@ -165,8 +187,7 @@ public class SalesPerformanceReportTallyStatusResource {
 	/**
 	 * GET /primary-sales-performance/:id : get the "id" InventoryVoucher.
 	 *
-	 * @param id
-	 *            the id of the InventoryVoucherDTO to retrieve
+	 * @param id the id of the InventoryVoucherDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         InventoryVoucherDTO, or with status 404 (Not Found)
 	 */
@@ -186,19 +207,20 @@ public class SalesPerformanceReportTallyStatusResource {
 							return 0;
 						}
 					}));
-			
+
 			// checking tax rate in product group if product does not have tax rate
-			for(InventoryVoucherDetailDTO ivd : inventoryVoucherDTO.getInventoryVoucherDetails()){
-				if(ivd.getTaxPercentage() == 0){
-					ProductGroup pg = productGroupProductRepository.findProductGroupByProductPid(ivd.getProductPid()).get(0);
-					if(pg != null){
-						if(pg.getTaxRate() != 0){
+			for (InventoryVoucherDetailDTO ivd : inventoryVoucherDTO.getInventoryVoucherDetails()) {
+				if (ivd.getTaxPercentage() == 0) {
+					ProductGroup pg = productGroupProductRepository.findProductGroupByProductPid(ivd.getProductPid())
+							.get(0);
+					if (pg != null) {
+						if (pg.getTaxRate() != 0) {
 							ivd.setTaxPercentage(pg.getTaxRate());
-						} 
+						}
 					}
 				}
 			}
-			
+
 			inventoryVoucherDTO.setDocumentVolume(ivTotalVolume);
 			return new ResponseEntity<>(inventoryVoucherDTO, HttpStatus.OK);
 		} else {
@@ -209,7 +231,8 @@ public class SalesPerformanceReportTallyStatusResource {
 	@RequestMapping(value = "/primary-sales-performance-download-status/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<SalesPerformanceDTO>> filterInventoryVouchers(
-			@RequestParam("employeePids") List<String> employeePids, @RequestParam("tallyDownloadStatus") String tallyDownloadStatus,
+			@RequestParam("employeePids") List<String> employeePids,
+			@RequestParam("tallyDownloadStatus") String tallyDownloadStatus,
 			@RequestParam("accountPid") String accountPid, @RequestParam("filterBy") String filterBy,
 			@RequestParam("documentPids") List<String> documentPids, @RequestParam String fromDate,
 			@RequestParam String toDate) {
@@ -232,13 +255,13 @@ public class SalesPerformanceReportTallyStatusResource {
 		} else if (filterBy.equals(SalesPerformanceReportTallyStatusResource.MTD)) {
 			fDate = LocalDate.now().withDayOfMonth(1);
 		}
-		List<SalesPerformanceDTO> salesPerformanceDTOs = getFilterData(employeePids, documentPids, tallyDownloadStatus, accountPid,
-				fDate, tDate);
+		List<SalesPerformanceDTO> salesPerformanceDTOs = getFilterData(employeePids, documentPids, tallyDownloadStatus,
+				accountPid, fDate, tDate);
 		return new ResponseEntity<>(salesPerformanceDTOs, HttpStatus.OK);
 	}
 
-	private List<SalesPerformanceDTO> getFilterData(List<String> employeePids, List<String> documentPids, String tallyDownloadStatus,
-			String accountPid, LocalDate fDate, LocalDate tDate) {
+	private List<SalesPerformanceDTO> getFilterData(List<String> employeePids, List<String> documentPids,
+			String tallyDownloadStatus, String accountPid, LocalDate fDate, LocalDate tDate) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<Long> userIds = employeeProfileRepository.findUserIdByEmployeePidIn(employeePids);
@@ -248,33 +271,33 @@ public class SalesPerformanceReportTallyStatusResource {
 			return Collections.emptyList();
 		}
 
-		List<TallyDownloadStatus> tallyStatus = null ;
-		
-		switch(tallyDownloadStatus) {
+		List<TallyDownloadStatus> tallyStatus = null;
+
+		switch (tallyDownloadStatus) {
 		case "PENDING":
-			 tallyStatus = Arrays.asList(TallyDownloadStatus.PENDING);
+			tallyStatus = Arrays.asList(TallyDownloadStatus.PENDING);
 			break;
 		case "PROCESSING":
-			 tallyStatus = Arrays.asList(TallyDownloadStatus.PROCESSING);
+			tallyStatus = Arrays.asList(TallyDownloadStatus.PROCESSING);
 			break;
 		case "COMPLETED":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED);
 			break;
 		case "ALL":
-			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED,TallyDownloadStatus.PROCESSING,TallyDownloadStatus.PENDING);
+			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED, TallyDownloadStatus.PROCESSING,
+					TallyDownloadStatus.PENDING);
 			break;
 		}
-		
-		
+
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
 			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(userIds, documentPids,
-							tallyStatus, fromDate, toDate);
+					.findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(userIds,
+							documentPids, tallyStatus, fromDate, toDate);
 		} else {
 			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(userIds,
-							accountPid, documentPids, tallyStatus, fromDate, toDate);
+					.findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
+							userIds, accountPid, documentPids, tallyStatus, fromDate, toDate);
 		}
 		if (inventoryVouchers.isEmpty()) {
 			return Collections.emptyList();
@@ -289,7 +312,15 @@ public class SalesPerformanceReportTallyStatusResource {
 				.collect(Collectors.toSet());
 		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
 		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
-				Collectors.summingDouble(obj -> ((Double) (obj[3]==null?1.0d:obj[3]) * (Double) obj[4]))));
+				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
+
+		boolean pdfDownloadStatus = false;
+		Optional<CompanyConfiguration> opCompanyConfiguration = CompanyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
+		if (opCompanyConfiguration.isPresent()) {
+			pdfDownloadStatus = true;
+		}
+
 		int size = inventoryVouchers.size();
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
@@ -312,9 +343,10 @@ public class SalesPerformanceReportTallyStatusResource {
 			salesPerformanceDTO.setDocumentTotal((double) ivData[14]);
 			salesPerformanceDTO.setDocumentVolume((double) ivData[15]);
 			salesPerformanceDTO.setTotalVolume(ivTotalVolume.get(salesPerformanceDTO.getPid()));
+			salesPerformanceDTO.setPdfDownloadStatus(pdfDownloadStatus);
 
-			salesPerformanceDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(ivData[16].toString())); 
-			salesPerformanceDTO.setVisitRemarks(ivData[17] == null?null:ivData[17].toString());
+			salesPerformanceDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(ivData[16].toString()));
+			salesPerformanceDTO.setVisitRemarks(ivData[17] == null ? null : ivData[17].toString());
 
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
@@ -514,12 +546,209 @@ public class SalesPerformanceReportTallyStatusResource {
 
 	@RequestMapping(value = "/primary-sales-performance-download-status/changeStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<InventoryVoucherHeaderDTO> changeStatus(@RequestParam String pid,@RequestParam TallyDownloadStatus tallyDownloadStatus) {
+	public ResponseEntity<InventoryVoucherHeaderDTO> changeStatus(@RequestParam String pid,
+			@RequestParam TallyDownloadStatus tallyDownloadStatus) {
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(pid).get();
 		inventoryVoucherHeaderDTO.setTallyDownloadStatus(tallyDownloadStatus);
 		inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
+	}
+
+	@RequestMapping(value = "/primary-sales-performance-download-status/downloadPdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public void downloadStatus(@RequestParam String inventoryPid, HttpServletResponse response) throws IOException {
+
+		log.info("Download pdf with pid " + inventoryPid);
+
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(inventoryPid).get();
+
+		buildPdf(inventoryVoucherHeaderDTO, response);
+
+	}
+
+	private void buildPdf(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO, HttpServletResponse response)
+			throws IOException {
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition",
+				"inline;filename=\"" + "Packing Slip_" + inventoryVoucherHeaderDTO.getOrderNumber() + ".pdf\"");
+		// Get the output stream for writing PDF object
+		ServletOutputStream out = response.getOutputStream();
+		try {
+			Document document = new Document();
+			/* Basic PDF Creation inside servlet */
+			PdfWriter.getInstance(document, out);
+			com.itextpdf.text.Font fontSize_22 = FontFactory.getFont(FontFactory.TIMES, 20f,
+					com.itextpdf.text.Font.BOLD);
+			com.itextpdf.text.Font fontSize_16 = FontFactory.getFont(FontFactory.TIMES, 16f,
+					com.itextpdf.text.Font.BOLD);
+
+			Paragraph companyName = new Paragraph();
+			Paragraph line = new Paragraph();
+			companyName.setAlignment(Element.ALIGN_CENTER);
+			line.setAlignment(Element.ALIGN_CENTER);
+			companyName.setFont(fontSize_22);
+			companyName.add(CompanyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getLegalName());
+			line.add(new Paragraph("_______________________________________________________"));
+
+			String customerAddress = "";
+			String customerEmail = "";
+			String customerPhone = "";
+
+			LocalDateTime date = inventoryVoucherHeaderDTO.getDocumentDate();
+
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+			String orderDate = date.format(formatter);
+
+			if (!inventoryVoucherHeaderDTO.getCustomeraddress().equalsIgnoreCase("No Address")
+					&& inventoryVoucherHeaderDTO.getCustomeraddress() != null)
+				customerAddress = inventoryVoucherHeaderDTO.getCustomeraddress();
+
+			if (inventoryVoucherHeaderDTO.getCustomerEmail() != null)
+				customerEmail = inventoryVoucherHeaderDTO.getCustomerEmail();
+
+			if (inventoryVoucherHeaderDTO.getCustomerPhone() != null)
+				customerPhone = inventoryVoucherHeaderDTO.getCustomerPhone();
+
+			document.open();
+			document.add(companyName);
+			document.add(line);
+			document.add(new Paragraph("Sales Order No :" + inventoryVoucherHeaderDTO.getOrderNumber()));
+			document.add(new Paragraph("Date :" + orderDate));
+			document.add(new Paragraph("Reference :"));
+			document.add(new Paragraph("\n"));
+			document.add(new Paragraph("Status :", fontSize_16));
+			document.add(new Paragraph("Customer :" + inventoryVoucherHeaderDTO.getReceiverAccountName()));
+			document.add(new Paragraph("Address :" + customerAddress));
+			document.add(new Paragraph("Email :" + customerEmail));
+			document.add(new Paragraph("Phone :" + customerPhone));
+			document.add(new Paragraph("\n"));
+			PdfPTable table = createPdfTable(inventoryVoucherHeaderDTO);
+			table.setWidthPercentage(100);
+			document.add(table);
+			document.add(new Paragraph("\n\n"));
+			document.add(new Paragraph("Internal Note :"));
+			document.add(new Paragraph("\n"));
+			document.add(new Paragraph("Customer Note :"));
+			document.add(new Paragraph("\n\n"));
+
+			double totalTaxAmount = 0.0;
+			for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
+					.getInventoryVoucherDetails()) {
+
+				double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
+				double taxAmt = amount * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
+				double taxAmount = Math.round(taxAmt * 100.0) / 100.0;
+				totalTaxAmount += taxAmount;
+			}
+			document.add(new Paragraph("Grand Total :\t \t \t \t \t" + inventoryVoucherHeaderDTO.getDocumentTotal()));
+			document.add(new Paragraph("\n"));
+			document.add(new Paragraph("Tax Total :\t \t \t \t \t" + Math.round(totalTaxAmount * 100) / 100));
+			document.add(new Paragraph("\n"));
+			document.add(new Paragraph("Discount :\t \t \t \t" + inventoryVoucherHeaderDTO.getDocDiscountAmount()));
+
+			/*
+			 * ByteArrayOutputStream baos = new ByteArrayOutputStream(); PrintStream ps =
+			 * new PrintStream(baos); PdfWriter.getInstance(document, ps);
+			 */
+
+			document.close();
+		} catch (DocumentException exc) {
+			throw new IOException(exc.getMessage());
+		} finally {
+			out.close();
+		}
+
+	}
+
+	private PdfPTable createPdfTable(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+
+		com.itextpdf.text.Font fontWeight = FontFactory.getFont(FontFactory.TIMES, 12f, com.itextpdf.text.Font.BOLD);
+		com.itextpdf.text.Font font = FontFactory.getFont(FontFactory.TIMES, 12f);
+
+		PdfPTable table = new PdfPTable(new float[] { 225f, 100f, 100f, 100f, 100f, 100f, 100f });
+
+		PdfPCell cell1 = new PdfPCell(new Paragraph("Item Name", fontWeight));
+		cell1.setBorder(Rectangle.NO_BORDER);
+		cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell2 = new PdfPCell(new Paragraph("Price", fontWeight));
+		cell2.setBorder(Rectangle.NO_BORDER);
+		cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell3 = new PdfPCell(new Paragraph("Quantity", fontWeight));
+		cell3.setBorder(Rectangle.NO_BORDER);
+		cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell4 = new PdfPCell(new Paragraph("Billed Quantity", fontWeight));
+		cell4.setBorder(Rectangle.NO_BORDER);
+		cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell5 = new PdfPCell(new Paragraph("Balance Quantity", fontWeight));
+		cell5.setBorder(Rectangle.NO_BORDER);
+		cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell6 = new PdfPCell(new Paragraph("Tax", fontWeight));
+		cell6.setBorder(Rectangle.NO_BORDER);
+		cell6.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell7 = new PdfPCell(new Paragraph("Total", fontWeight));
+		cell7.setBorder(Rectangle.NO_BORDER);
+		cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		table.addCell(cell1);
+		table.addCell(cell2);
+		table.addCell(cell3);
+		table.addCell(cell4);
+		table.addCell(cell5);
+		table.addCell(cell6);
+		table.addCell(cell7);
+
+		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
+				.getInventoryVoucherDetails()) {
+
+			double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
+			double taxAmt = amount * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
+			double taxAmount = Math.round(taxAmt * 100.0) / 100.0;
+			PdfPCell col1 = new PdfPCell(new Paragraph(inventoryVoucherDetailDTO.getProductName(), fontWeight));
+			col1.setBorder(Rectangle.NO_BORDER);
+
+			PdfPCell col2 = new PdfPCell(
+					new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getSellingRate()), font));
+			col2.setBorder(Rectangle.NO_BORDER);
+			col2.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col3 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getQuantity()), font));
+			col3.setBorder(Rectangle.NO_BORDER);
+			col3.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col4 = new PdfPCell(new Paragraph(String.valueOf(0.0), font));
+			col4.setBorder(Rectangle.NO_BORDER);
+			col4.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col5 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getQuantity()), font));
+			col5.setBorder(Rectangle.NO_BORDER);
+			col5.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col6 = new PdfPCell(new Paragraph(String.valueOf(taxAmount), font));
+			col6.setBorder(Rectangle.NO_BORDER);
+			col6.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col7 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getRowTotal()), font));
+			col7.setBorder(Rectangle.NO_BORDER);
+			col7.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			table.addCell(col1);
+			table.addCell(col2);
+			table.addCell(col3);
+			table.addCell(col4);
+			table.addCell(col5);
+			table.addCell(col6);
+			table.addCell(col7);
+		}
+
+		return table;
 	}
 
 }
