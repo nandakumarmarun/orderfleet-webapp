@@ -69,19 +69,19 @@ public class InventoryVoucherHeaderDTO {
 	private String referenceDocumentNumber;
 
 	private String referenceDocumentType;
-	
+
 	private String processStatus;
-	
+
 	private Long orderStatusId;
-	
+
 	private String orderStatusName;
-	
+
 	// SaveOrUpdate Dashboard update
 	private Boolean isNew = Boolean.FALSE;
-	
-	//status for tally download
+
+	// status for tally download
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
-	
+
 	private long orderNumber;
 	private String customeraddress;
 	private String customerEmail;
@@ -96,20 +96,20 @@ public class InventoryVoucherHeaderDTO {
 		this.pid = inventoryVoucherHeader.getPid();
 		this.documentNumberLocal = inventoryVoucherHeader.getDocumentNumberLocal();
 		this.documentNumberServer = inventoryVoucherHeader.getDocumentNumberServer();
-		if(inventoryVoucherHeader.getDocument() != null) {
+		if (inventoryVoucherHeader.getDocument() != null) {
 			this.documentPid = inventoryVoucherHeader.getDocument().getPid();
 			this.documentName = inventoryVoucherHeader.getDocument().getName();
 		}
 		this.createdDate = inventoryVoucherHeader.getCreatedDate();
 		this.documentDate = inventoryVoucherHeader.getDocumentDate();
-		if(inventoryVoucherHeader.getReceiverAccount() != null) {
+		if (inventoryVoucherHeader.getReceiverAccount() != null) {
 			this.receiverAccountPid = inventoryVoucherHeader.getReceiverAccount().getPid();
 			this.receiverAccountName = inventoryVoucherHeader.getReceiverAccount().getName();
 		}
 		this.processStatus = inventoryVoucherHeader.getProcessStatus();
-		if(!inventoryVoucherHeader.getInventoryVoucherDetails().isEmpty()) {
-			this.inventoryVoucherDetails=inventoryVoucherHeader.getInventoryVoucherDetails().stream().map(InventoryVoucherDetailDTO::new)
-					.collect(Collectors.toList());
+		if (!inventoryVoucherHeader.getInventoryVoucherDetails().isEmpty()) {
+			this.inventoryVoucherDetails = inventoryVoucherHeader.getInventoryVoucherDetails().stream()
+					.map(InventoryVoucherDetailDTO::new).collect(Collectors.toList());
 		}
 		if (inventoryVoucherHeader.getSupplierAccount() != null) {
 			this.supplierAccountPid = inventoryVoucherHeader.getSupplierAccount().getPid();
@@ -119,7 +119,7 @@ public class InventoryVoucherHeaderDTO {
 			this.employeePid = inventoryVoucherHeader.getEmployee().getPid();
 			this.employeeName = inventoryVoucherHeader.getEmployee().getName();
 		}
-		if(inventoryVoucherHeader.getCreatedBy() != null ) {
+		if (inventoryVoucherHeader.getCreatedBy() != null) {
 			this.userName = inventoryVoucherHeader.getCreatedBy().getFirstName();
 		}
 		this.documentTotal = inventoryVoucherHeader.getDocumentTotal();
@@ -133,17 +133,19 @@ public class InventoryVoucherHeaderDTO {
 			this.priceLevelName = inventoryVoucherHeader.getPriceLevel().getName();
 		}
 		if (inventoryVoucherHeader.getOrderStatus() != null) {
-			this.orderStatusId=inventoryVoucherHeader.getOrderStatus().getId();
-			this.orderStatusName=inventoryVoucherHeader.getOrderStatus().getName();
+			this.orderStatusId = inventoryVoucherHeader.getOrderStatus().getId();
+			this.orderStatusName = inventoryVoucherHeader.getOrderStatus().getName();
 		}
 		if (inventoryVoucherHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = inventoryVoucherHeader.getTallyDownloadStatus();
 		}
-		this.orderNumber = inventoryVoucherHeader.getOrderNumber();
+
+		this.orderNumber = inventoryVoucherHeader.getOrderNumber() == null ? 0
+				: inventoryVoucherHeader.getOrderNumber();
 		this.customeraddress = inventoryVoucherHeader.getReceiverAccount().getAddress();
 		this.customerEmail = inventoryVoucherHeader.getReceiverAccount().getEmail1();
 		this.customerPhone = inventoryVoucherHeader.getReceiverAccount().getPhone1();
-		
+
 	}
 
 	public InventoryVoucherHeaderDTO(InventoryVoucherHeaderHistory inventoryVoucherHeader) {
@@ -417,7 +419,6 @@ public class InventoryVoucherHeaderDTO {
 		this.processStatus = processStatus;
 	}
 
-	
 	public Long getOrderStatusId() {
 		return orderStatusId;
 	}
@@ -433,7 +434,7 @@ public class InventoryVoucherHeaderDTO {
 	public void setOrderStatusName(String orderStatusName) {
 		this.orderStatusName = orderStatusName;
 	}
-	
+
 	public Boolean getIsNew() {
 		return isNew;
 	}
@@ -449,7 +450,7 @@ public class InventoryVoucherHeaderDTO {
 	public void setTallyDownloadStatus(TallyDownloadStatus tallyDownloadStatus) {
 		this.tallyDownloadStatus = tallyDownloadStatus;
 	}
-	
+
 	public long getOrderNumber() {
 		return orderNumber;
 	}
