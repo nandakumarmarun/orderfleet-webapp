@@ -215,7 +215,7 @@
 									</div>
 									<div class="form-group" id="orderNoEnabled">
 										<label for="orderNoEnabled"> <input
-											type="checkbox" id="field_orderNoEnabled" /> &nbsp;<span>Enable Order No:</span>
+											type="checkbox" id="field_orderNoEnabled" /> &nbsp;<span>Enable Order No.</span>
 										</label>
 									</div>
 								</div>

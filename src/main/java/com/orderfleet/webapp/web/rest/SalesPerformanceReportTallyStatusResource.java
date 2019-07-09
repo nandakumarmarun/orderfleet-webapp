@@ -1,9 +1,11 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -48,12 +50,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -348,6 +352,8 @@ public class SalesPerformanceReportTallyStatusResource {
 			salesPerformanceDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(ivData[16].toString()));
 			salesPerformanceDTO.setVisitRemarks(ivData[17] == null ? null : ivData[17].toString());
 
+			salesPerformanceDTO.setOrderNumber(ivData[18] == null ? 0 : Long.parseLong(ivData[18].toString()));
+
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
@@ -577,7 +583,11 @@ public class SalesPerformanceReportTallyStatusResource {
 		try {
 			Document document = new Document();
 			/* Basic PDF Creation inside servlet */
-			PdfWriter.getInstance(document, out);
+			PdfWriter writer = PdfWriter.getInstance(document, out);
+			document.open();
+
+			// writer.addJavaScript("this.print(false);", false);
+
 			com.itextpdf.text.Font fontSize_22 = FontFactory.getFont(FontFactory.TIMES, 20f,
 					com.itextpdf.text.Font.BOLD);
 			com.itextpdf.text.Font fontSize_16 = FontFactory.getFont(FontFactory.TIMES, 16f,
@@ -611,7 +621,6 @@ public class SalesPerformanceReportTallyStatusResource {
 			if (inventoryVoucherHeaderDTO.getCustomerPhone() != null)
 				customerPhone = inventoryVoucherHeaderDTO.getCustomerPhone();
 
-			document.open();
 			document.add(companyName);
 			document.add(line);
 			document.add(new Paragraph("Sales Order No :" + inventoryVoucherHeaderDTO.getOrderNumber()));
@@ -632,26 +641,18 @@ public class SalesPerformanceReportTallyStatusResource {
 			document.add(new Paragraph("\n"));
 			document.add(new Paragraph("Customer Note :"));
 			document.add(new Paragraph("\n\n"));
-
-			double totalTaxAmount = 0.0;
-			for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
-					.getInventoryVoucherDetails()) {
-
-				double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
-				double taxAmt = amount * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
-				double taxAmount = Math.round(taxAmt * 100.0) / 100.0;
-				totalTaxAmount += taxAmount;
-			}
-			document.add(new Paragraph("Grand Total :\t \t \t \t \t" + inventoryVoucherHeaderDTO.getDocumentTotal()));
-			document.add(new Paragraph("\n"));
-			document.add(new Paragraph("Tax Total :\t \t \t \t \t" + Math.round(totalTaxAmount * 100) / 100));
-			document.add(new Paragraph("\n"));
-			document.add(new Paragraph("Discount :\t \t \t \t" + inventoryVoucherHeaderDTO.getDocDiscountAmount()));
+			PdfPTable tableTotal = createTotalTable(inventoryVoucherHeaderDTO);
+			//tableTotal.setWidthPercentage(50);
+			tableTotal.setHorizontalAlignment(Element.ALIGN_LEFT);
+			document.add(tableTotal);
 
 			/*
 			 * ByteArrayOutputStream baos = new ByteArrayOutputStream(); PrintStream ps =
 			 * new PrintStream(baos); PdfWriter.getInstance(document, ps);
 			 */
+
+			PdfAction action = new PdfAction(PdfAction.PRINTDIALOG);
+			writer.setOpenAction(action);
 
 			document.close();
 		} catch (DocumentException exc) {
@@ -662,10 +663,53 @@ public class SalesPerformanceReportTallyStatusResource {
 
 	}
 
+	private PdfPTable createTotalTable(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+
+		DecimalFormat df = new DecimalFormat("0.00");
+
+		double totalTaxAmount = 0.0;
+		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
+				.getInventoryVoucherDetails()) {
+
+			double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
+			double taxAmount = amount * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
+			totalTaxAmount += taxAmount;
+		}
+
+		PdfPTable table = new PdfPTable(new float[] { 10f, 10f });
+
+		PdfPCell cell1 = new PdfPCell(new Paragraph("Grand Total :"));
+		cell1.setBorder(Rectangle.NO_BORDER);
+
+		PdfPCell cell2 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherHeaderDTO.getDocumentTotal())));
+		cell2.setBorder(Rectangle.NO_BORDER);
+
+		PdfPCell cell3 = new PdfPCell(new Paragraph("Tax Total :"));
+		cell3.setBorder(Rectangle.NO_BORDER);
+
+		PdfPCell cell4 = new PdfPCell(new Paragraph(df.format(totalTaxAmount)));
+		cell4.setBorder(Rectangle.NO_BORDER);
+
+		PdfPCell cell5 = new PdfPCell(new Paragraph("Discount :"));
+		cell5.setBorder(Rectangle.NO_BORDER);
+
+		PdfPCell cell6 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherHeaderDTO.getDocDiscountAmount())));
+		cell6.setBorder(Rectangle.NO_BORDER);
+
+		table.addCell(cell1);
+		table.addCell(cell2);
+		table.addCell(cell3);
+		table.addCell(cell4);
+		table.addCell(cell5);
+		table.addCell(cell6);
+
+		return table;
+	}
+
 	private PdfPTable createPdfTable(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
 
-		com.itextpdf.text.Font fontWeight = FontFactory.getFont(FontFactory.TIMES, 12f, com.itextpdf.text.Font.BOLD);
-		com.itextpdf.text.Font font = FontFactory.getFont(FontFactory.TIMES, 12f);
+		com.itextpdf.text.Font fontWeight = FontFactory.getFont(FontFactory.TIMES, 9f, com.itextpdf.text.Font.BOLD);
+		com.itextpdf.text.Font font = FontFactory.getFont(FontFactory.TIMES, 9f);
 
 		PdfPTable table = new PdfPTable(new float[] { 225f, 100f, 100f, 100f, 100f, 100f, 100f });
 
@@ -705,12 +749,16 @@ public class SalesPerformanceReportTallyStatusResource {
 		table.addCell(cell6);
 		table.addCell(cell7);
 
+		DecimalFormat df = new DecimalFormat("0.00");
+
 		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
 				.getInventoryVoucherDetails()) {
 
 			double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
-			double taxAmt = amount * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
-			double taxAmount = Math.round(taxAmt * 100.0) / 100.0;
+			double taxAmnt = amount * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
+			// double taxAmount = Math.round(taxAmt * 100.0) / 100.0;
+			String taxAmount = df.format(taxAmnt);
+
 			PdfPCell col1 = new PdfPCell(new Paragraph(inventoryVoucherDetailDTO.getProductName(), fontWeight));
 			col1.setBorder(Rectangle.NO_BORDER);
 

@@ -215,7 +215,7 @@ if (!this.InventoryVoucher) {
 
 												button = "<br><br><button type='button' class='btn btn-primary' onclick='InventoryVoucher.downloadSalesorderPdf(\""
 														+ inventoryVoucher.pid
-														+ "\");'>Packing Slip</button>";
+														+ "\");'>Packing Slip-"+inventoryVoucher.orderNumber+"</button>";
 
 											}
 

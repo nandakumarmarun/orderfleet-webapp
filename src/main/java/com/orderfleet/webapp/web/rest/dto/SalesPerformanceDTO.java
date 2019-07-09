@@ -47,6 +47,8 @@ public class SalesPerformanceDTO {
 
 	private Boolean status;
 
+	private long orderNumber;
+
 	private TallyDownloadStatus tallyDownloadStatus;
 
 	private String visitRemarks;
@@ -217,6 +219,14 @@ public class SalesPerformanceDTO {
 
 	public void setPdfDownloadStatus(boolean pdfDownloadStatus) {
 		this.pdfDownloadStatus = pdfDownloadStatus;
+	}
+
+	public long getOrderNumber() {
+		return orderNumber;
+	}
+
+	public void setOrderNumber(long orderNumber) {
+		this.orderNumber = orderNumber;
 	}
 
 }
