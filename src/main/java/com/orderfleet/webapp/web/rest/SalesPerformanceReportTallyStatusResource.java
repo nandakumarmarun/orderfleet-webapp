@@ -322,7 +322,12 @@ public class SalesPerformanceReportTallyStatusResource {
 		Optional<CompanyConfiguration> opCompanyConfiguration = CompanyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
 		if (opCompanyConfiguration.isPresent()) {
-			pdfDownloadStatus = true;
+
+			if (opCompanyConfiguration.get().getValue().equals("true")) {
+				pdfDownloadStatus = true;
+			} else {
+				pdfDownloadStatus = false;
+			}
 		}
 
 		int size = inventoryVouchers.size();
@@ -642,7 +647,7 @@ public class SalesPerformanceReportTallyStatusResource {
 			document.add(new Paragraph("Customer Note :"));
 			document.add(new Paragraph("\n\n"));
 			PdfPTable tableTotal = createTotalTable(inventoryVoucherHeaderDTO);
-			//tableTotal.setWidthPercentage(50);
+			// tableTotal.setWidthPercentage(50);
 			tableTotal.setHorizontalAlignment(Element.ALIGN_LEFT);
 			document.add(tableTotal);
 
