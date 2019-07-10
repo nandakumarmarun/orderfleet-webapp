@@ -257,8 +257,8 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(salesPdfDownloadCompany);
 
-		if (optVisitVasedTransaction.isPresent()) {
-			visitBasedTransactionCompany = optVisitVasedTransaction.get();
+		if (optVisitBasedTransaction.isPresent()) {
+			visitBasedTransactionCompany = optVisitBasedTransaction.get();
 			visitBasedTransactionCompany.setValue(visitBasedTransaction);
 		} else {
 			visitBasedTransactionCompany = new CompanyConfiguration();
