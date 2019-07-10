@@ -45,6 +45,7 @@
 						<th>New Customer Alias</th>
 						<th>Chat Reply</th>
 						<th>Sales Pdf Download</th>
+						<th>Visit Based Transaction</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -61,6 +62,7 @@
 							<td>${companyConfiguration.newCustomerAlias}</td>
 							<td>${companyConfiguration.chatReply}</td>
 							<td>${companyConfiguration.salesPdfDownload}</td>
+							<td>${companyConfiguration.visitBasedTransaction}</td>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
 						</tr>
@@ -157,6 +159,13 @@
 											<td><div class="form-group">
 													<label class="control-label">Sales Pdf Download</label> <input
 														id="salesPdfDownload" name='checksSalesPdfDownload'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Visit Based Transation</label> <input
+														id="visitBasedTransaction" name='checksVisitBasedTransation"'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>

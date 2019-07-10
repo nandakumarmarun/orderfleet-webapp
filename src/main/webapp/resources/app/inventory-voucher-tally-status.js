@@ -266,8 +266,12 @@ if (!this.InventoryVoucher) {
 	InventoryVoucher.downloadSalesorderPdf = function(inventoryPid) {
 
 		if (confirm("Are you sure?")) {
-			window.location.href = inventoryVoucherContextPath
-					+ "/downloadPdf?inventoryPid=" + inventoryPid;
+			/*
+			 * window.location.href = inventoryVoucherContextPath +
+			 * "/downloadPdf?inventoryPid=" + inventoryPid;
+			 */
+			
+			window.open(inventoryVoucherContextPath+ "/downloadPdf?inventoryPid=" + inventoryPid);
 
 		}
 

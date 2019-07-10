@@ -13,12 +13,14 @@ public class CompanyConfigDTO {
 	private String companyPid;
 	private boolean distanceTraveled;
 	private boolean locationVariance;
-	private boolean interimSave;//save is equal to send
-	private boolean refreshProductGroupProduct;//for refreshing product - product group association
-	private boolean stageChangeAccountingVoucher;//for changing stage even if document in accounting voucher type  for geologic
-	private boolean newCustomerAlias;//devsoft if new customer is added alias will be filled with N_1, N_2 etc
-	private boolean chatReply;//settings to reply for a firebase notification
-	private boolean salesPdfDownload;//setting for download as pdf button in sales order
+	private boolean interimSave;// save is equal to send
+	private boolean refreshProductGroupProduct;// for refreshing product - product group association
+	private boolean stageChangeAccountingVoucher;// for changing stage even if document in accounting voucher type for
+													// geologic
+	private boolean newCustomerAlias;// devsoft if new customer is added alias will be filled with N_1, N_2 etc
+	private boolean chatReply;// settings to reply for a firebase notification
+	private boolean salesPdfDownload;// setting for download as pdf button in sales order
+	private boolean visitBasedTransaction;// setting for visit based transaction
 
 	public CompanyConfigDTO() {
 		super();
@@ -103,8 +105,13 @@ public class CompanyConfigDTO {
 	public void setSalesPdfDownload(boolean salesPdfDownload) {
 		this.salesPdfDownload = salesPdfDownload;
 	}
-	
-	
-	
+
+	public boolean getVisitBasedTransaction() {
+		return visitBasedTransaction;
+	}
+
+	public void setVisitBasedTransaction(boolean visitBasedTransaction) {
+		this.visitBasedTransaction = visitBasedTransaction;
+	}
 
 }
