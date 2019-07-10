@@ -29,14 +29,17 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.enums.BestPerformanceType;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.service.DocumentService;
+import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.ProductGroupProductService;
 import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.service.SalesTargetGroupDocumentService;
+import com.orderfleet.webapp.service.SalesTargetGroupLocationService;
 import com.orderfleet.webapp.service.SalesTargetGroupProductService;
 import com.orderfleet.webapp.service.SalesTargetGroupService;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
+import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.SaleTargetGroupProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesTargetGroupDTO;
@@ -67,6 +70,9 @@ public class SalesTargetGroupResource {
 	private SalesTargetGroupProductService salesTargetGrouProductService;
 
 	@Inject
+	private SalesTargetGroupLocationService salesTargetGroupLocationService;
+
+	@Inject
 	private ProductProfileService productProfileService;
 
 	@Inject
@@ -78,16 +84,17 @@ public class SalesTargetGroupResource {
 	@Inject
 	private ProductGroupService productGroupService;
 
+	@Inject
+	private LocationService locationService;
+
 	/**
 	 * POST /salesTargetGroups : Create a new salesTargetGroup.
 	 *
-	 * @param salesTargetGroupDTO
-	 *            the salesTargetGroupDTO to create
+	 * @param salesTargetGroupDTO the salesTargetGroupDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body the new
 	 *         salesTargetGroupDTO, or with status 400 (Bad Request) if the
 	 *         salesTargetGroup has already an ID
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/salesTargetGroups", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -113,14 +120,12 @@ public class SalesTargetGroupResource {
 	/**
 	 * PUT /salesTargetGroups : Updates an existing salesTargetGroup.
 	 *
-	 * @param salesTargetGroupDTO
-	 *            the salesTargetGroupDTO to update
+	 * @param salesTargetGroupDTO the salesTargetGroupDTO to update
 	 * @return the ResponseEntity with status 200 (OK) and with body the updated
 	 *         salesTargetGroupDTO, or with status 400 (Bad Request) if the
 	 *         salesTargetGroupDTO is not valid, or with status 500 (Internal Server
 	 *         Error) if the salesTargetGroupDTO couldnt be updated
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/salesTargetGroups", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -154,12 +159,11 @@ public class SalesTargetGroupResource {
 	/**
 	 * GET /salesTargetGroups : get all the salesTargetGroups.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of
 	 *         salesTargetGroups in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/salesTargetGroups", method = RequestMethod.GET)
 	@Timed
@@ -168,6 +172,7 @@ public class SalesTargetGroupResource {
 		log.debug("Web request to get a page of SalesTargetGroups");
 		model.addAttribute("salesTargetGroups", salesTargetGroupService.findAllByCompany());
 		model.addAttribute("products", productProfileService.findAllByCompany());
+		model.addAttribute("locations", locationService.findAllByCompany());
 		model.addAttribute("productCategories", productCategoryService.findAllByCompany());
 		model.addAttribute("productGroups", productGroupService.findAllByCompany());
 		model.addAttribute("targetSettingTypes", Arrays.asList(BestPerformanceType.values()));
@@ -177,8 +182,7 @@ public class SalesTargetGroupResource {
 	/**
 	 * GET /salesTargetGroups/:pid : get the "pid" salesTargetGroup.
 	 *
-	 * @param pid
-	 *            the pid of the salesTargetGroupDTO to retrieve
+	 * @param pid the pid of the salesTargetGroupDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         salesTargetGroupDTO, or with status 404 (Not Found)
 	 */
@@ -194,8 +198,7 @@ public class SalesTargetGroupResource {
 	/**
 	 * DELETE /salesTargetGroups/:id : delete the "id" salesTargetGroup.
 	 *
-	 * @param id
-	 *            the id of the salesTargetGroupDTO to delete
+	 * @param id the id of the salesTargetGroupDTO to delete
 	 * @return the ResponseEntity with status 200 (OK)
 	 */
 	@RequestMapping(value = "/salesTargetGroups/{pid}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -222,7 +225,8 @@ public class SalesTargetGroupResource {
 				.findSalesTargetGroupDocumentsBySalesTargetGroupPid(salesTargetGroupPid);
 		List<DocumentDTO> result = new ArrayList<>();
 		allDocumnts.forEach(allDoc -> {
-			Optional<DocumentDTO> docDTO = trueDocuments.stream().filter(td -> td.getPid().equals(allDoc.getPid())).findAny();
+			Optional<DocumentDTO> docDTO = trueDocuments.stream().filter(td -> td.getPid().equals(allDoc.getPid()))
+					.findAny();
 			if (docDTO.isPresent()) {
 				allDoc.setAlias("TRUE");
 			}
@@ -250,12 +254,30 @@ public class SalesTargetGroupResource {
 				HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/salesTargetGroups/getLocations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<LocationDTO>> getSalesTargetGroupLocations(@RequestParam String salesTargetGroupPid) {
+		log.debug("Web request to get get Documents by salesTargetGroup pid : {}", salesTargetGroupPid);
+		return new ResponseEntity<>(
+				salesTargetGroupLocationService.findSalesTargetGroupLocationsBySalesTargetGroupPid(salesTargetGroupPid),
+				HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/salesTargetGroups/saveProducts", method = RequestMethod.POST)
 	@Timed
 	public ResponseEntity<Void> saveProducts(@RequestParam String salesTargetGroupPid,
 			@RequestParam String assignedProducts) {
 		log.debug("REST request to save assigned products", salesTargetGroupPid);
 		salesTargetGrouProductService.save(salesTargetGroupPid, assignedProducts);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/salesTargetGroups/saveLocations", method = RequestMethod.POST)
+	@Timed
+	public ResponseEntity<Void> saveLocations(@RequestParam String salesTargetGroupPid,
+			@RequestParam String assignedLocations) {
+		log.debug("REST request to save assigned locations", salesTargetGroupPid);
+		salesTargetGroupLocationService.save(salesTargetGroupPid, assignedLocations);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

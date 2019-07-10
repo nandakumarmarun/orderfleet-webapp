@@ -66,6 +66,10 @@
 								<button type="button" class="btn btn-info"
 									onclick="SalesTargetGroup.showModalPopup($('#documentsModal'),'${salesTargetGroup .pid}',3,'${salesTargetGroup .targetSettingType}');">Assign
 									Documents</button>
+										
+								<button type="button" class="btn btn-info"
+									onclick="SalesTargetGroup.assignLocations($('#locationModal'),'${salesTargetGroup.pid}');">
+									Assign Locations</button>
 							</td>
 						</tr>
 					</c:forEach>
@@ -362,6 +366,68 @@
 						<div class="modal-footer">
 							<input class="btn btn-success" type="button" id="btnSaveProducts"
 								value="Save" />
+							<button class="btn" data-dismiss="modal">Cancel</button>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+			
+			<div class="modal fade container" id="locationModal">
+				<!-- model Dialog -->
+				<div class="modal-dialog">
+					<div class="modal-content" style="width: 120%">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">Assign Locations</h4>
+						</div>
+						<div class="modal-body" style="overflow: auto; height: 500px">
+							<div class="form-group">
+								<div id="divLocations">
+									<div class="row">
+										<div class="col-md-12 col-sm-12 clearfix">
+											<input type="radio" value="all" name="filter">
+											&nbsp;All&nbsp;&nbsp; <input type="radio" value="selected"
+												name="filter"> &nbsp;Selected&nbsp;&nbsp; <input
+												type="radio" value="unselected" name="filter">
+											&nbsp;Unselected&nbsp;&nbsp;
+
+											<button type="button" class="btn btn-info" id="btnSearchLocations"
+												style="float: right;">Search</button>
+											<input type="text" id="searchLocations" placeholder="Search..."
+												class="form-control" style="width: 200px; float: right;">
+										</div>
+									</div>
+									<br>
+									<table class='table table-striped table-bordered'>
+										<thead>
+											<tr>
+												<th><label><input type="checkbox"
+														class="allcheckbox" value="">All</label></th>
+												<th>Name</th>
+											</tr>
+										</thead>
+										<tbody id="tBodyLocation" >
+											<c:forEach items="${locations}" var="location">
+												<tr>
+													<td><input name='location' type='checkbox'
+														value="${location.pid}" style="display: block;"/></td>
+													<td>${location.name}</td>
+												</tr>
+											</c:forEach>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<label class="error-msg" style="color: red;"></label>
+						</div>
+						<div class="modal-footer">
+							<input class="btn btn-success" type="button"
+								id="btnSaveLocations" value="Save" />
 							<button class="btn" data-dismiss="modal">Cancel</button>
 						</div>
 					</div>
