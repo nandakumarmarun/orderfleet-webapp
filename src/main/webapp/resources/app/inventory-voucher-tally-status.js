@@ -19,7 +19,7 @@ if (!this.InventoryVoucher) {
 			dateFormat : "dd-mm-yy"
 		});
 		// load today data
-		//InventoryVoucher.filter();
+		// InventoryVoucher.filter();
 
 		$('#selectAll').on('click', function() {
 			selectAllInventoryVoucher(this);
@@ -60,9 +60,9 @@ if (!this.InventoryVoucher) {
 							"<option value='" + document.pid + "'>"
 									+ document.name + "</option>");
 				});
-				
+
 				InventoryVoucher.filter();
-				
+
 			}
 		});
 	}
@@ -289,8 +289,7 @@ if (!this.InventoryVoucher) {
 	InventoryVoucher.downloadSalesorderPdf = function(inventoryPid) {
 
 		if (confirm("Are you sure?")) {
-			
-			
+
 			/*
 			 * window.location.href = inventoryVoucherContextPath +
 			 * "/downloadPdf?inventoryPid=" + inventoryPid;
@@ -299,11 +298,12 @@ if (!this.InventoryVoucher) {
 			window.open(inventoryVoucherContextPath
 					+ "/downloadPdf?inventoryPid=" + inventoryPid);
 
-			
-
 		}
-		
-		location.reload();
+
+		setTimeout(function() {
+			InventoryVoucher.filter();
+		}, 1000);
+		// location.reload();
 
 	}
 
