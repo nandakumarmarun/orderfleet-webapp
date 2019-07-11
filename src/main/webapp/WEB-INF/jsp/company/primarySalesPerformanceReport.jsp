@@ -112,8 +112,7 @@
 							</div>
 							<div class="col-sm-1">
 								<br>
-								<button type="button" class="btn btn-info"
-									onclick="InventoryVoucher.filter()">Apply</button>
+								<button type="button" class="btn btn-info" id="btnApply">Apply</button>
 							</div>
 							<div class="col-sm-1">
 								<br>

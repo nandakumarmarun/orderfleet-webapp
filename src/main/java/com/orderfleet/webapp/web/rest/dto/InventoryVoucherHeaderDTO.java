@@ -76,6 +76,8 @@ public class InventoryVoucherHeaderDTO {
 
 	private String orderStatusName;
 
+	private String visitRemarks; // executive task execution remarks
+
 	// SaveOrUpdate Dashboard update
 	private Boolean isNew = Boolean.FALSE;
 
@@ -86,6 +88,8 @@ public class InventoryVoucherHeaderDTO {
 	private String customeraddress;
 	private String customerEmail;
 	private String customerPhone;
+
+	private boolean pdfDownloadStatus;
 
 	public InventoryVoucherHeaderDTO() {
 		super();
@@ -145,6 +149,11 @@ public class InventoryVoucherHeaderDTO {
 		this.customeraddress = inventoryVoucherHeader.getReceiverAccount().getAddress();
 		this.customerEmail = inventoryVoucherHeader.getReceiverAccount().getEmail1();
 		this.customerPhone = inventoryVoucherHeader.getReceiverAccount().getPhone1();
+
+		this.visitRemarks = inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks() == null ? ""
+				: inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks();
+
+		this.pdfDownloadStatus = inventoryVoucherHeader.getPdfDownloadStatus();
 
 	}
 
@@ -235,6 +244,14 @@ public class InventoryVoucherHeaderDTO {
 		this.documentPid = documentPid;
 	}
 
+	public boolean getPdfDownloadStatus() {
+		return pdfDownloadStatus;
+	}
+
+	public void setPdfDownloadStatus(boolean pdfDownloadStatus) {
+		this.pdfDownloadStatus = pdfDownloadStatus;
+	}
+
 	public String getDocumentName() {
 		return documentName;
 	}
@@ -273,6 +290,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setReceiverAccountName(String receiverAccountName) {
 		this.receiverAccountName = receiverAccountName;
+	}
+
+	public String getVisitRemarks() {
+		return visitRemarks;
+	}
+
+	public void setVisitRemarks(String visitRemarks) {
+		this.visitRemarks = visitRemarks;
 	}
 
 	public String getSupplierAccountPid() {

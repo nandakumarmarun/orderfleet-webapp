@@ -63,6 +63,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.codec.Base64.OutputStream;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
@@ -318,15 +319,15 @@ public class SalesPerformanceReportTallyStatusResource {
 		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
 				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
 
-		boolean pdfDownloadStatus = false;
+		boolean pdfDownloadButtonStatus = false;
 		Optional<CompanyConfiguration> opCompanyConfiguration = CompanyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
 		if (opCompanyConfiguration.isPresent()) {
 
 			if (opCompanyConfiguration.get().getValue().equals("true")) {
-				pdfDownloadStatus = true;
+				pdfDownloadButtonStatus = true;
 			} else {
-				pdfDownloadStatus = false;
+				pdfDownloadButtonStatus = false;
 			}
 		}
 
@@ -352,12 +353,14 @@ public class SalesPerformanceReportTallyStatusResource {
 			salesPerformanceDTO.setDocumentTotal((double) ivData[14]);
 			salesPerformanceDTO.setDocumentVolume((double) ivData[15]);
 			salesPerformanceDTO.setTotalVolume(ivTotalVolume.get(salesPerformanceDTO.getPid()));
-			salesPerformanceDTO.setPdfDownloadStatus(pdfDownloadStatus);
+			salesPerformanceDTO.setPdfDownloadButtonStatus(pdfDownloadButtonStatus);
 
 			salesPerformanceDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(ivData[16].toString()));
 			salesPerformanceDTO.setVisitRemarks(ivData[17] == null ? null : ivData[17].toString());
 
 			salesPerformanceDTO.setOrderNumber(ivData[18] == null ? 0 : Long.parseLong(ivData[18].toString()));
+
+			salesPerformanceDTO.setPdfDownloadStatus(Boolean.valueOf(ivData[19].toString()));
 
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
@@ -576,6 +579,16 @@ public class SalesPerformanceReportTallyStatusResource {
 
 		buildPdf(inventoryVoucherHeaderDTO, response);
 
+		if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
+			Optional<InventoryVoucherHeader> opInventoryVoucherHeader = inventoryVoucherHeaderRepository
+					.findOneByPid(inventoryVoucherHeaderDTO.getPid());
+			if (opInventoryVoucherHeader.isPresent()) {
+				InventoryVoucherHeader inventoryVoucherHeader = opInventoryVoucherHeader.get();
+				inventoryVoucherHeader.setPdfDownloadStatus(true);
+				inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
+			}
+		}
+
 	}
 
 	private void buildPdf(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO, HttpServletResponse response)
@@ -610,9 +623,9 @@ public class SalesPerformanceReportTallyStatusResource {
 			String customerEmail = "";
 			String customerPhone = "";
 
-			LocalDateTime date = inventoryVoucherHeaderDTO.getDocumentDate();
+			LocalDateTime date = inventoryVoucherHeaderDTO.getCreatedDate();
 
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
 
 			String orderDate = date.format(formatter);
 
@@ -630,9 +643,8 @@ public class SalesPerformanceReportTallyStatusResource {
 			document.add(line);
 			document.add(new Paragraph("Sales Order No :" + inventoryVoucherHeaderDTO.getOrderNumber()));
 			document.add(new Paragraph("Date :" + orderDate));
-			document.add(new Paragraph("Reference :"));
+			document.add(new Paragraph("Executive : " + inventoryVoucherHeaderDTO.getEmployeeName()));
 			document.add(new Paragraph("\n"));
-			document.add(new Paragraph("Status :", fontSize_16));
 			document.add(new Paragraph("Customer :" + inventoryVoucherHeaderDTO.getReceiverAccountName()));
 			document.add(new Paragraph("Address :" + customerAddress));
 			document.add(new Paragraph("Email :" + customerEmail));
@@ -642,9 +654,7 @@ public class SalesPerformanceReportTallyStatusResource {
 			table.setWidthPercentage(100);
 			document.add(table);
 			document.add(new Paragraph("\n\n"));
-			document.add(new Paragraph("Internal Note :"));
-			document.add(new Paragraph("\n"));
-			document.add(new Paragraph("Customer Note :"));
+			document.add(new Paragraph("Remarks :" + inventoryVoucherHeaderDTO.getVisitRemarks()));
 			document.add(new Paragraph("\n\n"));
 			PdfPTable tableTotal = createTotalTable(inventoryVoucherHeaderDTO);
 			// tableTotal.setWidthPercentage(50);
@@ -676,9 +686,17 @@ public class SalesPerformanceReportTallyStatusResource {
 		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
 				.getInventoryVoucherDetails()) {
 
+			/*
+			 * double amount = (inventoryVoucherDetailDTO.getSellingRate() *
+			 * inventoryVoucherDetailDTO.getQuantity()); double taxAmount = amount *
+			 * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
+			 */
+
 			double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
-			double taxAmount = amount * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
-			totalTaxAmount += taxAmount;
+			double discountedAmount = amount - (amount * inventoryVoucherDetailDTO.getDiscountPercentage() / 100);
+			double taxAmnt = (discountedAmount * inventoryVoucherDetailDTO.getTaxPercentage() / 100);
+
+			totalTaxAmount += taxAmnt;
 		}
 
 		PdfPTable table = new PdfPTable(new float[] { 10f, 10f });
@@ -695,28 +713,20 @@ public class SalesPerformanceReportTallyStatusResource {
 		PdfPCell cell4 = new PdfPCell(new Paragraph(df.format(totalTaxAmount)));
 		cell4.setBorder(Rectangle.NO_BORDER);
 
-		PdfPCell cell5 = new PdfPCell(new Paragraph("Discount :"));
-		cell5.setBorder(Rectangle.NO_BORDER);
-
-		PdfPCell cell6 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherHeaderDTO.getDocDiscountAmount())));
-		cell6.setBorder(Rectangle.NO_BORDER);
-
 		table.addCell(cell1);
 		table.addCell(cell2);
 		table.addCell(cell3);
 		table.addCell(cell4);
-		table.addCell(cell5);
-		table.addCell(cell6);
 
 		return table;
 	}
 
 	private PdfPTable createPdfTable(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
 
-		com.itextpdf.text.Font fontWeight = FontFactory.getFont(FontFactory.TIMES, 9f, com.itextpdf.text.Font.BOLD);
-		com.itextpdf.text.Font font = FontFactory.getFont(FontFactory.TIMES, 9f);
+		com.itextpdf.text.Font fontWeight = FontFactory.getFont(FontFactory.TIMES, 12f, com.itextpdf.text.Font.BOLD);
 
-		PdfPTable table = new PdfPTable(new float[] { 225f, 100f, 100f, 100f, 100f, 100f, 100f });
+		PdfPTable table = new PdfPTable(new float[] { 225f, 100f, 100f, 100f, 100f, 100f });
+		table.setTotalWidth(350f);
 
 		PdfPCell cell1 = new PdfPCell(new Paragraph("Item Name", fontWeight));
 		cell1.setBorder(Rectangle.NO_BORDER);
@@ -730,19 +740,19 @@ public class SalesPerformanceReportTallyStatusResource {
 		cell3.setBorder(Rectangle.NO_BORDER);
 		cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-		PdfPCell cell4 = new PdfPCell(new Paragraph("Billed Quantity", fontWeight));
+		PdfPCell cell4 = new PdfPCell(new Paragraph("Discount %", fontWeight));
 		cell4.setBorder(Rectangle.NO_BORDER);
 		cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-		PdfPCell cell5 = new PdfPCell(new Paragraph("Balance Quantity", fontWeight));
+		PdfPCell cell5 = new PdfPCell(new Paragraph("Tax Amount", fontWeight));
 		cell5.setBorder(Rectangle.NO_BORDER);
 		cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-		PdfPCell cell6 = new PdfPCell(new Paragraph("Tax", fontWeight));
+		PdfPCell cell6 = new PdfPCell(new Paragraph("Total", fontWeight));
 		cell6.setBorder(Rectangle.NO_BORDER);
 		cell6.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-		PdfPCell cell7 = new PdfPCell(new Paragraph("Total", fontWeight));
+		PdfPCell cell7 = new PdfPCell(new Paragraph(""));
 		cell7.setBorder(Rectangle.NO_BORDER);
 		cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
 
@@ -753,6 +763,11 @@ public class SalesPerformanceReportTallyStatusResource {
 		table.addCell(cell5);
 		table.addCell(cell6);
 		table.addCell(cell7);
+		table.addCell(cell7);
+		table.addCell(cell7);
+		table.addCell(cell7);
+		table.addCell(cell7);
+		table.addCell(cell7);
 
 		DecimalFormat df = new DecimalFormat("0.00");
 
@@ -760,35 +775,36 @@ public class SalesPerformanceReportTallyStatusResource {
 				.getInventoryVoucherDetails()) {
 
 			double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
-			double taxAmnt = amount * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
+			double discountedAmount = amount - (amount * inventoryVoucherDetailDTO.getDiscountPercentage() / 100);
+			double taxAmnt = (discountedAmount * inventoryVoucherDetailDTO.getTaxPercentage() / 100);
 			// double taxAmount = Math.round(taxAmt * 100.0) / 100.0;
 			String taxAmount = df.format(taxAmnt);
 
-			PdfPCell col1 = new PdfPCell(new Paragraph(inventoryVoucherDetailDTO.getProductName(), fontWeight));
+			PdfPCell col1 = new PdfPCell(new Paragraph(inventoryVoucherDetailDTO.getProductName()));
 			col1.setBorder(Rectangle.NO_BORDER);
 
-			PdfPCell col2 = new PdfPCell(
-					new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getSellingRate()), font));
+			PdfPCell col2 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getSellingRate())));
 			col2.setBorder(Rectangle.NO_BORDER);
 			col2.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-			PdfPCell col3 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getQuantity()), font));
+			PdfPCell col3 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getQuantity())));
 			col3.setBorder(Rectangle.NO_BORDER);
 			col3.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-			PdfPCell col4 = new PdfPCell(new Paragraph(String.valueOf(0.0), font));
+			PdfPCell col4 = new PdfPCell(
+					new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getDiscountPercentage())));
 			col4.setBorder(Rectangle.NO_BORDER);
 			col4.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-			PdfPCell col5 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getQuantity()), font));
+			PdfPCell col5 = new PdfPCell(new Paragraph(String.valueOf(taxAmount)));
 			col5.setBorder(Rectangle.NO_BORDER);
 			col5.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-			PdfPCell col6 = new PdfPCell(new Paragraph(String.valueOf(taxAmount), font));
+			PdfPCell col6 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getRowTotal())));
 			col6.setBorder(Rectangle.NO_BORDER);
 			col6.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-			PdfPCell col7 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getRowTotal()), font));
+			PdfPCell col7 = new PdfPCell(new Paragraph(""));
 			col7.setBorder(Rectangle.NO_BORDER);
 			col7.setHorizontalAlignment(Element.ALIGN_CENTER);
 
@@ -798,6 +814,11 @@ public class SalesPerformanceReportTallyStatusResource {
 			table.addCell(col4);
 			table.addCell(col5);
 			table.addCell(col6);
+			table.addCell(col7);
+			table.addCell(col7);
+			table.addCell(col7);
+			table.addCell(col7);
+			table.addCell(col7);
 			table.addCell(col7);
 		}
 
