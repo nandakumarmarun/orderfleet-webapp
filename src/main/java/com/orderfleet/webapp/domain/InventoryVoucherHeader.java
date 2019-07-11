@@ -57,7 +57,7 @@ public class InventoryVoucherHeader implements Serializable {
 	@Column(name = "document_number_server", unique = true, nullable = false, updatable = false)
 	private String documentNumberServer;
 
-	//custom status that customer can change - Pending/Processed etc..
+	// custom status that customer can change - Pending/Processed etc..
 	@NotNull
 	@Column(name = "process_status", nullable = false, columnDefinition = "varchar(100) DEFAULT 'Pending'")
 	private String processStatus = "Pending";
@@ -113,7 +113,7 @@ public class InventoryVoucherHeader implements Serializable {
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<InventoryVoucherDetail> inventoryVoucherDetails;
 
-	//tally download status
+	// tally download status
 	@NotNull
 	@Column(name = "status", nullable = false)
 	private Boolean status = false;
@@ -128,29 +128,32 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "reference_document_number", updatable = false)
 	private String referenceDocumentNumber;
-	
-	@Column(name = "order_number")//for increment order number
+
+	@Column(name = "order_number") // for increment order number
 	private Long orderNumber;
 
 	@Column(name = "reference_document_type", updatable = false)
 	private String referenceDocumentType;
 
-	//custom status for a company 
+	// custom status for a company
 	@ManyToOne
 	private OrderStatus orderStatus;
-	
+
 	@Column(name = "updated_date")
-	private LocalDateTime updatedDate ;
-	
+	private LocalDateTime updatedDate;
+
 	@ManyToOne
 	private User updatedBy;
-	
-	
-	//status for tally download
+
+	// status for tally download
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(name = "tally_download_status" , nullable = false, columnDefinition = "character varying DEFAULT 'PENDING'")
+	@Column(name = "tally_download_status", nullable = false, columnDefinition = "character varying DEFAULT 'PENDING'")
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
+
+	@NotNull
+	@Column(name = "pdf_download_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean pdfDownloadStatus = false;
 
 	public Long getId() {
 		return id;
@@ -304,6 +307,14 @@ public class InventoryVoucherHeader implements Serializable {
 		this.status = status;
 	}
 
+	public boolean getPdfDownloadStatus() {
+		return pdfDownloadStatus;
+	}
+
+	public void setPdfDownloadStatus(boolean pdfDownloadStatus) {
+		this.pdfDownloadStatus = pdfDownloadStatus;
+	}
+
 	public PriceLevel getPriceLevel() {
 		return priceLevel;
 	}
@@ -327,7 +338,7 @@ public class InventoryVoucherHeader implements Serializable {
 	public void setReferenceDocumentNumber(String referenceDocumentNumber) {
 		this.referenceDocumentNumber = referenceDocumentNumber;
 	}
-	
+
 	public Long getOrderNumber() {
 		return orderNumber;
 	}
@@ -383,10 +394,5 @@ public class InventoryVoucherHeader implements Serializable {
 	public void setTallyDownloadStatus(TallyDownloadStatus tallyDownloadStatus) {
 		this.tallyDownloadStatus = tallyDownloadStatus;
 	}
-
-	
-	
-	
-	
 
 }

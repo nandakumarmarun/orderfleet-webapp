@@ -33,6 +33,10 @@ if (!this.InventoryVoucher) {
 		$("#dbDocumentType").change(function() {
 			loadAllDocumentByDocumentType();
 		});
+
+		$("#btnApply").on('click', function() {
+			InventoryVoucher.filter();
+		});
 	});
 
 	function loadAllDocumentByDocumentType() {
@@ -175,6 +179,11 @@ if (!this.InventoryVoucher) {
 		}
 		$('#tBodyInventoryVoucher').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
+		console.log($("#dbStatus").val() + "----" + empPids + "----"
+				+ $("#dbAccount").val() + "---" + $("#dbDateSearch").val()
+				+ "---" + $("#txtFromDate").val() + "---"
+				+ $("#txtToDate").val() + "---" + $("#dbDocumentType").val()
+				+ "---" + docPids);
 		$
 				.ajax({
 					url : inventoryVoucherContextPath + "/filter",
@@ -211,11 +220,22 @@ if (!this.InventoryVoucher) {
 
 											var button = "";
 
-											if (inventoryVoucher.pdfDownloadStatus) {
+											if (inventoryVoucher.pdfDownloadButtonStatus) {
 
-												button = "<br><br><button type='button' class='btn btn-primary' onclick='InventoryVoucher.downloadSalesorderPdf(\""
-														+ inventoryVoucher.pid
-														+ "\");'>Packing Slip-"+inventoryVoucher.orderNumber+"</button>";
+												if (inventoryVoucher.pdfDownloadStatus) {
+
+													button = "<br><br><button type='button' class='btn btn-primary' onclick='InventoryVoucher.downloadSalesorderPdf(\""
+															+ inventoryVoucher.pid
+															+ "\");'>Packing Slip-"
+															+ inventoryVoucher.orderNumber
+															+ "</button>";
+												} else {
+													button = "<br><br><button type='button' class='btn btn-success' onclick='InventoryVoucher.downloadSalesorderPdf(\""
+															+ inventoryVoucher.pid
+															+ "\");'>Packing Slip-"
+															+ inventoryVoucher.orderNumber
+															+ "</button>";
+												}
 
 											}
 
@@ -266,14 +286,21 @@ if (!this.InventoryVoucher) {
 	InventoryVoucher.downloadSalesorderPdf = function(inventoryPid) {
 
 		if (confirm("Are you sure?")) {
+			
+			
 			/*
 			 * window.location.href = inventoryVoucherContextPath +
 			 * "/downloadPdf?inventoryPid=" + inventoryPid;
 			 */
+
+			window.open(inventoryVoucherContextPath
+					+ "/downloadPdf?inventoryPid=" + inventoryPid);
+
 			
-			window.open(inventoryVoucherContextPath+ "/downloadPdf?inventoryPid=" + inventoryPid);
 
 		}
+		
+		location.reload();
 
 	}
 

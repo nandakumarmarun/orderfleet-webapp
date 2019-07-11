@@ -43,6 +43,8 @@ public class SalesPerformanceDTO {
 
 	private double totalVolume;
 
+	private boolean pdfDownloadButtonStatus;
+
 	private boolean pdfDownloadStatus;
 
 	private Boolean status;
@@ -211,6 +213,14 @@ public class SalesPerformanceDTO {
 
 	public void setVisitRemarks(String visitRemarks) {
 		this.visitRemarks = visitRemarks;
+	}
+
+	public boolean isPdfDownloadButtonStatus() {
+		return pdfDownloadButtonStatus;
+	}
+
+	public void setPdfDownloadButtonStatus(boolean pdfDownloadButtonStatus) {
+		this.pdfDownloadButtonStatus = pdfDownloadButtonStatus;
 	}
 
 	public boolean getPdfDownloadStatus() {
