@@ -84,6 +84,14 @@ if (!this.SalesTargetGroup) {
 				$('#btnSaveProducts').on('click', function() {
 					saveAssignedProducts();
 				});
+				
+				$('#btnSaveLocations').on('click', function() {
+					saveAssignedLocations();
+				});
+				
+				$('#btnSearchLocations').click(function() {
+					searchTableLocations($("#searchLocations").val());
+				});
 				// table search
 				$('#btnSearch').click(
 						function() {
@@ -143,6 +151,78 @@ if (!this.SalesTargetGroup) {
 					$(row).hide();
 			}
 		});
+	}
+	
+	function searchTableLocations(inputVal) {
+		var table = $('#tBodyLocation');
+		var filterBy = $("input[name='filter']:checked").val();
+		table.find('tr').each(function(index, row) {
+			var allCells = $(row).find('td');
+			if (allCells.length > 0) {
+				var found = false;
+				allCells.each(function(index, td) {
+					if (index == 0) {
+						if (filterBy != "all") {
+							var val = $(td).find('input').prop('checked');
+							if (filterBy == "selected") {
+								if (!val) {
+									return false;
+								}
+							} else if (filterBy == "unselected") {
+								if (val) {
+									return false;
+								}
+							}
+						}
+					}
+					var regExp = new RegExp(inputVal, 'i');
+					if (regExp.test($(td).text())) {
+						found = true;
+						return false;
+					}
+				});
+				if (found == true)
+					$(row).show();
+				else
+					$(row).hide();
+			}
+		});
+	}
+	
+	SalesTargetGroup.assignLocations = function(el, pid, type) {
+		salesTargetGroupModel.pid = pid;
+
+		$("input[name='filter'][value='all']").prop("checked", true);
+		$("#searchLocations").val("");
+		searchTableLocations("");
+
+		// clear all check box
+		$("#divLocations input:checkbox").attr('checked', false);
+		$(".error-msg").html("");
+
+		$.ajax({
+			url : salesTargetGroupContextPath + "/getLocations",
+			type : "GET",
+			data : {
+				salesTargetGroupPid : salesTargetGroupModel.pid
+			},
+			success : function(assignedLocations) {
+				if (assignedLocations) {
+					$.each(assignedLocations, function(index,
+							location) {
+						$(
+								"#divLocations input:checkbox[value="
+										+ location.pid + "]").prop(
+								"checked", true);
+					});
+				}
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+		el.modal('show');
+
 	}
 
 	function loadUserDocument(salesTargetGroupPid, type) {
@@ -232,6 +312,7 @@ if (!this.SalesTargetGroup) {
 		$("#productsCheckboxes input:checkbox").attr('checked', false);
 
 	}
+	
 
 	SalesTargetGroup.filterByCategoryAndGroup = function() {
 		$(".error-msg").html("");
@@ -297,6 +378,39 @@ if (!this.SalesTargetGroup) {
 			data : {
 				salesTargetGroupPid : saleTargetGroupPid,
 				assignedProducts : selectedProducts,
+			},
+			success : function(status) {
+				$("#tasksModal").modal("hide");
+				onSaveSuccess(status);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			},
+		});
+	}
+	
+	function saveAssignedLocations() {
+		
+		var saleTargetGroupPid = salesTargetGroupModel.pid ;
+
+		$(".error-msg").html("");
+		var selectedLocations = "";
+
+		$.each($("input[name='location']:checked"), function() {
+			selectedLocations += $(this).val() + ",";
+		});
+		
+		console.log(selectedLocations);
+		if (selectedLocations == "") {
+			$(".error-msg").html("Please select Locations");
+			return;
+		}
+		$.ajax({
+			url : salesTargetGroupContextPath + "/saveLocations",
+			type : "POST",
+			data : {
+				salesTargetGroupPid : saleTargetGroupPid,
+				assignedLocations : selectedLocations,
 			},
 			success : function(status) {
 				$("#tasksModal").modal("hide");
@@ -408,7 +522,6 @@ if (!this.SalesTargetGroup) {
 				$(".error-msg").html("");
 				$('#tblProducts').html("");
 				loadproducts(id);
-
 				break
 			}
 		}

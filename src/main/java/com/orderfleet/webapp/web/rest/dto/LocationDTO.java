@@ -7,6 +7,8 @@ import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.orderfleet.webapp.domain.Location;
+
 /**
  * A DTO for the Location entity.
  * 
@@ -40,6 +42,19 @@ public class LocationDTO {
 	public LocationDTO() {
 		super();
 
+	}
+
+	public LocationDTO(Location location) {
+		super();
+		this.id = String.valueOf(location.getId());
+		this.pid = location.getPid();
+		this.name = location.getName();
+		this.alias = location.getAlias();
+		this.description = location.getDescription();
+		this.latitude = location.getLatitude();
+		this.longitude = location.getLongitude();
+		this.activated = location.getActivated();
+		this.lastModifiedDate = location.getLastModifiedDate();
 	}
 
 	public boolean getActivated() {
