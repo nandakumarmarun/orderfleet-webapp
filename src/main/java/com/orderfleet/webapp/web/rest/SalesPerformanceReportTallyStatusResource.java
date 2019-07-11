@@ -580,13 +580,8 @@ public class SalesPerformanceReportTallyStatusResource {
 		buildPdf(inventoryVoucherHeaderDTO, response);
 
 		if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
-			Optional<InventoryVoucherHeader> opInventoryVoucherHeader = inventoryVoucherHeaderRepository
-					.findOneByPid(inventoryVoucherHeaderDTO.getPid());
-			if (opInventoryVoucherHeader.isPresent()) {
-				InventoryVoucherHeader inventoryVoucherHeader = opInventoryVoucherHeader.get();
-				inventoryVoucherHeader.setPdfDownloadStatus(true);
-				inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
-			}
+				inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
+			
 		}
 
 	}

@@ -19,7 +19,7 @@ if (!this.InventoryVoucher) {
 			dateFormat : "dd-mm-yy"
 		});
 		// load today data
-		InventoryVoucher.filter();
+		//InventoryVoucher.filter();
 
 		$('#selectAll').on('click', function() {
 			selectAllInventoryVoucher(this);
@@ -60,6 +60,9 @@ if (!this.InventoryVoucher) {
 							"<option value='" + document.pid + "'>"
 									+ document.name + "</option>");
 				});
+				
+				InventoryVoucher.filter();
+				
 			}
 		});
 	}
