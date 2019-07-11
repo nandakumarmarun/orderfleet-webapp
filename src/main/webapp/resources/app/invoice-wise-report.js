@@ -163,6 +163,8 @@ if (!this.InvoiceWiseReport) {
 										+ "</td><td>"
 										+ invoiceWiseReport.activityName
 										+ "</td><td class='tableexport-string target'>"
+										+ formatDate(invoiceWiseReport.punchInDate, 'MMM DD YYYY, h:mm:ss a')
+										+ "</td><td class='tableexport-string target'>"
 										+ formatDate(invoiceWiseReport.sendDate, 'MMM DD YYYY, h:mm:ss a')
 										+ "</td><td class='tableexport-string target'>"
 										+ formatDate(invoiceWiseReport.createdDate, 'MMM DD YYYY, h:mm:ss a' )

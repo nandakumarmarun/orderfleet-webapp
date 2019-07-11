@@ -77,6 +77,8 @@ public class InvoiceWiseReportView {
 	private double totalRecieptAmount;
 
 	private double totalSalesOrderAmount;
+	
+	private LocalDateTime punchInDate;
 
 	public InvoiceWiseReportView() {
 		super();
@@ -91,7 +93,7 @@ public class InvoiceWiseReportView {
 			ActivityStatus activityStatus, String rejectReasonRemark,
 			List<InvoiceWiseReportDetailView> invoiceWiseReportDetailViews, BigDecimal latitude, BigDecimal longitude,
 			BigDecimal towerLatitude, BigDecimal towerLongitude, String employeeName, String towerLocation,
-			double totalRecieptAmount, double totalSalesOrderAmount) {
+			double totalRecieptAmount, double totalSalesOrderAmount, LocalDateTime punchInDate) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -127,6 +129,7 @@ public class InvoiceWiseReportView {
 		this.towerLocation = towerLocation;
 		this.totalRecieptAmount = totalRecieptAmount;
 		this.totalSalesOrderAmount = totalSalesOrderAmount;
+		this.punchInDate = punchInDate;
 	}
 
 	public InvoiceWiseReportView(ExecutiveTaskExecution executiveTaskExecution) {
@@ -161,6 +164,7 @@ public class InvoiceWiseReportView {
 		this.towerLatitude = executiveTaskExecution.getTowerLatitude();
 		this.towerLongitude = executiveTaskExecution.getTowerLongitude();
 		this.towerLocation = executiveTaskExecution.getTowerLocation();
+		this.punchInDate = executiveTaskExecution.getPunchInDate();
 	}
 
 	public String getPid() {
@@ -441,6 +445,14 @@ public class InvoiceWiseReportView {
 
 	public void setTotalSalesOrderAmount(double totalSalesOrderAmount) {
 		this.totalSalesOrderAmount = totalSalesOrderAmount;
+	}
+	
+	public LocalDateTime getPunchInDate() {
+		return punchInDate;
+	}
+
+	public void setPunchInDate(LocalDateTime punchInDate) {
+		this.punchInDate = punchInDate;
 	}
 
 	@Override
