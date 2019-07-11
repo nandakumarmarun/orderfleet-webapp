@@ -176,6 +176,9 @@ public class ExecutiveTaskExecution implements Serializable {
 
 	@Column(name = "location_variance")
 	private String locationVariance;
+	
+	@Column(name = "punch_in_date")
+	private LocalDateTime punchInDate;
 
 	public Long getId() {
 		return id;
@@ -512,6 +515,13 @@ public class ExecutiveTaskExecution implements Serializable {
 	public void setTowerLongitude(BigDecimal towerLongitude) {
 		this.towerLongitude = towerLongitude;
 	}
+	public LocalDateTime getPunchInDate() {
+		return punchInDate;
+	}
+
+	public void setPunchInDate(LocalDateTime punchInDate) {
+		this.punchInDate = punchInDate;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -527,7 +537,7 @@ public class ExecutiveTaskExecution implements Serializable {
 		}
 		return Objects.equals(id, executiveTaskExecution.id);
 	}
-
+	
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id);

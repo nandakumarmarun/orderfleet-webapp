@@ -309,6 +309,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		}
 		executiveTaskExecution
 				.setActivity(activityRepository.findOneByPid(executiveTaskExecutionDTO.getActivityPid()).get());
+		executiveTaskExecution.setPunchInDate(executiveTaskExecutionDTO.getPunchInDate());
 		executiveTaskExecution.setDate(executiveTaskExecutionDTO.getDate());
 		executiveTaskExecution.setSendDate(executiveTaskExecutionDTO.getSendDate());
 		executiveTaskExecution.setRemarks(executiveTaskExecutionDTO.getRemarks());
@@ -405,6 +406,13 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				Document document = documentRepository.findOneByPid(inventoryVoucherDTO.getDocumentPid()).get();
 				if(document.getOrderNoEnabled()) {
 					long count = 0;
+					
+					Optional<Object[]> opDocWiseCount = documentWiseCount.stream().filter(dwc -> document.getPid().equals(dwc[1])).findAny();
+					if(!opDocWiseCount.isPresent()) {
+						count = 1;
+						inventoryVoucherHeader.setOrderNumber(count);
+					}
+					
 					for(Object[] obj : documentWiseCount) {
 						if(document.getPid().equals(obj[1].toString())) {
 							count = obj[0] != null ? Long.parseLong(obj[0].toString()) : 0;

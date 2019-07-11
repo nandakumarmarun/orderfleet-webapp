@@ -73,6 +73,8 @@ public class ExecutiveTaskExecutionView {
 	private String employeeName;
 	
 	private String towerLocation;
+	
+	private LocalDateTime punchInDate;
 
 	public ExecutiveTaskExecutionView() {
 		super();
@@ -83,7 +85,7 @@ public class ExecutiveTaskExecutionView {
 			LocationType locationType, String location, boolean isGpsOff, boolean isMobileDataOff,
 			LocalDateTime startTime, LocalDateTime endTime, boolean startIsGpsOff, boolean startIsMobileDataOff,
 			LocationType startLocationType, String startLocation, String timeSpend, String accountProfileLocation,
-			ActivityStatus activityStatus, String rejectReasonRemark) {
+			ActivityStatus activityStatus, String rejectReasonRemark,LocalDateTime punchInDate) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -108,6 +110,7 @@ public class ExecutiveTaskExecutionView {
 		this.timeSpend = timeSpend;
 		this.activityStatus = activityStatus;
 		this.rejectReasonRemark = rejectReasonRemark;
+		this.punchInDate = punchInDate;
 	}
 
 	public ExecutiveTaskExecutionView(ExecutiveTaskExecution executiveTaskExecution) {
@@ -141,6 +144,7 @@ public class ExecutiveTaskExecutionView {
 		this.towerLatitude = executiveTaskExecution.getTowerLatitude();
 		this.towerLongitude = executiveTaskExecution.getTowerLongitude();
 		this.towerLocation = executiveTaskExecution.getTowerLocation();
+		this.punchInDate = executiveTaskExecution.getPunchInDate();
 	}
 
 	public String getPid() {
@@ -406,6 +410,14 @@ public class ExecutiveTaskExecutionView {
 
 	public void setTowerLongitude(BigDecimal towerLongitude) {
 		this.towerLongitude = towerLongitude;
+	}
+
+	public LocalDateTime getPunchInDate() {
+		return punchInDate;
+	}
+
+	public void setPunchInDate(LocalDateTime punchInDate) {
+		this.punchInDate = punchInDate;
 	}
 
 	@Override

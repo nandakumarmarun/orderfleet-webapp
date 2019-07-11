@@ -107,6 +107,8 @@ public class ExecutiveTaskExecutionDTO {
 	private String employeeName;
 
 	private boolean interimSave;
+	
+	private LocalDateTime punchInDate;
 
 	public ExecutiveTaskExecutionDTO() {
 		super();
@@ -132,7 +134,7 @@ public class ExecutiveTaskExecutionDTO {
 				executiveTaskExecution.getStartLocationType(), executiveTaskExecution.getStartLocation(),
 				executiveTaskExecution.getStartLatitude(), executiveTaskExecution.getStartLongitude(),
 				executiveTaskExecution.getStartTime(), executiveTaskExecution.getEndTime(),
-				executiveTaskExecution.getRejectReasonRemark());
+				executiveTaskExecution.getRejectReasonRemark(),executiveTaskExecution.getPunchInDate());
 	}
 
 	public ExecutiveTaskExecutionDTO(String pid, String clientTransactionKey, BigDecimal latitude, BigDecimal longitude,
@@ -142,7 +144,7 @@ public class ExecutiveTaskExecutionDTO {
 			String accountLocation, String location, String towerLocation, LocationType locationType, boolean isGpsOff, boolean isMobileDataOff, 
 			ActivityStatus activityStatus, String executiveTaskPlanPid, boolean startIsGpsOff, boolean startIsMobileDataOff,
 			LocationType startLocationType, String startLocation, BigDecimal startLatitude, BigDecimal startLongitude,
-			LocalDateTime startTime, LocalDateTime endTime, String rejectReasonRemark) {
+			LocalDateTime startTime, LocalDateTime endTime, String rejectReasonRemark, LocalDateTime punchInDate) {
 		super();
 		this.pid = pid;
 		this.clientTransactionKey = clientTransactionKey;
@@ -179,6 +181,7 @@ public class ExecutiveTaskExecutionDTO {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.rejectReasonRemark = rejectReasonRemark;
+		this.punchInDate = punchInDate;
 	}
 
 	public String getPid() {
@@ -555,6 +558,14 @@ public class ExecutiveTaskExecutionDTO {
 
 	public void setTowerLongitude(BigDecimal towerLongitude) {
 		this.towerLongitude = towerLongitude;
+	}
+	
+	public LocalDateTime getPunchInDate() {
+		return punchInDate;
+	}
+
+	public void setPunchInDate(LocalDateTime punchInDate) {
+		this.punchInDate = punchInDate;
 	}
 
 	@Override

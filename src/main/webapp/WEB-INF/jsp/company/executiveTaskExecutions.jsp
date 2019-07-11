@@ -213,6 +213,7 @@
 							<th style="min-width: 80px;">Employee</th>
 							<th>Account Profile</th>
 							<th>Activity</th>
+							<th>PunchIn</th>
 							<th>Client Date</th>
 							<th>Server Date</th>
 							<th>GPS Location</th>

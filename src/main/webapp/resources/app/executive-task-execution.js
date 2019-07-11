@@ -38,7 +38,8 @@ if (!this.ExecutiveTaskExecution) {
 			contactPerson : null,
 			defaultDiscountPercentage:null,
 			closingBalance:0,
-			towerLocation:null
+			towerLocation:null,
+			punchInDate : null
 	};
 	
 	$(document).ready(function() {
@@ -162,6 +163,8 @@ if (!this.ExecutiveTaskExecution) {
 										+ executiveTaskExecution.accountProfileName
 										+ "</td><td>"
 										+ executiveTaskExecution.activityName
+										+ "</td><td>"
+										+ formatDate(executiveTaskExecution.punchInDate, 'MMM DD YYYY, h:mm:ss a')
 										+ "</td><td class='tableexport-string target'>"
 										+ formatDate(executiveTaskExecution.sendDate, 'MMM DD YYYY, h:mm:ss a')
 										+ "</td><td class='tableexport-string target'>"
