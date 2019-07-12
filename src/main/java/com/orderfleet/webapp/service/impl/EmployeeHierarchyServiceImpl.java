@@ -258,11 +258,11 @@ public class EmployeeHierarchyServiceImpl implements EmployeeHierarchyService {
 		log.info("User :"+login);
 		Optional<User> optionalUser = userRepository.findOneByLogin(login);
 		EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUserLogin(login);
-		log.info("Employee Profile"+employee);
+		//log.info("Employee Profile"+employee);
 		if (optionalUser.isPresent() && !optionalUser.get().getShowAllUsersData() && employee != null) {
 			// get users from employee hierarchy
 			List<Object> result = employeeHierarchyRepository.findChildrenByEmployeeIdAndActivatedTrue(employee.getId());
-			log.info("Hierarchy result size :"+result);
+			log.info("Hierarchy result size :"+result.size());
 			List<Long> employeeIds= new ArrayList<>();
 			for (Object object : result) {
 				employeeIds.add(((BigInteger)object).longValue());

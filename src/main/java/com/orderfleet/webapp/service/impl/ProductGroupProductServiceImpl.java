@@ -392,7 +392,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 			}
 			List<OpeningStock> openingStocks = openingStockRepository
 					.findOpeningStocksAndStockLocationIdIn(sLocationIds);
-			log.info("Caluclationg op Stock");
+			//log.info("Caluclationg op Stock");
 			if (productNameTextSettings.size() > 0) {
 				for (ProductProfileDTO productProfileDTO : productProfileDTOs) {
 					String name = " (";
@@ -457,7 +457,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 				}
 			}
 			
-			log.info("Caluclationg op Stock Completed");
+			//log.info("Caluclationg op Stock Completed");
 
 			productGroupProductDTO.setProductProfiles(productProfileDTOs);
 			if (!productProfiles.isEmpty()) {

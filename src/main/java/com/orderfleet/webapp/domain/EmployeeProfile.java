@@ -54,8 +54,8 @@ public class EmployeeProfile implements Serializable, Cloneable {
 	@Size(max = 55)
 	@Column(name = "alias", length = 55)
 	private String alias;
-	
-	//id of third party system like rosh
+
+	// id of third party system like rosh
 	@Column(name = "reference_id")
 	private String referenceId;
 
@@ -290,11 +290,9 @@ public class EmployeeProfile implements Serializable, Cloneable {
 	public String toString() {
 		return "EmployeeProfile [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", referenceId="
 				+ referenceId + ", address=" + address + ", phone=" + phone + ", email=" + email + ", createdDate="
-				+ createdDate + ", lastUpdatedDate=" + lastUpdatedDate + ", profileImage="
-				+ Arrays.toString(profileImage) + ", profileImageContentType=" + profileImageContentType + ", company="
-				+ company + ", designation=" + designation + ", department=" + department + ", user=" + user
-				+ ", activated=" + activated + "]";
+				+ createdDate + ", lastUpdatedDate=" + lastUpdatedDate + ",  company=" + company.getLegalName()
+				+ ", designation=" + designation + ", department=" + department + ", user=" + user + ", activated="
+				+ activated + "]";
 	}
-	
-	
+
 }
