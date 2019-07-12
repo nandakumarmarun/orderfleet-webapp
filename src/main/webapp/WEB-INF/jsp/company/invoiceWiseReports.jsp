@@ -25,7 +25,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Invoice Wise Reports</h2>
+			<h2>Activities\Transactions</h2>
 			<div class="clearfix"></div>
 			<hr />
 			<div class="row">
@@ -218,7 +218,7 @@
 							<th>Server Date</th>
 							<th>GPS Location</th>
 							<th>Tower Location</th>
-							<th>Sales Order Amount Total</th>
+							<th>Sales/Sales Order Amount Total</th>
 							<th>Receipt Amount Total</th>
 							<th>Remarks</th>
 						</tr>

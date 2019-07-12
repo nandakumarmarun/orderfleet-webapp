@@ -19,10 +19,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -187,7 +190,18 @@ public class ExecutiveTaskExecutionResource {
 	@RequestMapping(value = "/executive-task-executions", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
-	public String getAllExecutiveTaskExecutions(Pageable pageable, Model model) {
+	public String getAllExecutiveTaskExecutions(Pageable pageable, Model model,@RequestParam(value="user-key-pid",required=false) String userKeyPid) {
+		Optional<CompanyConfiguration> opCompanyConfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.VISIT_BASED_TRANSACTION);
+		
+		if(opCompanyConfig.isPresent() && opCompanyConfig.get().getValue().equals("true")) {
+			log.info("Visit Based Transactions..");
+		}else {
+			if(userKeyPid != null) {
+				return "redirect:/web/invoice-wise-reports?user-key-pid="+userKeyPid;
+			}else {
+				return "redirect:/web/invoice-wise-reports";
+			}
+		}
 		// user under current user
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 		model.addAttribute("accountTypes", accountTypeService.findAllByCompany());
