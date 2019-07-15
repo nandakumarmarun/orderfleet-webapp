@@ -626,6 +626,7 @@ public class TransactionResource {
 					for (AccountingVoucherAllocation accountingVoucherAllocation : accountingVoucherDetail
 							.getAccountingVoucherAllocations()) {
 						ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherAllocation);
+						receiptDTO.setHeaderAmount(accountingVoucherHeader.getTotalAmount());
 						receiptDTOs.add(receiptDTO);
 					}
 				}

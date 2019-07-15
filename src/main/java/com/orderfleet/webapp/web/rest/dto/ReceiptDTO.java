@@ -15,6 +15,7 @@ public class ReceiptDTO {
 	private String accountingVoucherHeaderPid;
 	private String particularsName;
 	private double amount;
+	private double headerAmount;
 	private String reference;
 	private String date;
 	private String chequeNo;
@@ -201,6 +202,14 @@ public class ReceiptDTO {
 
 	public void setEmployeeName(String employeeName) {
 		this.employeeName = employeeName;
+	}
+
+	public double getHeaderAmount() {
+		return headerAmount;
+	}
+
+	public void setHeaderAmount(double headerAmount) {
+		this.headerAmount = headerAmount;
 	}
 	
 }
