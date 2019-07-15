@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -86,6 +87,7 @@ import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDetailView;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionView;
+import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
@@ -180,26 +182,28 @@ public class ExecutiveTaskExecutionResource {
 	/**
 	 * GET /executive-task-executions : get all the executive task executions.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of executive
 	 *         task execution in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/executive-task-executions", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
-	public String getAllExecutiveTaskExecutions(Pageable pageable, Model model,@RequestParam(value="user-key-pid",required=false) String userKeyPid) {
-		Optional<CompanyConfiguration> opCompanyConfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.VISIT_BASED_TRANSACTION);
-		
-		if(opCompanyConfig.isPresent() && opCompanyConfig.get().getValue().equals("true")) {
+	public String getAllExecutiveTaskExecutions(Pageable pageable, Model model,
+			@RequestParam(value = "user-key-pid", required = false) String userKeyPid,
+			@RequestParam(value = "filterBy", required = false) String filterBy) {
+		Optional<CompanyConfiguration> opCompanyConfig = companyConfigurationRepository.findByCompanyIdAndName(
+				SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.VISIT_BASED_TRANSACTION);
+
+		if (opCompanyConfig.isPresent() && opCompanyConfig.get().getValue().equals("true")) {
 			log.info("Visit Based Transactions..");
-		}else {
-			if(userKeyPid != null) {
-				return "redirect:/web/invoice-wise-reports?user-key-pid="+userKeyPid;
-			}else {
-				return "redirect:/web/invoice-wise-reports";
+		} else {
+			if (userKeyPid != null) {
+				return "redirect:/web/invoice-wise-reports?user-key-pid=" + userKeyPid;
+			} else {
+				return "redirect:/web/invoice-wise-reports?filterBy=" + filterBy;
 			}
 		}
 		// user under current user
@@ -253,26 +257,99 @@ public class ExecutiveTaskExecutionResource {
 		return "company/executiveTaskExecutions";
 	}
 
+	/*
+	 * @RequestMapping(value = "/executive-task-executions/updateLocation/{pid}",
+	 * method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	 * 
+	 * @Timed public ResponseEntity<ExecutiveTaskExecutionView>
+	 * updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
+	 * Optional<ExecutiveTaskExecution> opExecutiveeExecution =
+	 * executiveTaskExecutionRepository.findOneByPid(pid);
+	 * ExecutiveTaskExecutionView executionView = new ExecutiveTaskExecutionView();
+	 * if (opExecutiveeExecution.isPresent()) { ExecutiveTaskExecution execution =
+	 * opExecutiveeExecution.get(); if (execution.getLocationType() ==
+	 * LocationType.GpsLocation) { String location = geoLocationService
+	 * .findAddressFromLatLng(execution.getLatitude() + "," +
+	 * execution.getLongitude()); execution.setLocation(location); } else if
+	 * (execution.getLocationType() == LocationType.TowerLocation) { TowerLocation
+	 * location = geoLocationService.findAddressFromCellTower(execution.getMcc(),
+	 * execution.getMnc(), execution.getCellId(), execution.getLac());
+	 * execution.setLatitude(location.getLat());
+	 * execution.setLongitude(location.getLan());
+	 * execution.setLocation(location.getLocation()); } execution =
+	 * executiveTaskExecutionRepository.save(execution); executionView = new
+	 * ExecutiveTaskExecutionView(execution); } return new
+	 * ResponseEntity<>(executionView, HttpStatus.OK); }
+	 */
+	
 	@RequestMapping(value = "/executive-task-executions/updateLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<ExecutiveTaskExecutionView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
+	public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
 		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
-		ExecutiveTaskExecutionView executionView = new ExecutiveTaskExecutionView();
+		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
 		if (opExecutiveeExecution.isPresent()) {
 			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
-			if (execution.getLocationType() == LocationType.GpsLocation) {
+
+			if (execution.getLatitude() != BigDecimal.ZERO) {
+				System.out.println("-------lat != 0");
 				String location = geoLocationService
 						.findAddressFromLatLng(execution.getLatitude() + "," + execution.getLongitude());
+				System.out.println("-------" + location);
 				execution.setLocation(location);
-			} else if (execution.getLocationType() == LocationType.TowerLocation) {
-				TowerLocation location = geoLocationService.findAddressFromCellTower(execution.getMcc(),
-						execution.getMnc(), execution.getCellId(), execution.getLac());
-				execution.setLatitude(location.getLat());
-				execution.setLongitude(location.getLan());
-				execution.setLocation(location.getLocation());
+
+			} else {
+				System.out.println("-------No Location");
+				execution.setLocation("No Location");
 			}
+			/*
+			 * if (execution.getLocationType() == LocationType.GpsLocation) { String
+			 * location = geoLocationService .findAddressFromLatLng(execution.getLatitude()
+			 * + "," + execution.getLongitude()); execution.setLocation(location); } else if
+			 * (execution.getLocationType() == LocationType.TowerLocation) { TowerLocation
+			 * location = geoLocationService.findAddressFromCellTower(execution.getMcc(),
+			 * execution.getMnc(), execution.getCellId(), execution.getLac());
+			 * execution.setLatitude(location.getLat());
+			 * execution.setLongitude(location.getLan());
+			 * execution.setLocation(location.getLocation()); }
+			 */
 			execution = executiveTaskExecutionRepository.save(execution);
-			executionView = new ExecutiveTaskExecutionView(execution);
+			executionView = new InvoiceWiseReportView(execution);
+		}
+		return new ResponseEntity<>(executionView, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/executive-task-executions/updateTowerLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InvoiceWiseReportView> updateTowerLocationExecutiveTaskExecutions(@PathVariable String pid) {
+		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
+		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
+		if (opExecutiveeExecution.isPresent()) {
+			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
+
+			/*
+			 * if (execution.getLatitude() != BigDecimal.ZERO) {
+			 * System.out.println("-------lat != 0"); String location = geoLocationService
+			 * .findAddressFromLatLng(execution.getLatitude() + "," +
+			 * execution.getLongitude()); System.out.println("-------" + location);
+			 * execution.setLocation(location);
+			 * 
+			 * } else { System.out.println("-------No Location");
+			 * execution.setLocation("No Location"); }
+			 */
+
+			TowerLocation location = geoLocationService.findAddressFromCellTower(execution.getMcc(), execution.getMnc(),
+					execution.getCellId(), execution.getLac());
+
+			if (location.getLat() != null && location.getLat() != BigDecimal.ZERO) {
+				execution.setTowerLatitude(location.getLat());
+				execution.setTowerLongitude(location.getLan());
+
+			}
+
+			execution.setTowerLocation(location.getLocation());
+
+			execution = executiveTaskExecutionRepository.save(execution);
+			executionView = new InvoiceWiseReportView(execution);
 		}
 		return new ResponseEntity<>(executionView, HttpStatus.OK);
 	}
