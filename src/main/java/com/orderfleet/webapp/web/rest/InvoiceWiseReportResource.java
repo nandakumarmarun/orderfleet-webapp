@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -245,17 +246,65 @@ public class InvoiceWiseReportResource {
 		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
 		if (opExecutiveeExecution.isPresent()) {
 			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
-			if (execution.getLocationType() == LocationType.GpsLocation) {
+
+			if (execution.getLatitude() != BigDecimal.ZERO) {
+				System.out.println("-------lat != 0");
 				String location = geoLocationService
 						.findAddressFromLatLng(execution.getLatitude() + "," + execution.getLongitude());
+				System.out.println("-------" + location);
 				execution.setLocation(location);
-			} else if (execution.getLocationType() == LocationType.TowerLocation) {
-				TowerLocation location = geoLocationService.findAddressFromCellTower(execution.getMcc(),
-						execution.getMnc(), execution.getCellId(), execution.getLac());
-				execution.setLatitude(location.getLat());
-				execution.setLongitude(location.getLan());
-				execution.setLocation(location.getLocation());
+
+			} else {
+				System.out.println("-------No Location");
+				execution.setLocation("No Location");
 			}
+			/*
+			 * if (execution.getLocationType() == LocationType.GpsLocation) { String
+			 * location = geoLocationService .findAddressFromLatLng(execution.getLatitude()
+			 * + "," + execution.getLongitude()); execution.setLocation(location); } else if
+			 * (execution.getLocationType() == LocationType.TowerLocation) { TowerLocation
+			 * location = geoLocationService.findAddressFromCellTower(execution.getMcc(),
+			 * execution.getMnc(), execution.getCellId(), execution.getLac());
+			 * execution.setLatitude(location.getLat());
+			 * execution.setLongitude(location.getLan());
+			 * execution.setLocation(location.getLocation()); }
+			 */
+			execution = executiveTaskExecutionRepository.save(execution);
+			executionView = new InvoiceWiseReportView(execution);
+		}
+		return new ResponseEntity<>(executionView, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/invoice-wise-reports/updateTowerLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InvoiceWiseReportView> updateTowerLocationExecutiveTaskExecutions(@PathVariable String pid) {
+		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
+		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
+		if (opExecutiveeExecution.isPresent()) {
+			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
+
+			/*
+			 * if (execution.getLatitude() != BigDecimal.ZERO) {
+			 * System.out.println("-------lat != 0"); String location = geoLocationService
+			 * .findAddressFromLatLng(execution.getLatitude() + "," +
+			 * execution.getLongitude()); System.out.println("-------" + location);
+			 * execution.setLocation(location);
+			 * 
+			 * } else { System.out.println("-------No Location");
+			 * execution.setLocation("No Location"); }
+			 */
+
+			TowerLocation location = geoLocationService.findAddressFromCellTower(execution.getMcc(), execution.getMnc(),
+					execution.getCellId(), execution.getLac());
+
+			if (location.getLat() != null && location.getLat() != BigDecimal.ZERO) {
+				execution.setTowerLatitude(location.getLat());
+				execution.setTowerLongitude(location.getLan());
+
+			}
+
+			execution.setTowerLocation(location.getLocation());
+
 			execution = executiveTaskExecutionRepository.save(execution);
 			executionView = new InvoiceWiseReportView(execution);
 		}

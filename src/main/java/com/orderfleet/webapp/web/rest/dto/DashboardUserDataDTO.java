@@ -27,15 +27,15 @@ public class DashboardUserDataDTO<T> {
 	private String userPid;
 
 	private String userName;
-	
+
 	private String employeePid;
-	
+
 	private String employeeName;
 
 	private byte[] profileImage;
 
 	private boolean attendanceMarked;
-	
+
 	private String attendanceStatus;
 
 	private String remarks;
@@ -47,7 +47,7 @@ public class DashboardUserDataDTO<T> {
 	private String lastAccountLocation;
 
 	private LocalDateTime lastTime;
-	
+
 	private LocalDateTime plannedDate;
 
 	private int notificationCount;
@@ -55,32 +55,33 @@ public class DashboardUserDataDTO<T> {
 	private LocationType locationType;
 	private boolean isGpsOff;
 	private boolean isMobileDataOff;
-	
+
 	private String attendanceSubGroupName;
 	private String attendanceSubGroupCode;
 
-	//Set Customer Time Spent for Dashboard
+	// Set Customer Time Spent for Dashboard
 	private Long customerTimeSpentTime;
-	
+
 	private boolean customerTimeSpentBoolean;
-	
-	
+
 	@JsonIgnore
 	private AttendanceService attendanceService;
 	@JsonIgnore
 	private EmployeeProfileRepository employeeProfileRepository;
 	@JsonIgnore
 	private CustomerTimeSpentRepository customerTimeSpentRepository;
-	
+
 	public DashboardUserDataDTO() {
 	}
 
-	public DashboardUserDataDTO(AttendanceService attendanceService, EmployeeProfileRepository employeeProfileRepository, CustomerTimeSpentRepository customerTimeSpentRepository) {
+	public DashboardUserDataDTO(AttendanceService attendanceService,
+			EmployeeProfileRepository employeeProfileRepository,
+			CustomerTimeSpentRepository customerTimeSpentRepository) {
 		this.attendanceService = attendanceService;
 		this.employeeProfileRepository = employeeProfileRepository;
 		this.customerTimeSpentRepository = customerTimeSpentRepository;
 	}
-	
+
 	public String getUserPid() {
 		return userPid;
 	}
@@ -249,7 +250,6 @@ public class DashboardUserDataDTO<T> {
 		this.customerTimeSpentBoolean = customerTimeSpentBoolean;
 	}
 
-	
 	public void setEmployeeData(DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData, String userPid) {
 		// set employee profile name and image
 		employeeProfileRepository.findByUserPid(userPid).ifPresent(employeeProfile -> {
@@ -286,7 +286,7 @@ public class DashboardUserDataDTO<T> {
 			dashboardUserData.setAttendanceSubGroupCode(attendanceDTOs.get(0).getAttendanceSubGroupCode());
 		}
 	}
-	
+
 	public void setCustomerTimeSpent(DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData, String userPid) {
 		// set customer time spent
 		Optional<CustomerTimeSpent> customerTimeSpent = customerTimeSpentRepository
@@ -300,17 +300,26 @@ public class DashboardUserDataDTO<T> {
 			dashboardUserData.setCustomerTimeSpentBoolean(false);
 		}
 	}
-	
-	public void setLastExecutionDetails(DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData, ExecutiveTaskExecution executiveTaskExecution) {
+
+	public void setLastExecutionDetails(DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData,
+			ExecutiveTaskExecution executiveTaskExecution) {
 		if (executiveTaskExecution != null) {
 			dashboardUserData.setLastAccountLocation(executiveTaskExecution.getAccountProfile().getLocation());
 			dashboardUserData.setLastTime(executiveTaskExecution.getDate());
-			dashboardUserData.setLastLocation(executiveTaskExecution.getLocation());
+
+			if (executiveTaskExecution.getLocation() != null
+					&& !executiveTaskExecution.getLocation().equals("No Location")) {
+				dashboardUserData.setLastLocation(executiveTaskExecution.getLocation());
+			} else if (executiveTaskExecution.getTowerLocation() != null
+					&& !executiveTaskExecution.getTowerLocation().equals("Not Found")) {
+				dashboardUserData.setLastLocation(executiveTaskExecution.getTowerLocation());
+			} else {
+				dashboardUserData.setLastLocation("No Location");
+			}
 			dashboardUserData.setLocationType(executiveTaskExecution.getLocationType());
 			dashboardUserData.setIsGpsOff(executiveTaskExecution.getIsGpsOff());
 			dashboardUserData.setIsMobileDataOff(executiveTaskExecution.getIsMobileDataOff());
 		}
 	}
-	
 
 }
