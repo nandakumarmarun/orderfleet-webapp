@@ -627,6 +627,7 @@ public class TransactionResource {
 							.getAccountingVoucherAllocations()) {
 						ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherAllocation);
 						receiptDTO.setHeaderAmount(accountingVoucherHeader.getTotalAmount());
+						receiptDTO.setNarrationMessage(accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
 						receiptDTOs.add(receiptDTO);
 					}
 				}
