@@ -70,7 +70,7 @@
 												<td><input name='user' type='checkbox'
 													value="${user.pid}" /></td>
 												<td>${user.firstName}</td>
-												<td><input type="number" min="0" class="form-control"
+												<td><input type="number" min="0" class="form-control sort_order"
 													name="sortOrder" id="field_sortOrder_${user.pid}" value="0" /></td>
 											</tr>
 										</c:forEach>

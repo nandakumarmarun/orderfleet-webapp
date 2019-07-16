@@ -16,30 +16,77 @@ if (!this.DashboardUser) {
 			saveAssignedUsers();
 		});
 	});
-	
+
 	var dashboardUserModel = {
-			userPid : null,
-			sortOrder : null
-			
-		};
+		userPid : null,
+		sortOrder : null
+
+	};
 
 	DashboardUser.assignUsers = function() {
 		// clear all check box
 		$("#divUsers input:checkbox").attr('checked', false);
-		$.ajax({
-			url : dashboardUserContextPath + "/edit",
-			type : "GET",
-			success : function(dashboardUsers) {
-				$.each(dashboardUsers, function(index, dashboardUser) {
-					$("#divUsers input:checkbox[value=" + dashboardUser.userPid + "]").prop(
-							"checked", true);
-					$('#field_sortOrder_'+dashboardUser.userPid).val(dashboardUser.sortOrder);
+		$
+				.ajax({
+					url : dashboardUserContextPath + "/edit",
+					type : "GET",
+					success : function(dashboardUsers) {
+						$.each(dashboardUsers, function(index, dashboardUser) {
+							$(
+									"#divUsers input:checkbox[value="
+											+ dashboardUser.userPid + "]")
+									.prop("checked", true);
+							$('#field_sortOrder_' + dashboardUser.userPid).val(
+									dashboardUser.sortOrder);
+
+						});
+
+						var sortorders = document
+								.getElementsByClassName("sort_order");
+
+						$
+								.each(
+										dashboardUsers,
+										function(index, dashboardUser) {
+
+											$(
+													'#field_sortOrder_'
+															+ dashboardUser.userPid)
+													.on(
+															'change',
+															function() {
+																var sortFeildId = this.id;
+																var sortFeildValue = this.value;
+																$
+																		.each(
+																				sortorders,
+																				function(
+																						index,
+																						sortOrder) {
+																					if (sortOrder.id != sortFeildId) {
+																						if (sortOrder.value != 0
+																								&& sortFeildValue == sortOrder.value) {
+
+																							$(
+																									'#field_sortOrder_'
+																											+ dashboardUser.userPid)
+																									.val(
+																											dashboardUser.sortOrder);
+
+																							alert("Sort Order Value : "
+																									+ sortOrder.value
+																									+ " Already Exists");
+
+																						}
+																					}
+																				});
+															});
+										});
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
 				});
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			}
-		});
 		$("#assignUsersModal").modal("show");
 	}
 
@@ -47,8 +94,10 @@ if (!this.DashboardUser) {
 
 		$(".error-msg").html("");
 		var selectedUsers = [];
-		
-		var selectUserWithSortOrder=[];
+
+		var selectUserWithSortOrder = [];
+
+		var sortedNumberList = [];
 
 		$.each($("input[name='user']:checked"), function() {
 			selectedUsers.push($(this).val());
@@ -57,31 +106,69 @@ if (!this.DashboardUser) {
 			$(".error-msg").html("Please select users");
 			return;
 		}
-		
+
 		$.each(selectedUsers, function(index, userPid) {
-			dashboardUserModel={};
+			dashboardUserModel = {};
 			dashboardUserModel.userPid = userPid
-			dashboardUserModel.sortOrder = $('#field_sortOrder_'+userPid).val();
+			dashboardUserModel.sortOrder = $('#field_sortOrder_' + userPid)
+					.val();
+			sortedNumberList.push($('#field_sortOrder_' + userPid).val());
 			selectUserWithSortOrder.push(dashboardUserModel);
 		});
-		
-		console.log(JSON.stringify(selectUserWithSortOrder));
-		
-		
-		$(".error-msg").html("Please wait.....");
-		$.ajax({
-			url : dashboardUserContextPath,
-			type : "POST",
-			contentType : "application/json; charset=utf-8",
-			data : JSON.stringify(selectUserWithSortOrder),
-			success : function(status) {
-				$("#assignUsersModal").modal("hide");
-				onSaveSuccess(status);
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			},
+
+		var uniqueSortOrderListArray = [];
+
+		var duplicatedSortOrderListArray = [];
+
+		var i = 0;
+
+		// Loop through array values
+		for (i = 0; i < sortedNumberList.length; i++) {
+
+			if (uniqueSortOrderListArray.indexOf(sortedNumberList[i]) === -1) {
+				uniqueSortOrderListArray.push(sortedNumberList[i]);
+			} else {
+				duplicatedSortOrderListArray.push(sortedNumberList[i]);
+			}
+		}
+
+		var duplicatestatus = false;
+
+		$.each(uniqueSortOrderListArray, function(index, sotedValue) {
+			$.each(duplicatedSortOrderListArray,
+					function(index, duplicateValue) {
+						if (duplicateValue != 0) {
+							if (sotedValue == duplicateValue) {
+								duplicatestatus = true;
+								var result = confirm("Sort Order Value : "
+										+ duplicateValue + " Already Exists");
+								return;
+							}
+						}
+					});
+			return;
 		});
+
+		if (duplicatestatus) {
+			return;
+		} else {
+
+			$(".error-msg").html("Please wait.....");
+			$.ajax({
+				url : dashboardUserContextPath,
+				type : "POST",
+				contentType : "application/json; charset=utf-8",
+				data : JSON.stringify(selectUserWithSortOrder),
+				success : function(status) {
+					$("#assignUsersModal").modal("hide");
+					onSaveSuccess(status);
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				},
+			});
+
+		}
 	}
 
 	function onSaveSuccess(result) {
