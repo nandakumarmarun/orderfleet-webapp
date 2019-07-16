@@ -576,8 +576,11 @@ public class AccountProfileCsvUploadService {
 		}
 		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
 		for (Location location : locations) {
-			for (AccountProfile accountProfile : newAccountProfiles) {
-				locationAccountProfiles.add(new LocationAccountProfile(location, accountProfile, company));
+
+			if (location.getName().equalsIgnoreCase("Territory")) {
+				for (AccountProfile accountProfile : newAccountProfiles) {
+					locationAccountProfiles.add(new LocationAccountProfile(location, accountProfile, company));
+				}
 			}
 		}
 		System.out.println(locationAccountProfiles.size() + "----------");
