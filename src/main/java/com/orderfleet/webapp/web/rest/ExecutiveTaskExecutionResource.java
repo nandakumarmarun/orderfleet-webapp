@@ -182,11 +182,12 @@ public class ExecutiveTaskExecutionResource {
 	/**
 	 * GET /executive-task-executions : get all the executive task executions.
 	 *
-	 * @param pageable the pagination information
+	 * @param pageable
+	 *            the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of executive
 	 *         task execution in body
-	 * @throws URISyntaxException if there is an error to generate the pagination
-	 *                            HTTP headers
+	 * @throws URISyntaxException
+	 *             if there is an error to generate the pagination HTTP headers
 	 */
 	@RequestMapping(value = "/executive-task-executions", method = RequestMethod.GET)
 	@Timed
@@ -202,8 +203,10 @@ public class ExecutiveTaskExecutionResource {
 		} else {
 			if (userKeyPid != null) {
 				return "redirect:/web/invoice-wise-reports?user-key-pid=" + userKeyPid;
-			} else {
+			} else if (filterBy != null) {
 				return "redirect:/web/invoice-wise-reports?filterBy=" + filterBy;
+			} else {
+				return "redirect:/web/invoice-wise-reports";
 			}
 		}
 		// user under current user
@@ -281,7 +284,7 @@ public class ExecutiveTaskExecutionResource {
 	 * ExecutiveTaskExecutionView(execution); } return new
 	 * ResponseEntity<>(executionView, HttpStatus.OK); }
 	 */
-	
+
 	@RequestMapping(value = "/executive-task-executions/updateLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
@@ -413,14 +416,30 @@ public class ExecutiveTaskExecutionResource {
 		} else {
 			activityPids = Arrays.asList(activityPid);
 		}
+		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
+
 		if (accountPid.equalsIgnoreCase("no")) {
-			accountProfilePids = getAccountPids(userIds);
+			// accountProfilePids = getAccountPids(userIds);
+			// if all accounts selected avoid account wise query
+			executiveTaskExecutions = executiveTaskExecutionRepository
+					.getByDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
 		} else {
+			// if a specific account is selected load data based on that particular account
 			accountProfilePids = Arrays.asList(accountPid);
+			executiveTaskExecutions = executiveTaskExecutionRepository
+					.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
+							accountProfilePids);
 		}
-		List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
-				.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
-						accountProfilePids);
+		// if (accountPid.equalsIgnoreCase("no")) {
+		// accountProfilePids = getAccountPids(userIds);
+		// } else {
+		// accountProfilePids = Arrays.asList(accountPid);
+		// }
+		// List<ExecutiveTaskExecution> executiveTaskExecutions =
+		// executiveTaskExecutionRepository
+		// .getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate,
+		// activityPids, userIds,
+		// accountProfilePids);
 		List<ExecutiveTaskExecutionView> executiveTaskExecutionViews = new ArrayList<>();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			ExecutiveTaskExecutionView executiveTaskExecutionView = new ExecutiveTaskExecutionView(

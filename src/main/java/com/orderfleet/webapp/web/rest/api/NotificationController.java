@@ -33,13 +33,16 @@ import com.orderfleet.webapp.domain.UserTaskAssignment;
 import com.orderfleet.webapp.domain.enums.MessageStatus;
 import com.orderfleet.webapp.domain.enums.PriorityStatus;
 import com.orderfleet.webapp.domain.model.FirebaseData;
+import com.orderfleet.webapp.repository.NotificationDetailRepository;
 import com.orderfleet.webapp.repository.NotificationMessageRecipientRepository;
 import com.orderfleet.webapp.repository.NotificationReplyRepository;
+import com.orderfleet.webapp.repository.NotificationRepository;
 import com.orderfleet.webapp.repository.TaskRepository;
 import com.orderfleet.webapp.repository.UserDeviceRepository;
 import com.orderfleet.webapp.repository.UserTaskAssignmentRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.NotificationReplyService;
+import com.orderfleet.webapp.service.NotificationService;
 import com.orderfleet.webapp.service.UserTaskAssignmentService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.api.dto.ChatReplyNotificationDTO;
@@ -72,7 +75,13 @@ public class NotificationController {
 	
 	@Inject
 	private NotificationReplyService notificationReplyService;
-
+	
+	@Inject
+	private NotificationDetailRepository notificationDetailRepository;
+	
+	@Inject
+	private NotificationRepository notificationRepository;
+	
 	@Inject
 	public NotificationController(NotificationMessageRecipientRepository notificationMessageRecipientRepository,
 			UserDeviceRepository userDeviceRepository) {
@@ -142,6 +151,22 @@ public class NotificationController {
 			return new ResponseEntity<>("Chat Reply Failed", HttpStatus.OK);
 		}
 			
+	}
+	
+	@Timed
+	@RequestMapping(value = "/chat-reply-read-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> chatReplyNotificationReadStatus(
+			@Valid @RequestBody List<String> notificationPids) {
+		log.debug("Web request to save NotificationReply start");
+
+		if (notificationPids == null || notificationPids.size()==0) {
+			return new ResponseEntity<>("Empty data present", HttpStatus.OK);
+		}
+		log.info(notificationPids.size() + "************"+ "notifications updating to read status");
+		
+		List<Long> notificationIds = notificationRepository.findNotificationIdByPids(notificationPids);
+		notificationDetailRepository.updateNotificationReadStatus(MessageStatus.READ,notificationIds);
+		return new ResponseEntity<>("Notification status updated", HttpStatus.OK);
 	}
 
 	private void assignTaskToUser(Task task, User user, LocalDate startDate) {

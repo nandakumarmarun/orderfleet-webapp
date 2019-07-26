@@ -202,6 +202,10 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and exeTaskExecution.activity.pid in ?3 and exeTaskExecution.user.id in ?4 and exeTaskExecution.accountProfile.pid in ?5 Order By exeTaskExecution.date desc")
 	List<ExecutiveTaskExecution> getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(LocalDateTime fromDate,
 			LocalDateTime toDate, List<String> activityPids, List<Long> userIds, List<String> accountPids);
+	
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and exeTaskExecution.activity.pid in ?3 and exeTaskExecution.user.id in ?4  Order By exeTaskExecution.date desc")
+	List<ExecutiveTaskExecution> getByDateBetweenAndActivityPidInAndUserIdIn(LocalDateTime fromDate,
+			LocalDateTime toDate, List<String> activityPids, List<Long> userIds);
 
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and exeTaskExecution.user.pid = ?3 and exeTaskExecution.accountProfile.pid in ?4")
 	List<ExecutiveTaskExecution> findAllByDateBetweenAndUserPidAndAccountProfilePidIn(LocalDateTime fromDate,

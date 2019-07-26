@@ -370,14 +370,22 @@ public class InvoiceWiseReportResource {
 		} else {
 			activityPids = Arrays.asList(activityPid);
 		}
+		
+		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
+		
 		if (accountPid.equalsIgnoreCase("no")) {
-			accountProfilePids = getAccountPids(userIds);
+			//accountProfilePids = getAccountPids(userIds);
+			//if all accounts selected avoid account wise query
+			executiveTaskExecutions = executiveTaskExecutionRepository
+					.getByDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
 		} else {
+			//if a specific account is selected load data based on that particular account
 			accountProfilePids = Arrays.asList(accountPid);
+			executiveTaskExecutions = executiveTaskExecutionRepository
+					.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
+							accountProfilePids);
 		}
-		List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
-				.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
-						accountProfilePids);
+
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			double totalSalesOrderAmount = 0.0;
@@ -724,13 +732,23 @@ public class InvoiceWiseReportResource {
 		} else {
 			if (inclSubordinate) {
 				userIds = employeeHierarchyService.getEmployeeSubordinateIds(employeePid);
+				System.out.println("Testing start for Activity Transaction");
+				System.out.println("employeePid:"+employeePid);
+				System.out.println("userIds:"+userIds.toString());
+				System.out.println("Testing end for Activity Transaction");
 			} else {
 				Optional<EmployeeProfile> opEmployee = employeeProfileRepository.findOneByPid(employeePid);
 				if (opEmployee.isPresent()) {
 					userIds = Arrays.asList(opEmployee.get().getUser().getId());
 				}
+				System.out.println("Testing start for Activity Transaction");
+				System.out.println("--------------------------------------");
+				System.out.println("employeePid:"+employeePid);
+				System.out.println("UserIds:"+userIds.toString());
+				System.out.println("Testing end for Activity Transaction");
 			}
 		}
+
 		return userIds;
 	}
 

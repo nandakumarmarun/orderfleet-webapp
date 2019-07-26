@@ -339,7 +339,7 @@ public class AccountProfileUploadService {
 
 		for (LocationAccountProfileDTO locAccDto : locationAccountProfileDTOs) {
 
-			LocationAccountProfile profile = new LocationAccountProfile();
+			LocationAccountProfile locationAccountProfile = new LocationAccountProfile();
 			// find location
 
 			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getAlias()))
@@ -349,21 +349,23 @@ public class AccountProfileUploadService {
 
 			Optional<AccountProfile> acc = accountProfiles.stream()
 					.filter(ap -> locAccDto.getAccountProfileName().equals(ap.getAlias())).findFirst();
-
-			if (loc.isPresent() && acc.isPresent()) {
-
+			if(acc.isPresent()) 
+			{
 				List<Long> locationAccountProfileIds = locationAccountProfiles.stream()
-						.filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
-						.map(lap -> lap.getId()).collect(Collectors.toList());
+										.filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
+										.map(lap -> lap.getId()).collect(Collectors.toList());
 				if (locationAccountProfileIds.size() != 0) {
 					locationAccountProfilesIds.addAll(locationAccountProfileIds);
 				}
-
-				profile.setLocation(loc.get());
-				profile.setAccountProfile(acc.get());
-				profile.setCompany(company);
-				newLocationAccountProfiles.add(profile);
-			}
+				if (loc.isPresent()) {
+					locationAccountProfile.setLocation(loc.get());
+				}else if(acc.isPresent()) {
+					locationAccountProfile.setLocation(locations.get(0));
+				}
+				locationAccountProfile.setAccountProfile(acc.get());
+				locationAccountProfile.setCompany(company);
+				newLocationAccountProfiles.add(locationAccountProfile);
+			}	
 		}
 		if (locationAccountProfilesIds.size() != 0) {
 			locationAccountProfileRepository.deleteByIdIn(companyId, locationAccountProfilesIds);
@@ -531,7 +533,9 @@ public class AccountProfileUploadService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-
+	
+	
+	
 	private static boolean isValidEmail(String email) {
 		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
 				+ "A-Z]{2,7}$";

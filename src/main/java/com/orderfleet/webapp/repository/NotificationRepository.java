@@ -32,5 +32,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 	
 	@Query("select notification from Notification notification where notification.pid= ?1 Order By notification.createdDate desc")
 	Notification findByPidOrderByCreatedDateDesc(String notificationPid);
+	
+	@Query("select notification.id from Notification notification where notification.pid IN ?1")
+	List<Long> findNotificationIdByPids(List<String> notificationPids);
 
 }

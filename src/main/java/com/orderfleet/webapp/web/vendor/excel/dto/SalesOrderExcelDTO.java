@@ -20,6 +20,9 @@ public class SalesOrderExcelDTO {
 	private Double CGSTAmt;
 	private Double SGSTAmt;
 	private String inventoryPid;
+	private String customerName;
+	private Double mrp;
+	private Double freeQuantity;
 
 	public SalesOrderExcelDTO() {
 
@@ -129,4 +132,37 @@ public class SalesOrderExcelDTO {
 		this.discPrice = discPrice;
 	}
 
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public Double getMrp() {
+		return mrp;
+	}
+
+	public void setMrp(Double mrp) {
+		this.mrp = mrp;
+	}
+
+	public Double getFreeQuantity() {
+		return freeQuantity;
+	}
+
+	public void setFreeQuantity(Double freeQuantity) {
+		this.freeQuantity = freeQuantity;
+	}
+
+	@Override
+	public String toString() {
+		return "SalesOrderExcelDTO [billNo=" + billNo + ", date=" + date + ", customerCode=" + customerCode
+				+ ", itemCode=" + itemCode + ", quantity=" + quantity + ", rate=" + rate + ", discPer=" + discPer
+				+ ", discPrice=" + discPrice + ", taxPer=" + taxPer + ", total=" + total + ", CGSTAmt=" + CGSTAmt
+				+ ", SGSTAmt=" + SGSTAmt + ", inventoryPid=" + inventoryPid + ", customerName=" + customerName
+				+ ", mrp=" + mrp + ", freeQuantity=" + freeQuantity + "]";
+	}
+	
 }

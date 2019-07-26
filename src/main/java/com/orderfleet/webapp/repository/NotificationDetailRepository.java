@@ -4,10 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.NotificationDetail;
 import com.orderfleet.webapp.domain.enums.MessageStatus;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 
 public interface NotificationDetailRepository extends JpaRepository<NotificationDetail, Long> {
@@ -20,4 +23,10 @@ public interface NotificationDetailRepository extends JpaRepository<Notification
 	
 	@Query("select nd from NotificationDetail nd where nd.company.id = ?#{principal.companyId} and nd.createdDate between ?1 and ?2 order by nd.createdDate DESC")
 	List<NotificationDetail> findByCompanyIdAndDateBetweenOrderByCreatedDateDesc(LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Transactional
+	@Modifying
+	@Query("UPDATE NotificationDetail notificationDetail SET notificationDetail.messageStatus = ?1 where  notificationDetail.notification.id IN ?2")
+	int updateNotificationReadStatus(MessageStatus messageStatus,List<Long> notificationIds);
+	
 }

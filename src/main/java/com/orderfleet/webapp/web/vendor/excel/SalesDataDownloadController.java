@@ -187,10 +187,12 @@ public class SalesDataDownloadController {
 			 * : 0.0);
 			 */
 
-			double qty = Double.parseDouble(obj[4].toString());
-			double rate = Double.parseDouble(obj[5].toString());
-			double dis = Double.parseDouble(obj[6].toString());
-			double taxPer = Double.parseDouble(obj[7].toString());
+			double qty = Double.parseDouble(obj[4] != null ? obj[4].toString() : "0.0");
+			double rate = Double.parseDouble(obj[5] != null ? obj[5].toString() : "0.0");
+			double dis = Double.parseDouble(obj[6] != null ? obj[6].toString() : "0.0");
+			double taxPer = Double.parseDouble(obj[7] != null ? obj[7].toString() : "0.0");
+			double freeQty = Double.parseDouble(obj[12] != null ? obj[12].toString() : "0.0");
+			double mrp = Double.parseDouble(obj[14] != null ? obj[14].toString() : "0.0");
 
 			double amountValue = qty * rate;
 			double discountValue = amountValue * dis / 100;
@@ -220,7 +222,13 @@ public class SalesDataDownloadController {
 					RandomUtil.generateServerDocumentNo().length() - 10);
 
 			salesOrderDTO.setBillNo(obj[0].toString());
+			salesOrderDTO.setFreeQuantity(freeQty);
+			salesOrderDTO.setMrp(mrp);
+			salesOrderDTO.setCustomerName(obj[13] != null ? obj[13].toString() : "");
 			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
+			System.out.println("================================================================");
+			System.out.println(salesOrderDTO.toString());
+			System.out.println("================================================================");
 			salesOrderDTOs.add(salesOrderDTO);
 
 		}
