@@ -7,6 +7,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -20,6 +22,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
  * A DynamicDocumentHeader.
@@ -93,6 +97,12 @@ public class DynamicDocumentHeader implements Serializable {
 	@NotNull
 	@Column(name = "status", nullable = false)
 	private Boolean status = false;
+
+	// status for tally download
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "tally_download_status", nullable = false, columnDefinition = "character varying DEFAULT 'PENDING'")
+	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
 
 	public Long getId() {
 		return id;
@@ -212,6 +222,14 @@ public class DynamicDocumentHeader implements Serializable {
 
 	public void setStatus(Boolean status) {
 		this.status = status;
+	}
+
+	public TallyDownloadStatus getTallyDownloadStatus() {
+		return tallyDownloadStatus;
+	}
+
+	public void setTallyDownloadStatus(TallyDownloadStatus tallyDownloadStatus) {
+		this.tallyDownloadStatus = tallyDownloadStatus;
 	}
 
 }
