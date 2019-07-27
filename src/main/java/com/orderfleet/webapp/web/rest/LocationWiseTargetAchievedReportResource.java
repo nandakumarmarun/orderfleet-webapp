@@ -29,11 +29,13 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.CompanySetting;
+import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.ProductGroupLocationTarget;
 import com.orderfleet.webapp.domain.SalesSummaryAchievment;
 import com.orderfleet.webapp.domain.SalesTargetGroup;
 import com.orderfleet.webapp.domain.SalesTargetGroupUserTarget;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanySettingRepository;
@@ -42,6 +44,7 @@ import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
+import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.ProductGroupLocationTargetRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
@@ -129,6 +132,9 @@ public class LocationWiseTargetAchievedReportResource {
 
 	@Inject
 	private ProductGroupProductRepository productGroupProductRepository;
+
+	@Inject
+	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
 
 	/**
 	 * GET /sales-target-vs-achieved-report
@@ -237,10 +243,20 @@ public class LocationWiseTargetAchievedReportResource {
 
 		Set<Long> accountProfileIds = locationAccountProfileRepository.findAccountProfileIdByLocationPid(locationPid);
 
+		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
+				SecurityUtils.getCurrentUsersCompanyId());
+		if (primarySecDoc.isEmpty()) {
+			log.debug("........No PrimarySecondaryDocument configuration Available...........");
+			return 0;
+		}
+		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
+				.collect(Collectors.toList());
+
 		Double achievedVolume = 0D;
 		if (!accountProfileIds.isEmpty() && !productProfileIds.isEmpty()) {
 			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository.findIdByAccountProfileAndDocumentDateBetween(
-					accountProfileIds, start.atTime(0, 0), end.atTime(23, 59));
+					accountProfileIds, documentIds, start.atTime(0, 0), end.atTime(23, 59));
 			if (!ivHeaderIds.isEmpty()) {
 				achievedVolume = inventoryVoucherDetailRepository
 						.sumOfVolumeByAndProductIdsAndHeaderIds(productProfileIds, ivHeaderIds);

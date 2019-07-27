@@ -70,7 +70,7 @@ public interface InventoryVoucherDetailRepository extends JpaRepository<Inventor
 	@Query("select sum(voucherDetail.rowTotal) from InventoryVoucherDetail voucherDetail where voucherDetail.product.id in ?1 and voucherDetail.inventoryVoucherHeader.id in ?2")
 	Double sumOfAmountByAndProductIdsAndHeaderIds(Set<Long> productProfileIds, Set<Long> ivHeaderIds);
 	
-	@Query("select sum(voucherDetail.quantity) from InventoryVoucherDetail voucherDetail where voucherDetail.product.id in ?1 and voucherDetail.inventoryVoucherHeader.id in ?2")
+	@Query("select sum((voucherDetail.quantity*voucherDetail.product.unitQty)/1000) from InventoryVoucherDetail voucherDetail where voucherDetail.product.id in ?1 and voucherDetail.inventoryVoucherHeader.id in ?2")
 	Double sumOfVolumeByAndProductIdsAndHeaderIds(Set<Long> productProfileIds, Set<Long> ivHeaderIds);
 	
 	@Query("select sum(voucherDetail.rowTotal) from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.createdBy.pid = ?1 and  voucherDetail.inventoryVoucherHeader.document in ?2 and voucherDetail.product.id in ?3 and voucherDetail.inventoryVoucherHeader.documentDate between ?4 and ?5")
