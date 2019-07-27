@@ -149,4 +149,8 @@ public interface LocationService {
 	List<LocationDTO> findAllByCompanyAndLocationIdIn(List<Long> locationIds);
 
 	List<Location> findAllLocationByCompanyId(Long companyId);
+
+	List<LocationDTO> findAllLocationsByCompanyAndActivatedLocations();
+
+	void saveActivatedLocations(String assignedLocations);
 }

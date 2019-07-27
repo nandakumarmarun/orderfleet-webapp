@@ -19,6 +19,10 @@ import com.orderfleet.webapp.domain.Location;
  */
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
+	
+	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.activatedLocations=?1 order by location.name asc")
+	List<Location> findAllLocationsByCompanyAndActivatedLocations(boolean activated);
+
 	Optional<Location> findByCompanyIdAndNameIgnoreCase(Long id, String name);
 
 	Optional<Location> findOneByPid(String pid);

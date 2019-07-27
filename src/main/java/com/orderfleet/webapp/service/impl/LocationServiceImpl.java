@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
@@ -53,8 +52,7 @@ public class LocationServiceImpl implements LocationService {
 	/**
 	 * Save a location.
 	 * 
-	 * @param locationDTO
-	 *            the entity to save
+	 * @param locationDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -71,8 +69,7 @@ public class LocationServiceImpl implements LocationService {
 	/**
 	 * Update a location.
 	 * 
-	 * @param locationDTO
-	 *            the entity to update
+	 * @param locationDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -105,8 +102,7 @@ public class LocationServiceImpl implements LocationService {
 	/**
 	 * Get all the locations.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -122,8 +118,7 @@ public class LocationServiceImpl implements LocationService {
 	/**
 	 * Get one location by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -138,8 +133,7 @@ public class LocationServiceImpl implements LocationService {
 	/**
 	 * Get one location by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -155,8 +149,7 @@ public class LocationServiceImpl implements LocationService {
 	/**
 	 * Get one location by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -173,8 +166,7 @@ public class LocationServiceImpl implements LocationService {
 	/**
 	 * Delete the location by id.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete Location : {}", pid);
@@ -202,10 +194,8 @@ public class LocationServiceImpl implements LocationService {
 	 * 
 	 *        Update the Location status by pid.
 	 * 
-	 * @param pid
-	 *            the pid of the entity
-	 * @param active
-	 *            the active of the entity
+	 * @param pid    the pid of the entity
+	 * @param active the active of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -229,8 +219,7 @@ public class LocationServiceImpl implements LocationService {
 	 * 
 	 *        find all locationDTOs from Location by status and company.
 	 * 
-	 * @param active
-	 *            the active of the entity
+	 * @param active the active of the entity
 	 * @return the entity
 	 */
 
@@ -249,11 +238,9 @@ public class LocationServiceImpl implements LocationService {
 	 * 
 	 *        find all active company
 	 * 
-	 * @param active
-	 *            the active of the entity
+	 * @param active   the active of the entity
 	 * 
-	 * @param pageable
-	 *            the pageable of the entity
+	 * @param pageable the pageable of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -271,8 +258,7 @@ public class LocationServiceImpl implements LocationService {
 	/**
 	 * Get one location by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -288,8 +274,7 @@ public class LocationServiceImpl implements LocationService {
 	/**
 	 * Save a location.
 	 * 
-	 * @param locationDTO
-	 *            the entity to save
+	 * @param locationDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -337,6 +322,48 @@ public class LocationServiceImpl implements LocationService {
 			locations.add(location);
 		}
 		return locations;
+	}
+
+	@Override
+	public List<LocationDTO> findAllLocationsByCompanyAndActivatedLocations() {
+
+		log.debug("Request to get all Locations Activated");
+
+		List<Location> locationList = locationRepository.findAllLocationsByCompanyAndActivatedLocations(true);
+
+		List<LocationDTO> result = new ArrayList<>();
+
+		for (Location location : locationList) {
+			result.add(new LocationDTO(location));
+		}
+		return result;
+
+	}
+
+	@Override
+	public void saveActivatedLocations(String assignedLocations) {
+
+		List<Location> allLocations = locationRepository.findAllByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
+		List<Location> deactivatedLocationList = new ArrayList<>();
+		for (Location location1 : allLocations) {
+			location1.setActivatedLocations(false);
+			deactivatedLocationList.add(location1);
+		}
+		log.debug("Request to Change activated locations to false : " + deactivatedLocationList.size());
+		locationRepository.save(deactivatedLocationList);
+
+		log.debug("Request to Save  Locations Activated with Pids : " + assignedLocations);
+
+		List<Location> activatedlocationsList = new ArrayList<>();
+		String[] locations = assignedLocations.split(",");
+		for (String locationPid : locations) {
+			Location location = locationRepository.findOneByPid(locationPid).get();
+			location.setActivatedLocations(true);
+			activatedlocationsList.add(location);
+		}
+		log.debug("Size : " + activatedlocationsList.size());
+		locationRepository.save(activatedlocationsList);
+
 	}
 
 }

@@ -68,6 +68,10 @@ public class Location implements Serializable, Cloneable {
 	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
 	private boolean activated = true;
 
+	@NotNull
+	@Column(name = "activated_locations", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean activatedLocations = false;
+
 	@Column(name = "created_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	@JsonIgnore
 	private LocalDateTime createdDate = LocalDateTime.now();
@@ -164,6 +168,14 @@ public class Location implements Serializable, Cloneable {
 
 	public LocalDateTime getLastModifiedDate() {
 		return lastModifiedDate;
+	}
+
+	public boolean getActivatedLocations() {
+		return activatedLocations;
+	}
+
+	public void setActivatedLocations(boolean activatedLocations) {
+		this.activatedLocations = activatedLocations;
 	}
 
 	@Override
