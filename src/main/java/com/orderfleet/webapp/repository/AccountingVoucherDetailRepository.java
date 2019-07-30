@@ -59,4 +59,7 @@ public interface AccountingVoucherDetailRepository extends JpaRepository<Account
 	@Query("select accVoucherDetail from AccountingVoucherDetail accVoucherDetail where accVoucherDetail.accountingVoucherHeader.pid in ?1")
 	List<AccountingVoucherDetail> findAllByAccountingVoucherHeaderPidIn(Set<String> accHeaderPids);
 
+	@Query("select sum(voucherDetail.amount) from AccountingVoucherDetail voucherDetail where voucherDetail.accountingVoucherHeader.id in ?1")
+	Double sumOfAmountByHeaderIds(Set<Long> avHeaderIds);
+
 }

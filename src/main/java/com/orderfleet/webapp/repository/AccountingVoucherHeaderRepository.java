@@ -185,7 +185,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 
 	@Query("select accountingVoucherHeader from AccountingVoucherHeader accountingVoucherHeader where accountingVoucherHeader.company.id = ?1 and tally_download_status = 'PENDING' Order By accountingVoucherHeader.createdDate desc")
 	List<AccountingVoucherHeader> findByCompanyIdAndStatusOrderByCreatedDateDesc(Long companyId);
-	
+
 	@Query("select accountingVoucherHeader from AccountingVoucherHeader accountingVoucherHeader where accountingVoucherHeader.company.id = ?#{principal.companyId}  and tally_download_status = 'PENDING' Order By accountingVoucherHeader.createdDate desc")
 	List<AccountingVoucherHeader> findByCompanyAndStatusOrderByCreatedDateDesc();
 
@@ -200,19 +200,31 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 
 	@Query("select accVoucher from AccountingVoucherHeader accVoucher where accVoucher.company.id = ?#{principal.companyId} and accVoucher.createdBy.pid in ?1 and accVoucher.accountProfile.pid = ?2 and accVoucher.document.pid in ?3 and accVoucher.tallyDownloadStatus in ?4 and accVoucher.createdDate between ?5 and ?6 Order By accVoucher.createdDate desc")
 	List<AccountingVoucherHeader> getAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(
-			List<String> userPids, String accountPid, List<String> documentPids, List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
-	
+			List<String> userPids, String accountPid, List<String> documentPids,
+			List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
+
 	@Query("select accVoucher from AccountingVoucherHeader accVoucher where accVoucher.company.id = ?#{principal.companyId} and accVoucher.createdBy.pid in ?1 and accVoucher.document.pid in ?2 and accVoucher.tallyDownloadStatus in ?3 and accVoucher.createdDate between ?4 and ?5 Order By accVoucher.createdDate desc")
 	List<AccountingVoucherHeader> getAllByCompanyIdUserPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(
-			List<String> userPids, List<String> documentPids, List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
-	
+			List<String> userPids, List<String> documentPids, List<TallyDownloadStatus> tallyDownloadStatus,
+			LocalDateTime fromDate, LocalDateTime toDate);
+
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE AccountingVoucherHeader accVoucher SET accVoucher.tallyDownloadStatus = ?1 WHERE accVoucher.company.id = ?2 AND accVoucher.pid in ?3")
-	int updateAccountingVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus tallyDownloadStatus, long companyId, List<String> accountingPids);
-	
+	int updateAccountingVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus tallyDownloadStatus,
+			long companyId, List<String> accountingPids);
+
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE AccountingVoucherHeader accVoucher SET accVoucher.tallyDownloadStatus = ?1 WHERE accVoucher.company.id = ?#{principal.companyId} AND accVoucher.pid in ?2")
-	int updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus tallyDownloadStatus, List<String> accountingPids);
+	int updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus tallyDownloadStatus,
+			List<String> accountingPids);
+
+	@Query("select av.id from AccountingVoucherHeader av where av.accountProfile.id in ?1 and av.document.pid = ?2 and av.executiveTaskExecution.activity.pid=?3 and av.documentDate between ?4 and ?5")
+	Set<Long> findIdByAccountProfileAndDocumentAndActivityDateBetween(Set<Long> accountProfileIds, String documentPid,
+			String activityPid, LocalDateTime fromDate, LocalDateTime toDate);
+
+	@Query("select sum(av.totalAmount) from AccountingVoucherHeader av where av.accountProfile.id in ?1 and av.document.pid = ?2 and av.executiveTaskExecution.activity.pid=?3 and av.documentDate between ?4 and ?5")
+	Double totalAmountByAccountProfileAndDocumentAndActivityDateBetween(Set<Long> accountProfileIds, String documentPid,
+			String activityPid, LocalDateTime fromDate, LocalDateTime toDate);
 }

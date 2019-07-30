@@ -1,26 +1,18 @@
 package com.orderfleet.webapp.web.rest;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,32 +22,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupLocationTarget;
-import com.orderfleet.webapp.domain.SalesTargetGroup;
-import com.orderfleet.webapp.domain.SalesTargetGroupUserTarget;
-import com.orderfleet.webapp.domain.enums.DocumentType;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.ProductGroupLocationTargetRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
-import com.orderfleet.webapp.repository.ProductGroupSalesTargetGrouprepository;
-import com.orderfleet.webapp.repository.SalesTargetGroupRepository;
-import com.orderfleet.webapp.repository.SalesTargetGroupUserTargetRepository;
-import com.orderfleet.webapp.service.DocumentService;
-import com.orderfleet.webapp.service.EmployeeHierarchyService;
-import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.ProductGroupLocationTargetService;
 import com.orderfleet.webapp.service.ProductGroupService;
-import com.orderfleet.webapp.service.SalesTargetGroupService;
-import com.orderfleet.webapp.service.SalesTargetGroupUserTargetService;
-import com.orderfleet.webapp.service.UserService;
-import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupMonthlyTargetDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesMonthlyTargetDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesTargetBlockDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesTargetGroupUserTargetDTO;
-import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
  * Web controller for managing SalesTargetGroupUserTarget.
@@ -70,37 +44,7 @@ public class ProductGroupLocationTargetResource {
 	private final Logger log = LoggerFactory.getLogger(ProductGroupLocationTargetResource.class);
 
 	@Inject
-	private SalesTargetGroupUserTargetService salesTargetGroupUserTargetService;
-
-	@Inject
-	private SalesTargetGroupService salesTargetGroupService;
-
-	@Inject
-	private UserService userService;
-
-	@Inject
-	private DocumentService documentService;
-
-	@Inject
-	private SalesTargetGroupRepository salesTargetGroupRepository;
-
-	@Inject
-	private SalesTargetGroupUserTargetRepository salesTargetGroupUserTargetRepository;
-
-	@Inject
-	private AccountProfileRepository accountProfileRepository;
-
-	@Inject
-	private EmployeeProfileService employeeProfileService;
-
-	@Inject
-	private EmployeeHierarchyService employeeHierarchyService;
-
-	@Inject
 	private ProductGroupService productGroupService;
-
-	@Inject
-	private ProductGroupSalesTargetGrouprepository productGroupSalesTargetGrouprepository;
 
 	@Inject
 	private LocationService locationService;

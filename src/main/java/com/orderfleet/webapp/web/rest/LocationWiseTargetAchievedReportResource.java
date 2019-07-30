@@ -4,12 +4,9 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,21 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.CompanySetting;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.ProductGroupLocationTarget;
-import com.orderfleet.webapp.domain.SalesSummaryAchievment;
-import com.orderfleet.webapp.domain.SalesTargetGroup;
-import com.orderfleet.webapp.domain.SalesTargetGroupUserTarget;
-import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.VoucherType;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
-import com.orderfleet.webapp.repository.CompanySettingRepository;
-import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
-import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
@@ -48,21 +33,11 @@ import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.ProductGroupLocationTargetRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
-import com.orderfleet.webapp.repository.ProductGroupSalesTargetGrouprepository;
-import com.orderfleet.webapp.repository.ProductProfileRepository;
-import com.orderfleet.webapp.repository.SalesSummaryAchievmentRepository;
-import com.orderfleet.webapp.repository.SalesTargetGroupDocumentRepository;
-import com.orderfleet.webapp.repository.SalesTargetGroupProductRepository;
-import com.orderfleet.webapp.repository.SalesTargetGroupUserTargetRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.LocationService;
-import com.orderfleet.webapp.service.ProductGroupSalesTargetGroupService;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationPerformaceDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesPerformaceDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesTargetGroupUserTargetDTO;
-import com.orderfleet.webapp.web.rest.mapper.SalesTargetGroupUserTargetMapper;
 
 /**
  * Web controller for Sales Target v/s achieved report
@@ -77,52 +52,16 @@ public class LocationWiseTargetAchievedReportResource {
 	private final Logger log = LoggerFactory.getLogger(LocationWiseTargetAchievedReportResource.class);
 
 	@Inject
-	private SalesTargetGroupUserTargetRepository salesTargetGroupUserTargetRepository;
-
-	@Inject
-	private SalesTargetGroupUserTargetMapper productGroupLocationTargetMapper;
-
-	@Inject
-	private SalesTargetGroupDocumentRepository salesTargetGroupDocumentRepository;
-
-	@Inject
-	private SalesTargetGroupProductRepository salesTargetGroupProductRepository;
-
-	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
 
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
 
 	@Inject
-	private SalesSummaryAchievmentRepository salesSummaryAchievmentRepository;
-
-	@Inject
-	private CompanySettingRepository companySettingRepository;
-
-	@Inject
-	private CompanyConfigurationRepository companyConfigurationRepository;
-
-	@Inject
-	private EmployeeProfileLocationRepository employeeProfileLocationRepository;
-
-	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
 
 	@Inject
-	private EmployeeProfileRepository employeeRepository;
-
-	@Inject
-	private ProductGroupSalesTargetGroupService productGroupSalesTargetGroupService;
-
-	@Inject
-	private ProductGroupSalesTargetGrouprepository productGroupSalesTargetGrouprepository;
-
-	@Inject
 	private ProductGroupRepository productGroupRepository;
-
-	@Inject
-	private ProductProfileRepository productProfileRepository;
 
 	@Inject
 	private ProductGroupLocationTargetRepository productGroupLocationTargetRepository;
@@ -264,57 +203,6 @@ public class LocationWiseTargetAchievedReportResource {
 		}
 		return achievedVolume == null ? 0 : achievedVolume;
 
-	}
-
-	private double getAchievedAmountFromTransactionUserWise(String userPid, LocalDate initialDate,
-			Set<Long> documentIds, Set<Long> productProfileIds) {
-		LocalDate start = initialDate.with(TemporalAdjusters.firstDayOfMonth());
-		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
-		Double achievedAmount = 0D;
-		if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
-			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository
-					.findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(userPid, documentIds,
-							start.atTime(0, 0), end.atTime(23, 59));
-			if (!ivHeaderIds.isEmpty()) {
-				achievedAmount = inventoryVoucherDetailRepository
-						.sumOfAmountByAndProductIdsAndHeaderIds(productProfileIds, ivHeaderIds);
-			}
-		}
-		return achievedAmount == null ? 0 : achievedAmount;
-	}
-
-	private double getAchievedAmountFromTransactionTerritoryWise(String userPid, LocalDate initialDate,
-			Set<Long> documentIds, Set<Long> productProfileIds) {
-		LocalDate start = initialDate.with(TemporalAdjusters.firstDayOfMonth());
-		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
-		Double achievedAmount = 0D;
-		// user's account profile
-		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserPidIn(Arrays.asList(userPid));
-		Set<Long> accountProfileIds = locationAccountProfileRepository
-				.findAccountProfileIdsByUserLocationIdsIn(locationIds);
-		if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
-			// get achieved amount
-			achievedAmount = inventoryVoucherDetailRepository
-					.sumOfAmountByDocumentsAndProductsAndAccountProfilesAndCreatedDateBetween(accountProfileIds,
-							documentIds, productProfileIds, start.atTime(0, 0), end.atTime(23, 59));
-		}
-		return achievedAmount == null ? 0 : achievedAmount;
-	}
-
-	private double getAchievedAmountFromSummary(String userPid,
-			SalesTargetGroupUserTargetDTO productGroupLocationTargetDTO, LocalDate initialDate) {
-		LocalDate start = initialDate.with(TemporalAdjusters.firstDayOfMonth());
-		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
-		List<SalesSummaryAchievment> salesSummaryAchievmentList = salesSummaryAchievmentRepository
-				.findByUserPidAndSalesTargetGroupPidAndAchievedDateBetween(userPid,
-						productGroupLocationTargetDTO.getSalesTargetGroupPid(), start, end);
-		double achievedAmount = 0;
-		if (!salesSummaryAchievmentList.isEmpty()) {
-			for (SalesSummaryAchievment summaryAchievment : salesSummaryAchievmentList) {
-				achievedAmount += summaryAchievment.getAmount();
-			}
-		}
-		return achievedAmount;
 	}
 
 	private List<LocalDate> monthsDateBetweenDates(LocalDate start, LocalDate end) {

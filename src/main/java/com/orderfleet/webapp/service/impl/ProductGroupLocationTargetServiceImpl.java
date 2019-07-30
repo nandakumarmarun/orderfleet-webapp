@@ -1,53 +1,24 @@
 package com.orderfleet.webapp.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.orderfleet.webapp.domain.Company;
-import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ProductGroupLocationTarget;
-import com.orderfleet.webapp.domain.SalesTargetGroupUserTarget;
-import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.enums.TargetFrequency;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
-import com.orderfleet.webapp.repository.EmployeeProfileRepository;
-import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.ProductGroupLocationTargetRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
-import com.orderfleet.webapp.repository.SalesTargetGroupDocumentRepository;
-import com.orderfleet.webapp.repository.SalesTargetGroupProductRepository;
-import com.orderfleet.webapp.repository.SalesTargetGroupRepository;
-import com.orderfleet.webapp.repository.SalesTargetGroupUserTargetRepository;
-import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ProductGroupLocationTargetService;
-import com.orderfleet.webapp.service.SalesTargetGroupUserTargetService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupMonthlyTargetDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesMonthlyTargetDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesTargetGroupUserTargetDTO;
-import com.orderfleet.webapp.web.rest.mapper.SalesTargetGroupUserTargetMapper;
 
 /**
  * Service Implementation for managing SalesTargetGroupUserTarget.
@@ -62,34 +33,7 @@ public class ProductGroupLocationTargetServiceImpl implements ProductGroupLocati
 	private final Logger log = LoggerFactory.getLogger(ProductGroupLocationTargetServiceImpl.class);
 
 	@Inject
-	private SalesTargetGroupUserTargetRepository salesTargetGroupUserTargetRepository;
-
-	@Inject
 	private CompanyRepository companyRepository;
-
-	@Inject
-	private SalesTargetGroupUserTargetMapper salesTargetGroupUserTargetMapper;
-
-	@Inject
-	private SalesTargetGroupRepository salesTargetGroupRepository;
-
-	@Inject
-	private UserRepository userRepository;
-
-	@Inject
-	private SalesTargetGroupDocumentRepository salesTargetGroupDocumentRepository;
-
-	@Inject
-	private SalesTargetGroupProductRepository salesTargetGroupProductRepository;
-
-	@Inject
-	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
-
-	@Inject
-	private AccountProfileRepository accountProfileRepository;
-
-	@Inject
-	private EmployeeProfileRepository employeeProfileRepository;
 
 	@Inject
 	private LocationRepository locationRepository;
@@ -103,6 +47,7 @@ public class ProductGroupLocationTargetServiceImpl implements ProductGroupLocati
 	@Override
 	public ProductGroupLocationTargetDTO saveMonthlyTarget(ProductGroupMonthlyTargetDTO monthlyTargetDTO,
 			LocalDate startDate, LocalDate endDate) {
+		log.info("Save monthly target location wise");
 		ProductGroupLocationTarget productGroupLocationTarget = new ProductGroupLocationTarget();
 		// set pid
 		productGroupLocationTarget.setPid(ProductGroupLocationTargetService.PID_PREFIX + RandomUtil.generatePid());
