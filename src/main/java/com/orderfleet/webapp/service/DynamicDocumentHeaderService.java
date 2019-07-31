@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.FilledForm;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 
 /**
@@ -26,8 +27,7 @@ public interface DynamicDocumentHeaderService {
 	/**
 	 * Save a dynamicDocumentHeader.
 	 * 
-	 * @param dynamicDocumentHeaderDTO
-	 *            the entity to save
+	 * @param dynamicDocumentHeaderDTO the entity to save
 	 * @return the persisted entity
 	 */
 	DynamicDocumentHeaderDTO save(DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO);
@@ -37,8 +37,7 @@ public interface DynamicDocumentHeaderService {
 	/**
 	 * Get all the dynamicDocumentHeaders.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	Page<DynamicDocumentHeader> findAll(Pageable pageable);
@@ -53,8 +52,7 @@ public interface DynamicDocumentHeaderService {
 	/**
 	 * Get all the dynamicDocumentHeaders of a company.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	Page<DynamicDocumentHeaderDTO> findAllByCompany(Pageable pageable);
@@ -62,8 +60,7 @@ public interface DynamicDocumentHeaderService {
 	/**
 	 * Get the "id" dynamicDocumentHeader.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	DynamicDocumentHeaderDTO findOne(Long id);
@@ -71,8 +68,7 @@ public interface DynamicDocumentHeaderService {
 	/**
 	 * Get the dynamicDocumentHeader by "pid".
 	 * 
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	Optional<DynamicDocumentHeaderDTO> findOneByPid(String pid);
@@ -104,4 +100,16 @@ public interface DynamicDocumentHeaderService {
 			String documentPid, LocalDateTime fromDate, LocalDateTime toDate);
 
 	List<DynamicDocumentHeaderDTO> findAllDynamicDocumentByExecutiveTaskExecutionPid(String pid);
+
+	List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidDocumentPidAndTallyDownloadStatusAndDateBetween(
+			String userPid, String documentPid, List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate,
+			LocalDateTime toDate);
+
+	List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidAndTallyDownloadStatusAndDateBetween(String userPid,
+			List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate, LocalDateTime toDate);
+
+	List<DynamicDocumentHeaderDTO> findAllByCompanyIdDocumentPidAndTallyDownloadStatusAndDateBetween(String documentPid,
+			List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate, LocalDateTime toDate);
+
+	void updateDynamicDocumentHeaderStatus(DynamicDocumentHeaderDTO dynamicDocumentDTO);
 }

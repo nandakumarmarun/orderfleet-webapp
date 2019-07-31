@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.DynamicDocumentHeaderHistory;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
  * A DTO for the InventoryVoucherHeader entity.
@@ -58,8 +59,10 @@ public class DynamicDocumentHeaderDTO {
 
 	// SaveOrUpdate Dashboard update
 	private Boolean isNew = Boolean.FALSE;
-	
+
 	private boolean imageButtonVisible = false;// for displaying image button if images exist
+
+	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
 
 	public DynamicDocumentHeaderDTO() {
 		super();
@@ -92,6 +95,9 @@ public class DynamicDocumentHeaderDTO {
 			this.accountPhone = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getPhone1();
 			this.accountEmail = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getEmail1();
 		}
+		if (dynamicDocumentHeader.getTallyDownloadStatus() != null) {
+			this.tallyDownloadStatus = dynamicDocumentHeader.getTallyDownloadStatus();
+		}
 	}
 
 	public DynamicDocumentHeaderDTO(DynamicDocumentHeaderHistory dynamicDocumentHeader) {
@@ -115,6 +121,7 @@ public class DynamicDocumentHeaderDTO {
 		this.accountAddress = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getAddress();
 		this.accountPhone = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getPhone1();
 		this.accountEmail = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getEmail1();
+
 	}
 
 	public String getPid() {
@@ -291,6 +298,14 @@ public class DynamicDocumentHeaderDTO {
 
 	public void setImageButtonVisible(boolean imageButtonVisible) {
 		this.imageButtonVisible = imageButtonVisible;
+	}
+
+	public TallyDownloadStatus getTallyDownloadStatus() {
+		return tallyDownloadStatus;
+	}
+
+	public void setTallyDownloadStatus(TallyDownloadStatus tallyDownloadStatus) {
+		this.tallyDownloadStatus = tallyDownloadStatus;
 	}
 
 	@Override

@@ -50,6 +50,19 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	List<DynamicDocumentHeader> findAllByCompanyIdDocumentPidAndDateBetweenOrderByCreatedDateDesc(String documentPid,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
+	@Query("select dDocument from DynamicDocumentHeader dDocument where dDocument.company.id = ?#{principal.companyId} and dDocument.createdBy.pid = ?1 and dDocument.document.pid = ?2 and dDocument.tallyDownloadStatus in ?3 and dDocument.createdDate between ?4 and ?5 Order By dDocument.createdDate desc")
+	List<DynamicDocumentHeader> findAllByCompanyIdUserPidDocumentPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(
+			String userPid, String documentPid, List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate,
+			LocalDateTime toDate);
+
+	@Query("select dDocument from DynamicDocumentHeader dDocument where dDocument.company.id = ?#{principal.companyId} and dDocument.createdBy.pid = ?1 and dDocument.tallyDownloadStatus in ?2 and dDocument.createdDate between ?3 and ?4 Order By dDocument.createdDate desc")
+	List<DynamicDocumentHeader> findAllByCompanyIdUserPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(
+			String userPid, List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate, LocalDateTime toDate);
+
+	@Query("select dDocument from DynamicDocumentHeader dDocument where dDocument.company.id = ?#{principal.companyId} and dDocument.document.pid = ?1 and dDocument.tallyDownloadStatus in ?2 and dDocument.createdDate between ?3 and ?4 Order By dDocument.createdDate desc")
+	List<DynamicDocumentHeader> findAllByCompanyIdDocumentPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(
+			String documentPid, List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate, LocalDateTime toDate);
+
 	@Query("select dDocument.pid,dDocument.document.name,dDocument.document.documentType from DynamicDocumentHeader dDocument where dDocument.executiveTaskExecution.id = ?1")
 	List<Object[]> findByExecutiveTaskExecutionId(Long executiveTaskExecutionId);
 

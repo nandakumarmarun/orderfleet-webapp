@@ -24,7 +24,9 @@ import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.DynamicDocumentHeaderHistory;
 import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.FilledFormDetail;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountProfileDynamicDocumentAccountprofileRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
@@ -84,8 +86,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	/**
 	 * Save a dynamicDocumentHeader.
 	 * 
-	 * @param dynamicDocumentHeaderDTO
-	 *            the entity to save
+	 * @param dynamicDocumentHeaderDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -202,8 +203,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	/**
 	 * Get all the dynamicDocumentHeaders.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -233,8 +233,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	/**
 	 * Get all the dynamicDocumentHeaders.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -253,8 +252,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	/**
 	 * Get one dynamicDocumentHeader by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -271,8 +269,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	/**
 	 * Get one dynamicDocumentHeader by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -429,6 +426,53 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 			}
 		}
 		return new ArrayList<>(dynamics);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidDocumentPidAndTallyDownloadStatusAndDateBetween(
+			String userPid, String documentPid, List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate,
+			LocalDateTime toDate) {
+		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
+				.findAllByCompanyIdUserPidDocumentPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(userPid,
+						documentPid, tallyStatus, fromDate, toDate);
+		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
+				.collect(Collectors.toList());
+		return result;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidAndTallyDownloadStatusAndDateBetween(String userPid,
+			List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate, LocalDateTime toDate) {
+		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
+				.findAllByCompanyIdUserPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(userPid,
+						tallyStatus, fromDate, toDate);
+		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
+				.collect(Collectors.toList());
+		return result;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdDocumentPidAndTallyDownloadStatusAndDateBetween(
+			String documentPid, List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate, LocalDateTime toDate) {
+		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
+				.findAllByCompanyIdDocumentPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(documentPid,
+						tallyStatus, fromDate, toDate);
+		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
+				.collect(Collectors.toList());
+		return result;
+	}
+
+	@Override
+	public void updateDynamicDocumentHeaderStatus(DynamicDocumentHeaderDTO dynamicDocumentDTO) {
+		DynamicDocumentHeader dynamicDocumentHeader = dynamicDocumentHeaderRepository
+				.findOneByPid(dynamicDocumentDTO.getPid()).get();
+		dynamicDocumentHeader.setStatus(true);
+		dynamicDocumentHeader.setTallyDownloadStatus(dynamicDocumentDTO.getTallyDownloadStatus());
+		dynamicDocumentHeaderRepository.save(dynamicDocumentHeader);
+
 	}
 
 }

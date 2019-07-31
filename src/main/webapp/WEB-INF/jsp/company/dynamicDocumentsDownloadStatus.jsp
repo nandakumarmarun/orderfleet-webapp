@@ -67,7 +67,7 @@
 							</div>
 							<div class="col-sm-2">
 								Day <select class="form-control" id="dbDateSearch"
-									onchange="DynamicDocument.showDatePicker().showDatePicker()">
+									onchange="DynamicDocument.showDatePicker()">
 									<option value="TODAY">Today</option>
 									<option value="YESTERDAY">Yesterday</option>
 									<option value="WTD">WTD</option>
@@ -98,6 +98,15 @@
 									</div>
 								</div>
 							</div>
+							<div class="col-sm-2">
+								Status <select id="dbStatus" name="tallyDownloadStatus"
+									class="form-control">
+									<option value="ALL">All</option>
+									<option value="PENDING">PENDING</option>
+									<option value="PROCESSING">PROCESSING</option>
+									<option value="COMPLETED">COMPLETED</option>
+								</select>
+							</div>
 							<div class="col-sm-1" style="margin-top: 23px">
 								<button type="button" class="btn btn-info" id="btnApply">Apply</button>
 							</div>
@@ -113,6 +122,7 @@
 						<th>Activity</th>
 						<th>Document</th>
 						<th>Date</th>
+						<th>Status</th>
 						<th colspan="3">Action</th>
 					</tr>
 				</thead>
@@ -288,9 +298,9 @@
 		var="jqueryUI"></spring:url>
 	<script type="text/javascript" src="${jqueryUI}"></script>
 
-	<spring:url value="/resources/app/dynamic-document.js"
-		var="dynamicDocumentJs"></spring:url>
-	<script type="text/javascript" src="${dynamicDocumentJs}"></script>
+	<spring:url value="/resources/app/dynamic-document-download-status.js"
+		var="dynamicDocumentDownloadStatusJs"></spring:url>
+	<script type="text/javascript" src="${dynamicDocumentDownloadStatusJs}"></script>
 
 	<spring:url value="/resources/assets/js/moment.js" var="momentJs"></spring:url>
 	<script type="text/javascript" src="${momentJs}"></script>
