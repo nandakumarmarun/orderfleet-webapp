@@ -8,12 +8,15 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.FilledForm;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
  * Spring Data JPA repository for the DynamicDocumentHeader entity.
@@ -134,13 +137,27 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 
 	@Query("select dynamicDocumentHeader from DynamicDocumentHeader dynamicDocumentHeader where dynamicDocumentHeader.company.id = ?#{principal.companyId}  and tally_download_status = 'PENDING' Order By dynamicDocumentHeader.createdDate desc")
 	List<DynamicDocumentHeader> findByCompanyAndStatusOrderByCreatedDateDesc();
-	
-//	@Query("select dDocument.pid,dDocument.documentNumberLocal,dDocument.documentNumberServer,dDocument.document.pid," + 
-//			"dDocument.document.name,dDocument.createdDate,dDocument.documentDate,dDocument.employee.pid,dDocument.employee.name," + 
-//			"dDocument.createdBy.firstName,dDocument.createdBy.pid,dDocument.executiveTaskExecution.activity.name," + 
-//			"dDocument.executiveTaskExecution.accountProfile.name,dDocument.employee.phone,dDocument.executiveTaskExecution.accountProfile.address," + 
-//			"dDocument.executiveTaskExecution.accountProfile.phone,dDocument.executiveTaskExecution.accountProfile.email," + 
-//			"dDocument.status from DynamicDocumentHeader dDocument  where dDocument.company.id = ?#{principal.companyId} and "+
-//			"dDocument.document.id in ?1 and dDocument.accountProfile.pid = ?2")			
-//	List<Object[]> findAllByAccountProfilePidAndDocumentIn(Set<Long> documentPids ,String accountProfilePid);
+
+	@Transactional
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE DynamicDocumentHeader dynamicDocumentHeader SET dynamicDocumentHeader.tallyDownloadStatus = ?1 WHERE dynamicDocumentHeader.company.id = ?#{principal.companyId} AND dynamicDocumentHeader.pid in ?2")
+	int updateDynamicDocumentHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus tallyDownloadStatus,
+			List<String> dynamicDocumentPids);
+
+	// @Query("select
+	// dDocument.pid,dDocument.documentNumberLocal,dDocument.documentNumberServer,dDocument.document.pid,"
+	// +
+	// "dDocument.document.name,dDocument.createdDate,dDocument.documentDate,dDocument.employee.pid,dDocument.employee.name,"
+	// +
+	// "dDocument.createdBy.firstName,dDocument.createdBy.pid,dDocument.executiveTaskExecution.activity.name,"
+	// +
+	// "dDocument.executiveTaskExecution.accountProfile.name,dDocument.employee.phone,dDocument.executiveTaskExecution.accountProfile.address,"
+	// +
+	// "dDocument.executiveTaskExecution.accountProfile.phone,dDocument.executiveTaskExecution.accountProfile.email,"
+	// +
+	// "dDocument.status from DynamicDocumentHeader dDocument where
+	// dDocument.company.id = ?#{principal.companyId} and "+
+	// "dDocument.document.id in ?1 and dDocument.accountProfile.pid = ?2")
+	// List<Object[]> findAllByAccountProfilePidAndDocumentIn(Set<Long> documentPids
+	// ,String accountProfilePid);
 }
