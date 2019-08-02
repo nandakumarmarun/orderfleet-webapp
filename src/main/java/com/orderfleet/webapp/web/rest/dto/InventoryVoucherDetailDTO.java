@@ -467,6 +467,27 @@ public class InventoryVoucherDetailDTO {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "InventoryVoucherDetailDTO [detailId=" + detailId + ", productPid=" + productPid + ", productName="
+				+ productName + ", productCategory=" + productCategory + ", productGroups=" + productGroups
+				+ ", productSKU=" + productSKU + ", productUnitQty=" + productUnitQty + ", quantity=" + quantity
+				+ ", freeQuantity=" + freeQuantity + ", sellingRate=" + sellingRate + ", mrp=" + mrp + ", purchaseRate="
+				+ purchaseRate + ", taxPercentage=" + taxPercentage + ", discountPercentage=" + discountPercentage
+				+ ", batchNumber=" + batchNumber + ", batchDate=" + batchDate + ", rowTotal=" + rowTotal
+				+ ", discountAmount=" + discountAmount + ", taxAmount=" + taxAmount + ", length=" + length + ", width="
+				+ width + ", thickness=" + thickness + ", size=" + size + ", color=" + color
+				+ ", sourceStockLocationPid=" + sourceStockLocationPid + ", sourceStockLocationName="
+				+ sourceStockLocationName + ", destinationStockLocationPid=" + destinationStockLocationPid
+				+ ", destinationStockLocationName=" + destinationStockLocationName
+				+ ", referenceInventoryVoucherHeaderPid=" + referenceInventoryVoucherHeaderPid
+				+ ", referenceInventoryVoucherDetailId=" + referenceInventoryVoucherDetailId + ", remarks=" + remarks
+				+ ", visitRemarks=" + visitRemarks + ", inventoryVoucherBatchDetails=" + inventoryVoucherBatchDetails
+				+ ", createdDate=" + createdDate + ", accountPid=" + accountPid + ", accountName=" + accountName
+				+ ", employeeName=" + employeeName + "]";
+	}
+	
 	
 	
 

@@ -540,8 +540,13 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						referenceInventoryVoucherDetail = inventoryVoucherDetailRepository
 								.findOne(inventoryVoucherDetailDTO.getReferenceInventoryVoucherDetailId());
 
-					ProductProfile productProfile = productProfileRepository
-							.findOneByPid(inventoryVoucherDetailDTO.getProductPid()).get();
+					Optional<ProductProfile> opProductProfile = productProfileRepository
+																	.findOneByPid(inventoryVoucherDetailDTO.getProductPid());
+					if(!opProductProfile.isPresent()) {
+						log.info(inventoryVoucherDetailDTO.toString());
+						throw new IllegalArgumentException(inventoryVoucherDetailDTO.getProductName() + "Product Not found");
+					}
+					ProductProfile productProfile = opProductProfile.get();
 
 					// Inventory Voucher Batch Details
 					List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails = new ArrayList<>();

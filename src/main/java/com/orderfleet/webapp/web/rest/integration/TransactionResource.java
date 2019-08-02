@@ -521,6 +521,9 @@ public class TransactionResource {
 			String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 			SalesOrderDTO salesOrderDTO = new SalesOrderDTO(inventoryVoucherHeader);
 			List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
+			if(inventoryVoucherHeader.getInventoryVoucherDetails()==null) {
+				throw new IllegalArgumentException("Inventory Detail not present");
+			}
 			for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader.getInventoryVoucherDetails()) {
 				SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
 				if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
