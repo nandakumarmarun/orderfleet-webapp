@@ -94,6 +94,8 @@ public interface InventoryVoucherHeaderService {
 			String locationPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents);
 
 	void updateInventoryVoucherHeaderStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
+	
+	void updateInventoryVoucherHeaderSalesManagementStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
 
 	List<InventoryVoucherHeaderDTO> findAllByExecutiveTaskExecutionPid(String executiveTaskExecutionPid);
 	

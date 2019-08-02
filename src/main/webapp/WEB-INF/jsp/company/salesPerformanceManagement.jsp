@@ -143,6 +143,7 @@
 							<th>Total Quantity</th>
 							<th>Date</th>
 							<th>Status</th>
+							<th>Management Status</th>
 							<th>Action</th>
 							<th>VisitRemarks</th>
 						</tr>

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
+import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.SourceModule;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
@@ -84,6 +85,8 @@ public class InventoryVoucherHeaderDTO {
 	// status for tally download
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
 
+	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.HOLD;
+
 	private long orderNumber;
 	private String customeraddress;
 	private String customerEmail;
@@ -154,6 +157,10 @@ public class InventoryVoucherHeaderDTO {
 				: inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks();
 
 		this.pdfDownloadStatus = inventoryVoucherHeader.getPdfDownloadStatus();
+
+		if (inventoryVoucherHeader.getSalesManagementStatus() != null) {
+			this.salesManagementStatus = inventoryVoucherHeader.getSalesManagementStatus();
+		}
 
 	}
 
@@ -338,6 +345,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public SalesManagementStatus getSalesManagementStatus() {
+		return salesManagementStatus;
+	}
+
+	public void setSalesManagementStatus(SalesManagementStatus salesManagementStatus) {
+		this.salesManagementStatus = salesManagementStatus;
 	}
 
 	public double getDocumentTotal() {

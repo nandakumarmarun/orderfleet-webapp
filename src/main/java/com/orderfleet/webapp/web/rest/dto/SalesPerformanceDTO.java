@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.dto;
 
 import java.time.LocalDateTime;
 
+import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
@@ -52,6 +53,8 @@ public class SalesPerformanceDTO {
 	private long orderNumber;
 
 	private TallyDownloadStatus tallyDownloadStatus;
+
+	private SalesManagementStatus salesManagementStatus;
 
 	private String visitRemarks;
 
@@ -237,6 +240,14 @@ public class SalesPerformanceDTO {
 
 	public void setOrderNumber(long orderNumber) {
 		this.orderNumber = orderNumber;
+	}
+
+	public SalesManagementStatus getSalesManagementStatus() {
+		return salesManagementStatus;
+	}
+
+	public void setSalesManagementStatus(SalesManagementStatus salesManagementStatus) {
+		this.salesManagementStatus = salesManagementStatus;
 	}
 
 }

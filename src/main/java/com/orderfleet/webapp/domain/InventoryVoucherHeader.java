@@ -23,6 +23,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.SourceModule;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
@@ -152,6 +153,11 @@ public class InventoryVoucherHeader implements Serializable {
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
 
 	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "sales_management_status", nullable = false, columnDefinition = "character varying DEFAULT 'HOLD'")
+	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.HOLD;
+
+	@NotNull
 	@Column(name = "pdf_download_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean pdfDownloadStatus = false;
 
@@ -241,6 +247,14 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setEmployee(EmployeeProfile employee) {
 		this.employee = employee;
+	}
+
+	public SalesManagementStatus getSalesManagementStatus() {
+		return salesManagementStatus;
+	}
+
+	public void setSalesManagementStatus(SalesManagementStatus salesManagementStatus) {
+		this.salesManagementStatus = salesManagementStatus;
 	}
 
 	public double getDocumentTotal() {

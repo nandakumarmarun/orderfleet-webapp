@@ -66,6 +66,7 @@ import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
@@ -99,9 +100,9 @@ import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
  */
 @Controller
 @RequestMapping("/web")
-public class SalesPerformanceManagement {
+public class SalesPerformanceManagementResource {
 
-	private final Logger log = LoggerFactory.getLogger(SalesPerformanceManagement.class);
+	private final Logger log = LoggerFactory.getLogger(SalesPerformanceManagementResource.class);
 
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
@@ -247,17 +248,17 @@ public class SalesPerformanceManagement {
 		}
 		LocalDate fDate = LocalDate.now();
 		LocalDate tDate = LocalDate.now();
-		if (filterBy.equals(SalesPerformanceManagement.CUSTOM)) {
+		if (filterBy.equals(SalesPerformanceManagementResource.CUSTOM)) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			fDate = LocalDate.parse(fromDate, formatter);
 			tDate = LocalDate.parse(toDate, formatter);
-		} else if (filterBy.equals(SalesPerformanceManagement.YESTERDAY)) {
+		} else if (filterBy.equals(SalesPerformanceManagementResource.YESTERDAY)) {
 			fDate = LocalDate.now().minusDays(1);
 			tDate = fDate;
-		} else if (filterBy.equals(SalesPerformanceManagement.WTD)) {
+		} else if (filterBy.equals(SalesPerformanceManagementResource.WTD)) {
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			fDate = LocalDate.now().with(fieldISO, 1);
-		} else if (filterBy.equals(SalesPerformanceManagement.MTD)) {
+		} else if (filterBy.equals(SalesPerformanceManagementResource.MTD)) {
 			fDate = LocalDate.now().withDayOfMonth(1);
 		}
 		List<SalesPerformanceDTO> salesPerformanceDTOs = getFilterData(employeePids, documentPids, tallyDownloadStatus,
@@ -361,6 +362,8 @@ public class SalesPerformanceManagement {
 			salesPerformanceDTO.setOrderNumber(ivData[18] == null ? 0 : Long.parseLong(ivData[18].toString()));
 
 			salesPerformanceDTO.setPdfDownloadStatus(Boolean.valueOf(ivData[19].toString()));
+
+			salesPerformanceDTO.setSalesManagementStatus(SalesManagementStatus.valueOf(ivData[20].toString()));
 
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
@@ -562,9 +565,22 @@ public class SalesPerformanceManagement {
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> changeStatus(@RequestParam String pid,
 			@RequestParam TallyDownloadStatus tallyDownloadStatus) {
+		log.info("Sales Tally Download Status " + tallyDownloadStatus);
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(pid).get();
 		inventoryVoucherHeaderDTO.setTallyDownloadStatus(tallyDownloadStatus);
 		inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
+	}
+
+	@RequestMapping(value = "/sales-performance-management/changeSalesManagementStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> changeSalesManagementStatus(@RequestParam String pid,
+			@RequestParam SalesManagementStatus salesManagementStatus) {
+		log.info("Sales Sales Management Status " + salesManagementStatus);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(pid).get();
+		inventoryVoucherHeaderDTO.setSalesManagementStatus(salesManagementStatus);
+		inventoryVoucherService.updateInventoryVoucherHeaderSalesManagementStatus(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
 	}
@@ -580,8 +596,8 @@ public class SalesPerformanceManagement {
 		buildPdf(inventoryVoucherHeaderDTO, response);
 
 		if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
-				inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
-			
+			inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
+
 		}
 
 	}
