@@ -84,6 +84,10 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Column(name = "location", length = 255)
 	private String location;
 
+	@Size(max = 255)
+	@Column(name = "gst_registration_type", length = 255)
+	private String gstRegistrationType;
+
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "tbl_account_geolocation_file", joinColumns = {
@@ -107,7 +111,7 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Size(max = 20)
 	@Column(name = "phone_2", length = 20)
 	private String phone2;
-	
+
 	@Size(max = 20)
 	@Column(name = "whats_app_no", length = 20)
 	private String whatsAppNo;
@@ -143,7 +147,7 @@ public class AccountProfile implements Serializable, Cloneable {
 	@ManyToOne
 	private Company company;
 
-	//tally status
+	// tally status
 	@NotNull
 	@Column(name = "import_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE' ")
 	private Boolean importStatus = false;
@@ -156,7 +160,7 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	@Column(name = "contact_person")
 	private String contactPerson;
-	
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "data_source_type", nullable = false, columnDefinition = "character varying DEFAULT 'WEB'")
@@ -172,7 +176,7 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	@Column(name = "lead_to_cash_stage")
 	private String leadToCashStage;
-	
+
 	@PreUpdate
 	public void preUpdate() {
 		this.lastModifiedDate = LocalDateTime.now();
@@ -189,14 +193,12 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	@Column(name = "trim_char")
 	private String trimChar;
-	
+
 	@Column(name = "state_name")
 	private String stateName;
-	
+
 	@Column(name = "country_name")
 	private String countryName;
-
-
 
 	public Long getId() {
 		return id;
@@ -469,7 +471,7 @@ public class AccountProfile implements Serializable, Cloneable {
 	public void setLeadToCashStage(String leadToCashStage) {
 		this.leadToCashStage = leadToCashStage;
 	}
-	
+
 	public String getStateName() {
 		return stateName;
 	}
@@ -484,6 +486,14 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	public void setCountryName(String countryName) {
 		this.countryName = countryName;
+	}
+
+	public String getGstRegistrationType() {
+		return gstRegistrationType;
+	}
+
+	public void setGstRegistrationType(String gstRegistrationType) {
+		this.gstRegistrationType = gstRegistrationType;
 	}
 
 	@Override
@@ -511,13 +521,4 @@ public class AccountProfile implements Serializable, Cloneable {
 		return super.clone();
 	}
 
-	
-
-	
-
-	
-
-
-	
-	
 }

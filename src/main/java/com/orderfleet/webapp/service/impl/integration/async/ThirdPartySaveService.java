@@ -182,7 +182,9 @@ public class ThirdPartySaveService {
 				+ company.getLegalName());
 
 		for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
+
 			if (accountProfileDTO.getName() != null) {
+
 				if (accountProfileDTO.getDefaultPriceLevelName() != null
 						&& !accountProfileDTO.getDefaultPriceLevelName().equalsIgnoreCase("")) {
 					Optional<PriceLevelDTO> priceLevelDTO = pricelevelservice.findByCompanyIdName(companyId,

@@ -89,8 +89,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Save a accountProfile.
 	 *
-	 * @param accountProfileDTO
-	 *            the entity to save
+	 * @param accountProfileDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -111,8 +110,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Update a accountProfile.
 	 *
-	 * @param accountProfileDTO
-	 *            the entity to update
+	 * @param accountProfileDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -155,8 +153,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Get all the categorys.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -199,8 +196,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Get all the categorys.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -217,8 +213,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Get one accountProfile by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -233,8 +228,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Get one accountProfile by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -251,8 +245,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Get one accountProfile by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -270,8 +263,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Delete the accountProfile by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete AccountProfile : {}", pid);
@@ -283,8 +275,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Get one accountProfile by alias.
 	 *
-	 * @param alias
-	 *            the alias of the entity
+	 * @param alias the alias of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -340,10 +331,8 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Update the accountProfile by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
-	 * @param active
-	 *            the active of the entity
+	 * @param pid    the pid of the entity
+	 * @param active the active of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -388,8 +377,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Get one accountProfile by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -406,8 +394,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Save a accountProfile.
 	 *
-	 * @param accountProfileDTO
-	 *            the entity to save
+	 * @param accountProfileDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -464,8 +451,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	/**
 	 * Get one accountProfile by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override

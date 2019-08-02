@@ -103,7 +103,7 @@ public class TPAccountProfileManagementService {
 	private final ProductGroupRepository productGroupRepository;
 
 	private final PriceLevelAccountProductGroupRepository priceLevelAccountProductGroupRepository;
-	
+
 	private final LocationService locationService;
 
 	private final GstLedgerRepository gstLedgerRepository;
@@ -118,7 +118,7 @@ public class TPAccountProfileManagementService {
 			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
 			ProductGroupRepository productGroupRepository,
 			PriceLevelAccountProductGroupRepository priceLevelAccountProductGroupRepository,
-			LocationService locationService,GstLedgerRepository gstLedgerRepository) {
+			LocationService locationService, GstLedgerRepository gstLedgerRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.syncOperationRepository = syncOperationRepository;
@@ -199,6 +199,8 @@ public class TPAccountProfileManagementService {
 			accountProfile.setContactPerson(apDto.getContactPerson());
 			accountProfile.setStateName(apDto.getStateName());
 			accountProfile.setCountryName(apDto.getCountryName());
+			accountProfile.setGstRegistrationType(
+					apDto.getGstRegistrationType() == null ? "" : apDto.getGstRegistrationType());
 			if (apDto.getDefaultPriceLevelName() != null && !apDto.getDefaultPriceLevelName().equalsIgnoreCase("")) {
 				// price level
 				Optional<PriceLevel> optionalPriceLevel = tempPriceLevel.stream()
@@ -330,8 +332,7 @@ public class TPAccountProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
-	
+
 	@Transactional
 	@Async
 	public void saveUpdateLocationAccountProfiles(final List<LocationAccountProfileDTO> locationAccountProfileDTOs,
@@ -341,7 +342,7 @@ public class TPAccountProfileManagementService {
 		final Long companyId = syncOperation.getCompany().getId();
 		List<LocationAccountProfile> newLocationAccountProfiles = new ArrayList<>();
 		List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileService
-																	.findAllLocationAccountProfiles(companyId);
+				.findAllLocationAccountProfiles(companyId);
 		// delete all assigned location account profile from tally
 		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
 		List<AccountProfile> accountProfiles = accountProfileService.findAllAccountProfileByCompanyId(companyId);
@@ -355,29 +356,27 @@ public class TPAccountProfileManagementService {
 					.findAny();
 			// find accountprofile
 			Optional<AccountProfile> acc = accountProfiles.stream()
-					.filter(ap -> locAccDto.getAccountProfileName().equals(ap.getName()))
-					.findAny();
+					.filter(ap -> locAccDto.getAccountProfileName().equals(ap.getName())).findAny();
 
 			if (loc.isPresent() && acc.isPresent()) {
 
-				List<Long> locationAccountProfileIds = locationAccountProfiles
-						.stream().filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
-						.map(lap -> lap.getId())
-						.collect(Collectors.toList());
-				if(locationAccountProfileIds.size() != 0){
+				List<Long> locationAccountProfileIds = locationAccountProfiles.stream()
+						.filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
+						.map(lap -> lap.getId()).collect(Collectors.toList());
+				if (locationAccountProfileIds.size() != 0) {
 					locationAccountProfilesIds.addAll(locationAccountProfileIds);
 				}
 
 				profile.setLocation(loc.get());
 				profile.setAccountProfile(acc.get());
 				profile.setCompany(company);
-				newLocationAccountProfiles.add(profile); 
+				newLocationAccountProfiles.add(profile);
 			}
 		}
-		if(locationAccountProfilesIds.size() != 0) {
+		if (locationAccountProfilesIds.size() != 0) {
 			locationAccountProfileRepository.deleteByIdIn(companyId, locationAccountProfilesIds);
 		}
-		
+
 		locationAccountProfileRepository.save(newLocationAccountProfiles);
 
 		long end = System.nanoTime();
@@ -389,8 +388,7 @@ public class TPAccountProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
-	
+
 	@Transactional
 	@Async
 	public void saveUpdateReceivablePayables(final List<ReceivablePayableDTO> receivablePayableDTOs,
@@ -407,24 +405,25 @@ public class TPAccountProfileManagementService {
 		receivablePayableRepository.deleteByCompanyId(company.getId());
 		for (ReceivablePayableDTO rpDto : receivablePayableDTOs) {
 			// only save if account profile exist
-			accountProfiles.stream().filter(a -> a.getName().equalsIgnoreCase(rpDto.getAccountName())).findAny().ifPresent(ap -> {
-				ReceivablePayable receivablePayable = new ReceivablePayable();
-				if (receivablePayable.getReceivablePayableType() == null) {
-					receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
-				}
-				receivablePayable.setReceivablePayableType(rpDto.getReceivablePayableType());
-				receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
-				receivablePayable.setAccountProfile(ap);
-				receivablePayable.setCompany(company);
-				receivablePayable.setBillOverDue(Long.valueOf(rpDto.getBillOverDue()));
-				receivablePayable.setReferenceDocumentAmount(rpDto.getReferenceDocumentAmount());
-				receivablePayable.setReferenceDocumentBalanceAmount(rpDto.getReferenceDocumentBalanceAmount());
-				receivablePayable.setReferenceDocumentDate(rpDto.getReferenceDocumentDate());
-				receivablePayable.setReferenceDocumentNumber(rpDto.getReferenceDocumentNumber());
-				receivablePayable.setReferenceDocumentType(rpDto.getReferenceDocumentType());
-				receivablePayable.setRemarks(rpDto.getRemarks());
-				saveReceivablePayable.add(receivablePayable);
-			});
+			accountProfiles.stream().filter(a -> a.getName().equalsIgnoreCase(rpDto.getAccountName())).findAny()
+					.ifPresent(ap -> {
+						ReceivablePayable receivablePayable = new ReceivablePayable();
+						if (receivablePayable.getReceivablePayableType() == null) {
+							receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
+						}
+						receivablePayable.setReceivablePayableType(rpDto.getReceivablePayableType());
+						receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
+						receivablePayable.setAccountProfile(ap);
+						receivablePayable.setCompany(company);
+						receivablePayable.setBillOverDue(Long.valueOf(rpDto.getBillOverDue()));
+						receivablePayable.setReferenceDocumentAmount(rpDto.getReferenceDocumentAmount());
+						receivablePayable.setReferenceDocumentBalanceAmount(rpDto.getReferenceDocumentBalanceAmount());
+						receivablePayable.setReferenceDocumentDate(rpDto.getReferenceDocumentDate());
+						receivablePayable.setReferenceDocumentNumber(rpDto.getReferenceDocumentNumber());
+						receivablePayable.setReferenceDocumentType(rpDto.getReferenceDocumentType());
+						receivablePayable.setRemarks(rpDto.getRemarks());
+						saveReceivablePayable.add(receivablePayable);
+					});
 		}
 		bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);
 		long end = System.nanoTime();
@@ -541,33 +540,33 @@ public class TPAccountProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
 	@Transactional
 	public void saveOrUpdateGstLedgers(List<GstLedgerDTO> gstLedgers, SyncOperation syncOperation) {
 		List<GstLedger> saveGstLedgers = new ArrayList<>();
 		final Company company = syncOperation.getCompany();
 		List<GstLedger> existingGstLedgers = gstLedgerRepository.findAllByCompanyId(company.getId());
-		for(GstLedgerDTO gstLedgerDTO : gstLedgers){
+		for (GstLedgerDTO gstLedgerDTO : gstLedgers) {
 			Optional<GstLedger> opGstLedger = existingGstLedgers.stream()
-									.filter(eGst -> eGst.getName().equals(gstLedgerDTO.getName())).findAny();
-				GstLedger gstLedger = null;
-				if(opGstLedger.isPresent()) {
-					gstLedger = opGstLedger.get();
-					gstLedger.setTaxRate(gstLedgerDTO.getTaxRate());
-				}else {
-					gstLedger = new GstLedger();
-					gstLedger.setName(gstLedgerDTO.getName());
-					gstLedger.setTaxRate(gstLedgerDTO.getTaxRate());
-					gstLedger.setCompany(company);
-					gstLedger.setTaxType(gstLedgerDTO.getTaxType());
-					gstLedger.setAccountType(GstAccountType.DUTIES_AND_TAXES);
-					gstLedger.setActivated(false);
-				}	
-					saveGstLedgers.add(gstLedger);
+					.filter(eGst -> eGst.getName().equals(gstLedgerDTO.getName())).findAny();
+			GstLedger gstLedger = null;
+			if (opGstLedger.isPresent()) {
+				gstLedger = opGstLedger.get();
+				gstLedger.setTaxRate(gstLedgerDTO.getTaxRate());
+			} else {
+				gstLedger = new GstLedger();
+				gstLedger.setName(gstLedgerDTO.getName());
+				gstLedger.setTaxRate(gstLedgerDTO.getTaxRate());
+				gstLedger.setCompany(company);
+				gstLedger.setTaxType(gstLedgerDTO.getTaxType());
+				gstLedger.setAccountType(GstAccountType.DUTIES_AND_TAXES);
+				gstLedger.setActivated(false);
+			}
+			saveGstLedgers.add(gstLedger);
 		}
 		gstLedgerRepository.save(saveGstLedgers);
 	}
-	
+
 	private static boolean isValidEmail(String email) {
 		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
 				+ "A-Z]{2,7}$";

@@ -37,6 +37,8 @@ public class AccountProfileDTO {
 
 	private String accountTypeName;
 
+	private String gstRegistrationType;
+
 	@NotNull
 	@Size(min = 1, max = 500)
 	private String address;
@@ -68,7 +70,7 @@ public class AccountProfileDTO {
 	@Email
 	@Size(max = 100)
 	private String email2;
-	
+
 	private String whatsAppNo;
 
 	private String defaultPriceLevelPid;
@@ -90,7 +92,7 @@ public class AccountProfileDTO {
 	private LocalDateTime lastModifiedDate;
 
 	private LocalDateTime createdDate;
-	
+
 	private String leadToCashStage;
 
 	private String tinNo;
@@ -103,15 +105,15 @@ public class AccountProfileDTO {
 
 	// Only for InventoryVoucherTransaction
 	private boolean hasDefaultAccountInventory;
-	
+
 	private boolean promptStockLocationInventory;
-	
+
 	private DataSourceType dataSourceType = DataSourceType.WEB;
 
 	private String stateName;
-	
+
 	private String countryName;
-	
+
 	public AccountProfileDTO() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -216,6 +218,14 @@ public class AccountProfileDTO {
 
 	public void setCity(String city) {
 		this.city = city;
+	}
+
+	public String getGstRegistrationType() {
+		return gstRegistrationType;
+	}
+
+	public void setGstRegistrationType(String gstRegistrationType) {
+		this.gstRegistrationType = gstRegistrationType;
 	}
 
 	public String getLocation() {
@@ -433,7 +443,7 @@ public class AccountProfileDTO {
 	public void setLeadToCashStage(String leadToCashStage) {
 		this.leadToCashStage = leadToCashStage;
 	}
-	
+
 	public String getStateName() {
 		return stateName;
 	}
@@ -465,7 +475,7 @@ public class AccountProfileDTO {
 	public void setDataSourceType(DataSourceType dataSourceType) {
 		this.dataSourceType = dataSourceType;
 	}
-	
+
 	public String getCountryName() {
 		return countryName;
 	}
@@ -490,12 +500,12 @@ public class AccountProfileDTO {
 
 		return true;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(pid);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "AccountProfileDTO [pid=" + pid + ", name=" + name + ", alias=" + alias + ", userPid=" + userPid
@@ -512,9 +522,5 @@ public class AccountProfileDTO {
 				+ ", hasDefaultAccountInventory=" + hasDefaultAccountInventory + ", promptStockLocationInventory="
 				+ promptStockLocationInventory + ", dataSourceType=" + dataSourceType + "]";
 	}
-
-	
-	
-	
 
 }
