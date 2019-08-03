@@ -156,8 +156,15 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and tallyDownloadStatus='PENDING' Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
 
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and tallyDownloadStatus='PENDING' and salesManagementStatus='APPROVE' Order By inventoryVoucher.createdDate desc")
+	List<InventoryVoucherHeader> findAllByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
+
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and tallyDownloadStatus='PENDING' and inventoryVoucher.employee.id IN ?1 Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdAndTallyStatusAndEmployeeOrderByCreatedDateDesc(
+			List<Long> employeeIds);
+
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and tallyDownloadStatus='PENDING' and salesManagementStatus='APPROVE' and inventoryVoucher.employee.id IN ?1 Order By inventoryVoucher.createdDate desc")
+	List<InventoryVoucherHeader> findAllByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc(
 			List<Long> employeeIds);
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.executiveTaskExecution.pid=?1 Order By inventoryVoucher.createdDate desc")
@@ -448,4 +455,5 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE  InventoryVoucherHeader iv SET iv.pdfDownloadStatus=true WHERE iv.pid=?1")
 	void updatePdfDownlodStatusByPid(String pid);
+
 }

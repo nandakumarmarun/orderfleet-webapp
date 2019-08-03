@@ -84,6 +84,7 @@
 							<th>Email1</th>
 							<th>WhatsApp No</th>
 							<th>Account Status</th>
+							<th>GST Registration Type</th>
 							<th>Created Date</th>
 							<th>Created By</th>
 							<th>Stage</th>

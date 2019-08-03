@@ -264,11 +264,13 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ spanStatus(
 																			inventoryVoucher.pid,
-																			inventoryVoucher.tallyDownloadStatus)
-																	+ "</td><td>" 
+																			inventoryVoucher.tallyDownloadStatus,
+																			inventoryVoucher.salesManagementStatus)
+																	+ "</td><td>"
 																	+ spanSalesManagementStatus(
 																			inventoryVoucher.pid,
-																			inventoryVoucher.salesManagementStatus)
+																			inventoryVoucher.salesManagementStatus,
+																			inventoryVoucher.tallyDownloadStatus)
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='InventoryVoucher.showModalPopup($(\"#viewModal\"),\""
 																	+ inventoryVoucher.pid
 																	+ "\",0);'>View Details</button>"
@@ -311,7 +313,7 @@ if (!this.InventoryVoucher) {
 
 	}
 
-	function spanStatus(inventoryVoucherPid, status) {
+	function spanStatus(inventoryVoucherPid, status, managementStatus) {
 
 		var pending = "'" + 'PENDING' + "'";
 		var processing = "'" + 'PROCESSING' + "'";
@@ -334,6 +336,7 @@ if (!this.InventoryVoucher) {
 					+ completed
 					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
 					+ '</ul></div>';
+
 			break;
 		case 'PROCESSING':
 			spanStatus = '<div class="dropdown"><span class="label label-warning dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
@@ -350,6 +353,7 @@ if (!this.InventoryVoucher) {
 					+ completed
 					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
 					+ '</ul></div>';
+
 			break;
 		case 'COMPLETED':
 			spanStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
@@ -377,8 +381,8 @@ if (!this.InventoryVoucher) {
 		 */
 		return spanStatus;
 	}
-	
-	function spanSalesManagementStatus(inventoryVoucherPid, status) {
+
+	function spanSalesManagementStatus(inventoryVoucherPid, status, tallyStatus) {
 
 		var hold = "'" + 'HOLD' + "'";
 		var approve = "'" + 'APPROVE' + "'";
@@ -403,20 +407,27 @@ if (!this.InventoryVoucher) {
 					+ '</ul></div>';
 			break;
 		case 'APPROVE':
-			spanSalesManagementStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'APPROVE <span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
-					+ pid
-					+ ','
-					+ hold
-					+ ')"  style="cursor: pointer;"><a>HOLD</a></li>'
-					+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
-					+ pid
-					+ ','
-					+ reject
-					+ ')" style="cursor: pointer;"><a>REJECT</a></li>'
-					+ '</ul></div>';
+
+			if (tallyStatus == 'COMPLETED') {
+				spanSalesManagementStatus = '<div ><span class="label label-success dropdown-toggle" data-toggle="dropdown" >'
+						+ 'APPROVE <span></span></span></div>';
+
+			} else {
+				spanSalesManagementStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
+						+ 'APPROVE <span class="caret"></span></span>'
+						+ '<ul class="dropdown-menu">'
+						+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
+						+ pid
+						+ ','
+						+ hold
+						+ ')"  style="cursor: pointer;"><a>HOLD</a></li>'
+						+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
+						+ pid
+						+ ','
+						+ reject
+						+ ')" style="cursor: pointer;"><a>REJECT</a></li>'
+						+ '</ul></div>';
+			}
 			break;
 		case 'REJECT':
 			spanSalesManagementStatus = '<div class="dropdown"><span class="label label-danger dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
@@ -473,14 +484,16 @@ if (!this.InventoryVoucher) {
 		}
 
 	}
-	
-	InventoryVoucher.setSalesManagementStatus = function(pid, salesManagementStatus) {
+
+	InventoryVoucher.setSalesManagementStatus = function(pid,
+			salesManagementStatus) {
 
 		if (confirm("Are you sure?")) {
 			// update status;changeStatus
 
 			$.ajax({
-				url : inventoryVoucherContextPath + "/changeSalesManagementStatus",
+				url : inventoryVoucherContextPath
+						+ "/changeSalesManagementStatus",
 				method : 'GET',
 				data : {
 					pid : pid,

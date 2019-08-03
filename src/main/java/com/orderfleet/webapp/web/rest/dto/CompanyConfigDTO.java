@@ -21,6 +21,7 @@ public class CompanyConfigDTO {
 	private boolean chatReply;// settings to reply for a firebase notification
 	private boolean salesPdfDownload;// setting for download as pdf button in sales order
 	private boolean visitBasedTransaction;// setting for visit based transaction
+	private boolean salesManagement;// setting for Sales Management
 
 	public CompanyConfigDTO() {
 		super();
@@ -112,6 +113,14 @@ public class CompanyConfigDTO {
 
 	public void setVisitBasedTransaction(boolean visitBasedTransaction) {
 		this.visitBasedTransaction = visitBasedTransaction;
+	}
+
+	public boolean getSalesManagement() {
+		return salesManagement;
+	}
+
+	public void setSalesManagement(boolean salesManagement) {
+		this.salesManagement = salesManagement;
 	}
 
 }

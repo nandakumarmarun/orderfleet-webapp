@@ -30,6 +30,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
@@ -41,10 +42,12 @@ import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
@@ -57,6 +60,7 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountingVoucherHeaderService;
 import com.orderfleet.webapp.service.ActivityService;
+import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.DocumentService;
 import com.orderfleet.webapp.service.DynamicDocumentHeaderService;
 import com.orderfleet.webapp.service.ExecutiveTaskSubmissionService;
@@ -81,7 +85,6 @@ import com.orderfleet.webapp.web.rest.dto.SalesOrderItemDTO;
 import com.orderfleet.webapp.web.rest.dto.VatLedgerDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.tally.dto.GstLedgerDTO;
-
 
 /**
  * REST controller for managing order data for third party application.
@@ -145,13 +148,18 @@ public class TransactionResource {
 
 	@Inject
 	private LocationAccountProfileService locationAccountProfileService;
-	
+
 	@Inject
 	private GstLedgerRepository gstLedgerRepository;
-	
+
 	@Inject
 	private EmployeeProfileRepository employeeProfileRepository;
 
+	@Inject
+	private CompanyService companyService;
+
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 	// @Inject
 	// private DocumentStockLocationSourceRepository
 	// documentStockLocationSourceRepository;
@@ -163,8 +171,7 @@ public class TransactionResource {
 	 * POST /sales-order.json : Create new salesOrders.
 	 * 
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/get-sales-orders.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -266,16 +273,13 @@ public class TransactionResource {
 		return salesOrderDTOs;
 	}
 
-	
-	
 	/**
 	 * POST /sales-order.json : Create new salesOrders.
 	 * 
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
-	//Method used for getting sales order (aquatech, and new companies)
+	// Method used for getting sales order (aquatech, and new companies)
 	@RequestMapping(value = "/v2/get-sales-orders.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
@@ -284,16 +288,30 @@ public class TransactionResource {
 		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
 		List<String> inventoryHeaderPid = new ArrayList<String>();
-		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-				.findAllByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
-		log.debug("IVH size : {}",inventoryVoucherHeaders.size());
+
+		String companyPid = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid();
+
+		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+
+		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
+
+		if (optSalesManagement.isPresent()) {
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+					.findAllByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
+
+		} else {
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+					.findAllByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
+		}
+		log.debug("IVH size : {}", inventoryVoucherHeaders.size());
 		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
-			
+
 //			if(inventoryVoucherHeader.getTallyDownloadStatus() == TallyDownloadStatus.PROCESSING || 
 //					inventoryVoucherHeader.getTallyDownloadStatus() == TallyDownloadStatus.COMPLETED) {
 //				continue;
 //			}
-			
+
 			String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 
 			// seting inventory heder to salesOrderDTO
@@ -356,55 +374,71 @@ public class TransactionResource {
 			}
 			salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
 			List<GstLedger> gstLedgerList = new ArrayList<>();
-			gstLedgerList = gstLedgerRepository.findAllByCompanyIdAndActivated(inventoryVoucherHeader.getCompany().getId(),true);
-			if(gstLedgerList != null && gstLedgerList.size()!=0) {
-				List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst)).collect(Collectors.toList());
+			gstLedgerList = gstLedgerRepository
+					.findAllByCompanyIdAndActivated(inventoryVoucherHeader.getCompany().getId(), true);
+			if (gstLedgerList != null && gstLedgerList.size() != 0) {
+				List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst))
+						.collect(Collectors.toList());
 				salesOrderDTO.setGstLedgerDtos(gstLedgerDtos);
 			}
 			inventoryHeaderPid.add(inventoryVoucherHeader.getPid());
-			
+
 			salesOrderDTOs.add(salesOrderDTO);
 		}
-		if(!salesOrderDTOs.isEmpty()) {
-			int updated = inventoryVoucherHeaderRepository.
-								updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
-			log.debug("updated "+updated+" to PROCESSING");
+		if (!salesOrderDTOs.isEmpty()) {
+			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+					TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
+			log.debug("updated " + updated + " to PROCESSING");
 		}
-		
+
 		return salesOrderDTOs;
 	}
-	
-	
-	
-	//Method used for getting sales grouped by employee
+
+	// Method used for getting sales grouped by employee
 	@RequestMapping(value = "/v2/get-sales.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
-	public List<SalesOrderDTO> getSalesJsonData(@RequestParam("employeeVoucher") String employeeVoucher) throws URISyntaxException {
+	public List<SalesOrderDTO> getSalesJsonData(@RequestParam("employeeVoucher") String employeeVoucher)
+			throws URISyntaxException {
 		log.debug("REST request to download sales : {}");
-		log.info("REST request to download sales  ***** : {}"+employeeVoucher);
+		log.info("REST request to download sales  ***** : {}" + employeeVoucher);
 
-		if(employeeVoucher == null) {
-			log.info("REST request to download sales Failed : {}"+employeeVoucher);
+		if (employeeVoucher == null) {
+			log.info("REST request to download sales Failed : {}" + employeeVoucher);
 			return Collections.emptyList();
 		}
 		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyId(true);
-		List<Long> empId =new ArrayList<>();
-		if("All".equalsIgnoreCase(employeeVoucher)) {
+		List<Long> empId = new ArrayList<>();
+		if ("All".equalsIgnoreCase(employeeVoucher)) {
 			empId = employeeProfiles.stream().map(emp -> emp.getId()).collect(Collectors.toList());
-		}else {
+		} else {
 			empId = employeeProfiles.stream().filter(emp -> emp.getName().trim().equals(employeeVoucher))
 					.map(emp -> emp.getId()).collect(Collectors.toList());
 		}
-		
+
 		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
 		List<String> inventoryHeaderPid = new ArrayList<String>();
-		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-				.findAllByCompanyIdAndTallyStatusAndEmployeeOrderByCreatedDateDesc(empId);
-		log.debug("IVH size : {}",inventoryVoucherHeaders.size());
+		
+		String companyPid = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid();
+
+		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+
+		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
+
+		if (optSalesManagement.isPresent()) {
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+					.findAllByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc(empId);
+
+		} else {
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+					.findAllByCompanyIdAndTallyStatusAndEmployeeOrderByCreatedDateDesc(empId);
+		}
+		
+		log.debug("IVH size : {}", inventoryVoucherHeaders.size());
 		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
-			
+
 			String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 
 			// seting inventory heder to salesOrderDTO
@@ -467,30 +501,31 @@ public class TransactionResource {
 			}
 			salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
 			List<GstLedger> gstLedgerList = new ArrayList<>();
-			gstLedgerList = gstLedgerRepository.findAllByCompanyIdAndActivated(inventoryVoucherHeader.getCompany().getId(),true);
-			if(gstLedgerList != null && gstLedgerList.size()!=0) {
-				List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst)).collect(Collectors.toList());
+			gstLedgerList = gstLedgerRepository
+					.findAllByCompanyIdAndActivated(inventoryVoucherHeader.getCompany().getId(), true);
+			if (gstLedgerList != null && gstLedgerList.size() != 0) {
+				List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst))
+						.collect(Collectors.toList());
 				salesOrderDTO.setGstLedgerDtos(gstLedgerDtos);
 			}
 			inventoryHeaderPid.add(inventoryVoucherHeader.getPid());
-			
+
 			salesOrderDTOs.add(salesOrderDTO);
 		}
-		if(!salesOrderDTOs.isEmpty()) {
-			int updated = inventoryVoucherHeaderRepository.
-								updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
-			log.debug("updated "+updated+" to PROCESSING");
+		if (!salesOrderDTOs.isEmpty()) {
+			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+					TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
+			log.debug("updated " + updated + " to PROCESSING");
 		}
-		
+
 		return salesOrderDTOs;
 	}
-	
+
 	/**
 	 * POST /sales-order.json : Create new salesOrders.
 	 * 
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/get-doc-wise-sales-orders", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -521,7 +556,7 @@ public class TransactionResource {
 			String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 			SalesOrderDTO salesOrderDTO = new SalesOrderDTO(inventoryVoucherHeader);
 			List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
-			if(inventoryVoucherHeader.getInventoryVoucherDetails()==null) {
+			if (inventoryVoucherHeader.getInventoryVoucherDetails() == null) {
 				throw new IllegalArgumentException("Inventory Detail not present");
 			}
 			for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader.getInventoryVoucherDetails()) {
@@ -607,11 +642,10 @@ public class TransactionResource {
 				}
 			}
 		}
-		
+
 		return receiptDTOs;
 	}
-	
-	
+
 	@RequestMapping(value = "/v2/get-receipts.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public List<ReceiptDTO> downloadReceiptsJson() throws URISyntaxException {
@@ -630,17 +664,20 @@ public class TransactionResource {
 							.getAccountingVoucherAllocations()) {
 						ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherAllocation);
 						receiptDTO.setHeaderAmount(accountingVoucherHeader.getTotalAmount());
-						receiptDTO.setNarrationMessage(accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
+						receiptDTO.setNarrationMessage(
+								accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
 						receiptDTOs.add(receiptDTO);
 					}
 				}
 			}
 		}
-		
-		if(!receiptDTOs.isEmpty()) {
-			int updated = accountingVoucherHeaderRepository.
-					updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PROCESSING, receiptDTOs.stream().map(avh -> avh.getAccountingVoucherHeaderPid()).collect(Collectors.toList()));
-			log.debug("updated "+updated+" to PROCESSING");
+
+		if (!receiptDTOs.isEmpty()) {
+			int updated = accountingVoucherHeaderRepository
+					.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PROCESSING,
+							receiptDTOs.stream().map(avh -> avh.getAccountingVoucherHeaderPid())
+									.collect(Collectors.toList()));
+			log.debug("updated " + updated + " to PROCESSING");
 		}
 		return receiptDTOs;
 	}
@@ -648,11 +685,9 @@ public class TransactionResource {
 	/**
 	 * POST /update-receipt-status .
 	 *
-	 * @param String
-	 *            the List<String> to create
+	 * @param String the List<String> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/update-receipt-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -668,26 +703,25 @@ public class TransactionResource {
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
-	
+
 	@RequestMapping(value = "/v2/update-receipt-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Void> UpdateReceiptStatus(@Valid @RequestBody List<String> accountingVoucherHeaderPids)
 			throws URISyntaxException {
 		log.debug("REST request to update Accounting Voucher Header Status : {}", accountingVoucherHeaderPids.size());
-			if (!accountingVoucherHeaderPids.isEmpty()) {
-				accountingVoucherHeaderRepository.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.COMPLETED,  accountingVoucherHeaderPids);
-			}
+		if (!accountingVoucherHeaderPids.isEmpty()) {
+			accountingVoucherHeaderRepository.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(
+					TallyDownloadStatus.COMPLETED, accountingVoucherHeaderPids);
+		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	/**
 	 * POST /update-order-status .
 	 *
-	 * @param String
-	 *            the List<String> to create
+	 * @param String the List<String> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/update-order-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -702,17 +736,20 @@ public class TransactionResource {
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
-	
-	//method used for update order status based on tally response : updating variable TallyDownloadStatus enum
+
+	// method used for update order status based on tally response : updating
+	// variable TallyDownloadStatus enum
 	@RequestMapping(value = "/v2/update-order-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
-	public ResponseEntity<Void> UpdarteOrderStatusWithTallyStatus(@Valid @RequestBody List<String> inventoryVoucherHeaderPids)
-			throws URISyntaxException {
-		log.debug("REST request to update Inventory Voucher Header Status (aquatech) : {}", inventoryVoucherHeaderPids.size());
+	public ResponseEntity<Void> UpdarteOrderStatusWithTallyStatus(
+			@Valid @RequestBody List<String> inventoryVoucherHeaderPids) throws URISyntaxException {
+		log.debug("REST request to update Inventory Voucher Header Status (aquatech) : {}",
+				inventoryVoucherHeaderPids.size());
 
 		if (!inventoryVoucherHeaderPids.isEmpty()) {
-			inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.COMPLETED,inventoryVoucherHeaderPids);
+			inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+					TallyDownloadStatus.COMPLETED, inventoryVoucherHeaderPids);
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
@@ -721,8 +758,7 @@ public class TransactionResource {
 	 * POST /get-receipts.json : Create new salesOrders.
 	 * 
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/get-ledgers.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -747,11 +783,9 @@ public class TransactionResource {
 	/**
 	 * POST /update-ledgers-status .
 	 *
-	 * @param String
-	 *            the List<String> to create
+	 * @param String the List<String> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/update-ledgers-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -770,11 +804,9 @@ public class TransactionResource {
 	/**
 	 * POST /send sales from tally .
 	 *
-	 * @param String
-	 *            the List<inventoryVoucherHeaderDTO> to create
+	 * @param String the List<inventoryVoucherHeaderDTO> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/tally-accounting-vouchers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -789,11 +821,12 @@ public class TransactionResource {
 			// delete InventoryVoucherHeaders for avoidind duplicates and for new or updated
 			// sales vouchers
 			List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
-					.findAllByCompanyIdAndDocumentDateAndActivityAndDocumentOrderByCreatedDateDesc(
-							documentDate, activityDto.getPid(), documentDto.getPid());
+					.findAllByCompanyIdAndDocumentDateAndActivityAndDocumentOrderByCreatedDateDesc(documentDate,
+							activityDto.getPid(), documentDto.getPid());
 			if (!accountingVoucherHeaders.isEmpty()) {
 				deleteAccountingVoucherHeaders(accountingVoucherHeaders);
-				//return ResponseEntity.ok().body("Receipt already uploaded in this date : " + documentDate);
+				// return ResponseEntity.ok().body("Receipt already uploaded in this date : " +
+				// documentDate);
 			}
 
 			int documentUniqueNoToPref = 1;
@@ -835,7 +868,8 @@ public class TransactionResource {
 
 					executiveTaskSubmissionDTO.setExecutiveTaskExecutionDTO(eteDTO);
 					executiveTaskSubmissionDTO.setAccountingVouchers(accountingVouchers);
-					executiveTaskSubmissionService.saveTPExecutiveTaskSubmission(executiveTaskSubmissionDTO, opUser.get());
+					executiveTaskSubmissionService.saveTPExecutiveTaskSubmission(executiveTaskSubmissionDTO,
+							opUser.get());
 				}
 			}
 		}
@@ -845,11 +879,9 @@ public class TransactionResource {
 	/**
 	 * POST /send sales from tally .
 	 *
-	 * @param String
-	 *            the List<inventoryVoucherHeaderDTO> to create
+	 * @param String the List<inventoryVoucherHeaderDTO> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/tally-inventory-vouchers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -865,11 +897,12 @@ public class TransactionResource {
 			// delete InventoryVoucherHeaders for avoidind duplicates and for
 			// new or updated sales vouchers
 			List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findAllByCompanyIdAndDocumentDateAndActivityAndDocumentOrderByCreatedDateDesc(
-							documentDate, activityDto.getPid(), documentDto.getPid());
+					.findAllByCompanyIdAndDocumentDateAndActivityAndDocumentOrderByCreatedDateDesc(documentDate,
+							activityDto.getPid(), documentDto.getPid());
 			if (!inventoryVoucherHeaders.isEmpty()) {
 				deleteInventoryVoucherHeaders(inventoryVoucherHeaders);
-				//return ResponseEntity.ok().body("Sales already uploaded in this date : " + documentDate);
+				// return ResponseEntity.ok().body("Sales already uploaded in this date : " +
+				// documentDate);
 			}
 			int documentUniqueNoToPref = 1;
 			for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaderDTOs) {
@@ -921,7 +954,8 @@ public class TransactionResource {
 					executiveTaskSubmissionDTO.setExecutiveTaskExecutionDTO(eteDTO);
 					executiveTaskSubmissionDTO.setInventoryVouchers(inventoryVouchers);
 
-					executiveTaskSubmissionService.saveTPExecutiveTaskSubmission(executiveTaskSubmissionDTO, opUser.get());
+					executiveTaskSubmissionService.saveTPExecutiveTaskSubmission(executiveTaskSubmissionDTO,
+							opUser.get());
 				}
 			}
 		}
@@ -929,8 +963,8 @@ public class TransactionResource {
 	}
 
 	/**
-	 * delete InventoryVoucherHeaders for avoidind duplicates and for new or
-	 * updated sales vouchers
+	 * delete InventoryVoucherHeaders for avoidind duplicates and for new or updated
+	 * sales vouchers
 	 * 
 	 * @param inventoryVoucherHeaders
 	 */
@@ -946,8 +980,8 @@ public class TransactionResource {
 	}
 
 	/**
-	 * delete InventoryVoucherHeaders for avoidind duplicates and for new or
-	 * updated sales vouchers
+	 * delete InventoryVoucherHeaders for avoidind duplicates and for new or updated
+	 * sales vouchers
 	 * 
 	 * @param inventoryVoucherHeaders
 	 */
@@ -969,7 +1003,7 @@ public class TransactionResource {
 		activityDto.setName(name);
 		activityDto.setActivated(true);
 		activityDto.setHasDefaultAccount(false);
-		activityDto.setDescription("Used to send data "+ name +" from tally");
+		activityDto.setDescription("Used to send data " + name + " from tally");
 		return activityService.save(activityDto);
 	}
 
@@ -982,7 +1016,7 @@ public class TransactionResource {
 		documentDto.setName(name);
 		documentDto.setDocumentType(DocumentType.ACCOUNTING_VOUCHER);
 		documentDto.setDocumentPrefix("Receipts");
-		documentDto.setDescription("used to send data "+ name +" from tally");
+		documentDto.setDescription("used to send data " + name + " from tally");
 		return documentService.save(documentDto);
 	}
 }

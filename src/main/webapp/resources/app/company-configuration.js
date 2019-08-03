@@ -45,6 +45,7 @@ if (!this.CompanyConfiguration) {
 		var chatReply = $('#chatReply').is(":checked");
 		var salesPdfDownload = $('#salesPdfDownload').is(":checked");
 		var visitBasedTransaction = $('#visitBasedTransaction').is(":checked");
+		var salesManagement = $('#salesManagement').is(":checked");
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -58,7 +59,8 @@ if (!this.CompanyConfiguration) {
 				newCustomerAlias : newCustomerAlias,
 				chatReply : chatReply,
 				salesPdfDownload : salesPdfDownload,
-				visitBasedTransaction : visitBasedTransaction
+				visitBasedTransaction : visitBasedTransaction,
+				salesManagement : salesManagement
 			},
 			success : function(data) {
 				onSaveSuccess(data);
@@ -86,6 +88,7 @@ if (!this.CompanyConfiguration) {
 				$("#chatReply").prop("checked", data.chatReply);
 				$("#salesPdfDownload").prop("checked", data.salesPdfDownload);
 				$("#visitBasedTransaction").prop("checked", data.visitBasedTransaction);
+				$("#salesManagement").prop("checked", data.salesManagement);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);

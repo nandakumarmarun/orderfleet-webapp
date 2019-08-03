@@ -113,6 +113,10 @@ public class CompanyConfigurationResource {
 					mcDto.setVisitBasedTransaction(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.SALES_MANAGEMENT)) {
+					mcDto.setSalesManagement(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 			}
 			if (anyValueExist) {
@@ -130,7 +134,8 @@ public class CompanyConfigurationResource {
 			@RequestParam String interimSave, @RequestParam String refreshProductGroupProduct,
 			@RequestParam String stageChangeAccountingVoucher, @RequestParam String newCustomerAlias,
 			@RequestParam String chatReply, @RequestParam String salesPdfDownload,
-			@RequestParam String visitBasedTransaction) throws URISyntaxException {
+			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement)
+			throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 
 		Company company = null;
@@ -158,6 +163,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_PDF_DOWNLOAD);
 		Optional<CompanyConfiguration> optVisitBasedTransaction = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.VISIT_BASED_TRANSACTION);
+		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
 
 		CompanyConfiguration saveOfflineConfiguration = null;
 		CompanyConfiguration promptAttendance = null;
@@ -168,6 +175,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration chatReplyCompany = null;
 		CompanyConfiguration salesPdfDownloadCompany = null;
 		CompanyConfiguration visitBasedTransactionCompany = null;
+		CompanyConfiguration salesManagementCompany = null;
 
 		if (optDistanceTraveled.isPresent()) {
 			saveOfflineConfiguration = optDistanceTraveled.get();
@@ -268,6 +276,17 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(visitBasedTransactionCompany);
 
+		if (optSalesManagement.isPresent()) {
+			salesManagementCompany = optSalesManagement.get();
+			salesManagementCompany.setValue(salesManagement);
+		} else {
+			salesManagementCompany = new CompanyConfiguration();
+			salesManagementCompany.setCompany(company);
+			salesManagementCompany.setName(CompanyConfig.SALES_MANAGEMENT);
+			salesManagementCompany.setValue(salesManagement);
+		}
+		companyConfigurationRepository.save(salesManagementCompany);
+
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -302,6 +321,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_PDF_DOWNLOAD);
 		Optional<CompanyConfiguration> optVisitBasedTransaction = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.VISIT_BASED_TRANSACTION);
+		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
 
 		CompanyConfigDTO companyConfigurationDTO = new CompanyConfigDTO();
 
@@ -335,6 +356,9 @@ public class CompanyConfigurationResource {
 			companyConfigurationDTO
 					.setVisitBasedTransaction(Boolean.valueOf(optVisitBasedTransaction.get().getValue()));
 		}
+		if (optSalesManagement.isPresent()) {
+			companyConfigurationDTO.setSalesManagement(Boolean.valueOf(optSalesManagement.get().getValue()));
+		}
 		return companyConfigurationDTO;
 	}
 
@@ -362,6 +386,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_PDF_DOWNLOAD);
 		Optional<CompanyConfiguration> optVisitBasedTransaction = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.VISIT_BASED_TRANSACTION);
+		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
 
 		if (optDistanceTraveled.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optDistanceTraveled.get().getCompany().getId(),
@@ -400,6 +426,10 @@ public class CompanyConfigurationResource {
 		if (optVisitBasedTransaction.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optVisitBasedTransaction.get().getCompany().getId(),
 					CompanyConfig.VISIT_BASED_TRANSACTION);
+		}
+		if (optSalesManagement.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optSalesManagement.get().getCompany().getId(),
+					CompanyConfig.SALES_MANAGEMENT);
 		}
 		return ResponseEntity.ok()
 				.headers(HeaderUtil.createEntityDeletionAlert("companyConfiguration", companyPid.toString())).build();

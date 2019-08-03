@@ -368,6 +368,10 @@ function findByfilfter() {
 		.each(
 				accountProfiles,
 				function(index, accountProfile) {
+					var gstRegistrationType = accountProfile.gstRegistrationType;
+					if(gstRegistrationType==null){
+						gstRegistrationType="";
+					}
 					$('#tBodyAccountProfile')
 							.append(
 									"<tr><td title='click to view' class='sa'><span style='color: #2C7BD0; cursor: pointer;' onclick='AccountProfile.showModalPopup($(\"#viewModal\"),\""
@@ -392,6 +396,8 @@ function findByfilfter() {
 													accountProfile.address,
 													accountProfile.accountStatus,
 													accountProfile.pid)
+											+ "</td><td>"
+											+ gstRegistrationType
 											+ "</td><td>"
 											+ convertDateTimeFromServer(accountProfile.createdDate)
 											+ "</td><td class='userName'>"
