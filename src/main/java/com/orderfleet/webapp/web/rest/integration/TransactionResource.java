@@ -301,10 +301,9 @@ public class TransactionResource {
 
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 
-		if (optSalesManagement.isPresent()) {
-			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findAllByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
-
+		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
 		} else {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
@@ -430,7 +429,7 @@ public class TransactionResource {
 
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 
-		if (optSalesManagement.isPresent()) {
+		if (optSalesManagement.isPresent()  && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc(empId);
 
