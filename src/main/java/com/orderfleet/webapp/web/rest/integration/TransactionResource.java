@@ -868,6 +868,7 @@ public class TransactionResource {
 					accountingVouchers.add(accountingVoucherHeaderDTO);
 					ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO = new ExecutiveTaskSubmissionDTO();
 
+					System.out.println(accountingVouchers);
 					executiveTaskSubmissionDTO.setExecutiveTaskExecutionDTO(eteDTO);
 					executiveTaskSubmissionDTO.setAccountingVouchers(accountingVouchers);
 					executiveTaskSubmissionService.saveTPExecutiveTaskSubmission(executiveTaskSubmissionDTO, opUser.get());
