@@ -302,10 +302,9 @@ public class TransactionResource {
 
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 
-		if (optSalesManagement.isPresent()) {
-			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findAllByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
-
+		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
 		} else {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
@@ -431,7 +430,7 @@ public class TransactionResource {
 
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 
-		if (optSalesManagement.isPresent()) {
+		if (optSalesManagement.isPresent()  && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc(empId);
 
@@ -874,6 +873,7 @@ public class TransactionResource {
 					accountingVouchers.add(accountingVoucherHeaderDTO);
 					ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO = new ExecutiveTaskSubmissionDTO();
 
+					System.out.println(accountingVouchers);
 					executiveTaskSubmissionDTO.setExecutiveTaskExecutionDTO(eteDTO);
 					executiveTaskSubmissionDTO.setAccountingVouchers(accountingVouchers);
 					executiveTaskSubmissionService.saveTPExecutiveTaskSubmission(executiveTaskSubmissionDTO, opUser.get());
