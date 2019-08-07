@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.integration;
 
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -855,10 +856,14 @@ public class TransactionResource {
 					eteDTO.setUserPid(opUser.get().getPid());
 
 					accountingVoucherHeaderDTO.setAccountProfilePid(accpDTO.getPid());
+					
+					
+					 LocalDateTime localDateTime = LocalDateTime.now();
+					 long dateValue=localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 					accountingVoucherHeaderDTO
-							.setDocumentNumberLocal(accountingVoucherHeaderDTO.getDocumentNumberLocal());
+							.setDocumentNumberLocal(dateValue+"_"+accountingVoucherHeaderDTO.getDocumentNumberLocal());
 					accountingVoucherHeaderDTO
-							.setDocumentNumberServer(accountingVoucherHeaderDTO.getDocumentNumberServer());
+							.setDocumentNumberServer(dateValue+"_"+accountingVoucherHeaderDTO.getDocumentNumberServer());
 					accountingVoucherHeaderDTO.setDocumentPid(documentDto.getPid());
 					accountingVoucherHeaderDTO.setDocumentName(documentDto.getName());
 					accountingVoucherHeaderDTO.setStatus(true);
