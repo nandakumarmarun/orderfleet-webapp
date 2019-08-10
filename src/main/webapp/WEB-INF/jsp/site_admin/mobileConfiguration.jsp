@@ -56,6 +56,7 @@
 						<th>Prevent Negative Stock</th>
 						<th>Vch.No Generation Type</th>
 						<th>Inventory Vch UI Type</th>
+						<th>Cart Type</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -83,6 +84,7 @@
 							<td>${mobileConfiguration.preventNegativeStock}</td>
 							<td>${mobileConfiguration.voucherNumberGenerationType}</td>
 							<td>${mobileConfiguration.inventoryVoucherUIType}</td>
+							<td>${mobileConfiguration.cartType}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -277,7 +279,17 @@
 													</select>
 												</div></td>
 										</tr>
-
+							
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Cart Type</label> 
+													<select id="cartType"
+														name='cartType' class="form-control">
+														<option value="NORMAL" selected="selected">NORMAL</option>
+														<option value="GROUP_WISE">GROUP_WISE</option>
+													</select>
+												</div></td>
+										</tr>
 
 
 									</table>

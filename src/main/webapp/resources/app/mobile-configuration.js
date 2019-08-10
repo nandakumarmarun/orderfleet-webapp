@@ -30,7 +30,8 @@ if (!this.MobileConfiguration) {
 		addNewCustomer : true,
 		preventNegativeStock : false,
 		voucherNumberGenerationType : 'TYPE_1',
-		inventoryVoucherUIType : 'TYPE_1'
+		inventoryVoucherUIType : 'TYPE_1',
+		cartType : 'NORMAL'
 	};
 
 	$(document).ready(function() {
@@ -101,6 +102,7 @@ if (!this.MobileConfiguration) {
 				"#voucherNumberGenerationType").val();
 		mobileConfigurationDTO.inventoryVoucherUIType = $(
 				"#inventoryVoucherUIType").val();
+		mobileConfigurationDTO.cartType = $("#cartType").val();
 
 		$.ajax({
 			url : contextPath,
@@ -165,6 +167,7 @@ if (!this.MobileConfiguration) {
 									data.voucherNumberGenerationType);
 							$('#inventoryVoucherUIType').val(
 									data.inventoryVoucherUIType);
+							$('#cartType').val(data.cartType);
 						}
 
 					},

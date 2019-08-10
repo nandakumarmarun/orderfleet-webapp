@@ -68,7 +68,7 @@ public class DynamicFormDownloadController {
 			}
 			dynamicExcelDto.setDynamicDocumentPid(ddh.getPid());
 			dynamicExcelDto.setFormDetails(formDetail);
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			String formatDateTime = ddh.getDocumentDate().format(formatter);
 			dynamicExcelDto.setDateTime(formatDateTime);
 			dynamicExcelDtos.add(dynamicExcelDto);

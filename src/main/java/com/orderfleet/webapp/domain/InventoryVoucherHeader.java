@@ -154,8 +154,8 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(name = "sales_management_status", nullable = false, columnDefinition = "character varying DEFAULT 'HOLD'")
-	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.HOLD;
+	@Column(name = "sales_management_status", nullable = false, columnDefinition = "character varying DEFAULT 'DEFAULT'")
+	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.DEFAULT;
 
 	@NotNull
 	@Column(name = "pdf_download_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")

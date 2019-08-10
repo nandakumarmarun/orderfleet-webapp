@@ -1,5 +1,9 @@
 package com.orderfleet.webapp.web.vendor.excel.dto;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+
 import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
@@ -36,7 +40,8 @@ public class ReceiptExcelDTO {
 		this.particularsName = accountingVoucherDetail.getBy().getName();
 		this.amount = accountingVoucherDetail.getAmount();
 		this.reference = accountingVoucherDetail.getReferenceNumber();
-		this.date = accountingVoucherDetail.getVoucherDate().toString();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		this.date = accountingVoucherDetail.getVoucherDate().format(formatter);
 		this.chequeNo = accountingVoucherDetail.getInstrumentNumber();
 		this.bankName = accountingVoucherDetail.getBankName();
 		this.ledgerName = accountingVoucherDetail.getBy().getName();
@@ -47,7 +52,7 @@ public class ReceiptExcelDTO {
 		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
 				accountingVoucherDetail.getAccountingVoucherHeader());
 		this.trimChar = accountingVoucherDetail.getBy().getTrimChar();
-		this.chequeDate = accountingVoucherDetail.getInstrumentDate()==null?"":accountingVoucherDetail.getInstrumentDate().toString();
+		this.chequeDate = accountingVoucherDetail.getInstrumentDate()==null?"":accountingVoucherDetail.getInstrumentDate().format(formatter);
 		this.employeeName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
 	}
 

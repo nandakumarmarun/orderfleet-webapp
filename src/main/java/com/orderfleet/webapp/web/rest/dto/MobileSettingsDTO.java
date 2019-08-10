@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.dto;
 
 import java.util.List;
 
+import com.orderfleet.webapp.domain.enums.CartType;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 import com.orderfleet.webapp.web.rest.api.dto.ActivityNotificationDTO;
@@ -60,6 +61,8 @@ public class MobileSettingsDTO {
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 
 	private InventoryVoucherUIType inventoryVoucherUIType;
+	
+	private CartType cartType;
 
 	public MobileSettingsDTO() {
 		super();
@@ -86,6 +89,7 @@ public class MobileSettingsDTO {
 		this.preventNegativeStock = mobileConfigurationDTO.getPreventNegativeStock();
 		this.voucherNumberGenerationType = mobileConfigurationDTO.getVoucherNumberGenerationType();
 		this.inventoryVoucherUIType = mobileConfigurationDTO.getInventoryVoucherUIType();
+		this.cartType = mobileConfigurationDTO.getCartType();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -272,4 +276,12 @@ public class MobileSettingsDTO {
 		this.inventoryVoucherUIType = inventoryVoucherUIType;
 	}
 
+	public CartType getCartType() {
+		return cartType;
+	}
+
+	public void setCartType(CartType cartType) {
+		this.cartType = cartType;
+	}
+	
 }

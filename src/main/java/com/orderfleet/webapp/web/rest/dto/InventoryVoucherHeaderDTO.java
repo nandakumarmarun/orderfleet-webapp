@@ -85,7 +85,7 @@ public class InventoryVoucherHeaderDTO {
 	// status for tally download
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
 
-	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.HOLD;
+	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.DEFAULT;
 
 	private long orderNumber;
 	private String customeraddress;

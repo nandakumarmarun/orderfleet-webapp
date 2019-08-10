@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.orderfleet.webapp.domain.enums.CartType;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 
@@ -93,6 +94,9 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "prevent_negative_stock", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean preventNegativeStock;
+	
+	@Column(name = "group_wise_cart", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean groupWiseCart;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -104,6 +108,12 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "inventory_voucher_ui_type", nullable = false, columnDefinition = "character varying DEFAULT 'TYPE_1'")
 	private InventoryVoucherUIType inventoryVoucherUIType;
 
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "cart_type", nullable = false, columnDefinition = "character varying DEFAULT 'NORMAL'")
+	private CartType cartType;
+
+	
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -271,6 +281,14 @@ public class MobileConfiguration implements Serializable {
 	public void setPreventNegativeStock(boolean preventNegativeStock) {
 		this.preventNegativeStock = preventNegativeStock;
 	}
+	
+	public boolean getGroupWiseCart() {
+		return groupWiseCart;
+	}
+
+	public void setGroupWiseCart(boolean groupWiseCart) {
+		this.groupWiseCart = groupWiseCart;
+	}
 
 	public VoucherNumberGenerationType getVoucherNumberGenerationType() {
 		return voucherNumberGenerationType;
@@ -286,6 +304,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setInventoryVoucherUIType(InventoryVoucherUIType inventoryVoucherUIType) {
 		this.inventoryVoucherUIType = inventoryVoucherUIType;
+	}
+	
+	public CartType getCartType() {
+		return cartType;
+	}
+
+	public void setCartType(CartType cartType) {
+		this.cartType = cartType;
 	}
 
 	@Override

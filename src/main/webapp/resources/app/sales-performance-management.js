@@ -356,20 +356,8 @@ if (!this.InventoryVoucher) {
 
 			break;
 		case 'COMPLETED':
-			spanStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'COMPLETED <span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setStatus('
-					+ pid
-					+ ','
-					+ pending
-					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
-					+ '<li onclick="InventoryVoucher.setStatus('
-					+ pid
-					+ ','
-					+ processing
-					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
-					+ '</ul></div>';
+			spanStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" >'
+					+ 'COMPLETED <span></span></span></div>';
 			break;
 		}
 
@@ -391,8 +379,8 @@ if (!this.InventoryVoucher) {
 		var pid = "'" + inventoryVoucherPid + "'";
 		switch (status) {
 		case 'HOLD':
-			spanSalesManagementStatus = '<div class="dropdown"><span class="label label-info dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'HOLD<span class="caret"></span></span>'
+			spanSalesManagementStatus = '<div class="dropdown"><span class="label label-warning dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
+					+ 'ON HOLD<span class="caret"></span></span>'
 					+ '<ul class="dropdown-menu">'
 					+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
 					+ pid
@@ -410,11 +398,11 @@ if (!this.InventoryVoucher) {
 
 			if (tallyStatus == 'COMPLETED') {
 				spanSalesManagementStatus = '<div ><span class="label label-success dropdown-toggle" data-toggle="dropdown" >'
-						+ 'APPROVE <span></span></span></div>';
+						+ 'APPROVED <span></span></span></div>';
 
 			} else {
 				spanSalesManagementStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-						+ 'APPROVE <span class="caret"></span></span>'
+						+ 'APPROVED <span class="caret"></span></span>'
 						+ '<ul class="dropdown-menu">'
 						+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
 						+ pid
@@ -431,7 +419,7 @@ if (!this.InventoryVoucher) {
 			break;
 		case 'REJECT':
 			spanSalesManagementStatus = '<div class="dropdown"><span class="label label-danger dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'REJECT <span class="caret"></span></span>'
+					+ 'REJECTED <span class="caret"></span></span>'
 					+ '<ul class="dropdown-menu">'
 					+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
 					+ pid
@@ -443,6 +431,27 @@ if (!this.InventoryVoucher) {
 					+ ','
 					+ approve
 					+ ')" style="cursor: pointer;"><a>APPROVE</a></li>'
+					+ '</ul></div>';
+			break;
+		case 'DEFAULT':
+			spanSalesManagementStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
+					+ 'SELECT STATUS <span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
+					+ pid
+					+ ','
+					+ hold
+					+ ')"  style="cursor: pointer;"><a>HOLD</a></li>'
+					+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
+					+ pid
+					+ ','
+					+ approve
+					+ ')" style="cursor: pointer;"><a>APPROVE</a></li>'
+					+ '<li onclick="InventoryVoucher.setSalesManagementStatus('
+					+ pid
+					+ ','
+					+ reject
+					+ ')"  style="cursor: pointer;"><a>REJECT</a></li>'
 					+ '</ul></div>';
 			break;
 		}
@@ -500,6 +509,10 @@ if (!this.InventoryVoucher) {
 					salesManagementStatus : salesManagementStatus
 				},
 				success : function(data) {
+					console.log(data);
+					if(data == 'failed'){
+						alert("Cannot update a downloaded order");
+					}
 					InventoryVoucher.filter();
 					// onSaveSuccess(data);
 				},

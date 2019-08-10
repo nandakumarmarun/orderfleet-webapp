@@ -165,8 +165,6 @@ public class ExecutiveTaskSubmissionController {
 	public ResponseEntity<TaskSubmissionResponse> executiveTaskSubmission(
 			@Valid @RequestBody ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO) {
 		log.debug("Web request to save ExecutiveTaskExecution start");
-		log.info(executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO().getPunchInDate()+"--------");
-		log.info("=========================================="+executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO().getSendDate());
 		MobileConfigurationDTO mobileConfiguration = mobileConfigurationService
 				.findByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
 		if(mobileConfiguration == null) {

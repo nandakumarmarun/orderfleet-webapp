@@ -160,7 +160,39 @@ public class SalesDataDownloadController {
 		return salesOrderDTOs;
 
 	}
+	
+	
+	@RequestMapping(value = "/get-service-data.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	@Transactional
+	public List<SalesOrderExcelDTO> getServiceDataJSON() throws URISyntaxException {
+		log.debug("REST request to download primary sales orders : {}");
+		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
 
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_ORDER,
+				company.getId());
+		if (primarySecDoc.isEmpty()) {
+			log.info("........No PrimarySecondaryDocument configuration Available...........");
+			return salesOrderDTOs;
+		}
+		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
+				.collect(Collectors.toList());
+
+		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+				.getSalesOrderForExcel(company.getId());
+
+		log.debug("REST request to download primary sales orders : " + inventoryVoucherHeaders.size());
+		salesOrderDTOs = getServiceDataList(inventoryVoucherHeaders);
+
+		return salesOrderDTOs;
+
+	}
+	
+	
+	
 	private List<SalesOrderExcelDTO> getInventoryVoucherList(List<Object[]> inventoryVoucherHeaders) {
 
 		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
@@ -241,6 +273,53 @@ public class SalesDataDownloadController {
 		return salesOrderDTOs;
 	}
 
+	
+	private List<SalesOrderExcelDTO> getServiceDataList(List<Object[]> inventoryVoucherHeaders) {
+
+		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
+		List<String> inventoryHeaderPid = new ArrayList<String>();
+
+
+		for (Object[] obj : inventoryVoucherHeaders) {
+			SalesOrderExcelDTO salesOrderDTO = new SalesOrderExcelDTO();
+
+			String pattern = "dd-MM-yyyy";
+			DateFormat df = new SimpleDateFormat(pattern);
+			
+			salesOrderDTO.setBillNo(obj[0].toString());
+			String dateAsString = df.format(obj[1]);
+			salesOrderDTO.setDate(dateAsString != null ? dateAsString : "");
+			salesOrderDTO.setCustomerCode(obj[2] != null ? obj[2].toString() : "");
+			salesOrderDTO.setItemCode(obj[3] != null ? obj[3].toString() : "");
+			salesOrderDTO.setQuantity(obj[4] != null ? Double.parseDouble(obj[4].toString()) : 0.0);
+			salesOrderDTO.setRate(obj[5] != null ? Double.parseDouble(obj[5].toString()) : 0.0);
+			salesOrderDTO.setDiscPer(obj[6] != null ? Double.parseDouble(obj[6].toString()) : 0.0);
+			salesOrderDTO.setTaxPer(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
+			salesOrderDTO.setTotal(obj[8] != null ? Double.parseDouble(obj[8].toString()) : 0.0);
+			salesOrderDTO.setInventoryPid(obj[9] != null ? obj[9].toString() : "");
+			salesOrderDTO.setFreeQuantity(Double.parseDouble(obj[12] != null ? obj[12].toString() : "0.0"));
+			salesOrderDTO.setCustomerName(obj[13] != null ? obj[13].toString() : "");
+			salesOrderDTO.setMrp(Double.parseDouble(obj[14] != null ? obj[14].toString() : "0.0"));
+			salesOrderDTO.setDiscPrice(Double.parseDouble(obj[15] != null ? obj[15].toString() : "0.0"));
+			
+			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
+			System.out.println("================================================================");
+			System.out.println(salesOrderDTO.toString());
+			System.out.println("================================================================");
+			salesOrderDTOs.add(salesOrderDTO);
+
+		}
+
+		if (!salesOrderDTOs.isEmpty()) {
+			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+					TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
+			log.debug("updated " + updated + " to PROCESSING");
+		}
+		return salesOrderDTOs;
+	}
+	
+	
+	
 	@PostMapping("/update-order-status.json")
 	@Timed
 	@Transactional

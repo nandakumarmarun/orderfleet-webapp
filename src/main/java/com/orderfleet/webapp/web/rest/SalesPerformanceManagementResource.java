@@ -573,15 +573,19 @@ public class SalesPerformanceManagementResource {
 
 	}
 
-	@RequestMapping(value = "/sales-performance-management/changeSalesManagementStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/sales-performance-management/changeSalesManagementStatus", method = RequestMethod.GET)
 	@Timed
-	public ResponseEntity<InventoryVoucherHeaderDTO> changeSalesManagementStatus(@RequestParam String pid,
+	public ResponseEntity<String> changeSalesManagementStatus(@RequestParam String pid,
 			@RequestParam SalesManagementStatus salesManagementStatus) {
 		log.info("Sales Sales Management Status " + salesManagementStatus);
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(pid).get();
-		inventoryVoucherHeaderDTO.setSalesManagementStatus(salesManagementStatus);
-		inventoryVoucherService.updateInventoryVoucherHeaderSalesManagementStatus(inventoryVoucherHeaderDTO);
-		return new ResponseEntity<>(null, HttpStatus.OK);
+		if(inventoryVoucherHeaderDTO.getTallyDownloadStatus() != TallyDownloadStatus.COMPLETED) {
+			inventoryVoucherHeaderDTO.setSalesManagementStatus(salesManagementStatus);
+			inventoryVoucherService.updateInventoryVoucherHeaderSalesManagementStatus(inventoryVoucherHeaderDTO);
+			return new ResponseEntity<>("success", HttpStatus.OK);
+		}
+		
+		return new ResponseEntity<>("failed", HttpStatus.OK);
 
 	}
 

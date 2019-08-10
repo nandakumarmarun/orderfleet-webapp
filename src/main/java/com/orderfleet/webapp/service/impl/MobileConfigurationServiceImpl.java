@@ -64,6 +64,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setPreventNegativeStock(mobileConfigurationDTO.getPreventNegativeStock());
 		configuration.setVoucherNumberGenerationType(mobileConfigurationDTO.getVoucherNumberGenerationType());
 		configuration.setInventoryVoucherUIType(mobileConfigurationDTO.getInventoryVoucherUIType());
+		configuration.setCartType(mobileConfigurationDTO.getCartType());
 
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
@@ -93,7 +94,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setPreventNegativeStock(mobileConfigurationDTO.getPreventNegativeStock());
 			configuration.setVoucherNumberGenerationType(mobileConfigurationDTO.getVoucherNumberGenerationType());
 			configuration.setInventoryVoucherUIType(mobileConfigurationDTO.getInventoryVoucherUIType());
-
+			configuration.setCartType(mobileConfigurationDTO.getCartType());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;
