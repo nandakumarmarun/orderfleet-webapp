@@ -37,6 +37,7 @@ public class MobileConfigurationDTO {
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 	private InventoryVoucherUIType inventoryVoucherUIType;
 	private CartType cartType;
+	private boolean kfcEnabled;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -67,6 +68,7 @@ public class MobileConfigurationDTO {
 		this.voucherNumberGenerationType = mobileConfiguration.getVoucherNumberGenerationType();
 		this.inventoryVoucherUIType = mobileConfiguration.getInventoryVoucherUIType();
 		this.cartType = mobileConfiguration.getCartType();
+		this.kfcEnabled = mobileConfiguration.getKfcEnabled();
 	}
 
 	public String getPid() {
@@ -252,5 +254,13 @@ public class MobileConfigurationDTO {
 	public void setCartType(CartType cartType) {
 		this.cartType = cartType;
 	}
-	
+
+	public boolean getKfcEnabled() {
+		return kfcEnabled;
+	}
+
+	public void setKfcEnabled(boolean kfcEnabled) {
+		this.kfcEnabled = kfcEnabled;
+	}
+
 }

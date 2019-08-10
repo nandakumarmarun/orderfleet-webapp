@@ -46,6 +46,7 @@ if (!this.CompanyConfiguration) {
 		var salesPdfDownload = $('#salesPdfDownload').is(":checked");
 		var visitBasedTransaction = $('#visitBasedTransaction').is(":checked");
 		var salesManagement = $('#salesManagement').is(":checked");
+		var kfcEnabled = $('#kfcEnabled').is(":checked");
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -60,7 +61,8 @@ if (!this.CompanyConfiguration) {
 				chatReply : chatReply,
 				salesPdfDownload : salesPdfDownload,
 				visitBasedTransaction : visitBasedTransaction,
-				salesManagement : salesManagement
+				salesManagement : salesManagement,
+				kfcEnabled : kfcEnabled
 			},
 			success : function(data) {
 				onSaveSuccess(data);
@@ -89,6 +91,7 @@ if (!this.CompanyConfiguration) {
 				$("#salesPdfDownload").prop("checked", data.salesPdfDownload);
 				$("#visitBasedTransaction").prop("checked", data.visitBasedTransaction);
 				$("#salesManagement").prop("checked", data.salesManagement);
+				$("#kfcEnabled").prop("checked", data.kfcEnabled);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);

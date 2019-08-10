@@ -22,6 +22,7 @@ public class CompanyConfigDTO {
 	private boolean salesPdfDownload;// setting for download as pdf button in sales order
 	private boolean visitBasedTransaction;// setting for visit based transaction
 	private boolean salesManagement;// setting for Sales Management
+	private boolean kfcEnabled;// setting for KFC
 
 	public CompanyConfigDTO() {
 		super();
@@ -122,5 +123,15 @@ public class CompanyConfigDTO {
 	public void setSalesManagement(boolean salesManagement) {
 		this.salesManagement = salesManagement;
 	}
+
+	public boolean getKfcEnabled() {
+		return kfcEnabled;
+	}
+
+	public void setKfcEnabled(boolean kfcEnabled) {
+		this.kfcEnabled = kfcEnabled;
+	}
+	
+	
 
 }

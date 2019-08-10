@@ -61,8 +61,10 @@ public class MobileSettingsDTO {
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 
 	private InventoryVoucherUIType inventoryVoucherUIType;
-	
+
 	private CartType cartType;
+
+	private boolean kfcEnabled;
 
 	public MobileSettingsDTO() {
 		super();
@@ -90,6 +92,7 @@ public class MobileSettingsDTO {
 		this.voucherNumberGenerationType = mobileConfigurationDTO.getVoucherNumberGenerationType();
 		this.inventoryVoucherUIType = mobileConfigurationDTO.getInventoryVoucherUIType();
 		this.cartType = mobileConfigurationDTO.getCartType();
+		this.kfcEnabled = mobileConfigurationDTO.getKfcEnabled();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -283,5 +286,13 @@ public class MobileSettingsDTO {
 	public void setCartType(CartType cartType) {
 		this.cartType = cartType;
 	}
-	
+
+	public boolean getKfcEnabled() {
+		return kfcEnabled;
+	}
+
+	public void setKfcEnabled(boolean kfcEnabled) {
+		this.kfcEnabled = kfcEnabled;
+	}
+
 }

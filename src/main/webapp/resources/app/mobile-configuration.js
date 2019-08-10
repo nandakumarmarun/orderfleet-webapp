@@ -31,7 +31,8 @@ if (!this.MobileConfiguration) {
 		preventNegativeStock : false,
 		voucherNumberGenerationType : 'TYPE_1',
 		inventoryVoucherUIType : 'TYPE_1',
-		cartType : 'NORMAL'
+		cartType : 'NORMAL',
+		kfcEnabled : false,
 	};
 
 	$(document).ready(function() {
@@ -59,6 +60,7 @@ if (!this.MobileConfiguration) {
 			+ location.pathname;
 
 	function saveMobileConfiguration() {
+
 		if ($("#dbCompany").val() == -1) {
 			alert("Please select company");
 			return;
@@ -103,6 +105,7 @@ if (!this.MobileConfiguration) {
 		mobileConfigurationDTO.inventoryVoucherUIType = $(
 				"#inventoryVoucherUIType").val();
 		mobileConfigurationDTO.cartType = $("#cartType").val();
+		mobileConfigurationDTO.kfcEnabled = $("#kfcEnabled").is(":checked");
 
 		$.ajax({
 			url : contextPath,
@@ -168,6 +171,7 @@ if (!this.MobileConfiguration) {
 							$('#inventoryVoucherUIType').val(
 									data.inventoryVoucherUIType);
 							$('#cartType').val(data.cartType);
+							$('#kfcEnabled').prop("checked", data.kfcEnabled);
 						}
 
 					},

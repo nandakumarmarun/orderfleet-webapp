@@ -117,6 +117,10 @@ public class CompanyConfigurationResource {
 					mcDto.setSalesManagement(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.KFC_ENABLED)) {
+					mcDto.setKfcEnabled(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 			}
 			if (anyValueExist) {
@@ -134,8 +138,8 @@ public class CompanyConfigurationResource {
 			@RequestParam String interimSave, @RequestParam String refreshProductGroupProduct,
 			@RequestParam String stageChangeAccountingVoucher, @RequestParam String newCustomerAlias,
 			@RequestParam String chatReply, @RequestParam String salesPdfDownload,
-			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement)
-			throws URISyntaxException {
+			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement,
+			@RequestParam String kfcEnabled) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 
 		Company company = null;
@@ -165,6 +169,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.VISIT_BASED_TRANSACTION);
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+		Optional<CompanyConfiguration> optKfcEnabled = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.KFC_ENABLED);
 
 		CompanyConfiguration saveOfflineConfiguration = null;
 		CompanyConfiguration promptAttendance = null;
@@ -176,6 +182,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration salesPdfDownloadCompany = null;
 		CompanyConfiguration visitBasedTransactionCompany = null;
 		CompanyConfiguration salesManagementCompany = null;
+		CompanyConfiguration kfcEnabledCompany = null;
 
 		if (optDistanceTraveled.isPresent()) {
 			saveOfflineConfiguration = optDistanceTraveled.get();
@@ -286,6 +293,17 @@ public class CompanyConfigurationResource {
 			salesManagementCompany.setValue(salesManagement);
 		}
 		companyConfigurationRepository.save(salesManagementCompany);
+		
+		if (optKfcEnabled.isPresent()) {
+			kfcEnabledCompany = optKfcEnabled.get();
+			kfcEnabledCompany.setValue(kfcEnabled);
+		} else {
+			kfcEnabledCompany = new CompanyConfiguration();
+			kfcEnabledCompany.setCompany(company);
+			kfcEnabledCompany.setName(CompanyConfig.KFC_ENABLED);
+			kfcEnabledCompany.setValue(kfcEnabled);
+		}
+		companyConfigurationRepository.save(kfcEnabledCompany);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -323,6 +341,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.VISIT_BASED_TRANSACTION);
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+		Optional<CompanyConfiguration> optKfcEnabled = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.KFC_ENABLED);
 
 		CompanyConfigDTO companyConfigurationDTO = new CompanyConfigDTO();
 
@@ -359,6 +379,9 @@ public class CompanyConfigurationResource {
 		if (optSalesManagement.isPresent()) {
 			companyConfigurationDTO.setSalesManagement(Boolean.valueOf(optSalesManagement.get().getValue()));
 		}
+		if (optKfcEnabled.isPresent()) {
+			companyConfigurationDTO.setKfcEnabled(Boolean.valueOf(optKfcEnabled.get().getValue()));
+		}
 		return companyConfigurationDTO;
 	}
 
@@ -388,6 +411,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.VISIT_BASED_TRANSACTION);
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+		Optional<CompanyConfiguration> optKfcEnabled = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.KFC_ENABLED);
 
 		if (optDistanceTraveled.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optDistanceTraveled.get().getCompany().getId(),
@@ -430,6 +455,10 @@ public class CompanyConfigurationResource {
 		if (optSalesManagement.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optSalesManagement.get().getCompany().getId(),
 					CompanyConfig.SALES_MANAGEMENT);
+		}
+		if (optKfcEnabled.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optKfcEnabled.get().getCompany().getId(),
+					CompanyConfig.KFC_ENABLED);
 		}
 		return ResponseEntity.ok()
 				.headers(HeaderUtil.createEntityDeletionAlert("companyConfiguration", companyPid.toString())).build();

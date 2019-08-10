@@ -47,6 +47,7 @@
 						<th>Sales Pdf Download</th>
 						<th>Visit Based Transaction</th>
 						<th>Sales Management</th>
+						<th>KFC Enabledt</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -65,6 +66,7 @@
 							<td>${companyConfiguration.salesPdfDownload}</td>
 							<td>${companyConfiguration.visitBasedTransaction}</td>
 							<th>${companyConfiguration.salesManagement}</th>
+							<th>${companyConfiguration.kfcEnabled}</th>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
 						</tr>
@@ -176,6 +178,14 @@
 											<td><div class="form-group">
 													<label class="control-label">Sales Management</label> <input
 														id="salesManagement" name='checksSalesManagement"'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">KFC Enabled</label> <input
+														id="kfcEnabled" name='checksKfcEnabled"'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>

@@ -94,7 +94,7 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "prevent_negative_stock", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean preventNegativeStock;
-	
+
 	@Column(name = "group_wise_cart", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean groupWiseCart;
 
@@ -113,7 +113,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "cart_type", nullable = false, columnDefinition = "character varying DEFAULT 'NORMAL'")
 	private CartType cartType;
 
-	
+	@Column(name = "kfc_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean kfcEnabled;
+
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -281,7 +283,7 @@ public class MobileConfiguration implements Serializable {
 	public void setPreventNegativeStock(boolean preventNegativeStock) {
 		this.preventNegativeStock = preventNegativeStock;
 	}
-	
+
 	public boolean getGroupWiseCart() {
 		return groupWiseCart;
 	}
@@ -305,13 +307,21 @@ public class MobileConfiguration implements Serializable {
 	public void setInventoryVoucherUIType(InventoryVoucherUIType inventoryVoucherUIType) {
 		this.inventoryVoucherUIType = inventoryVoucherUIType;
 	}
-	
+
 	public CartType getCartType() {
 		return cartType;
 	}
 
 	public void setCartType(CartType cartType) {
 		this.cartType = cartType;
+	}
+
+	public boolean getKfcEnabled() {
+		return kfcEnabled;
+	}
+
+	public void setKfcEnabled(boolean kfcEnabled) {
+		this.kfcEnabled = kfcEnabled;
 	}
 
 	@Override

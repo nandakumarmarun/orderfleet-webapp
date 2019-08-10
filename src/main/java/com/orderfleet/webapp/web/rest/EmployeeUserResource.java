@@ -46,9 +46,9 @@ public class EmployeeUserResource {
 	@RequestMapping(value = "/employee-user", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
-	public String getUserEmployee( Model model) throws URISyntaxException {
+	public String getUserEmployee(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of User Employee");
-		
+
 		model.addAttribute("employeeUsers", employeeProfileService.findAllByCompanyAndDeactivatedEmployeeProfile(true));
 		model.addAttribute("users", userService.findAllByCompany());
 		return "company/employeeUser";
@@ -65,32 +65,33 @@ public class EmployeeUserResource {
 	@Timed
 	public ResponseEntity<?> save(@RequestParam String userPid, @RequestParam String employeePid) {
 		log.debug("REST request to save assigned  userPid", userPid);
-		Optional<EmployeeProfile>  opEmployee = employeeProfileService.findByUserPid(userPid);
+		Optional<EmployeeProfile> opEmployee = employeeProfileService.findByUserPid(userPid);
 		if (opEmployee.isPresent()) {
 			EmployeeProfile employeeProfile = opEmployee.get();
 			employeeProfile.setUser(null);
 			employeeProfileService.updateEmployee(employeeProfile);
-			/*return ResponseEntity.badRequest()
-					.headers(HeaderUtil.createFailureAlert("employeeProfile", "nameexists", "User already in use"))
-					.body(null);*/
+			/*
+			 * return ResponseEntity.badRequest()
+			 * .headers(HeaderUtil.createFailureAlert("employeeProfile", "nameexists",
+			 * "User already in use")) .body(null);
+			 */
 		}
 		employeeProfileService.saveEmployeeUser(employeePid, userPid);
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
-	
+
 	@RequestMapping(value = "/employee-user/check", method = RequestMethod.POST)
 	@Timed
-	public ResponseEntity<?> isEmployeeAndUserAssociated(@RequestParam String userPid, @RequestParam String employeePid) {
+	public ResponseEntity<?> isEmployeeAndUserAssociated(@RequestParam String userPid,
+			@RequestParam String employeePid) {
 		log.debug("REST request to chek user and employee are associated", userPid);
-		EmployeeProfileDTO employee =  employeeProfileService.findDtoByUserPid(userPid);
+		EmployeeProfileDTO employee = employeeProfileService.findDtoByUserPid(userPid);
 		if (employee != null) {
-			return new ResponseEntity<>(employee,HttpStatus.OK);
-		}else {
-			return new ResponseEntity<>(null,HttpStatus.OK);
+			return new ResponseEntity<>(employee, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(null, HttpStatus.OK);
 		}
-		
-
 	}
 
 	@RequestMapping(value = "/employee-user/{employeePid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
