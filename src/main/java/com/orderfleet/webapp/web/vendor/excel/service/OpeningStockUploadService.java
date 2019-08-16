@@ -149,7 +149,7 @@ public class OpeningStockUploadService {
 		this.stockLocationRepository = stockLocationRepository;
 		this.stockLocationService = stockLocationService;
 		this.openingStockRepository = openingStockRepository;
-		this.productProfileRepository=productProfileRepository;
+		this.productProfileRepository = productProfileRepository;
 	}
 
 	@Transactional
@@ -164,6 +164,20 @@ public class OpeningStockUploadService {
 		// one
 		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(company.getId());
 		// find all exist product profiles
+
+		long stockLocationId = 0L;
+
+		if (defaultStockLocation != null) {
+			String stockLocationName = openingStockDTOs.get(0).getStockLocationName();
+			if (defaultStockLocation.getName().equalsIgnoreCase(stockLocationName)) {
+				stockLocationId = defaultStockLocation.getId();
+			}
+		}
+
+		if (stockLocationId != 0) {
+			openingStockRepository.deleteByStockLocationIdAndCompanyId(stockLocationId, companyId);
+		}
+
 		Set<String> ppAlias = openingStockDTOs.stream().map(os -> os.getProductProfileName())
 				.collect(Collectors.toSet());
 
@@ -196,7 +210,9 @@ public class OpeningStockUploadService {
 							}
 						}
 						openingStock.setQuantity(osDto.getQuantity());
-						saveOpeningStocks.add(openingStock);
+						if (osDto.getQuantity() != 0.0) {
+							saveOpeningStocks.add(openingStock);
+						}
 					});
 		}
 		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);

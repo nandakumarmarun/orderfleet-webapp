@@ -69,6 +69,7 @@ import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
+import com.orderfleet.webapp.domain.enums.CartType;
 import com.orderfleet.webapp.domain.enums.CompanyType;
 import com.orderfleet.webapp.domain.enums.ContactManagement;
 import com.orderfleet.webapp.domain.enums.DashboardItemConfigType;
@@ -871,6 +872,8 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setTaskExecutionOfflineSave(true);
 		mobileConfiguration.setVoucherNumberGenerationType(VoucherNumberGenerationType.TYPE_1);
 		mobileConfiguration.setInventoryVoucherUIType(InventoryVoucherUIType.TYPE_1);
+		mobileConfiguration.setCartType(CartType.NORMAL);
+		mobileConfiguration.setKfcEnabled(false);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 

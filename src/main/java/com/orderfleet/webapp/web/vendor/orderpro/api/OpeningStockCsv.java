@@ -63,20 +63,6 @@ public class OpeningStockCsv {
 	public ResponseEntity<String> bulkSaveOpeningStock(@Valid @RequestBody List<OpeningStockDTO> openingStockDTOs) {
 		log.debug("REST request to save opening stock : {}", openingStockDTOs.size());
 		
-		long companyId = SecurityUtils.getCurrentUsersCompanyId();
-		long stockLocationId = 0L;
-		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
-		if(!openingStockDTOs.isEmpty()) {
-			String stockLocationName = openingStockDTOs.get(0).getStockLocationName();
-			Optional<StockLocation> stockLocation = 
-					StockLocations.stream().filter(sl -> sl.getAlias()!=null?sl.getAlias().equals(stockLocationName):false).findFirst();
-			if(stockLocation.isPresent()) {
-				stockLocationId = stockLocation.get().getId();
-			}
-		}
-		if(stockLocationId!=0) {
-			openingStockRepository.deleteByStockLocationIdAndCompanyId(stockLocationId,companyId);
-		}
 		
 		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
 				SyncOperationType.OPENING_STOCK).map(so -> {
