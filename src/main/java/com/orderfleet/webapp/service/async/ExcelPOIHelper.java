@@ -3,21 +3,30 @@ package com.orderfleet.webapp.service.async;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -29,7 +38,8 @@ import org.springframework.util.StringUtils;
 @Component
 public class ExcelPOIHelper {
 
-	public Map<Integer, List<String>> readExcel(File file,int sheetNumber) throws IOException {
+	public Map<Integer, List<String>> readExcel(File file,int sheetNumber) throws IOException{
+		
 		Map<Integer, List<String>> data = new HashMap<>();
 		FileInputStream fis = new FileInputStream(file);
 		if (file.getName().endsWith(".xls")) {

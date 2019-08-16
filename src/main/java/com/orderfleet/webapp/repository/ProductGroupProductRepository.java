@@ -8,6 +8,7 @@ import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
@@ -151,6 +152,7 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 	
 	void deleteByCompanyId(Long companyId);
 	
+	@Transactional
 	@Modifying
 	@Query(value = "delete from tbl_product_group_product where company_id= ?1 ",nativeQuery = true)
 	void deleteByCompany(Long companyId);

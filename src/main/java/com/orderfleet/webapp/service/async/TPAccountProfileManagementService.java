@@ -143,7 +143,15 @@ public class TPAccountProfileManagementService {
 			final SyncOperation syncOperation) {
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
-		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+		
+		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		User userObject = new User();
+		if(opUser.isPresent()) {
+			userObject = opUser.get();
+		}else {
+			userObject = userRepository.findOneByLogin("siteadmin").get();
+		}
+		final User user = userObject;
 		final Long companyId = company.getId();
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
 		// All product must have a division/category, if not, set a default one
@@ -200,7 +208,7 @@ public class TPAccountProfileManagementService {
 			accountProfile.setStateName(apDto.getStateName());
 			accountProfile.setCountryName(apDto.getCountryName());
 			accountProfile.setGstRegistrationType(
-					apDto.getGstRegistrationType() == null ? "" : apDto.getGstRegistrationType());
+					apDto.getGstRegistrationType() == null ? "Regular" : apDto.getGstRegistrationType());
 			if (apDto.getDefaultPriceLevelName() != null && !apDto.getDefaultPriceLevelName().equalsIgnoreCase("")) {
 				// price level
 				Optional<PriceLevel> optionalPriceLevel = tempPriceLevel.stream()

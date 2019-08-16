@@ -4,6 +4,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -967,6 +968,10 @@ public class MasterDataController {
 		} else {
 			documentAccountingVoucherColumns = documentAccountingVoucherColumnService
 					.findByCompanyIdAndLastModifiedDate(lastSyncdate);
+		}
+		if(documentAccountingVoucherColumns == null) {
+			ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
+			.body(Collections.emptyList());
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
 				.body(documentAccountingVoucherColumns.stream().map(DocumentAccountingVoucherColumnDTO::new)

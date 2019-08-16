@@ -164,6 +164,11 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	@Query("delete from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?1 and locationAccountProfile.id in ?2")
 	void deleteByIdIn(Long companyId, List<Long> ids);
 	
+	@Transactional
+	@Modifying
+	@Query("delete from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?1")
+	void deleteByCompany(Long companyId);
+	
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile  where locationAccountProfile.accountProfile.pid in ?1 and locationAccountProfile.accountProfile.activated = true")
 	List<LocationAccountProfile> findAllLocationByAccountProfilePids(List<String> accountProfilePids);
 	

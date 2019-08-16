@@ -22,6 +22,7 @@ import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
+import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
@@ -98,7 +99,13 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 		accountProfileDTO.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid()); // set
 																								// pid
 		AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
-		accountProfile.setUser(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
+		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		if(opUser.isPresent()) {
+			accountProfile.setUser(opUser.get());
+		}else {
+			accountProfile.setUser(userRepository.findOneByLogin("siteadmin").get());
+		}
+		
 		// set company
 		accountProfile.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		accountProfile.setAccountStatus(accountProfileDTO.getAccountStatus());
@@ -116,7 +123,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	@Override
 	public AccountProfileDTO update(AccountProfileDTO accountProfileDTO) {
 		log.debug("Request to Update AccountProfile : {}", accountProfileDTO);
-
+		
 		return accountProfileRepository.findOneByPid(accountProfileDTO.getPid()).map(accountProfile -> {
 			accountProfile.setName(accountProfileDTO.getName());
 			accountProfile.setAlias(accountProfileDTO.getAlias());
@@ -144,6 +151,16 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			accountProfile
 					.setDefaultPriceLevel(priceLevelRepository.findOneByPid(accountProfileDTO.getDefaultPriceLevelPid())
 							.map(priceLevel -> priceLevel).orElse(null));
+			
+			if(accountProfile.getUser() == null) {
+				Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+				if(opUser.isPresent() ) {
+					accountProfile.setUser(opUser.get());
+				}else {
+					accountProfile.setUser(userRepository.findOneByLogin("siteadmin").get());
+				}
+			}
+			
 			accountProfile = accountProfileRepository.save(accountProfile);
 			AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
 			return result;
@@ -405,7 +422,14 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 		AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
 		// set company
 		accountProfile.setCompany(companyRepository.findOne(companyId));
-		accountProfile.setUser(userRepository.findOneByLogin(userLogin).get());
+		
+		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		if(opUser.isPresent()) {
+			accountProfile.setUser(opUser.get());
+		}else {
+			accountProfile.setUser(userRepository.findOneByLogin("siteadmin").get());
+		}
+		
 		accountProfile.setAccountStatus(accountProfileDTO.getAccountStatus());
 		accountProfile = accountProfileRepository.save(accountProfile);
 		AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
@@ -558,7 +582,12 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			newAccountType = accountTypeRepository.save(newAccountType);
 			accountProfile.setAccountType(newAccountType);
 		}
-		accountProfile.setUser(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
+		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		if(opUser.isPresent()) {
+			accountProfile.setUser(opUser.get());
+		}else {
+			accountProfile.setUser(userRepository.findOneByLogin("siteadmin").get());
+		}
 		AccountProfile newAccountProfile = accountProfileRepository.save(accountProfile);
 		locationRepository.findOneByPid(leadManagementDTO.getLocationPid()).ifPresent(loc -> {
 			LocationAccountProfile locationAccount = new LocationAccountProfile(loc, newAccountProfile, company);

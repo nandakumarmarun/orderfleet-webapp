@@ -131,7 +131,9 @@ if (!this.MobileConfiguration) {
 						if (data == "") {
 							$('#saveOffline').prop("checked", true);
 							$('#addNewCustomer').prop("checked", true);
+							$('#inventoryVoucherUIType').val("TYPE_1");
 							$('#voucherNumberGenerationType').val("TYPE_1");
+							$('#cartType').val("NORMAL");
 						} else {
 							$('#saveOffline').prop("checked",
 									data.taskExecutionSaveOfflineValue);
