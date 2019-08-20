@@ -44,13 +44,18 @@ public class ReceiptDTO {
 		this.chequeNo = accountingVoucherDetail.getInstrumentNumber();
 		this.bankName = accountingVoucherDetail.getBankName();
 		this.ledgerName = accountingVoucherDetail.getBy().getName();
-		this.narrationMessage = accountingVoucherDetail.getRemarks();
+		String remarks = accountingVoucherDetail.getRemarks();
+		if (remarks.contains("&")) {
+			remarks = remarks.replaceAll("&", "and ");
+		}
+		this.narrationMessage = remarks == null ? "" : remarks;
 		this.userName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
 		this.mode = accountingVoucherDetail.getMode();
 		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
 				accountingVoucherDetail.getAccountingVoucherHeader());
 		this.trimChar = accountingVoucherDetail.getBy().getTrimChar();
-		this.chequeDate = accountingVoucherDetail.getInstrumentDate()==null?"":accountingVoucherDetail.getInstrumentDate().toString();
+		this.chequeDate = accountingVoucherDetail.getInstrumentDate() == null ? ""
+				: accountingVoucherDetail.getInstrumentDate().toString();
 		this.employeeName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
 	}
 
@@ -65,15 +70,20 @@ public class ReceiptDTO {
 		this.chequeNo = accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentNumber();
 		this.bankName = accountingVoucherAllocation.getAccountingVoucherDetail().getBankName();
 		this.ledgerName = accountingVoucherAllocation.getAccountingVoucherDetail().getBy().getName();
-		this.narrationMessage = accountingVoucherAllocation.getRemarks();
+		String remarks = accountingVoucherAllocation.getRemarks();
+		if (remarks.contains("&")) {
+			remarks = remarks.replace("&", "and ");
+		}
+		this.narrationMessage = remarks == null ? "" : remarks;
 		this.userName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader()
 				.getEmployee().getName();
 		this.mode = accountingVoucherAllocation.getMode();
 		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
 				accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader());
-		this.chequeDate = accountingVoucherAllocation.getAccountingVoucherDetail()
-				.getInstrumentDate()==null?"":accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate().toString();
-		this.employeeName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader().getEmployee().getName();
+		this.chequeDate = accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate() == null ? ""
+				: accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate().toString();
+		this.employeeName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader()
+				.getEmployee().getName();
 	}
 
 	public String getParticularsName() {
@@ -211,5 +221,5 @@ public class ReceiptDTO {
 	public void setHeaderAmount(double headerAmount) {
 		this.headerAmount = headerAmount;
 	}
-	
+
 }
