@@ -342,6 +342,35 @@ public class TPAccountProfileManagementService {
 	}
 
 	@Transactional
+	public void saveUpdateLocationHierarchyExcel(Company company,Set<String> accountNames,
+												List<Location> existingLocationList,Location defaultLocation) {
+		Long companyId = company.getId();
+		Long version ;
+		// Only one version of a company hierarchy is active at a time
+		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
+				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
+		if (locationHierarchy.isPresent()) {
+			locationHierarchyRepository.updateLocationHierarchyInactivatedFor(ZonedDateTime.now(),
+					locationHierarchy.get().getVersion());
+			version = locationHierarchy.get().getVersion() + 1;
+			locationHierarchyRepository.insertLocationHierarchyWithNoParent(version, defaultLocation.getId());
+		} else {
+			version = 1L;
+		}
+		
+		// create hierarchy
+		for(String accounts : accountNames) {
+			Optional<Location> opLocation = existingLocationList.stream().filter(ell -> ell.getName().equals(accounts)).findAny();
+			if(opLocation.isPresent()) {
+				locationHierarchyRepository.insertLocationHierarchyWithParent(version,
+						opLocation.get().getId(), defaultLocation.getId());
+			}
+		}
+
+	}
+	
+	
+	@Transactional
 	@Async
 	public void saveUpdateLocationAccountProfiles(final List<LocationAccountProfileDTO> locationAccountProfileDTOs,
 			final SyncOperation syncOperation) {

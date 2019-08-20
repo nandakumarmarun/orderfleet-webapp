@@ -64,6 +64,8 @@
 						
 							<button id='btnUpload' type="button" class="btn btn-blue"
 								title="Upload">Upload</button>
+							<br><br>
+							<input type="checkbox" id="locationHierarchy">Upload Hierarchy
 							<div id="loading"> </div>
 						</td>
 					</tr>

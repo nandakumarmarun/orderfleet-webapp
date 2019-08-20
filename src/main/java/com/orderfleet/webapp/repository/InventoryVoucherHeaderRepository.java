@@ -68,7 +68,14 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3) and iv.created_date IN "
 			+ "(select MAX(ivh.created_date) from tbl_inventory_voucher_header ivh where "
 			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id)";
-
+	public static final String EXCEL_SALES_DOWNLOAD = "select ap.name accName,ivh.order_number,ivh.document_date,emp.name empName, "
+			+" pp.name ppName ,ivd.selling_rate,ivd.quantity , pp.sku  from tbl_inventory_voucher_header ivh "
+			+" INNER JOIN tbl_inventory_voucher_detail ivd on ivd.inventory_voucher_header_id = ivh.id  "
+			+" INNER JOIN tbl_employee_profile emp on ivh.employee_id = emp.id "
+			+" INNER JOIN tbl_product_profile pp on ivd.product_id = pp.id "
+			+" INNER JOIN tbl_account_profile ap on ivh.receiver_account_id = ap.id "
+			+" where ivh.pid IN (?1) ";
+	
 	Optional<InventoryVoucherHeader> findOneByPid(String pid);
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} Order By inventoryVoucher.createdDate desc")
@@ -450,6 +457,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query(value = PRIMARY_SALES_EXCEl, nativeQuery = true)
 	List<Object[]> getPrimarySalesForExcel(Long companyId, List<Long> documentIds);
+
+	@Query(value = EXCEL_SALES_DOWNLOAD, nativeQuery = true)
+	List<Object[]> getExcelFileSales(List<String> ivhPids);
 
 	@Transactional
 	@Modifying(clearAutomatically = true)

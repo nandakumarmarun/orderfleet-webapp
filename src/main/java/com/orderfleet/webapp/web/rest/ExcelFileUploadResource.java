@@ -9,10 +9,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -42,6 +45,7 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
+import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PriceLevelList;
@@ -61,6 +65,7 @@ import com.orderfleet.webapp.repository.ActivityStageRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
+import com.orderfleet.webapp.repository.LocationHierarchyRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.PriceLevelListRepository;
@@ -87,6 +92,7 @@ import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.service.StageService;
 import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.async.ExcelPOIHelper;
+import com.orderfleet.webapp.service.async.TPAccountProfileManagementService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 
 /**
@@ -169,6 +175,12 @@ public class ExcelFileUploadResource {
 	
 	@Inject
 	private OpeningStockRepository openingStockRepository;
+	
+	@Inject
+	private LocationHierarchyRepository locationHierarchyRepository;
+	
+	@Inject
+	private TPAccountProfileManagementService tpAccountProfileManagementService;
 
 	@RequestMapping(value = "/excel-file-upload", method = RequestMethod.GET)
 	@Timed
@@ -179,9 +191,9 @@ public class ExcelFileUploadResource {
 	}
 
 	@RequestMapping(value = "/excel-file-upload/uploadFile", method = RequestMethod.POST)
-	public @ResponseBody String uploadFile(MultipartHttpServletRequest request)
+	public @ResponseBody String uploadFile(MultipartHttpServletRequest request,@RequestParam("locHrchy") boolean locationHirarchy)
 			throws IOException, EncryptedDocumentException, InvalidFormatException {
-
+		System.out.println("Location Hierarchy : "+locationHirarchy);
 		Iterator<String> itrator = request.getFileNames();
 		MultipartFile multipartFile = request.getFile(itrator.next());
 
@@ -191,14 +203,14 @@ public class ExcelFileUploadResource {
 
 		String fileExtension = file.getName().split("\\.")[1];
 
-		if (!fileExtension.equalsIgnoreCase("xls") && !fileExtension.equalsIgnoreCase("xlsx")) {
+		if (!fileExtension.equalsIgnoreCase("xlsx")) {
 			return "FAILED";
 		}
 		String status = "";
 		Optional<Company> opCompany = companyRepository.findById(SecurityUtils.getCurrentUsersCompanyId());
 		if(opCompany.isPresent()) {
 			Company company = opCompany.get();
-			String uploadCustomeStatus = uploadCustomer(file,company);
+			String uploadCustomeStatus = uploadCustomer(file,company,locationHirarchy);
 			String uploadProductstatus = uploadProduct(file,company);
 			String uploadProductPriceStatus = uploadProductPrice(file,company);
 			String uploadStock = uploadStock(file,company);
@@ -213,9 +225,13 @@ public class ExcelFileUploadResource {
 			return status;
 	}
 
-	private String uploadCustomer(File file,Company company) throws IOException {
+	private String uploadCustomer(File file,Company company,boolean isLocationHrchy) throws IOException {
 		Map<Integer, List<String>> data = excelPOIHelper.readExcel(file, 0);
 			parseAndUploadLocations(data,company);
+			if(isLocationHrchy) {
+				parseAndUploadLocationsHierarchy(data,company);
+			}
+			parseAndUploadAccountPriceLevel(data,company);
 			parseAndUploadAccountProfile(data,company);
 			parseAndUploadLocationAccountProfile(data,company);
 		return "SUCCESS";
@@ -247,25 +263,51 @@ public class ExcelFileUploadResource {
 		return "SUCCESS";
 	}
 
+	private void parseAndUploadAccountPriceLevel(Map<Integer, List<String>> datas , Company company) {
+
+		List<PriceLevel> priceLevelList = new ArrayList<>();
+		List<PriceLevel> existingPriceLevelList = priceLevelRepository.findAllByCompanyId();
+		for (int rowCount = 1; rowCount < datas.size(); rowCount++) {
+			List<String> dataList = datas.get(rowCount);
+			PriceLevel priceLevel= new PriceLevel();
+			
+			String name = dataList.get(24) != null ? dataList.get(24) : "";
+			if("".equals(name)) {
+				continue;
+			}
+			Optional<PriceLevel> opPriceLevel = existingPriceLevelList.stream().filter(epl -> epl.getName().equals(name)).findAny();
+			if(opPriceLevel.isPresent()) {
+				priceLevel = opPriceLevel.get();
+			}else {
+				priceLevel.setName(dataList.get(24) != null ? dataList.get(24) : "");
+				priceLevel.setAlias(dataList.get(24) != null ? dataList.get(24) : "");
+				priceLevel.setCompany(company);
+				priceLevel.setPid(PriceLevelService.PID_PREFIX+ RandomUtil.generatePid());
+			}
+			
+			if(!priceLevelList.stream().filter(loc -> loc.getName().equals(name)).findAny().isPresent())
+				priceLevelList.add(priceLevel);
+		}
+		System.out.println("Account Price Level :"+priceLevelList.size());
+		priceLevelRepository.save(priceLevelList);
+
+	}
+	
 	private void parseAndUploadAccountProfile(Map<Integer, List<String>> datas,Company company) {
 		AccountType accountType = accountTypeRepository.findByCompanyIdAndName("Sundry Debtors");
 		List<AccountProfile> existingAccountProfiles = accountProfileRepository.findAllByCompanyId();
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		List<PriceLevel> existingPriceLevelList = priceLevelRepository.findAllByCompanyId();
 		if(!opUser.isPresent()) {
 			return;
 		}
-//		System.out.println("========================================");
-//		datas.forEach((k, v) -> {
-//			System.out.println("Key => " + k + "  Value => " + v);
-//		});
-//		System.out.println("========================================");
 		List<AccountProfile> accountProfileList = new ArrayList<>();
 		for (int rowCount = 1; rowCount < datas.size(); rowCount++) {
 			List<String> dataList = datas.get(rowCount);
 			AccountProfile accountProfile = new AccountProfile();
 			String name = dataList.get(0) != null ? dataList.get(0) : "";
 			if(name.isEmpty()) {
-				break;
+				continue;
 			}
 			Optional<AccountProfile> opAccountProfile = existingAccountProfiles.stream().filter(eap -> eap.getAlias().equals(name)).findAny();
 			if(opAccountProfile.isPresent()) {
@@ -278,6 +320,11 @@ public class ExcelFileUploadResource {
 				accountProfile.setAccountType(accountType);
 				accountProfile.setUser(opUser.get());
 				accountProfile.setCompany(company);
+			}
+			String defaultPriceLevel = dataList.get(24) != null && !dataList.get(24).equals("") ? dataList.get(24) : "General";
+			Optional<PriceLevel> opPriceLevel = existingPriceLevelList.stream().filter(epl -> epl.getName().equals(defaultPriceLevel)).findAny();
+			if(opPriceLevel.isPresent()) {
+				accountProfile.setDefaultPriceLevel(opPriceLevel.get());
 			}
 			accountProfile.setCity(!dataList.get(5).isEmpty() ? dataList.get(5) : "No City");
 			accountProfile.setPhone1(dataList.get(15) != null &&  1< dataList.get(15).length() && dataList.get(15).length() < 13 ? dataList.get(15) : "9999999999");
@@ -301,13 +348,16 @@ public class ExcelFileUploadResource {
 			List<String> dataList = datas.get(rowCount);
 			Location location = new Location();
 			
-			String name = dataList.get(5) != null ? dataList.get(5) : "";
+			String name = dataList.get(23) != null ? dataList.get(23) : "";
+			if("".equals(name)) {
+				continue;
+			}
 			Optional<Location> opLocation = existingLocationList.stream().filter(ell -> ell.getAlias().equals(name)).findAny();
 			if(opLocation.isPresent()) {
 				location = opLocation.get();
 			}else {
-				location.setName(dataList.get(5) != null ? dataList.get(5) : "");
-				location.setAlias(dataList.get(5) != null ? dataList.get(5) : "");
+				location.setName(dataList.get(23) != null ? dataList.get(23) : "");
+				location.setAlias(dataList.get(23) != null ? dataList.get(23) : "");
 				location.setCompany(company);
 				location.setPid(LocationService.PID_PREFIX+ RandomUtil.generatePid());
 			}
@@ -320,19 +370,49 @@ public class ExcelFileUploadResource {
 		
 	}
 	
+	
+	private void parseAndUploadLocationsHierarchy(Map<Integer, List<String>> datas, Company company) {
+
+		List<Location> existingLocationList = locationRepository.findAllByCompanyId();
+		Optional<Location> defaultLocation = locationRepository.findByCompanyIdAndNameIgnoreCase(company.getId(), "Territory");
+		if(!defaultLocation.isPresent()) {
+			return;
+		}
+		
+
+		Set<String> accountNames = new LinkedHashSet<String>();  
+		for (int rowCount = 1; rowCount < datas.size(); rowCount++) {
+			List<String> dataList = datas.get(rowCount);
+			
+			String name = dataList.get(23) != null ? dataList.get(23) : "";
+			if("".equals(name)) {
+				continue;
+			}
+			accountNames.add(name);
+		}
+		tpAccountProfileManagementService.saveUpdateLocationHierarchyExcel(company, accountNames, existingLocationList, defaultLocation.get());
+		
+		
+	}
+	
 	private void parseAndUploadLocationAccountProfile(Map<Integer, List<String>> datas , Company company) {
 
 		List<Location> locations =  locationRepository.findAllByCompanyId();
 		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
 		Set<LocationAccountProfile> locationAccountProfileList = new HashSet<>();
 		if(!datas.isEmpty()) {
-			locationAccountProfileRepository.deleteByCompany(company.getId());
+			List<Long> accountProfileIds = 
+					accountProfiles.stream().filter(ap -> ap.getAccountType().getName().equals("Company"))
+					.map(acc -> acc.getId()).collect(Collectors.toList());
+
+			locationAccountProfileRepository.deleteByCompanyExcludeDefault(company.getId(),accountProfileIds);
+
 		}
 		
 		for (int rowCount = 1; rowCount < datas.size(); rowCount++) {
 			List<String> dataList = datas.get(rowCount);
 			LocationAccountProfile locationAccountProfile = new LocationAccountProfile();
-			String locationAlias = dataList.get(5) != null ? dataList.get(5) : "";
+			String locationAlias = dataList.get(23) != null ? dataList.get(23) : "";
 			String accountAlias = dataList.get(0) != null ? dataList.get(0) : "";
 
 			Optional<Location> location = locations.stream().filter(loc -> loc.getAlias().equals(locationAlias)).findAny();

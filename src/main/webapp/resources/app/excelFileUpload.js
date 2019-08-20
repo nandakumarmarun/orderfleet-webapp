@@ -22,7 +22,9 @@ if (!this.ExcelFileUpload) {
 	function uploadFile() {
 
 		var fileObject = document.getElementById("uploadFile");
-		console.log(fileObject.files[0]);
+		var locHrchy = document.getElementById("locationHierarchy").checked;
+		console.log(locHrchy);
+//		console.log(fileObject.files[0]);
 
 		document.getElementById("loading").innerHTML = "<div class='loader'></div>"
 
@@ -33,7 +35,7 @@ if (!this.ExcelFileUpload) {
 		$
 				.ajax({
 					type : 'POST',
-					url : excelFileUploadContextPath + "/uploadFile",
+					url : excelFileUploadContextPath + "/uploadFile?locHrchy="+locHrchy,
 					data : uploadXls,
 					cache : false,
 					contentType : false,
@@ -53,7 +55,13 @@ if (!this.ExcelFileUpload) {
 									"Upload Excel File Failed.");
 							return;
 						}
-						document.getElementById("loading").innerHTML = data;
+						
+						if( data == 'SUCCESS') {
+							document.getElementById("loading").innerHTML = "Data Uploaded Successfully";
+							$('#loading').css('color', 'green');
+							$('#loading').css('font-weight', 'bold');
+						}
+						
 					},
 					error : function(err) {
 						document.getElementById("loading").innerHTML = "<label class='error-msg' style='color: red;'></label>";
