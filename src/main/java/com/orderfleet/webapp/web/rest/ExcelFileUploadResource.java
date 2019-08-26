@@ -218,6 +218,7 @@ public class ExcelFileUploadResource {
 			if (uploadCustomeStatus.equalsIgnoreCase("SUCCESS") && uploadProductstatus.equalsIgnoreCase("SUCCESS")
 					&& uploadProductPriceStatus.equalsIgnoreCase("SUCCESS") && uploadStock.equalsIgnoreCase("SUCCESS")) {
 				status = "SUCCESS";
+				delete(file);
 			} else {
 				status = "UPLOAD FAILED";
 			}
@@ -697,6 +698,10 @@ public class ExcelFileUploadResource {
 		fos.write(file.getBytes());
 		fos.close();
 		return convFile;
+	}
+	
+	public static void delete(File file) throws IOException {
+		file.delete();
 	}
 
 }

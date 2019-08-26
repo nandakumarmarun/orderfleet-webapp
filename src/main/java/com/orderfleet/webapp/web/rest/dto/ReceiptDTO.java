@@ -71,7 +71,8 @@ public class ReceiptDTO {
 		this.bankName = accountingVoucherAllocation.getAccountingVoucherDetail().getBankName();
 		this.ledgerName = accountingVoucherAllocation.getAccountingVoucherDetail().getBy().getName();
 		String remarks = accountingVoucherAllocation.getRemarks();
-		if (remarks.contains("&")) {
+		
+		if (remarks != null && remarks.contains("&")) {
 			remarks = remarks.replace("&", "and ");
 		}
 		this.narrationMessage = remarks == null ? "" : remarks;

@@ -29,6 +29,7 @@ public class SalesOrderDTO {
 	private String selectedVats;
 	private String tabOrderNumber;
 	private String documentName;
+	private String documentAlias;
 	private double docDiscountAmount;
 	private double docDiscountPercentage;
 	private String trimChar;
@@ -55,6 +56,7 @@ public class SalesOrderDTO {
 		this.ledgerAddress = inventoryVoucherHeader.getReceiverAccount().getAddress();
 		this.date = inventoryVoucherHeader.getDocumentDate();
 		this.documentName = inventoryVoucherHeader.getDocument().getName();
+		this.documentAlias = inventoryVoucherHeader.getDocument().getAlias();
 		this.docDiscountAmount = inventoryVoucherHeader.getDocDiscountAmount();
 		this.docDiscountPercentage = inventoryVoucherHeader.getDocDiscountPercentage();
 		if (inventoryVoucherHeader.getReceiverAccount().getDefaultPriceLevel() != null) {
@@ -164,6 +166,14 @@ public class SalesOrderDTO {
 
 	public void setDocumentName(String documentName) {
 		this.documentName = documentName;
+	}
+	
+	public String getDocumentAlias() {
+		return documentAlias;
+	}
+
+	public void setDocumentAlias(String documentAlias) {
+		this.documentAlias = documentAlias;
 	}
 
 	public List<DynamicDocumentHeaderDTO> getDynamicDocumentHeaderDTOs() {
