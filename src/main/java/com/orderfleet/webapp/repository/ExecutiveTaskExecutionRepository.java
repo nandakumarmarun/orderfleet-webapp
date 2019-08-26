@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +75,7 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 
 	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2")
 	Long countByDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
-	
+
 	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and exeTaskExecution.user.login = ?3")
 	Long countByDateBetweenAndUserLogin(LocalDateTime fromDate, LocalDateTime toDate, String login);
 
@@ -202,7 +203,7 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and exeTaskExecution.activity.pid in ?3 and exeTaskExecution.user.id in ?4 and exeTaskExecution.accountProfile.pid in ?5 Order By exeTaskExecution.date desc")
 	List<ExecutiveTaskExecution> getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(LocalDateTime fromDate,
 			LocalDateTime toDate, List<String> activityPids, List<Long> userIds, List<String> accountPids);
-	
+
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and exeTaskExecution.activity.pid in ?3 and exeTaskExecution.user.id in ?4  Order By exeTaskExecution.date desc")
 	List<ExecutiveTaskExecution> getByDateBetweenAndActivityPidInAndUserIdIn(LocalDateTime fromDate,
 			LocalDateTime toDate, List<String> activityPids, List<Long> userIds);
@@ -212,24 +213,28 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 			LocalDateTime toDate, String userPid, List<String> accountProfilePids);
 
 	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.pid = ?2 and exeTaskExecution.location in ?1 and exeTaskExecution.createdDate between ?3 and ?4 and exeTaskExecution.locationType = ?5")
-	Long countAndUserNameByCompanyPidAndLocationInAndDateBetweenAndLocationType(List<String> locations, String companyPid,
-			LocalDateTime fromDate, LocalDateTime toDate,LocationType locationType);
+	Long countAndUserNameByCompanyPidAndLocationInAndDateBetweenAndLocationType(List<String> locations,
+			String companyPid, LocalDateTime fromDate, LocalDateTime toDate, LocationType locationType);
 
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.pid = ?2 and exeTaskExecution.location in ?1 and exeTaskExecution.createdDate between ?3 and ?4")
 	List<ExecutiveTaskExecution> getByCompanyPidAndLocationInAndDateBetween(List<String> locations, String companyPid,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.pid in ?1")
-	List<ExecutiveTaskExecution> findAllByExecutiveTaskExecutionPidIn(List<String>pids);
-	
+	List<ExecutiveTaskExecution> findAllByExecutiveTaskExecutionPidIn(List<String> pids);
+
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.pid = ?2 and exeTaskExecution.location in ?1 and exeTaskExecution.createdDate between ?3 and ?4 and exeTaskExecution.locationType = ?5")
-	List<ExecutiveTaskExecution> getByCompanyPidAndLocationInAndDateBetweenAndLocationType(List<String> locations, String companyPid,
-			LocalDateTime fromDate, LocalDateTime toDate,LocationType locationType);
-	
+	List<ExecutiveTaskExecution> getByCompanyPidAndLocationInAndDateBetweenAndLocationType(List<String> locations,
+			String companyPid, LocalDateTime fromDate, LocalDateTime toDate, LocationType locationType);
+
 	@Query("select ete.id, ep.name from ExecutiveTaskExecution ete inner join EmployeeProfile ep on ete.user.id=ep.user.id where ete.user.id in ?1 and ete.date between ?2 and ?3 Order By ep.name ASC")
 	List<Object[]> findByUserIdInAndDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.pid = ?1")
 	ExecutiveTaskExecution findByExecutionPid(String executionPid);
+
+	
+	@Query("select exeTaskExecution.pid,exeTaskExecution.accountProfile.name,exeTaskExecution.activity.name,exeTaskExecution.date from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and  exeTaskExecution.user.id = ?3 order By exeTaskExecution.date desc")
+	List<Object[]> getByDateBetweenAndUser(LocalDateTime fromDate, LocalDateTime toDate, long userId);
 
 }

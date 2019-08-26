@@ -15,27 +15,30 @@ import com.orderfleet.webapp.web.rest.dto.SalesTargetReportSettingDTO;
 @RestController
 @RequestMapping("/api")
 public class PerformanceReportMobileController {
-	
+
 	private final PerformanceReportMobileService performanceReportMobileService;
-	
+
 	public PerformanceReportMobileController(PerformanceReportMobileService performanceReportMobileService) {
 		super();
 		this.performanceReportMobileService = performanceReportMobileService;
 	}
-	
+
 	@Timed
 	@GetMapping("/accountwise-sales-performance-report")
-	public ResponseEntity<SalesTargetReportSettingDTO> accountwiseSalesPerformanceReport(@RequestParam MobileUINames mobileUINames,@RequestParam String accountPids) {
-		SalesTargetReportSettingDTO salesTargetReportSettingDTO = performanceReportMobileService.getAccountWiseSalesTargetPerformanceReport(mobileUINames, accountPids);
+	public ResponseEntity<SalesTargetReportSettingDTO> accountwiseSalesPerformanceReport(
+			@RequestParam MobileUINames mobileUINames, @RequestParam String accountPids) {
+		SalesTargetReportSettingDTO salesTargetReportSettingDTO = performanceReportMobileService
+				.getAccountWiseSalesTargetPerformanceReport(mobileUINames, accountPids);
 		return new ResponseEntity<>(salesTargetReportSettingDTO, HttpStatus.OK);
 	}
 
 	@Timed
 	@GetMapping("/userwise-sales-performance-report")
-	public ResponseEntity<SalesTargetReportSettingDTO> userwiseSalesPerformanceReport(@RequestParam MobileUINames mobileUINames,  @RequestParam String login) {
-		SalesTargetReportSettingDTO salesTargetReportSettingDTO = performanceReportMobileService.getUserWiseSalesTargetPerformanceReport(mobileUINames, login);
+	public ResponseEntity<SalesTargetReportSettingDTO> userwiseSalesPerformanceReport(
+			@RequestParam MobileUINames mobileUINames, @RequestParam String login) {
+		SalesTargetReportSettingDTO salesTargetReportSettingDTO = performanceReportMobileService
+				.getUserWiseSalesTargetPerformanceReport(mobileUINames, login);
 		return new ResponseEntity<>(salesTargetReportSettingDTO, HttpStatus.OK);
 	}
 
 }
-

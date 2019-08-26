@@ -157,6 +157,12 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	int updateDynamicDocumentHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus tallyDownloadStatus,
 			List<String> dynamicDocumentPids);
 
+	@Query("select dd.pid,dd.document.name,dd.document.pid from DynamicDocumentHeader dd where dd.company.id = ?#{principal.companyId} and dd.executiveTaskExecution.pid = ?1")
+	List<Object[]> findDynamicDocumentsHeaderByExecutiveTaskExecutionPid(String exeTasKPid);
+
+	@Query("select dd from DynamicDocumentHeader dd where dd.company.id = ?#{principal.companyId} and dd.pid = ?1 Order By dd.createdDate desc")
+	List<DynamicDocumentHeader> findDynamicDocumentHeaderByPid(String dynamicDocumentHeaderPid);
+
 	// @Query("select
 	// dDocument.pid,dDocument.documentNumberLocal,dDocument.documentNumberServer,dDocument.document.pid,"
 	// +

@@ -14,6 +14,7 @@ import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.AttendanceStatusSubgroup;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AttendanceStatus;
+import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 
 /**
  * Spring Data JPA repository for the Attendance entity.
@@ -88,5 +89,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 	Optional<Attendance> findTop1ByCompanyPidAndUserPidOrderByCreatedDateDesc(String companyPid, String userPid);
 	
 	Optional<Attendance> findTop1ByCompanyIdAndUserPidOrderByCreatedDateDesc(Long companyPid, String userPid);
+
+	@Query("select attendance from Attendance attendance where attendance.company.id = ?#{principal.companyId} and attendance.plannedDate between ?1 and ?2 and attendance.user.id = ?3 Order By attendance.plannedDate desc")
+	List<Attendance> getByDateBetweenAndUser(LocalDateTime fromDate, LocalDateTime toDate, Long userId);
 
 }

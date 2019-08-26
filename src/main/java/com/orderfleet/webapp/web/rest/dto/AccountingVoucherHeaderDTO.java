@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
@@ -64,11 +65,11 @@ public class AccountingVoucherHeaderDTO {
 	private Boolean isNew = Boolean.FALSE;
 
 	private Boolean status;
-	
+
 	private double cashAmount;
-	
+
 	private double chequeAmount;
-	
+
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
 
 	public AccountingVoucherHeaderDTO() {
@@ -103,20 +104,25 @@ public class AccountingVoucherHeaderDTO {
 		if (accountingVoucherHeader.getCreatedBy() != null) {
 			this.userName = accountingVoucherHeader.getCreatedBy().getFirstName();
 		}
+
+		if (!accountingVoucherHeader.getAccountingVoucherDetails().isEmpty()) {
+			this.accountingVoucherDetails = accountingVoucherHeader.getAccountingVoucherDetails().stream()
+					.map(AccountingVoucherDetailDTO::new).collect(Collectors.toList());
+		}
 		this.totalAmount = accountingVoucherHeader.getTotalAmount();
 		this.outstandingAmount = accountingVoucherHeader.getOutstandingAmount();
 		this.remarks = accountingVoucherHeader.getRemarks();
 		this.documentNumberLocal = accountingVoucherHeader.getDocumentNumberLocal();
 		this.documentNumberServer = accountingVoucherHeader.getDocumentNumberServer();
 		this.status = accountingVoucherHeader.getStatus();
-		for(AccountingVoucherDetail avd : accountingVoucherHeader.getAccountingVoucherDetails()) {
-			if(avd.getMode() == PaymentMode.Bank) {
+		for (AccountingVoucherDetail avd : accountingVoucherHeader.getAccountingVoucherDetails()) {
+			if (avd.getMode() == PaymentMode.Bank) {
 				this.chequeAmount += avd.getAmount();
-			}else if(avd.getMode() == PaymentMode.Cash) {
+			} else if (avd.getMode() == PaymentMode.Cash) {
 				this.cashAmount += avd.getAmount();
 			}
 		}
-		
+
 		if (accountingVoucherHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = accountingVoucherHeader.getTallyDownloadStatus();
 		}
@@ -318,8 +324,6 @@ public class AccountingVoucherHeaderDTO {
 	public void setStatus(Boolean status) {
 		this.status = status;
 	}
-	
-	
 
 	public double getCashAmount() {
 		return cashAmount;
@@ -336,7 +340,7 @@ public class AccountingVoucherHeaderDTO {
 	public void setChequeAmount(double chequeAmount) {
 		this.chequeAmount = chequeAmount;
 	}
-	
+
 	public TallyDownloadStatus getTallyDownloadStatus() {
 		return tallyDownloadStatus;
 	}

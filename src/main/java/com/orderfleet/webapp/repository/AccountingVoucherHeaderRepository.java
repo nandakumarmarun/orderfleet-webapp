@@ -227,4 +227,11 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("select sum(av.totalAmount) from AccountingVoucherHeader av where av.accountProfile.id in ?1 and av.document.pid = ?2 and av.executiveTaskExecution.activity.pid=?3 and av.documentDate between ?4 and ?5")
 	Double totalAmountByAccountProfileAndDocumentAndActivityDateBetween(Set<Long> accountProfileIds, String documentPid,
 			String activityPid, LocalDateTime fromDate, LocalDateTime toDate);
+
+	@Query("select av.pid,av.document.name,av.document.pid from AccountingVoucherHeader av where av.company.id = ?#{principal.companyId} and av.executiveTaskExecution.pid = ?1")
+	List<Object[]> findAccountingVoucherHeaderByExecutiveTaskExecutionPid(String exeTasKPid);
+
+	@Query("select avh from AccountingVoucherHeader avh where avh.company.id = ?#{principal.companyId} and avh.pid = ?1 Order By avh.createdDate desc")
+	List<AccountingVoucherHeader> findAccountingVoucherHeaderByPid(String accountingVoucherHeaderPid);
+
 }

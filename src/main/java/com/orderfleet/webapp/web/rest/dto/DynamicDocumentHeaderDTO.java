@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.DynamicDocumentHeaderHistory;
@@ -98,6 +99,9 @@ public class DynamicDocumentHeaderDTO {
 		if (dynamicDocumentHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = dynamicDocumentHeader.getTallyDownloadStatus();
 		}
+
+		this.filledForms = dynamicDocumentHeader.getFilledForms().stream().map(FilledFormDTO::new)
+				.collect(Collectors.toList());
 	}
 
 	public DynamicDocumentHeaderDTO(DynamicDocumentHeaderHistory dynamicDocumentHeader) {
