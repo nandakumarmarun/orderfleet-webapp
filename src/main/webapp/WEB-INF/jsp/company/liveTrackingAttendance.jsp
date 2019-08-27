@@ -1,0 +1,259 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
+<html lang="en">
+<head>
+<title>SalesNrich | LiveTrackingAttendance</title>
+
+<jsp:include page="../fragments/m_head.jsp"></jsp:include>
+
+<!-- Googli map API -->
+<script
+	src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDwL42-LQ4wTz5fYvNuBvlTAnWVugNC_h4&signed_in=true&libraries=places"></script>
+
+<spring:url value="/resources/assets/css/style.css" var="style"></spring:url>
+<link href="${style}" rel="stylesheet">
+
+<!-- SockJs -->
+<spring:url value="/resources/assets/js/websocket/sockjs-0.3.4.js"
+	var="sockjs"></spring:url>
+<script type="text/javascript" src="${sockjs}"></script>
+
+<!-- StompJS -->
+<spring:url value="/resources/assets/js/websocket/stomp.js" var="stomp"></spring:url>
+<script type="text/javascript" src="${stomp}"></script>
+
+<spring:url value="/resources/assets/css/preloader.css" var="preloader"></spring:url>
+<link href="${preloader}" rel="stylesheet">
+
+<spring:url value="/resources/assets/js/markerwithlabel.js"
+	var="markerwithlabel"></spring:url>
+<script type="text/javascript" src="${markerwithlabel}"></script>
+
+<!-- jQuery UI css-->
+<spring:url value="/resources/assets/css/jquery-ui.css"
+	var="jqueryUiCss"></spring:url>
+<link href="${jqueryUiCss}" rel="stylesheet">
+
+<!-- preloader -->
+<spring:url value="/resources/assets/js/jquery.isloading.js"
+	var="isloading"></spring:url>
+<script type="text/javascript" src="${isloading}"></script>
+
+<spring:url value="/resources/assets/js/jquery.isloading.min.js"
+	var="isloadingmin"></spring:url>
+<script type="text/javascript" src="${isloadingmin}"></script>
+
+<!-- Live Tracking custom js -->
+<spring:url value="/resources/app/live-tracking-attendance.js" var="liveTrackingAttendance"></spring:url>
+<script type="text/javascript" src="${liveTrackingAttendance}"></script>
+
+<script type="text/javascript">
+	var companyId = "${companyId}";
+	var contextPath = "${pageContext.request.contextPath}";
+	// initialize google map
+	var map;
+	var kerala = new google.maps.LatLng(10.7700, 76.6500);
+	var mapOptions = {
+		zoom : 9,
+		center : kerala
+	};
+	function initialize() {
+		console.log("initialize...........");
+		map = new google.maps.Map(document.getElementById('map-canvas'),
+				mapOptions);
+		console.log("initialized");
+
+		$("#txtDate").datepicker({
+			dateFormat : 'yy-mm-dd',
+			maxDate : new Date()
+		}).datepicker("setDate", getParameterByName('date'));
+
+		// call from dash board
+		var dashboardUserPid = getParameterByName('user-key-pid');
+		var urlDate = getParameterByName('date');
+		console.log("........" + dashboardUserPid);
+		console.log("........" + urlDate);
+
+		// show users and routes
+		loadUsersDetails(dashboardUserPid);
+
+		// establish websocket connection
+		connect();
+	}
+
+	function getParameterByName(name, url) {
+		if (!url)
+			url = window.location.href;
+		name = name.replace(/[\[\]]/g, "\\$&");
+		var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex
+				.exec(url);
+		if (!results)
+			return null;
+		if (!results[2])
+			return '';
+		return decodeURIComponent(results[2].replace(/\+/g, " "));
+	}
+
+	google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+<style>
+.labels {
+	color: red;
+	background-color: white;
+	font-family: "Lucida Grande", "Arial", sans-serif;
+	font-size: 10px;
+	font-weight: bold;
+	text-align: center;
+	width: 65px;
+	border: 1px solid #19A7BF;
+	white-space: nowrap;
+}
+</style>
+<!-- media query style of add route expand collapse -->
+<style>
+@media screen and (min-width: 50px) and (max-width: 991px) {
+	#btn-collapse-table {
+		width: 45px;
+		float: none;
+	}
+	.icon-expand-collapse {
+		height: 40px;
+		border-radius: 4px;
+	}
+	#icon-left-media {
+		margin-top: 0px;
+	}
+	#div_for_hide {
+		border-radius: 0 4px 4px 0;
+		border-left: 1px solid #EBEBEB;
+	}
+	.a-icon-left-media {
+		padding: 13px !important;
+	}
+	.form-padding {
+		padding-left: 15px;
+	}
+}
+</style>
+<!-- media query style of add route expand collapse -->
+</head>
+<body class="page-body  page-left-in">
+
+	<div class="page-container">
+		<jsp:include page="../fragments/m_navbar.jsp"></jsp:include>
+
+		<div class="main-content">
+			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
+			<hr />
+			<div class="" id="btn-collapse-table">
+				<div
+					class="panel panel-primary table-for-left-collapse icon-expand-collapse panel-height">
+					<div class="panel-heading" style="border-bottom: transparent;">
+						<div class="panel-options" style="padding: 0px;">
+							<!-- <a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a> -->
+							<a href="#" class="a-icon-left-media"><i
+								class="entypo-left-open" id="icon-left-media"></i></a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- the content of slide expand collapse -->
+
+			<div class="row">
+				<div class="col-md-3 col-lg-3 form-padding">
+					<div class="panel panel-primary table-for-left-collapse"
+						id="div_for_hide">
+						<div class="panel-heading">
+							<div class="panel-title col-sm-12 bg-head">
+								<!-- <strong class="f-s-18">Users</strong> -->
+								<div class="input-group">
+									<input type="text" class="form-control" id="txtDate"
+										style="background-color: #fff;" readonly="readonly"
+										onchange="loadUsersDetails();" placeholder="Select From Date" />
+
+									<div class="input-group-addon">
+										<a href="#"><i class="entypo-calendar"></i></a>
+									</div>
+								</div>
+							</div>
+							<div class="panel-options">
+								<!-- <a href="#" id="btn-collapse-table"><i class="entypo-cancel"></i></a> -->
+							</div>
+						</div>
+
+						<div class="panel-body">
+							<div class="">
+								<div id="divUsers" class="panel-group joined"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<!-- map starts here -->
+				<div class="col-md-8" id="g-map">
+					<div class="panel panel-primary" data-collapsed="0">
+						<!-- to apply shadow add class "panel-shadow" -->
+						<!-- panel head -->
+						<div class="panel-heading">
+							<div class="panel-title"></div>
+
+							<div class="panel-options">
+								<a href="#" data-rel="reload" id="fullscreen"
+									data-toggle="tooltip" data-placement="top"
+									data-original-title="Full Screen"><i class="entypo-window"></i></a>
+								<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+							</div>
+						</div>
+
+						<!-- panel body -->
+						<div class="panel-body no-padding" style="height: 500px;">
+							<div id="map-canvas" style="height: 100%; width: 100%"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
+		</div>
+	</div>
+	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
+
+	<!-- jQuery UI Js-->
+	<spring:url value="/resources/assets/js/jquery-ui.js" var="jqueryUI"></spring:url>
+	<script type="text/javascript" src="${jqueryUI}"></script>
+
+	<spring:url value="/resources/assets/js/moment.js" var="momentJs"></spring:url>
+	<script type="text/javascript" src="${momentJs}"></script>
+
+	<!-- custom script here -->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$(".table-for-left-collapse").show();
+
+			$("#btn-collapse-table").click(function() {
+				$("#div_for_hide").toggle("slide");
+				$("#g-map").toggleClass("col-md-11");
+				$("#g-map").toggleClass("col-md-8");
+				$(".entypo-left-open").toggleClass("entypo-right-open");
+			});
+
+			$("#fullscreen").click(function() {
+				var elem = document.getElementById("map-canvas");
+				if (elem.requestFullscreen) {
+					elem.requestFullscreen();
+				} else if (elem.msRequestFullscreen) {
+					elem.msRequestFullscreen();
+				} else if (elem.mozRequestFullScreen) {
+					elem.mozRequestFullScreen();
+				} else if (elem.webkitRequestFullscreen) {
+					elem.webkitRequestFullscreen();
+				}
+			});
+
+		})
+	</script>
+</body>
+</html>

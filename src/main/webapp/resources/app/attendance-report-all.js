@@ -13,16 +13,16 @@ if (!this.AttendanceReport) {
 	$(document).ready(function() {
 		var employeePid = getParameterByName('user-key-pid');
 		getEmployees(employeePid); // common js
-		
+
 		$("#txtToDate").datepicker({
 			dateFormat : "dd-mm-yy"
 		});
 		$("#txtFromDate").datepicker({
 			dateFormat : "dd-mm-yy"
 		});
-		
+
 		let empPid = getParameterByName('empPid');
-		if(empPid) {
+		if (empPid) {
 			$('#dbEmployee').val(empPid);
 		}
 		// load today data
@@ -47,7 +47,7 @@ if (!this.AttendanceReport) {
 			downloadXls();
 		});
 	});
-	
+
 	function getParameterByName(name, url) {
 		if (!url)
 			url = window.location.href;
@@ -116,53 +116,107 @@ if (!this.AttendanceReport) {
 										function(index, attendance) {
 											let end = moment(attendance.createdDate);
 											let startTime = moment(attendance.plannedDate);
-											let duration = moment.duration(end.diff(startTime));
+											let duration = moment.duration(end
+													.diff(startTime));
 											let rowColor = "";
-											if(duration.asMinutes() > 10){
+											if (duration.asMinutes() > 10) {
 												rowColor = "background-color:yellow";
 											}
-											if(attendance.attendanceSubGroupName==null){
-											$('#tBodyAttendanceReport')
-													.append(
-															"<tr style='"+ rowColor +"'><td>"
-																	+ formatDate(attendance.attendanceDay, 'dddd, MMM Do YYYY')
-																	+ "</td><td>"
-																	+ attendance.employeeName
-																	+ "</td><td>"+ attendance.attendanceStatus+ "</td><td>"
-																	+ formatDate(attendance.plannedDate, 'MMM DD YYYY, h:mm:ss a')
-																	+ "</td><td>"
-																	+ formatDate(attendance.createdDate,'MMM DD YYYY, h:mm:ss a')
-																	+ "</td><td>"
-																	+ attendance.location
-																	+ "</td><td>"
-																	+ (attendance.towerLocation == null ? "" : attendance.towerLocation)
-																	+ "</td><td>"
-																	+ (attendance.remarks == null ? ""
-																			: attendance.remarks)
-																	+ "</td></tr>");
-											} else {
-												var taskListAlias = attendance.taskListAlias == null ? "" : " - " + attendance.taskListAlias;
-												console.log(attendance.attendanceSubGroupName);
+											if (attendance.attendanceSubGroupName == null) {
 												$('#tBodyAttendanceReport')
-												.append(
-														"<tr style='"+ rowColor +"'><td>"
-																+ formatDate(attendance.attendanceDay, 'dddd, MMM Do YYYY')
-																+ "</td><td>"
-																+ attendance.employeeName
-																+ "</td><td>"+ attendance.attendanceStatus +"("+attendance.attendanceSubGroupName+")" 
-																+ taskListAlias
-																+ "</td><td>"
-																+ formatDate(attendance.plannedDate,'MMM DD YYYY, h:mm:ss a')
-																+ "</td><td>"
-																+ formatDate(attendance.createdDate, 'MMM DD YYYY, h:mm:ss a')
-																+ "</td><td>"
-																+ attendance.location
-																+ "</td><td>"
-																+ (attendance.towerLocation == null ? "" : attendance.towerLocation)
-																+ "</td><td>"
-																+ (attendance.remarks == null ? ""
-																		: attendance.remarks)
-																+ "</td></tr>");
+														.append(
+																"<tr style='"
+																		+ rowColor
+																		+ "'><td>"
+																		+ formatDate(
+																				attendance.attendanceDay,
+																				'dddd, MMM Do YYYY')
+																		+ "</td><td>"
+																		+ attendance.employeeName
+																		+ "</td><td>"
+																		+ attendance.attendanceStatus
+																		+ "</td><td>"
+																		+ formatDate(
+																				attendance.plannedDate,
+																				'MMM DD YYYY, h:mm:ss a')
+																		+ "</td><td>"
+																		+ formatDate(
+																				attendance.createdDate,
+																				'MMM DD YYYY, h:mm:ss a')
+																		+ "</td><td><a href='"
+																		+ appContextPath
+																		+ '/web/live-tracking-attendance?user-key-pid='
+																		+ attendance.userPid
+																		+ '&date='
+																		+ convertDateTime(attendance.plannedDate)
+																		+ "' class='icon-container'>"
+																		+ attendance.location
+																		+ "</a></td><td>"
+																		+ "</td><td><a href='"
+																		+ appContextPath
+																		+ '/web/live-tracking-attendance?user-key-pid='
+																		+ attendance.userPid
+																		+ '&date='
+																		+ convertDateTime(attendance.plannedDate)
+																		+ "' class='icon-container'>"
+																		+ (attendance.towerLocation == null ? ""
+																				: attendance.towerLocation)
+																		+ "</a></td></td>"
+																		+ (attendance.remarks == null ? ""
+																				: attendance.remarks)
+																		+ "</td></tr>");
+											} else {
+												var taskListAlias = attendance.taskListAlias == null ? ""
+														: " - "
+																+ attendance.taskListAlias;
+												console
+														.log(attendance.attendanceSubGroupName);
+												$('#tBodyAttendanceReport')
+														.append(
+																"<tr style='"
+																		+ rowColor
+																		+ "'><td>"
+																		+ formatDate(
+																				attendance.attendanceDay,
+																				'dddd, MMM Do YYYY')
+																		+ "</td><td>"
+																		+ attendance.employeeName
+																		+ "</td><td>"
+																		+ attendance.attendanceStatus
+																		+ "("
+																		+ attendance.attendanceSubGroupName
+																		+ ")"
+																		+ taskListAlias
+																		+ "</td><td>"
+																		+ formatDate(
+																				attendance.plannedDate,
+																				'MMM DD YYYY, h:mm:ss a')
+																		+ "</td><td>"
+																		+ formatDate(
+																				attendance.createdDate,
+																				'MMM DD YYYY, h:mm:ss a')
+																		+ "</td><td><a href='"
+																		+ appContextPath
+																		+ '/web/live-tracking-attendance?user-key-pid='
+																		+ attendance.userPid
+																		+ '&date='
+																		+ convertDateTime(attendance.plannedDate)
+																		+ "' class='icon-container'>"
+																		+ attendance.location
+																		+ "</a></td><td>"
+																		+ "</td><td><a href='"
+																		+ appContextPath
+																		+ '/web/live-tracking-attendance?user-key-pid='
+																		+ attendance.userPid
+																		+ '&date='
+																		+ convertDateTime(attendance.plannedDate)
+																		+ "' class='icon-container'>"
+																		+ (attendance.towerLocation == null ? ""
+																				: attendance.towerLocation)
+																		+ "</a></td></td>"
+																		+ (attendance.remarks == null ? ""
+																				: attendance.remarks)
+																		+ "</td></tr>");
 											}
 										});
 					}
@@ -208,6 +262,14 @@ if (!this.AttendanceReport) {
 		});
 	}
 
+	function convertDateTime(createdDate) {
+		if (createdDate) {
+			return moment(createdDate).format('YYYY-MM-DD');
+		} else {
+			return "";
+		}
+	}
+	
 	function convertDateTimeFromServer(createdDate) {
 		if (createdDate) {
 			return moment(createdDate).format();
@@ -215,5 +277,5 @@ if (!this.AttendanceReport) {
 			return "";
 		}
 	}
-	
+
 })();

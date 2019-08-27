@@ -126,11 +126,14 @@ public class AttendanceReportResource {
 		for (LocalDate localDate : dates) {
 			for (EmployeeProfile employee : employeeProfiles) {
 				Optional<AttendanceDTO> attendanceExists = attendanceList.stream()
-						.filter(a -> a.getLogin().equals(employee.getUser().getLogin()) && localDate.equals(a.getPlannedDate().toLocalDate())).findAny();
+						.filter(a -> a.getLogin().equals(employee.getUser().getLogin())
+								&& localDate.equals(a.getPlannedDate().toLocalDate()))
+						.findAny();
 				AttendanceReportDTO attendanceReportDTO = new AttendanceReportDTO();
 				attendanceReportDTO.setAttendanceDay(localDate);
 				if (attendanceExists.isPresent()) {
 					AttendanceDTO attDto = attendanceExists.get();
+					attendanceReportDTO.setUserPid(attDto.getUserPid());
 					attendanceReportDTO.setEmployeeName(employee.getName());
 					attendanceReportDTO.setAttendanceStatus(attDto.getAttendanceStatus().toString());
 					attendanceReportDTO.setPlannedDate(attDto.getPlannedDate());
@@ -210,7 +213,8 @@ public class AttendanceReportResource {
 	}
 
 	private List<LocalDate> getDaysBetweenDates(LocalDate startDate, LocalDate endDate) {
-		//the startDate is inclusive and endDate is exclusive in the calculation of noOfDaysBetween, so add one day
+		// the startDate is inclusive and endDate is exclusive in the calculation of
+		// noOfDaysBetween, so add one day
 		long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate.plusDays(1));
 		return IntStream.iterate(0, i -> i + 1).limit(numOfDaysBetween).mapToObj(i -> startDate.plusDays(i))
 				.collect(Collectors.toList());

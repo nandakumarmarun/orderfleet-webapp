@@ -11,7 +11,7 @@ import com.orderfleet.webapp.domain.FilledFormDetail;
 public class FilledFormDetailDTO {
 
 	private Long id;
-	
+
 	private String value;
 
 	private String formElementPid;
@@ -27,7 +27,7 @@ public class FilledFormDetailDTO {
 	public FilledFormDetailDTO(FilledFormDetail filledFormDetail) {
 		super();
 		this.id = filledFormDetail.getId();
-		this.value = filledFormDetail.getValue();
+		this.value = filledFormDetail.getValue() == null ? "" : filledFormDetail.getValue();
 		this.formElementPid = filledFormDetail.getFormElement().getPid();
 		this.formElementName = filledFormDetail.getFormElement().getName();
 		this.formElementType = filledFormDetail.getFormElement().getFormElementType().getName();
@@ -78,5 +78,5 @@ public class FilledFormDetailDTO {
 		return "FilledFormDetailDTO [id=" + id + ", value=" + value + ", formElementPid=" + formElementPid
 				+ ", formElementName=" + formElementName + ", formElementType=" + formElementType + "]";
 	}
-	
+
 }

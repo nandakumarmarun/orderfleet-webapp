@@ -6,25 +6,27 @@ import java.time.LocalDateTime;
 public class AttendanceReportDTO {
 
 	private LocalDate attendanceDay;
-	
+
 	private String employeeName;
-	
+
 	private String attendanceStatus;
-	
+
 	private String attendanceSubGroupName;
 
 	private LocalDateTime plannedDate;
-	
+
 	private LocalDateTime createdDate;
-	
+
 	private boolean completed;
-	
+
 	private String remarks;
-	
+
 	private String location;
-	
+
 	private String towerLocation;
-	
+
+	private String userPid;
+
 	public LocalDate getAttendanceDay() {
 		return attendanceDay;
 	}
@@ -48,7 +50,7 @@ public class AttendanceReportDTO {
 	public void setAttendanceStatus(String attendanceStatus) {
 		this.attendanceStatus = attendanceStatus;
 	}
-	
+
 	public String getAttendanceSubGroupName() {
 		return attendanceSubGroupName;
 	}
@@ -104,5 +106,13 @@ public class AttendanceReportDTO {
 	public void setTowerLocation(String towerLocation) {
 		this.towerLocation = towerLocation;
 	}
-	
+
+	public String getUserPid() {
+		return userPid;
+	}
+
+	public void setUserPid(String userPid) {
+		this.userPid = userPid;
+	}
+
 }

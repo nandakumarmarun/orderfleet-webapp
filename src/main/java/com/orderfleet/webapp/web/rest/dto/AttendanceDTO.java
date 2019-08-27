@@ -41,15 +41,16 @@ public class AttendanceDTO {
 	private String towerLocation;
 	private BigDecimal towerLatitude;
 	private BigDecimal towerLongitude;
-	
+
 	public AttendanceDTO() {
 		super();
 	}
 
-	public AttendanceDTO(String pid, String login, String userPid, String userName, LocalDateTime createdDate, boolean completed,
-			String remarks, LocalDateTime plannedDate, AttendanceStatus attendanceStatus, BigDecimal latitude,
-			BigDecimal longitude, String mnc, String mcc, String cellId, String lac, LocationType locationType,
-			String location, String attendanceSubGroupName,String towerLocation, BigDecimal towerLatitude, BigDecimal towerLongitude) {
+	public AttendanceDTO(String pid, String login, String userPid, String userName, LocalDateTime createdDate,
+			boolean completed, String remarks, LocalDateTime plannedDate, AttendanceStatus attendanceStatus,
+			BigDecimal latitude, BigDecimal longitude, String mnc, String mcc, String cellId, String lac,
+			LocationType locationType, String location, String attendanceSubGroupName, String towerLocation,
+			BigDecimal towerLatitude, BigDecimal towerLongitude) {
 		super();
 		this.pid = pid;
 		this.login = login;
@@ -302,7 +303,6 @@ public class AttendanceDTO {
 	public void setTowerLocation(String towerLocation) {
 		this.towerLocation = towerLocation;
 	}
-	
 
 	public BigDecimal getTowerLatitude() {
 		return towerLatitude;
@@ -322,9 +322,9 @@ public class AttendanceDTO {
 
 	@Override
 	public String toString() {
-		return "AttendanceDTO [pid=" + pid + ", login=" + login + ", userName=" + userName + ", createdDate="
-				+ createdDate + ", latitude=" + latitude + ", longitude=" + longitude + ", location=" + location
-				+ ", employeeName=" + employeeName + "]";
+		return "AttendanceDTO [pid=" + pid + ", login=" + login + ", userName=" + userName + ", plannedDate="
+				+ plannedDate + ", createdDate=" + createdDate + ", latitude=" + latitude + ", longitude=" + longitude
+				+ ", location=" + location + ", employeeName=" + employeeName + "]";
 	}
 
 }

@@ -35,9 +35,9 @@ import com.orderfleet.webapp.web.rest.dto.LiveTrackingDTO;
  */
 @Controller
 @RequestMapping("/web")
-public class LiveTrackingController {
+public class LiveTrackingAttendanceController {
 
-	private final Logger log = LoggerFactory.getLogger(LiveTrackingController.class);
+	private final Logger log = LoggerFactory.getLogger(LiveTrackingAttendanceController.class);
 
 	@Inject
 	private ExecutiveTaskExecutionService executiveTaskExecutionService;
@@ -51,14 +51,14 @@ public class LiveTrackingController {
 	@Inject
 	private AttendanceService attendanceService;
 
-	@RequestMapping("/live-tracking")
+	@RequestMapping("/live-tracking-attendance")
 	public String executives(Model model) {
 		log.info("liveTracking.........................");
 		model.addAttribute("companyId", SecurityUtils.getCurrentUsersCompanyId());
-		return "company/liveTracking";
+		return "company/liveTrackingAttendance";
 	}
 
-	@RequestMapping(value = "/getUsersDetails", method = RequestMethod.GET)
+	@RequestMapping(value = "/getUsersAttendanceDetails", method = RequestMethod.GET)
 	public @ResponseBody List<LiveTrackingDTO> getUsersDetails(
 			@RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 		// get user under current users
@@ -79,29 +79,13 @@ public class LiveTrackingController {
 
 			List<ExecutiveTaskExecutionDTO> trackingPoints = new ArrayList<>();
 
+			List<AttendanceDTO> attendanceList = attendanceService.findAllByCompanyIdUserPidAndDateBetween(
+					employee.getUserPid(), date.atTime(0, 0), date.atTime(23, 59));
+
 			/*
 			 * Optional<AttendanceDTO> attendance = attendanceService
 			 * .findTop1(SecurityUtils.getCurrentUsersCompanyId(),employee.getUserPid());
-			 * if(attendance.isPresent() &&
-			 * attendance.get().getCreatedDate().toLocalDate().isEqual(LocalDate.now())) {
-			 * ExecutiveTaskExecutionDTO executiveTaskExecutionDTO = new
-			 * ExecutiveTaskExecutionDTO(); if(attendance.get().getTowerLatitude() != null){
-			 * executiveTaskExecutionDTO.setTowerLatitude(attendance.get().getTowerLatitude(
-			 * )); executiveTaskExecutionDTO.setTowerLongitude(attendance.get().
-			 * getTowerLongitude()); }
-			 * executiveTaskExecutionDTO.setLatitude(attendance.get().getLatitude());
-			 * executiveTaskExecutionDTO.setLongitude(attendance.get().getLongitude());
-			 * executiveTaskExecutionDTO.setLocation(attendance.get().getLocation());
-			 * executiveTaskExecutionDTO.setTowerLocation(attendance.get().getTowerLocation(
-			 * ));
-			 * executiveTaskExecutionDTO.setLocationType(attendance.get().getLocationType())
-			 * ; executiveTaskExecutionDTO.setDate(attendance.get().getCreatedDate());
-			 * executiveTaskExecutionDTO.setAccountProfileName("Attendance");
-			 * trackingPoints.add(executiveTaskExecutionDTO); }
 			 */
-
-			List<AttendanceDTO> attendanceList = attendanceService.findAllByCompanyIdUserPidAndDateBetween(
-					employee.getUserPid(), date.atTime(0, 0), date.atTime(23, 59));
 			if (attendanceList.size() > 0 && attendanceList.get(0).getCreatedDate().toLocalDate().isEqual(date)) {
 				ExecutiveTaskExecutionDTO executiveTaskExecutionDTO = new ExecutiveTaskExecutionDTO();
 				if (attendanceList.get(0).getTowerLatitude() != null) {
@@ -118,8 +102,12 @@ public class LiveTrackingController {
 				trackingPoints.add(executiveTaskExecutionDTO);
 			}
 
-			trackingPoints.addAll(executiveTaskExecutionService.findAllByCompanyIdUserPidAndDateBetweenOrderByDateAsc(
-					employee.getUserPid(), date.atTime(0, 0), date.atTime(23, 59)));
+			/*
+			 * 
+			 * trackingPoints.addAll(executiveTaskExecutionService
+			 * .findAllByCompanyIdUserPidAndDateBetweenOrderByDateAsc(employee.getUserPid(),
+			 * date.atTime(0, 0), date.atTime(23, 59)));
+			 */
 
 			liveTrackingDTO.setTrackingPoints(trackingPoints);
 			liveTrackingDTOs.add(liveTrackingDTO);
