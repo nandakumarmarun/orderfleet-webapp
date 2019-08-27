@@ -151,8 +151,7 @@ if (!this.AttendanceReport) {
 																		+ convertDateTime(attendance.plannedDate)
 																		+ "' class='icon-container'>"
 																		+ attendance.location
-																		+ "</a></td><td>"
-																		+ "</td><td><a href='"
+																		+ "</a></td><td><a href='"
 																		+ appContextPath
 																		+ '/web/live-tracking-attendance?user-key-pid='
 																		+ attendance.userPid
@@ -161,7 +160,7 @@ if (!this.AttendanceReport) {
 																		+ "' class='icon-container'>"
 																		+ (attendance.towerLocation == null ? ""
 																				: attendance.towerLocation)
-																		+ "</a></td></td>"
+																		+ "</a></td><td>"
 																		+ (attendance.remarks == null ? ""
 																				: attendance.remarks)
 																		+ "</td></tr>");
@@ -213,7 +212,7 @@ if (!this.AttendanceReport) {
 																		+ "' class='icon-container'>"
 																		+ (attendance.towerLocation == null ? ""
 																				: attendance.towerLocation)
-																		+ "</a></td></td>"
+																		+ "</a></td><td>"
 																		+ (attendance.remarks == null ? ""
 																				: attendance.remarks)
 																		+ "</td></tr>");
