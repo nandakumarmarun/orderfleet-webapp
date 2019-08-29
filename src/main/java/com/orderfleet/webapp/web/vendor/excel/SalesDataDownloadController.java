@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
@@ -165,14 +166,15 @@ public class SalesDataDownloadController {
 	@RequestMapping(value = "/get-service-data.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
-	public List<SalesOrderExcelDTO> getServiceDataJSON() throws URISyntaxException {
+	public List<SalesOrderExcelDTO> getServiceDataJSON(@RequestParam(value="voucherType",required=true)VoucherType voucherType) throws URISyntaxException {
 		log.debug("REST request to download primary sales orders : {}");
 		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
 
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 
 		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
-		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_ORDER,
+		
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(voucherType,
 				company.getId());
 		if (primarySecDoc.isEmpty()) {
 			log.info("........No PrimarySecondaryDocument configuration Available...........");
@@ -182,7 +184,7 @@ public class SalesDataDownloadController {
 				.collect(Collectors.toList());
 
 		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-				.getSalesOrderForExcel(company.getId());
+				.getPrimarySecondarySalesOrderForExcel(company.getId(),documentIds);
 
 		log.debug("REST request to download primary sales orders : " + inventoryVoucherHeaders.size());
 		salesOrderDTOs = getServiceDataList(inventoryVoucherHeaders);
@@ -190,6 +192,9 @@ public class SalesDataDownloadController {
 		return salesOrderDTOs;
 
 	}
+	
+	
+	
 	
 	
 	
@@ -301,11 +306,10 @@ public class SalesDataDownloadController {
 			salesOrderDTO.setCustomerName(obj[13] != null ? obj[13].toString() : "");
 			salesOrderDTO.setMrp(Double.parseDouble(obj[14] != null ? obj[14].toString() : "0.0"));
 			salesOrderDTO.setDiscPrice(Double.parseDouble(obj[15] != null ? obj[15].toString() : "0.0"));
+			salesOrderDTO.setRemarks(obj[16] != null ? obj[16].toString() : "");
 			
 			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
-			System.out.println("================================================================");
-			System.out.println(salesOrderDTO.toString());
-			System.out.println("================================================================");
+
 			salesOrderDTOs.add(salesOrderDTO);
 
 		}

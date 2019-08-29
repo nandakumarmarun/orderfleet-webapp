@@ -39,6 +39,12 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "INNER JOIN tbl_product_profile pp on pp.id = ivd.product_id INNER JOIN tbl_employee_profile ep on ep.id =ivh.employee_id "
 			+ "INNER JOIN tbl_account_profile ap on ap.id = ivh.receiver_account_id where ivh.company_id = ?1  and ivh.tally_download_status = 'PENDING' order by ivh.created_date desc";
 
+	public static final String PRIMARY_SECONDARY_SALES_ORDER_EXCEL = "select ivh.document_number_server as billno,ivh.document_date as date,ap.alias as customerId,pp.alias as itemId,ivd.quantity as qty,ivd.selling_rate as rate,ivd.discount_percentage as discountPercentage,ivd.tax_percentage as taxpercentage,ivd.row_total as total,ivh.pid as inventoryPid,ep.name as empName,ivh.reference_document_number as refDocNo,ivd.free_quantity as freeQuantity,ap.name as customerName,ivd.mrp as mrp,ivd.discount_amount as discountAmt ,ivd.remarks as remarks "
+			+ "from tbl_inventory_voucher_header ivh INNER JOIN tbl_inventory_voucher_detail ivd on ivh.id = ivd.inventory_voucher_header_id "
+			+ "INNER JOIN tbl_product_profile pp on pp.id = ivd.product_id INNER JOIN tbl_employee_profile ep on ep.id =ivh.employee_id "
+			+ "INNER JOIN tbl_account_profile ap on ap.id = ivh.receiver_account_id where ivh.company_id = ?1  and ivh.tally_download_status = 'PENDING' and ivh.document_id in(?2)  order by ivh.created_date desc";
+
+	
 	public static final String PRIMARY_SALES_ORDER_EXCEl = "select ivh.document_number_server as billno,ivh.document_date as date,ap.alias as customerId,pp.alias as itemId,ivd.quantity as qty,ivd.selling_rate as rate,ivd.discount_percentage as discountPercentage,ivd.tax_percentage as taxpercentage,ivd.row_total as total,ivh.pid as inventoryPid,ep.name as empName,ivh.reference_document_number as refDocNo,ivd.free_quantity as freeQuantity "
 			+ "from tbl_inventory_voucher_header ivh INNER JOIN tbl_inventory_voucher_detail ivd on ivh.id = ivd.inventory_voucher_header_id "
 			+ "INNER JOIN tbl_product_profile pp on pp.id = ivd.product_id INNER JOIN tbl_employee_profile ep on ep.id =ivh.employee_id "
@@ -441,6 +447,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query(value = SALES_ORDER_EXCEl, nativeQuery = true)
 	List<Object[]> getSalesOrderForExcel(Long companyId);
+	
+	@Query(value = PRIMARY_SECONDARY_SALES_ORDER_EXCEL, nativeQuery = true)
+	List<Object[]> getPrimarySecondarySalesOrderForExcel(Long companyId , List<Long> documentIds);
 
 	@Query(value = STOCK_DETAILS, nativeQuery = true)
 	List<Object[]> getAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate);

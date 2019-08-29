@@ -23,6 +23,7 @@ public class SalesOrderExcelDTO {
 	private String customerName;
 	private Double mrp;
 	private Double freeQuantity;
+	private String remarks;
 
 	public SalesOrderExcelDTO() {
 
@@ -156,13 +157,13 @@ public class SalesOrderExcelDTO {
 		this.freeQuantity = freeQuantity;
 	}
 
-	@Override
-	public String toString() {
-		return "SalesOrderExcelDTO [billNo=" + billNo + ", date=" + date + ", customerCode=" + customerCode
-				+ ", itemCode=" + itemCode + ", quantity=" + quantity + ", rate=" + rate + ", discPer=" + discPer
-				+ ", discPrice=" + discPrice + ", taxPer=" + taxPer + ", total=" + total + ", CGSTAmt=" + CGSTAmt
-				+ ", SGSTAmt=" + SGSTAmt + ", inventoryPid=" + inventoryPid + ", customerName=" + customerName
-				+ ", mrp=" + mrp + ", freeQuantity=" + freeQuantity + "]";
+	public String getRemarks() {
+		return remarks;
 	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+	
 	
 }
