@@ -182,11 +182,12 @@ if (!this.InventoryVoucher) {
 		}
 		$('#tBodyInventoryVoucher').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
-		console.log($("#dbStatus").val() + "----" + empPids + "----"
-				+ $("#dbAccount").val() + "---" + $("#dbDateSearch").val()
-				+ "---" + $("#txtFromDate").val() + "---"
-				+ $("#txtToDate").val() + "---" + $("#dbDocumentType").val()
-				+ "---" + docPids);
+		/*
+		 * console.log($("#dbStatus").val() + "----" + empPids + "----" +
+		 * $("#dbAccount").val() + "---" + $("#dbDateSearch").val() + "---" +
+		 * $("#txtFromDate").val() + "---" + $("#txtToDate").val() + "---" +
+		 * $("#dbDocumentType").val() + "---" + docPids);
+		 */
 		$
 				.ajax({
 					url : inventoryVoucherContextPath + "/filter",
@@ -320,10 +321,22 @@ if (!this.InventoryVoucher) {
 		var completed = "'" + 'COMPLETED' + "'";
 		var spanStatus = "";
 		var pid = "'" + inventoryVoucherPid + "'";
+		console.log("....." + managementStatus);
+
+		var pointerEnable = '';
+
+		var pointerDisable = '';
+
 		switch (status) {
 		case 'PENDING':
-			spanStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'PENDING<span class="caret"></span></span>'
+			pointerEnable = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer" >';
+			pointerDisable = '<div class="dropdown"><span class="label label-default dropdown-toggle" >';
+
+			spanStatus = (managementStatus == "APPROVE" ? pointerEnable
+					: pointerDisable)
+					+ 'PENDING<span class="'
+					+ (managementStatus == "APPROVE" ? 'caret' : '')
+					+ '"></span></span>'
 					+ '<ul class="dropdown-menu">'
 					+ '<li onclick="InventoryVoucher.setStatus('
 					+ pid
@@ -339,8 +352,14 @@ if (!this.InventoryVoucher) {
 
 			break;
 		case 'PROCESSING':
-			spanStatus = '<div class="dropdown"><span class="label label-warning dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'PROCESSING <span class="caret"></span></span>'
+			pointerEnable = '<div class="dropdown"><span class="label label-warning dropdown-toggle" data-toggle="dropdown" style="cursor: pointer" >';
+			pointerDisable = '<div class="dropdown"><span class="label label-warning dropdown-toggle" >';
+
+			spanStatus = (managementStatus == "APPROVE" ? pointerEnable
+					: pointerDisable)
+					+ 'PROCESSING <span class="'
+					+ (managementStatus == "APPROVE" ? 'caret' : '')
+					+ '"></span></span>'
 					+ '<ul class="dropdown-menu">'
 					+ '<li onclick="InventoryVoucher.setStatus('
 					+ pid
@@ -356,7 +375,11 @@ if (!this.InventoryVoucher) {
 
 			break;
 		case 'COMPLETED':
-			spanStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" >'
+
+			pointerEnable = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer" >';
+			pointerDisable = '<div class="dropdown"><span class="label label-success dropdown-toggle" >';
+			spanStatus = (managementStatus == "APPROVE" ? pointerEnable
+					: pointerDisable)
 					+ 'COMPLETED <span></span></span></div>';
 			break;
 		}
@@ -510,7 +533,7 @@ if (!this.InventoryVoucher) {
 				},
 				success : function(data) {
 					console.log(data);
-					if(data == 'failed'){
+					if (data == 'failed') {
 						alert("Cannot update a downloaded order");
 					}
 					InventoryVoucher.filter();
