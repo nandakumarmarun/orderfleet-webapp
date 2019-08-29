@@ -106,13 +106,13 @@ public class LoadServerItemsToMobileController {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
 			attendenceDTOs = getFilterAttendenceData(monthStartDate, LocalDate.now());
 		} else if (filterBy.equalsIgnoreCase("CUSTOM")) {
-			log.info("CUSTOM------");
+			log.info("CUSTOM------" + fromDate + " to " + toDate + "------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
 			attendenceDTOs = getFilterAttendenceData(fromDateTime, toFateTime);
 		} else if (filterBy.equalsIgnoreCase("SINGLE")) {
-			log.info("SINGLE------");
+			log.info("SINGLE------" + fromDate + "-------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			attendenceDTOs = getFilterAttendenceData(fromDateTime, fromDateTime);
@@ -146,13 +146,13 @@ public class LoadServerItemsToMobileController {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
 			executiveTaskExecutions = getFilterData(monthStartDate, LocalDate.now());
 		} else if (filterBy.equalsIgnoreCase("CUSTOM")) {
-			log.info("CUSTOM------");
+			log.info("CUSTOM------" + fromDate + " to " + toDate + "------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
 			executiveTaskExecutions = getFilterData(fromDateTime, toFateTime);
 		} else if (filterBy.equalsIgnoreCase("SINGLE")) {
-			log.info("SINGLE------");
+			log.info("SINGLE------" + fromDate + "-------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			executiveTaskExecutions = getFilterData(fromDateTime, fromDateTime);
