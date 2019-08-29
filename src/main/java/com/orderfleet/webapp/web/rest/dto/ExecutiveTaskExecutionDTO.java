@@ -23,7 +23,7 @@ public class ExecutiveTaskExecutionDTO {
 	private LocalDateTime createdDate;
 
 	private LocalDateTime date;
-	
+
 	private LocalDateTime sendDate;
 
 	private LocalDateTime startTime;
@@ -55,7 +55,7 @@ public class ExecutiveTaskExecutionDTO {
 	private BigDecimal latitude;
 
 	private BigDecimal longitude;
-	
+
 	private BigDecimal towerLatitude;
 
 	private BigDecimal towerLongitude;
@@ -95,7 +95,7 @@ public class ExecutiveTaskExecutionDTO {
 	private boolean startIsMobileDataOff;
 
 	private String location;
-	
+
 	private String towerLocation;
 
 	private ActivityStatus activityStatus;
@@ -107,7 +107,7 @@ public class ExecutiveTaskExecutionDTO {
 	private String employeeName;
 
 	private boolean interimSave;
-	
+
 	private LocalDateTime punchInDate;
 
 	public ExecutiveTaskExecutionDTO() {
@@ -118,31 +118,34 @@ public class ExecutiveTaskExecutionDTO {
 		this(executiveTaskExecution.getPid(), executiveTaskExecution.getClientTransactionKey(),
 				executiveTaskExecution.getLatitude(), executiveTaskExecution.getLongitude(),
 				executiveTaskExecution.getTowerLatitude(), executiveTaskExecution.getTowerLongitude(),
-				executiveTaskExecution.getCreatedDate(), executiveTaskExecution.getDate(),executiveTaskExecution.getSendDate(),
-				executiveTaskExecution.getRemarks(), executiveTaskExecution.getUser().getPid(),
-				executiveTaskExecution.getUser().getFirstName(), executiveTaskExecution.getActivity().getPid(),
-				executiveTaskExecution.getActivity().getName(), executiveTaskExecution.getAccountType().getPid(),
-				executiveTaskExecution.getAccountType().getName(), executiveTaskExecution.getAccountProfile().getPid(),
+				executiveTaskExecution.getCreatedDate(), executiveTaskExecution.getDate(),
+				executiveTaskExecution.getSendDate(), executiveTaskExecution.getRemarks(),
+				executiveTaskExecution.getUser().getPid(), executiveTaskExecution.getUser().getFirstName(),
+				executiveTaskExecution.getActivity().getPid(), executiveTaskExecution.getActivity().getName(),
+				executiveTaskExecution.getAccountType().getPid(), executiveTaskExecution.getAccountType().getName(),
+				executiveTaskExecution.getAccountProfile().getPid(),
 				executiveTaskExecution.getAccountProfile().getName(),
 				executiveTaskExecution.getAccountProfile().getLocation(), executiveTaskExecution.getLocation(),
-				executiveTaskExecution.getTowerLocation(),
-				executiveTaskExecution.getLocationType(), executiveTaskExecution.getIsGpsOff(),
-				executiveTaskExecution.getIsMobileDataOff(), executiveTaskExecution.getActivityStatus(),
+				executiveTaskExecution.getTowerLocation(), executiveTaskExecution.getLocationType(),
+				executiveTaskExecution.getIsGpsOff(), executiveTaskExecution.getIsMobileDataOff(),
+				executiveTaskExecution.getActivityStatus(),
 				executiveTaskExecution.getExecutiveTaskPlan() != null
-						? executiveTaskExecution.getExecutiveTaskPlan().getPid() : null,
+						? executiveTaskExecution.getExecutiveTaskPlan().getPid()
+						: null,
 				executiveTaskExecution.getStartIsGpsOff(), executiveTaskExecution.getIsMobileDataOff(),
 				executiveTaskExecution.getStartLocationType(), executiveTaskExecution.getStartLocation(),
 				executiveTaskExecution.getStartLatitude(), executiveTaskExecution.getStartLongitude(),
 				executiveTaskExecution.getStartTime(), executiveTaskExecution.getEndTime(),
-				executiveTaskExecution.getRejectReasonRemark(),executiveTaskExecution.getPunchInDate());
+				executiveTaskExecution.getRejectReasonRemark(), executiveTaskExecution.getPunchInDate());
 	}
 
 	public ExecutiveTaskExecutionDTO(String pid, String clientTransactionKey, BigDecimal latitude, BigDecimal longitude,
-			BigDecimal towerLatitude, BigDecimal towerLongitude, LocalDateTime createdDate, LocalDateTime date, LocalDateTime sendDate,
-			String remarks, String userPid, String userName, String activityPid, String activityName, 
-			String accountTypePid, String accountTypeName, String accountProfilePid, String accountProfileName, 
-			String accountLocation, String location, String towerLocation, LocationType locationType, boolean isGpsOff, boolean isMobileDataOff, 
-			ActivityStatus activityStatus, String executiveTaskPlanPid, boolean startIsGpsOff, boolean startIsMobileDataOff,
+			BigDecimal towerLatitude, BigDecimal towerLongitude, LocalDateTime createdDate, LocalDateTime date,
+			LocalDateTime sendDate, String remarks, String userPid, String userName, String activityPid,
+			String activityName, String accountTypePid, String accountTypeName, String accountProfilePid,
+			String accountProfileName, String accountLocation, String location, String towerLocation,
+			LocationType locationType, boolean isGpsOff, boolean isMobileDataOff, ActivityStatus activityStatus,
+			String executiveTaskPlanPid, boolean startIsGpsOff, boolean startIsMobileDataOff,
 			LocationType startLocationType, String startLocation, BigDecimal startLatitude, BigDecimal startLongitude,
 			LocalDateTime startTime, LocalDateTime endTime, String rejectReasonRemark, LocalDateTime punchInDate) {
 		super();
@@ -287,7 +290,7 @@ public class ExecutiveTaskExecutionDTO {
 	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
-	
+
 	public LocalDateTime getSendDate() {
 		return sendDate;
 	}
@@ -543,7 +546,7 @@ public class ExecutiveTaskExecutionDTO {
 	public void setInterimSave(boolean interimSave) {
 		this.interimSave = interimSave;
 	}
-	
+
 	public BigDecimal getTowerLatitude() {
 		return towerLatitude;
 	}
@@ -559,7 +562,7 @@ public class ExecutiveTaskExecutionDTO {
 	public void setTowerLongitude(BigDecimal towerLongitude) {
 		this.towerLongitude = towerLongitude;
 	}
-	
+
 	public LocalDateTime getPunchInDate() {
 		return punchInDate;
 	}

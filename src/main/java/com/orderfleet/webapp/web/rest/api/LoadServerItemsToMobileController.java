@@ -6,9 +6,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -42,6 +44,7 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.PerformanceReportMobileService;
 import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
+import com.orderfleet.webapp.web.rest.api.dto.LoadServerExeTaskDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerSentItemDTO;
 import com.orderfleet.webapp.web.rest.api.dto.ManagedUserDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
@@ -122,43 +125,43 @@ public class LoadServerItemsToMobileController {
 	}
 
 	@GetMapping("/load-server-sent-items")
-	public ResponseEntity<List<ExecutiveTaskExecutionDTO>> sentItemsDownload(@RequestParam String filterBy,
+	public ResponseEntity<LoadServerExeTaskDTO> sentItemsDownload(@RequestParam String filterBy,
 			@RequestParam(required = false) String fromDate, @RequestParam(required = false) String toDate) {
 
 		log.info("Request to load server sent items...");
 
-		List<ExecutiveTaskExecutionDTO> executiveTaskExecutions = new ArrayList<>();
+		LoadServerExeTaskDTO loadServerExeTaskDTO = new LoadServerExeTaskDTO();
 
 		if (filterBy.equalsIgnoreCase("TODAY")) {
 			log.info("TODAY------");
-			executiveTaskExecutions = getFilterData(LocalDate.now(), LocalDate.now());
+			loadServerExeTaskDTO = getFilterData(LocalDate.now(), LocalDate.now());
 		} else if (filterBy.equalsIgnoreCase("YESTERDAY")) {
 			log.info("YESTERDAY------");
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			executiveTaskExecutions = getFilterData(yeasterday, yeasterday);
+			loadServerExeTaskDTO = getFilterData(yeasterday, yeasterday);
 		} else if (filterBy.equalsIgnoreCase("WTD")) {
 			log.info("WTD------");
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			executiveTaskExecutions = getFilterData(weekStartDate, LocalDate.now());
+			loadServerExeTaskDTO = getFilterData(weekStartDate, LocalDate.now());
 		} else if (filterBy.equalsIgnoreCase("MTD")) {
 			log.info("MTD------");
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			executiveTaskExecutions = getFilterData(monthStartDate, LocalDate.now());
+			loadServerExeTaskDTO = getFilterData(monthStartDate, LocalDate.now());
 		} else if (filterBy.equalsIgnoreCase("CUSTOM")) {
 			log.info("CUSTOM------" + fromDate + " to " + toDate + "------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-			executiveTaskExecutions = getFilterData(fromDateTime, toFateTime);
+			loadServerExeTaskDTO = getFilterData(fromDateTime, toFateTime);
 		} else if (filterBy.equalsIgnoreCase("SINGLE")) {
 			log.info("SINGLE------" + fromDate + "-------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			executiveTaskExecutions = getFilterData(fromDateTime, fromDateTime);
+			loadServerExeTaskDTO = getFilterData(fromDateTime, fromDateTime);
 		}
 
-		return new ResponseEntity<>(executiveTaskExecutions, HttpStatus.OK);
+		return new ResponseEntity<>(loadServerExeTaskDTO, HttpStatus.OK);
 	}
 
 	@GetMapping("/load-server-sent-items-document")
@@ -222,7 +225,9 @@ public class LoadServerItemsToMobileController {
 		return attendenceDtos;
 	}
 
-	private List<ExecutiveTaskExecutionDTO> getFilterData(LocalDate fDate, LocalDate tDate) {
+	private LoadServerExeTaskDTO getFilterData(LocalDate fDate, LocalDate tDate) {
+
+		LoadServerExeTaskDTO loadServerExeTaskDTO = new LoadServerExeTaskDTO();
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
@@ -241,6 +246,8 @@ public class LoadServerItemsToMobileController {
 					userId);
 		}
 
+		Set<Long> exeIds = new HashSet<>();
+
 		for (Object[] obj : executiveTaskExecutionsObject) {
 
 			ExecutiveTaskExecutionDTO executiveTaskExecutionDTO = new ExecutiveTaskExecutionDTO();
@@ -254,15 +261,37 @@ public class LoadServerItemsToMobileController {
 				DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 				date = LocalDateTime.parse(obj[3].toString(), formatter);
 			}
+
 			executiveTaskExecutionDTO.setDate(date);
+
+			exeIds.add(obj[4] != null ? Long.parseLong(obj[4].toString()) : 0);
 
 			executiveTaskExecutions.add(executiveTaskExecutionDTO);
 
 		}
 
-		log.info("Executive Task Execution Size= " + executiveTaskExecutions.size());
+		if (exeIds.size() != 0) {
+			List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTos = getDocumentInventoryItemsByExeIdIn(exeIds);
+			List<AccountingVoucherHeaderDTO> accountingVoucherHeaderDTos = getDocumentAccountingItemsByExeIdIn(exeIds);
 
-		return executiveTaskExecutions;
+			int inventoryVoucherCount = inventoryVoucherHeaderDTos.size();
+			int accountingVoucherCount = accountingVoucherHeaderDTos.size();
+			double inventoryVocherTotal = inventoryVoucherHeaderDTos.stream().mapToDouble(ivh -> ivh.getDocumentTotal())
+					.sum();
+			double accountingVoucherTotal = accountingVoucherHeaderDTos.stream()
+					.mapToDouble(avh -> avh.getTotalAmount()).sum();
+
+			log.info("Executive Task Execution Size= " + executiveTaskExecutions.size());
+			log.info("Inventory Voucher Size= " + inventoryVoucherCount + " & Total= " + inventoryVocherTotal);
+			log.info("Accounting Voucher Size= " + accountingVoucherCount + " & Total= " + accountingVoucherTotal);
+
+			loadServerExeTaskDTO.setAccountingVoucherCount(accountingVoucherCount);
+			loadServerExeTaskDTO.setAccountingVoucherTotal(accountingVoucherTotal);
+			loadServerExeTaskDTO.setExecutiveTaskExecutionDTOs(executiveTaskExecutions);
+			loadServerExeTaskDTO.setInventoryVoucherCount(inventoryVoucherCount);
+			loadServerExeTaskDTO.setInventoryVoucherTotal(inventoryVocherTotal);
+		}
+		return loadServerExeTaskDTO;
 	}
 
 	private List<InventoryVoucherHeaderDTO> getDocumentInventoryItems(String exeTasKPid) {
@@ -298,6 +327,43 @@ public class LoadServerItemsToMobileController {
 		}
 
 		log.info("Accounting Voucher Size= " + accountingVoucherHeaderDTOs.size());
+		return accountingVoucherHeaderDTOs;
+	}
+
+	private List<InventoryVoucherHeaderDTO> getDocumentInventoryItemsByExeIdIn(Set<Long> exeIds) {
+
+		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
+
+		List<Object[]> inventoryVouchersObject = inventoryVoucherHeaderRepository
+				.findInventoryVoucherHeaderByExecutiveTaskExecutionIdIn(exeIds);
+
+		for (Object[] obj : inventoryVouchersObject) {
+			InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
+			inventoryVoucherHeaderDTO.setPid(obj[0] != null ? obj[0].toString() : "");
+			inventoryVoucherHeaderDTO.setDocumentName(obj[1] != null ? obj[1].toString() : "");
+			inventoryVoucherHeaderDTO.setDocumentPid(obj[2] != null ? obj[2].toString() : "");
+			inventoryVoucherHeaderDTO.setDocumentTotal(obj[3] != null ? Double.parseDouble(obj[3].toString()) : 0.0);
+			inventoryVoucherHeaderDTOs.add(inventoryVoucherHeaderDTO);
+		}
+
+		return inventoryVoucherHeaderDTOs;
+	}
+
+	private List<AccountingVoucherHeaderDTO> getDocumentAccountingItemsByExeIdIn(Set<Long> exeIds) {
+		List<AccountingVoucherHeaderDTO> accountingVoucherHeaderDTOs = new ArrayList<>();
+
+		List<Object[]> accountingVouchersObject = accountingVoucherHeaderRepository
+				.findAccountingVoucherHeaderByExecutiveTaskExecutionIdin(exeIds);
+
+		for (Object[] obj : accountingVouchersObject) {
+			AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
+			accountingVoucherHeaderDTO.setPid(obj[0] != null ? obj[0].toString() : "");
+			accountingVoucherHeaderDTO.setDocumentName(obj[1] != null ? obj[1].toString() : "");
+			accountingVoucherHeaderDTO.setDocumentPid(obj[2] != null ? obj[2].toString() : "");
+			accountingVoucherHeaderDTO.setTotalAmount(obj[3] != null ? Double.parseDouble(obj[3].toString()) : 0.0);
+			accountingVoucherHeaderDTOs.add(accountingVoucherHeaderDTO);
+		}
+
 		return accountingVoucherHeaderDTOs;
 	}
 

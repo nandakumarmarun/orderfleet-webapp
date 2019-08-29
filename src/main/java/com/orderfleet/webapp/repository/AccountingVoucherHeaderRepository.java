@@ -234,4 +234,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("select avh from AccountingVoucherHeader avh where avh.company.id = ?#{principal.companyId} and avh.pid = ?1 Order By avh.createdDate desc")
 	List<AccountingVoucherHeader> findAccountingVoucherHeaderByPid(String accountingVoucherHeaderPid);
 
+	@Query("select av.pid,av.document.name,av.document.pid,av.totalAmount from AccountingVoucherHeader av where av.company.id = ?#{principal.companyId} and av.executiveTaskExecution.id in ?1")
+	List<Object[]> findAccountingVoucherHeaderByExecutiveTaskExecutionIdin(Set<Long> exeIds);
+
 }
