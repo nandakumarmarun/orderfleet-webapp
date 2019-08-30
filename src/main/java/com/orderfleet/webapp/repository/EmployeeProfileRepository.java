@@ -2,6 +2,7 @@ package com.orderfleet.webapp.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -93,4 +94,7 @@ public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile
 	
 	@Query("select employeeProfile.user.pid from EmployeeProfile employeeProfile where employeeProfile.pid in ?1")
 	List<String> findUserPidsByEmployeePids(List<String> employeePid);
+
+	@Query("select employeeProfile from EmployeeProfile employeeProfile where employeeProfile.company.id = ?#{principal.companyId} and employeeProfile.id in ?1")
+	List<EmployeeProfile> findAllByCompanyIdAndIdsIn(Set<Long> employeeIds);
 }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -233,8 +234,10 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.pid = ?1")
 	ExecutiveTaskExecution findByExecutionPid(String executionPid);
 
-	
 	@Query("select exeTaskExecution.pid,exeTaskExecution.accountProfile.name,exeTaskExecution.activity.name,exeTaskExecution.date,exeTaskExecution.id from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and  exeTaskExecution.user.id = ?3 order By exeTaskExecution.date desc")
 	List<Object[]> getByDateBetweenAndUser(LocalDateTime fromDate, LocalDateTime toDate, long userId);
+
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.id in ?1")
+	List<ExecutiveTaskExecution> findAllByCompanyIdAndIdsIn(Set<Long> exeIds);
 
 }

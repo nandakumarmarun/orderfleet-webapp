@@ -46,7 +46,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findOneWithAuthoritiesByLogin(String login);
 
 	Optional<User> findOneByPid(String pid);
-	
+
 	List<User> findByPidIn(List<String> pids);
 
 	@Query(value = "select distinct user from User user join fetch user.authorities", countQuery = "select count(user) from User user")
@@ -92,30 +92,33 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@Query("select count(user) from User user where user.company.legalName = ?1 and user.createdDate between ?2 and ?3")
 	Long getCountofUserByCompanyNameAndCreatedDateBetween(String companyName, ZonedDateTime startDate,
 			ZonedDateTime toDate);
-	
+
 	@Query("select count(user) from User user where user.company.legalName in ?1 and user.createdDate between ?2 and ?3")
 	Long getCountofUserByCompanyNameInAndCreatedDateBetween(List<String> companyName, ZonedDateTime startDate,
 			ZonedDateTime toDate);
-	
+
 	@Query("select user.id from User user where user.login = ?1")
 	Long getIdByLogin(String login);
-	
+
 	@Query("select user.pid from User user where user.login = ?1")
 	String getPidByLogin(String login);
-	
+
 	List<Long> findUserIdByActivated(Boolean activated);
-	
+
 	@Query("select user.pid, user.firstName, user.lastName from User user where user.company.id = ?#{principal.companyId} and user.activated = 'TRUE' order by user.firstName")
 	List<Object[]> findByUserPropertyCompanyId();
-	
+
 	User findTop1ByCompanyId(Long companyId);
-	
+
 	@Query("select user.login, user.firstName, user.lastName, user.company.pid, user.company.legalName from User user where user.company.pid = ?1 order by user.firstName")
 	List<Object[]> findUsersByCompanyPid(String companyPid);
-	
+
 	Long countByCompanyPidAndAuthoritiesIn(String companyPid, Set<Authority> authorities);
-	
+
 	@Query("select user.login from User user where user.login in ?1 and user.company.id=?#{principal.companyId}")
 	List<String> findAllUserByLogin(List<String> logins);
-	
+
+	@Query("select user from User user where user.id in ?1 and user.company.id=?#{principal.companyId}")
+	List<User> findAllByCompanyIdAndIdsIn(Set<Long> userIds);
+
 }

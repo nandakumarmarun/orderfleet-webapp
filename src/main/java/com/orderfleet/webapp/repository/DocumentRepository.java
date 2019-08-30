@@ -2,6 +2,7 @@ package com.orderfleet.webapp.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,4 +50,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 	List<Document> findAllDocumentsByDocumentPidsAndDocumentType(DocumentType documentType,List<String> documentPids);
 	
 	Optional<Document> findByCompanyPidAndNameIgnoreCase(String companyPd, String name);
+
+	@Query("select document from Document document where document.company.id = ?#{principal.companyId} and document.id in ?1")
+	List<Document> findAllByCompanyIdAndIdsIn(Set<Long> documentIds);
 }

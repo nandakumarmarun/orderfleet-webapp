@@ -86,40 +86,29 @@ public class LoadServerItemsToMobileController {
 	private AttendanceRepository attendanceRepository;
 
 	@GetMapping("/load-server-attendence")
-	public ResponseEntity<List<AttendanceDTO>> sentAttendenceDownload(@RequestParam String filterBy,
-			@RequestParam(required = false) String fromDate, @RequestParam(required = false) String toDate) {
+	public ResponseEntity<List<AttendanceDTO>> sentAttendenceDownload() {
 
-		log.info("Request to load attendence data...");
+		log.info("Request to load server attendance...");
+
 		List<AttendanceDTO> attendenceDTOs = new ArrayList<>();
 
-		if (filterBy.equalsIgnoreCase("TODAY")) {
-			log.info("TODAY------");
-			attendenceDTOs = getFilterAttendenceData(LocalDate.now(), LocalDate.now());
-		} else if (filterBy.equalsIgnoreCase("YESTERDAY")) {
-			log.info("YESTERDAY------");
-			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			attendenceDTOs = getFilterAttendenceData(yeasterday, yeasterday);
-		} else if (filterBy.equalsIgnoreCase("WTD")) {
-			log.info("WTD------");
-			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
-			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			attendenceDTOs = getFilterAttendenceData(weekStartDate, LocalDate.now());
-		} else if (filterBy.equalsIgnoreCase("MTD")) {
-			log.info("MTD------");
-			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			attendenceDTOs = getFilterAttendenceData(monthStartDate, LocalDate.now());
-		} else if (filterBy.equalsIgnoreCase("CUSTOM")) {
-			log.info("CUSTOM------" + fromDate + " to " + toDate + "------");
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-			attendenceDTOs = getFilterAttendenceData(fromDateTime, toFateTime);
-		} else if (filterBy.equalsIgnoreCase("SINGLE")) {
-			log.info("SINGLE------" + fromDate + "-------");
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			attendenceDTOs = getFilterAttendenceData(fromDateTime, fromDateTime);
+		List<Attendance> attendances = new ArrayList<>();
+
+		Optional<User> user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+
+		long userId;
+
+		if (user.isPresent()) {
+			userId = user.get().getId();
+			attendances = attendanceRepository.findTop61ByUserIdOrderByPlannedDateDesc(userId);
+			// getAttendanceByUserandUptoLimitDesc(userId);
 		}
+
+		for (Attendance attendance : attendances) {
+			attendenceDTOs.add(new AttendanceDTO(attendance));
+		}
+
+		log.info("Attendance Size= " + attendenceDTOs.size());
 
 		return new ResponseEntity<>(attendenceDTOs, HttpStatus.OK);
 	}
@@ -199,30 +188,6 @@ public class LoadServerItemsToMobileController {
 
 		return new ResponseEntity<>(loadServerSentItemDTO, HttpStatus.OK);
 
-	}
-
-	private List<AttendanceDTO> getFilterAttendenceData(LocalDate fDate, LocalDate tDate) {
-
-		LocalDateTime fromDate = fDate.atTime(0, 0);
-		LocalDateTime toDate = tDate.atTime(23, 59);
-
-		List<Attendance> attendences = new ArrayList<>();
-		List<AttendanceDTO> attendenceDtos = new ArrayList<>();
-
-		Optional<User> user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
-
-		long userId;
-
-		if (user.isPresent()) {
-			userId = user.get().getId();
-			attendences = attendanceRepository.getByDateBetweenAndUser(fromDate, toDate, userId);
-		}
-
-		for (Attendance attendance : attendences) {
-			attendenceDtos.add(new AttendanceDTO(attendance));
-		}
-		log.info("Attendence Size= " + attendenceDtos.size());
-		return attendenceDtos;
 	}
 
 	private LoadServerExeTaskDTO getFilterData(LocalDate fDate, LocalDate tDate) {

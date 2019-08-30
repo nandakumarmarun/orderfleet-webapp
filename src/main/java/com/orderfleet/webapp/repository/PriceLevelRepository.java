@@ -56,5 +56,8 @@ public interface PriceLevelRepository extends JpaRepository<PriceLevel, Long> {
 	@Modifying(clearAutomatically = true)
 	@Query("update PriceLevel priceLevel set priceLevel.activated = ?1 where priceLevel.id = ?2 and priceLevel.company.id = ?3")
 	void updateActivatedByIdAndCompanyId(boolean activated, Long id, Long companyId);
+
+	@Query("select priceLevel from PriceLevel priceLevel where priceLevel.company.id = ?#{principal.companyId} and priceLevel.id in ?1")
+	List<PriceLevel> findAllByCompanyIdAndIdsIn(Set<Long> priceLeveIds);
 	
 }

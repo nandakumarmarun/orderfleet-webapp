@@ -66,10 +66,10 @@ public class SalesOrderDTO {
 		this.ledgerState = inventoryVoucherHeader.getReceiverAccount().getStateName();
 		this.ledgerCountry = inventoryVoucherHeader.getReceiverAccount().getCountryName();
 		this.ledgerGstType = inventoryVoucherHeader.getReceiverAccount().getGstRegistrationType();
-		if(inventoryVoucherHeader.getEmployee() != null) {
+		if (inventoryVoucherHeader.getEmployee() != null) {
 			this.employeeAlias = inventoryVoucherHeader.getEmployee().getAlias();
 		}
-		
+
 	}
 
 	public Long getId() {
@@ -167,7 +167,7 @@ public class SalesOrderDTO {
 	public void setDocumentName(String documentName) {
 		this.documentName = documentName;
 	}
-	
+
 	public String getDocumentAlias() {
 		return documentAlias;
 	}
@@ -223,7 +223,7 @@ public class SalesOrderDTO {
 	public void setTrimChar(String trimChar) {
 		this.trimChar = trimChar;
 	}
-	
+
 	public List<GstLedgerDTO> getGstLedgerDtos() {
 		return gstLedgerDtos;
 	}
@@ -231,7 +231,7 @@ public class SalesOrderDTO {
 	public void setGstLedgerDtos(List<GstLedgerDTO> gstLedgerDtos) {
 		this.gstLedgerDtos = gstLedgerDtos;
 	}
-	
+
 	public String getLedgerState() {
 		return ledgerState;
 	}
@@ -247,7 +247,7 @@ public class SalesOrderDTO {
 	public void setLedgerCountry(String ledgerCountry) {
 		this.ledgerCountry = ledgerCountry;
 	}
-	
+
 	public String getLedgerGstType() {
 		return ledgerGstType;
 	}
@@ -262,13 +262,6 @@ public class SalesOrderDTO {
 
 	public void setEmployeeAlias(String employeeAlias) {
 		this.employeeAlias = employeeAlias;
-	}
-
-	@Override
-	public String toString() {
-		return "SalesOrderDTO [ledgerName=" + ledgerName + ", ledgerAddress=" + ledgerAddress + ", priceLevel="
-				+ priceLevel + ", date=" + date + ", narration=" + narration + ", selectedVats=" + selectedVats
-				+ ", tabOrderNumber=" + tabOrderNumber + ", salesOrderItemDTOs=" + salesOrderItemDTOs + "]";
 	}
 
 }
