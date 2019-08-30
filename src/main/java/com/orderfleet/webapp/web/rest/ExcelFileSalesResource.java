@@ -386,59 +386,45 @@ public class ExcelFileSalesResource {
 		if (inventoryObject.isEmpty()) {
 			return;
 		}
-		buildExcelDocument(inventoryObject, response);
+		//buildExcelDocument(inventoryObject, response);
+		buildCSVDocument(inventoryObject, response);
 		inventoryVoucherHeaderRepository.
 			updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
 					TallyDownloadStatus.COMPLETED, SecurityUtils.getCurrentUsersCompanyId(), ivhList);
 		
 	}
 
-	private void buildExcelDocument(List<Object[]> inventoryVoucherHeaderDTOs,
+	private void buildCSVDocument(List<Object[]> inventoryVoucherHeaderDTOs,
 			HttpServletResponse response) {
 		log.debug("Downloading Excel report");
-		String excelFileName = "SalesOrder" + ".csv";
-		String sheetName = "Salesorder";
-		String[] headerColumns = {"Customer", "OrderId", "Date","Product Name","Unit Quantity","Quantity","Row Total","Location"};
-		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
-			HSSFSheet worksheet = workbook.createSheet(sheetName);
-			//createHeaderRow(worksheet, headerColumns);
-			createReportRows(worksheet, inventoryVoucherHeaderDTOs);
-			// Resize all columns to fit the content size
-			for (int i = 0; i < headerColumns.length; i++) {
-				worksheet.autoSizeColumn(i);
-			}
-			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
-			response.setContentType("application/vnd.ms-excel");
-			// Writes the report to the output stream
-			ServletOutputStream outputStream = response.getOutputStream();
-			worksheet.getWorkbook().write(outputStream);
-			outputStream.flush();
-		} catch (IOException ex) {
-			log.error("IOException on downloading Sales Order {}", ex.getMessage());
-		}
+		response.setContentType("text/csv");
+		response.setHeader("Content-Disposition", "attachment; filename=\"SalesOrder.csv\"");
+		    try
+		    {
+		        ServletOutputStream outputStream = response.getOutputStream();
+		        String outputResult = createReportEntries(inventoryVoucherHeaderDTOs);
+		        outputStream.write(outputResult.getBytes());
+		        outputStream.flush();
+		        outputStream.close();
+		    }
+		    catch(Exception e)
+		    {
+		        System.out.println(e.toString());
+		    }
 	}
-
-	private void createReportRows(HSSFSheet worksheet, List<Object[]> inventoryVoucherHeaderDTOs) {
-		/*
-		 * CreationHelper helps us create instances of various things like DataFormat,
-		 * Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way
-		 */
-		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
-		// Create Cell Style for formatting Date
-		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
-//		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
-//		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yy"));
-		// Create Other rows and cells with Sales data
-		int rowNum = 0;
+	
+	private String createReportEntries(List<Object[]> inventoryVoucherHeaderDTOs) {
+		StringBuilder sb = new StringBuilder();
 		for (Object[] object : inventoryVoucherHeaderDTOs) {
-				HSSFRow row = worksheet.createRow(rowNum++);
-				String accountName = object[0] != null ?object[0].toString() : "";
-				String refDocNo = object[1] != null ? object[1].toString() : "0";
-				String docDate = object[2] != null ? object[2].toString() : "";
 				
 				SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 				SimpleDateFormat format2 = new SimpleDateFormat("dd-MM-yy");
 				Date date = new Date();
+				
+				String accountName = object[0] != null ?object[0].toString() : "";
+				String refDocNo = object[1] != null ? object[1].toString() : "0";
+				String docDate = object[2] != null ? object[2].toString() : "";
+				
 				try {
 					date = format1.parse(docDate.split(" ")[0]);
 				} catch (ParseException e) {
@@ -451,17 +437,13 @@ public class ExcelFileSalesResource {
 				String qty = object[6] != null ? object[6].toString() : "0.0"; 
 				String sku  = object[7] != null ? object[7].toString() : "";
 
-				row.createCell(0).setCellValue(accountName);
-				row.createCell(1).setCellValue(refDocNo);
-				row.createCell(2).setCellValue(formatedDate);
-				row.createCell(3).setCellValue(ppName);
-				row.createCell(4).setCellValue(sku);
-				row.createCell(5).setCellValue(qty);
-				row.createCell(6).setCellValue(sellingRate);
-				row.createCell(7).setCellValue(empName);
+				
+				sb.append(accountName+","+refDocNo+","+formatedDate+","+ppName+","+sku+","+qty+","+sellingRate+","+empName);
+				sb.append("\n");
 		}
+		return sb.toString();
 	}
-
+	
 
 	@RequestMapping(value = "/excel-file-sales/changeStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -723,6 +705,79 @@ public class ExcelFileSalesResource {
 		}
 
 		return table;
+	}
+	
+	
+	//for excel file generation
+	private void buildExcelDocument(List<Object[]> inventoryVoucherHeaderDTOs,
+			HttpServletResponse response) {
+		log.debug("Downloading Excel report");
+		String excelFileName = "SalesOrder" + ".xls";
+		String sheetName = "Salesorder";
+		String[] headerColumns = {"Customer", "OrderId", "Date","Product Name","Unit Quantity","Quantity","Row Total","Location"};
+		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
+			HSSFSheet worksheet = workbook.createSheet(sheetName);
+			//createHeaderRow(worksheet, headerColumns);
+			createReportRows(worksheet, inventoryVoucherHeaderDTOs);
+			// Resize all columns to fit the content size
+			for (int i = 0; i < headerColumns.length; i++) {
+				worksheet.autoSizeColumn(i);
+			}
+			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
+			response.setContentType("application/vnd.ms-excel");
+			// Writes the report to the output stream
+			ServletOutputStream outputStream = response.getOutputStream();
+			worksheet.getWorkbook().write(outputStream);
+			outputStream.flush();
+		} catch (IOException ex) {
+			log.error("IOException on downloading Sales Order {}", ex.getMessage());
+		}
+	}
+	
+	
+	//for excel file generation
+	private void createReportRows(HSSFSheet worksheet, List<Object[]> inventoryVoucherHeaderDTOs) {
+		/*
+		 * CreationHelper helps us create instances of various things like DataFormat,
+		 * Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way
+		 */
+		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
+		// Create Cell Style for formatting Date
+		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
+//		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
+//		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yy"));
+		// Create Other rows and cells with Sales data
+		int rowNum = 0;
+		for (Object[] object : inventoryVoucherHeaderDTOs) {
+				HSSFRow row = worksheet.createRow(rowNum++);
+				String accountName = object[0] != null ?object[0].toString() : "";
+				String refDocNo = object[1] != null ? object[1].toString() : "0";
+				String docDate = object[2] != null ? object[2].toString() : "";
+				
+				SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+				SimpleDateFormat format2 = new SimpleDateFormat("dd-MM-yy");
+				Date date = new Date();
+				try {
+					date = format1.parse(docDate.split(" ")[0]);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				String formatedDate = format2.format(date);
+				String empName = object[3] != null ? object[3].toString() : ""; 
+				String ppName = object[4] != null ? object[4].toString() : "";
+				String sellingRate = object[5] != null ?object[5].toString() : "0.0";
+				String qty = object[6] != null ? object[6].toString() : "0.0"; 
+				String sku  = object[7] != null ? object[7].toString() : "";
+
+				row.createCell(0).setCellValue(accountName);
+				row.createCell(1).setCellValue(refDocNo);
+				row.createCell(2).setCellValue(formatedDate);
+				row.createCell(3).setCellValue(ppName);
+				row.createCell(4).setCellValue(sku);
+				row.createCell(5).setCellValue(qty);
+				row.createCell(6).setCellValue(sellingRate);
+				row.createCell(7).setCellValue(empName);
+		}
 	}
 
 }
