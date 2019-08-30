@@ -38,6 +38,7 @@ public class MobileConfigurationDTO {
 	private InventoryVoucherUIType inventoryVoucherUIType;
 	private CartType cartType;
 	private boolean kfcEnabled;
+	private boolean gpsMandatory;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -69,6 +70,7 @@ public class MobileConfigurationDTO {
 		this.inventoryVoucherUIType = mobileConfiguration.getInventoryVoucherUIType();
 		this.cartType = mobileConfiguration.getCartType();
 		this.kfcEnabled = mobileConfiguration.getKfcEnabled();
+		this.gpsMandatory = mobileConfiguration.getGpsMandatory();
 	}
 
 	public String getPid() {
@@ -263,4 +265,12 @@ public class MobileConfigurationDTO {
 		this.kfcEnabled = kfcEnabled;
 	}
 
+	public boolean getGpsMandatory() {
+		return gpsMandatory;
+	}
+
+	public void setGpsMandatory(boolean gpsMandatory) {
+		this.gpsMandatory = gpsMandatory;
+	}
+	
 }

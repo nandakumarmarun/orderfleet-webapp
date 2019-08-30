@@ -66,7 +66,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setInventoryVoucherUIType(mobileConfigurationDTO.getInventoryVoucherUIType());
 		configuration.setCartType(mobileConfigurationDTO.getCartType());
 		configuration.setKfcEnabled(mobileConfigurationDTO.getKfcEnabled());
-
+		configuration.setGpsMandatory(mobileConfigurationDTO.getGpsMandatory());
+		
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -97,6 +98,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setInventoryVoucherUIType(mobileConfigurationDTO.getInventoryVoucherUIType());
 			configuration.setCartType(mobileConfigurationDTO.getCartType());
 			configuration.setKfcEnabled(mobileConfigurationDTO.getKfcEnabled());
+			configuration.setGpsMandatory(mobileConfigurationDTO.getGpsMandatory());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

@@ -65,6 +65,8 @@ public class MobileSettingsDTO {
 	private CartType cartType;
 
 	private boolean kfcEnabled;
+	
+	private boolean gpsMandatory;
 
 	public MobileSettingsDTO() {
 		super();
@@ -93,6 +95,7 @@ public class MobileSettingsDTO {
 		this.inventoryVoucherUIType = mobileConfigurationDTO.getInventoryVoucherUIType();
 		this.cartType = mobileConfigurationDTO.getCartType();
 		this.kfcEnabled = mobileConfigurationDTO.getKfcEnabled();
+		this.gpsMandatory = mobileConfigurationDTO.getGpsMandatory();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -295,4 +298,12 @@ public class MobileSettingsDTO {
 		this.kfcEnabled = kfcEnabled;
 	}
 
+	public boolean getGpsMandatory() {
+		return gpsMandatory;
+	}
+
+	public void setGpsMandatory(boolean gpsMandatory) {
+		this.gpsMandatory = gpsMandatory;
+	}
+	
 }

@@ -115,6 +115,9 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "kfc_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean kfcEnabled;
+	
+	@Column(name = "gps_mandatory", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean gpsMandatory;
 
 	@NotNull
 	@ManyToOne
@@ -322,6 +325,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setKfcEnabled(boolean kfcEnabled) {
 		this.kfcEnabled = kfcEnabled;
+	}
+	
+	public boolean getGpsMandatory() {
+		return gpsMandatory;
+	}
+
+	public void setGpsMandatory(boolean gpsMandatory) {
+		this.gpsMandatory = gpsMandatory;
 	}
 
 	@Override

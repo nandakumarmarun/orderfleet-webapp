@@ -58,6 +58,7 @@
 						<th>Inventory Vch UI Type</th>
 						<th>Cart Type</th>
 						<th>KFC Enabled</th>
+						<th>GPS Mandatory</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -87,6 +88,7 @@
 							<td>${mobileConfiguration.inventoryVoucherUIType}</td>
 							<td>${mobileConfiguration.cartType}</td>
 							<td>${mobileConfiguration.kfcEnabled}</td>
+							<td>${mobileConfiguration.gpsMandatory}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -264,6 +266,13 @@
 											<td><div class="form-group">
 													<label class="control-label">KFC Enabled</label> <input
 														id="kfcEnabled" name='kfcEnabled' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">GPS Mandatory</label> <input
+														id="gpsMandatory" name='gpsMandatory' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
