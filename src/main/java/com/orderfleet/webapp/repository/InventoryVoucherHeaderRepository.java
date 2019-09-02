@@ -492,10 +492,29 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status "
 			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and company_id = ?#{principal.companyId} order by created_date desc";
 
+	public static final String EMPLOYEE_SALES_ORDER__MANAGEMENT_TALLY = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
+			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
+			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status "
+			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and sales_management_status = 'APPROVE' and company_id = ?#{principal.companyId} and employee_id in ?1 order by created_date desc";
+
+	public static final String EMPLOYEE_PRIMARY_SALES_ORDER__MANAGEMENT_TALLY = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
+			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
+			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status "
+			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and company_id = ?#{principal.companyId} and employee_id in ?1 order by created_date desc";
+
+	
+	
 	@Query(value = SALES_ORDER__MANAGEMENT_TALLY, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
 
 	@Query(value = PRIMARY_SALES_ORDER__MANAGEMENT_TALLY, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
+
+	@Query(value = EMPLOYEE_SALES_ORDER__MANAGEMENT_TALLY, nativeQuery = true)
+	List<Object[]> findByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc(
+			List<Long> empId);
+
+	@Query(value = EMPLOYEE_PRIMARY_SALES_ORDER__MANAGEMENT_TALLY, nativeQuery = true)
+	List<Object[]> findByCompanyIdAndTallyStatusOrderAndEmployeeByCreatedDateDesc(List<Long> empId);
 
 }

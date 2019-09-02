@@ -36,6 +36,7 @@ import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
+import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.EmployeeProfile;
@@ -83,6 +84,7 @@ import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
+import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
@@ -308,11 +310,13 @@ public class TransactionResource {
 	public List<SalesOrderDTO> getSalesOrderJsonData() throws URISyntaxException {
 
 		long start = System.nanoTime();
-		log.debug("REST request to download sales orders (aquatech) : {}");
+		CompanyViewDTO company = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		log.debug("REST request to download sales orders " + company.getLegalName() + " : {}");
+
 		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
 		List<String> inventoryHeaderPid = new ArrayList<String>();
-		String companyPid = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid();
+		String companyPid = company.getPid();
 
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
@@ -492,183 +496,149 @@ public class TransactionResource {
 		return salesOrderDTOs;
 	}
 
-	private SalesOrderDTO ivhObjToSalesOrderDTO(Object[] obj, User user, Document document,
-			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
-			AccountProfile receiverAccountProfile, AccountProfile supplierAccountProfile, PriceLevel priceLevel,
-			OrderStatus orderStatus) {
-		SalesOrderDTO salesOrderDTO = new SalesOrderDTO();
-		salesOrderDTO.setInventoryVoucherHeaderPid(obj[9].toString());
-		salesOrderDTO.setId(Long.parseLong(obj[0].toString()));
-		salesOrderDTO.setLedgerName(receiverAccountProfile.getName());
-		salesOrderDTO.setTrimChar(receiverAccountProfile.getTrimChar());
-		salesOrderDTO.setLedgerAddress(receiverAccountProfile.getAddress());
-		LocalDateTime date = null;
-		if (obj[4] != null) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			String[] splitDate = obj[4].toString().split(" ");
-			date = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
-
-		}
-		salesOrderDTO.setDate(date);
-		salesOrderDTO.setDocumentName(document.getName());
-		salesOrderDTO.setDocumentAlias(document.getAlias());
-		salesOrderDTO.setDocDiscountAmount(Double.parseDouble(obj[2].toString()));
-		salesOrderDTO.setDocDiscountPercentage(Double.parseDouble(obj[3].toString()));
-		if (receiverAccountProfile.getDefaultPriceLevel() != null) {
-			salesOrderDTO.setPriceLevel(receiverAccountProfile.getDefaultPriceLevel().getName());
-		}
-		salesOrderDTO.setInventoryVoucherHeaderDTO(ivhObjectToivhDTO(obj, user, document, employeeProfile,
-				executiveTaskExecution, receiverAccountProfile, supplierAccountProfile, priceLevel, orderStatus));
-		salesOrderDTO.setLedgerState(receiverAccountProfile.getStateName());
-		salesOrderDTO.setLedgerCountry(receiverAccountProfile.getCountryName());
-		salesOrderDTO.setLedgerGstType(receiverAccountProfile.getGstRegistrationType());
-		if (employeeProfile != null) {
-			salesOrderDTO.setEmployeeAlias(employeeProfile.getAlias());
-		}
-		return salesOrderDTO;
-	}
-
-	private InventoryVoucherHeaderDTO ivhObjectToivhDTO(Object[] obj, User user, Document document,
-			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
-			AccountProfile receiverAccountProfile, AccountProfile supplierAccountProfile, PriceLevel priceLevel,
-			OrderStatus orderStatus) {
-		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
-
-		inventoryVoucherHeaderDTO.setPid(obj[9].toString());
-		inventoryVoucherHeaderDTO.setDocumentNumberLocal(obj[5].toString());
-		inventoryVoucherHeaderDTO.setDocumentNumberServer(obj[6].toString());
-
-		if (document != null) {
-			inventoryVoucherHeaderDTO.setDocumentPid(document.getPid());
-			inventoryVoucherHeaderDTO.setDocumentName(document.getName());
-		}
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		LocalDateTime createdDate = null;
-		LocalDateTime documentDate = null;
-		if (obj[1] != null) {
-			String[] splitDate = obj[1].toString().split(" ");
-			createdDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
-
-		}
-		if (obj[4] != null) {
-			String[] splitDate = obj[4].toString().split(" ");
-			documentDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
-
-		}
-		inventoryVoucherHeaderDTO.setCreatedDate(createdDate);
-		inventoryVoucherHeaderDTO.setDocumentDate(documentDate);
-
-		if (receiverAccountProfile != null) {
-			inventoryVoucherHeaderDTO.setReceiverAccountPid(receiverAccountProfile.getPid());
-			inventoryVoucherHeaderDTO.setReceiverAccountName(receiverAccountProfile.getName());
-		}
-
-		inventoryVoucherHeaderDTO.setProcessStatus(obj[22].toString());
-
-		if (supplierAccountProfile != null) {
-			inventoryVoucherHeaderDTO.setSupplierAccountPid(supplierAccountProfile.getPid());
-			inventoryVoucherHeaderDTO.setSupplierAccountName(supplierAccountProfile.getName());
-		}
-
-		if (employeeProfile != null) {
-			inventoryVoucherHeaderDTO.setEmployeePid(employeeProfile.getPid());
-			inventoryVoucherHeaderDTO.setEmployeeName(employeeProfile.getName());
-		}
-		if (user != null) {
-			inventoryVoucherHeaderDTO.setUserName(user.getFirstName());
-		}
-
-		inventoryVoucherHeaderDTO.setDocumentTotal(Double.parseDouble(obj[7].toString()));
-		inventoryVoucherHeaderDTO.setDocumentVolume(Double.parseDouble(obj[8].toString()));
-		inventoryVoucherHeaderDTO.setDocDiscountAmount(Double.parseDouble(obj[2].toString()));
-		inventoryVoucherHeaderDTO.setDocDiscountPercentage(Double.parseDouble(obj[3].toString()));
-		inventoryVoucherHeaderDTO.setStatus(Boolean.valueOf(obj[10].toString()));
-
-		if (priceLevel != null) {
-			inventoryVoucherHeaderDTO.setPriceLevelPid(priceLevel.getPid());
-			inventoryVoucherHeaderDTO.setPriceLevelName(priceLevel.getName());
-		}
-		if (orderStatus != null) {
-			inventoryVoucherHeaderDTO.setOrderStatusId(orderStatus.getId());
-			inventoryVoucherHeaderDTO.setOrderStatusName(orderStatus.getName());
-		}
-
-		if (obj[26] != null) {
-			inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(obj[26].toString()));
-
-		}
-
-		inventoryVoucherHeaderDTO.setOrderNumber(obj[27] == null ? 0 : Long.parseLong(obj[27].toString()));
-
-		inventoryVoucherHeaderDTO.setCustomeraddress(receiverAccountProfile.getAddress());
-		inventoryVoucherHeaderDTO.setCustomerEmail(receiverAccountProfile.getEmail1());
-		inventoryVoucherHeaderDTO.setCustomerPhone(receiverAccountProfile.getPhone1());
-		inventoryVoucherHeaderDTO.setVisitRemarks(
-				executiveTaskExecution.getRemarks() == null ? "" : executiveTaskExecution.getRemarks());
-
-		inventoryVoucherHeaderDTO.setPdfDownloadStatus(Boolean.getBoolean(obj[28].toString()));
-		if (obj[29] != null) {
-			inventoryVoucherHeaderDTO.setSalesManagementStatus(SalesManagementStatus.valueOf(obj[29].toString()));
-
-		}
-
-		return inventoryVoucherHeaderDTO;
-	}
-
 	// Method used for getting sales grouped by employee
 	@RequestMapping(value = "/v2/get-sales.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
 	public List<SalesOrderDTO> getSalesJsonData(@RequestParam("employeeVoucher") String employeeVoucher)
 			throws URISyntaxException {
-		log.debug("REST request to download sales : {}");
-		log.info("REST request to download sales  ***** : {}" + employeeVoucher);
+		long start = System.nanoTime();
+		CompanyViewDTO company = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		log.debug("REST request to download sales " + company.getLegalName() + " : {}");
+		log.info("REST request to download sales  *****" + company.getLegalName() + " : {}" + employeeVoucher);
 
 		if (employeeVoucher == null) {
 			log.info("REST request to download sales Failed : {}" + employeeVoucher);
 			return Collections.emptyList();
 		}
-		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyId(true);
+		List<EmployeeProfile> employeeProfilesList = employeeProfileRepository.findAllByCompanyId(true);
 		List<Long> empId = new ArrayList<>();
 		if ("All".equalsIgnoreCase(employeeVoucher)) {
-			empId = employeeProfiles.stream().map(emp -> emp.getId()).collect(Collectors.toList());
+			empId = employeeProfilesList.stream().map(emp -> emp.getId()).collect(Collectors.toList());
 		} else {
-			empId = employeeProfiles.stream().filter(emp -> emp.getName().trim().equals(employeeVoucher))
+			empId = employeeProfilesList.stream().filter(emp -> emp.getName().trim().equals(employeeVoucher))
 					.map(emp -> emp.getId()).collect(Collectors.toList());
 		}
 
 		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
 		List<String> inventoryHeaderPid = new ArrayList<String>();
-		String companyPid = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid();
+		String companyPid = company.getPid();
 
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
 
-		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
+		/* List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>(); */
+
+		/*
+		 * if (optSalesManagement.isPresent() &&
+		 * optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
+		 * inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+		 * .findAllByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc
+		 * (empId);
+		 * 
+		 * } else { inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+		 * .findAllByCompanyIdAndTallyStatusAndEmployeeOrderByCreatedDateDesc(empId); }
+		 */
+
+		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findAllByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc(empId);
-
+					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc(empId);
 		} else {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findAllByCompanyIdAndTallyStatusAndEmployeeOrderByCreatedDateDesc(empId);
+					.findByCompanyIdAndTallyStatusOrderAndEmployeeByCreatedDateDesc(empId);
 		}
 		log.debug("IVH size : {}", inventoryVoucherHeaders.size());
-		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
+
+		Set<Long> ivhIds = new HashSet<>();
+		Set<String> ivhPids = new HashSet<>();
+		Set<Long> documentIds = new HashSet<>();
+		Set<Long> employeeIds = new HashSet<>();
+		Set<Long> receiverAccountProfileIds = new HashSet<>();
+		Set<Long> supplierAccountProfileIds = new HashSet<>();
+		Set<Long> priceLeveIds = new HashSet<>();
+		Set<Long> userIds = new HashSet<>();
+		Set<Long> orderStatusIds = new HashSet<>();
+		Set<Long> exeIds = new HashSet<>();
+
+		for (Object[] obj : inventoryVoucherHeaders) {
+
+			ivhIds.add(Long.parseLong(obj[0].toString()));
+			ivhPids.add(obj[9].toString());
+			userIds.add(Long.parseLong(obj[12].toString()));
+			documentIds.add(Long.parseLong(obj[13].toString()));
+			employeeIds.add(Long.parseLong(obj[14].toString()));
+			exeIds.add(Long.parseLong(obj[15].toString()));
+			receiverAccountProfileIds.add(Long.parseLong(obj[16].toString()));
+			supplierAccountProfileIds.add(Long.parseLong(obj[17].toString()));
+			priceLeveIds.add(Long.parseLong(obj[18].toString()));
+			orderStatusIds.add(obj[23] != null ? Long.parseLong(obj[23].toString()) : 0);
+
+		}
+
+		List<Document> documents = documentRepository.findAllByCompanyIdAndIdsIn(documentIds);
+		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyIdAndIdsIn(employeeIds);
+		List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
+				.findAllByCompanyIdAndIdsIn(exeIds);
+		List<AccountProfile> receiverAccountProfiles = accountProfileRepository
+				.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
+		List<AccountProfile> supplierAccountProfiles = accountProfileRepository
+				.findAllByCompanyIdAndIdsIn(supplierAccountProfileIds);
+		List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+		List<PriceLevel> priceLevels = priceLevelRepository.findAllByCompanyIdAndIdsIn(priceLeveIds);
+		List<OrderStatus> orderStatusList = orderStatusRepository.findAllByCompanyIdAndIdsIn(orderStatusIds);
+		List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
+				.findAllByInventoryVoucherHeaderPidIn(ivhPids);
+
+		for (Object[] obj : inventoryVoucherHeaders) {
 
 			String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 
-			// seting inventory heder to salesOrderDTO
-			SalesOrderDTO salesOrderDTO = new SalesOrderDTO(inventoryVoucherHeader);
-			salesOrderDTO.setAccountProfileDTO(accountProfileMapper
-					.accountProfileToAccountProfileDTO(inventoryVoucherHeader.getReceiverAccount()));
+			Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
+					.findAny();
+
+			Optional<Document> opDocument = documents.stream()
+					.filter(doc -> doc.getId() == Long.parseLong(obj[13].toString())).findAny();
+
+			Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
+					.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
+
+			Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
+					.filter(doc -> doc.getId() == Long.parseLong(obj[15].toString())).findAny();
+
+			Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
+					.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
+
+			Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
+					.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
+
+			Optional<PriceLevel> opPriceLevel = priceLevels.stream()
+					.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
+
+			Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
+					.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
+
+			OrderStatus orderStatus = new OrderStatus();
+			if (opOrderStatus.isPresent()) {
+				orderStatus = opOrderStatus.get();
+			}
+
+			SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
+					opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), opPriceLevel.get(),
+					orderStatus);
+
+			salesOrderDTO
+					.setAccountProfileDTO(accountProfileMapper.accountProfileToAccountProfileDTO(opRecAccPro.get()));
+
+			List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
+					.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
+					.collect(Collectors.toList());
 
 			List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
 
-			for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader.getInventoryVoucherDetails()) {
+			for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
 				SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
 				if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
 					rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
@@ -709,8 +679,8 @@ public class TransactionResource {
 						.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
 								rferenceInventoryVoucherHeaderExecutiveExecutionPid, dynamicDocumentAditional);
 				DynamicDocumentHeaderDTO dynamicDocumentHeadersDespatch = dynamicDocumentHeaderService
-						.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
-								inventoryVoucherHeader.getExecutiveTaskExecution().getPid(), dynamicDocumentDespach);
+						.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(opExe.get().getPid(),
+								dynamicDocumentDespach);
 
 				if (documentHeaderDTOAditonal.getDocumentPid() != null) {
 					documentHeaderDTOs.add(documentHeaderDTOAditonal);
@@ -721,25 +691,152 @@ public class TransactionResource {
 			}
 			salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
 			List<GstLedger> gstLedgerList = new ArrayList<>();
-			gstLedgerList = gstLedgerRepository
-					.findAllByCompanyIdAndActivated(inventoryVoucherHeader.getCompany().getId(), true);
+			gstLedgerList = gstLedgerRepository.findAllByCompanyIdAndActivated(SecurityUtils.getCurrentUsersCompanyId(),
+					true);
 			if (gstLedgerList != null && gstLedgerList.size() != 0) {
 				List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst))
 						.collect(Collectors.toList());
 				salesOrderDTO.setGstLedgerDtos(gstLedgerDtos);
 			}
-			inventoryHeaderPid.add(inventoryVoucherHeader.getPid());
+			inventoryHeaderPid.add(obj[9].toString());
 
 			salesOrderDTOs.add(salesOrderDTO);
 		}
+
 		if (!salesOrderDTOs.isEmpty()) {
 			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 					TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
 			log.debug("updated " + updated + " to PROCESSING");
 		}
 
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		log.info("Sync completed in {} ms", elapsedTime);
+
 		return salesOrderDTOs;
 	}
+	/*
+	 * @RequestMapping(value = "/v2/get-sales.json", method = RequestMethod.GET,
+	 * produces = MediaType.APPLICATION_JSON_VALUE)
+	 * 
+	 * @Timed
+	 * 
+	 * @Transactional public List<SalesOrderDTO>
+	 * getSalesJsonData(@RequestParam("employeeVoucher") String employeeVoucher)
+	 * throws URISyntaxException { log.debug("REST request to download sales : {}");
+	 * log.info("REST request to download sales  ***** : {}" + employeeVoucher);
+	 * 
+	 * if (employeeVoucher == null) {
+	 * log.info("REST request to download sales Failed : {}" + employeeVoucher);
+	 * return Collections.emptyList(); } List<EmployeeProfile> employeeProfiles =
+	 * employeeProfileRepository.findAllByCompanyId(true); List<Long> empId = new
+	 * ArrayList<>(); if ("All".equalsIgnoreCase(employeeVoucher)) { empId =
+	 * employeeProfiles.stream().map(emp ->
+	 * emp.getId()).collect(Collectors.toList()); } else { empId =
+	 * employeeProfiles.stream().filter(emp ->
+	 * emp.getName().trim().equals(employeeVoucher)) .map(emp ->
+	 * emp.getId()).collect(Collectors.toList()); }
+	 * 
+	 * List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
+	 * List<AccountProfileDTO> accountProfileDTOs =
+	 * accountProfileService.findAllByAccountTypeName("VAT"); List<String>
+	 * inventoryHeaderPid = new ArrayList<String>(); String companyPid =
+	 * companyService.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid();
+	 * 
+	 * Optional<CompanyConfiguration> optSalesManagement =
+	 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
+	 * CompanyConfig.SALES_MANAGEMENT);
+	 * 
+	 * List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
+	 * 
+	 * if (optSalesManagement.isPresent() &&
+	 * optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
+	 * inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+	 * .findAllByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc
+	 * (empId);
+	 * 
+	 * } else { inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+	 * .findAllByCompanyIdAndTallyStatusAndEmployeeOrderByCreatedDateDesc(empId); }
+	 * log.debug("IVH size : {}", inventoryVoucherHeaders.size()); for
+	 * (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
+	 * 
+	 * String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
+	 * 
+	 * // seting inventory heder to salesOrderDTO SalesOrderDTO salesOrderDTO = new
+	 * SalesOrderDTO(inventoryVoucherHeader);
+	 * salesOrderDTO.setAccountProfileDTO(accountProfileMapper
+	 * .accountProfileToAccountProfileDTO(inventoryVoucherHeader.getReceiverAccount(
+	 * )));
+	 * 
+	 * List<SalesOrderItemDTO> salesOrderItemDTOs = new
+	 * ArrayList<SalesOrderItemDTO>();
+	 * 
+	 * for (InventoryVoucherDetail inventoryVoucherDetail :
+	 * inventoryVoucherHeader.getInventoryVoucherDetails()) { SalesOrderItemDTO
+	 * salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail); if
+	 * (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
+	 * rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
+	 * .getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid(); }
+	 * List<InventoryVoucherBatchDetailDTO> inventoryVoucherBatchDetailsDTOs = new
+	 * ArrayList<>();
+	 * 
+	 * List<OpeningStockDTO> openingStockDTOs = new ArrayList<>(); for
+	 * (InventoryVoucherBatchDetail inventoryVoucherBatchDetail :
+	 * inventoryVoucherDetail .getInventoryVoucherBatchDetails()) { openingStockDTOs
+	 * = openingStockRepository .findByCompanyIdAndProductProfilePidAndBatchNumber(
+	 * inventoryVoucherBatchDetail.getProductProfile().getPid(),
+	 * inventoryVoucherBatchDetail.getBatchNumber())
+	 * .stream().map(OpeningStockDTO::new).collect(Collectors.toList()); }
+	 * 
+	 * salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
+	 * salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(
+	 * inventoryVoucherBatchDetailsDTOs); salesOrderItemDTOs.add(salesOrderItemDTO);
+	 * } List<VatLedgerDTO> vatLedgerDTOs = new ArrayList<>(); for
+	 * (AccountProfileDTO accountProfileDTO : accountProfileDTOs) { VatLedgerDTO
+	 * vatLedgerDTO = new VatLedgerDTO();
+	 * vatLedgerDTO.setName(accountProfileDTO.getName()); String vatledgerArray[] =
+	 * accountProfileDTO.getAlias().split("\\,");
+	 * vatLedgerDTO.setPercentageOfCalculation(vatledgerArray[1]);
+	 * vatLedgerDTO.setVatClass(vatledgerArray[0]); vatLedgerDTOs.add(vatLedgerDTO);
+	 * } salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
+	 * salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
+	 * List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
+	 * 
+	 * if
+	 * (!rferenceInventoryVoucherHeaderExecutiveExecutionPid.equalsIgnoreCase("")) {
+	 * 
+	 * DynamicDocumentHeaderDTO documentHeaderDTOAditonal =
+	 * dynamicDocumentHeaderService
+	 * .findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
+	 * rferenceInventoryVoucherHeaderExecutiveExecutionPid,
+	 * dynamicDocumentAditional); DynamicDocumentHeaderDTO
+	 * dynamicDocumentHeadersDespatch = dynamicDocumentHeaderService
+	 * .findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
+	 * inventoryVoucherHeader.getExecutiveTaskExecution().getPid(),
+	 * dynamicDocumentDespach);
+	 * 
+	 * if (documentHeaderDTOAditonal.getDocumentPid() != null) {
+	 * documentHeaderDTOs.add(documentHeaderDTOAditonal); } if
+	 * (dynamicDocumentHeadersDespatch.getDocumentPid() != null) {
+	 * documentHeaderDTOs.add(dynamicDocumentHeadersDespatch); } }
+	 * salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
+	 * List<GstLedger> gstLedgerList = new ArrayList<>(); gstLedgerList =
+	 * gstLedgerRepository
+	 * .findAllByCompanyIdAndActivated(inventoryVoucherHeader.getCompany().getId(),
+	 * true); if (gstLedgerList != null && gstLedgerList.size() != 0) {
+	 * List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new
+	 * GstLedgerDTO(gst)) .collect(Collectors.toList());
+	 * salesOrderDTO.setGstLedgerDtos(gstLedgerDtos); }
+	 * inventoryHeaderPid.add(inventoryVoucherHeader.getPid());
+	 * 
+	 * salesOrderDTOs.add(salesOrderDTO); } if (!salesOrderDTOs.isEmpty()) { int
+	 * updated = inventoryVoucherHeaderRepository.
+	 * updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+	 * TallyDownloadStatus.PROCESSING, inventoryHeaderPid); log.debug("updated " +
+	 * updated + " to PROCESSING"); }
+	 * 
+	 * return salesOrderDTOs; }
+	 */
 
 	/**
 	 * POST /sales-order.json : Create new salesOrders.
@@ -930,8 +1027,10 @@ public class TransactionResource {
 			throws URISyntaxException {
 		log.debug("REST request to update Accounting Voucher Header Status : {}", accountingVoucherHeaderPids.size());
 		if (!accountingVoucherHeaderPids.isEmpty()) {
-			accountingVoucherHeaderRepository.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(
-					TallyDownloadStatus.COMPLETED, accountingVoucherHeaderPids);
+			int updated = accountingVoucherHeaderRepository
+					.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.COMPLETED,
+							accountingVoucherHeaderPids);
+			log.debug("updated " + updated + " to COMPLETED");
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
@@ -968,8 +1067,9 @@ public class TransactionResource {
 				inventoryVoucherHeaderPids.size());
 
 		if (!inventoryVoucherHeaderPids.isEmpty()) {
-			inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 					TallyDownloadStatus.COMPLETED, inventoryVoucherHeaderPids);
+			log.debug("updated " + updated + " to COMPLETED");
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
@@ -1257,5 +1357,129 @@ public class TransactionResource {
 
 		documentDto.setDescription("used to send data " + name + " from tally");
 		return documentService.save(documentDto);
+	}
+
+	private SalesOrderDTO ivhObjToSalesOrderDTO(Object[] obj, User user, Document document,
+			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
+			AccountProfile receiverAccountProfile, AccountProfile supplierAccountProfile, PriceLevel priceLevel,
+			OrderStatus orderStatus) {
+		SalesOrderDTO salesOrderDTO = new SalesOrderDTO();
+		salesOrderDTO.setInventoryVoucherHeaderPid(obj[9].toString());
+		salesOrderDTO.setId(Long.parseLong(obj[0].toString()));
+		salesOrderDTO.setLedgerName(receiverAccountProfile.getName());
+		salesOrderDTO.setTrimChar(receiverAccountProfile.getTrimChar());
+		salesOrderDTO.setLedgerAddress(receiverAccountProfile.getAddress());
+		LocalDateTime date = null;
+		if (obj[4] != null) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String[] splitDate = obj[4].toString().split(" ");
+			date = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
+
+		}
+		salesOrderDTO.setDate(date);
+		salesOrderDTO.setDocumentName(document.getName());
+		salesOrderDTO.setDocumentAlias(document.getAlias());
+		salesOrderDTO.setDocDiscountAmount(Double.parseDouble(obj[2].toString()));
+		salesOrderDTO.setDocDiscountPercentage(Double.parseDouble(obj[3].toString()));
+		if (receiverAccountProfile.getDefaultPriceLevel() != null) {
+			salesOrderDTO.setPriceLevel(receiverAccountProfile.getDefaultPriceLevel().getName());
+		}
+		salesOrderDTO.setInventoryVoucherHeaderDTO(ivhObjectToivhDTO(obj, user, document, employeeProfile,
+				executiveTaskExecution, receiverAccountProfile, supplierAccountProfile, priceLevel, orderStatus));
+		salesOrderDTO.setLedgerState(receiverAccountProfile.getStateName());
+		salesOrderDTO.setLedgerCountry(receiverAccountProfile.getCountryName());
+		salesOrderDTO.setLedgerGstType(receiverAccountProfile.getGstRegistrationType());
+		if (employeeProfile != null) {
+			salesOrderDTO.setEmployeeAlias(employeeProfile.getAlias());
+		}
+		return salesOrderDTO;
+	}
+
+	private InventoryVoucherHeaderDTO ivhObjectToivhDTO(Object[] obj, User user, Document document,
+			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
+			AccountProfile receiverAccountProfile, AccountProfile supplierAccountProfile, PriceLevel priceLevel,
+			OrderStatus orderStatus) {
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
+
+		inventoryVoucherHeaderDTO.setPid(obj[9].toString());
+		inventoryVoucherHeaderDTO.setDocumentNumberLocal(obj[5].toString());
+		inventoryVoucherHeaderDTO.setDocumentNumberServer(obj[6].toString());
+
+		if (document != null) {
+			inventoryVoucherHeaderDTO.setDocumentPid(document.getPid());
+			inventoryVoucherHeaderDTO.setDocumentName(document.getName());
+		}
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDateTime createdDate = null;
+		LocalDateTime documentDate = null;
+		if (obj[1] != null) {
+			String[] splitDate = obj[1].toString().split(" ");
+			createdDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
+
+		}
+		if (obj[4] != null) {
+			String[] splitDate = obj[4].toString().split(" ");
+			documentDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
+
+		}
+		inventoryVoucherHeaderDTO.setCreatedDate(createdDate);
+		inventoryVoucherHeaderDTO.setDocumentDate(documentDate);
+
+		if (receiverAccountProfile != null) {
+			inventoryVoucherHeaderDTO.setReceiverAccountPid(receiverAccountProfile.getPid());
+			inventoryVoucherHeaderDTO.setReceiverAccountName(receiverAccountProfile.getName());
+		}
+
+		inventoryVoucherHeaderDTO.setProcessStatus(obj[22].toString());
+
+		if (supplierAccountProfile != null) {
+			inventoryVoucherHeaderDTO.setSupplierAccountPid(supplierAccountProfile.getPid());
+			inventoryVoucherHeaderDTO.setSupplierAccountName(supplierAccountProfile.getName());
+		}
+
+		if (employeeProfile != null) {
+			inventoryVoucherHeaderDTO.setEmployeePid(employeeProfile.getPid());
+			inventoryVoucherHeaderDTO.setEmployeeName(employeeProfile.getName());
+		}
+		if (user != null) {
+			inventoryVoucherHeaderDTO.setUserName(user.getFirstName());
+		}
+
+		inventoryVoucherHeaderDTO.setDocumentTotal(Double.parseDouble(obj[7].toString()));
+		inventoryVoucherHeaderDTO.setDocumentVolume(Double.parseDouble(obj[8].toString()));
+		inventoryVoucherHeaderDTO.setDocDiscountAmount(Double.parseDouble(obj[2].toString()));
+		inventoryVoucherHeaderDTO.setDocDiscountPercentage(Double.parseDouble(obj[3].toString()));
+		inventoryVoucherHeaderDTO.setStatus(Boolean.valueOf(obj[10].toString()));
+
+		if (priceLevel != null) {
+			inventoryVoucherHeaderDTO.setPriceLevelPid(priceLevel.getPid());
+			inventoryVoucherHeaderDTO.setPriceLevelName(priceLevel.getName());
+		}
+		if (orderStatus != null) {
+			inventoryVoucherHeaderDTO.setOrderStatusId(orderStatus.getId());
+			inventoryVoucherHeaderDTO.setOrderStatusName(orderStatus.getName());
+		}
+
+		if (obj[26] != null) {
+			inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(obj[26].toString()));
+
+		}
+
+		inventoryVoucherHeaderDTO.setOrderNumber(obj[27] == null ? 0 : Long.parseLong(obj[27].toString()));
+
+		inventoryVoucherHeaderDTO.setCustomeraddress(receiverAccountProfile.getAddress());
+		inventoryVoucherHeaderDTO.setCustomerEmail(receiverAccountProfile.getEmail1());
+		inventoryVoucherHeaderDTO.setCustomerPhone(receiverAccountProfile.getPhone1());
+		inventoryVoucherHeaderDTO.setVisitRemarks(
+				executiveTaskExecution.getRemarks() == null ? "" : executiveTaskExecution.getRemarks());
+
+		inventoryVoucherHeaderDTO.setPdfDownloadStatus(Boolean.getBoolean(obj[28].toString()));
+		if (obj[29] != null) {
+			inventoryVoucherHeaderDTO.setSalesManagementStatus(SalesManagementStatus.valueOf(obj[29].toString()));
+
+		}
+
+		return inventoryVoucherHeaderDTO;
 	}
 }
