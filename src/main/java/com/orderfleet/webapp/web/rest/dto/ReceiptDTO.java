@@ -45,9 +45,6 @@ public class ReceiptDTO {
 		this.bankName = accountingVoucherDetail.getBankName();
 		this.ledgerName = accountingVoucherDetail.getBy().getName();
 		String remarks = accountingVoucherDetail.getRemarks();
-		if (remarks.contains("&")) {
-			remarks = remarks.replaceAll("&", "and ");
-		}
 		this.narrationMessage = remarks == null ? "" : remarks;
 		this.userName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
 		this.mode = accountingVoucherDetail.getMode();

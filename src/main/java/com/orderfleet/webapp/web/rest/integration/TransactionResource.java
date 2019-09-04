@@ -353,7 +353,7 @@ public class TransactionResource {
 			exeIds.add(Long.parseLong(obj[15].toString()));
 			receiverAccountProfileIds.add(Long.parseLong(obj[16].toString()));
 			supplierAccountProfileIds.add(Long.parseLong(obj[17].toString()));
-			priceLeveIds.add(Long.parseLong(obj[18].toString()));
+			priceLeveIds.add(obj[18] != null ? Long.parseLong(obj[18].toString()) : 0);
 			orderStatusIds.add(obj[23] != null ? Long.parseLong(obj[23].toString()) : 0);
 
 		}
@@ -397,6 +397,11 @@ public class TransactionResource {
 			Optional<PriceLevel> opPriceLevel = priceLevels.stream()
 					.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
 
+			PriceLevel priceLevel = new PriceLevel();
+			if (opPriceLevel.isPresent()) {
+				priceLevel = opPriceLevel.get();
+			}
+
 			Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
 					.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
 
@@ -406,7 +411,7 @@ public class TransactionResource {
 			}
 
 			SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
-					opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), opPriceLevel.get(),
+					opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
 					orderStatus);
 
 			salesOrderDTO
@@ -573,7 +578,7 @@ public class TransactionResource {
 			exeIds.add(Long.parseLong(obj[15].toString()));
 			receiverAccountProfileIds.add(Long.parseLong(obj[16].toString()));
 			supplierAccountProfileIds.add(Long.parseLong(obj[17].toString()));
-			priceLeveIds.add(Long.parseLong(obj[18].toString()));
+			priceLeveIds.add(obj[18] != null ? Long.parseLong(obj[18].toString()) : 0);
 			orderStatusIds.add(obj[23] != null ? Long.parseLong(obj[23].toString()) : 0);
 
 		}
@@ -617,6 +622,11 @@ public class TransactionResource {
 			Optional<PriceLevel> opPriceLevel = priceLevels.stream()
 					.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
 
+			PriceLevel priceLevel = new PriceLevel();
+			if (opPriceLevel.isPresent()) {
+				priceLevel = opPriceLevel.get();
+			}
+
 			Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
 					.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
 
@@ -626,7 +636,7 @@ public class TransactionResource {
 			}
 
 			SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
-					opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), opPriceLevel.get(),
+					opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
 					orderStatus);
 
 			salesOrderDTO
