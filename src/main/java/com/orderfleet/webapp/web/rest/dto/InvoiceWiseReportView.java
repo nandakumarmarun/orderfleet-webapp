@@ -77,8 +77,9 @@ public class InvoiceWiseReportView {
 	private double totalRecieptAmount;
 
 	private double totalSalesOrderAmount;
-	
+
 	private LocalDateTime punchInDate;
+
 
 	public InvoiceWiseReportView() {
 		super();
@@ -446,7 +447,7 @@ public class InvoiceWiseReportView {
 	public void setTotalSalesOrderAmount(double totalSalesOrderAmount) {
 		this.totalSalesOrderAmount = totalSalesOrderAmount;
 	}
-	
+
 	public LocalDateTime getPunchInDate() {
 		return punchInDate;
 	}
