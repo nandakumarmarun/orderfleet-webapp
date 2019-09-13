@@ -22,6 +22,8 @@ public class LoadServerExeTaskDTO {
 
 	private int accountingVoucherCount;
 
+	private int dynamicDocumentCount;
+
 	private double inventoryVoucherTotal;
 
 	private double accountingVoucherTotal;
@@ -64,6 +66,14 @@ public class LoadServerExeTaskDTO {
 
 	public void setAccountingVoucherTotal(double accountingVoucherTotal) {
 		this.accountingVoucherTotal = accountingVoucherTotal;
+	}
+
+	public int getDynamicDocumentCount() {
+		return dynamicDocumentCount;
+	}
+
+	public void setDynamicDocumentCount(int dynamicDocumentCount) {
+		this.dynamicDocumentCount = dynamicDocumentCount;
 	}
 
 }

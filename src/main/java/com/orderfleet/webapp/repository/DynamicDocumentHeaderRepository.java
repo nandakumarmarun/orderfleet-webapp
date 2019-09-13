@@ -163,6 +163,9 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	@Query("select dd from DynamicDocumentHeader dd where dd.company.id = ?#{principal.companyId} and dd.pid = ?1 Order By dd.createdDate desc")
 	List<DynamicDocumentHeader> findDynamicDocumentHeaderByPid(String dynamicDocumentHeaderPid);
 
+	@Query("select dd.pid,dd.document.name,dd.document.pid from DynamicDocumentHeader dd where dd.company.id = ?#{principal.companyId} and dd.executiveTaskExecution.id in ?1")
+	List<Object[]> findDynamicDocumentsHeaderByExecutiveTaskExecutionIdin(Set<Long> exeIds);
+
 	// @Query("select
 	// dDocument.pid,dDocument.documentNumberLocal,dDocument.documentNumberServer,dDocument.document.pid,"
 	// +

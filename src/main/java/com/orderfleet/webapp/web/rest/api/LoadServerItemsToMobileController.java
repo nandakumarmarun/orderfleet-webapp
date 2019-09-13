@@ -238,9 +238,11 @@ public class LoadServerItemsToMobileController {
 		if (exeIds.size() != 0) {
 			List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTos = getDocumentInventoryItemsByExeIdIn(exeIds);
 			List<AccountingVoucherHeaderDTO> accountingVoucherHeaderDTos = getDocumentAccountingItemsByExeIdIn(exeIds);
+			List<DynamicDocumentHeaderDTO> dynamicHeaderDTos = getDynamicDocumentsByExeIdIn(exeIds);
 
 			int inventoryVoucherCount = inventoryVoucherHeaderDTos.size();
 			int accountingVoucherCount = accountingVoucherHeaderDTos.size();
+			int dynamicDocumentCount = dynamicHeaderDTos.size();
 			double inventoryVocherTotal = inventoryVoucherHeaderDTos.stream().mapToDouble(ivh -> ivh.getDocumentTotal())
 					.sum();
 			double accountingVoucherTotal = accountingVoucherHeaderDTos.stream()
@@ -251,6 +253,7 @@ public class LoadServerItemsToMobileController {
 			log.info("Accounting Voucher Size= " + accountingVoucherCount + " & Total= " + accountingVoucherTotal);
 
 			loadServerExeTaskDTO.setAccountingVoucherCount(accountingVoucherCount);
+			loadServerExeTaskDTO.setDynamicDocumentCount(dynamicDocumentCount);
 			loadServerExeTaskDTO.setAccountingVoucherTotal(accountingVoucherTotal);
 			loadServerExeTaskDTO.setExecutiveTaskExecutionDTOs(executiveTaskExecutions);
 			loadServerExeTaskDTO.setInventoryVoucherCount(inventoryVoucherCount);
@@ -330,6 +333,23 @@ public class LoadServerItemsToMobileController {
 		}
 
 		return accountingVoucherHeaderDTOs;
+	}
+
+	private List<DynamicDocumentHeaderDTO> getDynamicDocumentsByExeIdIn(Set<Long> exeIds) {
+
+		List<DynamicDocumentHeaderDTO> dynamicDocumentHeaderDTOs = new ArrayList<>();
+
+		List<Object[]> dynamicDocumentsObject = dynamicDocumentHeaderRepository
+				.findDynamicDocumentsHeaderByExecutiveTaskExecutionIdin(exeIds);
+
+		for (Object[] obj : dynamicDocumentsObject) {
+			DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO = new DynamicDocumentHeaderDTO();
+			dynamicDocumentHeaderDTO.setPid(obj[0] != null ? obj[0].toString() : "");
+			dynamicDocumentHeaderDTO.setDocumentName(obj[1] != null ? obj[1].toString() : "");
+			dynamicDocumentHeaderDTO.setDocumentPid(obj[2] != null ? obj[2].toString() : "");
+			dynamicDocumentHeaderDTOs.add(dynamicDocumentHeaderDTO);
+		}
+		return dynamicDocumentHeaderDTOs;
 	}
 
 	private List<DynamicDocumentHeaderDTO> getDocumentDynamicItems(String exeTasKPid) {
