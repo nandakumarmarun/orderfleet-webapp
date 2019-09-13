@@ -251,6 +251,7 @@ public class LoadServerItemsToMobileController {
 			log.info("Executive Task Execution Size= " + executiveTaskExecutions.size());
 			log.info("Inventory Voucher Size= " + inventoryVoucherCount + " & Total= " + inventoryVocherTotal);
 			log.info("Accounting Voucher Size= " + accountingVoucherCount + " & Total= " + accountingVoucherTotal);
+			log.info("Dynamic Document Size= " + dynamicDocumentCount);
 
 			loadServerExeTaskDTO.setAccountingVoucherCount(accountingVoucherCount);
 			loadServerExeTaskDTO.setDynamicDocumentCount(dynamicDocumentCount);
