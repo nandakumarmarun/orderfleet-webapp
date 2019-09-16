@@ -46,7 +46,7 @@ if (!this.CompanyConfiguration) {
 		var salesPdfDownload = $('#salesPdfDownload').is(":checked");
 		var visitBasedTransaction = $('#visitBasedTransaction').is(":checked");
 		var salesManagement = $('#salesManagement').is(":checked");
-		var kfcEnabled = $('#kfcEnabled').is(":checked");
+		var salesEditEnabled = $('#salesEditEnabled').is(":checked");
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -62,7 +62,7 @@ if (!this.CompanyConfiguration) {
 				salesPdfDownload : salesPdfDownload,
 				visitBasedTransaction : visitBasedTransaction,
 				salesManagement : salesManagement,
-				kfcEnabled : kfcEnabled
+				salesEditEnabled : salesEditEnabled
 			},
 			success : function(data) {
 				onSaveSuccess(data);
@@ -91,7 +91,7 @@ if (!this.CompanyConfiguration) {
 				$("#salesPdfDownload").prop("checked", data.salesPdfDownload);
 				$("#visitBasedTransaction").prop("checked", data.visitBasedTransaction);
 				$("#salesManagement").prop("checked", data.salesManagement);
-				$("#kfcEnabled").prop("checked", data.kfcEnabled);
+				$("#salesEditEnabled").prop("checked", data.salesEditEnabled);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);

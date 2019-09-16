@@ -10,6 +10,8 @@
 
 <script type="text/javascript"
 	src="http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"></script>
+	
+
 
 <style type="text/css">
 .error {
@@ -30,11 +32,26 @@
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
 			<h2>Geo Location Variance Report</h2>
+			<br> <br>
 			<div class="row">
 				<!-- Profile Info and Notifications -->
 				<div class="col-md-12 col-sm-12 clearfix">
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
+
+							<div class="col-sm-3">
+								<div class="radio">
+									<label><input type="radio" name="optVariance" value="All" checked="checked">All</label>&nbsp;&nbsp;&nbsp; 
+									<label><input type="radio" name="optVariance" value="Less Than">Less Than</label>&nbsp;&nbsp;&nbsp;
+									<label><input type="radio" name="optVariance" value="Greater Than">Greater Than</label>&nbsp;&nbsp;&nbsp;
+								</div>
+
+							</div>
+							<div class="col-sm-2 divSetVariance hide" id="divSetVariance">
+								Set Variance(in KM)<input type="number" class="form-control"
+									id="txtVariance" style="background-color: #fff;" value='0' />
+							</div>
+							<br> <br> <br>
 							<div class="col-sm-2">
 								<br /> <select id="dbUser" name="userPid" class="form-control">
 									<option value="no">Select Employee</option>
@@ -161,9 +178,12 @@
 	<spring:url value="/resources/assets/js/table2excel.js"
 		var="table2excel"></spring:url>
 	<script type="text/javascript" src="${table2excel}"></script>
+	
 
 	<spring:url value="/resources/app/geo-location-variance.js"
 		var="geoLocationVarianceJs"></spring:url>
 	<script type="text/javascript" src="${geoLocationVarianceJs}"></script>
+	
+	
 </body>
 </html>

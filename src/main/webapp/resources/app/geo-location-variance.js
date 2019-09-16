@@ -21,6 +21,23 @@ if (!this.GeoLocationVariance) {
 			searchTable($("#search").val());
 		});
 		
+		
+		$('input[type=radio][name=optVariance]').change(function() {
+		    if (this.value == 'All') {
+		    	$("#txtVariance").val('0');
+		    	$(".divSetVariance").removeClass('show');
+		    }
+		    else if (this.value == 'Less Than') {
+		        $(".divSetVariance").addClass('show');
+		    }
+		    else if (this.value == 'Greater Than') {
+		    	$(".divSetVariance").addClass('show');
+		    }
+		});
+		
+		
+		
+		
 // GeoLocationVariance.filter();
 		
 		$('#btnDownload').on('click', function() {
@@ -92,11 +109,11 @@ if (!this.GeoLocationVariance) {
 	}
 
 	GeoLocationVariance.filter = function() {
-		if ($('#dbDateSearch').val() == "CUSTOM") {
-			if ($("#txtFromDate").val() == "" || $("#txtToDate").val() == "") {
-				return;
-			}
-		}
+		
+		var radioVariance=$("input[name='optVariance']:checked").val();
+		var setVariance=Number($("#txtVariance").val());
+		
+		
 		$('#tBodyGeoLocationVariance').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
 		$
@@ -133,22 +150,86 @@ if (!this.GeoLocationVariance) {
 											}else{
 													variance=geoLocVariance.variation;
 											}
-											$('#tBodyGeoLocationVariance')
-													.append(
-										
-															"<tr><td>"
-																	+ geoLocVariance.accountProfileName
-																	+ "</td><td>"
-																	+ geoLocVariance.activityName
-																	+ "</td><td>"
-																	+ geoLocVariance.date
-																	+ "</td><td>"
-																	+ geoLocVariance.actualLocation
-																	+ "</td><td>"
-																	+ geoLocVariance.reportedLocation
-																	+ "</td><td>"
-																	+ variance
-																	+ "</td></tr>");
+											var varianceNo=variance.split(" ");
+											var varianceNum=Number(varianceNo[0]);
+											if(radioVariance=='All'){
+												$('#tBodyGeoLocationVariance')
+												.append(
+									
+														"<tr><td>"
+																+ geoLocVariance.accountProfileName
+																+ "</td><td>"
+																+ geoLocVariance.activityName
+																+ "</td><td>"
+																+ geoLocVariance.date
+																+ "</td><td>"
+																+ geoLocVariance.actualLocation
+																+ "</td><td>"
+																+ geoLocVariance.reportedLocation
+																+ "</td><td>"
+																+ variance
+																+ "</td></tr>");
+											}
+											
+											if(radioVariance=='Less Than'){
+
+												if(varianceNum!='NaN'){
+													if(varianceNum <= setVariance){
+														$('#tBodyGeoLocationVariance')
+														.append(
+											
+																"<tr><td>"
+																		+ geoLocVariance.accountProfileName
+																		+ "</td><td>"
+																		+ geoLocVariance.activityName
+																		+ "</td><td>"
+																		+ geoLocVariance.date
+																		+ "</td><td>"
+																		+ geoLocVariance.actualLocation
+																		+ "</td><td>"
+																		+ geoLocVariance.reportedLocation
+																		+ "</td><td>"
+																		+ variance
+																		+ "</td></tr>");
+													}
+												}
+											}
+											
+											if(radioVariance=='Greater Than'){
+												if(varianceNum!='NaN'){
+													if(varianceNum >= setVariance){
+														$('#tBodyGeoLocationVariance')
+														.append(
+											
+																"<tr><td>"
+																		+ geoLocVariance.accountProfileName
+																		+ "</td><td>"
+																		+ geoLocVariance.activityName
+																		+ "</td><td>"
+																		+ geoLocVariance.date
+																		+ "</td><td>"
+																		+ geoLocVariance.actualLocation
+																		+ "</td><td>"
+																		+ geoLocVariance.reportedLocation
+																		+ "</td><td>"
+																		+ variance
+																		+ "</td></tr>");
+													}
+												}
+											}
+											
+											if ($('#dbDateSearch').val() == "CUSTOM") {
+												if ($("#txtFromDate").val() == "" || $("#txtToDate").val() == "") {
+													return;
+												}
+											}
+											
+											
+											
+											
+											
+											
+											
 										});
 
 					}

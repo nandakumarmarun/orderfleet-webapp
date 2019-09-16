@@ -395,8 +395,8 @@ public class InvoiceWiseReportResource {
 					.findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
 			if (employeeProfile != null) {
 				invoiceWiseReportView.setEmployeeName(employeeProfile.getName());
-				String timeSpend = findTimeSpend(executiveTaskExecution.getStartTime(),
-						executiveTaskExecution.getEndTime());
+				String timeSpend = findTimeSpend(executiveTaskExecution.getPunchInDate(),
+						executiveTaskExecution.getSendDate());
 				invoiceWiseReportView.setTimeSpend(timeSpend);
 				List<InvoiceWiseReportDetailView> executiveTaskExecutionDetailViews = new ArrayList<>();
 				List<Object[]> inventoryVouchers;
@@ -753,9 +753,9 @@ public class InvoiceWiseReportResource {
 	}
 
 	public String findTimeSpend(LocalDateTime startTime, LocalDateTime endTime) {
-		long hours = 0;
-		long minutes = 0;
-		long seconds = 0;
+		long hours = 00;
+		long minutes = 00;
+		long seconds = 00;
 		if (startTime != null && endTime != null) {
 			long years = startTime.until(endTime, ChronoUnit.YEARS);
 			startTime = startTime.plusYears(years);

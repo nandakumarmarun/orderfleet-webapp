@@ -240,6 +240,8 @@ if (!this.InvoiceWiseReport) {
 																			invoiceWiseReport.sendDate,
 																			'MMM DD YYYY, h:mm:ss a')
 																	+ "</td><td class='tableexport-string target'>"
+																	+ invoiceWiseReport.timeSpend
+																	+ "</td><td class='tableexport-string target'>"
 																	+ formatDate(
 																			invoiceWiseReport.createdDate,
 																			'MMM DD YYYY, h:mm:ss a')
