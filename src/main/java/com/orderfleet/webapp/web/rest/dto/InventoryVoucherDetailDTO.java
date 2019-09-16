@@ -30,6 +30,8 @@ public class InventoryVoucherDetailDTO {
 	private Double productUnitQty;
 
 	private double quantity;
+	
+	private double updatedQty;
 
 	private double freeQuantity;
 
@@ -48,6 +50,8 @@ public class InventoryVoucherDetailDTO {
 	private LocalDateTime batchDate;
 
 	private double rowTotal;
+	
+	private double updatedRowTotal;
 
 	private double discountAmount;
 
@@ -88,6 +92,8 @@ public class InventoryVoucherDetailDTO {
 	private String accountName;
 
 	private String employeeName;
+	
+	private boolean updatedStatus;
 
 	public InventoryVoucherDetailDTO() {
 	}
@@ -103,6 +109,7 @@ public class InventoryVoucherDetailDTO {
 			this.productUnitQty = inventoryVoucherDetail.getProduct().getUnitQty();
 		}
 		this.quantity = inventoryVoucherDetail.getQuantity();
+		this.updatedQty = inventoryVoucherDetail.getUpdatedQuantity();
 		this.freeQuantity = inventoryVoucherDetail.getFreeQuantity();
 		this.sellingRate = inventoryVoucherDetail.getSellingRate();
 		this.taxPercentage = inventoryVoucherDetail.getTaxPercentage();
@@ -112,6 +119,7 @@ public class InventoryVoucherDetailDTO {
 		this.mrp = inventoryVoucherDetail.getMrp();
 		this.batchDate = inventoryVoucherDetail.getBatchDate();
 		this.rowTotal = inventoryVoucherDetail.getRowTotal();
+		this.updatedRowTotal = inventoryVoucherDetail.getUpdatedRowTotal();
 		this.discountAmount = inventoryVoucherDetail.getDiscountAmount();
 		this.taxAmount = inventoryVoucherDetail.getTaxAmount();
 		this.length = inventoryVoucherDetail.getLength();
@@ -143,6 +151,7 @@ public class InventoryVoucherDetailDTO {
 		if (inventoryVoucherDetail.getRferenceInventoryVoucherDetail() != null)
 			this.referenceInventoryVoucherDetailId = inventoryVoucherDetail.getRferenceInventoryVoucherDetail().getId();
 		this.remarks = inventoryVoucherDetail.getRemarks();
+		this.updatedStatus = inventoryVoucherDetail.getUpdatedStatus();
 		this.inventoryVoucherBatchDetails = inventoryVoucherDetail.getInventoryVoucherBatchDetails().stream()
 				.map(InventoryVoucherBatchDetailDTO::new).collect(Collectors.toList());
 	}
@@ -209,6 +218,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setQuantity(double quantity) {
 		this.quantity = quantity;
+	}
+	
+	public double getUpdatedQty() {
+		return updatedQty;
+	}
+
+	public void setUpdatedQty(double updatedQty) {
+		this.updatedQty = updatedQty;
 	}
 
 	public double getFreeQuantity() {
@@ -281,6 +298,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setRowTotal(double rowTotal) {
 		this.rowTotal = rowTotal;
+	}
+	
+	public double getUpdatedRowTotal() {
+		return updatedRowTotal;
+	}
+
+	public void setUpdatedRowTotal(double updatedRowTotal) {
+		this.updatedRowTotal = updatedRowTotal;
 	}
 
 	public double getDiscountAmount() {
@@ -441,6 +466,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setVisitRemarks(String visitRemarks) {
 		this.visitRemarks = visitRemarks;
+	}
+	
+	public boolean getUpdatedStatus() {
+		return updatedStatus;
+	}
+
+	public void setUpdatedStatus(boolean updatedStatus) {
+		this.updatedStatus = updatedStatus;
 	}
 
 	@Override

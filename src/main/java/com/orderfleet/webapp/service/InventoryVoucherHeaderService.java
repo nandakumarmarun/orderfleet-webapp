@@ -131,6 +131,8 @@ public interface InventoryVoucherHeaderService {
 	List<Object[]> findByCompanyIdAndInventoryPidIn(List<String> inventoryPids);
 
 	List<StockDetailsDTO> findAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate);
+	
+	InventoryVoucherHeader updateInventoryVoucherHeader(InventoryVoucherHeaderDTO inventoryVoucherHeaderDto);
 
 	
 }

@@ -48,8 +48,12 @@ public class InventoryVoucherHeaderDTO {
 	private String userName;
 
 	private double documentTotal;
+	
+	private double documentTotalUpdated;
 
 	private double documentVolume;
+	
+	private double documentVolumeUpdated;
 
 	private double docDiscountPercentage;
 
@@ -93,6 +97,7 @@ public class InventoryVoucherHeaderDTO {
 	private String customerPhone;
 
 	private boolean pdfDownloadStatus;
+	private boolean updatedStatus;
 
 	public InventoryVoucherHeaderDTO() {
 		super();
@@ -131,6 +136,8 @@ public class InventoryVoucherHeaderDTO {
 		}
 		this.documentTotal = inventoryVoucherHeader.getDocumentTotal();
 		this.documentVolume = inventoryVoucherHeader.getDocumentVolume();
+		this.documentTotalUpdated = inventoryVoucherHeader.getDocumentTotalUpdated();
+		this.documentVolumeUpdated = inventoryVoucherHeader.getDocumentVolumeUpdated();
 		this.docDiscountAmount = inventoryVoucherHeader.getDocDiscountAmount();
 		this.docDiscountPercentage = inventoryVoucherHeader.getDocDiscountPercentage();
 		this.docDiscountPercentage = inventoryVoucherHeader.getDocDiscountPercentage();
@@ -161,7 +168,7 @@ public class InventoryVoucherHeaderDTO {
 		if (inventoryVoucherHeader.getSalesManagementStatus() != null) {
 			this.salesManagementStatus = inventoryVoucherHeader.getSalesManagementStatus();
 		}
-
+		this.updatedStatus = inventoryVoucherHeader.getUpdatedStatus();
 	}
 
 	public InventoryVoucherHeaderDTO(InventoryVoucherHeaderHistory inventoryVoucherHeader) {
@@ -362,6 +369,14 @@ public class InventoryVoucherHeaderDTO {
 	public void setDocumentTotal(double documentTotal) {
 		this.documentTotal = documentTotal;
 	}
+	
+	public double getDocumentTotalUpdated() {
+		return documentTotalUpdated;
+	}
+
+	public void setDocumentTotalUpdated(double documentTotalUpdated) {
+		this.documentTotalUpdated = documentTotalUpdated;
+	}
 
 	public double getDocumentVolume() {
 		return documentVolume;
@@ -369,6 +384,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setDocumentVolume(double documentVolume) {
 		this.documentVolume = documentVolume;
+	}
+	
+	public double getDocumentVolumeUpdated() {
+		return documentVolumeUpdated;
+	}
+
+	public void setDocumentVolumeUpdated(double documentVolumeUpdated) {
+		this.documentVolumeUpdated = documentVolumeUpdated;
 	}
 
 	public double getDocDiscountAmount() {
@@ -521,6 +544,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setCustomerPhone(String customerPhone) {
 		this.customerPhone = customerPhone;
+	}
+	
+	public boolean getUpdatedStatus() {
+		return updatedStatus;
+	}
+
+	public void setUpdatedStatus(boolean updatedStatus) {
+		this.updatedStatus = updatedStatus;
 	}
 
 	@Override

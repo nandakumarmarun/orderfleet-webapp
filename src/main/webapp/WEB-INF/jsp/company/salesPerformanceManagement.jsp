@@ -142,8 +142,8 @@
 							<th>Volume<p id="totalVolume" style="float: right;"></p></th>
 							<th>Total Quantity</th>
 							<th>Date</th>
-							<th>Status</th>
 							<th>Management Status</th>
+							<th>Status</th>
 							<th>Action</th>
 							<th>VisitRemarks</th>
 						</tr>

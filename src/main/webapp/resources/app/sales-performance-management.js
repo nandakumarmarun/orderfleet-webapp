@@ -37,6 +37,7 @@ if (!this.InventoryVoucher) {
 		$("#btnApply").on('click', function() {
 			InventoryVoucher.filter();
 		});
+		
 	});
 
 	function loadAllDocumentByDocumentType() {
@@ -68,6 +69,7 @@ if (!this.InventoryVoucher) {
 	}
 
 	function showInventoryVoucher(pid) {
+		var ivhPid = pid ;
 		$
 				.ajax({
 					url : inventoryVoucherContextPath + "/" + pid,
@@ -80,8 +82,8 @@ if (!this.InventoryVoucher) {
 								convertDateTimeFromServer(data.createdDate));
 						$('#lbl_receiver').text(data.receiverAccountName);
 						$('#lbl_supplier').text(data.supplierAccountName);
-						$('#lbl_documentTotal').text(data.documentTotal);
-						$('#lbl_documentVolume').text(data.documentVolume);
+						$('#lbl_documentTotal').text(data.updatedStatus ? data.documentTotalUpdated :data.documentTotal);
+						$('#lbl_documentVolume').text(data.updatedStatus ? data.documentVolumeUpdated : data.documentVolume);
 						$('#lbl_documentDiscountAmount').text(
 								data.docDiscountAmount);
 						$('#lbl_documentDiscountPercentage').text(
@@ -97,7 +99,7 @@ if (!this.InventoryVoucher) {
 												unitQty = voucherDetail.productUnitQty;
 											}
 											let totQty = Math
-													.round((voucherDetail.quantity * unitQty) * 100) / 100;
+													.round(((voucherDetail.updatedStatus ? voucherDetail.updatedQty : voucherDetail.quantity) * unitQty) * 100) / 100;
 											$('#tblVoucherDetails')
 													.append(
 															"<tr data-id='"
@@ -105,9 +107,9 @@ if (!this.InventoryVoucher) {
 																	+ "'><td>"
 																	+ voucherDetail.productName
 																	+ "</td><td>"
-																	+ voucherDetail.quantity
+																	+(true?"<div class='input-group'><input type='number' id='updatedQty-"+voucherDetail.detailId+"' class='form-control' value='"+(voucherDetail.updatedStatus ? voucherDetail.updatedQty : voucherDetail.quantity)+"'><div class='input-group-btn'><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateInventory(\""+pid+"\",\""+voucherDetail.detailId+"\");'  value='update'></div></div>":voucherDetail.quantity)
 																	+ "</td><td>"
-																	+ voucherDetail.productUnitQty
+																	+ unitQty
 																	+ "</td><td>"
 																	+ totQty
 																	+ "</td><td>"
@@ -119,7 +121,7 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ voucherDetail.discountPercentage
 																	+ "</td><td>"
-																	+ voucherDetail.rowTotal
+																	+ (voucherDetail.updatedStatus ? voucherDetail.updatedRowTotal:voucherDetail.rowTotal)
 																	+ "</td></tr>");
 
 											$
@@ -142,14 +144,14 @@ if (!this.InventoryVoucher) {
 																						+ "</td></tr>");
 															});
 										});
-						$('.collaptable')
+						/*$('.collaptable')
 								.aCollapTable(
 										{
 											startCollapsed : true,
 											addColumn : false,
 											plusButton : '<span><i class="entypo-down-open-mini"></i></span>',
 											minusButton : '<span><i class="entypo-up-open-mini"></i></span>'
-										});
+										});*/
 					},
 					error : function(xhr, error) {
 						onError(xhr, error);
@@ -157,6 +159,25 @@ if (!this.InventoryVoucher) {
 				});
 	}
 
+	InventoryVoucher.updateInventory = function(ivhPid,ivdId){
+		$.ajax({
+			url : inventoryVoucherContextPath + "/updateInventory",
+			data : {
+				id : ivdId,
+				ivhPid : ivhPid,
+				quantity : $('#updatedQty-'+ivdId).val()
+			},
+			method : 'GET',
+			success : function(data) {
+				showInventoryVoucher(ivhPid);
+				InventoryVoucher.filter();
+			}
+			
+		});
+	}
+	
+	
+	
 	InventoryVoucher.filter = function() {
 		if ($('#dbDateSearch').val() == "CUSTOM") {
 			if ($("#txtFromDate").val() == "" || $("#txtToDate").val() == "") {
@@ -219,8 +240,8 @@ if (!this.InventoryVoucher) {
 										inventoryVouchers,
 										function(index, inventoryVoucher) {
 											counts += 1;
-											totAmount += inventoryVoucher.documentTotal;
-											totVolume += inventoryVoucher.totalVolume;
+											totAmount += (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated : inventoryVoucher.documentTotal);
+											totVolume += (inventoryVoucher.updatedStatus ? inventoryVoucher.documentVolumeUpdated : inventoryVoucher.totalVolume);
 
 											var button = "";
 
@@ -255,23 +276,23 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ inventoryVoucher.documentName
 																	+ "</td><td>"
-																	+ inventoryVoucher.documentTotal
+																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated : inventoryVoucher.documentTotal)
 																	+ "</td><td>"
 																	+ inventoryVoucher.totalVolume
 																	+ "</td><td>"
-																	+ inventoryVoucher.documentVolume
+																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentVolumeUpdated : inventoryVoucher.documentVolume)
 																	+ "</td><td>"
 																	+ convertDateTimeFromServer(inventoryVoucher.createdDate)
-																	+ "</td><td>"
-																	+ spanStatus(
-																			inventoryVoucher.pid,
-																			inventoryVoucher.tallyDownloadStatus,
-																			inventoryVoucher.salesManagementStatus)
 																	+ "</td><td>"
 																	+ spanSalesManagementStatus(
 																			inventoryVoucher.pid,
 																			inventoryVoucher.salesManagementStatus,
 																			inventoryVoucher.tallyDownloadStatus)
+																	+ "</td><td>"
+																	+ spanStatus(
+																			inventoryVoucher.pid,
+																			inventoryVoucher.tallyDownloadStatus,
+																			inventoryVoucher.salesManagementStatus)
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='InventoryVoucher.showModalPopup($(\"#viewModal\"),\""
 																	+ inventoryVoucher.pid
 																	+ "\",0);'>View Details</button>"
@@ -321,7 +342,6 @@ if (!this.InventoryVoucher) {
 		var completed = "'" + 'COMPLETED' + "'";
 		var spanStatus = "";
 		var pid = "'" + inventoryVoucherPid + "'";
-		console.log("....." + managementStatus);
 
 		var pointerEnable = '';
 

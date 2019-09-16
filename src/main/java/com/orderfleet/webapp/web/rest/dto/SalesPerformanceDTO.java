@@ -39,8 +39,12 @@ public class SalesPerformanceDTO {
 	private String userName;
 
 	private double documentTotal;
+	
+	private double documentTotalUpdated;
 
 	private double documentVolume;
+	
+	private double documentVolumeUpdated;
 
 	private double totalVolume;
 
@@ -57,6 +61,8 @@ public class SalesPerformanceDTO {
 	private SalesManagementStatus salesManagementStatus;
 
 	private String visitRemarks;
+	
+	private boolean updatedStatus;
 
 	public String getPid() {
 		return pid;
@@ -250,4 +256,28 @@ public class SalesPerformanceDTO {
 		this.salesManagementStatus = salesManagementStatus;
 	}
 
+	public double getDocumentTotalUpdated() {
+		return documentTotalUpdated;
+	}
+
+	public void setDocumentTotalUpdated(double documentTotalUpdated) {
+		this.documentTotalUpdated = documentTotalUpdated;
+	}
+
+	public double getDocumentVolumeUpdated() {
+		return documentVolumeUpdated;
+	}
+
+	public void setDocumentVolumeUpdated(double documentVolumeUpdated) {
+		this.documentVolumeUpdated = documentVolumeUpdated;
+	}
+
+	public boolean isUpdatedStatus() {
+		return updatedStatus;
+	}
+
+	public void setUpdatedStatus(boolean updatedStatus) {
+		this.updatedStatus = updatedStatus;
+	}
+	
 }

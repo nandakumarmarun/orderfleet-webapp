@@ -91,9 +91,15 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "document_total", nullable = false)
 	private double documentTotal;
+	
+	@Column(name = "document_total_updated", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double documentTotalUpdated;
 
 	@Column(name = "document_volume", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double documentVolume;
+	
+	@Column(name = "document_volume_updated", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double documentVolumeUpdated;
 
 	@Column(name = "doc_discount_amount", nullable = false, columnDefinition = "double precision DEFAULT 0 ")
 	private double docDiscountAmount;
@@ -160,6 +166,10 @@ public class InventoryVoucherHeader implements Serializable {
 	@NotNull
 	@Column(name = "pdf_download_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean pdfDownloadStatus = false;
+	
+	@NotNull
+	@Column(name = "updated_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean updatedStatus = false;//whether the inventory voucher is updated or not
 
 	public Long getId() {
 		return id;
@@ -271,6 +281,22 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setDocumentVolume(double documentVolume) {
 		this.documentVolume = documentVolume;
+	}
+	
+	public double getDocumentTotalUpdated() {
+		return documentTotalUpdated;
+	}
+
+	public void setDocumentTotalUpdated(double documentTotalUpdated) {
+		this.documentTotalUpdated = documentTotalUpdated;
+	}
+
+	public double getDocumentVolumeUpdated() {
+		return documentVolumeUpdated;
+	}
+
+	public void setDocumentVolumeUpdated(double documentVolumeUpdated) {
+		this.documentVolumeUpdated = documentVolumeUpdated;
 	}
 
 	public double getDocDiscountAmount() {
@@ -409,4 +435,12 @@ public class InventoryVoucherHeader implements Serializable {
 		this.tallyDownloadStatus = tallyDownloadStatus;
 	}
 
+	public boolean getUpdatedStatus() {
+		return updatedStatus;
+	}
+
+	public void setUpdatedStatus(boolean updatedStatus) {
+		this.updatedStatus = updatedStatus;
+	}
+	
 }

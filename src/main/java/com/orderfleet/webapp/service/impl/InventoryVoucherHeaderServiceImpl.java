@@ -454,4 +454,20 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		return proccessedStockDetailsDTOs;
 	}
 
+	@Override
+	public InventoryVoucherHeader updateInventoryVoucherHeader(InventoryVoucherHeaderDTO ivhDto) {
+		InventoryVoucherHeader ivh = new InventoryVoucherHeader();
+		Optional<InventoryVoucherHeader> opIvh = inventoryVoucherHeaderRepository.findOneByPid(ivhDto.getPid());
+		if(opIvh.isPresent()) {
+			ivh = opIvh.get();
+			ivh.setDocumentTotalUpdated(ivhDto.getDocumentTotalUpdated());
+			ivh.setDocumentVolumeUpdated(ivhDto.getDocumentVolumeUpdated());
+			ivh.setUpdatedStatus(ivhDto.getUpdatedStatus());
+			ivh = inventoryVoucherHeaderRepository.save(ivh);
+		}
+			
+		return ivh;
+	}
+	
+	
 }

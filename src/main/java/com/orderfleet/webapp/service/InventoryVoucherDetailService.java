@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.orderfleet.webapp.domain.Document;
+import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 
 public interface InventoryVoucherDetailService {
@@ -12,5 +13,7 @@ public interface InventoryVoucherDetailService {
 	
 	List<InventoryVoucherDetailDTO> findAllByCompanyIdAndDateBetweenOrderBy(String sort,String order, LocalDateTime fromDate, LocalDateTime toDate,
 			List<Document> documents,String employeePid);
+	
+	InventoryVoucherDetail updateInventoryVoucherDetail(InventoryVoucherDetailDTO ivdDto);
 
 }

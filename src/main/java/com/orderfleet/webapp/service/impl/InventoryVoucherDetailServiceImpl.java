@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.Document;
+import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.projections.CustomInventoryVoucherDetail;
@@ -168,4 +169,16 @@ public class InventoryVoucherDetailServiceImpl implements InventoryVoucherDetail
 		return inventoryVoucherDetailDTOs;
 	}
 
+	@Override
+	public InventoryVoucherDetail updateInventoryVoucherDetail(InventoryVoucherDetailDTO ivdDto) {
+		InventoryVoucherDetail ivd = new InventoryVoucherDetail();
+		ivd = inventoryVoucherDetailRepository.findOne(ivdDto.getDetailId());
+		ivd.setUpdatedQuantity(ivdDto.getUpdatedQty());
+		ivd.setUpdatedRowTotal(ivdDto.getUpdatedRowTotal());
+		ivd.setUpdatedStatus(true);
+		ivd = inventoryVoucherDetailRepository.save(ivd);
+		return ivd;
+	}
+
+	
 }

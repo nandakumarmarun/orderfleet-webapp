@@ -83,6 +83,7 @@ import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
+import com.orderfleet.webapp.service.InventoryVoucherDetailService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
@@ -150,6 +151,9 @@ public class SalesPerformanceManagementResource {
 
 	@Inject
 	private CompanyConfigurationRepository CompanyConfigurationRepository;
+	
+	@Inject
+	private InventoryVoucherDetailService inventoryVoucherDetailService;
 
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
@@ -317,8 +321,12 @@ public class SalesPerformanceManagementResource {
 		Set<String> ivHeaderPids = inventoryVouchers.parallelStream().map(obj -> obj[0].toString())
 				.collect(Collectors.toSet());
 		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
+//		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
+//				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
+		
+		//nested ternary operator
 		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
-				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
+				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : ((Boolean)obj[6] ? obj[5] :obj[4])) * (Double) obj[3]))));
 
 		boolean pdfDownloadButtonStatus = false;
 		Optional<CompanyConfiguration> opCompanyConfiguration = CompanyConfigurationRepository
@@ -364,7 +372,10 @@ public class SalesPerformanceManagementResource {
 			salesPerformanceDTO.setPdfDownloadStatus(Boolean.valueOf(ivData[19].toString()));
 
 			salesPerformanceDTO.setSalesManagementStatus(SalesManagementStatus.valueOf(ivData[20].toString()));
-
+			
+			salesPerformanceDTO.setDocumentTotalUpdated(ivData[21] != null ? Double.parseDouble(ivData[21].toString()) : 0.0);
+			salesPerformanceDTO.setDocumentVolumeUpdated(ivData[22] != null ? Double.parseDouble(ivData[22].toString()) : 0.0);
+			salesPerformanceDTO.setUpdatedStatus(ivData[23] != null ? Boolean.valueOf(ivData[23].toString()) : false);
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
@@ -570,6 +581,120 @@ public class SalesPerformanceManagementResource {
 		inventoryVoucherHeaderDTO.setTallyDownloadStatus(tallyDownloadStatus);
 		inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>(null, HttpStatus.OK);
+
+	}
+	
+	@RequestMapping(value = "/sales-performance-management/updateInventory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> updateInventoryDetail(@RequestParam long id,
+			@RequestParam long quantity,@RequestParam String ivhPid) {
+		System.out.println("------------------------------------------------------------------------");
+		System.out.println("quantity : "+quantity+"\n Id :"+id+" \n IVHPid : "+ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+		List<InventoryVoucherDetailDTO> ivdList = inventoryVoucherHeaderDTO.getInventoryVoucherDetails();
+		Optional<InventoryVoucherDetailDTO> opIvDetail = ivdList.stream().filter(ivd -> ivd.getDetailId() == id).findAny();
+		
+		if(opIvDetail.isPresent()) {
+			InventoryVoucherDetailDTO ivdDto = opIvDetail.get();
+			//ivdDto.setUpdatedQty(quantity);
+			double discAmt = ivdDto.getDiscountAmount();
+			double discPer = ivdDto.getDiscountPercentage();
+			double sellingRate = ivdDto.getSellingRate();
+			double taxPer = ivdDto.getTaxPercentage();
+			sellingRate = sellingRate - discAmt;
+			sellingRate = sellingRate - (sellingRate * (discPer * 0.01));
+			double rowTotal = sellingRate * quantity;
+			double totalTax  = rowTotal*(taxPer*0.01);
+			double updatedRowTotal = totalTax + rowTotal;
+			
+			double rowTotalDiff =   0.0;
+			double quantityDiff =   0.0;
+			if(ivdDto.getUpdatedStatus()) {
+				 rowTotalDiff = Math.abs(ivdDto.getUpdatedRowTotal() - updatedRowTotal);
+				 
+				 quantityDiff = Math.abs(ivdDto.getUpdatedQty() - quantity);
+				 
+				 System.out.println("updated : "+ivdDto.getUpdatedStatus());
+				 System.out.println("rowTotatlDiff : "+rowTotalDiff+"\n quantityDiff : "+quantityDiff);
+			}else {
+				 rowTotalDiff =   Math.abs(ivdDto.getRowTotal() - updatedRowTotal);
+				 
+				 quantityDiff =   Math.abs(ivdDto.getQuantity() - quantity) ;
+						 
+				 System.out.println("updated : "+ivdDto.getUpdatedStatus());
+				 System.out.println("rowTotatlDiff : "+rowTotalDiff+"\n quantityDiff : "+quantityDiff);
+			}
+			
+			
+
+			double updatedDocTotal = 0.0;
+			double updatedDocVol = 0.0;
+			if(inventoryVoucherHeaderDTO.getUpdatedStatus()) {
+					if(ivdDto.getUpdatedStatus()) {
+							if(ivdDto.getUpdatedQty() <= quantity) {
+								updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
+							}else {
+								updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
+							}
+							
+							if(ivdDto.getUpdatedRowTotal() <= updatedRowTotal) {
+								updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotalUpdated() + rowTotalDiff;
+							}else {
+								updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotalUpdated()) ;
+							}
+					}else {
+							if(ivdDto.getQuantity() <= quantity) {
+								updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
+							}else {
+								updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
+							}
+							
+							if(ivdDto.getRowTotal() <= updatedRowTotal) {
+								updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotalUpdated() + rowTotalDiff;
+							}else {
+								updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotalUpdated()) ;
+							}
+					}
+						
+				 
+				 System.out.println("updated... : TRUE");
+				 System.out.println("updatedDocTotal : "+updatedDocTotal+"\n updatedDocVol : "+updatedDocVol);
+			}else {
+				
+				if(ivdDto.getQuantity() <= quantity) {
+					updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolume() + quantityDiff;
+				}else {
+					updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolume());
+				}
+				
+				if(ivdDto.getRowTotal() <= updatedRowTotal) {
+					updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotal() + rowTotalDiff;
+				}else {
+					updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotal());
+				}
+				 
+				 System.out.println("updated... : FALSE");
+				 System.out.println("updatedDocTotal : "+updatedDocTotal+"\n updatedDocVol : "+updatedDocVol);
+			}
+			
+			ivdDto.setUpdatedStatus(true);
+			ivdDto.setUpdatedRowTotal(updatedRowTotal);
+			ivdDto.setUpdatedQty(quantity);
+			
+			inventoryVoucherHeaderDTO.setDocumentTotalUpdated(updatedDocTotal);
+			inventoryVoucherHeaderDTO.setDocumentVolumeUpdated(updatedDocVol);
+			inventoryVoucherHeaderDTO.setUpdatedStatus(true);
+			System.out.println("IVH : Volume : "+inventoryVoucherHeaderDTO.getDocumentVolume() +"\n");
+			System.out.println("IVH : Volume Updated : "+inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() +"\n");
+			System.out.println("------------------------------------------------------------------------");
+			inventoryVoucherDetailService.updateInventoryVoucherDetail(ivdDto);
+			inventoryVoucherService.updateInventoryVoucherHeader(inventoryVoucherHeaderDTO);
+			
+		}
+		
+		
+		//inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>(inventoryVoucherHeaderDTO , HttpStatus.OK);
 
 	}
 

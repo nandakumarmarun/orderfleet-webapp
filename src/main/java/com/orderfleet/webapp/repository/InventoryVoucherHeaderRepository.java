@@ -340,14 +340,14 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			List<String> documentPids, List<Boolean> status, LocalDateTime fromDate, LocalDateTime toDate);
 
 	// using for tally download status filtering
-	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
-			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
-			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
-			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks ,iv.orderNumber , iv.pdfDownloadStatus ,iv.salesManagementStatus from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
-			+ "iv.document.pid in ?2 and iv.tallyDownloadStatus in ?3 and iv.createdDate between ?4 and ?5 Order By iv.createdDate desc")
-	List<Object[]> findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
-			List<Long> userIds, List<String> documentPids, List<TallyDownloadStatus> tallyDownloadStatus,
-			LocalDateTime fromDate, LocalDateTime toDate);
+		@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
+				+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
+				+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
+				+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks ,iv.orderNumber , iv.pdfDownloadStatus ,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+				+ "iv.document.pid in ?2 and iv.tallyDownloadStatus in ?3 and iv.createdDate between ?4 and ?5 Order By iv.createdDate desc")
+		List<Object[]> findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
+				List<Long> userIds, List<String> documentPids, List<TallyDownloadStatus> tallyDownloadStatus,
+				LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
@@ -359,14 +359,14 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			LocalDateTime fromDate, LocalDateTime toDate);
 
 	// using for tally download status filtering
-	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
-			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
-			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
-			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks , iv.orderNumber , iv.pdfDownloadStatus,iv.salesManagementStatus from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
-			+ "iv.receiverAccount.pid = ?2 and iv.document.pid in ?3 and iv.tallyDownloadStatus in ?4 and iv.createdDate between ?5 and ?6 Order By iv.createdDate desc")
-	List<Object[]> findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
-			List<Long> userIds, String accountPids, List<String> documentPids,
-			List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
+		@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
+				+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
+				+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
+				+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks , iv.orderNumber , iv.pdfDownloadStatus,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+				+ "iv.receiverAccount.pid = ?2 and iv.document.pid in ?3 and iv.tallyDownloadStatus in ?4 and iv.createdDate between ?5 and ?6 Order By iv.createdDate desc")
+		List<Object[]> findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
+				List<Long> userIds, String accountPids, List<String> documentPids,
+				List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE InventoryVoucherHeader iv SET iv.tallyDownloadStatus = ?1  WHERE  iv.company.id = ?#{principal.companyId}  AND iv.pid in ?2")

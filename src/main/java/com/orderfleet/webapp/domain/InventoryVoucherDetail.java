@@ -49,6 +49,9 @@ public class InventoryVoucherDetail implements Serializable {
 
 	@Column(name = "quantity")
 	private double quantity;
+	
+	@Column(name = "updated_quantity", nullable = false, columnDefinition = "int default 0")
+	private double updatedQuantity;
 
 	@Column(name = "free_quantity")
 	private double freeQuantity;
@@ -76,6 +79,9 @@ public class InventoryVoucherDetail implements Serializable {
 
 	@Column(name = "row_total")
 	private double rowTotal;
+	
+	@Column(name = "updated_row_total", nullable = false, columnDefinition = "int default 0")
+	private double updatedRowTotal;
 
 	@Column(name = "discount_amount")
 	private double discountAmount;
@@ -120,7 +126,11 @@ public class InventoryVoucherDetail implements Serializable {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "inventory_voucher_detail_id")
 	private List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails;
-
+	
+	@NotNull
+	@Column(name = "updated_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean updatedStatus = false;//whether the inventory voucher detail is updated or not
+	
 	public InventoryVoucherDetail() {
 	}
 
@@ -188,6 +198,14 @@ public class InventoryVoucherDetail implements Serializable {
 
 	public void setQuantity(double quantity) {
 		this.quantity = quantity;
+	}
+	
+	public double getUpdatedQuantity() {
+		return updatedQuantity;
+	}
+
+	public void setUpdatedQuantity(double updatedQuantity) {
+		this.updatedQuantity = updatedQuantity;
 	}
 
 	public double getFreeQuantity() {
@@ -260,6 +278,14 @@ public class InventoryVoucherDetail implements Serializable {
 
 	public void setRowTotal(double rowTotal) {
 		this.rowTotal = rowTotal;
+	}
+	
+	public double getUpdatedRowTotal() {
+		return updatedRowTotal;
+	}
+
+	public void setUpdatedRowTotal(double updatedRowTotal) {
+		this.updatedRowTotal = updatedRowTotal;
 	}
 
 	public double getDiscountAmount() {
@@ -364,6 +390,14 @@ public class InventoryVoucherDetail implements Serializable {
 
 	public void setInventoryVoucherBatchDetails(List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails) {
 		this.inventoryVoucherBatchDetails = inventoryVoucherBatchDetails;
+	}
+
+	public boolean getUpdatedStatus() {
+		return updatedStatus;
+	}
+
+	public void setUpdatedStatus(boolean updatedStatus) {
+		this.updatedStatus = updatedStatus;
 	}
 
 	
