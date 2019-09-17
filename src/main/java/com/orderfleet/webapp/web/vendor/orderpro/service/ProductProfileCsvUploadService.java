@@ -248,9 +248,9 @@ public class ProductProfileCsvUploadService {
 		final Company company = syncOperation.getCompany();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
 		// find all exist product profiles
-		Set<String> ppNames = productProfileDTOs.stream().map(p -> p.getName()).collect(Collectors.toSet());
-		List<ProductProfile> productProfiles = productProfileRepository.findByCompanyIdAndNameIn(company.getId(),
-				ppNames);
+		Set<String> ppAlias = productProfileDTOs.stream().map(p -> p.getAlias()).collect(Collectors.toSet());
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
 
 		// All product must have a division/category, if not, set a default one
 		Division defaultDivision = divisionRepository.findFirstByCompanyId(company.getId());

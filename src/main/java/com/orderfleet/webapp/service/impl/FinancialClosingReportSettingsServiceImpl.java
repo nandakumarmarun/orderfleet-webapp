@@ -112,7 +112,7 @@ public class FinancialClosingReportSettingsServiceImpl implements FinancialClosi
 	@Override
 	public List<FinancialClosingReportSettingsDTO> findAllByPaymentModeExcludePettyCash() {
 		List<PaymentMode>paymentModes=new ArrayList<>();
-		paymentModes.add(PaymentMode.Bank);
+		paymentModes.add(PaymentMode.Cheque);
 		paymentModes.add(PaymentMode.Cash);
 		paymentModes.add(PaymentMode.CREDIT);
 		List<FinancialClosingReportSettings>financialClosingReportSettings=financialClosingReportSettingsRepository.findAllByPaymentModeExcludePettyCash(paymentModes);

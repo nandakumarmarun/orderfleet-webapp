@@ -75,13 +75,12 @@ public class AccountController {
 	private final UserDeviceRepository userDeviceRepository;
 
 	private final WhiteListedDevicesRepository whiteListedDevicesRepository;
-	
+
 	@Inject
 	private UserOnPremiseRepository userOnPremiseRepository;
-	
+
 	@Inject
 	private CompanyRepository companyRepository;
-
 
 	public AccountController(UserRepository userRepository, LicenseRepository licenseRepository,
 			UserService userService, MailService mailService, CompanyMapper companyMapper,
@@ -104,8 +103,7 @@ public class AccountController {
 	 * 
 	 * As of now, One user have only one device
 	 *
-	 * @param deviceKey
-	 *            the device key
+	 * @param deviceKey the device key
 	 * @return the ResponseEntity with status 200 (OK), or status 500 (Internal
 	 *         Server Error) if the device key couldn't be found
 	 */
@@ -143,8 +141,7 @@ public class AccountController {
 	/**
 	 * POST /register-fcmkey : register the device fcm key.
 	 * 
-	 * @param fcmKey
-	 *            the fcmkey of user device
+	 * @param fcmKey the fcmkey of user device
 	 * @return the ResponseEntity with status 200 (OK), or status 500 (Internal
 	 *         Server Error) if the device key couldn't be found
 	 */
@@ -163,13 +160,10 @@ public class AccountController {
 	/**
 	 * POST /register : register the user.
 	 *
-	 * @param managedUserDTO
-	 *            the managed user DTO
-	 * @param request
-	 *            the HTTP request
-	 * @return the ResponseEntity with status 201 (Created) if the user is
-	 *         registred or 400 (Bad Request) if the login wor e-mail is already
-	 *         in use
+	 * @param managedUserDTO the managed user DTO
+	 * @param request        the HTTP request
+	 * @return the ResponseEntity with status 201 (Created) if the user is registred
+	 *         or 400 (Bad Request) if the login wor e-mail is already in use
 	 */
 	@PostMapping(path = "/register", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE })
 	@Timed
@@ -203,13 +197,13 @@ public class AccountController {
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		}
 	}
-	
+
 	@GetMapping("/onpremise-users/{companyPid}")
 	@Timed
 	public ResponseEntity<List<UserDTO>> getAllUsers(@PathVariable String companyPid) {
 		List<Object[]> users = userRepository.findUsersByCompanyPid(companyPid);
 		List<UserDTO> userDTOs = new ArrayList<>();
-		users.forEach(user ->{
+		users.forEach(user -> {
 			UserDTO userDTO = new UserDTO();
 			userDTO.setLogin(user[0].toString());
 			userDTO.setFirstName(user[1].toString());
@@ -221,15 +215,13 @@ public class AccountController {
 		return new ResponseEntity<>(userDTOs, HttpStatus.OK);
 	}
 
-
 	/**
 	 * POST /validate : validate the license key.
 	 *
-	 * @param key
-	 *            the license key
-	 * @return the ResponseEntity with status 200 (OK) and the companyDTO in
-	 *         body, or status 500 (Internal Server Error) if the companyDTO
-	 *         couldn't be returned
+	 * @param key the license key
+	 * @return the ResponseEntity with status 200 (OK) and the companyDTO in body,
+	 *         or status 500 (Internal Server Error) if the companyDTO couldn't be
+	 *         returned
 	 */
 	@PostMapping(path = "/validate", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE })
 	@Timed
@@ -239,37 +231,40 @@ public class AccountController {
 						HttpStatus.OK))
 				.orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
-	
-	@PostMapping(path = "/validate/user-onpremise", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE })
+
+	@PostMapping(path = "/validate/user-onpremise", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.TEXT_PLAIN_VALUE })
 	@Timed
 	public ResponseEntity<CompanyUrlConfigDTO> validateUserOnpremiseAndGetRedirectUrl(@RequestParam String login) {
+		log.info("User Premise Login----------------" + login);
 		Optional<UserOnPremise> optionalUser = userOnPremiseRepository.findOneByLogin(login);
 		CompanyUrlConfigDTO companyUrlConfigDTO = new CompanyUrlConfigDTO();
 		companyUrlConfigDTO.setBaseUrl("http://salesnrich.com/api/");
 		companyUrlConfigDTO.setWebLoginUrl("http://salesnrich.com/login");
 //		companyUrlConfigDTO.setBaseUrl("http://192.168.100.61:8050/api/");
 //		companyUrlConfigDTO.setWebLoginUrl("http://192.168.100.61:8050/login");
-		if(optionalUser.isPresent()) {
-			if(optionalUser.get().getExpireDate().isBefore(Instant.now())) {
+		if (optionalUser.isPresent()) {
+			log.info("On Premise User Present----------------");
+			if (optionalUser.get().getExpireDate().isBefore(Instant.now())) {
+				log.info("User Expired----------------");
 				companyUrlConfigDTO.setValidUser(Boolean.FALSE);
 			}
 			String baseUrl = companyRepository.findApiUrlByCompanyPid(optionalUser.get().getCompanyPid());
-			if(baseUrl != null && !baseUrl.isEmpty()) {
+			if (baseUrl != null && !baseUrl.isEmpty()) {
+				log.info(baseUrl + "----------------");
 				companyUrlConfigDTO.setBaseUrl(baseUrl + "/api/");
 				companyUrlConfigDTO.setWebLoginUrl(baseUrl + "/login");
 			} else {
-				return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 			}
 		}
-		return new ResponseEntity<>(companyUrlConfigDTO,HttpStatus.OK);
+		return new ResponseEntity<>(companyUrlConfigDTO, HttpStatus.OK);
 	}
 
 	/**
-	 * GET /authenticate : check if the user is authenticated, and return its
-	 * login.
+	 * GET /authenticate : check if the user is authenticated, and return its login.
 	 *
-	 * @param request
-	 *            the HTTP request
+	 * @param request the HTTP request
 	 * @return the login if the user is authenticated
 	 */
 	@GetMapping("/authenticate")
@@ -282,9 +277,9 @@ public class AccountController {
 	/**
 	 * GET /account : get the current user.
 	 *
-	 * @return the ResponseEntity with status 200 (OK) and the current user in
-	 *         body, or status 500 (Internal Server Error) if the user couldn't
-	 *         be returned
+	 * @return the ResponseEntity with status 200 (OK) and the current user in body,
+	 *         or status 500 (Internal Server Error) if the user couldn't be
+	 *         returned
 	 */
 	@GetMapping("/account")
 	@Timed
@@ -297,11 +292,9 @@ public class AccountController {
 	/**
 	 * POST /account : update the current user information.
 	 *
-	 * @param userDTO
-	 *            the current user information
-	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
-	 *         Request) or 500 (Internal Server Error) if the user couldn't be
-	 *         updated
+	 * @param userDTO the current user information
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad Request)
+	 *         or 500 (Internal Server Error) if the user couldn't be updated
 	 */
 	@PostMapping("/account")
 	@Timed
@@ -322,10 +315,9 @@ public class AccountController {
 	/**
 	 * POST /account/change_password : changes the current user's password
 	 *
-	 * @param password
-	 *            the new password
-	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
-	 *         Request) if the new password is not strong enough
+	 * @param password the new password
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad Request)
+	 *         if the new password is not strong enough
 	 */
 	@PostMapping(path = "/account/change_password", produces = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.TEXT_PLAIN_VALUE })
@@ -339,11 +331,10 @@ public class AccountController {
 	}
 
 	/**
-	 * POST /account/reset_password/init : Send an email to reset the password
-	 * of the user
+	 * POST /account/reset_password/init : Send an email to reset the password of
+	 * the user
 	 *
-	 * @param mail
-	 *            the mail of the user
+	 * @param mail the mail of the user
 	 * @return the ResponseEntity with status 200 (OK) if the email was sent, or
 	 *         status 400 (Bad Request) if the email address is not registered
 	 */
@@ -360,11 +351,10 @@ public class AccountController {
 	 * POST /account/reset_password/finish : Finish to reset the password of the
 	 * user
 	 *
-	 * @param keyAndPassword
-	 *            the generated key and the new password
+	 * @param keyAndPassword the generated key and the new password
 	 * @return the ResponseEntity with status 200 (OK) if the password has been
-	 *         reset, or status 400 (Bad Request) or 500 (Internal Server Error)
-	 *         if the password could not be reset
+	 *         reset, or status 400 (Bad Request) or 500 (Internal Server Error) if
+	 *         the password could not be reset
 	 */
 	@PostMapping(path = "/account/reset_password/finish", produces = MediaType.TEXT_PLAIN_VALUE)
 	@Timed
@@ -388,8 +378,7 @@ public class AccountController {
 	}
 
 	/**
-	 * Post /mobile-discontinued-status : update user
-	 * mobile-discontinued-status.
+	 * Post /mobile-discontinued-status : update user mobile-discontinued-status.
 	 * 
 	 * @return the ResponseEntity with status 200 (OK).
 	 *
