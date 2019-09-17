@@ -48,6 +48,7 @@
 						<th>Visit Based Transaction</th>
 						<th>Sales Management</th>
 						<th>Sales Edit Enabled</th>
+						<th>Gps Variance Query</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -67,6 +68,7 @@
 							<td>${companyConfiguration.visitBasedTransaction}</td>
 							<th>${companyConfiguration.salesManagement}</th>
 							<th>${companyConfiguration.salesEditEnabled}</th>
+							<th>${companyConfiguration.gpsVarianceQuery}</th>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
 						</tr>
@@ -185,7 +187,15 @@
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Sales Edit Enabled</label> <input
-														id="salesEditEnabled" name='checksKfcEnabled"'
+														id="salesEditEnabled" name='checksSalesEditEnabled"'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Gps Variance Query</label> <input
+														id="gpsVarianceQuery" name='checksGpsVarianceQuery"'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>

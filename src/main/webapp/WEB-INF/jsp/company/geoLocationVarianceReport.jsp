@@ -39,19 +39,24 @@
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
 
-							<div class="col-sm-3">
-								<div class="radio">
-									<label><input type="radio" name="optVariance" value="All" checked="checked">All</label>&nbsp;&nbsp;&nbsp; 
-									<label><input type="radio" name="optVariance" value="Less Than">Less Than</label>&nbsp;&nbsp;&nbsp;
-									<label><input type="radio" name="optVariance" value="Greater Than">Greater Than</label>&nbsp;&nbsp;&nbsp;
+							<c:if test="${gpsVarianceQuery=='true'}">
+								<div id="divGpsVarianceQuery">
+									<div class="col-sm-3">
+										<div class="radio">
+											<label><input type="radio" name="optVariance" value="All" checked="checked">All</label>&nbsp;&nbsp;&nbsp; 
+											<label><input type="radio" name="optVariance" value="Less Than">Less Than</label>&nbsp;&nbsp;&nbsp;
+											<label><input type="radio" name="optVariance" value="Greater Than">Greater Than</label>&nbsp;&nbsp;&nbsp;
+										</div>
+									</div>
+									<div class="col-sm-2 divSetVariance hide" id="divSetVariance">
+										Set Variance(in KM)<input type="number" class="form-control"
+											id="txtVariance" style="background-color: #fff;" value='0' />
+									</div>
+									<br> <br> <br>
 								</div>
-
-							</div>
-							<div class="col-sm-2 divSetVariance hide" id="divSetVariance">
-								Set Variance(in KM)<input type="number" class="form-control"
-									id="txtVariance" style="background-color: #fff;" value='0' />
-							</div>
-							<br> <br> <br>
+							</c:if>
+							
+							
 							<div class="col-sm-2">
 								<br /> <select id="dbUser" name="userPid" class="form-control">
 									<option value="no">Select Employee</option>

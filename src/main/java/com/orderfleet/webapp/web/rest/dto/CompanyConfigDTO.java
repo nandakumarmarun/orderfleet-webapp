@@ -23,6 +23,7 @@ public class CompanyConfigDTO {
 	private boolean visitBasedTransaction;// setting for visit based transaction
 	private boolean salesManagement;// setting for Sales Management
 	private boolean salesEditEnabled;// setting for KFC
+	private boolean gpsVarianceQuery; // setting for gpsvariance
 
 	public CompanyConfigDTO() {
 		super();
@@ -131,6 +132,16 @@ public class CompanyConfigDTO {
 	public void setSalesEditEnabled(boolean salesEditEnabled) {
 		this.salesEditEnabled = salesEditEnabled;
 	}
+
+	public boolean isGpsVarianceQuery() {
+		return gpsVarianceQuery;
+	}
+
+	public void setGpsVarianceQuery(boolean gpsVarianceQuery) {
+		this.gpsVarianceQuery = gpsVarianceQuery;
+	}
+	
+	
 	
 	
 

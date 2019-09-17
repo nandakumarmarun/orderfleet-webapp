@@ -47,6 +47,7 @@ if (!this.CompanyConfiguration) {
 		var visitBasedTransaction = $('#visitBasedTransaction').is(":checked");
 		var salesManagement = $('#salesManagement').is(":checked");
 		var salesEditEnabled = $('#salesEditEnabled').is(":checked");
+		var gpsVarianceQuery = $('#gpsVarianceQuery').is(":checked");
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -62,7 +63,8 @@ if (!this.CompanyConfiguration) {
 				salesPdfDownload : salesPdfDownload,
 				visitBasedTransaction : visitBasedTransaction,
 				salesManagement : salesManagement,
-				salesEditEnabled : salesEditEnabled
+				salesEditEnabled : salesEditEnabled,
+				gpsVarianceQuery : gpsVarianceQuery
 			},
 			success : function(data) {
 				onSaveSuccess(data);
@@ -92,6 +94,7 @@ if (!this.CompanyConfiguration) {
 				$("#visitBasedTransaction").prop("checked", data.visitBasedTransaction);
 				$("#salesManagement").prop("checked", data.salesManagement);
 				$("#salesEditEnabled").prop("checked", data.salesEditEnabled);
+				$("#gpsVarianceQuery").prop("checked", data.gpsVarianceQuery);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);

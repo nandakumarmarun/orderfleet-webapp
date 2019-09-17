@@ -28,9 +28,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
@@ -67,6 +72,13 @@ public class GeoLocationVarianceReportResource {
 
 	@Inject
 	private GeoLocationService geoLocationService;
+	
+	@Inject 
+	private CompanyRepository companyRepository;
+
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
+	
 
 	@RequestMapping(value = "/geo-location-variance-report", method = RequestMethod.GET)
 	@Timed
@@ -74,6 +86,16 @@ public class GeoLocationVarianceReportResource {
 	public String getGeoLocationVariances(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of geo location variance report");
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		
+		Optional<CompanyConfiguration> optGpsVarianceQuery = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.GPS_VARIANCE_QUERY);
+		
+		if (optGpsVarianceQuery.isPresent()) {
+			model.addAttribute("gpsVarianceQuery", optGpsVarianceQuery.get().getValue());
+		} else {
+			model.addAttribute("gpsVarianceQuery", "false");
+		}
 
 		if (userIds.isEmpty()) {
 			model.addAttribute("employees", employeeProfileService.findAllByCompany());

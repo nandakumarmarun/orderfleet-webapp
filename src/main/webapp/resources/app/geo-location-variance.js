@@ -111,6 +111,11 @@ if (!this.GeoLocationVariance) {
 	GeoLocationVariance.filter = function() {
 		
 		var radioVariance=$("input[name='optVariance']:checked").val();
+		
+		
+		if (typeof radioVariance == 'undefined') {
+			radioVariance = "All";
+		}
 		var setVariance=Number($("#txtVariance").val());
 		
 		
