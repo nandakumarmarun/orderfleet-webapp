@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -217,7 +218,8 @@ public class TransactionResource {
 					.accountProfileToAccountProfileDTO(inventoryVoucherHeader.getReceiverAccount()));
 
 			List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
-
+			List<InventoryVoucherDetail> ivdList = inventoryVoucherHeader.getInventoryVoucherDetails(); 
+			ivdList.sort((InventoryVoucherDetail i1 , InventoryVoucherDetail i2)-> i1.getProduct().getName().compareTo(i2.getProduct().getName()));
 			for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader.getInventoryVoucherDetails()) {
 				SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
 				if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
@@ -422,10 +424,10 @@ public class TransactionResource {
 
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
-						.collect(Collectors.toList());
+						.collect(Collectors.toList())
+						.stream().sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());
 
 				List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
-
 				for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
 					SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
 					if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
@@ -458,6 +460,8 @@ public class TransactionResource {
 					vatLedgerDTOs.add(vatLedgerDTO);
 				}
 				salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
+				//List<SalesOrderItemDTO> sortedSalesOrderItems = new ArrayList<SalesOrderItemDTO>();
+				//sortedSalesOrderItems = salesOrderItemDTOs.stream().sorted(Comparator.comparingLong(SalesOrderItemDTO::getSortOrder)).collect(Collectors.toList());
 				salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
 				List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
 
@@ -648,7 +652,8 @@ public class TransactionResource {
 
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
-						.collect(Collectors.toList());
+						.collect(Collectors.toList())
+						.stream().sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());;
 
 				List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
 

@@ -147,10 +147,10 @@ public class SalesPerformanceManagementResource {
 	private ProductGroupProductRepository productGroupProductRepository;
 
 	@Inject
-	private CompanyRepository CompanyRepository;
+	private CompanyRepository companyRepository;
 
 	@Inject
-	private CompanyConfigurationRepository CompanyConfigurationRepository;
+	private CompanyConfigurationRepository companyConfigurationRepository;
 	
 	@Inject
 	private InventoryVoucherDetailService inventoryVoucherDetailService;
@@ -209,6 +209,10 @@ public class SalesPerformanceManagementResource {
 				.findOneByPid(pid);
 		if (optionalInventoryVoucherHeaderDTO.isPresent()) {
 			InventoryVoucherHeaderDTO inventoryVoucherDTO = optionalInventoryVoucherHeaderDTO.get();
+
+			Optional<CompanyConfiguration> opCompanyConfigurationSalesEdit = companyConfigurationRepository
+					.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_EDIT_ENABLED);
+			
 			Double ivTotalVolume = inventoryVoucherDTO.getInventoryVoucherDetails().stream()
 					.collect(Collectors.summingDouble(ivd -> {
 						if (ivd.getProductUnitQty() != null) {
@@ -220,6 +224,11 @@ public class SalesPerformanceManagementResource {
 
 			// checking tax rate in product group if product does not have tax rate
 			for (InventoryVoucherDetailDTO ivd : inventoryVoucherDTO.getInventoryVoucherDetails()) {
+				if(opCompanyConfigurationSalesEdit.isPresent()) {
+					if (opCompanyConfigurationSalesEdit.get().getValue().equals("true")) {
+						ivd.setEditOrder(true);
+					} 
+				}
 				if (ivd.getTaxPercentage() == 0) {
 					ProductGroup pg = productGroupProductRepository.findProductGroupByProductPid(ivd.getProductPid())
 							.get(0);
@@ -329,14 +338,29 @@ public class SalesPerformanceManagementResource {
 				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : ((Boolean)obj[6] ? obj[5] :obj[4])) * (Double) obj[3]))));
 
 		boolean pdfDownloadButtonStatus = false;
-		Optional<CompanyConfiguration> opCompanyConfiguration = CompanyConfigurationRepository
+		boolean orderEdit = false;
+		Optional<CompanyConfiguration> opCompanyConfigurationPdfDownload = companyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
-		if (opCompanyConfiguration.isPresent()) {
+		Optional<CompanyConfiguration> opCompanyConfigurationSalesEdit = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_EDIT_ENABLED);
+		
+		
+		
+		if (opCompanyConfigurationPdfDownload.isPresent()) {
 
-			if (opCompanyConfiguration.get().getValue().equals("true")) {
+			if (opCompanyConfigurationPdfDownload.get().getValue().equals("true")) {
 				pdfDownloadButtonStatus = true;
 			} else {
 				pdfDownloadButtonStatus = false;
+			}
+		}
+		
+		if (opCompanyConfigurationSalesEdit.isPresent()) {
+
+			if (opCompanyConfigurationSalesEdit.get().getValue().equals("true")) {
+				orderEdit = true;
+			} else {
+				orderEdit = false;
 			}
 		}
 
@@ -376,6 +400,7 @@ public class SalesPerformanceManagementResource {
 			salesPerformanceDTO.setDocumentTotalUpdated(ivData[21] != null ? Double.parseDouble(ivData[21].toString()) : 0.0);
 			salesPerformanceDTO.setDocumentVolumeUpdated(ivData[22] != null ? Double.parseDouble(ivData[22].toString()) : 0.0);
 			salesPerformanceDTO.setUpdatedStatus(ivData[23] != null ? Boolean.valueOf(ivData[23].toString()) : false);
+			salesPerformanceDTO.setEditOrder(orderEdit);
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
@@ -756,7 +781,7 @@ public class SalesPerformanceManagementResource {
 			companyName.setAlignment(Element.ALIGN_CENTER);
 			line.setAlignment(Element.ALIGN_CENTER);
 			companyName.setFont(fontSize_22);
-			companyName.add(CompanyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getLegalName());
+			companyName.add(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getLegalName());
 			line.add(new Paragraph("_______________________________________________________"));
 
 			String customerAddress = "";

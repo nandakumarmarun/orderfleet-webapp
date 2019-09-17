@@ -94,6 +94,8 @@ public class InventoryVoucherDetailDTO {
 	private String employeeName;
 	
 	private boolean updatedStatus;
+	
+	private boolean editOrder;
 
 	public InventoryVoucherDetailDTO() {
 	}
@@ -474,6 +476,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setUpdatedStatus(boolean updatedStatus) {
 		this.updatedStatus = updatedStatus;
+	}
+	
+	public boolean getEditOrder() {
+		return editOrder;
+	}
+
+	public void setEditOrder(boolean editOrder) {
+		this.editOrder = editOrder;
 	}
 
 	@Override

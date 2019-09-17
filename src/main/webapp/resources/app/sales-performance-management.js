@@ -107,7 +107,7 @@ if (!this.InventoryVoucher) {
 																	+ "'><td>"
 																	+ voucherDetail.productName
 																	+ "</td><td>"
-																	+(true?"<div class='input-group'><input type='number' id='updatedQty-"+voucherDetail.detailId+"' class='form-control' value='"+(voucherDetail.updatedStatus ? voucherDetail.updatedQty : voucherDetail.quantity)+"'><div class='input-group-btn'><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateInventory(\""+pid+"\",\""+voucherDetail.detailId+"\");'  value='update'></div></div>":voucherDetail.quantity)
+																	+(voucherDetail.editOrder?"<div class='input-group'><input type='number' id='updatedQty-"+voucherDetail.detailId+"' class='form-control' value='"+(voucherDetail.updatedStatus ? voucherDetail.updatedQty : voucherDetail.quantity)+"'><div class='input-group-btn'><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateInventory(\""+pid+"\",\""+voucherDetail.detailId+"\");'  value='update'></div></div>":voucherDetail.quantity)
 																	+ "</td><td>"
 																	+ unitQty
 																	+ "</td><td>"
