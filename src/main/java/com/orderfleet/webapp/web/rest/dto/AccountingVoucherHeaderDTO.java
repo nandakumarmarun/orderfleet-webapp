@@ -116,7 +116,7 @@ public class AccountingVoucherHeaderDTO {
 		this.documentNumberServer = accountingVoucherHeader.getDocumentNumberServer();
 		this.status = accountingVoucherHeader.getStatus();
 		for (AccountingVoucherDetail avd : accountingVoucherHeader.getAccountingVoucherDetails()) {
-			if (avd.getMode() == PaymentMode.Cheque) {
+			if (avd.getMode() == PaymentMode.Cheque || avd.getMode() == PaymentMode.Bank) {
 				this.chequeAmount += avd.getAmount();
 			} else if (avd.getMode() == PaymentMode.Cash) {
 				this.cashAmount += avd.getAmount();

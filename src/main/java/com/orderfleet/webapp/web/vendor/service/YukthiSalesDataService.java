@@ -95,7 +95,7 @@ public class YukthiSalesDataService {
 						+ mFormat.format(Double.valueOf(pDate.getYear()));
 				customerPayment.setPaymentDate(paymentDate);
 				customerPayment.setDueDate(paymentDate);
-				if (avDetail.getMode() == PaymentMode.Cheque) {
+				if (avDetail.getMode() == PaymentMode.Cheque || avDetail.getMode() == PaymentMode.Bank) {
 					customerPayment.setPaymentType("1");
 				} else if (avDetail.getMode() == PaymentMode.Cash) {
 					customerPayment.setPaymentType("3");
