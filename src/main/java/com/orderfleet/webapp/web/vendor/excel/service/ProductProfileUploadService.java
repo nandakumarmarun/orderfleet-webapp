@@ -282,9 +282,9 @@ public class ProductProfileUploadService {
 		final Company company = syncOperation.getCompany();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
 		// find all exist product profiles
-		Set<String> ppNames = productProfileDTOs.stream().map(p -> p.getName()).collect(Collectors.toSet());
-		List<ProductProfile> productProfiles = productProfileRepository.findByCompanyIdAndNameIn(company.getId(),
-				ppNames);
+		Set<String> ppAlias = productProfileDTOs.stream().map(p -> p.getAlias()).collect(Collectors.toSet());
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
 
 		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
 
@@ -308,7 +308,7 @@ public class ProductProfileUploadService {
 		for (ProductProfileDTO ppDto : productProfileDTOs) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
+					.filter(p -> p.getAlias().equals(ppDto.getAlias())).findAny();
 			ProductProfile productProfile;
 			if (optionalPP.isPresent()) {
 				productProfile = optionalPP.get();
@@ -320,11 +320,11 @@ public class ProductProfileUploadService {
 				productProfile = new ProductProfile();
 				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
 				productProfile.setCompany(company);
+				productProfile.setAlias(ppDto.getAlias());
 				productProfile.setDivision(defaultDivision);
 				productProfile.setDataSourceType(DataSourceType.TALLY);
 			}
 			productProfile.setName(ppDto.getName());
-			productProfile.setAlias(ppDto.getAlias());
 			productProfile.setDescription(ppDto.getDescription());
 			productProfile.setPrice(ppDto.getPrice());
 			productProfile.setMrp(ppDto.getMrp());
