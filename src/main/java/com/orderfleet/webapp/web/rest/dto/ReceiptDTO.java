@@ -47,7 +47,14 @@ public class ReceiptDTO {
 		String remarks = accountingVoucherDetail.getRemarks();
 		this.narrationMessage = remarks == null ? "" : remarks;
 		this.userName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
-		this.mode = accountingVoucherDetail.getMode();
+
+		if (accountingVoucherDetail.getMode() == PaymentMode.Cheque
+				|| accountingVoucherDetail.getMode() == PaymentMode.Bank) {
+			this.mode = PaymentMode.Bank;
+		} else {
+			this.mode = accountingVoucherDetail.getMode();
+		}
+
 		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
 				accountingVoucherDetail.getAccountingVoucherHeader());
 		this.trimChar = accountingVoucherDetail.getBy().getTrimChar();
@@ -68,14 +75,19 @@ public class ReceiptDTO {
 		this.bankName = accountingVoucherAllocation.getAccountingVoucherDetail().getBankName();
 		this.ledgerName = accountingVoucherAllocation.getAccountingVoucherDetail().getBy().getName();
 		String remarks = accountingVoucherAllocation.getRemarks();
-		
+
 		if (remarks != null && remarks.contains("&")) {
 			remarks = remarks.replace("&", "and ");
 		}
 		this.narrationMessage = remarks == null ? "" : remarks;
 		this.userName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader()
 				.getEmployee().getName();
-		this.mode = accountingVoucherAllocation.getMode();
+		if (accountingVoucherAllocation.getMode() == PaymentMode.Cheque
+				|| accountingVoucherAllocation.getMode() == PaymentMode.Bank) {
+			this.mode = PaymentMode.Bank;
+		} else {
+			this.mode = accountingVoucherAllocation.getMode();
+		}
 		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
 				accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader());
 		this.chequeDate = accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate() == null ? ""

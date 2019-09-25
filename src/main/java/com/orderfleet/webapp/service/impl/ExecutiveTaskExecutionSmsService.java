@@ -246,7 +246,8 @@ public class ExecutiveTaskExecutionSmsService {
 						.getAccountingVoucherDetails()) {
 
 					String type = "";
-					if (PaymentMode.Cheque.equals(accountingVoucherDetail.getMode())) {
+					if (PaymentMode.Cheque.equals(accountingVoucherDetail.getMode())
+							|| PaymentMode.Bank.equals(accountingVoucherDetail.getMode())) {
 						type = "Cheque";
 					} else {
 						type = accountingVoucherDetail.getMode().name();
