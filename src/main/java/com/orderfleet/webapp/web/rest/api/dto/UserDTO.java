@@ -33,6 +33,8 @@ public class UserDTO {
 
 	private String gstNumber;
 
+	private String companyPhoneNo;
+
 	@NotNull
 	@Pattern(regexp = Constants.LOGIN_REGEX)
 	@Size(min = 1, max = 50)
@@ -76,12 +78,14 @@ public class UserDTO {
 		this(user.getPid(), user.getCompany().getPid(), user.getCompany().getLegalName(), user.getLogin(),
 				user.getFirstName(), user.getLastName(), user.getEmail(), user.getMobile(), user.getActivated(),
 				user.getLangKey(), user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()),
-				user.getShowAllUsersData(), user.getDashboardUIType(), user.getDiscontinued(), user.getDeviceKey(),user.getCompany().getGstNo());
+				user.getShowAllUsersData(), user.getDashboardUIType(), user.getDiscontinued(), user.getDeviceKey(),
+				user.getCompany().getGstNo(), user.getCompany().getPhoneNo());
 	}
 
 	public UserDTO(String pid, String companyPid, String companyName, String login, String firstName, String lastName,
 			String email, String mobile, boolean activated, String langKey, Set<String> authorities,
-			boolean showAllUserData, DashboardUIType dashboardUIType, boolean discontinued, String deviceKey,String gstNumber) {
+			boolean showAllUserData, DashboardUIType dashboardUIType, boolean discontinued, String deviceKey,
+			String gstNumber, String companyPhoneNo) {
 		this.pid = pid;
 		this.companyPid = companyPid;
 		this.companyName = companyName;
@@ -97,7 +101,8 @@ public class UserDTO {
 		this.dashboardUIType = dashboardUIType;
 		this.discontinued = discontinued;
 		this.deviceKey = deviceKey;
-		this.gstNumber=gstNumber;
+		this.gstNumber = gstNumber;
+		this.companyPhoneNo = companyPhoneNo;
 	}
 
 	public UserDTO(String pid, String firstName, String lastName) {
@@ -240,6 +245,14 @@ public class UserDTO {
 
 	public void setGstNumber(String gstNumber) {
 		this.gstNumber = gstNumber;
+	}
+
+	public String getCompanyPhoneNo() {
+		return companyPhoneNo;
+	}
+
+	public void setCompanyPhoneNo(String companyPhoneNo) {
+		this.companyPhoneNo = companyPhoneNo;
 	}
 
 	@Override

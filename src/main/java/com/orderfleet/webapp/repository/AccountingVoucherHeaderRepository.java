@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Document;
+import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
@@ -236,5 +237,8 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 
 	@Query("select av.pid,av.document.name,av.document.pid,av.totalAmount from AccountingVoucherHeader av where av.company.id = ?#{principal.companyId} and av.executiveTaskExecution.id in ?1")
 	List<Object[]> findAccountingVoucherHeaderByExecutiveTaskExecutionIdin(Set<Long> exeIds);
+
+	Optional<AccountingVoucherHeader> findOneByExecutiveTaskExecutionPidAndImageRefNo(
+			String executiveTaskExecutionPid, String imageRefNo);
 
 }

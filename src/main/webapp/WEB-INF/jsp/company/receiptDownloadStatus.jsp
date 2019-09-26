@@ -15,8 +15,19 @@
 .error {
 	color: red;
 }
+
 #tBodyAccountVoucher td {
-	padding-bottom:50px;
+	padding-bottom: 50px;
+}
+
+.zoom {
+	background-color: white;
+}
+
+.zoom:hover {
+	-ms-transform: scale(2.0); /* IE 9 */
+	-webkit-transform: scale(2.0); /* Safari 3-8 */
+	transform: scale(2.0);
 }
 </style>
 </head>
@@ -37,7 +48,8 @@
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
 							<div class="col-sm-2">
-								Employee<select id="dbEmployee" name="employeePid" class="form-control">
+								Employee<select id="dbEmployee" name="employeePid"
+									class="form-control">
 									<option value="no">All Employee</option>
 									<c:forEach items="${employees}" var="employee">
 										<option value="${employee.pid}">${employee.name}</option>
@@ -69,7 +81,8 @@
 								Document <select id="dbDocument" name="documentPid"
 									class="form-control">
 									<c:if test="${empty documents}">
-									<option value="no">Select Document</option></c:if>
+										<option value="no">Select Document</option>
+									</c:if>
 									<c:forEach items="${documents}" var="document">
 										<option value="${document.pid}">${document.name}</option>
 									</c:forEach>
@@ -86,11 +99,11 @@
 								</select>
 							</div>
 							<div class="col-sm-2 hide custom_date1">
-							<br/>
-							<div class="input-group">
+								<br />
+								<div class="input-group">
 									<input type="text" class="form-control" id="txtFromDate"
-										 placeholder="Select From Date"
-										style="background-color: #fff;" readonly="readonly" />
+										placeholder="Select From Date" style="background-color: #fff;"
+										readonly="readonly" />
 
 									<div class="input-group-addon">
 										<a href="#"><i class="entypo-calendar"></i></a>
@@ -98,10 +111,9 @@
 								</div>
 							</div>
 							<div class="col-sm-2 hide custom_date2">
-							<br/>
+								<br />
 								<div class="input-group">
-									<input  type="text"
-										class="form-control" id="txtToDate"
+									<input type="text" class="form-control" id="txtToDate"
 										placeholder="Select To Date" style="background-color: #fff;"
 										readonly="readonly" />
 									<div class="input-group-addon">
@@ -116,7 +128,7 @@
 									<option value="PENDING">PENDING</option>
 									<option value="PROCESSING">PROCESSING</option>
 									<option value="COMPLETED">COMPLETED</option>
-								</select>					
+								</select>
 							</div>
 							<div class="col-sm-1">
 								<br>
@@ -126,35 +138,50 @@
 							<div class="col-sm-1">
 								<br>
 								<button type="button" class="btn btn-success" id="downloadXls">Download</button>
-							</div> 
+							</div>
 						</div>
 					</form>
 				</div>
 				<div class="col-md-12 col-sm-12 clearfix"
 					style="font-size: 14px; color: black;">
-					<div class="col-sm-2"><label>Count : </label>&nbsp;&nbsp;&nbsp;<label id="lblCounts">0.00</label></div>
+					<div class="col-sm-2">
+						<label>Count : </label>&nbsp;&nbsp;&nbsp;<label id="lblCounts">0.00</label>
+					</div>
 					<!-- <div class="col-sm-3"> <label>Total By Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalByAmount">0.00</label></div>
 					<div class="col-sm-3"> <label>Total To Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalToAmount" >0.00</label></div> -->
-					<div class="col-sm-3"> <label>Total Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalAmount">0.00</label></div>
-					<div class="col-sm-3"> <label>Total Cheque Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalChequeAmount">0.00</label></div>
-					<div class="col-sm-3"> <label>Total Cash Amount : </label>&nbsp;&nbsp;&nbsp;<label id="lblTotalCashAmount">0.00</label></div>
+					<div class="col-sm-3">
+						<label>Total Amount : </label>&nbsp;&nbsp;&nbsp;<label
+							id="lblTotalAmount">0.00</label>
+					</div>
+					<div class="col-sm-3">
+						<label>Total Cheque Amount : </label>&nbsp;&nbsp;&nbsp;<label
+							id="lblTotalChequeAmount">0.00</label>
+					</div>
+					<div class="col-sm-3">
+						<label>Total Cash Amount : </label>&nbsp;&nbsp;&nbsp;<label
+							id="lblTotalCashAmount">0.00</label>
+					</div>
 				</div>
-				
+
 			</div>
 			<div class="table-responsive">
 				<table class="table  table-striped table-bordered">
 					<thead>
 						<tr>
-							<th><input type="checkbox" id="selectAll"/>&nbsp;&nbsp;Select All</th>
+							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
+								All</th>
 							<th>Employee</th>
 							<th>Account</th>
 							<th>Document</th>
-							<th>Amount<p id="totalDocument" style="float: right;"></p></th>
-<!-- 							<th>Volume<p id="totalVolume" style="float: right;"></p></th>
+							<th>Amount
+								<p id="totalDocument" style="float: right;"></p>
+							</th>
+							<!-- 							<th>Volume<p id="totalVolume" style="float: right;"></p></th>
 							<th>Total Quantity</th> -->
 							<th>Date</th>
 							<th>Status</th>
 							<th>Action</th>
+							<th></th>
 							<!-- <th>VisitRemarks</th> -->
 						</tr>
 					</thead>
@@ -168,6 +195,40 @@
 			<spring:url value="/web/account-vouchers" var="urlAccountVoucher"></spring:url>
 		</div>
 
+
+
+		<!-- Model Container-->
+		<div class="modal fade container " id="imagesModal">
+			<!-- model Dialog -->
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="viewModalLabel">Receipt Images</h4>
+					</div>
+					<div class="modal-body zoom">
+						<!-- error message -->
+						<div class="alert alert-danger alert-dismissible" role="alert"
+							style="display: none;">
+							<button type="button" class="close" onclick="$('.alert').hide();"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<p></p>
+						</div>
+						<div id="divReceiptImages" style="overflow: auto; height: 500px;"></div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
 
 		<!-- Model Container-->
 		<div class="modal fade container" id="viewModal">

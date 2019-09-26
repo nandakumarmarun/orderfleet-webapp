@@ -18,6 +18,7 @@ if (!this.Company) {
 		alias : null,
 		companyType : null,
 		industry : null,
+		phoneNo : null,
 		gstNo : null,
 		address1 : null,
 		address2 : null,
@@ -63,7 +64,10 @@ if (!this.Company) {
 		location : {
 			required : true,
 			maxlength : 255
-		}
+		},
+		phoneNo : {
+			maxlength : 20
+		},
 	};
 
 	// Specify the validation error messages
@@ -78,7 +82,10 @@ if (!this.Company) {
 		location : {
 			required : "This field is required.",
 			maxlength : "This field cannot be longer than 255 characters."
-		}
+		},
+		phoneNo : {
+			maxlength : "This field cannot be longer than 20 characters."
+		},
 	};
 
 	$(document).ready(function() {
@@ -135,6 +142,7 @@ if (!this.Company) {
 		companyModel.alias = $('#field_alias').val();
 		companyModel.companyType = $('#field_companyType').val();
 		companyModel.industry = $('#field_industry').val();
+		companyModel.phoneNo = $('#field_phoneNo').val();
 		companyModel.gstNo = $('#field_gstNo').val();
 		companyModel.address1 = $('#field_address1').val();
 		companyModel.address2 = $('#field_address2').val();
@@ -182,6 +190,7 @@ if (!this.Company) {
 			});
 
 	function showCompany(id) {
+		console.log(id);
 		$.ajax({
 			url : companyContextPath + "/" + id,
 			method : 'GET',
@@ -190,7 +199,12 @@ if (!this.Company) {
 				$('#lbl_alias').text(data.alias);
 				$('#lbl_companyType').text(data.companyType);
 				$('#lbl_industry').text(data.industry);
-				if (data.gstNo != null) {
+				if (data.phoneNo != null && data.phoneNo != "") {
+					$('#lbl_phoneNo').text(data.phoneNo);
+				} else {
+					$('#lbl_phoneNo').text("-");
+				}
+				if (data.gstNo != null && data.gstNo != "") {
 					$('#lbl_gstNo').text(data.gstNo);
 				} else {
 					$('#lbl_gstNo').text("-");
@@ -250,6 +264,7 @@ if (!this.Company) {
 				$('#field_website').val(data.website);
 				$('#field_on_premise').prop("checked", data.onPremise);
 				$('#field_smsApiKey').val(data.smsApiKey);
+				$('#field_phoneNo').val(data.phoneNo);
 
 				if (data.logo != null) {
 					$('#previewImage').attr('src',

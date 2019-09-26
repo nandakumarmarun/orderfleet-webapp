@@ -8,12 +8,12 @@ if (!this.EmployeeProfileLocation) {
 (function() {
 	'use strict';
 
-	var employeeProfileLocationContextPath = location.protocol + '//' + location.host
-			+ location.pathname;
+	var employeeProfileLocationContextPath = location.protocol + '//'
+			+ location.host + location.pathname;
 	var employeeProfileLocationModel = {
 		employeeProfilePid : null
 	};
-	
+
 	var locationTreeData;
 
 	$(document).ready(function() {
@@ -22,7 +22,7 @@ if (!this.EmployeeProfileLocation) {
 		$.validator.addMethod("valueNotEquals", function(value, element, arg) {
 			return arg != value;
 		}, "");
-		
+
 		$('#btnSearch').click(function() {
 			searchTable($("#search").val());
 		});
@@ -30,19 +30,19 @@ if (!this.EmployeeProfileLocation) {
 		$('#btnSaveLocation').on('click', function() {
 			saveAssignedLocations();
 		});
-		
-		//on-load fetch location hierarchy
+
+		// on-load fetch location hierarchy
 		getLocationHierarchy();
-		
+
 		$('#cbSelectAll').change(function() {
-			if($(this).is(":checked")) {
+			if ($(this).is(":checked")) {
 				$('#tree-container').jstree("select_all");
 			} else {
 				$('#tree-container').jstree("deselect_all");
 			}
 		});
 	});
-	
+
 	function searchTable(inputVal) {
 		var table = $('#tbodyemployeeProfileLocations');
 		table.find('tr').each(function(index, row) {
@@ -65,22 +65,65 @@ if (!this.EmployeeProfileLocation) {
 			}
 		});
 	}
-	
-	function getLocationHierarchy() {
-		var locationHierarchyUrl = location.protocol + '//' + location.host + '/web/location-hierarchies';
-		  $.ajax({
-	          url:  locationHierarchyUrl,
-	          method: 'GET',
-	          success: function(responseData){
-	        	buildLocationTree(responseData);
-	          },
-	          error: function(xhr, error){
-	          	console.log("error : " + error);
-	          }
-	      });
+
+	EmployeeProfileLocation.filter = function() {
+
+		$('#tbodyemployeeProfileLocations').html(
+				"<tr><td colspan='2' align='center'>Please wait...</td></tr>");
+		$
+				.ajax({
+					url : employeeProfileLocationContextPath + "/filter",
+					type : 'GET',
+					data : {
+						employeePid : $('#dbEmployee').val()
+					},
+					success : function(employeeProfiles) {
+
+						if (employeeProfiles.length == 0) {
+							$('#tbodyemployeeProfileLocations')
+									.html(
+											"<tr><td colspan='2' align='center'>No data available</td></tr>");
+							return;
+						} else {
+							$('#tbodyemployeeProfileLocations').html("");
+							$
+									.each(
+											employeeProfiles,
+											function(index, employeeProfile) {
+
+												$(
+														'#tbodyemployeeProfileLocations')
+														.append(
+																"<tr><td>"
+																		+ employeeProfile.name
+																		+ "</td><td><button type='button' class='btn btn-info' onclick='EmployeeProfileLocation.showModalPopup($(\"#locationsModal\"),\""
+																		+ employeeProfile.pid
+																		+ "\",0);'>Assign Locations</button></td></tr>");
+
+											});
+
+						}
+					}
+
+				});
 	}
-	
-	function buildLocationTree(responseData){
+
+	function getLocationHierarchy() {
+		var locationHierarchyUrl = location.protocol + '//' + location.host
+				+ '/web/location-hierarchies';
+		$.ajax({
+			url : locationHierarchyUrl,
+			method : 'GET',
+			success : function(responseData) {
+				buildLocationTree(responseData);
+			},
+			error : function(xhr, error) {
+				console.log("error : " + error);
+			}
+		});
+	}
+
+	function buildLocationTree(responseData) {
 		var i, len, model, element;
 		i = 0;
 		locationTreeData = [];
@@ -88,7 +131,7 @@ if (!this.EmployeeProfileLocation) {
 			model = {};
 			element = responseData[i];
 			model.id = element["id"];
-			if(element["parentId"] === null) {
+			if (element["parentId"] === null) {
 				model.parent = "#"
 			} else {
 				model.parent = element["parentId"];
@@ -101,61 +144,71 @@ if (!this.EmployeeProfileLocation) {
 				'data' : locationTreeData
 			},
 			"checkbox" : {
-				"three_state": false
+				"three_state" : false
 			},
-			"plugins" : ["checkbox"]
-		}).on('loaded.jstree', function (e, data) {
+			"plugins" : [ "checkbox" ]
+		}).on('loaded.jstree', function(e, data) {
 			$(this).jstree("open_all");
 		});
-		
-	  }
+
+	}
 
 	function loadEmployeeProfileLocation(employeeProfilePid) {
 		employeeProfileLocationModel.employeeProfilePid = employeeProfilePid;
-		//un select all
+		// un select all
 		$('#tree-container').jstree("deselect_all");
-		$.ajax({
-			url : employeeProfileLocationContextPath + "/" + employeeProfilePid,
-			type : "GET",
-			success : function(locations) {
-				var locationIds = [];
-				if (locations) {
-					$.each(locations, function(index, location) {
-						locationIds.push(location.id);
-					});
-					$('#tree-container').jstree('select_node', locationIds); //node ids that you want to check
-				}
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			},
-		});
+		$
+				.ajax({
+					url : employeeProfileLocationContextPath + "/"
+							+ employeeProfilePid,
+					type : "GET",
+					success : function(locations) {
+						var locationIds = [];
+						if (locations) {
+							$.each(locations, function(index, location) {
+								locationIds.push(location.id);
+							});
+							$('#tree-container').jstree('select_node',
+									locationIds); // node
+							// ids
+							// that
+							// you
+							// want
+							// to
+							// check
+						}
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					},
+				});
 	}
 
 	function saveAssignedLocations() {
 		var checked_ids = $('#tree-container').jstree('get_selected');
 		$(".error-msg").html("");
-		
+
 		if (checked_ids == "") {
 			$(".error-msg").html("Please select Locations");
 			return;
 		}
 		// $(".error-msg").html("Please wait.....");
-		$.ajax({
-			url : employeeProfileLocationContextPath + "/save",
-			type : "POST",
-			data : {
-				employeeProfilePid : employeeProfileLocationModel.employeeProfilePid,
-				assignedLocations : "" + checked_ids,
-			},
-			success : function(status) {
-				$("#locationsModal").modal("hide");
-				onSaveSuccess(status);
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			},
-		});
+		$
+				.ajax({
+					url : employeeProfileLocationContextPath + "/save",
+					type : "POST",
+					data : {
+						employeeProfilePid : employeeProfileLocationModel.employeeProfilePid,
+						assignedLocations : "" + checked_ids,
+					},
+					success : function(status) {
+						$("#locationsModal").modal("hide");
+						onSaveSuccess(status);
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					},
+				});
 	}
 
 	function onSaveSuccess(result) {

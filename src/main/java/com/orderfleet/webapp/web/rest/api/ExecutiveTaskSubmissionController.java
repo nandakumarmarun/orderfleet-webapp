@@ -153,12 +153,10 @@ public class ExecutiveTaskSubmissionController {
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
 	 *
-	 * @param executiveTaskSubmissionDTO
-	 *            the executiveTaskSubmissionDTO to create
+	 * @param executiveTaskSubmissionDTO the executiveTaskSubmissionDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body the
 	 *         TaskSubmissionResponse
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@Timed
 	@RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -167,14 +165,15 @@ public class ExecutiveTaskSubmissionController {
 		log.debug("Web request to save ExecutiveTaskExecution start");
 		MobileConfigurationDTO mobileConfiguration = mobileConfigurationService
 				.findByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
-		if(mobileConfiguration == null) {
+		if (mobileConfiguration == null) {
 			log.debug("Mobile Configuration is not Set for this company (Type_1 or Type_2)");
 			TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 			taskSubmissionResponse.setStatus("Error");
 			taskSubmissionResponse.setMessage("Mobile Configuration is not Set for this company, CONTACT ADMIN");
 			return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.EXPECTATION_FAILED);
 		}
-		VoucherNumberGenerationType inventoryVoucherGenerationType = mobileConfiguration.getVoucherNumberGenerationType();
+		VoucherNumberGenerationType inventoryVoucherGenerationType = mobileConfiguration
+				.getVoucherNumberGenerationType();
 		if (inventoryVoucherGenerationType == VoucherNumberGenerationType.TYPE_2) {
 			List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders = executiveTaskSubmissionDTO.getInventoryVouchers();
 
@@ -240,8 +239,7 @@ public class ExecutiveTaskSubmissionController {
 			}
 		}
 		TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
-		
-		
+
 		try {
 			ExecutiveTaskExecutionDTO executionDTO = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO();
 			if (executionDTO.getInterimSave()) {
@@ -282,12 +280,10 @@ public class ExecutiveTaskSubmissionController {
 	/**
 	 * POST /executive-task-execution : Create or update executiveTaskExecution.
 	 *
-	 * @param executiveTaskSubmissionDTO
-	 *            the executiveTaskSubmissionDTO to create
+	 * @param executiveTaskSubmissionDTO the executiveTaskSubmissionDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body the
 	 *         TaskSubmissionResponse
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@Timed
 	@RequestMapping(value = "/saveOrupdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -320,12 +316,10 @@ public class ExecutiveTaskSubmissionController {
 	 * PUT /executive-task-execution/inventory-voucher/update : update accounting
 	 * voucher
 	 *
-	 * @param executiveTaskSubmissionDTO
-	 *            the executiveTaskSubmissionDTO to create
+	 * @param executiveTaskSubmissionDTO the executiveTaskSubmissionDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body the
 	 *         TaskSubmissionResponse
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@Timed
 	@RequestMapping(value = "/inventory-voucher/update", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -357,12 +351,10 @@ public class ExecutiveTaskSubmissionController {
 	 * PUT /executive-task-execution/accounting-voucher/update : update accounting
 	 * voucher
 	 *
-	 * @param executiveTaskSubmissionDTO
-	 *            the executiveTaskSubmissionDTO to create
+	 * @param executiveTaskSubmissionDTO the executiveTaskSubmissionDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body the
 	 *         TaskSubmissionResponse
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@Timed
 	@RequestMapping(value = "/accounting-voucher/update", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -385,12 +377,10 @@ public class ExecutiveTaskSubmissionController {
 	 * PUT /executive-task-execution/dynamic-document/update : update dynamic
 	 * document
 	 *
-	 * @param executiveTaskSubmissionDTO
-	 *            the executiveTaskSubmissionDTO to create
+	 * @param executiveTaskSubmissionDTO the executiveTaskSubmissionDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body the
 	 *         TaskSubmissionResponse
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@Timed
 	@RequestMapping(value = "/dynamic-document/update", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -428,8 +418,7 @@ public class ExecutiveTaskSubmissionController {
 	 * @param toDate
 	 * @return the ResponseEntity with status 200 (OK) and with body the List of
 	 *         ExecutiveTaskSubmissionDTO
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@Timed
 	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -512,6 +501,42 @@ public class ExecutiveTaskSubmissionController {
 						filledForm.getFiles().add(uploadedFile);
 						filledFormRepository.save(filledForm);
 						log.debug("uploaded file for FilledForm: {}", filledForm);
+						return new ResponseEntity<>(HttpStatus.OK);
+					} catch (FileManagerException | IOException ex) {
+						log.debug("File upload exception : {}", ex.getMessage());
+						return ResponseEntity.badRequest()
+								.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage()))
+								.body(null);
+					}
+				})
+				.orElse(ResponseEntity.badRequest()
+						.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
+						.body(null));
+	}
+
+	@Transactional
+	@RequestMapping(value = "/upload/receiptImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> uploadReceiptImageFile(
+			@RequestParam("executiveTaskExecutionPid") String executiveTaskExecutionPid,
+			@RequestParam("imageRefNo") String imageRefNo, @RequestParam("file") MultipartFile file) {
+		log.debug("Request Receipt Image to upload a file : {}", file);
+		if (file.isEmpty()) {
+			return ResponseEntity.badRequest()
+					.headers(
+							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
+					.body(null);
+		}
+		return accountingVoucherHeaderRepository
+				.findOneByExecutiveTaskExecutionPidAndImageRefNo(executiveTaskExecutionPid,
+						imageRefNo)
+				.map(accountingVoucherHeader -> {
+					try {
+						File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
+								file.getOriginalFilename(), file.getContentType());
+						// update filledForm with file
+						accountingVoucherHeader.getFiles().add(uploadedFile);
+						accountingVoucherHeaderRepository.save(accountingVoucherHeader);
+						log.debug("uploaded file for Accounting Voucher Header: {}", accountingVoucherHeader);
 						return new ResponseEntity<>(HttpStatus.OK);
 					} catch (FileManagerException | IOException ex) {
 						log.debug("File upload exception : {}", ex.getMessage());

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
@@ -83,6 +84,10 @@ public class DashboardUserEmployeeHierarchyResource {
 			otherEmployees.addAll(employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
 			dashBoardEmployees = employeeProfileService.findAllEmployeeByUserIdsIn(new ArrayList<>(dashboardLastUsersIds));
 		}
+		
+		dashBoardEmployees.sort((EmployeeProfileDTO e1,EmployeeProfileDTO e2)->e1.getName().compareToIgnoreCase(e2.getName()));
+		otherEmployees.sort((EmployeeProfileDTO e1,EmployeeProfileDTO e2)->e1.getName().compareToIgnoreCase(e2.getName()));
+
 		mapEmployyes.put("DASHBOARD", dashBoardEmployees);
 		mapEmployyes.put("OTHERS", otherEmployees);
 		return new ResponseEntity<>(mapEmployyes, HttpStatus.OK);

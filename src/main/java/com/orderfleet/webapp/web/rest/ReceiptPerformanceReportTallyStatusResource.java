@@ -44,9 +44,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.io.Files;
+import com.orderfleet.webapp.domain.AccountingVoucherHeader;
+import com.orderfleet.webapp.domain.File;
+import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
+import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
@@ -58,6 +63,7 @@ import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountingVoucherHeaderService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
+import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
@@ -65,6 +71,8 @@ import com.orderfleet.webapp.web.rest.dto.AccountingVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherXlsDownloadDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
+import com.orderfleet.webapp.web.rest.dto.FileDTO;
+import com.orderfleet.webapp.web.rest.dto.FormFileDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
@@ -88,6 +96,9 @@ public class ReceiptPerformanceReportTallyStatusResource {
 
 	@Inject
 	private AccountingVoucherHeaderService accountingVoucherService;
+
+	@Inject
+	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
 
 	@Inject
 	private UserRepository userRepository;
@@ -122,15 +133,17 @@ public class ReceiptPerformanceReportTallyStatusResource {
 	@Inject
 	private AccountingVoucherHeaderService accountingVoucherHeaderService;
 
+	@Inject
+	private FileManagerService fileManagerService;
+
 	/**
 	 * GET /receipt : get all the inventory vouchers.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of inventory
 	 *         vouchers in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/receipt-download-status", method = RequestMethod.GET)
 	@Timed
@@ -167,8 +180,7 @@ public class ReceiptPerformanceReportTallyStatusResource {
 	/**
 	 * GET /receipt/:id : get the "id" InventoryVoucher.
 	 *
-	 * @param id
-	 *            the id of the InventoryVoucherDTO to retrieve
+	 * @param id the id of the InventoryVoucherDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         InventoryVoucherDTO, or with status 404 (Not Found)
 	 */
@@ -183,6 +195,51 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+	}
+
+	/**
+	 * GET /receipt-download-status/images/:pid : get the "id" FormFileDTO.
+	 * 
+	 * @param pid the pid of the FormFileDTO to retrieve
+	 * @return the ResponseEntity with status 200 (OK) and with body the
+	 *         FormFileDTO, or with status 404 (Not Found)
+	 */
+	@Timed
+	@RequestMapping(value = "/receipt-download-status/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<FormFileDTO>> getDynamicDocumentImages(@PathVariable String pid) {
+		log.debug("Web request to get Receipt images by pid : {}", pid);
+
+		Optional<AccountingVoucherHeader> optionalAccountingVoucherHeaderDTO = accountingVoucherHeaderRepository
+				.findOneByPid(pid);
+		AccountingVoucherHeader accountingVoucherHeader = new AccountingVoucherHeader();
+
+		List<FormFileDTO> formFileDTOs = new ArrayList<>();
+		if (optionalAccountingVoucherHeaderDTO.isPresent()) {
+			accountingVoucherHeader = optionalAccountingVoucherHeaderDTO.get();
+		}
+		if (accountingVoucherHeader.getFiles().size() > 0) {
+			FormFileDTO formFileDTO = new FormFileDTO();
+			formFileDTO.setFormName(accountingVoucherHeader.getDocument().getName());
+			formFileDTO.setFiles(new ArrayList<>());
+			Set<File> files = accountingVoucherHeader.getFiles();
+			for (File file : files) {
+				FileDTO fileDTO = new FileDTO();
+				fileDTO.setFileName(file.getFileName());
+				fileDTO.setMimeType(file.getMimeType());
+				java.io.File physicalFile = this.fileManagerService.getPhysicalFileByFile(file);
+				if (physicalFile.exists()) {
+					try {
+						fileDTO.setContent(Files.toByteArray(physicalFile));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				formFileDTO.getFiles().add(fileDTO);
+			}
+			formFileDTOs.add(formFileDTO);
+		}
+		return new ResponseEntity<>(formFileDTOs, HttpStatus.OK);
+
 	}
 
 	@RequestMapping(value = "/receipt-download-status/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -213,8 +270,8 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		} else if (filterBy.equals(ReceiptPerformanceReportTallyStatusResource.MTD)) {
 			fDate = LocalDate.now().withDayOfMonth(1);
 		}
-		List<AccountingVoucherHeaderDTO> receiptStatusDTOs = getFilterData(employeePids, documentPid, tallyDownloadStatus,
-				accountPid, fDate, tDate);
+		List<AccountingVoucherHeaderDTO> receiptStatusDTOs = getFilterData(employeePids, documentPid,
+				tallyDownloadStatus, accountPid, fDate, tDate);
 		return new ResponseEntity<>(receiptStatusDTOs, HttpStatus.OK);
 	}
 
@@ -252,13 +309,12 @@ public class ReceiptPerformanceReportTallyStatusResource {
 
 		List<AccountingVoucherHeaderDTO> accountVouchers = new ArrayList<>();
 		if ("-1".equals(accountPid)) {
-			accountVouchers = accountingVoucherHeaderService
-					.getAllByCompanyIdUserPidDocumentPidAndDateBetween(userPids,
-							documentPids, tallyStatus, fromDate, toDate);
+			accountVouchers = accountingVoucherHeaderService.getAllByCompanyIdUserPidDocumentPidAndDateBetween(userPids,
+					documentPids, tallyStatus, fromDate, toDate);
 		} else {
 			accountVouchers = accountingVoucherHeaderService
-					.getAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetween(
-							userPids, accountPid, documentPids, tallyStatus, fromDate, toDate);
+					.getAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetween(userPids, accountPid, documentPids,
+							tallyStatus, fromDate, toDate);
 		}
 		if (accountVouchers.isEmpty()) {
 			return Collections.emptyList();
@@ -266,7 +322,6 @@ public class ReceiptPerformanceReportTallyStatusResource {
 			return accountVouchers;
 		}
 	}
-	
 
 	@RequestMapping(value = "/receipt-download-status/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -351,7 +406,7 @@ public class ReceiptPerformanceReportTallyStatusResource {
 				row.createCell(9).setCellValue(avd.getBankName());
 				row.createCell(10).setCellValue(avd.getIncomeExpenseHeadName());
 				row.createCell(11).setCellValue(avd.getRemarks());
-				
+
 			}
 		}
 	}
@@ -375,7 +430,7 @@ public class ReceiptPerformanceReportTallyStatusResource {
 			cell.setCellStyle(headerCellStyle);
 		}
 	}
-	
+
 	@RequestMapping(value = "/receipt-download-status/changeStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<AccountingVoucherHeaderDTO> changeStatus(@RequestParam String pid,
@@ -476,7 +531,5 @@ public class ReceiptPerformanceReportTallyStatusResource {
 //			cell17.setCellStyle(bodyCellStyle);
 //		}
 //	}
-
-	
 
 }

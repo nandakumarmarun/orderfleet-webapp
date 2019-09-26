@@ -34,6 +34,7 @@ public class CompanyViewDTO {
 	private String apiUrl;
 	private boolean onPremise;
 	private String smsApiKey;
+	private String phoneNo;
 
 	public CompanyViewDTO() {
 		super();
@@ -67,6 +68,7 @@ public class CompanyViewDTO {
 		this.onPremise = company.isOnPremise();
 		this.gstNo = company.getGstNo();
 		this.smsApiKey = company.getSmsApiKey();
+		this.phoneNo = company.getPhoneNo();
 	}
 
 	public String getPid() {
@@ -275,6 +277,14 @@ public class CompanyViewDTO {
 
 	public void setSmsApiKey(String smsApiKey) {
 		this.smsApiKey = smsApiKey;
+	}
+
+	public String getPhoneNo() {
+		return phoneNo;
+	}
+
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
 	}
 
 	@Override

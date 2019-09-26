@@ -99,7 +99,8 @@ public class CompanyServiceImpl implements CompanyService {
 		company.setIsActivated(false);
 		company.setOnPremise(companyDTO.isOnPremise());
 		company.setSmsApiKey(companyDTO.getSmsApiKey());
-		
+		company.setPhoneNo(companyDTO.getPhoneNo());
+
 		// company = companyRepository.save(company);
 		// CompanyViewDTO result = new CompanyViewDTO(company);
 		return companyRepository.save(company);
@@ -147,6 +148,7 @@ public class CompanyServiceImpl implements CompanyService {
 			company.setWebsite(companyDTO.getWebsite());
 			company.setOnPremise(companyDTO.isOnPremise());
 			company.setSmsApiKey(companyDTO.getSmsApiKey());
+			company.setPhoneNo(companyDTO.getPhoneNo());
 
 			company = companyRepository.save(company);
 			CompanyViewDTO result = new CompanyViewDTO(company);
@@ -290,7 +292,7 @@ public class CompanyServiceImpl implements CompanyService {
 			return companyDTO;
 		});
 	}
-	
+
 	@Override
 	public Optional<CompanyViewDTO> findByEmail(String email) {
 		return companyRepository.findByEmail(email).map(company -> {

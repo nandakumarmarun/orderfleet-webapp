@@ -137,7 +137,7 @@ public class CompanyManagementResource {
 	@Timed
 	public ResponseEntity<CompanyViewDTO> createCompany(@Valid @RequestBody CompanyViewDTO companyDTO)
 			throws URISyntaxException {
-		log.debug("Web request to save Company : {}", companyDTO);
+		log.debug("Web request to save Company : {}", companyDTO.getPhoneNo());
 		if (companyDTO.getPid() != null) {
 			return ResponseEntity.badRequest().headers(
 					HeaderUtil.createFailureAlert("company", "idexists", "A new company cannot already have an ID"))

@@ -12,8 +12,12 @@ if (!this.AccountVoucher) {
 			+ location.pathname;
 
 	$(document).ready(function() {
-		$("#txtToDate").datepicker({ dateFormat: "dd-mm-yy" });
-		$("#txtFromDate").datepicker({ dateFormat: "dd-mm-yy" });
+		$("#txtToDate").datepicker({
+			dateFormat : "dd-mm-yy"
+		});
+		$("#txtFromDate").datepicker({
+			dateFormat : "dd-mm-yy"
+		});
 		// load today data
 		AccountVoucher.filter();
 
@@ -23,15 +27,16 @@ if (!this.AccountVoucher) {
 		$('#downloadXls').on('click', function() {
 			downloadXls();
 		});
-		/*if($("#dbDocumentType").val!="no"){
-			loadAllDocumentByDocumentType();
-		}*/
-		/*$("#dbDocumentType").change(function() {
-			loadAllDocumentByDocumentType();
-		});*/
+		/*
+		 * if($("#dbDocumentType").val!="no"){ loadAllDocumentByDocumentType(); }
+		 */
+		/*
+		 * $("#dbDocumentType").change(function() {
+		 * loadAllDocumentByDocumentType(); });
+		 */
 	});
 
-	function loadAllDocumentByDocumentType(){
+	function loadAllDocumentByDocumentType() {
 		if ($('#dbDocumentType').val() == "no") {
 			$("#dbDocument").html("<option>All</option>");
 			alert("Please Select Document Type");
@@ -40,15 +45,13 @@ if (!this.AccountVoucher) {
 		var documentType = $('#dbDocumentType').val();
 		$("#dbDocument").html("<option>Documents loading...</option>")
 		$.ajax({
-			url : accountVoucherContextPath
-					+ "/load-document",
+			url : accountVoucherContextPath + "/load-document",
 			type : 'GET',
 			data : {
 				voucherType : documentType,
 			},
 			success : function(documents) {
-				$("#dbDocument").html(
-						"<option value='no'>All</option>")
+				$("#dbDocument").html("<option value='no'>All</option>")
 				$.each(documents, function(key, document) {
 					$("#dbDocument").append(
 							"<option value='" + document.pid + "'>"
@@ -56,8 +59,8 @@ if (!this.AccountVoucher) {
 				});
 			}
 		});
-}
-	
+	}
+
 	function showAccountVoucher(pid) {
 		$
 				.ajax({
@@ -71,7 +74,8 @@ if (!this.AccountVoucher) {
 						$('#lbl_createdDate').text(
 								convertDateTimeFromServer(data.createdDate));
 						$('#lbl_totalAmount').text(data.totalAmount);
-						$('#lbl_remarks').text((data.remarks == null ? "" : data.remarks));
+						$('#lbl_remarks').text(
+								(data.remarks == null ? "" : data.remarks));
 
 						$('#tblVoucherDetails').html("");
 						$
@@ -87,27 +91,33 @@ if (!this.AccountVoucher) {
 																	+ "</td><td>"
 																	+ voucherDetail.amount
 																	+ "</td><td>"
-																	+(voucherDetail.instrumentNumber == null ? "" : voucherDetail.instrumentNumber)
+																	+ (voucherDetail.instrumentNumber == null ? ""
+																			: voucherDetail.instrumentNumber)
 																	+ "</td><td>"
 																	+ convertDateFromServer(voucherDetail.instrumentDate)
 																	+ "</td><td>"
-																	+(voucherDetail.bankName == null ? "" : voucherDetail.bankName)
+																	+ (voucherDetail.bankName == null ? ""
+																			: voucherDetail.bankName)
 																	+ "</td><td>"
 																	+ voucherDetail.byAccountName
 																	+ "</td><td>"
 																	+ voucherDetail.toAccountName
 																	+ "</td><td>"
-																	+ (voucherDetail.incomeExpenseHeadName == null ? "" : voucherDetail.incomeExpenseHeadName)
+																	+ (voucherDetail.incomeExpenseHeadName == null ? ""
+																			: voucherDetail.incomeExpenseHeadName)
 																	+ "</td><td>"
 																	+ voucherDetail.voucherNumber
 																	+ "</td><td>"
 																	+ convertDateFromServer(voucherDetail.voucherDate)
 																	+ "</td><td>"
-																	+(voucherDetail.referenceNumber == null ? "" : voucherDetail.referenceNumber)
+																	+ (voucherDetail.referenceNumber == null ? ""
+																			: voucherDetail.referenceNumber)
 																	+ "</td><td>"
-																	+(voucherDetail.provisionalReceiptNo == null ? "" : voucherDetail.provisionalReceiptNo)
+																	+ (voucherDetail.provisionalReceiptNo == null ? ""
+																			: voucherDetail.provisionalReceiptNo)
 																	+ "</td><td>"
-																	+(voucherDetail.remarks == null ? "" : voucherDetail.remarks)
+																	+ (voucherDetail.remarks == null ? ""
+																			: voucherDetail.remarks)
 																	+ "</td>");
 
 											$
@@ -150,22 +160,22 @@ if (!this.AccountVoucher) {
 				return;
 			}
 		}
-		if($("#dbDocumentType").val()=="no"){
+		if ($("#dbDocumentType").val() == "no") {
 			alert("Please Select Document Type")
 			return;
 		}
-		
+
 		let docPids = $('#dbDocument').val();
 		let empPids = $('#dbEmployee').val();
-		if("no" == docPids){
+		if ("no" == docPids) {
 			docPids = $('#dbDocument option').map(function() {
-		        return $(this).val();
-		    }).get().join(',');
+				return $(this).val();
+			}).get().join(',');
 		}
-		if("no" == empPids){
+		if ("no" == empPids) {
 			empPids = $('#dbEmployee option').map(function() {
-		        return $(this).val();
-		    }).get().join(',');
+				return $(this).val();
+			}).get().join(',');
 		}
 		$('#tBodyAccountVoucher').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
@@ -187,7 +197,7 @@ if (!this.AccountVoucher) {
 						documentPids : $("#dbDocument").val(),
 					},
 					success : function(accountVouchers) {
-						
+
 						$("#lblCounts").text("0");
 						$('#tBodyAccountVoucher').html("");
 						if (accountVouchers.length == 0) {
@@ -200,6 +210,7 @@ if (!this.AccountVoucher) {
 						let totAmount = 0;
 						var chequeTotal = 0.00;
 						var cashTotal = 0.00;
+
 						$
 								.each(
 										accountVouchers,
@@ -208,6 +219,16 @@ if (!this.AccountVoucher) {
 											totAmount += accountVoucher.totalAmount;
 											chequeTotal += accountVoucher.chequeAmount
 											cashTotal += accountVoucher.cashAmount
+											var content = "";
+
+											if (accountVoucher.imageButtonVisible) {
+												content = "<td><button type='button' class='btn btn-info' onclick='AccountVoucher.showModalPopup($(\"#imagesModal\"),\""
+														+ accountVoucher.pid
+														+ "\",1);'>View Images</button></td>";
+											} else {
+												content = "<td>No Image</td>";
+											}
+
 											$('#tBodyAccountVoucher')
 													.append(
 															"<tr><td><input type='checkbox' class='check-one' value='"
@@ -224,80 +245,143 @@ if (!this.AccountVoucher) {
 																	+ "</td><td>"
 																	+ convertDateTimeFromServer(accountVoucher.createdDate)
 																	+ "</td><td>"
-																	+ spanStatus(accountVoucher.pid,accountVoucher.tallyDownloadStatus)
-																	+"</td><td><button type='button' class='btn btn-blue' onclick='AccountVoucher.showModalPopup($(\"#viewModal\"),\""
+																	+ spanStatus(
+																			accountVoucher.pid,
+																			accountVoucher.tallyDownloadStatus)
+																	+ "</td><td><button type='button' class='btn btn-blue' onclick='AccountVoucher.showModalPopup($(\"#viewModal\"),\""
 																	+ accountVoucher.pid
-																	+ "\",0);'>View Details</button></td></tr>");
+																	+ "\",0);'>View Details</button></td>"
+																	+ content
+																	+ "</tr>");
 										});
 						$("#lblCounts").text(counts);
 						$('#lblTotalChequeAmount').text(chequeTotal);
 						$('#lblTotalCashAmount').text(cashTotal);
-						
-						if(totAmount != 0){
-							//$("#totalDocument").html("(" + totAmount.toFixed(2) + ")");
+
+						if (totAmount != 0) {
+							// $("#totalDocument").html("(" +
+							// totAmount.toFixed(2) + ")");
 							$('#lblTotalAmount').text(totAmount.toFixed(2));
 						}
 					}
 				});
 	}
-	function spanStatus(accountVoucherPid,status) {
-		
-		var pending ="'" + 'PENDING' + "'" ;
-		var processing = "'" + 'PROCESSING' + "'" ;
-		var completed = "'" + 'COMPLETED' + "'" ;
+
+	function showReceiptImages(pid) {
+		$
+				.ajax({
+					url : accountVoucherContextPath + "/images/" + pid,
+					method : 'GET',
+					success : function(filledFormFiles) {
+
+						$('#divReceiptImages').html("");
+						$
+								.each(
+										filledFormFiles,
+										function(index, filledFormFile) {
+											var table = '<table class="table  table-striped table-bordered"><tr><td style="font-weight: bold;">'
+													+ filledFormFile.formName
+													+ '</td></tr>';
+											$
+													.each(
+															filledFormFile.files,
+															function(index,
+																	file) {
+																table += '<tr><th>'
+																		+ file.fileName
+																		+ '</th></tr>';
+																table += '<tr><td><img width="100%" src="data:image/png;base64,'
+																		+ file.content
+																		+ '"/></td></tr>';
+															});
+											table += '</table>';
+											$('#divReceiptImages')
+													.append(table);
+										});
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
+	}
+
+	function spanStatus(accountVoucherPid, status) {
+
+		var pending = "'" + 'PENDING' + "'";
+		var processing = "'" + 'PROCESSING' + "'";
+		var completed = "'" + 'COMPLETED' + "'";
 		var spanStatus = "";
 		var pid = "'" + accountVoucherPid + "'";
-		switch(status){
+		switch (status) {
 		case 'PENDING':
 			spanStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-						+'PENDING<span class="caret"></span></span>'
-						+'<ul class="dropdown-menu">'
-						+'<li onclick="AccountVoucher.setStatus('+pid+','+processing+')" style="cursor: pointer;"><a>PROCESSING</a></li>'
-						+'<li onclick="AccountVoucher.setStatus('+pid+','+completed+')" style="cursor: pointer;"><a>COMPLETED</a></li>'
-						+'</ul></div>';
+					+ 'PENDING<span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ processing
+					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ completed
+					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+					+ '</ul></div>';
 			break;
 		case 'PROCESSING':
 			spanStatus = '<div class="dropdown"><span class="label label-warning dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-						+'PROCESSING <span class="caret"></span></span>'
-						+'<ul class="dropdown-menu">'
-						+'<li onclick="AccountVoucher.setStatus('+pid+','+pending+')"  style="cursor: pointer;"><a>PENDING</a></li>'
-						+'<li onclick="AccountVoucher.setStatus('+pid+','+completed+')" style="cursor: pointer;"><a>COMPLETED</a></li>'
-						+'</ul></div>';
+					+ 'PROCESSING <span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ pending
+					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ completed
+					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+					+ '</ul></div>';
 			break;
 		case 'COMPLETED':
 			spanStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-						+'COMPLETED <span class="caret"></span></span>'
-						+'<ul class="dropdown-menu">'
-						+'<li onclick="AccountVoucher.setStatus('+pid+','+pending+')"  style="cursor: pointer;"><a>PENDING</a></li>'
-						+'<li onclick="AccountVoucher.setStatus('+pid+','+processing+')" style="cursor: pointer;"><a>PROCESSING</a></li>'
-						+'</ul></div>';
-			break;
-		}
-		
-		
-		
-		/*if (status) {
-			spanStatus = '<span class="label label-success" style="cursor: pointer;">Processed</span>';
-		} else {
-			spanStatus = '<span class="label label-default" onclick="AccountVoucher.setStatus('
+					+ 'COMPLETED <span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="AccountVoucher.setStatus('
 					+ pid
 					+ ','
-					+ !status
-					+ ')" style="cursor: pointer;">Pending</span>';
-		}*/
+					+ pending
+					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ processing
+					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
+					+ '</ul></div>';
+			break;
+		}
+
+		/*
+		 * if (status) { spanStatus = '<span class="label label-success"
+		 * style="cursor: pointer;">Processed</span>'; } else { spanStatus = '<span
+		 * class="label label-default" onclick="AccountVoucher.setStatus(' + pid +
+		 * ',' + !status + ')" style="cursor: pointer;">Pending</span>'; }
+		 */
 		return spanStatus;
 	}
-	
+
 	function onSaveSuccess(result) {
 		// reloading page to see the updated data
 		window.location = accountVoucherContextPath;
 	}
-	
-	AccountVoucher.setStatus = function(pid,tallyDownloadStatus) {
-		
+
+	AccountVoucher.setStatus = function(pid, tallyDownloadStatus) {
+
 		if (confirm("Are you sure?")) {
 			// update status;changeStatus
-			
+
 			$.ajax({
 				url : accountVoucherContextPath + "/changeStatus",
 				method : 'GET',
@@ -307,7 +391,7 @@ if (!this.AccountVoucher) {
 				},
 				success : function(data) {
 					AccountVoucher.filter();
-					//onSaveSuccess(data);
+					// onSaveSuccess(data);
 				},
 				error : function(xhr, error) {
 					onError(xhr, error);
@@ -364,6 +448,9 @@ if (!this.AccountVoucher) {
 			switch (action) {
 			case 0:
 				showAccountVoucher(pid);
+				break;
+			case 1:
+				showReceiptImages(pid);
 				break;
 			}
 		}

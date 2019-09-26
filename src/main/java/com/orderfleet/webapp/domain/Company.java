@@ -141,6 +141,10 @@ public class Company extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "sms_api_key")
 	private String smsApiKey;
 
+	@Size(max = 20)
+	@Column(name = "phone_number", length = 20)
+	private String phoneNo;;
+
 	public Long getId() {
 		return id;
 	}
@@ -347,6 +351,14 @@ public class Company extends AbstractAuditingEntity implements Serializable {
 
 	public void setSmsApiKey(String smsApiKey) {
 		this.smsApiKey = smsApiKey;
+	}
+
+	public String getPhoneNo() {
+		return phoneNo;
+	}
+
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
 	}
 
 	@Override

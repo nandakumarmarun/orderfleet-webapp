@@ -26,9 +26,9 @@
 
 				<div class="col-sm-4">
 					<div class="col-sm-8">
-						<select id="field_mainIndustry" name="mainIndustry" onchange="Company.onChangeIndustry();"
-							class="form-control"><option value="-1">Select
-								Industry</option>
+						<select id="field_mainIndustry" name="mainIndustry"
+							onchange="Company.onChangeIndustry();" class="form-control"><option
+								value="-1">Select Industry</option>
 							<c:forEach items="${industries}" var="industry">
 								<option value="${industry}">${industry}</option>
 							</c:forEach>
@@ -162,10 +162,16 @@
 										</select>
 
 									</div>
-									
+
 									<div class="form-group">
-										<label class="control-label" for="field_gstNo">GST Number</label> <input
-											type="text" class="form-control" name="gstNo"
+										<label class="control-label" for="field_phoneNo">Phone
+											Number</label> <input type="text" class="form-control" name="phoneNo"
+											id="field_phoneNo" maxlength="20" placeholder="Phone Number" />
+									</div>
+
+									<div class="form-group">
+										<label class="control-label" for="field_gstNo">GST
+											Number</label> <input type="text" class="form-control" name="gstNo"
 											id="field_gstNo" maxlength="55" placeholder="GST Number" />
 									</div>
 
@@ -233,15 +239,16 @@
 											id="field_website" placeholder="WebSite" />
 									</div>
 									<div class="form-group">
-									
-										<label class="control-label">On Premise</label> 
-										<input id="field_on_premise" name='onPremise'type='checkbox' 
-										class="form-group" />
+
+										<label class="control-label">On Premise</label> <input
+											id="field_on_premise" name='onPremise' type='checkbox'
+											class="form-group" />
 									</div>
 									<div class="form-group">
-										<label class="control-label" for="field_smsApiKey">SMS Api Key</label> <input
-											type="text" class="form-control" name="smsApiKey"
-											id="field_smsApiKey" maxlength="55" placeholder="SMS Api Key" />
+										<label class="control-label" for="field_smsApiKey">SMS
+											Api Key</label> <input type="text" class="form-control"
+											name="smsApiKey" id="field_smsApiKey" maxlength="55"
+											placeholder="SMS Api Key" />
 									</div>
 								</div>
 
@@ -304,6 +311,10 @@
 										<tr>
 											<td>Industry</td>
 											<td><span id="lbl_industry"></span></td>
+										</tr>
+										<tr>
+											<td>Phone Number</td>
+											<td><span id="lbl_phoneNo"></span></td>
 										</tr>
 										<tr>
 											<td>GST Number</td>

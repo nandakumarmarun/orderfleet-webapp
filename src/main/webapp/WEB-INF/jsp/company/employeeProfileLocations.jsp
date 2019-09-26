@@ -27,19 +27,57 @@
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
 			<h2>Employee Locations</h2>
-			<div class="row col-xs-12"></div>
-			<form class="form-inline">
+			<hr />
+			<div class="row">
+				<!-- Profile Info and Notifications -->
+				<div class="col-md-12  clearfix">
+					<form role="form" class="form-horizontal">
 						<div class="form-group">
-							<div class="input-group">
-								<input type="text" id="search" placeholder="Search..."
-									class="form-control" style="width: 200px;"><span
-									class="input-group-btn">
-									<button type="button" class="btn btn-info"
-										id="btnSearch" style="float: right;">Search</button>
-								</span>
+							<div class="col-sm-3">
+								<div class=" input-group">
+									<span
+										class='input-group-addon btn  dropdown-toggle glyphicon glyphicon-filter'
+										data-toggle='dropdown' aria-haspopup='true'
+										aria-expanded='false' title='filter employee'></span>
+									<div class='dropdown-menu dropdown-menu-left'
+										style='background-color: #F0F0F0'>
+										<div>
+											<a class='btn btn-default dropdown-item'
+												style='width: 100%; text-align: left;'
+												onclick='GetDashboardEmployees(this,"Dashboard Employee","All Dashboard Employee")'>Dashboard
+												Employee</a>
+										</div>
+										<div>
+											<a class='btn btn-default dropdown-item'
+												style='width: 100%; text-align: left;'
+												onclick='GetAllEmployees(this,"no","All Employee")'>All
+												Employee</a>
+										</div>
+										<!-- <div>
+											<a class='btn btn-default dropdown-item'
+												style='width: 100%; text-align: left;'
+												onclick='GetOtherEmployees(this,"no","Other Employee")'>Other
+												Employees</a>
+										</div> -->
+									</div>
+									<select id="dbEmployee" name="employeePid"
+										class="form-control selectpicker">
+										<option value="Dashboard Employee">All Dashboard
+											Employees</option>
+									</select>
+								</div>
+							</div>
+							<div class="input-group col-sm-2">
+								<div class="col-sm-3">
+									<button type="button" class="btn btn-info entypo-search"
+										style="font-size: 18px"
+										onclick="EmployeeProfileLocation.filter()" title="Apply"></button>
+								</div>
 							</div>
 						</div>
 					</form>
+				</div>
+			</div>
 			<div class="clearfix"></div>
 			<hr />
 			<table class="table  table-striped table-bordered">
@@ -50,17 +88,6 @@
 					</tr>
 				</thead>
 				<tbody id="tbodyemployeeProfileLocations">
-					<c:forEach items="${employeeProfileLocations}"
-						var="employeeProfile" varStatus="loopStatus">
-						<tr class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'}">
-							<td>${employeeProfile.name}</td>
-							<td>
-								<button type="button" class="btn btn-info"
-									onclick="EmployeeProfileLocation.showModalPopup($('#locationsModal'),'${employeeProfile.pid}',0);">Assign
-									Locations</button>
-							</td>
-						</tr>
-					</c:forEach>
 				</tbody>
 			</table>
 			<hr />
@@ -106,10 +133,23 @@
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
 	<spring:url value="/resources/assets/plugin/jstree/jstree.min.js"
 		var="jstreeJS"></spring:url>
+	<spring:url value="/resources/app/report-common-js-file.js"
+		var="reportcommonjsfileJS"></spring:url>
 	<spring:url value="/resources/app/employee-location.js"
 		var="employeeProfileLocation"></spring:url>
+
+
 	<script type="text/javascript" src="${jstreeJS}"></script>
+	<script type="text/javascript" src="${reportcommonjsfileJS}"></script>
 	<script type="text/javascript" src="${employeeProfileLocation}"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var employeePid = getParameterByName('user-key-pid');
+			getEmployees(employeePid);
+			EmployeeProfileLocation.filter();
+		});
+	</script>
 
 </body>
 </html>

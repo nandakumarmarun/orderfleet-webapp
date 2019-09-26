@@ -2,7 +2,9 @@ package com.orderfleet.webapp.domain;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,6 +15,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -23,6 +27,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
@@ -104,18 +109,28 @@ public class AccountingVoucherHeader implements Serializable {
 	@NotNull
 	@Column(name = "status", nullable = false)
 	private Boolean status = false;
-	
+
 	@Column(name = "updated_date")
-	private LocalDateTime updatedDate ;
-	
+	private LocalDateTime updatedDate;
+
 	@ManyToOne
 	private User updatedBy;
-	
-	//status for tally download
-    @NotNull
+
+	// status for tally download
+	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(name = "tally_download_status" , nullable = false, columnDefinition = "character varying DEFAULT 'PENDING'")
+	@Column(name = "tally_download_status", nullable = false, columnDefinition = "character varying DEFAULT 'PENDING'")
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
+
+	@Column(name = "imageRefNo")
+	private String imageRefNo;
+
+	@JsonIgnore
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "tbl_receipt_file", joinColumns = {
+			@JoinColumn(name = "receipt_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "file_id", referencedColumnName = "id") })
+	private Set<File> files = new HashSet<>();
 
 	public Long getId() {
 		return id;
@@ -277,5 +292,20 @@ public class AccountingVoucherHeader implements Serializable {
 		this.tallyDownloadStatus = tallyDownloadStatus;
 	}
 
-	
+	public String getImageRefNo() {
+		return imageRefNo;
+	}
+
+	public void setImageRefNo(String imageRefNo) {
+		this.imageRefNo = imageRefNo;
+	}
+
+	public Set<File> getFiles() {
+		return files;
+	}
+
+	public void setFiles(Set<File> files) {
+		this.files = files;
+	}
+
 }

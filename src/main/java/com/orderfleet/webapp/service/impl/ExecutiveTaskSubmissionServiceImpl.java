@@ -628,6 +628,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				accountingVoucherHeader.setOutstandingAmount(accountingVoucherDTO.getOutstandingAmount());
 				accountingVoucherHeader.setRemarks(accountingVoucherDTO.getRemarks());
 				accountingVoucherHeader.setTotalAmount(accountingVoucherDTO.getTotalAmount());
+				accountingVoucherHeader.setImageRefNo(accountingVoucherDTO.getImageRefNo());
 
 				// set company
 				accountingVoucherHeader.setCompany(company);

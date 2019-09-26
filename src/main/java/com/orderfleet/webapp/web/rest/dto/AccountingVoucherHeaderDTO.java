@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javax.persistence.Column;
+import javax.validation.constraints.NotNull;
+
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.AccountingVoucherHeaderHistory;
@@ -54,6 +57,8 @@ public class AccountingVoucherHeaderDTO {
 
 	private String documentNumberServer;
 
+	private String imageRefNo;
+
 	private List<AccountingVoucherHeaderDTO> history;
 
 	/* for show in aac voucher report */
@@ -71,6 +76,8 @@ public class AccountingVoucherHeaderDTO {
 	private double chequeAmount;
 
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
+
+	private Boolean imageButtonVisible = Boolean.FALSE;;
 
 	public AccountingVoucherHeaderDTO() {
 		super();
@@ -125,6 +132,10 @@ public class AccountingVoucherHeaderDTO {
 
 		if (accountingVoucherHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = accountingVoucherHeader.getTallyDownloadStatus();
+		}
+
+		if (accountingVoucherHeader.getFiles().size() > 0) {
+			this.imageButtonVisible = true;
 		}
 	}
 
@@ -317,6 +328,14 @@ public class AccountingVoucherHeaderDTO {
 		this.isNew = isNew;
 	}
 
+	public Boolean getImageButtonVisible() {
+		return imageButtonVisible;
+	}
+
+	public void setImageButtonVisible(Boolean imageButtonVisible) {
+		this.imageButtonVisible = imageButtonVisible;
+	}
+
 	public Boolean getStatus() {
 		return status;
 	}
@@ -347,6 +366,14 @@ public class AccountingVoucherHeaderDTO {
 
 	public void setTallyDownloadStatus(TallyDownloadStatus tallyDownloadStatus) {
 		this.tallyDownloadStatus = tallyDownloadStatus;
+	}
+
+	public String getImageRefNo() {
+		return imageRefNo;
+	}
+
+	public void setImageRefNo(String imageRefNo) {
+		this.imageRefNo = imageRefNo;
 	}
 
 	@Override
