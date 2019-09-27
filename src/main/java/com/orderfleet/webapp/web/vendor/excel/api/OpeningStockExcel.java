@@ -86,11 +86,11 @@ public class OpeningStockExcel {
 		
 		long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		long stockLocationId = 0L;
-		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
+		List<StockLocation> stockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
 		if(!openingStockDTOs.isEmpty()) {
 			String stockLocationName = openingStockDTOs.get(0).getStockLocationName();
 			Optional<StockLocation> stockLocation = 
-					StockLocations.stream().filter(sl -> sl.getAlias()!=null?sl.getAlias().equals(stockLocationName):false).findFirst();
+					stockLocations.stream().filter(sl -> sl.getAlias()!=null?sl.getAlias().equals(stockLocationName):false).findFirst();
 			if(stockLocation.isPresent()) {
 				stockLocationId = stockLocation.get().getId();
 			}

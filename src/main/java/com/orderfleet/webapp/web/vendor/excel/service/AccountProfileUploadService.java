@@ -186,6 +186,7 @@ public class AccountProfileUploadService {
 			accountProfile.setCity(apDto.getCity());
 			accountProfile.setContactPerson(apDto.getContactPerson());
 			accountProfile.setDefaultDiscountPercentage(apDto.getDefaultDiscountPercentage());
+			accountProfile.setClosingBalance(apDto.getClosingBalance());
 			if (apDto.getDefaultPriceLevelName() != null && !apDto.getDefaultPriceLevelName().equalsIgnoreCase("")) {
 				// price level
 				Optional<PriceLevel> optionalPriceLevel = tempPriceLevel.stream()
@@ -212,8 +213,6 @@ public class AccountProfileUploadService {
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}
-			
-			
 
 			// Optional<AccountType> optionalAccountType = accountTypes.stream()
 			// .filter(atn ->
@@ -349,23 +348,22 @@ public class AccountProfileUploadService {
 
 			Optional<AccountProfile> acc = accountProfiles.stream()
 					.filter(ap -> locAccDto.getAccountProfileName().equals(ap.getAlias())).findFirst();
-			if(acc.isPresent()) 
-			{
+			if (acc.isPresent()) {
 				List<Long> locationAccountProfileIds = locationAccountProfiles.stream()
-										.filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
-										.map(lap -> lap.getId()).collect(Collectors.toList());
+						.filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
+						.map(lap -> lap.getId()).collect(Collectors.toList());
 				if (locationAccountProfileIds.size() != 0) {
 					locationAccountProfilesIds.addAll(locationAccountProfileIds);
 				}
 				if (loc.isPresent()) {
 					locationAccountProfile.setLocation(loc.get());
-				}else if(acc.isPresent()) {
+				} else if (acc.isPresent()) {
 					locationAccountProfile.setLocation(locations.get(0));
 				}
 				locationAccountProfile.setAccountProfile(acc.get());
 				locationAccountProfile.setCompany(company);
 				newLocationAccountProfiles.add(locationAccountProfile);
-			}	
+			}
 		}
 		if (locationAccountProfilesIds.size() != 0) {
 			locationAccountProfileRepository.deleteByIdIn(companyId, locationAccountProfilesIds);
@@ -533,9 +531,7 @@ public class AccountProfileUploadService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
-	
-	
+
 	private static boolean isValidEmail(String email) {
 		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
 				+ "A-Z]{2,7}$";
