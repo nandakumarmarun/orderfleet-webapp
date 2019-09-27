@@ -23,52 +23,52 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.SnrichPartnerCompany;
-import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.enums.SyncOperationType;
-import com.orderfleet.webapp.repository.ProductProfileRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.SnrichPartnerCompanyRepository;
-import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.security.AuthoritiesConstants;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.async.TPProductProfileManagementService;
-import com.orderfleet.webapp.web.rest.dto.StockLocationDTO;
-import com.orderfleet.webapp.web.rest.integration.MasterDataProductResource;
-import com.orderfleet.webapp.web.rest.tallypartner.DocumentUserWiseUpdateController;
-import com.orderfleet.webapp.web.vendor.excel.service.ProductProfileUploadService;
-import com.orderfleet.webapp.web.vendor.excel.service.StockLocationUploadService;
-import com.orderfleet.webapp.web.vendor.integre.dto.StockLocationVendorDTO;
+import com.orderfleet.webapp.service.async.MailService;
+import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
+import com.orderfleet.webapp.web.vendor.excel.dto.EmployeeProfileExcelDTO;
+import com.orderfleet.webapp.web.vendor.excel.service.AccountProfileUploadService;
+import com.orderfleet.webapp.web.vendor.excel.service.EmployeeProfileUploadService;
+import com.orderfleet.webapp.web.vendor.integre.dto.EmployeeProfileVendorDTO;
 import com.orderfleet.webapp.web.vendor.integre.service.AssignUploadDataService;
 import com.orderfleet.webapp.web.vendor.integre.service.MasterDataUploadService;
 
 @RestController
 @RequestMapping(value = "/api/excel/v1")
-public class StockLocationExcel {
+public class EmployeeProfileExcel {
 
-	private final Logger log = LoggerFactory.getLogger(MasterDataProductResource.class);
-
+	private final Logger log = LoggerFactory.getLogger(EmployeeProfileExcel.class);
+	
 	@Inject
 	private SyncOperationRepository syncOperationRepository;
-
+	
 	@Inject
-	private StockLocationUploadService stockLocationUploadService;
-
-	@RequestMapping(value = "/stock-locations.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	private EmployeeProfileUploadService employeeProfileUploadService;
+	
+	@RequestMapping(value = "/employee-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<String> bulkSavestockLocations(@Valid @RequestBody List<StockLocationDTO> stockLocationDTOs) {
-		log.debug("REST request to save Stock Locations : {}", stockLocationDTOs.size());
+	public ResponseEntity<String> bulkSaveEmployeeProfiles(
+			@Valid @RequestBody List<EmployeeProfileExcelDTO> employeeProfileDTOs) {
+		log.debug("REST request to save EmployeeProfiles : {}", employeeProfileDTOs.size());
 		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.STOCK_LOCATION).map(so -> {
+				SyncOperationType.ACCOUNT_PROFILE).map(so -> {
 					// update sync status
 					so.setCompleted(false);
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					stockLocationUploadService.saveUpdateStockLocations(stockLocationDTOs, so);
-
+					employeeProfileUploadService.saveUpdateEmployeeProfiles(employeeProfileDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
-				}).orElse(new ResponseEntity<>("Stock-location sync operation not registered for this company",
+				}).orElse(new ResponseEntity<>("Account-Profile sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
 	}
+	
 }
