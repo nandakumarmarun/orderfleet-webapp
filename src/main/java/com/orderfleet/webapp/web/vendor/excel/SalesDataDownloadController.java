@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
@@ -38,6 +40,7 @@ import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.SnrichPartnerCompany;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
@@ -79,6 +82,9 @@ public class SalesDataDownloadController {
 
 	@Inject
 	private UserRepository userRepository;
+
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
 
 	@Inject
 	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
@@ -161,21 +167,20 @@ public class SalesDataDownloadController {
 		return salesOrderDTOs;
 
 	}
-	
-	
+
 	@RequestMapping(value = "/get-service-data.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional
-	public List<SalesOrderExcelDTO> getServiceDataJSON(@RequestParam(value="voucherType",required=true)VoucherType voucherType) throws URISyntaxException {
+	public List<SalesOrderExcelDTO> getServiceDataJSON(
+			@RequestParam(value = "voucherType", required = true) VoucherType voucherType) throws URISyntaxException {
 		log.debug("REST request to download primary sales orders : {}");
 		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
 
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 
 		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
-		
-		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(voucherType,
-				company.getId());
+
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(voucherType, company.getId());
 		if (primarySecDoc.isEmpty()) {
 			log.info("........No PrimarySecondaryDocument configuration Available...........");
 			return salesOrderDTOs;
@@ -184,7 +189,7 @@ public class SalesDataDownloadController {
 				.collect(Collectors.toList());
 
 		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-				.getPrimarySecondarySalesOrderForExcel(company.getId(),documentIds);
+				.getPrimarySecondarySalesOrderForExcel(company.getId(), documentIds);
 
 		log.debug("REST request to download primary sales orders : " + inventoryVoucherHeaders.size());
 		salesOrderDTOs = getServiceDataList(inventoryVoucherHeaders);
@@ -192,12 +197,7 @@ public class SalesDataDownloadController {
 		return salesOrderDTOs;
 
 	}
-	
-	
-	
-	
-	
-	
+
 	private List<SalesOrderExcelDTO> getInventoryVoucherList(List<Object[]> inventoryVoucherHeaders) {
 
 		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
@@ -207,6 +207,7 @@ public class SalesDataDownloadController {
 
 		for (Object[] obj : inventoryVoucherHeaders) {
 			SalesOrderExcelDTO salesOrderDTO = new SalesOrderExcelDTO();
+			boolean unregisteredCustomer = false;
 
 			String pattern = "dd-MMM-yy";
 			DateFormat df = new SimpleDateFormat(pattern);
@@ -214,11 +215,25 @@ public class SalesDataDownloadController {
 
 			salesOrderDTO.setDate(dateAsString != null ? dateAsString : "");
 			salesOrderDTO.setCustomerCode(obj[2] != null ? obj[2].toString() : "");
+
+			Optional<AccountProfile> apOp = accountProfileRepository
+					.findByCompanyIdAndAliasIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), obj[2].toString());
+
+			if (apOp.isPresent()) {
+				if (apOp.get().getTinNo().equalsIgnoreCase("") || apOp.get().getTinNo() == null) {
+					unregisteredCustomer = true;
+				}
+			}
 			salesOrderDTO.setItemCode(obj[3] != null ? obj[3].toString() : "");
 			salesOrderDTO.setQuantity(obj[4] != null ? Double.parseDouble(obj[4].toString()) : 0.0);
 			salesOrderDTO.setRate(obj[5] != null ? Double.parseDouble(obj[5].toString()) : 0.0);
 			salesOrderDTO.setDiscPer(obj[6] != null ? Double.parseDouble(obj[6].toString()) : 0.0);
 			salesOrderDTO.setTaxPer(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
+
+			salesOrderDTO.setEmployeeCode(obj[16] != null ? obj[16].toString() : "");
+			salesOrderDTO.setCaseValue(0.0);
+			salesOrderDTO.setCompDiscAmt(obj[15] != null ? Double.parseDouble(obj[15].toString()) : 0.0);
+
 			/*
 			 * salesOrderDTO.setTotal(obj[8] != null ? Double.parseDouble(obj[8].toString())
 			 * : 0.0);
@@ -239,13 +254,21 @@ public class SalesDataDownloadController {
 
 			double taxValue = amountWithoutTax * taxPer / 100;
 			double totalAmount = amountWithoutTax + taxValue;
+
 			// double gstRate = taxValue - discountValue;
 			// taxAmount = taxAmount + tax;
 
 			// double taxableAmount = taxableAmount + amountWithoutTax;
 
 			DecimalFormat round = new DecimalFormat(".##");
-
+			if (unregisteredCustomer) {
+				if (taxPer > 5) {
+					double amount = Double.parseDouble(round.format(amountWithoutTax * 0.01));
+					salesOrderDTO.setKfcAmt(amount);
+					salesOrderDTO.setKfcPer(1.0);
+					totalAmount += amount;
+				}
+			}
 			double cgst = Double.parseDouble(round.format(taxValue / 2));
 			double sgst = Double.parseDouble(round.format(taxValue / 2));
 
@@ -278,19 +301,17 @@ public class SalesDataDownloadController {
 		return salesOrderDTOs;
 	}
 
-	
 	private List<SalesOrderExcelDTO> getServiceDataList(List<Object[]> inventoryVoucherHeaders) {
 
 		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
 		List<String> inventoryHeaderPid = new ArrayList<String>();
-
 
 		for (Object[] obj : inventoryVoucherHeaders) {
 			SalesOrderExcelDTO salesOrderDTO = new SalesOrderExcelDTO();
 
 			String pattern = "dd-MM-yyyy";
 			DateFormat df = new SimpleDateFormat(pattern);
-			
+
 			salesOrderDTO.setBillNo(obj[0].toString());
 			String dateAsString = df.format(obj[1]);
 			salesOrderDTO.setDate(dateAsString != null ? dateAsString : "");
@@ -307,7 +328,7 @@ public class SalesDataDownloadController {
 			salesOrderDTO.setMrp(Double.parseDouble(obj[14] != null ? obj[14].toString() : "0.0"));
 			salesOrderDTO.setDiscPrice(Double.parseDouble(obj[15] != null ? obj[15].toString() : "0.0"));
 			salesOrderDTO.setRemarks(obj[16] != null ? obj[16].toString() : "");
-			
+
 			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
 
 			salesOrderDTOs.add(salesOrderDTO);
@@ -321,9 +342,7 @@ public class SalesDataDownloadController {
 		}
 		return salesOrderDTOs;
 	}
-	
-	
-	
+
 	@PostMapping("/update-order-status.json")
 	@Timed
 	@Transactional

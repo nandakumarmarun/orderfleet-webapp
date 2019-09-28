@@ -12,18 +12,23 @@ public class SalesOrderExcelDTO {
 	private String customerCode;
 	private String itemCode;
 	private Double quantity;
+	private Double mrp;
 	private Double rate;
 	private Double discPer;
 	private Double discPrice;
+	private Double compDiscAmt;
+	private Double freeQuantity;
+	private Double caseValue;
+	private String employeeCode;
 	private Double taxPer;
 	private Double total;
 	private Double CGSTAmt;
 	private Double SGSTAmt;
 	private String inventoryPid;
-	private String customerName;
-	private Double mrp;
-	private Double freeQuantity;
+	private Double kfcAmt;
+	private Double kfcPer;
 	private String remarks;
+	private String customerName;
 
 	public SalesOrderExcelDTO() {
 
@@ -39,6 +44,46 @@ public class SalesOrderExcelDTO {
 
 	public String getDate() {
 		return date;
+	}
+
+	public Double getCompDiscAmt() {
+		return compDiscAmt;
+	}
+
+	public void setCompDiscAmt(Double compDiscAmt) {
+		this.compDiscAmt = compDiscAmt;
+	}
+
+	public Double getCaseValue() {
+		return caseValue;
+	}
+
+	public void setCaseValue(Double caseValue) {
+		this.caseValue = caseValue;
+	}
+
+	public String getEmployeeCode() {
+		return employeeCode;
+	}
+
+	public void setEmployeeCode(String employeeCode) {
+		this.employeeCode = employeeCode;
+	}
+
+	public Double getKfcAmt() {
+		return kfcAmt;
+	}
+
+	public void setKfcAmt(Double kfcAmt) {
+		this.kfcAmt = kfcAmt;
+	}
+
+	public Double getKfcPer() {
+		return kfcPer;
+	}
+
+	public void setKfcPer(Double kfcPer) {
+		this.kfcPer = kfcPer;
 	}
 
 	public void setDate(String date) {
@@ -164,6 +209,5 @@ public class SalesOrderExcelDTO {
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
-	
-	
+
 }
