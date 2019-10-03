@@ -38,6 +38,7 @@ function loadUsersSummary() {
 			date : formatDate(selDate, 'YYYY-MM-DD'),
 		},
 		success : function(usersSummary) {
+			console.log(usersSummary);
 			$("#divUsers").html("");
 			userDataList = usersSummary;
 			createUserTiles(usersSummary);

@@ -24,6 +24,7 @@ import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
 import com.orderfleet.webapp.domain.enums.StockFlow;
+import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 
 /**
  * A Document.
@@ -92,10 +93,10 @@ public class Document implements Serializable, Cloneable {
 
 	@Column(name = "single_voucher_mode", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean singleVoucherMode;
-	
+
 	@Column(name = "photo_mandatory", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean photoMandatory;
-	
+
 	@Column(name = "is_take_image_from_gallery", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean isTakeImageFromGallery;
 
@@ -106,20 +107,26 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "last_modified_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	@JsonIgnore
 	private LocalDateTime lastModifiedDate = LocalDateTime.now();
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "payment_mode")
 	private PaymentMode mode;
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "stock_flow")
 	private StockFlow stockFlow;
-	
+
 	@Column(name = "qrcode_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean qrCodeEnabled;
 
 	@Column(name = "order_no_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean orderNoEnabled;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "voucher_number_generation_type", nullable = false, columnDefinition = "character varying DEFAULT 'TYPE_1'")
+	private VoucherNumberGenerationType voucherNumberGenerationType;
+
 	@PreUpdate
 	public void preUpdate() {
 		this.lastModifiedDate = LocalDateTime.now();
@@ -237,7 +244,6 @@ public class Document implements Serializable, Cloneable {
 		this.singleVoucherMode = singleVoucherMode;
 	}
 
-	
 	public boolean getPhotoMandatory() {
 		return photoMandatory;
 	}
@@ -277,7 +283,7 @@ public class Document implements Serializable, Cloneable {
 	public void setStockFlow(StockFlow stockFlow) {
 		this.stockFlow = stockFlow;
 	}
-	
+
 	public boolean getQrCodeEnabled() {
 		return qrCodeEnabled;
 	}
@@ -285,13 +291,21 @@ public class Document implements Serializable, Cloneable {
 	public void setQrCodeEnabled(boolean qrCodeEnabled) {
 		this.qrCodeEnabled = qrCodeEnabled;
 	}
-	
+
 	public boolean getOrderNoEnabled() {
 		return orderNoEnabled;
 	}
 
 	public void setOrderNoEnabled(boolean orderNoEnabled) {
 		this.orderNoEnabled = orderNoEnabled;
+	}
+
+	public VoucherNumberGenerationType getVoucherNumberGenerationType() {
+		return voucherNumberGenerationType;
+	}
+
+	public void setVoucherNumberGenerationType(VoucherNumberGenerationType voucherNumberGenerationType) {
+		this.voucherNumberGenerationType = voucherNumberGenerationType;
 	}
 
 	@Override
@@ -313,8 +327,6 @@ public class Document implements Serializable, Cloneable {
 	public int hashCode() {
 		return Objects.hashCode(id);
 	}
-
-	
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {

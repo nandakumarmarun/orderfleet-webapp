@@ -306,6 +306,7 @@
 												<th><input type="checkbox" class="allcheckbox">
 													All</th>
 												<th>Account Type</th>
+												<th>Receiver/Supplier Type</th>
 											</tr>
 										</thead>
 										<tbody id="tbodyAccountTypes">
@@ -314,6 +315,7 @@
 													<td><input name='accountType' type='checkbox'
 														value="${accountType.pid}" style="display: block;" /></td>
 													<td>${accountType.name}</td>
+													<td>${accountType.receiverSupplierType}</td>
 												</tr>
 											</c:forEach>
 										</tbody>

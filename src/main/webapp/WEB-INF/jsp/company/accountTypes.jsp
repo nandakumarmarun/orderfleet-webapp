@@ -10,8 +10,8 @@
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
 <title>SalesNrich | AccountTypes</title>
 <style type="text/css">
-.error{
-	color : red;
+.error {
+	color: red;
 }
 </style>
 </head>
@@ -40,13 +40,15 @@
 			</div>
 			<div class="clearfix"></div>
 			<hr />
-			<table class="table  table-striped table-bordered" id="tb_accounttypes">
+			<table class="table  table-striped table-bordered"
+				id="tb_accounttypes">
 				<thead>
 					<tr>
 						<th>Name</th>
 						<th>Alias</th>
 						<th>Account Name Type</th>
 						<th>Description</th>
+						<th>Receiver/Supplier Type</th>
 						<th>Status</th>
 						<th>Actions</th>
 					</tr>
@@ -54,11 +56,13 @@
 				<tbody>
 					<c:forEach items="${accountTypes}" var="accountType"
 						varStatus="loopStatus">
-						<tr class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'} ${accountType.pid}" >
+						<tr
+							class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'} ${accountType.pid}">
 							<td>${accountType.name}</td>
 							<td>${accountType.alias == null ? "" : accountType.alias}</td>
 							<td>${accountType.accountNameType == null ? "" : accountType.accountNameType}</td>
 							<td>${accountType.description == null ? "" : accountType.description}</td>
+							<td>${accountType.receiverSupplierType == null ? "" : accountType.receiverSupplierType}</td>
 							<td><span
 								class="label ${accountType.activated? 'label-success':'label-danger' }"
 								onclick="AccountType.setActive('${accountType.name}','${accountType.pid}','${ !accountType.activated}')"
@@ -70,13 +74,15 @@
 									onclick="AccountType.showModalPopup($('#myModal'),'${accountType.pid}',1);">Edit</button>
 								<button type="button" class="btn btn-danger"
 									onclick="AccountType.showModalPopup($('#deleteModal'),'${accountType.pid}',2);">Delete</button>
-								<button type="button" class="btn btn-info" onclick="AccountType.loadAccounts('${accountType.pid}',this)">Assign
+								<button type="button" class="btn btn-info"
+									onclick="AccountType.loadAccounts('${accountType.pid}',this)">Assign
 									Accounts</button>
-								<button type="button" class="btn btn-info" onclick="AccountType.loadActivities('${accountType.pid}',this)">Assign
+								<button type="button" class="btn btn-info"
+									onclick="AccountType.loadActivities('${accountType.pid}',this)">Assign
 									Activities</button>
-								
-									
-									
+
+
+
 							</td>
 						</tr>
 					</c:forEach>
@@ -126,14 +132,25 @@
 											id="field_alias" maxlength="55" placeholder="Alias" />
 									</div>
 									<div class="form-group">
-										<label class="control-label" for="field_accountNameType">Account Name Type</label> 
-											<select id="field_accountNameType" name="accountNameType"
-											class="form-control">
+										<label class="control-label" for="field_accountNameType">Account
+											Name Type</label> <select id="field_accountNameType"
+											name="accountNameType" class="form-control">
 											<option value="-1">Select Account Name Type</option>
 											<c:forEach items="${accountNameTypes}" var="accountNameType">
 												<option value="${accountNameType}">${accountNameType}</option>
 											</c:forEach>
-											</select>
+										</select>
+									</div>
+									<div class="form-group">
+										<label class="control-label" for="field_receiverSupplierType">Receiver/Supplier
+											Type</label> <select id="field_receiverSupplierType"
+											name="receiverSupplierType" class="form-control">
+											<option value="-1">Select Receiver/Supplier Type</option>
+											<c:forEach items="${receiverSupplierTypes}"
+												var="receiverSupplierType">
+												<option value="${receiverSupplierType}">${receiverSupplierType}</option>
+											</c:forEach>
+										</select>
 									</div>
 									<div class="form-group">
 										<label class="control-label" for="field_description">Description</label>
@@ -202,6 +219,13 @@
 										</dt>
 										<dd>
 											<span id="lbl_accountNameType"></span>
+										</dd>
+										<hr />
+										<dt>
+											<span>Receiver/Supplier Type</span>
+										</dt>
+										<dd>
+											<span id="lbl_receiverSupplierType"></span>
 										</dd>
 										<hr />
 										<dt>
@@ -341,7 +365,7 @@
 				<!-- /.modal-dialog -->
 			</div>
 
-<div class="modal fade container" id="activitiesModal">
+			<div class="modal fade container" id="activitiesModal">
 				<!-- model Dialog -->
 				<div class="modal-dialog">
 					<div class="modal-content">
@@ -368,7 +392,7 @@
 												class="form-control" style="width: 200px; float: right;">
 										</div>
 									</div>
-							
+
 									<br>
 
 									<table class='table table-striped table-bordered'
@@ -387,14 +411,12 @@
 													<td><input name='activity' type='checkbox'
 														value="${activity.pid}" style="display: block;" /></td>
 													<td>${activity.name}</td>
-													<td>
-														<select class="form-control" id="drop-${activity.pid}" name="assignNotification">
-															<option value ="false">false</option>
-															<option value ="true">true</option>
-														</select>
-													
-													</td>
-													
+													<td><select class="form-control"
+														id="drop-${activity.pid}" name="assignNotification">
+															<option value="false">false</option>
+															<option value="true">true</option>
+													</select></td>
+
 												</tr>
 											</c:forEach>
 										</tbody>
@@ -413,7 +435,7 @@
 				</div>
 				<!-- /.modal-dialog -->
 			</div>
-			
+
 
 			<div class="modal fade container" id="enableAccountTypesModal">
 				<!-- model Dialog -->

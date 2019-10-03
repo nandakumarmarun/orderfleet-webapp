@@ -21,6 +21,7 @@ import org.hibernate.annotations.Parameter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
+import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 
 /**
  * A AccountType.
@@ -72,11 +73,16 @@ public class AccountType implements Serializable, Cloneable {
 	@Column(name = "last_modified_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	@JsonIgnore
 	private LocalDateTime lastModifiedDate = LocalDateTime.now();
-	
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "account_name_type", nullable = false, columnDefinition = "character varying DEFAULT 'GENERAL'")
 	private AccountNameType accountNameType;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "receiver_supplier_type", nullable = false, columnDefinition = "character varying DEFAULT 'Receiver'")
+	private ReceiverSupplierType receiverSupplierType;
 
 	@PreUpdate
 	public void preUpdate() {
@@ -146,14 +152,21 @@ public class AccountType implements Serializable, Cloneable {
 	public LocalDateTime getLastModifiedDate() {
 		return lastModifiedDate;
 	}
-	
-	
+
 	public AccountNameType getAccountNameType() {
 		return accountNameType;
 	}
 
 	public void setAccountNameType(AccountNameType accountNameType) {
 		this.accountNameType = accountNameType;
+	}
+
+	public ReceiverSupplierType getReceiverSupplierType() {
+		return receiverSupplierType;
+	}
+
+	public void setReceiverSupplierType(ReceiverSupplierType receiverSupplierType) {
+		this.receiverSupplierType = receiverSupplierType;
 	}
 
 	@Override

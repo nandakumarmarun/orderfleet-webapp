@@ -38,6 +38,7 @@
 						<th>Description</th>
 						<th>Document Type</th>
 						<th>Activity Account</th>
+						<th>Voucher Generation Type</th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -50,6 +51,7 @@
 							<td>${document.description == null ? "" : document.description}</td>
 							<td>${document.documentType}</td>
 							<td>${document.activityAccount}</td>
+							<td>${document.voucherNumberGenerationType}</td>
 							<td>
 								<button type="button" class="btn btn-blue"
 									onclick="Document.showModalPopup($('#viewModal'),'${document.pid}',0);">View</button>
@@ -164,6 +166,14 @@
 										</select>
 									</div>
 									<div class="form-group">
+										<label class="control-label">Vchr.No Generation type</label> <select
+											id="field_voucherNumberGenerationType"
+											name='field_voucherNumberGenerationType' class="form-control">
+											<option value="TYPE_1" selected="selected">Type_1</option>
+											<option value="TYPE_2">Type_2</option>
+										</select>
+									</div>
+									<div class="form-group">
 										<label class="control-label" for="field_description">Description</label>
 										<textarea class="form-control" name="description"
 											maxlength="250" id="field_description"
@@ -209,15 +219,18 @@
 										</label>
 									</div>
 									<div class="form-group" id="qrCodeEnabled">
-										<label for="qrCodeEnabled"> <input
-											type="checkbox" id="field_qrCodeEnabled" /> &nbsp;<span>QR-code Enable</span>
+										<label for="qrCodeEnabled"> <input type="checkbox"
+											id="field_qrCodeEnabled" /> &nbsp;<span>QR-code
+												Enable</span>
 										</label>
 									</div>
 									<div class="form-group" id="orderNoEnabled">
-										<label for="orderNoEnabled"> <input
-											type="checkbox" id="field_orderNoEnabled" /> &nbsp;<span>Enable Order No.</span>
+										<label for="orderNoEnabled"> <input type="checkbox"
+											id="field_orderNoEnabled" /> &nbsp;<span>Enable Order
+												No.</span>
 										</label>
 									</div>
+
 								</div>
 							</div>
 							<div class="modal-footer">

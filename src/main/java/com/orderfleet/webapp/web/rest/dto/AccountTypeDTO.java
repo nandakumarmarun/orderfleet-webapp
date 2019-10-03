@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
 
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
+import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 
 /**
  * A DTO for the AccountType entity.
@@ -31,8 +32,10 @@ public class AccountTypeDTO {
 	private Boolean activated;
 
 	private LocalDateTime lastModifiedDate;
-	
+
 	private AccountNameType accountNameType;
+
+	private ReceiverSupplierType receiverSupplierType;
 
 	public AccountTypeDTO() {
 		super();
@@ -47,6 +50,7 @@ public class AccountTypeDTO {
 		this.lastModifiedDate = accountType.getLastModifiedDate();
 		this.activated = accountType.getActivated();
 		this.accountNameType = accountType.getAccountNameType();
+		this.receiverSupplierType = accountType.getReceiverSupplierType();
 	}
 
 	public Boolean getActivated() {
@@ -96,7 +100,6 @@ public class AccountTypeDTO {
 	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}
-	
 
 	public AccountNameType getAccountNameType() {
 		return accountNameType;
@@ -104,6 +107,14 @@ public class AccountTypeDTO {
 
 	public void setAccountNameType(AccountNameType accountNameType) {
 		this.accountNameType = accountNameType;
+	}
+
+	public ReceiverSupplierType getReceiverSupplierType() {
+		return receiverSupplierType;
+	}
+
+	public void setReceiverSupplierType(ReceiverSupplierType receiverSupplierType) {
+		this.receiverSupplierType = receiverSupplierType;
 	}
 
 	@Override

@@ -27,7 +27,8 @@ if (!this.Document) {
 		photoMandatory:false,
 		isTakeImageFromGallery:false,
 		qrCodeEnabled :false,
-		orderNoEnabled : false
+		orderNoEnabled : false,
+		voucherNumberGenerationType : 'TYPE_1'
 
 	};
 
@@ -190,6 +191,8 @@ if (!this.Document) {
 		documentModel.isTakeImageFromGallery = $('#field_isTakeImageFromGallery').prop('checked');
 		documentModel.qrCodeEnabled = $('#field_qrCodeEnabled').prop('checked');
 		documentModel.orderNoEnabled = $('#field_orderNoEnabled').prop('checked');
+		documentModel.voucherNumberGenerationType = $(
+		"#field_voucherNumberGenerationType").val();
 		console.log(documentModel);
 		$.ajax({
 			method : $(el).attr('method'),
@@ -248,6 +251,8 @@ if (!this.Document) {
 				$('#field_isTakeImageFromGallery').prop("checked",data.isTakeImageFromGallery);
 				$('#field_qrCodeEnabled').prop("checked",data.qrCodeEnabled);
 				$('#field_orderNoEnabled').prop("checked",data.orderNoEnabled);
+				$('#field_voucherNumberGenerationType').val(
+						data.voucherNumberGenerationType);
 				console.log("===========")
 				console.log(data.orderNoEnabled);
 				documentModel.pid = data.pid;

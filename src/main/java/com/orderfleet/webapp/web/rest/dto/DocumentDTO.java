@@ -11,6 +11,7 @@ import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
 import com.orderfleet.webapp.domain.enums.StockFlow;
+import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 
 /**
  * A DTO for the Document entity.
@@ -72,15 +73,16 @@ public class DocumentDTO implements Cloneable {
 	private String companyPid;
 
 	private boolean imageOption = false;
-	
+
 	private PaymentMode mode;
-	
+
 	private StockFlow stockFlow;
-	
+
 	private boolean qrCodeEnabled;
-	
+
 	private boolean orderNoEnabled;
-	
+
+	private VoucherNumberGenerationType voucherNumberGenerationType;
 
 	public DocumentDTO() {
 
@@ -109,6 +111,7 @@ public class DocumentDTO implements Cloneable {
 		this.stockFlow = document.getStockFlow() == null ? StockFlow.NONE : document.getStockFlow();
 		this.qrCodeEnabled = document.getQrCodeEnabled();
 		this.orderNoEnabled = document.getOrderNoEnabled();
+		this.voucherNumberGenerationType = document.getVoucherNumberGenerationType();
 	}
 
 	public DocumentDTO(Document document, boolean activityDocRequired, int activityDocSortOrder) {
@@ -136,6 +139,7 @@ public class DocumentDTO implements Cloneable {
 		this.stockFlow = document.getStockFlow() == null ? StockFlow.NONE : document.getStockFlow();
 		this.qrCodeEnabled = document.getQrCodeEnabled();
 		this.orderNoEnabled = document.getOrderNoEnabled();
+		this.voucherNumberGenerationType = document.getVoucherNumberGenerationType();
 	}
 
 	public String getPid() {
@@ -329,7 +333,6 @@ public class DocumentDTO implements Cloneable {
 	public void setImageOption(boolean imageOption) {
 		this.imageOption = imageOption;
 	}
-	
 
 	public PaymentMode getMode() {
 		return mode;
@@ -346,7 +349,7 @@ public class DocumentDTO implements Cloneable {
 	public void setStockFlow(StockFlow stockFlow) {
 		this.stockFlow = stockFlow;
 	}
-	
+
 	public boolean getQrCodeEnabled() {
 		return qrCodeEnabled;
 	}
@@ -361,6 +364,14 @@ public class DocumentDTO implements Cloneable {
 
 	public void setOrderNoEnabled(boolean orderNoEnabled) {
 		this.orderNoEnabled = orderNoEnabled;
+	}
+
+	public VoucherNumberGenerationType getVoucherNumberGenerationType() {
+		return voucherNumberGenerationType;
+	}
+
+	public void setVoucherNumberGenerationType(VoucherNumberGenerationType voucherNumberGenerationType) {
+		this.voucherNumberGenerationType = voucherNumberGenerationType;
 	}
 
 	@Override
@@ -400,7 +411,5 @@ public class DocumentDTO implements Cloneable {
 				+ imageOption + ", mode=" + mode + ", stockFlow=" + stockFlow + ", qrCodeEnabled=" + qrCodeEnabled
 				+ "]";
 	}
-
-	
 
 }

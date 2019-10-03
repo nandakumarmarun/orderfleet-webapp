@@ -61,8 +61,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Save a document.
 	 * 
-	 * @param documentDTO
-	 *            the entity to save
+	 * @param documentDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -106,8 +105,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Update a document.
 	 * 
-	 * @param documentDTO
-	 *            the entity to update
+	 * @param documentDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -132,6 +130,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setStockFlow(documentDTO.getStockFlow());
 			document.setQrCodeEnabled(documentDTO.getQrCodeEnabled());
 			document.setOrderNoEnabled(documentDTO.getOrderNoEnabled());
+			document.setVoucherNumberGenerationType(documentDTO.getVoucherNumberGenerationType());
 			document = documentRepository.save(document);
 			DocumentDTO result = documentMapper.documentToDocumentDTO(document);
 			return result;
@@ -141,8 +140,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Get all the documents.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -170,8 +168,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Get all the documents.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -187,8 +184,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Get all the documents.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -204,8 +200,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Get one document by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -220,8 +215,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Get one document by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -238,8 +232,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Get one document by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -256,8 +249,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Get one document by documentPrefix.
 	 *
-	 * @param documentPrefix
-	 *            the documentPrefix of the entity
+	 * @param documentPrefix the documentPrefix of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -275,8 +267,7 @@ public class DocumentServiceImpl implements DocumentService {
 	/**
 	 * Delete the document by id.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete Document : {}", pid);
@@ -374,6 +365,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setCompany(opCompany.get());
 			document.setMode(documentDTO.getMode());
 			document.setStockFlow(documentDTO.getStockFlow());
+			document.setVoucherNumberGenerationType(documentDTO.getVoucherNumberGenerationType());
 			document = documentRepository.save(document);
 			DocumentDTO result = documentMapper.documentToDocumentDTO(document);
 			return result;

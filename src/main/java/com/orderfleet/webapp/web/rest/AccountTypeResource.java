@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
+import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 import com.orderfleet.webapp.repository.AccountActivityTaskConfigRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountActivityTaskConfigService;
@@ -55,29 +56,24 @@ public class AccountTypeResource {
 
 	@Inject
 	private AccountProfileService accountProfileService;
-	
+
 	@Inject
 	private ActivityService activityService;
-	
+
 	@Inject
 	private AccountActivityTaskConfigService activityAccountTypeConfigService;
-	
+
 	@Inject
 	private AccountActivityTaskConfigRepository activityConfigRepository;
-	
-	
-	
 
 	/**
 	 * POST /accountTypes : Create a new accountType.
 	 *
-	 * @param accountTypeDTO
-	 *            the accountTypeDTO to create
-	 * @return the ResponseEntity with status 201 (Created) and with body the
-	 *         new accountTypeDTO, or with status 400 (Bad Request) if the
-	 *         accountType has already an ID
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @param accountTypeDTO the accountTypeDTO to create
+	 * @return the ResponseEntity with status 201 (Created) and with body the new
+	 *         accountTypeDTO, or with status 400 (Bad Request) if the accountType
+	 *         has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/accountTypes", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -103,14 +99,12 @@ public class AccountTypeResource {
 	/**
 	 * PUT /accountTypes : Updates an existing accountType.
 	 *
-	 * @param accountTypeDTO
-	 *            the accountTypeDTO to update
+	 * @param accountTypeDTO the accountTypeDTO to update
 	 * @return the ResponseEntity with status 200 (OK) and with body the updated
 	 *         accountTypeDTO, or with status 400 (Bad Request) if the
 	 *         accountTypeDTO is not valid, or with status 500 (Internal Server
 	 *         Error) if the accountTypeDTO couldnt be updated
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/accountTypes", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -143,31 +137,30 @@ public class AccountTypeResource {
 	/**
 	 * GET /accountTypes : get all the accountTypes.
 	 *
-	 * @param pageable
-	 *            the pagination information
-	 * @return the ResponseEntity with status 200 (OK) and the list of
-	 *         accountTypes in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @param pageable the pagination information
+	 * @return the ResponseEntity with status 200 (OK) and the list of accountTypes
+	 *         in body
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/accountTypes", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
-	public String getAllAccountTypes( Model model) throws URISyntaxException {
+	public String getAllAccountTypes(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of AccountTypes");
 		model.addAttribute("accountTypes", accountTypeService.findAllCompanyAndAccountTypeActivated(true));
 		model.addAttribute("accounts", accountProfileService.findAllByCompanyAndActivated(true));
 		model.addAttribute("deactivatedAccountTypes", accountTypeService.findAllCompanyAndAccountTypeActivated(false));
 		model.addAttribute("activities", activityService.findAllByCompany());
-		model.addAttribute("accountNameTypes",AccountNameType.values());
+		model.addAttribute("accountNameTypes", AccountNameType.values());
+		model.addAttribute("receiverSupplierTypes", ReceiverSupplierType.values());
 		return "company/accountTypes";
 	}
 
 	/**
 	 * GET /accountTypes/:id : get the "id" accountType.
 	 *
-	 * @param id
-	 *            the id of the accountTypeDTO to retrieve
+	 * @param id the id of the accountTypeDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         accountTypeDTO, or with status 404 (Not Found)
 	 */
@@ -183,8 +176,7 @@ public class AccountTypeResource {
 	/**
 	 * DELETE /accountTypes/:id : delete the "id" accountType.
 	 *
-	 * @param id
-	 *            the id of the accountTypeDTO to delete
+	 * @param id the id of the accountTypeDTO to delete
 	 * @return the ResponseEntity with status 200 (OK)
 	 */
 	@RequestMapping(value = "/accountTypes/{pid}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -207,17 +199,18 @@ public class AccountTypeResource {
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/accountTypes/assignActivities", method = RequestMethod.POST)
 	@Timed
-	public ResponseEntity<Void> saveAssignedActivities(@RequestParam String pid,@RequestParam String assignedActivities) {
-		
+	public ResponseEntity<Void> saveAssignedActivities(@RequestParam String pid,
+			@RequestParam String assignedActivities) {
+
 		log.debug("REST request to save assigned account type : {}", pid);
 		activityConfigRepository.deleteByAccountTypePidAndCompanyId(pid, SecurityUtils.getCurrentUsersCompanyId());
 		String[] activity = assignedActivities.split(",");
 		for (String activityPid : activity) {
 			String actypid = activityPid.split("~")[0].toString();
-			boolean assignNotification = activityPid.split("~")[1].toString().equals("true")?true:false;
+			boolean assignNotification = activityPid.split("~")[1].toString().equals("true") ? true : false;
 			AccountActivityTaskConfigDTO activityAccountTaskDTO = new AccountActivityTaskConfigDTO();
 			activityAccountTaskDTO.setAccountTypePid(pid);
 			activityAccountTaskDTO.setActivityPid(actypid);
@@ -234,33 +227,29 @@ public class AccountTypeResource {
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountType(pid);
 		return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/accountTypes/findActivities/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<AccountActivityTaskConfigDTO>> getActivities(@PathVariable String pid) {
 		log.debug("REST request to get accounts by accountTypePid : {}", pid);
 		List<Object[]> activityConfig = activityConfigRepository.findActivityPidByAccountTypePid(pid);
 		List<AccountActivityTaskConfigDTO> activityConfiglist = new ArrayList<>();
-		
-		for(Object[] obj : activityConfig)
-		{
-			AccountActivityTaskConfigDTO  accActivityConfig = new AccountActivityTaskConfigDTO();
-			log.info(obj[0].toString()+"  ---- "+obj[1].toString());
+
+		for (Object[] obj : activityConfig) {
+			AccountActivityTaskConfigDTO accActivityConfig = new AccountActivityTaskConfigDTO();
+			log.info(obj[0].toString() + "  ---- " + obj[1].toString());
 			accActivityConfig.setActivityPid(obj[0].toString());
-			accActivityConfig.setAssignNotification((boolean)obj[1]);
+			accActivityConfig.setAssignNotification((boolean) obj[1]);
 			activityConfiglist.add(accActivityConfig);
 		}
-		
-		
+
 		return new ResponseEntity<>(activityConfiglist, HttpStatus.OK);
 	}
 
 	/**
-	 * Update Status /accountTypes/changeStatus: Activate or Deactivate
-	 * accountType.
+	 * Update Status /accountTypes/changeStatus: Activate or Deactivate accountType.
 	 *
-	 * @param accountTypeDTO
-	 *            the accountTypeDTO to update
+	 * @param accountTypeDTO the accountTypeDTO to update
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         accountTypeDTO
 	 */
@@ -277,8 +266,7 @@ public class AccountTypeResource {
 	/**
 	 * Update Status /accountTypes/activateAccountTypes: Activate accountType.
 	 *
-	 * @param accountTypeDTO
-	 *            the accountTypeDTO to update
+	 * @param accountTypeDTO the accountTypeDTO to update
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         accountTypeDTO
 	 */
@@ -294,7 +282,6 @@ public class AccountTypeResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	
 	@RequestMapping(value = "/accountTypes/deactivatedAccounts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<AccountProfileDTO>> getDeActivatedAccounts() {

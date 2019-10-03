@@ -612,6 +612,7 @@ public class DashboardResource {
 		List<DashboardUserDataDTO<DashboardSummaryDTO>> dashboardUserDatas = new ArrayList<>();
 		List<UserDTO> dashboardUsers = getDashboardUsers(parentLocationId);
 		for (UserDTO user : dashboardUsers) {
+			log.info(user.getFirstName());
 			dashboardUserDatas.add(makeDashboardUserDataDTO(date, user, dashboardItems));
 		}
 		return dashboardUserDatas;
@@ -650,13 +651,17 @@ public class DashboardResource {
 		} else {
 			User currentUser = userService.getCurrentUser();
 			if (currentUser.getShowAllUsersData()) {
+				log.info("get all users");
 				dashboardUsers = dashboardUserService.findUsersByCompanyId();
 			} else {
+				log.info("get employee hierarchy users");
 				// get employee hierarchy users
 				List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 				dashboardUsers = dashboardUserService.findUsersByUserIdIn(userIds);
 			}
 		}
+		
+		
 		return dashboardUsers;
 	}
 

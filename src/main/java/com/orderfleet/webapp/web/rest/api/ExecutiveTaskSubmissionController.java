@@ -38,6 +38,7 @@ import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyIntegrationModule;
 import com.orderfleet.webapp.domain.CustomerTimeSpent;
+import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
@@ -52,6 +53,7 @@ import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyIntegrationModuleRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.CustomerTimeSpentRepository;
+import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
@@ -150,6 +152,9 @@ public class ExecutiveTaskSubmissionController {
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	private DocumentRepository documentRepository;
+
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
 	 *
@@ -163,78 +168,83 @@ public class ExecutiveTaskSubmissionController {
 	public ResponseEntity<TaskSubmissionResponse> executiveTaskSubmission(
 			@Valid @RequestBody ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO) {
 		log.debug("Web request to save ExecutiveTaskExecution start");
-		MobileConfigurationDTO mobileConfiguration = mobileConfigurationService
-				.findByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
-		if (mobileConfiguration == null) {
-			log.debug("Mobile Configuration is not Set for this company (Type_1 or Type_2)");
-			TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
-			taskSubmissionResponse.setStatus("Error");
-			taskSubmissionResponse.setMessage("Mobile Configuration is not Set for this company, CONTACT ADMIN");
-			return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.EXPECTATION_FAILED);
-		}
-		VoucherNumberGenerationType inventoryVoucherGenerationType = mobileConfiguration
-				.getVoucherNumberGenerationType();
-		if (inventoryVoucherGenerationType == VoucherNumberGenerationType.TYPE_2) {
-			List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders = executiveTaskSubmissionDTO.getInventoryVouchers();
 
-			Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
-			String companyPid = company.getPid();
+		/*
+		 * VoucherNumberGenerationType inventoryVoucherGenerationType =
+		 * mobileConfiguration .getVoucherNumberGenerationType();
+		 */
 
-			User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+		Optional<Document> document = documentRepository
+				.findOneByPid(executiveTaskSubmissionDTO.getInventoryVouchers().get(0).getDocumentPid());
 
-			String userPid = user.getPid();
+		if (document.isPresent()) {
+			VoucherNumberGenerationType inventoryVoucherGenerationType = document.get()
+					.getVoucherNumberGenerationType();
+			if (inventoryVoucherGenerationType == VoucherNumberGenerationType.TYPE_2) {
+				List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders = executiveTaskSubmissionDTO
+						.getInventoryVouchers();
 
-			List<VoucherNumberGenerator> voucherNumberGeneratorList = voucherNumberGeneratorRepository
-					.findAllByUserAndCompany(userPid, companyPid);
+				Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+				String companyPid = company.getPid();
 
-			if (voucherNumberGeneratorList == null || voucherNumberGeneratorList.size() == 0) {
-				log.debug(voucherNumberGeneratorList + " Size is either null or 0");
-				TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
-				taskSubmissionResponse.setStatus("Error");
-				taskSubmissionResponse.setMessage("Not Voucher Generator List");
-				return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+				User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 
-			List<String> documentPids = voucherNumberGeneratorList.stream().map(vng -> vng.getDocument().getPid())
-					.collect(Collectors.toList());
+				String userPid = user.getPid();
 
-			List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocument(companyPid,
-					userPid, documentPids);
+				List<VoucherNumberGenerator> voucherNumberGeneratorList = voucherNumberGeneratorRepository
+						.findAllByUserAndCompany(userPid, companyPid);
 
-			for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaders) {
-				String documentNumberLocalPrefix = null;
-				for (VoucherNumberGenerator voucherNumberGenerator : voucherNumberGeneratorList) {
-					if (voucherNumberGenerator.getDocument().getPid()
-							.equals(inventoryVoucherHeaderDTO.getDocumentPid())) {
-						documentNumberLocalPrefix = voucherNumberGenerator.getPrefix();
-					}
+				if (voucherNumberGeneratorList == null || voucherNumberGeneratorList.size() == 0) {
+					log.debug(voucherNumberGeneratorList + " Size is either null or 0");
+					TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
+					taskSubmissionResponse.setStatus("Error");
+					taskSubmissionResponse.setMessage("Not Voucher Generator List");
+					return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
-				String documentNumberLocal = inventoryVoucherHeaderDTO.getDocumentNumberLocal();
-				log.debug("----------" + documentNumberLocal + " Saving to Server---------");
-				if (documentNumberLocalPrefix != null) {
-					String[] splitDocumentNumberLocal = documentNumberLocal.split(documentNumberLocalPrefix);
-					long documentNumberLocalCount = Long.parseLong(splitDocumentNumberLocal[1].toString());
-					for (Object[] obj : objectArray) {
-						String dbDocumentNumberLocalPrefix = null;
-						for (VoucherNumberGenerator voucherNumberGenerator : voucherNumberGeneratorList) {
-							if (voucherNumberGenerator.getDocument().getPid().equals(obj[1].toString())) {
-								dbDocumentNumberLocalPrefix = voucherNumberGenerator.getPrefix();
-							}
-						}
-						if (dbDocumentNumberLocalPrefix != null) {
-							String[] dbDocumentNumberLocal = obj[0].toString().split(dbDocumentNumberLocalPrefix);
-							long dbDocumentNumberLocalCount = Long.parseLong(dbDocumentNumberLocal[1].toString());
-							if ((documentNumberLocalPrefix.equals(dbDocumentNumberLocalPrefix))
-									&& ((dbDocumentNumberLocalCount + 1) != documentNumberLocalCount)) {
-								log.debug("----------" + documentNumberLocal + "  Saving to Server Failed---------");
-								TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
-								taskSubmissionResponse.setStatus("Error");
-								taskSubmissionResponse.setMessage("Not in Sequential Order");
-								return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-							}
+
+				List<String> documentPids = voucherNumberGeneratorList.stream().map(vng -> vng.getDocument().getPid())
+						.collect(Collectors.toList());
+
+				List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocument(companyPid,
+						userPid, documentPids);
+
+				for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaders) {
+					String documentNumberLocalPrefix = null;
+					for (VoucherNumberGenerator voucherNumberGenerator : voucherNumberGeneratorList) {
+						if (voucherNumberGenerator.getDocument().getPid()
+								.equals(inventoryVoucherHeaderDTO.getDocumentPid())) {
+							documentNumberLocalPrefix = voucherNumberGenerator.getPrefix();
 						}
 					}
-					log.debug("----------" + documentNumberLocal + " Saving to Server Success---------");
+					String documentNumberLocal = inventoryVoucherHeaderDTO.getDocumentNumberLocal();
+					log.debug("----------" + documentNumberLocal + " Saving to Server---------");
+					if (documentNumberLocalPrefix != null) {
+						String[] splitDocumentNumberLocal = documentNumberLocal.split(documentNumberLocalPrefix);
+						long documentNumberLocalCount = Long.parseLong(splitDocumentNumberLocal[1].toString());
+						for (Object[] obj : objectArray) {
+							String dbDocumentNumberLocalPrefix = null;
+							for (VoucherNumberGenerator voucherNumberGenerator : voucherNumberGeneratorList) {
+								if (voucherNumberGenerator.getDocument().getPid().equals(obj[1].toString())) {
+									dbDocumentNumberLocalPrefix = voucherNumberGenerator.getPrefix();
+								}
+							}
+							if (dbDocumentNumberLocalPrefix != null) {
+								String[] dbDocumentNumberLocal = obj[0].toString().split(dbDocumentNumberLocalPrefix);
+								long dbDocumentNumberLocalCount = Long.parseLong(dbDocumentNumberLocal[1].toString());
+								if ((documentNumberLocalPrefix.equals(dbDocumentNumberLocalPrefix))
+										&& ((dbDocumentNumberLocalCount + 1) != documentNumberLocalCount)) {
+									log.debug(
+											"----------" + documentNumberLocal + "  Saving to Server Failed---------");
+									TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
+									taskSubmissionResponse.setStatus("Error");
+									taskSubmissionResponse.setMessage("Not in Sequential Order");
+									return new ResponseEntity<>(taskSubmissionResponse,
+											HttpStatus.INTERNAL_SERVER_ERROR);
+								}
+							}
+						}
+						log.debug("----------" + documentNumberLocal + " Saving to Server Success---------");
+					}
 				}
 			}
 		}
@@ -527,8 +537,7 @@ public class ExecutiveTaskSubmissionController {
 					.body(null);
 		}
 		return accountingVoucherHeaderRepository
-				.findOneByExecutiveTaskExecutionPidAndImageRefNo(executiveTaskExecutionPid,
-						imageRefNo)
+				.findOneByExecutiveTaskExecutionPidAndImageRefNo(executiveTaskExecutionPid, imageRefNo)
 				.map(accountingVoucherHeader -> {
 					try {
 						File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),

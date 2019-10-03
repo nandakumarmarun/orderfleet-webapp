@@ -47,8 +47,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	/**
 	 * Save a accountType.
 	 * 
-	 * @param accountTypeDTO
-	 *            the entity to save
+	 * @param accountTypeDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -68,8 +67,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	/**
 	 * Update a accountType.
 	 * 
-	 * @param accountTypeDTO
-	 *            the entity to update
+	 * @param accountTypeDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -80,6 +78,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 			accountType.setAlias(accountTypeDTO.getAlias());
 			accountType.setAccountNameType(accountTypeDTO.getAccountNameType());
 			accountType.setDescription(accountTypeDTO.getDescription());
+			accountType.setReceiverSupplierType(accountTypeDTO.getReceiverSupplierType());
 			accountType = accountTypeRepository.save(accountType);
 			AccountTypeDTO result = accountTypeMapper.accountTypeToAccountTypeDTO(accountType);
 			return result;
@@ -89,8 +88,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	/**
 	 * Get all the accountTypes.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -118,8 +116,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	/**
 	 * Get all the accountTypes.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -136,8 +133,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	/**
 	 * Get one accountType by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -152,8 +148,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	/**
 	 * Get one accountType by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -169,8 +164,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	/**
 	 * Get one accountType by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -187,8 +181,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	/**
 	 * Delete the accountType by id.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete AccountType : {}", pid);
@@ -204,10 +197,8 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	 * 
 	 *        Update the accountType by pid.
 	 * 
-	 * @param pid
-	 *            the pid of the entity
-	 * @param active
-	 *            the active of the entity
+	 * @param pid    the pid of the entity
+	 * @param active the active of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -228,17 +219,16 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	 * 
 	 *        find all accountTypeDTOs from AccountType by status and company.
 	 * 
-	 * @param pageable
-	 *            the pagination information
-	 * @param active
-	 *            the active of the entity
+	 * @param pageable the pagination information
+	 * @param active   the active of the entity
 	 * @return the list of entities
 	 */
 
 	@Override
 	@Transactional(readOnly = true)
 	public Page<AccountTypeDTO> findAllCompanyAndAccountTypeActivated(Pageable pageable, Boolean active) {
-		Page<AccountType> accountTypes = accountTypeRepository.findAllByCompanyIdAndAccountTypeActivated(pageable,active);
+		Page<AccountType> accountTypes = accountTypeRepository.findAllByCompanyIdAndAccountTypeActivated(pageable,
+				active);
 		Page<AccountTypeDTO> accountTypeDTOs = new PageImpl<AccountTypeDTO>(
 				accountTypeMapper.accountTypesToAccountTypeDTOs(accountTypes.getContent()), pageable,
 				accountTypes.getTotalElements());
@@ -257,7 +247,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	public List<AccountTypeDTO> findAllCompanyAndAccountTypeActivated(boolean active) {
 		log.debug("Request to get all active or deactivated AccountTypes");
 		List<AccountType> accountTypeList = accountTypeRepository.findAllByCompanyIdAndActivated(active);
-		log.info("Account type list size :"+accountTypeList.size());
+		log.info("Account type list size :" + accountTypeList.size());
 		List<AccountTypeDTO> result = accountTypeMapper.accountTypesToAccountTypeDTOs(accountTypeList);
 		return result;
 	}
@@ -265,8 +255,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	/**
 	 * Get one accountType by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -292,16 +281,15 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 		List<AccountTypeDTO> result = accountTypeMapper.accountTypesToAccountTypeDTOs(accountTypeList);
 		return result;
 	}
-	
+
 	/**
 	 * Save a accountType.
 	 * 
-	 * @param accountTypeDTO
-	 *            the entity to save
+	 * @param accountTypeDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
-	public AccountTypeDTO saveAccountType(Long companyId,AccountTypeDTO accountTypeDTO) {
+	public AccountTypeDTO saveAccountType(Long companyId, AccountTypeDTO accountTypeDTO) {
 		log.debug("Request to save AccountType : {}", accountTypeDTO);
 
 		// set pid
@@ -313,7 +301,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 		AccountTypeDTO result = accountTypeMapper.accountTypeToAccountTypeDTO(accountType);
 		return result;
 	}
-	
+
 	/**
 	 * Get all the accountTypes.
 	 * 
@@ -330,7 +318,8 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 
 	@Override
 	public Page<AccountTypeDTO> findByLastModifiedAndActivatedTrue(LocalDateTime lastSyncdate, Pageable pageable) {
-		Page<AccountType> accountTypes = accountTypeRepository.findAllByCompanyIdAndAccountTypeActivatedTrueAndLastModifiedDateGreater(lastSyncdate, pageable);
+		Page<AccountType> accountTypes = accountTypeRepository
+				.findAllByCompanyIdAndAccountTypeActivatedTrueAndLastModifiedDateGreater(lastSyncdate, pageable);
 		Page<AccountTypeDTO> accountTypeDTOs = new PageImpl<AccountTypeDTO>(
 				accountTypeMapper.accountTypesToAccountTypeDTOs(accountTypes.getContent()), pageable,
 				accountTypes.getTotalElements());

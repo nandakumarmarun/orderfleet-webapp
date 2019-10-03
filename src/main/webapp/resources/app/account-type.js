@@ -16,7 +16,8 @@ if (!this.AccountType) {
 		name : null,
 		alias : null,
 		accountNameType : null,
-		description : null
+		description : null,
+		receiverSupplierType : null,
 		
 	};
 
@@ -31,6 +32,9 @@ if (!this.AccountType) {
 		},
 		alias : {
 			maxlength : 55
+		},
+		receiverSupplierType : {
+			valueNotEquals : "-1"
 		}
 	};
 
@@ -48,6 +52,9 @@ if (!this.AccountType) {
 		},
 		description : {
 			maxlength : "This field cannot be longer than 250 characters."
+		},
+		receiverSupplierType : {
+			required : "This field is required."
 		}
 	};
 
@@ -94,7 +101,7 @@ if (!this.AccountType) {
 					saveAssignedActivities();
 				});
 
-				/*select all checkbox in table product table*/
+				/* select all checkbox in table product table */
 				$('input:checkbox.allcheckbox').click(
 						function() {
 							$(this).closest('table').find(
@@ -355,6 +362,7 @@ if (!this.AccountType) {
 		accountTypeModel.alias = $('#field_alias').val();
 		accountTypeModel.accountNameType = $('#field_accountNameType').val();
 		accountTypeModel.description = $('#field_description').val();
+		accountTypeModel.receiverSupplierType = $('#field_receiverSupplierType').val();
 
 		$.ajax({
 			method : $(el).attr('method'),
@@ -379,6 +387,7 @@ if (!this.AccountType) {
 				$('#lbl_alias').text((data.alias == null ? "" : data.alias));
 				$('#lbl_accountNameType').text((data.accountNameType == null ? "" : data.accountNameType));
 				$('#lbl_description').text((data.description == null ? "" : data.description));
+				$('#lbl_receiverSupplierType').text((data.receiverSupplierType == null ? "" : data.receiverSupplierType));
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -395,6 +404,7 @@ if (!this.AccountType) {
 				$('#field_alias').val((data.alias == null ? "" : data.alias));
 				$('#field_accountNameType').val((data.accountNameType == null ? "" : data.accountNameType));
 				$('#field_description').val((data.description == null ? "" : data.description));
+				$('#field_receiverSupplierType').val((data.receiverSupplierType == null ? "" : data.receiverSupplierType));
 				// set pid
 				accountTypeModel.pid = data.pid;
 			},

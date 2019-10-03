@@ -80,6 +80,7 @@ import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.Industry;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.PartnerIntegrationSystem;
+import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 import com.orderfleet.webapp.domain.enums.StockLocationType;
 import com.orderfleet.webapp.domain.enums.TaskPlanType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
@@ -885,6 +886,7 @@ public class CompanyTrialSetUpService {
 		accountType.setPid(AccountTypeService.PID_PREFIX + RandomUtil.generatePid());
 		accountType.setCompany(company);
 		accountType.setActivated(true);
+		accountType.setReceiverSupplierType(ReceiverSupplierType.Receiver);
 		accountType.setAccountNameType(AccountNameType.GENERAL);
 		accountTypes.add(accountType);
 		AccountType accountType1 = new AccountType();
@@ -892,6 +894,7 @@ public class CompanyTrialSetUpService {
 		accountType1.setActivated(true);
 		accountType1.setPid(AccountTypeService.PID_PREFIX + RandomUtil.generatePid());
 		accountType1.setCompany(company);
+		accountType1.setReceiverSupplierType(ReceiverSupplierType.Supplier);
 		accountType1.setAccountNameType(AccountNameType.GENERAL);
 		accountTypes.add(accountType1);
 		return accountTypeRepository.save(accountTypes);
