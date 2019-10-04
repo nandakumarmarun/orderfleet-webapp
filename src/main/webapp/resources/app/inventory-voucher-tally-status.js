@@ -27,6 +27,9 @@ if (!this.InventoryVoucher) {
 		$('#downloadXls').on('click', function() {
 			downloadXls();
 		});
+		$('#sendSalesOrderEmail').on('click', function() {
+			sendSalesOrderEmail();
+		});
 		if ($("#dbDocumentType").val != "no") {
 			loadAllDocumentByDocumentType();
 		}
@@ -223,6 +226,10 @@ if (!this.InventoryVoucher) {
 
 											var button = "";
 
+											var sendSalesOrderEmailTd = "";
+
+											var supplierName = "";
+
 											if (inventoryVoucher.pdfDownloadButtonStatus) {
 
 												if (inventoryVoucher.pdfDownloadStatus) {
@@ -242,6 +249,22 @@ if (!this.InventoryVoucher) {
 
 											}
 
+											if (inventoryVoucher.sendSalesOrderEmailStatusColumn) {
+
+												sendSalesOrderEmailTd = "<td>"
+														+ spanSendEmailStatus(
+																inventoryVoucher.pid,
+																inventoryVoucher.sendSalesOrderEmailStatus)
+														+ "</td>";
+
+												supplierName = "<td>"
+														+ inventoryVoucher.supplierAccountName
+														+ "</td>";
+											} else {
+												sendSalesOrderEmailTd = "";
+												supplierName = "";
+											}
+
 											$('#tBodyInventoryVoucher')
 													.append(
 															"<tr><td><input type='checkbox' class='check-one' value='"
@@ -249,7 +272,9 @@ if (!this.InventoryVoucher) {
 																	+ "' />"
 																	+ "</td><td>"
 																	+ inventoryVoucher.employeeName
-																	+ "</td><td>"
+																	+ "</td>"
+																	+ supplierName
+																	+ "<td>"
 																	+ inventoryVoucher.receiverAccountName
 																	+ "</td><td>"
 																	+ inventoryVoucher.documentName
@@ -265,7 +290,9 @@ if (!this.InventoryVoucher) {
 																	+ spanStatus(
 																			inventoryVoucher.pid,
 																			inventoryVoucher.tallyDownloadStatus)
-																	+ "</td><td><button type='button' class='btn btn-blue' onclick='InventoryVoucher.showModalPopup($(\"#viewModal\"),\""
+																	+ "</td>"
+																	+ sendSalesOrderEmailTd
+																	+ "<td><button type='button' class='btn btn-blue' onclick='InventoryVoucher.showModalPopup($(\"#viewModal\"),\""
 																	+ inventoryVoucher.pid
 																	+ "\",0);'>View Details</button>"
 																	+ button
@@ -284,6 +311,23 @@ if (!this.InventoryVoucher) {
 						}
 					}
 				});
+	}
+
+	function sendSalesOrderEmail() {
+		if (confirm("Are you sure?")) {
+	
+			$.ajax({
+				url : inventoryVoucherContextPath + "/sendSalesOrderEmail",
+				method : 'GET',
+				success : function(data) {
+					InventoryVoucher.filter();
+					// onSaveSuccess(data);
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+		}
 	}
 
 	InventoryVoucher.downloadSalesorderPdf = function(inventoryPid) {
@@ -374,6 +418,43 @@ if (!this.InventoryVoucher) {
 		return spanStatus;
 	}
 
+	function spanSendEmailStatus(inventoryVoucherPid, emailSendstatus) {
+
+		console.log(emailSendstatus);
+
+		var not_sent = "'" + 'NOT_SENT' + "'";
+		var sent = "'" + 'SENT' + "'";
+		var spanEmailStatus = "";
+
+		var pid = "'" + inventoryVoucherPid + "'";
+		switch (emailSendstatus) {
+		case 'NOT_SENT':
+			spanEmailStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
+					+ 'NOT_SENT<span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="InventoryVoucher.setSalesOrderEmailStatus('
+					+ pid
+					+ ','
+					+ sent
+					+ ')" style="cursor: pointer;"><a>SENT</a></li>'
+					+ '</ul></div>';
+			break;
+		case 'SENT':
+			spanEmailStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
+					+ 'SENT <span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="InventoryVoucher.setSalesOrderEmailStatus('
+					+ pid
+					+ ','
+					+ not_sent
+					+ ')"  style="cursor: pointer;"><a>NOT_SENT</a></li>'
+					+ '</ul></div>';
+			break;
+		}
+
+		return spanEmailStatus;
+	}
+
 	function onSaveSuccess(result) {
 		// reloading page to see the updated data
 		window.location = inventoryVoucherContextPath;
@@ -390,6 +471,32 @@ if (!this.InventoryVoucher) {
 				data : {
 					pid : pid,
 					tallyDownloadStatus : tallyDownloadStatus
+				},
+				success : function(data) {
+					InventoryVoucher.filter();
+					// onSaveSuccess(data);
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+		}
+
+	}
+
+	InventoryVoucher.setSalesOrderEmailStatus = function(pid,
+			sendSalesOrderEmailStatus) {
+
+		if (confirm("Are you sure?")) {
+			// update status;changeStatus
+
+			$.ajax({
+				url : inventoryVoucherContextPath
+						+ "/changeSendSalesOrderEmailStatus",
+				method : 'GET',
+				data : {
+					pid : pid,
+					sendSalesOrderEmailStatus : sendSalesOrderEmailStatus
 				},
 				success : function(data) {
 					InventoryVoucher.filter();

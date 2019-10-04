@@ -34,7 +34,8 @@
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
 							<div class="col-sm-2">
-								Employee<select id="dbEmployee" name="employeePid" class="form-control">
+								Employee<select id="dbEmployee" name="employeePid"
+									class="form-control">
 									<option value="no">All Employee</option>
 									<c:forEach items="${employees}" var="employee">
 										<option value="${employee.pid}">${employee.name}</option>
@@ -52,13 +53,15 @@
 								</select>
 							</div>
 							<div class="col-sm-2">
-								Document Type <select id="dbDocumentType" name="documentType" class="form-control">
-								<c:if test="${empty voucherTypes}">
-									<option value="no">Select DocumentType</option></c:if>
+								Document Type <select id="dbDocumentType" name="documentType"
+									class="form-control">
+									<c:if test="${empty voucherTypes}">
+										<option value="no">Select DocumentType</option>
+									</c:if>
 									<c:forEach items="${voucherTypes}" var="voucherType">
 										<option value="${voucherType}">${voucherType}</option>
 									</c:forEach>
-									
+
 								</select>
 							</div>
 
@@ -79,11 +82,11 @@
 								</select>
 							</div>
 							<div class="col-sm-2 hide custom_date1">
-							<br/>
-							<div class="input-group">
+								<br />
+								<div class="input-group">
 									<input type="text" class="form-control" id="txtFromDate"
-										 placeholder="Select From Date"
-										style="background-color: #fff;" readonly="readonly" />
+										placeholder="Select From Date" style="background-color: #fff;"
+										readonly="readonly" />
 
 									<div class="input-group-addon">
 										<a href="#"><i class="entypo-calendar"></i></a>
@@ -91,10 +94,9 @@
 								</div>
 							</div>
 							<div class="col-sm-2 hide custom_date2">
-							<br/>
+								<br />
 								<div class="input-group">
-									<input  type="text"
-										class="form-control" id="txtToDate"
+									<input type="text" class="form-control" id="txtToDate"
 										placeholder="Select To Date" style="background-color: #fff;"
 										readonly="readonly" />
 									<div class="input-group-addon">
@@ -109,17 +111,22 @@
 									<option value="PENDING">PENDING</option>
 									<option value="PROCESSING">PROCESSING</option>
 									<option value="COMPLETED">COMPLETED</option>
-								</select>					
+								</select>
 							</div>
 							<div class="col-sm-1">
 								<br>
 								<button type="button" class="btn btn-info"
 									onclick="InventoryVoucher.filter()">Apply</button>
 							</div>
-							<div class="col-sm-1">
-								<br>
-								<button type="button" class="btn btn-success" id="downloadXls">Download</button>
-							</div>
+
+
+							<c:if test="${sendSalesOrderEmailStatus=='true'}">
+								<div class="col-sm-1">
+									<br>
+									<button type="button" class="btn btn-primary"
+										id="sendSalesOrderEmail">Send Sales Order Email</button>
+								</div>
+							</c:if>
 						</div>
 					</form>
 				</div>
@@ -134,15 +141,27 @@
 				<table class="table  table-striped table-bordered">
 					<thead>
 						<tr>
-							<th><input type="checkbox" id="selectAll"/>&nbsp;&nbsp;Select All</th>
+							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
+								All</th>
 							<th>Employee</th>
+							<c:if test="${sendSalesOrderEmailStatus=='true'}">
+								<th>Supplier</th>
+							</c:if>
 							<th>Receiver</th>
 							<th>Document</th>
-							<th>Amount<p id="totalDocument" style="float: right;"></p></th>
-							<th>Volume<p id="totalVolume" style="float: right;"></p></th>
+							<th>Amount
+								<p id="totalDocument" style="float: right;"></p>
+							</th>
+							<th>Volume
+								<p id="totalVolume" style="float: right;"></p>
+							</th>
 							<th>Total Quantity</th>
 							<th>Date</th>
 							<th>Status</th>
+							<c:if test="${sendSalesOrderEmailStatus=='true'}">
+								<th>Email Send Status</th>
+							</c:if>
+
 							<th>Action</th>
 							<th>VisitRemarks</th>
 						</tr>

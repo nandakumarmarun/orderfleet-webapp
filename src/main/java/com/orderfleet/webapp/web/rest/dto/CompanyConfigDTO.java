@@ -24,6 +24,7 @@ public class CompanyConfigDTO {
 	private boolean salesManagement;// setting for Sales Management
 	private boolean salesEditEnabled;// setting for KFC
 	private boolean gpsVarianceQuery; // setting for gpsvariance
+	private boolean sendSalesOrderEmail;
 
 	public CompanyConfigDTO() {
 		super();
@@ -133,16 +134,20 @@ public class CompanyConfigDTO {
 		this.salesEditEnabled = salesEditEnabled;
 	}
 
-	public boolean isGpsVarianceQuery() {
+	public boolean getGpsVarianceQuery() {
 		return gpsVarianceQuery;
 	}
 
 	public void setGpsVarianceQuery(boolean gpsVarianceQuery) {
 		this.gpsVarianceQuery = gpsVarianceQuery;
 	}
-	
-	
-	
-	
+
+	public boolean getSendSalesOrderEmail() {
+		return sendSalesOrderEmail;
+	}
+
+	public void setSendSalesOrderEmail(boolean sendSalesOrderEmail) {
+		this.sendSalesOrderEmail = sendSalesOrderEmail;
+	}
 
 }

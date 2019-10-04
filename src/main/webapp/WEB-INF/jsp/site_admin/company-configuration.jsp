@@ -49,6 +49,7 @@
 						<th>Sales Management</th>
 						<th>Sales Edit Enabled</th>
 						<th>Gps Variance Query</th>
+						<th>Send Sales Order Email</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -69,6 +70,7 @@
 							<th>${companyConfiguration.salesManagement}</th>
 							<th>${companyConfiguration.salesEditEnabled}</th>
 							<th>${companyConfiguration.gpsVarianceQuery}</th>
+							<th>${companyConfiguration.sendSalesOrderEmail}</th>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
 						</tr>
@@ -157,8 +159,8 @@
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Chat Reply</label> <input
-														id="chatReply" name='checksChatReply'
-														type='checkbox' class="form-control" />
+														id="chatReply" name='checksChatReply' type='checkbox'
+														class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
@@ -170,12 +172,13 @@
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Visit Based Transation</label> <input
-														id="visitBasedTransaction" name='checksVisitBasedTransation"'
-														type='checkbox' class="form-control" />
+													<label class="control-label">Visit Based Transation</label>
+													<input id="visitBasedTransaction"
+														name='checksVisitBasedTransation"' type='checkbox'
+														class="form-control" />
 												</div></td>
 										</tr>
-										
+
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Sales Management</label> <input
@@ -183,7 +186,7 @@
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
-										
+
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Sales Edit Enabled</label> <input
@@ -191,12 +194,21 @@
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
-										
+
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Gps Variance Query</label> <input
 														id="gpsVarianceQuery" name='checksGpsVarianceQuery"'
 														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Send Sales Order Email</label>
+													<input id="sendSalesOrderEmail"
+														name='checksSendSalesOrderEmail"' type='checkbox'
+														class="form-control" />
 												</div></td>
 										</tr>
 

@@ -1,11 +1,14 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,14 +17,18 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -36,10 +43,17 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailParseException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -62,10 +76,12 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.codec.Base64.OutputStream;
+import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
@@ -90,6 +106,8 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
+import com.orderfleet.webapp.web.rest.dto.SecondarySalesOrderExcelDTO;
+import com.orderfleet.webapp.web.vendor.orderpro.dto.SalesOrderExcelDTO;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -148,7 +166,7 @@ public class SalesPerformanceReportTallyStatusResource {
 	private CompanyRepository CompanyRepository;
 
 	@Inject
-	private CompanyConfigurationRepository CompanyConfigurationRepository;
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
@@ -183,9 +201,28 @@ public class SalesPerformanceReportTallyStatusResource {
 				accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
 				accountProfileDTOs.add(accountProfileDTO);
 			}
+
 			model.addAttribute("accounts", accountProfileDTOs);
+
 		}
 		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
+
+		boolean sendSalesOrderEmailStatus = false;
+		Optional<CompanyConfiguration> opCompanyConfiguration = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_SALES_ORDER_EMAIL);
+		if (opCompanyConfiguration.isPresent()) {
+
+			if (opCompanyConfiguration.get().getValue().equals("true")) {
+				sendSalesOrderEmailStatus = true;
+			} else {
+				sendSalesOrderEmailStatus = false;
+			}
+		}
+		model.addAttribute("sendSalesOrderEmailStatus", sendSalesOrderEmailStatus);
+
+		model.addAttribute("notSentSize", inventoryVoucherHeaderRepository
+				.getCountOfSendSalesOrderEmailNotSent(SendSalesOrderEmailStatus.NOT_SENT));
+
 		return "company/primarySalesPerformanceTallyStatusReport";
 	}
 
@@ -320,14 +357,26 @@ public class SalesPerformanceReportTallyStatusResource {
 				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
 
 		boolean pdfDownloadButtonStatus = false;
-		Optional<CompanyConfiguration> opCompanyConfiguration = CompanyConfigurationRepository
+		Optional<CompanyConfiguration> opCompanyConfigurationPdfStatus = companyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
-		if (opCompanyConfiguration.isPresent()) {
+		if (opCompanyConfigurationPdfStatus.isPresent()) {
 
-			if (opCompanyConfiguration.get().getValue().equals("true")) {
+			if (opCompanyConfigurationPdfStatus.get().getValue().equals("true")) {
 				pdfDownloadButtonStatus = true;
 			} else {
 				pdfDownloadButtonStatus = false;
+			}
+		}
+
+		boolean sendSalesOrderEmailStatusColumn = false;
+		Optional<CompanyConfiguration> opsendSalesOrderEmailStatus = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_SALES_ORDER_EMAIL);
+		if (opsendSalesOrderEmailStatus.isPresent()) {
+
+			if (opsendSalesOrderEmailStatus.get().getValue().equals("true")) {
+				sendSalesOrderEmailStatusColumn = true;
+			} else {
+				sendSalesOrderEmailStatusColumn = false;
 			}
 		}
 
@@ -354,6 +403,7 @@ public class SalesPerformanceReportTallyStatusResource {
 			salesPerformanceDTO.setDocumentVolume((double) ivData[15]);
 			salesPerformanceDTO.setTotalVolume(ivTotalVolume.get(salesPerformanceDTO.getPid()));
 			salesPerformanceDTO.setPdfDownloadButtonStatus(pdfDownloadButtonStatus);
+			salesPerformanceDTO.setSendSalesOrderEmailStatusColumn(sendSalesOrderEmailStatusColumn);
 
 			salesPerformanceDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(ivData[16].toString()));
 			salesPerformanceDTO.setVisitRemarks(ivData[17] == null ? null : ivData[17].toString());
@@ -361,6 +411,8 @@ public class SalesPerformanceReportTallyStatusResource {
 			salesPerformanceDTO.setOrderNumber(ivData[18] == null ? 0 : Long.parseLong(ivData[18].toString()));
 
 			salesPerformanceDTO.setPdfDownloadStatus(Boolean.valueOf(ivData[19].toString()));
+
+			salesPerformanceDTO.setSendSalesOrderEmailStatus(SendSalesOrderEmailStatus.valueOf(ivData[24].toString()));
 
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
@@ -469,95 +521,6 @@ public class SalesPerformanceReportTallyStatusResource {
 		}
 	}
 
-//	public static void fillReport(HSSFSheet worksheet, List<InventoryVoucherXlsDownloadDTO> xlsDownloadDTOs) {
-//		// Row offset
-//		int startRowIndex = 1;
-//		int startColIndex = 0;
-//
-//		// Create cell style for the body
-//		HSSFCellStyle bodyCellStyle = worksheet.getWorkbook().createCellStyle();
-//		bodyCellStyle.setWrapText(true);
-//
-//		// Create body
-//		for (int i = 0; i < xlsDownloadDTOs.size(); i++) {
-//			// Create a new row
-//			startRowIndex = startRowIndex + 1;
-//			HSSFRow row = worksheet.createRow((short) startRowIndex);
-//
-//			HSSFCell cell1 = row.createCell(startColIndex + 0);
-//			cell1.setCellValue(xlsDownloadDTOs.get(i).getDocumentNumberLocal());
-//			cell1.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell2 = row.createCell(startColIndex + 1);
-//			cell2.setCellValue(xlsDownloadDTOs.get(i).getDocumentName());
-//			cell2.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell3 = row.createCell(startColIndex + 2);
-//			cell3.setCellValue(xlsDownloadDTOs.get(i).getUserName());
-//			cell3.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell4 = row.createCell(startColIndex + 3);
-//			if (xlsDownloadDTOs.get(i).getDocumentDate() != null) {
-//				cell4.setCellValue(xlsDownloadDTOs.get(i).getDocumentDate().toLocalDate().toString());
-//			} else {
-//				cell4.setCellValue("");
-//			}
-//			cell4.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell5 = row.createCell(startColIndex + 4);
-//			cell5.setCellValue(xlsDownloadDTOs.get(i).getReceiverAccountName());
-//			cell5.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell6 = row.createCell(startColIndex + 5);
-//			cell6.setCellValue(xlsDownloadDTOs.get(i).getSupplierAccountName());
-//			cell6.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell7 = row.createCell(startColIndex + 6);
-//			cell7.setCellValue(xlsDownloadDTOs.get(i).getDocumentTotal());
-//			cell7.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell8 = row.createCell(startColIndex + 7);
-//			cell8.setCellValue(xlsDownloadDTOs.get(i).getDocumentVolume());
-//			cell8.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell9 = row.createCell(startColIndex + 8);
-//			cell9.setCellValue(xlsDownloadDTOs.get(i).getDocDiscountAmount());
-//			cell9.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell10 = row.createCell(startColIndex + 9);
-//			cell10.setCellValue(xlsDownloadDTOs.get(i).getDocDiscountPercentage());
-//			cell10.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell11 = row.createCell(startColIndex + 10);
-//			cell11.setCellValue(xlsDownloadDTOs.get(i).getProductName());
-//			cell11.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell12 = row.createCell(startColIndex + 11);
-//			cell12.setCellValue(xlsDownloadDTOs.get(i).getQuantity());
-//			cell12.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell13 = row.createCell(startColIndex + 12);
-//			cell13.setCellValue(xlsDownloadDTOs.get(i).getFreeQuantity());
-//			cell13.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell14 = row.createCell(startColIndex + 13);
-//			cell14.setCellValue(xlsDownloadDTOs.get(i).getSellingRate());
-//			cell14.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell15 = row.createCell(startColIndex + 14);
-//			cell15.setCellValue(xlsDownloadDTOs.get(i).getTaxAmount());
-//			cell15.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell16 = row.createCell(startColIndex + 15);
-//			cell16.setCellValue(xlsDownloadDTOs.get(i).getDiscountAmount());
-//			cell16.setCellStyle(bodyCellStyle);
-//
-//			HSSFCell cell17 = row.createCell(startColIndex + 16);
-//			cell17.setCellValue(xlsDownloadDTOs.get(i).getRowTotal());
-//			cell17.setCellStyle(bodyCellStyle);
-//		}
-//	}
-
 	@RequestMapping(value = "/primary-sales-performance-download-status/changeStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> changeStatus(@RequestParam String pid,
@@ -567,6 +530,225 @@ public class SalesPerformanceReportTallyStatusResource {
 		inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
+	}
+
+	@RequestMapping(value = "/primary-sales-performance-download-status/changeSendSalesOrderEmailStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> changeSendSalesOrderEmailStatus(@RequestParam String pid,
+			@RequestParam SendSalesOrderEmailStatus sendSalesOrderEmailStatus) {
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(pid).get();
+		inventoryVoucherHeaderDTO.setSendSalesOrderEmailStatus(sendSalesOrderEmailStatus);
+		inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
+	}
+
+	@RequestMapping(value = "/primary-sales-performance-download-status/sendSalesOrderEmail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> sendSalesOrderEmail() throws MessagingException {
+
+		log.info("sendSalesOrderEmail()-----");
+		List<Object[]> inventoryVoucherHeaderObjects = inventoryVoucherHeaderRepository
+				.getSecondarySalesForExcel(SecurityUtils.getCurrentUsersCompanyId());
+
+		List<SecondarySalesOrderExcelDTO> secondarySalesOrderExcelDTOs = convertInventoryObjectToExcelDTO(
+				inventoryVoucherHeaderObjects);
+
+		Set<String> supplierNames = new HashSet<>();
+
+		supplierNames.addAll(secondarySalesOrderExcelDTOs.stream().map(SecondarySalesOrderExcelDTO::getSupplierName)
+				.collect(Collectors.toList()));
+
+		for (String supplierName : supplierNames) {
+
+			List<SecondarySalesOrderExcelDTO> secondarySalesOrderExcelBySupplierDTOs = new ArrayList<>();
+
+			secondarySalesOrderExcelBySupplierDTOs = secondarySalesOrderExcelDTOs.stream()
+					.filter(sso -> sso.getSupplierName().equalsIgnoreCase(supplierName)).collect(Collectors.toList());
+
+			String supplierEmail = secondarySalesOrderExcelBySupplierDTOs.stream().findFirst().get().getSupplierEmail();
+
+			if (supplierEmail != null && !supplierEmail.equalsIgnoreCase("")) {
+				sendSalesOrderEmail(supplierName, supplierEmail, secondarySalesOrderExcelBySupplierDTOs);
+			}
+		}
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
+	}
+
+	private void sendSalesOrderEmail(String supplierName, String supplierEmail,
+			List<SecondarySalesOrderExcelDTO> secondarySalesOrderExcelBySupplierDTOs) throws MessagingException {
+
+		log.debug("Sending a mail to -- " + supplierEmail);
+
+		long start = System.nanoTime();
+
+		String companyName = CompanyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getLegalName();
+
+		JavaMailSender emailSender = getJavaMailSender();
+
+		MimeMessage message = emailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+		helper.setSubject(companyName + " - Sales Order");
+		helper.setText("Sales Order Taken Under - " + supplierName);
+		helper.setTo(supplierEmail);
+		helper.setFrom(supplierEmail);
+
+		File excelFile = generateFile(supplierName, secondarySalesOrderExcelBySupplierDTOs);
+		FileSystemResource file = new FileSystemResource(excelFile);
+		helper.addAttachment(file.getFilename(), file);
+		emailSender.send(message);
+
+		excelFile.delete();
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+
+		List<String> succesOrders = (ArrayList<String>) secondarySalesOrderExcelBySupplierDTOs.stream()
+				.map(so -> so.getInventoryPid()).collect(Collectors.toList());
+
+		inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderSendSalesOrderEmailStatusUsingPidAndCompanyId(
+				SendSalesOrderEmailStatus.SENT, SecurityUtils.getCurrentUsersCompanyId(), succesOrders);
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
+	private File generateFile(String supplierName,
+			List<SecondarySalesOrderExcelDTO> secondarySalesOrderExcelBySupplierDTOs) {
+		log.debug("Creating Excel report");
+
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("ddMMYY_HHmmss");
+		LocalDateTime now = LocalDateTime.now();
+		String date = dtf.format(now);
+		String excelFileName = date + "_SalesOrder" + ".xls";
+		String sheetName = "Sheet1";
+		String[] headerColumns = { "Order No", "Salesman", "Order Date", "Customer", "Supplier", "Product Name",
+				"Quantity", "Free Quantity", "Selling Rate", "Discount Amount", "Discount Percentage", "Tax Percentage",
+				"Total" };
+		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
+			HSSFSheet worksheet = workbook.createSheet(sheetName);
+			createHeaderRow(worksheet, headerColumns);
+			createSecondaryReportRows(worksheet, secondarySalesOrderExcelBySupplierDTOs);
+			// Resize all columns to fit the content size
+			for (int i = 0; i < headerColumns.length; i++) {
+				worksheet.autoSizeColumn(i);
+			}
+
+			FileOutputStream fos = new FileOutputStream(supplierName + "-" + excelFileName);
+
+			workbook.write(fos);
+			fos.flush();
+			fos.close();
+
+			return new File(supplierName + "-" + excelFileName);
+
+		} catch (IOException ex) {
+			log.error("IOException on downloading Sales Order {}", ex.getMessage());
+		}
+		return null;
+	}
+
+	private void createSecondaryReportRows(HSSFSheet worksheet,
+			List<SecondarySalesOrderExcelDTO> secondarySalesOrderExcelBySupplierDTOs) {
+		/*
+		 * CreationHelper helps us create instances of various things like DataFormat,
+		 * Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way
+		 */
+		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
+		// Create Cell Style for formatting Date
+		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
+		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
+		// Create Other rows and cells with Sales data
+		int rowNum = 1;
+		for (SecondarySalesOrderExcelDTO salesOrder : secondarySalesOrderExcelBySupplierDTOs) {
+			HSSFRow row = worksheet.createRow(rowNum++);
+			row.createCell(0).setCellValue(salesOrder.getBillNo());
+			row.createCell(1).setCellValue(salesOrder.getEmployeeName());
+			HSSFCell docDateCell = row.createCell(2);
+			docDateCell.setCellValue(salesOrder.getDate().toString());
+			docDateCell.setCellStyle(dateCellStyle);
+			row.createCell(3).setCellValue(salesOrder.getReceiverName());
+			row.createCell(4).setCellValue(salesOrder.getSupplierName());
+
+			row.createCell(5).setCellValue(salesOrder.getItemName());
+			row.createCell(6).setCellValue(salesOrder.getQuantity());
+			row.createCell(7).setCellValue(salesOrder.getFreeQuantity());
+			row.createCell(8).setCellValue(salesOrder.getRate());
+			row.createCell(9).setCellValue(salesOrder.getDiscPrice());
+			row.createCell(10).setCellValue(salesOrder.getDiscPer());
+			row.createCell(11).setCellValue(salesOrder.getTaxPer());
+			row.createCell(12).setCellValue(salesOrder.getTotal());
+
+		}
+
+	}
+
+	private List<SecondarySalesOrderExcelDTO> convertInventoryObjectToExcelDTO(
+			List<Object[]> inventoryVoucherHeaderObjects) {
+
+		List<SecondarySalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
+		List<String> inventoryHeaderPid = new ArrayList<String>();
+
+		for (Object[] obj : inventoryVoucherHeaderObjects) {
+			SecondarySalesOrderExcelDTO salesOrderDTO = new SecondarySalesOrderExcelDTO();
+
+			String pattern = "dd-MMM-yyyy";
+			DateFormat df = new SimpleDateFormat(pattern);
+			String dateAsString = df.format(obj[1]);
+
+			salesOrderDTO.setDate(dateAsString != null ? dateAsString : "");
+			salesOrderDTO.setReceiverName(obj[2] != null ? obj[2].toString() : "");
+			salesOrderDTO.setSupplierName(obj[3] != null ? obj[3].toString() : "");
+			salesOrderDTO.setSupplierEmail(obj[4] != null ? obj[4].toString() : "");
+			salesOrderDTO.setItemName(obj[5] != null ? obj[5].toString() : "");
+			salesOrderDTO.setQuantity(obj[6] != null ? Double.parseDouble(obj[6].toString()) : 0.0);
+			salesOrderDTO.setRate(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
+			salesOrderDTO.setDiscPer(obj[8] != null ? Double.parseDouble(obj[8].toString()) : 0.0);
+			salesOrderDTO.setTaxPer(obj[9] != null ? Double.parseDouble(obj[9].toString()) : 0.0);
+
+			double qty = Double.parseDouble(obj[6].toString());
+			double rate = Double.parseDouble(obj[7].toString());
+			double dis = Double.parseDouble(obj[8].toString());
+			double taxPer = Double.parseDouble(obj[9].toString());
+
+			double amountValue = qty * rate;
+			double discountValue = amountValue * dis / 100;
+			double amountWithoutTax = amountValue - discountValue;
+
+			// tax calculation
+
+			double taxValue = amountWithoutTax * taxPer / 100;
+			double totalAmount = amountWithoutTax + taxValue;
+
+			DecimalFormat round = new DecimalFormat(".##");
+
+			double cgst = Double.parseDouble(round.format(taxValue / 2));
+			double sgst = Double.parseDouble(round.format(taxValue / 2));
+
+			salesOrderDTO.setTotal(Double.parseDouble(round.format(totalAmount)));
+			salesOrderDTO.setDiscPrice(Double.parseDouble(round.format(discountValue)));
+			salesOrderDTO.setCGSTAmt(cgst);
+			salesOrderDTO.setSGSTAmt(sgst);
+			salesOrderDTO.setInventoryPid(obj[11] != null ? obj[11].toString() : "");
+			salesOrderDTO.setEmployeeName(obj[12] != null ? obj[12].toString() : "");
+
+			salesOrderDTO.setBillNo(obj[0].toString());
+			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
+
+			salesOrderDTO.setRefDocNo(obj[13] != null ? obj[13].toString() : "0");
+
+			double freeQuantity = Double.parseDouble(obj[14].toString());
+
+			salesOrderDTO.setFreeQuantity(freeQuantity);
+
+			salesOrderDTOs.add(salesOrderDTO);
+
+		}
+
+		return salesOrderDTOs;
 	}
 
 	@RequestMapping(value = "/primary-sales-performance-download-status/downloadPdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -580,8 +762,8 @@ public class SalesPerformanceReportTallyStatusResource {
 		buildPdf(inventoryVoucherHeaderDTO, response);
 
 		if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
-				inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
-			
+			inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
+
 		}
 
 	}
@@ -818,6 +1000,23 @@ public class SalesPerformanceReportTallyStatusResource {
 		}
 
 		return table;
+	}
+
+	public JavaMailSender getJavaMailSender() {
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost("smtp.gmail.com");
+		mailSender.setPort(587);
+
+		mailSender.setUsername("salesnrich.info@gmail.com");
+		mailSender.setPassword("password@salesnrich");
+
+		Properties props = mailSender.getJavaMailProperties();
+		props.put("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.debug", "true");
+
+		return mailSender;
 	}
 
 }

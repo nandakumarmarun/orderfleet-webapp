@@ -65,8 +65,10 @@ public class MobileSettingsDTO {
 	private CartType cartType;
 
 	private boolean kfcEnabled;
-	
+
 	private boolean gpsMandatory;
+
+	private boolean enableSecondarySales;
 
 	public MobileSettingsDTO() {
 		super();
@@ -96,6 +98,7 @@ public class MobileSettingsDTO {
 		this.cartType = mobileConfigurationDTO.getCartType();
 		this.kfcEnabled = mobileConfigurationDTO.getKfcEnabled();
 		this.gpsMandatory = mobileConfigurationDTO.getGpsMandatory();
+		this.enableSecondarySales = mobileConfigurationDTO.getEnableSecondarySales();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -305,5 +308,13 @@ public class MobileSettingsDTO {
 	public void setGpsMandatory(boolean gpsMandatory) {
 		this.gpsMandatory = gpsMandatory;
 	}
-	
+
+	public boolean isEnableSecondarySales() {
+		return enableSecondarySales;
+	}
+
+	public void setEnableSecondarySales(boolean enableSecondarySales) {
+		this.enableSecondarySales = enableSecondarySales;
+	}
+
 }

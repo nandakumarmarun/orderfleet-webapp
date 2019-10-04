@@ -33,7 +33,8 @@ if (!this.MobileConfiguration) {
 		inventoryVoucherUIType : 'TYPE_1',
 		cartType : 'NORMAL',
 		kfcEnabled : false,
-		gpsMandatory : false
+		gpsMandatory : false,
+		enableSecondarySales : false
 	};
 
 	$(document).ready(function() {
@@ -108,7 +109,9 @@ if (!this.MobileConfiguration) {
 		mobileConfigurationDTO.cartType = $("#cartType").val();
 		mobileConfigurationDTO.kfcEnabled = $("#kfcEnabled").is(":checked");
 		mobileConfigurationDTO.gpsMandatory = $("#gpsMandatory").is(":checked");
-		
+		mobileConfigurationDTO.enableSecondarySales = $("#enableSecondarySales")
+				.is(":checked");
+
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -176,7 +179,10 @@ if (!this.MobileConfiguration) {
 									data.inventoryVoucherUIType);
 							$('#cartType').val(data.cartType);
 							$('#kfcEnabled').prop("checked", data.kfcEnabled);
-							$('#gpsMandatory').prop("checked", data.gpsMandatory);
+							$('#gpsMandatory').prop("checked",
+									data.gpsMandatory);
+							$('#enableSecondarySales').prop("checked",
+									data.enableSecondarySales);
 						}
 
 					},

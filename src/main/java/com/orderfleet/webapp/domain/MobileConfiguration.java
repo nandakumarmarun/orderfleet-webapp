@@ -115,9 +115,12 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "kfc_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean kfcEnabled;
-	
+
 	@Column(name = "gps_mandatory", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean gpsMandatory;
+
+	@Column(name = "enable_secondory_sales", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enableSecondarySales;
 
 	@NotNull
 	@ManyToOne
@@ -326,13 +329,21 @@ public class MobileConfiguration implements Serializable {
 	public void setKfcEnabled(boolean kfcEnabled) {
 		this.kfcEnabled = kfcEnabled;
 	}
-	
+
 	public boolean getGpsMandatory() {
 		return gpsMandatory;
 	}
 
 	public void setGpsMandatory(boolean gpsMandatory) {
 		this.gpsMandatory = gpsMandatory;
+	}
+
+	public boolean getEnableSecondarySales() {
+		return enableSecondarySales;
+	}
+
+	public void setEnableSecondarySales(boolean enableSecondarySales) {
+		this.enableSecondarySales = enableSecondarySales;
 	}
 
 	@Override

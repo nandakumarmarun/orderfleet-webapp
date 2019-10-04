@@ -125,6 +125,10 @@ public class CompanyConfigurationResource {
 					mcDto.setGpsVarianceQuery(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.SEND_SALES_ORDER_EMAIL)) {
+					mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 			}
 			if (anyValueExist) {
@@ -143,7 +147,8 @@ public class CompanyConfigurationResource {
 			@RequestParam String stageChangeAccountingVoucher, @RequestParam String newCustomerAlias,
 			@RequestParam String chatReply, @RequestParam String salesPdfDownload,
 			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement,
-			@RequestParam String salesEditEnabled, @RequestParam String gpsVarianceQuery) throws URISyntaxException {
+			@RequestParam String salesEditEnabled, @RequestParam String gpsVarianceQuery,
+			@RequestParam String sendSalesOrderEmail) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 
 		Company company = null;
@@ -177,6 +182,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_EDIT_ENABLED);
 		Optional<CompanyConfiguration> optGpsVarianceQuery = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.GPS_VARIANCE_QUERY);
+		Optional<CompanyConfiguration> optSendSalesOrderEmail = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_EMAIL);
 
 		CompanyConfiguration saveOfflineConfiguration = null;
 		CompanyConfiguration promptAttendance = null;
@@ -190,6 +197,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration salesManagementCompany = null;
 		CompanyConfiguration salesEditEnabledCompany = null;
 		CompanyConfiguration gpsVarianceQueryCompany = null;
+		CompanyConfiguration sendSalesOrderEmailCompany = null;
 
 		if (optDistanceTraveled.isPresent()) {
 			saveOfflineConfiguration = optDistanceTraveled.get();
@@ -300,7 +308,7 @@ public class CompanyConfigurationResource {
 			salesManagementCompany.setValue(salesManagement);
 		}
 		companyConfigurationRepository.save(salesManagementCompany);
-		
+
 		if (optSalesEditEnabled.isPresent()) {
 			salesEditEnabledCompany = optSalesEditEnabled.get();
 			salesEditEnabledCompany.setValue(salesEditEnabled);
@@ -311,7 +319,7 @@ public class CompanyConfigurationResource {
 			salesEditEnabledCompany.setValue(salesEditEnabled);
 		}
 		companyConfigurationRepository.save(salesEditEnabledCompany);
-		
+
 		if (optGpsVarianceQuery.isPresent()) {
 			gpsVarianceQueryCompany = optGpsVarianceQuery.get();
 			gpsVarianceQueryCompany.setValue(gpsVarianceQuery);
@@ -322,6 +330,17 @@ public class CompanyConfigurationResource {
 			gpsVarianceQueryCompany.setValue(gpsVarianceQuery);
 		}
 		companyConfigurationRepository.save(gpsVarianceQueryCompany);
+
+		if (optSendSalesOrderEmail.isPresent()) {
+			sendSalesOrderEmailCompany = optSendSalesOrderEmail.get();
+			sendSalesOrderEmailCompany.setValue(sendSalesOrderEmail);
+		} else {
+			sendSalesOrderEmailCompany = new CompanyConfiguration();
+			sendSalesOrderEmailCompany.setCompany(company);
+			sendSalesOrderEmailCompany.setName(CompanyConfig.SEND_SALES_ORDER_EMAIL);
+			sendSalesOrderEmailCompany.setValue(sendSalesOrderEmail);
+		}
+		companyConfigurationRepository.save(sendSalesOrderEmailCompany);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -361,9 +380,12 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
 		Optional<CompanyConfiguration> optSalesEditEnabled = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_EDIT_ENABLED);
-		
+
 		Optional<CompanyConfiguration> optGpsVarianceQuery = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.GPS_VARIANCE_QUERY);
+
+		Optional<CompanyConfiguration> optSendSalesOrderEmail = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_EMAIL);
 
 		CompanyConfigDTO companyConfigurationDTO = new CompanyConfigDTO();
 
@@ -406,6 +428,9 @@ public class CompanyConfigurationResource {
 		if (optGpsVarianceQuery.isPresent()) {
 			companyConfigurationDTO.setGpsVarianceQuery(Boolean.valueOf(optGpsVarianceQuery.get().getValue()));
 		}
+		if (optSendSalesOrderEmail.isPresent()) {
+			companyConfigurationDTO.setSendSalesOrderEmail(Boolean.valueOf(optSendSalesOrderEmail.get().getValue()));
+		}
 		return companyConfigurationDTO;
 	}
 
@@ -437,10 +462,12 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
 		Optional<CompanyConfiguration> optSalesEditEnabled = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_EDIT_ENABLED);
-		
 
 		Optional<CompanyConfiguration> optGpsVarianceQuery = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.GPS_VARIANCE_QUERY);
+
+		Optional<CompanyConfiguration> optSendSalesOrderEmail = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_EMAIL);
 
 		if (optDistanceTraveled.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optDistanceTraveled.get().getCompany().getId(),
@@ -488,11 +515,15 @@ public class CompanyConfigurationResource {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optSalesEditEnabled.get().getCompany().getId(),
 					CompanyConfig.SALES_EDIT_ENABLED);
 		}
-		
 		if (optGpsVarianceQuery.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optGpsVarianceQuery.get().getCompany().getId(),
 					CompanyConfig.GPS_VARIANCE_QUERY);
 		}
+		if (optSendSalesOrderEmail.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optSendSalesOrderEmail.get().getCompany().getId(),
+					CompanyConfig.SEND_SALES_ORDER_EMAIL);
+		}
+
 		return ResponseEntity.ok()
 				.headers(HeaderUtil.createEntityDeletionAlert("companyConfiguration", companyPid.toString())).build();
 	}

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
+import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.SourceModule;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
@@ -48,11 +49,11 @@ public class InventoryVoucherHeaderDTO {
 	private String userName;
 
 	private double documentTotal;
-	
+
 	private double documentTotalUpdated;
 
 	private double documentVolume;
-	
+
 	private double documentVolumeUpdated;
 
 	private double docDiscountPercentage;
@@ -90,6 +91,8 @@ public class InventoryVoucherHeaderDTO {
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
 
 	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.DEFAULT;
+
+	private SendSalesOrderEmailStatus sendSalesOrderEmailStatus = SendSalesOrderEmailStatus.NOT_SENT;
 
 	private long orderNumber;
 	private String customeraddress;
@@ -168,6 +171,11 @@ public class InventoryVoucherHeaderDTO {
 		if (inventoryVoucherHeader.getSalesManagementStatus() != null) {
 			this.salesManagementStatus = inventoryVoucherHeader.getSalesManagementStatus();
 		}
+
+		if (inventoryVoucherHeader.getSendSalesOrderEmailStatus() != null) {
+			this.sendSalesOrderEmailStatus = inventoryVoucherHeader.getSendSalesOrderEmailStatus();
+		}
+
 		this.updatedStatus = inventoryVoucherHeader.getUpdatedStatus();
 	}
 
@@ -369,7 +377,7 @@ public class InventoryVoucherHeaderDTO {
 	public void setDocumentTotal(double documentTotal) {
 		this.documentTotal = documentTotal;
 	}
-	
+
 	public double getDocumentTotalUpdated() {
 		return documentTotalUpdated;
 	}
@@ -385,7 +393,7 @@ public class InventoryVoucherHeaderDTO {
 	public void setDocumentVolume(double documentVolume) {
 		this.documentVolume = documentVolume;
 	}
-	
+
 	public double getDocumentVolumeUpdated() {
 		return documentVolumeUpdated;
 	}
@@ -545,7 +553,7 @@ public class InventoryVoucherHeaderDTO {
 	public void setCustomerPhone(String customerPhone) {
 		this.customerPhone = customerPhone;
 	}
-	
+
 	public boolean getUpdatedStatus() {
 		return updatedStatus;
 	}
@@ -554,6 +562,13 @@ public class InventoryVoucherHeaderDTO {
 		this.updatedStatus = updatedStatus;
 	}
 
+	public SendSalesOrderEmailStatus getSendSalesOrderEmailStatus() {
+		return sendSalesOrderEmailStatus;
+	}
+
+	public void setSendSalesOrderEmailStatus(SendSalesOrderEmailStatus sendSalesOrderEmailStatus) {
+		this.sendSalesOrderEmailStatus = sendSalesOrderEmailStatus;
+	}
 
 	@Override
 	public boolean equals(Object o) {

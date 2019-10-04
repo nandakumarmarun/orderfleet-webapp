@@ -24,6 +24,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
+import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.SourceModule;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
@@ -91,13 +92,13 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "document_total", nullable = false)
 	private double documentTotal;
-	
+
 	@Column(name = "document_total_updated", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double documentTotalUpdated;
 
 	@Column(name = "document_volume", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double documentVolume;
-	
+
 	@Column(name = "document_volume_updated", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double documentVolumeUpdated;
 
@@ -166,10 +167,15 @@ public class InventoryVoucherHeader implements Serializable {
 	@NotNull
 	@Column(name = "pdf_download_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean pdfDownloadStatus = false;
-	
+
 	@NotNull
 	@Column(name = "updated_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
-	private boolean updatedStatus = false;//whether the inventory voucher is updated or not
+	private boolean updatedStatus = false;// whether the inventory voucher is updated or not
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "send_sales_order_status", nullable = false, columnDefinition = "character varying DEFAULT 'NOT_SENT'")
+	private SendSalesOrderEmailStatus sendSalesOrderEmailStatus = SendSalesOrderEmailStatus.NOT_SENT;
 
 	public Long getId() {
 		return id;
@@ -282,7 +288,7 @@ public class InventoryVoucherHeader implements Serializable {
 	public void setDocumentVolume(double documentVolume) {
 		this.documentVolume = documentVolume;
 	}
-	
+
 	public double getDocumentTotalUpdated() {
 		return documentTotalUpdated;
 	}
@@ -442,5 +448,13 @@ public class InventoryVoucherHeader implements Serializable {
 	public void setUpdatedStatus(boolean updatedStatus) {
 		this.updatedStatus = updatedStatus;
 	}
-	
+
+	public SendSalesOrderEmailStatus getSendSalesOrderEmailStatus() {
+		return sendSalesOrderEmailStatus;
+	}
+
+	public void setSendSalesOrderEmailStatus(SendSalesOrderEmailStatus sendSalesOrderEmailStatus) {
+		this.sendSalesOrderEmailStatus = sendSalesOrderEmailStatus;
+	}
+
 }

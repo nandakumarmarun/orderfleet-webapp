@@ -66,7 +66,7 @@ public class MobileSettingsController {
 	private final ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
 	private final UserActivityRepository userActivityRepository;
-	
+
 	@Inject
 	private ReceivablePayableColumnConfigRepository receivablePayableColumnConfigRepository;
 
@@ -91,12 +91,10 @@ public class MobileSettingsController {
 	/**
 	 * GET /mobile-settings : get all mobile settings.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and with body
 	 *         MobileSettingsDTO
-	 * @throws URISyntaxException
-	 *             if the pagination headers couldn't be generated
+	 * @throws URISyntaxException if the pagination headers couldn't be generated
 	 */
 	@Timed
 	@GetMapping("/mobile-settings")
@@ -108,12 +106,10 @@ public class MobileSettingsController {
 	/**
 	 * GET /mobile-settings : get all mobile settings.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and with body
 	 *         MobileSettingsDTO
-	 * @throws URISyntaxException
-	 *             if the pagination headers couldn't be generated
+	 * @throws URISyntaxException if the pagination headers couldn't be generated
 	 */
 	@Timed
 	@GetMapping("/user-all-activity-count")
@@ -180,15 +176,18 @@ public class MobileSettingsController {
 
 		return userTargetAchievedDTO;
 	}
-	
+
 	@GetMapping("/mobile-settings/receivable-payable-column-config")
 	public ResponseEntity<List<ReceivablePayableColumnConfigDTO>> getReceivablePayableColumnConfig() {
 		log.debug("REST request to get ReceivablePayableColumnConfig");
-		List<ReceivablePayableColumnConfig> rpColumnConfigs = receivablePayableColumnConfigRepository.findAllByCompanyId();
-		if(!rpColumnConfigs.isEmpty()) {
-			return new ResponseEntity<>(rpColumnConfigs.stream().map(ReceivablePayableColumnConfigDTO::new).collect(Collectors.toList()), HttpStatus.OK);	
+		List<ReceivablePayableColumnConfig> rpColumnConfigs = receivablePayableColumnConfigRepository
+				.findAllByCompanyId();
+		if (!rpColumnConfigs.isEmpty()) {
+			return new ResponseEntity<>(
+					rpColumnConfigs.stream().map(ReceivablePayableColumnConfigDTO::new).collect(Collectors.toList()),
+					HttpStatus.OK);
 		}
 		return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
-		
+
 	}
 }

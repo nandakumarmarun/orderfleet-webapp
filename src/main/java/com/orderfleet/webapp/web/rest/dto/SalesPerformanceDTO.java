@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest.dto;
 import java.time.LocalDateTime;
 
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
+import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
@@ -39,11 +40,11 @@ public class SalesPerformanceDTO {
 	private String userName;
 
 	private double documentTotal;
-	
+
 	private double documentTotalUpdated;
 
 	private double documentVolume;
-	
+
 	private double documentVolumeUpdated;
 
 	private double totalVolume;
@@ -51,6 +52,8 @@ public class SalesPerformanceDTO {
 	private boolean pdfDownloadButtonStatus;
 
 	private boolean pdfDownloadStatus;
+
+	private boolean sendSalesOrderEmailStatusColumn;
 
 	private Boolean status;
 
@@ -60,10 +63,12 @@ public class SalesPerformanceDTO {
 
 	private SalesManagementStatus salesManagementStatus;
 
+	private SendSalesOrderEmailStatus sendSalesOrderEmailStatus;
+
 	private String visitRemarks;
-	
+
 	private boolean updatedStatus;
-	
+
 	private boolean editOrder;
 
 	public String getPid() {
@@ -289,5 +294,21 @@ public class SalesPerformanceDTO {
 	public void setEditOrder(boolean editOrder) {
 		this.editOrder = editOrder;
 	}
-	
+
+	public boolean getSendSalesOrderEmailStatusColumn() {
+		return sendSalesOrderEmailStatusColumn;
+	}
+
+	public void setSendSalesOrderEmailStatusColumn(boolean sendSalesOrderEmailStatusColumn) {
+		this.sendSalesOrderEmailStatusColumn = sendSalesOrderEmailStatusColumn;
+	}
+
+	public SendSalesOrderEmailStatus getSendSalesOrderEmailStatus() {
+		return sendSalesOrderEmailStatus;
+	}
+
+	public void setSendSalesOrderEmailStatus(SendSalesOrderEmailStatus sendSalesOrderEmailStatus) {
+		this.sendSalesOrderEmailStatus = sendSalesOrderEmailStatus;
+	}
+
 }

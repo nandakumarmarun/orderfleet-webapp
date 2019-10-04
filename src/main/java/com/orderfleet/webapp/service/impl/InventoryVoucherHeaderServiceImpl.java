@@ -61,8 +61,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	/**
 	 * Save a inventoryVoucherHeader.
 	 * 
-	 * @param inventoryVoucherHeaderDTO
-	 *            the entity to save
+	 * @param inventoryVoucherHeaderDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -74,8 +73,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	/**
 	 * Get all the inventoryVoucherHeaders.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -105,8 +103,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	/**
 	 * Get all the inventoryVoucherHeaders.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -125,8 +122,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	/**
 	 * Get one inventoryVoucherHeader by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -143,8 +139,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	/**
 	 * Get one inventoryVoucherHeader by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -240,6 +235,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();
 		inventoryVoucherHeader.setStatus(true);
 		inventoryVoucherHeader.setTallyDownloadStatus(inventoryVoucherHeaderDTO.getTallyDownloadStatus());
+		inventoryVoucherHeader.setSendSalesOrderEmailStatus(inventoryVoucherHeaderDTO.getSendSalesOrderEmailStatus());
 		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
 	}
 
@@ -250,7 +246,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		inventoryVoucherHeader.setSalesManagementStatus(inventoryVoucherHeaderDTO.getSalesManagementStatus());
 		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByExecutiveTaskExecutionPid(String executiveTaskExecutionPid) {
@@ -368,7 +364,6 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				.collect(Collectors.toList());
 		return result;
 	}
-	
 
 	@Override
 	public void updateProcessStatus(String inventoryVoucherHeaderPid, String status) {
@@ -458,16 +453,15 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	public InventoryVoucherHeader updateInventoryVoucherHeader(InventoryVoucherHeaderDTO ivhDto) {
 		InventoryVoucherHeader ivh = new InventoryVoucherHeader();
 		Optional<InventoryVoucherHeader> opIvh = inventoryVoucherHeaderRepository.findOneByPid(ivhDto.getPid());
-		if(opIvh.isPresent()) {
+		if (opIvh.isPresent()) {
 			ivh = opIvh.get();
 			ivh.setDocumentTotalUpdated(ivhDto.getDocumentTotalUpdated());
 			ivh.setDocumentVolumeUpdated(ivhDto.getDocumentVolumeUpdated());
 			ivh.setUpdatedStatus(ivhDto.getUpdatedStatus());
 			ivh = inventoryVoucherHeaderRepository.save(ivh);
 		}
-			
+
 		return ivh;
 	}
-	
-	
+
 }
