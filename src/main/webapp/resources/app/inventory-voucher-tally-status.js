@@ -12,6 +12,7 @@ if (!this.InventoryVoucher) {
 			+ location.pathname;
 
 	$(document).ready(function() {
+
 		$("#txtToDate").datepicker({
 			dateFormat : "dd-mm-yy"
 		});
@@ -40,6 +41,7 @@ if (!this.InventoryVoucher) {
 		$("#btnApply").on('click', function() {
 			InventoryVoucher.filter();
 		});
+
 	});
 
 	function loadAllDocumentByDocumentType() {
@@ -314,13 +316,17 @@ if (!this.InventoryVoucher) {
 	}
 
 	function sendSalesOrderEmail() {
+
+		$(".loader").addClass('show');
+
 		if (confirm("Are you sure?")) {
-	
+
 			$.ajax({
 				url : inventoryVoucherContextPath + "/sendSalesOrderEmail",
 				method : 'GET',
 				success : function(data) {
 					InventoryVoucher.filter();
+					$(".loader").removeClass('show');
 					// onSaveSuccess(data);
 				},
 				error : function(xhr, error) {
@@ -328,6 +334,7 @@ if (!this.InventoryVoucher) {
 				}
 			});
 		}
+
 	}
 
 	InventoryVoucher.downloadSalesorderPdf = function(inventoryPid) {

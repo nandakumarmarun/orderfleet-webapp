@@ -220,9 +220,6 @@ public class SalesPerformanceReportTallyStatusResource {
 		}
 		model.addAttribute("sendSalesOrderEmailStatus", sendSalesOrderEmailStatus);
 
-		model.addAttribute("notSentSize", inventoryVoucherHeaderRepository
-				.getCountOfSendSalesOrderEmailNotSent(SendSalesOrderEmailStatus.NOT_SENT));
-
 		return "company/primarySalesPerformanceTallyStatusReport";
 	}
 
@@ -626,8 +623,7 @@ public class SalesPerformanceReportTallyStatusResource {
 		String excelFileName = date + "_SalesOrder" + ".xls";
 		String sheetName = "Sheet1";
 		String[] headerColumns = { "Order No", "Salesman", "Order Date", "Customer", "Supplier", "Product Name",
-				"Quantity", "Free Quantity", "Selling Rate", "Discount Amount", "Discount Percentage", "Tax Percentage",
-				"Total" };
+				"Quantity", "Free Quantity", "Selling Rate", "Discount Percentage", "Tax Percentage", "Total" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -660,7 +656,7 @@ public class SalesPerformanceReportTallyStatusResource {
 		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
 		// Create Cell Style for formatting Date
 		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
-		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
+		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss a"));
 		// Create Other rows and cells with Sales data
 		int rowNum = 1;
 		for (SecondarySalesOrderExcelDTO salesOrder : secondarySalesOrderExcelBySupplierDTOs) {
@@ -677,10 +673,9 @@ public class SalesPerformanceReportTallyStatusResource {
 			row.createCell(6).setCellValue(salesOrder.getQuantity());
 			row.createCell(7).setCellValue(salesOrder.getFreeQuantity());
 			row.createCell(8).setCellValue(salesOrder.getRate());
-			row.createCell(9).setCellValue(salesOrder.getDiscPrice());
-			row.createCell(10).setCellValue(salesOrder.getDiscPer());
-			row.createCell(11).setCellValue(salesOrder.getTaxPer());
-			row.createCell(12).setCellValue(salesOrder.getTotal());
+			row.createCell(9).setCellValue(salesOrder.getDiscPer());
+			row.createCell(10).setCellValue(salesOrder.getTaxPer());
+			row.createCell(11).setCellValue(salesOrder.getTotal());
 
 		}
 
@@ -695,7 +690,7 @@ public class SalesPerformanceReportTallyStatusResource {
 		for (Object[] obj : inventoryVoucherHeaderObjects) {
 			SecondarySalesOrderExcelDTO salesOrderDTO = new SecondarySalesOrderExcelDTO();
 
-			String pattern = "dd-MMM-yyyy";
+			String pattern = "dd-MMM-yyyy hh:mm:ss a";
 			DateFormat df = new SimpleDateFormat(pattern);
 			String dateAsString = df.format(obj[1]);
 
@@ -1014,7 +1009,7 @@ public class SalesPerformanceReportTallyStatusResource {
 		props.put("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.debug", "true");
+		props.put("mail.debug", "false");
 
 		return mailSender;
 	}
