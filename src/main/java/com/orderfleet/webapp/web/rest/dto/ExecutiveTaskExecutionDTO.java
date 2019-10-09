@@ -595,6 +595,24 @@ public class ExecutiveTaskExecutionDTO {
 
 	@Override
 	public String toString() {
-		return "ExecutiveTaskExecutionDTO{" + ", pid='" + pid + "'" + ", remarks='" + remarks + "'" + '}';
+		return "ExecutiveTaskExecutionDTO [pid=" + pid + ", clientTransactionKey=" + clientTransactionKey
+				+ ", createdDate=" + createdDate + ", date=" + date + ", sendDate=" + sendDate + ", startTime="
+				+ startTime + ", endTime=" + endTime + ", timeSpend=" + timeSpend + ", remarks=" + remarks
+				+ ", userPid=" + userPid + ", userName=" + userName + ", activityPid=" + activityPid + ", activityName="
+				+ activityName + ", accountTypePid=" + accountTypePid + ", accountTypeName=" + accountTypeName
+				+ ", accountProfilePid=" + accountProfilePid + ", accountProfileName=" + accountProfileName
+				+ ", accountLocation=" + accountLocation + ", latitude=" + latitude + ", longitude=" + longitude
+				+ ", towerLatitude=" + towerLatitude + ", towerLongitude=" + towerLongitude + ", mnc=" + mnc + ", mcc="
+				+ mcc + ", cellId=" + cellId + ", lac=" + lac + ", locationType=" + locationType + ", isGpsOff="
+				+ isGpsOff + ", isMobileDataOff=" + isMobileDataOff + ", startLocation=" + startLocation
+				+ ", startLatitude=" + startLatitude + ", startLongitude=" + startLongitude + ", startMnc=" + startMnc
+				+ ", startMcc=" + startMcc + ", startCellId=" + startCellId + ", startLac=" + startLac
+				+ ", startLocationType=" + startLocationType + ", startIsGpsOff=" + startIsGpsOff
+				+ ", startIsMobileDataOff=" + startIsMobileDataOff + ", location=" + location + ", towerLocation="
+				+ towerLocation + ", activityStatus=" + activityStatus + ", executiveTaskPlanPid="
+				+ executiveTaskPlanPid + ", rejectReasonRemark=" + rejectReasonRemark + ", employeeName=" + employeeName
+				+ ", interimSave=" + interimSave + ", punchInDate=" + punchInDate + "]";
 	}
+
+	
 }

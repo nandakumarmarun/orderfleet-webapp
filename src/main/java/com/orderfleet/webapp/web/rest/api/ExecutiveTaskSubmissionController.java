@@ -173,11 +173,14 @@ public class ExecutiveTaskSubmissionController {
 		 * VoucherNumberGenerationType inventoryVoucherGenerationType =
 		 * mobileConfiguration .getVoucherNumberGenerationType();
 		 */
+		Optional<Document> document = null;
+		if(executiveTaskSubmissionDTO.getInventoryVouchers().size()!=0) {
+			document = documentRepository
+					.findOneByPid(executiveTaskSubmissionDTO.getInventoryVouchers().get(0).getDocumentPid());
+		}
+		
 
-		Optional<Document> document = documentRepository
-				.findOneByPid(executiveTaskSubmissionDTO.getInventoryVouchers().get(0).getDocumentPid());
-
-		if (document.isPresent()) {
+		if (document != null && document.isPresent()) {
 			VoucherNumberGenerationType inventoryVoucherGenerationType = document.get()
 					.getVoucherNumberGenerationType();
 			if (inventoryVoucherGenerationType == VoucherNumberGenerationType.TYPE_2) {
@@ -219,7 +222,11 @@ public class ExecutiveTaskSubmissionController {
 					String documentNumberLocal = inventoryVoucherHeaderDTO.getDocumentNumberLocal();
 					log.debug("----------" + documentNumberLocal + " Saving to Server---------");
 					if (documentNumberLocalPrefix != null) {
+						log.info("documentNumberLocal "+documentNumberLocal);
+						log.info("documentNumberLocalPrefix "+documentNumberLocalPrefix);
 						String[] splitDocumentNumberLocal = documentNumberLocal.split(documentNumberLocalPrefix);
+						log.info("splitDocumentNumberLocal 0 -- "+splitDocumentNumberLocal[0]);
+						log.info("splitDocumentNumberLocal 1 -- "+splitDocumentNumberLocal[1]);
 						long documentNumberLocalCount = Long.parseLong(splitDocumentNumberLocal[1].toString());
 						for (Object[] obj : objectArray) {
 							String dbDocumentNumberLocalPrefix = null;
@@ -251,6 +258,9 @@ public class ExecutiveTaskSubmissionController {
 		TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 
 		try {
+			System.out.println("......................");
+			System.out.println(executiveTaskSubmissionDTO.toString());
+			System.out.println("......................");
 			ExecutiveTaskExecutionDTO executionDTO = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO();
 			if (executionDTO.getInterimSave()) {
 				deleteOldAllExecutions(executionDTO);

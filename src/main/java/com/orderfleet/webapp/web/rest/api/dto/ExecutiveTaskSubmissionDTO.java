@@ -66,4 +66,11 @@ public class ExecutiveTaskSubmissionDTO {
 		this.updateDashboard = updateDashboard;
 	}
 
+	@Override
+	public String toString() {
+		return "ExecutiveTaskSubmissionDTO [executiveTaskExecutionDTO=" + executiveTaskExecutionDTO
+				+ ", inventoryVouchers=" + inventoryVouchers + ", accountingVouchers=" + accountingVouchers
+				+ ", dynamicDocuments=" + dynamicDocuments + ", updateDashboard=" + updateDashboard + "]";
+	}
+	
 }

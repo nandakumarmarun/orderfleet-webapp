@@ -18,6 +18,8 @@ public class LoadServerExeTaskDTO {
 
 	private List<ExecutiveTaskExecutionDTO> executiveTaskExecutionDTOs = new ArrayList<>();
 
+	private int visitCount;
+
 	private int inventoryVoucherCount;
 
 	private int accountingVoucherCount;
@@ -74,6 +76,14 @@ public class LoadServerExeTaskDTO {
 
 	public void setDynamicDocumentCount(int dynamicDocumentCount) {
 		this.dynamicDocumentCount = dynamicDocumentCount;
+	}
+
+	public int getVisitCount() {
+		return visitCount;
+	}
+
+	public void setVisitCount(int visitCount) {
+		this.visitCount = visitCount;
 	}
 
 }
