@@ -232,7 +232,6 @@ public class SalesDataDownloadController {
 
 			salesOrderDTO.setEmployeeCode(obj[16] != null ? obj[16].toString() : "");
 			salesOrderDTO.setCaseValue(0.0);
-			salesOrderDTO.setCompDiscAmt(obj[15] != null ? Double.parseDouble(obj[15].toString()) : 0.0);
 
 			/*
 			 * salesOrderDTO.setTotal(obj[8] != null ? Double.parseDouble(obj[8].toString())
@@ -246,9 +245,18 @@ public class SalesDataDownloadController {
 			double freeQty = Double.parseDouble(obj[12] != null ? obj[12].toString() : "0.0");
 			double mrp = Double.parseDouble(obj[14] != null ? obj[14].toString() : "0.0");
 
+			double compDisAmount = 0.0;
+			if (obj[15] != null) {
+				compDisAmount = Double.parseDouble(obj[15].toString());
+				salesOrderDTO.setCompDiscAmt(Double.parseDouble(obj[15].toString()));
+			} else {
+				salesOrderDTO.setCompDiscAmt(0.0);
+
+			}
+
 			double amountValue = qty * rate;
 			double discountValue = amountValue * dis / 100;
-			double amountWithoutTax = amountValue - discountValue;
+			double amountWithoutTax = (amountValue - discountValue) - compDisAmount;
 
 			// tax calculation
 

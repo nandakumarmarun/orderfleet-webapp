@@ -28,16 +28,15 @@ import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.web.vendor.excel.dto.ReceiptExcelDTO;
 
-
 @RestController
 @RequestMapping(value = "/api/excel/v1")
 public class ReceiptDownloadController {
 
 	private final Logger log = LoggerFactory.getLogger(ReceiptDownloadController.class);
-	
+
 	@Autowired
 	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
-	
+
 	@RequestMapping(value = "/get-receipts.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public List<ReceiptExcelDTO> downloadReceiptsJson() throws URISyntaxException {
@@ -56,31 +55,34 @@ public class ReceiptDownloadController {
 							.getAccountingVoucherAllocations()) {
 						ReceiptExcelDTO receiptDTO = new ReceiptExcelDTO(accountingVoucherAllocation);
 						receiptDTO.setHeaderAmount(accountingVoucherHeader.getTotalAmount());
-						receiptDTO.setNarrationMessage(accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
+						receiptDTO.setNarrationMessage(
+								accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
 						receiptDTOs.add(receiptDTO);
 					}
 				}
 			}
 		}
-		
-		if(!receiptDTOs.isEmpty()) {
-			int updated = accountingVoucherHeaderRepository.
-					updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PROCESSING, receiptDTOs.stream().map(avh -> avh.getAccountingVoucherHeaderPid()).collect(Collectors.toList()));
-			log.debug("updated "+updated+" to PROCESSING");
+
+		if (!receiptDTOs.isEmpty()) {
+			int updated = accountingVoucherHeaderRepository
+					.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PROCESSING,
+							receiptDTOs.stream().map(avh -> avh.getAccountingVoucherHeaderPid())
+									.collect(Collectors.toList()));
+			log.debug("updated " + updated + " to PROCESSING");
 		}
 		return receiptDTOs;
 	}
-	
-	
+
 	@RequestMapping(value = "/update-receipt-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Void> UpdateReceiptStatus(@Valid @RequestBody List<String> accountingVoucherHeaderPids)
 			throws URISyntaxException {
 		log.debug("REST request to update Accounting Voucher Header Status : {}", accountingVoucherHeaderPids.size());
-			if (!accountingVoucherHeaderPids.isEmpty()) {
-				accountingVoucherHeaderRepository.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.COMPLETED,  accountingVoucherHeaderPids);
-			}
+		if (!accountingVoucherHeaderPids.isEmpty()) {
+			accountingVoucherHeaderRepository.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(
+					TallyDownloadStatus.COMPLETED, accountingVoucherHeaderPids);
+		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
-	
+
 }
