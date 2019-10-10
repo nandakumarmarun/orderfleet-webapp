@@ -220,7 +220,11 @@ public class SalesDataDownloadController {
 					.findByCompanyIdAndAliasIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), obj[2].toString());
 
 			if (apOp.isPresent()) {
-				if (apOp.get().getTinNo().equalsIgnoreCase("") || apOp.get().getTinNo() == null) {
+				if(apOp.get().getTinNo() != null) {
+					if(apOp.get().getTinNo().equalsIgnoreCase("")) {
+						unregisteredCustomer = true;
+					}
+				}else {
 					unregisteredCustomer = true;
 				}
 			}

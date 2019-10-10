@@ -181,10 +181,10 @@ public class ModernSalesDataService {
 					HttpHeaders headers = new HttpHeaders();
 					headers.setContentType(MediaType.APPLICATION_XML);
 					HttpEntity<String> request = new HttpEntity<>(xmlString, headers);
-					final ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
-					if (response.getStatusCode().equals(HttpStatus.OK)) {
-						System.out.println("order successfully uploaded to **:modern ");
-					}
+//					final ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
+//					if (response.getStatusCode().equals(HttpStatus.OK)) {
+//						System.out.println("order successfully uploaded to **:modern ");
+//					}
 			}	
 		}
 		
@@ -246,6 +246,7 @@ public class ModernSalesDataService {
 								.equals(inventoryVoucher.getReceiverAccount().getPid())).findFirst();
 		
 		if(locAcc.isPresent()) {
+			boolean employeeFound = false;
 			List<EmployeeProfileLocation> epLocation = employeeLocationList.stream()
 					.filter(el -> 
 					el.getLocation().getPid().equals(locAcc.get().getLocation().getPid()))
@@ -255,8 +256,12 @@ public class ModernSalesDataService {
 					if(upg.getUser().getId() == el.getEmployeeProfile().getUser().getId()) {
 						log.info(el.getEmployeeProfile().getName()+"----*----"+upg.getUser().getFirstName());
 						xmlRequest.append(el.getEmployeeProfile().getAlias());
+						employeeFound  = true;
 						break;
 					}
+				}
+				if(employeeFound) {
+					break;
 				}
 			}
 		}
