@@ -30,7 +30,9 @@ if (!this.Document) {
 		companyPid : null,
 		companyName : null,
 		stockFlow : null,
-		qrCodeEnabled :false
+		qrCodeEnabled :false,
+		orderNoEnabled : false,
+		voucherNumberGenerationType : 'TYPE_1'
 		
 	};
 
