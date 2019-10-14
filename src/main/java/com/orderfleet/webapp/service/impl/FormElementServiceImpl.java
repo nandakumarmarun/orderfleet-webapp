@@ -64,8 +64,7 @@ public class FormElementServiceImpl implements FormElementService {
 	/**
 	 * Save a formElement.
 	 * 
-	 * @param formElementDTO
-	 *            the entity to save
+	 * @param formElementDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -93,8 +92,7 @@ public class FormElementServiceImpl implements FormElementService {
 	/**
 	 * Update a formElement.
 	 * 
-	 * @param formElementDTO
-	 *            the entity to update
+	 * @param formElementDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -107,11 +105,18 @@ public class FormElementServiceImpl implements FormElementService {
 			formElement.setFormElementType(formElementTypeRepository.findOne(formElementDTO.getFormElementTypeId()));
 			Set<FormElementValue> newFormElementValues = new LinkedHashSet<>();
 			for (FormElementValueDTO formElementValueDto : formElementDTO.getFormElementValues()) {
-				FormElementValue formElementValue = new FormElementValue();
-				formElementValue.setName(formElementValueDto.getName());
-				formElementValue.setSortOrder(0);
-				formElementValue.setFormElement(formElement);
-				newFormElementValues.add(formElementValue);
+
+				Optional<FormElementValue> opFormElementValue = formElement.getFormElementValues().stream()
+						.filter(fev -> fev.getName().equalsIgnoreCase(formElementValueDto.getName())).findAny();
+				if (!opFormElementValue.isPresent()) {
+					FormElementValue formElementValue = new FormElementValue();
+					formElementValue.setName(formElementValueDto.getName());
+					formElementValue.setSortOrder(0);
+					formElementValue.setFormElement(formElement);
+					newFormElementValues.add(formElementValue);
+				} else {
+					newFormElementValues.add(opFormElementValue.get());
+				}
 			}
 			formElement.setFormLoadFromMobile(formElementDTO.getFormLoadFromMobile());
 			formElement.setFormLoadMobileData(formElementDTO.getFormLoadMobileData());
@@ -126,8 +131,7 @@ public class FormElementServiceImpl implements FormElementService {
 	/**
 	 * Get all the formElements.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -155,8 +159,7 @@ public class FormElementServiceImpl implements FormElementService {
 	/**
 	 * Get all the formElements.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -173,8 +176,7 @@ public class FormElementServiceImpl implements FormElementService {
 	/**
 	 * Get one formElement by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -189,8 +191,7 @@ public class FormElementServiceImpl implements FormElementService {
 	/**
 	 * Get one formElement by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -206,8 +207,7 @@ public class FormElementServiceImpl implements FormElementService {
 	/**
 	 * Get one formElement by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -224,8 +224,7 @@ public class FormElementServiceImpl implements FormElementService {
 	/**
 	 * Delete the formElement by id.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete FormElement : {}", pid);
@@ -255,10 +254,8 @@ public class FormElementServiceImpl implements FormElementService {
 	/**
 	 * Update the FormElement status by pid.
 	 * 
-	 * @param pid
-	 *            the pid of the entity
-	 * @param active
-	 *            the active of the entity
+	 * @param pid    the pid of the entity
+	 * @param active the active of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -278,11 +275,9 @@ public class FormElementServiceImpl implements FormElementService {
 	 * 
 	 *        find all active company
 	 * 
-	 * @param active
-	 *            the active of the entity
+	 * @param active   the active of the entity
 	 * 
-	 * @param pageable
-	 *            the pageable of the entity
+	 * @param pageable the pageable of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -302,8 +297,7 @@ public class FormElementServiceImpl implements FormElementService {
 	 * 
 	 *        find all deactive company
 	 * 
-	 * @param deactive
-	 *            the deactive of the entity
+	 * @param deactive the deactive of the entity
 	 * @return the list
 	 */
 	@Override
