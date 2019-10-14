@@ -122,7 +122,11 @@ public class FormElementServiceImpl implements FormElementService {
 			formElement.setFormLoadMobileData(formElementDTO.getFormLoadMobileData());
 			formElement.setFormElementValues(newFormElementValues);
 			formElement = formElementRepository.save(formElement);
-			formElementValueRepository.deleteByFormElementIdIsNull();
+			try {
+				formElementValueRepository.deleteByFormElementIdIsNull();
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Form Element Value is reffered to another table");
+			}
 			return formElementMapper.formElementToFormElementDTO(formElement);
 		}
 		return null;
