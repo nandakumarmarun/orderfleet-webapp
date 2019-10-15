@@ -626,6 +626,11 @@ public class TransactionResource {
 
 				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
+				
+				if(obj[18]==null) {
+					log.info("No Price Level Found for "+obj[9].toString());
+					throw new IllegalArgumentException("No Price Level Found for "+obj[9].toString());
+				}
 
 				Optional<PriceLevel> opPriceLevel = priceLevels.stream()
 						.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
