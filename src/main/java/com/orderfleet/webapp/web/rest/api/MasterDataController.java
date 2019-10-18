@@ -395,9 +395,9 @@ public class MasterDataController {
 		log.debug("REST request to get all territories");
 		List<LocationDTO> locationDTOs;
 		if (lastSyncdate == null) {
-			locationDTOs = locationService.findAllByCompanyAndLocationActivated(true);
+			locationDTOs = locationService.findAllByUserAndLocationActivated(true);
 		} else {
-			locationDTOs = locationService.findAllByCompanyIdAndLocationActivatedLastModified(true, lastSyncdate);
+			locationDTOs = locationService.findAllByUserAndLocationActivatedLastModified(true, lastSyncdate);
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(locationDTOs);
 	}
@@ -414,7 +414,7 @@ public class MasterDataController {
 	@GetMapping("/employee-location-hierarchies")
 	public ResponseEntity<List<MBLocationHierarchyDTO>> getuserLocationHierarchies() throws URISyntaxException {
 		log.debug("REST request to get all location-hierarchies");
-		List<MBLocationHierarchyDTO> locationHierarchyDTOs = locationHierarchyService.findByCompanyAndActivatedTrue();
+		List<MBLocationHierarchyDTO> locationHierarchyDTOs = locationHierarchyService.findByUserAndActivatedTrue();
 		return ResponseEntity.ok().body(locationHierarchyDTOs);
 	}
 

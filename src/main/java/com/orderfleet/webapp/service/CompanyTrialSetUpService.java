@@ -944,6 +944,7 @@ public class CompanyTrialSetUpService {
 		document.setDocumentPrefix("SO");
 		document.setPid(DocumentService.PID_PREFIX + RandomUtil.generatePid());
 		document.setSave(true);
+		document.setVoucherNumberGenerationType(VoucherNumberGenerationType.TYPE_1);
 		documents.add(document);
 
 		Document document1 = new Document();
@@ -954,6 +955,7 @@ public class CompanyTrialSetUpService {
 		document1.setDocumentPrefix("RE");
 		document1.setPid(DocumentService.PID_PREFIX + RandomUtil.generatePid());
 		document1.setSave(true);
+		document1.setVoucherNumberGenerationType(VoucherNumberGenerationType.TYPE_1);
 		documents.add(document1);
 
 		Document document2 = new Document();
@@ -963,6 +965,7 @@ public class CompanyTrialSetUpService {
 		document2.setDocumentPrefix("NO");
 		document2.setPid(DocumentService.PID_PREFIX + RandomUtil.generatePid());
 		document2.setSave(true);
+		document2.setVoucherNumberGenerationType(VoucherNumberGenerationType.TYPE_1);
 		documents.add(document2);
 		return documentRepository.save(documents);
 

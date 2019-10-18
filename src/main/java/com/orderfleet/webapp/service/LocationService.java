@@ -153,4 +153,9 @@ public interface LocationService {
 	List<LocationDTO> findAllLocationsByCompanyAndActivatedLocations();
 
 	void saveActivatedLocations(String assignedLocations);
+	
+	List<LocationDTO> findAllByUserAndLocationActivated(boolean active);
+	
+	List<LocationDTO> findAllByUserAndLocationActivatedLastModified(boolean active,
+			LocalDateTime lastModifiedDate);
 }

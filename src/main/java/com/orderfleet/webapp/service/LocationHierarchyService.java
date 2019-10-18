@@ -72,4 +72,6 @@ public interface LocationHierarchyService {
     List<LocationHierarchyDTO> findByLocationPidInAndActivatedTrue(List<String> locationPids);
     
     List<MBLocationHierarchyDTO> findByCompanyAndActivatedTrue();
+    
+    List<MBLocationHierarchyDTO> findByUserAndActivatedTrue();
 }

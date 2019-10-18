@@ -19,6 +19,7 @@ import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.repository.LocationHierarchyRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.LocationHierarchyService;
+import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.web.rest.api.dto.MBLocationHierarchyDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
@@ -46,6 +47,8 @@ public class LocationHierarchyServiceImpl implements LocationHierarchyService {
 	@Inject
 	private LocationMapper locationMapper;
 
+	@Inject
+	private LocationService locationService;
 	/**
 	 * Save a locationHierarchy.
 	 * 
@@ -206,4 +209,30 @@ public class LocationHierarchyServiceImpl implements LocationHierarchyService {
 		return locationsHierarchies.stream().map(MBLocationHierarchyDTO::new).collect(Collectors.toList());
 	}
 
+	@Override
+	public List<MBLocationHierarchyDTO> findByUserAndActivatedTrue() {
+		log.debug("Request to get all User based LocationHierarchies");
+		List<LocationHierarchy> userLocationsHierarchies  = new ArrayList<>();
+		List<LocationHierarchy> locationsHierarchies = locationHierarchyRepository
+				.findByCompanyIdAndActivatedTrue(SecurityUtils.getCurrentUsersCompanyId());
+		List<LocationDTO> locationDTOs = locationService.findAllByUserAndLocationActivated(true);
+//		for(LocationDTO loc: locationDTOs) {
+//			locationsHierarchies.stream()
+//					.filter(locHry -> (locHry.getLocation().getPid().equals(loc.getPid()) || 
+//							locHry.getParent().getPid().equals(loc.getPid()) ));
+//		}
+		for(LocationHierarchy locHierychy: locationsHierarchies) {
+			
+			Optional<LocationDTO> parentExist = 
+					locationDTOs.stream().filter(loc -> loc.getPid().equals(locHierychy.getParent()==null?null:locHierychy.getParent().getPid()))
+					.findAny();
+			Optional<LocationDTO> childExist = 
+					locationDTOs.stream().filter(loc ->	loc.getPid().equals(locHierychy.getLocation()==null?null:locHierychy.getLocation().getPid()))
+					.findAny();
+			if(parentExist.isPresent() && childExist.isPresent()) {
+				userLocationsHierarchies.add(locHierychy);
+			}
+		}
+		return userLocationsHierarchies.stream().map(MBLocationHierarchyDTO::new).collect(Collectors.toList());
+	}
 }

@@ -16,9 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.Location;
+import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
+import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.util.RandomUtil;
@@ -48,6 +51,12 @@ public class LocationServiceImpl implements LocationService {
 
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
+	
+	@Inject
+	private UserRepository userRepository;
+	
+	@Inject
+	private EmployeeProfileLocationRepository employeeProfileLocationRepository;
 
 	/**
 	 * Save a location.
@@ -366,4 +375,33 @@ public class LocationServiceImpl implements LocationService {
 
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public List<LocationDTO> findAllByUserAndLocationActivated(boolean active) {
+		log.debug("request to get all activated locations ");
+		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+		List<LocationDTO> locationDTOs = locationMapper.locationsToLocationDTOs(locations);
+		return locationDTOs;
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<LocationDTO> findAllByUserAndLocationActivatedLastModified(boolean active,
+			LocalDateTime lastModifiedDate) {
+		log.debug("request to get all activated locations ");
+		List<Location> userAssignedLocations = new ArrayList<>();
+		List<Location> locations = locationRepository.findAllByCompanyIdAndLocationActivatedLastModified(active,
+				lastModifiedDate);
+		List<Location> userLocations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+		
+		for(Location userLoc : userLocations) {
+			Optional<Location> opLocation = locations.stream().filter(loc -> loc.getId()==userLoc.getId()).findAny();
+			if(opLocation.isPresent()) {
+				userAssignedLocations.add(opLocation.get());
+			}
+		}
+		
+		List<LocationDTO> locationDTOs = locationMapper.locationsToLocationDTOs(userAssignedLocations);
+		return locationDTOs;
+	}
 }
