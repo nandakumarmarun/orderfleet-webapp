@@ -58,7 +58,7 @@ public class OtpService {
 	public boolean sendOtpMessage(String mobileNumber, int otp) {
 		try {
 			String authkey = "102303Axh5n6kDaubM5694f339";
-			String sender = "salesnrich";
+			String sender = "SNRICH";
 			String Otp = "OTP : " + String.valueOf(otp);
 			
 			String requestUrl = "http://api.msg91.com/api/sendhttp.php?authkey=" + authkey + "&mobiles=+91" + mobileNumber
