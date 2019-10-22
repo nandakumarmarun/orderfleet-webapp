@@ -92,7 +92,7 @@ public class ModernSalesDataService {
 	@Transactional
 	public void saveTransactions(ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper, Long companyId, String apiUrl) {
 		if (tsTransactionWrapper != null) {
-			System.out.println("posting data to server");
+			log.info("posting data to server");
 			postDataToServer( tsTransactionWrapper,  companyId,  apiUrl);
 		}
 	}
@@ -106,22 +106,22 @@ public class ModernSalesDataService {
 				List<String> accountProfilePids = ivhList.stream()
 												.map(iv -> iv.getReceiverAccount().getPid())
 												.collect(Collectors.toList());
-				System.out.println("length account profile pids"+accountProfilePids.size());
+				log.info("length account profile pids"+accountProfilePids.size());
 				List<LocationAccountProfile> locationAccountProfiles = 
 						locationAccountProfileRepository.findAllLocationByAccountProfilePids(accountProfilePids);
 				
 				
 				
-				System.out.println("length LocationAccountProfile "+locationAccountProfiles.size());
+				log.info("length LocationAccountProfile "+locationAccountProfiles.size());
 				List<EmployeeProfileLocation> employeeList = employeeProfileLocationRepository.
 						findAllEmployeeByLocationPids(locationAccountProfiles.stream().map(
 										la -> la.getLocation().getPid()).collect(Collectors.toList()));
-				System.out.println("length EmployeeProfileLocation "+employeeList.size());
+				log.info("length EmployeeProfileLocation "+employeeList.size());
 				List<InventoryVoucherDetail> ivdList = new ArrayList<InventoryVoucherDetail>();
 				for(InventoryVoucherHeader iv : ivhList) {
 					ivdList.addAll(iv.getInventoryVoucherDetails());
 				}
-				System.out.println("length InventoryVoucherDetail "+ivdList.size());
+				log.info("length InventoryVoucherDetail "+ivdList.size());
 				List<PriceLevelList> priceLevelLists = priceLevelListRepository.findAllByCompanyAndProductProfilePidIn(
 													companyId,ivdList.stream().map(ivd -> ivd.getProduct().getPid())
 													.collect(Collectors.toList()));
@@ -132,27 +132,27 @@ public class ModernSalesDataService {
 						ecomProductProductProfileRepo.findByProductProfilePids(ivdList.stream()
 																		.map(ivd -> ivd.getProduct().getPid())
 																		.collect(Collectors.toList()));
-				System.out.println("length EcomProductProfileProduct "+ecomProductProductProfile.size());
+				log.info("length EcomProductProfileProduct "+ecomProductProductProfile.size());
 				List<ProductGroupEcomProduct> productGroupEcomProductList = productGroupEcomProductRepo.findProductGroupEcomProductByEcomProductPidIn(ecomProductProductProfile.stream()
 																	.map(ecom -> ecom.getEcomProductProfile().getPid())
 																	.collect(Collectors.toList()));
 				List<String> productGroupPids = productGroupEcomProductList.stream()
 						.map(pg -> pg.getProductGroup().getPid()).collect(Collectors.toList());
-				System.out.println("length ProductGroupEcom "+productGroupEcomProductList.size());
+				log.info("length ProductGroupEcom "+productGroupEcomProductList.size());
 				List<UserProductGroup> userProductGroupList = userProductGroupRepository.findByProductGroupPids(
 						productGroupEcomProductList.stream().map(pgEcom -> pgEcom.getProductGroup().getPid()).collect(Collectors.toList()));	
-				System.out.println("length UserProductGroup "+userProductGroupList.size());
+				log.info("length UserProductGroup "+userProductGroupList.size());
 				
 				List<LocationHierarchy> locationHierarchyList = locationHierarchyRepository.findByCompanyIdAndActivatedTrue(companyId);
-				System.out.println("length LocationHierarchy "+locationHierarchyList.size());
+				log.info("length LocationHierarchy "+locationHierarchyList.size());
 				Optional<Long> northId = locationHierarchyList.stream().filter(lh ->
 											lh.getLocation().getName().equalsIgnoreCase("NORTH"))
 											.map(lh -> lh.getLocation().getId()).findFirst() ;
 				Optional<Long> southId = locationHierarchyList.stream().filter(lh ->
 											lh.getLocation().getName().equalsIgnoreCase("SOUTH"))
 											.map(lh -> lh.getLocation().getId()).findFirst() ;
-				System.out.println("northId :"+northId);
-				System.out.println("southId :"+southId);
+				log.info("northId :"+northId);
+				log.info("southId :"+southId);
 				List<Long> northChildren = new ArrayList<>();
 				List<Long> southChildren = new ArrayList<>();
 				if(northId.isPresent()) {
@@ -161,8 +161,8 @@ public class ModernSalesDataService {
 				if(southId.isPresent()) {
 					southChildren = locationHierarchyService.getAllChildrenIdsByParentId(southId.get());
 				}
-				System.out.println("north children size :"+northChildren.size());
-				System.out.println("south children size :"+southChildren.size());
+				log.info("north children size :"+northChildren.size());
+				log.info("south children size :"+southChildren.size());
 				
 				List<PriceLevelAccountProductGroup> priceLevelAccountProductGroups = priceLevelAccountProductGroupRepository
 							.findByAccountPidsAndProductGroupPisds(companyId,accountProfilePids,productGroupPids);
@@ -173,17 +173,15 @@ public class ModernSalesDataService {
 										northChildren,southChildren,priceLevelAccountProductGroups,
 										ecomProductProductProfile,productGroupEcomProductList,
 										priceLevelLists).toString();
-					System.out.println("-------------------");
-					System.out.println(xmlString);
+					log.info("-------------------");
 					log.info(xmlString);
-					log.debug(xmlString);
-					System.out.println("-------------------");
+					log.info("-------------------");
 					HttpHeaders headers = new HttpHeaders();
 					headers.setContentType(MediaType.APPLICATION_XML);
 					HttpEntity<String> request = new HttpEntity<>(xmlString, headers);
 					final ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
 					if (response.getStatusCode().equals(HttpStatus.OK)) {
-						System.out.println("order successfully uploaded to **:modern ");
+						log.info("order successfully uploaded to **:modern ");
 					}
 			}	
 		}

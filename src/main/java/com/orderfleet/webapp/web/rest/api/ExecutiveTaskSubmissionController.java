@@ -661,7 +661,7 @@ public class ExecutiveTaskSubmissionController {
 		} else if (integrationModuleName.isPresent()
 				&& Constants.MODERN_ERP.equals(integrationModuleName.get().getIntegrationModule().getName())) {
 			String apiBaseUrl = integrationModuleName.get().getBaseUrl();
-			System.out.println("order sent to ** " + apiBaseUrl);
+			log.info("order sent to ** " + apiBaseUrl);
 			log.info("checking url for :modern ");
 			if (apiBaseUrl != null) {
 				log.info("order sending to **:modern ");
