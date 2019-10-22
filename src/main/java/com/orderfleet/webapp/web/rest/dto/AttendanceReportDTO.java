@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 public class AttendanceReportDTO {
 
+	private String attendancePid;
+
 	private LocalDate attendanceDay;
 
 	private String employeeName;
@@ -26,6 +28,8 @@ public class AttendanceReportDTO {
 	private String towerLocation;
 
 	private String userPid;
+
+	private Boolean imageButtonVisible = Boolean.FALSE;;
 
 	public LocalDate getAttendanceDay() {
 		return attendanceDay;
@@ -113,6 +117,22 @@ public class AttendanceReportDTO {
 
 	public void setUserPid(String userPid) {
 		this.userPid = userPid;
+	}
+
+	public Boolean getImageButtonVisible() {
+		return imageButtonVisible;
+	}
+
+	public void setImageButtonVisible(Boolean imageButtonVisible) {
+		this.imageButtonVisible = imageButtonVisible;
+	}
+
+	public String getAttendancePid() {
+		return attendancePid;
+	}
+
+	public void setAttendancePid(String attendancePid) {
+		this.attendancePid = attendancePid;
 	}
 
 }

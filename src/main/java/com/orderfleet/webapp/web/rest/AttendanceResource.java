@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -27,21 +29,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.io.Files;
+import com.orderfleet.webapp.domain.AccountingVoucherHeader;
+import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.RootPlanDetail;
 import com.orderfleet.webapp.domain.enums.ApprovalStatus;
+import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.RootPlanDetailRepository;
 import com.orderfleet.webapp.service.AttendanceService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
+import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.FileDTO;
+import com.orderfleet.webapp.web.rest.dto.FormFileDTO;
 
 /**
  * Web controller for managing Attendance.
@@ -59,29 +70,35 @@ public class AttendanceResource {
 	private AttendanceService attendanceService;
 
 	@Inject
+	private AttendanceRepository attendanceRepository;
+
+	@Inject
 	private EmployeeHierarchyService employeeHierarchyService;
 
 	@Inject
 	private RootPlanDetailRepository rootPlanDetailRepository;
-	
+
 	@Inject
 	private EmployeeProfileService employeeProfileService;
-	
+
 	@Inject
 	private EmployeeProfileRepository employeeProfileRepository;
+
+	@Inject
+	private FileManagerService fileManagerService;
 
 	/**
 	 * GET /attendance-report : get attendance list.
 	 *
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/attendance-report", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
 	public String getAttendanceReport(Model model) {
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-		
+
 		if (userIds.isEmpty()) {
 			model.addAttribute("employees", employeeProfileService.findAllByCompany());
 		} else {
@@ -93,7 +110,8 @@ public class AttendanceResource {
 	@RequestMapping(value = "/attendance-report/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<AttendanceDTO>> filterAttendanceReport(@RequestParam("employeePid") String employeePid,
-			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate, @RequestParam boolean inclSubordinate) {
+			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
+			@RequestParam boolean inclSubordinate) {
 		log.debug("Web request to filter executive task executions");
 
 		List<AttendanceDTO> attendanceList = new ArrayList<>();
@@ -122,9 +140,10 @@ public class AttendanceResource {
 			List<RootPlanDetail> rootplanDetails = rootPlanDetailRepository
 					.findAllByUserLoginAndApprovalStatusNotEqualOrderByRootOrder(attendanceDTO.getLogin(),
 							ApprovalStatus.PENDING);
-			
+
 			rootplanDetails.stream().filter(rpd -> {
-				if (rpd.getDownloadDate() != null && rpd.getDownloadDate().toLocalDate().equals(attendanceDTO.getCreatedDate().toLocalDate())) {
+				if (rpd.getDownloadDate() != null
+						&& rpd.getDownloadDate().toLocalDate().equals(attendanceDTO.getCreatedDate().toLocalDate())) {
 					return true;
 				} else {
 					return false;
@@ -135,15 +154,18 @@ public class AttendanceResource {
 		return new ResponseEntity<>(filteredAttendanceDTOs, HttpStatus.OK);
 	}
 
-	private List<AttendanceDTO> getFilterData(String employeePid, LocalDate fDate, LocalDate tDate, boolean inclSubordinate) {
+	
+
+	private List<AttendanceDTO> getFilterData(String employeePid, LocalDate fDate, LocalDate tDate,
+			boolean inclSubordinate) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
-		
+
 		List<Long> userIds = Collections.emptyList();
-		if(employeePid.equals("no")) {
+		if (employeePid.equals("no")) {
 			userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 		} else {
-			if(inclSubordinate) {
+			if (inclSubordinate) {
 				userIds = employeeHierarchyService.getEmployeeSubordinateIds(employeePid);
 			} else {
 				Optional<EmployeeProfile> opEmployee = employeeProfileRepository.findOneByPid(employeePid);
@@ -153,13 +175,14 @@ public class AttendanceResource {
 			}
 		}
 		List<AttendanceDTO> attendanceList;
-		if(userIds.isEmpty()) {
+		if (userIds.isEmpty()) {
 			attendanceList = attendanceService.findAllByCompanyIdAndDateBetween(fromDate, toDate);
 		} else {
 			attendanceList = attendanceService.findAllByCompanyIdUserPidInAndDateBetween(userIds, fromDate, toDate);
 		}
 		for (AttendanceDTO attendanceDTO : attendanceList) {
-			EmployeeProfileDTO employeeProfileDTO2=employeeProfileService.findEmployeeProfileByUserLogin(attendanceDTO.getLogin());
+			EmployeeProfileDTO employeeProfileDTO2 = employeeProfileService
+					.findEmployeeProfileByUserLogin(attendanceDTO.getLogin());
 			attendanceDTO.setEmployeeName(employeeProfileDTO2.getName());
 		}
 		return attendanceList;
@@ -176,8 +199,10 @@ public class AttendanceResource {
 		Map<String, List<AttendanceDTO>> attendanceUserMap = attendanceList.parallelStream()
 				.collect(Collectors.groupingBy(AttendanceDTO::getLogin));
 		for (Entry<String, List<AttendanceDTO>> entry : attendanceUserMap.entrySet()) {
-			Map<String, List<AttendanceDTO>> individulDayWiseMap = entry.getValue().parallelStream().collect(Collectors.groupingBy(a -> a.getPlannedDate().toLocalDate().toString()));
-			individulDayWiseMap.forEach((k, v) -> filteredAttendanceDTO.add(v.stream().max(Comparator.comparing(AttendanceDTO::getPlannedDate)).get()));
+			Map<String, List<AttendanceDTO>> individulDayWiseMap = entry.getValue().parallelStream()
+					.collect(Collectors.groupingBy(a -> a.getPlannedDate().toLocalDate().toString()));
+			individulDayWiseMap.forEach((k, v) -> filteredAttendanceDTO
+					.add(v.stream().max(Comparator.comparing(AttendanceDTO::getPlannedDate)).get()));
 		}
 		Collections.sort(filteredAttendanceDTO, (p1, p2) -> p1.getPlannedDate().compareTo(p2.getPlannedDate()));
 		return filteredAttendanceDTO;

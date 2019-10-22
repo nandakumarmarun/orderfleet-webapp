@@ -70,6 +70,8 @@ public class MobileSettingsDTO {
 
 	private boolean enableSecondarySales;
 
+	private boolean enableAttendanceImage;
+
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -99,6 +101,7 @@ public class MobileSettingsDTO {
 		this.kfcEnabled = mobileConfigurationDTO.getKfcEnabled();
 		this.gpsMandatory = mobileConfigurationDTO.getGpsMandatory();
 		this.enableSecondarySales = mobileConfigurationDTO.getEnableSecondarySales();
+		this.enableAttendanceImage = mobileConfigurationDTO.getEnableAttendanceImage();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -309,12 +312,20 @@ public class MobileSettingsDTO {
 		this.gpsMandatory = gpsMandatory;
 	}
 
-	public boolean isEnableSecondarySales() {
+	public boolean getEnableSecondarySales() {
 		return enableSecondarySales;
 	}
 
 	public void setEnableSecondarySales(boolean enableSecondarySales) {
 		this.enableSecondarySales = enableSecondarySales;
+	}
+
+	public boolean getEnableAttendanceImage() {
+		return enableAttendanceImage;
+	}
+
+	public void setEnableAttendanceImage(boolean enableAttendanceImage) {
+		this.enableAttendanceImage = enableAttendanceImage;
 	}
 
 }

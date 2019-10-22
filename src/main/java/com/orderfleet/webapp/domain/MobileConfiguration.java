@@ -122,6 +122,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "enable_secondory_sales", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean enableSecondarySales;
 
+	@Column(name = "enable_attendance_image", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enableAttendanceImage;
+
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -344,6 +347,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setEnableSecondarySales(boolean enableSecondarySales) {
 		this.enableSecondarySales = enableSecondarySales;
+	}
+
+	public boolean getEnableAttendanceImage() {
+		return enableAttendanceImage;
+	}
+
+	public void setEnableAttendanceImage(boolean enableAttendanceImage) {
+		this.enableAttendanceImage = enableAttendanceImage;
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.AttendanceStatusSubgroup;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AttendanceStatus;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
@@ -87,15 +88,19 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 			LocalDateTime startDate, LocalDateTime endDate);
 
 	Optional<Attendance> findTop1ByCompanyPidAndUserPidOrderByCreatedDateDesc(String companyPid, String userPid);
-	
+
 	Optional<Attendance> findTop1ByCompanyIdAndUserPidOrderByCreatedDateDesc(Long companyPid, String userPid);
-	
+
 	List<Attendance> findAllByCompanyIdAndUserPidOrderByCreatedDateDesc(Long companyPid, String userPid);
 
 	@Query("select attendance from Attendance attendance where attendance.company.id = ?#{principal.companyId} and attendance.plannedDate between ?1 and ?2 and attendance.user.id = ?3 Order By attendance.plannedDate desc")
 	List<Attendance> getByDateBetweenAndUser(LocalDateTime fromDate, LocalDateTime toDate, Long userId);
 
 	List<Attendance> findTop61ByUserIdOrderByPlannedDateDesc(long userId);
+
+	Optional<Attendance> findOneByPidAndImageRefNo(String attendancePid, String imageRefNo);
+
+	Optional<Attendance> findOneByImageRefNo(String imageRefNo);
 
 	/*
 	 * @Query("select planned_date,attendance_status,remarks from tbl_attendance WHERE company_id = ?#{principal.companyId} and  user_id = ?1 ORDER BY  DESC top 61"

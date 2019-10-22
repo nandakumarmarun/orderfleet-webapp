@@ -40,6 +40,7 @@ public class MobileConfigurationDTO {
 	private boolean kfcEnabled;
 	private boolean gpsMandatory;
 	private boolean enableSecondarySales;
+	private boolean enableAttendanceImage;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -73,6 +74,7 @@ public class MobileConfigurationDTO {
 		this.kfcEnabled = mobileConfiguration.getKfcEnabled();
 		this.gpsMandatory = mobileConfiguration.getGpsMandatory();
 		this.enableSecondarySales = mobileConfiguration.getEnableSecondarySales();
+		this.enableAttendanceImage = mobileConfiguration.getEnableAttendanceImage();
 	}
 
 	public String getPid() {
@@ -281,6 +283,14 @@ public class MobileConfigurationDTO {
 
 	public void setEnableSecondarySales(boolean enableSecondarySales) {
 		this.enableSecondarySales = enableSecondarySales;
+	}
+
+	public boolean getEnableAttendanceImage() {
+		return enableAttendanceImage;
+	}
+
+	public void setEnableAttendanceImage(boolean enableAttendanceImage) {
+		this.enableAttendanceImage = enableAttendanceImage;
 	}
 
 }

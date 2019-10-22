@@ -86,6 +86,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 		attendance.setAttendanceStatus(attendanceDTO.getAttendanceStatus());
 		attendance.setUser(user);
 		attendance.setCompany(user.getCompany());
+		attendance.setImageRefNo(attendanceDTO.getImageRefNo());
 		// set subgroup
 		if (attendanceDTO.getAttendanceSubGroupId() != null) {
 			attendance.setAttendanceStatusSubgroup(

@@ -68,7 +68,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setKfcEnabled(mobileConfigurationDTO.getKfcEnabled());
 		configuration.setGpsMandatory(mobileConfigurationDTO.getGpsMandatory());
 		configuration.setEnableSecondarySales(mobileConfigurationDTO.getEnableSecondarySales());
-		
+		configuration.setEnableAttendanceImage(mobileConfigurationDTO.getEnableAttendanceImage());
+
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -101,6 +102,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setKfcEnabled(mobileConfigurationDTO.getKfcEnabled());
 			configuration.setGpsMandatory(mobileConfigurationDTO.getGpsMandatory());
 			configuration.setEnableSecondarySales(mobileConfigurationDTO.getEnableSecondarySales());
+			configuration.setEnableAttendanceImage(mobileConfigurationDTO.getEnableAttendanceImage());
 
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);

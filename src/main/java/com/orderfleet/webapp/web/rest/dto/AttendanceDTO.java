@@ -41,6 +41,8 @@ public class AttendanceDTO {
 	private String towerLocation;
 	private BigDecimal towerLatitude;
 	private BigDecimal towerLongitude;
+	private String imageRefNo;
+	private Boolean imageButtonVisible = Boolean.FALSE;;
 
 	public AttendanceDTO() {
 		super();
@@ -97,10 +99,15 @@ public class AttendanceDTO {
 		this.towerLocation = attendance.getTowerLocation();
 		this.towerLatitude = attendance.getTowerLatitude();
 		this.towerLongitude = attendance.getTowerLongitude();
+		this.imageRefNo = attendance.getImageRefNo();
 		if (attendance.getAttendanceStatusSubgroup() != null) {
 			this.attendanceSubGroupId = attendance.getAttendanceStatusSubgroup().getId();
 			this.attendanceSubGroupName = attendance.getAttendanceStatusSubgroup().getName();
 			this.attendanceSubGroupCode = attendance.getAttendanceStatusSubgroup().getCode();
+		}
+
+		if (attendance.getFiles().size() > 0) {
+			this.imageButtonVisible = true;
 		}
 	}
 
@@ -318,6 +325,22 @@ public class AttendanceDTO {
 
 	public void setTowerLongitude(BigDecimal towerLongitude) {
 		this.towerLongitude = towerLongitude;
+	}
+
+	public String getImageRefNo() {
+		return imageRefNo;
+	}
+
+	public void setImageRefNo(String imageRefNo) {
+		this.imageRefNo = imageRefNo;
+	}
+
+	public Boolean getImageButtonVisible() {
+		return imageButtonVisible;
+	}
+
+	public void setImageButtonVisible(Boolean imageButtonVisible) {
+		this.imageButtonVisible = imageButtonVisible;
 	}
 
 	@Override

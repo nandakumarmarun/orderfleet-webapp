@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,31 +20,44 @@ import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.io.Files;
+import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
+import com.orderfleet.webapp.repository.RootPlanDetailRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.service.AttendanceService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
+import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceReportDTO;
+import com.orderfleet.webapp.web.rest.dto.FileDTO;
+import com.orderfleet.webapp.web.rest.dto.FormFileDTO;
 
 @Controller
 @RequestMapping("/web")
 public class AttendanceReportResource {
+
+	private final Logger log = LoggerFactory.getLogger(AttendanceResource.class);
 
 	@Inject
 	private AttendanceService attendanceService;
@@ -62,6 +76,12 @@ public class AttendanceReportResource {
 
 	@Inject
 	private UserRepository userRepository;
+
+	@Inject
+	private AttendanceRepository attendanceRepository;
+
+	@Inject
+	private FileManagerService fileManagerService;
 
 	/**
 	 * GET /attendance-report : get attendance list.
@@ -109,6 +129,43 @@ public class AttendanceReportResource {
 				HttpStatus.OK);
 	}
 
+	@Timed
+	@RequestMapping(value = "/attendance-report/all/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<FormFileDTO>> getAttendanceImages(@PathVariable String pid) {
+		log.debug("Web request to get Attendance images by pid : {}", pid);
+
+		Optional<Attendance> optionalAttendanceDTO = attendanceRepository.findOneByPid(pid);
+		Attendance attendance = new Attendance();
+
+		List<FormFileDTO> formFileDTOs = new ArrayList<>();
+		if (optionalAttendanceDTO.isPresent()) {
+			attendance = optionalAttendanceDTO.get();
+		}
+		if (attendance.getFiles().size() > 0) {
+			FormFileDTO formFileDTO = new FormFileDTO();
+			formFileDTO.setFormName(attendance.getUser().getFirstName());
+			formFileDTO.setFiles(new ArrayList<>());
+			Set<File> files = attendance.getFiles();
+			for (File file : files) {
+				FileDTO fileDTO = new FileDTO();
+				fileDTO.setFileName(file.getFileName());
+				fileDTO.setMimeType(file.getMimeType());
+				java.io.File physicalFile = this.fileManagerService.getPhysicalFileByFile(file);
+				if (physicalFile.exists()) {
+					try {
+						fileDTO.setContent(Files.toByteArray(physicalFile));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				formFileDTO.getFiles().add(fileDTO);
+			}
+			formFileDTOs.add(formFileDTO);
+		}
+		return new ResponseEntity<>(formFileDTOs, HttpStatus.OK);
+
+	}
+
 	private List<AttendanceReportDTO> getFilterData(String employeePid, String attStatus, LocalDate fDate,
 			LocalDate tDate, boolean inclSubordinate) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
@@ -131,6 +188,7 @@ public class AttendanceReportResource {
 						.findAny();
 				AttendanceReportDTO attendanceReportDTO = new AttendanceReportDTO();
 				attendanceReportDTO.setAttendanceDay(localDate);
+
 				if (attendanceExists.isPresent()) {
 					AttendanceDTO attDto = attendanceExists.get();
 					attendanceReportDTO.setUserPid(attDto.getUserPid());
@@ -143,12 +201,18 @@ public class AttendanceReportResource {
 					attendanceReportDTO.setLocation(attDto.getLocation());
 					attendanceReportDTO.setTowerLocation(attDto.getTowerLocation());
 					attendanceReportDTO.setAttendanceSubGroupName(attDto.getAttendanceSubGroupName());
+					attendanceReportDTO.setImageButtonVisible(attDto.getImageButtonVisible());
+					attendanceReportDTO.setAttendancePid(attDto.getPid());
+					
+
 				} else {
 					attendanceReportDTO.setEmployeeName(employee.getName());
 					attendanceReportDTO.setAttendanceStatus("NOT MARKED");
 					attendanceReportDTO.setCompleted(false);
 					attendanceReportDTO.setRemarks("");
 					attendanceReportDTO.setLocation("");
+					attendanceReportDTO.setImageButtonVisible(Boolean.FALSE);
+					attendanceReportDTO.setAttendancePid("");
 				}
 				attendanceReportDtos.add(attendanceReportDTO);
 			}

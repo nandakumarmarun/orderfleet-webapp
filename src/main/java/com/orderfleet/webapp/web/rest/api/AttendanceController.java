@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest.api;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -12,11 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.Attendance;
@@ -24,20 +27,25 @@ import com.orderfleet.webapp.domain.AttendanceSubgroupApprovalRequest;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.DashboardAttendance;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
+import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.RootPlanSubgroupApprove;
 import com.orderfleet.webapp.domain.enums.ApprovalStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.AttendanceSubgroupApprovalRequestRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DashboardAttendanceUserRepository;
 import com.orderfleet.webapp.repository.RootPlanSubgroupApproveRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AttendanceService;
+import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.service.KilometreCalculationService;
 import com.orderfleet.webapp.service.PunchOutService;
+import com.orderfleet.webapp.service.impl.FileManagerException;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 import com.orderfleet.webapp.web.rest.dto.KilometerCalculationDTO;
 import com.orderfleet.webapp.web.rest.dto.PunchOutDTO;
+import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 import com.orderfleet.webapp.web.websocket.dto.ActivityDTO;
 
 /**
@@ -54,6 +62,9 @@ public class AttendanceController {
 
 	@Inject
 	private AttendanceService attendanceService;
+	
+	@Inject
+	private AttendanceRepository attendanceRepository;
 	
 	@Inject
 	private KilometreCalculationService kilometreCalculationService;
@@ -75,6 +86,9 @@ public class AttendanceController {
 	
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
+	
+	@Inject
+	private FileManagerService fileManagerService;
 
 	/**
 	 * POST /attendance : mark attendance.
@@ -150,6 +164,40 @@ public class AttendanceController {
 			log.error(e.getMessage());
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+	
+	@Transactional
+	@RequestMapping(value = "/upload/attendanceImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> uploadAttendanceImageFile(
+			@RequestParam("imageRefNo") String imageRefNo, @RequestParam("file") MultipartFile file) {
+		log.debug("Request Attendance Image to upload a file : {}", file);
+		if (file.isEmpty()) {
+			return ResponseEntity.badRequest()
+					.headers(
+							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
+					.body(null);
+		}
+		return attendanceRepository
+				.findOneByImageRefNo(imageRefNo)
+				.map(attendance -> {
+					try {
+						File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
+								file.getOriginalFilename(), file.getContentType());
+						// update filledForm with file
+						attendance.getFiles().add(uploadedFile);
+						attendanceRepository.save(attendance);
+						log.debug("uploaded file for Attendance: {}", attendance);
+						return new ResponseEntity<>(HttpStatus.OK);
+					} catch (FileManagerException | IOException ex) {
+						log.debug("File upload exception : {}", ex.getMessage());
+						return ResponseEntity.badRequest()
+								.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage()))
+								.body(null);
+					}
+				})
+				.orElse(ResponseEntity.badRequest()
+						.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
+						.body(null));
 	}
 
 	

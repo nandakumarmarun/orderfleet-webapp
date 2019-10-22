@@ -3,13 +3,20 @@ package com.orderfleet.webapp.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -17,6 +24,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.orderfleet.webapp.domain.enums.AttendanceStatus;
 import com.orderfleet.webapp.domain.enums.LocationType;
 
@@ -42,7 +50,7 @@ public class Attendance implements Serializable {
 	@NotNull
 	@Column(name = "pid", unique = true, nullable = false, updatable = false)
 	private String pid;
-	
+
 	@Column(name = "client_transaction_key", updatable = false)
 	private String clientTransactionKey;
 
@@ -68,7 +76,7 @@ public class Attendance implements Serializable {
 	@ManyToOne
 	@NotNull
 	private User user;
-	
+
 	@ManyToOne
 	private AttendanceStatusSubgroup attendanceStatusSubgroup;
 
@@ -101,7 +109,7 @@ public class Attendance implements Serializable {
 	@Column(name = "location_type")
 	@Enumerated(EnumType.STRING)
 	private LocationType locationType;
-	
+
 	@Column(name = "tower_location")
 	private String towerLocation;
 
@@ -110,7 +118,16 @@ public class Attendance implements Serializable {
 
 	@Column(name = "tower_longitude", precision = 11, scale = 8)
 	private BigDecimal towerLongitude;
-	
+
+	@Column(name = "imageRefNo")
+	private String imageRefNo;
+
+	@JsonIgnore
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "tbl_attendance_file", joinColumns = {
+			@JoinColumn(name = "attendance_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "file_id", referencedColumnName = "id") })
+	private Set<File> files = new HashSet<>();
 
 	public Attendance() {
 		super();
@@ -299,7 +316,7 @@ public class Attendance implements Serializable {
 	public void setLongitude(BigDecimal longitude) {
 		this.longitude = longitude;
 	}
-	
+
 	public String getTowerLocation() {
 		return towerLocation;
 	}
@@ -324,10 +341,26 @@ public class Attendance implements Serializable {
 		this.towerLongitude = towerLongitude;
 	}
 
+	public String getImageRefNo() {
+		return imageRefNo;
+	}
+
+	public void setImageRefNo(String imageRefNo) {
+		this.imageRefNo = imageRefNo;
+	}
+
+	public Set<File> getFiles() {
+		return files;
+	}
+
+	public void setFiles(Set<File> files) {
+		this.files = files;
+	}
+
 	@Override
 	public String toString() {
-		return "Attendance [id=" + id + ", pid=" + pid + ", createdDate=" + createdDate + ", completed="
-				+ completed + ", remarks=" + remarks + ", plannedDate=" + plannedDate + "]";
+		return "Attendance [id=" + id + ", pid=" + pid + ", createdDate=" + createdDate + ", completed=" + completed
+				+ ", remarks=" + remarks + ", plannedDate=" + plannedDate + "]";
 	}
 
 }

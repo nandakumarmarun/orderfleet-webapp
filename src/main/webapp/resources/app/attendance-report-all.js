@@ -122,6 +122,17 @@ if (!this.AttendanceReport) {
 											if (duration.asMinutes() > 10) {
 												rowColor = "background-color:yellow";
 											}
+
+											var content = "";
+
+											if (attendance.imageButtonVisible) {
+												content = "<td><button type='button' class='btn btn-info' onclick='AttendanceReport.showModalPopup($(\"#imagesModal\"),\""
+														+ attendance.attendancePid
+														+ "\",0);'>View Images</button></td>";
+											} else {
+												content = "<td></td>";
+											}
+
 											if (attendance.attendanceSubGroupName == null) {
 												$('#tBodyAttendanceReport')
 														.append(
@@ -163,7 +174,9 @@ if (!this.AttendanceReport) {
 																		+ "</a></td><td>"
 																		+ (attendance.remarks == null ? ""
 																				: attendance.remarks)
-																		+ "</td></tr>");
+																		+ "</td>"
+																		+ content
+																		+ "</tr>");
 											} else {
 												var taskListAlias = attendance.taskListAlias == null ? ""
 														: " - "
@@ -215,7 +228,9 @@ if (!this.AttendanceReport) {
 																		+ "</a></td><td>"
 																		+ (attendance.remarks == null ? ""
 																				: attendance.remarks)
-																		+ "</td></tr>");
+																		+ "</td>"
+																		+ content
+																		+ "</tr>");
 											}
 										});
 					}
@@ -239,6 +254,56 @@ if (!this.AttendanceReport) {
 			$('#divDatePickers').css('display', 'initial');
 		}
 	}
+
+	AttendanceReport.showModalPopup = function(el, pid, action) {
+		if (pid) {
+			switch (action) {
+			case 0:
+				showAttendanceImage(pid);
+				break;
+			}
+		}
+		el.modal('show');
+	}
+	
+	function showAttendanceImage(pid) {
+		$
+				.ajax({
+					url : attendanceReportContextPath + "/images/" + pid,
+					method : 'GET',
+					success : function(filledFormFiles) {
+
+						$('#divAttendanceImages').html("");
+						$
+								.each(
+										filledFormFiles,
+										function(index, filledFormFile) {
+											var table = '<table class="table  table-striped table-bordered"><tr><td style="font-weight: bold;">'
+													+ filledFormFile.formName
+													+ '</td></tr>';
+											$
+													.each(
+															filledFormFile.files,
+															function(index,
+																	file) {
+																table += '<tr><th>'
+																		+ file.fileName
+																		+ '</th></tr>';
+																table += '<tr><td><img width="100%" src="data:image/png;base64,'
+																		+ file.content
+																		+ '"/></td></tr>';
+															});
+											table += '</table>';
+											$('#divAttendanceImages')
+													.append(table);
+										});
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
+	}
+
 
 	function searchTable(inputVal) {
 		var table = $('#tBodyAttendanceReport');
@@ -268,7 +333,7 @@ if (!this.AttendanceReport) {
 			return "";
 		}
 	}
-	
+
 	function convertDateTimeFromServer(createdDate) {
 		if (createdDate) {
 			return moment(createdDate).format();

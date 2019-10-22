@@ -60,6 +60,7 @@
 						<th>KFC Enabled</th>
 						<th>GPS Mandatory</th>
 						<th>Enable Secondary Sales</th>
+						<th>Enable Attendance Image</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -91,6 +92,7 @@
 							<td>${mobileConfiguration.kfcEnabled}</td>
 							<td>${mobileConfiguration.gpsMandatory}</td>
 							<td>${mobileConfiguration.enableSecondarySales}</td>
+							<td>${mobileConfiguration.enableAttendanceImage}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -283,6 +285,14 @@
 													<label class="control-label">Enable Secondary Sales</label>
 													<input id="enableSecondarySales"
 														name='enableSecondarySales' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Enable Attendance
+														Image</label> <input id="enableAttendanceImage"
+														name='enableAttendanceImage' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

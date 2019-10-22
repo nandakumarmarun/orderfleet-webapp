@@ -14,6 +14,16 @@
 .error {
 	color: red;
 }
+
+.zoom {
+	background-color: white;
+}
+
+.zoom:hover {
+	-ms-transform: scale(2.0); /* IE 9 */
+	-webkit-transform: scale(2.0); /* Safari 3-8 */
+	transform: scale(2.0);
+}
 </style>
 </head>
 <body class="page-body" data-url="">
@@ -141,6 +151,7 @@
 						<th>GPS Location</th>
 						<th>Tower Location</th>
 						<th>Remarks</th>
+						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody id="tBodyAttendanceReport">
@@ -150,6 +161,41 @@
 			<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
 		</div>
+		
+		<!-- Model Container-->
+		<div class="modal fade container " id="imagesModal">
+			<!-- model Dialog -->
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="viewModalLabel">Attendance Images</h4>
+					</div>
+					<div class="modal-body zoom">
+						<!-- error message -->
+						<div class="alert alert-danger alert-dismissible" role="alert"
+							style="display: none;">
+							<button type="button" class="close" onclick="$('.alert').hide();"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<p></p>
+						</div>
+						<div id="divAttendanceImages" style="overflow: auto; height: 500px;"></div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+		
+		
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
 

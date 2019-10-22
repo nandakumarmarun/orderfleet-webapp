@@ -877,6 +877,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setKfcEnabled(false);
 		mobileConfiguration.setGpsMandatory(false);
 		mobileConfiguration.setEnableSecondarySales(false);
+		mobileConfiguration.setEnableAttendanceImage(false);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 
