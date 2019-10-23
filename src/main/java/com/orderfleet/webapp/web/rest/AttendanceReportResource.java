@@ -143,7 +143,13 @@ public class AttendanceReportResource {
 		}
 		if (attendance.getFiles().size() > 0) {
 			FormFileDTO formFileDTO = new FormFileDTO();
-			formFileDTO.setFormName(attendance.getUser().getFirstName());
+			String formName = attendance.getUser().getFirstName();
+			Optional<EmployeeProfile> opEmployee = employeeProfileRepository
+					.findByUserPid(attendance.getUser().getPid());
+			if (opEmployee.isPresent()) {
+				formName = formName + " " + opEmployee.get().getName();
+			}
+			formFileDTO.setFormName(formName);
 			formFileDTO.setFiles(new ArrayList<>());
 			Set<File> files = attendance.getFiles();
 			for (File file : files) {
@@ -203,7 +209,6 @@ public class AttendanceReportResource {
 					attendanceReportDTO.setAttendanceSubGroupName(attDto.getAttendanceSubGroupName());
 					attendanceReportDTO.setImageButtonVisible(attDto.getImageButtonVisible());
 					attendanceReportDTO.setAttendancePid(attDto.getPid());
-					
 
 				} else {
 					attendanceReportDTO.setEmployeeName(employee.getName());

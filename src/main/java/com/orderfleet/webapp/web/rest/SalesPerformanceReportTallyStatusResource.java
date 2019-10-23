@@ -1,10 +1,8 @@
 package com.orderfleet.webapp.web.rest;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -43,14 +41,11 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailParseException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -64,7 +59,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -75,15 +69,14 @@ import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.codec.Base64.OutputStream;
-import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
@@ -95,7 +88,6 @@ import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
-import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
@@ -104,10 +96,8 @@ import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 import com.orderfleet.webapp.web.rest.dto.SecondarySalesOrderExcelDTO;
-import com.orderfleet.webapp.web.vendor.orderpro.dto.SalesOrderExcelDTO;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -167,6 +157,9 @@ public class SalesPerformanceReportTallyStatusResource {
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
 
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
@@ -556,6 +549,14 @@ public class SalesPerformanceReportTallyStatusResource {
 		supplierNames.addAll(secondarySalesOrderExcelDTOs.stream().map(SecondarySalesOrderExcelDTO::getSupplierName)
 				.collect(Collectors.toList()));
 
+		List<AccountProfile> accountProfiles = accountProfileRepository
+				.findAllByCompanyIdAndAccountTypeName(SecurityUtils.getCurrentUsersCompanyId(), "Company");
+
+		String companyEmail = "";
+		if (accountProfiles != null && accountProfiles.size() > 0) {
+			companyEmail = accountProfiles.get(0).getEmail1();
+		}
+
 		for (String supplierName : supplierNames) {
 
 			List<SecondarySalesOrderExcelDTO> secondarySalesOrderExcelBySupplierDTOs = new ArrayList<>();
@@ -566,7 +567,7 @@ public class SalesPerformanceReportTallyStatusResource {
 			String supplierEmail = secondarySalesOrderExcelBySupplierDTOs.stream().findFirst().get().getSupplierEmail();
 
 			if (supplierEmail != null && !supplierEmail.equalsIgnoreCase("")) {
-				sendSalesOrderEmail(supplierName, supplierEmail, secondarySalesOrderExcelBySupplierDTOs);
+				sendSalesOrderEmail(supplierName, supplierEmail, companyEmail, secondarySalesOrderExcelBySupplierDTOs);
 			}
 		}
 
@@ -574,10 +575,10 @@ public class SalesPerformanceReportTallyStatusResource {
 
 	}
 
-	private void sendSalesOrderEmail(String supplierName, String supplierEmail,
+	private void sendSalesOrderEmail(String supplierName, String supplierEmail, String companyEmail,
 			List<SecondarySalesOrderExcelDTO> secondarySalesOrderExcelBySupplierDTOs) throws MessagingException {
 
-		log.debug("Sending a mail to -- " + supplierEmail);
+		log.debug("Sending a mail to Supplier-- " + supplierEmail);
 
 		long start = System.nanoTime();
 
@@ -591,6 +592,13 @@ public class SalesPerformanceReportTallyStatusResource {
 		helper.setSubject(companyName + " - Sales Order");
 		helper.setText("Sales Order Taken Under - " + supplierName);
 		helper.setTo(supplierEmail);
+
+		if (companyEmail != null && !companyEmail.equalsIgnoreCase("")) {
+			log.debug("Sending a mail to Company Account-- " + companyEmail);
+			helper.setCc(companyEmail);
+		} else {
+			log.info("No Email found for Company Account-- ");
+		}
 		helper.setFrom(supplierEmail);
 
 		File excelFile = generateFile(supplierName, secondarySalesOrderExcelBySupplierDTOs);
@@ -780,8 +788,10 @@ public class SalesPerformanceReportTallyStatusResource {
 
 			com.itextpdf.text.Font fontSize_22 = FontFactory.getFont(FontFactory.TIMES, 20f,
 					com.itextpdf.text.Font.BOLD);
-			com.itextpdf.text.Font fontSize_16 = FontFactory.getFont(FontFactory.TIMES, 16f,
-					com.itextpdf.text.Font.BOLD);
+			/*
+			 * com.itextpdf.text.Font fontSize_16 = FontFactory.getFont(FontFactory.TIMES,
+			 * 16f, com.itextpdf.text.Font.BOLD);
+			 */
 
 			Paragraph companyName = new Paragraph();
 			Paragraph line = new Paragraph();
