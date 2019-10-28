@@ -47,6 +47,8 @@ if (!this.InvoiceWiseReport) {
 			$('#dbDateSearch').val(filterBy);
 			InvoiceWiseReport.filter();
 		}
+		
+		$('.selectpicker').selectpicker();
 	});
 
 	InvoiceWiseReport.downloadXls = function() {

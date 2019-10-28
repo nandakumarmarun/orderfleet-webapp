@@ -123,7 +123,7 @@
 
 							<div class="col-md-6 col-md-offset-3">
 								<div class="form-group">
-									<select id="dbCompany" name="companyPid" class="form-control"><option
+									<select id="dbCompany" name="companyPid" class="form-control selectpicker" data-live-search="true"><option
 											value="-1">Select Company</option>
 										<c:forEach items="${companies}" var="company">
 											<option value="${company.pid}">${company.legalName}</option>

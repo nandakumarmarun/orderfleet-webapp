@@ -21,6 +21,8 @@
 	$(document).ready(
 			function() {
 
+				$('.selectpicker').selectpicker();
+
 				$('#saveDefaultData').on(
 						'click',
 						function() {
@@ -99,7 +101,7 @@
 							<div class="col-md-4">
 								<div class="form-group" id="selectCompany">
 									<label class="control-label" for="door_no">company</label> <select
-										id="dbCompany" name="companyPid" class="form-control"><option
+										id="dbCompany" name="companyPid" class="form-control selectpicker" data-live-search="true"><option
 											value="-1">select company</option>
 										<c:forEach items="${companies}" var="company">
 											<option value="${company.pid}">${company.legalName}</option>

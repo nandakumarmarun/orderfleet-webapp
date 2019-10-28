@@ -9,6 +9,9 @@ if (!this.TallyCompany) {
 	'use strict';
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
+		
 		$('#companysModal').on('click', function() {
 			$("#assignTallyCompanysModal").modal("show");
 		});

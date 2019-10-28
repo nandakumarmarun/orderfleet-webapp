@@ -6,6 +6,8 @@ if (!this.UserDiscontinuedStatus) {
 	'use strict';
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 
 		$('#dbCompany').on('change', function() {
 			var companyid = $('#dbCompany').val();

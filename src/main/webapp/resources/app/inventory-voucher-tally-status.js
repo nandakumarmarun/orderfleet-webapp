@@ -12,6 +12,8 @@ if (!this.InventoryVoucher) {
 			+ location.pathname;
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 
 		$("#txtToDate").datepicker({
 			dateFormat : "dd-mm-yy"

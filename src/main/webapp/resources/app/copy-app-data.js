@@ -9,6 +9,9 @@ if (!this.CopyAppData) {
 	'use strict';
 	var contextPath = location.protocol + '//' + location.host;
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
+		
 		$('#sbCompany').on('change', function() {
 			loadCompanyUsers();
 		});

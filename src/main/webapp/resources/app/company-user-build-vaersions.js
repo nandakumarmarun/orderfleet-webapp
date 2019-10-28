@@ -6,6 +6,9 @@ if (!this.CompanyUserDevice) {
 	'use strict';
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
+		
 		loadAllDevices();
 		$('#dbCompany').on('change', function() {
 			var companyid = $('#dbCompany').val();

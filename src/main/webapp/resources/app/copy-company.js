@@ -18,6 +18,8 @@ if (!this.CopyCompany) {
 	};
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 
 		CopyCompany.onChangeCompany();
 

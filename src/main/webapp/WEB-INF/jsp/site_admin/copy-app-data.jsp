@@ -21,7 +21,7 @@
 			<h2>Copy User Data</h2>
 			<div class="row">
 				<div class="col-md-12">
-					<select id="sbCompany" class="form-control"><option value="-1">Select a company</option>
+					<select id="sbCompany" class="form-control selectpicker" data-live-search="true"><option value="-1">Select a company</option>
 						<c:forEach items="${companies}" var="company">
 							<option value="${company.pid}">${company.legalName}</option>
 						</c:forEach>

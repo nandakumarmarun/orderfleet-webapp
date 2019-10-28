@@ -9,6 +9,9 @@ if (!this.CompanyConfiguration) {
 	'use strict';
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
+		
 		$('#companysModal').on('click', function() {
 			$("#assignCompanyConfigurationsModal").modal("show");
 		});

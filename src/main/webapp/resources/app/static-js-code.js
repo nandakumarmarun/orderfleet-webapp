@@ -12,6 +12,8 @@ if (!this.StaticJsCode) {
 			+ location.pathname;
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 		$('#myFormSubmit').on('click', function() {
 			createUpdateStaticJsCode();
 		});

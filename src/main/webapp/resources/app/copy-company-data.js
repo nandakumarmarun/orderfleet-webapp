@@ -15,6 +15,8 @@
 	};
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 		//numeric only
 		$('#field_to_company').keyup(function () { 
 		    this.value = this.value.replace(/[^0-9\.]/g,'');

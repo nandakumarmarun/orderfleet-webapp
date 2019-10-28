@@ -30,7 +30,7 @@
 			<form id="integrationModuleForm">
 				<div class="form-group">
 					<label class="control-label">Company</label> <select id="dbCompany"
-						class="form-control"><option value="no">Select
+						class="form-control selectpicker" data-live-search="true"><option value="no">Select
 							Company</option>
 						<c:forEach items="${companies}" var="company">
 							<option value="${company.pid}">${company.legalName}</option>
@@ -75,6 +75,8 @@
 
 	<script type="text/javascript">
 		$(document).ready(function() {
+
+			$('.selectpicker').selectpicker();
 			/* $("#txtFromDate").datepicker({
 				dateFormat : 'yy-mm-dd'
 			});

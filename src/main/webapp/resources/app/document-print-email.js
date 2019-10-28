@@ -59,6 +59,8 @@ if (!this.DocumentPrintEmail) {
 	$(document).ready(
 		function() {
 
+			$('.selectpicker').selectpicker();
+			
 			$('#field_company').on('change', function() {
 				getDocumentPrintEmail();
 			});

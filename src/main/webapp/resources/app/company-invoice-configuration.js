@@ -71,6 +71,8 @@ if (!this.CompanyInvoiceConfiguration) {
 					// pass the action-url of the form
 					deleteCompanyInvoiceConfiguration(e.currentTarget.action);
 				});
+				
+				$('.selectpicker').selectpicker();
 			});
 
 

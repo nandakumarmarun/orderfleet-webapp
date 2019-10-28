@@ -32,7 +32,7 @@
 				<div class="col-sm-4">
 					
 						<select id="field_mainCompany" name="mainCompanyPid"
-							class="form-control"><option value="-1">Select
+							class="form-control selectpicker" data-live-search="true"><option value="-1">Select
 								Company</option>
 							<c:forEach items="${companies}" var="company">
 								<option value="${company.pid}">${company.legalName}</option>

@@ -29,7 +29,7 @@
 			<div class="row">
 				<div class="form-group">
 					<div class="col-sm-3">
-						<select id="dbCompany" name="companyPid" class="form-control">
+						<select id="dbCompany" name="companyPid" class="form-control selectpicker" data-live-search="true">
 							<option value="no">Select Company</option>
 							<c:forEach items="${companies}" var="company">
 								<option value="${company.pid}">${company.legalName}</option>

@@ -28,6 +28,9 @@ if (!this.SyncOperation) {
 
 	$(document).ready(
 			function() {
+				
+				$('.selectpicker').selectpicker();
+				
 				deleteForm.submit(function(e) {
 					// prevent Default functionality
 					e.preventDefault();

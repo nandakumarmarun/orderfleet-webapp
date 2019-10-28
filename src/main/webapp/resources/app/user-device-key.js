@@ -7,6 +7,9 @@ var list = new Array();
 	'use strict';
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
+		
 		UserDeviceKey.getUserDeviceKey();
 
 		$('#dbCompany').on('change', function() {

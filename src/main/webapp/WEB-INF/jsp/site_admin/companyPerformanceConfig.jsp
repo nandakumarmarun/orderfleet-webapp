@@ -31,7 +31,7 @@
 				<div class="modal-body">
 					<div class="modal-body" style="overflow: auto;">
 						<div class="form-group">
-							<select id="dbCompany" class="form-control"
+							<select id="dbCompany" class="form-control selectpicker" data-live-search="true"
 								onchange="getCompanyPerformanceConfig()"><option
 									value="no">Select Company</option>
 								<c:forEach items="${companies}" var="company">
@@ -89,6 +89,8 @@
 
 	<script type="text/javascript">
 		$(document).ready(function() {
+
+			$('.selectpicker').selectpicker();
 			$("#txtFromDate").datepicker({
 				dateFormat : 'yy-mm-dd'
 			});

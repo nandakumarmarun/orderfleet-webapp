@@ -31,7 +31,7 @@
 			</div>
 			<div class="row col-xs-12">
 				<div class="form-group col-sm-3">
-					<select id="dbCompany" class="form-control"
+					<select id="dbCompany" class="form-control selectpicker" data-live-search="true"
 						onchange="User.filterUsers('Company')"><option value="no">Filter
 							By Company</option>
 						<c:forEach items="${companies}" var="company">

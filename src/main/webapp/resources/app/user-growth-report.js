@@ -14,6 +14,8 @@ if (!this.UserGrowthReport) {
 	
 	$( document ).ready(function() {
 		
+		$('.selectpicker').selectpicker();
+		
 		$('#txtFromMonth').MonthPicker({
 			MonthFormat: 'M, yy',
 			ShowIcon : false,

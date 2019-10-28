@@ -53,7 +53,7 @@
 								<div class="form-group">
 									<label class="control-label" for="field_from_company">From
 										Company</label><select id="field_company" data-validate="required"
-										class="form-control" onchange="CopyCompany.onChangeCompany()"><optgroup
+										class="form-control selectpicker" data-live-search="true" onchange="CopyCompany.onChangeCompany()"><optgroup
 											label="From Company">
 											<c:forEach items="${companies}" var="company">
 												<option value="${company.pid}">${company.legalName}</option>

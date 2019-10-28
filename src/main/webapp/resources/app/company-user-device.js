@@ -6,6 +6,9 @@ if (!this.CompanyUserDevice) {
 	'use strict';
 
 	$(document).ready(function() {
+		
+		
+		
 		loadAllDevices();
 
 		$('#dbCompany').on('change', function() {
@@ -16,6 +19,8 @@ if (!this.CompanyUserDevice) {
 		$('#btnSearch').click(function() {
 			searchTable($("#search").val(), $('#tableCompanyUserDevice'));
 		});
+		
+		$('.selectpicker').selectpicker();
 	});
 
 	var companyUserDeviceContextPath = location.protocol + '//' + location.host

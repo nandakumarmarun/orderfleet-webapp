@@ -28,6 +28,8 @@
 <spring:url value="/resources/assets/css/custom.css" var="customCss"></spring:url>
 <link href="${customCss}" rel="stylesheet">
 
+
+
 <spring:url value="/resources/assets/css/neon-forms.css"
 	var="neonFormsCss"></spring:url>
 <link href="${neonFormsCss}" rel="stylesheet">
@@ -60,6 +62,16 @@
 <spring:url value="/resources/assets/css/jquery-ui-1.11.4.css"
 	var="jqueryUICss"></spring:url>
 <link href="${jqueryUICss}" rel="stylesheet">
+
+
+<!-- For search select -->
+<spring:url value="/resources/assets/js/bootstrap-select.min.js"
+	var="bootstrapSelectJs"></spring:url>
+<script type="text/javascript" src="${bootstrapSelectJs}"></script>
+
+<spring:url value="/resources/assets/css/bootstrap-select.min.css"
+	var="bootstrapSelectCss"></spring:url>
+<link href="${bootstrapSelectCss}" rel="stylesheet">
 
 <!-- preloader -->
 <%-- <spring:url value="/resources/assets/css/preloader.css" var="preloader"></spring:url>

@@ -39,6 +39,8 @@ if (!this.MobileConfiguration) {
 	};
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 
 		$('#mobilesModal').on('click', function() {
 			$("#assignMobileConfigurationsModal").modal("show");

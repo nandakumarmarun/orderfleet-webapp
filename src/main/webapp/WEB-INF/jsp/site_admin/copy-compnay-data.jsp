@@ -40,7 +40,7 @@
 						<div class="col-sm-3">
 							<div class="form-group">
 								<label class="control-label">From Company</label> <select
-									id="dbCompanyFrom" class="form-control"><option
+									id="dbCompanyFrom" class="form-control selectpicker" data-live-search="true"><option
 										value="-1">-- Select --</option>
 									<c:forEach items="${companies}" var="company">
 										<option value="${company.id}">${company.legalName}</option>

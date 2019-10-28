@@ -55,6 +55,9 @@ if (!this.RealTimeAPI) {
 
 	$(document).ready(
 			function() {
+				
+				$('.selectpicker').selectpicker();
+				
 				createEditForm.validate({
 					rules : validationRules,
 					messages : validationMessages,

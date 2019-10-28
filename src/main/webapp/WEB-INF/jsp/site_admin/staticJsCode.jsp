@@ -32,7 +32,7 @@
 						<div class="form-group">
 							<label class="control-label">Company</label> <select
 								onchange="StaticJsCode.onChangeCompany();" id="dbCompany"
-								class="form-control">
+								class="form-control selectpicker" data-live-search="true">
 								<option value="no">Select Company</option>
 								<c:forEach items="${companies}" var="company">
 									<option value="${company.pid}">${company.legalName}</option>

@@ -10,6 +10,7 @@
 <spring:url value="/resources/assets/css/jquery-ui.css"
 	var="jqueryUiCss"></spring:url>
 <link href="${jqueryUiCss}" rel="stylesheet">
+	
 <style type="text/css">
 .error {
 	color: red;
@@ -72,7 +73,7 @@
 										</div> -->
 									</div>
 									<select id="dbEmployee" name="employeePid"
-										class="form-control selectpicker">
+										class="form-control">
 										<option value="Dashboard Employee">All Dashboard
 											Employees</option>
 									</select>
@@ -89,7 +90,7 @@
 							</div>
 							<div class="col-sm-2">
 								Account <select id="dbAccount" name="accountPid"
-									class="form-control">
+									class="form-control selectpicker" data-live-search="true">
 									<option value="no">All Account</option>
 									<c:forEach items="${accounts}" var="account">
 										<option value="${account.pid}">${account.name}</option>
@@ -126,7 +127,7 @@
 
 									</div>
 									<select id="dbActivity" name="employeePid"
-										class="form-control selectpicker">
+										class="form-control">
 										<option value="no">All Activity</option>
 										<c:forEach items="${activities}" var="activity">
 											<option value="${activity.pid}">${activity.name}</option>
@@ -172,8 +173,8 @@
 								<div class="col-sm-3">
 									<br />
 									<button type="button" class="btn btn-info entypo-search"
-										style="font-size: 18px"
-										onclick="InvoiceWiseReport.filter()" title="Apply"></button>
+										style="font-size: 18px" onclick="InvoiceWiseReport.filter()"
+										title="Apply"></button>
 								</div>
 								<div class="col-sm-3">
 									<br />
@@ -908,8 +909,11 @@
 							var employeePid = getParameterByName('user-key-pid');
 							getEmployees(employeePid);
 							var documentType = getParameterByName('document-name');
-							if(documentType != null){
-								 $("#dbDocument option:contains('"+documentType+"')").attr('selected', 'selected');
+							if (documentType != null) {
+								$(
+										"#dbDocument option:contains('"
+												+ documentType + "')").attr(
+										'selected', 'selected');
 							}
 							$("#txtToDate").datepicker({
 								dateFormat : "dd-mm-yy"
@@ -947,11 +951,9 @@
 								InvoiceWiseReport.getForms();
 							});
 
-							$('#createAndChangeAccount').click(
-									function() {
-										InvoiceWiseReport
-												.createAndChangeAccount();
-									});
+							$('#createAndChangeAccount').click(function() {
+								InvoiceWiseReport.createAndChangeAccount();
+							});
 
 							$('#loadAccountProfile').click(function() {
 								InvoiceWiseReport.loadAccountFromForm();
@@ -971,14 +973,13 @@
 													alert("no values available");
 													return;
 												}
-												InvoiceWiseReport
-														.downloadXls();
+												InvoiceWiseReport.downloadXls();
 											});
 
 							InvoiceWiseReport.filter();
 							//if(documentType == null){
-								//execute on normal page load
-								
+							//execute on normal page load
+
 							//}
 						});
 	</script>

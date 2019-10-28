@@ -9,6 +9,8 @@ if (!this.SyncOperationTime) {
 			+ location.pathname;
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 
 		$('#field_company').on('change', function() {
 			getSyncOperationTimes();

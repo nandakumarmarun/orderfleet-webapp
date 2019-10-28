@@ -12,6 +12,9 @@ if (!this.xlsFileUploader) {
 			+ location.pathname;
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
+		
 		$('#assignAccountColumnNumbers').on('click', function() {
 			assignAccountColumnNumbers();
 		});

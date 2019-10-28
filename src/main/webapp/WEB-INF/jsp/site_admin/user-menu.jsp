@@ -29,7 +29,7 @@
 			<div class="clearfix"></div>
 			<hr />
 			<div>
-				Company <select id="dbCompany" class="form-control">
+				Company <select id="dbCompany" class="form-control selectpicker" data-live-search="true">
 					<option value="no">Select Company</option>
 					<c:forEach items="${companies}" var="company">
 						<option value="${company.pid}">${company.legalName}</option>
@@ -128,6 +128,9 @@
 		var userPid = null;
 		var rootMenuItems = [];
 		$(document).ready(function() {
+
+			$('.selectpicker').selectpicker();
+			
 			$('#dbCompany').change(function() {
 				var optionSelected = $(this).find("option:selected");
 				loadCompanyUsers(optionSelected.val());

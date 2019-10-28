@@ -12,6 +12,8 @@ if (!this.UserOnPremiseImport) {
 	+ location.pathname;
 	
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 		$('#loadingDiv').hide();
 		$('#btnImportUsers').click(function() {
 			saveUsersFromServer();

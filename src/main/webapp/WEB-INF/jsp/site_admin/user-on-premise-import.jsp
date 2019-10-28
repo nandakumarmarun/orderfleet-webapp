@@ -49,7 +49,7 @@
 				<div class="col-md-3">
 					<!-- <label class="control-label" for="field_url">Company</label> -->
 					<select id="field_company" name="company" onchange="UserOnPremiseImport.showCompanyUrl()"
-						class="form-control"><option value="-1">Select Company</option>
+						class="form-control selectpicker" data-live-search="true"><option value="-1">Select Company</option>
 						<c:forEach items="${companies}" var="company">
 							<option value="${company.pid}">${company.legalName}</option>
 						</c:forEach>

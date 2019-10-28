@@ -10,6 +10,8 @@ if (!this.UnableToFindLocations) {
 	var cmpnyPid = null;
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 
 		$("#txtToDate").datepicker({
 			dateFormat : "dd-mm-yy"

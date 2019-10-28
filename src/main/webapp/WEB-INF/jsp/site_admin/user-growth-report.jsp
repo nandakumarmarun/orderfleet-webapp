@@ -26,7 +26,7 @@
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
 							<div class="col-sm-3">
-								<select id="dbCompany" name="companyPid" class="form-control">
+								<select id="dbCompany" name="companyPid" class="form-control selectpicker" data-live-search="true">
 									<option value="no">All Company</option>
 									<c:forEach items="${companies}" var="company">
 										<option value="${company.pid}">${company.legalName}</option>
