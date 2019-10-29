@@ -17,8 +17,8 @@ import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 /**
  * Service Interface for managing AccountingVoucherHeader.
  * 
- * @author Muhammed Riyas T
- * @since July 28, 2016
+ * @author Prashob Sasidharan
+ * @since October 29, 2019
  */
 public interface ExpenseVoucherHeaderService {
 

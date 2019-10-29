@@ -8,10 +8,10 @@ import com.orderfleet.webapp.domain.ExpenseVoucherDetail;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
 
 /**
- * A DTO for the InventoryVoucherDetailDTO entity.
+ * A DTO for the ExpenseVoucherDetailDTO entity.
  * 
- * @author Muhammed Riyas T
- * @since July 28, 2016
+ * @author Prashob Sasidharan
+ * @since October 29, 2019
  */
 public class ExpenseVoucherDetailDTO {
 

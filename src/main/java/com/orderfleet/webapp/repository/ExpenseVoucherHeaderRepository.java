@@ -22,8 +22,8 @@ import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 /**
  * Spring Data JPA repository for the AccountingVoucherHeader entity.
  * 
- * @author Muhammed Riyas T
- * @since July 28, 2016
+ * @author Prashob Sasidharan
+ * @since October 29, 2019
  */
 /*
  * public interface ExpenseHeaderRepository extends

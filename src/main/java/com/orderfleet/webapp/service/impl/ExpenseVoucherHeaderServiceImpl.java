@@ -10,8 +10,8 @@ import com.orderfleet.webapp.service.ExpenseVoucherHeaderService;
 /**
  * Service Implementation for managing ExpenseVoucherHeader.
  * 
- * @author Muhammed Riyas T
- * @since June 04, 2016
+ * @author Prashob Sasidharan
+ * @since October 29, 2019
  */
 @Service
 @Transactional

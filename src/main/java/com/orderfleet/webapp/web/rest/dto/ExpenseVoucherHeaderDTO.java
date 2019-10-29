@@ -18,8 +18,8 @@ import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 /**
  * A DTO for the ExpenseVoucherHeader entity.
  * 
- * @author Muhammed Riyas T
- * @since July 27, 2016
+ * @author Prashob Sasidharan
+ * @since October 29, 2019
  */
 public class ExpenseVoucherHeaderDTO {
 

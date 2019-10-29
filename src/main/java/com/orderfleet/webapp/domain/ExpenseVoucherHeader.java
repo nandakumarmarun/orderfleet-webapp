@@ -33,8 +33,8 @@ import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 /**
  * A ExpenseVoucherHeader.
  * 
- * @author Muhammed Riyas T
- * @since July 27, 2016
+ * @author Prashob Sasidharan
+ * @since October 29, 2019
  */
 //@Entity
 //@Table(name = "tbl_expense_voucher_header")

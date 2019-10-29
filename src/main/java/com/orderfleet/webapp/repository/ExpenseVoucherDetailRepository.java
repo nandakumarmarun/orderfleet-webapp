@@ -14,8 +14,8 @@ import com.orderfleet.webapp.domain.enums.PaymentMode;
 /**
  * Spring Data JPA repository for the AccountingVoucherDetail entity.
  * 
- * @author Muhammed Riyas T
- * @since Mar 14, 2016
+ * @author Prashob Sasidharan
+ * @since October 29, 2019
  */
 /*
  * public interface ExpenseVoucherDetailRepository extends
