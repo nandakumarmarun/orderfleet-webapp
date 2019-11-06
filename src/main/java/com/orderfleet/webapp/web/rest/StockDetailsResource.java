@@ -93,17 +93,15 @@ public class StockDetailsResource {
 
 	@Inject
 	private UserRepository userRepository;
-	
+
 	@Inject
 	private StockDetailsService stockDetailsService;
-	
+
 	@Inject
 	private OpeningStockRepository openingStockRepository;
-	
+
 	@Inject
 	private UserStockLocationRepository userStockLocationRepository;
-	
-	
 
 	@RequestMapping(value = "/stockDetails", method = RequestMethod.GET)
 	@Timed
@@ -128,24 +126,27 @@ public class StockDetailsResource {
 		String user = SecurityUtils.getCurrentUserLogin();
 		Optional<User> userOp = userRepository.findOneByLogin(user);
 		long userId = userOp.get().getId();
-		
+
 		List<UserStockLocation> userStockLocations = userStockLocationRepository.findByUserPid(userOp.get().getPid());
-		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation()).collect(Collectors.toSet());
-		List<OpeningStock> openingStockUserBased = openingStockRepository.findByStockLocationIn(new ArrayList<>(usersStockLocations));
+		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
+				.collect(Collectors.toSet());
+		List<OpeningStock> openingStockUserBased = openingStockRepository
+				.findByStockLocationIn(new ArrayList<>(usersStockLocations));
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
-		if(openingStockUserBased.size()!=0) {
+		if (openingStockUserBased.size() != 0) {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();
-			//LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
+			// LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
 			LocalDateTime toDate = LocalDate.now().atTime(23, 59);
 			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate);
 			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(userOp.get());
-			for(StockDetailsDTO dto : stockDetails) {
+			for (StockDetailsDTO dto : stockDetails) {
 				unSaled.removeIf(unSale -> unSale.getProductName().equals(dto.getProductName()));
 			}
 			stockDetails.addAll(unSaled);
 		}
-		
-		model.addAttribute("stockDetails",stockDetails);
+		stockDetails
+				.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName().compareTo(s2.getProductName()));
+		model.addAttribute("stockDetails", stockDetails);
 		return "company/stockDetails";
 	}
 
@@ -160,23 +161,27 @@ public class StockDetailsResource {
 		Optional<User> user = userRepository.findOneByPid(userPid);
 		long userId = user.get().getId();
 		List<UserStockLocation> userStockLocations = userStockLocationRepository.findByUserPid(user.get().getPid());
-		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation()).collect(Collectors.toSet());
-		List<OpeningStock> openingStockUserBased = openingStockRepository.findByStockLocationIn(new ArrayList<>(usersStockLocations));
+		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
+				.collect(Collectors.toSet());
+		List<OpeningStock> openingStockUserBased = openingStockRepository
+				.findByStockLocationIn(new ArrayList<>(usersStockLocations));
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
-		if(openingStockUserBased.size()!=0) {
+		if (openingStockUserBased.size() != 0) {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();
-			//LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
+			// LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
 			LocalDateTime toDate = LocalDate.now().atTime(23, 59);
 			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate);
 			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get());
-			for(StockDetailsDTO dto : stockDetails) {
+			for (StockDetailsDTO dto : stockDetails) {
 				unSaled.removeIf(unSale -> unSale.getProductName().equals(dto.getProductName()));
 			}
 			stockDetails.addAll(unSaled);
 		}
 		
+		stockDetails
+		.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName().compareTo(s2.getProductName()));
+
 		return new ResponseEntity<>(stockDetails, HttpStatus.OK);
-		
-		
+
 	}
 }

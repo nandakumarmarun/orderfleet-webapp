@@ -228,7 +228,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
-	
+
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
 
@@ -296,6 +296,8 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	private ExecutiveTaskExecution saveExecutiveTaskExecution(Company company, User user,
 			ExecutiveTaskExecutionDTO executiveTaskExecutionDTO) {
 		ExecutiveTaskExecution executiveTaskExecution = new ExecutiveTaskExecution();
+		
+		
 		// set pid
 		executiveTaskExecution.setPid(ExecutiveTaskExecutionService.PID_PREFIX + RandomUtil.generatePid());
 		executiveTaskExecution.setClientTransactionKey(executiveTaskExecutionDTO.getClientTransactionKey());
@@ -368,6 +370,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			executiveTaskExecution.setStartLocation("No Location");
 		}
 
+		executiveTaskExecution.setMockLocationStatus(executiveTaskExecutionDTO.getMockLocationStatus());
 		// set company
 		executiveTaskExecution.setCompany(company);
 		executiveTaskExecution = executiveTaskExecutionRepository.save(executiveTaskExecution);
@@ -388,37 +391,40 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
 			List<InventoryVoucherHeaderDTO> inventoryVoucherDTOs) {
 		if (inventoryVoucherDTOs != null && inventoryVoucherDTOs.size() > 0) {
-				//Optional<CompanyConfiguration> companyConfiguration = companyConfigurationRepository.findByCompanyPidAndName(company.getPid(), CompanyConfig.SALES_PDF_DOWNLOAD);
-				//not required
-				
-				
-				List<Object[]> documentWiseCount = new ArrayList<Object[]>();  //count ,pid ,document_id
-				documentWiseCount = inventoryVoucherHeaderRepository.findCountOfInventoryVoucherHeader(SecurityUtils.getCurrentUsersCompanyId());
-				List<OrderStatus> orderStatus = orderStatusRepository.findAllByCompanyId();
-			
+			// Optional<CompanyConfiguration> companyConfiguration =
+			// companyConfigurationRepository.findByCompanyPidAndName(company.getPid(),
+			// CompanyConfig.SALES_PDF_DOWNLOAD);
+			// not required
+
+			List<Object[]> documentWiseCount = new ArrayList<Object[]>(); // count ,pid ,document_id
+			documentWiseCount = inventoryVoucherHeaderRepository
+					.findCountOfInventoryVoucherHeader(SecurityUtils.getCurrentUsersCompanyId());
+			List<OrderStatus> orderStatus = orderStatusRepository.findAllByCompanyId();
+
 			List<InventoryVoucherHeader> inventoryVouchers = new ArrayList<>();
 			for (InventoryVoucherHeaderDTO inventoryVoucherDTO : inventoryVoucherDTOs) {
-				
+
 				InventoryVoucherHeader inventoryVoucherHeader = new InventoryVoucherHeader();
 				// set pid
 				inventoryVoucherHeader.setPid(InventoryVoucherHeaderService.PID_PREFIX + RandomUtil.generatePid());
 				inventoryVoucherHeader.setCreatedBy(user);
 				Document document = documentRepository.findOneByPid(inventoryVoucherDTO.getDocumentPid()).get();
-				if(document.getOrderNoEnabled()) {
+				if (document.getOrderNoEnabled()) {
 					long count = 0;
-					
-					Optional<Object[]> opDocWiseCount = documentWiseCount.stream().filter(dwc -> document.getPid().equals(dwc[1])).findAny();
-					if(!opDocWiseCount.isPresent()) {
+
+					Optional<Object[]> opDocWiseCount = documentWiseCount.stream()
+							.filter(dwc -> document.getPid().equals(dwc[1])).findAny();
+					if (!opDocWiseCount.isPresent()) {
 						count = 1;
 						inventoryVoucherHeader.setOrderNumber(count);
 					}
-					
-					for(Object[] obj : documentWiseCount) {
-						if(document.getPid().equals(obj[1].toString())) {
+
+					for (Object[] obj : documentWiseCount) {
+						if (document.getPid().equals(obj[1].toString())) {
 							count = obj[0] != null ? Long.parseLong(obj[0].toString()) : 0;
-								count = count + 1; //Finding count of total inventory vouchers incrementing one
-								inventoryVoucherHeader.setOrderNumber(count);
-								break;
+							count = count + 1; // Finding count of total inventory vouchers incrementing one
+							inventoryVoucherHeader.setOrderNumber(count);
+							break;
 						}
 					}
 				}
@@ -431,9 +437,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				inventoryVoucherHeader.setDocumentVolume(inventoryVoucherDTO.getDocumentVolume());
 				inventoryVoucherHeader.setDocDiscountAmount(inventoryVoucherDTO.getDocDiscountAmount());
 				inventoryVoucherHeader.setDocDiscountPercentage(inventoryVoucherDTO.getDocDiscountPercentage());
-				
-				
-				
+
 				InventoryVoucherHeader lastInventoryVoucher = inventoryVoucherHeaderRepository
 						.findTop1ByCreatedByLoginOrderByCreatedDateDesc(SecurityUtils.getCurrentUserLogin());
 
@@ -541,10 +545,11 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								.findOne(inventoryVoucherDetailDTO.getReferenceInventoryVoucherDetailId());
 
 					Optional<ProductProfile> opProductProfile = productProfileRepository
-																	.findOneByPid(inventoryVoucherDetailDTO.getProductPid());
-					if(!opProductProfile.isPresent()) {
+							.findOneByPid(inventoryVoucherDetailDTO.getProductPid());
+					if (!opProductProfile.isPresent()) {
 						log.info(inventoryVoucherDetailDTO.toString());
-						throw new IllegalArgumentException(inventoryVoucherDetailDTO.getProductName() + "Product Not found");
+						throw new IllegalArgumentException(
+								inventoryVoucherDetailDTO.getProductName() + "Product Not found");
 					}
 					ProductProfile productProfile = opProductProfile.get();
 

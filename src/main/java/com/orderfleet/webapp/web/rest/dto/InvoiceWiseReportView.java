@@ -80,6 +80,7 @@ public class InvoiceWiseReportView {
 
 	private LocalDateTime punchInDate;
 
+	private boolean mockLocationStatus;
 
 	public InvoiceWiseReportView() {
 		super();
@@ -94,7 +95,8 @@ public class InvoiceWiseReportView {
 			ActivityStatus activityStatus, String rejectReasonRemark,
 			List<InvoiceWiseReportDetailView> invoiceWiseReportDetailViews, BigDecimal latitude, BigDecimal longitude,
 			BigDecimal towerLatitude, BigDecimal towerLongitude, String employeeName, String towerLocation,
-			double totalRecieptAmount, double totalSalesOrderAmount, LocalDateTime punchInDate) {
+			double totalRecieptAmount, double totalSalesOrderAmount, LocalDateTime punchInDate,
+			boolean mockLocationStatus) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -131,6 +133,7 @@ public class InvoiceWiseReportView {
 		this.totalRecieptAmount = totalRecieptAmount;
 		this.totalSalesOrderAmount = totalSalesOrderAmount;
 		this.punchInDate = punchInDate;
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	public InvoiceWiseReportView(ExecutiveTaskExecution executiveTaskExecution) {
@@ -166,6 +169,7 @@ public class InvoiceWiseReportView {
 		this.towerLongitude = executiveTaskExecution.getTowerLongitude();
 		this.towerLocation = executiveTaskExecution.getTowerLocation();
 		this.punchInDate = executiveTaskExecution.getPunchInDate();
+		this.mockLocationStatus = executiveTaskExecution.getMockLocationStatus();
 	}
 
 	public String getPid() {
@@ -454,6 +458,14 @@ public class InvoiceWiseReportView {
 
 	public void setPunchInDate(LocalDateTime punchInDate) {
 		this.punchInDate = punchInDate;
+	}
+
+	public boolean getMockLocationStatus() {
+		return mockLocationStatus;
+	}
+
+	public void setMockLocationStatus(boolean mockLocationStatus) {
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	@Override

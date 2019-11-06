@@ -63,7 +63,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	public static final String STOCK_DETAILS = "select "
 			+ "ivh.created_by_id as users,ivh.created_date,pp.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
-			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd "
+			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity "
 			+ "from tbl_inventory_voucher_detail ivd "
 			+ "inner join tbl_inventory_voucher_header ivh on ivd.inventory_voucher_header_id = ivh.id "
 			+ "inner join tbl_user_stock_location usl on usl.user_id = ivh.created_by_id "
@@ -80,6 +80,13 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3) and iv.created_date IN "
 			+ "(select MAX(ivh.created_date) from tbl_inventory_voucher_header ivh where "
 			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id)";
+	
+	public static final String ALL_DOCUMENT_NUMBER = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
+			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "
+			+ "INNER JOIN tbl_document doc on iv.document_id = doc.id "
+			+ "INNER JOIN tbl_user u on iv.created_by_id = u.id where "
+			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3)";
+	
 	public static final String EXCEL_SALES_DOWNLOAD = "select ap.name accName,ivh.order_number,ivh.document_date,emp.name empName, "
 			+ " pp.name ppName ,ivd.selling_rate,ivd.quantity , pp.sku  from tbl_inventory_voucher_header ivh "
 			+ " INNER JOIN tbl_inventory_voucher_detail ivd on ivd.inventory_voucher_header_id = ivh.id  "
@@ -449,6 +456,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	// userPid, List<String> documentPids);
 	@Query(value = DOCUMENT_NUMBER, nativeQuery = true)
 	List<Object[]> getLastNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
+	
+	@Query(value = ALL_DOCUMENT_NUMBER, nativeQuery = true)
+	List<Object[]> getAllDocumentNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
 
 	@Query(value = "select count(iv.document_id) ,doc.pid ,iv.document_id from tbl_inventory_voucher_header iv "
 			+ "INNER JOIN tbl_document doc on iv.document_id = doc.id where iv.company_id = ?1 group by iv.document_id,doc.pid	", nativeQuery = true)

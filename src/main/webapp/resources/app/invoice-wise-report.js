@@ -47,7 +47,7 @@ if (!this.InvoiceWiseReport) {
 			$('#dbDateSearch').val(filterBy);
 			InvoiceWiseReport.filter();
 		}
-		
+
 		$('.selectpicker').selectpicker();
 	});
 
@@ -118,6 +118,12 @@ if (!this.InvoiceWiseReport) {
 
 											var towerLocationName = invoiceWiseReport.towerLocation;
 
+											var mockLocatation = "";
+
+											if (invoiceWiseReport.mockLocationStatus) {
+												mockLocatation = "Mock Location Is Enabled"
+											}
+
 											if (invoiceWiseReport.location == "No Location"
 													&& invoiceWiseReport.latitude != 0) {
 												locationName = "<span class='btn btn-success'  id='"
@@ -127,7 +133,8 @@ if (!this.InvoiceWiseReport) {
 
 											if (invoiceWiseReport.towerLocation == "Not Found"
 													&& invoiceWiseReport.mcc != 0
-													|| invoiceWiseReport.towerLocation == null && invoiceWiseReport.mcc != 0) {
+													|| invoiceWiseReport.towerLocation == null
+													&& invoiceWiseReport.mcc != 0) {
 												towerLocationName = "<span class='btn btn-success'  id='"
 														+ invoiceWiseReport.pid
 														+ "' onClick='InvoiceWiseReport.getTowerLocation(this)' >get location</span>";
@@ -256,6 +263,9 @@ if (!this.InvoiceWiseReport) {
 																	+ (invoiceWiseReport.accountProfileLocation == null ? ""
 																			: invoiceWiseReport.accountProfileLocation)
 																	+ "</i></td>"
+																	+ "<td>"
+																	+ mockLocatation
+																	+ "</td>"
 																	+ "<td>"
 																	+ towerLocationName
 																	+ "</td>"

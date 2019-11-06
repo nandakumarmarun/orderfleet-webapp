@@ -77,6 +77,8 @@ import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.MobileConfigurationDTO;
+import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
+import com.orderfleet.webapp.web.rest.dto.ReferenceDocumentDto;
 import com.orderfleet.webapp.web.rest.dto.VoucherNumberGeneratorDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 import com.orderfleet.webapp.web.vendor.service.ModernSalesDataService;
@@ -174,11 +176,10 @@ public class ExecutiveTaskSubmissionController {
 		 * mobileConfiguration .getVoucherNumberGenerationType();
 		 */
 		Optional<Document> document = null;
-		if(executiveTaskSubmissionDTO.getInventoryVouchers().size()!=0) {
+		if (executiveTaskSubmissionDTO.getInventoryVouchers().size() != 0) {
 			document = documentRepository
 					.findOneByPid(executiveTaskSubmissionDTO.getInventoryVouchers().get(0).getDocumentPid());
 		}
-		
 
 		if (document != null && document.isPresent()) {
 			VoucherNumberGenerationType inventoryVoucherGenerationType = document.get()
@@ -211,6 +212,18 @@ public class ExecutiveTaskSubmissionController {
 				List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocument(companyPid,
 						userPid, documentPids);
 
+				List<Object[]> documentVoucherNumberListObject = inventoryVoucherHeaderRepository
+						.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
+
+				List<String> documentVoucherNumberList = new ArrayList<>();
+
+				if (documentVoucherNumberListObject.size() > 0) {
+
+					for (Object[] obj : documentVoucherNumberListObject) {
+						documentVoucherNumberList.add(obj[0].toString());
+					}
+				}
+
 				for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaders) {
 					String documentNumberLocalPrefix = null;
 					for (VoucherNumberGenerator voucherNumberGenerator : voucherNumberGeneratorList) {
@@ -221,12 +234,25 @@ public class ExecutiveTaskSubmissionController {
 					}
 					String documentNumberLocal = inventoryVoucherHeaderDTO.getDocumentNumberLocal();
 					log.debug("----------" + documentNumberLocal + " Saving to Server---------");
+
+					Optional<String> opExist = documentVoucherNumberList.stream()
+							.filter(ol -> ol.equalsIgnoreCase(documentNumberLocal)).findAny();
+
+					if (opExist.isPresent()) {
+						TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
+						log.debug("----------" + documentNumberLocal
+								+ "  Saving to Server Failed---------Duplicate Found-------");
+						taskSubmissionResponse.setStatus("Error");
+						taskSubmissionResponse.setMessage("Duplicate found");
+						return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
+					}
+
 					if (documentNumberLocalPrefix != null) {
-						log.info("documentNumberLocal "+documentNumberLocal);
-						log.info("documentNumberLocalPrefix "+documentNumberLocalPrefix);
+						log.info("documentNumberLocal " + documentNumberLocal);
+						log.info("documentNumberLocalPrefix " + documentNumberLocalPrefix);
 						String[] splitDocumentNumberLocal = documentNumberLocal.split(documentNumberLocalPrefix);
-						log.info("splitDocumentNumberLocal 0 -- "+splitDocumentNumberLocal[0]);
-						log.info("splitDocumentNumberLocal 1 -- "+splitDocumentNumberLocal[1]);
+						log.info("splitDocumentNumberLocal 0 -- " + splitDocumentNumberLocal[0]);
+						log.info("splitDocumentNumberLocal 1 -- " + splitDocumentNumberLocal[1]);
 						long documentNumberLocalCount = Long.parseLong(splitDocumentNumberLocal[1].toString());
 						for (Object[] obj : objectArray) {
 							String dbDocumentNumberLocalPrefix = null;
@@ -240,8 +266,8 @@ public class ExecutiveTaskSubmissionController {
 								long dbDocumentNumberLocalCount = Long.parseLong(dbDocumentNumberLocal[1].toString());
 								if ((documentNumberLocalPrefix.equals(dbDocumentNumberLocalPrefix))
 										&& ((dbDocumentNumberLocalCount + 1) != documentNumberLocalCount)) {
-									log.debug(
-											"----------" + documentNumberLocal + "  Saving to Server Failed---------");
+									log.debug("----------" + documentNumberLocal
+											+ "  Saving to Server Failed---------Not in Sequential Order");
 									TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 									taskSubmissionResponse.setStatus("Error");
 									taskSubmissionResponse.setMessage("Not in Sequential Order");

@@ -61,7 +61,7 @@ public class ExecutiveTaskExecution implements Serializable {
 
 	@Column(name = "send_date")
 	private LocalDateTime sendDate;
-	
+
 	// start time of order taking
 	@Column(name = "start_time")
 	private LocalDateTime startTime;
@@ -88,7 +88,7 @@ public class ExecutiveTaskExecution implements Serializable {
 
 	@Column(name = "location")
 	private String location;
-	
+
 	@Column(name = "tower_location")
 	private String towerLocation;
 
@@ -97,7 +97,7 @@ public class ExecutiveTaskExecution implements Serializable {
 
 	@Column(name = "longitude", precision = 11, scale = 8)
 	private BigDecimal longitude;
-	
+
 	@Column(name = "tower_latitude", precision = 10, scale = 8)
 	private BigDecimal towerLatitude;
 
@@ -176,9 +176,12 @@ public class ExecutiveTaskExecution implements Serializable {
 
 	@Column(name = "location_variance")
 	private String locationVariance;
-	
+
 	@Column(name = "punch_in_date")
 	private LocalDateTime punchInDate;
+
+	@Column(name = "mock_location_status", columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean mockLocationStatus;
 
 	public Long getId() {
 		return id;
@@ -243,7 +246,7 @@ public class ExecutiveTaskExecution implements Serializable {
 	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
-	
+
 	public LocalDateTime getSendDate() {
 		return sendDate;
 	}
@@ -499,7 +502,7 @@ public class ExecutiveTaskExecution implements Serializable {
 	public void setLocationVariance(String locationVariance) {
 		this.locationVariance = locationVariance;
 	}
-	
+
 	public BigDecimal getTowerLatitude() {
 		return towerLatitude;
 	}
@@ -515,12 +518,21 @@ public class ExecutiveTaskExecution implements Serializable {
 	public void setTowerLongitude(BigDecimal towerLongitude) {
 		this.towerLongitude = towerLongitude;
 	}
+
 	public LocalDateTime getPunchInDate() {
 		return punchInDate;
 	}
 
 	public void setPunchInDate(LocalDateTime punchInDate) {
 		this.punchInDate = punchInDate;
+	}
+
+	public boolean getMockLocationStatus() {
+		return mockLocationStatus;
+	}
+
+	public void setMockLocationStatus(boolean mockLocationStatus) {
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	@Override
@@ -537,7 +549,7 @@ public class ExecutiveTaskExecution implements Serializable {
 		}
 		return Objects.equals(id, executiveTaskExecution.id);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id);
@@ -555,5 +567,5 @@ public class ExecutiveTaskExecution implements Serializable {
 //	public String toString() {
 //		return "ExecutiveTaskExecution{" + "id=" + id + ", pid='" + pid + "'" + '}';
 //	}
-	
+
 }

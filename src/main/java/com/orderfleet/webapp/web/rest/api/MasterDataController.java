@@ -1491,7 +1491,8 @@ public class MasterDataController {
 			stockDetails.addAll(unSaled);
 		}
 
-
+		stockDetails
+		.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName().compareTo(s2.getProductName()));
 		return new ResponseEntity<>(stockDetails, HttpStatus.OK);
 	}
 	

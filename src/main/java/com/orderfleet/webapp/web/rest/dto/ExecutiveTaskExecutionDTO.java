@@ -110,6 +110,8 @@ public class ExecutiveTaskExecutionDTO {
 
 	private LocalDateTime punchInDate;
 
+	private boolean mockLocationStatus;
+
 	public ExecutiveTaskExecutionDTO() {
 		super();
 	}
@@ -136,7 +138,9 @@ public class ExecutiveTaskExecutionDTO {
 				executiveTaskExecution.getStartLocationType(), executiveTaskExecution.getStartLocation(),
 				executiveTaskExecution.getStartLatitude(), executiveTaskExecution.getStartLongitude(),
 				executiveTaskExecution.getStartTime(), executiveTaskExecution.getEndTime(),
-				executiveTaskExecution.getRejectReasonRemark(), executiveTaskExecution.getPunchInDate());
+				executiveTaskExecution.getRejectReasonRemark(), executiveTaskExecution.getPunchInDate(),
+				executiveTaskExecution.getMockLocationStatus());
+
 	}
 
 	public ExecutiveTaskExecutionDTO(String pid, String clientTransactionKey, BigDecimal latitude, BigDecimal longitude,
@@ -147,7 +151,8 @@ public class ExecutiveTaskExecutionDTO {
 			LocationType locationType, boolean isGpsOff, boolean isMobileDataOff, ActivityStatus activityStatus,
 			String executiveTaskPlanPid, boolean startIsGpsOff, boolean startIsMobileDataOff,
 			LocationType startLocationType, String startLocation, BigDecimal startLatitude, BigDecimal startLongitude,
-			LocalDateTime startTime, LocalDateTime endTime, String rejectReasonRemark, LocalDateTime punchInDate) {
+			LocalDateTime startTime, LocalDateTime endTime, String rejectReasonRemark, LocalDateTime punchInDate,
+			boolean mockLocationStatus) {
 		super();
 		this.pid = pid;
 		this.clientTransactionKey = clientTransactionKey;
@@ -185,6 +190,7 @@ public class ExecutiveTaskExecutionDTO {
 		this.endTime = endTime;
 		this.rejectReasonRemark = rejectReasonRemark;
 		this.punchInDate = punchInDate;
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	public String getPid() {
@@ -571,6 +577,14 @@ public class ExecutiveTaskExecutionDTO {
 		this.punchInDate = punchInDate;
 	}
 
+	public boolean getMockLocationStatus() {
+		return mockLocationStatus;
+	}
+
+	public void setMockLocationStatus(boolean mockLocationStatus) {
+		this.mockLocationStatus = mockLocationStatus;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -611,8 +625,7 @@ public class ExecutiveTaskExecutionDTO {
 				+ ", startIsMobileDataOff=" + startIsMobileDataOff + ", location=" + location + ", towerLocation="
 				+ towerLocation + ", activityStatus=" + activityStatus + ", executiveTaskPlanPid="
 				+ executiveTaskPlanPid + ", rejectReasonRemark=" + rejectReasonRemark + ", employeeName=" + employeeName
-				+ ", interimSave=" + interimSave + ", punchInDate=" + punchInDate + "]";
+				+ ", interimSave=" + interimSave + ", punchInDate=" + punchInDate + ", mockLocationStatus=" + mockLocationStatus + "]";
 	}
 
-	
 }

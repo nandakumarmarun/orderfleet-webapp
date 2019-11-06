@@ -56,6 +56,8 @@ public class DashboardUserDataDTO<T> {
 	private boolean isGpsOff;
 	private boolean isMobileDataOff;
 
+	private boolean mockLocationStatus;
+
 	private String attendanceSubGroupName;
 	private String attendanceSubGroupCode;
 
@@ -202,6 +204,14 @@ public class DashboardUserDataDTO<T> {
 		this.isMobileDataOff = isMobileDataOff;
 	}
 
+	public boolean getMockLocationStatus() {
+		return mockLocationStatus;
+	}
+
+	public void setMockLocationStatus(boolean mockLocationStatus) {
+		this.mockLocationStatus = mockLocationStatus;
+	}
+
 	public String getAttendanceStatus() {
 		return attendanceStatus;
 	}
@@ -319,6 +329,7 @@ public class DashboardUserDataDTO<T> {
 			dashboardUserData.setLocationType(executiveTaskExecution.getLocationType());
 			dashboardUserData.setIsGpsOff(executiveTaskExecution.getIsGpsOff());
 			dashboardUserData.setIsMobileDataOff(executiveTaskExecution.getIsMobileDataOff());
+			dashboardUserData.setMockLocationStatus(executiveTaskExecution.getMockLocationStatus());
 		}
 	}
 

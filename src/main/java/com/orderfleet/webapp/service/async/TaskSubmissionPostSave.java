@@ -271,6 +271,7 @@ public class TaskSubmissionPostSave {
 		List<AccountingVoucherHeader> accountingVouchers = tsTransactionWrapper.getAccountingVouchers();
 		List<DynamicDocumentHeader> dynamicDocuments = tsTransactionWrapper.getDynamicDocuments();
 		log.debug("Started processing executive task submission post save..");
+		
 
 		try {
 			log.info("Update location info");

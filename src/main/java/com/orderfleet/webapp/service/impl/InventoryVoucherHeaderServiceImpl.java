@@ -405,6 +405,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 			double opStock = 0.0;
 			double slStock = 0.0;
+			double freeQuantity = 0.0;
 			if (obj[5] != null) {
 				opStock = Double.parseDouble(obj[5].toString());
 			}
@@ -413,8 +414,14 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				slStock = Double.parseDouble(obj[4].toString());
 			}
 
+			if (obj[10] != null) {
+				freeQuantity = Double.parseDouble(obj[10].toString());
+			}
+
+			double saledQuantity = slStock + freeQuantity;
+
 			stockDetailsDTO.setOpeningStock(opStock);
-			stockDetailsDTO.setSaledQuantity(slStock);
+			stockDetailsDTO.setSaledQuantity(saledQuantity);
 
 			stockDetailsDTOs.add(stockDetailsDTO);
 		}
