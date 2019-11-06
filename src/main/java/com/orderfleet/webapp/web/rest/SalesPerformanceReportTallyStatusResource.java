@@ -630,8 +630,8 @@ public class SalesPerformanceReportTallyStatusResource {
 		String date = dtf.format(now);
 		String excelFileName = date + "_SalesOrder" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = { "Order No", "Salesman", "Order Date", "Customer", "Supplier", "Product Name",
-				"Quantity", "Free Quantity", "Selling Rate", "Discount Percentage", "Tax Percentage", "Total" };
+		String[] headerColumns = { "Supplier", "Salesman", "Order Date", "Customer", "Product Name",
+				"Quantity", "Selling Rate","Tax Percentage", "Total" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -669,21 +669,18 @@ public class SalesPerformanceReportTallyStatusResource {
 		int rowNum = 1;
 		for (SecondarySalesOrderExcelDTO salesOrder : secondarySalesOrderExcelBySupplierDTOs) {
 			HSSFRow row = worksheet.createRow(rowNum++);
-			row.createCell(0).setCellValue(salesOrder.getBillNo());
+			
+			row.createCell(0).setCellValue(salesOrder.getSupplierName());
 			row.createCell(1).setCellValue(salesOrder.getEmployeeName());
 			HSSFCell docDateCell = row.createCell(2);
 			docDateCell.setCellValue(salesOrder.getDate().toString());
 			docDateCell.setCellStyle(dateCellStyle);
 			row.createCell(3).setCellValue(salesOrder.getReceiverName());
-			row.createCell(4).setCellValue(salesOrder.getSupplierName());
-
-			row.createCell(5).setCellValue(salesOrder.getItemName());
-			row.createCell(6).setCellValue(salesOrder.getQuantity());
-			row.createCell(7).setCellValue(salesOrder.getFreeQuantity());
-			row.createCell(8).setCellValue(salesOrder.getRate());
-			row.createCell(9).setCellValue(salesOrder.getDiscPer());
-			row.createCell(10).setCellValue(salesOrder.getTaxPer());
-			row.createCell(11).setCellValue(salesOrder.getTotal());
+			row.createCell(4).setCellValue(salesOrder.getItemName());
+			row.createCell(5).setCellValue(salesOrder.getQuantity());
+			row.createCell(6).setCellValue(salesOrder.getRate());
+			row.createCell(7).setCellValue(salesOrder.getTaxPer());
+			row.createCell(8).setCellValue(salesOrder.getTotal());
 
 		}
 

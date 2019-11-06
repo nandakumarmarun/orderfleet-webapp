@@ -218,8 +218,9 @@ public class TransactionResource {
 					.accountProfileToAccountProfileDTO(inventoryVoucherHeader.getReceiverAccount()));
 
 			List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
-			List<InventoryVoucherDetail> ivdList = inventoryVoucherHeader.getInventoryVoucherDetails(); 
-			ivdList.sort((InventoryVoucherDetail i1 , InventoryVoucherDetail i2)-> i1.getProduct().getName().compareTo(i2.getProduct().getName()));
+			List<InventoryVoucherDetail> ivdList = inventoryVoucherHeader.getInventoryVoucherDetails();
+			ivdList.sort((InventoryVoucherDetail i1, InventoryVoucherDetail i2) -> i1.getProduct().getName()
+					.compareTo(i2.getProduct().getName()));
 			for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader.getInventoryVoucherDetails()) {
 				SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
 				if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
@@ -399,14 +400,15 @@ public class TransactionResource {
 				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
 
-				Optional<PriceLevel> opPriceLevel = priceLevels.stream()
-						.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
-
 				PriceLevel priceLevel = new PriceLevel();
-				if (opPriceLevel.isPresent()) {
-					priceLevel = opPriceLevel.get();
-				}
+				if (obj[18] != null) {
+					Optional<PriceLevel> opPriceLevel = priceLevels.stream()
+							.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
 
+					if (opPriceLevel.isPresent()) {
+						priceLevel = opPriceLevel.get();
+					}
+				}
 				Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
 						.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
 
@@ -424,8 +426,8 @@ public class TransactionResource {
 
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
-						.collect(Collectors.toList())
-						.stream().sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());
+						.collect(Collectors.toList()).stream()
+						.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());
 
 				List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
 				for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
@@ -460,8 +462,10 @@ public class TransactionResource {
 					vatLedgerDTOs.add(vatLedgerDTO);
 				}
 				salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
-				//List<SalesOrderItemDTO> sortedSalesOrderItems = new ArrayList<SalesOrderItemDTO>();
-				//sortedSalesOrderItems = salesOrderItemDTOs.stream().sorted(Comparator.comparingLong(SalesOrderItemDTO::getSortOrder)).collect(Collectors.toList());
+				// List<SalesOrderItemDTO> sortedSalesOrderItems = new
+				// ArrayList<SalesOrderItemDTO>();
+				// sortedSalesOrderItems =
+				// salesOrderItemDTOs.stream().sorted(Comparator.comparingLong(SalesOrderItemDTO::getSortOrder)).collect(Collectors.toList());
 				salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
 				List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
 
@@ -626,10 +630,10 @@ public class TransactionResource {
 
 				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
-				
-				if(obj[18]==null) {
-					log.info("No Price Level Found for "+obj[9].toString());
-					throw new IllegalArgumentException("No Price Level Found for "+obj[9].toString());
+
+				if (obj[18] == null) {
+					log.info("No Price Level Found for " + obj[9].toString());
+					throw new IllegalArgumentException("No Price Level Found for " + obj[9].toString());
 				}
 
 				Optional<PriceLevel> opPriceLevel = priceLevels.stream()
@@ -657,8 +661,9 @@ public class TransactionResource {
 
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
-						.collect(Collectors.toList())
-						.stream().sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());;
+						.collect(Collectors.toList()).stream()
+						.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());
+				;
 
 				List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
 
