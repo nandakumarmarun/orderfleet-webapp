@@ -62,10 +62,10 @@ public class AttendanceController {
 
 	@Inject
 	private AttendanceService attendanceService;
-	
+
 	@Inject
 	private AttendanceRepository attendanceRepository;
-	
+
 	@Inject
 	private KilometreCalculationService kilometreCalculationService;
 
@@ -83,18 +83,17 @@ public class AttendanceController {
 
 	@Inject
 	private AttendanceSubgroupApprovalRequestRepository attendanceSubgroupApprovalRequestRepository;
-	
+
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
-	
+
 	@Inject
 	private FileManagerService fileManagerService;
 
 	/**
 	 * POST /attendance : mark attendance.
 	 * 
-	 * @param attendanceDTO
-	 *            the attendanceDTO to create
+	 * @param attendanceDTO the attendanceDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body thex
 	 */
 	@RequestMapping(value = "/attendance", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -104,8 +103,8 @@ public class AttendanceController {
 		try {
 			Attendance attendance = attendanceService.saveAttendance(attendanceDTO);
 
-			Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository.findByCompanyPidAndName(
-															attendance.getCompany().getPid(), CompanyConfig.DISTANCE_TRAVELED);
+			Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository
+					.findByCompanyPidAndName(attendance.getCompany().getPid(), CompanyConfig.DISTANCE_TRAVELED);
 			if (optDistanceTraveled.isPresent()) {
 				if (Boolean.valueOf(optDistanceTraveled.get().getValue())) {
 					log.info("Update Distance travelled");
@@ -165,11 +164,11 @@ public class AttendanceController {
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
-	
+
 	@Transactional
 	@RequestMapping(value = "/upload/attendanceImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> uploadAttendanceImageFile(
-			@RequestParam("imageRefNo") String imageRefNo, @RequestParam("file") MultipartFile file) {
+	public ResponseEntity<?> uploadAttendanceImageFile(@RequestParam("imageRefNo") String imageRefNo,
+			@RequestParam("file") MultipartFile file) {
 		log.debug("Request Attendance Image to upload a file : {}", file);
 		if (file.isEmpty()) {
 			return ResponseEntity.badRequest()
@@ -177,30 +176,24 @@ public class AttendanceController {
 							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
 					.body(null);
 		}
-		return attendanceRepository
-				.findOneByImageRefNo(imageRefNo)
-				.map(attendance -> {
-					try {
-						File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
-								file.getOriginalFilename(), file.getContentType());
-						// update filledForm with file
-						attendance.getFiles().add(uploadedFile);
-						attendanceRepository.save(attendance);
-						log.debug("uploaded file for Attendance: {}", attendance);
-						return new ResponseEntity<>(HttpStatus.OK);
-					} catch (FileManagerException | IOException ex) {
-						log.debug("File upload exception : {}", ex.getMessage());
-						return ResponseEntity.badRequest()
-								.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage()))
-								.body(null);
-					}
-				})
-				.orElse(ResponseEntity.badRequest()
-						.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
-						.body(null));
+		return attendanceRepository.findOneByImageRefNo(imageRefNo).map(attendance -> {
+			try {
+				File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
+						file.getOriginalFilename(), file.getContentType());
+				// update filledForm with file
+				attendance.getFiles().add(uploadedFile);
+				attendanceRepository.save(attendance);
+				log.debug("uploaded file for Attendance: {}", attendance);
+				return new ResponseEntity<>(HttpStatus.OK);
+			} catch (FileManagerException | IOException ex) {
+				log.debug("File upload exception : {}", ex.getMessage());
+				return ResponseEntity.badRequest()
+						.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage())).body(null);
+			}
+		}).orElse(ResponseEntity.badRequest()
+				.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
+				.body(null));
 	}
-
-	
 
 	@RequestMapping(value = "/update-attendance-status-subgroup", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -238,8 +231,7 @@ public class AttendanceController {
 	/**
 	 * POST /punchout : mark punchout.
 	 * 
-	 * @param punchOutDTO
-	 *            the punchOutDTO to create
+	 * @param punchOutDTO the punchOutDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body thex
 	 */
 	@RequestMapping(value = "/punchOut", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -248,14 +240,15 @@ public class AttendanceController {
 		log.debug("Rest request to save punchOut : {}", punchOutDTO);
 		try {
 			punchOutService.savePunchOut(punchOutDTO);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+
 		} catch (Exception e) {
 			log.error(e.getMessage());
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
-		return new ResponseEntity<>(HttpStatus.CREATED);
-	}
-	
 
-	
+	}
+
 	private void saveKilometreDifference(Attendance attendance) {
 		KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
 		kiloCalDTO.setKilometre(0.0);

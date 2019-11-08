@@ -330,31 +330,31 @@ public class MasterDataController {
 
 	@Inject
 	private VoucherNumberGeneratorRepository voucherNumberGeneratorRepository;
-	
+
 	@Inject
 	private VoucherNumberGeneratorService voucherNumberGeneratorSerice;
-	
+
 	@Inject
 	private PostDatedVoucherService postDatedVoucherService;
-	
+
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
-	
+
 	@Inject
 	private UserRepository userRepository;
-	
+
 	@Inject
 	private InventoryVoucherHeaderService inventoryVoucherHeaderService;
-	
+
 	@Inject
 	private StockDetailsService stockDetailsService;
-	
+
 	@Inject
 	private OpeningStockRepository openingStockRepository;
-	
+
 	@Inject
 	private UserStockLocationRepository userStockLocationRepository;
-	
+
 	/**
 	 * GET /account-types : get all accountTypes.
 	 *
@@ -969,9 +969,8 @@ public class MasterDataController {
 			documentAccountingVoucherColumns = documentAccountingVoucherColumnService
 					.findByCompanyIdAndLastModifiedDate(lastSyncdate);
 		}
-		if(documentAccountingVoucherColumns == null) {
-			ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
-			.body(Collections.emptyList());
+		if (documentAccountingVoucherColumns == null) {
+			ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(Collections.emptyList());
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
 				.body(documentAccountingVoucherColumns.stream().map(DocumentAccountingVoucherColumnDTO::new)
@@ -1073,7 +1072,7 @@ public class MasterDataController {
 			receivablePayableDTOs = receivablePayableService
 					.findAllByCompanyAndlastModifiedDateAndAccountProfileIn(lastSyncdate);
 		}
-		
+
 		List<PostDatedVoucherDTO> postDatedVoucherDTOs = new ArrayList<>();
 		postDatedVoucherDTOs = postDatedVoucherService.findAllPostDatedVouchers();
 		List<ReceivablePayableDTO> result = new ArrayList<>();
@@ -1088,21 +1087,20 @@ public class MasterDataController {
 
 				result.add(rpDTO);
 			} else {
-				if(postDatedVoucherDTOs != null && postDatedVoucherDTOs.size()!=0) {
+				if (postDatedVoucherDTOs != null && postDatedVoucherDTOs.size() != 0) {
 					List<PostDatedVoucherDTO> postDatedVouchers = postDatedVoucherDTOs.stream()
-										.filter(pdc -> pdc.getReferenceVoucher().
-												equals(rpDTO.getReferenceDocumentNumber()))
-										.collect(Collectors.toList());
-					if(postDatedVouchers!=null && postDatedVouchers.size()!=0) {
+							.filter(pdc -> pdc.getReferenceVoucher().equals(rpDTO.getReferenceDocumentNumber()))
+							.collect(Collectors.toList());
+					if (postDatedVouchers != null && postDatedVouchers.size() != 0) {
 						double finalAmount = rpDTO.getReferenceDocumentBalanceAmount();
-						for(PostDatedVoucherDTO dto : postDatedVouchers) {
+						for (PostDatedVoucherDTO dto : postDatedVouchers) {
 							finalAmount = finalAmount - dto.getReferenceDocumentAmount();
 						}
 						rpDTO.setReferenceDocumentFinalBalanceAmount(finalAmount);
-					}else {
+					} else {
 						rpDTO.setReferenceDocumentFinalBalanceAmount(rpDTO.getReferenceDocumentBalanceAmount());
 					}
-				}else {
+				} else {
 					rpDTO.setReferenceDocumentFinalBalanceAmount(rpDTO.getReferenceDocumentBalanceAmount());
 				}
 				result.add(rpDTO);
@@ -1418,83 +1416,80 @@ public class MasterDataController {
 		List<VehicleDTO> vehicleStockLocationDTOs = vehicleService.findAllByCompany();
 		return new ResponseEntity<>(vehicleStockLocationDTOs, HttpStatus.OK);
 	}
-	
-	@GetMapping(value = "/document-voucher-numbers")
-	public ResponseEntity<List<VoucherNumberGeneratorDTO>> getDocumentVoucherNumbers(
-								@RequestParam String userPid,@RequestParam String companyPid) {
-		log.debug("REST request to get all document voucher numbers");
-		List<VoucherNumberGenerator> voucherNumberGeneratorList = 
-				voucherNumberGeneratorRepository.findAllByUserAndCompany(userPid,companyPid);
-		if(voucherNumberGeneratorList==null || voucherNumberGeneratorList.size()==0) {
-			return new ResponseEntity<>(new ArrayList<VoucherNumberGeneratorDTO>(),HttpStatus.OK);
-		}
-		List<String> documentPids = voucherNumberGeneratorList.stream()
-											.map(vng -> vng.getDocument().getPid())
-											.collect(Collectors.toList());
-		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocument(companyPid, userPid, documentPids);
-	    log.info(objectArray.size()+"Object array size");
-		List<VoucherNumberGeneratorDTO> voucherNumberGeneratorDTOs = new ArrayList<>();
-		//document entry exist in inventory voucher entries
-		boolean documentExit = false;
-		for(VoucherNumberGenerator vng :voucherNumberGeneratorList) {
-			documentExit = false;
-			for(Object[] obj : objectArray) {
-	    		 log.info(obj[1].toString() +"---"+ vng.getDocument().getPid());
-	    		 if(vng.getDocument().getPid().equals(obj[1])) {
 
-	    			 voucherNumberGeneratorDTOs.add(new VoucherNumberGeneratorDTO
-	    					 (vng.getId(), vng.getUser().getPid(), vng.getUser().getFirstName(),
-	    							 vng.getDocument().getPid(), vng.getDocument().getName(),
-	    							 vng.getPrefix(), vng.getStartwith(), obj[0].toString()));
-	    			 documentExit = true;
-	    		 }
-	    	 }
-			if(!documentExit) {
-				voucherNumberGeneratorDTOs.add(new VoucherNumberGeneratorDTO
-   					 (vng.getId(), vng.getUser().getPid(), vng.getUser().getFirstName(),
-   							 vng.getDocument().getPid(), vng.getDocument().getName(),
-   							 vng.getPrefix(), vng.getStartwith(), vng.getPrefix()+"0"));
+	@GetMapping(value = "/document-voucher-numbers")
+	public ResponseEntity<List<VoucherNumberGeneratorDTO>> getDocumentVoucherNumbers(@RequestParam String userPid,
+			@RequestParam String companyPid) {
+		log.debug("REST request to get all document voucher numbers");
+		List<VoucherNumberGenerator> voucherNumberGeneratorList = voucherNumberGeneratorRepository
+				.findAllByUserAndCompany(userPid, companyPid);
+		if (voucherNumberGeneratorList == null || voucherNumberGeneratorList.size() == 0) {
+			return new ResponseEntity<>(new ArrayList<VoucherNumberGeneratorDTO>(), HttpStatus.OK);
+		}
+		List<String> documentPids = voucherNumberGeneratorList.stream().map(vng -> vng.getDocument().getPid())
+				.collect(Collectors.toList());
+		log.info("Call to get the last document number...................");
+		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocument(companyPid, userPid,
+				documentPids);
+		log.info("Company Pid" + companyPid + "\n User Pid : " + userPid + "\n Document Pids : " + documentPids);
+		List<VoucherNumberGeneratorDTO> voucherNumberGeneratorDTOs = new ArrayList<>();
+		// document entry exist in inventory voucher entries
+		boolean documentExit = false;
+		for (VoucherNumberGenerator vng : voucherNumberGeneratorList) {
+			documentExit = false;
+			for (Object[] obj : objectArray) {
+				log.info(obj[1].toString() + "---" + vng.getDocument().getPid());
+				if (vng.getDocument().getPid().equals(obj[1])) {
+
+					voucherNumberGeneratorDTOs.add(new VoucherNumberGeneratorDTO(vng.getId(), vng.getUser().getPid(),
+							vng.getUser().getFirstName(), vng.getDocument().getPid(), vng.getDocument().getName(),
+							vng.getPrefix(), vng.getStartwith(), obj[0].toString()));
+					documentExit = true;
+				}
 			}
-	    	 
-	     }
-		
-		
-		
+			if (!documentExit) {
+				voucherNumberGeneratorDTOs.add(new VoucherNumberGeneratorDTO(vng.getId(), vng.getUser().getPid(),
+						vng.getUser().getFirstName(), vng.getDocument().getPid(), vng.getDocument().getName(),
+						vng.getPrefix(), vng.getStartwith(), vng.getPrefix() + "0"));
+			}
+
+		}
+
 		return new ResponseEntity<>(voucherNumberGeneratorDTOs, HttpStatus.OK);
 //		 String str = "abcdDCBA123";
 //		 String strNew = str.replace("a", "");
 	}
-	
+
 	@RequestMapping(value = "/stockDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<StockDetailsDTO>> filter(@RequestParam("userPid") String userPid) {
 		log.debug("API request to fetch users Stock Details (Van sales)");
-		
+
 		long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Optional<User> user = userRepository.findOneByPid(userPid);
 		long userId = user.get().getId();
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
 		List<UserStockLocation> userStockLocations = userStockLocationRepository.findByUserPid(user.get().getPid());
-		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation()).collect(Collectors.toSet());
-		List<OpeningStock> openingStockUserBased = openingStockRepository.findByStockLocationIn(new ArrayList<>(usersStockLocations));
-		
+		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
+				.collect(Collectors.toSet());
+		List<OpeningStock> openingStockUserBased = openingStockRepository
+				.findByStockLocationIn(new ArrayList<>(usersStockLocations));
 
-		if(openingStockUserBased.size()!=0) {
+		if (openingStockUserBased.size() != 0) {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();
-			//LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
+			// LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
 			LocalDateTime toDate = LocalDate.now().atTime(23, 59);
 			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate);
 			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get());
-			for(StockDetailsDTO dto : stockDetails) {
+			for (StockDetailsDTO dto : stockDetails) {
 				unSaled.removeIf(unSale -> unSale.getProductName().equals(dto.getProductName()));
 			}
 			stockDetails.addAll(unSaled);
 		}
 
 		stockDetails
-		.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName().compareTo(s2.getProductName()));
+				.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName().compareTo(s2.getProductName()));
 		return new ResponseEntity<>(stockDetails, HttpStatus.OK);
 	}
-	
-	
+
 }

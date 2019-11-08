@@ -55,8 +55,7 @@ public class PunchOutServiceImpl implements PunchOutService {
 	/**
 	 * Save a punchout.
 	 * 
-	 * @param punchOutDTO
-	 *            the entity to save
+	 * @param punchOutDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -100,8 +99,13 @@ public class PunchOutServiceImpl implements PunchOutService {
 						punchOut.setMnc(punchOutDTO.getMnc());
 						punchOut.setCellId(punchOutDTO.getCellId());
 						punchOut.setLac(punchOutDTO.getLac());
-						TowerLocation towerLocation = geoLocationService.findAddressFromCellTower(punchOutDTO.getMcc(),
-								punchOutDTO.getMnc(), punchOutDTO.getCellId(), punchOutDTO.getLac());
+						TowerLocation towerLocation = null;
+						try {
+							towerLocation = geoLocationService.findAddressFromCellTower(punchOutDTO.getMcc(),
+									punchOutDTO.getMnc(), punchOutDTO.getCellId(), punchOutDTO.getLac());
+						} catch (Exception e) {
+							log.error(e.getMessage());
+						}
 						if (towerLocation != null) {
 							punchOut.setLocation(towerLocation.getLocation());
 							punchOut.setLatitude(towerLocation.getLat());
