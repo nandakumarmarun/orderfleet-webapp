@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Invoice Wise Reports</title>
+<title>SalesNrich | Invoice Wise Location Reports</title>
 <spring:url value="/resources/assets/css/jquery-ui.css"
 	var="jqueryUiCss"></spring:url>
 <link href="${jqueryUiCss}" rel="stylesheet">
@@ -26,7 +26,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Activities\Transactions</h2>
+			<h2>Activities\Transactions (Location Wise)</h2>
 			<div class="clearfix"></div>
 			<hr />
 			<div class="row">
@@ -89,11 +89,11 @@
 								</select>
 							</div>
 							<div class="col-sm-2">
-								Account <select id="dbAccount" name="accountPid"
+								Location <select id="dbLocation" name="locationPid"
 									class="form-control selectpicker" data-live-search="true">
-									<option value="no">All Account</option>
-									<c:forEach items="${accounts}" var="account">
-										<option value="${account.pid}">${account.name}</option>
+									<option value="no">All Locations</option>
+									<c:forEach items="${locations}" var="location">
+										<option value="${location.pid}">${location.name}</option>
 									</c:forEach>
 								</select>
 							</div>
@@ -109,19 +109,19 @@
 										<div>
 											<a class='btn btn-default dropdown-item'
 												style='width: 100%; text-align: left;'
-												onclick='InvoiceWiseReport.getActivities("all")'>All
+												onclick='InvoiceWiseLocationReport.getActivities("all")'>All
 												Activity</a>
 										</div>
 										<div>
 											<a class='btn btn-default dropdown-item'
 												style='width: 100%; text-align: left;'
-												onclick='InvoiceWiseReport.getActivities("planed")'>Planned
+												onclick='InvoiceWiseLocationReport.getActivities("planed")'>Planned
 												Activity</a>
 										</div>
 										<div>
 											<a class='btn btn-default dropdown-item'
 												style='width: 100%; text-align: left;'
-												onclick='InvoiceWiseReport.getActivities("unPlaned")'>UnPlanned
+												onclick='InvoiceWiseLocationReport.getActivities("unPlaned")'>UnPlanned
 												Activity</a>
 										</div>
 
@@ -137,7 +137,7 @@
 							</div>
 							<div class="col-sm-2">
 								<br /> <select class="form-control" id="dbDateSearch"
-									onchange="InvoiceWiseReport.showDatePicker()">
+									onchange="InvoiceWiseLocationReport.showDatePicker()">
 									<option value="TODAY">Today</option>
 									<option value="YESTERDAY">Yesterday</option>
 									<option value="WTD">WTD</option>
@@ -173,7 +173,7 @@
 								<div class="col-sm-3">
 									<br />
 									<button type="button" class="btn btn-info entypo-search"
-										style="font-size: 18px" onclick="InvoiceWiseReport.filter()"
+										style="font-size: 18px" onclick="InvoiceWiseLocationReport.filter()"
 										title="Apply"></button>
 								</div>
 								<div class="col-sm-3">
@@ -207,7 +207,7 @@
 			</div>
 			<div class="table-responsive">
 				<table class="collaptable table  table-striped table-bordered"
-					id="tblInvoiceWiseReport">
+					id="tblInvoiceWiseLocationReport">
 					<!--table header-->
 					<thead>
 						<tr>
@@ -227,7 +227,7 @@
 						</tr>
 					</thead>
 					<!--table header-->
-					<tbody id="tBodyInvoiceWiseReport">
+					<tbody id="tBodyInvoiceWiseLocationReport">
 					</tbody>
 				</table>
 			</div>
@@ -538,7 +538,7 @@
 								</button>
 								<p></p>
 							</div>
-							<div id="divInvoiceWiseReportImages"
+							<div id="divInvoiceWiseLocationReportImages"
 								style="overflow: auto; height: 500px;"></div>
 						</div>
 						<div class="modal-footer">
@@ -869,7 +869,7 @@
 			<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
 			<spring:url value="/web/executive-task-executions"
-				var="urlInvoiceWiseReports"></spring:url>
+				var="urlInvoiceWiseLocationReports"></spring:url>
 		</div>
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
@@ -889,9 +889,9 @@
 		var="reportcommonjsfileJS"></spring:url>
 	<script type="text/javascript" src="${reportcommonjsfileJS}"></script>
 
-	<spring:url value="/resources/app/invoice-wise-report.js"
-		var="invoiceWiseRepoetJs"></spring:url>
-	<script type="text/javascript" src="${invoiceWiseRepoetJs}"></script>
+	<spring:url value="/resources/app/invoice-wise-location-report.js"
+		var="invoiceWiseLocationReportJs"></spring:url>
+	<script type="text/javascript" src="${invoiceWiseLocationReportJs}"></script>
 
 	<spring:url value="/resources/assets/js/moment.js" var="momentJs"></spring:url>
 	<script type="text/javascript" src="${momentJs}"></script>
@@ -924,60 +924,60 @@
 							});
 
 							$('#myFormSubmit').on('click', function() {
-								InvoiceWiseReport.reject();
+								InvoiceWiseLocationReport.reject();
 							});
 							$('#btnSaveNewGeoLocation').on('click', function() {
-								InvoiceWiseReport.saveNewGeoLocation();
+								InvoiceWiseLocationReport.saveNewGeoLocation();
 							});
 
 							$('#btnSearch').click(
 									function() {
-										InvoiceWiseReport.searchTable($(
+										InvoiceWiseLocationReport.searchTable($(
 												"#search").val(),
 												$('#tbodyAccountProfile'));
 									});
 
 							$('#newAccountProfile').click(function() {
-								InvoiceWiseReport.newAccount();
+								InvoiceWiseLocationReport.newAccount();
 							});
 
 							$('#changeAccount').click(function() {
-								InvoiceWiseReport.changeAccount();
+								InvoiceWiseLocationReport.changeAccount();
 							});
 							$('#return').click(function() {
-								InvoiceWiseReport.oldAccount();
+								InvoiceWiseLocationReport.oldAccount();
 							});
 
 							$('#field_dynamicDocument').change(function() {
-								InvoiceWiseReport.getForms();
+								InvoiceWiseLocationReport.getForms();
 							});
 
 							$('#createAndChangeAccount').click(function() {
-								InvoiceWiseReport.createAndChangeAccount();
+								InvoiceWiseLocationReport.createAndChangeAccount();
 							});
 
 							$('#loadAccountProfile').click(function() {
-								InvoiceWiseReport.loadAccountFromForm();
+								InvoiceWiseLocationReport.loadAccountFromForm();
 							});
 
 							$('#btnDownload')
 									.on(
 											'click',
 											function() {
-												var tblInvoiceWiseReport = $("#tblInvoiceWiseReport tbody");
-												if (tblInvoiceWiseReport
+												var tblInvoiceWiseLocationReport = $("#tblInvoiceWiseLocationReport tbody");
+												if (tblInvoiceWiseLocationReport
 														.children().length == 0) {
 													alert("no values available");
 													return;
 												}
-												if (tblInvoiceWiseReport[0].textContent == "No data available") {
+												if (tblInvoiceWiseLocationReport[0].textContent == "No data available") {
 													alert("no values available");
 													return;
 												}
-												InvoiceWiseReport.downloadXls();
+												InvoiceWiseLocationReport.downloadXls();
 											});
 
-							InvoiceWiseReport.filter();
+							InvoiceWiseLocationReport.filter();
 							//if(documentType == null){
 							//execute on normal page load
 

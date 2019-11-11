@@ -1,8 +1,8 @@
-// Create a InvoiceWiseReport object only if one does not already exist. We create the
+// Create a InvoiceWiseLocationReport object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
 
-if (!this.InvoiceWiseReport) {
-	this.InvoiceWiseReport = {};
+if (!this.InvoiceWiseLocationReport) {
+	this.InvoiceWiseLocationReport = {};
 }
 
 (function() {
@@ -45,26 +45,26 @@ if (!this.InvoiceWiseReport) {
 		let filterBy = getParameterByName('filterBy');
 		if (filterBy) {
 			$('#dbDateSearch').val(filterBy);
-			InvoiceWiseReport.filter();
+			InvoiceWiseLocationReport.filter();
 		}
 
 		$('.selectpicker').selectpicker();
 	});
 
-	InvoiceWiseReport.downloadXls = function() {
+	InvoiceWiseLocationReport.downloadXls = function() {
 		var excelName = "acvts_txns_"
 				+ new Date().toISOString().replace(/[\-\:\.]/g, "");
-		var instance = $('#tblInvoiceWiseReport').tableExport({
+		var instance = $('#tblInvoiceWiseLocationReport').tableExport({
 			formats : [ 'xlsx' ],
 			filename : excelName,
 			exportButtons : false
 		});
-		var exportData = instance.getExportData()['tblInvoiceWiseReport']['xlsx'];
+		var exportData = instance.getExportData()['tblInvoiceWiseLocationReport']['xlsx'];
 		instance.export2file(exportData.data, exportData.mimeType,
 				exportData.filename, exportData.fileExtension);
 	}
 
-	InvoiceWiseReport.filter = function() {
+	InvoiceWiseLocationReport.filter = function() {
 		if ($('#dbDateSearch').val() == "SINGLE") {
 			if ($("#txtFromDate").val() == "") {
 				return;
@@ -76,7 +76,7 @@ if (!this.InvoiceWiseReport) {
 			}
 		}
 
-		$('#tBodyInvoiceWiseReport').html(
+		$('#tBodyInvoiceWiseLocationReport').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
 		$
 				.ajax({
@@ -86,21 +86,21 @@ if (!this.InvoiceWiseReport) {
 						employeePid : $('#dbEmployee').val(),
 						documentPid : $("#dbDocument").val(),
 						activityPid : $("#dbActivity").val(),
-						accountPid : $("#dbAccount").val(),
+						locationPid : $("#dbLocation").val(),
 						filterBy : $("#dbDateSearch").val(),
 						fromDate : $("#txtFromDate").val(),
 						toDate : $("#txtToDate").val(),
 						inclSubordinate : $('#inclSubOrdinates').is(":checked")
 					},
 					success : function(invoiceWiseReports) {
-						$('#tBodyInvoiceWiseReport').html("");
+						$('#tBodyInvoiceWiseLocationReport').html("");
 
 						$("#lblActivities").text("0");
 						$("#lblTransactionAmount").text("0");
 						$("#lblTransactionVolume").text("0");
 						$("#lblTotalPayments").text("0");
 						if (invoiceWiseReports.length == 0) {
-							$('#tBodyInvoiceWiseReport')
+							$('#tBodyInvoiceWiseLocationReport')
 									.html(
 											"<tr><td colspan='9' align='center'>No data available</td></tr>");
 							return;
@@ -128,7 +128,7 @@ if (!this.InvoiceWiseReport) {
 													&& invoiceWiseReport.latitude != 0) {
 												locationName = "<span class='btn btn-success'  id='"
 														+ invoiceWiseReport.pid
-														+ "' onClick='InvoiceWiseReport.getLocation(this)' >get location</span>";
+														+ "' onClick='InvoiceWiseLocationReport.getLocation(this)' >get location</span>";
 											}
 
 											if (invoiceWiseReport.towerLocation == "Not Found"
@@ -137,7 +137,7 @@ if (!this.InvoiceWiseReport) {
 													&& invoiceWiseReport.mcc != 0) {
 												towerLocationName = "<span class='btn btn-success'  id='"
 														+ invoiceWiseReport.pid
-														+ "' onClick='InvoiceWiseReport.getTowerLocation(this)' >get location</span>";
+														+ "' onClick='InvoiceWiseLocationReport.getTowerLocation(this)' >get location</span>";
 											}
 
 											/*
@@ -150,7 +150,7 @@ if (!this.InvoiceWiseReport) {
 											 * locationName="<span class='btn
 											 * btn-success'
 											 * id='"+invoiceWiseReport.pid+"'
-											 * onClick='InvoiceWiseReport.getLocation(this)'
+											 * onClick='InvoiceWiseLocationReport.getLocation(this)'
 											 * >get location</span>"; }
 											 */
 
@@ -164,7 +164,7 @@ if (!this.InvoiceWiseReport) {
 											 * locationName="<span class='btn
 											 * btn-success'
 											 * id='"+invoiceWiseReport.pid+"'
-											 * onClick='InvoiceWiseReport.getLocation(this)'
+											 * onClick='InvoiceWiseLocationReport.getLocation(this)'
 											 * >get location</span>"; }
 											 */
 											// if(invoiceWiseReport.locationType=="GpsLocation"
@@ -175,7 +175,7 @@ if (!this.InvoiceWiseReport) {
 											// locationName="<span class='btn
 											// btn-success'
 											// id='"+invoiceWiseReport.pid+"'
-											// onClick='InvoiceWiseReport.getLocation(this)'
+											// onClick='InvoiceWiseLocationReport.getLocation(this)'
 											// >get location</span>";
 											// }
 											var locationIcon = locationIcons(invoiceWiseReport);
@@ -195,7 +195,7 @@ if (!this.InvoiceWiseReport) {
 											}
 											var changeAccount = "";
 											if (interimSave == "true") {
-												changeAccount = "&nbsp;&nbsp;<button type='button' class='btn btn-blue' onclick='InvoiceWiseReport.changeAccountProfile(\""
+												changeAccount = "&nbsp;&nbsp;<button type='button' class='btn btn-blue' onclick='InvoiceWiseLocationReport.changeAccountProfile(\""
 														+ invoiceWiseReport.pid
 														+ "\");'>Change Account Profile</button>"
 											} else {
@@ -203,7 +203,7 @@ if (!this.InvoiceWiseReport) {
 											}
 											var geoTag = "";
 											if (distanceTarvel == "true") {
-												geoTag = "&nbsp;&nbsp;<button type='button' title='geo tag to account' class='btn btn-orange entypo-map' aria-label='entypo-map' onclick='InvoiceWiseReport.setGeoTag(\""
+												geoTag = "&nbsp;&nbsp;<button type='button' title='geo tag to account' class='btn btn-orange entypo-map' aria-label='entypo-map' onclick='InvoiceWiseLocationReport.setGeoTag(\""
 														+ invoiceWiseReport.pid
 														+ "\",\""
 														+ invoiceWiseReport.accountProfileLatitude
@@ -228,7 +228,7 @@ if (!this.InvoiceWiseReport) {
 											if (duration.asMinutes() > 10) {
 												rowColor = "background-color:yellow";
 											}
-											$('#tBodyInvoiceWiseReport')
+											$('#tBodyInvoiceWiseLocationReport')
 													.append(
 															"<tr style='"
 																	+ rowColor
@@ -293,7 +293,7 @@ if (!this.InvoiceWiseReport) {
 
 																var editButton = "";
 																if (interimSave == "true") {
-																	editButton = "<button type='button' class='btn btn-white' onclick='InvoiceWiseReport.editDetails(\""
+																	editButton = "<button type='button' class='btn btn-white' onclick='InvoiceWiseLocationReport.editDetails(\""
 																			+ invoiceWiseReport.pid
 																			+ "\",\""
 																			+ executionDetail.documentType
@@ -307,7 +307,7 @@ if (!this.InvoiceWiseReport) {
 																var dynamicvalue = "";
 																if (executionDetail.documentType != "DYNAMIC_DOCUMENT") {
 																	$(
-																			'#tBodyInvoiceWiseReport')
+																			'#tBodyInvoiceWiseLocationReport')
 																			.append(
 																					"<tr class='tableexport-ignore' style='background: rgba(225, 225, 225, 0.66);' data-id='"
 																							+ executionDetail.pid
@@ -317,7 +317,7 @@ if (!this.InvoiceWiseReport) {
 																							+ executionDetail.documentName
 																							+ "</td><td>"
 																							+ executionDetail.documentTotal
-																							+ "</td><td><button type='button' class='btn btn-white' onclick='InvoiceWiseReport.viewDetails(\""
+																							+ "</td><td><button type='button' class='btn btn-white' onclick='InvoiceWiseLocationReport.viewDetails(\""
 																							+ executionDetail.pid
 																							+ "\",\""
 																							+ executionDetail.documentType
@@ -327,12 +327,12 @@ if (!this.InvoiceWiseReport) {
 																} else {
 																	var elmViewImage = "";
 																	if (executionDetail.imageSaved) {
-																		elmViewImage = "<td><button type='button' class='btn btn-blue' onclick='InvoiceWiseReport.showModalPopup($(\"#imagesModal\"),\""
+																		elmViewImage = "<td><button type='button' class='btn btn-blue' onclick='InvoiceWiseLocationReport.showModalPopup($(\"#imagesModal\"),\""
 																				+ executionDetail.pid
 																				+ "\",0);'>View Images</button></td>";
 																	}
 																	$(
-																			'#tBodyInvoiceWiseReport')
+																			'#tBodyInvoiceWiseLocationReport')
 																			.append(
 																					"<tr style='background: rgba(225, 225, 225, 0.66);' data-id='"
 																							+ executionDetail.pid
@@ -342,7 +342,7 @@ if (!this.InvoiceWiseReport) {
 																							+ executionDetail.documentName
 																							+ "</td><td>"
 																							+ dynamicvalue
-																							+ "</td><td><button type='button' class='btn btn-white' onclick='InvoiceWiseReport.viewDetails(\""
+																							+ "</td><td><button type='button' class='btn btn-white' onclick='InvoiceWiseLocationReport.viewDetails(\""
 																							+ executionDetail.pid
 																							+ "\",\""
 																							+ executionDetail.documentType
@@ -373,7 +373,7 @@ if (!this.InvoiceWiseReport) {
 				});
 	}
 
-	InvoiceWiseReport.setGeoTag = function(pid, accLat, accLon, accLoc, newLat,
+	InvoiceWiseLocationReport.setGeoTag = function(pid, accLat, accLon, accLoc, newLat,
 			newLon, newLoc, obj) {
 
 		$("#oldLatitude").text(
@@ -393,7 +393,7 @@ if (!this.InvoiceWiseReport) {
 
 	}
 
-	InvoiceWiseReport.saveNewGeoLocation = function() {
+	InvoiceWiseLocationReport.saveNewGeoLocation = function() {
 		var pid = $("#hdn_lbl").val();
 		$.ajax({
 			url : invoiceWiseReportContextPath + "/updateGeoTag/" + pid,
@@ -410,7 +410,7 @@ if (!this.InvoiceWiseReport) {
 		});
 	}
 
-	InvoiceWiseReport.getActivities = function(activityType) {
+	InvoiceWiseLocationReport.getActivities = function(activityType) {
 		$("#dbActivity").children().remove();
 		if (activityType == 'all') {
 			$("#dbActivity").append('<option value="no">All Activity</option>');
@@ -439,7 +439,7 @@ if (!this.InvoiceWiseReport) {
 		});
 	}
 
-	InvoiceWiseReport.editDetails = function(pid, documentType, documentTypePid) {
+	InvoiceWiseLocationReport.editDetails = function(pid, documentType, documentTypePid) {
 		if (documentType == "INVENTORY_VOUCHER") {
 			window.location = location.protocol + '//' + location.host
 					+ "/web/inventory-voucher-transaction?etePid=" + pid
@@ -456,7 +456,7 @@ if (!this.InvoiceWiseReport) {
 	};
 
 	var savePidForAccountChanging;
-	InvoiceWiseReport.changeAccountProfile = function(pid) {
+	InvoiceWiseLocationReport.changeAccountProfile = function(pid) {
 		$.ajax({
 			url : invoiceWiseReportContextPath + "/getDynamicDocument/" + pid,
 			method : 'GET',
@@ -478,7 +478,7 @@ if (!this.InvoiceWiseReport) {
 							});
 				}
 
-				InvoiceWiseReport.getForms();
+				InvoiceWiseLocationReport.getForms();
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -491,7 +491,7 @@ if (!this.InvoiceWiseReport) {
 		$("#accountProfileModal").modal("show");
 	};
 
-	InvoiceWiseReport.searchTable = function(inputVal, table) {
+	InvoiceWiseLocationReport.searchTable = function(inputVal, table) {
 		table.find('tr').each(function(index, row) {
 			var allCells = $(row).find('td');
 			if (allCells.length > 0) {
@@ -513,17 +513,17 @@ if (!this.InvoiceWiseReport) {
 		});
 	}
 
-	InvoiceWiseReport.newAccount = function() {
+	InvoiceWiseLocationReport.newAccount = function() {
 		$("#newAccount").css("display", "block");
 		$("#oldAccounts").css("display", "none");
 	};
 
-	InvoiceWiseReport.oldAccount = function() {
+	InvoiceWiseLocationReport.oldAccount = function() {
 		$("#oldAccounts").css("display", "block");
 		$("#newAccount").css("display", "none");
 	};
 
-	InvoiceWiseReport.changeAccount = function() {
+	InvoiceWiseLocationReport.changeAccount = function() {
 
 		$(".error-msg").html("");
 		var accountProfilePid = "";
@@ -544,7 +544,7 @@ if (!this.InvoiceWiseReport) {
 			},
 			success : function(status) {
 				$("#accountProfileModal").modal("hide");
-				InvoiceWiseReport.filter();
+				InvoiceWiseLocationReport.filter();
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -552,7 +552,7 @@ if (!this.InvoiceWiseReport) {
 		});
 	};
 
-	InvoiceWiseReport.createAndChangeAccount = function() {
+	InvoiceWiseLocationReport.createAndChangeAccount = function() {
 		if ($("#field_name").val() == "") {
 			alert("Please Fill Name");
 			return;
@@ -620,7 +620,7 @@ if (!this.InvoiceWiseReport) {
 				$('#field_contactPerson').val("");
 				$('#field_defaultDiscountPercentage').val("");
 				$('#field_closingBalance').val("");
-				InvoiceWiseReport.filter();
+				InvoiceWiseLocationReport.filter();
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -629,7 +629,7 @@ if (!this.InvoiceWiseReport) {
 
 	};
 
-	InvoiceWiseReport.getForms = function() {
+	InvoiceWiseLocationReport.getForms = function() {
 		var dynamicDocumentPid = $("#field_dynamicDocument").val();
 		if (dynamicDocumentPid == "-1") {
 			$("#field_form").html('<option value="-1">Select Form</option>');
@@ -659,7 +659,7 @@ if (!this.InvoiceWiseReport) {
 		});
 	}
 
-	InvoiceWiseReport.loadAccountFromForm = function() {
+	InvoiceWiseLocationReport.loadAccountFromForm = function() {
 		$('#field_name').val("");
 		$('#field_alias').val("");
 		$('#field_city').val("City");
@@ -743,7 +743,7 @@ if (!this.InvoiceWiseReport) {
 
 	};
 
-	InvoiceWiseReport.getLocation = function(obj) {
+	InvoiceWiseLocationReport.getLocation = function(obj) {
 		var pid = $(obj).attr("id");
 		$(obj).html("loading...");
 		$.ajax({
@@ -761,7 +761,7 @@ if (!this.InvoiceWiseReport) {
 
 	}
 
-	InvoiceWiseReport.getTowerLocation = function(obj) {
+	InvoiceWiseLocationReport.getTowerLocation = function(obj) {
 		var pid = $(obj).attr("id");
 		$(obj).html("loading...");
 		$.ajax({
@@ -814,7 +814,7 @@ if (!this.InvoiceWiseReport) {
 		return images;
 	}
 
-	InvoiceWiseReport.accept = function(pid, obj) {
+	InvoiceWiseLocationReport.accept = function(pid, obj) {
 		$.ajax({
 			url : location.protocol + '//' + location.host
 					+ "/web/verification/accept/" + pid,
@@ -834,7 +834,7 @@ if (!this.InvoiceWiseReport) {
 		});
 	}
 
-	InvoiceWiseReport.reject = function() {
+	InvoiceWiseLocationReport.reject = function() {
 		var reasons = $("#field_reason").val();
 
 		if (reasons == null) {
@@ -867,7 +867,7 @@ if (!this.InvoiceWiseReport) {
 		});
 	}
 
-	InvoiceWiseReport.showModal = function(pid, obj) {
+	InvoiceWiseLocationReport.showModal = function(pid, obj) {
 		object = obj;
 		invoiceWiseReportPid = pid;
 		$("#field_reason").val("");
@@ -875,7 +875,7 @@ if (!this.InvoiceWiseReport) {
 
 	}
 
-	InvoiceWiseReport.viewDetails = function(pid, documentType) {
+	InvoiceWiseLocationReport.viewDetails = function(pid, documentType) {
 		if (documentType == "INVENTORY_VOUCHER") {
 			showInventoryVoucher(pid);
 		} else if (documentType == "ACCOUNTING_VOUCHER") {
@@ -885,7 +885,7 @@ if (!this.InvoiceWiseReport) {
 		}
 	}
 
-	InvoiceWiseReport.showModalPopup = function(el, pid, action) {
+	InvoiceWiseLocationReport.showModalPopup = function(el, pid, action) {
 		if (pid) {
 			switch (action) {
 			case 0:
@@ -897,7 +897,7 @@ if (!this.InvoiceWiseReport) {
 	}
 
 	function showDynamicDocumentImages(pid) {
-		$('#divInvoiceWiseReportImages')
+		$('#divInvoiceWiseLocationReportImages')
 				.html(
 						'<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
 		$
@@ -906,10 +906,10 @@ if (!this.InvoiceWiseReport) {
 							+ "/web/dynamic-documents/images/" + pid,
 					type : 'GET',
 					success : function(filledFormFiles) {
-						$('#divInvoiceWiseReportImages').html("");
+						$('#divInvoiceWiseLocationReportImages').html("");
 						if (filledFormFiles.length == 0) {
 							var table = '<table class="table  table-striped table-bordered"><tr><td style="font-weight: bold;">Image Not Found</td></tr></table>';
-							$('#divInvoiceWiseReportImages').append(table);
+							$('#divInvoiceWiseLocationReportImages').append(table);
 						}
 						$
 								.each(
@@ -932,7 +932,7 @@ if (!this.InvoiceWiseReport) {
 																		+ '"/></td></tr>';
 															});
 											table += '</table>';
-											$('#divInvoiceWiseReportImages')
+											$('#divInvoiceWiseLocationReportImages')
 													.append(table);
 
 										});
@@ -1243,7 +1243,7 @@ if (!this.InvoiceWiseReport) {
 		$('#viewModalDynamicDocument').modal('show');
 	}
 
-	InvoiceWiseReport.showDatePicker = function() {
+	InvoiceWiseLocationReport.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");
 		if ($('#dbDateSearch').val() == "CUSTOM") {
@@ -1272,7 +1272,7 @@ if (!this.InvoiceWiseReport) {
 
 	}
 
-	InvoiceWiseReport.closeModalPopup = function(el) {
+	InvoiceWiseLocationReport.closeModalPopup = function(el) {
 		el.modal('hide');
 	}
 

@@ -66,6 +66,9 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	@Query("select location from Location location where location.company.id= ?#{principal.companyId} and location.activated = true and location.id in ?1")
 	List<Location> findAllByCompanyIdAndActivatedLocationIn(List<Long> locationIds);
 	
+	@Query("select location from Location location where location.company.id= ?#{principal.companyId} and location.activated = true and location.pid in ?1")
+	List<Location> findAllByCompanyIdAndActivatedLocationPidIn(List<String> locationPids);
+	
 	@Query("select location.id, location.name,location.alias from Location location where location.company.id = ?1")
 	List<Object[]> findAllLocationByCompanyId(Long companyId);
 
