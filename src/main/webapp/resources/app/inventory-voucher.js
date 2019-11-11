@@ -23,6 +23,9 @@ if (!this.InventoryVoucher) {
 		$('#downloadXls').on('click', function() {
 			downloadXls();
 		});
+		$('#btnApply').on('click', function() {
+			InventoryVoucher.filter();
+		});
 		if($("#dbDocumentType").val!="no"){
 			loadAllDocumentByDocumentType();
 		}

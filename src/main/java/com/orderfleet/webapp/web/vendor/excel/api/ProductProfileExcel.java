@@ -128,8 +128,8 @@ public class ProductProfileExcel {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					productProfileUploadService.saveUpdateProductGroupProductExcel(productProfileDTOs, so);
 					productProfileUploadService.saveUpdateProductProfiles(productProfileDTOs, so);
+					productProfileUploadService.saveUpdateProductGroupProductExcel(productProfileDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Product-Profile sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));

@@ -50,6 +50,7 @@ import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.OrderStatus;
 import com.orderfleet.webapp.domain.PriceLevel;
+import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
@@ -57,9 +58,11 @@ import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
@@ -69,6 +72,7 @@ import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.OrderStatusRepository;
 import com.orderfleet.webapp.repository.PriceLevelRepository;
+import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -172,6 +176,9 @@ public class TransactionResource {
 
 	@Inject
 	private CompanyService companyService;
+	
+	@Inject
+	private CompanyRepository companyRepository;
 
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
@@ -184,6 +191,9 @@ public class TransactionResource {
 
 	@Inject
 	private OrderStatusRepository orderStatusRepository;
+	
+	@Inject
+	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
 
 	// @Inject
 	// private DocumentStockLocationSourceRepository
@@ -196,7 +206,8 @@ public class TransactionResource {
 	 * POST /sales-order.json : Create new salesOrders.
 	 * 
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 * @throws URISyntaxException
+	 *             if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/get-sales-orders.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -304,7 +315,8 @@ public class TransactionResource {
 	 * POST /sales-order.json : Create new salesOrders.
 	 * 
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 * @throws URISyntaxException
+	 *             if the Location URI syntax is incorrect
 	 */
 	// Method used for getting sales order (aquatech, and new companies)
 	@RequestMapping(value = "/v2/get-sales-orders.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -400,15 +412,16 @@ public class TransactionResource {
 				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
 
-				PriceLevel priceLevel = new PriceLevel();
+				PriceLevel priceLevel = null;
 				if (obj[18] != null) {
+					
 					Optional<PriceLevel> opPriceLevel = priceLevels.stream()
 							.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
-
 					if (opPriceLevel.isPresent()) {
 						priceLevel = opPriceLevel.get();
 					}
 				}
+
 				Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
 						.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
 
@@ -631,18 +644,17 @@ public class TransactionResource {
 				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
 
-				if (obj[18] == null) {
-					log.info("No Price Level Found for " + obj[9].toString());
-					throw new IllegalArgumentException("No Price Level Found for " + obj[9].toString());
+				PriceLevel priceLevel = null;
+				if (obj[18] != null) {
+					Optional<PriceLevel> opPriceLevel = priceLevels.stream()
+							.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
+
+					if (opPriceLevel.isPresent()) {
+						priceLevel = opPriceLevel.get();
+					}
 				}
 
-				Optional<PriceLevel> opPriceLevel = priceLevels.stream()
-						.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
-
-				PriceLevel priceLevel = new PriceLevel();
-				if (opPriceLevel.isPresent()) {
-					priceLevel = opPriceLevel.get();
-				}
+				
 
 				Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
 						.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
@@ -699,6 +711,235 @@ public class TransactionResource {
 					vatLedgerDTOs.add(vatLedgerDTO);
 				}
 				salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
+				salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
+				List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
+
+				if (!rferenceInventoryVoucherHeaderExecutiveExecutionPid.equalsIgnoreCase("")) {
+
+					DynamicDocumentHeaderDTO documentHeaderDTOAditonal = dynamicDocumentHeaderService
+							.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
+									rferenceInventoryVoucherHeaderExecutiveExecutionPid, dynamicDocumentAditional);
+					DynamicDocumentHeaderDTO dynamicDocumentHeadersDespatch = dynamicDocumentHeaderService
+							.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(opExe.get().getPid(),
+									dynamicDocumentDespach);
+
+					if (documentHeaderDTOAditonal.getDocumentPid() != null) {
+						documentHeaderDTOs.add(documentHeaderDTOAditonal);
+					}
+					if (dynamicDocumentHeadersDespatch.getDocumentPid() != null) {
+						documentHeaderDTOs.add(dynamicDocumentHeadersDespatch);
+					}
+				}
+				salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
+				List<GstLedger> gstLedgerList = new ArrayList<>();
+				gstLedgerList = gstLedgerRepository
+						.findAllByCompanyIdAndActivated(SecurityUtils.getCurrentUsersCompanyId(), true);
+				if (gstLedgerList != null && gstLedgerList.size() != 0) {
+					List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst))
+							.collect(Collectors.toList());
+					salesOrderDTO.setGstLedgerDtos(gstLedgerDtos);
+				}
+				inventoryHeaderPid.add(obj[9].toString());
+
+				salesOrderDTOs.add(salesOrderDTO);
+			}
+
+			if (!salesOrderDTOs.isEmpty()) {
+				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
+				log.debug("updated " + updated + " to PROCESSING");
+			}
+		}
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		log.info("Sync completed in {} ms", elapsedTime);
+
+		return salesOrderDTOs;
+	}
+	
+	//First writen for vansales based on voucher type
+	@RequestMapping(value = "/v2/get-sales-by-voucher.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	@Transactional
+	public List<SalesOrderDTO> getSalesOrderJsonDataByVoucherType(
+			@RequestParam(value = "voucherType", required = true) VoucherType voucherType) throws URISyntaxException {
+		
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		log.debug("REST request to download van sales <" + company.getLegalName() + "> : {}");
+		log.info("voucher type : "+voucherType);
+		long start = System.nanoTime();
+		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
+		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(voucherType, company.getId());
+		if (primarySecDoc.isEmpty()) {
+			log.info("........No PrimarySecondaryDocument configuration Available...........");
+			return salesOrderDTOs;
+		}
+		List<Long> documentIdList = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
+				.collect(Collectors.toList());
+
+		
+
+		
+		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
+		List<String> inventoryHeaderPid = new ArrayList<String>();
+		String companyPid = company.getPid();
+
+//		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
+//				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+
+		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
+
+//		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
+//			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+//					.findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
+//		} else {
+//			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+//					.findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
+//		}
+		if(documentIdList.size() < 0) {
+			log.info("Documents not found assigned with voucher type");
+			return salesOrderDTOs;
+		}
+		inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+				.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
+		log.debug("IVH size : {}", inventoryVoucherHeaders.size());
+
+		if (inventoryVoucherHeaders.size() > 0) {
+
+			Set<Long> ivhIds = new HashSet<>();
+			Set<String> ivhPids = new HashSet<>();
+			Set<Long> documentIds = new HashSet<>();
+			Set<Long> employeeIds = new HashSet<>();
+			Set<Long> receiverAccountProfileIds = new HashSet<>();
+			Set<Long> supplierAccountProfileIds = new HashSet<>();
+			Set<Long> priceLeveIds = new HashSet<>();
+			Set<Long> userIds = new HashSet<>();
+			Set<Long> orderStatusIds = new HashSet<>();
+			Set<Long> exeIds = new HashSet<>();
+
+			for (Object[] obj : inventoryVoucherHeaders) {
+
+				ivhIds.add(Long.parseLong(obj[0].toString()));
+				ivhPids.add(obj[9].toString());
+				userIds.add(Long.parseLong(obj[12].toString()));
+				documentIds.add(Long.parseLong(obj[13].toString()));
+				employeeIds.add(Long.parseLong(obj[14].toString()));
+				exeIds.add(Long.parseLong(obj[15].toString()));
+				receiverAccountProfileIds.add(Long.parseLong(obj[16].toString()));
+				supplierAccountProfileIds.add(Long.parseLong(obj[17].toString()));
+				priceLeveIds.add(obj[18] != null ? Long.parseLong(obj[18].toString()) : 0);
+				orderStatusIds.add(obj[23] != null ? Long.parseLong(obj[23].toString()) : 0);
+
+			}
+
+			List<Document> documents = documentRepository.findAllByCompanyIdAndIdsIn(documentIds);
+			List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyIdAndIdsIn(employeeIds);
+			List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
+					.findAllByCompanyIdAndIdsIn(exeIds);
+			List<AccountProfile> receiverAccountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
+			List<AccountProfile> supplierAccountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(supplierAccountProfileIds);
+			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+			List<PriceLevel> priceLevels = priceLevelRepository.findAllByCompanyIdAndIdsIn(priceLeveIds);
+			List<OrderStatus> orderStatusList = orderStatusRepository.findAllByCompanyIdAndIdsIn(orderStatusIds);
+			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
+					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
+
+			for (Object[] obj : inventoryVoucherHeaders) {
+
+				String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
+
+				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
+						.findAny();
+
+				Optional<Document> opDocument = documents.stream()
+						.filter(doc -> doc.getId() == Long.parseLong(obj[13].toString())).findAny();
+
+				Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
+						.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
+
+				Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
+						.filter(doc -> doc.getId() == Long.parseLong(obj[15].toString())).findAny();
+
+				Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
+						.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
+
+				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
+						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
+
+				if (obj[18] == null) {
+					log.info("No Price Level Found for " + obj[9].toString());
+					throw new IllegalArgumentException("No Price Level Found for " + obj[9].toString());
+				}
+
+				Optional<PriceLevel> opPriceLevel = priceLevels.stream()
+						.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
+
+				PriceLevel priceLevel = new PriceLevel();
+
+				if (opPriceLevel.isPresent()) {
+					priceLevel = opPriceLevel.get();
+				}
+
+				Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
+						.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
+
+				OrderStatus orderStatus = new OrderStatus();
+				if (opOrderStatus.isPresent()) {
+					orderStatus = opOrderStatus.get();
+				}
+
+				SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
+						opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
+						orderStatus);
+
+				salesOrderDTO.setAccountProfileDTO(
+						accountProfileMapper.accountProfileToAccountProfileDTO(opRecAccPro.get()));
+
+				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
+						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
+						.collect(Collectors.toList()).stream()
+						.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());
+
+				List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
+				for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
+					SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
+					if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
+						rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
+								.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
+					}
+					List<InventoryVoucherBatchDetailDTO> inventoryVoucherBatchDetailsDTOs = new ArrayList<>();
+
+					List<OpeningStockDTO> openingStockDTOs = new ArrayList<>();
+					for (InventoryVoucherBatchDetail inventoryVoucherBatchDetail : inventoryVoucherDetail
+							.getInventoryVoucherBatchDetails()) {
+						openingStockDTOs = openingStockRepository
+								.findByCompanyIdAndProductProfilePidAndBatchNumber(
+										inventoryVoucherBatchDetail.getProductProfile().getPid(),
+										inventoryVoucherBatchDetail.getBatchNumber())
+								.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
+					}
+
+					salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
+					salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(inventoryVoucherBatchDetailsDTOs);
+					salesOrderItemDTOs.add(salesOrderItemDTO);
+				}
+				List<VatLedgerDTO> vatLedgerDTOs = new ArrayList<>();
+				for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
+					VatLedgerDTO vatLedgerDTO = new VatLedgerDTO();
+					vatLedgerDTO.setName(accountProfileDTO.getName());
+					String vatledgerArray[] = accountProfileDTO.getAlias().split("\\,");
+					vatLedgerDTO.setPercentageOfCalculation(vatledgerArray[1]);
+					vatLedgerDTO.setVatClass(vatledgerArray[0]);
+					vatLedgerDTOs.add(vatLedgerDTO);
+				}
+				salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
+				// List<SalesOrderItemDTO> sortedSalesOrderItems = new
+				// ArrayList<SalesOrderItemDTO>();
+				// sortedSalesOrderItems =
+				// salesOrderItemDTOs.stream().sorted(Comparator.comparingLong(SalesOrderItemDTO::getSortOrder)).collect(Collectors.toList());
 				salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
 				List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
 
@@ -871,7 +1112,8 @@ public class TransactionResource {
 	 * POST /sales-order.json : Create new salesOrders.
 	 * 
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 * @throws URISyntaxException
+	 *             if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/get-doc-wise-sales-orders", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -1034,9 +1276,11 @@ public class TransactionResource {
 	/**
 	 * POST /update-receipt-status .
 	 *
-	 * @param String the List<String> to create
+	 * @param String
+	 *            the List<String> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 * @throws URISyntaxException
+	 *             if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/update-receipt-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -1072,9 +1316,11 @@ public class TransactionResource {
 	/**
 	 * POST /update-order-status .
 	 *
-	 * @param String the List<String> to create
+	 * @param String
+	 *            the List<String> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 * @throws URISyntaxException
+	 *             if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/update-order-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -1114,7 +1360,8 @@ public class TransactionResource {
 	 * POST /get-receipts.json : Create new salesOrders.
 	 * 
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 * @throws URISyntaxException
+	 *             if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/get-ledgers.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -1139,9 +1386,11 @@ public class TransactionResource {
 	/**
 	 * POST /update-ledgers-status .
 	 *
-	 * @param String the List<String> to create
+	 * @param String
+	 *            the List<String> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 * @throws URISyntaxException
+	 *             if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/update-ledgers-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -1160,9 +1409,11 @@ public class TransactionResource {
 	/**
 	 * POST /send sales from tally .
 	 *
-	 * @param String the List<inventoryVoucherHeaderDTO> to create
+	 * @param String
+	 *            the List<inventoryVoucherHeaderDTO> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 * @throws URISyntaxException
+	 *             if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/tally-accounting-vouchers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -1239,9 +1490,11 @@ public class TransactionResource {
 	/**
 	 * POST /send sales from tally .
 	 *
-	 * @param String the List<inventoryVoucherHeaderDTO> to create
+	 * @param String
+	 *            the List<inventoryVoucherHeaderDTO> to create
 	 * @return the ResponseEntity with status 201 (Created)
-	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 * @throws URISyntaxException
+	 *             if the Location URI syntax is incorrect
 	 */
 
 	@RequestMapping(value = "/tally-inventory-vouchers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
