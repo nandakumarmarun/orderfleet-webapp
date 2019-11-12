@@ -8,6 +8,7 @@ import com.orderfleet.webapp.domain.enums.Industry;
 
 public class CompanyViewDTO {
 
+	private Long id;
 	private String pid;
 	private String legalName;
 	private String alias;
@@ -42,6 +43,7 @@ public class CompanyViewDTO {
 
 	public CompanyViewDTO(Company company) {
 		super();
+		this.id = company.getId();
 		this.pid = company.getPid();
 		this.legalName = company.getLegalName();
 		this.alias = company.getAlias();
@@ -69,6 +71,14 @@ public class CompanyViewDTO {
 		this.gstNo = company.getGstNo();
 		this.smsApiKey = company.getSmsApiKey();
 		this.phoneNo = company.getPhoneNo();
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getPid() {
