@@ -78,7 +78,8 @@ if (!this.PunchOutReport) {
 						employeePid : $("#dbEmployee").val(),
 						filterBy : $("#dbDateSearch").val(),
 						fromDate : $("#txtFromDate").val(),
-						toDate : $("#txtToDate").val()
+						toDate : $("#txtToDate").val(),
+						dateType : $('#dateType').val()
 					},
 					success : function(punchOutList) {
 						$('#tBodyPunchOutReport').html("");

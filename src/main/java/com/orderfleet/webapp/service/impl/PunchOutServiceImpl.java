@@ -65,6 +65,7 @@ public class PunchOutServiceImpl implements PunchOutService {
 		// find user and company
 		Optional<User> user = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername());
 		if (user.isPresent()) {
+			log.debug("punchOut user : {}", user.get().getFirstName()+"----");
 			Optional<Attendance> optionalAttendence = attendanceRepository
 					.findTop1ByCompanyPidAndUserPidOrderByCreatedDateDesc(user.get().getCompany().getPid(),
 							user.get().getPid());
@@ -128,21 +129,21 @@ public class PunchOutServiceImpl implements PunchOutService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<PunchOutDTO> findAllByCompanyIdAndDateBetween(LocalDateTime fromDate, LocalDateTime toDate) {
+	public List<PunchOutDTO> findAllByCompanyIdAndPunchDateBetween(LocalDateTime fromDate, LocalDateTime toDate) {
 		log.debug("Request to find all by companyid and date between : {}", fromDate, " - ", toDate);
-		List<PunchOut> punchOutList = punchOutRepository.findAllByCompanyIdAndDateBetween(fromDate, toDate);
+		List<PunchOut> punchOutList = punchOutRepository.findAllByCompanyIdAndPunchDateBetween(fromDate, toDate);
 		List<PunchOutDTO> result = punchOutList.stream().map(PunchOutDTO::new).collect(Collectors.toList());
 		return result;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<PunchOutDTO> findAllByCompanyIdUserPidInAndDateBetween(List<Long> userIds, LocalDateTime fromDate,
+	public List<PunchOutDTO> findAllByCompanyIdUserPidInAndPunchDateBetween(List<Long> userIds, LocalDateTime fromDate,
 			LocalDateTime toDate) {
 		log.debug("Request to find All By Company Id UserPid In And Date Between : {}", fromDate, " - ", toDate);
 
 		List<User> users = userRepository.findByUserIdIn(userIds);
-		List<PunchOut> punchOutList = punchOutRepository.findAllByCompanyIdUserPidInAndDateBetween(users, fromDate,
+		List<PunchOut> punchOutList = punchOutRepository.findAllByCompanyIdUserPidInAndPunchDateBetween(users, fromDate,
 				toDate);
 		List<PunchOutDTO> result = punchOutList.stream().map(PunchOutDTO::new).collect(Collectors.toList());
 		return result;
@@ -150,12 +151,46 @@ public class PunchOutServiceImpl implements PunchOutService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<PunchOutDTO> findAllByCompanyIdUserPidAndDateBetween(String userPid, LocalDateTime fromDate,
+	public List<PunchOutDTO> findAllByCompanyIdUserPidAndPunchDateBetween(String userPid, LocalDateTime fromDate,
 			LocalDateTime toDate) {
 		log.debug("Request to find All By Company Id UserPid And Date Between : {}", fromDate, " - ", toDate);
 
-		List<PunchOut> punchOutList = punchOutRepository.findAllByCompanyIdUserPidAndDateBetween(userPid, fromDate,
+		List<PunchOut> punchOutList = punchOutRepository.findAllByCompanyIdUserPidAndPunchDateBetween(userPid, fromDate,
 				toDate);
+		List<PunchOutDTO> result = punchOutList.stream().map(PunchOutDTO::new).collect(Collectors.toList());
+		return result;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<PunchOutDTO> findAllByCompanyIdAndCreatedDateBetween(LocalDateTime fromDate, LocalDateTime toDate) {
+		log.debug("Request to find all by companyid and date between : {}", fromDate, " - ", toDate);
+		List<PunchOut> punchOutList = punchOutRepository.findAllByCompanyIdAndCreatedDateBetween(fromDate, toDate);
+		List<PunchOutDTO> result = punchOutList.stream().map(PunchOutDTO::new).collect(Collectors.toList());
+		return result;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<PunchOutDTO> findAllByCompanyIdUserPidInAndCreatedDateBetween(List<Long> userIds,
+			LocalDateTime fromDate, LocalDateTime toDate) {
+		log.debug("Request to find All By Company Id UserPid In And Date Between : {}", fromDate, " - ", toDate);
+
+		List<User> users = userRepository.findByUserIdIn(userIds);
+		List<PunchOut> punchOutList = punchOutRepository.findAllByCompanyIdUserPidInAndCreatedDateBetween(users,
+				fromDate, toDate);
+		List<PunchOutDTO> result = punchOutList.stream().map(PunchOutDTO::new).collect(Collectors.toList());
+		return result;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<PunchOutDTO> findAllByCompanyIdUserPidAndCreatedDateBetween(String userPid, LocalDateTime fromDate,
+			LocalDateTime toDate) {
+		log.debug("Request to find All By Company Id UserPid And Date Between : {}", fromDate, " - ", toDate);
+
+		List<PunchOut> punchOutList = punchOutRepository.findAllByCompanyIdUserPidAndCreatedDateBetween(userPid,
+				fromDate, toDate);
 		List<PunchOutDTO> result = punchOutList.stream().map(PunchOutDTO::new).collect(Collectors.toList());
 		return result;
 	}

@@ -18,12 +18,20 @@ public interface PunchOutService {
 
 	PunchOutDTO savePunchOut(PunchOutDTO punchOutDTO);
 
-	List<PunchOutDTO> findAllByCompanyIdAndDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
+	List<PunchOutDTO> findAllByCompanyIdAndPunchDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
 
-	List<PunchOutDTO> findAllByCompanyIdUserPidInAndDateBetween(List<Long> userIds, LocalDateTime fromDate,
+	List<PunchOutDTO> findAllByCompanyIdUserPidInAndPunchDateBetween(List<Long> userIds, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
-	List<PunchOutDTO> findAllByCompanyIdUserPidAndDateBetween(String userPid, LocalDateTime fromDate,
+	List<PunchOutDTO> findAllByCompanyIdUserPidAndPunchDateBetween(String userPid, LocalDateTime fromDate,
+			LocalDateTime toDate);
+
+	List<PunchOutDTO> findAllByCompanyIdAndCreatedDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
+
+	List<PunchOutDTO> findAllByCompanyIdUserPidInAndCreatedDateBetween(List<Long> userIds, LocalDateTime fromDate,
+			LocalDateTime toDate);
+
+	List<PunchOutDTO> findAllByCompanyIdUserPidAndCreatedDateBetween(String userPid, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
 }

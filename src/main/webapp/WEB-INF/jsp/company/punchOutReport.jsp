@@ -41,6 +41,12 @@
 								</select>
 							</div>
 							<div class="col-sm-2">
+								<select class="form-control" id="dateType">
+									<option value="serverDate">SERVER_DATE</option>
+									<option value="punchOutDate">CLIENT_DATE</option>
+								</select>
+							</div>
+							<div class="col-sm-2">
 								<select class="form-control" id="dbDateSearch"
 									onchange="PunchOutReport.showDatePicker()">
 									<option value="TODAY">Today</option>

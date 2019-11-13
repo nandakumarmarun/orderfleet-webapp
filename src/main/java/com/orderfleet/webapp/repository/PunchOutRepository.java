@@ -23,14 +23,25 @@ public interface PunchOutRepository extends JpaRepository<PunchOut, Long> {
 	Optional<PunchOut> findIsAttendancePresent(String attendancepid);
 
 	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.punchOutDate between ?1 and ?2 Order By pncout.punchOutDate asc")
-	List<PunchOut> findAllByCompanyIdAndDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
+	List<PunchOut> findAllByCompanyIdAndPunchDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.user in ?1 and pncout.punchOutDate between ?2 and ?3 Order By pncout.punchOutDate asc")
-	List<PunchOut> findAllByCompanyIdUserPidInAndDateBetween(List<User> user, LocalDateTime fromDate,
+	List<PunchOut> findAllByCompanyIdUserPidInAndPunchDateBetween(List<User> user, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
 	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.user.pid = ?1 and pncout.punchOutDate between ?2 and ?3 Order By pncout.punchOutDate asc")
-	List<PunchOut> findAllByCompanyIdUserPidAndDateBetween(String userPid, LocalDateTime fromDate,
+	List<PunchOut> findAllByCompanyIdUserPidAndPunchDateBetween(String userPid, LocalDateTime fromDate,
+			LocalDateTime toDate);
+
+	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.createdDate between ?1 and ?2 Order By pncout.createdDate asc")
+	List<PunchOut> findAllByCompanyIdAndCreatedDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
+
+	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.user in ?1 and pncout.createdDate between ?2 and ?3 Order By pncout.createdDate asc")
+	List<PunchOut> findAllByCompanyIdUserPidInAndCreatedDateBetween(List<User> user, LocalDateTime fromDate,
+			LocalDateTime toDate);
+
+	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.user.pid = ?1 and pncout.createdDate between ?2 and ?3 Order By pncout.createdDate asc")
+	List<PunchOut> findAllByCompanyIdUserPidAndCreatedDateBetween(String userPid, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
 }
