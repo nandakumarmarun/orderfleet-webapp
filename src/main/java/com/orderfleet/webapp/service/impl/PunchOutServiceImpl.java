@@ -18,6 +18,7 @@ import com.orderfleet.webapp.domain.PunchOut;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
+import com.orderfleet.webapp.geolocation.api.GeoLocationServiceException;
 import com.orderfleet.webapp.geolocation.model.TowerLocation;
 import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.PunchOutRepository;
@@ -60,12 +61,11 @@ public class PunchOutServiceImpl implements PunchOutService {
 	 */
 	@Override
 	public PunchOutDTO savePunchOut(PunchOutDTO punchOutDTO) {
-		log.debug("Request to save  punchOut : {}", punchOutDTO);
 
 		// find user and company
 		Optional<User> user = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername());
 		if (user.isPresent()) {
-			log.debug("punchOut user : {}", user.get().getFirstName()+"----");
+			log.debug("punchOut user : {}", user.get().getLogin() + "----");
 			Optional<Attendance> optionalAttendence = attendanceRepository
 					.findTop1ByCompanyPidAndUserPidOrderByCreatedDateDesc(user.get().getCompany().getPid(),
 							user.get().getPid());
@@ -92,32 +92,62 @@ public class PunchOutServiceImpl implements PunchOutService {
 					punchOut.setLocationType(locationType);
 					punchOut.setLatitude(lat);
 					punchOut.setLongitude(lon);
+					punchOut.setMcc(punchOutDTO.getMcc());
+					punchOut.setMnc(punchOutDTO.getMnc());
+					punchOut.setCellId(punchOutDTO.getCellId());
+					punchOut.setLac(punchOutDTO.getLac());
 
 					if (locationType.equals(LocationType.GpsLocation)) {
 						punchOut.setLocation(geoLocationService.findAddressFromLatLng(lat + "," + lon));
-					} else if (locationType.equals(LocationType.TowerLocation)) {
-						punchOut.setMcc(punchOutDTO.getMcc());
-						punchOut.setMnc(punchOutDTO.getMnc());
-						punchOut.setCellId(punchOutDTO.getCellId());
-						punchOut.setLac(punchOutDTO.getLac());
-						TowerLocation towerLocation = null;
+						log.info("LocationType : GpsLocaTION");
+					} else if (locationType.equals(LocationType.TowerLocation)
+							|| (punchOutDTO.getMcc().length() > 1 && punchOutDTO.getMnc().length() > 1
+									&& punchOutDTO.getCellId().length() > 1 && punchOutDTO.getLac().length() > 1)) {
+						log.info("LocationType : TowerLocation");
 						try {
-							towerLocation = geoLocationService.findAddressFromCellTower(punchOutDTO.getMcc(),
-									punchOutDTO.getMnc(), punchOutDTO.getCellId(), punchOutDTO.getLac());
-						} catch (Exception e) {
-							log.error(e.getMessage());
-						}
-						if (towerLocation != null) {
+							TowerLocation towerLocation = geoLocationService.findAddressFromCellTower(
+									punchOutDTO.getMcc(), punchOutDTO.getMnc(), punchOutDTO.getCellId(),
+									punchOutDTO.getLac());
+							log.info("LocationType : TowerLocation 1");
 							punchOut.setLocation(towerLocation.getLocation());
-							punchOut.setLatitude(towerLocation.getLat());
-							punchOut.setLongitude(towerLocation.getLan());
-						} else {
-							punchOut.setLocation("Unable to find location");
+
+						} catch (GeoLocationServiceException lae) {
+							log.debug("Exception while calling google Tower geo location API {}", lae);
+							String locationDetails = "Tower Location => mcc:" + punchOutDTO.getMcc() + " mnc:"
+									+ punchOutDTO.getMnc() + " cellID:" + punchOutDTO.getCellId() + " lac:"
+									+ punchOutDTO.getLac();
+							String errorMsg = "Exception while calling google Tower geo location API. " + "Company : "
+									+ user.get().getCompany().getLegalName() + " User: " + user.get().getLogin();
+							punchOut.setLocation("Unable to find Location");
+							log.info(locationDetails + "\n\n" + errorMsg);
+
 						}
 					} else if (locationType.equals(LocationType.NoLocation)
 							|| locationType.equals(LocationType.FlightMode)) {
+						log.info("LocationType : NoLocation or flightmode");
+						punchOut.setLocation("No Location");
+					} else {
+						log.info("LocationType : else case");
 						punchOut.setLocation("No Location");
 					}
+
+					/*
+					 * else if (locationType.equals(LocationType.TowerLocation)) {
+					 * punchOut.setMcc(punchOutDTO.getMcc()); punchOut.setMnc(punchOutDTO.getMnc());
+					 * punchOut.setCellId(punchOutDTO.getCellId());
+					 * punchOut.setLac(punchOutDTO.getLac()); TowerLocation towerLocation = null;
+					 * try { towerLocation =
+					 * geoLocationService.findAddressFromCellTower(punchOutDTO.getMcc(),
+					 * punchOutDTO.getMnc(), punchOutDTO.getCellId(), punchOutDTO.getLac()); } catch
+					 * (Exception e) { log.error(e.getMessage()); } if (towerLocation != null) {
+					 * punchOut.setLocation(towerLocation.getLocation());
+					 * punchOut.setLatitude(towerLocation.getLat());
+					 * punchOut.setLongitude(towerLocation.getLan()); } else {
+					 * punchOut.setLocation("Unable to find location"); } } else if
+					 * (locationType.equals(LocationType.NoLocation) ||
+					 * locationType.equals(LocationType.FlightMode)) {
+					 * punchOut.setLocation("No Location"); }
+					 */
 					punchOut = punchOutRepository.save(punchOut);
 					PunchOutDTO result = new PunchOutDTO(punchOut);
 					return result;
