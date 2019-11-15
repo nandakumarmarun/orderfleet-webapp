@@ -205,4 +205,15 @@ public class PunchOutDTO {
 		this.createdDate = createdDate;
 	}
 
+	@Override
+	public String toString() {
+		return "PunchOutDTO [pid=" + pid + ", clientTransactionKey=" + clientTransactionKey + ", punchOutRemarks="
+				+ punchOutRemarks + ", latitude=" + latitude + ", longitude=" + longitude + ", mnc=" + mnc + ", mcc="
+				+ mcc + ", cellId=" + cellId + ", lac=" + lac + ", locationType=" + locationType + ", location="
+				+ location + ", login=" + login + ", userName=" + userName + ", userPid=" + userPid + ", attendancePid="
+				+ attendancePid + ", punchOutDate=" + punchOutDate + ", createdDate=" + createdDate + ", employeeName="
+				+ employeeName + "]";
+	}
+
+	
 }
