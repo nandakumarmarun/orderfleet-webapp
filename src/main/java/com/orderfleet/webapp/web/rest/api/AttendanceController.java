@@ -31,6 +31,7 @@ import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.RootPlanSubgroupApprove;
 import com.orderfleet.webapp.domain.enums.ApprovalStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.geolocation.api.GeoLocationServiceException;
 import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.AttendanceSubgroupApprovalRequestRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
@@ -242,8 +243,13 @@ public class AttendanceController {
 			punchOutService.savePunchOut(punchOutDTO);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 
+		} catch (GeoLocationServiceException e) {
+			log.error("Gelocation service exception :---"+e.getMessage());
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error("Exception service exception :---"+e.getMessage());
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
 

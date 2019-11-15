@@ -70,9 +70,11 @@ public class PunchOutServiceImpl implements PunchOutService {
 					.findTop1ByCompanyPidAndUserPidOrderByCreatedDateDesc(user.get().getCompany().getPid(),
 							user.get().getPid());
 			if (optionalAttendence.isPresent()) {
+				log.info("Attendance exist");
 				Optional<PunchOut> optionalPunchOut = punchOutRepository
 						.findIsAttendancePresent(optionalAttendence.get().getPid());
 				if (!optionalPunchOut.isPresent()) {
+					log.info("Attendance pid not present on punchout");
 					PunchOut punchOut = new PunchOut();
 					punchOut.setPid(PunchOutService.PID_PREFIX + RandomUtil.generatePid());
 					punchOut.setClientTransactionKey(punchOutDTO.getClientTransactionKey());
@@ -96,10 +98,15 @@ public class PunchOutServiceImpl implements PunchOutService {
 					punchOut.setMnc(punchOutDTO.getMnc());
 					punchOut.setCellId(punchOutDTO.getCellId());
 					punchOut.setLac(punchOutDTO.getLac());
-
+					log.info("Location type :"+locationType);
 					if (locationType.equals(LocationType.GpsLocation)) {
-						punchOut.setLocation(geoLocationService.findAddressFromLatLng(lat + "," + lon));
 						log.info("LocationType : GpsLocaTION");
+						try {
+							punchOut.setLocation(geoLocationService.findAddressFromLatLng(lat + "," + lon));
+						} catch (GeoLocationServiceException lae) {
+							log.debug("Exception while calling google GPS geo location API {}", lae.getMessage());
+							punchOut.setLocation("Unable to find Location");
+						}
 					} else if (locationType.equals(LocationType.TowerLocation)
 							|| (punchOutDTO.getMcc().length() > 1 && punchOutDTO.getMnc().length() > 1
 									&& punchOutDTO.getCellId().length() > 1 && punchOutDTO.getLac().length() > 1)) {
@@ -152,6 +159,9 @@ public class PunchOutServiceImpl implements PunchOutService {
 					PunchOutDTO result = new PunchOutDTO(punchOut);
 					return result;
 				}
+			}else {
+				log.info("Attendance not marked");
+				throw new GeoLocationServiceException("Attendance not marked");
 			}
 		}
 		return null;
