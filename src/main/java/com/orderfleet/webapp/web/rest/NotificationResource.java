@@ -268,6 +268,7 @@ public class NotificationResource {
 				NotificationDTO notificationDTO = new NotificationDTO();
 				notificationDTO.setPid(notification.getPid());
 				notificationDTO.setExecutiveName(opEmployee.get().getName());
+				notificationDTO.setIsImportant(notification.getIsImportant());
 				notificationDTO.setCreatedDate(notificationDetail.getCreatedDate());
 				notificationDTO.setTitle(notification.getTitle());
 				notificationDTO.setMessage(notification.getMessage());
