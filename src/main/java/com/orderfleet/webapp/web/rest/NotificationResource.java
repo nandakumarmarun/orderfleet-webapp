@@ -134,14 +134,20 @@ public class NotificationResource {
 					HeaderUtil.createFailureAlert("notification", "loginEmpty", "Please re-login and send message."))
 					.body(null);
 		}
-		/*
-		 * if (notificationDTO.getIsImportant()) { new java.util.Timer().schedule(new
-		 * java.util.TimerTask() {
-		 * 
-		 * @Override public void run() { pushNotificationToFCM(notification); } },
-		 * notificationDTO.getResendTime() * 60 * 1000); }
-		 */
-		NotificationStatusDTO notificationStatusDTO = pushNotificationToFCM(notification);
+		
+		 NotificationStatusDTO notificationStatusDTO = pushNotificationToFCM(notification);
+		  if (notificationDTO.getIsImportant()) { 
+			  new java.util.Timer().schedule(new java.util.TimerTask() {
+		  
+				  @Override 
+				  public void run() { 
+					  pushNotificationToFCM(notification); 
+				  } 
+			  },
+					  notificationDTO.getResendTime() * 60 * 1000); 
+		  }
+		 
+		
 		return new ResponseEntity<>(notificationStatusDTO, HttpStatus.CREATED);
 	}
 
@@ -251,7 +257,7 @@ public class NotificationResource {
 
 		List<MessageStatus> msgStatus;
 		if (MessageStatus.NONE.equals(status)) {
-			msgStatus = Arrays.asList(MessageStatus.NONE, MessageStatus.SUCCESS, MessageStatus.FAILED);
+			msgStatus = Arrays.asList(MessageStatus.NONE, MessageStatus.SUCCESS, MessageStatus.FAILED, MessageStatus.READ);
 		} else {
 			msgStatus = Arrays.asList(status);
 		}
