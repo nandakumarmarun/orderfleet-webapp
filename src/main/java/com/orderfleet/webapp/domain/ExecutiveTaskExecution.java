@@ -183,6 +183,9 @@ public class ExecutiveTaskExecution implements Serializable {
 	@Column(name = "mock_location_status", columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean mockLocationStatus;
 
+	@Column(name = "with_customer", columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean withCustomer;
+
 	public Long getId() {
 		return id;
 	}
@@ -533,6 +536,14 @@ public class ExecutiveTaskExecution implements Serializable {
 
 	public void setMockLocationStatus(boolean mockLocationStatus) {
 		this.mockLocationStatus = mockLocationStatus;
+	}
+
+	public boolean getWithCustomer() {
+		return withCustomer;
+	}
+
+	public void setWithCustomer(boolean withCustomer) {
+		this.withCustomer = withCustomer;
 	}
 
 	@Override

@@ -878,6 +878,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setGpsMandatory(false);
 		mobileConfiguration.setEnableSecondarySales(false);
 		mobileConfiguration.setEnableAttendanceImage(false);
+		mobileConfiguration.setSmartSearch(false);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 

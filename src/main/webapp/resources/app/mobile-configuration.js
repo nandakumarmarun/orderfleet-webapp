@@ -35,11 +35,12 @@ if (!this.MobileConfiguration) {
 		kfcEnabled : false,
 		gpsMandatory : false,
 		enableSecondarySales : false,
-		enableAttendanceImage : false
+		enableAttendanceImage : false,
+		smartSearch : false
 	};
 
 	$(document).ready(function() {
-		
+
 		$('.selectpicker').selectpicker();
 
 		$('#mobilesModal').on('click', function() {
@@ -114,8 +115,9 @@ if (!this.MobileConfiguration) {
 		mobileConfigurationDTO.gpsMandatory = $("#gpsMandatory").is(":checked");
 		mobileConfigurationDTO.enableSecondarySales = $("#enableSecondarySales")
 				.is(":checked");
-		mobileConfigurationDTO.enableAttendanceImage = $("#enableAttendanceImage")
-		.is(":checked");
+		mobileConfigurationDTO.enableAttendanceImage = $(
+				"#enableAttendanceImage").is(":checked");
+		mobileConfigurationDTO.smartSearch = $("#smartSearch").is(":checked");
 
 		$.ajax({
 			url : contextPath,
@@ -190,8 +192,8 @@ if (!this.MobileConfiguration) {
 									data.enableSecondarySales);
 							$('#enableAttendanceImage').prop("checked",
 									data.enableAttendanceImage);
-							
-							
+							$('#smartSearch').prop("checked", data.smartSearch);
+
 						}
 
 					},

@@ -41,6 +41,7 @@ public class MobileConfigurationDTO {
 	private boolean gpsMandatory;
 	private boolean enableSecondarySales;
 	private boolean enableAttendanceImage;
+	private boolean smartSearch;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -75,6 +76,7 @@ public class MobileConfigurationDTO {
 		this.gpsMandatory = mobileConfiguration.getGpsMandatory();
 		this.enableSecondarySales = mobileConfiguration.getEnableSecondarySales();
 		this.enableAttendanceImage = mobileConfiguration.getEnableAttendanceImage();
+		this.smartSearch = mobileConfiguration.getSmartSearch();
 	}
 
 	public String getPid() {
@@ -291,6 +293,14 @@ public class MobileConfigurationDTO {
 
 	public void setEnableAttendanceImage(boolean enableAttendanceImage) {
 		this.enableAttendanceImage = enableAttendanceImage;
+	}
+
+	public boolean getSmartSearch() {
+		return smartSearch;
+	}
+
+	public void setSmartSearch(boolean smartSearch) {
+		this.smartSearch = smartSearch;
 	}
 
 }

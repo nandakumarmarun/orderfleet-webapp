@@ -61,6 +61,7 @@
 						<th>GPS Mandatory</th>
 						<th>Enable Secondary Sales</th>
 						<th>Enable Attendance Image</th>
+						<th>Smart Search</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -93,6 +94,7 @@
 							<td>${mobileConfiguration.gpsMandatory}</td>
 							<td>${mobileConfiguration.enableSecondarySales}</td>
 							<td>${mobileConfiguration.enableAttendanceImage}</td>
+							<td>${mobileConfiguration.smartSearch}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -123,7 +125,8 @@
 
 							<div class="col-md-6 col-md-offset-3">
 								<div class="form-group">
-									<select id="dbCompany" name="companyPid" class="form-control selectpicker" data-live-search="true"><option
+									<select id="dbCompany" name="companyPid"
+										class="form-control selectpicker" data-live-search="true"><option
 											value="-1">Select Company</option>
 										<c:forEach items="${companies}" var="company">
 											<option value="${company.pid}">${company.legalName}</option>
@@ -293,6 +296,13 @@
 													<label class="control-label">Enable Attendance
 														Image</label> <input id="enableAttendanceImage"
 														name='enableAttendanceImage' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Smart Search</label> <input
+														id="smartSearch" name='smartSearch' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

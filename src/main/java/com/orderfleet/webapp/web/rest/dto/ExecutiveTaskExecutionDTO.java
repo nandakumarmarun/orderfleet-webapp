@@ -112,6 +112,8 @@ public class ExecutiveTaskExecutionDTO {
 
 	private boolean mockLocationStatus;
 
+	private boolean withCustomer;
+
 	public ExecutiveTaskExecutionDTO() {
 		super();
 	}
@@ -139,7 +141,7 @@ public class ExecutiveTaskExecutionDTO {
 				executiveTaskExecution.getStartLatitude(), executiveTaskExecution.getStartLongitude(),
 				executiveTaskExecution.getStartTime(), executiveTaskExecution.getEndTime(),
 				executiveTaskExecution.getRejectReasonRemark(), executiveTaskExecution.getPunchInDate(),
-				executiveTaskExecution.getMockLocationStatus());
+				executiveTaskExecution.getMockLocationStatus(), executiveTaskExecution.getWithCustomer());
 
 	}
 
@@ -152,7 +154,7 @@ public class ExecutiveTaskExecutionDTO {
 			String executiveTaskPlanPid, boolean startIsGpsOff, boolean startIsMobileDataOff,
 			LocationType startLocationType, String startLocation, BigDecimal startLatitude, BigDecimal startLongitude,
 			LocalDateTime startTime, LocalDateTime endTime, String rejectReasonRemark, LocalDateTime punchInDate,
-			boolean mockLocationStatus) {
+			boolean mockLocationStatus, boolean withCustomer) {
 		super();
 		this.pid = pid;
 		this.clientTransactionKey = clientTransactionKey;
@@ -191,6 +193,7 @@ public class ExecutiveTaskExecutionDTO {
 		this.rejectReasonRemark = rejectReasonRemark;
 		this.punchInDate = punchInDate;
 		this.mockLocationStatus = mockLocationStatus;
+		this.withCustomer = withCustomer;
 	}
 
 	public String getPid() {
@@ -585,6 +588,14 @@ public class ExecutiveTaskExecutionDTO {
 		this.mockLocationStatus = mockLocationStatus;
 	}
 
+	public boolean getWithCustomer() {
+		return withCustomer;
+	}
+
+	public void setWithCustomer(boolean withCustomer) {
+		this.withCustomer = withCustomer;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -625,7 +636,8 @@ public class ExecutiveTaskExecutionDTO {
 				+ ", startIsMobileDataOff=" + startIsMobileDataOff + ", location=" + location + ", towerLocation="
 				+ towerLocation + ", activityStatus=" + activityStatus + ", executiveTaskPlanPid="
 				+ executiveTaskPlanPid + ", rejectReasonRemark=" + rejectReasonRemark + ", employeeName=" + employeeName
-				+ ", interimSave=" + interimSave + ", punchInDate=" + punchInDate + ", mockLocationStatus=" + mockLocationStatus + "]";
+				+ ", interimSave=" + interimSave + ", punchInDate=" + punchInDate + ", mockLocationStatus="
+				+ mockLocationStatus + ", withCustomer=" + withCustomer + "]";
 	}
 
 }

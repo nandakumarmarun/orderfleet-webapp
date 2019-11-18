@@ -119,6 +119,8 @@ if (!this.InvoiceWiseReport) {
 											var towerLocationName = invoiceWiseReport.towerLocation;
 
 											var mockLocatation = "";
+											
+											var withCustomer=""
 
 											if (invoiceWiseReport.mockLocationStatus) {
 												mockLocatation = "Enabled"

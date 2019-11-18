@@ -296,8 +296,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	private ExecutiveTaskExecution saveExecutiveTaskExecution(Company company, User user,
 			ExecutiveTaskExecutionDTO executiveTaskExecutionDTO) {
 		ExecutiveTaskExecution executiveTaskExecution = new ExecutiveTaskExecution();
-		
-		
+
 		// set pid
 		executiveTaskExecution.setPid(ExecutiveTaskExecutionService.PID_PREFIX + RandomUtil.generatePid());
 		executiveTaskExecution.setClientTransactionKey(executiveTaskExecutionDTO.getClientTransactionKey());
@@ -371,6 +370,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		}
 
 		executiveTaskExecution.setMockLocationStatus(executiveTaskExecutionDTO.getMockLocationStatus());
+		executiveTaskExecution.setWithCustomer(executiveTaskExecutionDTO.getWithCustomer());
 		// set company
 		executiveTaskExecution.setCompany(company);
 		executiveTaskExecution = executiveTaskExecutionRepository.save(executiveTaskExecution);

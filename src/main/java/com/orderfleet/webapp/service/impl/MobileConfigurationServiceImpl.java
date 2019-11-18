@@ -69,6 +69,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setGpsMandatory(mobileConfigurationDTO.getGpsMandatory());
 		configuration.setEnableSecondarySales(mobileConfigurationDTO.getEnableSecondarySales());
 		configuration.setEnableAttendanceImage(mobileConfigurationDTO.getEnableAttendanceImage());
+		configuration.setSmartSearch(mobileConfigurationDTO.getSmartSearch());
 
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
@@ -103,6 +104,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setGpsMandatory(mobileConfigurationDTO.getGpsMandatory());
 			configuration.setEnableSecondarySales(mobileConfigurationDTO.getEnableSecondarySales());
 			configuration.setEnableAttendanceImage(mobileConfigurationDTO.getEnableAttendanceImage());
+			configuration.setSmartSearch(mobileConfigurationDTO.getSmartSearch());
 
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);

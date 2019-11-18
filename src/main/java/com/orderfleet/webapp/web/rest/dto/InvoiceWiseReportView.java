@@ -82,6 +82,8 @@ public class InvoiceWiseReportView {
 
 	private boolean mockLocationStatus;
 
+	private boolean withCustomer;
+
 	public InvoiceWiseReportView() {
 		super();
 	}
@@ -96,7 +98,7 @@ public class InvoiceWiseReportView {
 			List<InvoiceWiseReportDetailView> invoiceWiseReportDetailViews, BigDecimal latitude, BigDecimal longitude,
 			BigDecimal towerLatitude, BigDecimal towerLongitude, String employeeName, String towerLocation,
 			double totalRecieptAmount, double totalSalesOrderAmount, LocalDateTime punchInDate,
-			boolean mockLocationStatus) {
+			boolean mockLocationStatus, boolean withCustomer) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -134,6 +136,7 @@ public class InvoiceWiseReportView {
 		this.totalSalesOrderAmount = totalSalesOrderAmount;
 		this.punchInDate = punchInDate;
 		this.mockLocationStatus = mockLocationStatus;
+		this.withCustomer = withCustomer;
 	}
 
 	public InvoiceWiseReportView(ExecutiveTaskExecution executiveTaskExecution) {
@@ -170,6 +173,7 @@ public class InvoiceWiseReportView {
 		this.towerLocation = executiveTaskExecution.getTowerLocation();
 		this.punchInDate = executiveTaskExecution.getPunchInDate();
 		this.mockLocationStatus = executiveTaskExecution.getMockLocationStatus();
+		this.withCustomer = executiveTaskExecution.getWithCustomer();
 	}
 
 	public String getPid() {
@@ -466,6 +470,14 @@ public class InvoiceWiseReportView {
 
 	public void setMockLocationStatus(boolean mockLocationStatus) {
 		this.mockLocationStatus = mockLocationStatus;
+	}
+
+	public boolean getWithCustomer() {
+		return withCustomer;
+	}
+
+	public void setWithCustomer(boolean withCustomer) {
+		this.withCustomer = withCustomer;
 	}
 
 	@Override

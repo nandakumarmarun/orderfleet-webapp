@@ -72,6 +72,8 @@ public class MobileSettingsDTO {
 
 	private boolean enableAttendanceImage;
 
+	private boolean smartSearch;
+
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -102,6 +104,7 @@ public class MobileSettingsDTO {
 		this.gpsMandatory = mobileConfigurationDTO.getGpsMandatory();
 		this.enableSecondarySales = mobileConfigurationDTO.getEnableSecondarySales();
 		this.enableAttendanceImage = mobileConfigurationDTO.getEnableAttendanceImage();
+		this.smartSearch = mobileConfigurationDTO.getSmartSearch();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -326,6 +329,14 @@ public class MobileSettingsDTO {
 
 	public void setEnableAttendanceImage(boolean enableAttendanceImage) {
 		this.enableAttendanceImage = enableAttendanceImage;
+	}
+
+	public boolean getSmartSearch() {
+		return smartSearch;
+	}
+
+	public void setSmartSearch(boolean smartSearch) {
+		this.smartSearch = smartSearch;
 	}
 
 }

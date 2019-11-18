@@ -404,9 +404,12 @@ public class InvoiceWiseLocationReportResource {
 
 			accountProfilePids = accountProfiles.stream().map(AccountProfileDTO::getPid).collect(Collectors.toList());
 
-			executiveTaskExecutions = executiveTaskExecutionRepository
-					.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
-							accountProfilePids);
+			if (accountProfilePids.size() > 0) {
+
+				executiveTaskExecutions = executiveTaskExecutionRepository
+						.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids,
+								userIds, accountProfilePids);
+			}
 		}
 
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
