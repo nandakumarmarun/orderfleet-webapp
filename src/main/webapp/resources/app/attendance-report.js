@@ -115,8 +115,8 @@ if (!this.AttendanceReport) {
 																		+ convertDateTime(attendance.plannedDate)
 																		+ "' class='icon-container'>"
 																		+ attendance.location
-																		+ "</a></td><td>"
-																		+ "</td><td><a href='"
+																		+ "</a></td>"
+																		+ "<td><a href='"
 																		+ appContextPath
 																		+ '/web/live-tracking-attendance?user-key-pid='
 																		+ attendance.userPid

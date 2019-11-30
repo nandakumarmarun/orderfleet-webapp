@@ -74,6 +74,8 @@ public class MobileSettingsDTO {
 
 	private boolean smartSearch;
 
+	private boolean salesOrderDownloadPdf;
+
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -105,6 +107,7 @@ public class MobileSettingsDTO {
 		this.enableSecondarySales = mobileConfigurationDTO.getEnableSecondarySales();
 		this.enableAttendanceImage = mobileConfigurationDTO.getEnableAttendanceImage();
 		this.smartSearch = mobileConfigurationDTO.getSmartSearch();
+		this.salesOrderDownloadPdf = mobileConfigurationDTO.getSalesOrderDownloadPdf();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -337,6 +340,14 @@ public class MobileSettingsDTO {
 
 	public void setSmartSearch(boolean smartSearch) {
 		this.smartSearch = smartSearch;
+	}
+
+	public boolean isSalesOrderDownloadPdf() {
+		return salesOrderDownloadPdf;
+	}
+
+	public void setSalesOrderDownloadPdf(boolean salesOrderDownloadPdf) {
+		this.salesOrderDownloadPdf = salesOrderDownloadPdf;
 	}
 
 }

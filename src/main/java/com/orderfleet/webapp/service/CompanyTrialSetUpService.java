@@ -879,6 +879,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setEnableSecondarySales(false);
 		mobileConfiguration.setEnableAttendanceImage(false);
 		mobileConfiguration.setSmartSearch(false);
+		mobileConfiguration.setSalesOrderDownloadPdf(false);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 

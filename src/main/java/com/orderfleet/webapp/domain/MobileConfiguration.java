@@ -128,6 +128,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "smart_search", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean smartSearch;
 
+	@Column(name = "sales_order_download_pdf", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean salesOrderDownloadPdf;
+
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -366,6 +369,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setEnableAttendanceImage(boolean enableAttendanceImage) {
 		this.enableAttendanceImage = enableAttendanceImage;
+	}
+
+	public boolean getSalesOrderDownloadPdf() {
+		return salesOrderDownloadPdf;
+	}
+
+	public void setSalesOrderDownloadPdf(boolean salesOrderDownloadPdf) {
+		this.salesOrderDownloadPdf = salesOrderDownloadPdf;
 	}
 
 	@Override

@@ -14,14 +14,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.AttendanceStatusSubgroup;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
+import com.orderfleet.webapp.geolocation.api.GeoLocationServiceException;
 import com.orderfleet.webapp.geolocation.model.TowerLocation;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.AttendanceRepository;
@@ -56,21 +60,20 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 	@Inject
 	private AttendanceStatusSubgroupRepository attendanceStatusSubgroupRepository;
-	
+
 	@Inject
 	private GeoLocationService geoLocationService;
 
 	/**
 	 * Save a attendance.
 	 * 
-	 * @param attendanceDTO
-	 *            the entity to save
+	 * @param attendanceDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
 	public Attendance saveAttendance(AttendanceDTO attendanceDTO) {
 		log.debug("Request to save  attendance : {}", attendanceDTO);
-		log.info("******/"+attendanceDTO.getAttendanceSubGroupId()+attendanceDTO.getAttendanceSubGroupName());
+		log.info("******/" + attendanceDTO.getAttendanceSubGroupId() + attendanceDTO.getAttendanceSubGroupName());
 		// find user and company
 		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).get();
 
@@ -102,42 +105,81 @@ public class AttendanceServiceImpl implements AttendanceService {
 		attendance.setLatitude(lat);
 		attendance.setLongitude(lon);
 
-		if (locationType.equals(LocationType.GpsLocation) || (lat != null && lat.compareTo(BigDecimal.ZERO) != 0 && 
-															  lon != null && lon.compareTo(BigDecimal.ZERO) != 0)) {
-			attendance.setLocation(geoLocationService.findAddressFromLatLng(lat + "," +lon));
-			
+		if (locationType.equals(LocationType.GpsLocation) || (lat != null && lat.compareTo(BigDecimal.ZERO) != 0
+				&& lon != null && lon.compareTo(BigDecimal.ZERO) != 0)) {
+
+			log.info("Attendance Gps Location----");
+			try {
+				attendance.setLocation(geoLocationService.findAddressFromLatLng(lat + "," + lon));
+			} catch (HttpClientErrorException e) {
+				log.info("HttpClientErrorException-- " + e.getMessage());
+				attendance.setLocation("Unable to find location");
+				log.error(e.getResponseBodyAsString());
+				e.printStackTrace();
+			} catch (GeoLocationServiceException e) {
+				log.info("GeoLocationServiceException-- " + e.getMessage());
+				attendance.setLocation("Unable to find location");
+				e.printStackTrace();
+			} catch (Exception e) {
+				log.info("Exception-- " + e.getMessage());
+				attendance.setLocation("Unable to find location");
+				e.printStackTrace();
+			}
+
 //			if(attendanceDTO.getMcc() != null && !attendanceDTO.getMcc().equals("0") &&
 //				attendanceDTO.getMnc() != null && !attendanceDTO.getMnc().equals("0") &&
 //				attendanceDTO.getLac() != null && !attendanceDTO.getLac().equals("0") &&
 //				attendanceDTO.getCellId() != null && !attendanceDTO.getCellId().equals("0")) {
 //				
 //			}
-			
-		}else {
+
+		} else {
 			attendance.setLocation("No Location");
-		} 
-		if (locationType.equals(LocationType.TowerLocation) || attendanceDTO.getMcc() != null && !attendanceDTO.getMcc().equals("0") &&
-																	  attendanceDTO.getMnc() != null && !attendanceDTO.getMnc().equals("0") &&
-																	  attendanceDTO.getLac() != null && !attendanceDTO.getLac().equals("0") &&
-																	  attendanceDTO.getCellId() != null && !attendanceDTO.getCellId().equals("0")) {
+		}
+		if (locationType.equals(LocationType.TowerLocation)
+				|| attendanceDTO.getMcc() != null && !attendanceDTO.getMcc().equals("0")
+						&& attendanceDTO.getMnc() != null && !attendanceDTO.getMnc().equals("0")
+						&& attendanceDTO.getLac() != null && !attendanceDTO.getLac().equals("0")
+						&& attendanceDTO.getCellId() != null && !attendanceDTO.getCellId().equals("0")) {
+
+			log.info("Attendance Tower Location----");
+
 			attendance.setMcc(attendanceDTO.getMcc());
 			attendance.setMnc(attendanceDTO.getMnc());
 			attendance.setCellId(attendanceDTO.getCellId());
 			attendance.setLac(attendanceDTO.getLac());
-			TowerLocation towerLocation = geoLocationService.findAddressFromCellTower(attendanceDTO.getMcc(), attendanceDTO.getMnc(),
-					attendanceDTO.getCellId(), attendanceDTO.getLac());
-			if (towerLocation != null) {
-				attendance.setTowerLocation(towerLocation.getLocation());
-				attendance.setTowerLatitude(towerLocation.getLat());
-				attendance.setTowerLongitude(towerLocation.getLan());
-			} else {
-				attendance.setLocation("Unable to find location");
+
+			try {
+				TowerLocation towerLocation = geoLocationService.findAddressFromCellTower(attendanceDTO.getMcc(),
+						attendanceDTO.getMnc(), attendanceDTO.getCellId(), attendanceDTO.getLac());
+				if (towerLocation != null) {
+					attendance.setTowerLocation(towerLocation.getLocation());
+					attendance.setTowerLatitude(towerLocation.getLat());
+					attendance.setTowerLongitude(towerLocation.getLan());
+				} else {
+					attendance.setTowerLocation("Unable to find location");
+				}
+			} catch (HttpClientErrorException e) {
+				log.info("HttpClientErrorException-- " + e.getMessage());
+				attendance.setTowerLocation("Unable to find location");
+				log.error(e.getResponseBodyAsString());
+				e.printStackTrace();
+			} catch (GeoLocationServiceException e) {
+				log.info("GeoLocationServiceException-- " + e.getMessage());
+				attendance.setTowerLocation("Unable to find location");
+				e.printStackTrace();
+			} catch (Exception e) {
+				log.info("Exception-- " + e.getMessage());
+				attendance.setTowerLocation("Unable to find location");
+				e.printStackTrace();
 			}
 		} else {
 			attendance.setTowerLocation("No Location");
 		}
-		
+
 		if (locationType.equals(LocationType.NoLocation) || locationType.equals(LocationType.FlightMode)) {
+
+			log.info("Attendance No Location/Flight Mode----");
 			attendance.setLocation("No Location");
 		}
 		attendance = attendanceRepository.save(attendance);
@@ -147,8 +189,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	/**
 	 * Save a attendance.
 	 * 
-	 * @param attendanceDTO
-	 *            the entity to save
+	 * @param attendanceDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -175,8 +216,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	/**
 	 * Update a attendance.
 	 * 
-	 * @param attendanceDTO
-	 *            the entity to update
+	 * @param attendanceDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -198,8 +238,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	/**
 	 * Get all the attendances.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -241,8 +280,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	/**
 	 * Get all the attendances.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -260,8 +298,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	/**
 	 * Get one attendance by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -276,8 +313,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	/**
 	 * Get one attendance by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -293,8 +329,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	/**
 	 * Delete the attendance by id.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete Attendance : {}", pid);
@@ -355,8 +390,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 	@Override
 	public Optional<AttendanceDTO> findTop1(Long companyId, String userPid) {
-		Optional<AttendanceDTO> attendance = attendanceRepository.findTop1ByCompanyIdAndUserPidOrderByCreatedDateDesc(companyId,userPid)
-																.map(att -> new AttendanceDTO(att));
+		Optional<AttendanceDTO> attendance = attendanceRepository
+				.findTop1ByCompanyIdAndUserPidOrderByCreatedDateDesc(companyId, userPid)
+				.map(att -> new AttendanceDTO(att));
 		return attendance;
 	}
 }

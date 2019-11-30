@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
@@ -28,6 +29,7 @@ import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.DashboardAttendance;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.File;
+import com.orderfleet.webapp.domain.PunchOut;
 import com.orderfleet.webapp.domain.RootPlanSubgroupApprove;
 import com.orderfleet.webapp.domain.enums.ApprovalStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
@@ -100,70 +102,109 @@ public class AttendanceController {
 	@RequestMapping(value = "/attendance", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Void> attendance(@RequestBody AttendanceDTO attendanceDTO, Principal principal) {
+		/*
+		 * try { PunchOutDTO punchOut = punchOutService.savePunchOut(punchOutDTO);
+		 * 
+		 * if (punchOut != null) { log.info("Saving punchOut Success"); return new
+		 * ResponseEntity<>(HttpStatus.CREATED); } else {
+		 * log.info("Saving punchOut Failed"); return new
+		 * ResponseEntity<>(HttpStatus.CONFLICT); } } catch (GeoLocationServiceException
+		 * e) { log.info("Saving punchOut failed");
+		 * log.error("Gelocation service exception :---" + e.getMessage());
+		 * e.printStackTrace(); return new ResponseEntity<>(HttpStatus.CONFLICT); }
+		 * catch (Exception e) { log.info("Saving punchOut failed");
+		 * log.error("Exception service exception :---" + e.getMessage());
+		 * e.printStackTrace(); return new ResponseEntity<>(HttpStatus.CONFLICT); }
+		 */
+
 		log.debug("Rest request to save attendance : {}", attendanceDTO);
+
+		Attendance attendance = null;
+
 		try {
-			Attendance attendance = attendanceService.saveAttendance(attendanceDTO);
 
-			Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository
-					.findByCompanyPidAndName(attendance.getCompany().getPid(), CompanyConfig.DISTANCE_TRAVELED);
-			if (optDistanceTraveled.isPresent()) {
-				if (Boolean.valueOf(optDistanceTraveled.get().getValue())) {
-					log.info("Update Distance travelled");
-					// saveUpdate distance
-					saveKilometreDifference(attendance);
-				}
-			}
+			attendance = attendanceService.saveAttendance(attendanceDTO);
 
-			if (attendance.getAttendanceStatusSubgroup() != null) {
-				// Save for approval if approval required status equal to true.
-				List<RootPlanSubgroupApprove> optionalRootPlanSubGroupApproval = rootPlanSubgroupApproveRepository
-						.findByUserLoginAndAttendanceStatusSubgroupId(SecurityUtils.getCurrentUserLogin(),
-								attendance.getAttendanceStatusSubgroup().getId());
-				if (!optionalRootPlanSubGroupApproval.isEmpty()) {
-					RootPlanSubgroupApprove rootPlanSubgroupApprove = optionalRootPlanSubGroupApproval
-							.get(optionalRootPlanSubGroupApproval.size() - 1);
-					if (rootPlanSubgroupApprove.getApprovalRequired()) {
-						// save for approval
-						AttendanceSubgroupApprovalRequest asApprovalRequest = new AttendanceSubgroupApprovalRequest();
-						asApprovalRequest.setCompany(attendance.getCompany());
-						asApprovalRequest.setRequestedUser(attendance.getUser());
-						asApprovalRequest.setAttendanceStatusSubgroup(attendance.getAttendanceStatusSubgroup());
-						asApprovalRequest.setApprovalStatus(ApprovalStatus.REQUEST_FOR_APPROVAL);
-						asApprovalRequest.setRequestedDate(attendance.getPlannedDate());
-						attendanceSubgroupApprovalRequestRepository.save(asApprovalRequest);
-
-						return new ResponseEntity<>(HttpStatus.CREATED);
-					}
-				}
+			if (attendance != null) {
+				log.info("Saving Attendance Success....");
+			} else {
+				log.info("Saving Attendance failed");
+				return new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
-			// mark attendance in dash board view
-			ActivityDTO activityDTO = new ActivityDTO();
-			activityDTO.setUserPid(attendance.getUser().getPid());
-			activityDTO.setRemarks(attendance.getRemarks());
-			activityDTO.setTime(attendance.getPlannedDate().toString());
-			if (attendance.getAttendanceStatusSubgroup() != null) {
-				// dash board item configured to user
-				List<DashboardAttendance> dashboardAttendances = dashboardAttendanceUserRepository
-						.findDashboardAttendanceByUserLogin(SecurityUtils.getCurrentUserLogin());
-				long dashBoardItemId = 0;
-				for (DashboardAttendance dashboardAttendance : dashboardAttendances) {
-					if (dashboardAttendance.getAttendanceStatusSubgroup() != null
-							&& (dashboardAttendance.getAttendanceStatusSubgroup().getId() == attendance
-									.getAttendanceStatusSubgroup().getId())) {
-						dashBoardItemId = dashboardAttendance.getId();
-						break;
-					}
-				}
-				activityDTO.setDashboardItemId(dashBoardItemId);
-				activityDTO.setAttendanceSubGroupName(attendance.getAttendanceStatusSubgroup().getName());
-				activityDTO.setAttendanceSubGroupCode(attendance.getAttendanceStatusSubgroup().getCode());
-			}
-			simpMessagingTemplate.convertAndSend(
-					"/live-tracking/attendance/" + SecurityUtils.getCurrentUsersCompanyId(), activityDTO);
+		} catch (HttpClientErrorException e) {
+			log.info("Saving Attendance failed");
+			log.error("HttpClientErrorException :---" + e.getMessage());
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
+		} catch (GeoLocationServiceException e) {
+			log.info("Saving Attendance failed");
+			log.error("Gelocation service exception :---" + e.getMessage());
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.info("Saving Attendane failed");
+			log.error("Exception service exception :---" + e.getMessage());
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
+		Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository
+				.findByCompanyPidAndName(attendance.getCompany().getPid(), CompanyConfig.DISTANCE_TRAVELED);
+		if (optDistanceTraveled.isPresent()) {
+			if (Boolean.valueOf(optDistanceTraveled.get().getValue())) {
+				log.info("Update Distance travelled");
+				// saveUpdate distance
+				saveKilometreDifference(attendance);
+			}
+		}
+
+		if (attendance.getAttendanceStatusSubgroup() != null) {
+			// Save for approval if approval required status equal to true.
+			List<RootPlanSubgroupApprove> optionalRootPlanSubGroupApproval = rootPlanSubgroupApproveRepository
+					.findByUserLoginAndAttendanceStatusSubgroupId(SecurityUtils.getCurrentUserLogin(),
+							attendance.getAttendanceStatusSubgroup().getId());
+			if (!optionalRootPlanSubGroupApproval.isEmpty()) {
+				RootPlanSubgroupApprove rootPlanSubgroupApprove = optionalRootPlanSubGroupApproval
+						.get(optionalRootPlanSubGroupApproval.size() - 1);
+				if (rootPlanSubgroupApprove.getApprovalRequired()) {
+					// save for approval
+					AttendanceSubgroupApprovalRequest asApprovalRequest = new AttendanceSubgroupApprovalRequest();
+					asApprovalRequest.setCompany(attendance.getCompany());
+					asApprovalRequest.setRequestedUser(attendance.getUser());
+					asApprovalRequest.setAttendanceStatusSubgroup(attendance.getAttendanceStatusSubgroup());
+					asApprovalRequest.setApprovalStatus(ApprovalStatus.REQUEST_FOR_APPROVAL);
+					asApprovalRequest.setRequestedDate(attendance.getPlannedDate());
+					attendanceSubgroupApprovalRequestRepository.save(asApprovalRequest);
+
+					return new ResponseEntity<>(HttpStatus.CREATED);
+				}
+			}
+		}
+		// mark attendance in dash board view
+		ActivityDTO activityDTO = new ActivityDTO();
+		activityDTO.setUserPid(attendance.getUser().getPid());
+		activityDTO.setRemarks(attendance.getRemarks());
+		activityDTO.setTime(attendance.getPlannedDate().toString());
+		if (attendance.getAttendanceStatusSubgroup() != null) {
+			// dash board item configured to user
+			List<DashboardAttendance> dashboardAttendances = dashboardAttendanceUserRepository
+					.findDashboardAttendanceByUserLogin(SecurityUtils.getCurrentUserLogin());
+			long dashBoardItemId = 0;
+			for (DashboardAttendance dashboardAttendance : dashboardAttendances) {
+				if (dashboardAttendance.getAttendanceStatusSubgroup() != null && (dashboardAttendance
+						.getAttendanceStatusSubgroup().getId() == attendance.getAttendanceStatusSubgroup().getId())) {
+					dashBoardItemId = dashboardAttendance.getId();
+					break;
+				}
+			}
+			activityDTO.setDashboardItemId(dashBoardItemId);
+			activityDTO.setAttendanceSubGroupName(attendance.getAttendanceStatusSubgroup().getName());
+			activityDTO.setAttendanceSubGroupCode(attendance.getAttendanceStatusSubgroup().getCode());
+		}
+		simpMessagingTemplate.convertAndSend("/live-tracking/attendance/" + SecurityUtils.getCurrentUsersCompanyId(),
+				activityDTO);
+
 		return new ResponseEntity<>(HttpStatus.CREATED);
+
 	}
 
 	@Transactional
@@ -240,15 +281,23 @@ public class AttendanceController {
 	public ResponseEntity<Void> punchOut(@RequestBody PunchOutDTO punchOutDTO) {
 		log.debug("Rest request to save punchOut : {}", punchOutDTO);
 		try {
-			punchOutService.savePunchOut(punchOutDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
+			PunchOutDTO punchOut = punchOutService.savePunchOut(punchOutDTO);
 
+			if (punchOut != null) {
+				log.info("Saving punchOut Success");
+				return new ResponseEntity<>(HttpStatus.CREATED);
+			} else {
+				log.info("Saving punchOut Failed");
+				return new ResponseEntity<>(HttpStatus.CONFLICT);
+			}
 		} catch (GeoLocationServiceException e) {
-			log.error("Gelocation service exception :---"+e.getMessage());
+			log.info("Saving punchOut failed");
+			log.error("Gelocation service exception :---" + e.getMessage());
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		} catch (Exception e) {
-			log.error("Exception service exception :---"+e.getMessage());
+			log.info("Saving punchOut failed");
+			log.error("Exception service exception :---" + e.getMessage());
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}

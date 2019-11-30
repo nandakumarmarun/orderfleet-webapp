@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -101,6 +102,12 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 	Optional<Attendance> findOneByPidAndImageRefNo(String attendancePid, String imageRefNo);
 
 	Optional<Attendance> findOneByImageRefNo(String imageRefNo);
+
+	Optional<Attendance> findTop1ByCompanyPidAndUserPidAndCreatedDateBetweenOrderByCreatedDateDesc(String companyPid,
+			String userPid, LocalDateTime clientFromDate, LocalDateTime clientToDate);
+
+	Optional<Attendance> findTop1ByCompanyPidAndUserPidAndPlannedDateBetweenOrderByCreatedDateDesc(String companyPid,
+			String userPid, LocalDateTime clientFromDate, LocalDateTime clientToDate);
 
 	/*
 	 * @Query("select planned_date,attendance_status,remarks from tbl_attendance WHERE company_id = ?#{principal.companyId} and  user_id = ?1 ORDER BY  DESC top 61"

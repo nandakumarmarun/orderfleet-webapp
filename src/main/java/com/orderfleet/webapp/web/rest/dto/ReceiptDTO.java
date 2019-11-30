@@ -29,6 +29,8 @@ public class ReceiptDTO {
 	private PaymentMode mode;
 	private AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
 	private String employeeName;
+	private String provisionalReceiptNo;
+	private String employeeAlias;
 
 	public ReceiptDTO() {
 		super();
@@ -47,6 +49,7 @@ public class ReceiptDTO {
 		String remarks = accountingVoucherDetail.getRemarks();
 		this.narrationMessage = remarks == null ? "" : remarks;
 		this.userName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
+		this.provisionalReceiptNo = accountingVoucherDetail.getProvisionalReceiptNo();
 
 		if (accountingVoucherDetail.getMode() == PaymentMode.Cheque
 				|| accountingVoucherDetail.getMode() == PaymentMode.Bank) {
@@ -61,6 +64,7 @@ public class ReceiptDTO {
 		this.chequeDate = accountingVoucherDetail.getInstrumentDate() == null ? ""
 				: accountingVoucherDetail.getInstrumentDate().toString();
 		this.employeeName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
+		this.employeeAlias = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getAlias();
 	}
 
 	public ReceiptDTO(AccountingVoucherAllocation accountingVoucherAllocation) {
@@ -74,6 +78,7 @@ public class ReceiptDTO {
 		this.chequeNo = accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentNumber();
 		this.bankName = accountingVoucherAllocation.getAccountingVoucherDetail().getBankName();
 		this.ledgerName = accountingVoucherAllocation.getAccountingVoucherDetail().getBy().getName();
+
 		String remarks = accountingVoucherAllocation.getRemarks();
 
 		if (remarks != null && remarks.contains("&")) {
@@ -230,6 +235,22 @@ public class ReceiptDTO {
 
 	public void setHeaderAmount(double headerAmount) {
 		this.headerAmount = headerAmount;
+	}
+
+	public String getProvisionalReceiptNo() {
+		return provisionalReceiptNo;
+	}
+
+	public void setProvisionalReceiptNo(String provisionalReceiptNo) {
+		this.provisionalReceiptNo = provisionalReceiptNo;
+	}
+
+	public String getEmployeeAlias() {
+		return employeeAlias;
+	}
+
+	public void setEmployeeAlias(String employeeAlias) {
+		this.employeeAlias = employeeAlias;
 	}
 
 }

@@ -70,6 +70,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setEnableSecondarySales(mobileConfigurationDTO.getEnableSecondarySales());
 		configuration.setEnableAttendanceImage(mobileConfigurationDTO.getEnableAttendanceImage());
 		configuration.setSmartSearch(mobileConfigurationDTO.getSmartSearch());
+		configuration.setSalesOrderDownloadPdf(mobileConfigurationDTO.getSalesOrderDownloadPdf());
 
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
@@ -105,6 +106,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setEnableSecondarySales(mobileConfigurationDTO.getEnableSecondarySales());
 			configuration.setEnableAttendanceImage(mobileConfigurationDTO.getEnableAttendanceImage());
 			configuration.setSmartSearch(mobileConfigurationDTO.getSmartSearch());
+			configuration.setSalesOrderDownloadPdf(mobileConfigurationDTO.getSalesOrderDownloadPdf());
 
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);

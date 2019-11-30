@@ -664,6 +664,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 					accountingVoucherDetail.setRemarks(accountingVoucherDetailDTO.getRemarks());
 					accountingVoucherDetail.setVoucherDate(accountingVoucherDetailDTO.getVoucherDate());
 					accountingVoucherDetail.setVoucherNumber(accountingVoucherDetailDTO.getVoucherNumber());
+					accountingVoucherDetail.setProvisionalReceiptNo(accountingVoucherDetailDTO.getProvisionalReceiptNo());
 					// set bank
 					if (accountingVoucherDetailDTO.getBankPid() != null) {
 						Bank bank = bankRepository.findOneByPid(accountingVoucherDetailDTO.getBankPid()).get();

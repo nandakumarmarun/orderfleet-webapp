@@ -50,7 +50,7 @@
 										</div> -->
 						</div>
 						<select id="dbEmployee" name="employeePid"
-							class="form-control selectpicker">
+							class="form-control">
 							<option value="Dashboard Employee">All Dashboard
 								Employees</option>
 						</select>

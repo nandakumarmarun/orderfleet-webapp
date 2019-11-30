@@ -42,6 +42,7 @@ public class MobileConfigurationDTO {
 	private boolean enableSecondarySales;
 	private boolean enableAttendanceImage;
 	private boolean smartSearch;
+	private boolean salesOrderDownloadPdf;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -77,6 +78,7 @@ public class MobileConfigurationDTO {
 		this.enableSecondarySales = mobileConfiguration.getEnableSecondarySales();
 		this.enableAttendanceImage = mobileConfiguration.getEnableAttendanceImage();
 		this.smartSearch = mobileConfiguration.getSmartSearch();
+		this.salesOrderDownloadPdf = mobileConfiguration.getSalesOrderDownloadPdf();
 	}
 
 	public String getPid() {
@@ -301,6 +303,14 @@ public class MobileConfigurationDTO {
 
 	public void setSmartSearch(boolean smartSearch) {
 		this.smartSearch = smartSearch;
+	}
+
+	public boolean getSalesOrderDownloadPdf() {
+		return salesOrderDownloadPdf;
+	}
+
+	public void setSalesOrderDownloadPdf(boolean salesOrderDownloadPdf) {
+		this.salesOrderDownloadPdf = salesOrderDownloadPdf;
 	}
 
 }
