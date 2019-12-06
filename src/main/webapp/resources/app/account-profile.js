@@ -33,7 +33,8 @@ if (!this.AccountProfile) {
 		leadToCashStage : null,
 		contactPerson : null,
 		defaultDiscountPercentage:null,
-		closingBalance:0
+		closingBalance:0,
+		tinNo : null
 		
 	};
 
@@ -397,6 +398,8 @@ function findByfilfter() {
 													accountProfile.accountStatus,
 													accountProfile.pid)
 											+ "</td><td>"
+											+(accountProfile.tinNo == null? "" :accountProfile.tinNo)
+											+"</td><td>"
 											+ gstRegistrationType
 											+ "</td><td>"
 											+ convertDateTimeFromServer(accountProfile.createdDate)
@@ -569,6 +572,7 @@ function findByfilfter() {
 		accountProfileModel.contactPerson = $('#field_contactPerson').val();
 		accountProfileModel.defaultDiscountPercentage=$('#field_defaultDiscountPercentage').val();
 		accountProfileModel.closingBalance=$('#field_closingBalance').val();
+		accountProfileModel.tinNo=$('#field_tinNo').val();
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -607,6 +611,7 @@ function findByfilfter() {
 				$('#lbl_contactPerson').text((data.contactPerson == null ? "" : data.contactPerson));
 				$('#lbl_defaultDiscountPercentage').text((data.defaultDiscountPercentage == null ? 0 : data.defaultDiscountPercentage));
 				$('#lbl_closingBalance').text((data.closingBalance == null ? 0 : data.closingBalance));
+				$('#lbl_tinNo').text((data.tinNo == null ? "" : data.tinNo));
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -639,6 +644,7 @@ function findByfilfter() {
 				$('#field_contactPerson').val(data.contactPerson);
 				$('#field_defaultDiscountPercentage').val(data.defaultDiscountPercentage);
 				$('#field_closingBalance').val(data.closingBalance);
+				$('#field_tinNo').val(data.tinNo);
 				// set pid
 				accountProfileModel.pid = data.pid;
 			},

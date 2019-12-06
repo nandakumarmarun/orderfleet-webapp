@@ -100,12 +100,12 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 																								// pid
 		AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
-		if(opUser.isPresent()) {
+		if (opUser.isPresent()) {
 			accountProfile.setUser(opUser.get());
-		}else {
+		} else {
 			accountProfile.setUser(userRepository.findOneByLogin("siteadmin").get());
 		}
-		
+
 		// set company
 		accountProfile.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		accountProfile.setAccountStatus(accountProfileDTO.getAccountStatus());
@@ -123,7 +123,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	@Override
 	public AccountProfileDTO update(AccountProfileDTO accountProfileDTO) {
 		log.debug("Request to Update AccountProfile : {}", accountProfileDTO);
-		
+
 		return accountProfileRepository.findOneByPid(accountProfileDTO.getPid()).map(accountProfile -> {
 			accountProfile.setName(accountProfileDTO.getName());
 			accountProfile.setAlias(accountProfileDTO.getAlias());
@@ -147,20 +147,21 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			accountProfile.setContactPerson(accountProfileDTO.getContactPerson());
 			accountProfile.setDefaultDiscountPercentage(accountProfileDTO.getDefaultDiscountPercentage());
 			accountProfile.setClosingBalance(accountProfileDTO.getClosingBalance());
+			accountProfile.setTinNo(accountProfileDTO.getTinNo());
 			// accountProfile.setActivated(accountProfileDTO.getActivated());
 			accountProfile
 					.setDefaultPriceLevel(priceLevelRepository.findOneByPid(accountProfileDTO.getDefaultPriceLevelPid())
 							.map(priceLevel -> priceLevel).orElse(null));
-			
-			if(accountProfile.getUser() == null) {
+
+			if (accountProfile.getUser() == null) {
 				Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
-				if(opUser.isPresent() ) {
+				if (opUser.isPresent()) {
 					accountProfile.setUser(opUser.get());
-				}else {
+				} else {
 					accountProfile.setUser(userRepository.findOneByLogin("siteadmin").get());
 				}
 			}
-			
+
 			accountProfile = accountProfileRepository.save(accountProfile);
 			AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
 			return result;
@@ -422,14 +423,14 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 		AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
 		// set company
 		accountProfile.setCompany(companyRepository.findOne(companyId));
-		
+
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
-		if(opUser.isPresent()) {
+		if (opUser.isPresent()) {
 			accountProfile.setUser(opUser.get());
-		}else {
+		} else {
 			accountProfile.setUser(userRepository.findOneByLogin("siteadmin").get());
 		}
-		
+
 		accountProfile.setAccountStatus(accountProfileDTO.getAccountStatus());
 		accountProfile = accountProfileRepository.save(accountProfile);
 		AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
@@ -583,9 +584,9 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			accountProfile.setAccountType(newAccountType);
 		}
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
-		if(opUser.isPresent()) {
+		if (opUser.isPresent()) {
 			accountProfile.setUser(opUser.get());
-		}else {
+		} else {
 			accountProfile.setUser(userRepository.findOneByLogin("siteadmin").get());
 		}
 		AccountProfile newAccountProfile = accountProfileRepository.save(accountProfile);

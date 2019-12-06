@@ -84,6 +84,7 @@
 							<th>Email1</th>
 							<th>WhatsApp No</th>
 							<th>Account Status</th>
+							<th>GSTIN</th>
 							<th>GST Registration Type</th>
 							<th>Created Date</th>
 							<th>Created By</th>
@@ -202,6 +203,11 @@
 									<label class="control-label" for="field_address">Address</label>
 									<textarea class="form-control" name="address" maxlength="250"
 										id="field_address" placeholder="Address"></textarea>
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="field_tinNo">GSTIN</label> <input type="text" class="form-control"
+										name="tinNo" id="field_tinNo" maxlength="8"
+										placeholder="GSTIN" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="field_description">Description</label>
@@ -333,6 +339,10 @@
 										<tr>
 											<td>Address</td>
 											<td id="lbl_address"></td>
+										</tr>
+										<tr>
+											<td>GSTIN</td>
+											<td id="lbl_tinNo"></td>
 										</tr>
 										<tr>
 											<td>Description</td>
