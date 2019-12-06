@@ -25,6 +25,7 @@ public class CompanyConfigDTO {
 	private boolean salesEditEnabled;// setting for KFC
 	private boolean gpsVarianceQuery; // setting for gpsvariance
 	private boolean sendSalesOrderEmail;
+	private boolean findLocation;//do we need to find location
 
 	public CompanyConfigDTO() {
 		super();
@@ -150,4 +151,12 @@ public class CompanyConfigDTO {
 		this.sendSalesOrderEmail = sendSalesOrderEmail;
 	}
 
+	public boolean getFindLocation() {
+		return findLocation;
+	}
+
+	public void setFindLocation(boolean findLocation) {
+		this.findLocation = findLocation;
+	}
+	
 }

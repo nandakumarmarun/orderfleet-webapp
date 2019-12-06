@@ -43,6 +43,7 @@ public class MobileConfigurationDTO {
 	private boolean enableAttendanceImage;
 	private boolean smartSearch;
 	private boolean salesOrderDownloadPdf;
+	private boolean findLocation;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -79,6 +80,7 @@ public class MobileConfigurationDTO {
 		this.enableAttendanceImage = mobileConfiguration.getEnableAttendanceImage();
 		this.smartSearch = mobileConfiguration.getSmartSearch();
 		this.salesOrderDownloadPdf = mobileConfiguration.getSalesOrderDownloadPdf();
+		this.findLocation = mobileConfiguration.getFindLocation();
 	}
 
 	public String getPid() {
@@ -313,4 +315,12 @@ public class MobileConfigurationDTO {
 		this.salesOrderDownloadPdf = salesOrderDownloadPdf;
 	}
 
+	public boolean getFindLocation() {
+		return findLocation;
+	}
+
+	public void setFindLocation(boolean findLocation) {
+		this.findLocation = findLocation;
+	}
+	
 }

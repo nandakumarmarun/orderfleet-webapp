@@ -63,6 +63,7 @@
 						<th>Enable Attendance Image</th>
 						<th>Smart Search</th>
 						<th>Sales Order Download Pdf</th>
+						<th>Find Location</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -97,7 +98,7 @@
 							<td>${mobileConfiguration.enableAttendanceImage}</td>
 							<td>${mobileConfiguration.smartSearch}</td>
 							<td>${mobileConfiguration.salesOrderDownloadPdf}</td>
-
+							<td>${mobileConfiguration.findLocation}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -314,6 +315,14 @@
 													<label class="control-label">Sales Order Download
 														Pdf</label> <input id="salesOrderDownloadPdf"
 														name='salesOrderDownloadPdf' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Find Loction
+													</label> <input id="findLocation"
+														name='findLocation' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

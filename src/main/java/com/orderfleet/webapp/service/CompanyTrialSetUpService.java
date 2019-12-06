@@ -880,6 +880,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setEnableAttendanceImage(false);
 		mobileConfiguration.setSmartSearch(false);
 		mobileConfiguration.setSalesOrderDownloadPdf(false);
+		mobileConfiguration.setFindLocation(true);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 

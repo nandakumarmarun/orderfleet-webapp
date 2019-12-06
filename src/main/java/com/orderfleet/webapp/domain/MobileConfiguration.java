@@ -131,6 +131,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "sales_order_download_pdf", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean salesOrderDownloadPdf;
 
+	@Column(name = "find_location", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
+	private boolean findLocation;
+	
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -377,6 +380,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setSalesOrderDownloadPdf(boolean salesOrderDownloadPdf) {
 		this.salesOrderDownloadPdf = salesOrderDownloadPdf;
+	}
+	
+	public boolean getFindLocation() {
+		return findLocation;
+	}
+
+	public void setFindLocation(boolean findLocation) {
+		this.findLocation = findLocation;
 	}
 
 	@Override

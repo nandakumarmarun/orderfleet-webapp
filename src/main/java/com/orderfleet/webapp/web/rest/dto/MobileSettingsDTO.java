@@ -75,6 +75,8 @@ public class MobileSettingsDTO {
 	private boolean smartSearch;
 
 	private boolean salesOrderDownloadPdf;
+	
+	private boolean findLocation;
 
 	public MobileSettingsDTO() {
 		super();
@@ -108,6 +110,7 @@ public class MobileSettingsDTO {
 		this.enableAttendanceImage = mobileConfigurationDTO.getEnableAttendanceImage();
 		this.smartSearch = mobileConfigurationDTO.getSmartSearch();
 		this.salesOrderDownloadPdf = mobileConfigurationDTO.getSalesOrderDownloadPdf();
+		this.findLocation = mobileConfigurationDTO.getFindLocation();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -350,4 +353,12 @@ public class MobileSettingsDTO {
 		this.salesOrderDownloadPdf = salesOrderDownloadPdf;
 	}
 
+	public boolean isFindLocation() {
+		return findLocation;
+	}
+
+	public void setFindLocation(boolean findLocation) {
+		this.findLocation = findLocation;
+	}
+	
 }
