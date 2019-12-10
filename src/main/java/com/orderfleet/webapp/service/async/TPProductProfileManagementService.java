@@ -309,6 +309,7 @@ public class TPProductProfileManagementService {
 			productProfile.setActivated(ppDto.getActivated());
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
+			productProfile.setHsnCode(ppDto.getHsnCode());
 			if (ppDto.getUnitQty() != null) {
 				productProfile.setUnitQty(ppDto.getUnitQty());
 			}

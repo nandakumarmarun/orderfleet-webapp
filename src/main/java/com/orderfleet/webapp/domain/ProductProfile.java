@@ -159,6 +159,9 @@ public class ProductProfile implements Serializable, Cloneable {
 	@Column(name = "stock_availability_status", nullable = false, columnDefinition = "character varying DEFAULT 'AVAILABLE'")
 	private StockAvailabilityStatus stockAvailabilityStatus = StockAvailabilityStatus.AVAILABLE;
 
+	@Column(name = "hsn_code")
+	private String hsnCode;
+	
 	@Column(name = "trim_char")
 	private String trimChar;
 
@@ -356,6 +359,14 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public void setStockAvailabilityStatus(StockAvailabilityStatus stockAvailabilityStatus) {
 		this.stockAvailabilityStatus = stockAvailabilityStatus;
+	}
+	
+	public String getHsnCode() {
+		return hsnCode;
+	}
+
+	public void setHsnCode(String hsnCode) {
+		this.hsnCode = hsnCode;
 	}
 
 	public String getTrimChar() {

@@ -75,6 +75,8 @@ public class ProductProfileDTO {
 	private StockAvailabilityStatus stockAvailabilityStatus = StockAvailabilityStatus.AVAILABLE;
 
 	private String trimChar;
+	
+	private String hsnCode;
 
 	public ProductProfileDTO() {
 		super();
@@ -124,6 +126,7 @@ public class ProductProfileDTO {
 		this.defaultLedger = profile.getDefaultLedger();
 		this.stockAvailabilityStatus = profile.getStockAvailabilityStatus();
 		this.trimChar = profile.getTrimChar();
+		this.hsnCode = profile.getHsnCode();
 
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
@@ -343,6 +346,14 @@ public class ProductProfileDTO {
 
 	public void setStockAvailabilityStatus(StockAvailabilityStatus stockAvailabilityStatus) {
 		this.stockAvailabilityStatus = stockAvailabilityStatus;
+	}
+	
+	public String getHsnCode() {
+		return hsnCode;
+	}
+
+	public void setHsnCode(String hsnCode) {
+		this.hsnCode = hsnCode;
 	}
 
 	public String getTrimChar() {

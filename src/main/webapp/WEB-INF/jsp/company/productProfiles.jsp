@@ -250,6 +250,11 @@
 										type="text" class="form-control" name="size" id="field_size"
 										placeholder="Size" value="0" />
 								</div>
+								<div class="form-group">
+									<label class="control-label" for="field_hsnCode">HSN Code</label> <input
+										type="text" class="form-control" name="hsnCode" id="field_hsnCode"
+										placeholder="HSNCODE"  />
+								</div>
 								<div class="form-group" id="divColorImage">
 									<label>Choose Color Image</label> <input type="file"
 										name="colorImage" id="field_colorImage" accept="image/*" /> <img
@@ -340,6 +345,10 @@
 										<tr>
 											<td>Size</td>
 											<td id="lbl_size"></td>
+										</tr>
+										<tr>
+											<td>HSN Code</td>
+											<td id="lbl_hsnCode"></td>
 										</tr>
 										<tr>
 											<td>Color Image</td>
