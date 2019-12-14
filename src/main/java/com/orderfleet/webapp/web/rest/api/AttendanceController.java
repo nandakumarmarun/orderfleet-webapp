@@ -290,6 +290,11 @@ public class AttendanceController {
 				log.info("Saving punchOut Failed");
 				return new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
+		} catch (HttpClientErrorException e) {
+			log.info("Saving Punch Out failed");
+			log.error("HttpClientErrorException :---" + e.getMessage());
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		} catch (GeoLocationServiceException e) {
 			log.info("Saving punchOut failed");
 			log.error("Gelocation service exception :---" + e.getMessage());

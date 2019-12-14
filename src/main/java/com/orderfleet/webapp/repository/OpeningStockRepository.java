@@ -48,7 +48,7 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 	
 	Optional<OpeningStock> findTopByStockLocationPid(String stockLocationPid);
 
-	List<OpeningStock> findByStockLocationIn(List<StockLocation> stockLocations);
+	List<OpeningStock> findByStockLocationInOrderByCreatedDateAsc(List<StockLocation> stockLocations);
 	
 	List<OpeningStock> findByStockLocation(StockLocation stockLocation);
 
@@ -99,6 +99,8 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 
 	@Query("select openingStock from OpeningStock openingStock where  openingStock.stockLocation.id in ?1") 
 	List<OpeningStock> findOpeningStocksAndStockLocationIdIn(Set<Long> sLocationIds);
+
+	List<OpeningStock> findByStockLocationIn(List<StockLocation> stockLocations);
 	
 	
 }

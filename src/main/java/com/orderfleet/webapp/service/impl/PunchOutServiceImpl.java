@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.PunchOut;
@@ -104,39 +105,66 @@ public class PunchOutServiceImpl implements PunchOutService {
 					punchOut.setMnc(punchOutDTO.getMnc());
 					punchOut.setCellId(punchOutDTO.getCellId());
 					punchOut.setLac(punchOutDTO.getLac());
-					// log.info("Location type :"+locationType);
-					/*
-					 * if (locationType.equals(LocationType.GpsLocation)) {
-					 * log.info("LocationType : GpsLocaTION"); try {
-					 * punchOut.setLocation(geoLocationService.findAddressFromLatLng(lat + "," +
-					 * lon)); } catch (GeoLocationServiceException lae) {
-					 * log.debug("Exception while calling google GPS geo location API {}",
-					 * lae.getMessage()); punchOut.setLocation("Unable to find Location"); } } else
-					 * if (locationType.equals(LocationType.TowerLocation) ||
-					 * (punchOutDTO.getMcc().length() > 1 && punchOutDTO.getMnc().length() > 1 &&
-					 * punchOutDTO.getCellId().length() > 1 && punchOutDTO.getLac().length() > 1)) {
-					 * log.info("LocationType : TowerLocation"); try { TowerLocation towerLocation =
-					 * geoLocationService.findAddressFromCellTower( punchOutDTO.getMcc(),
-					 * punchOutDTO.getMnc(), punchOutDTO.getCellId(), punchOutDTO.getLac());
-					 * log.info("LocationType : TowerLocation 1");
-					 * punchOut.setLocation(towerLocation.getLocation());
-					 * 
-					 * } catch (GeoLocationServiceException lae) {
-					 * log.debug("Exception while calling google Tower geo location API {}", lae);
-					 * String locationDetails = "Tower Location => mcc:" + punchOutDTO.getMcc() +
-					 * " mnc:" + punchOutDTO.getMnc() + " cellID:" + punchOutDTO.getCellId() +
-					 * " lac:" + punchOutDTO.getLac(); String errorMsg =
-					 * "Exception while calling google Tower geo location API. " + "Company : " +
-					 * user.get().getCompany().getLegalName() + " User: " + user.get().getLogin();
-					 * punchOut.setLocation("Unable to find Location"); log.info(locationDetails +
-					 * "\n\n" + errorMsg);
-					 * 
-					 * } } else if (locationType.equals(LocationType.NoLocation) ||
-					 * locationType.equals(LocationType.FlightMode)) {
-					 * log.info("LocationType : NoLocation or flightmode");
-					 * punchOut.setLocation("No Location"); } else {
-					 * log.info("LocationType : else case"); punchOut.setLocation("No Location"); }
-					 */
+
+					log.info("Location type :" + locationType);
+
+					if (locationType.equals(LocationType.GpsLocation)) {
+						log.info("LocationType : GpsLocaTION");
+						try {
+							punchOut.setLocation(geoLocationService.findAddressFromLatLng(lat + "," + lon));
+						} catch (GeoLocationServiceException lae) {
+							log.debug("Geo Location Service Exception while calling google GPS geo location API {}", lae.getMessage());
+							punchOut.setLocation("Unable to find Location");
+						}catch (HttpClientErrorException e) {
+							log.debug("Http CLient Error Exception while calling google GPS geo location API {}", e.getMessage());
+							punchOut.setLocation("Unable to find Location");
+						} catch (Exception e) {
+							log.debug("Exception while calling google GPS geo location API {}", e.getMessage());
+							punchOut.setLocation("Unable to find Location");
+						}
+						
+					} else if (locationType.equals(LocationType.TowerLocation)
+							|| (punchOutDTO.getMcc().length() > 1 && punchOutDTO.getMnc().length() > 1
+									&& punchOutDTO.getCellId().length() > 1 && punchOutDTO.getLac().length() > 1)) {
+						log.info("LocationType : TowerLocation");
+						try {
+							TowerLocation towerLocation = geoLocationService.findAddressFromCellTower(
+									punchOutDTO.getMcc(), punchOutDTO.getMnc(), punchOutDTO.getCellId(),
+									punchOutDTO.getLac());
+							log.info("LocationType : TowerLocation 1");
+							punchOut.setLocation(towerLocation.getLocation());
+
+						} catch (GeoLocationServiceException lae) {
+							log.debug("Geo Location Service Exception while calling google Tower geo location API {}", lae);
+							String locationDetails = "Tower Location => mcc:" + punchOutDTO.getMcc() + " mnc:"
+									+ punchOutDTO.getMnc() + " cellID:" + punchOutDTO.getCellId() + " lac:"
+									+ punchOutDTO.getLac();
+							String errorMsg = "Exception while calling google Tower geo location API. " + "Company : "
+									+ user.get().getCompany().getLegalName() + " User: " + user.get().getLogin();
+							punchOut.setLocation("Unable to find Location");
+							log.info(locationDetails + "\n\n" + errorMsg);
+
+						}catch (HttpClientErrorException e) {
+							log.debug("Http Client Error Exception while calling google Tower geo location API {}", e);
+							String locationDetails = "Tower Location => mcc:" + punchOutDTO.getMcc() + " mnc:"
+									+ punchOutDTO.getMnc() + " cellID:" + punchOutDTO.getCellId() + " lac:"
+									+ punchOutDTO.getLac();
+							String errorMsg = "Exception while calling google Tower geo location API. " + "Company : "
+									+ user.get().getCompany().getLegalName() + " User: " + user.get().getLogin();
+							punchOut.setLocation("Unable to find Location");
+							log.info(locationDetails + "\n\n" + errorMsg);
+						} catch (Exception e) {
+							log.debug("Exception while calling google GPS geo location API {}", e.getMessage());
+							punchOut.setLocation("Unable to find Location");
+						}
+					} else if (locationType.equals(LocationType.NoLocation)
+							|| locationType.equals(LocationType.FlightMode)) {
+						log.info("LocationType : NoLocation or flightmode");
+						punchOut.setLocation("No Location");
+					} else {
+						log.info("LocationType : else case");
+						punchOut.setLocation("No Location");
+					}
 
 					/*
 					 * else if (locationType.equals(LocationType.TowerLocation)) {
@@ -156,7 +184,7 @@ public class PunchOutServiceImpl implements PunchOutService {
 					 * punchOut.setLocation("No Location"); }
 					 */
 
-					punchOut.setLocation("Unable to find Location");
+					// punchOut.setLocation("Unable to find Location");
 
 					log.info("saving PunchOut.....");
 					punchOut = punchOutRepository.save(punchOut);

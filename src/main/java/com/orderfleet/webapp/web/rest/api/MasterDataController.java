@@ -1473,7 +1473,7 @@ public class MasterDataController {
 		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
 				.collect(Collectors.toSet());
 		List<OpeningStock> openingStockUserBased = openingStockRepository
-				.findByStockLocationIn(new ArrayList<>(usersStockLocations));
+				.findByStockLocationInOrderByCreatedDateAsc(new ArrayList<>(usersStockLocations));
 
 		if (openingStockUserBased.size() != 0) {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();

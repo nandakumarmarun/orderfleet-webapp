@@ -99,6 +99,9 @@ public class ReceiptDTO {
 				: accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate().toString();
 		this.employeeName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader()
 				.getEmployee().getName();
+
+		this.employeeAlias = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader()
+				.getEmployee().getAlias();
 	}
 
 	public String getParticularsName() {
@@ -251,6 +254,14 @@ public class ReceiptDTO {
 
 	public void setEmployeeAlias(String employeeAlias) {
 		this.employeeAlias = employeeAlias;
+	}
+
+	@Override
+	public String toString() {
+		return "ReceiptDTO [amount=" + amount + ", headerAmount=" + headerAmount + ", chequeNo=" + chequeNo
+				+ ", bankName=" + bankName + ", remoteId=" + remoteId + ", ledgerName=" + ledgerName
+				+ ", narrationMessage=" + narrationMessage + ", employeeName=" + employeeName
+				+ ", provisionalReceiptNo=" + provisionalReceiptNo + ", employeeAlias=" + employeeAlias + "]";
 	}
 
 }

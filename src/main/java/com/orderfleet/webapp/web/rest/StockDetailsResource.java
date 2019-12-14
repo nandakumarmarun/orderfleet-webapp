@@ -131,7 +131,7 @@ public class StockDetailsResource {
 		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
 				.collect(Collectors.toSet());
 		List<OpeningStock> openingStockUserBased = openingStockRepository
-				.findByStockLocationIn(new ArrayList<>(usersStockLocations));
+				.findByStockLocationInOrderByCreatedDateAsc(new ArrayList<>(usersStockLocations));
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
 		if (openingStockUserBased.size() != 0) {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();
@@ -164,7 +164,7 @@ public class StockDetailsResource {
 		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
 				.collect(Collectors.toSet());
 		List<OpeningStock> openingStockUserBased = openingStockRepository
-				.findByStockLocationIn(new ArrayList<>(usersStockLocations));
+				.findByStockLocationInOrderByCreatedDateAsc(new ArrayList<>(usersStockLocations));
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
 		if (openingStockUserBased.size() != 0) {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();
