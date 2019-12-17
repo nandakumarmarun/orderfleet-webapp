@@ -40,6 +40,7 @@ import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
+import com.orderfleet.webapp.domain.DocumentStockLocationSource;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.GstLedger;
@@ -51,6 +52,7 @@ import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.OrderStatus;
 import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
+import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
@@ -64,6 +66,7 @@ import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
+import com.orderfleet.webapp.repository.DocumentStockLocationSourceRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.GstLedgerRepository;
@@ -74,6 +77,7 @@ import com.orderfleet.webapp.repository.OrderStatusRepository;
 import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountingVoucherHeaderService;
@@ -194,6 +198,12 @@ public class TransactionResource {
 
 	@Inject
 	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
+
+	@Inject
+	private UserStockLocationRepository userStockLocationRepository;
+
+	@Inject
+	private DocumentStockLocationSourceRepository documentStockLocationSourceRepository;
 
 	// @Inject
 	// private DocumentStockLocationSourceRepository
@@ -931,6 +941,27 @@ public class TransactionResource {
 										inventoryVoucherBatchDetail.getProductProfile().getPid(),
 										inventoryVoucherBatchDetail.getBatchNumber())
 								.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
+					}
+
+					List<StockLocation> userStockLocations = userStockLocationRepository
+							.findStockLocationsByUserPid(opUser.get().getPid());
+
+					List<DocumentStockLocationSource> documentStockLocationSources = documentStockLocationSourceRepository
+							.findByDocumentPid(opDocument.get().getPid());
+
+					List<StockLocation> stockLocations = new ArrayList<>();
+					for (DocumentStockLocationSource documentStockLocationSource : documentStockLocationSources) {
+
+						log.info("Document Stock Location Name: "
+								+ documentStockLocationSource.getStockLocation().getName());
+						stockLocations = userStockLocations.stream().filter(
+								usl -> usl.getPid().equals(documentStockLocationSource.getStockLocation().getPid()))
+								.collect(Collectors.toList());
+						if (stockLocations.size() > 0) {
+							log.info("Stock Location Name: " + stockLocations.get(0).getName());
+							salesOrderItemDTO.setStockLocationName(stockLocations.get(0).getName());
+							break;
+						}
 					}
 
 					salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);

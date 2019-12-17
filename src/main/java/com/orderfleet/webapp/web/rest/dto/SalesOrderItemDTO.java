@@ -57,6 +57,7 @@ public class SalesOrderItemDTO {
 	private String referenceInventoryVoucherHeaderPid;
 	private Long referenceInventoryVoucherDetailId;
 	private String remarks;
+	private String stockLocationName;
 
 	public SalesOrderItemDTO() {
 		super();
@@ -74,11 +75,12 @@ public class SalesOrderItemDTO {
 		// this.itemStock = inventoryVoucherDetail.getProduct().getitemStock;
 		this.quantity = inventoryVoucherDetail.getQuantity();
 		double unitQty = 1;
-		if(inventoryVoucherDetail.getProduct().getUnitQty() != null && inventoryVoucherDetail.getProduct().getUnitQty() > 0) {
+		if (inventoryVoucherDetail.getProduct().getUnitQty() != null
+				&& inventoryVoucherDetail.getProduct().getUnitQty() > 0) {
 			unitQty = inventoryVoucherDetail.getProduct().getUnitQty();
 		}
 		this.unitQuantity = unitQty;
-		
+
 		this.itemFreeQuantity = inventoryVoucherDetail.getFreeQuantity();
 		this.sellingRate = inventoryVoucherDetail.getSellingRate();
 		// this.mrp = mrp;
@@ -448,6 +450,14 @@ public class SalesOrderItemDTO {
 
 	public void setTrimChar(String trimChar) {
 		this.trimChar = trimChar;
+	}
+
+	public String getStockLocationName() {
+		return stockLocationName;
+	}
+
+	public void setStockLocationName(String stockLocationName) {
+		this.stockLocationName = stockLocationName;
 	}
 
 	@Override

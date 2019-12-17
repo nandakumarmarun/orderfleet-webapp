@@ -93,10 +93,8 @@ public class AccountProfileController {
 	/**
 	 * POST /account-profile/:pid : Create a new Account Profile.
 	 * 
-	 * @param accountProfileDTO
-	 *            the accountProfileDTO to create
-	 * @param pid
-	 *            territory pid
+	 * @param accountProfileDTO the accountProfileDTO to create
+	 * @param pid               territory pid
 	 * @return the ResponseEntity with status 201 (Created) and with body the new
 	 *         accountProfileDTO
 	 */
@@ -149,7 +147,7 @@ public class AccountProfileController {
 							i++;
 
 							newAccountProfile.setAlias("N_" + i);
-						}else {
+						} else {
 							newAccountProfile.setAlias("N_1");
 						}
 					} else {
@@ -197,6 +195,32 @@ public class AccountProfileController {
 		// "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
 		AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
 		return new ResponseEntity<>(result, HttpStatus.CREATED);
+	}
+
+	@RequestMapping(value = "/update-account-profile/{pid}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<AccountProfileDTO> updateAccountProfile(@RequestBody AccountProfileDTO accountProfileDTO,
+			@PathVariable String pid) {
+		log.debug("Rest request to Update AccountProfile : {} under location with pid {}", accountProfileDTO, pid);
+		Optional<AccountProfile> exisitingAccountProfile = accountProfileRepository.findOneByPid(pid);
+		if (exisitingAccountProfile.isPresent()) {
+
+			log.info("Account Profile Exists");
+
+			AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
+			accountProfile.setId(exisitingAccountProfile.get().getId());
+
+			accountProfile = accountProfileRepository.save(accountProfile);
+
+			AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
+			return new ResponseEntity<>(result, HttpStatus.CREATED);
+
+		} else {
+			return ResponseEntity.badRequest().headers(
+					HeaderUtil.createFailureAlert("accountProfile", "noAccountFound", "Account Profile not found"))
+					.body(null);
+		}
+
 	}
 
 	@Timed
