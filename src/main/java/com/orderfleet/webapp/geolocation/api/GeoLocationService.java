@@ -57,7 +57,8 @@ public class GeoLocationService {
 	
 	private static final String OPENCAGE_API_ENDPOINT = "https://api.opencagedata.com/geocode/v1/json";
 	
-	private static final String OPENCAGE_API_KEY = "af60f0d7e182487dbdb9638da38b551d";
+//	private static final String OPENCAGE_API_KEY = "af60f0d7e182487dbdb9638da38b551d";
+	private static final String OPENCAGE_API_KEY = "a73de03502fc4e06b14a25277d58c839";
 	
 	private static final String UNABLE_FIND_LOCATION = "Unable to find location";
 	
