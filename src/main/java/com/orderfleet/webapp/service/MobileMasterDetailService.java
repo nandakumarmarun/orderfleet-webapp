@@ -10,17 +10,15 @@ import org.springframework.data.domain.Pageable;
 
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
+import com.orderfleet.webapp.domain.MobileMasterDetail;
+import com.orderfleet.webapp.domain.MobileMasterUpdate;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
+import com.orderfleet.webapp.web.rest.dto.MobileMasterDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
 
-/**
- * Service Interface for managing InventoryVoucherHeader.
- * 
- * @author Muhammed Riyas T
- * @since July 19, 2016
- */
+
 public interface MobileMasterDetailService {
 
 	String PID_PREFIX = "MMD-";
-
+	List<MobileMasterDetail> convertMobileMasterDetails(List<MobileMasterDetailDTO> mobileMasterDetailDtos,MobileMasterUpdate mobileMasterUpdate);
 }

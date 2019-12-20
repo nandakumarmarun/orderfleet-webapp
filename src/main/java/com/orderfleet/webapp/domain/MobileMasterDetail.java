@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.domain;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,7 +39,7 @@ public class MobileMasterDetail implements Serializable {
 	@Column(name = "mobile_master_item", nullable = false, columnDefinition = "character varying DEFAULT 'DEFAULT'")
 	private MobileMasterItem mobileMasterItem;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "mobile_master_update_id")
 	private MobileMasterUpdate mobileMasterUpdate;
 
@@ -48,6 +49,10 @@ public class MobileMasterDetail implements Serializable {
 	@Column(name = "count")
 	private Long count;
 
+	@NotNull
+	@Column(name = "created_date", nullable = false)
+	private LocalDateTime createdDate = LocalDateTime.now();
+	
 	@ManyToOne
 	@NotNull
 	private Company company;
@@ -90,6 +95,14 @@ public class MobileMasterDetail implements Serializable {
 
 	public void setCount(Long count) {
 		this.count = count;
+	}
+	
+	public LocalDateTime getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(LocalDateTime createdDate) {
+		this.createdDate = createdDate;
 	}
 
 	public Company getCompany() {

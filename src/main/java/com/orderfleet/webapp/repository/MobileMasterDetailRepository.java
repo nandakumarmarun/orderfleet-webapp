@@ -20,4 +20,5 @@ import com.orderfleet.webapp.domain.MobileMasterUpdate;
  */
 public interface MobileMasterDetailRepository extends JpaRepository<MobileMasterDetail, Long> {
 
+	List<MobileMasterDetail> findByMobileMasterUpdateId(Long id);
 }

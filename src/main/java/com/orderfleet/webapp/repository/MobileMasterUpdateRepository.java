@@ -1,15 +1,9 @@
 package com.orderfleet.webapp.repository;
 
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import com.orderfleet.webapp.domain.Department;
-import com.orderfleet.webapp.domain.MobileMasterDetail;
 import com.orderfleet.webapp.domain.MobileMasterUpdate;
 
 /**
@@ -19,5 +13,6 @@ import com.orderfleet.webapp.domain.MobileMasterUpdate;
  * @since Dec 18, 2019
  */
 public interface MobileMasterUpdateRepository extends JpaRepository<MobileMasterUpdate, Long> {
-
+	
+	Optional<MobileMasterUpdate> findByUserPid(String userPid);
 }
