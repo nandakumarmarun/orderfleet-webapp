@@ -45,29 +45,30 @@ public class MobileMasterUpdateServiceImpl implements MobileMasterUpdateService 
 	UserRepository userRepository;
 	@Autowired
 	MobileMasterUpdateRepository mobileMasterUpdateRepository;
-	
+
 	@Override
 	public MobileMasterUpdate convertMobileMasterUpdate(MobileMasterUpdateDTO mobileMasterUpdateDto) {
 		MobileMasterUpdate mobileMasterUpdate = new MobileMasterUpdate();
-		Optional<MobileMasterUpdate> opMobileMasterUpdate = mobileMasterUpdateRepository.findByUserPid(mobileMasterUpdateDto.getUserPid());
-		if(!opMobileMasterUpdate.isPresent()) {
+		Optional<MobileMasterUpdate> opMobileMasterUpdate = mobileMasterUpdateRepository
+				.findByUserPid(mobileMasterUpdateDto.getUserPid());
+		if (!opMobileMasterUpdate.isPresent()) {
 			Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 			mobileMasterUpdate.setCompany(company);
-			mobileMasterUpdate.setPid(MobileMasterUpdateService.PID_PREFIX+RandomUtil.generatePid());
+			mobileMasterUpdate.setPid(MobileMasterUpdateService.PID_PREFIX + RandomUtil.generatePid());
 			Optional<User> opUser = userRepository.findOneByPid(mobileMasterUpdateDto.getUserPid());
-			if(opUser.isPresent()) {
+			if (opUser.isPresent()) {
 				mobileMasterUpdate.setUser(opUser.get());
 			}
-		}else {
+		} else {
 			mobileMasterUpdate = opMobileMasterUpdate.get();
 		}
 		mobileMasterUpdate.setUpdateTime(mobileMasterUpdateDto.getUpdateTime());
 		mobileMasterUpdate.setCreatedDate(LocalDateTime.now());
-		
+		mobileMasterUpdate.setUserBuildVersion(
+				mobileMasterUpdateDto.getUserBuildVersion() != null ? mobileMasterUpdateDto.getUserBuildVersion()
+						: "1.0.0.1");
+
 		return mobileMasterUpdate;
 	}
 
-
-
-	
 }

@@ -1,15 +1,13 @@
-if (!this.CompanyUserDevice) {
-	this.CompanyUserDevice = {};
+if (!this.MobileMasterUpdate) {
+	this.MobileMasterUpdate = {};
 }
 
 (function() {
 	'use strict';
 
 	$(document).ready(function() {
-		
-		
-		
-		//loadAllDevices();
+
+		// loadAllDevices();
 
 		$('#dbCompany').on('change', function() {
 			var companyid = $('#dbCompany').val();
@@ -19,19 +17,18 @@ if (!this.CompanyUserDevice) {
 		$('#btnSearch').click(function() {
 			searchTable($("#search").val(), $('#tableMobileMasterUpdate'));
 		});
-		
+
 		$('.selectpicker').selectpicker();
 	});
 
-	var companyUserDeviceContextPath = location.protocol + '//' + location.host
-			+ location.pathname;
-
+	var mobileMasterUpdateContextPath = location.protocol + '//'
+			+ location.host + location.pathname;
 
 	function loadUserByCompanyId(companyid) {
 		$("#dbUser").html("<option>Users loading...</option>")
 		$.ajax({
-			url : location.protocol + '//' + location.host + "/web/load-company-users/"
-					+ companyid,
+			url : location.protocol + '//' + location.host
+					+ "/web/load-company-users/" + companyid,
 			type : 'GET',
 			success : function(users) {
 				$("#dbUser").html("<option value='no'>Select User</option>")
@@ -44,58 +41,97 @@ if (!this.CompanyUserDevice) {
 		});
 	}
 
+	MobileMasterUpdate.getMobileMasterUpdate = function() {
+		var companyPid = $('#dbCompany').val();
+		var userPid = $('#dbUser').val();
+		if (companyPid != "no" && userPid != 'no') {
+			$('#tableMobileMasterUpdate')
+					.html(
+							"<tr><td colspan='8' align='center'>Please wait...</td></tr>");
+			$
+					.ajax({
+						url : mobileMasterUpdateContextPath
+								+ "/getUsersMobileMasterUpdate",
+						type : "GET",
+						data : {
+							companyPid : companyPid,
+							userPid : userPid
+						},
+						success : function(mobileMasterDetails) {
+							$('#tableMobileMasterUpdate').html("");
+							if (mobileMasterDetails.length == 0) {
+								$('#tableMobileMasterUpdate')
+										.html(
+												"<tr><td colspan='8' align='center'>No data available</td></tr>");
+								return;
+							}
 
-	/*function loadAllDevices() {
+							$("#lblUsername").text(
+									mobileMasterDetails[0].userName);
+							$("#lblEmployeeName").text(
+									mobileMasterDetails[0].employeeName);
+							$("#lblUserBuildVersion").text(
+									mobileMasterDetails[0].userBuildVersion);
+							$("#lblTotalUpdateTime").text(
+									mobileMasterDetails[0].totalTime);
 
-		$('#tableCompanyUserDevice').html(
-				"<tr><td colspan='8' align='center'>Please wait...</td></tr>");
-		$
-				.ajax({
-					url : companyUserDeviceContextPath + "/listAllDevice",
-					method : 'GET',
-					success : function(companyUserDevices) {
-						$('#tableCompanyUserDevice').html("");
-						if (companyUserDevices.length == 0) {
-							$('#tableCompanyUserDevice')
-									.html(
-											"<tr><td colspan='8' align='center'>No data available</td></tr>");
-							return;
-						}
-						$
-								.each(
-										companyUserDevices,
-										function(index, companyUserDevice) {
-											var date1 = convertDateTimeFromServer(companyUserDevice.createdDate);
-											var date2 = convertDateTimeFromServer(companyUserDevice.lastModifiedDate);
-											$('#tableCompanyUserDevice')
-													.append(
-															"<tr><td>"
-																	+ companyUserDevice.userLoginName
-																	+ "</td><td>"
-																	+ activated(companyUserDevice.activated)
-																	+ "</td><td>"
-																	+ date1
-																	+ "</td><td>"
-																	+ date2
-																	+ "</td><td>"
-																	+ companyUserDevice.deviceKey
-																	+ "</td><td>"
-																	+ companyUserDevice.lastAcessedDeviceKey
-																	+ "</td><td>"
-																	+ companyUserDevice.lastAcessedLogin
-																	+ "</td><td>"
-																	+ spanReleasedDevice(
-																			companyUserDevice.pid,
-																			companyUserDevice.activated)
-																	+ "</td></tr>");
-										});
-					},
-					error : function(xhr, error) {
-						onError(xhr, error);
-					}
-				});
-	}*/
+							$
+									.each(
+											mobileMasterDetails,
+											function(index, mobileMasterDetail) {
+												var date1 = convertDateTimeFromServer(mobileMasterDetail.createdDate);
 
+												$('#tableMobileMasterUpdate')
+														.append(
+																"<tr><td>"
+																		+ mobileMasterDetail.masterItem
+																		+ "</td><td>"
+																		+ date1
+																		+ "</td><td>"
+																		+ mobileMasterDetail.count
+																		+ "</td><td>"
+																		+ mobileMasterDetail.operationTime
+																		+ "</td></tr>");
+											});
+						},
+						error : function(xhr, error) {
+							onError(xhr, error);
+						},
+					});
+		} else {
+			var data = null;
+			if (companyPid == "no") {
+				alert("Please Select Company");
+				return;
+			}
+			if (userPid == "no") {
+				alert("Please Select User");
+				return;
+			}
+		}
+	}
+
+	/*
+	 * function loadAllDevices() {
+	 * 
+	 * $('#tableCompanyUserDevice').html( "<tr><td colspan='8' align='center'>Please
+	 * wait...</td></tr>"); $ .ajax({ url : mobileMasterUpdateContextPath +
+	 * "/listAllDevice", method : 'GET', success : function(companyUserDevices) {
+	 * $('#tableCompanyUserDevice').html(""); if (companyUserDevices.length ==
+	 * 0) { $('#tableCompanyUserDevice') .html( "<tr><td colspan='8' align='center'>No
+	 * data available</td></tr>"); return; } $ .each( companyUserDevices,
+	 * function(index, companyUserDevice) { var date1 =
+	 * convertDateTimeFromServer(companyUserDevice.createdDate); var date2 =
+	 * convertDateTimeFromServer(companyUserDevice.lastModifiedDate);
+	 * $('#tableCompanyUserDevice') .append( "<tr><td>" +
+	 * companyUserDevice.userLoginName + "</td><td>" +
+	 * activated(companyUserDevice.activated) + "</td><td>" + date1 + "</td><td>" +
+	 * date2 + "</td><td>" + companyUserDevice.deviceKey + "</td><td>" +
+	 * companyUserDevice.lastAcessedDeviceKey + "</td><td>" +
+	 * companyUserDevice.lastAcessedLogin + "</td><td>" + spanReleasedDevice(
+	 * companyUserDevice.pid, companyUserDevice.activated) + "</td></tr>");
+	 * }); }, error : function(xhr, error) { onError(xhr, error); } }); }
+	 */
 
 	function searchTable(inputVal, table) {
 		table.find('tr').each(function(index, row) {
@@ -121,7 +157,7 @@ if (!this.CompanyUserDevice) {
 
 	function onSaveSuccess(result) {
 		// reloading page to see the updated data
-		window.location = companyUserDeviceContextPath;
+		window.location = mobileMasterUpdateContextPath;
 	}
 
 	function onError(httpResponse, exception) {

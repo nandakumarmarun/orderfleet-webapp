@@ -26,7 +26,7 @@
 			<h2>Mobile Master Update</h2>
 			<div class="row col-xs-12"></div>
 			<hr>
-							<div class="row">
+			<div class="row">
 				<div class="form-group">
 					<div class="col-sm-3">
 						Company<select id="dbCompany" name="companyPid"
@@ -37,9 +37,8 @@
 							</c:forEach>
 						</select>
 					</div>
-					<div class="col-sm-3"> 
-						User <select id="dbUser" name="userPid"
-							class="form-control">
+					<div class="col-sm-3">
+						User <select id="dbUser" name="userPid" class="form-control">
 							<option value="no">All User</option>
 						</select>
 					</div>
@@ -50,31 +49,46 @@
 					</div>
 				</div>
 				<div class="col-sm-3">
-				<div class="input-group">
-						 <input type="text"
-							class="form-control" placeholder="Search" id="search"/> <span
-							class="input-group-btn">
-							<button
-								class="btn btn-default" type="button" id="btnSearch">Search</button>
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Search"
+							id="search" /> <span class="input-group-btn">
+							<button class="btn btn-default" type="button" id="btnSearch">Search</button>
 						</span>
-						
+
 					</div>
-					</div>
+				</div>
+				
 			</div>
-							
+			
+			<div class="clearfix"></div>
+			<hr />
+				<div class="col-md-12 col-sm-12 clearfix"
+					style="font-size: 14px; color: black;">
+					<div class="col-sm-2">
+						<label>Username : </label> <label id="lblUsername"></label>
+					</div>
+					<div class="col-sm-3">
+						<label>Employee : </label> <label
+							id="lblEmployeeName"></label>
+					</div>
+					<div class="col-sm-3">
+						<label>User Build Version : </label> <label
+							id="lblUserBuildVersion"></label>
+					</div>
+					<div class="col-sm-3">
+						<label>Total Update Time : </label> <label id="lblTotalUpdateTime"></label>
+					</div>
+				</div>
+
 			<div class="clearfix"></div>
 			<hr />
 			<table class="table  table-striped table-bordered">
 				<thead>
 					<tr>
-						<th>User name</th>
-						<th>Activated</th>
-						<th>Created Date</th>
-						<th>Last Modified Date</th>
-						<th>Device Key</th>
-						<th>Last Accessed Device Key</th>
-						<th>Last Accessed Login</th>
-						<th>Actions</th>
+						<th>Master Item</th>
+						<th>Date</th>
+						<th>Count</th>
+						<th>Time Taken</th>
 					</tr>
 				</thead>
 				<tbody id="tableMobileMasterUpdate">
@@ -87,7 +101,8 @@
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
 
-	<spring:url value="/resources/app/mobile-master-update.js" var="mobileMasterUpdateJs"></spring:url>
+	<spring:url value="/resources/app/mobile-master-update.js"
+		var="mobileMasterUpdateJs"></spring:url>
 	<script type="text/javascript" src="${mobileMasterUpdateJs}"></script>
 </body>
 </html>

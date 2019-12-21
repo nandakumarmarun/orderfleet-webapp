@@ -58,6 +58,9 @@ public class MobileMasterUpdate implements Serializable {
 	@NotNull
 	private Company company;
 
+	@Column(name = "user_build_version")
+	private String userBuildVersion;
+
 	public Long getId() {
 		return id;
 	}
@@ -112,6 +115,14 @@ public class MobileMasterUpdate implements Serializable {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public String getUserBuildVersion() {
+		return userBuildVersion;
+	}
+
+	public void setUserBuildVersion(String userBuildVersion) {
+		this.userBuildVersion = userBuildVersion;
 	}
 
 }

@@ -11,6 +11,7 @@ public class MobileMasterUpdateDTO {
 	private String userPid;
 	private List<MobileMasterDetailDTO> mobileMasterDetailDtos;
 	private String updateTime;
+	private String userBuildVersion;
 
 	public MobileMasterUpdateDTO() {
 		super();
@@ -24,6 +25,7 @@ public class MobileMasterUpdateDTO {
 			this.mobileMasterDetailDtos = mobileMasterUpdate.getMobileMasterDetails().stream()
 					.map(MobileMasterDetailDTO::new).collect(Collectors.toList());
 		}
+		this.userBuildVersion = mobileMasterUpdate.getUserBuildVersion();
 	}
 
 	public String getUserPid() {
@@ -48,6 +50,14 @@ public class MobileMasterUpdateDTO {
 
 	public void setUpdateTime(String updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public String getUserBuildVersion() {
+		return userBuildVersion;
+	}
+
+	public void setUserBuildVersion(String userBuildVersion) {
+		this.userBuildVersion = userBuildVersion;
 	}
 
 }

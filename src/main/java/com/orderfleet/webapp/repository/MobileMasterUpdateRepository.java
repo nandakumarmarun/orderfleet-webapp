@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,6 @@ import com.orderfleet.webapp.domain.MobileMasterUpdate;
 public interface MobileMasterUpdateRepository extends JpaRepository<MobileMasterUpdate, Long> {
 	
 	Optional<MobileMasterUpdate> findByUserPid(String userPid);
+
+	List<MobileMasterUpdate> findAllByCompanyPidAndUserPid(String companyPid, String userPid);
 }

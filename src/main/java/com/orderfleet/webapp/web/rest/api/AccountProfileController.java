@@ -42,6 +42,7 @@ import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.service.impl.FileManagerException;
 import com.orderfleet.webapp.service.util.RandomUtil;
+import com.orderfleet.webapp.web.rest.CompanyPerformanceConfigResource;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
@@ -209,6 +210,7 @@ public class AccountProfileController {
 
 			AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
 			accountProfile.setId(exisitingAccountProfile.get().getId());
+			accountProfile.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 
 			accountProfile = accountProfileRepository.save(accountProfile);
 
