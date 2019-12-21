@@ -127,13 +127,13 @@ public class MobileMasterUpdateResource {
 					double totalTimeMs = Double.parseDouble(
 							mobileMasterUpdate.getUpdateTime() != null ? mobileMasterUpdate.getUpdateTime() : "0");
 					double totalTimeSec = Math.round(totalTimeMs / 1000.0);
-					mobileMasterDetailDTO.setTotalTime(String.valueOf(totalTimeSec) + " Seconds");
+					mobileMasterDetailDTO.setTotalTime(String.valueOf(totalTimeSec) + " Sec");
 
 					double totalOpTimeMs = Double.parseDouble(
 							mobileMasterDetail.getOperationTime() != null ? mobileMasterDetail.getOperationTime()
 									: "0");
 					double totalOpTimeSec = Math.round(totalOpTimeMs / 1000.0);
-					mobileMasterDetailDTO.setOperationTime(String.valueOf(totalOpTimeSec) + " Seconds");
+					mobileMasterDetailDTO.setOperationTime(String.valueOf(totalOpTimeSec) + " Sec");
 
 					mobileMasterDetailDTOs.add(mobileMasterDetailDTO);
 
