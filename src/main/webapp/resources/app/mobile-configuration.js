@@ -121,7 +121,7 @@ if (!this.MobileConfiguration) {
 				"#enableAttendanceImage").is(":checked");
 		mobileConfigurationDTO.smartSearch = $("#smartSearch").is(":checked");
 		mobileConfigurationDTO.salesOrderDownloadPdf = $(
-				"#findLocation").is(":checked");
+				"#salesOrderDownloadPdf").is(":checked");
 		mobileConfigurationDTO.findLocation = $(
 		"#findLocation").is(":checked");
 		
