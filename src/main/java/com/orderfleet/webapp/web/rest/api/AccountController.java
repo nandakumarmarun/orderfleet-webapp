@@ -26,11 +26,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.License;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserDevice;
 import com.orderfleet.webapp.domain.UserOnPremise;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.LicenseRepository;
 import com.orderfleet.webapp.repository.UserDeviceRepository;
 import com.orderfleet.webapp.repository.UserOnPremiseRepository;
@@ -81,6 +83,9 @@ public class AccountController {
 
 	@Inject
 	private CompanyRepository companyRepository;
+	
+	@Inject
+	private EmployeeProfileRepository employeeProfileRepository;
 
 	public AccountController(UserRepository userRepository, LicenseRepository licenseRepository,
 			UserService userService, MailService mailService, CompanyMapper companyMapper,
@@ -284,9 +289,21 @@ public class AccountController {
 	@GetMapping("/account")
 	@Timed
 	public ResponseEntity<UserDTO> getAccount() {
-		return Optional.ofNullable(userService.getUserWithAuthorities())
-				.map(user -> new ResponseEntity<>(new UserDTO(user), HttpStatus.OK))
-				.orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+		Optional<User> opUser = Optional.ofNullable(userService.getUserWithAuthorities());
+		if(opUser.isPresent()) {
+			UserDTO userDto = new UserDTO(opUser.get());
+			Optional<EmployeeProfile> opEmployeeProfile = employeeProfileRepository.findByUserPid(userDto.getPid());
+			if(opEmployeeProfile.isPresent()) {
+				userDto.setEmployeeName(opEmployeeProfile.get().getName());
+			}else {
+				userDto.setEmployeeName(userDto.getFirstName());
+			}
+			
+			return new ResponseEntity<>(userDto, HttpStatus.OK);
+		}else{
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 
 	/**

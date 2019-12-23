@@ -63,6 +63,7 @@ public class MobileMasterDetailServiceImpl implements MobileMasterDetailService 
 				mmd.setMobileMasterItem(dto.getMobileMasterItem());
 				mmd.setMobileMasterUpdate(mobileMasterUpdate);
 			}else {
+				log.info("-------"+opMobileExisting.get().toString());
 				mmd = opMobileExisting.get();
 			}
 			mmd.setCreatedDate(LocalDateTime.now());
@@ -71,6 +72,17 @@ public class MobileMasterDetailServiceImpl implements MobileMasterDetailService 
 			
 			mmdList.add(mmd);
 		}
+		
+		for(MobileMasterDetail emmd : mmdExistingList) {
+			Optional<MobileMasterDetail> opmmd = 
+					mmdList.stream().filter(mmd -> 
+						mmd.getMobileMasterItem() == emmd.getMobileMasterItem()).findAny();
+			
+			if(!opmmd.isPresent()) {
+				mmdList.add(emmd);
+			}
+		}
+		
 		return mmdList;
 	}
 	

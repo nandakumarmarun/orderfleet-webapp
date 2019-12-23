@@ -54,7 +54,9 @@ public class MobileMasterUpdateController {
 			List<MobileMasterDetail> mmdList = mobileMasterDetailService.convertMobileMasterDetails(
 								mobileMasterUpdateDTO.getMobileMasterDetailDtos(), mobileMasterUpdate);
 			if(mmdList != null && mmdList.size()>0) {
+				log.info("--***---mmdList size = "+mmdList.size());
 				mobileMasterUpdate.setMobileMasterDetails(mmdList);
+				log.info(mobileMasterUpdate.toString()+"---------------");
 				mobileMasterUpdate = mobileMasterUpdateRepository.save(mobileMasterUpdate);
 				return new ResponseEntity<>(true,HttpStatus.CREATED);
 			}else {

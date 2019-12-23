@@ -44,7 +44,7 @@ public class MobileMasterUpdate implements Serializable {
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "mobile_master_update_id")
-//	@Fetch(value = FetchMode.SUBSELECT)
+	@Fetch(value = FetchMode.SUBSELECT)
 	private List<MobileMasterDetail> mobileMasterDetails;
 
 	@Column(name = "update_time")
@@ -125,4 +125,10 @@ public class MobileMasterUpdate implements Serializable {
 		this.userBuildVersion = userBuildVersion;
 	}
 
+	@Override
+	public String toString() {
+		return "MobileMasterUpdate [id=" + id + ", pid=" + pid + ", user=" + user + ", updateTime=" + updateTime + ", createdDate=" + createdDate + ", company="
+				+ company + ", userBuildVersion=" + userBuildVersion + "]";
+	}
+	
 }

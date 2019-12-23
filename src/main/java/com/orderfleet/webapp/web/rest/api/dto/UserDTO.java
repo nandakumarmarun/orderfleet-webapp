@@ -70,6 +70,8 @@ public class UserDTO {
 	private DashboardUIType dashboardUIType;
 
 	private boolean discontinued;
+	
+	private String employeeName;
 
 	public UserDTO() {
 	}
@@ -253,6 +255,14 @@ public class UserDTO {
 
 	public void setCompanyPhoneNo(String companyPhoneNo) {
 		this.companyPhoneNo = companyPhoneNo;
+	}
+	
+	public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
 	}
 
 	@Override
