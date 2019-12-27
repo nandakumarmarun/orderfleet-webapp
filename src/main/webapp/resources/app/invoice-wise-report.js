@@ -119,8 +119,12 @@ if (!this.InvoiceWiseReport) {
 											var towerLocationName = invoiceWiseReport.towerLocation;
 
 											var mockLocatation = "";
-											
-											var withCustomer=""
+
+											var withCustomer = "Remote Visit"
+
+											if (invoiceWiseReport.withCustomer) {
+												withCustomer = "Counter Visit"
+											}
 
 											if (invoiceWiseReport.mockLocationStatus) {
 												mockLocatation = "Enabled"
@@ -270,8 +274,9 @@ if (!this.InvoiceWiseReport) {
 																	+ "</td>"
 																	+ "<td>"
 																	+ towerLocationName
-																	+ "</td>"
-																	+ "<td>"
+																	+ "</td><td>"
+																	+ withCustomer
+																	+ "</td><td>"
 																	+ invoiceWiseReport.totalSalesOrderAmount
 																	+ "</td>"
 																	+ "<td>"

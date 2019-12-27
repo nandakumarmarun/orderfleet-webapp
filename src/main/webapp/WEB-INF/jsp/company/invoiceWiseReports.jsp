@@ -216,12 +216,13 @@
 							<th>Activity</th>
 							<th>Punch In</th>
 							<th>Client Date</th>
-							<th>Time Spend(hh:mm:ss)</th>
+							<th>Time Spend (hh:mm:ss)</th>
 							<th>Server Date</th>
 							<th>GPS Location</th>
-							<th>Enable/Disable</th>
+							<th>Enable/ Disable</th>
 							<th>Tower Location</th>
-							<th>Sales/Sales Order Amount Total</th>
+							<th>Visit Type</th>
+							<th>Sales/ Sales Order Amount Total</th>
 							<th>Receipt Amount Total</th>
 							<th>Remarks</th>
 						</tr>
