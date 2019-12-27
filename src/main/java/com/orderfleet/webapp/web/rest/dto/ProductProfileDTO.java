@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javax.persistence.Column;
 import javax.persistence.Lob;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -75,8 +76,14 @@ public class ProductProfileDTO {
 	private StockAvailabilityStatus stockAvailabilityStatus = StockAvailabilityStatus.AVAILABLE;
 
 	private String trimChar;
-	
+
 	private String hsnCode;
+
+	private String productDescription;
+
+	private String barcode;
+
+	private String remarks;
 
 	public ProductProfileDTO() {
 		super();
@@ -127,6 +134,9 @@ public class ProductProfileDTO {
 		this.stockAvailabilityStatus = profile.getStockAvailabilityStatus();
 		this.trimChar = profile.getTrimChar();
 		this.hsnCode = profile.getHsnCode();
+		this.productDescription = profile.getProductDescription();
+		this.barcode = profile.getBarcode();
+		this.remarks = profile.getRemarks();
 
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
@@ -347,7 +357,7 @@ public class ProductProfileDTO {
 	public void setStockAvailabilityStatus(StockAvailabilityStatus stockAvailabilityStatus) {
 		this.stockAvailabilityStatus = stockAvailabilityStatus;
 	}
-	
+
 	public String getHsnCode() {
 		return hsnCode;
 	}
@@ -362,6 +372,30 @@ public class ProductProfileDTO {
 
 	public void setTrimChar(String trimChar) {
 		this.trimChar = trimChar;
+	}
+
+	public String getProductDescription() {
+		return productDescription;
+	}
+
+	public void setProductDescription(String productDescription) {
+		this.productDescription = productDescription;
+	}
+
+	public String getBarcode() {
+		return barcode;
+	}
+
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
 	}
 
 	@Override

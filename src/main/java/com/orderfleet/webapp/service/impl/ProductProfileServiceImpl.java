@@ -162,6 +162,9 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 			productProfile.setColorImageContentType(productProfileDTO.getColorImageContentType());
 			productProfile.setStockAvailabilityStatus(productProfileDTO.getStockAvailabilityStatus());
 			productProfile.setHsnCode(productProfileDTO.getHsnCode());
+			productProfile.setProductDescription(productProfileDTO.getProductDescription());
+			productProfile.setBarcode(productProfileDTO.getBarcode());
+			productProfile.setRemarks(productProfileDTO.getRemarks());
 			productProfile = productProfileRepository.save(productProfile);
 			ProductProfileDTO result = productProfileMapper.productProfileToProductProfileDTO(productProfile);
 			return result;

@@ -161,9 +161,18 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "hsn_code")
 	private String hsnCode;
-	
+
 	@Column(name = "trim_char")
 	private String trimChar;
+
+	@Column(name = "trim_char")
+	private String productDescription;
+
+	@Column(name = "trim_char")
+	private String barcode;
+
+	@Column(name = "trim_char")
+	private String remarks;
 
 	public Long getId() {
 		return id;
@@ -360,7 +369,7 @@ public class ProductProfile implements Serializable, Cloneable {
 	public void setStockAvailabilityStatus(StockAvailabilityStatus stockAvailabilityStatus) {
 		this.stockAvailabilityStatus = stockAvailabilityStatus;
 	}
-	
+
 	public String getHsnCode() {
 		return hsnCode;
 	}
@@ -375,6 +384,30 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public void setTrimChar(String trimChar) {
 		this.trimChar = trimChar;
+	}
+
+	public String getProductDescription() {
+		return productDescription;
+	}
+
+	public void setProductDescription(String productDescription) {
+		this.productDescription = productDescription;
+	}
+
+	public String getBarcode() {
+		return barcode;
+	}
+
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
 	}
 
 	@Override
