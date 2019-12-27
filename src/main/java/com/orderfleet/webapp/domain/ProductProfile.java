@@ -165,13 +165,13 @@ public class ProductProfile implements Serializable, Cloneable {
 	@Column(name = "trim_char")
 	private String trimChar;
 
-	@Column(name = "trim_char")
+	@Column(name = "product_description")
 	private String productDescription;
 
-	@Column(name = "trim_char")
+	@Column(name = "barcode")
 	private String barcode;
 
-	@Column(name = "trim_char")
+	@Column(name = "remarks")
 	private String remarks;
 
 	public Long getId() {
