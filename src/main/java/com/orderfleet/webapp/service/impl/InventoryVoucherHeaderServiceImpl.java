@@ -26,7 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
+import com.orderfleet.webapp.domain.OpeningStock;
+import com.orderfleet.webapp.domain.ProductNameTextSettings;
+import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.ProductNameTextSettingsRepository;
+import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
@@ -34,7 +39,9 @@ import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
+import com.orderfleet.webapp.web.rest.mapper.ProductProfileMapper;
 import com.orderfleet.webapp.web.vendor.excel.dto.SalesOrderExcelDTO;
 
 /**
@@ -57,6 +64,15 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 	@Inject
 	private LocationAccountProfileService locationAccountProfileService;
+
+	@Inject
+	private ProductProfileRepository productProfileRepository;
+
+	@Inject
+	private ProductProfileMapper productProfileMapper;
+
+	@Inject
+	private ProductNameTextSettingsRepository productNameTextSettingsRepository;
 
 	/**
 	 * Save a inventoryVoucherHeader.
@@ -397,6 +413,12 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetails(companyId, userId,
 				fromDate, toDate);
 
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyIdActivatedTrue();
+		List<ProductProfileDTO> productProfileDtos = productProfileMapper
+				.productProfilesToProductProfileDTOs(productProfiles);
+		List<ProductNameTextSettings> productNameTextSettings = productNameTextSettingsRepository
+				.findAllByCompanyIdAndEnabledTrue(companyId);
+
 		List<StockDetailsDTO> stockDetailsDTOs = new ArrayList<>();
 		for (Object[] obj : inventoryVoucherHeaders) {
 			StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
@@ -433,7 +455,13 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 		List<StockDetailsDTO> proccessedStockDetailsDTOs = new ArrayList<>();
 
+		log.info("Key set size = " + keySet.size() + "*******");
+
 		for (String productName : keySet) {
+
+			Optional<ProductProfileDTO> opProductProfile = productProfileDtos.stream()
+					.filter(ppDto -> ppDto.getName().equalsIgnoreCase(productName)).findAny();
+
 			List<StockDetailsDTO> valuesList = groupedList.get(productName);
 
 			StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
@@ -444,7 +472,47 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 			double closingStock = openingStock - saledQuantity;
 
-			stockDetailsDTO.setProductName(productName);
+			if (opProductProfile.isPresent()) {
+				if (productNameTextSettings.size() > 0) {
+					ProductProfileDTO productProfileDTO = opProductProfile.get();
+					String name = " (";
+					for (ProductNameTextSettings productNameText : productNameTextSettings) {
+						if (productNameText.getName().equals("DESCRIPTION")) {
+							if (productProfileDTO.getDescription() != null
+									&& !productProfileDTO.getDescription().isEmpty())
+								name += productProfileDTO.getDescription() + ",";
+						} else if (productNameText.getName().equals("MRP")) {
+							name += productProfileDTO.getMrp() + ",";
+						} else if (productNameText.getName().equals("SELLING RATE")) {
+							name += productProfileDTO.getPrice() + ",";
+						} else if (productNameText.getName().equals("STOCK")) {
+							name += openingStock + ",";
+						} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+							if (productProfileDTO.getProductDescription() != null
+									&& !productProfileDTO.getProductDescription().isEmpty())
+								name += productProfileDTO.getProductDescription() + ",";
+						} else if (productNameText.getName().equals("BARCODE")) {
+							if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+								name += productProfileDTO.getBarcode() + ",";
+						} else if (productNameText.getName().equals("REMARKS")) {
+							if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+								name += productProfileDTO.getRemarks() + ",";
+						}
+					}
+					name = name.substring(0, name.length() - 1);
+					if (name.length() > 1) {
+						name += ")";
+					}
+					stockDetailsDTO.setProductName(productName + name);
+
+				} else {
+					log.info("Product Profile Size < 0");
+					stockDetailsDTO.setProductName(productName);
+				}
+			} else {
+				log.info("Optional Product Profile not present");
+				stockDetailsDTO.setProductName(productName);
+			}
 			stockDetailsDTO.setOpeningStock(openingStock);
 			stockDetailsDTO.setSaledQuantity(saledQuantity);
 			stockDetailsDTO.setClosingStock(closingStock);

@@ -104,8 +104,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Save a productProfile.
 	 *
-	 * @param productProfileDTO
-	 *            the entity to save
+	 * @param productProfileDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -136,8 +135,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Update a productProfile.
 	 *
-	 * @param productProfileDTO
-	 *            the entity to update
+	 * @param productProfileDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -174,8 +172,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Get all the categorys.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -189,8 +186,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Get all the categorys.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -207,8 +203,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Get one productProfile by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -223,8 +218,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Get one productProfile by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -241,8 +235,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Get one productProfile by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -260,8 +253,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Delete the productProfile by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete ProductProfile : {}", pid);
@@ -331,6 +323,16 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 						if (openingStock != null) {
 							name += openingStock.getQuantity() + ",";
 						}
+					} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+						if (productProfileDTO.getProductDescription() != null
+								&& !productProfileDTO.getProductDescription().isEmpty())
+							name += productProfileDTO.getProductDescription() + ",";
+					} else if (productNameText.getName().equals("BARCODE")) {
+						if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+							name += productProfileDTO.getBarcode() + ",";
+					} else if (productNameText.getName().equals("REMARKS")) {
+						if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+							name += productProfileDTO.getRemarks() + ",";
 					}
 				}
 				name = name.substring(0, name.length() - 1);
@@ -346,8 +348,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Get all the categorys.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -445,6 +446,16 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 						if (openingStock != null) {
 							name += openingStock.getQuantity() + ",";
 						}
+					} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+						if (productProfileDTO.getProductDescription() != null
+								&& !productProfileDTO.getProductDescription().isEmpty())
+							name += productProfileDTO.getProductDescription() + ",";
+					} else if (productNameText.getName().equals("BARCODE")) {
+						if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+							name += productProfileDTO.getBarcode() + ",";
+					} else if (productNameText.getName().equals("REMARKS")) {
+						if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+							name += productProfileDTO.getRemarks() + ",";
 					}
 				}
 				name = name.substring(0, name.length() - 1);
@@ -466,10 +477,8 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Update the ProductProfile status by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
-	 * @param activated
-	 *            the activated of the entity
+	 * @param pid       the pid of the entity
+	 * @param activated the activated of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -489,8 +498,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	 *
 	 *        find all active company
 	 *
-	 * @param active
-	 *            the active of the entity
+	 * @param active the active of the entity
 	 * @return the list
 	 */
 	@Override
@@ -509,6 +517,9 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 			Boolean mrpExist = Boolean.FALSE;
 			Boolean sellingRateExist = Boolean.FALSE;
 			Boolean stockExist = Boolean.FALSE;
+			Boolean productDescriptionExist = Boolean.FALSE;
+			Boolean barcodeExist = Boolean.FALSE;
+			Boolean remarkExist = Boolean.FALSE;
 			for (String productNameText : productNameTextSettings) {
 				switch (productNameText) {
 				case "DESCRIPTION":
@@ -522,6 +533,15 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 					break;
 				case "STOCK":
 					stockExist = Boolean.TRUE;
+					break;
+				case "PRODUCT DESCRIPTION":
+					productDescriptionExist = Boolean.TRUE;
+					break;
+				case "BARCODE":
+					barcodeExist = Boolean.TRUE;
+					break;
+				case "REMARKS":
+					remarkExist = Boolean.TRUE;
 					break;
 				default:
 					break;
@@ -552,6 +572,18 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 						name.append(",").append(sum);
 					}
 				}
+				if (productDescriptionExist && productProfileDTO.getProductDescription() != null
+						&& !productProfileDTO.getProductDescription().isEmpty()) {
+					name.append(",").append(productProfileDTO.getProductDescription());
+				}
+				if (barcodeExist && productProfileDTO.getBarcode() != null
+						&& !productProfileDTO.getBarcode().isEmpty()) {
+					name.append(",").append(productProfileDTO.getBarcode());
+				}
+				if (remarkExist && productProfileDTO.getRemarks() != null
+						&& !productProfileDTO.getRemarks().isEmpty()) {
+					name.append(",").append(productProfileDTO.getRemarks());
+				}
 				name.append(")");
 				if (name.length() > 3) {
 					productProfileDTO.setName(productProfileDTO.getName() + name.toString());
@@ -568,8 +600,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	 * @since Feb 17, 2017
 	 *
 	 *        find ProductProfile by ProductCategoryPids And Activated
-	 * @param categoryPids
-	 *            the categoryPids of the entity
+	 * @param categoryPids the categoryPids of the entity
 	 * @return the list
 	 */
 	@Override
@@ -596,6 +627,16 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 						if (openingStock != null) {
 							name += openingStock.getQuantity() + ",";
 						}
+					} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+						if (productProfileDTO.getProductDescription() != null
+								&& !productProfileDTO.getProductDescription().isEmpty())
+							name += productProfileDTO.getProductDescription() + ",";
+					} else if (productNameText.getName().equals("BARCODE")) {
+						if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+							name += productProfileDTO.getBarcode() + ",";
+					} else if (productNameText.getName().equals("REMARKS")) {
+						if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+							name += productProfileDTO.getRemarks() + ",";
 					}
 				}
 				name = name.substring(0, name.length() - 1);
@@ -611,8 +652,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Get one productProfile by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -669,6 +709,16 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 						if (openingStock != null) {
 							name += openingStock.getQuantity() + ",";
 						}
+					} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+						if (productProfileDTO.getProductDescription() != null
+								&& !productProfileDTO.getProductDescription().isEmpty())
+							name += productProfileDTO.getProductDescription() + ",";
+					} else if (productNameText.getName().equals("BARCODE")) {
+						if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+							name += productProfileDTO.getBarcode() + ",";
+					} else if (productNameText.getName().equals("REMARKS")) {
+						if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+							name += productProfileDTO.getRemarks() + ",";
 					}
 				}
 				name = name.substring(0, name.length() - 1);
@@ -684,8 +734,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	/**
 	 * Get one productProfile by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -757,8 +806,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 
 	@Override
 	public List<ProductProfileDTO> findAllProductProfilePidByProductProfilePidAndActivated(List<String> profilePids) {
-		List<ProductProfile> productProfileList = productProfileRepository
-				.findByPidInAndActivated(profilePids, true);
+		List<ProductProfile> productProfileList = productProfileRepository.findByPidInAndActivated(profilePids, true);
 		List<ProductProfileDTO> result = productProfileMapper.productProfilesToProductProfileDTOs(productProfileList);
 		return result;
 	}

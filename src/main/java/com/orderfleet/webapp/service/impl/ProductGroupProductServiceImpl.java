@@ -219,6 +219,16 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 						if (openingStock != null) {
 							name += openingStock.getQuantity() + ",";
 						}
+					} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+						if (productProfileDTO.getProductDescription() != null
+								&& !productProfileDTO.getProductDescription().isEmpty())
+							name += productProfileDTO.getProductDescription() + ",";
+					} else if (productNameText.getName().equals("BARCODE")) {
+						if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+							name += productProfileDTO.getBarcode() + ",";
+					} else if (productNameText.getName().equals("REMARKS")) {
+						if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+							name += productProfileDTO.getRemarks() + ",";
 					}
 				}
 				name = name.substring(0, name.length() - 1);
@@ -263,6 +273,16 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 						if (openingStock != null) {
 							name += openingStock.getQuantity() + ",";
 						}
+					} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+						if (productProfileDTO.getProductDescription() != null
+								&& !productProfileDTO.getProductDescription().isEmpty())
+							name += productProfileDTO.getProductDescription() + ",";
+					} else if (productNameText.getName().equals("BARCODE")) {
+						if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+							name += productProfileDTO.getBarcode() + ",";
+					} else if (productNameText.getName().equals("REMARKS")) {
+						if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+							name += productProfileDTO.getRemarks() + ",";
 					}
 				}
 				name = name.substring(0, name.length() - 1);
@@ -387,12 +407,12 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 			List<ProductNameTextSettings> productNameTextSettings = productNameTextSettingsRepository
 					.findAllByCompanyIdAndEnabledTrue(SecurityUtils.getCurrentUsersCompanyId());
 			Set<Long> sLocationIds = documentStockLocationSourceRepository.findStockLocationIdsByCompanyId();
-			if(sLocationIds == null || sLocationIds.size() == 0) {
+			if (sLocationIds == null || sLocationIds.size() == 0) {
 				throw new IllegalArgumentException("Document Stock Location not assigned");
 			}
 			List<OpeningStock> openingStocks = openingStockRepository
 					.findOpeningStocksAndStockLocationIdIn(sLocationIds);
-			//log.info("Caluclationg op Stock");
+			// log.info("Caluclationg op Stock");
 			if (productNameTextSettings.size() > 0) {
 				for (ProductProfileDTO productProfileDTO : productProfileDTOs) {
 					String name = " (";
@@ -447,6 +467,16 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 //							if (quantity != 0.0) {
 //								name +="STK:"+ quantity + ",";
 //							}
+						} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+							if (productProfileDTO.getProductDescription() != null
+									&& !productProfileDTO.getProductDescription().isEmpty())
+								name += productProfileDTO.getProductDescription() + ",";
+						} else if (productNameText.getName().equals("BARCODE")) {
+							if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+								name += productProfileDTO.getBarcode() + ",";
+						} else if (productNameText.getName().equals("REMARKS")) {
+							if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+								name += productProfileDTO.getRemarks() + ",";
 						}
 					}
 					name = name.substring(0, name.length() - 1);
@@ -456,8 +486,8 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 					productProfileDTO.setName(productProfileDTO.getName() + name);
 				}
 			}
-			
-			//log.info("Caluclationg op Stock Completed");
+
+			// log.info("Caluclationg op Stock Completed");
 
 			productGroupProductDTO.setProductProfiles(productProfileDTOs);
 			if (!productProfiles.isEmpty()) {
@@ -517,6 +547,16 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 							if (openingStock != null) {
 								name += openingStock.getQuantity() + ",";
 							}
+						} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+							if (productProfileDTO.getProductDescription() != null
+									&& !productProfileDTO.getProductDescription().isEmpty())
+								name += productProfileDTO.getProductDescription() + ",";
+						} else if (productNameText.getName().equals("BARCODE")) {
+							if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+								name += productProfileDTO.getBarcode() + ",";
+						} else if (productNameText.getName().equals("REMARKS")) {
+							if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+								name += productProfileDTO.getRemarks() + ",";
 						}
 					}
 					name = name.substring(0, name.length() - 1);

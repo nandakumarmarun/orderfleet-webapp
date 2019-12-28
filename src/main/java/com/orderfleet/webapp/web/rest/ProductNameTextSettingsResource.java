@@ -43,12 +43,11 @@ public class ProductNameTextSettingsResource {
 	/**
 	 * GET /productNameTextSettings : get all the productNameTextSettingss.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of
 	 *         productNameTextSettingss in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/productNameTextSettings", method = RequestMethod.GET)
 	@Timed
@@ -62,13 +61,11 @@ public class ProductNameTextSettingsResource {
 	/**
 	 * POST /productNameTextSettings : Create a new productNameTextSettings.
 	 *
-	 * @param productNameTextSettingsDTO
-	 *            the productNameTextSettingsDTO to create
-	 * @return the ResponseEntity with status 201 (Created) and with body the
-	 *         new productNameTextSettingsDTO, or with status 400 (Bad Request)
-	 *         if the productNameTextSettings has already an ID
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @param productNameTextSettingsDTO the productNameTextSettingsDTO to create
+	 * @return the ResponseEntity with status 201 (Created) and with body the new
+	 *         productNameTextSettingsDTO, or with status 400 (Bad Request) if the
+	 *         productNameTextSettings has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@Timed
 	@RequestMapping(value = "/productNameTextSettings", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,7 +81,8 @@ public class ProductNameTextSettingsResource {
 	@PostMapping(value = "/productNameTextSettings/defValues", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> getAllProductNameTextSettings() throws URISyntaxException {
 		log.debug("web request to save default productnametextsettings ");
-		List<String> defTexts = Arrays.asList("STOCK", "DESCRIPTION", "SELLING RATE", "MRP");
+		List<String> defTexts = Arrays.asList("STOCK", "DESCRIPTION", "SELLING RATE", "MRP", "PRODUCT DESCRIPTION",
+				"BARCODE", "REMARKS");
 		List<ProductNameTextSettingsDTO> textSettingsDTOs = new ArrayList<>();
 		for (String text : defTexts) {
 			textSettingsDTOs.add(new ProductNameTextSettingsDTO(text, false));
