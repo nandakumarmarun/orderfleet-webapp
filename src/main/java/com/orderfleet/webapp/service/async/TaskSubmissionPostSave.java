@@ -1569,6 +1569,7 @@ public class TaskSubmissionPostSave {
 			if (distanceApiJson != null && !distanceApiJson.getRows().isEmpty()) {
 				distance = distanceApiJson.getRows().get(0).getElements().get(0).getDistance();
 				if (distance != null) {
+					log.debug("Distance != null");
 					KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
 					kiloCalDTO.setKilometre(distance.getValue() * 0.001);
 					kiloCalDTO.setMetres(distance.getValue());
@@ -1579,13 +1580,16 @@ public class TaskSubmissionPostSave {
 							&& attendance.isPresent()) {
 						kiloCalDTO.setStartLocation("Attendance");
 					} else {
+						log.debug("Start location not attendance");
 						kiloCalDTO.setStartLocation(lastExecutiveTaskExecution.get(0).getLocation());
 					}
 					kiloCalDTO.setEndLocation(executiveTaskExecution.getLocation());
 					kiloCalDTO.setTaskExecutionPid(executiveTaskExecution.getPid());
+					log.debug("Saving Kilometre calculation...");
 					kilometreCalculationService.save(kiloCalDTO, companyId);
 				}
 			}
+			log.debug(" distance == null");
 		} catch (Exception e) {
 			log.debug("Exception while processing saveKilometreDifference method {}", e);
 			throw new TaskSubmissionPostSaveException("Exception while processing saveKilometreDifference method. "

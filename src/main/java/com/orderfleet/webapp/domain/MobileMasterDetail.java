@@ -113,11 +113,5 @@ public class MobileMasterDetail implements Serializable {
 		this.company = company;
 	}
 
-	@Override
-	public String toString() {
-		return "MobileMasterDetail [id=" + id + ", mobileMasterItem=" + mobileMasterItem + ", mobileMasterUpdate="
-				+ mobileMasterUpdate + ", operationTime=" + operationTime + ", count=" + count + ", createdDate="
-				+ createdDate + ", company=" + company + "]";
-	}
 	
 }

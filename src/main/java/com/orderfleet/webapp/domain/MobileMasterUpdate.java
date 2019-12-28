@@ -124,11 +124,5 @@ public class MobileMasterUpdate implements Serializable {
 	public void setUserBuildVersion(String userBuildVersion) {
 		this.userBuildVersion = userBuildVersion;
 	}
-
-	@Override
-	public String toString() {
-		return "MobileMasterUpdate [id=" + id + ", pid=" + pid + ", user=" + user + ", updateTime=" + updateTime + ", createdDate=" + createdDate + ", company="
-				+ company + ", userBuildVersion=" + userBuildVersion + "]";
-	}
 	
 }

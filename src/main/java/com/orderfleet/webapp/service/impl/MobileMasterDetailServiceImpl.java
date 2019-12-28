@@ -63,7 +63,6 @@ public class MobileMasterDetailServiceImpl implements MobileMasterDetailService 
 				mmd.setMobileMasterItem(dto.getMobileMasterItem());
 				mmd.setMobileMasterUpdate(mobileMasterUpdate);
 			}else {
-				log.info("-------"+opMobileExisting.get().toString());
 				mmd = opMobileExisting.get();
 			}
 			mmd.setCreatedDate(LocalDateTime.now());
