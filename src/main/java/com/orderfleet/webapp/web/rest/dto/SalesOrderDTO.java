@@ -42,6 +42,7 @@ public class SalesOrderDTO {
 	private List<DynamicDocumentHeaderDTO> dynamicDocumentHeaderDTOs;
 	private InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
 	private List<GstLedgerDTO> gstLedgerDtos;
+	private String activityRemarks;
 
 	public SalesOrderDTO() {
 		super();
@@ -262,6 +263,14 @@ public class SalesOrderDTO {
 
 	public void setEmployeeAlias(String employeeAlias) {
 		this.employeeAlias = employeeAlias;
+	}
+
+	public String getActivityRemarks() {
+		return activityRemarks;
+	}
+
+	public void setActivityRemarks(String activityRemarks) {
+		this.activityRemarks = activityRemarks;
 	}
 
 }
