@@ -15,6 +15,8 @@ public class ReceiptDTO {
 	private String accountingVoucherHeaderPid;
 	private String particularsName;
 	private double amount;
+	private double detailAmount;
+	private Long detailId;
 	private double headerAmount;
 	private String reference;
 	private String date;
@@ -41,6 +43,7 @@ public class ReceiptDTO {
 		this.accountingVoucherHeaderPid = accountingVoucherDetail.getAccountingVoucherHeader().getPid();
 		this.particularsName = accountingVoucherDetail.getBy().getName();
 		this.amount = accountingVoucherDetail.getAmount();
+		this.detailId = accountingVoucherDetail.getId();
 		this.reference = accountingVoucherDetail.getReferenceNumber();
 		this.date = accountingVoucherDetail.getVoucherDate().toString();
 		this.chequeNo = accountingVoucherDetail.getInstrumentNumber();
@@ -73,6 +76,8 @@ public class ReceiptDTO {
 				.getAccountingVoucherHeader().getPid();
 		this.particularsName = accountingVoucherAllocation.getAccountingVoucherDetail().getBy().getName();
 		this.amount = accountingVoucherAllocation.getAmount();
+		this.detailAmount = accountingVoucherAllocation.getAccountingVoucherDetail().getAmount();
+		this.detailId = accountingVoucherAllocation.getAccountingVoucherDetail().getId();
 		this.reference = accountingVoucherAllocation.getReferenceNumber();
 		this.date = accountingVoucherAllocation.getAccountingVoucherDetail().getVoucherDate().toString();
 		this.chequeNo = accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentNumber();
@@ -118,6 +123,22 @@ public class ReceiptDTO {
 
 	public void setAmount(double amount) {
 		this.amount = amount;
+	}
+	
+	public double getDetailAmount() {
+		return detailAmount;
+	}
+
+	public void setDetailAmount(double detailAmount) {
+		this.detailAmount = detailAmount;
+	}
+	
+	public Long getDetailId() {
+		return detailId;
+	}
+
+	public void setDetailId(Long detailId) {
+		this.detailId = detailId;
 	}
 
 	public String getReference() {
