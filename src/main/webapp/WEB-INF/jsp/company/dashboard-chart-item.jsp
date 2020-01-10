@@ -93,7 +93,7 @@
 								</div>
 								<div class="form-group">
 									<select id="dbDashboardItem" name="dashboardItemPid"
-										class="form-control selectpicker">
+										class="form-control">
 										<option value="-1">-- Select Dashboard Item --</option>
 										<c:forEach items="${dashboardItems}" var="dashboardItem">
 											<option value="${dashboardItem.pid}">${dashboardItem.name}</option>

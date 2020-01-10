@@ -72,7 +72,7 @@
 										</div> -->
 									</div>
 									<select id="dbEmployee" name="employeePid"
-										class="form-control selectpicker">
+										class="form-control">
 										<option value="Dashboard Employee">All Dashboard
 											Employees</option>
 									</select>
@@ -126,7 +126,7 @@
 
 									</div>
 									<select id="dbActivity" name="employeePid"
-										class="form-control selectpicker">
+										class="form-control">
 										<option value="no">All Activity</option>
 										<c:forEach items="${activities}" var="activity">
 											<option value="${activity.pid}">${activity.name}</option>

@@ -57,8 +57,8 @@
 												Employee</a>
 										</div>
 									</div>
-									<select id="dbEmployee" name="employeePid"
-										class="form-control selectpicker" onchange="EcomSalesReport.loadAccountProfileByEmployee();">
+									<select id="dbEmployee" name="employeePid" class="form-control"
+										onchange="EcomSalesReport.loadAccountProfileByEmployee();">
 										<option value="Dashboard Employees">All Dashboard
 											Employees</option>
 									</select>
@@ -68,9 +68,9 @@
 								Account <select id="dbAccount" name="accountPid"
 									class="form-control">
 									<option value="no">All Account</option>
-									 <c:forEach items="${accounts}" var="account">
+									<c:forEach items="${accounts}" var="account">
 										<option value="${account.pid}">${account.name}</option>
-									</c:forEach> 
+									</c:forEach>
 								</select>
 							</div>
 							<div class="col-sm-2">
@@ -203,7 +203,7 @@
 				<!-- /.modal-dialog -->
 			</div>
 
-			
+
 
 			<!-- Model Container Inventory Voucher-->
 			<div class="modal fade container" id="viewModalInventoryVoucher">
@@ -298,8 +298,7 @@
 
 			<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
-			<spring:url value="/web/ecom-sales-reports"
-				var="urlEcomSalesReports"></spring:url>
+			<spring:url value="/web/ecom-sales-reports" var="urlEcomSalesReports"></spring:url>
 		</div>
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
@@ -324,45 +323,38 @@
 	<script type="text/javascript" src="${aCollapTable}"></script>
 	<script type="text/javascript">
 		// call from dash board
-		$(document)
-				.ready(
-						function() {
-							
-							var employeePid = getParameterByName('user-key-pid');
-							getEmployees(employeePid);
+		$(document).ready(function() {
 
-							$("#txtToDate").datepicker({
-								dateFormat : "dd-mm-yy"
-							});
-							$("#txtFromDate").datepicker({
-								dateFormat : "dd-mm-yy"
-							});
+			var employeePid = getParameterByName('user-key-pid');
+			getEmployees(employeePid);
 
-							$('#myFormSubmit').on('click', function() {
-								EcomSalesReport.reject();
-							});
+			$("#txtToDate").datepicker({
+				dateFormat : "dd-mm-yy"
+			});
+			$("#txtFromDate").datepicker({
+				dateFormat : "dd-mm-yy"
+			});
 
-							$('#btnDownload')
-									.on(
-											'click',
-											function() {
-												var tblEcomSalesReport = $("#tblEcomSalesReport tbody");
-												if (tblEcomSalesReport
-														.children().length == 0) {
-													alert("no values available");
-													return;
-												}
-												if (tblEcomSalesReport[0].textContent == "No data available") {
-													alert("no values available");
-													return;
-												}
-												EcomSalesReport
-														.downloadXls();
-											});
+			$('#myFormSubmit').on('click', function() {
+				EcomSalesReport.reject();
+			});
 
-							/* EcomSalesReport.filter(); */
+			$('#btnDownload').on('click', function() {
+				var tblEcomSalesReport = $("#tblEcomSalesReport tbody");
+				if (tblEcomSalesReport.children().length == 0) {
+					alert("no values available");
+					return;
+				}
+				if (tblEcomSalesReport[0].textContent == "No data available") {
+					alert("no values available");
+					return;
+				}
+				EcomSalesReport.downloadXls();
+			});
 
-						});
+			/* EcomSalesReport.filter(); */
+
+		});
 
 		function getParameterByName(name, url) {
 			if (!url)
