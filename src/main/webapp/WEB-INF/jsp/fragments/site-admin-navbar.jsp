@@ -16,6 +16,7 @@
 <spring:url value="/web/user-menu" var="userMenuItems"></spring:url>
 <spring:url value="/web/syncOperation" var="syncOperation"></spring:url>
 <spring:url value="/web/mobile-configuration" var="mobileConfiguration"></spring:url>
+<spring:url value="/web/mobile-master-update" var="mobileMasterUpdate"></spring:url>
 <spring:url value="/web/sync-operation-time" var="syncOperationTime"></spring:url>
 <spring:url value="/web/document-print-email" var="documentPrintEmail"></spring:url>
 <spring:url value="/web/company-user-devices" var="companyUserDevice"></spring:url>
@@ -143,6 +144,9 @@
 </a></li>
 <li><a href="${mobileConfiguration}"> <i class="entypo-users"></i>
 		<span class="title">Mobile Configuration</span>
+</a></li>
+<li><a href="${mobileMasterUpdate}"> <i class="entypo-users"></i>
+		<span class="title">Mobile Master Update</span>
 </a></li>
 
 <li><a href="${syncOperation}"> <i class="entypo-users"></i> <span

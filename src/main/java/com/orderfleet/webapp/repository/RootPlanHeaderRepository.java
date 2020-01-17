@@ -39,4 +39,10 @@ public interface RootPlanHeaderRepository extends JpaRepository<RootPlanHeader, 
 
 	@Query("select rootPlanHeader from RootPlanHeader rootPlanHeader where rootPlanHeader.company.id =?#{principal.companyId} and rootPlanHeader.user.pid=?1 and rootPlanHeader.activated =?2")
 	List<RootPlanHeader> findAllByUserPidAndActivated(String userPid, boolean activated);
+
+	@Query("select rootPlanHeader from RootPlanHeader rootPlanHeader where rootPlanHeader.company.id =?#{principal.companyId} and rootPlanHeader.user.id in ?1 and rootPlanHeader.activated =?2")
+	List<RootPlanHeader> findAllByUserIdsInAndActivated(List<Long> userIds, boolean activated);
+
+	@Query("select rootPlanHeader from RootPlanHeader rootPlanHeader where rootPlanHeader.company.id =?#{principal.companyId} and rootPlanHeader.user.id in ?1")
+	List<RootPlanHeader> findAllByUserIdsIn(List<Long> userIds);
 }

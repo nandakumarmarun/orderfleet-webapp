@@ -90,4 +90,8 @@ public interface RootPlanHeaderService {
 
 	List<RootPlanHeaderDTO> findAllByUserPidAndActivated(String userPid, boolean active);
 
+	List<RootPlanHeaderDTO> findAllByUserIdsInAndActivated(List<Long> userIds,boolean activated);
+
+	List<RootPlanHeaderDTO> findAllByUserIdsInAndCompany(List<Long> userIds);
+
 }

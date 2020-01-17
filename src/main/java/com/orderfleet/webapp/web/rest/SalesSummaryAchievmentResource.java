@@ -23,15 +23,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.ProductGroupSalesTargetGroup;
 import com.orderfleet.webapp.domain.SalesSummaryAchievment;
 import com.orderfleet.webapp.domain.SalesTargetGroup;
+import com.orderfleet.webapp.repository.ProductGroupSalesTargetGrouprepository;
 import com.orderfleet.webapp.repository.SalesTargetGroupUserTargetRepository;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileLocationService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
+import com.orderfleet.webapp.service.ProductGroupSalesTargetGroupService;
+import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.SalesSummaryAchievmentService;
+import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductGroupSalesTargetGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesSummaryAchievmentDTO;
 
 /**
@@ -61,11 +67,17 @@ public class SalesSummaryAchievmentResource {
 	@Inject
 	private EmployeeProfileLocationService employeeProfileLocationService;
 
+	@Inject
+	private ProductGroupService productGroupService;
+
+	@Inject
+	private ProductGroupSalesTargetGrouprepository productGroupSalesTargetGroupRepository;
+
 	/**
 	 * GET /sales-summary-achievments : get salesSummaryAchievments.
 	 *
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/sales-summary-achievments", method = RequestMethod.GET)
 	@Timed
@@ -78,19 +90,20 @@ public class SalesSummaryAchievmentResource {
 		} else {
 			model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
 		}
+
+		model.addAttribute("productGroups", productGroupService.findAllByCompanyAndDeactivatedProductGroup(true));
+
 		return "company/salesSummaryAchievments";
 	}
 
 	/**
 	 * POST /sales-summary-achievments : Create a new salesSummaryAchievment.
 	 *
-	 * @param salesSummaryAchievmentDTO
-	 *            the salesSummaryAchievmentDTO to create
-	 * @return the ResponseEntity with status 201 (Created) and with body the
-	 *         new salesSummaryAchievmentDTO, or with status 400 (Bad Request)
-	 *         if the salesSummaryAchievment has already an ID
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @param salesSummaryAchievmentDTO the salesSummaryAchievmentDTO to create
+	 * @return the ResponseEntity with status 201 (Created) and with body the new
+	 *         salesSummaryAchievmentDTO, or with status 400 (Bad Request) if the
+	 *         salesSummaryAchievment has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/sales-summary-achievments", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -104,11 +117,20 @@ public class SalesSummaryAchievmentResource {
 
 	@RequestMapping(value = "/sales-summary-achievments/monthly-data", method = RequestMethod.GET)
 	public @ResponseBody List<SalesSummaryAchievmentDTO> monthlySalesSummaryAchievment(@RequestParam String employeePid,
-			@RequestParam String locationPid,
+			@RequestParam String locationPid, @RequestParam String productGroupPid,
 			@RequestParam(value = "date", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 		log.debug("Web request to get Sales Summary Achievments");
-		List<SalesTargetGroup> userSalesTargetGroups = salesTargetGroupUserTargetRepository
-				.findAllSalesTargetGroupByCompanyId();
+		List<SalesTargetGroup> userSalesTargetGroups = new ArrayList<>();
+
+		if (productGroupPid.equalsIgnoreCase("no")) {
+			userSalesTargetGroups = salesTargetGroupUserTargetRepository.findAllSalesTargetGroupByCompanyId();
+		} else {
+
+			userSalesTargetGroups = productGroupSalesTargetGroupRepository
+					.findSalesTargetGroupByProductGroupPid(productGroupPid);
+
+		}
+
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
 		if (!employeePid.equals("-1")) {
 			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
@@ -140,6 +162,9 @@ public class SalesSummaryAchievmentResource {
 					}
 					salesSummaryAchievmentDTOs.add(salesSummaryAchievmentDTO);
 				}
+
+				salesSummaryAchievmentDTOs.sort((SalesSummaryAchievmentDTO s1, SalesSummaryAchievmentDTO s2) -> s1
+						.getSalesTargetGroupName().toLowerCase().compareTo(s2.getSalesTargetGroupName().toLowerCase()));
 				return salesSummaryAchievmentDTOs;
 			}
 		}

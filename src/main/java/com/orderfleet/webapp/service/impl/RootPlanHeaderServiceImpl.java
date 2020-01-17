@@ -277,4 +277,27 @@ public class RootPlanHeaderServiceImpl implements RootPlanHeaderService {
 		return rootPlanHeaderDTOs;
 	}
 
+	@Override
+	public List<RootPlanHeaderDTO> findAllByUserIdsInAndActivated(List<Long> userIds, boolean activated) {
+		List<RootPlanHeader> rootPlanHeaders = rootPlanHeaderRepository.findAllByUserIdsInAndActivated(userIds,
+				activated);
+		List<RootPlanHeaderDTO> rootPlanHeaderDTOs = new ArrayList<>();
+		for (RootPlanHeader rootPlanHeader : rootPlanHeaders) {
+			RootPlanHeaderDTO rootPlanHeaderDTO = new RootPlanHeaderDTO(rootPlanHeader);
+			rootPlanHeaderDTOs.add(rootPlanHeaderDTO);
+		}
+		return rootPlanHeaderDTOs;
+	}
+
+	@Override
+	public List<RootPlanHeaderDTO> findAllByUserIdsInAndCompany(List<Long> userIds) {
+		List<RootPlanHeader> rootPlanHeaders = rootPlanHeaderRepository.findAllByUserIdsIn(userIds);
+		List<RootPlanHeaderDTO> rootPlanHeaderDTOs = new ArrayList<>();
+		for (RootPlanHeader rootPlanHeader : rootPlanHeaders) {
+			RootPlanHeaderDTO rootPlanHeaderDTO = new RootPlanHeaderDTO(rootPlanHeader);
+			rootPlanHeaderDTOs.add(rootPlanHeaderDTO);
+		}
+		return rootPlanHeaderDTOs;
+	}
+
 }
