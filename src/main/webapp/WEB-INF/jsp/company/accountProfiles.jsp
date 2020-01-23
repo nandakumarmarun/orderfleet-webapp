@@ -206,7 +206,7 @@
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="field_tinNo">GSTIN</label> <input type="text" class="form-control"
-										name="tinNo" id="field_tinNo" maxlength="8"
+										name="tinNo" id="field_tinNo" maxlength="30"
 										placeholder="GSTIN" />
 								</div>
 								<div class="form-group">
