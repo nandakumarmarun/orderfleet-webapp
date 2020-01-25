@@ -1799,7 +1799,13 @@ public class TransactionResource {
 			inventoryVoucherHeaderDTO.setSalesManagementStatus(SalesManagementStatus.valueOf(obj[29].toString()));
 
 		}
-
+		inventoryVoucherHeaderDTO.setDocumentTotalUpdated(Double.parseDouble(obj[30].toString()));
+		inventoryVoucherHeaderDTO.setDocumentVolumeUpdated(Double.parseDouble(obj[31].toString()));
+		inventoryVoucherHeaderDTO.setUpdatedStatus(Boolean.getBoolean(obj[32].toString()));
+		if(inventoryVoucherHeaderDTO.getUpdatedStatus()) {
+			inventoryVoucherHeaderDTO.setDocumentTotal(inventoryVoucherHeaderDTO.getDocumentTotalUpdated());
+			inventoryVoucherHeaderDTO.setDocumentVolume(inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
+		}
 		return inventoryVoucherHeaderDTO;
 	}
 }

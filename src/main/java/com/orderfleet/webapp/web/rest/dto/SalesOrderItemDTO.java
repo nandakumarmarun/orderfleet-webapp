@@ -58,6 +58,9 @@ public class SalesOrderItemDTO {
 	private Long referenceInventoryVoucherDetailId;
 	private String remarks;
 	private String stockLocationName;
+	private double updatedQuantity;
+	private double updatedRowTotal;
+	private boolean updateStatus;
 
 	public SalesOrderItemDTO() {
 		super();
@@ -121,6 +124,13 @@ public class SalesOrderItemDTO {
 		this.remarks = inventoryVoucherDetail.getRemarks();
 		this.inventoryVoucherBatchDetailsDTO = inventoryVoucherDetail.getInventoryVoucherBatchDetails().stream()
 				.map(InventoryVoucherBatchDetailDTO::new).collect(Collectors.toList());
+		this.updatedQuantity = inventoryVoucherDetail.getUpdatedQuantity();
+		this.updatedRowTotal = inventoryVoucherDetail.getUpdatedRowTotal();
+		this.updateStatus = inventoryVoucherDetail.getUpdatedStatus();
+		if(inventoryVoucherDetail.getUpdatedStatus()) {
+			this.rowTotal = inventoryVoucherDetail.getUpdatedRowTotal();
+			this.quantity = inventoryVoucherDetail.getUpdatedQuantity();
+		}
 	}
 
 	public Long getItemId() {
@@ -458,6 +468,30 @@ public class SalesOrderItemDTO {
 
 	public void setStockLocationName(String stockLocationName) {
 		this.stockLocationName = stockLocationName;
+	}
+	
+	public double getUpdatedQuantity() {
+		return updatedQuantity;
+	}
+
+	public void setUpdatedQuantity(double updatedQuantity) {
+		this.updatedQuantity = updatedQuantity;
+	}
+
+	public double getUpdatedRowTotal() {
+		return updatedRowTotal;
+	}
+
+	public void setUpdatedRowTotal(double updatedRowTotal) {
+		this.updatedRowTotal = updatedRowTotal;
+	}
+
+	public boolean isUpdateStatus() {
+		return updateStatus;
+	}
+
+	public void setUpdateStatus(boolean updateStatus) {
+		this.updateStatus = updateStatus;
 	}
 
 	@Override

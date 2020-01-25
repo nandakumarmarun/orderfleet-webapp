@@ -3,10 +3,11 @@ package com.orderfleet.webapp.domain.util;
 import java.sql.Types;
 
 import org.hibernate.dialect.PostgreSQL82Dialect;
+import org.hibernate.dialect.PostgreSQL94Dialect;
 import org.hibernate.type.descriptor.sql.BinaryTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
-public class FixedPostgreSQL82Dialect extends PostgreSQL82Dialect {
+public class FixedPostgreSQL82Dialect extends PostgreSQL94Dialect {
 
     public FixedPostgreSQL82Dialect() {
         super();
