@@ -67,6 +67,7 @@ if (!this.SalesSummaryAchievment) {
 				employeePid : employeePid,
 				date : achievedDate,
 				locationPid:$('#dbLocation').val(),
+				productGroupPid:$('#productGroup').val()
 			},
 			success : function(salesSummaryAchievments) {
 				addRowsToTable(salesSummaryAchievments);

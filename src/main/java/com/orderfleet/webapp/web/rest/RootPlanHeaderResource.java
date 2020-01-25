@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -26,11 +27,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.RootPlanDetailService;
 import com.orderfleet.webapp.service.RootPlanHeaderService;
 import com.orderfleet.webapp.service.TaskListService;
 import com.orderfleet.webapp.service.UserService;
+import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.RootPlanDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.RootPlanHeaderAndDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.RootPlanHeaderDTO;
@@ -53,31 +57,49 @@ public class RootPlanHeaderResource {
 
 	@Inject
 	private UserService userService;
-	
+
 	@Inject
 	private EmployeeHierarchyService employeeHierarchyService;
+
+	@Inject
+	private EmployeeProfileRepository employeeProfileRepository;
 
 	/**
 	 * GET /root-plan-headers : get all the root Plan Headers.
 	 *
-	 * @return the ResponseEntity with status 200 (OK) and the list of root
-	 *         Plans in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @return the ResponseEntity with status 200 (OK) and the list of root Plans in
+	 *         body
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/root-plan-headers", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
 	public String getAllRootPlanHeaders(Model model) throws URISyntaxException {
 		log.debug("Web request to get page of root plan");
-		
+
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-		log.info("No: subordinate users :"+userIds);
-		if(userIds.isEmpty()) {
-			model.addAttribute("users", userService.findAllByCompany());
-		} else {
-			model.addAttribute("users", userService.findByUserIdIn(userIds));
+		log.info("No: subordinate users :" + userIds);
+//		if(userIds.isEmpty()) {
+//			model.addAttribute("users", userService.findAllByCompany());
+//		} else {
+//			model.addAttribute("users", userService.findByUserIdIn(userIds));
+//		}
+
+		if (userIds.isEmpty()) {
+			List<EmployeeProfile> employeeProfiles = employeeProfileRepository
+					.findAllByCompanyAndDeativatedEmployeeProfile(true);
+
+			userIds = employeeProfiles.stream().map(emp -> emp.getUser() != null ? emp.getUser().getId() : 0)
+					.collect(Collectors.toList());
 		}
+		List<UserDTO> userDtos = userService.findByUserIdIn(userIds);
+
+		userDtos.sort(
+				(UserDTO s1, UserDTO s2) -> s1.getFirstName().toLowerCase().compareTo(s2.getFirstName().toLowerCase()));
+
+		model.addAttribute("users", userDtos);
+
 		model.addAttribute("taskLists", taskListService.findAllByCompany());
 		return "company/rootPlanHeader";
 	}
@@ -86,8 +108,8 @@ public class RootPlanHeaderResource {
 	 * POST /root-plan-headers : save RootPlanHeaderDTO.
 	 *
 	 * @return the ResponseEntity with status 200 (OK)
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@Timed
 	@ResponseBody
@@ -137,8 +159,8 @@ public class RootPlanHeaderResource {
 	 *
 	 * @return the ResponseEntity with status 200 (OK) and the list of
 	 *         RootPlanHeaderDTO list in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/root-plan-headers/{id}", method = RequestMethod.GET)
 	public ResponseEntity<RootPlanHeaderDTO> getRootPlanHeaderById(@PathVariable String id) {
@@ -152,8 +174,8 @@ public class RootPlanHeaderResource {
 	 * PUT /root-plan-headers : update RootPlanHeaderDTO.
 	 *
 	 * @return the ResponseEntity with status 200 (OK)
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@Timed
 	@RequestMapping(value = "/root-plan-headers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -212,8 +234,7 @@ public class RootPlanHeaderResource {
 	/**
 	 * DELETE /root-plan-headers/:id : delete the "id" RootPlanHeader.
 	 *
-	 * @param id
-	 *            the id of the rootPlanHeaderDTO to delete
+	 * @param id the id of the rootPlanHeaderDTO to delete
 	 * @return the ResponseEntity with status 200 (OK)
 	 */
 	@RequestMapping(value = "/root-plan-headers/{pid}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -231,8 +252,8 @@ public class RootPlanHeaderResource {
 	 *
 	 * @return the ResponseEntity with status 200 (OK) and the list of
 	 *         RootPlanHeaderTaskListDTO list in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/root-plan-headers/loadTaskList/{id}", method = RequestMethod.GET)
 	public ResponseEntity<List<RootPlanDetailDTO>> getAssignTaskListById(@PathVariable String id) {
@@ -245,8 +266,8 @@ public class RootPlanHeaderResource {
 	 * POST /root-plan-headers/assignTasklist : save RootPlanDetailDTO.
 	 *
 	 * @return the ResponseEntity with status 200 (OK)
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP details
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP details
 	 */
 	@Timed
 	@ResponseBody
@@ -265,8 +286,8 @@ public class RootPlanHeaderResource {
 	 *
 	 * @return the ResponseEntity with status 200 (OK) and the list of
 	 *         RootPlanHeaderTaskListDTO list in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/root-plan-headers/changeStatus", method = RequestMethod.GET)
 	public ResponseEntity<Boolean> changeActivateStatus(@RequestParam String userPid,
@@ -305,8 +326,8 @@ public class RootPlanHeaderResource {
 	 * RootPlanDetailDTO.
 	 *
 	 * @return the ResponseEntity with status 200 (OK)
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP details
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP details
 	 */
 	@Timed
 	@ResponseBody
@@ -340,6 +361,9 @@ public class RootPlanHeaderResource {
 		log.debug("Web request to filter RootPlanHeader");
 		List<RootPlanHeaderDTO> rootPlanHeaderDTOs = new ArrayList<>();
 		rootPlanHeaderDTOs = getFilterData(userPid, active);
+		rootPlanHeaderDTOs.sort((RootPlanHeaderDTO s1, RootPlanHeaderDTO s2) -> s1.getUserName().toLowerCase()
+				.compareTo(s2.getUserName().toLowerCase()));
+
 		return new ResponseEntity<List<RootPlanHeaderDTO>>(rootPlanHeaderDTOs, HttpStatus.OK);
 
 	}
@@ -347,12 +371,28 @@ public class RootPlanHeaderResource {
 	private List<RootPlanHeaderDTO> getFilterData(String userPid, String active) {
 		List<RootPlanHeaderDTO> result = new ArrayList<>();
 		if (userPid.equals("no")) {
+//			if (active.equals("Active")) {
+//				result = rootPlanHeaderService.findAllByActivated(true);
+//			} else if (active.equals("Deactive")) {
+//				result = rootPlanHeaderService.findAllByActivated(false);
+//			} else {
+//				result = rootPlanHeaderService.findAllByCompany();
+//			}
+
+			List<Long> userIds = new ArrayList<>();
+
+			List<EmployeeProfile> employeeProfiles = employeeProfileRepository
+					.findAllByCompanyAndDeativatedEmployeeProfile(true);
+
+			userIds = employeeProfiles.stream().map(emp -> emp.getUser() != null ? emp.getUser().getId() : 0)
+					.collect(Collectors.toList());
+
 			if (active.equals("Active")) {
-				result = rootPlanHeaderService.findAllByActivated(true);
+				result = rootPlanHeaderService.findAllByUserIdsInAndActivated(userIds, true);
 			} else if (active.equals("Deactive")) {
-				result = rootPlanHeaderService.findAllByActivated(false);
+				result = rootPlanHeaderService.findAllByUserIdsInAndActivated(userIds, false);
 			} else {
-				result = rootPlanHeaderService.findAllByCompany();
+				result = rootPlanHeaderService.findAllByUserIdsInAndCompany(userIds);
 			}
 		} else {
 			if (active.equals("Active")) {

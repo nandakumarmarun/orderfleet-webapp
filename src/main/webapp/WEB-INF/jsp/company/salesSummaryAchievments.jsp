@@ -35,10 +35,20 @@
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
 							<div class="col-sm-3">
-								<select id="dbEmployee" class="form-control" onchange="SalesSummaryAchievment.onLoadLocation();">
+								<select id="dbEmployee" class="form-control"
+									onchange="SalesSummaryAchievment.onLoadLocation();">
 									<option value="-1">Select Employee</option>
 									<c:forEach items="${employees}" var="employee">
 										<option value="${employee.pid}">${employee.name}</option>
+									</c:forEach>
+								</select>
+							</div>
+							<div class="col-sm-3">
+								<select id="productGroup" name="productGroupPid"
+									class="form-control"><option value="no">All
+										ProductGroup</option>
+									<c:forEach items="${productGroups}" var="productGroup">
+										<option value="${productGroup.pid}">${productGroup.name}</option>
 									</c:forEach>
 								</select>
 							</div>
@@ -66,7 +76,7 @@
 							<!-- <div class="col-sm-1">
 								<button id="btnProductNoTarget" type="button" class="btn btn-info">Show Products With Out Target</button>
 							</div> -->
-							
+
 						</div>
 					</form>
 				</div>

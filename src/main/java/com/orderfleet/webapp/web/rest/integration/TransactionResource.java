@@ -1712,6 +1712,7 @@ public class TransactionResource {
 		if (employeeProfile != null) {
 			salesOrderDTO.setEmployeeAlias(employeeProfile.getAlias());
 		}
+		salesOrderDTO.setActivityRemarks(executiveTaskExecution.getRemarks()!=null?executiveTaskExecution.getRemarks():"");
 		return salesOrderDTO;
 	}
 
