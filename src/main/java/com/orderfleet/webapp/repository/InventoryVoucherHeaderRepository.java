@@ -521,7 +521,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	//FOR VAN SALES TO TALLY
 	public static final String DOCUMENT_BASED_ORDER_DOWNLOAD_TALLY = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
-			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status "
+			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status  "
 			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and document_id IN(?1) and company_id = ?#{principal.companyId} order by created_date desc";
 
 	public static final String DOCUMENT_BASED_ORDER_MANAGEMENT_DOWNLOAD_TALLY = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
