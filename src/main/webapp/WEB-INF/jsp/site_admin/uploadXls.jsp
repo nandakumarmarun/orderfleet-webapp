@@ -139,6 +139,16 @@
 											<td><input type="number" id="territoryColumnNumber"
 												maxlength="2" placeholder="Territory Column Number" /></td>
 										</tr>
+										<tr>
+											<td>Alias</td>
+											<td><input type="number" id="aliasColumnNumber"
+												maxlength="2" placeholder="Alias Column Number" /></td>
+										</tr>
+										<tr>
+											<td>Closing Balance(Text Format Required)</td>
+											<td><input type="number" id="closingBalanceColumnNumber"
+												maxlength="2" placeholder="Closing Balance Column Number" /></td>
+										</tr>
 									</table>
 								</div>
 							</div>
@@ -213,6 +223,16 @@
 										<tr>
 											<td>Size</td>
 											<td><input type="number" id="productSizeColumnNumber"
+												maxlength="2" placeholder="Size Column Number" /></td>
+										</tr>
+										<tr>
+											<td>Opening Stock</td>
+											<td><input type="number" id="productOpeningStockColumnNumber"
+												maxlength="2" placeholder="Opening Stock" /></td>
+										</tr>
+										<tr>
+											<td>Product Group</td>
+											<td><input type="number" id="productGroupColumnNumber"
 												maxlength="2" placeholder="Size Column Number" /></td>
 										</tr>
 									</table>

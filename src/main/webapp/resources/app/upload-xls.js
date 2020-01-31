@@ -12,9 +12,9 @@ if (!this.xlsFileUploader) {
 			+ location.pathname;
 
 	$(document).ready(function() {
-		
+
 		$('.selectpicker').selectpicker();
-		
+
 		$('#assignAccountColumnNumbers').on('click', function() {
 			assignAccountColumnNumbers();
 		});
@@ -30,6 +30,9 @@ if (!this.xlsFileUploader) {
 	});
 
 	function saveAccountXls() {
+
+		$(".error-msg").html("Saving....");
+
 		var accountNumbers = "";
 		var nameNumber = $('#nameColumnNumber').val();
 		var addressNumber = $('#addressColumnNumber').val();
@@ -42,6 +45,8 @@ if (!this.xlsFileUploader) {
 		var contactPersonNumber = $('#contactPersonColumnNumber').val();
 		var accountTypeColumnNumber = $('#accountTypeColumnNumber').val();
 		var territoryColumnNumber = $('#territoryColumnNumber').val();
+		var aliasColumnNumber = $("#aliasColumnNumber").val();
+		var closingBalanceColumnNumber = $("#closingBalanceColumnNumber").val();
 
 		if (nameNumber == '') {
 			$('#alertMessage').html("please assign name column number");
@@ -78,9 +83,18 @@ if (!this.xlsFileUploader) {
 		if (territoryColumnNumber == '') {
 			territoryColumnNumber = -1;
 		}
+		if (aliasColumnNumber == '') {
+			aliasColumnNumber = -1;
+		}
+		if (closingBalanceColumnNumber == '') {
+			closingBalanceColumnNumber = -1;
+		}
 		accountNumbers = nameNumber + "," + addressNumber + "," + cityNumber
 				+ "," + locationNumber + "," + pinNumber + "," + phoneNumber
-				+ "," + eMailNumber + "," + descriptionNumber + "," + contactPersonNumber + "," + accountTypeColumnNumber+ "," + territoryColumnNumber;
+				+ "," + eMailNumber + "," + descriptionNumber + ","
+				+ contactPersonNumber + "," + accountTypeColumnNumber + ","
+				+ territoryColumnNumber + "," + aliasColumnNumber + ","
+				+ closingBalanceColumnNumber;
 		if (accountNumbers == '') {
 			$('#alertMessage').html("please assign column numbers");
 			$('#alertBox').modal("show");
@@ -88,29 +102,36 @@ if (!this.xlsFileUploader) {
 		}
 
 		var accountXls = new FormData();
-		
+
 		accountXls.append("file", $('#txtAccountFile')[0].files[0]);
 		accountXls.append('companyId', $('#field_company').val());
 		accountXls.append('accountNumbers', accountNumbers);
-		$.ajax({
-			type : 'POST',
-			url : uploadXlsContextPath + "/saveAccountXls",
-			data : accountXls,
-			cache : false,
-			contentType : false,
-			processData : false,
+		$
+				.ajax({
+					type : 'POST',
+					url : uploadXlsContextPath + "/saveAccountXls",
+					data : accountXls,
+					cache : false,
+					contentType : false,
+					processData : false,
 
-			success : function(data) {
-				onSaveSuccess(data);
-			},
-			error : function(xhr, error) {
-				console.log("Error uploading excel .................");
-			}
-		});
+					success : function(data) {
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading excel .................");
+						$(".error-msg").html(
+								"Error uploading excel .................");
+					}
+				});
 
 	}
 
 	function saveProductXls() {
+
+		$(".error-msg").html("Saving....");
+
 		var productNumbers = "";
 		var nameNumber = $('#productNameColumnNumber').val();
 		var alias = $('#productAliasColumnNumber').val();
@@ -120,10 +141,11 @@ if (!this.xlsFileUploader) {
 		var unitQuantityNumber = $('#productUnitQuantityColumnNumber').val();
 		var TaxRateNumber = $('#productTaxRateColumnNumber').val();
 		var sizeNumber = $('#productSizeColumnNumber').val();
+		var openingStockNumber = $('#productOpeningStockColumnNumber').val();
+		var productGroupNumber = $('#productGroupColumnNumber').val();
 
 		if (nameNumber == '') {
-			$('#alertMessage')
-					.html("please assign product name column number");
+			$('#alertMessage').html("please assign product name column number");
 			$('#alertBox').modal("show");
 			return false;
 		}
@@ -148,10 +170,17 @@ if (!this.xlsFileUploader) {
 		if (sizeNumber == '') {
 			sizeNumber = -1;
 		}
+		if (openingStockNumber == '') {
+			openingStockNumber = -1;
+		}
+		if (productGroupNumber == '') {
+			productGroupNumber = -1;
+		}
 
 		productNumbers = nameNumber + "," + alias + "," + descriptionNumber
 				+ "," + priceNumber + "," + skuNumber + ","
-				+ unitQuantityNumber + "," + TaxRateNumber + "," + sizeNumber;
+				+ unitQuantityNumber + "," + TaxRateNumber + "," + sizeNumber
+				+ "," + openingStockNumber + "," + productGroupNumber;
 		if (productNumbers == '') {
 			$('#alertMessage').html("please assign column numbers");
 			$('#alertBox').modal("show");
@@ -162,25 +191,30 @@ if (!this.xlsFileUploader) {
 		productXls.append("file", $('#txtProductFile')[0].files[0]);
 		productXls.append('companyId', $('#field_company').val());
 		productXls.append('productNumbers', productNumbers);
-		$.ajax({
-			type : 'POST',
-			url : uploadXlsContextPath + "/saveProductXls",
-			data : productXls,
-			cache : false,
-			contentType : false,
-			processData : false,
+		$
+				.ajax({
+					type : 'POST',
+					url : uploadXlsContextPath + "/saveProductXls",
+					data : productXls,
+					cache : false,
+					contentType : false,
+					processData : false,
 
-			success : function(data) {
-				onSaveSuccess(data);
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			}
-		});
+					success : function(data) {
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading excel .................");
+						$(".error-msg").html(
+								"Error uploading excel .................");
+					}
+				});
 
 	}
 
 	function assignAccountColumnNumbers() {
+		$(".error-msg").html("");
 		if ($('#field_company').val() == -1) {
 			$('#alertMessage').html("please select company");
 			$('#alertBox').modal("show");
@@ -207,6 +241,7 @@ if (!this.xlsFileUploader) {
 	}
 
 	function assignProductColumnNumbers() {
+		$(".error-msg").html("");
 		if ($('#field_company').val() == -1) {
 			$('#alertMessage').html("please select company");
 			$('#alertBox').modal("show");
