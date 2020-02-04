@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -60,7 +59,6 @@ import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
-import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.OpeningStockService;
@@ -134,6 +132,7 @@ public class UploadXlsResource {
 		return "site_admin/uploadXls";
 	}
 
+	@SuppressWarnings("deprecation")
 	@RequestMapping(value = "/upload-xls/saveAccountXls", method = RequestMethod.POST)
 	@Timed
 	public ResponseEntity<Void> saveAssignedAccountProfiles(MultipartHttpServletRequest request) {
@@ -403,6 +402,7 @@ public class UploadXlsResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@SuppressWarnings("deprecation")
 	@RequestMapping(value = "/upload-xls/saveProductXls", method = RequestMethod.POST)
 	@Timed
 	public ResponseEntity<Void> saveAssignedProductProfiles(MultipartHttpServletRequest request) {
@@ -515,9 +515,11 @@ public class UploadXlsResource {
 						if (row.getCell(unitQuantityNumber).getCellType() == 1) {
 							unitQty = String.valueOf(row.getCell(unitQuantityNumber).getStringCellValue());
 						}
-						double unitQuantity = Double.parseDouble(unitQty);
+						double unitQuantity = 0.0;
 						if (unitQty == null || unitQty.isEmpty()) {
 							unitQuantity = 0.0;
+						} else {
+							unitQuantity = Double.parseDouble(unitQty);
 						}
 						productProfile.setUnitQty(unitQuantity);
 					}

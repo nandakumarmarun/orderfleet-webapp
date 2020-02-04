@@ -82,8 +82,8 @@ if (!this.InventoryVoucher) {
 								convertDateTimeFromServer(data.createdDate));
 						$('#lbl_receiver').text(data.receiverAccountName);
 						$('#lbl_supplier').text(data.supplierAccountName);
-						$('#lbl_documentTotal').text(data.updatedStatus ? data.documentTotalUpdated :data.documentTotal);
-						$('#lbl_documentVolume').text(data.updatedStatus ? data.documentVolumeUpdated : data.documentVolume);
+						$('#lbl_documentTotal').text(data.updatedStatus ? (data.documentTotalUpdated).toFixed(2) :data.documentTotal);
+						$('#lbl_documentVolume').text(data.updatedStatus ? (data.documentVolumeUpdated).toFixed(2) : data.documentVolume);
 						$('#lbl_documentDiscountAmount').text(
 								data.docDiscountAmount);
 						$('#lbl_documentDiscountPercentage').text(
@@ -121,7 +121,7 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ voucherDetail.discountPercentage
 																	+ "</td><td>"
-																	+ (voucherDetail.updatedStatus ? voucherDetail.updatedRowTotal:voucherDetail.rowTotal)
+																	+ (voucherDetail.updatedStatus ? (voucherDetail.updatedRowTotal).toFixed(2):voucherDetail.rowTotal)
 																	+ "</td></tr>");
 
 											$

@@ -151,7 +151,7 @@ public class SalesPerformanceManagementResource {
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
-	
+
 	@Inject
 	private InventoryVoucherDetailService inventoryVoucherDetailService;
 
@@ -212,7 +212,7 @@ public class SalesPerformanceManagementResource {
 
 			Optional<CompanyConfiguration> opCompanyConfigurationSalesEdit = companyConfigurationRepository
 					.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_EDIT_ENABLED);
-			
+
 			Double ivTotalVolume = inventoryVoucherDTO.getInventoryVoucherDetails().stream()
 					.collect(Collectors.summingDouble(ivd -> {
 						if (ivd.getProductUnitQty() != null) {
@@ -224,10 +224,10 @@ public class SalesPerformanceManagementResource {
 
 			// checking tax rate in product group if product does not have tax rate
 			for (InventoryVoucherDetailDTO ivd : inventoryVoucherDTO.getInventoryVoucherDetails()) {
-				if(opCompanyConfigurationSalesEdit.isPresent()) {
+				if (opCompanyConfigurationSalesEdit.isPresent()) {
 					if (opCompanyConfigurationSalesEdit.get().getValue().equals("true")) {
 						ivd.setEditOrder(true);
-					} 
+					}
 				}
 				if (ivd.getTaxPercentage() == 0) {
 					ProductGroup pg = productGroupProductRepository.findProductGroupByProductPid(ivd.getProductPid())
@@ -332,10 +332,13 @@ public class SalesPerformanceManagementResource {
 		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
 //		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
 //				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
-		
-		//nested ternary operator
-		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
-				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : ((Boolean)obj[6] ? obj[5] :obj[4])) * (Double) obj[3]))));
+
+		// nested ternary operator
+		Map<String, Double> ivTotalVolume = ivDetails.stream()
+				.collect(Collectors.groupingBy(obj -> obj[0].toString(),
+						Collectors.summingDouble(
+								obj -> ((Double) (obj[3] == null ? 1.0d : ((Boolean) obj[6] ? obj[5] : obj[4]))
+										* (Double) obj[3]))));
 
 		boolean pdfDownloadButtonStatus = false;
 		boolean orderEdit = false;
@@ -343,9 +346,7 @@ public class SalesPerformanceManagementResource {
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
 		Optional<CompanyConfiguration> opCompanyConfigurationSalesEdit = companyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_EDIT_ENABLED);
-		
-		
-		
+
 		if (opCompanyConfigurationPdfDownload.isPresent()) {
 
 			if (opCompanyConfigurationPdfDownload.get().getValue().equals("true")) {
@@ -354,7 +355,7 @@ public class SalesPerformanceManagementResource {
 				pdfDownloadButtonStatus = false;
 			}
 		}
-		
+
 		if (opCompanyConfigurationSalesEdit.isPresent()) {
 
 			if (opCompanyConfigurationSalesEdit.get().getValue().equals("true")) {
@@ -363,7 +364,7 @@ public class SalesPerformanceManagementResource {
 				orderEdit = false;
 			}
 		}
-
+		DecimalFormat df = new DecimalFormat("0.00");
 		int size = inventoryVouchers.size();
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
@@ -396,9 +397,12 @@ public class SalesPerformanceManagementResource {
 			salesPerformanceDTO.setPdfDownloadStatus(Boolean.valueOf(ivData[19].toString()));
 
 			salesPerformanceDTO.setSalesManagementStatus(SalesManagementStatus.valueOf(ivData[20].toString()));
-			
-			salesPerformanceDTO.setDocumentTotalUpdated(ivData[21] != null ? Double.parseDouble(ivData[21].toString()) : 0.0);
-			salesPerformanceDTO.setDocumentVolumeUpdated(ivData[22] != null ? Double.parseDouble(ivData[22].toString()) : 0.0);
+
+			salesPerformanceDTO.setDocumentTotalUpdated(
+					ivData[21] != null ? Double.parseDouble(df.format(Double.parseDouble(ivData[21].toString())))
+							: 0.0);
+			salesPerformanceDTO
+					.setDocumentVolumeUpdated(ivData[22] != null ? Double.parseDouble(ivData[22].toString()) : 0.0);
 			salesPerformanceDTO.setUpdatedStatus(ivData[23] != null ? Boolean.valueOf(ivData[23].toString()) : false);
 			salesPerformanceDTO.setEditOrder(orderEdit);
 			salesPerformanceDTOs.add(salesPerformanceDTO);
@@ -608,20 +612,21 @@ public class SalesPerformanceManagementResource {
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
 	}
-	
+
 	@RequestMapping(value = "/sales-performance-management/updateInventory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> updateInventoryDetail(@RequestParam long id,
-			@RequestParam long quantity,@RequestParam String ivhPid) {
+			@RequestParam long quantity, @RequestParam String ivhPid) {
 		System.out.println("------------------------------------------------------------------------");
-		System.out.println("quantity : "+quantity+"\n Id :"+id+" \n IVHPid : "+ivhPid);
+		System.out.println("quantity : " + quantity + "\n Id :" + id + " \n IVHPid : " + ivhPid);
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
 		List<InventoryVoucherDetailDTO> ivdList = inventoryVoucherHeaderDTO.getInventoryVoucherDetails();
-		Optional<InventoryVoucherDetailDTO> opIvDetail = ivdList.stream().filter(ivd -> ivd.getDetailId() == id).findAny();
-		
-		if(opIvDetail.isPresent()) {
+		Optional<InventoryVoucherDetailDTO> opIvDetail = ivdList.stream().filter(ivd -> ivd.getDetailId() == id)
+				.findAny();
+
+		if (opIvDetail.isPresent()) {
 			InventoryVoucherDetailDTO ivdDto = opIvDetail.get();
-			//ivdDto.setUpdatedQty(quantity);
+			// ivdDto.setUpdatedQty(quantity);
 			double discAmt = ivdDto.getDiscountAmount();
 			double discPer = ivdDto.getDiscountPercentage();
 			double sellingRate = ivdDto.getSellingRate();
@@ -629,97 +634,93 @@ public class SalesPerformanceManagementResource {
 			sellingRate = sellingRate - discAmt;
 			sellingRate = sellingRate - (sellingRate * (discPer * 0.01));
 			double rowTotal = sellingRate * quantity;
-			double totalTax  = rowTotal*(taxPer*0.01);
+			double totalTax = rowTotal * (taxPer * 0.01);
 			double updatedRowTotal = totalTax + rowTotal;
-			
-			double rowTotalDiff =   0.0;
-			double quantityDiff =   0.0;
-			if(ivdDto.getUpdatedStatus()) {
-				 rowTotalDiff = Math.abs(ivdDto.getUpdatedRowTotal() - updatedRowTotal);
-				 
-				 quantityDiff = Math.abs(ivdDto.getUpdatedQty() - quantity);
-				 
-				 System.out.println("updated : "+ivdDto.getUpdatedStatus());
-				 System.out.println("rowTotatlDiff : "+rowTotalDiff+"\n quantityDiff : "+quantityDiff);
-			}else {
-				 rowTotalDiff =   Math.abs(ivdDto.getRowTotal() - updatedRowTotal);
-				 
-				 quantityDiff =   Math.abs(ivdDto.getQuantity() - quantity) ;
-						 
-				 System.out.println("updated : "+ivdDto.getUpdatedStatus());
-				 System.out.println("rowTotatlDiff : "+rowTotalDiff+"\n quantityDiff : "+quantityDiff);
+
+			double rowTotalDiff = 0.0;
+			double quantityDiff = 0.0;
+			if (ivdDto.getUpdatedStatus()) {
+				rowTotalDiff = Math.abs(ivdDto.getUpdatedRowTotal() - updatedRowTotal);
+
+				quantityDiff = Math.abs(ivdDto.getUpdatedQty() - quantity);
+
+				System.out.println("updated : " + ivdDto.getUpdatedStatus());
+				System.out.println("rowTotatlDiff : " + rowTotalDiff + "\n quantityDiff : " + quantityDiff);
+			} else {
+				rowTotalDiff = Math.abs(ivdDto.getRowTotal() - updatedRowTotal);
+
+				quantityDiff = Math.abs(ivdDto.getQuantity() - quantity);
+
+				System.out.println("updated : " + ivdDto.getUpdatedStatus());
+				System.out.println("rowTotatlDiff : " + rowTotalDiff + "\n quantityDiff : " + quantityDiff);
 			}
-			
-			
 
 			double updatedDocTotal = 0.0;
 			double updatedDocVol = 0.0;
-			if(inventoryVoucherHeaderDTO.getUpdatedStatus()) {
-					if(ivdDto.getUpdatedStatus()) {
-							if(ivdDto.getUpdatedQty() <= quantity) {
-								updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
-							}else {
-								updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
-							}
-							
-							if(ivdDto.getUpdatedRowTotal() <= updatedRowTotal) {
-								updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotalUpdated() + rowTotalDiff;
-							}else {
-								updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotalUpdated()) ;
-							}
-					}else {
-							if(ivdDto.getQuantity() <= quantity) {
-								updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
-							}else {
-								updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
-							}
-							
-							if(ivdDto.getRowTotal() <= updatedRowTotal) {
-								updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotalUpdated() + rowTotalDiff;
-							}else {
-								updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotalUpdated()) ;
-							}
+			if (inventoryVoucherHeaderDTO.getUpdatedStatus()) {
+				if (ivdDto.getUpdatedStatus()) {
+					if (ivdDto.getUpdatedQty() <= quantity) {
+						updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
+					} else {
+						updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
 					}
-						
-				 
-				 System.out.println("updated... : TRUE");
-				 System.out.println("updatedDocTotal : "+updatedDocTotal+"\n updatedDocVol : "+updatedDocVol);
-			}else {
-				
-				if(ivdDto.getQuantity() <= quantity) {
+
+					if (ivdDto.getUpdatedRowTotal() <= updatedRowTotal) {
+						updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotalUpdated() + rowTotalDiff;
+					} else {
+						updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotalUpdated());
+					}
+				} else {
+					if (ivdDto.getQuantity() <= quantity) {
+						updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
+					} else {
+						updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
+					}
+
+					if (ivdDto.getRowTotal() <= updatedRowTotal) {
+						updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotalUpdated() + rowTotalDiff;
+					} else {
+						updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotalUpdated());
+					}
+				}
+
+				System.out.println("updated... : TRUE");
+				System.out.println("updatedDocTotal : " + updatedDocTotal + "\n updatedDocVol : " + updatedDocVol);
+			} else {
+
+				if (ivdDto.getQuantity() <= quantity) {
 					updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolume() + quantityDiff;
-				}else {
+				} else {
 					updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolume());
 				}
-				
-				if(ivdDto.getRowTotal() <= updatedRowTotal) {
+
+				if (ivdDto.getRowTotal() <= updatedRowTotal) {
 					updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotal() + rowTotalDiff;
-				}else {
+				} else {
 					updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotal());
 				}
-				 
-				 System.out.println("updated... : FALSE");
-				 System.out.println("updatedDocTotal : "+updatedDocTotal+"\n updatedDocVol : "+updatedDocVol);
+
+				System.out.println("updated... : FALSE");
+				System.out.println("updatedDocTotal : " + updatedDocTotal + "\n updatedDocVol : " + updatedDocVol);
 			}
-			
+
 			ivdDto.setUpdatedStatus(true);
 			ivdDto.setUpdatedRowTotal(updatedRowTotal);
 			ivdDto.setUpdatedQty(quantity);
-			
+
 			inventoryVoucherHeaderDTO.setDocumentTotalUpdated(updatedDocTotal);
 			inventoryVoucherHeaderDTO.setDocumentVolumeUpdated(updatedDocVol);
 			inventoryVoucherHeaderDTO.setUpdatedStatus(true);
-			System.out.println("IVH : Volume : "+inventoryVoucherHeaderDTO.getDocumentVolume() +"\n");
-			System.out.println("IVH : Volume Updated : "+inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() +"\n");
+			System.out.println("IVH : Volume : " + inventoryVoucherHeaderDTO.getDocumentVolume() + "\n");
+			System.out.println("IVH : Volume Updated : " + inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + "\n");
 			System.out.println("------------------------------------------------------------------------");
 			inventoryVoucherDetailService.updateInventoryVoucherDetail(ivdDto);
 			inventoryVoucherService.updateInventoryVoucherHeader(inventoryVoucherHeaderDTO);
-			
+
 		}
-		
-		
-		//inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
-		return new ResponseEntity<>(inventoryVoucherHeaderDTO , HttpStatus.OK);
+
+		// inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>(inventoryVoucherHeaderDTO, HttpStatus.OK);
 
 	}
 
@@ -729,12 +730,12 @@ public class SalesPerformanceManagementResource {
 			@RequestParam SalesManagementStatus salesManagementStatus) {
 		log.info("Sales Sales Management Status " + salesManagementStatus);
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(pid).get();
-		if(inventoryVoucherHeaderDTO.getTallyDownloadStatus() != TallyDownloadStatus.COMPLETED) {
+		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus() != TallyDownloadStatus.COMPLETED) {
 			inventoryVoucherHeaderDTO.setSalesManagementStatus(salesManagementStatus);
 			inventoryVoucherService.updateInventoryVoucherHeaderSalesManagementStatus(inventoryVoucherHeaderDTO);
 			return new ResponseEntity<>("success", HttpStatus.OK);
 		}
-		
+
 		return new ResponseEntity<>("failed", HttpStatus.OK);
 
 	}
@@ -847,6 +848,14 @@ public class SalesPerformanceManagementResource {
 
 		DecimalFormat df = new DecimalFormat("0.00");
 
+		double grandTotal = 0.0;
+
+		if (inventoryVoucherHeaderDTO.getUpdatedStatus()) {
+			grandTotal = inventoryVoucherHeaderDTO.getDocumentTotalUpdated();
+		} else {
+			grandTotal = inventoryVoucherHeaderDTO.getDocumentTotal();
+		}
+
 		double totalTaxAmount = 0.0;
 		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
 				.getInventoryVoucherDetails()) {
@@ -856,8 +865,14 @@ public class SalesPerformanceManagementResource {
 			 * inventoryVoucherDetailDTO.getQuantity()); double taxAmount = amount *
 			 * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
 			 */
+			double quantity = 0.0;
+			if (inventoryVoucherDetailDTO.getUpdatedStatus()) {
+				quantity = inventoryVoucherDetailDTO.getUpdatedQty();
+			} else {
+				quantity = inventoryVoucherDetailDTO.getQuantity();
+			}
 
-			double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
+			double amount = (inventoryVoucherDetailDTO.getSellingRate() * quantity);
 			double discountedAmount = amount - (amount * inventoryVoucherDetailDTO.getDiscountPercentage() / 100);
 			double taxAmnt = (discountedAmount * inventoryVoucherDetailDTO.getTaxPercentage() / 100);
 
@@ -869,7 +884,7 @@ public class SalesPerformanceManagementResource {
 		PdfPCell cell1 = new PdfPCell(new Paragraph("Grand Total :"));
 		cell1.setBorder(Rectangle.NO_BORDER);
 
-		PdfPCell cell2 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherHeaderDTO.getDocumentTotal())));
+		PdfPCell cell2 = new PdfPCell(new Paragraph(String.valueOf(df.format(grandTotal))));
 		cell2.setBorder(Rectangle.NO_BORDER);
 
 		PdfPCell cell3 = new PdfPCell(new Paragraph("Tax Total :"));
@@ -939,7 +954,18 @@ public class SalesPerformanceManagementResource {
 		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
 				.getInventoryVoucherDetails()) {
 
-			double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
+			double quantity = 0.0;
+			double rowTotal = 0.00;
+
+			if (inventoryVoucherDetailDTO.getUpdatedStatus()) {
+				quantity = inventoryVoucherDetailDTO.getUpdatedQty();
+				rowTotal = inventoryVoucherDetailDTO.getUpdatedRowTotal();
+			} else {
+				quantity = inventoryVoucherDetailDTO.getQuantity();
+				rowTotal = inventoryVoucherDetailDTO.getRowTotal();
+			}
+
+			double amount = (inventoryVoucherDetailDTO.getSellingRate() * quantity);
 			double discountedAmount = amount - (amount * inventoryVoucherDetailDTO.getDiscountPercentage() / 100);
 			double taxAmnt = (discountedAmount * inventoryVoucherDetailDTO.getTaxPercentage() / 100);
 			// double taxAmount = Math.round(taxAmt * 100.0) / 100.0;
@@ -952,7 +978,7 @@ public class SalesPerformanceManagementResource {
 			col2.setBorder(Rectangle.NO_BORDER);
 			col2.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-			PdfPCell col3 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getQuantity())));
+			PdfPCell col3 = new PdfPCell(new Paragraph(String.valueOf(quantity)));
 			col3.setBorder(Rectangle.NO_BORDER);
 			col3.setHorizontalAlignment(Element.ALIGN_CENTER);
 
@@ -965,7 +991,7 @@ public class SalesPerformanceManagementResource {
 			col5.setBorder(Rectangle.NO_BORDER);
 			col5.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-			PdfPCell col6 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getRowTotal())));
+			PdfPCell col6 = new PdfPCell(new Paragraph(String.valueOf(df.format(rowTotal))));
 			col6.setBorder(Rectangle.NO_BORDER);
 			col6.setHorizontalAlignment(Element.ALIGN_CENTER);
 
