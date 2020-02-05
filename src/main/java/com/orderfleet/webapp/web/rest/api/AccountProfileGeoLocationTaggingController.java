@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountProfile;
+import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.service.AccountProfileGeoLocationTaggingService;
 import com.orderfleet.webapp.web.rest.api.dto.AccountProfileGeoLocationTaggingDTO;
@@ -56,6 +57,7 @@ public class AccountProfileGeoLocationTaggingController {
 						HeaderUtil.createFailureAlert("accountProfile", "Account Profile Not exists", "Account Profile not Present"))
 						.body(null);
 			}
+			accountProfileGeoLocationTaggingDTO.setGeoTaggingType(GeoTaggingType.MOBILE_TAGGED);
 			AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO2=accountProfileGeoLocationTaggingService.save(accountProfileGeoLocationTaggingDTO);
 			
 		return new ResponseEntity<AccountProfileGeoLocationTaggingDTO>(accountProfileGeoLocationTaggingDTO2, HttpStatus.OK);

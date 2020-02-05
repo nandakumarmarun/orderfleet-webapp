@@ -136,8 +136,10 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			accountProfile.setEmail2(accountProfileDTO.getEmail2());
 			accountProfile.setWhatsAppNo(accountProfileDTO.getWhatsAppNo());
 			accountProfile.setLocation(accountProfileDTO.getLocation());
-			accountProfile.setLatitude(accountProfileDTO.getLatitude());
-			accountProfile.setLongitude(accountProfileDTO.getLongitude());
+			if(accountProfileDTO.getLatitude() != null && accountProfileDTO.getLongitude() != null) {
+				accountProfile.setLatitude(accountProfileDTO.getLatitude());
+				accountProfile.setLongitude(accountProfileDTO.getLongitude());
+			}
 			accountProfile.setPhone1(accountProfileDTO.getPhone1());
 			accountProfile.setPhone2(accountProfileDTO.getPhone2());
 			accountProfile.setPin(accountProfileDTO.getPin());
@@ -148,6 +150,16 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			accountProfile.setDefaultDiscountPercentage(accountProfileDTO.getDefaultDiscountPercentage());
 			accountProfile.setClosingBalance(accountProfileDTO.getClosingBalance());
 			accountProfile.setTinNo(accountProfileDTO.getTinNo());
+			if(accountProfileDTO.getGeoTaggingType() != null) {
+				accountProfile.setGeoTaggingType(accountProfileDTO.getGeoTaggingType());
+				accountProfile.setGeoTaggedTime(accountProfileDTO.getGeoTaggedTime());
+			Optional<User> opGeoTagUser = 
+					userRepository.findOneByLogin(accountProfileDTO.getGeoTaggedUserLogin() == null ? "" : accountProfileDTO.getGeoTaggedUserLogin());
+				if(opGeoTagUser.isPresent()) {
+					accountProfile.setGeoTaggedUser(opGeoTagUser.get());
+				}
+			}
+			
 			// accountProfile.setActivated(accountProfileDTO.getActivated());
 			accountProfile
 					.setDefaultPriceLevel(priceLevelRepository.findOneByPid(accountProfileDTO.getDefaultPriceLevelPid())

@@ -205,7 +205,7 @@ if(lat!=""){
 
 	function saveLocationToAccountProfile() {
 		var apLocSaveUrl = location.protocol + '//' + location.host
-			+ '/web/attach-geo-location/attachAccountProfile';
+			+ '/web/add-geo-location/attachAccountProfile';
 
 		var latitude = $("#newLat").text();
 		var longitude = $("#newLng").text();
@@ -299,6 +299,10 @@ if(lat!=""){
 										+ "</td><td>"
 										+ (accountProfile.location == null ? ""
 											: accountProfile.location)
+										+ "</td><td>"
+										+ (accountProfile.geoTaggingType == "NOT_TAGGED" ?"":accountProfile.geoTaggingType 
+												+",\n"+ formatDate(accountProfile.geoTaggedTime,'MMM DD YYYY, h:mm:ss a') 
+												+",\n"+ accountProfile.geoTaggedUserName)	
 										+ "</td><td><button type='button' class='btn btn-blue' onclick='AddGeoLocation.showModalPopup($(\"#viewModal\"),\""
 										+ accountProfile.pid + "\",\"" + accountProfile.latitude + "\",\"" + accountProfile.longitude + "\",\""
 										+ accountProfile.location
@@ -360,6 +364,10 @@ if(lat!=""){
 										+ "</td><td>"
 										+ (accountProfile.location == null ? ""
 											: accountProfile.location)
+										+ "</td><td>"
+										+ (accountProfile.geoTaggingType == "NOT_TAGGED" ?"":accountProfile.geoTaggingType 
+												+",\n"+ formatDate(accountProfile.geoTaggedTime,'MMM DD YYYY, h:mm:ss a') 
+												+",\n"+ accountProfile.geoTaggedUserName)
 										+ "</td><td><button type='button' data-target='#enableMapModal' class='btn btn-success' onclick='AddGeoLocation.oldLatLngValues($(\"#enableMapModal\"),\""
 										+ accountProfile.pid
 										+ "\",this);'>Add Geo Location From Map</button></td></tr>");

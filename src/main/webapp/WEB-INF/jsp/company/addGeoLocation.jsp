@@ -53,6 +53,7 @@
 							<th>Latitude</th>
 							<th>Longitude</th>
 							<th>Geo Location</th>
+							<th>Tag Details</th>
 							<th>Actions</th>
 						</tr>
 					</thead>

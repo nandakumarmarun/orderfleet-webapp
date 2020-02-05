@@ -13,6 +13,7 @@ import org.hibernate.validator.constraints.Email;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 import com.orderfleet.webapp.repository.projections.CustomAccountProfiles;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -113,6 +114,16 @@ public class AccountProfileDTO {
 	private String stateName;
 
 	private String countryName;
+	
+	private GeoTaggingType geoTaggingType;
+	
+	private LocalDateTime geoTaggedTime;
+	
+	private String geoTaggedUserName;
+	
+	private String geoTaggedUserPid;
+	
+	private String geoTaggedUserLogin;
 
 	public AccountProfileDTO() {
 		super();
@@ -482,6 +493,46 @@ public class AccountProfileDTO {
 
 	public void setCountryName(String countryName) {
 		this.countryName = countryName;
+	}
+
+	public GeoTaggingType getGeoTaggingType() {
+		return geoTaggingType;
+	}
+
+	public void setGeoTaggingType(GeoTaggingType geoTaggingType) {
+		this.geoTaggingType = geoTaggingType;
+	}
+	
+	public LocalDateTime getGeoTaggedTime() {
+		return geoTaggedTime;
+	}
+
+	public void setGeoTaggedTime(LocalDateTime geoTaggedTime) {
+		this.geoTaggedTime = geoTaggedTime;
+	}
+	
+	public String getGeoTaggedUserName() {
+		return geoTaggedUserName;
+	}
+
+	public void setGeoTaggedUserName(String geoTaggedUserName) {
+		this.geoTaggedUserName = geoTaggedUserName;
+	}
+
+	public String getGeoTaggedUserPid() {
+		return geoTaggedUserPid;
+	}
+
+	public void setGeoTaggedUserPid(String geoTaggedUserPid) {
+		this.geoTaggedUserPid = geoTaggedUserPid;
+	}
+	
+	public String getGeoTaggedUserLogin() {
+		return geoTaggedUserLogin;
+	}
+
+	public void setGeoTaggedUserLogin(String geoTaggedUserLogin) {
+		this.geoTaggedUserLogin = geoTaggedUserLogin;
 	}
 
 	@Override

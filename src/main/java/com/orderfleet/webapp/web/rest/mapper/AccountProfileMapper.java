@@ -41,6 +41,8 @@ public abstract class AccountProfileMapper {
 	@Mapping(source = "accountType.name", target = "accountTypeName")
 	@Mapping(source = "user.firstName", target = "userName")
 	@Mapping(source = "user.pid", target = "userPid")
+	@Mapping(source = "geoTaggedUser.login", target = "geoTaggedUserName")
+	@Mapping(source = "geoTaggedUser.pid", target = "geoTaggedUserPid")
 	public abstract AccountProfileDTO accountProfileToAccountProfileDTO(AccountProfile accountProfile);
 
 	public abstract List<AccountProfileDTO> accountProfilesToAccountProfileDTOs(List<AccountProfile> accountProfiles);

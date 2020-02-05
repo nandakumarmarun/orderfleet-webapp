@@ -43,6 +43,7 @@ public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfi
 		accountProfile.setLatitude(accountProfileGeoLocationTaggingDTO.getLatitude());
 		accountProfile.setLongitude(accountProfileGeoLocationTaggingDTO.getLongitude());
 		accountProfile.setLocation(accountProfileGeoLocationTaggingDTO.getLocation());
+		accountProfile.setGeoTaggingType(accountProfileGeoLocationTaggingDTO.getGeoTaggingType());
 		accountProfileRepository.save(accountProfile);
 		
 		User user=userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();

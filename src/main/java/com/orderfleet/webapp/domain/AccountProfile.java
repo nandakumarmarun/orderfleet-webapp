@@ -25,12 +25,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.validator.constraints.Email;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 
 /**
  * A Account.
@@ -200,6 +203,18 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Column(name = "country_name")
 	private String countryName;
 
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "geo_tagging_type", nullable = false, columnDefinition = "character varying DEFAULT 'NOT_TAGGED'")
+	private GeoTaggingType geoTaggingType;
+	
+	@Column(name = "geo_tagged_time", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	private LocalDateTime geoTaggedTime;
+	
+	@ManyToOne
+	@JoinColumn(nullable = true)
+	private User geoTaggedUser;
+	
 	public Long getId() {
 		return id;
 	}
@@ -494,6 +509,30 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	public void setGstRegistrationType(String gstRegistrationType) {
 		this.gstRegistrationType = gstRegistrationType;
+	}
+	
+	public GeoTaggingType getGeoTaggingType() {
+		return geoTaggingType;
+	}
+
+	public void setGeoTaggingType(GeoTaggingType geoTaggingType) {
+		this.geoTaggingType = geoTaggingType;
+	}
+	
+	public LocalDateTime getGeoTaggedTime() {
+		return geoTaggedTime;
+	}
+
+	public void setGeoTaggedTime(LocalDateTime geoTaggedTime) {
+		this.geoTaggedTime = geoTaggedTime;
+	}
+
+	public User getGeoTaggedUser() {
+		return geoTaggedUser;
+	}
+
+	public void setGeoTaggedUser(User geoTaggedUser) {
+		this.geoTaggedUser = geoTaggedUser;
 	}
 
 	@Override

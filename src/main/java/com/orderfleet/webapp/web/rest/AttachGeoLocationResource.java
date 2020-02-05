@@ -30,6 +30,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 import com.orderfleet.webapp.repository.AccountProfileGeoLocationTaggingRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
@@ -37,6 +38,7 @@ import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileGeoLocationTaggingService;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
@@ -353,6 +355,9 @@ public class AttachGeoLocationResource {
 		accountProfileDTO.setLatitude(latitude);
 		accountProfileDTO.setLongitude(longitude);
 		accountProfileDTO.setLocation(location);
+		accountProfileDTO.setGeoTaggingType(GeoTaggingType.WEB_TAGGED_VISIT);
+		accountProfileDTO.setGeoTaggedTime(LocalDateTime.now());
+		accountProfileDTO.setGeoTaggedUserLogin(SecurityUtils.getCurrentUserLogin());
 		accountProfileDTO = accountProfileService.update(accountProfileDTO);
 		return new ResponseEntity<>(accountProfileDTO, HttpStatus.OK);
 
@@ -366,6 +371,9 @@ public class AttachGeoLocationResource {
 		accountProfileDTO.setLatitude(accountProfileGeoLocationTaggingDTO.getLatitude());
 		accountProfileDTO.setLongitude(accountProfileGeoLocationTaggingDTO.getLongitude());
 		accountProfileDTO.setLocation(accountProfileGeoLocationTaggingDTO.getLocation());
+		accountProfileDTO.setGeoTaggingType(GeoTaggingType.WEB_TAGGED_MOBILE);
+		accountProfileDTO.setGeoTaggedTime(LocalDateTime.now());
+		accountProfileDTO.setGeoTaggedUserLogin(SecurityUtils.getCurrentUserLogin());
 		accountProfileDTO=accountProfileService.update(accountProfileDTO);
 		return new ResponseEntity<AccountProfileDTO>(accountProfileDTO, HttpStatus.OK);
 	}

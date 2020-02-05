@@ -1,6 +1,8 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.enums.GeoTaggingType;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileGeoLocationTaggingService;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
@@ -129,8 +133,28 @@ public class AddGeoLocationResource {
 		accountProfileDTO.setLatitude(accountProfileGeoLocationTaggingDTO.getLatitude());
 		accountProfileDTO.setLongitude(accountProfileGeoLocationTaggingDTO.getLongitude());
 		accountProfileDTO.setLocation(accountProfileGeoLocationTaggingDTO.getLocation());
+		accountProfileDTO.setGeoTaggingType(GeoTaggingType.WEB_TAGGED_MOBILE);
+		accountProfileDTO.setGeoTaggedTime(LocalDateTime.now());
+		accountProfileDTO.setGeoTaggedUserLogin(SecurityUtils.getCurrentUserLogin());
 		accountProfileDTO=accountProfileService.update(accountProfileDTO);
 		return new ResponseEntity<AccountProfileDTO>(accountProfileDTO, HttpStatus.OK);
 		
+	}
+	
+	@RequestMapping(value = "/add-geo-location/attachAccountProfile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<AccountProfileDTO> attachAccountProfile(
+			@RequestParam("accountProfilePid") String accountProfilePid, @RequestParam("latitude") BigDecimal latitude,
+			@RequestParam("longitude") BigDecimal longitude, @RequestParam("location") String location) {
+		AccountProfileDTO accountProfileDTO = accountProfileService.findOneByPid(accountProfilePid).get();
+		accountProfileDTO.setLatitude(latitude);
+		accountProfileDTO.setLongitude(longitude);
+		accountProfileDTO.setLocation(location);
+		accountProfileDTO.setGeoTaggingType(GeoTaggingType.WEB_TAGGED_MAP);
+		accountProfileDTO.setGeoTaggedTime(LocalDateTime.now());
+		accountProfileDTO.setGeoTaggedUserLogin(SecurityUtils.getCurrentUserLogin());
+		accountProfileDTO = accountProfileService.update(accountProfileDTO);
+		return new ResponseEntity<>(accountProfileDTO, HttpStatus.OK);
+
 	}
 }

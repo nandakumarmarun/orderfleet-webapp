@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.orderfleet.webapp.domain.AccountProfileGeoLocationTagging;
+import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 
 
 /**
@@ -27,6 +28,8 @@ public class AccountProfileGeoLocationTaggingDTO {
 	private String location;
 	
 	private LocalDateTime sendDate;
+	
+	private GeoTaggingType geoTaggingType;
 
 	
 	public AccountProfileGeoLocationTaggingDTO() {
@@ -116,6 +119,15 @@ public class AccountProfileGeoLocationTaggingDTO {
 	public void setSendDate(LocalDateTime sendDate) {
 		this.sendDate = sendDate;
 	}
+
+	public GeoTaggingType getGeoTaggingType() {
+		return geoTaggingType;
+	}
+
+	public void setGeoTaggingType(GeoTaggingType geoTaggingType) {
+		this.geoTaggingType = geoTaggingType;
+	}
+
 
 	@Override
 	public String toString() {
