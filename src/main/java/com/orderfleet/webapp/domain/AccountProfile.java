@@ -203,16 +203,14 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Column(name = "country_name")
 	private String countryName;
 
-	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(name = "geo_tagging_type", nullable = false, columnDefinition = "character varying DEFAULT 'NOT_TAGGED'")
+	@Column(name = "geo_tagging_type")
 	private GeoTaggingType geoTaggingType;
 	
-	@Column(name = "geo_tagged_time", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@Column(name = "geo_tagged_time")
 	private LocalDateTime geoTaggedTime;
 	
 	@ManyToOne
-	@JoinColumn(nullable = true)
 	private User geoTaggedUser;
 	
 	public Long getId() {

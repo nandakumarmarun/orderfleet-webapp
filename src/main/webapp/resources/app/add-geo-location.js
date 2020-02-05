@@ -25,6 +25,9 @@ if (!this.AddGeoLocation) {
 				searchTable($("#search").val());
 			});
 
+			$('#btnDownload').click(function() {
+				downloadXls();
+			});
 			$('#btnSaveLocationName').click(function() {
 				saveLocationToAccountProfile();
 			});
@@ -244,6 +247,7 @@ if(lat!=""){
 	AddGeoLocation.loadAccountProfiles = function(accountType, importStatus) {
 		var accounttypepid = "";
 		var imports = "";
+		var geoTag = $("input[name='geotag']:checked").val();
 		if (accountType != "" && importStatus != "") {
 			if (accountType != "No" && importStatus != "No") {
 				accounttypepid = accountType;
@@ -272,7 +276,8 @@ if(lat!=""){
 				method : 'GET',
 				data : {
 					accountTypePids : accounttypepid,
-					importedStatus : imports
+					importedStatus : imports,
+					geoTag : geoTag
 				},
 				success : function(accountProfiles) {
 					$('#tBodyAddGeoLocation').html("");
@@ -300,9 +305,9 @@ if(lat!=""){
 										+ (accountProfile.location == null ? ""
 											: accountProfile.location)
 										+ "</td><td>"
-										+ (accountProfile.geoTaggingType == "NOT_TAGGED" ?"":accountProfile.geoTaggingType 
-												+",\n"+ formatDate(accountProfile.geoTaggedTime,'MMM DD YYYY, h:mm:ss a') 
-												+",\n"+ accountProfile.geoTaggedUserName)	
+										+ (accountProfile.geoTaggingType == null ?"":"<b>Type:</b>"+accountProfile.geoTaggingType 
+												+",<br><b>Date:</b>"+ formatDate(accountProfile.geoTaggedTime,'MMM DD YYYY, h:mm:ss a') 
+												+",<br><b>User:</b>"+ accountProfile.geoTaggedUserLogin)	
 										+ "</td><td><button type='button' class='btn btn-blue' onclick='AddGeoLocation.showModalPopup($(\"#viewModal\"),\""
 										+ accountProfile.pid + "\",\"" + accountProfile.latitude + "\",\"" + accountProfile.longitude + "\",\""
 										+ accountProfile.location
@@ -327,6 +332,7 @@ if(lat!=""){
 				accountTypePids.push($(this).val());
 			});
 		var imports = $("input[name='import']:checked").val();
+		var geoTag = $("input[name='geotag']:checked").val();
 
 		$('#tBodyAddGeoLocation').html(
 			"<tr><td colspan='5' align='center'>Please wait...</td></tr>");
@@ -337,6 +343,7 @@ if(lat!=""){
 				data : {
 					accountTypePids : accountTypePids.join(","),
 					importedStatus : imports,
+					geoTag : geoTag
 				},
 
 				success : function(accountProfiles) {
@@ -365,10 +372,14 @@ if(lat!=""){
 										+ (accountProfile.location == null ? ""
 											: accountProfile.location)
 										+ "</td><td>"
-										+ (accountProfile.geoTaggingType == "NOT_TAGGED" ?"":accountProfile.geoTaggingType 
-												+",\n"+ formatDate(accountProfile.geoTaggedTime,'MMM DD YYYY, h:mm:ss a') 
-												+",\n"+ accountProfile.geoTaggedUserName)
-										+ "</td><td><button type='button' data-target='#enableMapModal' class='btn btn-success' onclick='AddGeoLocation.oldLatLngValues($(\"#enableMapModal\"),\""
+										+ (accountProfile.geoTaggingType == null ?"":"<b>Type:</b>"+accountProfile.geoTaggingType 
+												+",<br><b>Date:</b>"+ formatDate(accountProfile.geoTaggedTime,'MMM DD YYYY, h:mm:ss a') 
+												+",<br><b>User:</b>"+ accountProfile.geoTaggedUserLogin)
+										+ "</td><td><button type='button' class='btn btn-blue' onclick='AddGeoLocation.showModalPopup($(\"#viewModal\"),\""
+										+ accountProfile.pid + "\",\"" + accountProfile.latitude + "\",\"" + accountProfile.longitude + "\",\""
+										+ accountProfile.location
+										+ "\",0);'>Location From Geo Tag Mobile</button>"		
+										+ "<button type='button' data-target='#enableMapModal' class='btn btn-success' onclick='AddGeoLocation.oldLatLngValues($(\"#enableMapModal\"),\""
 										+ accountProfile.pid
 										+ "\",this);'>Add Geo Location From Map</button></td></tr>");
 							});
@@ -427,6 +438,14 @@ if(lat!=""){
 		});
 	}
 	
+	function downloadXls() {
+		
+		var geoTag = $("input[name='geotag']:checked").val();
+		console.log(geoTag);
+		window.location.href = addGeoLocationContextPath
+		+ "/download-account-xls?geoTag="+ geoTag;
+	}	
+
 	function saveNewGeoLocation(){
 		var geoLocationPid = $("input[name='geoLocation']:checked").val();
 		if(geoLocationPid==null){

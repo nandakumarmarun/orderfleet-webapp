@@ -39,6 +39,9 @@
 						class="form-control" placeholder="Search" id="search"
 						style="width: 200px;" />
 					<button id="btnSearch" class="btn btn-info" type="button">Search</button>
+					&emsp;<button type="button" class="btn btn-orange" id="btnDownload" title="download xlsx">
+						<i class="entypo-download"></i> download
+					</button>
 				</div>
 			</form>
 			<div class="clearfix"></div>
@@ -107,6 +110,27 @@
 												</div>
 											</div>
 										</form>
+										<div class="form-group">
+											<label class="control-label">Geo tagging status</label>
+											<div class="row">
+												<div class="col-md-4">
+													<label> <input type="radio" name="geotag"
+														value="all" checked="checked"> All
+													</label>
+												</div>
+												<div class="col-md-4">
+													<label> <input type="radio" name="geotag"
+														value="true"> Geo Tagged
+													</label>
+												</div>
+												<div class="col-md-4">
+													<label> <input type="radio" name="geotag"
+														value="false"> Not Geo Tagged
+													</label>
+												</div>
+											</div>
+										</div>
+										<hr>
 										<div class="form-group">
 											<label class="control-label">Import Status</label>
 											<div class="row">
