@@ -66,6 +66,9 @@ public class MenuItem implements Serializable {
 	@Column(name = "icon_class", length = 255)
 	private String iconClass = "entypo-users";
 
+	@Column(name = "menu_item_label_view")
+	private String menuItemLabelView;
+	
 	public MenuItem() {
 		super();
 	}
@@ -132,6 +135,14 @@ public class MenuItem implements Serializable {
 
 	public void setIconClass(String iconClass) {
 		this.iconClass = iconClass;
+	}
+	
+	public String getMenuItemLabelView() {
+		return menuItemLabelView;
+	}
+
+	public void setMenuItemLabelView(String menuItemLabelView) {
+		this.menuItemLabelView = menuItemLabelView;
 	}
 
 	@Override

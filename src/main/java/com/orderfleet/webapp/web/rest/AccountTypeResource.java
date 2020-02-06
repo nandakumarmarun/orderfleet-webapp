@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.MenuItem;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 import com.orderfleet.webapp.repository.AccountActivityTaskConfigRepository;
@@ -33,6 +34,7 @@ import com.orderfleet.webapp.service.AccountActivityTaskConfigService;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.ActivityService;
+import com.orderfleet.webapp.service.UserMenuItemService;
 import com.orderfleet.webapp.web.rest.dto.AccountActivityTaskConfigDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountTypeDTO;
@@ -65,6 +67,9 @@ public class AccountTypeResource {
 
 	@Inject
 	private AccountActivityTaskConfigRepository activityConfigRepository;
+	
+	@Inject
+	private UserMenuItemService userMenuItemService;
 
 	/**
 	 * POST /accountTypes : Create a new accountType.
@@ -154,6 +159,8 @@ public class AccountTypeResource {
 		model.addAttribute("activities", activityService.findAllByCompany());
 		model.addAttribute("accountNameTypes", AccountNameType.values());
 		model.addAttribute("receiverSupplierTypes", ReceiverSupplierType.values());
+		model.addAttribute("menuItemLabel",userMenuItemService.findMenuItemLabelView("/web/accountTypes"));
+
 		return "company/accountTypes";
 	}
 

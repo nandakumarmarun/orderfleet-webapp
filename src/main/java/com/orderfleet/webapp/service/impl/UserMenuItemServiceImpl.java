@@ -2,6 +2,7 @@ package com.orderfleet.webapp.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -127,4 +128,17 @@ public class UserMenuItemServiceImpl implements UserMenuItemService {
 		}
 	}
 
+	@Override
+	public String findMenuItemLabelView(String link) {
+		List<MenuItem> menuItems = userMenuItemRepository.findByUserIsCurrentUser().stream()
+				.filter(menu -> menu.getLink().equals(link) && menu.getMenuItemLabelView() != null 
+						&& !menu.getMenuItemLabelView().isEmpty()).collect(Collectors.toList());
+		String menuItemLabelView = null;
+		if(menuItems != null && !menuItems.isEmpty()) {
+			menuItemLabelView = menuItems.get(0).getMenuItemLabelView();
+		}
+		return menuItemLabelView;
+	}
+	
+	
 }

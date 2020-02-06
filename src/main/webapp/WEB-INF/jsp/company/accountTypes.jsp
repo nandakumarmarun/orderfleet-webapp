@@ -22,7 +22,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Account Types</h2>
+			<h2>${menuItemLabel == null ? 'Account Types' : menuItemLabel}</h2>
 			<div class="row col-xs-12">
 				<div class="pull-right">
 					<button type="button" class="btn btn-success"

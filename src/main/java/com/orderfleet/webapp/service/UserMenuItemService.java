@@ -25,4 +25,6 @@ public interface UserMenuItemService {
 	
 	void copyMenuItems(String fromUserPid, List<String> toUserPids);
 	
+	String findMenuItemLabelView(String link);
+	
 }
