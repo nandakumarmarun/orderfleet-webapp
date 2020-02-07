@@ -56,6 +56,7 @@ import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.service.FormFormElementService;
 import com.orderfleet.webapp.service.UserDocumentService;
+import com.orderfleet.webapp.service.UserMenuItemService;
 import com.orderfleet.webapp.web.rest.api.dto.TaskSubmissionResponse;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
@@ -106,6 +107,9 @@ public class DynamicDocumentResource {
 	
 	@Inject
 	private DocumentService documentService;
+	
+	@Inject
+	private UserMenuItemService userMenuItemService;
 
 	/**
 	 * GET /dynamic-documents : get all the filled forms.
@@ -126,6 +130,7 @@ public class DynamicDocumentResource {
 			model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
 		}
 		model.addAttribute("documents", documentService.findAllByDocumentType(DocumentType.DYNAMIC_DOCUMENT));
+		model.addAttribute("menuItemLabel",userMenuItemService.findMenuItemLabelView("/web/dynamic-documents"));
 		return "company/dynamicDocuments";
 	}
 

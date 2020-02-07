@@ -101,6 +101,7 @@
 						<th>Parent</th>
 						<th>Link</th>
 						<th>Description</th>
+						<th>Menu Item Label View</th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -112,6 +113,7 @@
 							<td>${menuItem.parentLabel}</td>
 							<td>${menuItem.link}</td>
 							<td>${menuItem.description}</td>
+							<td>${menuItem.menuItemLabelView}</td>
 							<td>
 								<button type="button" class="btn btn-blue"
 									onclick="MenuItem.showModalPopup($('#viewModal'),'${menuItem.id}',0);">View</button>
@@ -177,11 +179,16 @@
 										<input type="text" class="form-control" name="description"
 											id="field_description" placeholder="Description" />
 									</div>
-
+	
 									<div class="form-group">
 										<label class="control-label" for="field_link">Link</label> <input
 											type="text" class="form-control" name="link" id="field_link"
 											maxlength="150" placeholder="Link" />
+									</div>
+									<div class="form-group">
+										<label class="control-label" for="field_menuItemLabelView">Menu Item Label View</label>
+										<input type="text" class="form-control" name="menuItemLabelView"
+											id="field_menuItemLabelView" placeholder="Menu Item Label View" />
 									</div>
 
 									<div class="form-group">
@@ -514,6 +521,13 @@
 										</dt>
 										<dd>
 											<span id="lbl_description"></span>
+										</dd>
+										<hr />
+										<dt>
+											<span>Menu Item Label View</span>
+										</dt>
+										<dd>
+											<span id="lbl_menuItemLabelView"></span>
 										</dd>
 									</dl>
 								</div>

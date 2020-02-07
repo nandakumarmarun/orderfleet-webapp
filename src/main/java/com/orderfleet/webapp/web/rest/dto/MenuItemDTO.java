@@ -27,6 +27,8 @@ public class MenuItemDTO {
 
 	private String description;
 
+	private String menuItemLabelView;
+
 	@NotNull
 	private Boolean activated = true;
 
@@ -52,6 +54,7 @@ public class MenuItemDTO {
 		this.description = menuItem.getDescription();
 		this.sortOrder = menuItem.getSortOrder();
 		this.iconClass = menuItem.getIconClass();
+		this.menuItemLabelView = menuItem.getMenuItemLabelView();
 	}
 
 	public Long getId() {
@@ -124,6 +127,14 @@ public class MenuItemDTO {
 
 	public void setIconClass(String iconClass) {
 		this.iconClass = iconClass;
+	}
+
+	public String getMenuItemLabelView() {
+		return menuItemLabelView;
+	}
+
+	public void setMenuItemLabelView(String menuItemLabelView) {
+		this.menuItemLabelView = menuItemLabelView;
 	}
 
 	@Override

@@ -38,7 +38,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Documents</h2>
+			<h2>${menuItemLabel == null ? 'Documents' : menuItemLabel}</h2>
 			<div class="row col-xs-12"></div>
 			<div class="clearfix"></div>
 			<hr />

@@ -19,7 +19,8 @@ if (!this.MenuItem) {
 		description : null,
 		parentId : null,
 		parentLabel : null,
-		iconClass : ""
+		iconClass : "",
+		menuItemLabelView : null
 	};
 
 	// Specify the validation rules
@@ -95,6 +96,7 @@ if (!this.MenuItem) {
 		menuItemModel.description = $('#field_description').val();
 		menuItemModel.parentId = $('#field_parent').val();
 		menuItemModel.iconClass = $('#formDT').text();
+		menuItemModel.menuItemLabelView=$('#field_menuItemLabelView').val();
 		console.log(menuItemModel.iconClass);
 		$.ajax({
 			method : $(el).attr('method'),
@@ -120,6 +122,7 @@ if (!this.MenuItem) {
 				$('#lbl_link').text(data.link);
 				$('#lbl_description').text(data.description);
 				$('#lbl_icon').html("<i class='" + data.iconClass + "'></i>");
+				$('#lbl_menuItemLabelView').text(data.menuItemLabelView!=null ? data.menuItemLabelView:"-");
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -140,6 +143,7 @@ if (!this.MenuItem) {
 				}
 				$('#field_link').val(data.link);
 				$('#field_description').val(data.description);
+				$('#field_menuItemLabelView').val(data.menuItemLabelView);
 				if(data.iconClass==""){
 					$("#formDT").html("<span class='entypo-users'>entypo-users</span>")
 				}else{

@@ -43,6 +43,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 		menuItem.setLink(menuItemDTO.getLink());
 		menuItem.setDescription(menuItemDTO.getDescription());
 		menuItem.setIconClass(menuItemDTO.getIconClass());
+		menuItem.setMenuItemLabelView(menuItemDTO.getMenuItemLabelView());
 
 		menuItem = menuItemRepository.save(menuItem);
 		menuItemDTO = new MenuItemDTO(menuItem);
@@ -61,6 +62,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 		menuItem.setLink(menuItemDTO.getLink());
 		menuItem.setDescription(menuItemDTO.getDescription());
 		menuItem.setIconClass(menuItemDTO.getIconClass());
+		menuItem.setMenuItemLabelView(menuItemDTO.getMenuItemLabelView());
 		menuItem = menuItemRepository.save(menuItem);
 		menuItemDTO = new MenuItemDTO(menuItem);
 		return menuItemDTO;
