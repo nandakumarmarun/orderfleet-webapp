@@ -11,8 +11,10 @@ if (!this.InventoryVoucher) {
 	var inventoryVoucherContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
 
+	var inventoryPidsPdf = "";
+
 	$(document).ready(function() {
-		
+
 		$('.selectpicker').selectpicker();
 
 		$("#txtToDate").datepicker({
@@ -33,6 +35,11 @@ if (!this.InventoryVoucher) {
 		$('#sendSalesOrderEmail').on('click', function() {
 			sendSalesOrderEmail();
 		});
+
+		$('#packingSlipByCustomer').on('click', function() {
+			packingSlipByCustomer();
+		});
+
 		if ($("#dbDocumentType").val != "no") {
 			loadAllDocumentByDocumentType();
 		}
@@ -220,6 +227,7 @@ if (!this.InventoryVoucher) {
 						var counts = 0;
 						let totAmount = 0;
 						let totVolume = 0;
+						inventoryPidsPdf = "";
 						$
 								.each(
 										inventoryVouchers,
@@ -235,6 +243,25 @@ if (!this.InventoryVoucher) {
 											var supplierName = "";
 
 											if (inventoryVoucher.pdfDownloadButtonStatus) {
+
+												if ($("#dbAccount").val() != '-1') {
+													$(
+															".packingSlipByCustomerClass")
+															.addClass('show');
+													$(
+															".packingSlipByCustomerClass")
+															.removeClass('hide');
+
+													inventoryPidsPdf += inventoryVoucher.pid
+															+ ",";
+												} else {
+													$(
+															".packingSlipByCustomerClass")
+															.addClass('hide');
+													$(
+															".packingSlipByCustomerClass")
+															.removeClass('show');
+												}
 
 												if (inventoryVoucher.pdfDownloadStatus) {
 
@@ -315,6 +342,26 @@ if (!this.InventoryVoucher) {
 						}
 					}
 				});
+	}
+
+	function packingSlipByCustomer() {
+		$(".loader").addClass('show');
+
+		if (confirm("Are you sure?")) {
+
+			$(".loader").removeClass('show');
+
+			console.log(inventoryPidsPdf);
+
+			window.open(inventoryVoucherContextPath
+					+ "/downloadPdf?inventoryPid=" + inventoryPidsPdf);
+
+		}
+
+		setTimeout(function() {
+			InventoryVoucher.filter();
+		}, 1000);
+
 	}
 
 	function sendSalesOrderEmail() {

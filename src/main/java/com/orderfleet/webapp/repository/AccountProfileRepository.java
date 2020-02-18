@@ -16,6 +16,7 @@ import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 import com.orderfleet.webapp.repository.projections.CustomAccountProfiles;
 
 /**
@@ -168,5 +169,8 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.id in ?1")
 	List<AccountProfile> findAllByCompanyIdAndIdsIn(Set<Long> accountProfileIds);
+	
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and  accountProfile.geoTaggingType != ?2")
+	List<AccountProfile> findAllByCompanyIdAndGeoTaggingTypeNotEqual(Long currentUsersCompanyId, GeoTaggingType notTagged);
 
 }

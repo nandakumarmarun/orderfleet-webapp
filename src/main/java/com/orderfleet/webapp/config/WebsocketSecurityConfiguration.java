@@ -17,6 +17,7 @@ public class WebsocketSecurityConfiguration extends AbstractSecurityWebSocketMes
             .simpDestMatchers("/live-tracking/attendance/*").permitAll()
             .simpDestMatchers("/live-tracking/user-notification/*").permitAll()
             .simpDestMatchers("/live-tracking/map-view/*").permitAll()
+            .simpDestMatchers("/heat-map/map-view/*").permitAll()
             .simpDestMatchers("/live-tracking/dashboard-view/*").permitAll()
             .simpDestMatchers("/topic/**").permitAll()
             .simpDestMatchers("/hello/**").permitAll()

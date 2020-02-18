@@ -191,6 +191,20 @@ public class SalesPerformanceManagementResource {
 			model.addAttribute("accounts", accountProfileDTOs);
 		}
 		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
+
+		boolean pdfDownloadStatus = false;
+		Optional<CompanyConfiguration> opCompanyConfigurationPdf = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
+		if (opCompanyConfigurationPdf.isPresent()) {
+
+			if (opCompanyConfigurationPdf.get().getValue().equals("true")) {
+				pdfDownloadStatus = true;
+			} else {
+				pdfDownloadStatus = false;
+			}
+		}
+		model.addAttribute("pdfDownloadStatus", pdfDownloadStatus);
+
 		return "company/salesPerformanceManagement";
 	}
 
@@ -745,23 +759,46 @@ public class SalesPerformanceManagementResource {
 	public void downloadStatus(@RequestParam String inventoryPid, HttpServletResponse response) throws IOException {
 
 		log.info("Download pdf with pid " + inventoryPid);
+		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDtos = new ArrayList<>();
 
-		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(inventoryPid).get();
+		String[] inventoryPidArray = inventoryPid.split(",");
 
-		buildPdf(inventoryVoucherHeaderDTO, response);
+		if (inventoryPidArray.length > 0) {
 
-		if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
-			inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
+			for (String ivhPid : inventoryPidArray) {
 
+				InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid)
+						.get();
+
+				inventoryVoucherHeaderDtos.add(inventoryVoucherHeaderDTO);
+			}
+		}
+
+		buildPdf(inventoryVoucherHeaderDtos, response);
+
+		if (inventoryVoucherHeaderDtos.size() > 0) {
+
+			for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaderDtos)
+				if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
+					inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
+
+				}
 		}
 
 	}
 
-	private void buildPdf(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO, HttpServletResponse response)
+	private void buildPdf(List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs, HttpServletResponse response)
 			throws IOException {
 		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition",
-				"inline;filename=\"" + "Packing Slip_" + inventoryVoucherHeaderDTO.getOrderNumber() + ".pdf\"");
+		if (inventoryVoucherHeaderDTOs.size() > 1) {
+
+			response.setHeader("Content-Disposition", "inline;filename=\"" + "Packing Slip_"
+					+ inventoryVoucherHeaderDTOs.get(0).getReceiverAccountName() + ".pdf\"");
+
+		} else {
+			response.setHeader("Content-Disposition", "inline;filename=\"" + "Packing Slip_"
+					+ inventoryVoucherHeaderDTOs.get(0).getOrderNumber() + ".pdf\"");
+		}
 		// Get the output stream for writing PDF object
 		ServletOutputStream out = response.getOutputStream();
 		try {
@@ -777,55 +814,59 @@ public class SalesPerformanceManagementResource {
 			com.itextpdf.text.Font fontSize_16 = FontFactory.getFont(FontFactory.TIMES, 16f,
 					com.itextpdf.text.Font.BOLD);
 
-			Paragraph companyName = new Paragraph();
-			Paragraph line = new Paragraph();
-			companyName.setAlignment(Element.ALIGN_CENTER);
-			line.setAlignment(Element.ALIGN_CENTER);
-			companyName.setFont(fontSize_22);
-			companyName.add(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getLegalName());
-			line.add(new Paragraph("_______________________________________________________"));
+			for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaderDTOs) {
+				Paragraph companyName = new Paragraph();
+				Paragraph line = new Paragraph();
+				companyName.setAlignment(Element.ALIGN_CENTER);
+				line.setAlignment(Element.ALIGN_CENTER);
+				companyName.setFont(fontSize_22);
+				companyName.add(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getLegalName());
+				line.add(new Paragraph("_______________________________________________________"));
 
-			String customerAddress = "";
-			String customerEmail = "";
-			String customerPhone = "";
+				String customerAddress = "";
+				String customerEmail = "";
+				String customerPhone = "";
 
-			LocalDateTime date = inventoryVoucherHeaderDTO.getCreatedDate();
+				LocalDateTime date = inventoryVoucherHeaderDTO.getCreatedDate();
 
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
 
-			String orderDate = date.format(formatter);
+				String orderDate = date.format(formatter);
 
-			if (!inventoryVoucherHeaderDTO.getCustomeraddress().equalsIgnoreCase("No Address")
-					&& inventoryVoucherHeaderDTO.getCustomeraddress() != null)
-				customerAddress = inventoryVoucherHeaderDTO.getCustomeraddress();
+				if (!inventoryVoucherHeaderDTO.getCustomeraddress().equalsIgnoreCase("No Address")
+						&& inventoryVoucherHeaderDTO.getCustomeraddress() != null)
+					customerAddress = inventoryVoucherHeaderDTO.getCustomeraddress();
 
-			if (inventoryVoucherHeaderDTO.getCustomerEmail() != null)
-				customerEmail = inventoryVoucherHeaderDTO.getCustomerEmail();
+				if (inventoryVoucherHeaderDTO.getCustomerEmail() != null)
+					customerEmail = inventoryVoucherHeaderDTO.getCustomerEmail();
 
-			if (inventoryVoucherHeaderDTO.getCustomerPhone() != null)
-				customerPhone = inventoryVoucherHeaderDTO.getCustomerPhone();
+				if (inventoryVoucherHeaderDTO.getCustomerPhone() != null)
+					customerPhone = inventoryVoucherHeaderDTO.getCustomerPhone();
 
-			document.add(companyName);
-			document.add(line);
-			document.add(new Paragraph("Sales Order No :" + inventoryVoucherHeaderDTO.getOrderNumber()));
-			document.add(new Paragraph("Date :" + orderDate));
-			document.add(new Paragraph("Executive : " + inventoryVoucherHeaderDTO.getEmployeeName()));
-			document.add(new Paragraph("\n"));
-			document.add(new Paragraph("Customer :" + inventoryVoucherHeaderDTO.getReceiverAccountName()));
-			document.add(new Paragraph("Address :" + customerAddress));
-			document.add(new Paragraph("Email :" + customerEmail));
-			document.add(new Paragraph("Phone :" + customerPhone));
-			document.add(new Paragraph("\n"));
-			PdfPTable table = createPdfTable(inventoryVoucherHeaderDTO);
-			table.setWidthPercentage(100);
-			document.add(table);
-			document.add(new Paragraph("\n\n"));
-			document.add(new Paragraph("Remarks :" + inventoryVoucherHeaderDTO.getVisitRemarks()));
-			document.add(new Paragraph("\n\n"));
-			PdfPTable tableTotal = createTotalTable(inventoryVoucherHeaderDTO);
-			// tableTotal.setWidthPercentage(50);
-			tableTotal.setHorizontalAlignment(Element.ALIGN_LEFT);
-			document.add(tableTotal);
+				document.add(companyName);
+				document.add(line);
+				document.add(new Paragraph("Sales Order No :" + inventoryVoucherHeaderDTO.getOrderNumber()));
+				document.add(new Paragraph("Date :" + orderDate));
+				document.add(new Paragraph("Executive : " + inventoryVoucherHeaderDTO.getEmployeeName()));
+				document.add(new Paragraph("\n"));
+				document.add(new Paragraph("Customer :" + inventoryVoucherHeaderDTO.getReceiverAccountName()));
+				document.add(new Paragraph("Address :" + customerAddress));
+				document.add(new Paragraph("Email :" + customerEmail));
+				document.add(new Paragraph("Phone :" + customerPhone));
+				document.add(new Paragraph("\n"));
+				PdfPTable table = createPdfTable(inventoryVoucherHeaderDTO);
+				table.setWidthPercentage(100);
+				document.add(table);
+				document.add(new Paragraph("\n\n"));
+				document.add(new Paragraph("Remarks :" + inventoryVoucherHeaderDTO.getVisitRemarks()));
+				document.add(new Paragraph("\n\n"));
+				PdfPTable tableTotal = createTotalTable(inventoryVoucherHeaderDTO);
+				// tableTotal.setWidthPercentage(50);
+				tableTotal.setHorizontalAlignment(Element.ALIGN_LEFT);
+				document.add(tableTotal);
+
+				document.newPage();
+			}
 
 			/*
 			 * ByteArrayOutputStream baos = new ByteArrayOutputStream(); PrintStream ps =

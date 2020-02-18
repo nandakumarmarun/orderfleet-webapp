@@ -44,7 +44,7 @@
 
 							<div class="col-sm-2">
 								Account <select id="dbAccount" name="accountPid"
-									class="form-control">
+									class="form-control selectpicker" data-live-search="true">
 									<option value="-1">All Account</option>
 									<c:forEach items="${accounts}" var="account">
 										<option value="${account.pid}">${account.name}</option>
@@ -120,6 +120,18 @@
 								<br>
 								<button type="button" class="btn btn-success" id="downloadXls">Download</button>
 							</div>
+							<c:if test="${pdfDownloadStatus=='true'}">
+								<div class="col-sm-1">
+									<br>
+									<button type="button" class="btn btn-success hide packingSlipByCustomerClass"
+										id="packingSlipByCustomer">Packing Slip By Customer</button>
+										<div class="loader hide">
+
+										</div>
+				
+								</div>
+								
+							</c:if>
 						</div>
 					</form>
 				</div>

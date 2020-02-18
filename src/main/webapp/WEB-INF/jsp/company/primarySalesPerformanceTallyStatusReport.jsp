@@ -152,6 +152,19 @@
 								</div>
 								
 							</c:if>
+							
+							<c:if test="${pdfDownloadStatus=='true'}">
+								<div class="col-sm-1">
+									<br>
+									<button type="button" class="btn btn-success hide packingSlipByCustomerClass"
+										id="packingSlipByCustomer">Packing Slip By Customer</button>
+										<div class="loader hide">
+
+										</div>
+				
+								</div>
+								
+							</c:if>
 						</div>
 					</form>
 				</div>

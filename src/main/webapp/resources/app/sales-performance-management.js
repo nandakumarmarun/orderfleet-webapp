@@ -11,7 +11,12 @@ if (!this.InventoryVoucher) {
 	var inventoryVoucherContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
 
+	var inventoryPidsPdf = "";
+
 	$(document).ready(function() {
+
+		$('.selectpicker').selectpicker();
+
 		$("#txtToDate").datepicker({
 			dateFormat : "dd-mm-yy"
 		});
@@ -34,10 +39,14 @@ if (!this.InventoryVoucher) {
 			loadAllDocumentByDocumentType();
 		});
 
+		$('#packingSlipByCustomer').on('click', function() {
+			packingSlipByCustomer();
+		});
+
 		$("#btnApply").on('click', function() {
 			InventoryVoucher.filter();
 		});
-		
+
 	});
 
 	function loadAllDocumentByDocumentType() {
@@ -69,7 +78,7 @@ if (!this.InventoryVoucher) {
 	}
 
 	function showInventoryVoucher(pid) {
-		var ivhPid = pid ;
+		var ivhPid = pid;
 		$
 				.ajax({
 					url : inventoryVoucherContextPath + "/" + pid,
@@ -82,8 +91,16 @@ if (!this.InventoryVoucher) {
 								convertDateTimeFromServer(data.createdDate));
 						$('#lbl_receiver').text(data.receiverAccountName);
 						$('#lbl_supplier').text(data.supplierAccountName);
-						$('#lbl_documentTotal').text(data.updatedStatus ? (data.documentTotalUpdated).toFixed(2) :data.documentTotal);
-						$('#lbl_documentVolume').text(data.updatedStatus ? (data.documentVolumeUpdated).toFixed(2) : data.documentVolume);
+						$('#lbl_documentTotal')
+								.text(
+										data.updatedStatus ? (data.documentTotalUpdated)
+												.toFixed(2)
+												: data.documentTotal);
+						$('#lbl_documentVolume')
+								.text(
+										data.updatedStatus ? (data.documentVolumeUpdated)
+												.toFixed(2)
+												: data.documentVolume);
 						$('#lbl_documentDiscountAmount').text(
 								data.docDiscountAmount);
 						$('#lbl_documentDiscountPercentage').text(
@@ -99,7 +116,8 @@ if (!this.InventoryVoucher) {
 												unitQty = voucherDetail.productUnitQty;
 											}
 											let totQty = Math
-													.round(((voucherDetail.updatedStatus ? voucherDetail.updatedQty : voucherDetail.quantity) * unitQty) * 100) / 100;
+													.round(((voucherDetail.updatedStatus ? voucherDetail.updatedQty
+															: voucherDetail.quantity) * unitQty) * 100) / 100;
 											$('#tblVoucherDetails')
 													.append(
 															"<tr data-id='"
@@ -107,7 +125,17 @@ if (!this.InventoryVoucher) {
 																	+ "'><td>"
 																	+ voucherDetail.productName
 																	+ "</td><td>"
-																	+(voucherDetail.editOrder?"<div class='input-group'><input type='number' id='updatedQty-"+voucherDetail.detailId+"' class='form-control' value='"+(voucherDetail.updatedStatus ? voucherDetail.updatedQty : voucherDetail.quantity)+"'><div class='input-group-btn'><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateInventory(\""+pid+"\",\""+voucherDetail.detailId+"\");'  value='update'></div></div>":voucherDetail.quantity)
+																	+ (voucherDetail.editOrder ? "<div class='input-group'><input type='number' id='updatedQty-"
+																			+ voucherDetail.detailId
+																			+ "' class='form-control' value='"
+																			+ (voucherDetail.updatedStatus ? voucherDetail.updatedQty
+																					: voucherDetail.quantity)
+																			+ "'><div class='input-group-btn'><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateInventory(\""
+																			+ pid
+																			+ "\",\""
+																			+ voucherDetail.detailId
+																			+ "\");'  value='update'></div></div>"
+																			: voucherDetail.quantity)
 																	+ "</td><td>"
 																	+ unitQty
 																	+ "</td><td>"
@@ -121,7 +149,9 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ voucherDetail.discountPercentage
 																	+ "</td><td>"
-																	+ (voucherDetail.updatedStatus ? (voucherDetail.updatedRowTotal).toFixed(2):voucherDetail.rowTotal)
+																	+ (voucherDetail.updatedStatus ? (voucherDetail.updatedRowTotal)
+																			.toFixed(2)
+																			: voucherDetail.rowTotal)
 																	+ "</td></tr>");
 
 											$
@@ -144,14 +174,13 @@ if (!this.InventoryVoucher) {
 																						+ "</td></tr>");
 															});
 										});
-						/*$('.collaptable')
-								.aCollapTable(
-										{
-											startCollapsed : true,
-											addColumn : false,
-											plusButton : '<span><i class="entypo-down-open-mini"></i></span>',
-											minusButton : '<span><i class="entypo-up-open-mini"></i></span>'
-										});*/
+						/*
+						 * $('.collaptable') .aCollapTable( { startCollapsed :
+						 * true, addColumn : false, plusButton : '<span><i
+						 * class="entypo-down-open-mini"></i></span>',
+						 * minusButton : '<span><i
+						 * class="entypo-up-open-mini"></i></span>' });
+						 */
 					},
 					error : function(xhr, error) {
 						onError(xhr, error);
@@ -159,25 +188,23 @@ if (!this.InventoryVoucher) {
 				});
 	}
 
-	InventoryVoucher.updateInventory = function(ivhPid,ivdId){
+	InventoryVoucher.updateInventory = function(ivhPid, ivdId) {
 		$.ajax({
 			url : inventoryVoucherContextPath + "/updateInventory",
 			data : {
 				id : ivdId,
 				ivhPid : ivhPid,
-				quantity : $('#updatedQty-'+ivdId).val()
+				quantity : $('#updatedQty-' + ivdId).val()
 			},
 			method : 'GET',
 			success : function(data) {
 				showInventoryVoucher(ivhPid);
 				InventoryVoucher.filter();
 			}
-			
+
 		});
 	}
-	
-	
-	
+
 	InventoryVoucher.filter = function() {
 		if ($('#dbDateSearch').val() == "CUSTOM") {
 			if ($("#txtFromDate").val() == "" || $("#txtToDate").val() == "") {
@@ -235,18 +262,43 @@ if (!this.InventoryVoucher) {
 						var counts = 0;
 						let totAmount = 0;
 						let totVolume = 0;
+						inventoryPidsPdf = "";
 						$
 								.each(
 										inventoryVouchers,
 										function(index, inventoryVoucher) {
 											counts += 1;
-											totAmount += (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated : inventoryVoucher.documentTotal);
-											totVolume += (inventoryVoucher.updatedStatus ? inventoryVoucher.documentVolumeUpdated : inventoryVoucher.totalVolume);
+											totAmount += (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated
+													: inventoryVoucher.documentTotal);
+											totVolume += (inventoryVoucher.updatedStatus ? inventoryVoucher.documentVolumeUpdated
+													: inventoryVoucher.totalVolume);
 
 											var button = "";
 
 											if (inventoryVoucher.pdfDownloadButtonStatus) {
 
+												if ($("#dbAccount").val() != '-1') {
+													$(
+															".packingSlipByCustomerClass")
+															.addClass('show');
+													$(
+															".packingSlipByCustomerClass")
+															.removeClass('hide');
+
+													if (inventoryVoucher.salesManagementStatus == 'APPROVE') {
+
+														inventoryPidsPdf += inventoryVoucher.pid
+																+ ",";
+													}
+												} else {
+													$(
+															".packingSlipByCustomerClass")
+															.addClass('hide');
+													$(
+															".packingSlipByCustomerClass")
+															.removeClass('show');
+												}
+ 
 												if (inventoryVoucher.pdfDownloadStatus) {
 
 													button = "<br><br><button type='button' class='btn btn-primary' onclick='InventoryVoucher.downloadSalesorderPdf(\""
@@ -276,11 +328,13 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ inventoryVoucher.documentName
 																	+ "</td><td>"
-																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated : inventoryVoucher.documentTotal)
+																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated
+																			: inventoryVoucher.documentTotal)
 																	+ "</td><td>"
 																	+ inventoryVoucher.totalVolume
 																	+ "</td><td>"
-																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentVolumeUpdated : inventoryVoucher.documentVolume)
+																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentVolumeUpdated
+																			: inventoryVoucher.documentVolume)
 																	+ "</td><td>"
 																	+ convertDateTimeFromServer(inventoryVoucher.createdDate)
 																	+ "</td><td>"
@@ -312,6 +366,26 @@ if (!this.InventoryVoucher) {
 						}
 					}
 				});
+	}
+
+	function packingSlipByCustomer() {
+		$(".loader").addClass('show');
+
+		if (confirm("Are you sure?")) {
+
+			$(".loader").removeClass('show');
+
+			console.log(inventoryPidsPdf);
+
+			window.open(inventoryVoucherContextPath
+					+ "/downloadPdf?inventoryPid=" + inventoryPidsPdf);
+
+		}
+
+		setTimeout(function() {
+			InventoryVoucher.filter();
+		}, 1000);
+
 	}
 
 	InventoryVoucher.downloadSalesorderPdf = function(inventoryPid) {
