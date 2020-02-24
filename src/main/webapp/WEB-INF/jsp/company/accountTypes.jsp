@@ -48,7 +48,7 @@
 						<th>Alias</th>
 						<th>Account Name Type</th>
 						<th>Description</th>
-						<th>Receiver/Supplier Type</th>
+						<th>Receiver / Supplier Type</th>
 						<th>Status</th>
 						<th>Actions</th>
 					</tr>
@@ -80,9 +80,8 @@
 								<button type="button" class="btn btn-info"
 									onclick="AccountType.loadActivities('${accountType.pid}',this)">Assign
 									Activities</button>
-
-
-
+								<button type="button" class="entypo-link btn btn-primary"
+									onclick="AccountType.loadAssociatedAccountTypes('${accountType.pid}',this)"></button>
 							</td>
 						</tr>
 					</c:forEach>
@@ -381,14 +380,14 @@
 								<div id="activityCheckboxes">
 									<div class="row">
 										<div class="col-md-12 col-sm-12 clearfix">
-											<input type="radio" value="all" name="filter">
+											<input type="radio" value="all" name="filter_activities">
 											&nbsp;All&nbsp;&nbsp; <input type="radio" value="selected"
-												name="filter"> &nbsp;Selected&nbsp;&nbsp; <input
-												type="radio" value="unselected" name="filter">
+												name="filter_activities"> &nbsp;Selected&nbsp;&nbsp; <input
+												type="radio" value="unselected" name="filter_activities">
 											&nbsp;Unselected&nbsp;&nbsp;
-											<button type="button" class="btn btn-info" id="btnSearch"
+											<button type="button" class="btn btn-info" id="btnSearch_activities"
 												style="float: right;">Search</button>
-											<input type="text" id="search" placeholder="Search..."
+											<input type="text" id="search_activities" placeholder="Search..."
 												class="form-control" style="width: 200px; float: right;">
 										</div>
 									</div>
@@ -396,7 +395,7 @@
 									<br>
 
 									<table class='table table-striped table-bordered'
-										id="allAccounts">
+										id="allActivities">
 										<thead>
 											<tr>
 												<th><input type="checkbox" class="allcheckbox">
@@ -405,7 +404,7 @@
 												<th>Assing Notification</th>
 											</tr>
 										</thead>
-										<tbody id="tblAccounts">
+										<tbody id="tblActivities">
 											<c:forEach items="${activities}" var="activity">
 												<tr>
 													<td><input name='activity' type='checkbox'
@@ -427,6 +426,69 @@
 						</div>
 						<div class="modal-footer">
 							<input class="btn btn-success" type="button" id="btnSaveActivity"
+								value="Save" />
+							<button class="btn" data-dismiss="modal">Cancel</button>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+			
+			<div class="modal fade container" id="associatedAccountTypeModal">
+				<!-- model Dialog -->
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title">Assign Associated Account Types</h4>
+						</div>
+						<div class="modal-body" style="overflow: auto; height: 500px">
+							<div class="form-group">
+								<div id="associatedAccountTypeCheckboxes">
+									<div class="row">
+										<div class="col-md-12 col-sm-12 clearfix">
+											<input type="radio" value="all" name="filter_accountTypes">
+											&nbsp;All&nbsp;&nbsp; <input type="radio" value="selected"
+												name="filter_accountTypes"> &nbsp;Selected&nbsp;&nbsp; <input
+												type="radio" value="unselected" name="filter_accountTypes">
+											&nbsp;Unselected&nbsp;&nbsp;
+											<button type="button" class="btn btn-info" id="btnSearch_accountTypes"
+												style="float: right;">Search</button>
+											<input type="text" id="search_accountTypes" placeholder="Search..."
+												class="form-control" style="width: 200px; float: right;">
+										</div>
+									</div>
+
+									<br>
+
+									<table class='table table-striped table-bordered'
+										id="allAccountTypes">
+										<thead>
+											<tr>
+												<th><input type="checkbox" class="allcheckbox">
+													All</th>
+												<th>Account Types</th>
+											</tr>
+										</thead>
+										<tbody id="tblAccountTypes">
+											<c:forEach items="${accountTypes}" var="accountType">
+												<tr>
+													<td><input name='accountType' type='checkbox'
+														value="${accountType.pid}" style="display: block;" /></td>
+													<td>${accountType.name}</td>
+											</c:forEach>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<label class="error-msg" style="color: red;"></label>
+						</div>
+						<div class="modal-footer">
+							<input class="btn btn-success" type="button" id="btnSaveAssociatedAccountType"
 								value="Save" />
 							<button class="btn" data-dismiss="modal">Cancel</button>
 						</div>

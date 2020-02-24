@@ -18,7 +18,7 @@ if (!this.AccountType) {
 		accountNameType : null,
 		description : null,
 		receiverSupplierType : null,
-		
+
 	};
 
 	// Specify the validation rules
@@ -58,65 +58,85 @@ if (!this.AccountType) {
 		}
 	};
 
-	$(document).ready(
-			function() {
-				
-				// add the rule here
-				$.validator.addMethod("valueNotEquals", function(value, element, arg) {
-					return arg != value;
-				}, "");
-				
-				createEditForm.validate({
-					rules : validationRules,
-					messages : validationMessages,
-					submitHandler : function(form) {
-						createUpdateAccountType(form);
-					}
-				});
+	$(document)
+			.ready(
+					function() {
 
-				deleteForm.submit(function(e) {
-					// prevent Default functionality
-					e.preventDefault();
-					// pass the action-url of the form
-					deleteAccountType(e.currentTarget.action);
-				});
-				$('#btnSaveAccounts').click(function() {
-					saveAssignedAccounts();
-				});
+						// add the rule here
+						$.validator.addMethod("valueNotEquals", function(value,
+								element, arg) {
+							return arg != value;
+						}, "");
 
-				$('#btnActivateAccountTypes').on('click', function() {
-					activateAssignedAccountTypes();
-				});
-
-				$('#deactivatedAccounts').click(function() {
-					addDeactivatedAccounts();
-				});
-
-				// table search
-				$('#btnSearch').click(function() {
-					searchTable($("#search").val());
-				});
-				
-				$('#btnSaveActivity').click(function() {
-					saveAssignedActivities();
-				});
-
-				/* select all checkbox in table product table */
-				$('input:checkbox.allcheckbox').click(
-						function() {
-							$(this).closest('table').find(
-									'tbody tr td input[type="checkbox"]:visible').prop(
-									'checked', $(this).prop('checked'));
+						createEditForm.validate({
+							rules : validationRules,
+							messages : validationMessages,
+							submitHandler : function(form) {
+								createUpdateAccountType(form);
+							}
 						});
-			});
 
-	function searchTable(inputVal) {
+						deleteForm.submit(function(e) {
+							// prevent Default functionality
+							e.preventDefault();
+							// pass the action-url of the form
+							deleteAccountType(e.currentTarget.action);
+						});
+						$('#btnSaveAccounts').click(function() {
+							saveAssignedAccounts();
+						});
+
+						$('#btnActivateAccountTypes').on('click', function() {
+							activateAssignedAccountTypes();
+						});
+
+						$('#deactivatedAccounts').click(function() {
+							addDeactivatedAccounts();
+						});
+
+						$('#btnSaveActivity').click(function() {
+							saveAssignedActivities();
+						});
+
+						$('#btnSaveAssociatedAccountType').click(function() {
+							saveAssociatedAccountTypes();
+						});
+						
+						// table search
+						$('#btnSearch').click(function() {
+							searchAccountTable($("#search").val());
+						});
+						
+						$('#btnSearch_accountTypes').click(function() {
+							searchAccountTypeTable($("#search_accountTypes").val());
+						});
+						
+						$('#btnSearch_activities').click(function() {
+							searchActivityTable($("#search_activities").val());
+						});
+
+						/* select all checkbox in table product table */
+						$('input:checkbox.allcheckbox')
+								.click(
+										function() {
+											$(this)
+													.closest('table')
+													.find(
+															'tbody tr td input[type="checkbox"]:visible')
+													.prop(
+															'checked',
+															$(this).prop(
+																	'checked'));
+										});
+					});
+
+	function searchAccountTable(inputVal) {
 		var table = $('#tblAccounts');
-		var filterBy = $("input[name='filter']:checked").val();
+		var filterBy = $("input[name='filter']:checked").val();		
 		table.find('tr').each(
 				function(index, row) {
 					var allCells = $(row).find('td');
-					if (allCells.length > 0) {
+					if (allCells.length > 0) {	
 						var found = false;
 						allCells.each(function(index, td) {
 							if (index == 0) {
@@ -153,6 +173,95 @@ if (!this.AccountType) {
 					}
 				});
 	}
+	
+	function searchAccountTypeTable(inputVal) {
+		var table = $('#tblAccountTypes');
+		var filterBy = $("input[name='filter_accountTypes']:checked").val();		
+		table.find('tr').each(
+				function(index, row) {
+					var allCells = $(row).find('td');
+					if (allCells.length > 0) {	
+						var found = false;
+						allCells.each(function(index, td) {
+							if (index == 0) {
+								if (filterBy != "all") {
+									var val = $(td).find('input').prop(
+											'checked');
+									var deselected = $(td).closest('tr').find(
+											'td:eq(2)').text();
+									if (filterBy == "selected") {
+										if (!val) {
+											return false;
+										}
+									} else if (filterBy == "unselected") {
+										if (val) {
+											return false;
+										}
+									} else if (filterBy == "deactivated") {
+										if (deselected == "true") {
+											return false;
+										}
+									}
+								}
+							}
+							var regExp = new RegExp(inputVal, 'i');
+							if (regExp.test($(td).text())) {
+								found = true;
+								return false;
+							}
+						});
+						if (found == true)
+							$(row).show();
+						else
+							$(row).hide();
+					}
+				});
+	}
+	
+	function searchActivityTable(inputVal) {
+		var table = $('#tblActivities');
+		var filterBy = $("input[name='filter_activities']:checked").val();		
+		table.find('tr').each(
+				function(index, row) {
+					var allCells = $(row).find('td');
+					if (allCells.length > 0) {	
+						var found = false;
+						allCells.each(function(index, td) {
+							if (index == 0) {
+								if (filterBy != "all") {
+									var val = $(td).find('input').prop(
+											'checked');
+									var deselected = $(td).closest('tr').find(
+											'td:eq(2)').text();
+									if (filterBy == "selected") {
+										if (!val) {
+											return false;
+										}
+									} else if (filterBy == "unselected") {
+										if (val) {
+											return false;
+										}
+									} else if (filterBy == "deactivated") {
+										if (deselected == "true") {
+											return false;
+										}
+									}
+								}
+							}
+							var regExp = new RegExp(inputVal, 'i');
+							if (regExp.test($(td).text())) {
+								found = true;
+								return false;
+							}
+						});
+						if (found == true)
+							$(row).show();
+						else
+							$(row).hide();
+					}
+				});
+	}
+	
 	var accountTYpename = "";
 	var valueExist = true;
 
@@ -160,7 +269,7 @@ if (!this.AccountType) {
 		accountTYpename = $(obj).closest('tr').find('td:nth-child(1)').text();
 		$("input[name='filter'][value='all']").prop("checked", true);
 		$("#search").val("");
-		searchTable("");
+		searchAccountTable("");
 
 		// clear all check box
 		$("#accountsCheckboxes input:checkbox").attr('checked', false);
@@ -184,13 +293,12 @@ if (!this.AccountType) {
 		});
 		$("#accountsModal").modal("show");
 	}
-	
-	
+
 	AccountType.loadActivities = function(pid, obj) {
 		accountTYpename = $(obj).closest('tr').find('td:nth-child(1)').text();
 		$("input[name='filter'][value='all']").prop("checked", true);
-		$("#search").val("");
-		searchTable("");
+		$("#search_activities").val("");
+		searchActivityTable("");
 
 		// clear all check box
 		$("#activityCheckboxes input:checkbox").attr('checked', false);
@@ -198,17 +306,20 @@ if (!this.AccountType) {
 			url : accountTypeContextPath + "/findActivities/" + pid,
 			type : "GET",
 			success : function(data) {
-			
+
 				accountTypeModel.pid = pid;
 				if (data) {
 					$.each(data, function(index, activity) {
-						$("#activityCheckboxes input:checkbox[value="+ activity.activityPid + "]").prop("checked",true);
-						if(activity.assignNotification){
-							$("#drop-"+ activity.activityPid).val("true");
-						}else{
-							$("#drop-"+ activity.activityPid).val("false");
+						$(
+								"#activityCheckboxes input:checkbox[value="
+										+ activity.activityPid + "]").prop(
+								"checked", true);
+						if (activity.assignNotification) {
+							$("#drop-" + activity.activityPid).val("true");
+						} else {
+							$("#drop-" + activity.activityPid).val("false");
 						}
-						
+
 					});
 				}
 			},
@@ -218,8 +329,43 @@ if (!this.AccountType) {
 		});
 		$("#activitiesModal").modal("show");
 	}
-	
 
+	AccountType.loadAssociatedAccountTypes = function(pid, obj) {
+		accountTYpename = $(obj).closest('tr').find('td:nth-child(1)').text();
+		$("input[name='filter'][value='all']").prop("checked", true);
+		$("#search_accountTypes").val("");
+		searchAccountTypeTable("");
+
+		// clear all check box
+		$("#associatedAccountTypeCheckboxes input:checkbox").attr('checked',
+				false);
+		$
+				.ajax({
+					url : accountTypeContextPath
+							+ "/findAssociatedAccountTypes/" + pid,
+					type : "GET",
+					success : function(data) {
+
+						accountTypeModel.pid = pid;
+						if (data) {
+							$
+									.each(
+											data,
+											function(index, accountType) {
+												$(
+														"#associatedAccountTypeCheckboxes input:checkbox[value="
+																+ accountType.associatedAccountTypePid
+																+ "]").prop(
+														"checked", true);
+											});
+						}
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					},
+				});
+		$("#associatedAccountTypeModal").modal("show");
+	}
 
 	function saveAssignedAccounts() {
 
@@ -240,7 +386,7 @@ if (!this.AccountType) {
 			data : {
 				pid : accountTypeModel.pid,
 				assignedAccounts : selectedAccounts
-				
+
 			},
 			success : function(status) {
 				$("#activityModal").modal("hide");
@@ -251,19 +397,18 @@ if (!this.AccountType) {
 			},
 		});
 	}
-	
-	
+
 	function saveAssignedActivities() {
 
 		$(".error-msg").html("");
 		var selectedActivities = "";
 		var activityNotification = "";
 		$.each($("input[name='activity']:checked"), function() {
-			selectedActivities += $(this).val() +"~"+$('#drop-'+$(this).val()).val()+ ",";
-			
+			selectedActivities += $(this).val() + "~"
+					+ $('#drop-' + $(this).val()).val() + ",";
+
 		});
 
-		
 		if (selectedActivities == "") {
 			$(".error-msg").html("Please select Activities");
 			return;
@@ -274,7 +419,7 @@ if (!this.AccountType) {
 			data : {
 				pid : accountTypeModel.pid,
 				assignedActivities : selectedActivities
-				
+
 			},
 			success : function(status) {
 				$("#activityModal").modal("hide");
@@ -285,8 +430,42 @@ if (!this.AccountType) {
 			},
 		});
 	}
-	
 
+	function saveAssociatedAccountTypes() {
+
+		$(".error-msg").html("");
+		var selectedAccountTypes = "";
+
+		$.each($("input[name='accountType']:checked"), function() {
+			selectedAccountTypes += $(this).val() + "~"
+					+ $('#drop-' + $(this).val()).val() + ",";
+
+		});
+
+		if (selectedAccountTypes == "") {
+			$(".error-msg").html("Please select Account Types");
+			return;
+		}
+
+		console.log(accountTypeModel.pid + "------------"
+				+ selectedAccountTypes);
+		$.ajax({
+			url : accountTypeContextPath + "/assignAssociatedAccountTypes",
+			type : "POST",
+			data : {
+				pid : accountTypeModel.pid,
+				assignedAccountTypes : selectedAccountTypes
+
+			},
+			success : function(status) {
+				$("#associatedAccountTypeModal").modal("hide");
+				onSaveSuccess(status);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			},
+		});
+	}
 
 	function activateAssignedAccountTypes() {
 		$(".error-msg").html("");
@@ -362,7 +541,8 @@ if (!this.AccountType) {
 		accountTypeModel.alias = $('#field_alias').val();
 		accountTypeModel.accountNameType = $('#field_accountNameType').val();
 		accountTypeModel.description = $('#field_description').val();
-		accountTypeModel.receiverSupplierType = $('#field_receiverSupplierType').val();
+		accountTypeModel.receiverSupplierType = $('#field_receiverSupplierType')
+				.val();
 
 		$.ajax({
 			method : $(el).attr('method'),
@@ -385,9 +565,14 @@ if (!this.AccountType) {
 			success : function(data) {
 				$('#lbl_name').text(data.name);
 				$('#lbl_alias').text((data.alias == null ? "" : data.alias));
-				$('#lbl_accountNameType').text((data.accountNameType == null ? "" : data.accountNameType));
-				$('#lbl_description').text((data.description == null ? "" : data.description));
-				$('#lbl_receiverSupplierType').text((data.receiverSupplierType == null ? "" : data.receiverSupplierType));
+				$('#lbl_accountNameType').text(
+						(data.accountNameType == null ? ""
+								: data.accountNameType));
+				$('#lbl_description').text(
+						(data.description == null ? "" : data.description));
+				$('#lbl_receiverSupplierType').text(
+						(data.receiverSupplierType == null ? ""
+								: data.receiverSupplierType));
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -402,9 +587,14 @@ if (!this.AccountType) {
 			success : function(data) {
 				$('#field_name').val(data.name);
 				$('#field_alias').val((data.alias == null ? "" : data.alias));
-				$('#field_accountNameType').val((data.accountNameType == null ? "" : data.accountNameType));
-				$('#field_description').val((data.description == null ? "" : data.description));
-				$('#field_receiverSupplierType').val((data.receiverSupplierType == null ? "" : data.receiverSupplierType));
+				$('#field_accountNameType').val(
+						(data.accountNameType == null ? ""
+								: data.accountNameType));
+				$('#field_description').val(
+						(data.description == null ? "" : data.description));
+				$('#field_receiverSupplierType').val(
+						(data.receiverSupplierType == null ? ""
+								: data.receiverSupplierType));
 				// set pid
 				accountTypeModel.pid = data.pid;
 			},

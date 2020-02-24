@@ -25,10 +25,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountActivityTaskConfig;
+import com.orderfleet.webapp.domain.AccountType;
+import com.orderfleet.webapp.domain.AccountTypeAssociation;
+import com.orderfleet.webapp.domain.Activity;
 import com.orderfleet.webapp.domain.MenuItem;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 import com.orderfleet.webapp.repository.AccountActivityTaskConfigRepository;
+import com.orderfleet.webapp.repository.AccountTypeAssociationRepository;
+import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountActivityTaskConfigService;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -37,6 +43,7 @@ import com.orderfleet.webapp.service.ActivityService;
 import com.orderfleet.webapp.service.UserMenuItemService;
 import com.orderfleet.webapp.web.rest.dto.AccountActivityTaskConfigDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.AccountTypeAssociationDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountTypeDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
@@ -67,9 +74,15 @@ public class AccountTypeResource {
 
 	@Inject
 	private AccountActivityTaskConfigRepository activityConfigRepository;
-	
+
 	@Inject
 	private UserMenuItemService userMenuItemService;
+
+	@Inject
+	private AccountTypeAssociationRepository accountTypeAssociationRepository;
+
+	@Inject
+	private AccountTypeRepository accountTypeRepository;
 
 	/**
 	 * POST /accountTypes : Create a new accountType.
@@ -159,7 +172,7 @@ public class AccountTypeResource {
 		model.addAttribute("activities", activityService.findAllByCompany());
 		model.addAttribute("accountNameTypes", AccountNameType.values());
 		model.addAttribute("receiverSupplierTypes", ReceiverSupplierType.values());
-		model.addAttribute("menuItemLabel",userMenuItemService.findMenuItemLabelView("/web/accountTypes"));
+		model.addAttribute("menuItemLabel", userMenuItemService.findMenuItemLabelView("/web/accountTypes"));
 
 		return "company/accountTypes";
 	}
@@ -227,6 +240,34 @@ public class AccountTypeResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/accountTypes/assignAssociatedAccountTypes", method = RequestMethod.POST)
+	@Timed
+	public ResponseEntity<Void> saveAssignedAccountTypes(@RequestParam String pid,
+			@RequestParam String assignedAccountTypes) {
+
+		log.debug("REST request to save assigned account types : {}", pid);
+		accountTypeAssociationRepository.deleteByAccountTypePidAndCompanyId(pid,
+				SecurityUtils.getCurrentUsersCompanyId());
+		String[] associatedAccountType = assignedAccountTypes.split(",");
+		for (String associatedAccountTypePid : associatedAccountType) {
+			String aatpid = associatedAccountTypePid.split("~")[0].toString();
+
+			AccountTypeAssociation accountTypeAssociation = new AccountTypeAssociation();
+
+			Optional<AccountType> opAccountType = accountTypeRepository.findOneByPid(pid);
+			Optional<AccountType> opAssociatedAccountType = accountTypeRepository.findOneByPid(aatpid);
+
+			if (opAccountType.isPresent() && opAssociatedAccountType.isPresent()) {
+				accountTypeAssociation.setAccountType(opAccountType.get());
+				accountTypeAssociation.setCompany(opAccountType.get().getCompany());
+				accountTypeAssociation.setAssociatedAccountType(opAssociatedAccountType.get());
+			}
+
+			accountTypeAssociationRepository.save(accountTypeAssociation);
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/accountTypes/findAccounts/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<AccountProfileDTO>> getAccounts(@PathVariable String pid) {
@@ -251,6 +292,27 @@ public class AccountTypeResource {
 		}
 
 		return new ResponseEntity<>(activityConfiglist, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/accountTypes/findAssociatedAccountTypes/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<AccountTypeAssociationDTO>> getAssociatedAccountTypes(@PathVariable String pid) {
+		log.debug("REST request to get associated account types by accountTypePid : {}", pid);
+		// List<Object[]> activityConfig =
+		// activityConfigRepository.findActivityPidByAccountTypePid(pid);
+		List<String> associatedAccountTypes = accountTypeAssociationRepository.findAssociatedAccountTypeByPid(pid);
+
+		List<AccountTypeAssociationDTO> accountTypeAssociationDTOs = new ArrayList<>();
+
+		for (String associatedAccountType : associatedAccountTypes) {
+			AccountTypeAssociationDTO accountTypeAssociationDTO = new AccountTypeAssociationDTO();
+			log.info(associatedAccountType);
+			accountTypeAssociationDTO.setAssociatedAccountTypePid(associatedAccountType);
+
+			accountTypeAssociationDTOs.add(accountTypeAssociationDTO);
+		}
+
+		return new ResponseEntity<>(accountTypeAssociationDTOs, HttpStatus.OK);
 	}
 
 	/**

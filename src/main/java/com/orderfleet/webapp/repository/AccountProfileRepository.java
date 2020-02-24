@@ -169,8 +169,12 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.id in ?1")
 	List<AccountProfile> findAllByCompanyIdAndIdsIn(Set<Long> accountProfileIds);
-	
+
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and  accountProfile.geoTaggingType != ?2")
-	List<AccountProfile> findAllByCompanyIdAndGeoTaggingTypeNotEqual(Long currentUsersCompanyId, GeoTaggingType notTagged);
+	List<AccountProfile> findAllByCompanyIdAndGeoTaggingTypeNotEqual(Long currentUsersCompanyId,
+			GeoTaggingType notTagged);
+
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.pid in ?1")
+	List<AccountProfile> findAllByAccountProfilePids(List<String> associatedAccountProfilePids);
 
 }
