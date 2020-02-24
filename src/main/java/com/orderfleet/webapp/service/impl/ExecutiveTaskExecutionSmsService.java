@@ -259,7 +259,7 @@ public class ExecutiveTaskExecutionSmsService {
 
 				stringBuilder.append(".\nHe has collected total " + accountingVoucherHeader.getTotalAmount() + ".\n\n");
 
-				stringBuilder.append("Thank you for your time and consideration.\n" + company.getLegalName());
+				stringBuilder.append("We acknowledge with thanks the receipt of payment as above.\n" + company.getLegalName());
 
 			}
 

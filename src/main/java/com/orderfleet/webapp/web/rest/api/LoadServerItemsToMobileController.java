@@ -6,11 +6,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -32,6 +35,7 @@ import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.MobileUINames;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.AttendanceRepository;
@@ -39,16 +43,19 @@ import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.UserDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.PerformanceReportMobileService;
 import com.orderfleet.webapp.service.UserService;
+import com.orderfleet.webapp.web.rest.api.dto.DocumentDashboardDTO;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerExeTaskDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerSentItemDTO;
 import com.orderfleet.webapp.web.rest.api.dto.ManagedUserDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
+import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionView;
@@ -81,6 +88,9 @@ public class LoadServerItemsToMobileController {
 
 	@Inject
 	private DocumentRepository documentRepository;
+	
+	@Inject
+	private UserDocumentRepository userDocumentRepository;
 
 	@Inject
 	private AttendanceRepository attendanceRepository;
@@ -115,39 +125,40 @@ public class LoadServerItemsToMobileController {
 
 	@GetMapping("/load-server-sent-items")
 	public ResponseEntity<LoadServerExeTaskDTO> sentItemsDownload(@RequestParam String filterBy,
-			@RequestParam(required = false) String fromDate, @RequestParam(required = false) String toDate) {
+			@RequestParam(required = false) String fromDate, @RequestParam(required = false) String toDate,
+			@RequestParam(required = false) String accountPid) {
 
-		log.info("Request to load server sent items...");
+		log.info("Request to load server sent items..."+accountPid);
 
 		LoadServerExeTaskDTO loadServerExeTaskDTO = new LoadServerExeTaskDTO();
 
 		if (filterBy.equalsIgnoreCase("TODAY")) {
 			log.info("TODAY------");
-			loadServerExeTaskDTO = getFilterData(LocalDate.now(), LocalDate.now());
+			loadServerExeTaskDTO = getFilterData(LocalDate.now(), LocalDate.now() ,accountPid);
 		} else if (filterBy.equalsIgnoreCase("YESTERDAY")) {
 			log.info("YESTERDAY------");
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			loadServerExeTaskDTO = getFilterData(yeasterday, yeasterday);
+			loadServerExeTaskDTO = getFilterData(yeasterday, yeasterday ,accountPid);
 		} else if (filterBy.equalsIgnoreCase("WTD")) {
 			log.info("WTD------");
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			loadServerExeTaskDTO = getFilterData(weekStartDate, LocalDate.now());
+			loadServerExeTaskDTO = getFilterData(weekStartDate, LocalDate.now(), accountPid);
 		} else if (filterBy.equalsIgnoreCase("MTD")) {
 			log.info("MTD------");
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			loadServerExeTaskDTO = getFilterData(monthStartDate, LocalDate.now());
+			loadServerExeTaskDTO = getFilterData(monthStartDate, LocalDate.now(), accountPid);
 		} else if (filterBy.equalsIgnoreCase("CUSTOM")) {
 			log.info("CUSTOM------" + fromDate + " to " + toDate + "------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-			loadServerExeTaskDTO = getFilterData(fromDateTime, toFateTime);
+			loadServerExeTaskDTO = getFilterData(fromDateTime, toFateTime, accountPid);
 		} else if (filterBy.equalsIgnoreCase("SINGLE")) {
 			log.info("SINGLE------" + fromDate + "-------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			loadServerExeTaskDTO = getFilterData(fromDateTime, fromDateTime);
+			loadServerExeTaskDTO = getFilterData(fromDateTime, fromDateTime, accountPid);
 		}
 
 		return new ResponseEntity<>(loadServerExeTaskDTO, HttpStatus.OK);
@@ -190,7 +201,158 @@ public class LoadServerItemsToMobileController {
 
 	}
 
-	private LoadServerExeTaskDTO getFilterData(LocalDate fDate, LocalDate tDate) {
+	
+	@GetMapping("/load-server-document-wise-count")
+	public ResponseEntity<List<DocumentDashboardDTO>> getIndividualDocumentWiseCounts() {
+	
+		List<DocumentDashboardDTO> documentDashboardDtos = new ArrayList<>();
+		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		User user = new User();
+		if(opUser.isPresent()){
+			user = opUser.get();
+		}else {
+			return null;
+		}
+		List<Document> userDocuments = userDocumentRepository.findDocumentsByUserIsCurrentUser();
+		
+		Map<DocumentType,List<Document>> documentTypeDocuments = new HashMap<>();
+		documentTypeDocuments = userDocuments.stream().collect(Collectors.groupingBy(Document::getDocumentType));
+		
+		LocalDate today = LocalDate.now();
+		LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
+		TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+		LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
+		
+		LocalDateTime mfDate = monthStartDate.atTime(0,0);
+		LocalDateTime mtDate = today.atTime(23, 59);
+		
+		LocalDateTime wfDate = weekStartDate.atTime(0,0);
+		LocalDateTime wtDate = today.atTime(23, 59);
+		
+		LocalDateTime tfDate = today.atTime(0,0);
+		LocalDateTime ttDate = today.atTime(23, 59);
+		
+		for(Map.Entry<DocumentType, List<Document>> mapEntry : documentTypeDocuments.entrySet()) {
+			List<Document> documentList = mapEntry.getValue();
+			int dayCount = 0;
+			int weekCount = 0;
+			int monthCount = 0;
+			
+			if(mapEntry.getKey() == DocumentType.INVENTORY_VOUCHER) {
+				log.info("INVENTORY_VOUCHER");
+				List<Object[]> monthArray = inventoryVoucherHeaderRepository.findCountOfEachInventoryTypeDocuments(user.getId(), mfDate, mtDate);
+				List<Object[]> weekArray = inventoryVoucherHeaderRepository.findCountOfEachInventoryTypeDocuments(user.getId(), wfDate, wtDate);
+				List<Object[]> dayArray = inventoryVoucherHeaderRepository.findCountOfEachInventoryTypeDocuments(user.getId(), tfDate, ttDate);
+				log.info("monthArray size :"+ monthArray.size());
+				log.info("weekArray size :"+ weekArray.size());
+				log.info("dayArray size :"+ dayArray.size());
+				for(Document document : documentList) {
+					for(Object[] obj : monthArray) {
+						if(obj[1].equals(document.getPid())) {
+							monthCount = Integer.parseInt(obj[0].toString());
+							break;
+						}
+					}
+					for(Object[] obj : weekArray) {
+						if(obj[1].equals(document.getPid())) {
+							weekCount = Integer.parseInt(obj[0].toString());
+							break;
+						}
+					}
+					for(Object[] obj : dayArray) {
+						if(obj[1].equals(document.getPid())) {
+							dayCount = Integer.parseInt(obj[0].toString());
+							break;
+						}
+					}
+					documentDashboardDtos.add(setDocumentDashboard(document,dayCount,weekCount,monthCount));
+				}
+			}else if(mapEntry.getKey() == DocumentType.ACCOUNTING_VOUCHER) {
+				log.info("ACCOUNTING_VOUCHER");
+				List<Object[]> monthArray = accountingVoucherHeaderRepository.findCountOfEachAccountingTypeDocuments(user.getId(), mfDate, mtDate);
+				List<Object[]> weekArray = accountingVoucherHeaderRepository.findCountOfEachAccountingTypeDocuments(user.getId(), wfDate, wtDate);
+				List<Object[]> dayArray = accountingVoucherHeaderRepository.findCountOfEachAccountingTypeDocuments(user.getId(), tfDate, ttDate);
+				log.info("monthArray size :"+ monthArray.size());
+				log.info("weekArray size :"+ weekArray.size());
+				log.info("dayArray size :"+ dayArray.size());
+				for(Document document : documentList) {
+					dayCount = 0;
+					weekCount = 0;
+					monthCount = 0;
+					for(Object[] obj : monthArray) {
+						if(obj[1].equals(document.getPid())) {
+							monthCount = Integer.parseInt(obj[0].toString());
+							break;
+						}
+					}
+					for(Object[] obj : weekArray) {
+						if(obj[1].equals(document.getPid())) {
+							weekCount = Integer.parseInt(obj[0].toString());
+							break;
+						}
+					}
+					for(Object[] obj : dayArray) {
+						if(obj[1].equals(document.getPid())) {
+							dayCount = Integer.parseInt(obj[0].toString());
+							break;
+						}
+					}
+					documentDashboardDtos.add(setDocumentDashboard(document,dayCount,weekCount,monthCount));
+				}
+				
+			}else if(mapEntry.getKey() == DocumentType.DYNAMIC_DOCUMENT) {
+				log.info("DYNAMIC_DOCUMENT");
+				List<Object[]> monthArray = dynamicDocumentHeaderRepository.findCountOfEachDynamicTypeDocuments(user.getId(), mfDate, mtDate);
+				List<Object[]> weekArray = dynamicDocumentHeaderRepository.findCountOfEachDynamicTypeDocuments(user.getId(), wfDate, wtDate);
+				List<Object[]> dayArray = dynamicDocumentHeaderRepository.findCountOfEachDynamicTypeDocuments(user.getId(), tfDate, ttDate);
+				log.info("monthArray size :"+ monthArray.size());
+				log.info("weekArray size :"+ weekArray.size());
+				log.info("dayArray size :"+ dayArray.size());
+
+				for(Document document : documentList) {
+					for(Object[] obj : monthArray) {
+						if(obj[1].equals(document.getPid())) {
+							monthCount = Integer.parseInt(obj[0].toString());
+							break;
+						}
+					}
+					for(Object[] obj : weekArray) {
+						if(obj[1].equals(document.getPid())) {
+							weekCount = Integer.parseInt(obj[0].toString());
+							break;
+						}
+					}
+					for(Object[] obj : dayArray) {
+						if(obj[1].equals(document.getPid())) {
+							dayCount = Integer.parseInt(obj[0].toString());
+							break;
+						}
+					}
+					documentDashboardDtos.add(setDocumentDashboard(document,dayCount,weekCount,monthCount));
+				}
+			}else {
+				
+			}
+		}
+		for(DocumentDashboardDTO dto : documentDashboardDtos) {
+			System.out.println("Document : "+dto.getDocument().getName());
+			System.out.println("Month : "+dto.getMonthCount());
+			System.out.println("Week : "+dto.getWeekCount());
+			System.out.println("Day : "+dto.getDayCount());
+		}
+		log.info("Final Size : "+documentDashboardDtos.size());
+		return new ResponseEntity<>(documentDashboardDtos,HttpStatus.OK);
+	}
+	
+	private DocumentDashboardDTO setDocumentDashboard(Document document,int dayCount,int weekCount,int monthCount) {
+		DocumentDashboardDTO documentDashboardDto = new DocumentDashboardDTO();
+		documentDashboardDto.setDocument(new DocumentDTO(document));
+		documentDashboardDto.setDayCount(dayCount);
+		documentDashboardDto.setWeekCount(weekCount);
+		documentDashboardDto.setMonthCount(monthCount);
+		return documentDashboardDto;
+	}
+	private LoadServerExeTaskDTO getFilterData(LocalDate fDate, LocalDate tDate ,String accountPid) {
 
 		LoadServerExeTaskDTO loadServerExeTaskDTO = new LoadServerExeTaskDTO();
 
@@ -214,7 +376,13 @@ public class LoadServerItemsToMobileController {
 		Set<Long> exeIds = new HashSet<>();
 
 		for (Object[] obj : executiveTaskExecutionsObject) {
-
+			
+			if(accountPid != null && accountPid != "") {
+				String pid = obj[5].toString();
+				if(!accountPid.equals(pid)) {
+					continue;//if account profile pid not match search pid
+				}
+			}
 			ExecutiveTaskExecutionDTO executiveTaskExecutionDTO = new ExecutiveTaskExecutionDTO();
 
 			executiveTaskExecutionDTO.setPid(obj[0] != null ? obj[0].toString() : "");

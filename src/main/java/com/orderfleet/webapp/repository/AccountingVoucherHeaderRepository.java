@@ -240,5 +240,11 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 
 	Optional<AccountingVoucherHeader> findOneByExecutiveTaskExecutionPidAndImageRefNo(
 			String executiveTaskExecutionPid, String imageRefNo);
+	
+	@Query(value = "select count(*),doc.pid from tbl_accounting_voucher_header avh " + 
+			"inner join tbl_document doc on avh.document_id = doc.id " + 
+			"where avh.company_id = ?#{principal.companyId} and avh.created_by_id = ?1 " + 
+			"and avh.created_date between ?2 and ?3  group by doc.pid",nativeQuery = true)
+	List<Object[]> findCountOfEachAccountingTypeDocuments(long userId,LocalDateTime fDate,LocalDateTime tDate);
 
 }

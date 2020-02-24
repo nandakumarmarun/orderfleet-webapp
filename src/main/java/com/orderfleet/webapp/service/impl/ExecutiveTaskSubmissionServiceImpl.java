@@ -586,17 +586,12 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 							inventoryVoucherBatchDetails));
 				});
 				inventoryVoucherHeader.setInventoryVoucherDetails(inventoryVoucherDetails);
-				inventoryVouchers.add(inventoryVoucherHeader);
+				
+				inventoryVouchers.add(inventoryVoucherHeaderRepository.save(inventoryVoucherHeader));
 
-				// Add to web socket message
-				/*
-				 * MessageDTO messageDTO = new MessageDTO();
-				 * messageDTO.setDocumentName(inventoryVoucherDTO. getDocumentName());
-				 * messageDTO.setDocumentTotal(inventoryVoucherDTO. getDocumentTotal());
-				 * messageDTOs.add(messageDTO);
-				 */
+
 			}
-			return inventoryVoucherHeaderRepository.save(inventoryVouchers);
+			return inventoryVouchers;
 		}
 		return null;
 	}

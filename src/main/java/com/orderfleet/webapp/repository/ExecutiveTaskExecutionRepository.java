@@ -234,7 +234,7 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.pid = ?1")
 	ExecutiveTaskExecution findByExecutionPid(String executionPid);
 
-	@Query("select exeTaskExecution.pid,exeTaskExecution.accountProfile.name,exeTaskExecution.activity.name,exeTaskExecution.date,exeTaskExecution.id from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and  exeTaskExecution.user.id = ?3 order By exeTaskExecution.date desc")
+	@Query("select exeTaskExecution.pid,exeTaskExecution.accountProfile.name,exeTaskExecution.activity.name,exeTaskExecution.date,exeTaskExecution.id,exeTaskExecution.accountProfile.pid from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and  exeTaskExecution.user.id = ?3 order By exeTaskExecution.date desc")
 	List<Object[]> getByDateBetweenAndUser(LocalDateTime fromDate, LocalDateTime toDate, long userId);
 
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.id in ?1")

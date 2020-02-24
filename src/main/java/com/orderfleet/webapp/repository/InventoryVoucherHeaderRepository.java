@@ -565,6 +565,10 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	int updateInventoryVoucherHeaderSendSalesOrderEmailStatusUsingPidAndCompanyId(SendSalesOrderEmailStatus sendSalesOrderEmailStatus,
 			Long companyId, List<String> inventoryPids);
 
-	
+	@Query(value = "select count(*),doc.pid from tbl_inventory_voucher_header ivh " + 
+			"inner join tbl_document doc on ivh.document_id = doc.id " + 
+			"where ivh.company_id = ?#{principal.companyId} and ivh.created_by_id = ?1 " + 
+			"and ivh.created_date between ?2 and ?3  group by doc.pid",nativeQuery = true)
+	List<Object[]> findCountOfEachInventoryTypeDocuments(long userId,LocalDateTime fDate,LocalDateTime tDate);
 
 }
