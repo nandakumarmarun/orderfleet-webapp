@@ -254,13 +254,14 @@ if (!this.AccountProfileInfluencerAssociation) {
 			type : "POST",
 			data : {
 				pid : $('#dbAccount').val(),
-				assignedAccountProfiles : selectedAccountProfiles
+				assignedAccountProfiles : selectedAccountProfiles,
+				associatedAccountTypePid : $("#dbAssociatedAccountTypes").val(),
+				influencerAccountTypePid : $('#dbAccountTypes').val()
 
 			},
 			success : function(status) {
 				$('#savingStatus').html("Saving Success");
 
-			
 				loadAllAssociatedAccountProfiles()
 			},
 			error : function(xhr, error) {

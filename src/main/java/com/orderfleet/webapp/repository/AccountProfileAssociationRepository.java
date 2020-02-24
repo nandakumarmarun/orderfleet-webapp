@@ -32,9 +32,15 @@ public interface AccountProfileAssociationRepository extends JpaRepository<Accou
 
 	@Modifying
 	@Transactional
-	void deleteByAccountProfilePidAndCompanyId(String accountTypePid, Long companyId);
+	void deleteByAccountProfilePidAndCompanyIdAndAssociatedAccountProfileAccountTypePidIn(String accountTypePid, Long companyId,
+			List<String> associatedAccountTypePid);
 
 	@Query("select aap from AccountProfileAssociation aap where aap.accountProfile.pid = ?1 and aap.associatedAccountProfile.accountType.pid in ?2")
-	List<AccountProfileAssociation> findAllAssociatedAccountProfileByAccountProfilePid(String accountPid, List<String> accountTypePids);
+	List<AccountProfileAssociation> findAllAssociatedAccountProfileByAccountProfilePid(String accountPid,
+			List<String> accountTypePids);
+
+	@Modifying
+	@Transactional
+	void deleteByAccountProfilePidAndCompanyId(String accountProfilePid, Long currentUsersCompanyId);
 
 }
