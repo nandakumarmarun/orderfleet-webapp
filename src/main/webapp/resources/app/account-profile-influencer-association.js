@@ -59,7 +59,7 @@ if (!this.AccountProfileInfluencerAssociation) {
 					});
 
 	function searchAccountProfileTable(inputVal) {
-
+		$(".error-msg").html("");
 		console.log(inputVal);
 		var table = $('#tblAllAssociateAccountProfiles');
 		var filterBy = $("input[name='filter_accountProfile']:checked").val();
@@ -105,6 +105,7 @@ if (!this.AccountProfileInfluencerAssociation) {
 	}
 
 	function loadAccountProfiles() {
+		$(".error-msg").html("");
 		if ($('#dbAccountTypes').val() == "-1") {
 			$("#dbAccount").html("<option>--Select--</option>");
 			alert("Please Select Influencer Account Type");
@@ -131,6 +132,7 @@ if (!this.AccountProfileInfluencerAssociation) {
 	}
 
 	function loadAssociatedAccountTypes() {
+		$(".error-msg").html("");
 		if ($('#dbAccountTypes').val() == "-1") {
 			$("#dbAssociatedAccountTypes").html("<option>All</option>");
 			alert("Please Select Influencer Account Type");
@@ -160,6 +162,8 @@ if (!this.AccountProfileInfluencerAssociation) {
 	}
 
 	function loadAllAssociatedAccountProfiles() {
+		
+		$(".error-msg").html("");
 
 		if ($('#dbAccountTypes').val() == "-1") {
 			$("#dbAccount").html("<option>--Select--</option>");
@@ -229,6 +233,8 @@ if (!this.AccountProfileInfluencerAssociation) {
 	}
 
 	function saveAssociatedAccountProfiles() {
+		
+		$(".error-msg").html("");
 
 		$('#savingStatus').html("Saving..");
 
