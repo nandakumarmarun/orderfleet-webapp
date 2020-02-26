@@ -239,8 +239,8 @@ public class ExecutiveTaskExecutionSmsService {
 				LocalDateTime documentDate = accountingVoucherHeader.getDocumentDate();
 				String date = documentDate.format(formatter);
 
-				stringBuilder.append("Dear Customer,\n");
-				stringBuilder.append("Our sales officer had visited your firm on " + date + ". ");
+				stringBuilder.append("Dear Customer,\n\n");
+				stringBuilder.append("Our sales officer had visited your firm on " + date + ". \n\n");
 
 				for (AccountingVoucherDetail accountingVoucherDetail : accountingVoucherHeader
 						.getAccountingVoucherDetails()) {
@@ -257,9 +257,9 @@ public class ExecutiveTaskExecutionSmsService {
 
 				}
 
-				stringBuilder.append(".\nHe has collected total " + accountingVoucherHeader.getTotalAmount() + ".\n\n");
+				stringBuilder.append("\n\nHe had collected a total amount of Rs " + accountingVoucherHeader.getTotalAmount() + ".\n\n");
 
-				stringBuilder.append("We acknowledge with thanks the receipt of payment as above.\n" + company.getLegalName());
+				stringBuilder.append("We acknowledge with thanks the receipt of payment as above.\n\n" + company.getLegalName());
 
 			}
 
