@@ -42,10 +42,11 @@ if (!this.InvoiceWiseReport) {
 	};
 
 	$(document).ready(function() {
+		
 		let filterBy = getParameterByName('filterBy');
 		if (filterBy) {
 			$('#dbDateSearch').val(filterBy);
-			InvoiceWiseReport.filter();
+			//InvoiceWiseReport.filter();
 		}
 
 		$('.selectpicker').selectpicker();

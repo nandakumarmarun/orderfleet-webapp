@@ -90,12 +90,12 @@
 												maxlength="2" placeholder="Name Column Number" /></td>
 										</tr>
 										<tr>
-											<td>Address</td>
+											<td>Address(If null No Address)</td>
 											<td><input type="number" id="addressColumnNumber"
 												maxlength="2" placeholder="Address Column Number" /></td>
 										</tr>
 										<tr>
-											<td>City</td>
+											<td>City(If Null No city)</td>
 											<td><input type="number" id="cityColumnNumber"
 												maxlength="2" placeholder="City Column Number" /></td>
 										</tr>
@@ -110,7 +110,7 @@
 												maxlength="2" placeholder="Pin Column Number" /></td>
 										</tr>
 										<tr>
-											<td>Phone</td>
+											<td>Phone(Split with ", or /")</td>
 											<td><input type="number" id="phoneColumnNumber"
 												maxlength="2" placeholder="Phone Column Number" /></td>
 										</tr>
@@ -135,7 +135,7 @@
 												maxlength="2" placeholder="Account Type Column Number" /></td>
 										</tr>
 										<tr>
-											<td>Territory</td>
+											<td>Territory(Should Exist)</td>
 											<td><input type="number" id="territoryColumnNumber"
 												maxlength="2" placeholder="Territory Column Number" /></td>
 										</tr>
@@ -145,7 +145,7 @@
 												maxlength="2" placeholder="Alias Column Number" /></td>
 										</tr>
 										<tr>
-											<td>Closing Balance(Text Format Required)</td>
+											<td>Closing Balance</td>
 											<td><input type="number" id="closingBalanceColumnNumber"
 												maxlength="2" placeholder="Closing Balance Column Number" /></td>
 										</tr>
@@ -231,7 +231,7 @@
 												maxlength="2" placeholder="Opening Stock" /></td>
 										</tr>
 										<tr>
-											<td>Product Group</td>
+											<td>Product Group(Should Exist)</td>
 											<td><input type="number" id="productGroupColumnNumber"
 												maxlength="2" placeholder="Size Column Number" /></td>
 										</tr>

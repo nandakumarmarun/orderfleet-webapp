@@ -143,12 +143,12 @@ public class TPAccountProfileManagementService {
 			final SyncOperation syncOperation) {
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
-		
+
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
 		User userObject = new User();
-		if(opUser.isPresent()) {
+		if (opUser.isPresent()) {
 			userObject = opUser.get();
-		}else {
+		} else {
 			userObject = userRepository.findOneByLogin("siteadmin").get();
 		}
 		final User user = userObject;
@@ -192,9 +192,13 @@ public class TPAccountProfileManagementService {
 			accountProfile.setAlias(apDto.getAlias());
 			if (isValidPhone(apDto.getPhone1())) {
 				accountProfile.setPhone1(apDto.getPhone1());
+			} else {
+				accountProfile.setPhone1("");
 			}
 			if (isValidPhone(apDto.getPhone2())) {
 				accountProfile.setPhone2(apDto.getPhone2());
+			} else {
+				accountProfile.setPhone2("");
 			}
 			if (isValidEmail(apDto.getEmail1())) {
 				accountProfile.setEmail1(apDto.getEmail1());
@@ -342,10 +346,10 @@ public class TPAccountProfileManagementService {
 	}
 
 	@Transactional
-	public void saveUpdateLocationHierarchyExcel(Company company,Set<String> accountNames,
-												List<Location> existingLocationList,Location defaultLocation) {
+	public void saveUpdateLocationHierarchyExcel(Company company, Set<String> accountNames,
+			List<Location> existingLocationList, Location defaultLocation) {
 		Long companyId = company.getId();
-		Long version ;
+		Long version;
 		// Only one version of a company hierarchy is active at a time
 		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
 				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
@@ -357,19 +361,19 @@ public class TPAccountProfileManagementService {
 		} else {
 			version = 1L;
 		}
-		
+
 		// create hierarchy
-		for(String accounts : accountNames) {
-			Optional<Location> opLocation = existingLocationList.stream().filter(ell -> ell.getName().equals(accounts)).findAny();
-			if(opLocation.isPresent()) {
-				locationHierarchyRepository.insertLocationHierarchyWithParent(version,
-						opLocation.get().getId(), defaultLocation.getId());
+		for (String accounts : accountNames) {
+			Optional<Location> opLocation = existingLocationList.stream().filter(ell -> ell.getName().equals(accounts))
+					.findAny();
+			if (opLocation.isPresent()) {
+				locationHierarchyRepository.insertLocationHierarchyWithParent(version, opLocation.get().getId(),
+						defaultLocation.getId());
 			}
 		}
 
 	}
-	
-	
+
 	@Transactional
 	@Async
 	public void saveUpdateLocationAccountProfiles(final List<LocationAccountProfileDTO> locationAccountProfileDTOs,
