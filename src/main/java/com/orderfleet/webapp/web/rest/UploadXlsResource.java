@@ -261,7 +261,7 @@ public class UploadXlsResource {
 					}
 					if (phoneNumber != -1) {
 						String phones = formatter.formatCellValue(row.getCell(phoneNumber));
-						String[] phoneNums = phones.split("\n|\\/");
+						String[] phoneNums = phones.split("\n|\\/|\\,");
 						accProfile.setPhone1(phoneNums[0]);
 						if (phoneNums.length > 1) {
 							accProfile.setPhone2(phoneNums[1]);
@@ -445,14 +445,25 @@ public class UploadXlsResource {
 				rowNumber = row.getRowNum();
 				if (rowNumber > 0) {
 					rowNumber++;
-					String productProfileName = row.getCell(NameNumber).getStringCellValue();
+					String productProfileName = "";
+
+					if (row.getCell(NameNumber).getCellType() == 0) {
+
+						productProfileName = String.valueOf((long) row.getCell(NameNumber).getNumericCellValue());
+
+					}
+
+					if (row.getCell(NameNumber).getCellType() == 1) {
+						productProfileName = String.valueOf(row.getCell(NameNumber).getStringCellValue());
+					}
 
 					if (productProfileName == null || productProfileName.isEmpty()) {
 						break;
 					}
 
+					String ppName = productProfileName;
 					Optional<ProductProfile> productProfileDTO = existingProductProfiles.stream()
-							.filter(pp -> pp.getName().equals(productProfileName)).findAny();
+							.filter(pp -> pp.getName().equals(ppName)).findAny();
 
 					// Optional<ProductProfile> productProfileDTO = productProfileRepository
 					// .findByCompanyIdAndNameIgnoreCase(company.getId(), productProfileName);
@@ -530,10 +541,10 @@ public class UploadXlsResource {
 						productProfile.setSize(String.valueOf(row.getCell(sizeNumber).getNumericCellValue()));
 					}
 
-					if (saveUpdateProductProfiles.stream().filter(pp -> pp.getName().equals(productProfileName))
-							.findAny().isPresent()) {
+					if (saveUpdateProductProfiles.stream().filter(pp -> pp.getName().equals(ppName)).findAny()
+							.isPresent()) {
 						duplicateCount++;
-						System.out.println("Duplicate Product: ------- " + productProfileName);
+						System.out.println("Duplicate Product: ------- " + ppName);
 						continue;
 					}
 
@@ -560,11 +571,23 @@ public class UploadXlsResource {
 				if (rowNumber > 0) {
 					rowNumber++;
 
-					String productProfileName = row.getCell(NameNumber).getStringCellValue();
+					String productProfileName = "";
+
+					if (row.getCell(NameNumber).getCellType() == 0) {
+
+						productProfileName = String.valueOf((long) row.getCell(NameNumber).getNumericCellValue());
+
+					}
+
+					if (row.getCell(NameNumber).getCellType() == 1) {
+						productProfileName = String.valueOf(row.getCell(NameNumber).getStringCellValue());
+					}
 
 					if (productProfileName == null || productProfileName.isEmpty()) {
 						break;
 					}
+
+					String ppName = productProfileName;
 
 					if (productGroupNumber != -1) {
 						String productGroupName = row.getCell(productGroupNumber).getStringCellValue();
@@ -572,8 +595,7 @@ public class UploadXlsResource {
 								.filter(pg -> pg.getName().equals(productGroupName)).findAny();
 						if (opProductGroup.isPresent()) {
 
-							if (productNames.stream().filter(pn -> pn.equals(productProfileName)).findAny()
-									.isPresent()) {
+							if (productNames.stream().filter(pn -> pn.equals(ppName)).findAny().isPresent()) {
 								duplicateCount++;
 								System.out.println("Duplicate Product: ------- " + productProfileName);
 								continue;
@@ -636,11 +658,23 @@ public class UploadXlsResource {
 				if (rowNumber > 0) {
 					rowNumber++;
 
-					String productProfileName = row.getCell(NameNumber).getStringCellValue();
+					String productProfileName = "";
+
+					if (row.getCell(NameNumber).getCellType() == 0) {
+
+						productProfileName = String.valueOf((long) row.getCell(NameNumber).getNumericCellValue());
+
+					}
+
+					if (row.getCell(NameNumber).getCellType() == 1) {
+						productProfileName = String.valueOf(row.getCell(NameNumber).getStringCellValue());
+					}
 
 					if (productProfileName == null || productProfileName.isEmpty()) {
 						break;
 					}
+
+					String ppName = productProfileName;
 
 					if (openingStockNumber != -1) {
 						// String openingStockValue =
@@ -656,7 +690,7 @@ public class UploadXlsResource {
 							openingStockValue = String.valueOf(row.getCell(openingStockNumber).getStringCellValue());
 						}
 
-						if (productNames.stream().filter(pn -> pn.equals(productProfileName)).findAny().isPresent()) {
+						if (productNames.stream().filter(pn -> pn.equals(ppName)).findAny().isPresent()) {
 							duplicateCount++;
 							System.out.println("Duplicate Product: ------- " + productProfileName);
 							continue;
