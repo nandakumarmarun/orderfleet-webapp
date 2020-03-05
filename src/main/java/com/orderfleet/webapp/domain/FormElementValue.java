@@ -3,11 +3,15 @@ package com.orderfleet.webapp.domain;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A FormElementValue.
@@ -40,7 +44,10 @@ public class FormElementValue implements Serializable, Cloneable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "form_element_id")
 	private FormElement formElement;
-
+	
+	@OneToMany
+	private List<FormElement> formElements;
+	
 	public Long getId() {
 		return id;
 	}
@@ -71,6 +78,14 @@ public class FormElementValue implements Serializable, Cloneable {
 
 	public void setFormElement(FormElement formElement) {
 		this.formElement = formElement;
+	}
+
+	public List<FormElement> getFormElements() {
+		return formElements;
+	}
+
+	public void setFormElements(List<FormElement> formElements) {
+		this.formElements = formElements;
 	}
 
 	@Override

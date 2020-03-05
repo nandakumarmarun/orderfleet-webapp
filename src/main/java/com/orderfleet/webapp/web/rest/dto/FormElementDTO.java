@@ -53,6 +53,7 @@ public class FormElementDTO {
 		this.lastModifiedDate = formElement.getLastModifiedDate();
 		this.formLoadFromMobile = formElement.getFormLoadFromMobile();
 		this.formLoadMobileData = formElement.getFormLoadMobileData();
+		this.activated = formElement.getActivated();
 	}
 
 	public FormElementDTO(String pid, String name) {

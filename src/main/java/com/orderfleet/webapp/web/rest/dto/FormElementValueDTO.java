@@ -1,10 +1,14 @@
 package com.orderfleet.webapp.web.rest.dto;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.orderfleet.webapp.domain.FormElement;
 import com.orderfleet.webapp.domain.FormElementValue;
 
 /**
@@ -20,7 +24,9 @@ public class FormElementValueDTO {
 	@NotNull
 	@Size(min = 1, max = 400)
 	private String name;
-
+	
+	private List<FormElementDTO> formElementList;
+	
 	public FormElementValueDTO() {
 		super();
 	}
@@ -28,6 +34,9 @@ public class FormElementValueDTO {
 	public FormElementValueDTO(FormElementValue formElementValue) {
 		this.id = String.valueOf(formElementValue.getId());
 		this.name = formElementValue.getName();
+		this.formElementList = formElementValue.getFormElements()
+								.stream().map(fe -> new FormElementDTO(fe))
+								.collect(Collectors.toList());
 	}
 
 	public String getId() {
@@ -44,6 +53,14 @@ public class FormElementValueDTO {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public List<FormElementDTO> getFormElementList() {
+		return formElementList;
+	}
+
+	public void setFormElementList(List<FormElementDTO> formElementList) {
+		this.formElementList = formElementList;
 	}
 
 	@Override

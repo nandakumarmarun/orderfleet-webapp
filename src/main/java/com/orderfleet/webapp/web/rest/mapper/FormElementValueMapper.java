@@ -18,12 +18,14 @@ import com.orderfleet.webapp.web.rest.dto.FormElementValueDTO;
 @Mapper(componentModel = "spring", uses = {})
 public interface FormElementValueMapper {
 
+	@Mapping(target = "formElementList", ignore = true)
 	public FormElementValueDTO formElementValueToFormElementValueDTO(FormElementValue formElementValue);
 
 	public List<FormElementValueDTO> formElementValuesToFormElementValueDTOs(List<FormElementValue> formElementValues);
 
 	@Mapping(target = "formElement", ignore = true)
 	@Mapping(target = "sortOrder", ignore = true)
+	@Mapping(target = "formElements", ignore = true)
 	public FormElementValue formElementValueDTOToFormElementValue(FormElementValueDTO formElementValueDTO);
 
 	public Set<FormElementValue> formElementValueDTOsToFormElementValues(Set<FormElementValueDTO> formElementValueDTOs);

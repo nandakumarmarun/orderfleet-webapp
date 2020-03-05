@@ -1,10 +1,13 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -247,10 +250,48 @@ public class FormElementServiceImpl implements FormElementService {
 					.map(unae -> unae.getFormElement().getId()).collect(Collectors.toList());
 			List<FormElement> formElements = formElementRepository
 					.findAllByCompanyIdAndNotFormElementIn(formElementIds);
+			
 			result = formElementMapper.formElementsToFormElementDTOs(formElements);
 		} else {
 			List<FormElement> formElements = formElementRepository.findAllByCompanyId();
-			result = formElementMapper.formElementsToFormElementDTOs(formElements);
+			System.out.println("---*****************************");
+			for(FormElement fe : formElements) {
+				System.out.println("----"+fe.getName());
+				for(FormElementValue fv : fe.getFormElementValues()) {
+					System.out.println("---- *"+fv.getName());
+					for(FormElement fee : fv.getFormElements()) {
+						System.out.println("        "+fee.toString());
+					}
+				}
+			}
+	
+			List<FormElementDTO> formElementList = new ArrayList<>();
+			for(FormElement formElement : formElements) {
+				
+				List<FormElementValueDTO> formElementValueList = new ArrayList<>();
+				for(FormElementValue formValue : formElement.getFormElementValues()) {
+					
+					List<FormElementDTO> subElementList = new ArrayList<>();
+					for(FormElement subElement : formValue.getFormElements()) {
+						
+						 Optional<FormElement> sub = formElements.stream()
+						.filter(formElem -> formElem.getPid().equals(subElement.getPid())).findAny();
+						
+						if(sub.isPresent()) {
+							FormElementDTO feDTO = new FormElementDTO(sub.get());
+							
+							subElementList.add(feDTO);
+						}
+					}
+					FormElementValueDTO formValueDto = new FormElementValueDTO(formValue);
+					formElementValueList.add(formValueDto);
+				}
+				FormElementDTO formElementDto = new FormElementDTO(formElement);
+				formElementDto.setFormElementValues(formElementValueList);
+				formElementList.add(formElementDto);
+			}
+			result = formElementList;
+			//result = formElementMapper.formElementsToFormElementDTOs(formElements);
 		}
 		return result;
 	}
