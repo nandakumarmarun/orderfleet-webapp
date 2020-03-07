@@ -1,5 +1,7 @@
 package com.orderfleet.webapp.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.orderfleet.webapp.domain.FormElementValue;
@@ -13,5 +15,7 @@ import com.orderfleet.webapp.domain.FormElementValue;
 public interface FormElementValueRepository extends JpaRepository<FormElementValue, Long> {
 
 	void deleteByFormElementIdIsNull();
+
+	List<FormElementValue> findAllByFormElementPid(String formElementPid);
 
 }
