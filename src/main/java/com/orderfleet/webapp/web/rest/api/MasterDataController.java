@@ -92,6 +92,7 @@ import com.orderfleet.webapp.service.RootPlanHeaderService;
 import com.orderfleet.webapp.service.RootPlanSubgroupApproveService;
 import com.orderfleet.webapp.service.SalesTargetGroupUserTargetService;
 import com.orderfleet.webapp.service.StockDetailsService;
+import com.orderfleet.webapp.service.SubFormElementService;
 import com.orderfleet.webapp.service.UserActivityService;
 import com.orderfleet.webapp.service.UserDocumentService;
 import com.orderfleet.webapp.service.UserFavouriteDocumentService;
@@ -152,6 +153,7 @@ import com.orderfleet.webapp.web.rest.dto.RootPlanSubgroupApproveDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesTargetGroupUserTargetDTO;
 import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
 import com.orderfleet.webapp.web.rest.dto.StockLocationDTO;
+import com.orderfleet.webapp.web.rest.dto.SubFormElementDTO;
 import com.orderfleet.webapp.web.rest.dto.UserDocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.UserFavouriteDocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.UserReceiptTargetDTO;
@@ -354,6 +356,9 @@ public class MasterDataController {
 
 	@Inject
 	private UserStockLocationRepository userStockLocationRepository;
+	
+	@Inject
+	private SubFormElementService subFormElementService;
 
 	/**
 	 * GET /account-types : get all accountTypes.
@@ -862,6 +867,26 @@ public class MasterDataController {
 			formElementDTOs = formElementService.findUsersFormElement();
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(formElementDTOs);
+	}
+	
+	/**
+	 * GET /form-elements : get all the formElements.
+	 *
+	 * @return the ResponseEntity with status 200 (OK) and the list of formElements
+	 *         in body
+	 */
+	@GetMapping(value = "/sub-form-elements", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<SubFormElementDTO>> getAllSubFormElements(
+			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) {
+		log.debug("REST request to get all Form Elements");
+		List<SubFormElementDTO> subFormElementDTOs;
+		if (lastSyncdate == null) {
+			subFormElementDTOs = subFormElementService.findAllSubFormElementByCompany();
+		} else {
+			subFormElementDTOs = subFormElementService.findAllSubFormElementByCompany();
+		}
+		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(subFormElementDTOs);
 	}
 
 	/**

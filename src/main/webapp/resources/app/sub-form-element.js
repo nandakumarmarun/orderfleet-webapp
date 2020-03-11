@@ -19,6 +19,10 @@ if (!this.SubFormElement) {
 
 						});
 
+						$("#dbDocuments").change(function() {
+							loadForms();
+						});
+						
 						$("#dbFormElementTypes").change(function() {
 							loadFormElements();
 						});
@@ -89,23 +93,43 @@ if (!this.SubFormElement) {
 	}
 
 	var valueId = 0;
-
+	function loadForms() {
+		var docPid = $('#dbDocuments').val();
+		$.ajax({
+			url : subFormElementContextPath + "/load-forms",
+			type : 'GET',
+			data : {
+				documentPid : docPid
+			},
+			success : function(documentForms){
+				console.log("Form size by document :"+documentForms.length);
+				if(documentForms.length == 0){
+					alert("No forms assigned to this document");
+					$("#tBodyFormElement").html("");
+					$("#tblFormElementValues").html("");
+					return;
+				}
+				$("#dbForms").html("<option value='-1'>--Select--</option>");
+				$.each(documentForms,function(key,docForm){
+					$('#dbForms').append("<option value="+docForm.formPid+">"+docForm.formName+"</option>");
+				});
+			}
+			
+		});
+	}
 	function loadFormElements() {
 		$(".error-msg").html("");
-		if ($('#dbFormElementTypes').val() == "-1") {
-			$("#dbFormElements").html("<option>--Select--</option>");
-			alert("Please Select Form Element Type");
-			return;
-		}
 
 		if ($('#dbForms').val() == "-1") {
 			$("#dbFormElements").html("<option>--Select--</option>");
 			alert("Please Select Forms");
+			$("#tblFormElementValues").html("");
 			return;
 		}
 		var formElementType = $('#dbFormElementTypes').val();
 		var form = $('#dbForms').val();
 		$("#tBodyFormElement").append("");
+		$("#tBodyFormElement").html("");
 		$("#dbFormElements").html("<option>Form Elements loading...</option>")
 		$.ajax({
 			url : subFormElementContextPath + "/load-form-elements",
@@ -116,11 +140,40 @@ if (!this.SubFormElement) {
 			},
 			success : function(formElements) {
 				$("#dbFormElements").html(
-						"<option value='-1'>--Select--</option>")
+						"<option value='-1'>--Select--</option>");
 				$.each(formElements, function(key, formElement) {
 					$("#dbFormElements").append(
 							"<option value='" + formElement.pid + "'>"
 									+ formElement.name + "</option>");
+				});
+			}
+		});
+	}
+	
+	function loadFormElementsInModal() {
+		$(".error-msg").html("");
+
+		if ($('#dbForms').val() == "-1") {
+			$("#dbFormElements").html("<option>--Select--</option>");
+			alert("Please Select Forms");
+			$("#tBodyFormElement").html("");
+			return;
+		}
+		var formElementType = $('#dbFormElementTypes').val();
+		var form = $('#dbForms').val();
+		$("#tBodyFormElement").append("");
+		$("#tBodyFormElement").html("");
+		/*$("#dbFormElements").html("<option>Form Elements loading...</option>")*/
+		$.ajax({
+			url : subFormElementContextPath + "/load-form-elements-by-form",
+			type : 'GET',
+			data : {
+				formPid : form
+			},
+			success : function(formElements) {
+				/*$("#dbFormElements").html(
+						"<option value='-1'>--Select--</option>");*/
+				$.each(formElements, function(key, formElement) {
 
 					$("#tBodyFormElement").append(
 							"<tr><td><input name='formElement' type='checkbox' value='"
@@ -136,16 +189,13 @@ if (!this.SubFormElement) {
 
 	function loadAllFormElementValues() {
 
-		if ($('#dbFormElementTypes').val() == "-1") {
-			alert("Please Select Form Element Type");
-			return;
-		}
-
+		
 		if ($('#dbFormElements').val() == "-1") {
 			alert("Please Select Form Elements");
+			$("#tblFormElementValues").html("");
 			return;
 		}
-
+		$("#spFormElements").hide();
 		$("#tblFormElementValues").html("<tr><td>Loading...</td></tr>")
 		$
 				.ajax({
@@ -173,52 +223,69 @@ if (!this.SubFormElement) {
 										});
 
 						$
-
 					}
 				});
-
 	}
 
 	SubFormElement.assignSubFormElements = function(id) {
+		loadFormElementsInModal();
+		setTimeout(function (){
+			
+			
+			console.log("selected");
+			valueId = id;
+			var documentPid = $("#dbDocuments").val();
+			var formPid = $('#dbForms').val();
+			var formElementPid = $('#dbFormElements').val();
+			$("input[name='filter'][value='all']").prop("checked", true);
+			$("#search").val("");
+			searchTable("");
 
-		valueId = id;
-		$("input[name='filter'][value='all']").prop("checked", true);
-		$("#search").val("");
-		searchTable("");
+			// clear all check box
+			$("#divFormElements input:checkbox").attr('checked', false);
 
-		// clear all check box
-		$("#divFormElements input:checkbox").attr('checked', false);
+			$(".error-msg").html("");
 
-		$(".error-msg").html("");
-
-		$.ajax({
-			url : subFormElementContextPath + "/formElements",
-			type : "GET",
-			data : {
-				formElementValueId : valueId
-			},
-			success : function(assignedFormElements) {
-				if (assignedFormElements) {
-					$.each(assignedFormElements, function(index, formElement) {
-						$(
-								"#divFormElements input:checkbox[value="
-										+ formElement.pid + "]").prop(
-								"checked", true);
-					});
+			$.ajax({
+				url : subFormElementContextPath + "/formElements",
+				type : "GET",
+				data : {
+					formElementValueId : valueId,
+					documentPid : documentPid,
+					formPid : formPid,
+					formElementPid : formElementPid
+				},
+				success : function(assignedFormElements) {
+					if (assignedFormElements) {
+						$.each(assignedFormElements, function(index, formElement) {
+							$(
+									"#divFormElements input:checkbox[value="
+											+ formElement.pid + "]").prop(
+									"checked", true);
+						});
+					}
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
 				}
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			}
-		});
+			});
 
-		$("#subFormElementModal").modal('show');
+			$("#subFormElementModal").modal('show');
+			
+			
+			
+		}, 200);
+		
 	}
 
 	function saveAssignedFormElements() {
 		$(".error-msg").html("");
+		$("#spFormElements").show();
 		var selectedFormElements = "";
-
+		var documentPid = $("#dbDocuments").val();
+		var formPid = $('#dbForms').val();
+		var formElementPid = $('#dbFormElements').val();
+			
 		$.each($("input[name='formElement']:checked"), function() {
 			selectedFormElements += $(this).val() + ",";
 		});
@@ -231,7 +298,11 @@ if (!this.SubFormElement) {
 			type : "POST",
 			data : {
 				formElementValueId : valueId,
-				assignedFormElements : selectedFormElements
+				assignedFormElements : selectedFormElements,
+				documentPid : documentPid,
+				formPid : formPid,
+				formElementPid : formElementPid
+				
 			},
 			success : function(status) {
 				$("#subFormElementModal").modal('hide');

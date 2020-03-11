@@ -51,7 +51,7 @@ public class FormElement implements Serializable, Cloneable {
 	@ManyToOne
 	private Company company;
 
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(fetch = FetchType.EAGER,cascade = { CascadeType.ALL })
 	@JoinColumn(name = "form_element_id")
 	@OrderBy("id")
 	private Set<FormElementValue> formElementValues;

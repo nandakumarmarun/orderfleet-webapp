@@ -4,6 +4,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -21,17 +22,28 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.Document;
+import com.orderfleet.webapp.domain.Form;
 import com.orderfleet.webapp.domain.FormElement;
 import com.orderfleet.webapp.domain.FormElementValue;
 import com.orderfleet.webapp.domain.FormFormElement;
+import com.orderfleet.webapp.domain.SubFormElement;
 import com.orderfleet.webapp.domain.enums.LoadMobileData;
+import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.FormElementRepository;
 import com.orderfleet.webapp.repository.FormElementTypeRepository;
 import com.orderfleet.webapp.repository.FormElementValueRepository;
 import com.orderfleet.webapp.repository.FormFormElementRepository;
+import com.orderfleet.webapp.repository.FormRepository;
+import com.orderfleet.webapp.repository.UserDocumentRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.service.DocumentFormsService;
+import com.orderfleet.webapp.service.DocumentService;
 import com.orderfleet.webapp.service.FormElementService;
 import com.orderfleet.webapp.service.FormService;
+import com.orderfleet.webapp.service.SubFormElementService;
+import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
+import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
 import com.orderfleet.webapp.web.rest.dto.FormDTO;
 import com.orderfleet.webapp.web.rest.dto.FormElementDTO;
 import com.orderfleet.webapp.web.rest.dto.FormElementValueDTO;
@@ -62,29 +74,54 @@ public class SubFormElementResource {
 
 	@Inject
 	private FormService formService;
+	
+	@Inject
+	private FormRepository formRepository;
 
 	@Inject
 	private FormFormElementRepository formFormElementRepository;
+	
+	@Inject
+	private DocumentService documentService;
+	
+	@Inject
+	private DocumentRepository documentRepository;
+	
+	@Inject
+	private DocumentFormsService documentFormService;
+	
+	@Inject
+	private SubFormElementService subFormElementService;
 
 	@Timed
 	@Transactional(readOnly = true)
 	@RequestMapping(value = "/subFormElements", method = RequestMethod.GET)
 	public String getAllFormElements(Pageable pageable, Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of FormElements");
-		List<FormElementDTO> formElements = formElementService.findAllByCompanyAndDeactivatedFormElement(true);
+		List<FormElementDTO> formElementDtos = formElementService.findAllByCompanyAndDeactivatedFormElement(true);
 
-		List<FormDTO> forms = formService.findAllByCompanyAndDeactivatedForm(true);
-
-		model.addAttribute("forms", forms);
-
-		model.addAttribute("formElements", formElements);
+		List<FormDTO> formDtos = formService.findAllByCompanyAndDeactivatedForm(true);
+		List<DocumentDTO> documentDtos = documentService.findAllByCompany();
+		model.addAttribute("forms", formDtos);
+		model.addAttribute("documents",documentDtos);
+		model.addAttribute("formElements", formElementDtos);
 		model.addAttribute("formElementTypes", formElementTypeRepository.findAll());
-		model.addAttribute("loadMobileDataList", LoadMobileData.values());
-		model.addAttribute("deactivatedFormElements",
-				formElementService.findAllByCompanyAndDeactivatedFormElement(false));
+//		model.addAttribute("loadMobileDataList", LoadMobileData.values());
+//		model.addAttribute("deactivatedFormElements",
+//				formElementService.findAllByCompanyAndDeactivatedFormElement(false));
 		return "company/subFormElements";
 	}
 
+	
+	@RequestMapping(value = "/subFormElements/load-forms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<DocumentFormDTO>> getFormsByDocument(@RequestParam String documentPid){
+		List<DocumentFormDTO> documentForms = documentFormService.findByDocumentPid(documentPid);
+		log.info("document forms size " +documentForms.size());
+		return new ResponseEntity<List<DocumentFormDTO>>(documentForms, HttpStatus.OK);
+	}
+	
+			
 	@RequestMapping(value = "/subFormElements/load-form-elements", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<FormElementDTO>> getFormElements(@RequestParam long formElementTypeId,
@@ -111,6 +148,20 @@ public class SubFormElementResource {
 
 		return new ResponseEntity<List<FormElementDTO>>(formElementDtos, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/subFormElements/load-form-elements-by-form", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<FormElementDTO>> getFormElements(@RequestParam String formPid) {
+		log.debug("Web request to get FormElementType by id : {}", formPid);
+		List<FormElement> filteredFormElements = new ArrayList<>();
+		List<FormFormElement> formElementByForms = formFormElementRepository.findByFormPidAndReportOrderGreaterThanZero(formPid);
+		
+		filteredFormElements = formElementByForms.stream().map(FormFormElement :: getFormElement).collect(Collectors.toList());
+
+		List<FormElementDTO> formElementDtos = convertFormElementtoFormElementDtOs(filteredFormElements);
+
+		return new ResponseEntity<List<FormElementDTO>>(formElementDtos, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/subFormElements/load-all-form-element-values", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -126,25 +177,32 @@ public class SubFormElementResource {
 
 	@RequestMapping(value = "/subFormElements/formElements", method = RequestMethod.GET)
 	@Timed
-	public ResponseEntity<List<FormElementDTO>> formElementValueFormElements(@RequestParam long formElementValueId) {
+	public ResponseEntity<List<FormElementDTO>> formElementValueFormElements(@RequestParam long formElementValueId,
+			@RequestParam String documentPid ,@RequestParam String formPid,@RequestParam String formElementPid) {
 		log.debug("REST request to form element value Form Elements : {}", formElementValueId);
+		Long companyId  = SecurityUtils.getCurrentUsersCompanyId();
+		//FormElementValue formElementValue = formElementValueRepository.findOne(formElementValueId);
+		List<String> subFormPids = subFormElementService.assignedSubFormElements(companyId, documentPid, formPid, formElementPid, formElementValueId);
+		
+		List<FormElementDTO> formElementDTOs = formElementService.findAllByCompanyIdAndFormElementPidIn(subFormPids);
+		//List<FormElementDTO> formElementDTOs = convertFormElementtoFormElementDtOs(formElements);
 
-		FormElementValue formElementValue = formElementValueRepository.findOne(formElementValueId);
-		List<FormElement> formElements = formElementValue.getFormElements();
-
-		List<FormElementDTO> formElementDTOs = convertFormElementtoFormElementDtOs(formElements);
-
+		//return null;
 		return new ResponseEntity<List<FormElementDTO>>(formElementDTOs, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/subFormElements/assign-form-elements", method = RequestMethod.POST)
 	@Timed
 	public ResponseEntity<Void> saveAssignedFormElements(@RequestParam long formElementValueId,
-			@RequestParam String assignedFormElements) {
+			@RequestParam String assignedFormElements,@RequestParam String documentPid ,@RequestParam String formPid,
+			@RequestParam String formElementPid) {
 		log.debug("REST request to save assigned Form Element value : {}", formElementValueId);
-
+		
+		Optional<Document> opDocument = documentRepository.findOneByPid(documentPid);
 		FormElementValue formElementValue = formElementValueRepository.findOne(formElementValueId);
-
+		Optional<FormElement> opFormElement = formElementRepository.findOneByPid(formElementPid);
+		Optional<Form> opForm = formRepository.findOneByPid(formPid);
+		
 		List<String> formElementPids = new ArrayList<>();
 
 		String[] formElementString = assignedFormElements.split(",");
@@ -152,12 +210,22 @@ public class SubFormElementResource {
 		for (String pid : formElementString) {
 			formElementPids.add(pid);
 		}
-
-		List<FormElement> formElements = formElementRepository.findAllByCompanyIdAndFormElementPidIn(formElementPids);
-
-		formElementValue.setFormElements(formElements);
-
-		formElementValueRepository.save(formElementValue);
+		if(formElementPids.size()==1) {
+			log.info("deleting all related sub form elements");
+			subFormElementService.deleteAllAssociatedFormElements(opDocument.get(), opForm.get(), 
+					opFormElement.get(), formElementValue);
+		}else {
+			List<FormElement> subFormElements = formElementRepository.findAllByCompanyIdAndFormElementPidIn(formElementPids);
+			log.info("sub form element size "+subFormElements.size());
+			if(opDocument.isPresent() && opForm.isPresent() && 
+					opFormElement.isPresent() && formElementValueId != 0 && subFormElements.size() >0) {
+				log.info("Saving sub form elements");
+				subFormElementService.saveSubFormElements(opDocument.get(), opForm.get(), 
+													opFormElement.get(), formElementValue, subFormElements);
+			}else {
+				log.info("Failed to Save sub form elements");
+			}
+		}
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

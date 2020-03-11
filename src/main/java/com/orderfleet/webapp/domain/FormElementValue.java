@@ -45,9 +45,6 @@ public class FormElementValue implements Serializable, Cloneable {
 	@JoinColumn(name = "form_element_id")
 	private FormElement formElement;
 	
-	@ManyToMany(fetch = FetchType.EAGER)
-	private List<FormElement> formElements;
-	
 	public Long getId() {
 		return id;
 	}
@@ -80,13 +77,6 @@ public class FormElementValue implements Serializable, Cloneable {
 		this.formElement = formElement;
 	}
 
-	public List<FormElement> getFormElements() {
-		return formElements;
-	}
-
-	public void setFormElements(List<FormElement> formElements) {
-		this.formElements = formElements;
-	}
 
 	@Override
 	public boolean equals(Object o) {

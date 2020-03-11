@@ -29,22 +29,30 @@
 					<form role="form" class="form-horizontal form-groups-bordered">
 
 						<div class="form-group">
-						
+							<div class="col-sm-2">
+								Documents<select id="dbDocuments"
+									name="form" class="form-control">
+									<option value="-1">--Select--</option>
+									<c:forEach items="${documents}" var="document">
+										<option value="${document.pid}">${document.name}</option>
+									</c:forEach>
+								</select>
+							</div>
 						
 							<div class="col-sm-2">
 								Forms<select id="dbForms"
 									name="form" class="form-control">
 									<option value="-1">--Select--</option>
-									<c:forEach items="${forms}" var="form">
+									<%-- <c:forEach items="${forms}" var="form">
 										<option value="${form.pid}">${form.name}</option>
-									</c:forEach>
+									</c:forEach> --%>
 								</select>
 							</div>
 							
 							<div class="col-sm-2">
 								Form Element Types<select id="dbFormElementTypes"
 									name="formElementType" class="form-control">
-									<option value="-1">--Select--</option>
+									<!-- <option value="-1">--Select--</option> -->
 									<c:forEach items="${formElementTypes}" var="formElementType">
 										<option value="${formElementType.id}">${formElementType.name}</option>
 									</c:forEach>
@@ -125,14 +133,7 @@
 											</tr>
 										</thead>
 										<tbody id="tBodyFormElement">
-											<%-- <c:forEach items="${formElements}" var="formElement">
-												<tr>
-													<td><input name='formElement' type='checkbox'
-														value="${formElement.pid}" style="display: block;" /></td>
-													<td>${formElement.name}</td>
-													<td>${formElement.formElementTypeName}</td>
-												</tr>
-											</c:forEach> --%>
+
 										</tbody>
 									</table>
 								</div>
@@ -142,6 +143,7 @@
 						<div class="modal-footer">
 							<input class="btn btn-success" type="button"
 								id="btnSaveFormElements" value="Save" />
+							<span id="spFormElements" style="visibility: hidden;">Saving sub form elements..</span>
 							<button class="btn" data-dismiss="modal">Cancel</button>
 						</div>
 					</div>
