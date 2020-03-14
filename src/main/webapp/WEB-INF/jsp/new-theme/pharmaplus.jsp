@@ -12,8 +12,12 @@
 <!-- Meta -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="">
 <meta name="author" content="">
+<meta name="description" content="SalesNrich PharmaPlus is specially designed to enrich sales & marketing related activities of your pharmaceutical business. It helps you manage daily Call Reports (DCR), Doctors appointments and visits, Primary as well as Secondary Sales Orders, Expense Entries, and Samples or Gifts issues.">
+
+<meta name="keywords" content="Van Sales,Order Taking,Team Tracking,Sales Excutive Tracking,Sales Excutive Management,tally integration,order management system,sap integration,Manage Contacts and Leads,Lead Management,order taking mobile app,Mobile based sale,stock management,van sales management,salesforce automation">
+
+<meta name="robots" content="follow,index">
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!-- Favicon -->

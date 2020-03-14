@@ -12,8 +12,12 @@
 <!-- Meta -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="">
 <meta name="author" content="">
+<meta name="description" content="VanSales allows you real time visibility into billing & van stock at any given time. VanSales lets you embrace hassle free stock and sales order settlement with up-to-date synchronization with the back office">
+
+<meta name="keywords" content="Van Sales,Order Taking,Team Tracking,Sales Excutive Tracking,Sales Excutive Management,tally integration,order management system,sap integration,Manage Contacts and Leads,Lead Management,order taking mobile app,Mobile based sale,stock management,van sales management,salesforce automation">
+
+<meta name="robots" content="follow,index">
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!-- Favicon -->

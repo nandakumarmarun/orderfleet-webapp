@@ -12,8 +12,12 @@
 <!-- Meta -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="">
 <meta name="author" content="">
+<meta name="description" content="SalesNrich MarketPro helps to scale your business with monitored marketing activities. Hasten your sales and marketing activities in an effective and efficient manner. ">
+
+<meta name="keywords" content="Van Sales,Order Taking,Team Tracking,Sales Excutive Tracking,Sales Excutive Management,tally integration,order management system,sap integration,Manage Contacts and Leads,Lead Management,order taking mobile app,Mobile based sale,stock management,van sales management,salesforce automation">
+
+<meta name="robots" content="follow,index">
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!-- Favicon -->

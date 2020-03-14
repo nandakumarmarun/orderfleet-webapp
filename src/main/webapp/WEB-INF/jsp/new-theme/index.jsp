@@ -12,8 +12,13 @@
 <!-- Meta -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="">
 <meta name="author" content="">
+<meta name="description" content="SalesNrich is a Best crm software system in Thrissur .It's helps to Van Sales,Order Taking,Team Tracking,Sales executive Tracking,tally integration,And It also help to Manage Contacts and Leads.
+">
+
+<meta name="keywords" content="Van Sales,Order Taking,Team Tracking,Sales Excutive Tracking,Sales Excutive Management,tally integration,order management system,sap integration,Manage Contacts and Leads,Lead Management,order taking mobile app,Mobile based sale,stock management,van sales management">
+
+<meta name="robots" content="follow,index">
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!-- Favicon -->
@@ -119,8 +124,8 @@
 						<li><a href="../login">Login</a></li>
 						<li class="topbar-devider"></li>
 						<li><a href="../register">Register</a></li>
-						
-						
+
+
 					</ul>
 				</div>
 				<!-- End Topbar -->
@@ -254,7 +259,8 @@
 			<div class="container ">
 				<div class="row ">
 					<div class="col-md-9 animated fadeInLeft">
-						<h1>A platform for your team to work in a much organized manner</h1>
+						<h1>A platform for your team to work in a much organized
+							manner</h1>
 
 						<p>SalesNrich enables mobility to field staffs and automates
 							various business processes related to sales, marketing, and
@@ -486,10 +492,12 @@
 									<h2>Latest Features</h2>
 								</div>
 								<ul class="list-unstyled latest-list">
-									<li><a>Custom Report Designer</a> <small>May 8, 2017</small></li>
-									<li><a>Intelligent Analytics</a> <small>June 23, 2016</small></li>
-									<li><a>Predictive Customer Support</a> <small>September 15,
-											2015</small></li>
+									<li><a>Custom Report Designer</a> <small>May 8,
+											2017</small></li>
+									<li><a>Intelligent Analytics</a> <small>June 23,
+											2016</small></li>
+									<li><a>Predictive Customer Support</a> <small>September
+											15, 2015</small></li>
 								</ul>
 							</div>
 						</div>

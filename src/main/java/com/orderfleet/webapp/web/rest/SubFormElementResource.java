@@ -181,13 +181,11 @@ public class SubFormElementResource {
 			@RequestParam String documentPid ,@RequestParam String formPid,@RequestParam String formElementPid) {
 		log.debug("REST request to form element value Form Elements : {}", formElementValueId);
 		Long companyId  = SecurityUtils.getCurrentUsersCompanyId();
-		//FormElementValue formElementValue = formElementValueRepository.findOne(formElementValueId);
 		List<String> subFormPids = subFormElementService.assignedSubFormElements(companyId, documentPid, formPid, formElementPid, formElementValueId);
-		
-		List<FormElementDTO> formElementDTOs = formElementService.findAllByCompanyIdAndFormElementPidIn(subFormPids);
-		//List<FormElementDTO> formElementDTOs = convertFormElementtoFormElementDtOs(formElements);
-
-		//return null;
+		List<FormElementDTO> formElementDTOs = new ArrayList<>();
+		if(!subFormPids.isEmpty()) {
+			formElementDTOs = formElementService.findAllByCompanyIdAndFormElementPidIn(subFormPids);
+		}
 		return new ResponseEntity<List<FormElementDTO>>(formElementDTOs, HttpStatus.OK);
 	}
 
@@ -206,11 +204,14 @@ public class SubFormElementResource {
 		List<String> formElementPids = new ArrayList<>();
 
 		String[] formElementString = assignedFormElements.split(",");
-
+		log.info("array size : "+formElementString.length);
+		log.info("array  : "+formElementString.toString());
 		for (String pid : formElementString) {
 			formElementPids.add(pid);
 		}
-		if(formElementPids.size()==1) {
+		log.info("list size : "+formElementPids.size());
+		log.info("list : "+formElementPids.toString());
+		if(formElementPids.size()==1 && "".equals(formElementPids.get(0).trim())) {
 			log.info("deleting all related sub form elements");
 			subFormElementService.deleteAllAssociatedFormElements(opDocument.get(), opForm.get(), 
 					opFormElement.get(), formElementValue);
