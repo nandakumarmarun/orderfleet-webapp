@@ -59,6 +59,7 @@ import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserDevice;
 import com.orderfleet.webapp.domain.UserTaskAssignment;
 import com.orderfleet.webapp.domain.UserTaskExecutionLog;
+import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.domain.enums.ActivityEvent;
 import com.orderfleet.webapp.domain.enums.ApprovalStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
@@ -496,6 +497,7 @@ public class TaskSubmissionPostSave {
 	private void createTaskAndAssignToUsersAndSendNotification(ExecutiveTaskExecution executiveTaskExecution,
 			List<InventoryVoucherHeader> inventoryVouchers, List<AccountingVoucherHeader> accountingVouchers,
 			List<DynamicDocumentHeader> dynamicDocuments) throws TaskSubmissionPostSaveException {
+		log.info("--createTaskAndAssignToUsersAndSendNotification");
 		// create new Task And Assign to Users
 		if (inventoryVouchers != null && inventoryVouchers.size() > 0) {
 			for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVouchers) {
@@ -539,6 +541,7 @@ public class TaskSubmissionPostSave {
 		}
 
 		if (dynamicDocuments != null && !dynamicDocuments.isEmpty()) {
+			log.info("createAndAssignTask dynamicdocuments");
 			for (DynamicDocumentHeader dynamicDocumentHeader : dynamicDocuments) {
 				List<FilledFormDetail> datePickerFormElements = new ArrayList<>();
 				List<FilledFormDetailDTO> filledFormDetailList = new ArrayList<>();
@@ -551,6 +554,7 @@ public class TaskSubmissionPostSave {
 						filledFormDetailList.add(new FilledFormDetailDTO(filledFormDetail));
 					}
 				});
+				log.info("for loop createAndAssignTask dynamicdocuments");
 				// create new Task And Assign to Users
 				createAndAssignTask(executiveTaskExecution, dynamicDocumentHeader.getDocument(),
 						dynamicDocumentHeader.getPid(), dynamicDocumentHeader.getDocumentNumberServer(),
@@ -563,7 +567,11 @@ public class TaskSubmissionPostSave {
 				sendTaskNotificationToUsers(executiveTaskExecution, dynamicDocumentHeader.getDocument(),
 						dynamicDocumentHeader.getPid(), dynamicDocumentHeader.getDocumentNumberServer(),
 						datePickerFormElements, null, null, filledFormDetailList);
-
+				if(executiveTaskExecution.getCompany().getId() == 304935L && datePickerFormElements.size() == 1 && 
+						executiveTaskExecution.getAccountProfile().getAccountType().getAccountNameType() == AccountNameType.LEAD_MANAGEMENT) {
+					saveTaskAndUserTaskAutomatically(executiveTaskExecution, dynamicDocumentHeader, datePickerFormElements);
+				}
+				
 			}
 		}
 
@@ -936,7 +944,9 @@ public class TaskSubmissionPostSave {
 		TaskUserSetting taskUserSetting = taskUserSettingRepository
 				.findByExecutorPidAndTaskSettingPid(executiveTaskExecution.getUser().getPid(), taskSetting.getPid());
 		if (taskUserSetting != null) {
+			log.info("taskUserSetting ! = null");
 			if (taskSetting.getRequired()) {
+				log.info("taskUserSetting required true");
 				saveTaskAndUserTask(taskSetting, taskUserSetting, executiveTaskExecution, document, refTransactionPid,
 						refTransDocumentNumber, datePickerFormElements);
 			} else {
@@ -955,10 +965,13 @@ public class TaskSubmissionPostSave {
 									accountingVoucherDetailDTOs);
 						} else if (document.getDocumentType().equals(DocumentType.DYNAMIC_DOCUMENT)
 								&& taskSetting.getScript().indexOf("dynamicDocumentTaskRequired") != -1) {
+							log.info("result in dynamic document else if");
 							result = (ArrayList<String>) invocable.invokeFunction("dynamicDocumentTaskRequired",
 									filledFormDetailDTOs);
 						}
+						log.info("-result size--"+result.size());
 						if (!result.isEmpty()) {
+							log.info("result is not empty");
 							saveTaskAndUserTask(taskSetting, taskUserSetting, executiveTaskExecution, document,
 									refTransactionPid, refTransDocumentNumber, datePickerFormElements);
 						}
@@ -1109,6 +1122,7 @@ public class TaskSubmissionPostSave {
 		task.setCompany(executiveTaskExecution.getCompany());
 		task.setPid(TaskService.PID_PREFIX + RandomUtil.generatePid());
 		task.setRemarks(executiveTaskExecution.getRemarks());
+		log.info("Saving task -- "+task.toString());
 		task = taskRepository.save(task);
 
 		// save task reference document
@@ -1120,6 +1134,7 @@ public class TaskSubmissionPostSave {
 		taskReferenceDocument.setRefTransactionPid(refTransactionPid);
 		taskReferenceDocument.setRefTransDocumentNumber(refTransDocumentNumber);
 		taskReferenceDocument.setTask(task);
+		log.info("Saving taskReference - "+taskReferenceDocument.toString());
 		taskReferenceDocumentRepository.save(taskReferenceDocument);
 
 		if (!taskUserSetting.getApprovers().isEmpty()) {
@@ -1228,6 +1243,60 @@ public class TaskSubmissionPostSave {
 		}
 	}
 
+	
+	@Transactional
+	private void saveTaskAndUserTaskAutomatically(ExecutiveTaskExecution executiveTaskExecution,
+			DynamicDocumentHeader dynamicDocumentHeader ,List<FilledFormDetail> datePickerFormElements) {
+			LocalDate startDate = null;
+			
+			for (FilledFormDetail filledFormDetail : datePickerFormElements) {
+				startDate = LocalDate.parse(filledFormDetail.getValue());
+				if(startDate.isBefore(LocalDate.now())) {
+					return;
+				}
+			}
+			List<Task> tasksByActivityAndAccount = taskRepository.findTaskByCompanyIdActivityPidAndAccountPid(executiveTaskExecution.getCompany().getId(),
+					executiveTaskExecution.getActivity().getPid(),executiveTaskExecution.getAccountProfile().getPid());
+			Task task = new Task();
+			if(tasksByActivityAndAccount.isEmpty()) {
+				task.setAccountProfile(executiveTaskExecution.getAccountProfile());
+				task.setAccountType(executiveTaskExecution.getAccountType());
+				task.setActivity(executiveTaskExecution.getActivity());
+				task.setCompany(executiveTaskExecution.getCompany());
+				task.setPid(TaskService.PID_PREFIX + RandomUtil.generatePid());
+				task.setRemarks(executiveTaskExecution.getRemarks());
+				task = taskRepository.save(task);
+			}else {
+				task = tasksByActivityAndAccount.get(0);
+			}
+			
+			
+			
+			List<ExecutiveTaskPlan> executiveTaskPlanList = new ArrayList<>();
+			ExecutiveTaskPlan newExecutiveTaskPlan = new ExecutiveTaskPlan();
+			newExecutiveTaskPlan.setPid(ExecutiveTaskPlanService.PID_PREFIX + RandomUtil.generatePid());
+			newExecutiveTaskPlan.setAccountProfile(executiveTaskExecution.getAccountProfile());
+			newExecutiveTaskPlan.setAccountType(executiveTaskExecution.getAccountType());
+			newExecutiveTaskPlan.setActivity(executiveTaskExecution.getActivity());
+			newExecutiveTaskPlan.setCreatedDate(LocalDateTime.now());
+			newExecutiveTaskPlan.setCreatedBy(executiveTaskExecution.getUser().getLogin());
+			newExecutiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.CREATED);
+			LocalTime time = LocalTime.now();
+			newExecutiveTaskPlan.setPlannedDate(LocalDateTime.of(startDate, time));
+			newExecutiveTaskPlan.setRemarks("");
+			newExecutiveTaskPlan.setUserRemarks("");
+			newExecutiveTaskPlan.setUser(executiveTaskExecution.getUser());
+			newExecutiveTaskPlan.setCompany(executiveTaskExecution.getCompany());
+			newExecutiveTaskPlan.setTaskCreatedType(TaskCreatedType.TASK_SERVER_AUTO);
+			// set task
+			newExecutiveTaskPlan.setTask(task);
+			executiveTaskPlanList.add(newExecutiveTaskPlan);
+			executiveTaskPlanRepository.save(executiveTaskPlanList);
+	}
+	
+	
+	
+	
 	private boolean checkAccountIsAccessible(String userPid, String accountPid) {
 		// current user employee locations
 		List<Location> locations = employeeProfileLocationRepository.findLocationsByUserPid(userPid);

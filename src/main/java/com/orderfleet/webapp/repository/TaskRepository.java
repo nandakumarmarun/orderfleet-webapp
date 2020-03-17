@@ -44,6 +44,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
 	@Query("select task from Task task where task.company.id = ?#{principal.companyId} and task.activity.pid= ?1 and task.accountProfile.pid = ?2 and task.activated = 'TRUE'")
 	List<Task> findTaskByActivityPidAndAccountPid(String activityPid, String accountPid);
+	
+	@Query("select task from Task task where task.company.id = ?1 and task.activity.pid= ?2 and task.accountProfile.pid = ?3 and task.activated = 'TRUE'")
+	List<Task> findTaskByCompanyIdActivityPidAndAccountPid(long companyId ,String activityPid, String accountPid);
 
 	@Query("select task from Task task where task.company.id = ?#{principal.companyId} and task.activated = ?1 ")
 	List<Task> findAllByCompanyIdAndActivated(boolean active);

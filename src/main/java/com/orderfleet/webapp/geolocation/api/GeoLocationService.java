@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
@@ -98,14 +99,16 @@ public class GeoLocationService {
 				.queryParam("no_annotations", 1)
 				.build().toUri();
 		RestOperations template = new RestTemplate();
-		ResponseEntity<String> response = template.getForEntity(serviceUrl, String.class);
 		try {
+			ResponseEntity<String> response = template.getForEntity(serviceUrl, String.class);
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode array = mapper.readValue(response.getBody(), JsonNode.class);
 			JsonNode object = array.get("results").get(0);
 			return object.get("formatted").textValue();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (HttpClientErrorException ex) {
+			ex.printStackTrace();
 		}
 		return UNABLE_FIND_LOCATION;
 	}
@@ -126,10 +129,11 @@ public class GeoLocationService {
 		restTemplate.setErrorHandler(new CustomErrorHandler());
 		GTowerRequest request = new GTowerRequest();
 		request.getCellTowers().add(new CellTower(cellId, lac, mcc, mnc));
-		ResponseEntity<String> response = restTemplate.postForEntity(GEO_LOCATION_API_URL, request, String.class,
-				apiKey);
-		String responseBody = response.getBody();
+		String responseBody = "";
 		try {
+			ResponseEntity<String> response = restTemplate.postForEntity(GEO_LOCATION_API_URL, request, String.class,
+					apiKey);
+			 responseBody = response.getBody();
 			if (RestUtil.isError(response.getStatusCode())) {
 				return buildTowerErrorMessage(responseBody);
 			} else {
