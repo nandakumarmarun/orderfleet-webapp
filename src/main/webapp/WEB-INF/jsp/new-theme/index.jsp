@@ -19,6 +19,7 @@
 <meta name="keywords" content="Van Sales,Order Taking,Team Tracking,Sales Excutive Tracking,Sales Excutive Management,tally integration,order management system,sap integration,Manage Contacts and Leads,Lead Management,order taking mobile app,Mobile based sale,stock management,van sales management">
 
 <meta name="robots" content="follow,index">
+<meta name="p:domain_verify" content="d58647af00127e8383edd5fb3c2f99ef"/>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!-- Favicon -->

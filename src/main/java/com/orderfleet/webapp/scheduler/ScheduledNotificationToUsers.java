@@ -9,6 +9,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -20,11 +22,14 @@ import com.orderfleet.webapp.domain.model.FirebaseData;
 import com.orderfleet.webapp.repository.ExecutiveTaskPlanRepository;
 import com.orderfleet.webapp.repository.UserDeviceRepository;
 import com.orderfleet.webapp.service.async.FirebaseService;
+import com.orderfleet.webapp.web.rest.api.NotificationController;
 import com.orderfleet.webapp.web.rest.dto.FirebaseRequest;
 
 @Component
 public class ScheduledNotificationToUsers {
 
+	private final Logger log = LoggerFactory.getLogger(NotificationController.class);
+	
 	@Inject
 	private ExecutiveTaskPlanRepository executiveTaskPlanRepository;
 	
@@ -59,6 +64,7 @@ public class ScheduledNotificationToUsers {
 				sendTaskNotificationToUsers(etp);
 			}
 		}
+		log.info("***********************************************");
 		System.out.println("Executing notification based on plan....");
 	}
 	
@@ -77,19 +83,23 @@ public class ScheduledNotificationToUsers {
 			return;
 
 		String[] usersFcmKeys = userDevices.stream().map(ud -> ud.getFcmKey()).toArray(String[]::new);
+		for(String fcm : usersFcmKeys) {
+			log.info(fcm);
+			log.info("----------------------------------------");
+		}
 		FirebaseRequest firebaseRequest = new FirebaseRequest();
 		firebaseRequest.setRegistrationIds(usersFcmKeys);
 
 		String activityName = executiveTaskPlan.getActivity().getName();
 		String accountName = executiveTaskPlan.getAccountProfile().getName();
-		String taskCreatedUser = executiveTaskPlan.getUser().getFirstName();
+		String taskCreatedUser = executiveTaskPlan.getUser().getLogin();
 
 		String executionDate = formatter.format(executiveTaskPlan.getPlannedDate());
 		FirebaseData data = new FirebaseData();
 		data.setTitle("Remainder Notification");
 		data.setMessage(activityName+" is  scheduled with customer : "+accountName
 						+  " on, Date :" + executionDate);
-		data.setMessageType(NotificationMessageType.INFO);
+		data.setMessageType(NotificationMessageType.ACCOUNT_TASK);
 		data.setPidUrl("");
 		data.setNotificationPid("");
 		data.setSentDate(LocalDateTime.now().toString());
@@ -100,6 +110,7 @@ public class ScheduledNotificationToUsers {
 				// task-usertask send notification asynchronous
 				firebaseService.sendNotificationToUsers(firebaseRequest, userDevices,
 						taskCreatedUser);
+				//firebaseService.sendSynchronousNotificationToUsers(firebaseRequest, taskCreatedUser);
 	}
 	
 	private void setFirebaseRequest(FirebaseRequest firebaseRequest) {
