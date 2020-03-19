@@ -99,7 +99,7 @@ function createContentString(accountProfile, number, accountName) {
 	var location = accountProfile.location;
 
 	return '<div id="content"><table class="table table-striped table-bed ">'
-			+ '<tr><th colspan="2">Geo Tagging Details</th></tr>'
+			+ '<tr><th colspan="2">Customer Details</th></tr>'
 			+ '<tr><td>Account</td><td>' + accountName
 			+ '</td></tr><tr><td>Location</td><td>' + location
 			+ '</td></tr><tr><td>Number</td><td>' + number
