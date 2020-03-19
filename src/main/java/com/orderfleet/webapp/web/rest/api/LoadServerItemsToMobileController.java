@@ -247,6 +247,9 @@ public class LoadServerItemsToMobileController {
 				log.info("weekArray size :"+ weekArray.size());
 				log.info("dayArray size :"+ dayArray.size());
 				for(Document document : documentList) {
+					dayCount = 0;
+					weekCount = 0;
+					monthCount = 0;
 					for(Object[] obj : monthArray) {
 						if(obj[1].equals(document.getPid())) {
 							monthCount = Integer.parseInt(obj[0].toString());
@@ -308,8 +311,11 @@ public class LoadServerItemsToMobileController {
 				log.info("monthArray size :"+ monthArray.size());
 				log.info("weekArray size :"+ weekArray.size());
 				log.info("dayArray size :"+ dayArray.size());
-
+				
 				for(Document document : documentList) {
+					dayCount = 0;
+					weekCount = 0;
+					monthCount = 0;
 					for(Object[] obj : monthArray) {
 						if(obj[1].equals(document.getPid())) {
 							monthCount = Integer.parseInt(obj[0].toString());

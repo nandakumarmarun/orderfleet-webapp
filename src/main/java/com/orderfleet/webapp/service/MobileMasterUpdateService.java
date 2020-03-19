@@ -10,4 +10,5 @@ public interface MobileMasterUpdateService {
 
 	String PID_PREFIX = "MMU-";
 	MobileMasterUpdate convertMobileMasterUpdate(MobileMasterUpdateDTO mobileMasterUpdateDto);
+	MobileMasterUpdate saveMobileMasterUpdate(MobileMasterUpdate mobileMasterUpdate );
 }

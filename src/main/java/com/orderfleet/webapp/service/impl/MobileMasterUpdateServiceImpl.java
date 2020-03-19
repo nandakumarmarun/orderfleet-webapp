@@ -71,4 +71,12 @@ public class MobileMasterUpdateServiceImpl implements MobileMasterUpdateService 
 		return mobileMasterUpdate;
 	}
 
+	@Override
+	@Transactional
+	public MobileMasterUpdate saveMobileMasterUpdate(MobileMasterUpdate mobileMasterUpdate) {
+		// TODO Auto-generated method stub
+		return mobileMasterUpdateRepository.save(mobileMasterUpdate);
+	}
+
+	
 }

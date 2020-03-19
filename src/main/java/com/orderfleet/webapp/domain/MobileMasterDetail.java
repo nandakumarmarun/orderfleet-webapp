@@ -39,7 +39,8 @@ public class MobileMasterDetail implements Serializable {
 	@Column(name = "mobile_master_item", nullable = false, columnDefinition = "character varying DEFAULT 'DEFAULT'")
 	private MobileMasterItem mobileMasterItem;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	//(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "mobile_master_update_id")
 	private MobileMasterUpdate mobileMasterUpdate;
 

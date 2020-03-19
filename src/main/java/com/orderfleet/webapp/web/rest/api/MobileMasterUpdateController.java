@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.MobileMasterDetail;
 import com.orderfleet.webapp.domain.MobileMasterUpdate;
+import com.orderfleet.webapp.repository.MobileMasterDetailRepository;
 import com.orderfleet.webapp.repository.MobileMasterUpdateRepository;
 import com.orderfleet.webapp.service.MobileMasterDetailService;
 import com.orderfleet.webapp.service.MobileMasterUpdateService;
@@ -37,6 +38,9 @@ public class MobileMasterUpdateController {
 	@Autowired
 	MobileMasterUpdateRepository mobileMasterUpdateRepository;
 	
+	@Autowired
+	MobileMasterDetailRepository mobileMasterDetailRepository; 
+	
 	@RequestMapping(value = "/mobile-master-update-status", method = RequestMethod.POST, 
 						produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -54,8 +58,9 @@ public class MobileMasterUpdateController {
 			List<MobileMasterDetail> mmdList = mobileMasterDetailService.convertMobileMasterDetails(
 								mobileMasterUpdateDTO.getMobileMasterDetailDtos(), mobileMasterUpdate);
 			if(mmdList != null && mmdList.size()>0) {
+				//mmdList = mobileMasterDetailService.saveMobileMasterDetails(mmdList);
 				mobileMasterUpdate.setMobileMasterDetails(mmdList);
-				mobileMasterUpdate = mobileMasterUpdateRepository.save(mobileMasterUpdate);
+				mobileMasterUpdate = mobileMasterUpdateService.saveMobileMasterUpdate(mobileMasterUpdate);
 				return new ResponseEntity<>(true,HttpStatus.CREATED);
 			}else {
 				return new ResponseEntity<>(false,HttpStatus.CONFLICT);

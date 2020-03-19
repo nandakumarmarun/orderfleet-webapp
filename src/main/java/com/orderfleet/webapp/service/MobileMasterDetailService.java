@@ -20,5 +20,6 @@ import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
 public interface MobileMasterDetailService {
 
 	String PID_PREFIX = "MMD-";
+	List<MobileMasterDetail> saveMobileMasterDetails(List<MobileMasterDetail> mobileMasterDetails);
 	List<MobileMasterDetail> convertMobileMasterDetails(List<MobileMasterDetailDTO> mobileMasterDetailDtos,MobileMasterUpdate mobileMasterUpdate);
 }

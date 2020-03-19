@@ -84,5 +84,15 @@ public class MobileMasterDetailServiceImpl implements MobileMasterDetailService 
 		
 		return mmdList;
 	}
+
+	@Override
+	@Transactional
+	public List<MobileMasterDetail> saveMobileMasterDetails(List<MobileMasterDetail> mobileMasterDetails) {
+		// TODO Auto-generated method stub
+		return mobileMasterDetailRepository.save(mobileMasterDetails);
+	}
+	
+	
+	
 	
 }
