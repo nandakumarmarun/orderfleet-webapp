@@ -36,4 +36,6 @@ public interface FormFormElementService {
 	List<FormFormElementDTO> findByFormElementPid(String formElementPid);
 
 	List<FormFormElementDTO> findOneByFormPid(String formPid);
+
+	List<FormFormElement> findByFormPidAndDashboardVisibility(String formPid, boolean dashboardVisibility);
 }

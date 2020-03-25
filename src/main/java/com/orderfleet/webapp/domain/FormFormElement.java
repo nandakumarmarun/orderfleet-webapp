@@ -62,9 +62,12 @@ public class FormFormElement implements Serializable {
 
 	@Column(name = "mandatory", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean mandatory;
-	
+
 	@Column(name = "visibility", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
-	private boolean visibility =true;
+	private boolean visibility = true;
+
+	@Column(name = "dashboard_visibility", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean dashboardVisibility;
 
 	@NotNull
 	@ManyToOne
@@ -169,6 +172,14 @@ public class FormFormElement implements Serializable {
 
 	public void setVisibility(boolean visibility) {
 		this.visibility = visibility;
+	}
+
+	public boolean getDashboardVisibility() {
+		return dashboardVisibility;
+	}
+
+	public void setDashboardVisibility(boolean dashboardVisibility) {
+		this.dashboardVisibility = dashboardVisibility;
 	}
 
 	@Override

@@ -51,4 +51,6 @@ public interface FormFormElementRepository extends JpaRepository<FormFormElement
 	
 	@Query("SELECT f FROM FormFormElement AS f WHERE f.formElement.pid = ?1 ORDER BY f.reportOrder ASC")
 	List<FormFormElement>findByFormElementPid(String formElementPid);
+
+	List<FormFormElement> findByFormPidAndDashboardVisibility(String formPid, boolean dashboardVisibility);
 }

@@ -62,8 +62,7 @@ public class FormServiceImpl implements FormService {
 	/**
 	 * Save a form.
 	 * 
-	 * @param formDTO
-	 *            the entity to save
+	 * @param formDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -98,6 +97,7 @@ public class FormServiceImpl implements FormService {
 			formFormElement.setMandatory(formElementOrderDTO.getMandatory());
 			formFormElement.setValidationEnabled(formElementOrderDTO.getValidationEnabled());
 			formFormElement.setVisibility(formElementOrderDTO.getVisibility());
+			formFormElement.setDashboardVisibility(formElementOrderDTO.getDashboardVisibility());
 			formFormElements.add(formFormElement);
 		}
 		formFormElementRepository.deleteByFormPid(form.getPid());
@@ -107,8 +107,7 @@ public class FormServiceImpl implements FormService {
 	/**
 	 * Update a form.
 	 * 
-	 * @param formDTO
-	 *            the entity to update
+	 * @param formDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -128,8 +127,7 @@ public class FormServiceImpl implements FormService {
 	/**
 	 * Get all the forms.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -157,8 +155,7 @@ public class FormServiceImpl implements FormService {
 	/**
 	 * Get all the forms.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -174,8 +171,7 @@ public class FormServiceImpl implements FormService {
 	/**
 	 * Get one form by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -190,8 +186,7 @@ public class FormServiceImpl implements FormService {
 	/**
 	 * Get one form by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -207,16 +202,15 @@ public class FormServiceImpl implements FormService {
 	/**
 	 * Get one form by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
 	@Transactional(readOnly = true)
 	public Optional<FormDTO> findByName(String name) {
 		log.debug("Request to get FormGroup by name : {}", name);
-		return formRepository.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), name).map(
-				form -> {
+		return formRepository.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), name)
+				.map(form -> {
 					FormDTO formDTO = formMapper.formToFormDTO(form);
 					return formDTO;
 				});
@@ -225,8 +219,7 @@ public class FormServiceImpl implements FormService {
 	/**
 	 * Delete the form by id.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete Form : {}", pid);
@@ -236,21 +229,19 @@ public class FormServiceImpl implements FormService {
 	}
 
 	/**
-	 * Update  the Form status by pid.
+	 * Update the Form status by pid.
 	 * 
-	 * @param pid
-	 *            the pid of the entity
-	 *@param active
-	 *            the active of the entity
+	 * @param pid    the pid of the entity
+	 * @param active the active of the entity
 	 * @return the entity
 	 */
 	@Override
 	public FormDTO updateFormStatus(String pid, boolean active) {
 		log.debug("Request to update Form Status");
-		return formRepository.findOneByPid(pid).map(form ->{
+		return formRepository.findOneByPid(pid).map(form -> {
 			form.setActivated(active);
-			form=formRepository.save(form);
-			FormDTO result=formMapper.formToFormDTO(form);
+			form = formRepository.save(form);
+			FormDTO result = formMapper.formToFormDTO(form);
 			return result;
 		}).orElse(null);
 	}
@@ -261,18 +252,17 @@ public class FormServiceImpl implements FormService {
 	 * 
 	 *        find all active company
 	 * 
-	 * @param active
-	 *            the active of the entity
+	 * @param active   the active of the entity
 	 * 
-	 * @param pageable
-	 *            the pageable of the entity
+	 * @param pageable the pageable of the entity
 	 * @return the entity
 	 */
 	@Override
 	public Page<FormDTO> findAllByCompanyAndActivatedFormOrderByName(Pageable pageable, boolean active) {
 		log.debug("Request to get activated Form ");
-		Page<Form>pageForm=formRepository.findAllByCompanyIdAndActivatedFormOrderByName(pageable, active);
-		Page<FormDTO>pageFormDTO=new PageImpl<FormDTO>(formMapper.formsToFormDTOs(pageForm.getContent()),pageable,pageForm.getTotalElements());
+		Page<Form> pageForm = formRepository.findAllByCompanyIdAndActivatedFormOrderByName(pageable, active);
+		Page<FormDTO> pageFormDTO = new PageImpl<FormDTO>(formMapper.formsToFormDTOs(pageForm.getContent()), pageable,
+				pageForm.getTotalElements());
 		return pageFormDTO;
 	}
 
@@ -282,15 +272,14 @@ public class FormServiceImpl implements FormService {
 	 * 
 	 *        find all deactive company
 	 * 
-	 * @param deactive
-	 *            the deactive of the entity
+	 * @param deactive the deactive of the entity
 	 * @return the list
 	 */
 	@Override
 	public List<FormDTO> findAllByCompanyAndDeactivatedForm(boolean deactive) {
 		log.debug("Request to get deactivated Form ");
-		List<Form>forms=formRepository.findAllByCompanyIdAndDeactivatedForm(deactive);
-		List<FormDTO>formDTOs=formMapper.formsToFormDTOs(forms);
+		List<Form> forms = formRepository.findAllByCompanyIdAndDeactivatedForm(deactive);
+		List<FormDTO> formDTOs = formMapper.formsToFormDTOs(forms);
 		return formDTOs;
 	}
 

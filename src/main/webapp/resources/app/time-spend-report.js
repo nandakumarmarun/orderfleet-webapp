@@ -66,13 +66,13 @@ if (!this.TimeSpendReport) {
 	}
 
 	TimeSpendReport.filter = function() {
-		
+
 		if ($('#dbEmployee').val() == "-1") {
 			alert("Please Select Employee");
 			return
+
 		}
-		
-		
+
 		if ($('#dbDateSearch').val() == "SINGLE") {
 			if ($("#txtFromDate").val() == "") {
 				return;
@@ -101,11 +101,17 @@ if (!this.TimeSpendReport) {
 							return;
 						}
 
+						
 						$.each(timeSpendReports, function(index,
 								timeSpendReport) {
+							var rowStyle = "";
+							if (timeSpendReport.sortOrder == 1
+									|| timeSpendReport.sortOrder == 2) {
+								rowStyle = "background-color:#a3a2a2";
+							}
 
 							$('#tBodyTimeSpendReport').append(
-									"<tr>" + "<td>"
+									"<tr style=" + rowStyle + ">" + "<td>"
 											+ timeSpendReport.employeeName
 											+ "</td><td>"
 											+ timeSpendReport.customerName
@@ -135,8 +141,6 @@ if (!this.TimeSpendReport) {
 				});
 	}
 
-	
-	
 	TimeSpendReport.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");
@@ -165,6 +169,5 @@ if (!this.TimeSpendReport) {
 		}
 
 	}
-
 
 })();

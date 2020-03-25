@@ -46,15 +46,15 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach items="${forms}" var="form"
-						varStatus="loopStatus">
+					<c:forEach items="${forms}" var="form" varStatus="loopStatus">
 						<tr class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'}">
 							<td>${form.name}</td>
 							<td>${form.description == null ? "" : form.description}</td>
 							<td>${form.multipleRecord}</td>
-							<td><span class="label ${form.activated? 'label-success':'label-danger' }"
-							onclick="Form.setActive('${form.name}','${ form.pid}','${!form.activated }')"
-							style="cursor: pointer;">${form.activated? "Activated" : "Deactivated" }</span></td>
+							<td><span
+								class="label ${form.activated? 'label-success':'label-danger' }"
+								onclick="Form.setActive('${form.name}','${ form.pid}','${!form.activated }')"
+								style="cursor: pointer;">${form.activated? "Activated" : "Deactivated" }</span></td>
 							<td>
 								<button type="button" class="btn btn-blue"
 									onclick="Form.showModalPopup($('#viewModal'),'${form.pid}',0,this);">View</button>
@@ -105,8 +105,8 @@
 										name="name" id="field_name" maxlength="255" placeholder="Name" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="field_jsCode">JS Code</label> 
-									<textarea class="form-control" id="field_jsCode" name="jsCode" 
+									<label class="control-label" for="field_jsCode">JS Code</label>
+									<textarea class="form-control" id="field_jsCode" name="jsCode"
 										placeholder="JS Code" style="height: 300px"></textarea>
 								</div>
 								<div class="form-group">
@@ -277,6 +277,7 @@
 												<th>Validation Enabled</th>
 												<th>Mandatory</th>
 												<th>Visibility</th>
+												<th>Dashboard Visibility</th>
 											</tr>
 										</thead>
 										<tbody id="tbodyQuestions">
@@ -296,8 +297,10 @@
 														name='validationEnabled' type='checkbox' /></td>
 													<td><input id="mandatory${question.pid}"
 														name='mandatoryEnabled' type='checkbox' /></td>
-														<td><input id="visibility${question.pid}"
+													<td><input id="visibility${question.pid}"
 														name='visibility' type='checkbox' checked="checked" /></td>
+													<td><input id="dashboardVisibility${question.pid}"
+														name='dashboardVisibility' type='checkbox' /></td>
 												</tr>
 											</c:forEach>
 										</tbody>
@@ -317,7 +320,7 @@
 				<!-- /.modal-dialog -->
 			</div>
 
-		<div class="modal fade container" id="enableFormModal">
+			<div class="modal fade container" id="enableFormModal">
 				<!-- model Dialog -->
 				<div class="modal-dialog">
 					<div class="modal-content">
@@ -339,8 +342,7 @@
 											</tr>
 										</thead>
 										<tbody id="tblEnableForm">
-											<c:forEach items="${deactivatedForms}"
-												var="form">
+											<c:forEach items="${deactivatedForms}" var="form">
 												<tr>
 													<td><input name='form' type='checkbox'
 														value="${form.pid}" /></td>
@@ -354,8 +356,8 @@
 							<label class="error-msg" style="color: red;"></label>
 						</div>
 						<div class="modal-footer">
-							<input class="btn btn-success" type="button"
-								id="btnActivateForm" value="Activate" />
+							<input class="btn btn-success" type="button" id="btnActivateForm"
+								value="Activate" />
 							<button class="btn" data-dismiss="modal">Cancel</button>
 						</div>
 					</div>

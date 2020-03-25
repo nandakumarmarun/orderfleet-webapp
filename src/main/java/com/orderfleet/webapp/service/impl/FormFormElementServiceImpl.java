@@ -141,4 +141,10 @@ public class FormFormElementServiceImpl implements FormFormElementService {
 		List<FormFormElement> formFormElements = formFormElementRepository.findByFormPid(formPid);
 		return formFormElements.stream().map(FormFormElementDTO::new).collect(Collectors.toList());
 	}
+
+	@Override
+	public List<FormFormElement> findByFormPidAndDashboardVisibility(String formPid, boolean dashboardVisibility) {
+		log.info("find Form FormElements by form pid and dashboardVisibility");
+		return formFormElementRepository.findByFormPidAndDashboardVisibility(formPid, dashboardVisibility);
+	}
 }

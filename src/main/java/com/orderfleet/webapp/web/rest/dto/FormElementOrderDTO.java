@@ -19,29 +19,34 @@ public class FormElementOrderDTO {
 	private boolean editable;
 
 	private boolean validationEnabled;
-	
+
 	private boolean mandatory;
-	
+
 	private boolean visibility;
+
+	private boolean dashboardVisibility;
 
 	public FormElementOrderDTO() {
 	}
 
 	public FormElementOrderDTO(FormFormElement formFormElement) {
-		this(formFormElement.getFormElement().getPid(), formFormElement.getSortOrder(), formFormElement
-				.getReportOrder(), formFormElement.getEditable(), formFormElement.getValidationEnabled(),formFormElement.getMandatory(),formFormElement.getVisibility());
+		this(formFormElement.getFormElement().getPid(), formFormElement.getSortOrder(),
+				formFormElement.getReportOrder(), formFormElement.getEditable(), formFormElement.getValidationEnabled(),
+				formFormElement.getMandatory(), formFormElement.getVisibility(),
+				formFormElement.getDashboardVisibility());
 	}
 
 	public FormElementOrderDTO(String formElementPid, int sortOrder, int reportOrder, boolean editable,
-			boolean validationEnabled,boolean mandatory, boolean visibility) {
+			boolean validationEnabled, boolean mandatory, boolean visibility, boolean dashboardVisibility) {
 		super();
 		this.formElementPid = formElementPid;
 		this.sortOrder = sortOrder;
 		this.reportOrder = reportOrder;
 		this.editable = editable;
 		this.validationEnabled = validationEnabled;
-		this.mandatory=mandatory;
-		this.visibility=visibility;
+		this.mandatory = mandatory;
+		this.visibility = visibility;
+		this.dashboardVisibility = dashboardVisibility;
 	}
 
 	public String getFormElementPid() {
@@ -98,6 +103,14 @@ public class FormElementOrderDTO {
 
 	public void setVisibility(boolean visibility) {
 		this.visibility = visibility;
+	}
+
+	public boolean getDashboardVisibility() {
+		return dashboardVisibility;
+	}
+
+	public void setDashboardVisibility(boolean dashboardVisibility) {
+		this.dashboardVisibility = dashboardVisibility;
 	}
 
 	@Override

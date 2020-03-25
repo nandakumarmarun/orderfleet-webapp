@@ -262,8 +262,11 @@ if (!this.Form) {
 				'checked', false);
 		$("#divQuestions input:checkbox[name='mandatory']").attr('checked',
 				false);
-		$("#divQuestions input:checkbox[name='visibility']")
-		.attr('checked', true);
+		$("#divQuestions input:checkbox[name='visibility']").attr('checked',
+				true);
+		$("#divQuestions input:checkbox[name='dashboardVisibility']").attr(
+				'checked', false);
+
 		$(".sortOrder").val(0);
 		$(".reportOrder").val(0);
 		$
@@ -318,6 +321,14 @@ if (!this.Form) {
 																+ "").prop(
 														"checked",
 														formElement.visibility);
+
+												$(
+														"#dashboardVisibility"
+																+ formElement.formElementPid
+																+ "")
+														.prop(
+																"checked",
+																formElement.dashboardVisibility);
 											});
 						}
 					},
@@ -345,8 +356,12 @@ if (!this.Form) {
 							"checked");
 					var mandatory = $("#mandatory" + formElementPid + "").prop(
 							"checked");
-					var visibility = $("#visibility" + formElementPid + "").prop(
-					"checked");
+					var visibility = $("#visibility" + formElementPid + "")
+							.prop("checked");
+					var dashboardVisibility = $(
+							"#dashboardVisibility" + formElementPid + "").prop(
+							"checked");
+
 					selectedQuestions.push({
 						formElementPid : formElementPid,
 						sortOrder : sortOrder,
@@ -354,7 +369,8 @@ if (!this.Form) {
 						editable : editable,
 						validationEnabled : validationEnabled,
 						mandatory : mandatory,
-						visibility:visibility
+						visibility : visibility,
+						dashboardVisibility : dashboardVisibility
 					});
 				});
 

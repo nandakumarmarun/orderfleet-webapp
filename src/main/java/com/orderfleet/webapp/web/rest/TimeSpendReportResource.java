@@ -128,7 +128,7 @@ public class TimeSpendReportResource {
 
 				TimeSpendReportView timeSpendReportView = new TimeSpendReportView();
 
-				int sortOrder = 2;
+				int sortOrder = 3;
 
 				long hours = 00;
 				long minutes = 00;
@@ -196,27 +196,6 @@ public class TimeSpendReportResource {
 
 				timeSpendReportView = new TimeSpendReportView();
 
-				timeSpendReportView.setSortOrder(1);
-				timeSpendReportView.setCustomerName("-");
-				timeSpendReportView.setVisitType("Attendance");
-				timeSpendReportView.setEmployeeName(employeeProfile.getName());
-				timeSpendReportView.setPunchInTime(convertLocalDateTimetoString(opAttendance.get().getPlannedDate()));
-				timeSpendReportView.setPunchOutTime("-");
-				timeSpendReportView.setServerTime(convertLocalDateTimetoString(opAttendance.get().getCreatedDate()));
-
-				Optional<PunchOut> opPunchOut = punchOutRepository.findIsAttendancePresent(opAttendance.get().getPid());
-				// findAllByCompanyIdUserPidAndPunchDateBetween(employeeProfile.getUser().getPid(),
-				// fromDate, toDate);
-
-				String timeSpend = "00 : 00 : 00";
-
-				if (opPunchOut.isPresent()) {
-
-					timeSpend = findTimeSpend(opAttendance.get().getPlannedDate(), opPunchOut.get().getPunchOutDate());
-				} else {
-					timeSpend = "<b>No punch out found</b>";
-				}
-
 				long hoursToSec = hours * 3600;
 				long minToSec = minutes * 60;
 
@@ -227,10 +206,43 @@ public class TimeSpendReportResource {
 				long conMinutes = conHours % 60;
 				conHours = conHours / 60;
 
-				timeSpendReportView.setTimeSpend("Customer Faceing Time : <br> " + conHours + " : " + conMinutes + " : "
-						+ conSeconds + "<br><br>Total Spend Time : <br> " + timeSpend);
+				timeSpendReportView.setSortOrder(1);
+				timeSpendReportView.setCustomerName("-");
+				timeSpendReportView.setVisitType("Attendance");
+				timeSpendReportView.setEmployeeName(employeeProfile.getName());
+				timeSpendReportView.setPunchInTime(convertLocalDateTimetoString(opAttendance.get().getPlannedDate()));
+				timeSpendReportView.setPunchOutTime("-");
+				timeSpendReportView.setServerTime(convertLocalDateTimetoString(opAttendance.get().getCreatedDate()));
+				timeSpendReportView.setTimeSpend("<b>Customer Faceing Time :</b> <br><br> " + conHours + " : "
+						+ conMinutes + " : " + conSeconds);
 
 				timeSpendReportViews.add(timeSpendReportView);
+
+				Optional<PunchOut> opPunchOut = punchOutRepository.findIsAttendancePresent(opAttendance.get().getPid());
+				// findAllByCompanyIdUserPidAndPunchDateBetween(employeeProfile.getUser().getPid(),
+				// fromDate, toDate);
+
+				String timeSpend = "00 : 00 : 00";
+
+				if (opPunchOut.isPresent()) {
+
+					timeSpendReportView = new TimeSpendReportView();
+
+					timeSpendReportView.setSortOrder(2);
+					timeSpendReportView.setCustomerName("-");
+					timeSpendReportView.setVisitType("Punch Out");
+					timeSpendReportView.setEmployeeName(employeeProfile.getName());
+					timeSpendReportView.setPunchInTime("-");
+					timeSpendReportView
+							.setPunchOutTime(convertLocalDateTimetoString(opPunchOut.get().getPunchOutDate()));
+					timeSpendReportView.setServerTime(convertLocalDateTimetoString(opPunchOut.get().getCreatedDate()));
+
+					timeSpend = findTimeSpend(opAttendance.get().getPlannedDate(), opPunchOut.get().getPunchOutDate());
+
+					timeSpendReportView.setTimeSpend("<b>Total Login Hours :</b> <br><br>" + timeSpend);
+
+					timeSpendReportViews.add(timeSpendReportView);
+				}
 
 			}
 
