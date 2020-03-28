@@ -19,7 +19,6 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,49 +26,42 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.DynamicDocumentHeader;
-import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
+import com.orderfleet.webapp.domain.Form;
+import com.orderfleet.webapp.domain.FormElement;
+import com.orderfleet.webapp.domain.FormElementValue;
 import com.orderfleet.webapp.domain.FormFormElement;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.DocumentType;
-import com.orderfleet.webapp.domain.enums.MobileUINames;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
+import com.orderfleet.webapp.repository.FormElementRepository;
+import com.orderfleet.webapp.repository.FormElementValueRepository;
+import com.orderfleet.webapp.repository.FormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.UserDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.DocumentFormsService;
-import com.orderfleet.webapp.service.DocumentService;
 import com.orderfleet.webapp.service.FormFormElementService;
-import com.orderfleet.webapp.service.PerformanceReportMobileService;
-import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.api.dto.DocumentDashboardDTO;
-import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
 import com.orderfleet.webapp.web.rest.api.dto.FormFormElementDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerExeTaskDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerSentItemDTO;
-import com.orderfleet.webapp.web.rest.api.dto.ManagedUserDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
-import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionView;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesTargetReportSettingDTO;
-
-import javassist.expr.NewArray;
 
 @RestController
 @RequestMapping("/api")
@@ -94,6 +86,15 @@ public class LoadServerItemsToMobileController {
 
 	@Inject
 	private DocumentRepository documentRepository;
+
+	@Inject
+	private FormRepository formRepository;
+
+	@Inject
+	private FormElementRepository formElementRepository;
+
+	@Inject
+	private FormElementValueRepository formElementValueRepository;
 
 	@Inject
 	private UserDocumentRepository userDocumentRepository;
@@ -410,6 +411,116 @@ public class LoadServerItemsToMobileController {
 		documentDashboardDto.setFormFormElementDTOs(formFormElementDTOs);
 
 		return documentDashboardDto;
+	}
+
+	//@GetMapping("/load-form-element-value-count")
+	
+	@GetMapping("/load-form-element-value-count")
+	public ResponseEntity<List<DocumentDashboardDTO>> loadFormElementValues(@RequestParam String documentPid,
+			@RequestParam String formPid, @RequestParam String formElementPid) {
+//	public ResponseEntity<List<DocumentDashboardDTO>> loadFormElementValues(@RequestParam String documentPid,
+//			@RequestParam String formPid, @RequestParam String formElementPid) {
+
+		Optional<Document> opDocument = documentRepository.findOneByPid(documentPid);
+		Optional<Form> opForm = formRepository.findOneByPid(formPid);
+		Optional<FormElement> opFormElement = formElementRepository.findOneByPid(formElementPid);
+
+		List<FormElementValue> listFormElementValues = formElementValueRepository
+				.findAllByFormElementPid(formElementPid);
+
+		long documentId = 0;
+		long formId = 0;
+		long formElementId = 0;
+
+		if (opDocument.isPresent() && opForm.isPresent() && opFormElement.isPresent()) {
+			documentId = opDocument.get().getId();
+			formId = opForm.get().getId();
+			formElementId = opFormElement.get().getId();
+		}
+
+		List<DocumentDashboardDTO> documentDashboardDTOs = new ArrayList<>();
+
+		LocalDate today = LocalDate.now();
+		LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
+		TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+		LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
+
+		LocalDateTime mfDate = monthStartDate.atTime(0, 0);
+		LocalDateTime mtDate = today.atTime(23, 59);
+
+		LocalDateTime wfDate = weekStartDate.atTime(0, 0);
+		LocalDateTime wtDate = today.atTime(23, 59);
+
+		LocalDateTime tfDate = today.atTime(0, 0);
+		LocalDateTime ttDate = today.atTime(23, 59);
+
+		List<Object[]> monthArray = formElementRepository.getCountOfFormElementValues(mfDate, mtDate, documentId,
+				formId, formElementId);
+
+		List<Object[]> weekArray = formElementRepository.getCountOfFormElementValues(wfDate, wtDate, documentId, formId,
+				formElementId);
+
+		List<Object[]> dayArray = formElementRepository.getCountOfFormElementValues(tfDate, ttDate, documentId, formId,
+				formElementId);
+
+		log.info("monthArray size :" + monthArray.size());
+		log.info("weekArray size :" + weekArray.size());
+		log.info("dayArray size :" + dayArray.size());
+
+		for (FormElementValue formElementValue : listFormElementValues) {
+			int dayCount = 0;
+			int weekCount = 0;
+			int monthCount = 0;
+			for (Object[] obj : monthArray) {
+				if (obj[1].equals(formElementValue.getName())) {
+					monthCount = Integer.parseInt(obj[0].toString());
+					break;
+				}
+			}
+			for (Object[] obj : weekArray) {
+				if (obj[1].equals(formElementValue.getName())) {
+					weekCount = Integer.parseInt(obj[0].toString());
+					break;
+				}
+			}
+			for (Object[] obj : dayArray) {
+				if (obj[1].equals(formElementValue.getName())) {
+					dayCount = Integer.parseInt(obj[0].toString());
+					break;
+				}
+			}
+
+			documentDashboardDTOs.add(setDashboardFormElementValues(formElementValue, dayCount, weekCount, monthCount));
+
+		}
+
+//		documentDashboardDTOs.sort((DocumentDashboardDTO d1, DocumentDashboardDTO d2) -> d1.getFormElementValue()
+//				.compareTo(d2.getFormElementValue()));
+
+		for (DocumentDashboardDTO dto : documentDashboardDTOs) {
+			System.out.println("FormElementValue : " + dto.getFormElementValue());
+			System.out.println("Month : " + dto.getMonthCount());
+			System.out.println("Week : " + dto.getWeekCount());
+			System.out.println("Day : " + dto.getDayCount());
+		}
+		log.info("Final Size : " + documentDashboardDTOs.size());
+
+		return new ResponseEntity<>(documentDashboardDTOs, HttpStatus.OK);
+
+	}
+
+	private DocumentDashboardDTO setDashboardFormElementValues(FormElementValue formElementValue, int dayCount,
+			int weekCount, int monthCount) {
+
+		DocumentDashboardDTO documentDashboardDTO = new DocumentDashboardDTO();
+
+		documentDashboardDTO.setFormElementValueId(formElementValue.getId());
+		documentDashboardDTO.setFormElementValue(formElementValue.getName());
+		documentDashboardDTO.setDayCount(dayCount);
+		documentDashboardDTO.setWeekCount(weekCount);
+		documentDashboardDTO.setMonthCount(monthCount);
+
+		return documentDashboardDTO;
 	}
 
 	private LoadServerExeTaskDTO getFilterData(LocalDate fDate, LocalDate tDate, String accountPid) {

@@ -11,6 +11,8 @@ public class DocumentDashboardDTO {
 	int weekCount;
 	int monthCount;
 	List<FormFormElementDTO> formFormElementDTOs;
+	String formElementValue;
+	long formElementValueId;
 
 	public DocumentDTO getDocument() {
 		return document;
@@ -50,6 +52,22 @@ public class DocumentDashboardDTO {
 
 	public void setFormFormElementDTOs(List<FormFormElementDTO> formFormElementDTOs) {
 		this.formFormElementDTOs = formFormElementDTOs;
+	}
+
+	public String getFormElementValue() {
+		return formElementValue;
+	}
+
+	public void setFormElementValue(String formElementValue) {
+		this.formElementValue = formElementValue;
+	}
+
+	public long getFormElementValueId() {
+		return formElementValueId;
+	}
+
+	public void setFormElementValueId(long formElementValueId) {
+		this.formElementValueId = formElementValueId;
 	}
 
 }
