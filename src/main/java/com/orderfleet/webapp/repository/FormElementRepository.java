@@ -54,10 +54,10 @@ public interface FormElementRepository extends JpaRepository<FormElement, Long> 
 	public static final String FORM_ELEMENT_VALUE_QUERY = "select count(*),value from tbl_filled_form_detail where filled_form_id in "
 			+ "(select id from tbl_filled_form where dynamic_document_header_id in (select id from tbl_dynamic_document_header where executive_task_execution_id in "
 			+ "(select id from (select e.id,e.account_profile_id,e.created_date,row_number() over (partition by e.account_profile_id order by e.created_date desc) "
-			+ "as rn from tbl_executive_task_execution e where e.company_id = ?#{principal.companyId} and e.created_date between ?1 and ?2) et where et.rn = 1) "
-			+ "and document_id = ?3) and form_id = ?4) and form_element_id = ?5 group by value";
+			+ "as rn from tbl_executive_task_execution e where e.company_id = ?#{principal.companyId} and e.user_id = ?1 and e.created_date between ?2 and ?3) et "
+			+ "where et.rn = 1) and document_id = ?4) and form_id = ?5) and form_element_id = ?6 group by value";
 
 	@Query(value = FORM_ELEMENT_VALUE_QUERY, nativeQuery = true)
-	List<Object[]> getCountOfFormElementValues(LocalDateTime fDate, LocalDateTime tDate, long documentId, long formId,
+	List<Object[]> getCountOfFormElementValues(long userId,LocalDateTime fDate, LocalDateTime tDate, long documentId, long formId,
 			long formElementId);
 }

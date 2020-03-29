@@ -225,6 +225,8 @@ public class LoadServerItemsToMobileController {
 		} else {
 			return null;
 		}
+
+		log.info("Dashboard Document Count of :" + user.getLogin());
 		List<Document> userDocuments = userDocumentRepository.findDocumentsByUserIsCurrentUser();
 
 		Map<DocumentType, List<Document>> documentTypeDocuments = new HashMap<>();
@@ -261,6 +263,7 @@ public class LoadServerItemsToMobileController {
 				log.info("monthArray size :" + monthArray.size());
 				log.info("weekArray size :" + weekArray.size());
 				log.info("dayArray size :" + dayArray.size());
+				log.info("---------------------");
 				for (Document document : documentList) {
 					dayCount = 0;
 					weekCount = 0;
@@ -301,6 +304,7 @@ public class LoadServerItemsToMobileController {
 				log.info("monthArray size :" + monthArray.size());
 				log.info("weekArray size :" + weekArray.size());
 				log.info("dayArray size :" + dayArray.size());
+				log.info("---------------------");
 				for (Document document : documentList) {
 					dayCount = 0;
 					weekCount = 0;
@@ -342,6 +346,7 @@ public class LoadServerItemsToMobileController {
 				log.info("monthArray size :" + monthArray.size());
 				log.info("weekArray size :" + weekArray.size());
 				log.info("dayArray size :" + dayArray.size());
+				log.info("---------------------");
 
 				for (Document document : documentList) {
 					dayCount = 0;
@@ -378,10 +383,11 @@ public class LoadServerItemsToMobileController {
 			}
 		}
 		for (DocumentDashboardDTO dto : documentDashboardDtos) {
-			System.out.println("Document : " + dto.getDocument().getName());
-			System.out.println("Month : " + dto.getMonthCount());
-			System.out.println("Week : " + dto.getWeekCount());
-			System.out.println("Day : " + dto.getDayCount());
+			log.info("Document : " + dto.getDocument().getName());
+			log.info("Month : " + dto.getMonthCount());
+			log.info("Week : " + dto.getWeekCount());
+			log.info("Day : " + dto.getDayCount());
+			log.info("---------------------");
 		}
 		log.info("Final Size : " + documentDashboardDtos.size());
 		return new ResponseEntity<>(documentDashboardDtos, HttpStatus.OK);
@@ -413,14 +419,15 @@ public class LoadServerItemsToMobileController {
 		return documentDashboardDto;
 	}
 
-	//@GetMapping("/load-form-element-value-count")
-	
+	// @GetMapping("/load-form-element-value-count")
+
 	@GetMapping("/load-form-element-value-count")
 	public ResponseEntity<List<DocumentDashboardDTO>> loadFormElementValues(@RequestParam String documentPid,
 			@RequestParam String formPid, @RequestParam String formElementPid) {
 //	public ResponseEntity<List<DocumentDashboardDTO>> loadFormElementValues(@RequestParam String documentPid,
 //			@RequestParam String formPid, @RequestParam String formElementPid) {
 
+		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
 		Optional<Document> opDocument = documentRepository.findOneByPid(documentPid);
 		Optional<Form> opForm = formRepository.findOneByPid(formPid);
 		Optional<FormElement> opFormElement = formElementRepository.findOneByPid(formElementPid);
@@ -428,14 +435,20 @@ public class LoadServerItemsToMobileController {
 		List<FormElementValue> listFormElementValues = formElementValueRepository
 				.findAllByFormElementPid(formElementPid);
 
+		long userId = 0;
 		long documentId = 0;
 		long formId = 0;
 		long formElementId = 0;
 
-		if (opDocument.isPresent() && opForm.isPresent() && opFormElement.isPresent()) {
+		if (opUser.isPresent() && opDocument.isPresent() && opForm.isPresent() && opFormElement.isPresent()) {
+
+			userId = opUser.get().getId();
 			documentId = opDocument.get().getId();
 			formId = opForm.get().getId();
 			formElementId = opFormElement.get().getId();
+			log.info("Dashboard Form Element Values Count of User :" + opUser.get().getLogin());
+		} else {
+			return null;
 		}
 
 		List<DocumentDashboardDTO> documentDashboardDTOs = new ArrayList<>();
@@ -454,18 +467,19 @@ public class LoadServerItemsToMobileController {
 		LocalDateTime tfDate = today.atTime(0, 0);
 		LocalDateTime ttDate = today.atTime(23, 59);
 
-		List<Object[]> monthArray = formElementRepository.getCountOfFormElementValues(mfDate, mtDate, documentId,
+		List<Object[]> monthArray = formElementRepository.getCountOfFormElementValues(userId, mfDate, mtDate,
+				documentId, formId, formElementId);
+
+		List<Object[]> weekArray = formElementRepository.getCountOfFormElementValues(userId, wfDate, wtDate, documentId,
 				formId, formElementId);
 
-		List<Object[]> weekArray = formElementRepository.getCountOfFormElementValues(wfDate, wtDate, documentId, formId,
-				formElementId);
-
-		List<Object[]> dayArray = formElementRepository.getCountOfFormElementValues(tfDate, ttDate, documentId, formId,
-				formElementId);
+		List<Object[]> dayArray = formElementRepository.getCountOfFormElementValues(userId, tfDate, ttDate, documentId,
+				formId, formElementId);
 
 		log.info("monthArray size :" + monthArray.size());
 		log.info("weekArray size :" + weekArray.size());
 		log.info("dayArray size :" + dayArray.size());
+		log.info("---------------------");
 
 		for (FormElementValue formElementValue : listFormElementValues) {
 			int dayCount = 0;
@@ -498,10 +512,12 @@ public class LoadServerItemsToMobileController {
 //				.compareTo(d2.getFormElementValue()));
 
 		for (DocumentDashboardDTO dto : documentDashboardDTOs) {
-			System.out.println("FormElementValue : " + dto.getFormElementValue());
-			System.out.println("Month : " + dto.getMonthCount());
-			System.out.println("Week : " + dto.getWeekCount());
-			System.out.println("Day : " + dto.getDayCount());
+
+			log.info("FormElementValue : " + dto.getFormElementValue());
+			log.info("Month : " + dto.getMonthCount());
+			log.info("Week : " + dto.getWeekCount());
+			log.info("Day : " + dto.getDayCount());
+			log.info("---------------------");
 		}
 		log.info("Final Size : " + documentDashboardDTOs.size());
 
