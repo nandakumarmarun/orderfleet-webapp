@@ -70,6 +70,12 @@ public class SalesPerformanceDTO {
 	private boolean updatedStatus;
 
 	private boolean editOrder;
+	
+	private double totalWithoutTax; // reduced discount percentage and tax
+	
+	private double taxTotal;
+	
+	private LocalDateTime clientDate;
 
 	public String getPid() {
 		return pid;
@@ -311,4 +317,28 @@ public class SalesPerformanceDTO {
 		this.sendSalesOrderEmailStatus = sendSalesOrderEmailStatus;
 	}
 
+	public double getTotalWithoutTax() {
+		return totalWithoutTax;
+	}
+
+	public void setTotalWithoutTax(double totalWithoutTax) {
+		this.totalWithoutTax = totalWithoutTax;
+	}
+
+	public double getTaxTotal() {
+		return taxTotal;
+	}
+
+	public void setTaxTotal(double taxTotal) {
+		this.taxTotal = taxTotal;
+	}
+
+	public LocalDateTime getClientDate() {
+		return clientDate;
+	}
+
+	public void setClientDate(LocalDateTime clientDate) {
+		this.clientDate = clientDate;
+	}
+	
 }

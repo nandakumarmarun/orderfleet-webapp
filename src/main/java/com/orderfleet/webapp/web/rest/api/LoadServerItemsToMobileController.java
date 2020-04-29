@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.Document;
@@ -45,6 +46,7 @@ import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FormElementRepository;
 import com.orderfleet.webapp.repository.FormElementValueRepository;
 import com.orderfleet.webapp.repository.FormRepository;
+import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.UserDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
@@ -55,6 +57,7 @@ import com.orderfleet.webapp.web.rest.api.dto.DocumentDashboardDTO;
 import com.orderfleet.webapp.web.rest.api.dto.FormFormElementDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerExeTaskDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerSentItemDTO;
+import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
@@ -62,6 +65,9 @@ import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
+import com.orderfleet.webapp.web.vendor.sap.dto.CustomerDTO;
 
 @RestController
 @RequestMapping("/api")
@@ -75,6 +81,9 @@ public class LoadServerItemsToMobileController {
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
 
+	@Inject
+	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
+	
 	@Inject
 	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
 
@@ -107,6 +116,9 @@ public class LoadServerItemsToMobileController {
 
 	@Inject
 	private FormFormElementService formFormElementService;
+	
+	@Inject
+	private AccountProfileMapper accountProfileMapper;
 
 	@GetMapping("/load-server-attendence")
 	public ResponseEntity<List<AttendanceDTO>> sentAttendenceDownload() {
@@ -214,6 +226,72 @@ public class LoadServerItemsToMobileController {
 
 	}
 
+	@GetMapping("/load-order-related-customers")
+	public ResponseEntity<List<AccountProfileDTO>> getAllOrderTakenCustomers(){
+		String userLogin = SecurityUtils.getCurrentUserLogin();
+		long userId = userRepository.findOneByLogin(userLogin).get().getId();
+		List<AccountProfile> accountProfiles = executiveTaskExecutionRepository.getAllOrderBasedAndUserBasedCustomer(userId);
+		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfiles);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/load-order-related-product-count")
+	public ResponseEntity<List<ProductProfileDTO>> getAllOrderTakenCustomers(
+					@RequestParam String accountPid,@RequestParam String filterBy,
+					@RequestParam(required = false) String fromDate,@RequestParam(required = false) String toDate){
+		String userLogin = SecurityUtils.getCurrentUserLogin();
+		List<ProductProfileDTO> productQuantityList = new ArrayList<>();
+		if (filterBy.equalsIgnoreCase("TODAY")) {
+			log.info("TODAY------");
+			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,LocalDate.now(), LocalDate.now());
+		} else if (filterBy.equalsIgnoreCase("YESTERDAY")) {
+			log.info("YESTERDAY------");
+			LocalDate yesterday = LocalDate.now().minusDays(1);
+			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,yesterday, yesterday);
+		} else if (filterBy.equalsIgnoreCase("WTD")) {
+			log.info("WTD------");
+			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
+			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,weekStartDate, LocalDate.now());
+		} else if (filterBy.equalsIgnoreCase("MTD")) {
+			log.info("MTD------");
+			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
+			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,monthStartDate, LocalDate.now());
+		} else if (filterBy.equalsIgnoreCase("CUSTOM")) {
+			log.info("CUSTOM------" + fromDate + " to " + toDate + "------");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
+			LocalDate toDateTime = LocalDate.parse(toDate, formatter);
+			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,fromDateTime, toDateTime);
+		} else if (filterBy.equalsIgnoreCase("SINGLE")) {
+			log.info("SINGLE------" + fromDate + "-------");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
+			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,fromDateTime, fromDateTime);
+		}
+		
+		return new ResponseEntity<>(productQuantityList, HttpStatus.OK);
+	}
+	
+	public List<ProductProfileDTO> getCustomerRelatedProductDetails(String userLogin , String accountProfilePid , 
+							LocalDate fDate , LocalDate tDate) {
+		LocalDateTime fdateTime = fDate.atTime(0, 0);
+		LocalDateTime tdateTime = tDate.atTime(23, 59);
+		
+		List<Object[]> productQuantity = inventoryVoucherDetailRepository.getProductTotalQuantityForCustomerByDate
+											(userLogin, accountProfilePid,fdateTime, tdateTime);
+		List<ProductProfileDTO> productQuantityList = new ArrayList<>();
+		for(Object[] obj : productQuantity) {
+			ProductProfileDTO productProfileDto = new ProductProfileDTO();
+			productProfileDto.setUnitQty(Double.parseDouble(obj[0].toString()));
+			productProfileDto.setName(obj[1].toString());
+			productProfileDto.setPid(obj[2].toString());
+			productQuantityList.add(productProfileDto);
+		}
+		return productQuantityList;
+	}
+	
 	@GetMapping("/load-server-document-wise-count")
 	public ResponseEntity<List<DocumentDashboardDTO>> getIndividualDocumentWiseCounts() {
 

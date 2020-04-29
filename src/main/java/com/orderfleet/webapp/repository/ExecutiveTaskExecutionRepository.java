@@ -18,6 +18,7 @@ import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
 import com.orderfleet.webapp.domain.enums.LocationType;
+import com.orderfleet.webapp.web.vendor.sap.dto.CustomerDTO;
 
 /**
  * Spring Data JPA repository for the ExecutiveTaskExecution entity.
@@ -239,5 +240,8 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.id in ?1")
 	List<ExecutiveTaskExecution> findAllByCompanyIdAndIdsIn(Set<Long> exeIds);
-
+	
+	@Query("select distinct(ete.accountProfile) from ExecutiveTaskExecution ete where ete.user.id = ?1 and ete.company.id = ?#{principal.companyId}")
+	List<AccountProfile> getAllOrderBasedAndUserBasedCustomer(long userId);
+	
 }

@@ -101,7 +101,8 @@ public class InventoryVoucherHeaderDTO {
 
 	private boolean pdfDownloadStatus;
 	private boolean updatedStatus;
-
+	private LocalDateTime clientDate;
+	
 	public InventoryVoucherHeaderDTO() {
 		super();
 	}
@@ -176,6 +177,7 @@ public class InventoryVoucherHeaderDTO {
 			this.sendSalesOrderEmailStatus = inventoryVoucherHeader.getSendSalesOrderEmailStatus();
 		}
 
+		this.clientDate = inventoryVoucherHeader.getExecutiveTaskExecution().getSendDate();
 		this.updatedStatus = inventoryVoucherHeader.getUpdatedStatus();
 	}
 
@@ -568,6 +570,15 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setSendSalesOrderEmailStatus(SendSalesOrderEmailStatus sendSalesOrderEmailStatus) {
 		this.sendSalesOrderEmailStatus = sendSalesOrderEmailStatus;
+	}
+
+	
+	public LocalDateTime getClientDate() {
+		return clientDate;
+	}
+
+	public void setClientDate(LocalDateTime clientDate) {
+		this.clientDate = clientDate;
 	}
 
 	@Override

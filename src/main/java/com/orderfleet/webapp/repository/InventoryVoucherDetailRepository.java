@@ -23,6 +23,12 @@ import com.orderfleet.webapp.repository.projections.CustomInventoryVoucherDetail
  */
 public interface InventoryVoucherDetailRepository extends JpaRepository<InventoryVoucherDetail, Long> {
 
+	public String CUSTOMER_BASED_PRODUCTS = "select sum(ivd.quantity) as total_qty ,pp.name ,pp.pid from tbl_inventory_voucher_detail ivd " + 
+											"INNER JOIN tbl_product_profile pp on pp.id = ivd.product_id where ivd.inventory_voucher_header_id in (" + 
+											"	select ivh.id from tbl_inventory_voucher_header ivh " + 
+											"	INNER JOIN tbl_account_profile ap on ap.id = ivh.receiver_account_id " + 
+											"	INNER JOIN tbl_user us on us.id = ivh.created_by_id where ivh.company_id = ?#{principal.companyId} and us.login = ?1 and " + 
+											"	ap.pid = ?2 and ivh.created_date between ?3 and ?4 ) group by pp.name ,pp.pid";
 	@Query("select coalesce(sum(voucherDetail.quantity),0) from InventoryVoucherDetail voucherDetail where voucherDetail.product.pid = ?1 and voucherDetail.sourceStockLocation in ?2 and voucherDetail.inventoryVoucherHeader.createdDate > ?3")
 	Double getClosingStockBySourceStockLocation(String productPid, List<StockLocation> stockLocations,
 			LocalDateTime date);
@@ -321,10 +327,13 @@ public interface InventoryVoucherDetailRepository extends JpaRepository<Inventor
 
 	// Dash board End
 
-	@Query(value = "select voucherDetail.inventoryVoucherHeader.pid, voucherDetail.product.pid, voucherDetail.product.name, voucherDetail.product.unitQty, voucherDetail.quantity ,voucherDetail.updatedQuantity ,voucherDetail.updatedStatus from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.pid in ?1")
+	@Query(value = "select voucherDetail.inventoryVoucherHeader.pid, voucherDetail.product.pid, voucherDetail.product.name, voucherDetail.product.unitQty, voucherDetail.quantity ,voucherDetail.updatedQuantity ,voucherDetail.updatedStatus ,voucherDetail.taxPercentage , voucherDetail.sellingRate , voucherDetail.rowTotal ,voucherDetail.discountPercentage from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.pid in ?1")
 	List<Object[]> findByInventoryVoucherHeaderPidIn(Set<String> inventoryVoucherHeaderPids);
 
 	@Query(value = "select voucherDetail from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.pid in ?1")
 	List<InventoryVoucherDetail> findAllByInventoryVoucherHeaderPidIn(Set<String> inventoryVoucherHeaderPids);
 
+	@Query(value = CUSTOMER_BASED_PRODUCTS , nativeQuery = true)
+	List<Object[]> getProductTotalQuantityForCustomerByDate(String userLogin,String accountProfilePid ,
+			LocalDateTime fromDate, LocalDateTime toDate );
 }
