@@ -209,7 +209,7 @@ public class AccountProfileCsvUploadService {
 				}
 			}
 			// account type
-
+			log.info("APAT "+ accountProfile.getAccountType());
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}

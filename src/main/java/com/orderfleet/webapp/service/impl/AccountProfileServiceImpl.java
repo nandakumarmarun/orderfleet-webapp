@@ -96,9 +96,11 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	@Override
 	public AccountProfileDTO save(AccountProfileDTO accountProfileDTO) {
 		log.debug("Request to save AccountProfile : {}", accountProfileDTO);
+		log.info("AccountProfile Type :"+accountProfileDTO.getAccountTypeName());
 		accountProfileDTO.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid()); // set
 																								// pid
 		AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
+		log.info("AccountProfile Type 111 :"+accountProfile.getAccountType().getName());
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
 		if (opUser.isPresent()) {
 			accountProfile.setUser(opUser.get());
@@ -431,11 +433,11 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	public AccountProfileDTO saveAccountProfile(Long companyId, AccountProfileDTO accountProfileDTO, String userLogin) {
 		log.debug("Request to save AccountProfile : {}", accountProfileDTO);
 		accountProfileDTO.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid()); // set
-																								// pid
+		log.info("AccProfiledto Type :"+accountProfileDTO.getAccountTypeName());																						// pid
 		AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
 		// set company
 		accountProfile.setCompany(companyRepository.findOne(companyId));
-
+		log.info("AccountProfile Account Type :"+accountProfile.getAccountType().getName());
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
 		if (opUser.isPresent()) {
 			accountProfile.setUser(opUser.get());

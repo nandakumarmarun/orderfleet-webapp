@@ -156,6 +156,7 @@ public class TPAccountProfileManagementService {
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
 		// All product must have a division/category, if not, set a default one
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyId(company.getId());
+		log.info("Default Account Type TPAPMS:"+defaultAccountType.getName());
 		// find all exist account profiles
 		List<String> apNames = accountProfileDTOs.stream().map(apDto -> apDto.getName().toUpperCase())
 				.collect(Collectors.toList());
@@ -235,7 +236,7 @@ public class TPAccountProfileManagementService {
 				}
 			}
 			// account type
-
+			
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}

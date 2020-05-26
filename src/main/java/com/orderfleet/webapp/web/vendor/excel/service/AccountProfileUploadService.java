@@ -139,6 +139,7 @@ public class AccountProfileUploadService {
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
 		// All product must have a division/category, if not, set a default one
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyId(company.getId());
+		log.info("Default Account type 123456:"+defaultAccountType.getName());
 		// find all exist account profiles
 		List<String> apAlias = accountProfileDTOs.stream().map(apDto -> apDto.getAlias().toUpperCase())
 				.collect(Collectors.toList());
@@ -209,7 +210,7 @@ public class AccountProfileUploadService {
 				}
 			}
 			// account type
-
+			log.info("AccountProfileAccount type == null :"+accountProfile.getAccountType());
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}

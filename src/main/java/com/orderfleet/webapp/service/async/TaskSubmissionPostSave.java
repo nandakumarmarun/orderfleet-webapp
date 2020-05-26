@@ -1252,6 +1252,11 @@ public class TaskSubmissionPostSave {
 			for (FilledFormDetail filledFormDetail : datePickerFormElements) {
 				startDate = LocalDate.parse(filledFormDetail.getValue());
 				if(startDate.isBefore(LocalDate.now())) {
+					log.info("start Date b4 :"+startDate.toString());
+					return;
+				}
+				if(startDate.isEqual(LocalDate.now())) {
+					log.info("start Date equal :"+startDate.toString());
 					return;
 				}
 			}
