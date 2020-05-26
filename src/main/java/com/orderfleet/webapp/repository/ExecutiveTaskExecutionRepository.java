@@ -18,7 +18,6 @@ import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
 import com.orderfleet.webapp.domain.enums.LocationType;
-import com.orderfleet.webapp.web.vendor.sap.dto.CustomerDTO;
 
 /**
  * Spring Data JPA repository for the ExecutiveTaskExecution entity.

@@ -157,8 +157,10 @@
 				<table id="tblSalesInvoiceReport" class="table  table-striped table-bordered">
 					<thead>
 						<tr>
-							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
+							<th><input type="checkbox" id="selectAll" /><br>Select
 								All</th>
+							<th>Invoice No.</th>
+							<th>Invoice date</th>	
 							<th>Customer</th>
 							<th>Amount (without Tax)
 								<p id="totalAmount" style="float: right;"></p>
@@ -169,10 +171,10 @@
 							<th>Total
 								<p id="totalWithTax" style="float: right;"></p>
 							</th>
-							<th>Invoice No.</th>
-							<th>Invoice date</th>
+							
 							<th>Activity date</th>
 							<th>Client date</th>
+							<!-- <th>Invoice PDF</th> -->
 						</tr>
 					</thead>
 					<tbody id="tBodyInventoryVoucher">

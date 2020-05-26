@@ -225,9 +225,10 @@ public class TransactionResource {
 		log.debug("REST request to download sales orders : {}");
 		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
-
+		log.info("Retrived account profiles");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndStatusOrderByCreatedDateDesc();
+		log.info("Retrived inventory voucher headers");
 		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
 
 			String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
@@ -259,27 +260,6 @@ public class TransactionResource {
 							.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
 				}
 
-				// if (openingStockDTOs.isEmpty()) {
-				// List<DocumentStockLocationSource>
-				// documentStockLocationSources =
-				// documentStockLocationSourceRepository
-				// .findByDocumentPid(inventoryVoucherHeader.getDocument().getPid());
-				// List<StockLocation> stockLocations =
-				// documentStockLocationSources.stream()
-				// .map(docstoksou ->
-				// docstoksou.getStockLocation()).collect(Collectors.toList());
-				// if (!stockLocations.isEmpty()) {
-				// List<OpeningStock> openingStocks = openingStockRepository
-				// .findAllOpeningStockByProductPidAndStockLocations(
-				// inventoryVoucherDetail.getProduct().getPid(),
-				// stockLocations);
-				// openingStockDTOs =
-				// openingStocks.stream().map(OpeningStockDTO::new)
-				// .collect(Collectors.toList());
-				// }
-				// }
-
-				// .......................................................................................
 
 				salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
 				salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(inventoryVoucherBatchDetailsDTOs);
@@ -317,6 +297,7 @@ public class TransactionResource {
 			salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
 			salesOrderDTOs.add(salesOrderDTO);
 		}
+		log.info("Completed salesorder dtos");
 		return salesOrderDTOs;
 	}
 

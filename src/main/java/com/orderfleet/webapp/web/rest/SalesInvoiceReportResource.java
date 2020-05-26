@@ -399,8 +399,9 @@ public class SalesInvoiceReportResource {
 		log.debug("Downloading Excel report");
 		String excelFileName = "InvoiceDetails" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = { "Customer", "Amt(without tax)", "Tax Total","Total Amount", "Invoice Number", 
-				"Invoice Date", "Activity Date","Client Date" };
+		String[] headerColumns = { "Invoice Number","Invoice Date",
+				"Customer", "Amt(without tax)", "Tax Total","Total Amount", 
+				"Activity Date","Client Date" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -433,15 +434,16 @@ public class SalesInvoiceReportResource {
 		int rowNum = 1;
 		for (SalesPerformanceDTO salesPerform : salesPerformanceDTOs) {
 				HSSFRow row = worksheet.createRow(rowNum++);
-				row.createCell(0).setCellValue(salesPerform.getReceiverAccountName());
-				row.createCell(1).setCellValue(salesPerform.getTotalWithoutTax());
-				row.createCell(2).setCellValue(salesPerform.getTaxTotal());
-				row.createCell(3).setCellValue(salesPerform.getDocumentTotal());
-				row.createCell(4).setCellValue(salesPerform.getDocumentNumberLocal());
+				row.createCell(0).setCellValue(salesPerform.getDocumentNumberLocal());
 				
-				HSSFCell docDateCell = row.createCell(5);
+				HSSFCell docDateCell = row.createCell(1);
 				docDateCell.setCellValue(salesPerform.getDocumentDate().toString());
 				docDateCell.setCellStyle(dateCellStyle);
+				row.createCell(2).setCellValue(salesPerform.getReceiverAccountName());
+				row.createCell(3).setCellValue(salesPerform.getTotalWithoutTax());
+				row.createCell(4).setCellValue(salesPerform.getTaxTotal());
+				row.createCell(5).setCellValue(salesPerform.getDocumentTotal());
+			
 				
 				HSSFCell serverDateCell = row.createCell(6);
 				serverDateCell.setCellValue(salesPerform.getCreatedDate().toString());
@@ -474,5 +476,278 @@ public class SalesInvoiceReportResource {
 		}
 	}
 
+	
+	
+	@RequestMapping(value = "/sales-invoice-report/downloadPdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public void downloadStatus(@RequestParam String inventoryPid, HttpServletResponse response) throws IOException {
+
+		log.info("Download pdf with pid " + inventoryPid);
+
+		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDtos = new ArrayList<>();
+
+		String[] inventoryPidArray = inventoryPid.split(",");
+
+		if (inventoryPidArray.length > 0) {
+
+			for (String ivhPid : inventoryPidArray) {
+
+				InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid)
+						.get();
+
+				inventoryVoucherHeaderDtos.add(inventoryVoucherHeaderDTO);
+			}
+		}
+		buildPdf(inventoryVoucherHeaderDtos, response);
+
+
+	}
+
+	private void buildPdf(List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs, HttpServletResponse response)
+			throws IOException {
+		response.setContentType("application/pdf");
+
+		if (inventoryVoucherHeaderDTOs.size() > 1) {
+
+			response.setHeader("Content-Disposition", "inline;filename=\"" + "Tax Invoice_"
+					+ inventoryVoucherHeaderDTOs.get(0).getReceiverAccountName() + ".pdf\"");
+
+		} else {
+			response.setHeader("Content-Disposition", "inline;filename=\"" + "Tax Invoice_"
+					+ inventoryVoucherHeaderDTOs.get(0).getOrderNumber() + ".pdf\"");
+		}
+		// Get the output stream for writing PDF object
+		ServletOutputStream out = response.getOutputStream();
+		try {
+			Document document = new Document();
+			/* Basic PDF Creation inside servlet */
+			PdfWriter writer = PdfWriter.getInstance(document, out);
+			document.open();
+
+			// writer.addJavaScript("this.print(false);", false);
+
+			com.itextpdf.text.Font fontSize_22 = FontFactory.getFont(FontFactory.TIMES, 20f,
+					com.itextpdf.text.Font.BOLD);
+			/*
+			 * com.itextpdf.text.Font fontSize_16 = FontFactory.getFont(FontFactory.TIMES,
+			 * 16f, com.itextpdf.text.Font.BOLD);
+			 */
+			for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaderDTOs) {
+				Paragraph companyName = new Paragraph();
+				Paragraph line = new Paragraph();
+				companyName.setAlignment(Element.ALIGN_CENTER);
+				line.setAlignment(Element.ALIGN_CENTER);
+				companyName.setFont(fontSize_22);
+				companyName.add(CompanyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getLegalName());
+				line.add(new Paragraph("_______________________________________________________"));
+
+				String customerAddress = "";
+				String customerEmail = "";
+				String customerPhone = "";
+
+				LocalDateTime date = inventoryVoucherHeaderDTO.getCreatedDate();
+
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
+
+				String orderDate = date.format(formatter);
+
+				if (!inventoryVoucherHeaderDTO.getCustomeraddress().equalsIgnoreCase("No Address")
+						&& inventoryVoucherHeaderDTO.getCustomeraddress() != null)
+					customerAddress = inventoryVoucherHeaderDTO.getCustomeraddress();
+
+				if (inventoryVoucherHeaderDTO.getCustomerEmail() != null)
+					customerEmail = inventoryVoucherHeaderDTO.getCustomerEmail();
+
+				if (inventoryVoucherHeaderDTO.getCustomerPhone() != null)
+					customerPhone = inventoryVoucherHeaderDTO.getCustomerPhone();
+
+				document.add(companyName);
+				document.add(line);
+				document.add(new Paragraph("Sales Order No :" + inventoryVoucherHeaderDTO.getOrderNumber()));
+				document.add(new Paragraph("Date :" + orderDate));
+				document.add(new Paragraph("Executive : " + inventoryVoucherHeaderDTO.getEmployeeName()));
+				document.add(new Paragraph("\n"));
+				document.add(new Paragraph("Customer :" + inventoryVoucherHeaderDTO.getReceiverAccountName()));
+				document.add(new Paragraph("Address :" + customerAddress));
+				document.add(new Paragraph("Email :" + customerEmail));
+				document.add(new Paragraph("Phone :" + customerPhone));
+				document.add(new Paragraph("\n"));
+				PdfPTable table = createPdfTable(inventoryVoucherHeaderDTO);
+				table.setWidthPercentage(100);
+				document.add(table);
+				document.add(new Paragraph("\n\n"));
+				document.add(new Paragraph("Remarks :" + inventoryVoucherHeaderDTO.getVisitRemarks()));
+				document.add(new Paragraph("\n\n"));
+				PdfPTable tableTotal = createTotalTable(inventoryVoucherHeaderDTO);
+				// tableTotal.setWidthPercentage(50);
+				tableTotal.setHorizontalAlignment(Element.ALIGN_LEFT);
+				document.add(tableTotal);
+
+				document.newPage();
+			}
+
+			/*
+			 * ByteArrayOutputStream baos = new ByteArrayOutputStream(); PrintStream ps =
+			 * new PrintStream(baos); PdfWriter.getInstance(document, ps);
+			 */
+
+			PdfAction action = new PdfAction(PdfAction.PRINTDIALOG);
+			writer.setOpenAction(action);
+
+			document.close();
+		} catch (DocumentException exc) {
+			throw new IOException(exc.getMessage());
+		} finally {
+			out.close();
+		}
+
+	}
+
+	private PdfPTable createTotalTable(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+
+		DecimalFormat df = new DecimalFormat("0.00");
+
+		double totalTaxAmount = 0.0;
+		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
+				.getInventoryVoucherDetails()) {
+
+			/*
+			 * double amount = (inventoryVoucherDetailDTO.getSellingRate() *
+			 * inventoryVoucherDetailDTO.getQuantity()); double taxAmount = amount *
+			 * inventoryVoucherDetailDTO.getTaxPercentage() / 100;
+			 */
+
+			double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
+			double discountedAmount = amount - (amount * inventoryVoucherDetailDTO.getDiscountPercentage() / 100);
+			double taxAmnt = (discountedAmount * inventoryVoucherDetailDTO.getTaxPercentage() / 100);
+
+			totalTaxAmount += taxAmnt;
+		}
+
+		PdfPTable table = new PdfPTable(new float[] { 10f, 10f });
+
+		PdfPCell cell1 = new PdfPCell(new Paragraph("Grand Total :"));
+		cell1.setBorder(Rectangle.NO_BORDER);
+
+		PdfPCell cell2 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherHeaderDTO.getDocumentTotal())));
+		cell2.setBorder(Rectangle.NO_BORDER);
+
+		PdfPCell cell3 = new PdfPCell(new Paragraph("Tax Total :"));
+		cell3.setBorder(Rectangle.NO_BORDER);
+
+		PdfPCell cell4 = new PdfPCell(new Paragraph(df.format(totalTaxAmount)));
+		cell4.setBorder(Rectangle.NO_BORDER);
+
+		table.addCell(cell1);
+		table.addCell(cell2);
+		table.addCell(cell3);
+		table.addCell(cell4);
+
+		return table;
+	}
+
+	private PdfPTable createPdfTable(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+
+		com.itextpdf.text.Font fontWeight = FontFactory.getFont(FontFactory.TIMES, 12f, com.itextpdf.text.Font.BOLD);
+
+		PdfPTable table = new PdfPTable(new float[] { 225f, 100f, 100f, 100f, 100f, 100f });
+		table.setTotalWidth(350f);
+
+		PdfPCell cell1 = new PdfPCell(new Paragraph("Item Name", fontWeight));
+		cell1.setBorder(Rectangle.NO_BORDER);
+		cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell2 = new PdfPCell(new Paragraph("Price", fontWeight));
+		cell2.setBorder(Rectangle.NO_BORDER);
+		cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell3 = new PdfPCell(new Paragraph("Quantity", fontWeight));
+		cell3.setBorder(Rectangle.NO_BORDER);
+		cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell4 = new PdfPCell(new Paragraph("Discount %", fontWeight));
+		cell4.setBorder(Rectangle.NO_BORDER);
+		cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell5 = new PdfPCell(new Paragraph("Tax Amount", fontWeight));
+		cell5.setBorder(Rectangle.NO_BORDER);
+		cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell6 = new PdfPCell(new Paragraph("Total", fontWeight));
+		cell6.setBorder(Rectangle.NO_BORDER);
+		cell6.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell7 = new PdfPCell(new Paragraph(""));
+		cell7.setBorder(Rectangle.NO_BORDER);
+		cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		table.addCell(cell1);
+		table.addCell(cell2);
+		table.addCell(cell3);
+		table.addCell(cell4);
+		table.addCell(cell5);
+		table.addCell(cell6);
+		table.addCell(cell7);
+		table.addCell(cell7);
+		table.addCell(cell7);
+		table.addCell(cell7);
+		table.addCell(cell7);
+		table.addCell(cell7);
+
+		DecimalFormat df = new DecimalFormat("0.00");
+
+		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
+				.getInventoryVoucherDetails()) {
+
+			double amount = (inventoryVoucherDetailDTO.getSellingRate() * inventoryVoucherDetailDTO.getQuantity());
+			double discountedAmount = amount - (amount * inventoryVoucherDetailDTO.getDiscountPercentage() / 100);
+			double taxAmnt = (discountedAmount * inventoryVoucherDetailDTO.getTaxPercentage() / 100);
+			// double taxAmount = Math.round(taxAmt * 100.0) / 100.0;
+			String taxAmount = df.format(taxAmnt);
+
+			PdfPCell col1 = new PdfPCell(new Paragraph(inventoryVoucherDetailDTO.getProductName()));
+			col1.setBorder(Rectangle.NO_BORDER);
+
+			PdfPCell col2 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getSellingRate())));
+			col2.setBorder(Rectangle.NO_BORDER);
+			col2.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col3 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getQuantity())));
+			col3.setBorder(Rectangle.NO_BORDER);
+			col3.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col4 = new PdfPCell(
+					new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getDiscountPercentage())));
+			col4.setBorder(Rectangle.NO_BORDER);
+			col4.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col5 = new PdfPCell(new Paragraph(String.valueOf(taxAmount)));
+			col5.setBorder(Rectangle.NO_BORDER);
+			col5.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col6 = new PdfPCell(new Paragraph(String.valueOf(inventoryVoucherDetailDTO.getRowTotal())));
+			col6.setBorder(Rectangle.NO_BORDER);
+			col6.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			PdfPCell col7 = new PdfPCell(new Paragraph(""));
+			col7.setBorder(Rectangle.NO_BORDER);
+			col7.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+			table.addCell(col1);
+			table.addCell(col2);
+			table.addCell(col3);
+			table.addCell(col4);
+			table.addCell(col5);
+			table.addCell(col6);
+			table.addCell(col7);
+			table.addCell(col7);
+			table.addCell(col7);
+			table.addCell(col7);
+			table.addCell(col7);
+			table.addCell(col7);
+		}
+
+		return table;
+	}
 
 }

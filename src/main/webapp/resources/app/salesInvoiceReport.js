@@ -75,6 +75,20 @@ if (!this.InventoryVoucher) {
 		});
 	}
 
+	
+	InventoryVoucher.downloadSalesorderPdf = function(inventoryPid) {
+
+		if (confirm("Are you sure?")) {
+			window.open(inventoryVoucherContextPath
+					+ "/downloadPdf?inventoryPid=" + inventoryPid);
+		}
+//		setTimeout(function() {
+//			InventoryVoucher.filter();
+//		}, 1000);
+		// location.reload();
+
+	}
+	
 
 	InventoryVoucher.filter = function() {
 		if ($('#dbDateSearch').val() == "CUSTOM") {
@@ -122,7 +136,7 @@ if (!this.InventoryVoucher) {
 						if (inventoryVouchers.length == 0) {
 							$('#tBodyInventoryVoucher')
 									.html(
-											"<tr><td colspan='9' align='center'>No data available</td></tr>");
+											"<tr><td colspan='10' align='center'>No data available</td></tr>");
 							return;
 						}
 						var counts = 0;
@@ -153,6 +167,10 @@ if (!this.InventoryVoucher) {
 																	+ inventoryVoucher.pid
 																	+ "' />"
 																	+ "</td><td>"
+																	+ inventoryVoucher.documentNumberServer
+																	+ "</td><td>"
+																	+ convertDateTimeFromServer(inventoryVoucher.documentDate)
+																	+ "</td><td>"
 																	+ inventoryVoucher.receiverAccountName
 																	+ "</td><td>"
 																	+ inventoryVoucher.totalWithoutTax
@@ -161,13 +179,13 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ inventoryVoucher.documentTotal
 																	+ "</td><td>"
-																	+ inventoryVoucher.documentNumberServer
-																	+ "</td><td>"
-																	+ convertDateTimeFromServer(inventoryVoucher.documentDate)
-																	+ "</td><td>"
 																	+ convertDateTimeFromServer(inventoryVoucher.createdDate)
 																	+ "</td><td>"
 																	+ convertDateTimeFromServer(inventoryVoucher.clientDate)
+																	+ "</td><td>"
+//																	+ "<button class='btn btn-success'  onclick='InventoryVoucher.downloadSalesorderPdf(\""
+//																	+ inventoryVoucher.pid
+//																	+ "\");'>Download</button>"
 																	+"</td></tr>");
 										});
 						$("#lblCounts").text(counts);

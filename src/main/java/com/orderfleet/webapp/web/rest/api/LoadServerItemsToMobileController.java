@@ -67,7 +67,6 @@ import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
-import com.orderfleet.webapp.web.vendor.sap.dto.CustomerDTO;
 
 @RestController
 @RequestMapping("/api")
