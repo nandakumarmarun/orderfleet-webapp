@@ -45,7 +45,7 @@ public class AccountProfileExcel {
 	private TPAccountProfileManagementService tpAccountProfileManagementService;
 	
 	@Inject
-	private AccountProfileUploadService accountProfileUploadService;;
+	private AccountProfileUploadService accountProfileUploadService;
 
 	@Inject
 	private DocumentUserWiseUpdateController documentUserWiseUpdateController;

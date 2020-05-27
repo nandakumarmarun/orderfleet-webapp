@@ -156,4 +156,9 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 	@Modifying
 	@Query(value = "delete from tbl_product_group_product where company_id= ?1 ",nativeQuery = true)
 	void deleteByCompany(Long companyId);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "delete from tbl_product_group_product where company_id= ?1 and product_group_id in ?2 ",nativeQuery = true)
+	void deleteByCompanyAndProductGroup(Long companyId,List<Long> productGroupIds);
 }
