@@ -115,7 +115,7 @@ public class MasterDataUploadService {
 	public void saveOrUpdateAccountProfile(List<AccountProfileVendorDTO> accountProfileDtos, Company company) {
 		log.info("Account Profile list size : {}"+accountProfileDtos.size());
 		AccountProfile toSaveAccountProfile;
-		AccountType accountType = accountTypeRepository.findFirstByCompanyId(company.getId());
+		AccountType accountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
 		List<AccountProfile> dbAccountProfiles = accountProfileRepository
 				.findAllByCompanyId(company.getId());
 		for (AccountProfileVendorDTO apUpload : accountProfileDtos) {
@@ -148,7 +148,7 @@ public class MasterDataUploadService {
 	public void saveOrUpdateAccountProfileByPid(List<AccountProfileVendorDTO> accountProfileDtos, Company company) {
 		log.info("Account Profile list size : {}"+accountProfileDtos.size());
 		AccountProfile toSaveAccountProfile=new AccountProfile();
-		AccountType accountType = accountTypeRepository.findFirstByCompanyId(company.getId());
+		AccountType accountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
 		List<AccountProfile> dbAccountProfiles = accountProfileRepository
 				.findAllByCompanyId(company.getId());
 		for (AccountProfileVendorDTO apUpload : accountProfileDtos) {

@@ -101,7 +101,7 @@ public class AccountProfileSapUploadService {
 		Company company = companyRepository.findOne(companyId);
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
 		// All product must have a division/category, if not, set a default one
-		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyId(companyId);
+		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
 		// find all exist account profiles
 		List<String> apNames = resultAccountProfiles.stream().map(apDto -> apDto.getStr2().toUpperCase())
 				.collect(Collectors.toList());

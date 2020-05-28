@@ -139,7 +139,7 @@ public class AccountProfileCsvUploadService {
 		final Long companyId = company.getId();
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
 		// All product must have a division/category, if not, set a default one
-		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyId(company.getId());
+		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
 		// find all exist account profiles
 		List<String> apAlias = accountProfileDTOs.stream().map(apDto -> apDto.getAlias().toUpperCase())
 				.collect(Collectors.toList());

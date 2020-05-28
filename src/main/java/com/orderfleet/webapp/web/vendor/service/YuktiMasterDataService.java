@@ -393,7 +393,7 @@ public class YuktiMasterDataService {
 		if(optionalUser.isPresent()) {
 			user = optionalUser.get();
 		} 
-		AccountType accountType = accountTypeRepository.findFirstByCompanyId(company.getId());
+		AccountType accountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
 		List<AccountProfile> dbAccountProfiles = accountProfileRepository.findAllByCompanyId(company.getId());
 		
 		List<LocationAccountProfile> locationAccountProfiles = new ArrayList<>();

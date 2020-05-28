@@ -137,7 +137,7 @@ public class TallyDataUploadService {
 		log.info("Account Profile list size : {}"+accountProfileDtos.size());
 		List<AccountProfile> accountProfileList = new ArrayList<>();
 		List<AccountProfile> newAccountProfiles = new ArrayList<>();
-		AccountType accountType = accountTypeRepository.findFirstByCompanyId(company.getId());
+		AccountType accountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
 		//PriceLevel defaultPriceLevel = priceLevelRepository.findFirstByCompanyId(company.getId());
 		List<AccountProfile> dbAccountProfiles = accountProfileRepository.findAllByCompanyId(company.getId());
 		List<PriceLevel> dbPriceLevels = priceLevelRepository.findByCompanyId(company.getId());

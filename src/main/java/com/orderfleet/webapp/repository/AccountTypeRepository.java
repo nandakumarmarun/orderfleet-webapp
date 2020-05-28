@@ -40,7 +40,7 @@ public interface AccountTypeRepository extends JpaRepository<AccountType, Long> 
 	
 	List<AccountType> findAllByCompanyId(Long companyId);
 
-	AccountType findFirstByCompanyId(Long companyId);
+	AccountType findFirstByCompanyIdOrderByIdAsc(Long companyId);
 	
 	@Query("select accountType from AccountType accountType where accountType.company.id=?#{principal.companyId} and accountType.activated = true and accountType.lastModifiedDate > ?1")
 	Page<AccountType> findAllByCompanyIdAndAccountTypeActivatedTrueAndLastModifiedDateGreater(LocalDateTime lastSyncdate, Pageable pageable);

@@ -310,8 +310,8 @@ public class AccountTypeServiceImpl implements AccountTypeService {
 	@Override
 	@Transactional(readOnly = true)
 	public AccountTypeDTO findFirstByCompanyId(Long companyId) {
-		log.debug("Request to get all AccountTypes");
-		AccountType accountTypeList = accountTypeRepository.findFirstByCompanyId(companyId);
+		log.debug("Request to get top One AccountType");
+		AccountType accountTypeList = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
 		AccountTypeDTO result = accountTypeMapper.accountTypeToAccountTypeDTO(accountTypeList);
 		return result;
 	}
