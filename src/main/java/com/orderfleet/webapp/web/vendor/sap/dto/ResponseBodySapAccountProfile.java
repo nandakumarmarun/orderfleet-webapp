@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "Address", "Cellular", "Email", "str1", "str2" })
+@JsonPropertyOrder({ "Address", "Cellular", "Email", "SaleEmployeeCode", "SaleEmployeeName", "str1", "str2" })
 public class ResponseBodySapAccountProfile {
 
 	@JsonProperty("Address")
@@ -14,6 +14,10 @@ public class ResponseBodySapAccountProfile {
 	private String cellular;
 	@JsonProperty("Email")
 	private String email;
+	@JsonProperty("SaleEmployeeCode")
+	private String salesEmployeeCode;
+	@JsonProperty("SaleEmployeeName")
+	private String salesEmployeeName;
 	@JsonProperty("str1")
 	private String str1;
 	@JsonProperty("str2")
@@ -47,6 +51,26 @@ public class ResponseBodySapAccountProfile {
 	@JsonProperty("Email")
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	@JsonProperty("SaleEmployeeCode")
+	public String getSalesEmployeeCode() {
+		return salesEmployeeCode;
+	}
+
+	@JsonProperty("SaleEmployeeCode")
+	public void setSalesEmployeeCode(String salesEmployeeCode) {
+		this.salesEmployeeCode = salesEmployeeCode;
+	}
+
+	@JsonProperty("SaleEmployeeName")
+	public String getSalesEmployeeName() {
+		return salesEmployeeName;
+	}
+
+	@JsonProperty("SaleEmployeeName")
+	public void setSalesEmployeeName(String salesEmployeeName) {
+		this.salesEmployeeName = salesEmployeeName;
 	}
 
 	@JsonProperty("str1")

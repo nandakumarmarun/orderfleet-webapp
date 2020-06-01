@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "ItemGroupCode", "OnHand", "SalUnitMsr", "WeightPerPC", "str1", "str2" })
+@JsonPropertyOrder({ "ItemGroupCode", "ItemGroupName", "OnHand", "SalUnitMsr", "WeightPerPC", "str1", "str2" })
 public class ResponseBodySapProductProfile {
 
 	@JsonProperty("ItemGroupCode")
 	private String itemGroupCode;
+	@JsonProperty("ItemGroupName")
+	private String itemGroupName;
 	@JsonProperty("OnHand")
 	private String onHand;
 	@JsonProperty("SalUnitMsr")
@@ -29,6 +31,16 @@ public class ResponseBodySapProductProfile {
 	@JsonProperty("ItemGroupCode")
 	public void setItemGroupCode(String itemGroupCode) {
 		this.itemGroupCode = itemGroupCode;
+	}
+
+	@JsonProperty("ItemGroupName")
+	public String getItemGroupName() {
+		return itemGroupName;
+	}
+
+	@JsonProperty("ItemGroupName")
+	public void setItemGroupName(String itemGroupName) {
+		this.itemGroupName = itemGroupName;
 	}
 
 	@JsonProperty("OnHand")

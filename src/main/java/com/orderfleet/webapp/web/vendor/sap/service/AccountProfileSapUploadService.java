@@ -100,6 +100,8 @@ public class AccountProfileSapUploadService {
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
+
+		Set<LocationDTO> saveLocationDtos = new HashSet<>();
 		// All product must have a division/category, if not, set a default one
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
 		// find all exist account profiles
@@ -172,10 +174,23 @@ public class AccountProfileSapUploadService {
 				}
 			}
 
+			LocationDTO locationDTO = new LocationDTO();
+
 			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
 
-			locationAccountProfileDto.setAccountProfileName(apDto.getStr2());
-			locationAccountProfileDto.setLocationName("Territory");
+			if (apDto.getSalesEmployeeCode().equalsIgnoreCase("-1")) {
+				locationAccountProfileDto.setAccountProfileName(apDto.getStr2());
+				locationAccountProfileDto.setLocationName("Territory");
+			} else {
+
+				locationDTO.setAlias(apDto.getSalesEmployeeCode());
+				locationDTO.setName(apDto.getSalesEmployeeName());
+
+				locationDtos.add(locationDTO);
+
+				locationAccountProfileDto.setAccountProfileName(apDto.getStr2());
+				locationAccountProfileDto.setLocationName(apDto.getSalesEmployeeName());
+			}
 
 			locationAccountProfileDtos.add(locationAccountProfileDto);
 			accountProfile.setDataSourceType(DataSourceType.TALLY);
@@ -223,6 +238,12 @@ public class AccountProfileSapUploadService {
 			}
 			location.setAlias(locDto.getAlias());
 			location.setActivated(true);
+			Optional<Location> opLoc = saveUpdateLocations.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(locDto.getName())).findAny();
+			if (opLoc.isPresent()) {
+				continue;
+			}
+
 			saveUpdateLocations.add(location);
 		}
 		bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);

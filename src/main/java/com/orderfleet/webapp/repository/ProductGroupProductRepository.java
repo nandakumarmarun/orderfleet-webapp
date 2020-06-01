@@ -28,7 +28,7 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 
 	@Query("select productGroupProduct.productGroup from ProductGroupProduct productGroupProduct where productGroupProduct.product.pid = ?1 and productGroupProduct.productGroup.activated = true")
 	List<ProductGroup> findProductGroupByProductPid(String productPid);
-	
+
 	@Query("select productGroupProduct.productGroup from ProductGroupProduct productGroupProduct where productGroupProduct.product.pid IN ?1 and productGroupProduct.productGroup.activated = true")
 	List<ProductGroup> findProductGroupByProductPids(List<String> productPids);
 
@@ -43,7 +43,7 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 
 	@Query("select productGroupProduct from ProductGroupProduct productGroupProduct where productGroupProduct.company.id = ?#{principal.companyId}")
 	List<ProductGroupProduct> findAllByCompanyId();
-	
+
 	@Query("select productGroupProduct from ProductGroupProduct productGroupProduct where productGroupProduct.company.id = ?#{principal.companyId} and productGroupProduct.productGroup.activated=true and productGroupProduct.product.activated=true")
 	List<ProductGroupProduct> findByProductGroupProductActivatedAndCompanyId();
 
@@ -128,37 +128,47 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE ProductGroupProduct pgp SET pgp.activated = FALSE WHERE pgp.company.id = ?1")
 	int updateProductGroupProductInactivate(Long companyId);
-	
+
 	@Query("select productGroupProduct.product.id from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup in ?1 ")
 	Set<Long> findProductIdByProductGroupIn(Set<ProductGroup> productGroups);
-	
+
 	@Query("select productGroupProduct.product.id from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid = ?1 ")
 	Set<Long> findProductIdByProductGroupPid(String productGroupPid);
 
 	@Query("select productGroupProduct.product.pid from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid = ?1 ")
 	Set<String> findProductPidByProductGroupPid(String productGroupPid);
-	
+
 	@Query("select productGroupProduct.product.name from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid = ?1 and productGroupProduct.product.activated=true and productGroupProduct.product.createdDate <= ?2")
-	List<String> findProductNameByProductGroupPidAndActivatedTrueAndCreatedLessThan(String productGroupPid, LocalDateTime toDate);
-		
+	List<String> findProductNameByProductGroupPidAndActivatedTrueAndCreatedLessThan(String productGroupPid,
+			LocalDateTime toDate);
+
 	@Query("select productGroupProduct.product.pid from ProductGroupProduct productGroupProduct where productGroupProduct.product.pid in ?1 and productGroupProduct.productGroup.pid in ?2 and productGroupProduct.product.productCategory.pid in ?3 and productGroupProduct.product.activated = ?4 Order By productGroupProduct.product.name asc")
-	List<String> findProductByProductPidInAndProductGroupPidInAndProductProductCategoryPidInAndActivated(List<String> productProfilePids, List<String> productGroupPids, List<String> productCategoryPids, boolean active);
-	
+	List<String> findProductByProductPidInAndProductGroupPidInAndProductProductCategoryPidInAndActivated(
+			List<String> productProfilePids, List<String> productGroupPids, List<String> productCategoryPids,
+			boolean active);
+
 	@Query("select productGroupProduct.product.pid from ProductGroupProduct productGroupProduct where productGroupProduct.product.pid in ?1 and productGroupProduct.product.productCategory.pid in ?2 and productGroupProduct.product.activated = ?3 Order By productGroupProduct.product.name asc")
-	List<String> findProductByProductPidInAndProductProductCategoryPidInAndActivated(List<String> productProfilePids, List<String> productCategoryPids, boolean active);
-	
+	List<String> findProductByProductPidInAndProductProductCategoryPidInAndActivated(List<String> productProfilePids,
+			List<String> productCategoryPids, boolean active);
+
 	@Query("select productGroupProduct.product.pid from ProductGroupProduct productGroupProduct where productGroupProduct.product.pid in ?1 and productGroupProduct.productGroup.pid in ?2 and productGroupProduct.product.activated = ?3 Order By productGroupProduct.product.name asc")
-	List<String> findProductByProductPidInAndProductGroupPidInAndActivated(List<String> productProfilePids, List<String> productGroupPids, boolean active);
-	
+	List<String> findProductByProductPidInAndProductGroupPidInAndActivated(List<String> productProfilePids,
+			List<String> productGroupPids, boolean active);
+
 	void deleteByCompanyId(Long companyId);
-	
+
 	@Transactional
 	@Modifying
-	@Query(value = "delete from tbl_product_group_product where company_id= ?1 ",nativeQuery = true)
+	@Query(value = "delete from tbl_product_group_product where company_id= ?1 ", nativeQuery = true)
 	void deleteByCompany(Long companyId);
-	
+
 	@Transactional
 	@Modifying
-	@Query(value = "delete from tbl_product_group_product where company_id= ?1 and product_group_id in ?2 ",nativeQuery = true)
-	void deleteByCompanyAndProductGroup(Long companyId,List<Long> productGroupIds);
+	@Query(value = "delete from tbl_product_group_product where company_id= ?1 and product_group_id in ?2 ", nativeQuery = true)
+	void deleteByCompanyAndProductGroup(Long companyId, List<Long> productGroupIds);
+
+	@Transactional
+	@Modifying
+	@Query("delete from ProductGroupProduct productGroupProduct where productGroupProduct.company.id = ?1 and productGroupProduct.id in ?2")
+	void deleteByIdIn(Long companyId, List<Long> pgIds);
 }

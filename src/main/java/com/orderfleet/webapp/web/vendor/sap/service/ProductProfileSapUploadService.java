@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.vendor.sap.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,12 +15,16 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Division;
+import com.orderfleet.webapp.domain.Location;
+import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
@@ -33,6 +38,8 @@ import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.service.util.RandomUtil;
+import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
 import com.orderfleet.webapp.web.vendor.sap.dto.ResponseBodySapProductProfile;
 
@@ -93,7 +100,7 @@ public class ProductProfileSapUploadService {
 
 		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
 
-		List<String> productGroupNames = new ArrayList<>();
+		List<ProductGroupDTO> productGroupDtos = new ArrayList<>();
 
 		List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
 
@@ -155,22 +162,25 @@ public class ProductProfileSapUploadService {
 
 			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
 
-			productGroupProductDTO.setGroupName(ppDto.getItemGroupCode());
+			productGroupProductDTO.setGroupName(ppDto.getItemGroupName());
 			productGroupProductDTO.setProductName(ppDto.getStr2());
 
 			productGroupProductDTOs.add(productGroupProductDTO);
 
-			productGroupNames.add(ppDto.getItemGroupCode());
+			ProductGroupDTO productGroupDTO = new ProductGroupDTO();
+			productGroupDTO.setName(ppDto.getItemGroupName());
+			productGroupDTO.setAlias(ppDto.getItemGroupCode());
+
+			productGroupDtos.add(productGroupDTO);
 
 			saveUpdateProductProfiles.add(productProfile);
 
 		}
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
 
-		List<String> listWithoutDuplicatesPg = productGroupNames.stream().distinct().collect(Collectors.toList());
+		saveUpdateProductGroups(productGroupDtos);
 
-		saveUpdateProductGroups(listWithoutDuplicatesPg);
-		saveUpdateProductGroupProduct(productGroupProductDTOs, listWithoutDuplicatesPg);
+		saveUpdateProductGroupProduct(productGroupProductDTOs);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -180,41 +190,44 @@ public class ProductProfileSapUploadService {
 	}
 
 	@Transactional
-	@Async
-	private void saveUpdateProductGroups(List<String> productGroupNames) {
-
+	public void saveUpdateProductGroups(final List<ProductGroupDTO> productGroupDTOs) {
 		log.info("Saving Product Groups.........");
-
 		long start = System.nanoTime();
+		Set<ProductGroup> saveUpdateProductGroups = new HashSet<>();
+
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
-
-		Set<ProductGroup> saveUpdateProductGroups = new HashSet<>();
 		// find all product group
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
-
-		for (String pg : productGroupNames) {
+		for (ProductGroupDTO pgDto : productGroupDTOs) {
 			// check exist by name, only one exist with a name
-			if (pg != null) {
-				Optional<ProductGroup> optionalPG = productGroups.stream().filter(p -> p.getName().equals(pg))
-						.findAny();
-				ProductGroup productGroup;
-				if (optionalPG.isPresent()) {
-					productGroup = optionalPG.get();
-					// if not update, skip this iteration.
-					if (!productGroup.getThirdpartyUpdate()) {
-						continue;
-					}
-				} else {
-					productGroup = new ProductGroup();
-					productGroup.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
-					productGroup.setName(pg);
-					productGroup.setDataSourceType(DataSourceType.TALLY);
-					productGroup.setCompany(company);
+			Optional<ProductGroup> optionalPG = productGroups.stream().filter(p -> p.getName().equals(pgDto.getName()))
+					.findAny();
+			ProductGroup productGroup;
+			if (optionalPG.isPresent()) {
+				productGroup = optionalPG.get();
+				// if not update, skip this iteration.
+				if (!productGroup.getThirdpartyUpdate()) {
+					continue;
 				}
-				productGroup.setActivated(true);
-				saveUpdateProductGroups.add(productGroup);
+			} else {
+				productGroup = new ProductGroup();
+				productGroup.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
+				productGroup.setName(pgDto.getName());
+				productGroup.setDataSourceType(DataSourceType.TALLY);
+				productGroup.setCompany(company);
 			}
+			productGroup.setAlias(pgDto.getAlias());
+			productGroup.setDescription(pgDto.getDescription());
+			productGroup.setActivated(true);
+
+			Optional<ProductGroup> opPgs = saveUpdateProductGroups.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(pgDto.getName())).findAny();
+			if (opPgs.isPresent()) {
+				continue;
+			}
+
+			saveUpdateProductGroups.add(productGroup);
 		}
 		bulkOperationRepositoryCustom.bulkSaveProductGroup(saveUpdateProductGroups);
 		long end = System.nanoTime();
@@ -222,66 +235,60 @@ public class ProductProfileSapUploadService {
 		// update sync table
 
 		log.info("Sync completed in {} ms", elapsedTime);
-
 	}
 
 	@Transactional
 	@Async
-	public void saveUpdateProductGroupProduct(List<TPProductGroupProductDTO> productGroupProductDTOs,
-			List<String> pgNames) {
+	public void saveUpdateProductGroupProduct(List<TPProductGroupProductDTO> productGroupProductDTOs) {
 
 		log.info("Saving Product Group Products.........");
-
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
+		List<ProductGroupProduct> newProductGroupProducts = new ArrayList<>();
+		List<ProductGroupProduct> productGroupProducts = productGroupProductRepository
+				.findAllByCompanyPid(company.getPid());
 
-		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
-
-		List<Long> pgIds = new ArrayList<>();
-
-		for (String pg : pgNames) {
-
-			if (pg != null) {
-				Optional<ProductGroup> optionalPG = productGroups.stream().filter(p -> p.getName().equals(pg))
-						.findAny();
-
-				if (optionalPG.isPresent()) {
-					pgIds.add(optionalPG.get().getId());
-				}
-			}
-		}
-
-		deleteByCompanyAndProductGroup(companyId, pgIds);
-
-		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
-
+		// delete all assigned location account profile from tally
+		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
+		List<Long> productGroupProductsIds = new ArrayList<>();
+
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
-			// check exist by names,
-			Optional<ProductGroupProduct> optionalPGP = productGroupProductRepository
-					.findByCompanyIdAndProductGroupNameIgnoreCaseAndProductNameIgnoreCase(companyId,
-							pgpDto.getGroupName(), pgpDto.getProductName());
-			// if not exist save
-			if (!optionalPGP.isPresent()) {
-				Optional<ProductGroup> optionalGroup = productGroups.stream()
-						.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findAny();
-				Optional<ProductProfile> optionalpp = productProfiles.stream()
-						.filter(pl -> pgpDto.getProductName().equals(pl.getName())).findAny();
-				if (optionalpp.isPresent() && optionalGroup.isPresent()) {
-					ProductGroupProduct pgp = new ProductGroupProduct();
-					pgp.setProductGroup(optionalGroup.get());
-					pgp.setProduct(optionalpp.get());
-					pgp.setCompany(company);
-					pgp.setActivated(true);
-					saveUpdateProductGroupProducts.add(pgp);
+			ProductGroupProduct productGroupProduct = new ProductGroupProduct();
+			// find location
+
+			Optional<ProductGroup> opPg = productGroups.stream()
+					.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findFirst();
+			// find accountprofile
+			// System.out.println(loc.get()+"===Location");
+
+			Optional<ProductProfile> opPp = productProfiles.stream()
+					.filter(pp -> pgpDto.getProductName().equals(pp.getName())).findFirst();
+			if (opPp.isPresent()) {
+				List<Long> productGroupProductIds = productGroupProducts.stream()
+						.filter(pgp -> opPp.get().getPid().equals(pgp.getProduct().getPid())).map(pgp -> pgp.getId())
+						.collect(Collectors.toList());
+				if (productGroupProductIds.size() != 0) {
+					productGroupProductsIds.addAll(productGroupProductIds);
 				}
-			} else {
-				optionalPGP.get().setActivated(true);
-				saveUpdateProductGroupProducts.add(optionalPGP.get());
+				if (opPg.isPresent()) {
+					productGroupProduct.setProductGroup(opPg.get());
+				} else if (opPp.isPresent()) {
+					productGroupProduct.setProductGroup(productGroups.get(0));
+				}
+				productGroupProduct.setProduct(opPp.get());
+				productGroupProduct.setCompany(company);
+				newProductGroupProducts.add(productGroupProduct);
 			}
 		}
-		bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+		if (productGroupProductsIds.size() != 0) {
+			productGroupProductRepository.deleteByIdIn(companyId, productGroupProductsIds);
+		}
+
+		productGroupProductRepository.save(newProductGroupProducts);
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -290,8 +297,4 @@ public class ProductProfileSapUploadService {
 
 	}
 
-	@Transactional
-	public void deleteByCompanyAndProductGroup(long companyId, List<Long> pgIds) {
-		productGroupProductRepository.deleteByCompanyAndProductGroup(companyId, pgIds);
-	}
 }
