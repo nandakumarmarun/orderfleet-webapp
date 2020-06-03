@@ -20,25 +20,32 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
+import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
+import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
+import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.service.OpeningStockService;
 import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.ProductProfileService;
+import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
 import com.orderfleet.webapp.web.vendor.sap.dto.ResponseBodySapProductProfile;
@@ -68,11 +75,19 @@ public class ProductProfileSapUploadService {
 	private final ProductGroupProductRepository productGroupProductRepository;
 
 	private final CompanyRepository companyRepository;
+	
+	private final StockLocationRepository stockLocationRepository;
+
+	private final StockLocationService stockLocationService;
+	
+	private final OpeningStockRepository openingStockRepository;
 
 	public ProductProfileSapUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			DivisionRepository divisionRepository, ProductCategoryRepository productCategoryRepository,
 			ProductGroupRepository productGroupRepository, ProductProfileRepository productProfileRepository,
-			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository) {
+			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository,
+			StockLocationRepository stockLocationRepository,StockLocationService stockLocationService,
+			OpeningStockRepository openingStockRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.divisionRepository = divisionRepository;
@@ -81,6 +96,9 @@ public class ProductProfileSapUploadService {
 		this.productProfileRepository = productProfileRepository;
 		this.productGroupProductRepository = productGroupProductRepository;
 		this.companyRepository = companyRepository;
+		this.stockLocationRepository = stockLocationRepository;
+		this.stockLocationService = stockLocationService;
+		this.openingStockRepository = openingStockRepository;
 	}
 
 	@Transactional
@@ -91,10 +109,11 @@ public class ProductProfileSapUploadService {
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
-
+		
+		List<OpeningStockDTO> openingStockDtos = new ArrayList<>();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
 		// find all exist product profiles
-		Set<String> ppNames = resultProductProfiles.stream().map(p -> p.getStr2()).collect(Collectors.toSet());
+		Set<String> ppNames = resultProductProfiles.stream().map(p -> p.getStr1()).collect(Collectors.toSet());
 		List<ProductProfile> productProfiles = productProfileRepository
 				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
 
@@ -124,7 +143,7 @@ public class ProductProfileSapUploadService {
 		for (ResponseBodySapProductProfile ppDto : resultProductProfiles) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getName().equals(ppDto.getStr2())).findAny();
+					.filter(p -> p.getName().equals(ppDto.getStr1())).findAny();
 			ProductProfile productProfile;
 			if (optionalPP.isPresent()) {
 				productProfile = optionalPP.get();
@@ -136,12 +155,12 @@ public class ProductProfileSapUploadService {
 				productProfile = new ProductProfile();
 				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
 				productProfile.setCompany(company);
-				productProfile.setName(ppDto.getStr2());
+				productProfile.setName(ppDto.getStr1());
 				productProfile.setDivision(defaultDivision);
 				productProfile.setDataSourceType(DataSourceType.TALLY);
 			}
 
-			productProfile.setAlias(ppDto.getStr1());
+			productProfile.setAlias(ppDto.getStr2());
 			productProfile.setPrice(BigDecimal.valueOf(0));
 			productProfile.setMrp(0);
 
@@ -149,7 +168,7 @@ public class ProductProfileSapUploadService {
 			productProfile.setActivated(true);
 
 			Optional<ProductProfile> opAccP = saveUpdateProductProfiles.stream()
-					.filter(so -> so.getName().equalsIgnoreCase(ppDto.getStr2())).findAny();
+					.filter(so -> so.getName().equalsIgnoreCase(ppDto.getStr1())).findAny();
 			if (opAccP.isPresent()) {
 				continue;
 			}
@@ -160,10 +179,15 @@ public class ProductProfileSapUploadService {
 			}
 			productProfile.setProductCategory(defaultCategory.get());
 
+			OpeningStockDTO openingStockDto = new OpeningStockDTO();
+			openingStockDto.setProductProfileName(productProfile.getName());
+			openingStockDto.setQuantity(Double.parseDouble(ppDto.getOnHand()));
+			openingStockDtos.add(openingStockDto);
+			
 			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
 
 			productGroupProductDTO.setGroupName(ppDto.getItemGroupName());
-			productGroupProductDTO.setProductName(ppDto.getStr2());
+			productGroupProductDTO.setProductName(ppDto.getStr1());
 
 			productGroupProductDTOs.add(productGroupProductDTO);
 
@@ -176,11 +200,14 @@ public class ProductProfileSapUploadService {
 			saveUpdateProductProfiles.add(productProfile);
 
 		}
+		log.info("Saving product profiles");
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
-
+		log.info("Saving product groups");
 		saveUpdateProductGroups(productGroupDtos);
-
+		log.info("Saving product group product profiles");
 		saveUpdateProductGroupProduct(productGroupProductDTOs);
+		log.info("Saving opening stock");
+		saveUpdateOpeningStock(openingStockDtos);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -297,4 +324,60 @@ public class ProductProfileSapUploadService {
 
 	}
 
+	@Transactional
+	@Async
+	public void saveUpdateOpeningStock(List<OpeningStockDTO> openingStockDTOs) {
+		long start = System.nanoTime();
+		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		Set<OpeningStock> saveOpeningStocks = new HashSet<>();
+		// All opening-stock must have a stock-location, if not, set a default
+		// one
+		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(company.getId());
+		log.info("defaulst stock location found :"+defaultStockLocation.getName());
+		// find all exist product profiles
+		Set<String> ppNames = openingStockDTOs.stream().map(os -> os.getProductProfileName())
+				.collect(Collectors.toSet());
+		log.info("product profile names found :"+ppNames.size());
+		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
+
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
+		log.info(" product profiles found :"+productProfiles.size());
+		openingStockRepository.deleteByCompanyId(company.getId());
+		log.info("Deleted opening stock");
+		for (OpeningStockDTO osDto : openingStockDTOs) {
+			// only save if account profile exist
+			productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
+					.ifPresent(pp -> {
+						OpeningStock openingStock = new OpeningStock();
+						openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
+						openingStock.setOpeningStockDate(LocalDateTime.now());
+						openingStock.setCreatedDate(LocalDateTime.now());
+						openingStock.setCompany(company);
+						openingStock.setProductProfile(pp);
+
+						if (osDto.getStockLocationName() == null) {
+							openingStock.setStockLocation(defaultStockLocation);
+						} else {
+							// stock location
+							Optional<StockLocation> optionalStockLocation = StockLocations.stream()
+									.filter(pl -> osDto.getStockLocationName().equals(pl.getAlias())).findAny();
+							if (optionalStockLocation.isPresent()) {
+								openingStock.setStockLocation(optionalStockLocation.get());
+							} else {
+								openingStock.setStockLocation(defaultStockLocation);
+							}
+						}
+						openingStock.setQuantity(osDto.getQuantity());
+						saveOpeningStocks.add(openingStock);
+					});
+		}
+		log.info("Saving opening stock");
+		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
 }

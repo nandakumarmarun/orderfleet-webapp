@@ -34,8 +34,8 @@ import com.orderfleet.webapp.web.rest.mapper.EcomProductGroupMapper;
 /**
  * Service Implementation for managing ProductGroup.
  * 
- * @author Muhammed Riyas T
- * @since May 17, 2016
+ * @author Anish
+ * @since May 17, 2020
  */
 @Service
 @Transactional

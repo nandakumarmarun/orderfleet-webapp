@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.service.EcomProductGroupEcomProductsService;
 import com.orderfleet.webapp.service.EcomProductGroupService;
 import com.orderfleet.webapp.service.EcomProductProfileService;
 import com.orderfleet.webapp.service.ProductGroupEcomProductsService;
@@ -64,7 +65,7 @@ public class EcomProductGroupResource {
 	private ProductGroupProductService productGroupProductService;
 
 	@Inject
-	private ProductGroupEcomProductsService productGroupEcomProductsService;
+	private EcomProductGroupEcomProductsService productGroupEcomProductsService;
 
 	@Inject
 	private TaxMasterService taxmasterService;
@@ -98,7 +99,7 @@ public class EcomProductGroupResource {
 		}
 		productGroupDTO.setActivated(true);
 		EcomProductGroupDTO result = ecomProductGroupService.save(productGroupDTO);
-		return ResponseEntity.created(new URI("/web/productGroups/" + result.getPid()))
+		return ResponseEntity.created(new URI("/web/ecomProductGroups/" + result.getPid()))
 				.headers(HeaderUtil.createEntityCreationAlert("productGroup", result.getPid().toString())).body(result);
 	}
 
@@ -183,7 +184,7 @@ public class EcomProductGroupResource {
 		model.addAttribute("ecomProducts",
 				ecomProductProfileService.findAllByCompanyAndActivatedOrDeactivatedEcomProductProfile(true));
 		model.addAttribute("taxMasters", taxmasterService.findAllByCompany());
-		return "company/productGroups";
+		return "company/ecomProductGroups";
 	}
 
 	/**
@@ -219,13 +220,13 @@ public class EcomProductGroupResource {
 				.build();
 	}
 
-	@RequestMapping(value = "/ecomProductGroups/assignProducts", method = RequestMethod.POST)
-	@Timed
-	public ResponseEntity<Void> saveAssignedProducts(@RequestParam String pid, @RequestParam String assignedproducts) {
-		log.debug("REST request to save assigned account type : {}", pid);
-		productGroupProductService.save(pid, assignedproducts);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
+//	@RequestMapping(value = "/ecomProductGroups/assignProducts", method = RequestMethod.POST)
+//	@Timed
+//	public ResponseEntity<Void> saveAssignedProducts(@RequestParam String pid, @RequestParam String assignedproducts) {
+//		log.debug("REST request to save assigned account type : {}", pid);
+//		productGroupProductService.save(pid, assignedproducts);
+//		return new ResponseEntity<>(HttpStatus.OK);
+//	}
 
 	@RequestMapping(value = "/ecomProductGroups/findProducts/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed

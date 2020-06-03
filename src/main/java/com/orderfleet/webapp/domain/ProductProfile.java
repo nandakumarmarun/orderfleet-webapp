@@ -64,8 +64,8 @@ public class ProductProfile implements Serializable, Cloneable {
 	@Column(name = "name", length = 255, nullable = false)
 	private String name;
 
-	@Size(max = 55)
-	@Column(name = "alias", length = 55)
+	@Size(max = 255)
+	@Column(name = "alias", length = 255)
 	private String alias;
 
 	@Column(name = "description")
