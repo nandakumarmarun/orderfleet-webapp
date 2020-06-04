@@ -77,6 +77,8 @@ public class MobileSettingsDTO {
 	private boolean salesOrderDownloadPdf;
 	
 	private boolean findLocation;
+	
+	private boolean enableDynamicUnit;
 
 	public MobileSettingsDTO() {
 		super();
@@ -111,6 +113,7 @@ public class MobileSettingsDTO {
 		this.smartSearch = mobileConfigurationDTO.getSmartSearch();
 		this.salesOrderDownloadPdf = mobileConfigurationDTO.getSalesOrderDownloadPdf();
 		this.findLocation = mobileConfigurationDTO.getFindLocation();
+		this.enableDynamicUnit = mobileConfigurationDTO.getEnableDynamicUnit();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -359,6 +362,14 @@ public class MobileSettingsDTO {
 
 	public void setFindLocation(boolean findLocation) {
 		this.findLocation = findLocation;
+	}
+
+	public boolean getEnableDynamicUnit() {
+		return enableDynamicUnit;
+	}
+
+	public void setEnableDynamicUnit(boolean enableDynamicUnit) {
+		this.enableDynamicUnit = enableDynamicUnit;
 	}
 	
 }

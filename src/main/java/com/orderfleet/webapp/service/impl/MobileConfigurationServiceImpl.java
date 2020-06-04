@@ -72,6 +72,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setSmartSearch(mobileConfigurationDTO.getSmartSearch());
 		configuration.setSalesOrderDownloadPdf(mobileConfigurationDTO.getSalesOrderDownloadPdf());
 		configuration.setFindLocation(mobileConfigurationDTO.getFindLocation());
+		configuration.setEnableDynamicUnit(mobileConfigurationDTO.getEnableDynamicUnit());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -108,6 +109,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setSmartSearch(mobileConfigurationDTO.getSmartSearch());
 			configuration.setSalesOrderDownloadPdf(mobileConfigurationDTO.getSalesOrderDownloadPdf());
 			configuration.setFindLocation(mobileConfigurationDTO.getFindLocation());
+			configuration.setEnableDynamicUnit(mobileConfigurationDTO.getEnableDynamicUnit());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

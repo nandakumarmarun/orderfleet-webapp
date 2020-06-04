@@ -38,7 +38,8 @@ if (!this.MobileConfiguration) {
 		enableAttendanceImage : false,
 		smartSearch : false,
 		salesOrderDownloadPdf : false,
-		findLocation : true
+		findLocation : true,
+		enableDynamicUnit : false
 	};
 
 	$(document).ready(function() {
@@ -124,6 +125,8 @@ if (!this.MobileConfiguration) {
 				"#salesOrderDownloadPdf").is(":checked");
 		mobileConfigurationDTO.findLocation = $(
 		"#findLocation").is(":checked");
+		mobileConfigurationDTO.enableDynamicUnit = $(
+		"#enableDynamicUnit").is(":checked");
 		
 		$.ajax({
 			url : contextPath,
@@ -203,7 +206,10 @@ if (!this.MobileConfiguration) {
 									data.salesOrderDownloadPdf);
 							$('#findLocation').prop("checked",
 									data.findLocation);
+							$('#enableDynamicUnit').prop("checked",
+									data.enableDynamicUnit);
 
+							
 						}
 
 					},

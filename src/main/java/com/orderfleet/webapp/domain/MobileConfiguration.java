@@ -134,6 +134,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "find_location", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
 	private boolean findLocation;
 	
+	@Column(name = "enable_dynamic_unit", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enableDynamicUnit;
+	
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -388,6 +391,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setFindLocation(boolean findLocation) {
 		this.findLocation = findLocation;
+	}
+	
+	public boolean getEnableDynamicUnit() {
+		return enableDynamicUnit;
+	}
+
+	public void setEnableDynamicUnit(boolean enableDynamicUnit) {
+		this.enableDynamicUnit = enableDynamicUnit;
 	}
 
 	@Override

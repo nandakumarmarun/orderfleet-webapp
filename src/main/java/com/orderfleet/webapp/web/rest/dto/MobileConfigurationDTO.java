@@ -44,6 +44,7 @@ public class MobileConfigurationDTO {
 	private boolean smartSearch;
 	private boolean salesOrderDownloadPdf;
 	private boolean findLocation;
+	private boolean enableDynamicUnit;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -81,6 +82,7 @@ public class MobileConfigurationDTO {
 		this.smartSearch = mobileConfiguration.getSmartSearch();
 		this.salesOrderDownloadPdf = mobileConfiguration.getSalesOrderDownloadPdf();
 		this.findLocation = mobileConfiguration.getFindLocation();
+		this.enableDynamicUnit = mobileConfiguration.getEnableDynamicUnit();
 	}
 
 	public String getPid() {
@@ -321,6 +323,14 @@ public class MobileConfigurationDTO {
 
 	public void setFindLocation(boolean findLocation) {
 		this.findLocation = findLocation;
+	}
+
+	public boolean getEnableDynamicUnit() {
+		return enableDynamicUnit;
+	}
+
+	public void setEnableDynamicUnit(boolean enableDynamicUnit) {
+		this.enableDynamicUnit = enableDynamicUnit;
 	}
 	
 }
