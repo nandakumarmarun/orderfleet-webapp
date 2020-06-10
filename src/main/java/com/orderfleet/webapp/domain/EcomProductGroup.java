@@ -255,7 +255,7 @@ public class EcomProductGroup implements Serializable, Cloneable {
 	@Override
 	public String toString() {
 		return "ProductGroup [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
-				+ description + ", company=" + company + ", image=" + Arrays.toString(image) + ", imageContentType="
+				+ description + ", company=" + company + ", imageContentType="
 				+ imageContentType + ", activated=" + activated + ", dataSourceType=" + dataSourceType
 				+ ", thirdpartyUpdate=" + thirdpartyUpdate + ", createdDate=" + createdDate + ", lastModifiedDate="
 				+ lastModifiedDate + ", taxMastersList=" + taxMastersList + ", taxRate=" + taxRate + "]";

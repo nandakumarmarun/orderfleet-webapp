@@ -58,6 +58,7 @@ import com.orderfleet.webapp.service.AttendanceStatusSubgroupService;
 import com.orderfleet.webapp.service.CompetitorProfileService;
 import com.orderfleet.webapp.service.DocumentAccountTypeService;
 import com.orderfleet.webapp.service.DocumentAccountingVoucherColumnService;
+import com.orderfleet.webapp.service.DocumentEcomProductGroupService;
 import com.orderfleet.webapp.service.DocumentFormsService;
 import com.orderfleet.webapp.service.DocumentInventoryVoucherColumnService;
 import com.orderfleet.webapp.service.DocumentPriceLevelService;
@@ -67,6 +68,7 @@ import com.orderfleet.webapp.service.DocumentProductGroupService;
 import com.orderfleet.webapp.service.DocumentService;
 import com.orderfleet.webapp.service.DocumentStockLocationDestinationService;
 import com.orderfleet.webapp.service.DocumentStockLocationSourceService;
+import com.orderfleet.webapp.service.EcomProductGroupProductService;
 import com.orderfleet.webapp.service.EcomProductProfileService;
 import com.orderfleet.webapp.service.EmployeeProfileLocationService;
 import com.orderfleet.webapp.service.FormElementService;
@@ -122,12 +124,14 @@ import com.orderfleet.webapp.web.rest.dto.AttendanceStatusSubgroupDTO;
 import com.orderfleet.webapp.web.rest.dto.CompetitorProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentAccountTypeDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
+import com.orderfleet.webapp.web.rest.dto.DocumentEcomProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentPriceLevelDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentPrintDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentProductCategoryDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentStockLocationDTO;
+import com.orderfleet.webapp.web.rest.dto.EcomProductGroupProductDTO;
 import com.orderfleet.webapp.web.rest.dto.EcomProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.FormDTO;
@@ -218,6 +222,9 @@ public class MasterDataController {
 
 	@Inject
 	private DocumentProductGroupService documentProductGroupService;
+	
+	@Inject
+	private DocumentEcomProductGroupService documentEcomProductGroupService;
 
 	@Inject
 	private DocumentProductCategoryService documentProductCategoryService;
@@ -236,6 +243,9 @@ public class MasterDataController {
 
 	@Inject
 	private ProductGroupProductService productGroupProductService;
+	
+	@Inject
+	private EcomProductGroupProductService ecomProductGroupProductService;
 
 	@Inject
 	private UserPriceLevelService userPriceLevelService;
@@ -570,9 +580,34 @@ public class MasterDataController {
 	 * @return the ResponseEntity with status 200 (OK) and the list of productGroups
 	 *         in body
 	 */
+	@RequestMapping(value = "/ecom-product-group-products", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<EcomProductGroupProductDTO>> getAllProductGroupProducts(
+			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) {
+		log.debug("REST request to get all ProductGroupProducts");
+
+		List<EcomProductGroupProductDTO> productGroupProductDTOs;
+		if (lastSyncdate == null) {
+			productGroupProductDTOs = ecomProductGroupProductService
+					.findProductGroupProductsByUserProductGroupIsCurrentUserAndProductGroupActivated(true);
+		} else {
+			productGroupProductDTOs = ecomProductGroupProductService
+					.findProductGroupProductsByUserProductGroupIsCurrentUserAndProductGroupActivatedAndModifiedDate(
+							true, lastSyncdate);
+		}
+		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productGroupProductDTOs);
+	}
+
+	
+	/**
+	 * GET /product-group-products : get all the productGroupProducts.
+	 *
+	 * @return the ResponseEntity with status 200 (OK) and the list of productGroups
+	 *         in body
+	 */
 	@RequestMapping(value = "/product-group-products", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<List<ProductGroupProductDTO>> getAllProductGroupProducts(
+	public ResponseEntity<List<ProductGroupProductDTO>> getAllEcomProductGroupProducts(
 			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) {
 		log.debug("REST request to get all ProductGroupProducts");
 
@@ -587,7 +622,8 @@ public class MasterDataController {
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productGroupProductDTOs);
 	}
-
+	
+	
 	/**
 	 * GET /product-groups : get all the productGroups.
 	 *
@@ -801,6 +837,22 @@ public class MasterDataController {
 			documentProductGroupDTOs = documentProductGroupService.findByUserDocumentIsCurrentUser();
 		} else {
 			documentProductGroupDTOs = documentProductGroupService
+					.findByUserDocumentIsCurrentUserAndLastModifiedDate(lastSyncdate);
+		}
+		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(documentProductGroupDTOs);
+	}
+	
+	
+	@GetMapping(value = "/document-ecom-product-groups", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<DocumentEcomProductGroupDTO>> getAllDocumentEcomProductGroups(
+			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) {
+		log.debug("REST request to get all document ecom product groups");
+		List<DocumentEcomProductGroupDTO> documentProductGroupDTOs;
+		if (lastSyncdate == null) {
+			documentProductGroupDTOs = documentEcomProductGroupService.findByUserDocumentIsCurrentUser();
+		} else {
+			documentProductGroupDTOs = documentEcomProductGroupService
 					.findByUserDocumentIsCurrentUserAndLastModifiedDate(lastSyncdate);
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(documentProductGroupDTOs);

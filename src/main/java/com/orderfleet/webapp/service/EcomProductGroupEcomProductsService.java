@@ -9,8 +9,8 @@ import com.orderfleet.webapp.web.rest.dto.EcomProductProfileDTO;
 /**
  * Spring Data JPA repository for the ProductGroupEcomProduct entity.
  * 
- * @author Sarath
- * @since Sep 24, 2016
+ * @author Anish
+ * @since June 10, 2020
  */
 public interface EcomProductGroupEcomProductsService {
 
