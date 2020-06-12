@@ -34,12 +34,15 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -48,6 +51,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.codahale.metrics.annotation.Timed;
 import com.itextpdf.text.Chunk;
@@ -92,6 +97,12 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
+import com.orderfleet.webapp.web.util.RestClientUtil;
+import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
+import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderItemDetailsSap;
+import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderMasterSap;
+import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderResponseDataSap;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -356,10 +367,13 @@ public class SalesPerformanceManagementResource {
 
 		boolean pdfDownloadButtonStatus = false;
 		boolean orderEdit = false;
+		boolean sendSalesOrderSapButtonStatus = false;
 		Optional<CompanyConfiguration> opCompanyConfigurationPdfDownload = companyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
 		Optional<CompanyConfiguration> opCompanyConfigurationSalesEdit = companyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_EDIT_ENABLED);
+		Optional<CompanyConfiguration> opCompanyConfigurationSendSalesOrderSap = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_SALES_ORDER_SAP);
 
 		if (opCompanyConfigurationPdfDownload.isPresent()) {
 
@@ -378,6 +392,16 @@ public class SalesPerformanceManagementResource {
 				orderEdit = false;
 			}
 		}
+
+		if (opCompanyConfigurationSendSalesOrderSap.isPresent()) {
+
+			if (opCompanyConfigurationSendSalesOrderSap.get().getValue().equals("true")) {
+				sendSalesOrderSapButtonStatus = true;
+			} else {
+				sendSalesOrderSapButtonStatus = false;
+			}
+		}
+
 		DecimalFormat df = new DecimalFormat("0.00");
 		int size = inventoryVouchers.size();
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
@@ -419,6 +443,7 @@ public class SalesPerformanceManagementResource {
 					.setDocumentVolumeUpdated(ivData[22] != null ? Double.parseDouble(ivData[22].toString()) : 0.0);
 			salesPerformanceDTO.setUpdatedStatus(ivData[23] != null ? Boolean.valueOf(ivData[23].toString()) : false);
 			salesPerformanceDTO.setEditOrder(orderEdit);
+			salesPerformanceDTO.setSendSalesOrderSapButtonStatus(sendSalesOrderSapButtonStatus);
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
@@ -752,6 +777,128 @@ public class SalesPerformanceManagementResource {
 
 		return new ResponseEntity<>("failed", HttpStatus.OK);
 
+	}
+
+	@RequestMapping(value = "/sales-performance-management/downloadSalesOrderSap", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> downloadSalesOrderSap(@RequestParam String inventoryPid)
+			throws IOException {
+
+		log.info("Download to Sap with pid " + inventoryPid);
+
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(inventoryPid).get();
+
+		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)) {
+			log.info("Downloading to sap..............");
+
+			SalesOrderResponseDataSap salesOrderResponseDataSap = sendSalesOrdertoSap(inventoryVoucherHeaderDTO);
+
+			log.info("Response Data: " + salesOrderResponseDataSap);
+
+			inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.PROCESSING);
+
+			if (salesOrderResponseDataSap.getStatusCode() == 0) {
+				inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
+			}
+
+			if (salesOrderResponseDataSap.getStatusCode() == 1) {
+				inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.PENDING);
+			}
+
+			inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
+
+		}
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
+	}
+
+	private SalesOrderResponseDataSap sendSalesOrdertoSap(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+
+		log.debug("Web request to send to sap ...");
+
+		SalesOrderMasterSap requestBody = getRequestBody(inventoryVoucherHeaderDTO);
+
+		log.info("" + requestBody);
+
+		HttpEntity<SalesOrderMasterSap> entity = new HttpEntity<>(requestBody, RestClientUtil.createTokenAuthHeaders());
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+//		String API_URL = "";
+		
+		String API_URL = "http://192.168.10.36:130/Service1.svc/AddOrder";
+
+		log.info("POST URL: " + API_URL);
+
+		try {
+
+		SalesOrderResponseDataSap salesOrderResponseDataSap = restTemplate.postForObject(API_URL, entity,
+					SalesOrderResponseDataSap.class);
+
+//			SalesOrderResponseDataSap salesOrderResponseDataSap = new SalesOrderResponseDataSap();
+//			salesOrderResponseDataSap.setStatusCode(1);
+//			salesOrderResponseDataSap.setStatusMessage("Successfully Posted");
+
+			return salesOrderResponseDataSap;
+
+		} catch (HttpClientErrorException exception) {
+			SalesOrderResponseDataSap salesOrderResponseDataSap = new SalesOrderResponseDataSap();
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+
+				log.info("HttpClientError Exception-BadRequest........."+exception.getMessage());
+				// throw new ServiceException(exception.getResponseBodyAsString());
+				salesOrderResponseDataSap.setStatusCode(2);
+				salesOrderResponseDataSap.setStatusMessage("Could not able to connect the server");
+			}
+			log.info("HttpClientError Exception........."+exception.getMessage());
+			salesOrderResponseDataSap.setStatusCode(2);
+			salesOrderResponseDataSap.setStatusMessage("Could not able to connect the server");
+			// throw new ServiceException(exception.getMessage());
+			return salesOrderResponseDataSap;
+		} catch (Exception exception) {
+
+			log.info("Exception........."+exception.getMessage());
+			// throw new ServiceException(exception.getMessage());
+			SalesOrderResponseDataSap salesOrderResponseDataSap = new SalesOrderResponseDataSap();
+			salesOrderResponseDataSap.setStatusCode(2);
+			salesOrderResponseDataSap.setStatusMessage("Could not able to connect the server");
+			return salesOrderResponseDataSap;
+		}
+	}
+
+	private SalesOrderMasterSap getRequestBody(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+		SalesOrderMasterSap salesOrderMasterSap = new SalesOrderMasterSap();
+
+		salesOrderMasterSap.setCustomerCode(inventoryVoucherHeaderDTO.getReceiverAccountAlias());
+		salesOrderMasterSap.setCustomerName(inventoryVoucherHeaderDTO.getReceiverAccountName());
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		LocalDateTime localDateTime = inventoryVoucherHeaderDTO.getClientDate();
+		String date = localDateTime.format(formatter);
+
+		salesOrderMasterSap.setPostingDate(date);
+		salesOrderMasterSap.setDocDate(date);
+
+		salesOrderMasterSap.setRemarks(inventoryVoucherHeaderDTO.getVisitRemarks());
+
+		List<SalesOrderItemDetailsSap> salesOrderItems = new ArrayList<>();
+
+		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
+				.getInventoryVoucherDetails()) {
+			SalesOrderItemDetailsSap salesOrderItemDetailsSap = new SalesOrderItemDetailsSap();
+
+			salesOrderItemDetailsSap.setItemCode(inventoryVoucherDetailDTO.getProductName());
+			salesOrderItemDetailsSap.setItemName(inventoryVoucherDetailDTO.getProductAlias());
+			salesOrderItemDetailsSap.setQuantity(inventoryVoucherDetailDTO.getQuantity());
+
+			salesOrderItems.add(salesOrderItemDetailsSap);
+		}
+
+		salesOrderMasterSap.setItemDetails(salesOrderItems);
+
+		return salesOrderMasterSap;
 	}
 
 	@RequestMapping(value = "/sales-performance-management/downloadPdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

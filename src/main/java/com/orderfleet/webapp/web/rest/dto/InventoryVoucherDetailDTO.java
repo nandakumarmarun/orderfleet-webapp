@@ -21,16 +21,18 @@ public class InventoryVoucherDetailDTO {
 
 	private String productName;
 
+	private String productAlias;
+
 	private String productCategory;
-	
+
 	private List<String> productGroups;
-	
+
 	private String productSKU;
-	
+
 	private Double productUnitQty;
 
 	private double quantity;
-	
+
 	private double updatedQty;
 
 	private double freeQuantity;
@@ -50,7 +52,7 @@ public class InventoryVoucherDetailDTO {
 	private LocalDateTime batchDate;
 
 	private double rowTotal;
-	
+
 	private double updatedRowTotal;
 
 	private double discountAmount;
@@ -80,7 +82,7 @@ public class InventoryVoucherDetailDTO {
 	private Long referenceInventoryVoucherDetailId;
 
 	private String remarks;
-	
+
 	private String visitRemarks;
 
 	private List<InventoryVoucherBatchDetailDTO> inventoryVoucherBatchDetails;
@@ -92,9 +94,9 @@ public class InventoryVoucherDetailDTO {
 	private String accountName;
 
 	private String employeeName;
-	
+
 	private boolean updatedStatus;
-	
+
 	private boolean editOrder;
 
 	public InventoryVoucherDetailDTO() {
@@ -103,12 +105,14 @@ public class InventoryVoucherDetailDTO {
 	public InventoryVoucherDetailDTO(InventoryVoucherDetail inventoryVoucherDetail) {
 		super();
 		this.detailId = inventoryVoucherDetail.getId();
-		if(inventoryVoucherDetail.getProduct() != null) {
+		if (inventoryVoucherDetail.getProduct() != null) {
 			this.productPid = inventoryVoucherDetail.getProduct().getPid();
 			this.productName = inventoryVoucherDetail.getProduct().getName();
 			this.productCategory = inventoryVoucherDetail.getProduct().getProductCategory().getName();
 			this.productSKU = inventoryVoucherDetail.getProduct().getSku();
 			this.productUnitQty = inventoryVoucherDetail.getProduct().getUnitQty();
+			this.productAlias = inventoryVoucherDetail.getProduct().getAlias() == null ? ""
+					: inventoryVoucherDetail.getProduct().getAlias();
 		}
 		this.quantity = inventoryVoucherDetail.getQuantity();
 		this.updatedQty = inventoryVoucherDetail.getUpdatedQuantity();
@@ -135,8 +139,8 @@ public class InventoryVoucherDetailDTO {
 			// Used in Item Wise Sales
 			this.accountPid = inventoryVoucherDetail.getInventoryVoucherHeader().getReceiverAccount().getPid();
 			this.accountName = inventoryVoucherDetail.getInventoryVoucherHeader().getReceiverAccount().getName();
-			if(inventoryVoucherDetail.getInventoryVoucherHeader().getEmployee() != null) {
-				this.employeeName = inventoryVoucherDetail.getInventoryVoucherHeader().getEmployee().getName();	
+			if (inventoryVoucherDetail.getInventoryVoucherHeader().getEmployee() != null) {
+				this.employeeName = inventoryVoucherDetail.getInventoryVoucherHeader().getEmployee().getName();
 			}
 		}
 		if (inventoryVoucherDetail.getSourceStockLocation() != null) {
@@ -181,7 +185,7 @@ public class InventoryVoucherDetailDTO {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
-	
+
 	public String getProductCategory() {
 		return productCategory;
 	}
@@ -221,7 +225,7 @@ public class InventoryVoucherDetailDTO {
 	public void setQuantity(double quantity) {
 		this.quantity = quantity;
 	}
-	
+
 	public double getUpdatedQty() {
 		return updatedQty;
 	}
@@ -301,7 +305,7 @@ public class InventoryVoucherDetailDTO {
 	public void setRowTotal(double rowTotal) {
 		this.rowTotal = rowTotal;
 	}
-	
+
 	public double getUpdatedRowTotal() {
 		return updatedRowTotal;
 	}
@@ -469,7 +473,7 @@ public class InventoryVoucherDetailDTO {
 	public void setVisitRemarks(String visitRemarks) {
 		this.visitRemarks = visitRemarks;
 	}
-	
+
 	public boolean getUpdatedStatus() {
 		return updatedStatus;
 	}
@@ -477,13 +481,21 @@ public class InventoryVoucherDetailDTO {
 	public void setUpdatedStatus(boolean updatedStatus) {
 		this.updatedStatus = updatedStatus;
 	}
-	
+
 	public boolean getEditOrder() {
 		return editOrder;
 	}
 
 	public void setEditOrder(boolean editOrder) {
 		this.editOrder = editOrder;
+	}
+
+	public String getProductAlias() {
+		return productAlias;
+	}
+
+	public void setProductAlias(String productAlias) {
+		this.productAlias = productAlias;
 	}
 
 	@Override
@@ -530,8 +542,5 @@ public class InventoryVoucherDetailDTO {
 				+ ", createdDate=" + createdDate + ", accountPid=" + accountPid + ", accountName=" + accountName
 				+ ", employeeName=" + employeeName + "]";
 	}
-	
-	
-	
 
 }

@@ -55,6 +55,8 @@ public class SalesPerformanceDTO {
 
 	private boolean sendSalesOrderEmailStatusColumn;
 
+	private boolean sendSalesOrderSapButtonStatus;
+
 	private Boolean status;
 
 	private long orderNumber;
@@ -70,11 +72,11 @@ public class SalesPerformanceDTO {
 	private boolean updatedStatus;
 
 	private boolean editOrder;
-	
+
 	private double totalWithoutTax; // reduced discount percentage and tax
-	
+
 	private double taxTotal;
-	
+
 	private LocalDateTime clientDate;
 
 	public String getPid() {
@@ -340,5 +342,13 @@ public class SalesPerformanceDTO {
 	public void setClientDate(LocalDateTime clientDate) {
 		this.clientDate = clientDate;
 	}
-	
+
+	public boolean getSendSalesOrderSapButtonStatus() {
+		return sendSalesOrderSapButtonStatus;
+	}
+
+	public void setSendSalesOrderSapButtonStatus(boolean sendSalesOrderSapButtonStatus) {
+		this.sendSalesOrderSapButtonStatus = sendSalesOrderSapButtonStatus;
+	}
+
 }

@@ -275,6 +275,21 @@ if (!this.InventoryVoucher) {
 
 											var button = "";
 
+											var sendSalesOrderSapButton = "";
+
+											if (inventoryVoucher.sendSalesOrderSapButtonStatus) {
+
+												if (inventoryVoucher.tallyDownloadStatus == "PENDING") {
+													sendSalesOrderSapButton = "<br><br><button type='button' class='btn btn-primary' id='salesOrderSapButton' onclick='InventoryVoucher.downloadSalesOrderSap(\""
+															+ inventoryVoucher.pid
+															+ "\");'>Send Sales Order</button>";
+												} else if (inventoryVoucher.tallyDownloadStatus == "PROCESSING") {
+													sendSalesOrderSapButton = "<br><br><button type='button' class='btn btn-danger'>Sending Failed</button>";
+												} else if (inventoryVoucher.tallyDownloadStatus == "COMPLETED") {
+													sendSalesOrderSapButton = "<br><br><button type='button' class='btn btn-success'>Sending Success</button>";
+												}
+											}
+
 											if (inventoryVoucher.pdfDownloadButtonStatus) {
 
 												if ($("#dbAccount").val() != '-1') {
@@ -298,7 +313,7 @@ if (!this.InventoryVoucher) {
 															".packingSlipByCustomerClass")
 															.removeClass('show');
 												}
- 
+
 												if (inventoryVoucher.pdfDownloadStatus) {
 
 													button = "<br><br><button type='button' class='btn btn-primary' onclick='InventoryVoucher.downloadSalesorderPdf(\""
@@ -351,6 +366,8 @@ if (!this.InventoryVoucher) {
 																	+ inventoryVoucher.pid
 																	+ "\",0);'>View Details</button>"
 																	+ button
+																	+ ""
+																	+ sendSalesOrderSapButton
 																	+ "</td><td>"
 																	+ inventoryVoucher.visitRemarks
 																	+ "</td></tr>");
@@ -379,11 +396,12 @@ if (!this.InventoryVoucher) {
 
 			window.open(inventoryVoucherContextPath
 					+ "/downloadPdf?inventoryPid=" + inventoryPidsPdf);
+			InventoryVoucher.filter();
 
 		}
 
 		setTimeout(function() {
-			InventoryVoucher.filter();
+
 		}, 1000);
 
 	}
@@ -406,6 +424,39 @@ if (!this.InventoryVoucher) {
 			InventoryVoucher.filter();
 		}, 1000);
 		// location.reload();
+
+	}
+
+	InventoryVoucher.downloadSalesOrderSap = function(inventoryPid) {
+
+		$("#salesOrderSapButton").prop('disabled', true);
+
+		if (confirm("Are you sure?")) {
+
+			$.ajax({
+				url : inventoryVoucherContextPath + "/downloadSalesOrderSap",
+				method : 'GET',
+				data : {
+					inventoryPid : inventoryPid,
+				},
+				beforeSend : function() {
+					// Show image container
+					$("#loader").modal('show');
+
+				},
+				success : function(data) {
+					
+					$("#loader").modal('hide');
+					$("#salesOrderSapButton").prop('disabled', false);
+					InventoryVoucher.filter();
+
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+
+		}
 
 	}
 

@@ -1,6 +1,8 @@
 package com.orderfleet.webapp.web.vendor.sap.service;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -14,11 +16,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
+import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
@@ -26,6 +32,7 @@ import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
+import com.orderfleet.webapp.repository.LocationHierarchyRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
@@ -36,8 +43,12 @@ import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
+import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
 import com.orderfleet.webapp.web.vendor.sap.dto.ResponseBodySapAccountProfile;
 import com.orderfleet.webapp.web.vendor.sap.dto.ResponseBodySapAccountProfileOpeningBalance;
+import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderItemDetailsSap;
+import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderMasterSap;
+import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderResponseDataSap;
 
 /**
  * Service for save/update account profile related data from third party
@@ -71,12 +82,15 @@ public class AccountProfileSapUploadService {
 
 	private final CompanyRepository companyRepository;
 
+	private final LocationHierarchyRepository locationHierarchyRepository;
+
 	public AccountProfileSapUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
 			AccountProfileService accountProfileService, LocationRepository locationRepository,
 			LocationAccountProfileRepository locationAccountProfileRepository,
 			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
-			LocationService locationService, CompanyRepository companyRepository) {
+			LocationService locationService, CompanyRepository companyRepository,
+			LocationHierarchyRepository locationHierarchyRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.accountProfileRepository = accountProfileRepository;
@@ -88,12 +102,15 @@ public class AccountProfileSapUploadService {
 		this.userRepository = userRepository;
 		this.locationService = locationService;
 		this.companyRepository = companyRepository;
+		this.locationHierarchyRepository = locationHierarchyRepository;
 	}
 
 	@Transactional
 	public void saveUpdateAccountProfiles(final List<ResponseBodySapAccountProfile> resultAccountProfiles,
-			final List<ResponseBodySapAccountProfileOpeningBalance> resultAccountProfileOpeningBalances) {
+			final List<ResponseBodySapAccountProfileOpeningBalance> resultAccountProfileOpeningBalances)
+			throws Exception {
 		log.info("Saving Account Profiles.........");
+
 		long start = System.nanoTime();
 
 		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
@@ -101,7 +118,6 @@ public class AccountProfileSapUploadService {
 		Company company = companyRepository.findOne(companyId);
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
 
-		Set<LocationDTO> saveLocationDtos = new HashSet<>();
 		// All product must have a division/category, if not, set a default one
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
 		// find all exist account profiles
@@ -199,6 +215,7 @@ public class AccountProfileSapUploadService {
 
 		if (locationDtos.size() > 0) {
 			saveUpdateLocations(locationDtos);
+			saveUpdateLocationHierarchy(locationDtos);
 		}
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 
@@ -310,6 +327,87 @@ public class AccountProfileSapUploadService {
 		// update sync table
 
 		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	@Transactional
+	private void saveUpdateLocationHierarchy(List<LocationDTO> locationDtos) {
+		List<LocationHierarchyDTO> locationHierarchyDTOs = locationDtosToLocationHierarchyDtos(locationDtos);
+
+		log.info("Saving Location Hierarchies.........");
+
+		long start = System.nanoTime();
+
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+
+		Long version;
+		// Only one version of a company hierarchy is active at a time
+		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
+				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
+		if (locationHierarchy.isPresent()) {
+			locationHierarchyRepository.updateLocationHierarchyInactivatedFor(ZonedDateTime.now(),
+					locationHierarchy.get().getVersion());
+			version = locationHierarchy.get().getVersion() + 1;
+		} else {
+			version = 1L;
+		}
+		// find all locations
+		List<Location> locations = locationRepository.findByCompanyIdAndActivatedTrue(companyId);
+		// create hierarchy
+		for (LocationHierarchyDTO locationDTO : locationHierarchyDTOs) {
+
+			// check location exist
+			Optional<Location> optionalLoc = locations.stream()
+					.filter(p -> p.getName().equals(locationDTO.getLocationName())).findAny();
+			if (optionalLoc.isPresent()) {
+				if (locationDTO.getParentName() != null && locationDTO.getParentName().length() > 0) {
+					// check parent location exist
+					Optional<Location> optionalParentLoc = locations.stream()
+							.filter(p -> p.getName().equals(locationDTO.getParentName())).findAny();
+					if (optionalParentLoc.isPresent()) {
+						locationHierarchyRepository.insertLocationHierarchyWithParent(version,
+								optionalLoc.get().getId(), optionalParentLoc.get().getId());
+					}
+				} else {
+					locationHierarchyRepository.insertLocationHierarchyWithNoParent(version, optionalLoc.get().getId());
+				}
+			}
+		}
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
+	private List<LocationHierarchyDTO> locationDtosToLocationHierarchyDtos(List<LocationDTO> locationDtos) {
+
+		Set<String> locations = new HashSet<>();
+
+		for (LocationDTO locationDTO : locationDtos) {
+
+			locations.add(locationDTO.getName());
+		}
+
+		List<LocationHierarchyDTO> locationHierarchyDTOs = new ArrayList<>();
+
+		LocationHierarchyDTO defaultLocationHierarchyDTO = new LocationHierarchyDTO();
+		defaultLocationHierarchyDTO.setLocationName("Territory");
+		defaultLocationHierarchyDTO.setParentName(null);
+		locationHierarchyDTOs.add(defaultLocationHierarchyDTO);
+
+		for (String location : locations) {
+
+			LocationHierarchyDTO locationHierarchyDTO = new LocationHierarchyDTO();
+
+			locationHierarchyDTO.setLocationName(location);
+			locationHierarchyDTO.setParentName("Territory");
+
+			locationHierarchyDTOs.add(locationHierarchyDTO);
+
+		}
+
+		return locationHierarchyDTOs;
 	}
 
 	private static boolean isValidEmail(String email) {

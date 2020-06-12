@@ -38,6 +38,8 @@ public class InventoryVoucherHeaderDTO {
 
 	private String receiverAccountName;
 
+	private String receiverAccountAlias;
+
 	private String supplierAccountPid;
 
 	private String supplierAccountName;
@@ -102,7 +104,7 @@ public class InventoryVoucherHeaderDTO {
 	private boolean pdfDownloadStatus;
 	private boolean updatedStatus;
 	private LocalDateTime clientDate;
-	
+
 	public InventoryVoucherHeaderDTO() {
 		super();
 	}
@@ -121,6 +123,8 @@ public class InventoryVoucherHeaderDTO {
 		if (inventoryVoucherHeader.getReceiverAccount() != null) {
 			this.receiverAccountPid = inventoryVoucherHeader.getReceiverAccount().getPid();
 			this.receiverAccountName = inventoryVoucherHeader.getReceiverAccount().getName();
+			this.receiverAccountAlias = inventoryVoucherHeader.getReceiverAccount().getAlias() == null ? ""
+					: inventoryVoucherHeader.getReceiverAccount().getAlias();
 		}
 		this.processStatus = inventoryVoucherHeader.getProcessStatus();
 		if (!inventoryVoucherHeader.getInventoryVoucherDetails().isEmpty()) {
@@ -572,13 +576,20 @@ public class InventoryVoucherHeaderDTO {
 		this.sendSalesOrderEmailStatus = sendSalesOrderEmailStatus;
 	}
 
-	
 	public LocalDateTime getClientDate() {
 		return clientDate;
 	}
 
 	public void setClientDate(LocalDateTime clientDate) {
 		this.clientDate = clientDate;
+	}
+
+	public String getReceiverAccountAlias() {
+		return receiverAccountAlias;
+	}
+
+	public void setReceiverAccountAlias(String receiverAccountAlias) {
+		this.receiverAccountAlias = receiverAccountAlias;
 	}
 
 	@Override

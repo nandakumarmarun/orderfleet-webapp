@@ -50,6 +50,7 @@
 						<th>Sales Edit Enabled</th>
 						<th>Gps Variance Query</th>
 						<th>Send Sales Order Email</th>
+						<th>Send Sales Order Sap</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -72,6 +73,7 @@
 							<th>${companyConfiguration.salesEditEnabled}</th>
 							<th>${companyConfiguration.gpsVarianceQuery}</th>
 							<th>${companyConfiguration.sendSalesOrderEmail}</th>
+							<th>${companyConfiguration.sendSalesOrderSap}</th>
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
@@ -210,6 +212,15 @@
 													<label class="control-label">Send Sales Order Email</label>
 													<input id="sendSalesOrderEmail"
 														name='checksSendSalesOrderEmail"' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Send Sales Order Sap</label>
+													<input id="sendSalesOrderSap"
+														name='checksSendSalesOrderSap"' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

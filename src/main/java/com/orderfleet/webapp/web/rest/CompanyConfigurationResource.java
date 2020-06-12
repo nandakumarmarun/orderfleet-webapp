@@ -129,10 +129,15 @@ public class CompanyConfigurationResource {
 					mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
-/*				if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
-					mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue()));
+				if (cc.getName().equals(CompanyConfig.SEND_SALES_ORDER_SAP)) {
+					mcDto.setSendSalesOrderSap(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
-				}*/
+				}
+				/*
+				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
+				 * mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue())); anyValueExist =
+				 * true; }
+				 */
 
 			}
 			if (anyValueExist) {
@@ -152,9 +157,10 @@ public class CompanyConfigurationResource {
 			@RequestParam String chatReply, @RequestParam String salesPdfDownload,
 			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement,
 			@RequestParam String salesEditEnabled, @RequestParam String gpsVarianceQuery,
-			@RequestParam String sendSalesOrderEmail) throws URISyntaxException {
+			@RequestParam String sendSalesOrderEmail, @RequestParam String sendSalesOrderSap)
+			throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
-		/*,@RequestParam String findLocation*/
+		/* ,@RequestParam String findLocation */
 		Company company = null;
 		Optional<Company> optionalCompany = companyRepository.findOneByPid(companyPid);
 		if (optionalCompany.isPresent()) {
@@ -188,10 +194,14 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.GPS_VARIANCE_QUERY);
 		Optional<CompanyConfiguration> optSendSalesOrderEmail = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_EMAIL);
-		/*Optional<CompanyConfiguration> optFindLocation = companyConfigurationRepository
-				.findByCompanyPidAndName(companyPid, CompanyConfig.FIND_LOCATION);*/
-		
-		
+		Optional<CompanyConfiguration> optSendSalesOrderSap = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_SAP);
+		/*
+		 * Optional<CompanyConfiguration> optFindLocation =
+		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
+		 * CompanyConfig.FIND_LOCATION);
+		 */
+
 		CompanyConfiguration saveOfflineConfiguration = null;
 		CompanyConfiguration promptAttendance = null;
 		CompanyConfiguration interimSaveComapny = null;
@@ -205,7 +215,8 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration salesEditEnabledCompany = null;
 		CompanyConfiguration gpsVarianceQueryCompany = null;
 		CompanyConfiguration sendSalesOrderEmailCompany = null;
-		/*CompanyConfiguration findLocationCompany = null;*/
+		CompanyConfiguration sendSalesOrderSapCompany = null;
+		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
 			saveOfflineConfiguration = optDistanceTraveled.get();
@@ -349,18 +360,27 @@ public class CompanyConfigurationResource {
 			sendSalesOrderEmailCompany.setValue(sendSalesOrderEmail);
 		}
 		companyConfigurationRepository.save(sendSalesOrderEmailCompany);
-		
-		
-		/*if (optFindLocation.isPresent()) {
-			findLocationCompany = optFindLocation.get();
-			findLocationCompany.setValue(findLocation);
+
+		if (optSendSalesOrderSap.isPresent()) {
+			sendSalesOrderSapCompany = optSendSalesOrderSap.get();
+			sendSalesOrderSapCompany.setValue(sendSalesOrderSap);
 		} else {
-			findLocationCompany = new CompanyConfiguration();
-			findLocationCompany.setCompany(company);
-			findLocationCompany.setName(CompanyConfig.FIND_LOCATION);
-			findLocationCompany.setValue(findLocation);
+			sendSalesOrderSapCompany = new CompanyConfiguration();
+			sendSalesOrderSapCompany.setCompany(company);
+			sendSalesOrderSapCompany.setName(CompanyConfig.SEND_SALES_ORDER_SAP);
+			sendSalesOrderSapCompany.setValue(sendSalesOrderSap);
 		}
-		companyConfigurationRepository.save(findLocationCompany);*/
+		companyConfigurationRepository.save(sendSalesOrderSapCompany);
+
+		/*
+		 * if (optFindLocation.isPresent()) { findLocationCompany =
+		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
+		 * findLocationCompany = new CompanyConfiguration();
+		 * findLocationCompany.setCompany(company);
+		 * findLocationCompany.setName(CompanyConfig.FIND_LOCATION);
+		 * findLocationCompany.setValue(findLocation); }
+		 * companyConfigurationRepository.save(findLocationCompany);
+		 */
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -407,8 +427,14 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optSendSalesOrderEmail = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_EMAIL);
 
-		/*Optional<CompanyConfiguration> optFindLocation = companyConfigurationRepository
-				.findByCompanyPidAndName(companyPid, CompanyConfig.FIND_LOCATION);*/
+		Optional<CompanyConfiguration> optSendSalesOrderSap = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_SAP);
+
+		/*
+		 * Optional<CompanyConfiguration> optFindLocation =
+		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
+		 * CompanyConfig.FIND_LOCATION);
+		 */
 		CompanyConfigDTO companyConfigurationDTO = new CompanyConfigDTO();
 
 		if (optDistanceTraveled.isPresent()) {
@@ -453,9 +479,14 @@ public class CompanyConfigurationResource {
 		if (optSendSalesOrderEmail.isPresent()) {
 			companyConfigurationDTO.setSendSalesOrderEmail(Boolean.valueOf(optSendSalesOrderEmail.get().getValue()));
 		}
-		/*if (optFindLocation.isPresent()) {
-			companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get().getValue()));
-		}*/
+		if (optSendSalesOrderSap.isPresent()) {
+			companyConfigurationDTO.setSendSalesOrderSap(Boolean.valueOf(optSendSalesOrderSap.get().getValue()));
+		}
+		/*
+		 * if (optFindLocation.isPresent()) {
+		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
+		 * .getValue())); }
+		 */
 		return companyConfigurationDTO;
 	}
 
@@ -494,10 +525,15 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optSendSalesOrderEmail = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_EMAIL);
 
-		/*Optional<CompanyConfiguration> optFindLocation = companyConfigurationRepository
-				.findByCompanyPidAndName(companyPid, CompanyConfig.FIND_LOCATION);*/
+		Optional<CompanyConfiguration> optSendSalesOrderSap = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_SAP);
 
-		
+		/*
+		 * Optional<CompanyConfiguration> optFindLocation =
+		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
+		 * CompanyConfig.FIND_LOCATION);
+		 */
+
 		if (optDistanceTraveled.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optDistanceTraveled.get().getCompany().getId(),
 					CompanyConfig.DISTANCE_TRAVELED);
@@ -552,10 +588,15 @@ public class CompanyConfigurationResource {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optSendSalesOrderEmail.get().getCompany().getId(),
 					CompanyConfig.SEND_SALES_ORDER_EMAIL);
 		}
-		/*if (optFindLocation.isPresent()) {
-			companyConfigurationRepository.deleteByCompanyIdAndName(optFindLocation.get().getCompany().getId(),
-					CompanyConfig.FIND_LOCATION);
-		}*/
+		if (optSendSalesOrderSap.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optSendSalesOrderSap.get().getCompany().getId(),
+					CompanyConfig.SEND_SALES_ORDER_SAP);
+		}
+		/*
+		 * if (optFindLocation.isPresent()) {
+		 * companyConfigurationRepository.deleteByCompanyIdAndName(optFindLocation.get()
+		 * .getCompany().getId(), CompanyConfig.FIND_LOCATION); }
+		 */
 
 		return ResponseEntity.ok()
 				.headers(HeaderUtil.createEntityDeletionAlert("companyConfiguration", companyPid.toString())).build();
