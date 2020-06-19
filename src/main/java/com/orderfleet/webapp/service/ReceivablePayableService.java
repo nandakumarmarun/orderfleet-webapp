@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -133,4 +134,9 @@ public interface ReceivablePayableService {
 	ReceivablePayableDTO updateFromPage(ReceivablePayableDTO receivablePayableDTO);
 	
 	Integer dueUpdate();
+
+	List<ReceivablePayableDTO> findAllByCompanyAndDateBetween(LocalDate fromDate, LocalDate toDate);
+
+	List<ReceivablePayableDTO> findAllByAccountProfilePidAndDateBetween(String accountPid, LocalDate fromDate,
+			LocalDate toDate);
 }

@@ -48,7 +48,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 
 	@Inject
 	private CompanyRepository companyRepository;
-	
+
 	@Inject
 	private LocationAccountProfileService locationAccountProfileService;
 
@@ -61,8 +61,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	/**
 	 * Save a receivablePayable.
 	 * 
-	 * @param receivablePayableDTO
-	 *            the entity to save
+	 * @param receivablePayableDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -99,8 +98,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	/**
 	 * Update a receivablePayable.
 	 * 
-	 * @param receivablePayableDTO
-	 *            the entity to update
+	 * @param receivablePayableDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -128,8 +126,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	/**
 	 * Get all the receivablePayables.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -143,8 +140,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	/**
 	 * Get all the receivablePayables.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -165,8 +161,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	/**
 	 * Get one receivablePayable by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -181,8 +176,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	/**
 	 * Get one receivablePayable by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -198,8 +192,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	/**
 	 * Get one receivablePayable by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -217,8 +210,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	/**
 	 * Delete the receivablePayable by id.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete ReceivablePayable : {}", pid);
@@ -290,8 +282,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	/**
 	 * Save a receivablePayable.
 	 * 
-	 * @param receivablePayableDTO
-	 *            the entity to save
+	 * @param receivablePayableDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -324,7 +315,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Get all the receivablePayable.
 	 * 
@@ -334,7 +325,8 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	@Transactional(readOnly = true)
 	public List<ReceivablePayableDTO> findAllByCompanyAndlastModifiedDate(LocalDateTime lastModifiedDate) {
 		log.debug("Request to get all receivablePayables");
-		List<ReceivablePayable> receivablePayables = receivablePayableRepository.findAllByCompanyAndlastModifiedDate(lastModifiedDate);
+		List<ReceivablePayable> receivablePayables = receivablePayableRepository
+				.findAllByCompanyAndlastModifiedDate(lastModifiedDate);
 		List<ReceivablePayableDTO> result = new ArrayList<>();
 		for (ReceivablePayable receivablePayable : receivablePayables) {
 			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
@@ -352,14 +344,15 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	@Transactional(readOnly = true)
 	public List<ReceivablePayableDTO> findAllByCompanyAndAccountProfileIn() {
 		log.debug("Request to get all receivablePayables by accountProfile");
-		List<AccountProfileDTO> accountProfileDTOs= locationAccountProfileService.findAccountProfilesByCurrentUserLocations();
-		List<String>accountProfilePids=new ArrayList<>();
+		List<AccountProfileDTO> accountProfileDTOs = locationAccountProfileService
+				.findAccountProfilesByCurrentUserLocations();
+		List<String> accountProfilePids = new ArrayList<>();
 		for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
 			accountProfilePids.add(accountProfileDTO.getPid());
 		}
 		List<ReceivablePayable> receivablePayables = new ArrayList<>();
-		if(!accountProfilePids.isEmpty()){
-		receivablePayables = receivablePayableRepository.findAllByCompanyIdAndAccountprofileIn(accountProfilePids);
+		if (!accountProfilePids.isEmpty()) {
+			receivablePayables = receivablePayableRepository.findAllByCompanyIdAndAccountprofileIn(accountProfilePids);
 		}
 		List<ReceivablePayableDTO> result = new ArrayList<>();
 		for (ReceivablePayable receivablePayable : receivablePayables) {
@@ -368,8 +361,10 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 		}
 		return result;
 	}
+
 	/**
-	 * Get all the receivablePayable by AccountProfile of current Location and lastModifiedDate .
+	 * Get all the receivablePayable by AccountProfile of current Location and
+	 * lastModifiedDate .
 	 * 
 	 * @return the list of entities
 	 */
@@ -377,15 +372,17 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	@Transactional(readOnly = true)
 	public List<ReceivablePayableDTO> findAllByCompanyAndlastModifiedDateAndAccountProfileIn(
 			LocalDateTime lastModifiedDate) {
-		log.debug("Request to get all receivablePayables  by accountProfile",lastModifiedDate);
-		List<AccountProfileDTO> accountProfileDTOs= locationAccountProfileService.findAccountProfilesByCurrentUserLocations();
-		List<String>accountProfilePids=new ArrayList<>();
+		log.debug("Request to get all receivablePayables  by accountProfile", lastModifiedDate);
+		List<AccountProfileDTO> accountProfileDTOs = locationAccountProfileService
+				.findAccountProfilesByCurrentUserLocations();
+		List<String> accountProfilePids = new ArrayList<>();
 		for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
 			accountProfilePids.add(accountProfileDTO.getPid());
 		}
 		List<ReceivablePayable> receivablePayables = new ArrayList<>();
-		if(!accountProfilePids.isEmpty()){
-		 receivablePayables = receivablePayableRepository.findAllByCompanyAndlastModifiedDateAndAccountProfileIn(lastModifiedDate, accountProfilePids);
+		if (!accountProfilePids.isEmpty()) {
+			receivablePayables = receivablePayableRepository
+					.findAllByCompanyAndlastModifiedDateAndAccountProfileIn(lastModifiedDate, accountProfilePids);
 		}
 		List<ReceivablePayableDTO> result = new ArrayList<>();
 		for (ReceivablePayable receivablePayable : receivablePayables) {
@@ -415,19 +412,45 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	@Override
 	public Integer dueUpdate() {
 		List<ReceivablePayable> receivablePayables = receivablePayableRepository.findAll();
-		receivablePayables.forEach(receivablePayable ->{
+		receivablePayables.forEach(receivablePayable -> {
 			LocalDate currentDate = LocalDate.now();
-            Long differenceInDays = Math.abs(ChronoUnit.DAYS.between(currentDate, receivablePayable.getReferenceDocumentDate()));
-            if(receivablePayable.getAccountProfile().getCreditDays() == null ||
-            		receivablePayable.getAccountProfile().getCreditDays() == 0){
-            		receivablePayable.setBillOverDue(differenceInDays);
-            }
-            else{
-			receivablePayable.setBillOverDue(Math.abs(differenceInDays - receivablePayable.getAccountProfile().getCreditDays()));
-			receivablePayableRepository.save(receivablePayable);
+			Long differenceInDays = Math
+					.abs(ChronoUnit.DAYS.between(currentDate, receivablePayable.getReferenceDocumentDate()));
+			if (receivablePayable.getAccountProfile().getCreditDays() == null
+					|| receivablePayable.getAccountProfile().getCreditDays() == 0) {
+				receivablePayable.setBillOverDue(differenceInDays);
+			} else {
+				receivablePayable.setBillOverDue(
+						Math.abs(differenceInDays - receivablePayable.getAccountProfile().getCreditDays()));
+				receivablePayableRepository.save(receivablePayable);
 			}
 		});
 		return receivablePayables.size();
-		
+
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<ReceivablePayableDTO> findAllByCompanyAndDateBetween(LocalDate fromDate, LocalDate toDate) {
+		log.debug("Request to get all receivablePayables");
+		List<ReceivablePayable> receivablePayables = receivablePayableRepository.findAllByCompanyIdAndDateBetween(fromDate,toDate);
+		List<ReceivablePayableDTO> result = new ArrayList<>();
+		for (ReceivablePayable receivablePayable : receivablePayables) {
+			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
+			result.add(payableDTO);
+		}
+		return result;
+	}
+
+	@Override
+	public List<ReceivablePayableDTO> findAllByAccountProfilePidAndDateBetween(String accountPid, LocalDate fromDate,
+			LocalDate toDate) {
+		List<ReceivablePayable> receivablePayables = receivablePayableRepository.findAllByAccountProfilePidAndDateBetween(accountPid,fromDate,toDate);
+		List<ReceivablePayableDTO> result = new ArrayList<>();
+		for (ReceivablePayable receivablePayable : receivablePayables) {
+			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
+			result.add(payableDTO);
+		}
+		return result;
 	}
 }

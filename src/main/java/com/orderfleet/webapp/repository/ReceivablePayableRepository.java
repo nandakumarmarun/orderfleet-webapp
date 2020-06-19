@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -53,10 +54,18 @@ public interface ReceivablePayableRepository extends JpaRepository<ReceivablePay
 
 	@Query("select receivablePayable from ReceivablePayable receivablePayable where receivablePayable.company.id = ?#{principal.companyId} and receivablePayable.lastModifiedDate > ?1")
 	List<ReceivablePayable> findAllByCompanyAndlastModifiedDate(LocalDateTime lastModifiedDate);
-	
+
 	@Query("select receivablePayable from ReceivablePayable receivablePayable where receivablePayable.company.id = ?#{principal.companyId} and receivablePayable.accountProfile.pid in ?1")
-	List<ReceivablePayable> findAllByCompanyIdAndAccountprofileIn(List<String>accountProfilePids);
-	
+	List<ReceivablePayable> findAllByCompanyIdAndAccountprofileIn(List<String> accountProfilePids);
+
 	@Query("select receivablePayable from ReceivablePayable receivablePayable where receivablePayable.company.id = ?#{principal.companyId} and receivablePayable.lastModifiedDate > ?1 and receivablePayable.accountProfile.pid in ?2")
-	List<ReceivablePayable> findAllByCompanyAndlastModifiedDateAndAccountProfileIn(LocalDateTime lastModifiedDate,List<String>accountProfilePids);
+	List<ReceivablePayable> findAllByCompanyAndlastModifiedDateAndAccountProfileIn(LocalDateTime lastModifiedDate,
+			List<String> accountProfilePids);
+
+	@Query("select receivablePayable from ReceivablePayable receivablePayable where receivablePayable.company.id = ?#{principal.companyId} and receivablePayable.referenceDocumentDate between ?1 and ?2 order by receivablePayable.referenceDocumentDate desc")
+	List<ReceivablePayable> findAllByCompanyIdAndDateBetween(LocalDate fromDate, LocalDate toDate);
+
+	@Query("select receivablePayable from ReceivablePayable receivablePayable where receivablePayable.company.id = ?#{principal.companyId} and receivablePayable.accountProfile.pid = ?1 and receivablePayable.referenceDocumentDate between ?2 and ?3 order by receivablePayable.referenceDocumentDate desc")
+	List<ReceivablePayable> findAllByAccountProfilePidAndDateBetween(String accountPid, LocalDate fromDate,
+			LocalDate toDate);
 }

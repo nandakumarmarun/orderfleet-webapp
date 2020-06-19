@@ -84,7 +84,7 @@ public class SalesOrderItemDetailsSap {
 	@Override
 	public String toString() {
 		return "SalesOrderItemDetailsSap [itemCode=" + itemCode + ", itemName=" + itemName + ", quantity=" + quantity
-				+ "]";
+				+ ", uPrice=" + uPrice + ", taxCode=" + taxCode + ", wareHouseCode=" + wareHouseCode + "]";
 	}
 
 }

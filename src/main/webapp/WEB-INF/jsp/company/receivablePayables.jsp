@@ -31,18 +31,55 @@
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
 							<div class="col-sm-4">
-								<select id="dbAccount" name="accountPid" class="form-control">
+								<br /> <select id="dbAccount" name="accountPid"
+									class="form-control selectpicker" data-live-search="true">
 									<option value="no">All Account</option>
 									<c:forEach items="${accounts}" var="account">
 										<option value="${account.pid}">${account.name}</option>
 									</c:forEach>
 								</select>
 							</div>
+							<div class="col-sm-2">
+								<br /> <select class="form-control" id="dbDateSearch"
+									onchange="ReceivablePayable.showDatePicker()">
+									<option value="TODAY">Today</option>
+									<option value="YESTERDAY">Yesterday</option>
+									<option value="WTD">WTD</option>
+									<option value="MTD">MTD</option>
+									<option value="SINGLE">Single Date</option>
+									<option value="CUSTOM">CUSTOM</option>
+								</select>
+							</div>
+							<div class="col-sm-2 hide custom_date1">
+								<br />
+								<div class="input-group">
+									<input type="text" class="form-control" id="txtFromDate"
+										placeholder="Select From Date" style="background-color: #fff;"
+										readonly="readonly" />
+
+									<div class="input-group-addon">
+										<a href="#"><i class="entypo-calendar"></i></a>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-2 hide custom_date2">
+								<br />
+								<div class="input-group">
+									<input type="text" class="form-control" id="txtToDate"
+										placeholder="Select To Date" style="background-color: #fff;"
+										readonly="readonly" />
+									<div class="input-group-addon">
+										<a href="#"><i class="entypo-calendar"></i></a>
+									</div>
+								</div>
+							</div>
 							<div class="col-sm-1">
+								<br />
 								<button type="button" class="btn btn-info"
 									onclick="ReceivablePayable.loadData()">Apply</button>
 							</div>
 							<div class="col-sm-1">
+								<br />
 								<button type="button" class="btn btn-orange" id="btnDownload"
 									title="download xlsx">
 									<i class="entypo-download"></i> Download

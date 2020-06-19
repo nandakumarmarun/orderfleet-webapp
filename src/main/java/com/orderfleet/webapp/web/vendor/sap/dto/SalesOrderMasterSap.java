@@ -39,7 +39,7 @@ public class SalesOrderMasterSap {
 	@JsonProperty("itemDetails")
 	private List<SalesOrderItemDetailsSap> itemDetails;
 	@JsonProperty("Scode")
-	private String sCode;
+	private int sCode;
 	@JsonProperty("ordertype")
 	private String orderType;
 	@JsonProperty("discount")
@@ -180,12 +180,12 @@ public class SalesOrderMasterSap {
 	}
 
 	@JsonProperty("Scode")
-	public String getsCode() {
+	public int getsCode() {
 		return sCode;
 	}
 
 	@JsonProperty("Scode")
-	public void setsCode(String sCode) {
+	public void setsCode(int sCode) {
 		this.sCode = sCode;
 	}
 
@@ -231,10 +231,12 @@ public class SalesOrderMasterSap {
 
 	@Override
 	public String toString() {
-		return "SalesOrderMasterSap [customerCode=" + customerCode + ", customerName=" + customerName + ", postingDate="
-				+ postingDate + ", docDate=" + docDate + ", remarks=" + remarks + ", itemDetails=" + itemDetails + "]";
+		return "SalesOrderMasterSap [dbKey=" + dbKey + ", latitude=" + latitude + ", longitude=" + longitude
+				+ ", location=" + location + ", customerCode=" + customerCode + ", customerName=" + customerName
+				+ ", customerRef=" + customerRef + ", postingDate=" + postingDate + ", validUntil=" + validUntil
+				+ ", docDate=" + docDate + ", salesCommitDate=" + salesCommitDate + ", remarks=" + remarks
+				+ ", itemDetails=" + itemDetails + ", sCode=" + sCode + ", orderType=" + orderType + ", discount="
+				+ discount + ", shipTo=" + shipTo + ", billTo=" + billTo + "]";
 	}
-	
-	
 
 }

@@ -55,6 +55,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -827,14 +829,20 @@ public class SalesPerformanceManagementResource {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 //		String API_URL = "";
-		
+
 		String API_URL = "http://192.168.10.36:130/Service1.svc/AddOrder";
 
 		log.info("POST URL: " + API_URL);
 
 		try {
 
-		SalesOrderResponseDataSap salesOrderResponseDataSap = restTemplate.postForObject(API_URL, entity,
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.enable(SerializationFeature.INDENT_OUTPUT);
+			// Convert object to JSON string
+			String json = mapper.writeValueAsString(requestBody);
+			log.info("Sales Order Json:- " + json);
+
+			SalesOrderResponseDataSap salesOrderResponseDataSap = restTemplate.postForObject(API_URL, entity,
 					SalesOrderResponseDataSap.class);
 
 //			SalesOrderResponseDataSap salesOrderResponseDataSap = new SalesOrderResponseDataSap();
@@ -847,19 +855,19 @@ public class SalesPerformanceManagementResource {
 			SalesOrderResponseDataSap salesOrderResponseDataSap = new SalesOrderResponseDataSap();
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
 
-				log.info("HttpClientError Exception-BadRequest........."+exception.getMessage());
+				log.info("HttpClientError Exception-BadRequest........." + exception.getMessage());
 				// throw new ServiceException(exception.getResponseBodyAsString());
 				salesOrderResponseDataSap.setStatusCode(2);
 				salesOrderResponseDataSap.setStatusMessage("Could not able to connect the server");
 			}
-			log.info("HttpClientError Exception........."+exception.getMessage());
+			log.info("HttpClientError Exception........." + exception.getMessage());
 			salesOrderResponseDataSap.setStatusCode(2);
 			salesOrderResponseDataSap.setStatusMessage("Could not able to connect the server");
 			// throw new ServiceException(exception.getMessage());
 			return salesOrderResponseDataSap;
 		} catch (Exception exception) {
 
-			log.info("Exception........."+exception.getMessage());
+			log.info("Exception........." + exception.getMessage());
 			// throw new ServiceException(exception.getMessage());
 			SalesOrderResponseDataSap salesOrderResponseDataSap = new SalesOrderResponseDataSap();
 			salesOrderResponseDataSap.setStatusCode(2);
@@ -871,8 +879,15 @@ public class SalesPerformanceManagementResource {
 	private SalesOrderMasterSap getRequestBody(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
 		SalesOrderMasterSap salesOrderMasterSap = new SalesOrderMasterSap();
 
+		salesOrderMasterSap.setDbKey(1);
+		salesOrderMasterSap.setLatitude("");
+		salesOrderMasterSap.setLongitude("");
+		salesOrderMasterSap.setLocation("");
+
 		salesOrderMasterSap.setCustomerCode(inventoryVoucherHeaderDTO.getReceiverAccountAlias());
 		salesOrderMasterSap.setCustomerName(inventoryVoucherHeaderDTO.getReceiverAccountName());
+
+		salesOrderMasterSap.setCustomerRef("");
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 		LocalDateTime localDateTime = inventoryVoucherHeaderDTO.getClientDate();
@@ -880,6 +895,9 @@ public class SalesPerformanceManagementResource {
 
 		salesOrderMasterSap.setPostingDate(date);
 		salesOrderMasterSap.setDocDate(date);
+
+		salesOrderMasterSap.setValidUntil("");
+		salesOrderMasterSap.setSalesCommitDate("");
 
 		salesOrderMasterSap.setRemarks(inventoryVoucherHeaderDTO.getVisitRemarks());
 
@@ -892,11 +910,20 @@ public class SalesPerformanceManagementResource {
 			salesOrderItemDetailsSap.setItemCode(inventoryVoucherDetailDTO.getProductName());
 			salesOrderItemDetailsSap.setItemName(inventoryVoucherDetailDTO.getProductAlias());
 			salesOrderItemDetailsSap.setQuantity(inventoryVoucherDetailDTO.getQuantity());
+			salesOrderItemDetailsSap.setuPrice(0.0);
+			salesOrderItemDetailsSap.setTaxCode("");
+			salesOrderItemDetailsSap.setWareHouseCode("");
 
 			salesOrderItems.add(salesOrderItemDetailsSap);
 		}
 
 		salesOrderMasterSap.setItemDetails(salesOrderItems);
+
+		salesOrderMasterSap.setsCode(1);
+		salesOrderMasterSap.setOrderType("");
+		salesOrderMasterSap.setDiscount(0.0);
+		salesOrderMasterSap.setShipTo("");
+		salesOrderMasterSap.setBillTo("");
 
 		return salesOrderMasterSap;
 	}

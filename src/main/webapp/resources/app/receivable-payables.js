@@ -11,32 +11,63 @@ if (!this.ReceivablePayable) {
 	var receivablePayableContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
 
-	$(document).ready(function() {
-		// load data
-		ReceivablePayable.loadData();
-		
-		$('#btnDownload')
-		.on(
-				'click',
-				function() {
-					var tblReceivalbePayable = $("#tBodyReceivablePayable tbody");
-					if (tblReceivalbePayable
-							.children().length == 0) {
-						alert("no values available");
-						return;
-					}
-					if (tblReceivalbePayable[0].textContent == "No data available") {
-						alert("no values available");
-						return;
-					}
+	$(document)
+			.ready(
+					function() {
+						// load data
+						
+						
+						$("#txtToDate").datepicker({
+							dateFormat : "dd-mm-yy"
+						});
+						$("#txtFromDate").datepicker({
+							dateFormat : "dd-mm-yy"
+						});
+						
+						let filterBy = getParameterByName('filterBy');
+						if (filterBy) {
+							$('#dbDateSearch').val(filterBy);
+							// InvoiceWiseReport.filter();
+						}
+						
+						$('.selectpicker').selectpicker();
+						
+						ReceivablePayable.loadData();
 
-					downloadXls();
-					$("#tBodyReceivablePayable th:last-child, #tBodyReceivablePayable td:last-child").show();
-				});
-		
-	});
+						$('#btnDownload')
+								.on(
+										'click',
+										function() {
+											var tblReceivalbePayable = $("#tBodyReceivablePayable tbody");
+											if (tblReceivalbePayable.children().length == 0) {
+												alert("no values available");
+												return;
+											}
+											if (tblReceivalbePayable[0].textContent == "No data available") {
+												alert("no values available");
+												return;
+											}
+
+											downloadXls();
+											$(
+													"#tBodyReceivablePayable th:last-child, #tBodyReceivablePayable td:last-child")
+													.show();
+										});
+
+					});
 
 	ReceivablePayable.loadData = function() {
+
+		if ($('#dbDateSearch').val() == "SINGLE") {
+			if ($("#txtFromDate").val() == "") {
+				return;
+			}
+		}
+		if ($('#dbDateSearch').val() == "CUSTOM") {
+			if ($("#txtFromDate").val() == "" || $("#txtToDate").val() == "") {
+				return;
+			}
+		}
 
 		$('#tBodyReceivablePayable').html(
 				"<tr><td colspan='4' align='center'>Please wait...</td></tr>");
@@ -45,7 +76,10 @@ if (!this.ReceivablePayable) {
 					url : receivablePayableContextPath + "/load",
 					type : 'GET',
 					data : {
-						accountPid : $('#dbAccount').val()
+						accountPid : $('#dbAccount').val(),
+						filterBy : $("#dbDateSearch").val(),
+						fromDate : $("#txtFromDate").val(),
+						toDate : $("#txtToDate").val()
 					},
 					success : function(receivablePayableMap) {
 						$('#tBodyReceivablePayable').html("");
@@ -140,13 +174,59 @@ if (!this.ReceivablePayable) {
 				});
 	}
 
+	ReceivablePayable.showDatePicker = function() {
+		$("#txtFromDate").val("");
+		$("#txtToDate").val("");
+		if ($('#dbDateSearch').val() == "CUSTOM") {
+			$(".custom_date1").addClass('show');
+			$(".custom_date2").addClass('show');
+			$(".custom_date1").removeClass('hide');
+			$(".custom_date2").removeClass('hide');
+			$('#divDatePickers').css('display', 'initial');
+		} else if ($('#dbDateSearch').val() == "SINGLE") {
+			$(".custom_date1").addClass('show');
+			$(".custom_date1").removeClass('hide');
+			$(".custom_date2").addClass('hide');
+			$(".custom_date2").removeClass('show');
+			$("#txtFromDate").datepicker({
+				dateFormat : "dd-mm-yy"
+			});
+			$("#txtFromDate").datepicker('show');
+			$('#divDatePickers').css('display', 'initial');
+		} else {
+			$(".custom_date1").addClass('hide');
+			$(".custom_date1").removeClass('show');
+			$(".custom_date2").addClass('hide');
+			$(".custom_date2").removeClass('show');
+			$('#divDatePickers').css('display', 'none');
+		}
+
+	}
+
 	function downloadXls() {
+		if ($('#dbDateSearch').val() == "SINGLE") {
+			if ($("#txtFromDate").val() == "") {
+				return;
+			}
+		}
+		if ($('#dbDateSearch').val() == "CUSTOM") {
+			if ($("#txtFromDate").val() == "" || $("#txtToDate").val() == "") {
+				return;
+			}
+		}
+
 		var accPid = $('#dbAccount').val();
+		var filterBy = $("#dbDateSearch").val();
+		var fromDate = $("#txtFromDate").val();
+		var toDate = $("#txtToDate").val();
+
 		console.log(status);
 		window.location.href = receivablePayableContextPath
-		+ "/download-receivalbes-xls?accountPid="+ accPid;
+				+ "/download-receivalbes-xls?accountPid=" + accPid
+				+ "&filterBy=" + filterBy + "&fromDate=" + fromDate
+				+ "&toDate=" + toDate;
 	}
-	
+
 	function addErrorAlert(message, key, data) {
 		$(".alert > p").html(message);
 		$('.alert').show();
