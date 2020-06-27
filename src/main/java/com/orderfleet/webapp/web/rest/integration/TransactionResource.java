@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -366,7 +367,7 @@ public class TransactionResource {
 			Set<Long> userIds = new HashSet<>();
 			Set<Long> orderStatusIds = new HashSet<>();
 			Set<Long> exeIds = new HashSet<>();
-
+			
 			for (Object[] obj : inventoryVoucherHeaders) {
 
 				ivhIds.add(Long.parseLong(obj[0].toString()));
@@ -395,9 +396,10 @@ public class TransactionResource {
 			List<OrderStatus> orderStatusList = orderStatusRepository.findAllByCompanyIdAndIdsIn(orderStatusIds);
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
 					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
-
+			Object[] errorPrint = null;	
+			try {
 			for (Object[] obj : inventoryVoucherHeaders) {
-
+				errorPrint = obj;
 				String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 
 				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
@@ -517,7 +519,19 @@ public class TransactionResource {
 
 				salesOrderDTOs.add(salesOrderDTO);
 			}
-
+			}catch(NoSuchElementException  | NullPointerException  | ArrayIndexOutOfBoundsException e) {
+				int i = 0;
+				log.info("Error Printng");
+				for(Object ob : errorPrint) {
+					log.info(i+"-");
+					if(ob != null) {
+						log.info("--"+ob.toString());
+					}
+					i++;
+				}
+				e.printStackTrace();
+				throw new IllegalArgumentException("Data missing in sales order..");
+			}
 			if (!salesOrderDTOs.isEmpty()) {
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
@@ -554,15 +568,15 @@ public class TransactionResource {
 			empId = employeeProfilesList.stream().filter(emp -> emp.getName().trim().equals(employeeVoucher))
 					.map(emp -> emp.getId()).collect(Collectors.toList());
 		}
-
+		log.info("EmployeeId found :"+empId);
 		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
 		List<String> inventoryHeaderPid = new ArrayList<String>();
 		String companyPid = company.getPid();
-
+		log.info("Account Types found :"+accountProfileDTOs.size());
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
-
+		log.info("SalesManagement Company Config:"+optSalesManagement.isPresent());
 		/* List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>(); */
 
 		/*
@@ -627,29 +641,32 @@ public class TransactionResource {
 			List<OrderStatus> orderStatusList = orderStatusRepository.findAllByCompanyIdAndIdsIn(orderStatusIds);
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
 					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
-
+			Object[] errorPrint = null;	
+		try {
+			log.info("Starting Try block ");
 			for (Object[] obj : inventoryVoucherHeaders) {
-
+				errorPrint = obj;
+				
 				String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 
 				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
 						.findAny();
-
+				log.info("user empty  :"+ !opUser.isPresent());
 				Optional<Document> opDocument = documents.stream()
 						.filter(doc -> doc.getId() == Long.parseLong(obj[13].toString())).findAny();
-
+				log.info("document empty :"+ !opDocument.isPresent());
 				Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
 						.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
-
+				log.info("employee empty :"+ !opEmployeeProfile.isPresent());
 				Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
 						.filter(doc -> doc.getId() == Long.parseLong(obj[15].toString())).findAny();
-
+				log.info("executive empty :"+ !opExe.isPresent());
 				Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
-
+				log.info("receiver account empty :"+ !opRecAccPro.isPresent());
 				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
-
+				log.info("supplier account empty :"+ !opSupAccPro.isPresent());
 				PriceLevel priceLevel = null;
 				if (obj[18] != null) {
 					Optional<PriceLevel> opPriceLevel = priceLevels.stream()
@@ -667,7 +684,7 @@ public class TransactionResource {
 				if (opOrderStatus.isPresent()) {
 					orderStatus = opOrderStatus.get();
 				}
-
+				log.info("ivhObjToSalesOrderDTO function starts");
 				SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
 						opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
 						orderStatus);
@@ -682,7 +699,7 @@ public class TransactionResource {
 				;
 
 				List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
-
+				log.info("inventory detail loop starts");
 				for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
 					SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
 					if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
@@ -735,6 +752,7 @@ public class TransactionResource {
 					}
 				}
 				salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
+				log.info("GST ledger");
 				List<GstLedger> gstLedgerList = new ArrayList<>();
 				gstLedgerList = gstLedgerRepository
 						.findAllByCompanyIdAndActivated(SecurityUtils.getCurrentUsersCompanyId(), true);
@@ -747,7 +765,19 @@ public class TransactionResource {
 
 				salesOrderDTOs.add(salesOrderDTO);
 			}
-
+		}catch(NoSuchElementException  | NullPointerException  | ArrayIndexOutOfBoundsException e) {
+			int i = 0;
+			log.info("Error Printng");
+			for(Object ob : errorPrint) {
+				log.info(i+"-");
+				if(ob != null) {
+					log.info("--"+ob.toString());
+				}
+				i++;
+			}
+			e.printStackTrace();
+			throw new IllegalArgumentException("Data missing in sales order..");
+		}
 			if (!salesOrderDTOs.isEmpty()) {
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
@@ -1664,6 +1694,7 @@ public class TransactionResource {
 			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
 			AccountProfile receiverAccountProfile, AccountProfile supplierAccountProfile, PriceLevel priceLevel,
 			OrderStatus orderStatus) {
+		log.info("ivh to salesorder starts");
 		SalesOrderDTO salesOrderDTO = new SalesOrderDTO();
 		salesOrderDTO.setInventoryVoucherHeaderPid(obj[9].toString());
 		salesOrderDTO.setId(Long.parseLong(obj[0].toString()));
@@ -1677,6 +1708,7 @@ public class TransactionResource {
 			date = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
 
 		}
+		log.info("date split completed");
 		salesOrderDTO.setDate(date);
 		salesOrderDTO.setDocumentName(document.getName());
 		salesOrderDTO.setDocumentAlias(document.getAlias());
@@ -1687,6 +1719,7 @@ public class TransactionResource {
 		}
 		salesOrderDTO.setInventoryVoucherHeaderDTO(ivhObjectToivhDTO(obj, user, document, employeeProfile,
 				executiveTaskExecution, receiverAccountProfile, supplierAccountProfile, priceLevel, orderStatus));
+		log.info("function callss.....");
 		salesOrderDTO.setLedgerState(receiverAccountProfile.getStateName());
 		salesOrderDTO.setLedgerCountry(receiverAccountProfile.getCountryName());
 		salesOrderDTO.setLedgerGstType(receiverAccountProfile.getGstRegistrationType());
@@ -1701,6 +1734,7 @@ public class TransactionResource {
 			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
 			AccountProfile receiverAccountProfile, AccountProfile supplierAccountProfile, PriceLevel priceLevel,
 			OrderStatus orderStatus) {
+		log.info("function starts .... ivhObjectToivhDTO");
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
 
 		inventoryVoucherHeaderDTO.setPid(obj[9].toString());
@@ -1725,6 +1759,7 @@ public class TransactionResource {
 			documentDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
 
 		}
+		log.info("date parsing completed");
 		inventoryVoucherHeaderDTO.setCreatedDate(createdDate);
 		inventoryVoucherHeaderDTO.setDocumentDate(documentDate);
 
@@ -1767,7 +1802,7 @@ public class TransactionResource {
 			inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(obj[26].toString()));
 
 		}
-
+		log.info("setOrderNumber obj[27]");
 		inventoryVoucherHeaderDTO.setOrderNumber(obj[27] == null ? 0 : Long.parseLong(obj[27].toString()));
 
 		inventoryVoucherHeaderDTO.setCustomeraddress(receiverAccountProfile.getAddress());
