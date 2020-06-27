@@ -581,14 +581,13 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 							inventoryVoucherDetailDTO.getTaxAmount(), inventoryVoucherDetailDTO.getLength(),
 							inventoryVoucherDetailDTO.getWidth(), inventoryVoucherDetailDTO.getThickness(),
 							inventoryVoucherDetailDTO.getSize(), inventoryVoucherDetailDTO.getColor(),
-							sourceStockLocation, destinationStockLocation, referenceInventoryVoucherHeader,
-							referenceInventoryVoucherDetail, inventoryVoucherDetailDTO.getRemarks(),
-							inventoryVoucherBatchDetails));
+							inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
+							referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
+							inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails));
 				});
 				inventoryVoucherHeader.setInventoryVoucherDetails(inventoryVoucherDetails);
-				
-				inventoryVouchers.add(inventoryVoucherHeaderRepository.save(inventoryVoucherHeader));
 
+				inventoryVouchers.add(inventoryVoucherHeaderRepository.save(inventoryVoucherHeader));
 
 			}
 			return inventoryVouchers;
@@ -659,7 +658,8 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 					accountingVoucherDetail.setRemarks(accountingVoucherDetailDTO.getRemarks());
 					accountingVoucherDetail.setVoucherDate(accountingVoucherDetailDTO.getVoucherDate());
 					accountingVoucherDetail.setVoucherNumber(accountingVoucherDetailDTO.getVoucherNumber());
-					accountingVoucherDetail.setProvisionalReceiptNo(accountingVoucherDetailDTO.getProvisionalReceiptNo());
+					accountingVoucherDetail
+							.setProvisionalReceiptNo(accountingVoucherDetailDTO.getProvisionalReceiptNo());
 					// set bank
 					if (accountingVoucherDetailDTO.getBankPid() != null) {
 						Bank bank = bankRepository.findOneByPid(accountingVoucherDetailDTO.getBankPid()).get();
@@ -1486,9 +1486,10 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						inventoryVoucherDetailDTO.getDiscountAmount(), inventoryVoucherDetailDTO.getTaxAmount(),
 						inventoryVoucherDetailDTO.getLength(), inventoryVoucherDetailDTO.getWidth(),
 						inventoryVoucherDetailDTO.getThickness(), inventoryVoucherDetailDTO.getSize(),
-						inventoryVoucherDetailDTO.getColor(), sourceStockLocation, destinationStockLocation,
-						referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
-						inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails));
+						inventoryVoucherDetailDTO.getColor(), inventoryVoucherDetailDTO.getItemtype(),
+						sourceStockLocation, destinationStockLocation, referenceInventoryVoucherHeader,
+						referenceInventoryVoucherDetail, inventoryVoucherDetailDTO.getRemarks(),
+						inventoryVoucherBatchDetails));
 			}
 		}
 		return newInventoryVoucherDetails;
@@ -2041,9 +2042,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								inventoryVoucherDetailDTO.getTaxAmount(), inventoryVoucherDetailDTO.getLength(),
 								inventoryVoucherDetailDTO.getWidth(), inventoryVoucherDetailDTO.getThickness(),
 								inventoryVoucherDetailDTO.getSize(), inventoryVoucherDetailDTO.getColor(),
-								sourceStockLocation, destinationStockLocation, referenceInventoryVoucherHeader,
-								referenceInventoryVoucherDetail, inventoryVoucherDetailDTO.getRemarks(),
-								inventoryVoucherBatchDetails));
+								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
+								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
+								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails));
 					}
 				});
 

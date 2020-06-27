@@ -441,9 +441,9 @@ public class UploadTaskSubmissionResource {
 								inventoryVoucherDetailDTO.getTaxAmount(), inventoryVoucherDetailDTO.getLength(),
 								inventoryVoucherDetailDTO.getWidth(), inventoryVoucherDetailDTO.getThickness(),
 								inventoryVoucherDetailDTO.getSize(), inventoryVoucherDetailDTO.getColor(),
-								sourceStockLocation, destinationStockLocation, referenceInventoryVoucherHeader,
-								referenceInventoryVoucherDetail, inventoryVoucherDetailDTO.getRemarks(),
-								inventoryVoucherBatchDetails));
+								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
+								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
+								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails));
 					}
 				});
 

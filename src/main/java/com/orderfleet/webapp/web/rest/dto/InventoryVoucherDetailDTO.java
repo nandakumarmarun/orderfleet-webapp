@@ -99,6 +99,8 @@ public class InventoryVoucherDetailDTO {
 
 	private boolean editOrder;
 
+	private String itemtype;
+
 	public InventoryVoucherDetailDTO() {
 	}
 
@@ -133,6 +135,7 @@ public class InventoryVoucherDetailDTO {
 		this.thickness = inventoryVoucherDetail.getThickness();
 		this.size = inventoryVoucherDetail.getSize();
 		this.color = inventoryVoucherDetail.getColor();
+		this.itemtype = inventoryVoucherDetail.getItemtype();
 
 		if (inventoryVoucherDetail.getInventoryVoucherHeader() != null) {
 			this.createdDate = inventoryVoucherDetail.getInventoryVoucherHeader().getCreatedDate();
@@ -498,6 +501,14 @@ public class InventoryVoucherDetailDTO {
 		this.productAlias = productAlias;
 	}
 
+	public String getItemtype() {
+		return itemtype;
+	}
+
+	public void setItemtype(String itemtype) {
+		this.itemtype = itemtype;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -532,7 +543,7 @@ public class InventoryVoucherDetailDTO {
 				+ purchaseRate + ", taxPercentage=" + taxPercentage + ", discountPercentage=" + discountPercentage
 				+ ", batchNumber=" + batchNumber + ", batchDate=" + batchDate + ", rowTotal=" + rowTotal
 				+ ", discountAmount=" + discountAmount + ", taxAmount=" + taxAmount + ", length=" + length + ", width="
-				+ width + ", thickness=" + thickness + ", size=" + size + ", color=" + color
+				+ width + ", thickness=" + thickness + ", size=" + size + ", color=" + color + ", itemtype=" + itemtype
 				+ ", sourceStockLocationPid=" + sourceStockLocationPid + ", sourceStockLocationName="
 				+ sourceStockLocationName + ", destinationStockLocationPid=" + destinationStockLocationPid
 				+ ", destinationStockLocationName=" + destinationStockLocationName

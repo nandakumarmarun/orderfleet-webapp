@@ -234,6 +234,9 @@ public class SalesPerformanceManagementResource {
 		log.debug("Web request to get inventoryVoucherDTO by pid : {}", pid);
 		Optional<InventoryVoucherHeaderDTO> optionalInventoryVoucherHeaderDTO = inventoryVoucherService
 				.findOneByPid(pid);
+		Optional<CompanyConfiguration> opCompanyConfigurationSendSalesOrderSap = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_SALES_ORDER_SAP);
+
 		if (optionalInventoryVoucherHeaderDTO.isPresent()) {
 			InventoryVoucherHeaderDTO inventoryVoucherDTO = optionalInventoryVoucherHeaderDTO.get();
 
@@ -251,6 +254,12 @@ public class SalesPerformanceManagementResource {
 
 			// checking tax rate in product group if product does not have tax rate
 			for (InventoryVoucherDetailDTO ivd : inventoryVoucherDTO.getInventoryVoucherDetails()) {
+
+				if (opCompanyConfigurationSendSalesOrderSap.isPresent()) {
+					ivd.setItemtype(ivd.getItemtype() != null ? " (" + ivd.getItemtype() + ")" : " (MT)");
+				} else {
+					ivd.setItemtype(ivd.getItemtype() != null ? " (" + ivd.getItemtype() + ")" : "");
+				}
 				if (opCompanyConfigurationSalesEdit.isPresent()) {
 					if (opCompanyConfigurationSalesEdit.get().getValue().equals("true")) {
 						ivd.setEditOrder(true);
@@ -828,9 +837,9 @@ public class SalesPerformanceManagementResource {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-//		String API_URL = "";
+		String API_URL = "http://117.247.186.223:81/Service1.svc/AddOrder";
 
-		String API_URL = "http://192.168.10.36:130/Service1.svc/AddOrder";
+//		String API_URL = "http://192.168.10.36:130/Service1.svc/AddOrder";
 
 		log.info("POST URL: " + API_URL);
 
@@ -880,8 +889,6 @@ public class SalesPerformanceManagementResource {
 		SalesOrderMasterSap salesOrderMasterSap = new SalesOrderMasterSap();
 
 		salesOrderMasterSap.setDbKey(1);
-		salesOrderMasterSap.setLatitude("");
-		salesOrderMasterSap.setLongitude("");
 		salesOrderMasterSap.setLocation("");
 
 		salesOrderMasterSap.setCustomerCode(inventoryVoucherHeaderDTO.getReceiverAccountAlias());
@@ -896,10 +903,11 @@ public class SalesPerformanceManagementResource {
 		salesOrderMasterSap.setPostingDate(date);
 		salesOrderMasterSap.setDocDate(date);
 
-		salesOrderMasterSap.setValidUntil("");
-		salesOrderMasterSap.setSalesCommitDate("");
+		salesOrderMasterSap.setValidUntil(date);
+		salesOrderMasterSap.setSalesCommitDate(date);
 
 		salesOrderMasterSap.setRemarks(inventoryVoucherHeaderDTO.getVisitRemarks());
+		salesOrderMasterSap.setPriority("4");
 
 		List<SalesOrderItemDetailsSap> salesOrderItems = new ArrayList<>();
 
@@ -909,18 +917,21 @@ public class SalesPerformanceManagementResource {
 
 			salesOrderItemDetailsSap.setItemCode(inventoryVoucherDetailDTO.getProductName());
 			salesOrderItemDetailsSap.setItemName(inventoryVoucherDetailDTO.getProductAlias());
-			salesOrderItemDetailsSap.setQuantity(inventoryVoucherDetailDTO.getQuantity());
-			salesOrderItemDetailsSap.setuPrice(0.0);
+			salesOrderItemDetailsSap.setQuantity(String.valueOf(inventoryVoucherDetailDTO.getQuantity()));
+			salesOrderItemDetailsSap.setuPrice(String.valueOf("0.0"));
 			salesOrderItemDetailsSap.setTaxCode("");
-			salesOrderItemDetailsSap.setWareHouseCode("");
+			salesOrderItemDetailsSap.setWareHouseCode("PSO2");
+			salesOrderItemDetailsSap.setItemtype(
+					inventoryVoucherDetailDTO.getItemtype() != null ? inventoryVoucherDetailDTO.getItemtype() : "MT");
+			salesOrderItemDetailsSap.setArecieved("");
 
 			salesOrderItems.add(salesOrderItemDetailsSap);
 		}
 
 		salesOrderMasterSap.setItemDetails(salesOrderItems);
 
-		salesOrderMasterSap.setsCode(1);
-		salesOrderMasterSap.setOrderType("");
+		salesOrderMasterSap.setsCode(20);
+		salesOrderMasterSap.setOrderType("O");
 		salesOrderMasterSap.setDiscount(0.0);
 		salesOrderMasterSap.setShipTo("");
 		salesOrderMasterSap.setBillTo("");

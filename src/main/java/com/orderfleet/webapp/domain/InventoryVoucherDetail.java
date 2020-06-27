@@ -49,7 +49,7 @@ public class InventoryVoucherDetail implements Serializable {
 
 	@Column(name = "quantity")
 	private double quantity;
-	
+
 	@Column(name = "updated_quantity", nullable = false, columnDefinition = "int default 0")
 	private double updatedQuantity;
 
@@ -79,7 +79,7 @@ public class InventoryVoucherDetail implements Serializable {
 
 	@Column(name = "row_total")
 	private double rowTotal;
-	
+
 	@Column(name = "updated_row_total", nullable = false, columnDefinition = "int default 0")
 	private double updatedRowTotal;
 
@@ -104,6 +104,9 @@ public class InventoryVoucherDetail implements Serializable {
 	@Column(name = "color")
 	private String color;
 
+	@Column(name = "itemtype")
+	private String itemtype;
+
 	@ManyToOne
 	@JoinColumn(name = "source_stock_location_id", nullable = true)
 	private StockLocation sourceStockLocation;
@@ -126,19 +129,20 @@ public class InventoryVoucherDetail implements Serializable {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "inventory_voucher_detail_id")
 	private List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails;
-	
+
 	@NotNull
 	@Column(name = "updated_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
-	private boolean updatedStatus = false;//whether the inventory voucher detail is updated or not
-	
+	private boolean updatedStatus = false;// whether the inventory voucher detail is updated or not
+
 	public InventoryVoucherDetail() {
 	}
 
 	public InventoryVoucherDetail(ProductProfile product, double quantity, double freeQuantity, double sellingRate,
 			double mrp, BigDecimal purchaseRate, double taxPercentage, double discountPercentage, String batchNumber,
 			LocalDateTime batchDate, double rowTotal, double discountAmount, double taxAmount, String length,
-			String width, String thickness, String size, String color, StockLocation sourceStockLocation,
-			StockLocation destinationStockLocation, InventoryVoucherHeader rferenceInventoryVoucherHeader,
+			String width, String thickness, String size, String color, String itemtype,
+			StockLocation sourceStockLocation, StockLocation destinationStockLocation,
+			InventoryVoucherHeader rferenceInventoryVoucherHeader,
 			InventoryVoucherDetail rferenceInventoryVoucherDetail, String remarks,
 			List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails) {
 		super();
@@ -160,6 +164,7 @@ public class InventoryVoucherDetail implements Serializable {
 		this.thickness = thickness;
 		this.size = size;
 		this.color = color;
+		this.itemtype = itemtype;
 		this.sourceStockLocation = sourceStockLocation;
 		this.destinationStockLocation = destinationStockLocation;
 		this.rferenceInventoryVoucherHeader = rferenceInventoryVoucherHeader;
@@ -199,7 +204,7 @@ public class InventoryVoucherDetail implements Serializable {
 	public void setQuantity(double quantity) {
 		this.quantity = quantity;
 	}
-	
+
 	public double getUpdatedQuantity() {
 		return updatedQuantity;
 	}
@@ -279,7 +284,7 @@ public class InventoryVoucherDetail implements Serializable {
 	public void setRowTotal(double rowTotal) {
 		this.rowTotal = rowTotal;
 	}
-	
+
 	public double getUpdatedRowTotal() {
 		return updatedRowTotal;
 	}
@@ -400,7 +405,12 @@ public class InventoryVoucherDetail implements Serializable {
 		this.updatedStatus = updatedStatus;
 	}
 
-	
-	
+	public String getItemtype() {
+		return itemtype;
+	}
+
+	public void setItemtype(String itemtype) {
+		this.itemtype = itemtype;
+	}
 
 }

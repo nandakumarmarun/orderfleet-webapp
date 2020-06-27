@@ -7,17 +7,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "dbkey", "latitude", "longitude", "location", "customercode", "customername", "customer_ref",
-		"postingdate", "valid_until", "docdate", "SalesCommitDate", "remarks", "itemDetails", "Scode", "ordertype",
-		"discount", "shipto", "billTo" })
+@JsonPropertyOrder({ "dbkey", "location", "customercode", "customername", "customer_ref", "postingdate", "valid_until",
+		"docdate", "SalesCommitDate", "remarks", "priority", "itemDetails", "Scode", "ordertype", "discount", "shipto",
+		"billTo" })
 public class SalesOrderMasterSap {
 
 	@JsonProperty("dbkey")
 	private int dbKey;
-	@JsonProperty("latitude")
-	private String latitude;
-	@JsonProperty("longitude")
-	private String longitude;
 	@JsonProperty("location")
 	private String location;
 	@JsonProperty("customercode")
@@ -36,6 +32,8 @@ public class SalesOrderMasterSap {
 	private String salesCommitDate;
 	@JsonProperty("remarks")
 	private String remarks;
+	@JsonProperty("priority")
+	private String priority;
 	@JsonProperty("itemDetails")
 	private List<SalesOrderItemDetailsSap> itemDetails;
 	@JsonProperty("Scode")
@@ -57,26 +55,6 @@ public class SalesOrderMasterSap {
 	@JsonProperty("dbkey")
 	public void setDbKey(int dbKey) {
 		this.dbKey = dbKey;
-	}
-
-	@JsonProperty("latitude")
-	public String getLatitude() {
-		return latitude;
-	}
-
-	@JsonProperty("latitude")
-	public void setLatitude(String latitude) {
-		this.latitude = latitude;
-	}
-
-	@JsonProperty("longitude")
-	public String getLongitude() {
-		return longitude;
-	}
-
-	@JsonProperty("longitude")
-	public void setLongitude(String longitude) {
-		this.longitude = longitude;
 	}
 
 	@JsonProperty("location")
@@ -169,6 +147,16 @@ public class SalesOrderMasterSap {
 		this.remarks = remarks;
 	}
 
+	@JsonProperty("priority")
+	public String getPriority() {
+		return priority;
+	}
+
+	@JsonProperty("priority")
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
 	@JsonProperty("itemDetails")
 	public List<SalesOrderItemDetailsSap> getItemDetails() {
 		return itemDetails;
@@ -231,12 +219,12 @@ public class SalesOrderMasterSap {
 
 	@Override
 	public String toString() {
-		return "SalesOrderMasterSap [dbKey=" + dbKey + ", latitude=" + latitude + ", longitude=" + longitude
-				+ ", location=" + location + ", customerCode=" + customerCode + ", customerName=" + customerName
-				+ ", customerRef=" + customerRef + ", postingDate=" + postingDate + ", validUntil=" + validUntil
-				+ ", docDate=" + docDate + ", salesCommitDate=" + salesCommitDate + ", remarks=" + remarks
-				+ ", itemDetails=" + itemDetails + ", sCode=" + sCode + ", orderType=" + orderType + ", discount="
-				+ discount + ", shipTo=" + shipTo + ", billTo=" + billTo + "]";
+		return "SalesOrderMasterSap [dbKey=" + dbKey + ", location=" + location + ", customerCode=" + customerCode
+				+ ", customerName=" + customerName + ", customerRef=" + customerRef + ", postingDate=" + postingDate
+				+ ", validUntil=" + validUntil + ", docDate=" + docDate + ", salesCommitDate=" + salesCommitDate
+				+ ", remarks=" + remarks + ", priority=" + priority + ", itemDetails=" + itemDetails + ", sCode="
+				+ sCode + ", orderType=" + orderType + ", discount=" + discount + ", shipTo=" + shipTo + ", billTo="
+				+ billTo + "]";
 	}
 
 }

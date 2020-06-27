@@ -138,6 +138,7 @@ if (!this.InventoryVoucher) {
 																			: voucherDetail.quantity)
 																	+ "</td><td>"
 																	+ unitQty
+																	+ voucherDetail.itemtype
 																	+ "</td><td>"
 																	+ totQty
 																	+ "</td><td>"
@@ -445,7 +446,7 @@ if (!this.InventoryVoucher) {
 
 				},
 				success : function(data) {
-					
+
 					$("#loader").modal('hide');
 					$("#salesOrderSapButton").prop('disabled', false);
 					InventoryVoucher.filter();
