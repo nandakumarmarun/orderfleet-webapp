@@ -707,11 +707,14 @@ public class InvoiceWiseReportResource {
 				List<User> dashboardUsers = dashboardUserRepository.findUsersByCompanyId();
 				List<Long> dashboardUserIds = dashboardUsers.stream().map(User::getId).collect(Collectors.toList());
 				Set<Long> uniqueIds = new HashSet<>();
+				log.info("dashboard user ids empty: "+dashboardUserIds.isEmpty());
 				if (!dashboardUserIds.isEmpty()) {
+					log.info(" user ids empty: "+userIds.isEmpty());
+					log.info("userids :"+userIds.toString());
 					if (!userIds.isEmpty()) {
 						for (Long uid : userIds) {
 							for (Long sid : dashboardUserIds) {
-								if (uid.equals(sid)) {
+								if (uid != null && uid.equals(sid)) {
 									uniqueIds.add(sid);
 								}
 							}

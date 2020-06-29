@@ -52,7 +52,7 @@ public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile
 	@Query("select employeeProfile from EmployeeProfile employeeProfile where employeeProfile.company.id = ?#{principal.companyId} and employeeProfile.activated = ?1")
 	List<EmployeeProfile> findAllByCompanyAndDeativatedEmployeeProfile(boolean deactive);
 	
-	@Query("select employeeProfile.user.id from EmployeeProfile employeeProfile where employeeProfile.id in ?1")
+	@Query("select employeeProfile.user.id from EmployeeProfile employeeProfile where employeeProfile.id in ?1 and employeeProfile.activated = true")
 	List<Long> findUserIdByEmployeeIdIn(List<Long> employeeIds);
 	
 	@Query("select employeeProfile.user.id from EmployeeProfile employeeProfile where employeeProfile.pid in ?1")
