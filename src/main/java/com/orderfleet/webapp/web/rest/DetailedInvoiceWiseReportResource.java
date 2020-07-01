@@ -95,9 +95,9 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
  */
 @Controller
 @RequestMapping("/web")
-public class InvoiceWiseReportResource {
+public class DetailedInvoiceWiseReportResource {
 
-	private final Logger log = LoggerFactory.getLogger(InvoiceWiseReportResource.class);
+	private final Logger log = LoggerFactory.getLogger(DetailedInvoiceWiseReportResource.class);
 
 	private static final String INTERIM_SAVE = "interimSave";
 
@@ -176,7 +176,7 @@ public class InvoiceWiseReportResource {
 	private UserRepository userRepository;
 
 	/**
-	 * GET /invoice-wise-reports : get all the executive task executions.
+	 * GET /detailed-invoice-wise-reports : get all the executive task executions.
 	 *
 	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of executive
@@ -184,7 +184,7 @@ public class InvoiceWiseReportResource {
 	 * @throws URISyntaxException if there is an error to generate the pagination
 	 *                            HTTP headers
 	 */
-	@RequestMapping(value = "/invoice-wise-reports", method = RequestMethod.GET)
+	@RequestMapping(value = "/detailed-invoice-wise-reports", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
 	public String getAllExecutiveTaskExecutions(Pageable pageable, Model model) {
@@ -236,10 +236,10 @@ public class InvoiceWiseReportResource {
 			model.addAttribute(DISTANCE_TRAVELLED, false);
 		}
 
-		return "company/invoiceWiseReports";
+		return "company/detailedInvoiceWiseReports";
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/updateLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/updateLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
 		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
@@ -275,7 +275,7 @@ public class InvoiceWiseReportResource {
 		return new ResponseEntity<>(executionView, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/updateTowerLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/updateTowerLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InvoiceWiseReportView> updateTowerLocationExecutiveTaskExecutions(@PathVariable String pid) {
 		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
@@ -311,7 +311,7 @@ public class InvoiceWiseReportResource {
 		return new ResponseEntity<>(executionView, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed
 	@Transactional(readOnly = true)
@@ -390,7 +390,6 @@ public class InvoiceWiseReportResource {
 		log.info("executive task execution looping started :"+executiveTaskExecutions.size());
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
-			log.info("executive task execution loops start");
 			double totalSalesOrderAmount = 0.0;
 			double totalRecieptAmount = 0.0;
 			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView(executiveTaskExecution);
@@ -402,7 +401,8 @@ public class InvoiceWiseReportResource {
 						executiveTaskExecution.getSendDate());
 				invoiceWiseReportView.setTimeSpend(timeSpend);
 				List<InvoiceWiseReportDetailView> executiveTaskExecutionDetailViews = new ArrayList<>();
-				List<Object[]> inventoryVouchers;
+/*				List<Object[]> inventoryVouchers;
+				log.info("Inventory voucherer finding");
 				if (documentPid.equals("no")) {
 					inventoryVouchers = inventoryVoucherHeaderRepository
 							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
@@ -410,7 +410,7 @@ public class InvoiceWiseReportResource {
 					inventoryVouchers = inventoryVoucherHeaderRepository
 							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
 				}
-				
+				log.info("inventory voucher object array looping");
 				for (Object[] obj : inventoryVouchers) {
 					InvoiceWiseReportDetailView executiveTaskExecutionDetailView = new InvoiceWiseReportDetailView(
 							obj[0].toString(), obj[1].toString(), Double.valueOf(obj[2].toString()), obj[3].toString());
@@ -456,7 +456,9 @@ public class InvoiceWiseReportResource {
 							obj[1].toString(), obj[2].toString(), imageFound));
 				}
 				// if condition for document wise filter
-				if (!documentPid.equals("no") && executiveTaskExecutionDetailViews.isEmpty()) {
+				if (!documentPid.equals("no") && executiveTaskExecutionDetailViews.isEmpty()) {*/
+				
+				if (!documentPid.equals("no")) {
 				} else {
 					invoiceWiseReportView.setInvoiceWiseReportDetailViews(executiveTaskExecutionDetailViews);
 					invoiceWiseReportView.setTotalSalesOrderAmount(totalSalesOrderAmount);
@@ -464,7 +466,6 @@ public class InvoiceWiseReportResource {
 					invoiceWiseReportViews.add(invoiceWiseReportView);
 				}
 			}
-			log.info("executive task execution loops end");
 		}
 		return invoiceWiseReportViews;
 
@@ -785,7 +786,7 @@ public class InvoiceWiseReportResource {
 
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/changeAccountProfile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/changeAccountProfile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Void> changeAccountProfile(@RequestParam String accountProfilePid,
 			@RequestParam String exeTaskPid) {
@@ -822,7 +823,7 @@ public class InvoiceWiseReportResource {
 
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/createAndChangeAccountProfile/{pid}/{territoryPid}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/createAndChangeAccountProfile/{pid}/{territoryPid}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@ResponseBody
 	public ResponseEntity<Void> createAndChangeAccountProfile(@RequestBody AccountProfileDTO accountProfileDTO,
@@ -873,14 +874,14 @@ public class InvoiceWiseReportResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/getForms/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/getForms/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<DocumentFormDTO>> getForms(@PathVariable String pid) {
 		log.debug("Web request to get Form by dynamic document pid : {}", pid);
 		return new ResponseEntity<>(documentFormsService.findByDocumentPid(pid), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/getAccountFromForm", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/getAccountFromForm", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Map<String, String>> getAccountFromForm(@RequestParam String formPid,
 			@RequestParam String dynamicDocumentPid, @RequestParam String exePid) {
@@ -890,7 +891,7 @@ public class InvoiceWiseReportResource {
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/getDynamicDocument/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/getDynamicDocument/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<DynamicDocumentHeaderDTO>> getDynamicDocument(@PathVariable String pid) {
 		log.debug("Web request to get Dynamic Document by Executive Task Execution pid : {}", pid);
@@ -899,7 +900,7 @@ public class InvoiceWiseReportResource {
 				HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/updateGeoTag/{pid}", method = RequestMethod.GET)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/updateGeoTag/{pid}", method = RequestMethod.GET)
 	@Timed
 	public ResponseEntity<String> updateGeoTagLocation(@PathVariable String pid) {
 		log.debug("Web request to save accountProfile geo tag");
@@ -916,7 +917,7 @@ public class InvoiceWiseReportResource {
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/getActivities/{typeName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detailed-invoice-wise-reports/getActivities/{typeName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<ActivityDTO>> getActivities(@PathVariable String typeName) {
 		log.debug("Web request to get activities by typeName : {}", typeName);
