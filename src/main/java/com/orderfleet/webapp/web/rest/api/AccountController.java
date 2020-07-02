@@ -83,7 +83,7 @@ public class AccountController {
 
 	@Inject
 	private CompanyRepository companyRepository;
-	
+
 	@Inject
 	private EmployeeProfileRepository employeeProfileRepository;
 
@@ -290,20 +290,23 @@ public class AccountController {
 	@Timed
 	public ResponseEntity<UserDTO> getAccount() {
 		Optional<User> opUser = Optional.ofNullable(userService.getUserWithAuthorities());
-		if(opUser.isPresent()) {
+		if (opUser.isPresent()) {
 			UserDTO userDto = new UserDTO(opUser.get());
 			Optional<EmployeeProfile> opEmployeeProfile = employeeProfileRepository.findByUserPid(userDto.getPid());
-			if(opEmployeeProfile.isPresent()) {
+			if (opEmployeeProfile.isPresent()) {
 				userDto.setEmployeeName(opEmployeeProfile.get().getName());
-			}else {
+				userDto.setEmployeeAlias(
+						opEmployeeProfile.get().getAlias() != null ? opEmployeeProfile.get().getAlias() : "0");
+			} else {
 				userDto.setEmployeeName(userDto.getFirstName());
+				userDto.setEmployeeAlias("0");
 			}
-			
+
 			return new ResponseEntity<>(userDto, HttpStatus.OK);
-		}else{
+		} else {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
+
 	}
 
 	/**

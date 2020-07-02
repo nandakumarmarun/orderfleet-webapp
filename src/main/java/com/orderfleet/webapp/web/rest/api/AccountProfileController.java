@@ -211,7 +211,12 @@ public class AccountProfileController {
 			AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
 			accountProfile.setId(exisitingAccountProfile.get().getId());
 			accountProfile.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
+			accountProfile.setDataSourceType(DataSourceType.MOBILE);
+			Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
 
+			if (opUser.isPresent()) {
+				accountProfile.setUser(opUser.get());
+			}
 			accountProfile = accountProfileRepository.save(accountProfile);
 
 			AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);

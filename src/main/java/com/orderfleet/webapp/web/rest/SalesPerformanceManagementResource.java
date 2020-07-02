@@ -930,7 +930,16 @@ public class SalesPerformanceManagementResource {
 
 		salesOrderMasterSap.setItemDetails(salesOrderItems);
 
-		salesOrderMasterSap.setsCode(20);
+		int Scode = 0;
+
+		if (inventoryVoucherHeaderDTO.getEmployeeAlias() != null) {
+			try {
+				Scode = Integer.parseInt(inventoryVoucherHeaderDTO.getEmployeeAlias());
+			} catch (NumberFormatException e) {
+				Scode = 0;
+			}
+		}
+		salesOrderMasterSap.setsCode(Scode);
 		salesOrderMasterSap.setOrderType("O");
 		salesOrderMasterSap.setDiscount(0.0);
 		salesOrderMasterSap.setShipTo("");

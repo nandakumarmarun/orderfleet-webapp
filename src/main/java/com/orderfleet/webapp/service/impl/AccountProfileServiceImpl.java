@@ -96,11 +96,11 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	@Override
 	public AccountProfileDTO save(AccountProfileDTO accountProfileDTO) {
 		log.debug("Request to save AccountProfile : {}", accountProfileDTO);
-		log.info("AccountProfile Type :"+accountProfileDTO.getAccountTypeName());
+		log.info("AccountProfile Type :" + accountProfileDTO.getAccountTypeName());
 		accountProfileDTO.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid()); // set
 																								// pid
 		AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
-		log.info("AccountProfile Type 111 :"+accountProfile.getAccountType().getName());
+		log.info("AccountProfile Type 111 :" + accountProfile.getAccountType().getName());
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
 		if (opUser.isPresent()) {
 			accountProfile.setUser(opUser.get());
@@ -138,7 +138,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			accountProfile.setEmail2(accountProfileDTO.getEmail2());
 			accountProfile.setWhatsAppNo(accountProfileDTO.getWhatsAppNo());
 			accountProfile.setLocation(accountProfileDTO.getLocation());
-			if(accountProfileDTO.getLatitude() != null && accountProfileDTO.getLongitude() != null) {
+			if (accountProfileDTO.getLatitude() != null && accountProfileDTO.getLongitude() != null) {
 				accountProfile.setLatitude(accountProfileDTO.getLatitude());
 				accountProfile.setLongitude(accountProfileDTO.getLongitude());
 			}
@@ -152,16 +152,19 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			accountProfile.setDefaultDiscountPercentage(accountProfileDTO.getDefaultDiscountPercentage());
 			accountProfile.setClosingBalance(accountProfileDTO.getClosingBalance());
 			accountProfile.setTinNo(accountProfileDTO.getTinNo());
-			if(accountProfileDTO.getGeoTaggingType() != null) {
+			if (accountProfileDTO.getGeoTaggingType() != null) {
 				accountProfile.setGeoTaggingType(accountProfileDTO.getGeoTaggingType());
 				accountProfile.setGeoTaggedTime(accountProfileDTO.getGeoTaggedTime());
-			Optional<User> opGeoTagUser = 
-					userRepository.findOneByLogin(accountProfileDTO.getGeoTaggedUserLogin() == null ? "" : accountProfileDTO.getGeoTaggedUserLogin());
-				if(opGeoTagUser.isPresent()) {
+				Optional<User> opGeoTagUser = userRepository
+						.findOneByLogin(accountProfileDTO.getGeoTaggedUserLogin() == null ? ""
+								: accountProfileDTO.getGeoTaggedUserLogin());
+				if (opGeoTagUser.isPresent()) {
 					accountProfile.setGeoTaggedUser(opGeoTagUser.get());
 				}
 			}
-			
+
+			accountProfile.setDataSourceType(accountProfileDTO.getDataSourceType());
+
 			// accountProfile.setActivated(accountProfileDTO.getActivated());
 			accountProfile
 					.setDefaultPriceLevel(priceLevelRepository.findOneByPid(accountProfileDTO.getDefaultPriceLevelPid())
@@ -433,11 +436,11 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	public AccountProfileDTO saveAccountProfile(Long companyId, AccountProfileDTO accountProfileDTO, String userLogin) {
 		log.debug("Request to save AccountProfile : {}", accountProfileDTO);
 		accountProfileDTO.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid()); // set
-		log.info("AccProfiledto Type :"+accountProfileDTO.getAccountTypeName());																						// pid
+		log.info("AccProfiledto Type :" + accountProfileDTO.getAccountTypeName()); // pid
 		AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
 		// set company
 		accountProfile.setCompany(companyRepository.findOne(companyId));
-		log.info("AccountProfile Account Type :"+accountProfile.getAccountType().getName());
+		log.info("AccountProfile Account Type :" + accountProfile.getAccountType().getName());
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
 		if (opUser.isPresent()) {
 			accountProfile.setUser(opUser.get());
@@ -673,5 +676,19 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 		}
 		return accountProfiles;
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<AccountProfileDTO> findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(
+			Long companyId, List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate) {
+		
+		List<AccountProfile> accountProfileList = accountProfileRepository
+				.findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(companyId,
+						userIds, fromDate, toDate);
+		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfileList);
+		return result;
+	}
+	
+	
 
 }

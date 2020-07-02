@@ -172,4 +172,7 @@ public interface AccountProfileService {
 
 	List<AccountProfileDTO> findAllCustomByCompanyAndActivated(boolean active);
 
+	List<AccountProfileDTO> findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(
+			Long companyId, List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
+
 }

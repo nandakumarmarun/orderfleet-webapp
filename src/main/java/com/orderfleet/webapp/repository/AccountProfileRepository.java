@@ -177,4 +177,8 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.pid in ?1")
 	List<AccountProfile> findAllByAccountProfilePids(List<String> associatedAccountProfilePids);
 
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.user.id in ?2 and accountProfile.lastModifiedDate between ?3 and ?4  and accountProfile.activated = true order by accountProfile.lastModifiedDate desc")
+	List<AccountProfile> findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(Long companyId,
+			List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
+
 }

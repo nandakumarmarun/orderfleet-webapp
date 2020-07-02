@@ -27,8 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
@@ -66,16 +69,17 @@ public class AccountProfileResource {
 	@Inject
 	private EmployeeHierarchyService employeeHierarchyService;
 
+	@Inject
+	private UserRepository userRepository;
+
 	/**
 	 * POST /accountProfiles : Create a new accountProfile.
 	 *
-	 * @param accountProfileDTO
-	 *            the accountProfileDTO to create
+	 * @param accountProfileDTO the accountProfileDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body the new
 	 *         accountProfileDTO, or with status 400 (Bad Request) if the
 	 *         accountProfile has already an ID
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/accountProfiles", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -103,14 +107,12 @@ public class AccountProfileResource {
 	/**
 	 * PUT /accountProfiles : Updates an existing accountProfile.
 	 *
-	 * @param accountProfileDTO
-	 *            the accountProfileDTO to update
+	 * @param accountProfileDTO the accountProfileDTO to update
 	 * @return the ResponseEntity with status 200 (OK) and with body the updated
 	 *         accountProfileDTO, or with status 400 (Bad Request) if the
 	 *         accountProfileDTO is not valid, or with status 500 (Internal Server
 	 *         Error) if the accountProfileDTO couldnt be updated
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/accountProfiles", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -130,6 +132,7 @@ public class AccountProfileResource {
 					HeaderUtil.createFailureAlert("accountProfile", "nameexists", "Account Profile already in use"))
 					.body(null);
 		}
+		accountProfileDTO.setDataSourceType(DataSourceType.WEB);
 		AccountProfileDTO result = accountProfileService.update(accountProfileDTO);
 		if (result == null) {
 			return ResponseEntity.badRequest().headers(
@@ -144,12 +147,11 @@ public class AccountProfileResource {
 	/**
 	 * GET /accountProfiles : get all the accountProfiles.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of
 	 *         accountProfiles in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/accountProfiles", method = RequestMethod.GET)
 	@Timed
@@ -178,8 +180,7 @@ public class AccountProfileResource {
 	/**
 	 * GET /accountProfiles/:id : get the "id" accountProfile.
 	 *
-	 * @param id
-	 *            the id of the accountProfileDTO to retrieve
+	 * @param id the id of the accountProfileDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         accountProfileDTO, or with status 404 (Not Found)
 	 */
@@ -195,8 +196,7 @@ public class AccountProfileResource {
 	/**
 	 * DELETE /accountProfiles/:pid : delete the "pid" accountProfile.
 	 *
-	 * @param pid
-	 *            the pid of the accountProfileDTO to delete
+	 * @param pid the pid of the accountProfileDTO to delete
 	 * @return the ResponseEntity with status 200 (OK)
 	 */
 	@RequestMapping(value = "/accountProfiles/{pid}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -211,8 +211,7 @@ public class AccountProfileResource {
 	/**
 	 * GET /accountProfiles/user/:id : get the "id" accountProfile.
 	 *
-	 * @param id
-	 *            the user's id of the accountProfileDTO to retrieve
+	 * @param id the user's id of the accountProfileDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         accountProfileDTO, or with status 404 (Not Found)
 	 */
@@ -253,8 +252,7 @@ public class AccountProfileResource {
 	 *        Activate STATUS /accountProfiles/activateAccountProfile : activate
 	 *        status of accountProfile.
 	 * 
-	 * @param accountprofiles
-	 *            the accountprofiles to activate
+	 * @param accountprofiles the accountprofiles to activate
 	 * @return the ResponseEntity with status 200 (OK)
 	 */
 	@Timed
@@ -279,12 +277,13 @@ public class AccountProfileResource {
 		// Not selected
 		if (accountTypePids.isEmpty() && importedStatus.isEmpty()) {
 			if (userIds.isEmpty()) {
-				//accountProfileDTOs = accountProfileService.findAllByCompanyAndActivated(true);
+				// accountProfileDTOs =
+				// accountProfileService.findAllByCompanyAndActivated(true);
 				accountProfileDTOs = accountProfileService.findAllByCompanyAndActivated(true);
 			} else {
 				accountProfileDTOs = locationAccountProfileService.findAccountProfilesByCurrentUserLocations();
 			}
-			
+
 			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 		}
 
@@ -396,17 +395,16 @@ public class AccountProfileResource {
 		}
 		return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 	}
-	
-	
+
 	@Timed
 	@RequestMapping(value = "/accountProfiles/verifyStatus", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<AccountProfileDTO> accountProfilesVerifyStatus(
 			@Valid @RequestBody AccountProfileDTO accountProfileDTO) {
 		log.debug("Web request to update AccountProfiles Verified Status ", accountProfileDTO);
-		
-		AccountProfileDTO result = accountProfileService.updateAccountProfileVerifiedStatus(
-				accountProfileDTO.getPid(), 
-				accountProfileDTO.getAccountStatus() == AccountStatus.Verified ? AccountStatus.Unverified : AccountStatus.Verified);
+
+		AccountProfileDTO result = accountProfileService.updateAccountProfileVerifiedStatus(accountProfileDTO.getPid(),
+				accountProfileDTO.getAccountStatus() == AccountStatus.Verified ? AccountStatus.Unverified
+						: AccountStatus.Verified);
 
 		return new ResponseEntity<>(result, HttpStatus.OK);
 

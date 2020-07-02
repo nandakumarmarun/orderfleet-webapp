@@ -48,6 +48,8 @@ public class InventoryVoucherHeaderDTO {
 
 	private String employeeName;
 
+	private String employeeAlias;
+
 	private String userName;
 
 	private double documentTotal;
@@ -138,6 +140,7 @@ public class InventoryVoucherHeaderDTO {
 		if (inventoryVoucherHeader.getEmployee() != null) {
 			this.employeePid = inventoryVoucherHeader.getEmployee().getPid();
 			this.employeeName = inventoryVoucherHeader.getEmployee().getName();
+			this.employeeAlias = inventoryVoucherHeader.getEmployee().getAlias();
 		}
 		if (inventoryVoucherHeader.getCreatedBy() != null) {
 			this.userName = inventoryVoucherHeader.getCreatedBy().getFirstName();
@@ -590,6 +593,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setReceiverAccountAlias(String receiverAccountAlias) {
 		this.receiverAccountAlias = receiverAccountAlias;
+	}
+
+	public String getEmployeeAlias() {
+		return employeeAlias;
+	}
+
+	public void setEmployeeAlias(String employeeAlias) {
+		this.employeeAlias = employeeAlias;
 	}
 
 	@Override
