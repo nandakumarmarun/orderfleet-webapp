@@ -283,6 +283,8 @@ if (!this.InventoryVoucher) {
 												if (inventoryVoucher.tallyDownloadStatus == "PENDING") {
 													sendSalesOrderSapButton = "<br><br><button type='button' class='btn btn-primary' id='salesOrderSapButton' onclick='InventoryVoucher.downloadSalesOrderSap(\""
 															+ inventoryVoucher.pid
+															+ "\",\""
+															+ inventoryVoucher.salesManagementStatus
 															+ "\");'>Send Sales Order</button>";
 												} else if (inventoryVoucher.tallyDownloadStatus == "PROCESSING") {
 													sendSalesOrderSapButton = "<br><br><button type='button' class='btn btn-danger'>Sending Failed</button>";
@@ -428,35 +430,42 @@ if (!this.InventoryVoucher) {
 
 	}
 
-	InventoryVoucher.downloadSalesOrderSap = function(inventoryPid) {
+	InventoryVoucher.downloadSalesOrderSap = function(inventoryPid,
+			managementStatus) {
 
-		$("#salesOrderSapButton").prop('disabled', true);
+		if (managementStatus == "APPROVE") {
 
-		if (confirm("Are you sure?")) {
+			if (confirm("Are you sure?")) {
+				$("#salesOrderSapButton").prop('disabled', true);
 
-			$.ajax({
-				url : inventoryVoucherContextPath + "/downloadSalesOrderSap",
-				method : 'GET',
-				data : {
-					inventoryPid : inventoryPid,
-				},
-				beforeSend : function() {
-					// Show image container
-					$("#loader").modal('show');
+				$.ajax({
+					url : inventoryVoucherContextPath
+							+ "/downloadSalesOrderSap",
+					method : 'GET',
+					data : {
+						inventoryPid : inventoryPid,
+					},
+					beforeSend : function() {
+						// Show image container
+						$("#loader").modal('show');
 
-				},
-				success : function(data) {
+					},
+					success : function(data) {
 
-					$("#loader").modal('hide');
-					$("#salesOrderSapButton").prop('disabled', false);
-					InventoryVoucher.filter();
+						$("#loader").modal('hide');
+						$("#salesOrderSapButton").prop('disabled', false);
+						InventoryVoucher.filter();
 
-				},
-				error : function(xhr, error) {
-					onError(xhr, error);
-				}
-			});
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
 
+			}
+		} else {
+			alert("Please Verify and Approve Your Sales Order");
+			return;
 		}
 
 	}
@@ -480,21 +489,22 @@ if (!this.InventoryVoucher) {
 
 			spanStatus = (managementStatus == "APPROVE" ? pointerEnable
 					: pointerDisable)
-					+ 'PENDING<span class="'
-					+ (managementStatus == "APPROVE" ? 'caret' : '')
-					+ '"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setStatus('
-					+ pid
-					+ ','
-					+ processing
-					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
-					+ '<li onclick="InventoryVoucher.setStatus('
-					+ pid
-					+ ','
-					+ completed
-					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
-					+ '</ul></div>';
+					+ 'PENDING <span></span></span></div>';
+			// <span class="'
+			// + (managementStatus == "APPROVE" ? 'caret' : '')
+			// + '"></span></span>'
+			// + '<ul class="dropdown-menu">'
+			// + '<li onclick="InventoryVoucher.setStatus('
+			// + pid
+			// + ','
+			// + processing
+			// + ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
+			// + '<li onclick="InventoryVoucher.setStatus('
+			// + pid
+			// + ','
+			// + completed
+			// + ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+			// + '</ul></div>';
 
 			break;
 		case 'PROCESSING':
@@ -503,21 +513,22 @@ if (!this.InventoryVoucher) {
 
 			spanStatus = (managementStatus == "APPROVE" ? pointerEnable
 					: pointerDisable)
-					+ 'PROCESSING <span class="'
-					+ (managementStatus == "APPROVE" ? 'caret' : '')
-					+ '"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setStatus('
-					+ pid
-					+ ','
-					+ pending
-					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
-					+ '<li onclick="InventoryVoucher.setStatus('
-					+ pid
-					+ ','
-					+ completed
-					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
-					+ '</ul></div>';
+					+ 'PROCESSING <span></span></span></div>';
+			// <span class="'
+			// + (managementStatus == "APPROVE" ? 'caret' : '')
+			// + '"></span></span>'
+			// + '<ul class="dropdown-menu">'
+			// + '<li onclick="InventoryVoucher.setStatus('
+			// + pid
+			// + ','
+			// + pending
+			// + ')" style="cursor: pointer;"><a>PENDING</a></li>'
+			// + '<li onclick="InventoryVoucher.setStatus('
+			// + pid
+			// + ','
+			// + completed
+			// + ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+			// + '</ul></div>';
 
 			break;
 		case 'COMPLETED':

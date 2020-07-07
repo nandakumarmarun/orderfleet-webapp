@@ -39,7 +39,7 @@ import com.orderfleet.webapp.web.rest.util.RestUtil;
 @Service("geoLocationService")
 public class GeoLocationService {
 	private final Logger log = LoggerFactory.getLogger(GeoLocationService.class);
-	
+
 	// google api constants
 	public static final String STATUS_OK = "OK";
 	public static final String STATUS_ZERO_RESULTS = "ZERO_RESULTS";
@@ -48,33 +48,33 @@ public class GeoLocationService {
 	public static final String STATUS_INVALID_REQUEST = "INVALID_REQUEST";
 
 	// google maps api endpoint
-	//private static final String GEOCODE_API_URL = "https://maps.googleapis.com/maps/api/geocode/json?latlng={lat_lng}&key={api_key}";
+	// private static final String GEOCODE_API_URL =
+	// "https://maps.googleapis.com/maps/api/geocode/json?latlng={lat_lng}&key={api_key}";
 	private static final String GEOCODE_API_URL = "https://maps.googleapis.com/maps/api/geocode/json?latlng={lat_lng}";
 	private static final String GEO_LOCATION_API_URL = "https://www.googleapis.com/geolocation/v1/geolocate?key={api_key}";
 	private static final String DISTANCE_MATRIX_API_URL = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={source}&destinations={dest}&key={api_key}";
 
 	@Value("${google.api.key}")
 	String apiKey;
-	
+
 	private static final String OPENCAGE_API_ENDPOINT = "https://api.opencagedata.com/geocode/v1/json";
-	
+
 //	private static final String OPENCAGE_API_KEY = "af60f0d7e182487dbdb9638da38b551d";
 	private static final String OPENCAGE_API_KEY = "a73de03502fc4e06b14a25277d58c839";
-	
+
 	private static final String UNABLE_FIND_LOCATION = "Unable to find location";
-	
+
 	/**
 	 * Perform a reverse geocode request to find the address for a valid
 	 * coordinates.
 	 * 
-	 * @param latLng
-	 *            the coordinates that you want to reverse geocode.
+	 * @param latLng the coordinates that you want to reverse geocode.
 	 * @return the address.
 	 * @throws RestClientException
 	 * @throws UnsupportedEncodingException
 	 */
 	public String findAddressFromLatLng(String latLng) {
-		log.info("Reverse geocode using lalLan {} " , latLng);
+		log.info("Reverse geocode using lalLan {} ", latLng);
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<GoogleLocation> results = restTemplate.getForEntity(GEOCODE_API_URL, GoogleLocation.class,
 				latLng);
@@ -84,20 +84,16 @@ public class GeoLocationService {
 			if (STATUS_OK.equals(status) && !response.getResults().isEmpty()) {
 				return response.getResults().get(0).getFormatted_address();
 			}
-			//return buildLocationErrorMessage(status);
+			// return buildLocationErrorMessage(status);
 			return findAddressFromLatLngWithOpenCage(latLng);
 		}
 		throw new GeoLocationServiceException(
 				"API response status:" + results.getStatusCode() + " - API response object:" + results);
 	}
-	
+
 	private String findAddressFromLatLngWithOpenCage(String latLng) {
-		URI serviceUrl = UriComponentsBuilder.fromUriString(OPENCAGE_API_ENDPOINT)
-				.queryParam("key", OPENCAGE_API_KEY)
-				.queryParam("q", latLng)
-				.queryParam("abbrv", 1)
-				.queryParam("no_annotations", 1)
-				.build().toUri();
+		URI serviceUrl = UriComponentsBuilder.fromUriString(OPENCAGE_API_ENDPOINT).queryParam("key", OPENCAGE_API_KEY)
+				.queryParam("q", latLng).queryParam("abbrv", 1).queryParam("no_annotations", 1).build().toUri();
 		RestOperations template = new RestTemplate();
 		try {
 			ResponseEntity<String> response = template.getForEntity(serviceUrl, String.class);
@@ -124,7 +120,7 @@ public class GeoLocationService {
 	 * @return TowerLocation object contains lat,lon and address.
 	 */
 	public TowerLocation findAddressFromCellTower(String mcc, String mnc, String cellId, String lac) {
-		log.info("Cell tower details using mcc {} , mnc {}, cellId {} , lac {} ", mcc , mnc, cellId, lac);
+		log.info("Cell tower details using mcc {} , mnc {}, cellId {} , lac {} ", mcc, mnc, cellId, lac);
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new CustomErrorHandler());
 		GTowerRequest request = new GTowerRequest();
@@ -133,7 +129,8 @@ public class GeoLocationService {
 		try {
 			ResponseEntity<String> response = restTemplate.postForEntity(GEO_LOCATION_API_URL, request, String.class,
 					apiKey);
-			 responseBody = response.getBody();
+			responseBody = response.getBody();
+			log.info("API response object String :" + responseBody.toString());
 			if (RestUtil.isError(response.getStatusCode())) {
 				return buildTowerErrorMessage(responseBody);
 			} else {
@@ -192,20 +189,20 @@ public class GeoLocationService {
 		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 		return r * c;
 	}
-	
+
 }
 
 class CustomErrorHandler implements ResponseErrorHandler {
-	
-	private final Logger log = LoggerFactory.getLogger(CustomErrorHandler.class);
-	
-    @Override
-    public void handleError(ClientHttpResponse response) throws IOException {
-    	log.error("Response error: {} {}", response.getStatusCode(), response.getStatusText());
-    }
 
-    @Override
-    public boolean hasError(ClientHttpResponse response) throws IOException {
-        return RestUtil.isError(response.getStatusCode());
-    }
+	private final Logger log = LoggerFactory.getLogger(CustomErrorHandler.class);
+
+	@Override
+	public void handleError(ClientHttpResponse response) throws IOException {
+		log.error("Response error: {} {}", response.getStatusCode(), response.getStatusText());
+	}
+
+	@Override
+	public boolean hasError(ClientHttpResponse response) throws IOException {
+		return RestUtil.isError(response.getStatusCode());
+	}
 }
