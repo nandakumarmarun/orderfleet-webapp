@@ -51,6 +51,7 @@
 						<th>Gps Variance Query</th>
 						<th>Send Sales Order Email</th>
 						<th>Send Sales Order Sap</th>
+						<th>Pieces To Quantity</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -74,6 +75,8 @@
 							<th>${companyConfiguration.gpsVarianceQuery}</th>
 							<th>${companyConfiguration.sendSalesOrderEmail}</th>
 							<th>${companyConfiguration.sendSalesOrderSap}</th>
+							<th>${companyConfiguration.piecesToQuantity}</th>
+
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
@@ -103,7 +106,8 @@
 
 							<div class="col-md-6 col-md-offset-3">
 								<div class="form-group">
-									<select id="dbCompany" name="companyPid" class="form-control selectpicker" data-live-search="true"><option
+									<select id="dbCompany" name="companyPid"
+										class="form-control selectpicker" data-live-search="true"><option
 											value="-1">Select Company</option>
 										<c:forEach items="${companies}" var="company">
 											<option value="${company.pid}">${company.legalName}</option>
@@ -215,15 +219,24 @@
 														class="form-control" />
 												</div></td>
 										</tr>
-										
+
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Send Sales Order Sap</label>
-													<input id="sendSalesOrderSap"
-														name='checksSendSalesOrderSap"' type='checkbox'
-														class="form-control" />
+													<label class="control-label">Send Sales Order Sap</label> <input
+														id="sendSalesOrderSap" name='checksSendSalesOrderSap"'
+														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Pieces To Quantity</label> <input
+														id="piecesToQuantity" name='checksPiecesToQuantity"'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+
+
 										<!-- <tr>
 											<td><div class="form-group">
 													<label class="control-label">Find Location</label>

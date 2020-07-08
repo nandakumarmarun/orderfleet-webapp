@@ -390,6 +390,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	private List<InventoryVoucherHeader> saveInventoryVouchers(Company company, User user,
 			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
 			List<InventoryVoucherHeaderDTO> inventoryVoucherDTOs) {
+
+		Optional<CompanyConfiguration> opPiecesToQuantity = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.PIECES_TO_QUANTITY);
 		if (inventoryVoucherDTOs != null && inventoryVoucherDTOs.size() > 0) {
 			// Optional<CompanyConfiguration> companyConfiguration =
 			// companyConfigurationRepository.findByCompanyPidAndName(company.getPid(),
@@ -521,6 +524,15 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				List<InventoryVoucherDetail> inventoryVoucherDetails = new ArrayList<InventoryVoucherDetail>();
 				inventoryVoucherDTO.getInventoryVoucherDetails().forEach(inventoryVoucherDetailDTO -> {
 
+					// set pices and rate to quantity and selling rate(SAP)
+					if (opPiecesToQuantity.isPresent()) {
+
+						if (opPiecesToQuantity.get().getValue().equals("true")) {
+							inventoryVoucherDetailDTO.setQuantity(inventoryVoucherDetailDTO.getPieces());
+							inventoryVoucherDetailDTO.setSellingRate(inventoryVoucherDetailDTO.getRatePerPiece());
+						}
+					}
+
 					// find source and destination Stock Location
 					StockLocation sourceStockLocation = null;
 					StockLocation destinationStockLocation = null;
@@ -571,6 +583,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 											inventoryVoucherBatchDetail.getQuantity(), company, stockLocation));
 								});
 					}
+
 					inventoryVoucherDetails.add(new InventoryVoucherDetail(productProfile,
 							inventoryVoucherDetailDTO.getQuantity(), inventoryVoucherDetailDTO.getFreeQuantity(),
 							inventoryVoucherDetailDTO.getSellingRate(), inventoryVoucherDetailDTO.getMrp(),

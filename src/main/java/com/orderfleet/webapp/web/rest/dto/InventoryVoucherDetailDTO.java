@@ -101,6 +101,10 @@ public class InventoryVoucherDetailDTO {
 
 	private String itemtype;
 
+	private double pieces;
+
+	private double ratePerPiece;
+
 	public InventoryVoucherDetailDTO() {
 	}
 
@@ -507,6 +511,22 @@ public class InventoryVoucherDetailDTO {
 
 	public void setItemtype(String itemtype) {
 		this.itemtype = itemtype;
+	}
+
+	public double getPieces() {
+		return pieces;
+	}
+
+	public void setPieces(double pieces) {
+		this.pieces = pieces;
+	}
+
+	public double getRatePerPiece() {
+		return ratePerPiece;
+	}
+
+	public void setRatePerPieces(double ratePerPiece) {
+		this.ratePerPiece = ratePerPiece;
 	}
 
 	@Override

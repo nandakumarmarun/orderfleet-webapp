@@ -9,9 +9,9 @@ if (!this.CompanyConfiguration) {
 	'use strict';
 
 	$(document).ready(function() {
-		
+
 		$('.selectpicker').selectpicker();
-		
+
 		$('#companysModal').on('click', function() {
 			$("#assignCompanyConfigurationsModal").modal("show");
 		});
@@ -53,7 +53,8 @@ if (!this.CompanyConfiguration) {
 		var gpsVarianceQuery = $('#gpsVarianceQuery').is(":checked");
 		var sendSalesOrderEmail = $('#sendSalesOrderEmail').is(":checked");
 		var sendSalesOrderSap = $('#sendSalesOrderSap').is(":checked");
-		/*var findLocation = $('#findLocation').is(":checked");*/
+		var piecesToQuantity = $('#piecesToQuantity').is(":checked");
+		/* var findLocation = $('#findLocation').is(":checked"); */
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -72,8 +73,9 @@ if (!this.CompanyConfiguration) {
 				salesEditEnabled : salesEditEnabled,
 				gpsVarianceQuery : gpsVarianceQuery,
 				sendSalesOrderEmail : sendSalesOrderEmail,
-				sendSalesOrderSap : sendSalesOrderSap
-				/*findLocation : findLocation*/
+				sendSalesOrderSap : sendSalesOrderSap,
+				piecesToQuantity : piecesToQuantity
+			/* findLocation : findLocation */
 			},
 			success : function(data) {
 				onSaveSuccess(data);
@@ -86,32 +88,49 @@ if (!this.CompanyConfiguration) {
 
 	function getCompanyConfigurationConfig() {
 		$('input[type="checkbox"]:checked').prop('checked', false);
-		$.ajax({
-			url : contextPath + "/" + $("#dbCompany").val(),
-			method : 'GET',
-			success : function(data) {
-				$('#distanceTraveled').prop("checked", data.distanceTraveled);
-				$('#locationVariance').prop("checked", data.locationVariance);
-				$('#interimSave').prop("checked", data.interimSave);
-				$('#refreshProductGroupProduct').prop("checked",
-						data.refreshProductGroupProduct);
-				$("#stageChangeAccountingVoucher").prop("checked",
-						data.stageChangeAccountingVoucher);
-				$("#newCustomerAlias").prop("checked", data.newCustomerAlias);
-				$("#chatReply").prop("checked", data.chatReply);
-				$("#salesPdfDownload").prop("checked", data.salesPdfDownload);
-				$("#visitBasedTransaction").prop("checked", data.visitBasedTransaction);
-				$("#salesManagement").prop("checked", data.salesManagement);
-				$("#salesEditEnabled").prop("checked", data.salesEditEnabled);
-				$("#gpsVarianceQuery").prop("checked", data.gpsVarianceQuery);
-				$("#sendSalesOrderEmail").prop("checked", data.sendSalesOrderEmail);
-				$("#sendSalesOrderSap").prop("checked", data.sendSalesOrderSap);
-				/*$("#findLocation").prop("checked", data.findLocation);*/
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			}
-		});
+		$
+				.ajax({
+					url : contextPath + "/" + $("#dbCompany").val(),
+					method : 'GET',
+					success : function(data) {
+						$('#distanceTraveled').prop("checked",
+								data.distanceTraveled);
+						$('#locationVariance').prop("checked",
+								data.locationVariance);
+						$('#interimSave').prop("checked", data.interimSave);
+						$('#refreshProductGroupProduct').prop("checked",
+								data.refreshProductGroupProduct);
+						$("#stageChangeAccountingVoucher").prop("checked",
+								data.stageChangeAccountingVoucher);
+						$("#newCustomerAlias").prop("checked",
+								data.newCustomerAlias);
+						$("#chatReply").prop("checked", data.chatReply);
+						$("#salesPdfDownload").prop("checked",
+								data.salesPdfDownload);
+						$("#visitBasedTransaction").prop("checked",
+								data.visitBasedTransaction);
+						$("#salesManagement").prop("checked",
+								data.salesManagement);
+						$("#salesEditEnabled").prop("checked",
+								data.salesEditEnabled);
+						$("#gpsVarianceQuery").prop("checked",
+								data.gpsVarianceQuery);
+						$("#sendSalesOrderEmail").prop("checked",
+								data.sendSalesOrderEmail);
+						$("#sendSalesOrderSap").prop("checked",
+								data.sendSalesOrderSap);
+						$("#piecesToQuantity").prop("checked",
+								data.piecesToQuantity);
+
+						/*
+						 * $("#findLocation").prop("checked",
+						 * data.findLocation);
+						 */
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
 	}
 	var companyPid = "";
 	CompanyConfiguration.deletes = function(pid) {

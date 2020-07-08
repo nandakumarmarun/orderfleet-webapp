@@ -133,6 +133,10 @@ public class CompanyConfigurationResource {
 					mcDto.setSendSalesOrderSap(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.PIECES_TO_QUANTITY)) {
+					mcDto.setPiecesToQuantity(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
 				 * mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue())); anyValueExist =
@@ -157,8 +161,8 @@ public class CompanyConfigurationResource {
 			@RequestParam String chatReply, @RequestParam String salesPdfDownload,
 			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement,
 			@RequestParam String salesEditEnabled, @RequestParam String gpsVarianceQuery,
-			@RequestParam String sendSalesOrderEmail, @RequestParam String sendSalesOrderSap)
-			throws URISyntaxException {
+			@RequestParam String sendSalesOrderEmail, @RequestParam String sendSalesOrderSap,
+			@RequestParam String piecesToQuantity) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -196,6 +200,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_EMAIL);
 		Optional<CompanyConfiguration> optSendSalesOrderSap = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_SAP);
+		Optional<CompanyConfiguration> optPiecesToQuantity = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.PIECES_TO_QUANTITY);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -216,6 +222,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration gpsVarianceQueryCompany = null;
 		CompanyConfiguration sendSalesOrderEmailCompany = null;
 		CompanyConfiguration sendSalesOrderSapCompany = null;
+		CompanyConfiguration piecesToQuantityCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -372,6 +379,17 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(sendSalesOrderSapCompany);
 
+		if (optPiecesToQuantity.isPresent()) {
+			piecesToQuantityCompany = optPiecesToQuantity.get();
+			piecesToQuantityCompany.setValue(piecesToQuantity);
+		} else {
+			piecesToQuantityCompany = new CompanyConfiguration();
+			piecesToQuantityCompany.setCompany(company);
+			piecesToQuantityCompany.setName(CompanyConfig.PIECES_TO_QUANTITY);
+			piecesToQuantityCompany.setValue(piecesToQuantity);
+		}
+		companyConfigurationRepository.save(piecesToQuantityCompany);
+
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -430,6 +448,9 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optSendSalesOrderSap = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_SAP);
 
+		Optional<CompanyConfiguration> optPiecesToQuantity = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.PIECES_TO_QUANTITY);
+
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -482,6 +503,9 @@ public class CompanyConfigurationResource {
 		if (optSendSalesOrderSap.isPresent()) {
 			companyConfigurationDTO.setSendSalesOrderSap(Boolean.valueOf(optSendSalesOrderSap.get().getValue()));
 		}
+		if (optPiecesToQuantity.isPresent()) {
+			companyConfigurationDTO.setPiecesToQuantity(Boolean.valueOf(optPiecesToQuantity.get().getValue()));
+		}
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
@@ -527,6 +551,9 @@ public class CompanyConfigurationResource {
 
 		Optional<CompanyConfiguration> optSendSalesOrderSap = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_SAP);
+
+		Optional<CompanyConfiguration> optPiecesToQuantity = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.PIECES_TO_QUANTITY);
 
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
@@ -591,6 +618,10 @@ public class CompanyConfigurationResource {
 		if (optSendSalesOrderSap.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optSendSalesOrderSap.get().getCompany().getId(),
 					CompanyConfig.SEND_SALES_ORDER_SAP);
+		}
+		if (optPiecesToQuantity.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optSendSalesOrderSap.get().getCompany().getId(),
+					CompanyConfig.PIECES_TO_QUANTITY);
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {

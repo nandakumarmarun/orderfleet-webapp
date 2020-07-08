@@ -69,6 +69,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.codec.Base64.OutputStream;
+import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.ProductGroup;
@@ -887,6 +888,11 @@ public class SalesPerformanceManagementResource {
 	}
 
 	private SalesOrderMasterSap getRequestBody(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		Optional<CompanyConfiguration> opPiecesToQuantity = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.PIECES_TO_QUANTITY);
+
 		SalesOrderMasterSap salesOrderMasterSap = new SalesOrderMasterSap();
 
 		salesOrderMasterSap.setDbKey(1);
@@ -915,15 +921,25 @@ public class SalesPerformanceManagementResource {
 		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
 				.getInventoryVoucherDetails()) {
 			SalesOrderItemDetailsSap salesOrderItemDetailsSap = new SalesOrderItemDetailsSap();
+			double quantity = inventoryVoucherDetailDTO.getQuantity();
+			String itemType = inventoryVoucherDetailDTO.getItemtype() != null ? inventoryVoucherDetailDTO.getItemtype()
+					: "MT";
+			if (opPiecesToQuantity.isPresent()) {
+				if (opPiecesToQuantity.get().getValue().equals("true")) {
+					quantity = quantity / 1000; // Quantity into MT;
+					itemType = "MT";
+				}
+			}
 
 			salesOrderItemDetailsSap.setItemCode(inventoryVoucherDetailDTO.getProductName());
 			salesOrderItemDetailsSap.setItemName(inventoryVoucherDetailDTO.getProductAlias());
-			salesOrderItemDetailsSap.setQuantity(String.valueOf(inventoryVoucherDetailDTO.getQuantity()));
+			salesOrderItemDetailsSap.setQuantity(String.valueOf(quantity));
 			salesOrderItemDetailsSap.setuPrice(String.valueOf("0.0"));
 			salesOrderItemDetailsSap.setTaxCode("");
 			salesOrderItemDetailsSap.setWareHouseCode("PSO2");
-			salesOrderItemDetailsSap.setItemtype(
-					inventoryVoucherDetailDTO.getItemtype() != null ? inventoryVoucherDetailDTO.getItemtype() : "MT");
+			salesOrderItemDetailsSap.setItemtype("MT");
+
+			salesOrderItemDetailsSap.setItemtype(itemType);
 			salesOrderItemDetailsSap.setArecieved("");
 
 			salesOrderItems.add(salesOrderItemDetailsSap);
