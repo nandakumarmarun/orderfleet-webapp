@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Odoo Upload</title>
+<title>SalesNrich | Sync Odoo Masters</title>
 </head>
 <body class="page-body" data-url="">
 	<div class="page-container">
@@ -14,7 +14,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Odoo Upload</h2>
+			<h2>Sync Odoo Masters</h2>
 			<div class="row">
 				
 				<hr />

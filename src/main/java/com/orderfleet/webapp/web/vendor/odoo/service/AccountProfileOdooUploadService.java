@@ -135,6 +135,7 @@ public class AccountProfileOdooUploadService {
 			accountProfile.setAlias(apDto.getCustomerCode());
 			accountProfile.setTinNo(apDto.getTinNo());
 			accountProfile.setPin(apDto.getPin());
+			accountProfile.setDescription(String.valueOf(apDto.getId()));
 
 			accountProfile.setActivated(true);
 

@@ -18,7 +18,7 @@ public class ResultOdooAccountProfile {
 
 	private List<String> location;
 
-	private String id;
+	private long id;
 
 	private String credit;
 
@@ -80,11 +80,11 @@ public class ResultOdooAccountProfile {
 		this.location = location;
 	}
 
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

@@ -52,14 +52,11 @@ public class UploadOdooResource {
 
 	private final Logger log = LoggerFactory.getLogger(UploadOdooResource.class);
 
-	
 	@Inject
 	private AccountProfileOdooUploadService accountProfileOdooUploadService;
-	
+
 	@Inject
 	private ProductProfileOdooUploadService productProfileOdooUploadService;
-	
-	
 
 	@RequestMapping(value = "/upload-odoo", method = RequestMethod.GET)
 	@Timed
@@ -89,7 +86,7 @@ public class UploadOdooResource {
 			ResponseBodyOdooAccountProfile responseBodyAccountProfile = restTemplate.postForObject(API_URL, entity,
 					ResponseBodyOdooAccountProfile.class);
 			log.info("Account Profile Size= " + responseBodyAccountProfile.getResult().size() + "------------");
-			
+
 			accountProfileOdooUploadService.saveUpdateAccountProfiles(responseBodyAccountProfile.getResult());
 
 		} catch (HttpClientErrorException exception) {
@@ -124,7 +121,7 @@ public class UploadOdooResource {
 			ResponseBodyOdooProductProfile responseBodyProductProfile = restTemplate.postForObject(API_URL, entity,
 					ResponseBodyOdooProductProfile.class);
 			log.info("Product Profile Size= " + responseBodyProductProfile.getResult().size() + "------------");
-			
+
 			productProfileOdooUploadService.saveUpdateProductProfiles(responseBodyProductProfile.getResult());
 
 		} catch (HttpClientErrorException exception) {
@@ -133,6 +130,8 @@ public class UploadOdooResource {
 			}
 			throw new ServiceException(exception.getMessage());
 		} catch (Exception exception) {
+			System.out.println(exception.getMessage());
+
 			throw new ServiceException(exception.getMessage());
 		}
 

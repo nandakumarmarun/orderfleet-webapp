@@ -18,9 +18,9 @@ public class ResultOdooProductProfile {
 
 	private String name;
 
-	private String id;
+	private long id;
 
-	private List<String> sku;
+	private List<Object[]> sku;
 
 	public List<String> getTaxRate() {
 		return taxRate;
@@ -78,19 +78,19 @@ public class ResultOdooProductProfile {
 		this.name = name;
 	}
 
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public List<String> getSku() {
+	public List<Object[]> getSku() {
 		return sku;
 	}
 
-	public void setSku(List<String> sku) {
+	public void setSku(List<Object[]> sku) {
 		this.sku = sku;
 	}
 

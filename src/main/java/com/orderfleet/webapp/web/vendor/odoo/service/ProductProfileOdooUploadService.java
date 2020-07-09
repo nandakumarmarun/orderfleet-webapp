@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.vendor.odoo.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.service.util.RandomUtil;
+import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooProductProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.UnitQtyOdooProductProfile;
 
@@ -91,6 +93,8 @@ public class ProductProfileOdooUploadService {
 
 		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
 
+		List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
+
 		// All product must have a division/category, if not, set a default one
 		Division defaultDivision = divisionRepository.findFirstByCompanyId(company.getId());
 		String cat = productCategorys.get(0).getName();
@@ -145,44 +149,60 @@ public class ProductProfileOdooUploadService {
 			}
 
 			if (ppDto.getSku() != null && ppDto.getSku().size() > 0) {
-				int lastElementIndex = ppDto.getSku().size() - 1;
+				int lastElement = ppDto.getSku().size() - 1;
 
-				String sku = ppDto.getSku().get(lastElementIndex);
+				Object[] objArray = ppDto.getSku().get(lastElement);
 
-				productProfile.setSku(sku);
+				if (objArray != null && objArray.length > 0) {
 
-				if (ppDto.getUnitQty() != null && ppDto.getUnitQty().size() > 0) {
+					int lastElementIndex = objArray.length - 1;
 
-					List<UnitQtyOdooProductProfile> unitQuantities = ppDto.getUnitQty();
+					String sku = String.valueOf(objArray[lastElementIndex]);
 
-					int lastElementIndexUq = unitQuantities.size() - 1;
+					productProfile.setSku(sku);
 
-					if (sku.equalsIgnoreCase("KGM")) {
-						productProfile.setUnitQty(unitQuantities.get(lastElementIndexUq).getKGM());
+					if (ppDto.getUnitQty() != null && ppDto.getUnitQty().size() > 0) {
+
+						List<UnitQtyOdooProductProfile> unitQuantities = ppDto.getUnitQty();
+
+						int lastElementIndexUq = unitQuantities.size() - 1;
+
+						if (sku.equalsIgnoreCase("KGM")) {
+							productProfile.setUnitQty(unitQuantities.get(lastElementIndexUq).getKGM());
+						}
+
+						if (sku.equalsIgnoreCase("PCS")) {
+							productProfile.setUnitQty(unitQuantities.get(lastElementIndexUq).getPCS());
+						}
+
+						if (sku.equalsIgnoreCase("NOS")) {
+							productProfile.setUnitQty(unitQuantities.get(lastElementIndexUq).getNOS());
+						}
+
 					}
-
-					if (sku.equalsIgnoreCase("PCS")) {
-						productProfile.setUnitQty(unitQuantities.get(lastElementIndexUq).getPCS());
-					}
-
-					if (sku.equalsIgnoreCase("NOS")) {
-						productProfile.setUnitQty(unitQuantities.get(lastElementIndexUq).getNOS());
-					}
-
 				}
 
 			}
-
+			productProfile.setDescription(String.valueOf(ppDto.getId()));
 			productProfile.setSize(String.valueOf(ppDto.getSize()));
 			productProfile.setHsnCode(ppDto.getHsnCode() != null ? ppDto.getHsnCode() : "");
 
 			productProfile.setProductCategory(defaultCategory.get());
 
+			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
+
+			productGroupProductDTO.setGroupName("General");
+			productGroupProductDTO.setProductName(ppDto.getName());
+
+			productGroupProductDTOs.add(productGroupProductDTO);
+
 			saveUpdateProductProfiles.add(productProfile);
 
 		}
+
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
-		saveUpdateProductGroupProduct(resultProductProfiles);
+
+		saveUpdateProductGroupProduct(productGroupProductDTOs);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -193,42 +213,61 @@ public class ProductProfileOdooUploadService {
 
 	@Transactional
 	@Async
-	public void saveUpdateProductGroupProduct(List<ResultOdooProductProfile> resultProductProfiles) {
+	public void saveUpdateProductGroupProduct(List<TPProductGroupProductDTO> productGroupProductDTOs) {
+
+		log.info("Saving Product Group Products.........");
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
-		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
+		List<ProductGroupProduct> newProductGroupProducts = new ArrayList<>();
+		List<ProductGroupProduct> productGroupProducts = productGroupProductRepository
+				.findAllByCompanyPid(company.getPid());
 
-		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
+		// delete all assigned location account profile from tally
+		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
-		for (ResultOdooProductProfile pgpDto : resultProductProfiles) {
-			// check exist by names,
-			Optional<ProductGroupProduct> optionalPGP = productGroupProductRepository
-					.findByCompanyIdAndProductGroupNameIgnoreCaseAndProductNameIgnoreCase(companyId, "General",
-							pgpDto.getName());
-			// if not exist save
-			if (!optionalPGP.isPresent()) {
-				Optional<ProductGroup> optionalGroup = productGroups.stream()
-						.filter(pl -> "General".equals(pl.getName())).findAny();
-				Optional<ProductProfile> optionalpp = productProfiles.stream()
-						.filter(pl -> pgpDto.getName().equals(pl.getName())).findAny();
-				if (optionalpp.isPresent() && optionalGroup.isPresent()) {
-					ProductGroupProduct pgp = new ProductGroupProduct();
-					pgp.setProductGroup(optionalGroup.get());
-					pgp.setProduct(optionalpp.get());
-					pgp.setCompany(company);
-					pgp.setActivated(true);
-					saveUpdateProductGroupProducts.add(pgp);
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
+		List<Long> productGroupProductsIds = new ArrayList<>();
+
+		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
+			ProductGroupProduct productGroupProduct = new ProductGroupProduct();
+			// find location
+
+			Optional<ProductGroup> opPg = productGroups.stream()
+					.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findFirst();
+			// find accountprofile
+			// System.out.println(loc.get()+"===Location");
+
+			Optional<ProductProfile> opPp = productProfiles.stream()
+					.filter(pp -> pgpDto.getProductName().equals(pp.getName())).findFirst();
+			if (opPp.isPresent()) {
+				List<Long> productGroupProductIds = productGroupProducts.stream()
+						.filter(pgp -> opPp.get().getPid().equals(pgp.getProduct().getPid())).map(pgp -> pgp.getId())
+						.collect(Collectors.toList());
+				if (productGroupProductIds.size() != 0) {
+					productGroupProductsIds.addAll(productGroupProductIds);
 				}
-			} else {
-				optionalPGP.get().setActivated(true);
-				saveUpdateProductGroupProducts.add(optionalPGP.get());
+				if (opPg.isPresent()) {
+					productGroupProduct.setProductGroup(opPg.get());
+				} else if (opPp.isPresent()) {
+					productGroupProduct.setProductGroup(productGroups.get(0));
+				}
+				productGroupProduct.setProduct(opPp.get());
+				productGroupProduct.setCompany(company);
+				newProductGroupProducts.add(productGroupProduct);
 			}
 		}
-		bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+		if (productGroupProductsIds.size() != 0) {
+			productGroupProductRepository.deleteByIdIn(companyId, productGroupProductsIds);
+		}
+
+		productGroupProductRepository.save(newProductGroupProducts);
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
-		log.info("Product Group Product Sync completed in {} ms", elapsedTime);
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
 	}
 }
