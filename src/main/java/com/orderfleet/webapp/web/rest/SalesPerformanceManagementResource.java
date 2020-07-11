@@ -926,8 +926,15 @@ public class SalesPerformanceManagementResource {
 					: "MT";
 			if (opPiecesToQuantity.isPresent()) {
 				if (opPiecesToQuantity.get().getValue().equals("true")) {
-					quantity = quantity / 1000; // Quantity into MT;
-					itemType = "MT";
+
+					if (inventoryVoucherDetailDTO.getProductSKU() != null
+							&& inventoryVoucherDetailDTO.getProductSKU().equalsIgnoreCase("MT")) {
+						quantity = (quantity * inventoryVoucherDetailDTO.getProductUnitQty()) / 1000; // Quantity into MT;
+						itemType = inventoryVoucherDetailDTO.getProductSKU();
+					} else if (inventoryVoucherDetailDTO.getProductSKU() != null
+							&& inventoryVoucherDetailDTO.getProductSKU().equalsIgnoreCase("Pcs")) {
+						itemType = inventoryVoucherDetailDTO.getProductSKU();
+					}
 				}
 			}
 

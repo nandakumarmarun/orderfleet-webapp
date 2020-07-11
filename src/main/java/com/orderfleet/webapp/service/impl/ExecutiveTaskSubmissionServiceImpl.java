@@ -524,6 +524,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				List<InventoryVoucherDetail> inventoryVoucherDetails = new ArrayList<InventoryVoucherDetail>();
 				inventoryVoucherDTO.getInventoryVoucherDetails().forEach(inventoryVoucherDetailDTO -> {
 
+					log.info("Pieces :- " + inventoryVoucherDetailDTO.getPieces() + "------------"
+							+ "Rate Per Peices :-" + inventoryVoucherDetailDTO.getRatePerPiece());
+
 					// set pices and rate to quantity and selling rate(SAP)
 					if (opPiecesToQuantity.isPresent()) {
 
