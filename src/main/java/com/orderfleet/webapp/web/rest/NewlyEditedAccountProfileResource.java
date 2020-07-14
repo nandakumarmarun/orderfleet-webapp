@@ -34,8 +34,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.AccountStatus;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.EmployeeHierarchyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
+import com.orderfleet.webapp.repository.NewlyEditedAccountProfileRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -43,18 +46,26 @@ import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
+import com.orderfleet.webapp.service.NewlyEditedAccountProfileService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.NewlyEditedAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 @Controller
 @RequestMapping("/web")
-public class EditedAccountProfileResource {
+public class NewlyEditedAccountProfileResource {
 
-	private final Logger log = LoggerFactory.getLogger(EditedAccountProfileResource.class);
+	private final Logger log = LoggerFactory.getLogger(NewlyEditedAccountProfileResource.class);
 
 	@Inject
 	private AccountProfileService accountProfileService;
+
+	@Inject
+	private NewlyEditedAccountProfileService newlyEditedaccountProfileService;
+
+	@Inject
+	private NewlyEditedAccountProfileRepository newlyEditedaccountProfileRepository;
 
 	@Inject
 	private AccountTypeService accountTypeService;
@@ -85,7 +96,7 @@ public class EditedAccountProfileResource {
 	 * @throws URISyntaxException
 	 * 
 	 */
-	@RequestMapping(value = "/edited-account-profiles", method = RequestMethod.GET)
+	@RequestMapping(value = "/newly-edited-account-profiles", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
 	public String getAllAccountProfiles(Model model) throws URISyntaxException {
@@ -97,51 +108,55 @@ public class EditedAccountProfileResource {
 			model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
 		}
 
-		return "company/editedAccountProfiles";
+		return "company/newlyEditedAccountProfiles";
 	}
 
-	@RequestMapping(value = "/edited-account-profiles/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/newly-edited-account-profiles/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<AccountProfileDTO> getAccountProfile(@PathVariable String pid) {
+	public ResponseEntity<NewlyEditedAccountProfileDTO> getAccountProfile(@PathVariable String pid) {
 		log.debug("Web request to get AccountProfile by pid : {}", pid);
-		return accountProfileService.findOneByPid(pid)
-				.map(accountProfileDTO -> new ResponseEntity<>(accountProfileDTO, HttpStatus.OK))
-				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+		NewlyEditedAccountProfileDTO newlyEditedAp = newlyEditedaccountProfileService.findOneByPid(pid);
+
+		if (newlyEditedAp != null) {
+			return new ResponseEntity<>(newlyEditedAp, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	@RequestMapping(value = "/edited-account-profiles/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/newly-edited-account-profiles/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<List<AccountProfileDTO>> filterAccountProfileDTOs(
+	public ResponseEntity<List<NewlyEditedAccountProfileDTO>> filterAccountProfileDTOs(
 			@RequestParam("employeePid") String employeePid, @RequestParam("filterBy") String filterBy,
-			@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate) {
+			@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate,@RequestParam("accountStatus") String accountStatus) {
 		log.debug("Web request to filter account profiles");
-		List<AccountProfileDTO> accountProfileDTOs = new ArrayList<AccountProfileDTO>();
+		List<NewlyEditedAccountProfileDTO> accountProfileDTOs = new ArrayList<NewlyEditedAccountProfileDTO>();
 		if (filterBy.equals("TODAY")) {
-			accountProfileDTOs = getFilterData(employeePid, LocalDate.now(), LocalDate.now());
+			accountProfileDTOs = getFilterData(employeePid, LocalDate.now(), LocalDate.now(),accountStatus);
 		} else if (filterBy.equals("YESTERDAY")) {
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			accountProfileDTOs = getFilterData(employeePid, yeasterday, yeasterday);
+			accountProfileDTOs = getFilterData(employeePid, yeasterday, yeasterday,accountStatus);
 		} else if (filterBy.equals("WTD")) {
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			accountProfileDTOs = getFilterData(employeePid, weekStartDate, LocalDate.now());
+			accountProfileDTOs = getFilterData(employeePid, weekStartDate, LocalDate.now(),accountStatus);
 		} else if (filterBy.equals("MTD")) {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			accountProfileDTOs = getFilterData(employeePid, monthStartDate, LocalDate.now());
+			accountProfileDTOs = getFilterData(employeePid, monthStartDate, LocalDate.now(),accountStatus);
 		} else if (filterBy.equals("CUSTOM")) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-			accountProfileDTOs = getFilterData(employeePid, fromDateTime, toFateTime);
+			accountProfileDTOs = getFilterData(employeePid, fromDateTime, toFateTime,accountStatus);
 		} else if (filterBy.equals("SINGLE")) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			accountProfileDTOs = getFilterData(employeePid, fromDateTime, fromDateTime);
+			accountProfileDTOs = getFilterData(employeePid, fromDateTime, fromDateTime,accountStatus);
 		}
 		return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 	}
 
-	private List<AccountProfileDTO> getFilterData(String employeePid, LocalDate fDate, LocalDate tDate) {
+	private List<NewlyEditedAccountProfileDTO> getFilterData(String employeePid, LocalDate fDate, LocalDate tDate, String accountStatus) {
 
 		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
@@ -167,13 +182,24 @@ public class EditedAccountProfileResource {
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
+		
+		List<AccountStatus> status = null;
 
-		List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
+		switch (accountStatus) {
+		case "Verified":
+			status = Arrays.asList(AccountStatus.Verified);
+			break;
+		case "Unverified":
+			status = Arrays.asList(AccountStatus.Unverified);
+			break;
+		}
+
+		List<NewlyEditedAccountProfileDTO> accountProfileDTOs = new ArrayList<>();
 		if (userIds.size() > 0) {
 
-			accountProfileDTOs = accountProfileService
-					.findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(companyId, userIds,
-							fromDate, toDate);
+			accountProfileDTOs = newlyEditedaccountProfileService
+					.findByCompanyIdAndUserIdInAndCreatedDateBetweenOrderAndAccountStatusByCreatedDateDesc(companyId, userIds,
+							fromDate, toDate,status);
 
 		}
 		return accountProfileDTOs;

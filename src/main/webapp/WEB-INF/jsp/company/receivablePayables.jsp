@@ -94,9 +94,9 @@
 					<thead>
 						<tr>
 							<th>Account</th>
+							<th>Balance Amount</th>
 							<th>Type</th>
 							<th>Address</th>
-							<th>Blanace Amount</th>
 						</tr>
 					</thead>
 					<tbody id="tBodyReceivablePayable">

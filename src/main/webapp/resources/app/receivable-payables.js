@@ -15,23 +15,22 @@ if (!this.ReceivablePayable) {
 			.ready(
 					function() {
 						// load data
-						
-						
+
 						$("#txtToDate").datepicker({
 							dateFormat : "dd-mm-yy"
 						});
 						$("#txtFromDate").datepicker({
 							dateFormat : "dd-mm-yy"
 						});
-						
+
 						let filterBy = getParameterByName('filterBy');
 						if (filterBy) {
 							$('#dbDateSearch').val(filterBy);
 							// InvoiceWiseReport.filter();
 						}
-						
+
 						$('.selectpicker').selectpicker();
-						
+
 						ReceivablePayable.loadData();
 
 						$('#btnDownload')
@@ -100,28 +99,28 @@ if (!this.ReceivablePayable) {
 																	+ accountPid
 																	+ "'><td class='entypo-down-open-mini'>"
 																	+ receivablePayable1.accountName
-																	+ "</td><td>"
-																	+ receivablePayable1.accountType
-																	+ "</td><td>"
-																	+ receivablePayable1.accountAddress
 																	+ "</td><td id='bAmount"
 																	+ accountPid
 																	+ "' align='right' style='font-weight: bold;'>"
-																	+ +"</td></tr>");
+																	+"</td><td>"
+																	+ receivablePayable1.accountType
+																	+ "</td><td>"
+																	+ receivablePayable1.accountAddress
+																	+ "</td></tr>");
 											$('#tBodyReceivablePayable')
 													.append(
 															"<tr class='collapse' id='"
 																	+ accountPid
-																	+ "'><td colspan='4'><table class='table table-striped table-bordered'><tr><th>Voucher Number</th><th>Voucher Date</th><th>Voucher Amount</th><th>Blanace Amount</th></tr><tbody id='tblReceivable"
+																	+ "'><td colspan='4'><table class='table table-striped table-bordered'><tr><th>Voucher Number</th><th>Voucher Amount</th><th>Balance Amount</th><th>Voucher Date</th></tr><tbody id='tblReceivable"
 																	+ accountPid
-																	+ "'><tr style='background: antiquewhite;font-size: small; font-weight: bold;'><td colspan='2'>Receivables</td><td colspan='2' id='rbAmount"
+																	+ "'><tr style='background: antiquewhite;font-size: small; font-weight: bold;'><td colspan='2'>Receivables</td><td colspan='1' id='rbAmount"
 																	+ accountPid
-																	+ "' align='right'></td></tr></tbody>"
+																	+ "' align='right'></td><td></td></tr></tbody>"
 																	+ "<tbody id='tblPayable"
 																	+ accountPid
-																	+ "'><tr style='background: rgba(180, 232, 168, 0.56);font-size: small; font-weight: bold;'><td colspan='2'>Payable</td><td colspan='2' id='pbAmount"
+																	+ "'><tr style='background: rgba(180, 232, 168, 0.56);font-size: small; font-weight: bold;'><td colspan='2'>Payable</td><td colspan='1' id='pbAmount"
 																	+ accountPid
-																	+ "' align='right'></td></tr></tbody></table></td></tr>");
+																	+ "' align='right'></td><td></td></tr></tbody></table></td></tr>");
 											var receivablesBlanaceAmount = 0;
 											var payableBlanaceAmount = 0;
 											$
@@ -138,11 +137,11 @@ if (!this.ReceivablePayable) {
 																					"<tr><td>"
 																							+ receivablePayable.referenceDocumentNumber
 																							+ "</td><td>"
-																							+ receivablePayable.referenceDocumentDate
-																							+ "</td><td align='right'>"
 																							+ receivablePayable.referenceDocumentAmount
 																							+ "</td><td align='right'>"
 																							+ receivablePayable.referenceDocumentBalanceAmount
+																							+ "</td><td align='right'>"
+																							+ receivablePayable.referenceDocumentDate
 																							+ "</td></tr>");
 																} else if (receivablePayable.receivablePayableType == "Payable") {
 																	payableBlanaceAmount += receivablePayable.referenceDocumentBalanceAmount;
@@ -153,11 +152,11 @@ if (!this.ReceivablePayable) {
 																					"<tr><td>"
 																							+ receivablePayable.referenceDocumentNumber
 																							+ "</td><td>"
-																							+ receivablePayable.referenceDocumentDate
-																							+ "</td><td align='right'>"
 																							+ receivablePayable.referenceDocumentAmount
 																							+ "</td><td align='right'>"
 																							+ receivablePayable.referenceDocumentBalanceAmount
+																							+ "</td><td align='right'>"
+																							+ receivablePayable.referenceDocumentDate
 																							+ "</td></tr>");
 																}
 															});

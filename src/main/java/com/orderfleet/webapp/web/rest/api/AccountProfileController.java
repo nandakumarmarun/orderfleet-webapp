@@ -27,6 +27,7 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
+import com.orderfleet.webapp.domain.NewlyEditedAccountProfile;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
@@ -36,10 +37,12 @@ import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
+import com.orderfleet.webapp.repository.NewlyEditedAccountProfileRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.FileManagerService;
+import com.orderfleet.webapp.service.NewlyEditedAccountProfileService;
 import com.orderfleet.webapp.service.impl.FileManagerException;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.CompanyPerformanceConfigResource;
@@ -75,11 +78,17 @@ public class AccountProfileController {
 
 	private final FileManagerService fileManagerService;
 
+	private final NewlyEditedAccountProfileService newlyEditedAccountProfileService;
+
+	private final NewlyEditedAccountProfileRepository newlyEditedAccountProfileRepository;
+
 	public AccountProfileController(AccountProfileRepository accountProfileRepository,
 			LocationRepository locationRepository, LocationAccountProfileRepository locationAccountProfileRepository,
 			AccountProfileMapper accountProfileMapper, CompanyRepository companyRepository,
 			UserRepository userRepository, FileManagerService fileManagerService,
-			CompanyConfigurationRepository companyConfigurationRepository) {
+			CompanyConfigurationRepository companyConfigurationRepository,
+			NewlyEditedAccountProfileService newlyEditedAccountProfileService,
+			NewlyEditedAccountProfileRepository newlyEditedAccountProfileRepository) {
 		super();
 		this.accountProfileRepository = accountProfileRepository;
 		this.locationRepository = locationRepository;
@@ -89,6 +98,9 @@ public class AccountProfileController {
 		this.userRepository = userRepository;
 		this.fileManagerService = fileManagerService;
 		this.companyConfigurationRepository = companyConfigurationRepository;
+		this.newlyEditedAccountProfileService = newlyEditedAccountProfileService;
+		this.newlyEditedAccountProfileRepository = newlyEditedAccountProfileRepository;
+
 	}
 
 	/**
@@ -217,6 +229,13 @@ public class AccountProfileController {
 			if (opUser.isPresent()) {
 				accountProfile.setUser(opUser.get());
 			}
+
+//			NewlyEditedAccountProfile newlyEditedAccountProfile = newlyEditedAccountProfileService
+//					.accountProfileToNewlyEditedAccountProfile(accountProfile);
+//			newlyEditedAccountProfile.setPid(NewlyEditedAccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+//
+//			newlyEditedAccountProfile = newlyEditedAccountProfileRepository.save(newlyEditedAccountProfile);
+
 			accountProfile = accountProfileRepository.save(accountProfile);
 
 			AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
