@@ -55,7 +55,7 @@ public class UserEcomProductGroupResource {
 	public String getUserProductGroups(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of User ProductGroups");
 
-		List<UserDTO> users = userService.findAllByCompany();
+		List<UserDTO> users = userService.findAllEcomUsersByCompany();
 		model.addAttribute("users", users);
 		model.addAttribute("productGroups", productGroupService.findAllByCompany());
 

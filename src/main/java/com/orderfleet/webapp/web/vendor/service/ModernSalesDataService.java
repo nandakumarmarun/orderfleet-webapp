@@ -319,7 +319,7 @@ public class ModernSalesDataService {
 //			xmlRequest.append("</GROUP>");
 //			xmlRequest.append("<ITEMNAME>");
 ////..................Item name  to be used instead of Alias
-//			xmlRequest.append(ivd.getProduct().getAlias()==null?" ":ivd.getProduct().getAlias());
+//			xmlRequest.append(ivd.getProduct().getName()==null?" ":ivd.getProduct().getName());
 //			xmlRequest.append("</ITEMNAME>");
 //			xmlRequest.append("<QTY>");
 //			xmlRequest.append(ivd.getQuantity());

@@ -97,6 +97,7 @@ import com.orderfleet.webapp.service.StockDetailsService;
 import com.orderfleet.webapp.service.SubFormElementService;
 import com.orderfleet.webapp.service.UserActivityService;
 import com.orderfleet.webapp.service.UserDocumentService;
+import com.orderfleet.webapp.service.UserEcomProductGroupService;
 import com.orderfleet.webapp.service.UserFavouriteDocumentService;
 import com.orderfleet.webapp.service.UserKnowledgebaseFileService;
 import com.orderfleet.webapp.service.UserMobileMenuItemGroupService;
@@ -131,6 +132,7 @@ import com.orderfleet.webapp.web.rest.dto.DocumentPrintDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentProductCategoryDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentStockLocationDTO;
+import com.orderfleet.webapp.web.rest.dto.EcomProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.EcomProductGroupProductDTO;
 import com.orderfleet.webapp.web.rest.dto.EcomProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
@@ -198,6 +200,9 @@ public class MasterDataController {
 
 	@Inject
 	private UserProductGroupService userProductGroupService;
+	
+	@Inject
+	private UserEcomProductGroupService userEcomProductGroupService;
 
 	@Inject
 	private UserProductCategoryService userProductCategoryService;
@@ -642,6 +647,31 @@ public class MasterDataController {
 					.findProductGroupsByUserIsCurrentUserAndProductGroupsActivated(true);
 		} else {
 			productGroupDTOs = userProductGroupService
+					.findProductGroupsByUserIsCurrentUserAndProductGroupActivatedAndProductGroupLastModifiedDate(true,
+							lastSyncdate);
+		}
+		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productGroupDTOs);
+	}
+	
+	
+	/**
+	 * GET /product-groups : get all the productGroups.
+	 *
+	 * @return the ResponseEntity with status 200 (OK) and the list of productGroups
+	 *         in body
+	 */
+	@GetMapping(value = "/ecom-product-groups", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<EcomProductGroupDTO>> getAllEcomProductGroups(
+			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) {
+		log.debug("REST request to get all EcomProductGroups");
+
+		List<EcomProductGroupDTO> productGroupDTOs;
+		if (lastSyncdate == null) {
+			productGroupDTOs = userEcomProductGroupService
+					.findProductGroupsByUserIsCurrentUserAndProductGroupsActivated(true);
+		} else {
+			productGroupDTOs = userEcomProductGroupService
 					.findProductGroupsByUserIsCurrentUserAndProductGroupActivatedAndProductGroupLastModifiedDate(true,
 							lastSyncdate);
 		}

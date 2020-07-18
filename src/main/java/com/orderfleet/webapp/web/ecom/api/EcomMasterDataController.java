@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.ecom.api;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -119,6 +120,23 @@ public class EcomMasterDataController {
 		log.debug("REST request to get all ProductGroupInfoSections");
 		return productGroupInfoSectionService.findAllByCompanyWithRichText();
 	}
+	
+	
+	/**
+	 * GET /product-group-info-sections : get all the productGroupInfoSections.
+	 * This will give info-section with product-groups
+	 * 
+	 * @return the ResponseEntity with status 200 (OK) and the list of
+	 *         productGroupInfoSections in body
+	 */
+	@GetMapping("/ecom-product-group-info-sections")
+	@Timed
+	public List<ProductGroupInfoSectionDTO> getAllEcomProductGroupInfoSections() {
+		log.debug("REST request to get all ProductGroupInfoSections");
+		return Collections.emptyList();
+		//return productGroupInfoSectionService.findAllByCompanyWithRichText();
+	}
+	
 
 	/**
 	 * GET /ecom-product-profile : get all the ecomProductProfile. This will

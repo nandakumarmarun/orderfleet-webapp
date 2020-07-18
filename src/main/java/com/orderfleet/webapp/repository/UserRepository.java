@@ -57,6 +57,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query("select user from User user where user.company.id = ?#{principal.companyId} and user.activated = 'TRUE'")
 	List<User> findAllByCompanyId();
+	
+	@Query("select user from User user join fetch user.authorities a where a.name IN ('ROLE_ECOM_REG') and user.company.id = ?#{principal.companyId} and user.activated = 'TRUE'")
+	List<User> findAllEcomUsersByCompanyId();
 
 	@Query("select user from User user where user.company.id = ?#{principal.companyId} and user.activated = 'TRUE'")
 	Page<User> findAllByCompanyId(Pageable pageable);

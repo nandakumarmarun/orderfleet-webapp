@@ -259,6 +259,30 @@ public class UserService {
 	}
 
 	/**
+	 * Get all the users.
+	 * 
+	 * @return the list of entities
+	 */
+	@Transactional(readOnly = true)
+	public List<UserDTO> findAllEcomUsersByCompany() {
+		log.debug("Request to get all Ecom users");
+		List<User> users = userRepository.findAllEcomUsersByCompanyId();
+		
+		List<UserDTO> result = new ArrayList<>();
+		users.forEach(user -> {
+			UserDTO userDTO = new UserDTO();
+			userDTO.setPid(user.getPid());
+			userDTO.setFirstName(user.getFirstName());
+			userDTO.setLastName(user.getLastName());
+			userDTO.setLogin(user.getLogin());
+			userDTO.setChartColor(user.getChartColor());
+			userDTO.setDashboardUIType(user.getDashboardUIType());
+			result.add(userDTO);
+		});
+		return result;
+	}
+	
+	/**
 	 * Get all the users by company pid.
 	 * 
 	 * @return the list of entities
