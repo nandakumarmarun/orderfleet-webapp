@@ -17,6 +17,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * A Notification
  * 
@@ -39,11 +41,11 @@ public class Notification implements Serializable {
 	@NotNull
 	@Column(name = "pid", unique = true, nullable = false, updatable = false)
 	private String pid;
-	
+
 	@Column(name = "title")
 	private String title;
 
-	@Column(name = "message" ,length = 1024)
+	@Column(name = "message", length = 1024)
 	private String message;
 
 	@Column(name = "is_importent")
@@ -51,7 +53,7 @@ public class Notification implements Serializable {
 
 	@Column(name = "resend_time")
 	private Long resendTime;
-	
+
 	@Column(name = "success", nullable = false, columnDefinition = "int DEFAULT 0")
 	private int success;
 
@@ -62,13 +64,18 @@ public class Notification implements Serializable {
 	@Column(name = "created_date", nullable = false)
 	private LocalDateTime createdDate = LocalDateTime.now();
 
+	@NotNull
+	@Column(name = "last_modified_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@JsonIgnore
+	private LocalDateTime lastModifiedDate = LocalDateTime.now();
+
 	@ManyToOne
 	private User createdBy;
-	
+
 	@ManyToOne
 	@NotNull
 	private Company company;
-	
+
 	@Transient
 	private List<NotificationDetail> notificationDetails = new ArrayList<>();
 
@@ -168,6 +175,12 @@ public class Notification implements Serializable {
 		this.notificationDetails = notificationDetails;
 	}
 
-	
-	
+	public LocalDateTime getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
 }

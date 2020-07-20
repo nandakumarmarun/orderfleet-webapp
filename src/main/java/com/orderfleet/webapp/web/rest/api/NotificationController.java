@@ -72,16 +72,16 @@ public class NotificationController {
 
 	@Inject
 	private UserTaskAssignmentRepository userTaskAssignmentRepository;
-	
+
 	@Inject
 	private NotificationReplyService notificationReplyService;
-	
+
 	@Inject
 	private NotificationDetailRepository notificationDetailRepository;
-	
+
 	@Inject
 	private NotificationRepository notificationRepository;
-	
+
 	@Inject
 	public NotificationController(NotificationMessageRecipientRepository notificationMessageRecipientRepository,
 			UserDeviceRepository userDeviceRepository) {
@@ -135,37 +135,35 @@ public class NotificationController {
 
 	@Timed
 	@RequestMapping(value = "/chat-reply-notifications", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> chatReplyNotification(
-			@Valid @RequestBody NotificationReplyDTO notificationReplyDTO) {
+	public ResponseEntity<String> chatReplyNotification(@Valid @RequestBody NotificationReplyDTO notificationReplyDTO) {
 		log.debug("Web request to save NotificationReply start");
 
 		if (notificationReplyDTO == null) {
 			return new ResponseEntity<>("Chat Reply Failed", HttpStatus.OK);
 		}
-		log.info(notificationReplyDTO.getMessage() + "************"+ notificationReplyDTO.getNotificationPid());
-		NotificationReply notificationReply = 
-				notificationReplyService.saveNotificationReply(notificationReplyDTO);
-		if(notificationReply != null) {
+		log.info(notificationReplyDTO.getMessage() + "************" + notificationReplyDTO.getNotificationPid());
+		NotificationReply notificationReply = notificationReplyService.saveNotificationReply(notificationReplyDTO);
+		if (notificationReply != null) {
 			return new ResponseEntity<>("Chat Reply Success", HttpStatus.OK);
-		}else {
+		} else {
 			return new ResponseEntity<>("Chat Reply Failed", HttpStatus.OK);
 		}
-			
+
 	}
-	
+
 	@Timed
 	@RequestMapping(value = "/chat-reply-read-status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> chatReplyNotificationReadStatus(
-			@Valid @RequestBody List<String> notificationPids) {
+	public ResponseEntity<String> chatReplyNotificationReadStatus(@Valid @RequestBody List<String> notificationPids) {
 		log.debug("Web request to save NotificationReply start");
 
-		if (notificationPids == null || notificationPids.size()==0) {
+		if (notificationPids == null || notificationPids.size() == 0) {
 			return new ResponseEntity<>("Empty data present", HttpStatus.OK);
 		}
-		log.info(notificationPids.size() + "************"+ "notifications updating to read status");
-		
+		log.info(notificationPids.size() + "************" + "notifications updating to read status");
+
 		List<Long> notificationIds = notificationRepository.findNotificationIdByPids(notificationPids);
-		notificationDetailRepository.updateNotificationReadStatus(MessageStatus.READ,notificationIds);
+		notificationDetailRepository.updateNotificationReadStatus(MessageStatus.READ, notificationIds,
+				LocalDateTime.now());
 		return new ResponseEntity<>("Notification status updated", HttpStatus.OK);
 	}
 

@@ -7,7 +7,9 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.Notification;
 
@@ -35,5 +37,10 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 	
 	@Query("select notification.id from Notification notification where notification.pid IN ?1")
 	List<Long> findNotificationIdByPids(List<String> notificationPids);
+
+	@Transactional
+	@Modifying
+	@Query("UPDATE Notification notification SET notification.lastModifiedDate =?1 where notification.id = ?2")
+	int updateNotificationLastModifiedDate(LocalDateTime now,Long id);
 
 }

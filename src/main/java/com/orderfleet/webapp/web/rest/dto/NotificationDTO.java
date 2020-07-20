@@ -17,9 +17,9 @@ import com.orderfleet.webapp.domain.enums.MessageStatus;
 public class NotificationDTO {
 
 	private String pid;
-	
+
 	private String title;
-	
+
 	@NotNull
 	private String message;
 	private boolean isImportant;
@@ -27,18 +27,18 @@ public class NotificationDTO {
 	private List<String> users;
 	private String executiveName;
 	private LocalDateTime createdDate;
+	private LocalDateTime lastModifiedDate;
 	private String sendUserName;
 	private String sendExecutiveName;
 	private MessageStatus msgStatus;
 	private String errorCode;
 	private String failedReason;
-	
-	
-	
+	private LocalDateTime lastModifiedDateDetail;
+
 	public NotificationDTO() {
 		super();
 	}
-	
+
 	public NotificationDTO(Notification notification) {
 		super();
 		this.pid = notification.getPid();
@@ -46,6 +46,7 @@ public class NotificationDTO {
 		this.isImportant = notification.getIsImportant();
 		this.resendTime = notification.getResendTime();
 		this.createdDate = notification.getCreatedDate();
+		this.lastModifiedDate = notification.getLastModifiedDate();
 		this.title = notification.getTitle();
 	}
 
@@ -151,6 +152,22 @@ public class NotificationDTO {
 
 	public void setFailedReason(String failedReason) {
 		this.failedReason = failedReason;
+	}
+
+	public LocalDateTime getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public LocalDateTime getLastModifiedDateDetail() {
+		return lastModifiedDateDetail;
+	}
+
+	public void setLastModifiedDateDetail(LocalDateTime lastModifiedDateDetail) {
+		this.lastModifiedDateDetail = lastModifiedDateDetail;
 	}
 
 	@Override

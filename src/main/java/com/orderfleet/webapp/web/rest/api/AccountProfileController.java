@@ -230,13 +230,12 @@ public class AccountProfileController {
 				accountProfile.setUser(opUser.get());
 			}
 
-//			NewlyEditedAccountProfile newlyEditedAccountProfile = newlyEditedAccountProfileService
-//					.accountProfileToNewlyEditedAccountProfile(accountProfile);
-//			newlyEditedAccountProfile.setPid(NewlyEditedAccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-//
-//			newlyEditedAccountProfile = newlyEditedAccountProfileRepository.save(newlyEditedAccountProfile);
+			NewlyEditedAccountProfile newlyEditedAccountProfile = newlyEditedAccountProfileService
+					.accountProfileToNewlyEditedAccountProfile(accountProfileDTO, exisitingAccountProfile);
 
-			accountProfile = accountProfileRepository.save(accountProfile);
+			newlyEditedAccountProfile = newlyEditedAccountProfileRepository.save(newlyEditedAccountProfile);
+
+			// accountProfile = accountProfileRepository.save(accountProfile);
 
 			AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
 			return new ResponseEntity<>(result, HttpStatus.CREATED);

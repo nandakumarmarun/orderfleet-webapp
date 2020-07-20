@@ -216,72 +216,93 @@ public class NewlyEditedAccountProfileDTO {
 
 		this.pid = newlyEditedAccountProfile.getAccountProfile().getPid();
 		this.name = newlyEditedAccountProfile.getAccountProfile().getName();
-		this.alias = newlyEditedAccountProfile.getAccountProfile().getAlias();
+		this.alias = newlyEditedAccountProfile.getAccountProfile().getAlias() != null
+				? newlyEditedAccountProfile.getAccountProfile().getAlias()
+				: "-";
 		this.userName = newlyEditedAccountProfile.getAccountProfile().getUser().getFirstName();
-		this.description = newlyEditedAccountProfile.getAccountProfile().getDescription();
+		this.description = newlyEditedAccountProfile.getAccountProfile().getDescription() != null
+				? newlyEditedAccountProfile.getAccountProfile().getDescription()
+				: "-";
+		;
 		this.accountTypeName = newlyEditedAccountProfile.getAccountProfile().getName();
-		this.address = newlyEditedAccountProfile.getAccountProfile().getAddress();
-		this.city = newlyEditedAccountProfile.getAccountProfile().getCity();
-		this.pin = newlyEditedAccountProfile.getAccountProfile().getPin();
-		this.phone1 = newlyEditedAccountProfile.getAccountProfile().getPhone1();
+		this.address = newlyEditedAccountProfile.getAccountProfile().getAddress() != null
+				? newlyEditedAccountProfile.getAccountProfile().getAddress()
+				: "-";
+		;
+		this.city = newlyEditedAccountProfile.getAccountProfile().getCity() != null
+				? newlyEditedAccountProfile.getAccountProfile().getCity()
+				: "-";
+		;
+		this.pin = newlyEditedAccountProfile.getAccountProfile().getPin() != null
+				? newlyEditedAccountProfile.getAccountProfile().getPin()
+				: "-";
+		;
+		this.phone1 = newlyEditedAccountProfile.getAccountProfile().getPhone1() != null
+				? newlyEditedAccountProfile.getAccountProfile().getPhone1()
+				: "-";
+		;
 		this.phone2 = newlyEditedAccountProfile.getAccountProfile().getPhone2();
-		this.email1 = newlyEditedAccountProfile.getAccountProfile().getEmail1();
-		this.email2 = newlyEditedAccountProfile.getAccountProfile().getEmail2();
+		this.email1 = newlyEditedAccountProfile.getAccountProfile().getEmail1() != null
+				? newlyEditedAccountProfile.getAccountProfile().getEmail1()
+				: "-";
+		;
+		this.email2 = newlyEditedAccountProfile.getAccountProfile().getEmail2() != null
+				? newlyEditedAccountProfile.getAccountProfile().getEmail2()
+				: "-";
+		;
 		this.whatsAppNo = newlyEditedAccountProfile.getAccountProfile().getWhatsAppNo();
 		this.accountStatus = newlyEditedAccountProfile.getAccountProfile().getAccountStatus();
 		this.creditDays = newlyEditedAccountProfile.getAccountProfile().getCreditDays();
 		this.creditLimit = newlyEditedAccountProfile.getAccountProfile().getCreditLimit();
-		this.contactPerson = newlyEditedAccountProfile.getAccountProfile().getContactPerson();
+		this.contactPerson = newlyEditedAccountProfile.getAccountProfile().getContactPerson() != null
+				? newlyEditedAccountProfile.getAccountProfile().getContactPerson()
+				: "-";
+		this.tinNo = newlyEditedAccountProfile.getAccountProfile().getTinNo() != null
+				? newlyEditedAccountProfile.getAccountProfile().getTinNo()
+				: "-";
+
 		this.lastModifiedDate = newlyEditedAccountProfile.getAccountProfile().getLastModifiedDate();
 		this.createdDate = newlyEditedAccountProfile.getAccountProfile().getCreatedDate();
-		this.defaultDiscountPercentage = getDefaultDiscountPercentage();
+		this.defaultDiscountPercentage = newlyEditedAccountProfile.getAccountProfile().getDefaultDiscountPercentage();
 		this.dataSourceType = newlyEditedAccountProfile.getAccountProfile().getDataSourceType();
 
 		this.newlyEditedPid = newlyEditedAccountProfile.getPid();
 		this.newlyEditedName = newlyEditedAccountProfile.getName();
-		this.newlyEditedAlias = newlyEditedAccountProfile.getAlias().equalsIgnoreCase(
-				newlyEditedAccountProfile.getAccountProfile().getAlias()) ? "-" : newlyEditedAccountProfile.getAlias();
+		this.newlyEditedAlias = newlyEditedAccountProfile.getAlias() != null
+				&& newlyEditedAccountProfile.getAlias().equalsIgnoreCase(getAlias()) ? "-"
+						: newlyEditedAccountProfile.getAlias();
 		this.newlyEditedUserName = newlyEditedAccountProfile.getUser().getFirstName();
-		this.newlyEditedDescription = newlyEditedAccountProfile.getDescription()
-				.equalsIgnoreCase(newlyEditedAccountProfile.getAccountProfile().getDescription()) ? "-"
+		this.newlyEditedDescription = newlyEditedAccountProfile.getDescription() != null
+				&& newlyEditedAccountProfile.getDescription().equalsIgnoreCase(getDescription()) ? "-"
 						: newlyEditedAccountProfile.getDescription();
 		this.newlyEditedAccountTypeName = newlyEditedAccountProfile.getName();
-		this.newlyEditedAddress = newlyEditedAccountProfile.getAddress()
-				.equalsIgnoreCase(newlyEditedAccountProfile.getAccountProfile().getAddress()) ? "-"
+		this.newlyEditedAddress = newlyEditedAccountProfile.getAddress() != null
+				&& newlyEditedAccountProfile.getAddress().equalsIgnoreCase(getAddress()) ? "-"
 						: newlyEditedAccountProfile.getAddress();
-		this.newlyEditedCity = newlyEditedAccountProfile.getCity().equalsIgnoreCase(
-				newlyEditedAccountProfile.getAccountProfile().getCity()) ? "-" : newlyEditedAccountProfile.getCity();
-		this.newlyEditedPin = newlyEditedAccountProfile.getPin().equalsIgnoreCase(
-				newlyEditedAccountProfile.getAccountProfile().getPin()) ? "-" : newlyEditedAccountProfile.getPin();
-		this.newlyEditedPhone1 = newlyEditedAccountProfile.getPhone1()
-				.equalsIgnoreCase(newlyEditedAccountProfile.getAccountProfile().getPhone1()) ? "-"
+		this.newlyEditedCity = newlyEditedAccountProfile.getCity() != null
+				&& newlyEditedAccountProfile.getCity().equalsIgnoreCase(getCity()) ? "-"
+						: newlyEditedAccountProfile.getCity();
+		this.newlyEditedPin = newlyEditedAccountProfile.getPin() != null
+				&& newlyEditedAccountProfile.getPin().equalsIgnoreCase(getPin()) ? "-"
+						: newlyEditedAccountProfile.getPin();
+		this.newlyEditedPhone1 = newlyEditedAccountProfile.getPhone1() != null
+				&& newlyEditedAccountProfile.getPhone1().equalsIgnoreCase(getPhone1()) ? "-"
 						: newlyEditedAccountProfile.getPhone1();
-		this.newlyEditedPhone2 = newlyEditedAccountProfile.getPhone2()
-				.equalsIgnoreCase(newlyEditedAccountProfile.getAccountProfile().getPhone2()) ? "-"
-						: newlyEditedAccountProfile.getPhone2();
-		this.newlyEditedEmail1 = newlyEditedAccountProfile.getEmail1()
-				.equalsIgnoreCase(newlyEditedAccountProfile.getAccountProfile().getEmail1()) ? "-"
+		this.newlyEditedEmail1 = newlyEditedAccountProfile.getEmail1() != null
+				&& newlyEditedAccountProfile.getEmail1().equalsIgnoreCase(getEmail1()) ? "-"
 						: newlyEditedAccountProfile.getEmail1();
-		this.newlyEditedEmail2 = newlyEditedAccountProfile.getEmail2()
-				.equalsIgnoreCase(newlyEditedAccountProfile.getAccountProfile().getEmail2()) ? "-"
+		this.newlyEditedEmail2 = newlyEditedAccountProfile.getEmail2() != null
+				&& newlyEditedAccountProfile.getEmail2().equalsIgnoreCase(getEmail2()) ? "-"
 						: newlyEditedAccountProfile.getEmail2();
-		this.newlyEditedWhatsAppNo = newlyEditedAccountProfile.getWhatsAppNo()
-				.equalsIgnoreCase(newlyEditedAccountProfile.getAccountProfile().getWhatsAppNo()) ? "-"
-						: newlyEditedAccountProfile.getWhatsAppNo();
 		this.newlyEditedAccountStatus = newlyEditedAccountProfile.getAccountStatus();
-		this.newlyEditedCreditDays = newlyEditedAccountProfile.getCreditDays() == newlyEditedAccountProfile
-				.getAccountProfile().getCreditDays() ? 0 : newlyEditedAccountProfile.getCreditDays();
-		this.newlyEditedCreditLimit = newlyEditedAccountProfile.getCreditLimit() == newlyEditedAccountProfile
-				.getAccountProfile().getCreditLimit() ? 0 : newlyEditedAccountProfile.getCreditLimit();
-		this.newlyEditedContactPerson = newlyEditedAccountProfile.getContactPerson()
-				.equalsIgnoreCase(newlyEditedAccountProfile.getAccountProfile().getContactPerson()) ? "-"
+		this.newlyEditedContactPerson = newlyEditedAccountProfile.getContactPerson() != null
+				&& newlyEditedAccountProfile.getContactPerson().equalsIgnoreCase(getContactPerson()) ? "-"
 						: newlyEditedAccountProfile.getContactPerson();
 		this.newlyEditedLastModifiedDate = newlyEditedAccountProfile.getLastModifiedDate();
 		this.newlyEditedCreatedDate = newlyEditedAccountProfile.getCreatedDate();
-		this.newlyEditedDefaultDiscountPercentage = newlyEditedAccountProfile
-				.getDefaultDiscountPercentage() == newlyEditedAccountProfile.getAccountProfile()
-						.getDefaultDiscountPercentage() ? 0.0
-								: newlyEditedAccountProfile.getDefaultDiscountPercentage();
+		this.tinNo = newlyEditedAccountProfile.getTinNo() != null
+				&& getTinNo().equalsIgnoreCase(newlyEditedAccountProfile.getAccountProfile().getTinNo()) ? "-"
+						: newlyEditedAccountProfile.getTinNo();
 		this.newlyEditedDataSourceType = newlyEditedAccountProfile.getDataSourceType();
 	}
 

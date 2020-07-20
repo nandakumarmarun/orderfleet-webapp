@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | EditedAccountProfile</title>
+<title>SalesNrich | NewlyEditedAccountProfile</title>
 <style type="text/css">
 .error {
 	color: red;
@@ -26,7 +26,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Edited Account Profile</h2>
+			<h2>Newly Edited Account Profile</h2>
 			<div class="row">
 				<div class="col-sm-2">
 					Employee<select id="dbEmployee" name="employeePid"
@@ -40,13 +40,20 @@
 
 				<div class="col-sm-2">
 					<br /> <select class="form-control" id="dbDateSearch"
-						onchange="EditedAccountProfile.showDatePicker()">
+						onchange="NewlyEditedAccountProfile.showDatePicker()">
 						<option value="TODAY">Today</option>
 						<option value="YESTERDAY">Yesterday</option>
 						<option value="WTD">WTD</option>
 						<option value="MTD">MTD</option>
 						<option value="SINGLE">Single Date</option>
 						<option value="CUSTOM">CUSTOM</option>
+					</select>
+				</div>
+				<div class="col-sm-2">
+					Status <select id="dbStatus" name="accountStatus"
+						class="form-control">
+						<option value="Unverified">Unverified</option>
+						<option value="Verified">Verified</option>
 					</select>
 				</div>
 				<div class="col-sm-2 hide custom_date1">
@@ -75,7 +82,14 @@
 				<div class="col-sm-1">
 					<br />
 					<button type="button" class="btn btn-info"
-						onclick="EditedAccountProfile.filter()">Apply</button>
+						onclick="NewlyEditedAccountProfile.filter()">Apply</button>
+				</div>
+				<div class="col-sm-1">
+					<br />
+					<button type="button" class="btn btn-orange" id="btnDownload"
+						title="download xlsx">
+						<i class="entypo-download"></i> download
+					</button>
 				</div>
 				<br>
 				<div class="col-sm-4 ">
@@ -90,7 +104,11 @@
 				</div>
 			</div>
 			<br>
+			<div id='loader' class="modal fade container">
 
+				<img src='/resources/assets/images/Spinner.gif'>
+
+			</div>
 
 			<div class="clearfix"></div>
 			<hr />
@@ -102,18 +120,29 @@
 							<th>Name</th>
 							<th>Edited By</th>
 							<th>Edited On</th>
-							<th>Edited From</th>
+							<th>Gst No</th>
+							<th>Edited Gst No</th>
+							<th>Description</th>
+							<th>Edited Description</th>
 							<th>Alias</th>
+							<th>Edited Alias</th>
 							<th>Address</th>
-							<th>Type</th>
-							<th>Phone</th>
-							<th>Email</th>
+							<th>Edited Address</th>
 							<th>City</th>
-							<th>Location</th>
-							<th>Date</th>
-							<th>GST Number</th>
-							<th>Activated Status</th>
+							<th>Edited City</th>
+							<th>Pin Code</th>
+							<th>Edited Pin Code</th>
+							<th>Phone No.</th>
+							<th>Edited Phone No.</th>
+							<th>Email1</th>
+							<th>Edited Email1</th>
+							<th>Email2</th>
+							<th>Edited Email2</th>
+							<th>Contact Person</th>
+							<th>Edited Contact Person</th>
+							<th>Account Status</th>
 							<th>Actions</th>
+
 						</tr>
 					</thead>
 					<tbody id="tBodyEditedAccountProfile">
@@ -126,7 +155,7 @@
 			<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
 
-			<spring:url value="/web/edit-account-profile"
+			<spring:url value="/web/newly-edited-account-profile"
 				var="urlEditAccountProfile"></spring:url>
 
 
@@ -140,8 +169,8 @@
 								aria-label="Close">
 								<span aria-hidden="true">&times;</span>
 							</button>
-							<h4 class="modal-title" id="myModalLabel">View
-								Account Profile</h4>
+							<h4 class="modal-title" id="myModalLabel">View Account
+								Profile</h4>
 						</div>
 						<div class="modal-body" style="height: 500px; overflow: auto;">
 							<div class="alert alert-danger alert-dismissible" role="alert"
@@ -158,109 +187,127 @@
 								</dt>
 								<dd>
 									<span id="field_name"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Alias</span>
 								</dt>
 								<dd>
 									<span id="field_alias"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Account Type</span>
 								</dt>
 								<dd>
 									<span id="field_accountType"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Price Level</span>
 								</dt>
 								<dd>
 									<span id="field_priceLevel"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>City</span>
 								</dt>
 								<dd>
 									<span id="field_city"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Location</span>
 								</dt>
 								<dd>
 									<span id="field_location"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Pin</span>
 								</dt>
 								<dd>
 									<span id="field_pin"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Phone 1</span>
 								</dt>
 								<dd>
 									<span id="field_phone1"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Phone 2</span>
 								</dt>
 								<dd>
 									<span id="field_phone2"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Email 1</span>
 								</dt>
 								<dd>
 									<span id="field_email1"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Email 2</span>
 								</dt>
 								<dd>
 									<span id="field_email2"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>WhatsApp No</span>
 								</dt>
 								<dd>
 									<span id="field_whatsAppNo"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Address</span>
 								</dt>
 								<dd>
 									<span id="field_address"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Description</span>
 								</dt>
 								<dd>
 									<span id="field_description"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Credit Days</span>
 								</dt>
 								<dd>
 									<span id="field_creditDays"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Credit Limit</span>
 								</dt>
 								<dd>
 									<span id="field_creditLimit"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Default Discount %</span>
 								</dt>
 								<dd>
 									<span id="field_defaultDiscountPercentage"></span>
-								</dd><hr/>
+								</dd>
+								<hr />
 								<dt>
 									<span>Contact Person</span>
 								</dt>
 								<dd>
 									<span id="field_contactPerson"></span>
-								</dd>><hr/>
+								</dd>
+								<hr />
 							</dl>
 
 						</div>
@@ -280,7 +327,7 @@
 		var="table2excel"></spring:url>
 	<script type="text/javascript" src="${table2excel}"></script>
 
-	<spring:url value="/resources/app/edit-account-profile.js"
+	<spring:url value="/resources/app/newly-edited-account-profile.js"
 		var="editAccountProfileJs"></spring:url>
 	<script type="text/javascript" src="${editAccountProfileJs}"></script>
 </body>

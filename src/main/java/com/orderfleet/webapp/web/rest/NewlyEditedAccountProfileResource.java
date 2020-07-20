@@ -32,10 +32,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.NewlyEditedAccountProfile;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
+import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.EmployeeHierarchyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.NewlyEditedAccountProfileRepository;
@@ -49,7 +54,9 @@ import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.NewlyEditedAccountProfileService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.NewlyEditedAccountProfileDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 @Controller
@@ -60,6 +67,9 @@ public class NewlyEditedAccountProfileResource {
 
 	@Inject
 	private AccountProfileService accountProfileService;
+
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
 
 	@Inject
 	private NewlyEditedAccountProfileService newlyEditedaccountProfileService;
@@ -87,6 +97,9 @@ public class NewlyEditedAccountProfileResource {
 
 	@Inject
 	private EmployeeHierarchyRepository employeeHierarchyRepository;
+
+	@Inject
+	private AccountProfileMapper accountProfileMapper;
 
 	/**
 	 * GET /verify-account-profile : get all the VerifyAccountProfiles.
@@ -128,35 +141,75 @@ public class NewlyEditedAccountProfileResource {
 	@Timed
 	public ResponseEntity<List<NewlyEditedAccountProfileDTO>> filterAccountProfileDTOs(
 			@RequestParam("employeePid") String employeePid, @RequestParam("filterBy") String filterBy,
-			@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate,@RequestParam("accountStatus") String accountStatus) {
+			@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate,
+			@RequestParam("accountStatus") String accountStatus) {
 		log.debug("Web request to filter account profiles");
 		List<NewlyEditedAccountProfileDTO> accountProfileDTOs = new ArrayList<NewlyEditedAccountProfileDTO>();
 		if (filterBy.equals("TODAY")) {
-			accountProfileDTOs = getFilterData(employeePid, LocalDate.now(), LocalDate.now(),accountStatus);
+			accountProfileDTOs = getFilterData(employeePid, LocalDate.now(), LocalDate.now(), accountStatus);
 		} else if (filterBy.equals("YESTERDAY")) {
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			accountProfileDTOs = getFilterData(employeePid, yeasterday, yeasterday,accountStatus);
+			accountProfileDTOs = getFilterData(employeePid, yeasterday, yeasterday, accountStatus);
 		} else if (filterBy.equals("WTD")) {
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			accountProfileDTOs = getFilterData(employeePid, weekStartDate, LocalDate.now(),accountStatus);
+			accountProfileDTOs = getFilterData(employeePid, weekStartDate, LocalDate.now(), accountStatus);
 		} else if (filterBy.equals("MTD")) {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			accountProfileDTOs = getFilterData(employeePid, monthStartDate, LocalDate.now(),accountStatus);
+			accountProfileDTOs = getFilterData(employeePid, monthStartDate, LocalDate.now(), accountStatus);
 		} else if (filterBy.equals("CUSTOM")) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-			accountProfileDTOs = getFilterData(employeePid, fromDateTime, toFateTime,accountStatus);
+			accountProfileDTOs = getFilterData(employeePid, fromDateTime, toFateTime, accountStatus);
 		} else if (filterBy.equals("SINGLE")) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			accountProfileDTOs = getFilterData(employeePid, fromDateTime, fromDateTime,accountStatus);
+			accountProfileDTOs = getFilterData(employeePid, fromDateTime, fromDateTime, accountStatus);
 		}
 		return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 	}
 
-	private List<NewlyEditedAccountProfileDTO> getFilterData(String employeePid, LocalDate fDate, LocalDate tDate, String accountStatus) {
+	@RequestMapping(value = "/newly-edited-account-profiles/updateAccountProfileStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<NewlyEditedAccountProfileDTO> updateAccountProfileStatus(@RequestParam String pid) {
+		
+		log.info("Update Account Profile Status: "+pid);
+
+		newlyEditedaccountProfileRepository.updateAccountProfileStatus(AccountStatus.Verified, pid);
+
+		Optional<NewlyEditedAccountProfile> opNewlyEditedAccountProfile = newlyEditedaccountProfileRepository
+				.findOneByPid(pid);
+
+		if (opNewlyEditedAccountProfile.isPresent()) {
+
+			AccountProfileDTO accountProfileDTO = newlyEditedaccountProfileService
+					.newlyEditedAccountProfileToAccountProfileDTO(opNewlyEditedAccountProfile.get());
+
+			Optional<AccountProfile> exisitingAccountProfile = accountProfileRepository
+					.findOneByPid(opNewlyEditedAccountProfile.get().getAccountProfile().getPid());
+			if (exisitingAccountProfile.isPresent()) {
+
+				AccountProfile accountProfile = accountProfileMapper
+						.accountProfileDTOToAccountProfile(accountProfileDTO);
+				accountProfile.setId(exisitingAccountProfile.get().getId());
+				accountProfile.setCompany(opNewlyEditedAccountProfile.get().getCompany());
+				accountProfile.setDataSourceType(DataSourceType.MOBILE);
+				Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+
+				if (opUser.isPresent()) {
+					accountProfile.setUser(opUser.get());
+				}
+
+				accountProfile = accountProfileRepository.save(accountProfile);
+			}
+		}
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
+	}
+
+	private List<NewlyEditedAccountProfileDTO> getFilterData(String employeePid, LocalDate fDate, LocalDate tDate,
+			String accountStatus) {
 
 		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
@@ -182,7 +235,7 @@ public class NewlyEditedAccountProfileResource {
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
-		
+
 		List<AccountStatus> status = null;
 
 		switch (accountStatus) {
@@ -198,8 +251,8 @@ public class NewlyEditedAccountProfileResource {
 		if (userIds.size() > 0) {
 
 			accountProfileDTOs = newlyEditedaccountProfileService
-					.findByCompanyIdAndUserIdInAndCreatedDateBetweenOrderAndAccountStatusByCreatedDateDesc(companyId, userIds,
-							fromDate, toDate,status);
+					.findByCompanyIdAndUserIdInAndCreatedDateBetweenOrderAndAccountStatusByCreatedDateDesc(companyId,
+							userIds, fromDate, toDate, status);
 
 		}
 		return accountProfileDTOs;

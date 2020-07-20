@@ -128,7 +128,7 @@ public class NewlyEditedAccountProfile implements Serializable, Cloneable {
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "account_status", nullable = false, columnDefinition = "character varying DEFAULT 'Unverified'")
-	private AccountStatus accountStatus = AccountStatus.Unverified;
+	private AccountStatus accountStatus;
 
 	@NotNull
 	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")

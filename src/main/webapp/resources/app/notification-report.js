@@ -29,12 +29,12 @@ if (!this.Notification) {
 		}
 
 		let empPids = $('#dbEmployee').val();
-		if("no" == empPids){
+		if ("no" == empPids) {
 			empPids = $('#dbEmployee option').map(function() {
-				if($(this).val() != 'no'){
+				if ($(this).val() != 'no') {
 					return $(this).val();
 				}
-		    }).get().join(',');
+			}).get().join(',');
 		}
 		$('#tBodyNotification').html(
 				"<tr><td colspan='7' align='center'>Please wait...</td></tr>");
@@ -58,25 +58,36 @@ if (!this.Notification) {
 							return;
 						}
 						console.log(notifications);
-						
+
 						$
 								.each(
 										notifications,
 										function(index, notification) {
 											let importent = "";
+											var resendTime = "-";
 											if (notification.isImportant) {
 												importent = "important";
+												resendTime = convertDateTimeFromServer(notification.lastModifiedDate);
+
 											} else {
 												importent = "not important";
 											}
 											let status;
-											if(notification.msgStatus == "NONE") {
-												status = "<span class='label label-default'>"+ notification.msgStatus +"</span>";
-											} else if(notification.msgStatus == "FAILED") {
-												status = "<span class='label label-danger'>"+ notification.msgStatus +"</span>";
-												status += "<br />" + notification.failedReason;
+											if (notification.msgStatus == "NONE") {
+												status = "<span class='label label-default'>"
+														+ notification.msgStatus
+														+ "</span>";
+
+											} else if (notification.msgStatus == "FAILED") {
+												status = "<span class='label label-danger'>"
+														+ notification.msgStatus
+														+ "</span>";
+												status += "<br />"
+														+ notification.failedReason;
 											} else {
-												status = "<span class='label label-success'>"+ notification.msgStatus +"</span>";
+												status = "<span class='label label-success'>"
+														+ notification.msgStatus
+														+ "</span>";
 											}
 											$('#tBodyNotification')
 													.append(
@@ -87,11 +98,15 @@ if (!this.Notification) {
 																	+ "</td><td>"
 																	+ importent
 																	+ "</td><td>"
+																	+ resendTime
+																	+ "</td><td>"
 																	+ notification.title
 																	+ "</td><td>"
 																	+ notification.message
 																	+ "</td><td>"
 																	+ status
+																	+ "</td><td>"
+																	+ convertDateTimeFromServer(notification.lastModifiedDateDetail)
 																	+ "</td></tr>");
 										});
 

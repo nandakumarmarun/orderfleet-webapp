@@ -26,33 +26,29 @@ public class NotificationDetailDto {
 	private Long id;
 
 	private NotificationDTO notification;
-	
+
 	private Long userDeviceId;
 
 	private MessageStatus messageStatus = MessageStatus.NONE;
-	
+
 	private String errorCode;
-	
+
 	private String failedReason;
-	
+
 	private String fcmKey;
 
 	private Long userId;
-	
+
 	private String userName;
-	
+
 	private String userPid;
 
 	private long companyId;
 
 	private String createdDate;
-	
+
 	List<NotificationReplyDTO> notificationReplyDtoList;
 
-	
-	
-	
-	
 	public NotificationDetailDto(NotificationDetail notificationDetail) {
 		super();
 		this.id = notificationDetail.getId();
@@ -131,7 +127,7 @@ public class NotificationDetailDto {
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-	
+
 	public String getUserName() {
 		return userName;
 	}
@@ -163,7 +159,7 @@ public class NotificationDetailDto {
 	public void setCreatedDate(String createdDate) {
 		this.createdDate = createdDate;
 	}
-	
+
 	public List<NotificationReplyDTO> getNotificationReplyDtoList() {
 		return notificationReplyDtoList;
 	}
@@ -179,9 +175,5 @@ public class NotificationDetailDto {
 				+ ", fcmKey=" + fcmKey + ", userId=" + userId + ", userPid=" + userPid + ", companyId=" + companyId
 				+ ", createdDate=" + createdDate + "]";
 	}
-	
-	
-	
-	
 
 }

@@ -100,9 +100,11 @@
 						<th>Employee</th>
 						<th>Sent Time</th>
 						<th>Priority</th>
+						<th>Resend Time</th>
 						<th>Title</th>
 						<th>Message</th>
 						<th>Status</th>
+						<th>Last Status Received</th>
 					</tr>
 				</thead>
 				<tbody id="tBodyNotification">

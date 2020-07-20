@@ -1,11 +1,11 @@
-if (!this.EditedAccountProfile) {
-	this.EditedAccountProfile = {};
+if (!this.NewlyEditedAccountProfile) {
+	this.NewlyEditedAccountProfile = {};
 }
 
 (function() {
 	'use strict';
 
-	var editedAccountProfileContextPath = location.protocol + '//' + location.host
+	var newlyEditedAccountProfileContextPath = location.protocol + '//' + location.host
 	+ location.pathname;
 	
 
@@ -15,26 +15,38 @@ if (!this.EditedAccountProfile) {
 			searchTable($("#search").val());
 		});
 		
-		EditedAccountProfile.filter();
+		NewlyEditedAccountProfile.filter();
 
-		$('#btnDownload')
-			.on(
-				'click',
-				function() {
-					var tblEditedAccountProfile = $("#tblEditedAccountProfile tbody");
-					if (tblEditedAccountProfile
-							.children().length == 0) {
-						alert("no values available");
-						return;
-					}
-					if (tblEditedAccountProfile[0].textContent == "No data available") {
-						alert("no values available");
-						return;
-					}
+		$('#btnDownload').on('click',function() {
+			var tblAccountProfile = $("#tblEditedAccountProfile tbody");
 
-					downloadXls();
-					
-				});
+			if (tblAccountProfile
+					.children().length == 0) {
+				alert("no values available");
+				return;
+			}
+			if (tblAccountProfile[0].textContent == "No data available") {
+				alert("no values available");
+				return;
+			}
+			
+			var data = [];
+			var i = 0;
+			$('#tblEditedAccountProfile').find('.userName').each(function(){
+				 data[i] = $(this).html();
+				$(this).html(data[i].replace(" ",""));
+				i++;
+			});
+			
+			downloadXls();
+			
+			i = 0;
+			$('#tblEditedAccountProfile').find('.userName').each(function(){
+				$(this).html(data[i]);
+				i++;
+			});
+			
+		});
 		
 		$("#txtToDate").datepicker({
 			dateFormat : "dd-mm-yy"
@@ -44,13 +56,18 @@ if (!this.EditedAccountProfile) {
 		});
 
 	});
+	
+	
 
 	function downloadXls() {
 		// Avoid last column in each row
 		$("#tblEditedAccountProfile th:last-child, #tblEditedAccountProfile td:last-child").hide();
+		
+		
 		var excelName = "editedAccountProfile";
 		var table2excel = new Table2Excel();
-		    table2excel.export(document.getElementById('tblEditedAccountProfile'),excelName);
+		
+		table2excel.export(document.getElementById('tblEditedAccountProfile'),excelName);
 		$("#tblEditedAccountProfile th:last-child, #tblEditedAccountProfile td:last-child").show();
 	}
 
@@ -126,40 +143,110 @@ if (!this.EditedAccountProfile) {
 			.each(
 				accountProfiles,
 				function(index, accountProfile) {
+					
+					var tdNewlyEditedAlias=""; var tdNewlyEditedTinNo="";var tdNewlyEditedDescription="";var tdNewlyEditedAddress="";var tdNewlyEditedCity="";
+					var tdNewlyEditedPin="";var tdNewlyEditedPhone1="";var tdNewlyEditedEmail1="";var tdNewlyEditedEmail2="";var tdNewlyEditedContactPerson="";
+					
+					if(accountProfile.newlyEditedTinNo != "-"){
+						tdNewlyEditedAlias="yellow";
+					}
+					
+					if(accountProfile.newlyEditedDescription != "-"){
+						tdNewlyEditedDescription="yellow";
+					}
+					
+					if(accountProfile.newlyEditedDescription != "-"){
+						tdNewlyEditedDescription="yellow";
+					}
+					
+					if(accountProfile.newlyEditedAlias != "-"){
+						tdNewlyEditedAlias="yellow";
+					}
+					
+					if(accountProfile.newlyEditedAddress != "-"){
+						tdNewlyEditedAddress="yellow";
+					}
+					
+					if(accountProfile.newlyEditedPin != "-"){
+						tdNewlyEditedPin="yellow";
+					}
+					
+					if(accountProfile.newlyEditedCity != "-"){
+						tdNewlyEditedCity="yellow";
+					}
+					
+					if(accountProfile.newlyEditedPhone1 != "-"){
+						tdNewlyEditedPhone1="yellow";
+					}
+					
+					if(accountProfile.newlyEditedEmail1 != "-"){
+						tdNewlyEditedEmail1="yellow";
+					}
+					
+					if(accountProfile.newlyEditedEmail2 != "-"){
+						tdNewlyEditedEmail2="yellow";
+					}
+					
+					if(accountProfile.newlyEditedContactPerson != "-"){
+						tdNewlyEditedContactPerson="yellow";
+					}
+	
 					$('#tBodyEditedAccountProfile')
 						.append(
-							"<tr><td>"
+							"<tr><td style='background-color:'>"
 							+ accountProfile.name
-							+ "</td><td>"
-							+ accountProfile.userName
-							+ "</td><td>"
-							+ convertDateTimeFromServer(accountProfile.lastModifiedDate)
-							+"</td><td>"
-							+ accountProfile.dataSourceType
-							+ "</td><td>"
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.employeeName
+							+ "</td><td style='background-color:'>"
+							+ convertDateTimeFromServer(accountProfile.newlyEditedCreatedDate)
+							+"</td><td  style='background-color:'>"
+							+ accountProfile.tinNo
+							+ "</td><td style='background-color:"+tdNewlyEditedTinNo+"'>"
+							+ accountProfile.newlyEditedTinNo
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.description
+							+ "</td><td style='background-color:"+tdNewlyEditedDescription+"'>"
+							+ accountProfile.newlyEditedDescription
+							+ "</td><td style='background-color:'>"
 							+ accountProfile.alias
-							+ "</td><td>"
+							+ "</td><td style='background-color:"+tdNewlyEditedAlias+"'>"
+							+ accountProfile.newlyEditedAlias
+							+ "</td><td style='background-color:'>"
 							+ accountProfile.address
-							+ "</td><td>"
-							+ accountProfile.accountTypeName
-							+ "</td><td>"
-							+ accountProfile.phone1
-							+ "</td><td>"
-							+ accountProfile.email1
-							+ "</td><td>"
+							+ "</td><td style='background-color:"+tdNewlyEditedAddress+"'>"
+							+ accountProfile.newlyEditedAddress
+							+ "</td><td style='background-color:'>"
 							+ accountProfile.city
-							+ "</td><td>"
-							+ accountProfile.location
-							+ "</td><td>"
-							+ convertDateTimeFromServer(accountProfile.createdDate)
-							+ "</td><td>"
-							+ (accountProfile.tinNo==null ? "" : accountProfile.tinNo)
-							+ "</td><td>"
-							+ accountProfile.activated
-							+ "</td><td>"
-							+"<button class='btn btn-blue' onclick='EditedAccountProfile.showModalPopup($(\"#myModal\"),\""
-													+ accountProfile.pid
-													+ "\",1);'>View Details</button>"
+							+ "</td><td style='background-color:"+tdNewlyEditedCity+"'>"
+							+ accountProfile.newlyEditedCity
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.pin
+							+ "</td><td style='background-color:"+tdNewlyEditedPin+"'>"
+							+ accountProfile.newlyEditedPin
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.phone1
+							+ "</td><td style='background-color:"+tdNewlyEditedPhone1+"'>"
+							+ accountProfile.newlyEditedPhone1
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.email1
+							+ "</td><td style='background-color:"+tdNewlyEditedEmail1+"'>"
+							+ accountProfile.newlyEditedEmail1
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.email2
+							+ "</td><td style='background-color:"+tdNewlyEditedEmail2+"'>"
+							+ accountProfile.newlyEditedEmail2
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.contactPerson
+							+ "</td><td style='background-color:"+tdNewlyEditedContactPerson+"'>"
+							+ accountProfile.newlyEditedContactPerson
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.accountStatus
+							+ "</td><td style='background-color:'>"
+							+"<button class='btn btn-success' onclick='NewlyEditedAccountProfile.verifyAccount(\""
+															+ accountProfile.newlyEditedPid
+															+ "\",\""
+															+ accountProfile.accountStatus
+															+ "\");'>Verify</button>"
 							+ "</td></tr>");
 					
 					
@@ -167,7 +254,7 @@ if (!this.EditedAccountProfile) {
 	}
 	
 	
-	EditedAccountProfile.showModalPopup = function(el, id, action) {
+	NewlyEditedAccountProfile.showModalPopup = function(el, id, action) {
 		if (id) {
 			switch (action) {
 			case 0:
@@ -188,11 +275,11 @@ if (!this.EditedAccountProfile) {
 	}
 	function onSaveSuccess(result) {
 		// reloading page to see the updated data
-		window.location = editedAccountProfileContextPath;
+		window.location = newlyEditedAccountProfileContextPath;
 	}
 
 	
-	EditedAccountProfile.filter = function() {
+	NewlyEditedAccountProfile.filter = function() {
 	 
 		if ($('#dbDateSearch').val() == "SINGLE") {
 			if ($("#txtFromDate").val() == "") {
@@ -208,21 +295,63 @@ if (!this.EditedAccountProfile) {
 			"<tr><td colspan='13' align='center'>Please wait...</td></tr>");
 		$
 			.ajax({
-				url : editedAccountProfileContextPath + "/filter",
+				url : newlyEditedAccountProfileContextPath + "/filter",
 				type : 'GET',
 				data : {
 					employeePid : $("#dbEmployee").val(),
 					filterBy : $("#dbDateSearch").val(),
 					fromDate : $("#txtFromDate").val(),
 					toDate : $("#txtToDate").val(),
+					accountStatus : $("#dbStatus").val()
 				},
 				success : function(accountProfiles) {
 					createtableData(accountProfiles);
 				}
 			});
  }
+	
 
-	EditedAccountProfile.showDatePicker = function() {
+	NewlyEditedAccountProfile.verifyAccount = function(accountProfilePid,accountStatus) {
+		
+		console.log(accountStatus +"------"+ accountProfilePid);
+
+		if (accountStatus == "Unverified") {
+
+			if (confirm("Are you sure?")) {
+
+				$.ajax({
+					url : newlyEditedAccountProfileContextPath
+							+ "/updateAccountProfileStatus",
+					method : 'GET',
+					data : {
+						pid : accountProfilePid
+					},
+					beforeSend : function() {
+						// Show image container
+						$("#loader").modal('show');
+
+					},
+					success : function(data) {
+
+						$("#loader").modal('hide');
+						NewlyEditedAccountProfile.filter();
+
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
+
+			}
+		} else {
+			alert("Account Profile Is Already Verified");
+			return;
+		}
+
+	}
+
+
+	NewlyEditedAccountProfile.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");
 		if ($('#dbDateSearch').val() == "CUSTOM") {

@@ -44,6 +44,7 @@ import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.NotificationDetailRepository;
+import com.orderfleet.webapp.repository.NotificationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
@@ -87,6 +88,9 @@ public class NotificationResource {
 
 	@Inject
 	private NotificationDetailRepository notificationDetailRepository;
+
+	@Inject
+	private NotificationRepository notificationRepository;
 
 	@Inject
 	public NotificationResource(FirebaseService firebaseService, NotificationService notificationService,
@@ -134,20 +138,21 @@ public class NotificationResource {
 					HeaderUtil.createFailureAlert("notification", "loginEmpty", "Please re-login and send message."))
 					.body(null);
 		}
-		
-		 NotificationStatusDTO notificationStatusDTO = pushNotificationToFCM(notification);
-		  if (notificationDTO.getIsImportant()) { 
-			  new java.util.Timer().schedule(new java.util.TimerTask() {
-		  
-				  @Override 
-				  public void run() { 
-					  pushNotificationToFCM(notification); 
-				  } 
-			  },
-					  notificationDTO.getResendTime() * 60 * 1000); 
-		  }
-		 
-		
+
+		NotificationStatusDTO notificationStatusDTO = pushNotificationToFCM(notification);
+		if (notificationDTO.getIsImportant()) {
+			new java.util.Timer().schedule(new java.util.TimerTask() {
+
+				@Override
+				public void run() {
+					pushNotificationToFCM(notification);
+					notificationRepository.updateNotificationLastModifiedDate(LocalDateTime.now(),
+							notification.getId());
+				}
+			}, notificationDTO.getResendTime() * 60 * 1000);
+
+		}
+
 		return new ResponseEntity<>(notificationStatusDTO, HttpStatus.CREATED);
 	}
 
@@ -195,8 +200,6 @@ public class NotificationResource {
 		}
 		return null;
 	}
-	
-
 
 	@RequestMapping("/notifications-report")
 	@Timed
@@ -212,7 +215,6 @@ public class NotificationResource {
 		return "company/notification-report";
 	}
 
-	
 	@RequestMapping(value = "/notifications-report/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<NotificationDTO>> filterNotifications(@RequestParam("employeePids") String employeePids,
@@ -257,7 +259,8 @@ public class NotificationResource {
 
 		List<MessageStatus> msgStatus;
 		if (MessageStatus.NONE.equals(status)) {
-			msgStatus = Arrays.asList(MessageStatus.NONE, MessageStatus.SUCCESS, MessageStatus.FAILED, MessageStatus.READ);
+			msgStatus = Arrays.asList(MessageStatus.NONE, MessageStatus.SUCCESS, MessageStatus.FAILED,
+					MessageStatus.READ);
 		} else {
 			msgStatus = Arrays.asList(status);
 		}
@@ -267,7 +270,7 @@ public class NotificationResource {
 		List<NotificationDTO> notificationDtos = new ArrayList<>();
 		for (NotificationDetail notificationDetail : notificationDetails) {
 			Notification notification = notificationDetail.getNotification();
-			employeeProfiles.removeIf(emp -> emp.getUser()==null);//remove employees without users
+			employeeProfiles.removeIf(emp -> emp.getUser() == null);// remove employees without users
 			Optional<EmployeeProfile> opEmployee = employeeProfiles.stream()
 					.filter(e -> e.getUser().getPid().equals(notificationDetail.getUserPid())).findAny();
 			if (opEmployee.isPresent()) {
@@ -276,11 +279,13 @@ public class NotificationResource {
 				notificationDTO.setExecutiveName(opEmployee.get().getName());
 				notificationDTO.setIsImportant(notification.getIsImportant());
 				notificationDTO.setCreatedDate(notificationDetail.getCreatedDate());
+				notificationDTO.setLastModifiedDate(notification.getLastModifiedDate());
 				notificationDTO.setTitle(notification.getTitle());
 				notificationDTO.setMessage(notification.getMessage());
 				notificationDTO.setMsgStatus(notificationDetail.getMessageStatus());
 				notificationDTO.setErrorCode(notificationDetail.getErrorCode());
 				notificationDTO.setFailedReason(notificationDetail.getFailedReason());
+				notificationDTO.setLastModifiedDateDetail(notificationDetail.getLastModifiedDate());
 				notificationDtos.add(notificationDTO);
 			}
 		}
