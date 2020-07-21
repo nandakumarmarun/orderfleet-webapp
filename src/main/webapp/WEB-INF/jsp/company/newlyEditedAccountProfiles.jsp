@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | NewlyEditedAccountProfile</title>
+<title>SalesNrich | NewlyEditedAccountProfiles</title>
 <style type="text/css">
 .error {
 	color: red;
@@ -26,7 +26,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Newly Edited Account Profile</h2>
+			<h2>Newly Edited Account Profiles</h2>
 			<div class="row">
 				<div class="col-sm-2">
 					Employee<select id="dbEmployee" name="employeePid"
@@ -120,12 +120,6 @@
 							<th>Name</th>
 							<th>Edited By</th>
 							<th>Edited On</th>
-							<th>Gst No</th>
-							<th>Edited Gst No</th>
-							<th>Description</th>
-							<th>Edited Description</th>
-							<th>Alias</th>
-							<th>Edited Alias</th>
 							<th>Address</th>
 							<th>Edited Address</th>
 							<th>City</th>
@@ -138,6 +132,12 @@
 							<th>Edited Email1</th>
 							<th>Email2</th>
 							<th>Edited Email2</th>
+							<th>Alias</th>
+							<th>Edited Alias</th>
+							<th>Gst No</th>
+							<th>Edited Gst No</th>
+							<th>Description</th>
+							<th>Edited Description</th>
 							<th>Contact Person</th>
 							<th>Edited Contact Person</th>
 							<th>Account Status</th>

@@ -200,18 +200,6 @@ if (!this.NewlyEditedAccountProfile) {
 							+ "</td><td style='background-color:'>"
 							+ convertDateTimeFromServer(accountProfile.newlyEditedCreatedDate)
 							+"</td><td  style='background-color:'>"
-							+ accountProfile.tinNo
-							+ "</td><td style='background-color:"+tdNewlyEditedTinNo+"'>"
-							+ accountProfile.newlyEditedTinNo
-							+ "</td><td style='background-color:'>"
-							+ accountProfile.description
-							+ "</td><td style='background-color:"+tdNewlyEditedDescription+"'>"
-							+ accountProfile.newlyEditedDescription
-							+ "</td><td style='background-color:'>"
-							+ accountProfile.alias
-							+ "</td><td style='background-color:"+tdNewlyEditedAlias+"'>"
-							+ accountProfile.newlyEditedAlias
-							+ "</td><td style='background-color:'>"
 							+ accountProfile.address
 							+ "</td><td style='background-color:"+tdNewlyEditedAddress+"'>"
 							+ accountProfile.newlyEditedAddress
@@ -235,6 +223,18 @@ if (!this.NewlyEditedAccountProfile) {
 							+ accountProfile.email2
 							+ "</td><td style='background-color:"+tdNewlyEditedEmail2+"'>"
 							+ accountProfile.newlyEditedEmail2
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.alias
+							+ "</td><td style='background-color:"+tdNewlyEditedAlias+"'>"
+							+ accountProfile.newlyEditedAlias
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.tinNo
+							+ "</td><td style='background-color:"+tdNewlyEditedTinNo+"'>"
+							+ accountProfile.newlyEditedTinNo
+							+ "</td><td style='background-color:'>"
+							+ accountProfile.description
+							+ "</td><td style='background-color:"+tdNewlyEditedDescription+"'>"
+							+ accountProfile.newlyEditedDescription
 							+ "</td><td style='background-color:'>"
 							+ accountProfile.contactPerson
 							+ "</td><td style='background-color:"+tdNewlyEditedContactPerson+"'>"
