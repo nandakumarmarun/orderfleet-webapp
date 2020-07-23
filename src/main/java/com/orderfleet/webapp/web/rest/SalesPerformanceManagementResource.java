@@ -929,7 +929,8 @@ public class SalesPerformanceManagementResource {
 
 					if (inventoryVoucherDetailDTO.getProductSKU() != null
 							&& inventoryVoucherDetailDTO.getProductSKU().equalsIgnoreCase("MT")) {
-						quantity = (quantity * inventoryVoucherDetailDTO.getProductUnitQty()) / 1000; // Quantity into MT;
+						quantity = (quantity * inventoryVoucherDetailDTO.getProductUnitQty()) / 1000; // Quantity into
+																										// MT;
 						itemType = inventoryVoucherDetailDTO.getProductSKU();
 					} else if (inventoryVoucherDetailDTO.getProductSKU() != null
 							&& inventoryVoucherDetailDTO.getProductSKU().equalsIgnoreCase("Pcs")) {
@@ -945,8 +946,7 @@ public class SalesPerformanceManagementResource {
 			salesOrderItemDetailsSap.setTaxCode("");
 			salesOrderItemDetailsSap.setWareHouseCode("PSO2");
 			salesOrderItemDetailsSap.setItemtype("MT");
-
-			salesOrderItemDetailsSap.setItemtype(itemType);
+			// salesOrderItemDetailsSap.setItemtype(itemType);
 			salesOrderItemDetailsSap.setArecieved("");
 
 			salesOrderItems.add(salesOrderItemDetailsSap);
