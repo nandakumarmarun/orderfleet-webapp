@@ -41,11 +41,17 @@ import com.orderfleet.webapp.web.vendor.sap.service.ProductProfileSapUploadServi
 @RequestMapping("/web")
 public class UploadSapResource {
 
-	private static String API_URL_ACCOUNT_PROFILE = "http://117.247.186.223:81/Service1.svc/GetAllCustomersNameAndId?Scode=20&dbkey=1";
+	private static String API_URL_ACCOUNT_PROFILE = "http://59.94.176.87:81/Service1.svc/GetAllCustomersNameAndId?Scode=20&dbkey=1";
 
-	private static String API_URL_ACCOUNT_PROFILE_OPENING_BALANCE = "http://117.247.186.223:81/Service1.svc/GetAllCustomers?dbkey=1&code=20";
+	private static String API_URL_ACCOUNT_PROFILE_OPENING_BALANCE = "http://59.94.176.87:81/Service1.svc/GetAllCustomers?dbkey=1&code=20";
 
-	private static String API_URL_PRODUCT_PROFILE = "http://117.247.186.223:81/Service1.svc/GetAllItemsNameAndId?dbkey=1";
+	private static String API_URL_PRODUCT_PROFILE = "http://59.94.176.87:81/Service1.svc/GetAllItemsNameAndId?dbkey=1";
+
+//	private static String API_URL_ACCOUNT_PROFILE = "http://117.247.186.223:81/Service1.svc/GetAllCustomersNameAndId?Scode=20&dbkey=1";
+//
+//	private static String API_URL_ACCOUNT_PROFILE_OPENING_BALANCE = "http://117.247.186.223:81/Service1.svc/GetAllCustomers?dbkey=1&code=20";
+//
+//	private static String API_URL_PRODUCT_PROFILE = "http://117.247.186.223:81/Service1.svc/GetAllItemsNameAndId?dbkey=1";
 
 	private final Logger log = LoggerFactory.getLogger(UploadSapResource.class);
 

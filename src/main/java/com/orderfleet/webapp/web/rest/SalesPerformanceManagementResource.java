@@ -839,7 +839,9 @@ public class SalesPerformanceManagementResource {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		String API_URL = "http://117.247.186.223:81/Service1.svc/AddOrder";
+//		String API_URL = "http://117.247.186.223:81/Service1.svc/AddOrder"; //old ip address
+		
+		String API_URL = "http://59.94.176.87:81/Service1.svc/AddOrder";
 
 //		String API_URL = "http://192.168.10.36:130/Service1.svc/AddOrder";
 
