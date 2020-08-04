@@ -18,6 +18,7 @@ if (!this.Activity) {
 		alias : null,
 		description : null,
 		hasDefaultAccount : null,
+		hasSecondarySales : null,
 		completePlans : null,
 		targetDisplayOnDayplan : null,
 		companyPid : null,
@@ -230,6 +231,8 @@ if (!this.Activity) {
 		activityModel.description = $('#field_description').val();
 		activityModel.hasDefaultAccount = $('#hasDefaultAccount').prop(
 				"checked");
+		activityModel.hasSecondarySales = $('#hasSecondarySales').prop(
+		"checked");
 		activityModel.completePlans = $('#completePlans').prop("checked");
 		activityModel.targetDisplayOnDayplan = $('#targetDisplayOnDayplan')
 				.prop("checked");
@@ -312,10 +315,13 @@ if (!this.Activity) {
 								data.contactManagement == null ? "" : data.contactManagement)
 						$("#hasDefaultAccount").prop("checked",
 								data.hasDefaultAccount);
+						$("#hasSecondarySales").prop("checked",
+								data.hasSecondarySales);
 						$("#completePlans").prop("checked", data.completePlans);
 						$("#targetDisplayOnDayplan").prop("checked",
 								data.targetDisplayOnDayplan);
 						$("#field_company").val(data.companyPid);
+						
 
 						$("#field_company").prop('disabled', true);
 

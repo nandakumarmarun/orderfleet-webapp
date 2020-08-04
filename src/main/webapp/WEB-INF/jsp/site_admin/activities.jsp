@@ -157,6 +157,12 @@
 										style="width: 4%;" />
 								</div>
 								<div class="form-group">
+									<label class="control-label" for="hasSecondarySales">Has
+										Secondary Sales ?</label> <input type="checkbox" class="form-control"
+										name="hasSecondarySales" id="hasSecondarySales"
+										style="width: 4%;" />
+								</div>
+								<div class="form-group">
 									<label class="control-label" for="field_description">Description</label>
 									<textarea class="form-control" name="description"
 										maxlength="250" id="field_description"
