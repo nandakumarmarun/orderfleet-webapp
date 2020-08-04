@@ -82,6 +82,10 @@ public class Activity implements Serializable {
 	private boolean activated;
 
 	@NotNull
+	@Column(name = "has_secondary_sales", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean hasSecondarySales;
+
+	@NotNull
 	@Column(name = "target_display_on_day_plan", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean targetDisplayOnDayplan;
 
@@ -92,7 +96,7 @@ public class Activity implements Serializable {
 	@Column(name = "last_modified_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	@JsonIgnore
 	private LocalDateTime lastModifiedDate = LocalDateTime.now();
-	
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "contact_management", nullable = false, columnDefinition = "varchar(20) DEFAULT 'ENABLED'")
@@ -198,8 +202,6 @@ public class Activity implements Serializable {
 	public LocalDateTime getLastModifiedDate() {
 		return lastModifiedDate;
 	}
-	
-	
 
 	public ContactManagement getContactManagement() {
 		return contactManagement;
@@ -207,6 +209,14 @@ public class Activity implements Serializable {
 
 	public void setContactManagement(ContactManagement contactManagement) {
 		this.contactManagement = contactManagement;
+	}
+
+	public boolean getHasSecondarySales() {
+		return hasSecondarySales;
+	}
+
+	public void setHasSecondarySales(boolean hasSecondarySales) {
+		this.hasSecondarySales = hasSecondarySales;
 	}
 
 	@Override
@@ -234,7 +244,8 @@ public class Activity implements Serializable {
 		return "Activity [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
 				+ description + ", hasDefaultAccount=" + hasDefaultAccount + ", completePlans=" + completePlans
 				+ ", company=" + company + ", activityAccountTypes=" + activityAccountTypes + ", activated=" + activated
-				+ ", createdDate=" + createdDate + ", lastModifiedDate=" + lastModifiedDate + "]";
+				+ ", createdDate=" + createdDate + ", lastModifiedDate=" + lastModifiedDate + ", hasSecondarySales="
+				+ hasSecondarySales + "]";
 	}
 
 }

@@ -18,6 +18,7 @@ if (!this.Activity) {
 		alias : null,
 		description : null,
 		hasDefaultAccount : null,
+		hasSecondarySales : null,
 		completePlans : null,
 		targetDisplayOnDayplan : null,
 		contactManagement : null
@@ -74,12 +75,12 @@ if (!this.Activity) {
 						$('#btnSaveStages').on('click', function() {
 							saveAssignedStages();
 						});
-						
+
 						// table search
 						$('#btnSearch').click(function() {
 							searchTable($("#search").val(), "ACCTYPE");
 						});
-						
+
 						$('#btnStageSearch').click(function() {
 							searchTable($("#searchStage").val(), "STAGE");
 						});
@@ -146,13 +147,14 @@ if (!this.Activity) {
 		});
 	}
 
-
 	function createUpdateActivity(el) {
 		activityModel.name = $('#field_name').val();
 		activityModel.alias = $('#field_alias').val();
 		activityModel.description = $('#field_description').val();
 		activityModel.contactManagement = $('#contactManagement').val();
 		activityModel.hasDefaultAccount = $('#hasDefaultAccount').prop(
+				"checked");
+		activityModel.hasSecondarySales = $('#hasSecondarySales').prop(
 				"checked");
 		activityModel.completePlans = $('#completePlans').prop("checked");
 		activityModel.targetDisplayOnDayplan = $('#targetDisplayOnDayplan')
@@ -236,10 +238,12 @@ if (!this.Activity) {
 										: data.contactManagement));
 						$("#hasDefaultAccount").prop("checked",
 								data.hasDefaultAccount);
+						$("#hasSecondarySales").prop("checked",
+								data.hasSecondarySales);
 						$("#completePlans").prop("checked", data.completePlans);
 						$("#targetDisplayOnDayplan").prop("checked",
 								data.targetDisplayOnDayplan);
-						
+
 						// set pid
 						activityModel.pid = data.pid;
 					},
@@ -392,7 +396,7 @@ if (!this.Activity) {
 
 	function loadStages(pid) {
 		activityModel.pid = pid;
-		
+
 		$("input[name='filter'][value='all']").prop("checked", true);
 		$("#search").val("");
 		searchTable("");
@@ -403,12 +407,11 @@ if (!this.Activity) {
 			type : "GET",
 			success : function(stages) {
 				if (stages) {
-					$.each(stages, function(index,
-							stage) {
+					$.each(stages, function(index, stage) {
 						$(
 								"#divStages input:checkbox[value="
-										+ stage.stagePid + "]").prop(
-								"checked", true);
+										+ stage.stagePid + "]").prop("checked",
+								true);
 					});
 				}
 			},
@@ -420,29 +423,28 @@ if (!this.Activity) {
 
 	function saveAssignedStages() {
 		$(".error-msg").html("");
-		var stagePids = $("input[name='chkStage']:checked").map(
-				function() {
-					return $(this).val();
-					}).get().join(',');
-		
+		var stagePids = $("input[name='chkStage']:checked").map(function() {
+			return $(this).val();
+		}).get().join(',');
+
 		if (stagePids.length == 0) {
 			$(".error-msg").html("Please select Stage");
 			return;
 		}
 		$(".error-msg").html("Please wait.....");
-		$
-				.ajax({
-					url : activityContextPath + "/assignStages/" + activityModel.pid + "?stagePids="+ stagePids,
-					type : "POST",
-					contentType : "application/json; charset=utf-8",
-					success : function(status) {
-						$("#assignStagesModal").modal("hide");
-						onSaveSuccess(status);
-					},
-					error : function(xhr, error) {
-						onError(xhr, error);
-					},
-				});
+		$.ajax({
+			url : activityContextPath + "/assignStages/" + activityModel.pid
+					+ "?stagePids=" + stagePids,
+			type : "POST",
+			contentType : "application/json; charset=utf-8",
+			success : function(status) {
+				$("#assignStagesModal").modal("hide");
+				onSaveSuccess(status);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			},
+		});
 	}
 
 	Activity.setActive = function(name, pid, active) {
@@ -735,10 +737,10 @@ if (!this.Activity) {
 			}
 		}
 	}
-	
+
 	function searchTable(inputVal, sType) {
 		var table;
-		if("STAGE" == sType) {
+		if ("STAGE" == sType) {
 			table = $('#tbodyStages')
 		} else {
 			table = $('#tbodyAccountTypes');

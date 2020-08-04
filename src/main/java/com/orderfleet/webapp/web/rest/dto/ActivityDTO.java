@@ -33,6 +33,8 @@ public class ActivityDTO {
 
 	private boolean hasDefaultAccount;
 
+	private boolean hasSecondarySales;
+
 	private Set<AccountTypeDTO> activityAccountTypes = new HashSet<AccountTypeDTO>();
 
 	private Set<DocumentDTO> documents = new HashSet<DocumentDTO>();
@@ -58,7 +60,7 @@ public class ActivityDTO {
 	private String companyPid;
 
 	private String companyName;
-	
+
 	private ContactManagement contactManagement;
 
 	public ActivityDTO() {
@@ -75,6 +77,7 @@ public class ActivityDTO {
 		this.completePlans = activity.getCompletePlans();
 		this.lastModifiedDate = activity.getLastModifiedDate();
 		this.targetDisplayOnDayplan = activity.getTargetDisplayOnDayplan();
+		this.hasSecondarySales = activity.getHasSecondarySales();
 		// eagerly load the association
 		this.activityAccountTypes = activity.getActivityAccountTypes().stream().map(AccountTypeDTO::new)
 				.collect(Collectors.toSet());
@@ -94,6 +97,7 @@ public class ActivityDTO {
 		this.targetDisplayOnDayplan = activity.getTargetDisplayOnDayplan();
 		this.completePlans = activity.getCompletePlans();
 		this.lastModifiedDate = activity.getLastModifiedDate();
+		this.hasSecondarySales = activity.getHasSecondarySales();
 		// eagerly load the
 		// association
 		this.activityAccountTypes = activity.getActivityAccountTypes().stream().map(AccountTypeDTO::new)
@@ -250,7 +254,6 @@ public class ActivityDTO {
 	public void setCompanyName(String companyName) {
 		this.companyName = companyName;
 	}
-	
 
 	public ContactManagement getContactManagement() {
 		return contactManagement;
@@ -258,6 +261,14 @@ public class ActivityDTO {
 
 	public void setContactManagement(ContactManagement contactManagement) {
 		this.contactManagement = contactManagement;
+	}
+
+	public boolean getHasSecondarySales() {
+		return hasSecondarySales;
+	}
+
+	public void setHasSecondarySales(boolean hasSecondarySales) {
+		this.hasSecondarySales = hasSecondarySales;
 	}
 
 	@Override
@@ -293,7 +304,5 @@ public class ActivityDTO {
 				+ ", interimSave=" + interimSave + ", companyPid=" + companyPid + ", companyName=" + companyName
 				+ ", contactManagement=" + contactManagement + "]";
 	}
-
-	
 
 }

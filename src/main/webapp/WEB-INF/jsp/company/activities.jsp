@@ -16,6 +16,7 @@
 .error {
 	color: red;
 }
+
 @media ( min-width : 1360px) and (max-width: 1370px) {
 	.width83 {
 		width: 83%
@@ -124,9 +125,10 @@
 										maxlength="55" placeholder="Alias" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="contactManagement">Contact Management</label> 
-										<input type="text" class="form-control" name="contactManagement" 
-										id="contactManagement" maxlength="55" placeholder="Contact Management" readonly="readonly" />
+									<label class="control-label" for="contactManagement">Contact
+										Management</label> <input type="text" class="form-control"
+										name="contactManagement" id="contactManagement" maxlength="55"
+										placeholder="Contact Management" readonly="readonly" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="hasDefaultAccount">Has
@@ -143,6 +145,12 @@
 									<label class="control-label" for="targetDisplayOnDayplan">Target
 										Display On Dayplan</label> <input type="checkbox" class="form-control"
 										name="targetDisplayOnDayplan" id="targetDisplayOnDayplan"
+										style="width: 4%;" />
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="hasSecondarySales">Has
+										Secondary Sales ?</label> <input type="checkbox" class="form-control"
+										name="hasSecondarySales" id="hasSecondarySales"
 										style="width: 4%;" />
 								</div>
 								<div class="form-group">
@@ -458,8 +466,8 @@
 												type="radio" value="unselected" name="filter">
 											&nbsp;Unselected&nbsp;&nbsp;
 
-											<button type="button" class="btn btn-info" id="btnStageSearch"
-												style="float: right;">Search</button>
+											<button type="button" class="btn btn-info"
+												id="btnStageSearch" style="float: right;">Search</button>
 											<input type="text" id="searchStage" placeholder="Search..."
 												class="form-control" style="width: 200px; float: right;">
 										</div>
@@ -488,8 +496,8 @@
 							<label class="error-msg" style="color: red;"></label>
 						</div>
 						<div class="modal-footer">
-							<input class="btn btn-success" type="button"
-								id="btnSaveStages" value="Save" />
+							<input class="btn btn-success" type="button" id="btnSaveStages"
+								value="Save" />
 							<button class="btn" data-dismiss="modal">Cancel</button>
 						</div>
 					</div>

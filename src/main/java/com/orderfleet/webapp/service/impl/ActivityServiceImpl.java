@@ -193,6 +193,7 @@ public class ActivityServiceImpl implements ActivityService {
 			activity.setTargetDisplayOnDayplan(activityDTO.getTargetDisplayOnDayplan());
 			activity.setCompletePlans(activityDTO.getCompletePlans());
 			activity.setContactManagement(activityDTO.getContactManagement());
+			activity.setHasSecondarySales(activityDTO.getHasSecondarySales());
 			activity = activityRepository.save(activity);
 			ActivityDTO result = activityMapper.activityToActivityDTO(activity);
 			return result;
