@@ -70,18 +70,18 @@ public class ProductProfileSapUploadService {
 	private final ProductGroupProductRepository productGroupProductRepository;
 
 	private final CompanyRepository companyRepository;
-	
+
 	private final StockLocationRepository stockLocationRepository;
 
 	private final StockLocationService stockLocationService;
-	
+
 	private final OpeningStockRepository openingStockRepository;
 
 	public ProductProfileSapUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			DivisionRepository divisionRepository, ProductCategoryRepository productCategoryRepository,
 			ProductGroupRepository productGroupRepository, ProductProfileRepository productProfileRepository,
 			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository,
-			StockLocationRepository stockLocationRepository,StockLocationService stockLocationService,
+			StockLocationRepository stockLocationRepository, StockLocationService stockLocationService,
 			OpeningStockRepository openingStockRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
@@ -104,7 +104,7 @@ public class ProductProfileSapUploadService {
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
-		
+
 		List<OpeningStockDTO> openingStockDtos = new ArrayList<>();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
 		// find all exist product profiles
@@ -170,7 +170,14 @@ public class ProductProfileSapUploadService {
 
 			productProfile.setSku(ppDto.getSalUnitMsr());
 			if (ppDto.getWeightPerPC() != null && !ppDto.getWeightPerPC().isEmpty()) {
-				productProfile.setUnitQty(Double.parseDouble(ppDto.getWeightPerPC()));
+				double unitQty = Double.parseDouble(ppDto.getWeightPerPC());
+				if (unitQty != 0 || unitQty != 0.0) {
+					productProfile.setUnitQty(unitQty);
+				} else {
+					productProfile.setUnitQty(1.0);
+				}
+			} else {
+				productProfile.setUnitQty(1.0);
 			}
 			productProfile.setProductCategory(defaultCategory.get());
 
@@ -178,7 +185,7 @@ public class ProductProfileSapUploadService {
 			openingStockDto.setProductProfileName(productProfile.getName());
 			openingStockDto.setQuantity(Double.parseDouble(ppDto.getOnHand()));
 			openingStockDtos.add(openingStockDto);
-			
+
 			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
 
 			productGroupProductDTO.setGroupName(ppDto.getItemGroupName());
@@ -329,16 +336,16 @@ public class ProductProfileSapUploadService {
 		// All opening-stock must have a stock-location, if not, set a default
 		// one
 		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(company.getId());
-		log.info("defaulst stock location found :"+defaultStockLocation.getName());
+		log.info("defaulst stock location found :" + defaultStockLocation.getName());
 		// find all exist product profiles
 		Set<String> ppNames = openingStockDTOs.stream().map(os -> os.getProductProfileName())
 				.collect(Collectors.toSet());
-		log.info("product profile names found :"+ppNames.size());
+		log.info("product profile names found :" + ppNames.size());
 		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
 
 		List<ProductProfile> productProfiles = productProfileRepository
 				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
-		log.info(" product profiles found :"+productProfiles.size());
+		log.info(" product profiles found :" + productProfiles.size());
 		openingStockRepository.deleteByCompanyId(company.getId());
 		log.info("Deleted opening stock");
 		for (OpeningStockDTO osDto : openingStockDTOs) {
