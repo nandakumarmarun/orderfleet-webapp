@@ -390,7 +390,6 @@ public class InvoiceWiseReportResource {
 		log.info("executive task execution looping started :"+executiveTaskExecutions.size());
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
-			log.info("executive task execution loops start");
 			double totalSalesOrderAmount = 0.0;
 			double totalRecieptAmount = 0.0;
 			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView(executiveTaskExecution);
@@ -464,8 +463,8 @@ public class InvoiceWiseReportResource {
 					invoiceWiseReportViews.add(invoiceWiseReportView);
 				}
 			}
-			log.info("executive task execution loops end");
 		}
+		log.info("executive task execution looping ended :"+executiveTaskExecutions.size());
 		return invoiceWiseReportViews;
 
 	}
