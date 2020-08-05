@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Detailed Invoice Wise Reports</title>
+<title>SalesNrich | Activities And Transaction Lite</title>
 <spring:url value="/resources/assets/css/jquery-ui.css"
 	var="jqueryUiCss"></spring:url>
 <link href="${jqueryUiCss}" rel="stylesheet">
@@ -26,7 +26,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Activities\Transactions</h2>
+			<h2>Activities\Transactions Lite</h2>
 			<div class="clearfix"></div>
 			<hr />
 			<div class="row">
@@ -109,19 +109,19 @@
 										<div>
 											<a class='btn btn-default dropdown-item'
 												style='width: 100%; text-align: left;'
-												onclick='DetailedInvoiceWiseReport.getActivities("all")'>All
+												onclick='InvoiceWiseReportLite.getActivities("all")'>All
 												Activity</a>
 										</div>
 										<div>
 											<a class='btn btn-default dropdown-item'
 												style='width: 100%; text-align: left;'
-												onclick='DetailedInvoiceWiseReport.getActivities("planed")'>Planned
+												onclick='InvoiceWiseReportLite.getActivities("planed")'>Planned
 												Activity</a>
 										</div>
 										<div>
 											<a class='btn btn-default dropdown-item'
 												style='width: 100%; text-align: left;'
-												onclick='DetailedInvoiceWiseReport.getActivities("unPlaned")'>UnPlanned
+												onclick='InvoiceWiseReportLite.getActivities("unPlaned")'>UnPlanned
 												Activity</a>
 										</div>
 
@@ -137,7 +137,7 @@
 							</div>
 							<div class="col-sm-2">
 								<br /> <select class="form-control" id="dbDateSearch"
-									onchange="DetailedInvoiceWiseReport.showDatePicker()">
+									onchange="InvoiceWiseReportLite.showDatePicker()">
 									<option value="TODAY">Today</option>
 									<option value="YESTERDAY">Yesterday</option>
 									<option value="WTD">WTD</option>
@@ -173,7 +173,7 @@
 								<div class="col-sm-3">
 									<br />
 									<button type="button" class="btn btn-info entypo-search"
-										style="font-size: 18px" onclick="DetailedInvoiceWiseReport.filter()"
+										style="font-size: 18px" onclick="InvoiceWiseReportLite.filter()"
 										title="Apply"></button>
 								</div>
 								<div class="col-sm-3">
@@ -189,10 +189,11 @@
 
 				<div class="col-md-12 col-sm-12 clearfix"
 					style="font-size: 14px; color: black;">
-					<div class="col-sm-2">
+					<div class="col-sm-4">
 						<label>Activities : </label> <label id="lblActivities">0</label>
+						
 					</div>
-					<div class="col-sm-3">
+					<!-- <div class="col-sm-3">
 						<label>Transaction Amount : </label> <label
 							id="lblTransactionAmount">0</label>
 					</div>
@@ -202,7 +203,7 @@
 					</div>
 					<div class="col-sm-3">
 						<label>Total Payments : </label> <label id="lblTotalPayments">0</label>
-					</div>
+					</div> -->
 				</div>
 			</div>
 			<div class="table-responsive">
@@ -890,9 +891,9 @@
 		var="reportcommonjsfileJS"></spring:url>
 	<script type="text/javascript" src="${reportcommonjsfileJS}"></script>
 
-	<spring:url value="/resources/app/detailed-invoice-wise-report.js"
-		var="detailedInvoiceWiseRepoetJs"></spring:url>
-	<script type="text/javascript" src="${detailedInvoiceWiseRepoetJs}"></script>
+	<spring:url value="/resources/app/invoice-wise-report-lite.js"
+		var="invoiceWiseReportLiteJs"></spring:url>
+	<script type="text/javascript" src="${invoiceWiseReportLiteJs}"></script>
 
 	<spring:url value="/resources/assets/js/moment.js" var="momentJs"></spring:url>
 	<script type="text/javascript" src="${momentJs}"></script>
@@ -925,40 +926,40 @@
 							});
 
 							$('#myFormSubmit').on('click', function() {
-								DetailedInvoiceWiseReport.reject();
+								InvoiceWiseReportLite.reject();
 							});
 							$('#btnSaveNewGeoLocation').on('click', function() {
-								DetailedInvoiceWiseReport.saveNewGeoLocation();
+								InvoiceWiseReportLite.saveNewGeoLocation();
 							});
 
 							$('#btnSearch').click(
 									function() {
-										DetailedInvoiceWiseReport.searchTable($(
+										InvoiceWiseReportLite.searchTable($(
 												"#search").val(),
 												$('#tbodyAccountProfile'));
 									});
 
 							$('#newAccountProfile').click(function() {
-								DetailedInvoiceWiseReport.newAccount();
+								InvoiceWiseReportLite.newAccount();
 							});
 
 							$('#changeAccount').click(function() {
-								DetailedInvoiceWiseReport.changeAccount();
+								InvoiceWiseReportLite.changeAccount();
 							});
 							$('#return').click(function() {
-								DetailedInvoiceWiseReport.oldAccount();
+								InvoiceWiseReportLite.oldAccount();
 							});
 
 							$('#field_dynamicDocument').change(function() {
-								DetailedInvoiceWiseReport.getForms();
+								InvoiceWiseReportLite.getForms();
 							});
 
 							$('#createAndChangeAccount').click(function() {
-								DetailedInvoiceWiseReport.createAndChangeAccount();
+								InvoiceWiseReportLite.createAndChangeAccount();
 							});
 
 							$('#loadAccountProfile').click(function() {
-								DetailedInvoiceWiseReport.loadAccountFromForm();
+								InvoiceWiseReportLite.loadAccountFromForm();
 							});
 
 							$('#btnDownload')
@@ -975,10 +976,10 @@
 													alert("no values available");
 													return;
 												}
-												DetailedInvoiceWiseReport.downloadXls();
+												InvoiceWiseReportLite.downloadXls();
 											});
 
-							//DetailedInvoiceWiseReport.filter();
+							//InvoiceWiseReportLite.filter();
 							//if(documentType == null){
 							//execute on normal page load
 

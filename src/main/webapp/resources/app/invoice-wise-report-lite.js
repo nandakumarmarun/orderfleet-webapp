@@ -1,14 +1,14 @@
-// Create a DetailedInvoiceWiseReport object only if one does not already exist. We create the
+// Create a InvoiceWiseReportLite object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
 
-if (!this.DetailedInvoiceWiseReport) {
-	this.DetailedInvoiceWiseReport = {};
+if (!this.InvoiceWiseReportLite) {
+	this.InvoiceWiseReportLite = {};
 }
 
 (function() {
 	'use strict';
 
-	var detailedInvoiceWiseReportContextPath = location.protocol + '//' + location.host
+	var invoiceWiseReportLiteContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
 
 	var dashboardEmployees = [];
@@ -46,13 +46,13 @@ if (!this.DetailedInvoiceWiseReport) {
 		let filterBy = getParameterByName('filterBy');
 		if (filterBy) {
 			$('#dbDateSearch').val(filterBy);
-			//DetailedInvoiceWiseReport.filter();
+			//InvoiceWiseReportLite.filter();
 		}
 
 		$('.selectpicker').selectpicker();
 	});
 
-	DetailedInvoiceWiseReport.downloadXls = function() {
+	InvoiceWiseReportLite.downloadXls = function() {
 		var excelName = "acvts_txns_"
 				+ new Date().toISOString().replace(/[\-\:\.]/g, "");
 		var instance = $('#tblInvoiceWiseReport').tableExport({
@@ -64,8 +64,34 @@ if (!this.DetailedInvoiceWiseReport) {
 		instance.export2file(exportData.data, exportData.mimeType,
 				exportData.filename, exportData.fileExtension);
 	}
+	
 
-	DetailedInvoiceWiseReport.filter = function() {
+		
+	
+	InvoiceWiseReportLite.filter = function() {
+		$("#lblActivities").text("0");
+		$.ajax({
+			url : invoiceWiseReportLiteContextPath + "/count",
+					type : 'GET',
+					data : {
+						employeePid : $('#dbEmployee').val(),
+						documentPid : $("#dbDocument").val(),
+						activityPid : $("#dbActivity").val(),
+						accountPid : $("#dbAccount").val(),
+						filterBy : $("#dbDateSearch").val(),
+						fromDate : $("#txtFromDate").val(),
+						toDate : $("#txtToDate").val(),
+						inclSubordinate : $('#inclSubOrdinates').is(":checked")
+					},
+					success : function(invoiceWiseReports) {
+						$("#lblActivities").text(invoiceWiseReports);
+
+					}
+					
+		});
+		
+		
+		
 		if ($('#dbDateSearch').val() == "SINGLE") {
 			if ($("#txtFromDate").val() == "") {
 				return;
@@ -81,7 +107,7 @@ if (!this.DetailedInvoiceWiseReport) {
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
 		$
 				.ajax({
-					url : detailedInvoiceWiseReportContextPath + "/filter",
+					url : invoiceWiseReportLiteContextPath + "/filter",
 					type : 'GET',
 					data : {
 						employeePid : $('#dbEmployee').val(),
@@ -95,11 +121,11 @@ if (!this.DetailedInvoiceWiseReport) {
 					},
 					success : function(invoiceWiseReports) {
 						$('#tBodyInvoiceWiseReport').html("");
-
-						$("#lblActivities").text("0");
-						$("#lblTransactionAmount").text("0");
+						$("#activity-time").text("");
+						$("#lblActivities").text(invoiceWiseReports.length);
+						/*$("#lblTransactionAmount").text("0");
 						$("#lblTransactionVolume").text("0");
-						$("#lblTotalPayments").text("0");
+						$("#lblTotalPayments").text("0");*/
 						if (invoiceWiseReports.length == 0) {
 							$('#tBodyInvoiceWiseReport')
 									.html(
@@ -135,7 +161,7 @@ if (!this.DetailedInvoiceWiseReport) {
 													&& invoiceWiseReport.latitude != 0) {
 												locationName = "<span class='btn btn-success'  id='"
 														+ invoiceWiseReport.pid
-														+ "' onClick='DetailedInvoiceWiseReport.getLocation(this)' >get location</span>";
+														+ "' onClick='InvoiceWiseReportLite.getLocation(this)' >get location</span>";
 											}
 
 											if (invoiceWiseReport.towerLocation == "Not Found"
@@ -144,7 +170,7 @@ if (!this.DetailedInvoiceWiseReport) {
 													&& invoiceWiseReport.mcc != 0) {
 												towerLocationName = "<span class='btn btn-success'  id='"
 														+ invoiceWiseReport.pid
-														+ "' onClick='DetailedInvoiceWiseReport.getTowerLocation(this)' >get location</span>";
+														+ "' onClick='InvoiceWiseReportLite.getTowerLocation(this)' >get location</span>";
 											}
 
 											/*
@@ -157,7 +183,7 @@ if (!this.DetailedInvoiceWiseReport) {
 											 * locationName="<span class='btn
 											 * btn-success'
 											 * id='"+invoiceWiseReport.pid+"'
-											 * onClick='DetailedInvoiceWiseReport.getLocation(this)'
+											 * onClick='InvoiceWiseReportLite.getLocation(this)'
 											 * >get location</span>"; }
 											 */
 
@@ -171,7 +197,7 @@ if (!this.DetailedInvoiceWiseReport) {
 											 * locationName="<span class='btn
 											 * btn-success'
 											 * id='"+invoiceWiseReport.pid+"'
-											 * onClick='DetailedInvoiceWiseReport.getLocation(this)'
+											 * onClick='InvoiceWiseReportLite.getLocation(this)'
 											 * >get location</span>"; }
 											 */
 											// if(invoiceWiseReport.locationType=="GpsLocation"
@@ -182,7 +208,7 @@ if (!this.DetailedInvoiceWiseReport) {
 											// locationName="<span class='btn
 											// btn-success'
 											// id='"+invoiceWiseReport.pid+"'
-											// onClick='DetailedInvoiceWiseReport.getLocation(this)'
+											// onClick='InvoiceWiseReportLite.getLocation(this)'
 											// >get location</span>";
 											// }
 											var locationIcon = locationIcons(invoiceWiseReport);
@@ -202,7 +228,7 @@ if (!this.DetailedInvoiceWiseReport) {
 											}
 											var changeAccount = "";
 											if (interimSave == "true") {
-												changeAccount = "&nbsp;&nbsp;<button type='button' class='btn btn-blue' onclick='DetailedInvoiceWiseReport.changeAccountProfile(\""
+												changeAccount = "&nbsp;&nbsp;<button type='button' class='btn btn-blue' onclick='InvoiceWiseReportLite.changeAccountProfile(\""
 														+ invoiceWiseReport.pid
 														+ "\");'>Change Account Profile</button>"
 											} else {
@@ -210,7 +236,7 @@ if (!this.DetailedInvoiceWiseReport) {
 											}
 											var geoTag = "";
 											if (distanceTarvel == "true") {
-												geoTag = "&nbsp;&nbsp;<button type='button' title='geo tag to account' class='btn btn-orange entypo-map' aria-label='entypo-map' onclick='DetailedInvoiceWiseReport.setGeoTag(\""
+												geoTag = "&nbsp;&nbsp;<button type='button' title='geo tag to account' class='btn btn-orange entypo-map' aria-label='entypo-map' onclick='InvoiceWiseReportLite.setGeoTag(\""
 														+ invoiceWiseReport.pid
 														+ "\",\""
 														+ invoiceWiseReport.accountProfileLatitude
@@ -277,11 +303,11 @@ if (!this.DetailedInvoiceWiseReport) {
 																	+ towerLocationName
 																	+ "</td><td>"
 																	+ withCustomer
-																	+ "</td><td>"
+																	/*+ "</td><td>"
 																	+ invoiceWiseReport.totalSalesOrderAmount
 																	+ "</td>"
 																	+ "<td>"
-																	+ invoiceWiseReport.totalRecieptAmount
+																	+ invoiceWiseReport.totalRecieptAmount*/
 																	+ "</td><td>"
 																	+ (invoiceWiseReport.remarks == null ? ""
 																			: invoiceWiseReport.remarks)
@@ -301,7 +327,7 @@ if (!this.DetailedInvoiceWiseReport) {
 
 																var editButton = "";
 																if (interimSave == "true") {
-																	editButton = "<button type='button' class='btn btn-white' onclick='DetailedInvoiceWiseReport.editDetails(\""
+																	editButton = "<button type='button' class='btn btn-white' onclick='InvoiceWiseReportLite.editDetails(\""
 																			+ invoiceWiseReport.pid
 																			+ "\",\""
 																			+ executionDetail.documentType
@@ -325,7 +351,7 @@ if (!this.DetailedInvoiceWiseReport) {
 																							+ executionDetail.documentName
 																							+ "</td><td>"
 																							+ executionDetail.documentTotal
-																							+ "</td><td><button type='button' class='btn btn-white' onclick='DetailedInvoiceWiseReport.viewDetails(\""
+																							+ "</td><td><button type='button' class='btn btn-white' onclick='InvoiceWiseReportLite.viewDetails(\""
 																							+ executionDetail.pid
 																							+ "\",\""
 																							+ executionDetail.documentType
@@ -335,7 +361,7 @@ if (!this.DetailedInvoiceWiseReport) {
 																} else {
 																	var elmViewImage = "";
 																	if (executionDetail.imageSaved) {
-																		elmViewImage = "<td><button type='button' class='btn btn-blue' onclick='DetailedInvoiceWiseReport.showModalPopup($(\"#imagesModal\"),\""
+																		elmViewImage = "<td><button type='button' class='btn btn-blue' onclick='InvoiceWiseReportLite.showModalPopup($(\"#imagesModal\"),\""
 																				+ executionDetail.pid
 																				+ "\",0);'>View Images</button></td>";
 																	}
@@ -350,7 +376,7 @@ if (!this.DetailedInvoiceWiseReport) {
 																							+ executionDetail.documentName
 																							+ "</td><td>"
 																							+ dynamicvalue
-																							+ "</td><td><button type='button' class='btn btn-white' onclick='DetailedInvoiceWiseReport.viewDetails(\""
+																							+ "</td><td><button type='button' class='btn btn-white' onclick='InvoiceWiseReportLite.viewDetails(\""
 																							+ executionDetail.pid
 																							+ "\",\""
 																							+ executionDetail.documentType
@@ -381,7 +407,7 @@ if (!this.DetailedInvoiceWiseReport) {
 				});
 	}
 
-	DetailedInvoiceWiseReport.setGeoTag = function(pid, accLat, accLon, accLoc, newLat,
+	InvoiceWiseReportLite.setGeoTag = function(pid, accLat, accLon, accLoc, newLat,
 			newLon, newLoc, obj) {
 
 		$("#oldLatitude").text(
@@ -401,10 +427,10 @@ if (!this.DetailedInvoiceWiseReport) {
 
 	}
 
-	DetailedInvoiceWiseReport.saveNewGeoLocation = function() {
+	InvoiceWiseReportLite.saveNewGeoLocation = function() {
 		var pid = $("#hdn_lbl").val();
 		$.ajax({
-			url : detailedInvoiceWiseReportContextPath + "/updateGeoTag/" + pid,
+			url : invoiceWiseReportLiteContextPath + "/updateGeoTag/" + pid,
 			method : 'GET',
 			success : function(location) {
 				$("#lbl_" + pid).text("");
@@ -418,7 +444,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		});
 	}
 
-	DetailedInvoiceWiseReport.getActivities = function(activityType) {
+	InvoiceWiseReportLite.getActivities = function(activityType) {
 		$("#dbActivity").children().remove();
 		if (activityType == 'all') {
 			$("#dbActivity").append('<option value="no">All Activity</option>');
@@ -430,7 +456,7 @@ if (!this.DetailedInvoiceWiseReport) {
 					'<option value="unPlaned">All UnPlanned Activity</option>');
 		}
 		$.ajax({
-			url : detailedInvoiceWiseReportContextPath + "/getActivities/"
+			url : invoiceWiseReportLiteContextPath + "/getActivities/"
 					+ activityType,
 			method : 'GET',
 			success : function(activities) {
@@ -447,7 +473,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		});
 	}
 
-	DetailedInvoiceWiseReport.editDetails = function(pid, documentType, documentTypePid) {
+	InvoiceWiseReportLite.editDetails = function(pid, documentType, documentTypePid) {
 		if (documentType == "INVENTORY_VOUCHER") {
 			window.location = location.protocol + '//' + location.host
 					+ "/web/inventory-voucher-transaction?etePid=" + pid
@@ -464,9 +490,9 @@ if (!this.DetailedInvoiceWiseReport) {
 	};
 
 	var savePidForAccountChanging;
-	DetailedInvoiceWiseReport.changeAccountProfile = function(pid) {
+	InvoiceWiseReportLite.changeAccountProfile = function(pid) {
 		$.ajax({
-			url : detailedInvoiceWiseReportContextPath + "/getDynamicDocument/" + pid,
+			url : invoiceWiseReportLiteContextPath + "/getDynamicDocument/" + pid,
 			method : 'GET',
 			async : false,
 			success : function(data) {
@@ -486,7 +512,7 @@ if (!this.DetailedInvoiceWiseReport) {
 							});
 				}
 
-				DetailedInvoiceWiseReport.getForms();
+				InvoiceWiseReportLite.getForms();
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -499,7 +525,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		$("#accountProfileModal").modal("show");
 	};
 
-	DetailedInvoiceWiseReport.searchTable = function(inputVal, table) {
+	InvoiceWiseReportLite.searchTable = function(inputVal, table) {
 		table.find('tr').each(function(index, row) {
 			var allCells = $(row).find('td');
 			if (allCells.length > 0) {
@@ -521,17 +547,17 @@ if (!this.DetailedInvoiceWiseReport) {
 		});
 	}
 
-	DetailedInvoiceWiseReport.newAccount = function() {
+	InvoiceWiseReportLite.newAccount = function() {
 		$("#newAccount").css("display", "block");
 		$("#oldAccounts").css("display", "none");
 	};
 
-	DetailedInvoiceWiseReport.oldAccount = function() {
+	InvoiceWiseReportLite.oldAccount = function() {
 		$("#oldAccounts").css("display", "block");
 		$("#newAccount").css("display", "none");
 	};
 
-	DetailedInvoiceWiseReport.changeAccount = function() {
+	InvoiceWiseReportLite.changeAccount = function() {
 
 		$(".error-msg").html("");
 		var accountProfilePid = "";
@@ -544,7 +570,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		}
 		$(".error-msg").html("Please wait.....");
 		$.ajax({
-			url : detailedInvoiceWiseReportContextPath + "/changeAccountProfile",
+			url : invoiceWiseReportLiteContextPath + "/changeAccountProfile",
 			type : "POST",
 			data : {
 				accountProfilePid : accountProfilePid,
@@ -552,7 +578,7 @@ if (!this.DetailedInvoiceWiseReport) {
 			},
 			success : function(status) {
 				$("#accountProfileModal").modal("hide");
-				DetailedInvoiceWiseReport.filter();
+				InvoiceWiseReportLite.filter();
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -560,7 +586,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		});
 	};
 
-	DetailedInvoiceWiseReport.createAndChangeAccount = function() {
+	InvoiceWiseReportLite.createAndChangeAccount = function() {
 		if ($("#field_name").val() == "") {
 			alert("Please Fill Name");
 			return;
@@ -603,7 +629,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		accountProfile.closingBalance = $('#field_closingBalance').val();
 
 		$.ajax({
-			url : detailedInvoiceWiseReportContextPath
+			url : invoiceWiseReportLiteContextPath
 					+ "/createAndChangeAccountProfile/"
 					+ savePidForAccountChanging + "/"
 					+ $("#field_territory").val(),
@@ -628,7 +654,7 @@ if (!this.DetailedInvoiceWiseReport) {
 				$('#field_contactPerson').val("");
 				$('#field_defaultDiscountPercentage').val("");
 				$('#field_closingBalance').val("");
-				DetailedInvoiceWiseReport.filter();
+				InvoiceWiseReportLite.filter();
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -637,14 +663,14 @@ if (!this.DetailedInvoiceWiseReport) {
 
 	};
 
-	DetailedInvoiceWiseReport.getForms = function() {
+	InvoiceWiseReportLite.getForms = function() {
 		var dynamicDocumentPid = $("#field_dynamicDocument").val();
 		if (dynamicDocumentPid == "-1") {
 			$("#field_form").html('<option value="-1">Select Form</option>');
 			return;
 		}
 		$.ajax({
-			url : detailedInvoiceWiseReportContextPath + "/getForms/"
+			url : invoiceWiseReportLiteContextPath + "/getForms/"
 					+ dynamicDocumentPid,
 			method : 'GET',
 			success : function(data) {
@@ -667,7 +693,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		});
 	}
 
-	DetailedInvoiceWiseReport.loadAccountFromForm = function() {
+	InvoiceWiseReportLite.loadAccountFromForm = function() {
 		$('#field_name').val("");
 		$('#field_alias').val("");
 		$('#field_city').val("City");
@@ -691,7 +717,7 @@ if (!this.DetailedInvoiceWiseReport) {
 			return;
 		}
 		$.ajax({
-			url : detailedInvoiceWiseReportContextPath + "/getAccountFromForm",
+			url : invoiceWiseReportLiteContextPath + "/getAccountFromForm",
 			method : 'GET',
 			data : {
 				formPid : formPid,
@@ -751,11 +777,11 @@ if (!this.DetailedInvoiceWiseReport) {
 
 	};
 
-	DetailedInvoiceWiseReport.getLocation = function(obj) {
+	InvoiceWiseReportLite.getLocation = function(obj) {
 		var pid = $(obj).attr("id");
 		$(obj).html("loading...");
 		$.ajax({
-			url : detailedInvoiceWiseReportContextPath + "/updateLocation/" + pid,
+			url : invoiceWiseReportLiteContextPath + "/updateLocation/" + pid,
 			method : 'GET',
 			success : function(data) {
 				$(obj).html(data.location);
@@ -769,11 +795,11 @@ if (!this.DetailedInvoiceWiseReport) {
 
 	}
 
-	DetailedInvoiceWiseReport.getTowerLocation = function(obj) {
+	InvoiceWiseReportLite.getTowerLocation = function(obj) {
 		var pid = $(obj).attr("id");
 		$(obj).html("loading...");
 		$.ajax({
-			url : detailedInvoiceWiseReportContextPath + "/updateTowerLocation/" + pid,
+			url : invoiceWiseReportLiteContextPath + "/updateTowerLocation/" + pid,
 			method : 'GET',
 			success : function(data) {
 				$(obj).html(data.towerLocation);
@@ -822,7 +848,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		return images;
 	}
 
-	DetailedInvoiceWiseReport.accept = function(pid, obj) {
+	InvoiceWiseReportLite.accept = function(pid, obj) {
 		$.ajax({
 			url : location.protocol + '//' + location.host
 					+ "/web/verification/accept/" + pid,
@@ -842,7 +868,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		});
 	}
 
-	DetailedInvoiceWiseReport.reject = function() {
+	InvoiceWiseReportLite.reject = function() {
 		var reasons = $("#field_reason").val();
 
 		if (reasons == null) {
@@ -875,7 +901,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		});
 	}
 
-	DetailedInvoiceWiseReport.showModal = function(pid, obj) {
+	InvoiceWiseReportLite.showModal = function(pid, obj) {
 		object = obj;
 		invoiceWiseReportPid = pid;
 		$("#field_reason").val("");
@@ -883,7 +909,7 @@ if (!this.DetailedInvoiceWiseReport) {
 
 	}
 
-	DetailedInvoiceWiseReport.viewDetails = function(pid, documentType) {
+	InvoiceWiseReportLite.viewDetails = function(pid, documentType) {
 		if (documentType == "INVENTORY_VOUCHER") {
 			showInventoryVoucher(pid);
 		} else if (documentType == "ACCOUNTING_VOUCHER") {
@@ -893,7 +919,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		}
 	}
 
-	DetailedInvoiceWiseReport.showModalPopup = function(el, pid, action) {
+	InvoiceWiseReportLite.showModalPopup = function(el, pid, action) {
 		if (pid) {
 			switch (action) {
 			case 0:
@@ -1251,7 +1277,7 @@ if (!this.DetailedInvoiceWiseReport) {
 		$('#viewModalDynamicDocument').modal('show');
 	}
 
-	DetailedInvoiceWiseReport.showDatePicker = function() {
+	InvoiceWiseReportLite.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");
 		if ($('#dbDateSearch').val() == "CUSTOM") {
@@ -1280,7 +1306,7 @@ if (!this.DetailedInvoiceWiseReport) {
 
 	}
 
-	DetailedInvoiceWiseReport.closeModalPopup = function(el) {
+	InvoiceWiseReportLite.closeModalPopup = function(el) {
 		el.modal('hide');
 	}
 
