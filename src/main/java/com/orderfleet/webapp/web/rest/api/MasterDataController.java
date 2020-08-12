@@ -1572,14 +1572,23 @@ public class MasterDataController {
 
 	@RequestMapping(value = "/stockDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<List<StockDetailsDTO>> filter(@RequestParam("userPid") String userPid) {
+	public ResponseEntity<List<StockDetailsDTO>> filter(@RequestParam("userPid") String userPid,
+			@RequestParam(name="stockLocationPid",required = false) String stockLocationPid) {
 		log.debug("API request to fetch users Stock Details (Van sales)");
 
 		long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Optional<User> user = userRepository.findOneByPid(userPid);
 		long userId = user.get().getId();
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
-		List<UserStockLocation> userStockLocations = userStockLocationRepository.findByUserPid(user.get().getPid());
+		List<UserStockLocation> userStockLocations = new ArrayList<>();
+		if(stockLocationPid != null && !stockLocationPid.isEmpty()){
+			userStockLocations = userStockLocationRepository.findByUserPidAndStockLocationPid(user.get().getPid(), stockLocationPid);
+			log.info("stock details based on stocklocation and user"+userStockLocations.size());
+		}else{
+			userStockLocations = userStockLocationRepository.findByUserPid(user.get().getPid());
+			log.info("stock details based on  user");
+		}
+		
 		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
 				.collect(Collectors.toSet());
 		List<OpeningStock> openingStockUserBased = openingStockRepository

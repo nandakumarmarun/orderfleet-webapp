@@ -506,7 +506,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 					stockDetailsDTO.setProductName(productName + name);
 
 				} else {
-					log.info("Product Profile Size < 0");
+					
 					stockDetailsDTO.setProductName(productName);
 				}
 			} else {

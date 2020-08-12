@@ -51,4 +51,6 @@ public interface UserStockLocationRepository extends JpaRepository<UserStockLoca
 	List<String> findPidByCompanyId(Long id);
 	
 	void deleteByCompanyIdAndStockLocationPid(Long companyId, String pid);
+	
+	List<UserStockLocation> findByUserPidAndStockLocationPid(String fromUserPid,String stockLocationPid);
 }

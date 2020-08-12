@@ -53,6 +53,7 @@ public class MobileMasterUpdateController {
 			mobileMasterUpdate = mobileMasterUpdateService.convertMobileMasterUpdate(mobileMasterUpdateDTO);
 		}
 		
+		System.out.println("MobileMasterUpdateId :"+mobileMasterUpdate.getId());
 		if(mobileMasterUpdate != null) {
 			
 			List<MobileMasterDetail> mmdList = mobileMasterDetailService.convertMobileMasterDetails(
