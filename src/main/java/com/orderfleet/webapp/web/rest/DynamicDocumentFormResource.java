@@ -74,7 +74,7 @@ public class DynamicDocumentFormResource {
 
 	@Inject
 	private UserDocumentService userDocumentService;
-	
+
 	@Inject
 	private UserService userService;
 
@@ -94,12 +94,11 @@ public class DynamicDocumentFormResource {
 	/**
 	 * GET /dynamic-documents : get all the filled forms.
 	 *
-	 * @param pageable
-	 *            the pagination information
-	 * @return the ResponseEntity with status 200 (OK) and the list of filled
-	 *         forms in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @param pageable the pagination information
+	 * @return the ResponseEntity with status 200 (OK) and the list of filled forms
+	 *         in body
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@GetMapping("/dynamic-document-forms")
 	@Timed
@@ -118,16 +117,17 @@ public class DynamicDocumentFormResource {
 	public @ResponseBody List<DocumentDTO> getDocumentsByUser(@RequestParam(value = "employeePid") String employeePid) {
 		List<DocumentDTO> documentDTOs = new ArrayList<>();
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
-		if(employeePid.equals("all")) {
+		if (employeePid.equals("all")) {
 			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-			System.out.println("Subordinate user id :"+userIds.toString());
-			if(!userIds.isEmpty()) {
-				documentDTOs = userDocumentService.findDocumentsByUserIdsAndDocumentType(userIds,DocumentType.DYNAMIC_DOCUMENT);
-			}else {
+			System.out.println("Subordinate user id :" + userIds.toString());
+			if (!userIds.isEmpty()) {
+				documentDTOs = userDocumentService.findDocumentsByUserIdsAndDocumentType(userIds,
+						DocumentType.DYNAMIC_DOCUMENT);
+			} else {
 				documentDTOs = userDocumentService.findDocumentsByUserIsCurrentUser();
-				documentDTOs.removeIf(doc -> doc.getDocumentType()!=DocumentType.DYNAMIC_DOCUMENT);
+				documentDTOs.removeIf(doc -> doc.getDocumentType() != DocumentType.DYNAMIC_DOCUMENT);
 			}
-		}else {
+		} else {
 			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
 			String userPid = employeeProfileDTO.getUserPid();
 			documentDTOs = userDocumentService.findDocumentsByUserAndDocumentType(userPid,
@@ -153,6 +153,8 @@ public class DynamicDocumentFormResource {
 		log.debug("filter dynamic document forms by documentPid : {} and formPid : {}", documentPid, formPid);
 
 		DateTimeFormatter fmt = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+		DateTimeFormatter date = DateTimeFormatter.ofPattern("MMM dd,yyyy");
+		DateTimeFormatter time = DateTimeFormatter.ofPattern("hh:mm:ss a");
 
 		DynamicFormDTO dynamicFormDTO = new DynamicFormDTO();
 		Optional<FormDTO> optionalFormDto = formService.findOneByPid(formPid);
@@ -170,7 +172,8 @@ public class DynamicDocumentFormResource {
 				elementNameToShow.add("Phone Number");
 				elementNameToShow.add("User");
 				elementNameToShow.add("Employee");
-				elementNameToShow.add("Timestamp");
+				elementNameToShow.add("Date");
+				elementNameToShow.add("Time");
 				elementNameToShow.add("GPSLocation");
 
 			} else if (isHeaderIncluded && !includeAccount) {
@@ -178,7 +181,8 @@ public class DynamicDocumentFormResource {
 				elementNameToShow.add("Phone Number");
 				elementNameToShow.add("User");
 				elementNameToShow.add("Employee");
-				elementNameToShow.add("Timestamp");
+				elementNameToShow.add("Date");
+				elementNameToShow.add("Time");
 				elementNameToShow.add("GPSLocation");
 			}
 			elementNameToShow
@@ -186,7 +190,8 @@ public class DynamicDocumentFormResource {
 							.stream().map(e -> e.getFormElement().getName()).collect(Collectors.toList()));
 			List<FilledForm> filledForms = new ArrayList<>();
 			if (filterBy.equals("TODAY")) {
-				filledForms = getFilterData(employeePid, documentPid, LocalDate.now(), LocalDate.now(), formDTO.getPid());
+				filledForms = getFilterData(employeePid, documentPid, LocalDate.now(), LocalDate.now(),
+						formDTO.getPid());
 			} else if (filterBy.equals("YESTERDAY")) {
 				LocalDate yeasterday = LocalDate.now().minusDays(1);
 				filledForms = getFilterData(employeePid, documentPid, yeasterday, yeasterday, formDTO.getPid());
@@ -196,7 +201,8 @@ public class DynamicDocumentFormResource {
 				filledForms = getFilterData(employeePid, documentPid, weekStartDate, LocalDate.now(), formDTO.getPid());
 			} else if (filterBy.equals("MTD")) {
 				LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-				filledForms = getFilterData(employeePid, documentPid, monthStartDate, LocalDate.now(), formDTO.getPid());
+				filledForms = getFilterData(employeePid, documentPid, monthStartDate, LocalDate.now(),
+						formDTO.getPid());
 			} else if (filterBy.equals("CUSTOM")) {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 				LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
@@ -223,10 +229,12 @@ public class DynamicDocumentFormResource {
 					elements.put(elementNameToShow.indexOf("Phone Number"), accPhone1);
 					elements.put(elementNameToShow.indexOf("User"),
 							filledForm.getDynamicDocumentHeader().getCreatedBy().getFirstName());
-					elements.put(elementNameToShow.indexOf("Employee"), 
+					elements.put(elementNameToShow.indexOf("Employee"),
 							filledForm.getDynamicDocumentHeader().getEmployee().getName());
-					elements.put(elementNameToShow.indexOf("Timestamp"),
-							fmt.format(filledForm.getDynamicDocumentHeader().getDocumentDate()).toString());
+					elements.put(elementNameToShow.indexOf("Date"),
+							date.format(filledForm.getDynamicDocumentHeader().getDocumentDate()).toString());
+					elements.put(elementNameToShow.indexOf("Time"),
+							time.format(filledForm.getDynamicDocumentHeader().getDocumentDate()).toString());
 					elements.put(elementNameToShow.indexOf("GPSLocation"),
 							filledForm.getDynamicDocumentHeader().getExecutiveTaskExecution().getLocation());
 				} else if (isHeaderIncluded && includeAccount) {
@@ -262,10 +270,12 @@ public class DynamicDocumentFormResource {
 					elements.put(elementNameToShow.indexOf("Phone Number"), accPhone1);
 					elements.put(elementNameToShow.indexOf("User"),
 							filledForm.getDynamicDocumentHeader().getCreatedBy().getFirstName());
-					elements.put(elementNameToShow.indexOf("Employee"), 
+					elements.put(elementNameToShow.indexOf("Employee"),
 							filledForm.getDynamicDocumentHeader().getEmployee().getName());
-					elements.put(elementNameToShow.indexOf("Timestamp"),
-							fmt.format(filledForm.getDynamicDocumentHeader().getDocumentDate()).toString());
+					elements.put(elementNameToShow.indexOf("Date"),
+							date.format(filledForm.getDynamicDocumentHeader().getDocumentDate()).toString());
+					elements.put(elementNameToShow.indexOf("Time"),
+							time.format(filledForm.getDynamicDocumentHeader().getDocumentDate()).toString());
 					elements.put(elementNameToShow.indexOf("GPSLocation"),
 							filledForm.getDynamicDocumentHeader().getExecutiveTaskExecution().getLocation());
 				}
@@ -298,12 +308,13 @@ public class DynamicDocumentFormResource {
 						}
 						// End
 						String c = elements.get(elementNameToShow.indexOf(ffd.getFormElement().getName()));
-						if(c != null) {
-							elements.put(elementNameToShow.indexOf(ffd.getFormElement().getName()), c+","+ffd.getValue());
-						}else {
+						if (c != null) {
+							elements.put(elementNameToShow.indexOf(ffd.getFormElement().getName()),
+									c + "," + ffd.getValue());
+						} else {
 							elements.put(elementNameToShow.indexOf(ffd.getFormElement().getName()), ffd.getValue());
 						}
-						
+
 					}
 				}
 				// sort the elements by key
@@ -347,11 +358,11 @@ public class DynamicDocumentFormResource {
 		List<String> userPids = new ArrayList<>();
 		if (employeeProfileDTO.getPid() != null) {
 			userPids.add(employeeProfileDTO.getUserPid());
-		}else {
+		} else {
 			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-			System.out.println("UserIds"+userIds.toString());
+			System.out.println("UserIds" + userIds.toString());
 			List<UserDTO> userDtoList = userService.findByUserIdIn(userIds);
-			userPids = userDtoList.stream().map(UserDTO :: getPid).collect(Collectors.toList());
+			userPids = userDtoList.stream().map(UserDTO::getPid).collect(Collectors.toList());
 		}
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
@@ -360,11 +371,10 @@ public class DynamicDocumentFormResource {
 			filledForms = filledFormRepository.findFilledFormsByDocumentAndFormPidAndCreatedDateBetween(documentPid,
 					formPid, fromDate, toDate);
 		} else if (!userPids.isEmpty()) {
-			filledForms = filledFormRepository.findFilledFormsByDocumentAndFormPidAndAndCreatedDateBetween(
-					documentPid, formPid, userPids, fromDate, toDate);
+			filledForms = filledFormRepository.findFilledFormsByDocumentAndFormPidAndAndCreatedDateBetween(documentPid,
+					formPid, userPids, fromDate, toDate);
 		}
 		return filledForms;
 	}
-	
-	
+
 }

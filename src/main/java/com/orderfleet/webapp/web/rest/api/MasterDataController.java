@@ -47,6 +47,7 @@ import com.orderfleet.webapp.repository.FormElementTypeRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.ReferenceDocumentRepository;
+import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
@@ -109,6 +110,7 @@ import com.orderfleet.webapp.service.UserRestrictedAttendanceSubgroupService;
 import com.orderfleet.webapp.service.UserStockLocationService;
 import com.orderfleet.webapp.service.VehicleService;
 import com.orderfleet.webapp.service.VoucherNumberGeneratorService;
+import com.orderfleet.webapp.web.rest.StockLocationResource;
 import com.orderfleet.webapp.web.rest.api.dto.DocumentAccountingVoucherColumnDTO;
 import com.orderfleet.webapp.web.rest.api.dto.DocumentInventoryVoucherColumnDTO;
 import com.orderfleet.webapp.web.rest.api.dto.FormFormElementDTO;
@@ -168,6 +170,8 @@ import com.orderfleet.webapp.web.rest.dto.VehicleDTO;
 import com.orderfleet.webapp.web.rest.dto.VoucherNumberGeneratorDTO;
 import com.orderfleet.webapp.web.rest.util.PaginationUtil;
 
+import net.bytebuddy.description.annotation.AnnotationSource.Empty;
+
 /**
  * REST controller for master data given to android device.
  *
@@ -200,7 +204,7 @@ public class MasterDataController {
 
 	@Inject
 	private UserProductGroupService userProductGroupService;
-	
+
 	@Inject
 	private UserEcomProductGroupService userEcomProductGroupService;
 
@@ -227,7 +231,7 @@ public class MasterDataController {
 
 	@Inject
 	private DocumentProductGroupService documentProductGroupService;
-	
+
 	@Inject
 	private DocumentEcomProductGroupService documentEcomProductGroupService;
 
@@ -248,7 +252,7 @@ public class MasterDataController {
 
 	@Inject
 	private ProductGroupProductService productGroupProductService;
-	
+
 	@Inject
 	private EcomProductGroupProductService ecomProductGroupProductService;
 
@@ -371,9 +375,12 @@ public class MasterDataController {
 
 	@Inject
 	private UserStockLocationRepository userStockLocationRepository;
-	
+
 	@Inject
 	private SubFormElementService subFormElementService;
+
+	@Inject
+	private StockLocationRepository stockLocationRepository;
 
 	/**
 	 * GET /account-types : get all accountTypes.
@@ -603,7 +610,6 @@ public class MasterDataController {
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productGroupProductDTOs);
 	}
 
-	
 	/**
 	 * GET /product-group-products : get all the productGroupProducts.
 	 *
@@ -627,8 +633,7 @@ public class MasterDataController {
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productGroupProductDTOs);
 	}
-	
-	
+
 	/**
 	 * GET /product-groups : get all the productGroups.
 	 *
@@ -652,8 +657,7 @@ public class MasterDataController {
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productGroupDTOs);
 	}
-	
-	
+
 	/**
 	 * GET /product-groups : get all the productGroups.
 	 *
@@ -871,8 +875,7 @@ public class MasterDataController {
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(documentProductGroupDTOs);
 	}
-	
-	
+
 	@GetMapping(value = "/document-ecom-product-groups", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<DocumentEcomProductGroupDTO>> getAllDocumentEcomProductGroups(
@@ -950,7 +953,7 @@ public class MasterDataController {
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(formElementDTOs);
 	}
-	
+
 	/**
 	 * GET /form-elements : get all the formElements.
 	 *
@@ -1597,6 +1600,28 @@ public class MasterDataController {
 		stockDetails
 				.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName().compareTo(s2.getProductName()));
 		return new ResponseEntity<>(stockDetails, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/stock-location-products", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<String>> getProductPidsByStockLocation(
+			@RequestParam(value = "stockLocationPid") String stockLocationPid) {
+
+		log.debug("REST request to get products by stockLocations");
+		List<String> producProfilePids = new ArrayList<>();
+		Optional<StockLocation> opStockLocation = stockLocationRepository.findOneByPid(stockLocationPid);
+		if (opStockLocation.isPresent()) {
+			List<OpeningStock> openingStocks = openingStockRepository.findByStockLocation(opStockLocation.get());
+			if (openingStocks != null && openingStocks.size() > 0) {
+				for (OpeningStock os : openingStocks) {
+					producProfilePids.add(os.getProductProfile().getPid());
+				}
+			}
+		}
+		if (producProfilePids.size() > 0) {
+			producProfilePids = producProfilePids.stream().distinct().collect(Collectors.toList());
+		}
+		return new ResponseEntity<>(producProfilePids, HttpStatus.OK);
 	}
 
 }

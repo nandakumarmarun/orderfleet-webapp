@@ -546,6 +546,10 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						destinationStockLocation = stockLocationRepository
 								.findOneByPid(inventoryVoucherDetailDTO.getDestinationStockLocationPid()).get();
 
+					if (inventoryVoucherDetailDTO.getStockLocationPid() != null) {
+						sourceStockLocation = stockLocationRepository
+								.findOneByPid(inventoryVoucherDetailDTO.getStockLocationPid()).get();
+					}
 					// find referenceInventory Voucher header and detail
 					InventoryVoucherHeader referenceInventoryVoucherHeader = null;
 					InventoryVoucherDetail referenceInventoryVoucherDetail = null;

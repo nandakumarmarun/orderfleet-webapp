@@ -105,6 +105,10 @@ public class InventoryVoucherDetailDTO {
 
 	private double ratePerPiece;
 
+	private String stockLocationPid;
+
+	private String stockLocationName;
+
 	public InventoryVoucherDetailDTO() {
 	}
 
@@ -527,6 +531,22 @@ public class InventoryVoucherDetailDTO {
 
 	public void setRatePerPieces(double ratePerPiece) {
 		this.ratePerPiece = ratePerPiece;
+	}
+
+	public String getStockLocationPid() {
+		return stockLocationPid;
+	}
+
+	public void setStockLocationPid(String stockLocationPid) {
+		this.stockLocationPid = stockLocationPid;
+	}
+
+	public String getStockLocationName() {
+		return stockLocationName;
+	}
+
+	public void setStockLocationName(String stockLocationName) {
+		this.stockLocationName = stockLocationName;
 	}
 
 	@Override
