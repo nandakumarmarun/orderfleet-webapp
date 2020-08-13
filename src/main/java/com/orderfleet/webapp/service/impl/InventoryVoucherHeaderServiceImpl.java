@@ -418,9 +418,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			
 			Set<Long> stockLocationIds = new HashSet<>();
 			stockLocationIds = stockLocations.stream().map(sl -> sl.getId()).collect(Collectors.toSet());
-			for(Long id : stockLocationIds){
-				System.out.println("Stock locations "+id.longValue());
-			}
+
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetailsByStockLocations(companyId, userId,
 					fromDate, toDate, stockLocationIds);
 			

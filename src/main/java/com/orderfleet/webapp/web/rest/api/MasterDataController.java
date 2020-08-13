@@ -1605,11 +1605,8 @@ public class MasterDataController {
 			log.info("stockdetails check 1 :-"+stockDetails.size());
 			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get(),usersStockLocations, stockLocationSelected);
 			log.info("unsaled stockdetails check 2 :-"+unSaled.size());
-			for(StockDetailsDTO sd : unSaled){
-				log.info(sd.getProductName()+"======");
-			}
+
 			for (StockDetailsDTO dto : stockDetails) {
-				log.info("--"+dto.getProductName());
 				
 				unSaled.removeIf(unSale -> unSale.getProductName().equals(dto.getProductName()));
 			}
