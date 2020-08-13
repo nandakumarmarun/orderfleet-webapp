@@ -1581,9 +1581,11 @@ public class MasterDataController {
 		long userId = user.get().getId();
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
 		List<UserStockLocation> userStockLocations = new ArrayList<>();
+		boolean stockLocationSelected = false;
 		if(stockLocationPid != null && !stockLocationPid.isEmpty()){
 			userStockLocations = userStockLocationRepository.findByUserPidAndStockLocationPid(user.get().getPid(), stockLocationPid);
 			log.info("stock details based on stocklocation and user"+userStockLocations.size());
+			stockLocationSelected = true;
 		}else{
 			userStockLocations = userStockLocationRepository.findByUserPid(user.get().getPid());
 			log.info("stock details based on  user");
@@ -1598,14 +1600,22 @@ public class MasterDataController {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();
 			// LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
 			LocalDateTime toDate = LocalDate.now().atTime(23, 59);
-			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate);
-			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get());
+			
+			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate ,usersStockLocations);
+			log.info("stockdetails check 1 :-"+stockDetails.size());
+			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get(),usersStockLocations, stockLocationSelected);
+			log.info("unsaled stockdetails check 2 :-"+unSaled.size());
+			for(StockDetailsDTO sd : unSaled){
+				log.info(sd.getProductName()+"======");
+			}
 			for (StockDetailsDTO dto : stockDetails) {
+				log.info("--"+dto.getProductName());
+				
 				unSaled.removeIf(unSale -> unSale.getProductName().equals(dto.getProductName()));
 			}
 			stockDetails.addAll(unSaled);
 		}
-
+		log.info(stockDetails.size()+" size of stockdetails");
 		stockDetails
 				.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName().compareTo(s2.getProductName()));
 		return new ResponseEntity<>(stockDetails, HttpStatus.OK);

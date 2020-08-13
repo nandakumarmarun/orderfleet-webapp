@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
+import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
 
@@ -130,7 +131,7 @@ public interface InventoryVoucherHeaderService {
 
 	List<Object[]> findByCompanyIdAndInventoryPidIn(List<String> inventoryPids);
 
-	List<StockDetailsDTO> findAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate);
+	List<StockDetailsDTO> findAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate, Set<StockLocation> stockLocation);
 	
 	InventoryVoucherHeader updateInventoryVoucherHeader(InventoryVoucherHeaderDTO inventoryVoucherHeaderDto);
 

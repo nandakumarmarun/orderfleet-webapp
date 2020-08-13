@@ -128,17 +128,17 @@ public class StockDetailsResource {
 		long userId = userOp.get().getId();
 
 		List<UserStockLocation> userStockLocations = userStockLocationRepository.findByUserPid(userOp.get().getPid());
-		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
+		Set<StockLocation> stockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
 				.collect(Collectors.toSet());
 		List<OpeningStock> openingStockUserBased = openingStockRepository
-				.findByStockLocationInOrderByCreatedDateAsc(new ArrayList<>(usersStockLocations));
+				.findByStockLocationInOrderByCreatedDateAsc(new ArrayList<>(stockLocations));
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
 		if (openingStockUserBased.size() != 0) {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();
 			// LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
 			LocalDateTime toDate = LocalDate.now().atTime(23, 59);
-			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate);
-			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(userOp.get());
+			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate,null);
+			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(userOp.get(),stockLocations,false);
 			for (StockDetailsDTO dto : stockDetails) {
 				unSaled.removeIf(unSale -> unSale.getProductName().equals(dto.getProductName()));
 			}
@@ -170,8 +170,8 @@ public class StockDetailsResource {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();
 			// LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
 			LocalDateTime toDate = LocalDate.now().atTime(23, 59);
-			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate);
-			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get());
+			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate,null);
+			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get(),usersStockLocations,false);
 			for (StockDetailsDTO dto : stockDetails) {
 				unSaled.removeIf(unSale -> unSale.getProductName().equals(dto.getProductName()));
 			}

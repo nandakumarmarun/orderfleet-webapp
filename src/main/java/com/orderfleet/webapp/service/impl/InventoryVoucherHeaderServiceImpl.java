@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ProductNameTextSettings;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.ProductNameTextSettingsRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
@@ -408,11 +410,26 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 	@Override
 	public List<StockDetailsDTO> findAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate,
-			LocalDateTime toDate) {
+			LocalDateTime toDate, Set<StockLocation> stockLocations) {
 
-		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetails(companyId, userId,
-				fromDate, toDate);
+		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
+		if(stockLocations != null && stockLocations.size()!=0){
+			
+			Set<Long> stockLocationIds = new HashSet<>();
+			stockLocationIds = stockLocations.stream().map(sl -> sl.getId()).collect(Collectors.toSet());
+			for(Long id : stockLocationIds){
+				System.out.println("Stock locations "+id.longValue());
+			}
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetailsByStockLocations(companyId, userId,
+					fromDate, toDate, stockLocationIds);
+			
+			log.info("in stocklocation based "+inventoryVoucherHeaders.size());
+		}else{
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetails(companyId, userId,
+					fromDate, toDate);
+			log.info("in user  based");
+		}
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyIdActivatedTrue();
 		List<ProductProfileDTO> productProfileDtos = productProfileMapper
 				.productProfilesToProductProfileDTOs(productProfiles);
@@ -430,6 +447,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			double freeQuantity = 0.0;
 			if (obj[5] != null) {
 				opStock = Double.parseDouble(obj[5].toString());
+				log.info(obj[3]+" opStock : "+opStock);
 			}
 
 			if (obj[4] != null) {

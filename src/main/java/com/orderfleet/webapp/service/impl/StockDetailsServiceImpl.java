@@ -3,6 +3,7 @@ package com.orderfleet.webapp.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ProductNameTextSettings;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
@@ -49,10 +51,18 @@ public class StockDetailsServiceImpl implements StockDetailsService {
 	private final Logger log = LoggerFactory.getLogger(InventoryVoucherHeaderServiceImpl.class);
 
 	@Override
-	public List<StockDetailsDTO> findOtherStockItems(User user) {
+	public List<StockDetailsDTO> findOtherStockItems(User user ,Set<StockLocation> stockLocations,boolean stockLocationSelected) {
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
 		List<UserStockLocation> userStockLocation = new ArrayList<>();
 		userStockLocation = userStockLocationRepository.findByUserPid(user.getPid());
+		
+		if(stockLocations  != null && stockLocations.size() == 1 && stockLocationSelected){
+			String stockLocationPid = stockLocations.stream().findAny().get().getPid();
+			userStockLocation = userStockLocationRepository.findByUserPidAndStockLocationPid(user.getPid(), stockLocationPid);
+		}else{
+			userStockLocation = userStockLocationRepository.findByUserPid(user.getPid());
+		}
+		
 		if (!userStockLocation.isEmpty()) {
 			List<OpeningStock> openingStockList = openingStockRepository.findByStockLocationIn(
 					userStockLocation.stream().map(us -> us.getStockLocation()).collect(Collectors.toList()));

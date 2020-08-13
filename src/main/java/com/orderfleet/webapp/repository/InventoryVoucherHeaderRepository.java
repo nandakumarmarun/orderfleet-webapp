@@ -72,6 +72,17 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "inner join tbl_product_profile pp on pp.id = ivd.product_id where ivh.company_id = ?1 and "
 			+ "ivh.created_by_id in (?2) and ivh.created_date BETWEEN ?3 AND ?4 and "
 			+ "ivd.product_id = op.product_profile_id order by ivd.product_id";
+	
+	public static final String STOCK_DETAILS_STOCKLOCATION_BASED = "select "
+			+ "ivh.created_by_id as users,ivh.created_date,pp.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
+			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity "
+			+ "from tbl_inventory_voucher_detail ivd "
+			+ "inner join tbl_inventory_voucher_header ivh on ivd.inventory_voucher_header_id = ivh.id "
+			+ "inner join tbl_stock_location sl on sl.id IN ?5 "
+			+ "inner join tbl_opening_stock op on op.stock_location_id = sl.id "
+			+ "inner join tbl_product_profile pp on pp.id = ivd.product_id where ivh.company_id = ?1 and "
+			+ "ivh.created_by_id in (?2) and ivh.created_date BETWEEN ?3 AND ?4 and "
+			+ "ivd.product_id = op.product_profile_id order by ivd.product_id";
 
 	public static final String DOCUMENT_NUMBER = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
 			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "
@@ -480,6 +491,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query(value = PRIMARY_SECONDARY_SALES_ORDER_EXCEL, nativeQuery = true)
 	List<Object[]> getPrimarySecondarySalesOrderForExcel(Long companyId, List<Long> documentIds);
+
+	@Query(value = STOCK_DETAILS_STOCKLOCATION_BASED, nativeQuery = true)
+	List<Object[]> getAllStockDetailsByStockLocations(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate,Set<Long> stockLocationIds);
 
 	@Query(value = STOCK_DETAILS, nativeQuery = true)
 	List<Object[]> getAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate);
