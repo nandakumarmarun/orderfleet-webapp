@@ -166,12 +166,16 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	@Query("select dd.pid,dd.document.name,dd.document.pid from DynamicDocumentHeader dd where dd.company.id = ?#{principal.companyId} and dd.executiveTaskExecution.id in ?1")
 	List<Object[]> findDynamicDocumentsHeaderByExecutiveTaskExecutionIdin(Set<Long> exeIds);
 
-	@Query(value = "select count(*),doc.pid from tbl_dynamic_document_header ddh " + 
-			"inner join tbl_document doc on ddh.document_id = doc.id " + 
-			"where ddh.company_id = ?#{principal.companyId} and ddh.created_by_id = ?1 " + 
-			"and ddh.created_date between ?2 and ?3  group by doc.pid",nativeQuery = true)
-	List<Object[]> findCountOfEachDynamicTypeDocuments(long userId,LocalDateTime fDate,LocalDateTime tDate);
-	
+	@Query(value = "select count(*),doc.pid from tbl_dynamic_document_header ddh "
+			+ "inner join tbl_document doc on ddh.document_id = doc.id "
+			+ "where ddh.company_id = ?#{principal.companyId} and ddh.created_by_id = ?1 "
+			+ "and ddh.created_date between ?2 and ?3  group by doc.pid", nativeQuery = true)
+	List<Object[]> findCountOfEachDynamicTypeDocuments(long userId, LocalDateTime fDate, LocalDateTime tDate);
+
+	@Query(value = "select ddh.id,ddh.executive_task_execution_id,ddh.created_by_id,ddh.employee_id,ddh.document_date from tbl_dynamic_document_header ddh "
+			+ "where ddh.company_id = ?#{principal.companyId} and ddh.id IN ?1", nativeQuery = true)
+	List<Object[]> findByFilledDynamicDocumentHeaderIdIn(Set<Long> id);
+
 	// @Query("select
 	// dDocument.pid,dDocument.documentNumberLocal,dDocument.documentNumberServer,dDocument.document.pid,"
 	// +

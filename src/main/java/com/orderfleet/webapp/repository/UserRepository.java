@@ -57,7 +57,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query("select user from User user where user.company.id = ?#{principal.companyId} and user.activated = 'TRUE'")
 	List<User> findAllByCompanyId();
-	
+
 	@Query("select user from User user join fetch user.authorities a where a.name IN ('ROLE_ECOM_REG') and user.company.id = ?#{principal.companyId} and user.activated = 'TRUE'")
 	List<User> findAllEcomUsersByCompanyId();
 
@@ -123,5 +123,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query("select user from User user where user.id in ?1 and user.company.id=?#{principal.companyId}")
 	List<User> findAllByCompanyIdAndIdsIn(Set<Long> userIds);
+
+	@Query("select user.id from User user where user.pid in ?1 and user.company.id=?#{principal.companyId}")
+	List<Long> findAllUserByUserPidsIn(List<String> userPids);;
+
+	@Query("select user.id,user.firstName from User user where user.id IN ?1 and user.company.id=?#{principal.companyId}")
+	List<Object[]> findByUserIdIn(Set<Long> ids);
 
 }

@@ -100,4 +100,7 @@ public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile
 
 	@Query("select employeeProfile.user.id from EmployeeProfile employeeProfile where employeeProfile.activated = ?1 and employeeProfile.company.id = ?#{principal.companyId}")
 	List<Long> findAllUserIdsByActivatedAndCompanyId(boolean activated);
+
+	@Query("select employeeProfile.id,employeeProfile.name from EmployeeProfile employeeProfile where employeeProfile.company.id = ?#{principal.companyId} and employeeProfile.id IN ?1")
+	List<Object[]> findByEmpIdIn(Set<Long> ids);
 }
