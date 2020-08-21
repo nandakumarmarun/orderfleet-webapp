@@ -331,9 +331,9 @@ public class TaskSubmissionPostSave {
 				executiveTaskExecutionSmsService.sendSms(tsTransactionWrapper);
 			}
 
-			if (inventoryVouchers != null) {
-				updateOpeningStockOfSourceStockLocation(inventoryVouchers);
-			}
+//			if (inventoryVouchers != null) {
+//				updateOpeningStockOfSourceStockLocation(inventoryVouchers);
+//			}
 
 		} catch (TaskSubmissionPostSaveException ex) {
 			log.debug("Exception while processing doPostSaveExecutivetaskSubmission method {}", ex);
@@ -349,28 +349,28 @@ public class TaskSubmissionPostSave {
 		}
 	}
 
-	private void updateOpeningStockOfSourceStockLocation(List<InventoryVoucherHeader> inventoryVouchers) {
-
-		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVouchers) {
-			if (inventoryVoucherHeader.getInventoryVoucherDetails() != null) {
-				for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader
-						.getInventoryVoucherDetails()) {
-					if (inventoryVoucherDetail.getSourceStockLocation() != null) {
-						Optional<OpeningStock> opOpeningStock = openingStockRepository
-								.findTop1ByProductProfilePidAndStockLocationPidOrderByCreatedDateDesc(
-										inventoryVoucherDetail.getProduct().getPid(),
-										inventoryVoucherDetail.getSourceStockLocation().getPid());
-						if (opOpeningStock.isPresent()) {
-							OpeningStock openingStock = opOpeningStock.get();
-							double newQuantity = openingStock.getQuantity() - inventoryVoucherDetail.getQuantity();
-							openingStock.setQuantity(newQuantity);
-							openingStockRepository.save(openingStock);
-						}
-					}
-				}
-			}
-		}
-	}
+//	private void updateOpeningStockOfSourceStockLocation(List<InventoryVoucherHeader> inventoryVouchers) {
+//
+//		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVouchers) {
+//			if (inventoryVoucherHeader.getInventoryVoucherDetails() != null) {
+//				for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader
+//						.getInventoryVoucherDetails()) {
+//					if (inventoryVoucherDetail.getSourceStockLocation() != null) {
+//						Optional<OpeningStock> opOpeningStock = openingStockRepository
+//								.findTop1ByProductProfilePidAndStockLocationPidOrderByCreatedDateDesc(
+//										inventoryVoucherDetail.getProduct().getPid(),
+//										inventoryVoucherDetail.getSourceStockLocation().getPid());
+//						if (opOpeningStock.isPresent()) {
+//							OpeningStock openingStock = opOpeningStock.get();
+//							double newQuantity = openingStock.getQuantity() - inventoryVoucherDetail.getQuantity();
+//							openingStock.setQuantity(newQuantity);
+//							openingStockRepository.save(openingStock);
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
 
 	private void updateLocationInfo(ExecutiveTaskExecution executiveTaskExecution)
 			throws TaskSubmissionPostSaveException {
