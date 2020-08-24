@@ -46,23 +46,35 @@ if (!this.InvoiceWiseReportLite) {
 		let filterBy = getParameterByName('filterBy');
 		if (filterBy) {
 			$('#dbDateSearch').val(filterBy);
-			//InvoiceWiseReportLite.filter();
+			// InvoiceWiseReportLite.filter();
 		}
 
 		$('.selectpicker').selectpicker();
 	});
 
+//	InvoiceWiseReportLite.downloadXls = function() {
+//		var excelName = "acvts_txns_"
+//				+ new Date().toISOString().replace(/[\-\:\.]/g, "");
+//		var instance = $('#tblInvoiceWiseReport').tableExport({
+//			formats : [ 'xlsx' ],
+//			filename : excelName,
+//			exportButtons : false
+//		});
+//		var exportData = instance.getExportData()['tblInvoiceWiseReport']['xlsx'];
+//		instance.export2file(exportData.data, exportData.mimeType,
+//				exportData.filename, exportData.fileExtension);
+//	}
+	
 	InvoiceWiseReportLite.downloadXls = function() {
-		var excelName = "acvts_txns_"
-				+ new Date().toISOString().replace(/[\-\:\.]/g, "");
-		var instance = $('#tblInvoiceWiseReport').tableExport({
-			formats : [ 'xlsx' ],
-			filename : excelName,
-			exportButtons : false
-		});
-		var exportData = instance.getExportData()['tblInvoiceWiseReport']['xlsx'];
-		instance.export2file(exportData.data, exportData.mimeType,
-				exportData.filename, exportData.fileExtension);
+		// Avoid last column in each row
+		// $("#tblInvoiceWiseReport th:last-child, #tblAccountProfile
+		// td:last-child").hide();
+		
+		var excelName = "acvts_txns_"+ new Date().toISOString().replace(/[\-\:\.]/g, "");
+		 var table2excel = new Table2Excel();
+		     table2excel.export(document.getElementById('tblInvoiceWiseReport'),excelName);
+		 // $("#tblAccountProfile th:last-child, #tblAccountProfile
+			// td:last-child").show();
 	}
 	
 
@@ -123,9 +135,11 @@ if (!this.InvoiceWiseReportLite) {
 						$('#tBodyInvoiceWiseReport').html("");
 						$("#activity-time").text("");
 						$("#lblActivities").text(invoiceWiseReports.length);
-						/*$("#lblTransactionAmount").text("0");
-						$("#lblTransactionVolume").text("0");
-						$("#lblTotalPayments").text("0");*/
+						/*
+						 * $("#lblTransactionAmount").text("0");
+						 * $("#lblTransactionVolume").text("0");
+						 * $("#lblTotalPayments").text("0");
+						 */
 						if (invoiceWiseReports.length == 0) {
 							$('#tBodyInvoiceWiseReport')
 									.html(
@@ -303,11 +317,11 @@ if (!this.InvoiceWiseReportLite) {
 																	+ towerLocationName
 																	+ "</td><td>"
 																	+ withCustomer
-																	/*+ "</td><td>"
-																	+ invoiceWiseReport.totalSalesOrderAmount
-																	+ "</td>"
-																	+ "<td>"
-																	+ invoiceWiseReport.totalRecieptAmount*/
+																	/*
+																	 * + "</td><td>" +
+																	 * invoiceWiseReport.totalSalesOrderAmount + "</td>" + "<td>" +
+																	 * invoiceWiseReport.totalRecieptAmount
+																	 */
 																	+ "</td><td>"
 																	+ (invoiceWiseReport.remarks == null ? ""
 																			: invoiceWiseReport.remarks)

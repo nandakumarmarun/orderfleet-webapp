@@ -885,7 +885,11 @@
 		var="tableExport"></spring:url>
 	<script type="text/javascript" src="${jsXlsx}"></script>
 	<script type="text/javascript" src="${fileSaver}"></script>
-	<script type="text/javascript" src="${tableExport}"></script>
+	<!--  <script type="text/javascript" src="${tableExport}"></script>-->
+	
+	<spring:url value="/resources/assets/js/table2excel.js"
+		var="table2excel"></spring:url>
+	<script type="text/javascript" src="${table2excel}"></script>
 
 	<spring:url value="/resources/app/report-common-js-file.js"
 		var="reportcommonjsfileJS"></spring:url>
@@ -962,22 +966,39 @@
 								InvoiceWiseReportLite.loadAccountFromForm();
 							});
 
-							$('#btnDownload')
-									.on(
-											'click',
-											function() {
-												var tblInvoiceWiseReport = $("#tblInvoiceWiseReport tbody");
-												if (tblInvoiceWiseReport
-														.children().length == 0) {
-													alert("no values available");
-													return;
-												}
-												if (tblInvoiceWiseReport[0].textContent == "No data available") {
-													alert("no values available");
-													return;
-												}
-												InvoiceWiseReportLite.downloadXls();
-											});
+// 							$('#btnDownload')
+// 									.on(
+// 											'click',
+// 											function() {
+// 												var tblInvoiceWiseReport = $("#tblInvoiceWiseReport tbody");
+// 												if (tblInvoiceWiseReport
+// 														.children().length == 0) {
+// 													alert("no values available");
+// 													return;
+// 												}
+// 												if (tblInvoiceWiseReport[0].textContent == "No data available") {
+// 													alert("no values available");
+// 													return;
+// 												}
+// 												InvoiceWiseReportLite.downloadXls();
+// 											});
+
+
+ 							$('#btnDownload').on('click',function() {
+ 								var tblInvoiceWiseReport = $("#tblInvoiceWiseReport tbody");
+					
+ 								if (tblInvoiceWiseReport
+ 										.children().length == 0) {
+ 									alert("no values available");
+ 									return;
+ 								}
+ 								if (tblInvoiceWiseReport[0].textContent == "No data available") {
+ 									alert("no values available");
+ 									return;
+ 								}
+ 								InvoiceWiseReportLite.downloadXls();							
+								
+ 							});
 
 							//InvoiceWiseReportLite.filter();
 							//if(documentType == null){

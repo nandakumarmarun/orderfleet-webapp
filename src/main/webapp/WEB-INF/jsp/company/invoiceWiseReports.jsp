@@ -880,11 +880,15 @@
 		var="jsXlsx"></spring:url>
 	<spring:url value="/resources/assets/js/tableexport/FileSaver.min.js"
 		var="fileSaver"></spring:url>
-	<spring:url value="/resources/assets/js/tableexport/tableexport.min.js"
-		var="tableExport"></spring:url>
+<%-- 	<spring:url value="/resources/assets/js/tableexport/tableexport.min.js" --%>
+<%-- 		var="tableExport"></spring:url> --%>
 	<script type="text/javascript" src="${jsXlsx}"></script>
 	<script type="text/javascript" src="${fileSaver}"></script>
-	<script type="text/javascript" src="${tableExport}"></script>
+<%-- 	<script type="text/javascript" src="${tableExport}"></script> --%>
+	
+	<spring:url value="/resources/assets/js/table2excel.js"
+		var="table2excel"></spring:url>
+	<script type="text/javascript" src="${table2excel}"></script>
 
 	<spring:url value="/resources/app/report-common-js-file.js"
 		var="reportcommonjsfileJS"></spring:url>

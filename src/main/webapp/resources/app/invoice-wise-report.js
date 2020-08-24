@@ -52,17 +52,29 @@ if (!this.InvoiceWiseReport) {
 		$('.selectpicker').selectpicker();
 	});
 
+//	InvoiceWiseReport.downloadXls = function() {
+//		var excelName = "acvts_txns_"
+//				+ new Date().toISOString().replace(/[\-\:\.]/g, "");
+//		var instance = $('#tblInvoiceWiseReport').tableExport({
+//			formats : [ 'xlsx' ],
+//			filename : excelName,
+//			exportButtons : false
+//		});
+//		var exportData = instance.getExportData()['tblInvoiceWiseReport']['xlsx'];
+//		instance.export2file(exportData.data, exportData.mimeType,
+//				exportData.filename, exportData.fileExtension);
+//	}
+	
 	InvoiceWiseReport.downloadXls = function() {
-		var excelName = "acvts_txns_"
-				+ new Date().toISOString().replace(/[\-\:\.]/g, "");
-		var instance = $('#tblInvoiceWiseReport').tableExport({
-			formats : [ 'xlsx' ],
-			filename : excelName,
-			exportButtons : false
-		});
-		var exportData = instance.getExportData()['tblInvoiceWiseReport']['xlsx'];
-		instance.export2file(exportData.data, exportData.mimeType,
-				exportData.filename, exportData.fileExtension);
+		// Avoid last column in each row
+		// $("#tblInvoiceWiseReport th:last-child, #tblAccountProfile
+		// td:last-child").hide();
+		
+		var excelName = "acvts_txns_"+ new Date().toISOString().replace(/[\-\:\.]/g, "");
+		 var table2excel = new Table2Excel();
+		     table2excel.export(document.getElementById('tblInvoiceWiseReport'),excelName);
+		 // $("#tblAccountProfile th:last-child, #tblAccountProfile
+			// td:last-child").show();
 	}
 
 	InvoiceWiseReport.filter = function() {
