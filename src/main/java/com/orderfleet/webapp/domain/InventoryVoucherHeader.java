@@ -23,6 +23,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.SourceModule;
@@ -165,6 +166,11 @@ public class InventoryVoucherHeader implements Serializable {
 	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.DEFAULT;
 
 	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "process_flow_status", nullable = false, columnDefinition = "character varying DEFAULT 'DEFAULT'")
+	private ProcessFlowStatus processFlowStatus = ProcessFlowStatus.DEFAULT;
+
+	@NotNull
 	@Column(name = "pdf_download_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean pdfDownloadStatus = false;
 
@@ -176,6 +182,9 @@ public class InventoryVoucherHeader implements Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "send_sales_order_status", nullable = false, columnDefinition = "character varying DEFAULT 'NOT_SENT'")
 	private SendSalesOrderEmailStatus sendSalesOrderEmailStatus = SendSalesOrderEmailStatus.NOT_SENT;
+
+	@Column(name = "payment_received", nullable = false, columnDefinition = "double precision DEFAULT 0 ")
+	private double paymentReceived;
 
 	public Long getId() {
 		return id;
@@ -303,6 +312,14 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setDocumentVolumeUpdated(double documentVolumeUpdated) {
 		this.documentVolumeUpdated = documentVolumeUpdated;
+	}
+
+	public double getPaymentReceived() {
+		return paymentReceived;
+	}
+
+	public void setPaymentReceived(double paymentReceived) {
+		this.paymentReceived = paymentReceived;
 	}
 
 	public double getDocDiscountAmount() {
@@ -455,6 +472,14 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setSendSalesOrderEmailStatus(SendSalesOrderEmailStatus sendSalesOrderEmailStatus) {
 		this.sendSalesOrderEmailStatus = sendSalesOrderEmailStatus;
+	}
+
+	public ProcessFlowStatus getProcessFlowStatus() {
+		return processFlowStatus;
+	}
+
+	public void setProcessFlowStatus(ProcessFlowStatus processFlowStatus) {
+		this.processFlowStatus = processFlowStatus;
 	}
 
 }

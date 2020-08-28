@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
+import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
@@ -72,7 +73,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "inner join tbl_product_profile pp on pp.id = ivd.product_id where ivh.company_id = ?1 and "
 			+ "ivh.created_by_id in (?2) and ivh.created_date BETWEEN ?3 AND ?4 and "
 			+ "ivd.product_id = op.product_profile_id order by ivd.product_id";
-	
+
 	public static final String STOCK_DETAILS_STOCKLOCATION_BASED = "select "
 			+ "ivh.created_by_id as users,ivh.created_date,pp.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
 			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity "
@@ -91,13 +92,13 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3) and iv.created_date IN "
 			+ "(select MAX(ivh.created_date) from tbl_inventory_voucher_header ivh where "
 			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id)";
-	
+
 	public static final String ALL_DOCUMENT_NUMBER = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
 			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "
 			+ "INNER JOIN tbl_document doc on iv.document_id = doc.id "
 			+ "INNER JOIN tbl_user u on iv.created_by_id = u.id where "
 			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3)";
-	
+
 	public static final String EXCEL_SALES_DOWNLOAD = "select ap.name accName,ivh.order_number,ivh.document_date,emp.name empName, "
 			+ " pp.name ppName ,ivd.selling_rate,ivd.quantity , pp.sku  from tbl_inventory_voucher_header ivh "
 			+ " INNER JOIN tbl_inventory_voucher_detail ivd on ivd.inventory_voucher_header_id = ivh.id  "
@@ -389,14 +390,13 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			List<Long> userIds, String accountPids, List<String> documentPids, List<Boolean> status,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
-	
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
 			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
 			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks ,iv.orderNumber , iv.pdfDownloadStatus ,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.pid in ?1  "
 			+ " Order By iv.createdDate desc")
 	List<Object[]> findByPidsOrderByCreatedDateDesc(List<String> inventoryHeaderPids);
-	
+
 	// using for tally download status filtering
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
@@ -475,7 +475,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	// userPid, List<String> documentPids);
 	@Query(value = DOCUMENT_NUMBER, nativeQuery = true)
 	List<Object[]> getLastNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
-	
+
 	@Query(value = ALL_DOCUMENT_NUMBER, nativeQuery = true)
 	List<Object[]> getAllDocumentNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
 
@@ -493,7 +493,8 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	List<Object[]> getPrimarySecondarySalesOrderForExcel(Long companyId, List<Long> documentIds);
 
 	@Query(value = STOCK_DETAILS_STOCKLOCATION_BASED, nativeQuery = true)
-	List<Object[]> getAllStockDetailsByStockLocations(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate,Set<Long> stockLocationIds);
+	List<Object[]> getAllStockDetailsByStockLocations(Long companyId, Long userId, LocalDateTime fromDate,
+			LocalDateTime toDate, Set<Long> stockLocationIds);
 
 	@Query(value = STOCK_DETAILS, nativeQuery = true)
 	List<Object[]> getAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate);
@@ -539,8 +540,8 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status   "
 			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and company_id = ?#{principal.companyId} order by created_date desc";
-	
-	//FOR VAN SALES TO TALLY
+
+	// FOR VAN SALES TO TALLY
 	public static final String DOCUMENT_BASED_ORDER_DOWNLOAD_TALLY = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status  "
@@ -550,7 +551,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status "
 			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and sales_management_status = 'APPROVE' and document_id IN(?1) and company_id = ?#{principal.companyId} order by created_date desc";
-	
+
 	public static final String EMPLOYEE_SALES_ORDER__MANAGEMENT_TALLY = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status   "
@@ -566,10 +567,10 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query(value = PRIMARY_SALES_ORDER__MANAGEMENT_TALLY, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
-	
+
 	@Query(value = DOCUMENT_BASED_ORDER_DOWNLOAD_TALLY, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(List<Long> documentIds);
-	
+
 	@Query(value = DOCUMENT_BASED_ORDER_MANAGEMENT_DOWNLOAD_TALLY, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
 			List<Long> documentIds);
@@ -580,17 +581,37 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query(value = EMPLOYEE_PRIMARY_SALES_ORDER__MANAGEMENT_TALLY, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusOrderAndEmployeeByCreatedDateDesc(List<Long> empId);
-	
+
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE InventoryVoucherHeader iv SET iv.sendSalesOrderEmailStatus = ?1  WHERE  iv.company.id = ?2  AND iv.pid in ?3")
-	int updateInventoryVoucherHeaderSendSalesOrderEmailStatusUsingPidAndCompanyId(SendSalesOrderEmailStatus sendSalesOrderEmailStatus,
-			Long companyId, List<String> inventoryPids);
+	int updateInventoryVoucherHeaderSendSalesOrderEmailStatusUsingPidAndCompanyId(
+			SendSalesOrderEmailStatus sendSalesOrderEmailStatus, Long companyId, List<String> inventoryPids);
 
-	@Query(value = "select count(*),doc.pid from tbl_inventory_voucher_header ivh " + 
-			"inner join tbl_document doc on ivh.document_id = doc.id " + 
-			"where ivh.company_id = ?#{principal.companyId} and ivh.created_by_id = ?1 " + 
-			"and ivh.created_date between ?2 and ?3  group by doc.pid",nativeQuery = true)
-	List<Object[]> findCountOfEachInventoryTypeDocuments(long userId,LocalDateTime fDate,LocalDateTime tDate);
+	@Query(value = "select count(*),doc.pid from tbl_inventory_voucher_header ivh "
+			+ "inner join tbl_document doc on ivh.document_id = doc.id "
+			+ "where ivh.company_id = ?#{principal.companyId} and ivh.created_by_id = ?1 "
+			+ "and ivh.created_date between ?2 and ?3  group by doc.pid", nativeQuery = true)
+	List<Object[]> findCountOfEachInventoryTypeDocuments(long userId, LocalDateTime fDate, LocalDateTime tDate);
+
+	// using for process flow status filtering
+	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
+			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
+			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
+			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks ,iv.orderNumber , iv.pdfDownloadStatus ,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate ,iv.processFlowStatus ,iv.paymentReceived from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+			+ "iv.document.pid in ?2 and iv.processFlowStatus in ?3 and iv.createdDate between ?4 and ?5 Order By iv.createdDate desc")
+	List<Object[]> findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusDateBetweenOrderByCreatedDateDesc(
+			List<Long> userIds, List<String> documentPids, List<ProcessFlowStatus> processStatus,
+			LocalDateTime fromDate, LocalDateTime toDate);
+
+	// using for tally download status filtering
+	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
+			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
+			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
+			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks , iv.orderNumber , iv.pdfDownloadStatus,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate ,iv.processFlowStatus ,iv.paymentReceived from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+			+ "iv.receiverAccount.pid = ?2 and iv.document.pid in ?3 and iv.processFlowStatus in ?4 and iv.createdDate between ?5 and ?6 Order By iv.createdDate desc")
+	List<Object[]> findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusDateBetweenOrderByCreatedDateDesc(
+			List<Long> userIds, String accountPid, List<String> documentPids, List<ProcessFlowStatus> processStatus,
+			LocalDateTime fromDate, LocalDateTime toDate);
 
 }

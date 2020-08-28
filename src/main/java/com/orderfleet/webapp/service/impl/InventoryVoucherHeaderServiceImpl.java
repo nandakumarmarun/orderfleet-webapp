@@ -414,18 +414,18 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
-		if(stockLocations != null && stockLocations.size()!=0){
-			
+		if (stockLocations != null && stockLocations.size() != 0) {
+
 			Set<Long> stockLocationIds = new HashSet<>();
 			stockLocationIds = stockLocations.stream().map(sl -> sl.getId()).collect(Collectors.toSet());
 
-			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetailsByStockLocations(companyId, userId,
-					fromDate, toDate, stockLocationIds);
-			
-			log.info("in stocklocation based "+inventoryVoucherHeaders.size());
-		}else{
-			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetails(companyId, userId,
-					fromDate, toDate);
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetailsByStockLocations(companyId,
+					userId, fromDate, toDate, stockLocationIds);
+
+			log.info("in stocklocation based " + inventoryVoucherHeaders.size());
+		} else {
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetails(companyId, userId, fromDate,
+					toDate);
 			log.info("in user  based");
 		}
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyIdActivatedTrue();
@@ -445,7 +445,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			double freeQuantity = 0.0;
 			if (obj[5] != null) {
 				opStock = Double.parseDouble(obj[5].toString());
-				log.info(obj[3]+" opStock : "+opStock);
+				log.info(obj[3] + " opStock : " + opStock);
 			}
 
 			if (obj[4] != null) {
@@ -522,7 +522,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 					stockDetailsDTO.setProductName(productName + name);
 
 				} else {
-					
+
 					stockDetailsDTO.setProductName(productName);
 				}
 			} else {
@@ -553,6 +553,22 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		}
 
 		return ivh;
+	}
+
+	@Override
+	public void updateInventoryVoucherHeaderProcessFlowStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
+				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();
+		inventoryVoucherHeader.setProcessFlowStatus(inventoryVoucherHeaderDTO.getProcessFlowStatus());
+		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
+	}
+
+	@Override
+	public void updateInventoryVoucherHeaderPaymentReceived(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
+				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();
+		inventoryVoucherHeader.setPaymentReceived(inventoryVoucherHeaderDTO.getPaymentReceived());
+		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
 	}
 
 }

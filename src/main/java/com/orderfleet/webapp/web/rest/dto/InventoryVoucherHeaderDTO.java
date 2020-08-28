@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
+import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.SourceModule;
@@ -98,6 +99,10 @@ public class InventoryVoucherHeaderDTO {
 
 	private SendSalesOrderEmailStatus sendSalesOrderEmailStatus = SendSalesOrderEmailStatus.NOT_SENT;
 
+	private ProcessFlowStatus processFlowStatus = ProcessFlowStatus.DEFAULT;
+
+	private double paymentReceived;
+
 	private long orderNumber;
 	private String customeraddress;
 	private String customerEmail;
@@ -145,6 +150,7 @@ public class InventoryVoucherHeaderDTO {
 		if (inventoryVoucherHeader.getCreatedBy() != null) {
 			this.userName = inventoryVoucherHeader.getCreatedBy().getFirstName();
 		}
+		this.paymentReceived = inventoryVoucherHeader.getPaymentReceived();
 		this.documentTotal = inventoryVoucherHeader.getDocumentTotal();
 		this.documentVolume = inventoryVoucherHeader.getDocumentVolume();
 		this.documentTotalUpdated = inventoryVoucherHeader.getDocumentTotalUpdated();
@@ -163,6 +169,10 @@ public class InventoryVoucherHeaderDTO {
 		}
 		if (inventoryVoucherHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = inventoryVoucherHeader.getTallyDownloadStatus();
+		}
+
+		if (inventoryVoucherHeader.getProcessFlowStatus() != null) {
+			this.processFlowStatus = inventoryVoucherHeader.getProcessFlowStatus();
 		}
 
 		this.orderNumber = inventoryVoucherHeader.getOrderNumber() == null ? 0
@@ -601,6 +611,22 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setEmployeeAlias(String employeeAlias) {
 		this.employeeAlias = employeeAlias;
+	}
+
+	public ProcessFlowStatus getProcessFlowStatus() {
+		return processFlowStatus;
+	}
+
+	public void setProcessFlowStatus(ProcessFlowStatus processFlowStatus) {
+		this.processFlowStatus = processFlowStatus;
+	}
+
+	public double getPaymentReceived() {
+		return paymentReceived;
+	}
+
+	public void setPaymentReceived(double paymentReceived) {
+		this.paymentReceived = paymentReceived;
 	}
 
 	@Override

@@ -135,5 +135,9 @@ public interface InventoryVoucherHeaderService {
 	
 	InventoryVoucherHeader updateInventoryVoucherHeader(InventoryVoucherHeaderDTO inventoryVoucherHeaderDto);
 
+	void updateInventoryVoucherHeaderProcessFlowStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
+
+	void updateInventoryVoucherHeaderPaymentReceived(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
+
 	
 }

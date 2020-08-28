@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.dto;
 
 import java.time.LocalDateTime;
 
+import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
@@ -67,6 +68,8 @@ public class SalesPerformanceDTO {
 
 	private SendSalesOrderEmailStatus sendSalesOrderEmailStatus;
 
+	private ProcessFlowStatus processFlowStatus;
+
 	private String visitRemarks;
 
 	private boolean updatedStatus;
@@ -76,6 +79,8 @@ public class SalesPerformanceDTO {
 	private double totalWithoutTax; // reduced discount percentage and tax
 
 	private double taxTotal;
+
+	private double paymentReceived;
 
 	private LocalDateTime clientDate;
 
@@ -349,6 +354,22 @@ public class SalesPerformanceDTO {
 
 	public void setSendSalesOrderSapButtonStatus(boolean sendSalesOrderSapButtonStatus) {
 		this.sendSalesOrderSapButtonStatus = sendSalesOrderSapButtonStatus;
+	}
+
+	public ProcessFlowStatus getProcessFlowStatus() {
+		return processFlowStatus;
+	}
+
+	public void setProcessFlowStatus(ProcessFlowStatus processFlowStatus) {
+		this.processFlowStatus = processFlowStatus;
+	}
+
+	public double getPaymentReceived() {
+		return paymentReceived;
+	}
+
+	public void setPaymentReceived(double paymentReceived) {
+		this.paymentReceived = paymentReceived;
 	}
 
 }
