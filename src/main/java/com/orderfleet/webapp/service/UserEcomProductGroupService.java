@@ -3,6 +3,7 @@ package com.orderfleet.webapp.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.EcomProductGroupDTO;
 
 /**
@@ -41,4 +42,6 @@ public interface UserEcomProductGroupService {
 			boolean active, LocalDateTime lastModifiedDate);
 
 	void copyProductGroups(String fromUserPid, List<String> toUserPids);
+	
+	void autoAssignAllProductGroupsToUsers();
 }

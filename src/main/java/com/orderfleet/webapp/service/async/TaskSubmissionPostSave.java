@@ -599,9 +599,8 @@ public class TaskSubmissionPostSave {
 				sendTaskNotificationToUsers(executiveTaskExecution, dynamicDocumentHeader.getDocument(),
 						dynamicDocumentHeader.getPid(), dynamicDocumentHeader.getDocumentNumberServer(),
 						datePickerFormElements, null, null, filledFormDetailList);
-				if (executiveTaskExecution.getCompany().getId() == 304935L && datePickerFormElements.size() == 1
-						&& executiveTaskExecution.getAccountProfile().getAccountType()
-								.getAccountNameType() == AccountNameType.LEAD_MANAGEMENT) {
+				if (executiveTaskExecution.getCompany().getId() == 304935L 
+						&& datePickerFormElements.size() == 1) {
 					saveTaskAndUserTaskAutomatically(executiveTaskExecution, dynamicDocumentHeader,
 							datePickerFormElements);
 				}
@@ -1283,13 +1282,20 @@ public class TaskSubmissionPostSave {
 		LocalDate startDate = null;
 
 		for (FilledFormDetail filledFormDetail : datePickerFormElements) {
+			log.info("Filled From Value ~ : "+filledFormDetail.getValue());
+			if(filledFormDetail.getValue() == null || "".equals(filledFormDetail.getValue())){
+				log.info("Task Not Created ~ Date null");
+				return;
+			}
 			startDate = LocalDate.parse(filledFormDetail.getValue());
 			if (startDate.isBefore(LocalDate.now())) {
 				log.info("start Date b4 :" + startDate.toString());
+				log.info("Task Not Created ~ Before");
 				return;
 			}
 			if (startDate.isEqual(LocalDate.now())) {
 				log.info("start Date equal :" + startDate.toString());
+				log.info("Task Not Created ~ Equal");
 				return;
 			}
 		}

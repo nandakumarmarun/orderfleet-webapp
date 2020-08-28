@@ -22,6 +22,7 @@ import com.orderfleet.webapp.repository.UserEcomProductGroupRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.UserEcomProductGroupService;
+import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.EcomProductGroupDTO;
 import com.orderfleet.webapp.web.rest.mapper.EcomProductGroupMapper;
 
@@ -136,4 +137,23 @@ public class UserEcomProductGroupServiceImpl implements UserEcomProductGroupServ
 		}
 	}
 
+	@Override
+	public void autoAssignAllProductGroupsToUsers() {
+		// TODO Auto-generated method stub
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		List<User> users = userRepository.findAllEcomUsersByCompanyId();
+		List<String> userPids = users.stream().map(user -> user.getPid()).collect(Collectors.toList());
+		userProductGroupRepository.deleteByUserPidIn(userPids);
+		List<EcomProductGroup> ecomProductGroups = productGroupRepository.findAllByCompanyId(true);
+		List<UserEcomProductGroup> userEcomProductGroups = new ArrayList<>();
+		for(User user : users){
+			for(EcomProductGroup ecomPg : ecomProductGroups){
+				UserEcomProductGroup userEcomProductGroup = new UserEcomProductGroup(user, ecomPg, company);
+				userEcomProductGroups.add(userEcomProductGroup);
+			}
+		}
+		userProductGroupRepository.save(userEcomProductGroups);
+	}
+	
+	
 }

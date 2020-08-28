@@ -23,7 +23,14 @@
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
 			<h2>User Ecom Product Groups</h2>
-			<div class="row col-xs-12"></div>
+			<spring:url value="/resources/assets/images/Spinner.gif"
+			var="userEcomProductGroupImg"></spring:url>
+			<div class="row col-xs-12">
+				<button id="auto-assign" type="button" class="btn btn-success" 
+				onclick="UserEcomProductGroup.autoAssign();">Auto Assign</button>
+				<img id="spin-auto-assign"  src="${userEcomProductGroupImg}" width="30px" , height="30px">
+			</div>
+			
 			<div class="clearfix"></div>
 			<hr />
 			<table class="table  table-striped table-bordered">

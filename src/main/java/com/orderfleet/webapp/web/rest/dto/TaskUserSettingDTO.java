@@ -22,6 +22,10 @@ public class TaskUserSettingDTO {
 	private String executorName;
 
 	private String taskSettingPid;
+	
+	private String activityName;
+	
+	private String documentName;
 
 	private ActivityEvent taskSettingEvent;
 
@@ -35,6 +39,8 @@ public class TaskUserSettingDTO {
 		this.pid = taskUserSetting.getPid();
 		this.executorPid = taskUserSetting.getExecutor().getPid();
 		this.executorName = taskUserSetting.getExecutor().getFirstName();
+		this.activityName = taskUserSetting.getTaskSetting().getActivity().getName();
+		this.documentName = taskUserSetting.getTaskSetting().getDocument().getName();
 		this.taskSettingPid = taskUserSetting.getTaskSetting().getPid();
 		this.taskSettingEvent = taskUserSetting.getTaskSetting().getActivityEvent();
 		this.approvers = taskUserSetting.getApprovers().stream().map(UserDTO::new).collect(Collectors.toList());
@@ -88,4 +94,20 @@ public class TaskUserSettingDTO {
 		this.approvers = approvers;
 	}
 
+	public String getActivityName() {
+		return activityName;
+	}
+
+	public void setActivityName(String activityName) {
+		this.activityName = activityName;
+	}
+
+	public String getDocumentName() {
+		return documentName;
+	}
+
+	public void setDocumentName(String documentName) {
+		this.documentName = documentName;
+	}
+	
 }

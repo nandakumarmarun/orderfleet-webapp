@@ -30,6 +30,8 @@
 				<thead>
 					<tr>
 						<th>Executor</th>
+						<th>Activity</th>
+						<th>Document</th>
 						<th>Activity Event</th>
 						<th>Approvers</th>
 						<th>Actions</th>
@@ -40,6 +42,8 @@
 						var="taskUserSetting" varStatus="loopStatus">
 						<tr class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'}">
 							<td>${taskUserSetting.executorName}</td>
+							<td>${taskUserSetting.activityName}</td>
+							<td>${taskUserSetting.documentName}</td>
 							<td>${taskUserSetting.taskSettingEvent}</td>
 							<td><table class="table">
 									<c:forEach items="${taskUserSetting.approvers}" var="approver">

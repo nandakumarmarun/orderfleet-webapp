@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.EcomProductGroup;
 import com.orderfleet.webapp.service.EcomProductGroupService;
 import com.orderfleet.webapp.service.UserEcomProductGroupService;
 import com.orderfleet.webapp.service.UserService;
@@ -82,5 +83,17 @@ public class UserEcomProductGroupResource {
 	public ResponseEntity<List<EcomProductGroupDTO>> getUserProductGroups(@PathVariable String userPid) {
 		log.debug("Web request to get get ProductGroups by user pid : {}", userPid);
 		return new ResponseEntity<>(userProductGroupService.findProductGroupsByUserPid(userPid), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/user-ecom-product-groups/auto-assign", method = RequestMethod.GET)
+	@Timed
+	@Transactional()
+	public String getUserProductGroupsAutoAssign(Model model) throws URISyntaxException {
+		log.debug("Web request to get a page of User ProductGroups");
+		userProductGroupService.autoAssignAllProductGroupsToUsers();
+		List<UserDTO> users = userService.findAllEcomUsersByCompany();
+		model.addAttribute("users", users);
+		model.addAttribute("productGroups", productGroupService.findAllByCompany());
+		return "company/userEcomProductGroups";
 	}
 }

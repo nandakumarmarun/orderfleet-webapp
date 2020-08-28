@@ -16,6 +16,7 @@ if (!this.UserEcomProductGroup) {
 
 	$(document).ready(function() {
 
+		$('#spin-auto-assign').hide();
 		// add the rule here
 		$.validator.addMethod("valueNotEquals", function(value, element, arg) {
 			return arg != value;
@@ -139,6 +140,20 @@ if (!this.UserEcomProductGroup) {
 		window.location = userEcomProductGroupContextPath;
 	}
 
+	UserEcomProductGroup.autoAssign = function(){
+		$('#spin-auto-assign').show();
+		$('#auto-assign').prop( "disabled", true );
+		$.ajax({
+			url : userEcomProductGroupContextPath + "/auto-assign",
+			type : 'GET',
+			success : function(){
+				setTimeout(function () {
+					onSaveSuccess(true);
+				},4000);
+			}
+		});
+	}
+	
 	UserEcomProductGroup.showModalPopup = function(el, id, action) {
 		if (id) {
 			switch (action) {
