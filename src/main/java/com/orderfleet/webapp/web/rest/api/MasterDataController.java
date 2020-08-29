@@ -1413,6 +1413,21 @@ public class MasterDataController {
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(ecomProductProfileDTOs);
 
 	}
+	
+	@GetMapping("/ecom-product-profile-modern")
+	@Timed
+	public ResponseEntity<List<EcomProductProfileDTO>> getEcomProductsModern(
+			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) {
+		log.debug("REST request to get user EcomProductProfiles");
+		List<EcomProductProfileDTO> ecomProductProfileDTOs;
+		if (lastSyncdate == null) {
+			ecomProductProfileDTOs = ecomProductProfileService.findByCurrentUserForModern();
+		} else {
+			ecomProductProfileDTOs = ecomProductProfileService.findByCurrentUserAndLastModifiedDateForModern(lastSyncdate);
+		}
+		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(ecomProductProfileDTOs);
+
+	}
 
 	/**
 	 * GET /ecom-product-profile : get all the ecomProductProfile. This will give

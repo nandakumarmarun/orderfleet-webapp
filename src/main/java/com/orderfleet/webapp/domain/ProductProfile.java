@@ -81,7 +81,7 @@ public class ProductProfile implements Serializable, Cloneable {
 	@Column(name = "sku")
 	private String sku;
 
-	@Column(name = "unit_qty")
+	@Column(name = "unit_qty", columnDefinition = "double precision DEFAULT 1")
 	private Double unitQty = 1d;
 
 	@Column(name = "tax_rate", columnDefinition = "double precision DEFAULT 0")

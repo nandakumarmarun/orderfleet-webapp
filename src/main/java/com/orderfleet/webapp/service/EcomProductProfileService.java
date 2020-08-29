@@ -50,6 +50,7 @@ public interface EcomProductProfileService {
 	 * @return the list of entities
 	 */
 	List<EcomProductProfileDTO> findByCurrentUser();
+	List<EcomProductProfileDTO> findByCurrentUserForModern();
 
 	/**
 	 * Get all the ecomProductGroups of a company.
@@ -139,5 +140,6 @@ public interface EcomProductProfileService {
 	List<EcomProductProfileDTO> findAllByCompanyAndActivatedOrDeactivatedEcomProductProfile(boolean deactive);
 
 	List<EcomProductProfileDTO> findByCurrentUserAndLastModifiedDate(LocalDateTime lastModifiedDate);
+	List<EcomProductProfileDTO> findByCurrentUserAndLastModifiedDateForModern(LocalDateTime lastModifiedDate);
 
 }

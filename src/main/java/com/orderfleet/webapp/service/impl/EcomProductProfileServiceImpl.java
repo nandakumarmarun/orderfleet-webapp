@@ -57,12 +57,13 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	@Inject
 	private EcomProductProfileMapper ecomProductProfileMapper;
 
-//	@Inject
-//	private UserProductGroupRepository userProductGroupRepository;
-//
-//	@Inject
-//	private ProductGroupEcomProductsRepository productGroupEcomProductsRepository;
-	
+	//old code start
+	@Inject
+	private UserProductGroupRepository userProductGroupRepository;
+
+	@Inject
+	private ProductGroupEcomProductsRepository productGroupEcomProductsRepository;
+	//old code ends
 	@Inject
 	private UserEcomProductGroupRepository userEcomProductGroupRepository;
 
@@ -305,70 +306,70 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 				.ecomProductProfilesToEcomProductProfileDTOs(ecomProductProfiles);
 		return ecomProductProfileDTOs;
 	}
-
-//	@Override
-//	@Transactional(readOnly = true)
-//	public List<EcomProductProfileDTO> findByCurrentUserAndLastModifiedDate(LocalDateTime lastModifiedDate) {
-//		List<ProductGroup> productGroups = userProductGroupRepository.findProductGroupsByUserIsCurrentUser();
-//		List<EcomProductProfileDTO> ecomProductProfileDTOs = new ArrayList<>();
-//		if (productGroups.size() > 0) {
-//			List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository
-//					.findByProductGroupsAndLastModifiedDate(productGroups, lastModifiedDate);
-//			productGroupEcomProducts.forEach(p -> {
-//				EcomProductProfileDTO ecomProductProfileDTO = new EcomProductProfileDTO(p.getEcomProduct());
-//				ecomProductProfileDTO.setProductGroupPid(p.getProductGroup().getPid());
-//				ecomProductProfileDTO.setProductGroupName(p.getProductGroup().getName());
-//				List<ProductProfile> productProfiles = ecomProductProfileProductRepository
-//						.findProductByEcomProductProfilePid(p.getEcomProduct().getPid());
-//				for (ProductProfile productProfile : productProfiles) {
-//					productProfile.getFiles().size();
-//					ProductProfileDTO productProfileDTO = new ProductProfileDTO(productProfile);
-//					productProfileDTO.setFilesPid("");
-//					for (File file : productProfile.getFiles()) {
-//						productProfileDTO.setFilesPid(productProfileDTO.getFilesPid() + file.getPid() + ",");
-//					}
-//					ecomProductProfileDTO.getProductProfiles().add(productProfileDTO);
-//				}
-//				ecomProductProfileDTOs.add(ecomProductProfileDTO);
-//			});
-//		}
-//		return ecomProductProfileDTOs;
-//	}
-//	
-//	
-//	@Override
-//	@Transactional(readOnly = true)
-//	public List<EcomProductProfileDTO> findByCurrentUser() {
-//		List<ProductGroup> productGroups = userProductGroupRepository.findProductGroupsByUserIsCurrentUser();
-//		List<EcomProductProfileDTO> ecomProductProfileDTOs = new ArrayList<>();
-//		if (productGroups.size() > 0) {
-//			List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository
-//					.findByProductGroups(productGroups);
-//			productGroupEcomProducts.forEach(p -> {
-//				EcomProductProfileDTO ecomProductProfileDTO = new EcomProductProfileDTO(p.getEcomProduct());
-//				ecomProductProfileDTO.setProductGroupPid(p.getProductGroup().getPid());
-//				ecomProductProfileDTO.setProductGroupName(p.getProductGroup().getName());
-//				List<ProductProfile> productProfiles = ecomProductProfileProductRepository
-//						.findProductByEcomProductProfilePid(p.getEcomProduct().getPid());
-//				for (ProductProfile productProfile : productProfiles) {
-//					productProfile.getFiles().size();
-//					ProductProfileDTO productProfileDTO = new ProductProfileDTO(productProfile);
-//					productProfileDTO.setFilesPid("");
-//					for (File file : productProfile.getFiles()) {
-//						productProfileDTO.setFilesPid(productProfileDTO.getFilesPid() + file.getPid() + ",");
-//					}
-//					ecomProductProfileDTO.getProductProfiles().add(productProfileDTO);
-//				}
-//				ecomProductProfileDTOs.add(ecomProductProfileDTO);
-//			});
-//		}
-//		return ecomProductProfileDTOs;
-//	}
-
-	
+// old code start
 	@Override
 	@Transactional(readOnly = true)
 	public List<EcomProductProfileDTO> findByCurrentUserAndLastModifiedDate(LocalDateTime lastModifiedDate) {
+		List<ProductGroup> productGroups = userProductGroupRepository.findProductGroupsByUserIsCurrentUser();
+		List<EcomProductProfileDTO> ecomProductProfileDTOs = new ArrayList<>();
+		if (productGroups.size() > 0) {
+			List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository
+					.findByProductGroupsAndLastModifiedDate(productGroups, lastModifiedDate);
+			productGroupEcomProducts.forEach(p -> {
+				EcomProductProfileDTO ecomProductProfileDTO = new EcomProductProfileDTO(p.getEcomProduct());
+				ecomProductProfileDTO.setProductGroupPid(p.getProductGroup().getPid());
+				ecomProductProfileDTO.setProductGroupName(p.getProductGroup().getName());
+				List<ProductProfile> productProfiles = ecomProductProfileProductRepository
+						.findProductByEcomProductProfilePid(p.getEcomProduct().getPid());
+				for (ProductProfile productProfile : productProfiles) {
+					productProfile.getFiles().size();
+					ProductProfileDTO productProfileDTO = new ProductProfileDTO(productProfile);
+					productProfileDTO.setFilesPid("");
+					for (File file : productProfile.getFiles()) {
+						productProfileDTO.setFilesPid(productProfileDTO.getFilesPid() + file.getPid() + ",");
+					}
+					ecomProductProfileDTO.getProductProfiles().add(productProfileDTO);
+				}
+				ecomProductProfileDTOs.add(ecomProductProfileDTO);
+			});
+		}
+		return ecomProductProfileDTOs;
+	}
+	
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<EcomProductProfileDTO> findByCurrentUser() {
+		List<ProductGroup> productGroups = userProductGroupRepository.findProductGroupsByUserIsCurrentUser();
+		List<EcomProductProfileDTO> ecomProductProfileDTOs = new ArrayList<>();
+		if (productGroups.size() > 0) {
+			List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository
+					.findByProductGroups(productGroups);
+			productGroupEcomProducts.forEach(p -> {
+				EcomProductProfileDTO ecomProductProfileDTO = new EcomProductProfileDTO(p.getEcomProduct());
+				ecomProductProfileDTO.setProductGroupPid(p.getProductGroup().getPid());
+				ecomProductProfileDTO.setProductGroupName(p.getProductGroup().getName());
+				List<ProductProfile> productProfiles = ecomProductProfileProductRepository
+						.findProductByEcomProductProfilePid(p.getEcomProduct().getPid());
+				for (ProductProfile productProfile : productProfiles) {
+					productProfile.getFiles().size();
+					ProductProfileDTO productProfileDTO = new ProductProfileDTO(productProfile);
+					productProfileDTO.setFilesPid("");
+					for (File file : productProfile.getFiles()) {
+						productProfileDTO.setFilesPid(productProfileDTO.getFilesPid() + file.getPid() + ",");
+					}
+					ecomProductProfileDTO.getProductProfiles().add(productProfileDTO);
+				}
+				ecomProductProfileDTOs.add(ecomProductProfileDTO);
+			});
+		}
+		return ecomProductProfileDTOs;
+	}
+//old code ends
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<EcomProductProfileDTO> findByCurrentUserAndLastModifiedDateForModern(LocalDateTime lastModifiedDate) {
 		List<EcomProductGroup> productGroups = userEcomProductGroupRepository.findProductGroupsByUserIsCurrentUser();
 		List<EcomProductProfileDTO> ecomProductProfileDTOs = new ArrayList<>();
 		if (productGroups.size() > 0) {
@@ -398,7 +399,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<EcomProductProfileDTO> findByCurrentUser() {
+	public List<EcomProductProfileDTO> findByCurrentUserForModern() {
 		List<EcomProductGroup> productGroups = userEcomProductGroupRepository.findProductGroupsByUserIsCurrentUser();
 		List<EcomProductProfileDTO> ecomProductProfileDTOs = new ArrayList<>();
 		if (productGroups.size() > 0) {
