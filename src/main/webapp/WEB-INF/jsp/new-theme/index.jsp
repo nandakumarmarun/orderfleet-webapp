@@ -118,13 +118,17 @@
                             <li><a >German</a></li>
                         </ul>
                     </li>-->
+                    	<li><a>+91 9846 056 008</a></li>
+						<li class="topbar-devider"></li>
+                    	<li><a>+91 9387 007 657</a></li>
+						<li class="topbar-devider"></li>
 						<li><a>+91 8893 499 106</a></li>
 						<li class="topbar-devider"></li>
 						<li><a>Help</a></li>
 						<li class="topbar-devider"></li>
 						<li><a href="../login">Login</a></li>
-						<li class="topbar-devider"></li>
-						<li><a href="../register">Register</a></li>
+						<!-- <li class="topbar-devider"></li>
+						<li><a href="../register">Register</a></li> -->
 
 
 					</ul>
@@ -444,7 +448,7 @@
 		<div class="testimonials-v3 bg-image-v2">
 			<div class="container">
 				<div class="row">
-					<div class="col-md-8 col-md-offset-2">
+					<!-- <div class="col-md-8 col-md-offset-2">
 						<div class="headline-center-v2 headline-center-v2-dark">
 							<h2>What Our Clients Say About Us</h2>
 							<span class="bordered-icon"><i class="fa fa-th-large"></i></span>
@@ -462,6 +466,72 @@
 									implemented are countless. Good job, and keep going!
 								</p></li>
 						</ul>
+					</div> -->
+						<div class="col-md-8 col-md-offset-2">
+						<div class="headline-center-v2 headline-center-v2-dark">
+							<h2>Our Esteemed Clients</h2>
+							<span class="bordered-icon"><i class="fa fa-th-large"></i></span>
+						</div>
+						
+
+
+
+
+						<div class="row">
+   <div class="col-md-12">
+      <div class="carousel carousel-showmanymoveone slide" id="carousel-tilenav" data-interval="false">
+         <div class="carousel-inner">
+            <div class="item active">
+               <div class="col-xs-4 col-sm-6 col-md-2">
+                  <a href="#"><img src="/resources/web-assets/img/clients4/aquatech.png" class="img-responsive"></a>
+               </div>
+            </div>
+            <div class="item">
+               <div class="col-xs-4 col-sm-6 col-md-2">
+                  <a href="#"><img src="/resources/web-assets/img/clients4/Best_sellers.jpg" class="img-responsive"></a>
+               </div>
+            </div>
+            <div class="item">
+               <div class="col-xs-4 col-sm-6 col-md-2">
+                  <a href="#"><img src="/resources/web-assets/img/clients4/hymax.png" class="img-responsive"></a>
+               </div>
+            </div>
+            <div class="item">
+               <div class="col-xs-4 col-sm-6 col-md-2">
+                  <a href="#"><img src="/resources/web-assets/img/clients4/modern.png" class="img-responsive"></a>
+               </div>
+            </div>
+            <div class="item">
+               <div class="col-xs-4 col-sm-6 col-md-2">
+                  <a href="#"><img src="/resources/web-assets/img/clients4/pavizham.jpg" class="img-responsive"></a>
+               </div>
+            </div>
+            <div class="item">
+               <div class="col-xs-4 col-sm-6 col-md-2">
+                  <a href="#"><img src="/resources/web-assets/img/clients4/prabhu_steels.png" class="img-responsive"></a>
+               </div>
+            </div>
+            <div class="item">
+               <div class="col-xs-4 col-sm-6 col-md-2">
+                  <a href="#"><img src="/resources/web-assets/img/clients4/swad.png" class="img-responsive"></a>
+               </div>
+            </div>
+            <div class="item">
+               <div class="col-xs-4 col-sm-6 col-md-2">
+                  <a href="#"><img src="/resources/web-assets/img/clients4/truecoat_500x500.png" class="img-responsive"></a>
+               </div>
+            </div>
+         </div>
+         <a class="left carousel-control" href="#carousel-tilenav" data-slide="prev"><i class="glyphicon glyphicon-chevron-left"></i></a>
+         <a class="right carousel-control" href="#carousel-tilenav" data-slide="next"><i class="glyphicon glyphicon-chevron-right"></i></a>
+      </div>
+   </div>
+</div>
+
+
+
+
+
 					</div>
 				</div>
 			</div>
@@ -677,6 +747,27 @@
 			RevolutionSlider.initRSfullWidth();
 			ProgressBar.initProgressBarVertical();
 		});
+	</script>
+	<script type="text/javascript">
+		(function(){
+  $('.carousel-showmanymoveone .item').each(function(){
+    var itemToClone = $(this);
+
+    for (var i=1;i<6;i++) {
+      itemToClone = itemToClone.next();
+
+      // wrap around if at end of item collection
+      if (!itemToClone.length) {
+        itemToClone = $(this).siblings(':first');
+      }
+
+      // grab item, clone, add marker class, add to collection
+      itemToClone.children(':first-child').clone()
+        .addClass("cloneditem-"+(i))
+        .appendTo($(this));
+    }
+  });
+}());
 	</script>
 </body>
 </html>

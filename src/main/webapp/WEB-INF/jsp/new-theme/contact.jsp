@@ -114,13 +114,17 @@
                             <li><a >German</a></li>
                         </ul>
                     </li>-->
+                    	<li><a>+91 9846 056 008</a></li>
+						<li class="topbar-devider"></li>
+                    	<li><a>+91 9387 007 657</a></li>
+						<li class="topbar-devider"></li>
 						<li><a>+91 8893 499 106</a></li>
 						<li class="topbar-devider"></li>
 						<li><a>Help</a></li>
 						<li class="topbar-devider"></li>
 						<li><a href="../login">Login</a></li>
-						<li class="topbar-devider"></li>
-						<li><a href="../register">Register</a></li>
+						<!-- <li class="topbar-devider"></li>
+						<li><a href="../register">Register</a></li> -->
 					</ul>
 				</div>
 				<!-- End Topbar -->
@@ -399,13 +403,25 @@
 						src="/resources/web-assets/img/clients4/client-3.png" alt="">
 					</li>
 					<li class="owl-carousel-item"><img
-						src="/resources/web-assets/img/clients4/client-1.png" alt="">
+						src="/resources/web-assets/img/clients4/client-4.png"  alt="">
 					</li>
 					<li class="owl-carousel-item"><img
-						src="/resources/web-assets/img/clients4/client-2.png" alt="">
+						src="/resources/web-assets/img/clients4/client-5.jpg"  alt="">
 					</li>
 					<li class="owl-carousel-item"><img
-						src="/resources/web-assets/img/clients4/client-3.png" alt="">
+						src="/resources/web-assets/img/clients4/client-6.png"  alt="">
+					</li>
+					<li class="owl-carousel-item"><img
+						src="/resources/web-assets/img/clients4/client-7.jpg"  alt="">
+					</li>
+					<li class="owl-carousel-item"><img
+						src="/resources/web-assets/img/clients4/client-8.png"  alt="">
+					</li>
+					<li class="owl-carousel-item"><img
+						src="/resources/web-assets/img/clients4/client-9.png"  alt="">
+					</li>
+					<li class="owl-carousel-item"><img
+						src="/resources/web-assets/img/clients4/client-10.png"  alt="">
 					</li>
 
 				</ul>
@@ -665,6 +681,21 @@
 		}
 
 		google.maps.event.addDomListener(window, 'load', initialize);
+	</script>
+	<script type="text/javascript">
+		$(".owl-carousel").owlCarousel({
+      autoPlay: 3000,
+      items : 5, // THIS IS IMPORTANT
+      // responsive : {
+      // 		280:{items : 2 },
+      // 		320:{items : 2 },
+      // 		360:{items : 2 },
+      //       480 : { items : 2 }, // from zero to 480 screen width 4 items
+      //       768 : { items : 6 }, // from 480 screen widthto 768 6 items
+      //       1024 : { items : 4  // from 768 screen width to 1024 8 items
+      //       }
+      //   },
+  });
 	</script>
 
 	<!--[if lt IE 9]>
