@@ -107,12 +107,12 @@
                             <li><a >German</a></li>
                         </ul>
                     </li>-->
-                    	<li><a>+91 9846 056 008</a></li>
-						<li class="topbar-devider"></li>
+                    	<!-- <li><a>+91 9846 056 008</a></li>
+						<li class="topbar-devider"></li> -->
                     	<li><a>+91 9387 007 657</a></li>
 						<li class="topbar-devider"></li>
-						<li><a>+91 8893 499 106</a></li>
-						<li class="topbar-devider"></li>
+						<!-- <li><a>+91 8893 499 106</a></li>
+						<li class="topbar-devider"></li> -->
 						<li><a>Help</a></li>
 						<li class="topbar-devider"></li>
 						<li><a href="../login">Login</a></li>
@@ -570,8 +570,8 @@
 							<address class="md-margin-bottom-40">
 								Aitrich Technologies Pvt Ltd. <br /> 9/60. IInd Floor Visitors
 								Building<br /> MG Road,Thrissur-4, Kerala <br /> Phone: 91
-								9387007657, <br /> Mobile: 91 9846056008 <br /> Email: <a
-									href="mailto:sales@salesnrich.com" class="">sales@salenrich.com</a>
+								9387007657, <br /> Mobile: 91 8893 499 106 <br /> Email: <a
+									href="mailto:info@aitrich.com" class="">info@aitrich.com</a>
 							</address>
 						</div>
 						<!--/col-md-3-->
