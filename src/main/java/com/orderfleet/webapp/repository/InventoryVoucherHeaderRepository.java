@@ -614,4 +614,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			List<Long> userIds, String accountPid, List<String> documentPids, List<ProcessFlowStatus> processStatus,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
+	@Query("select sum(inventoryVoucher.documentTotal) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdBy.id in ?1 and inventoryVoucher.createdDate between ?2 and ?3")
+	Object[] findnetSaleAmountByUserIdandDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
+
 }

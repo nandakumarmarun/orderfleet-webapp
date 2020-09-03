@@ -15,25 +15,46 @@
 .error {
 	color: red;
 }
+
 .loader {
-  border: 10px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 10px solid #3498db;
-  width: 40px;
-  height: 40px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
-  animation: spin 2s linear infinite;
+	border: 10px solid #f3f3f3;
+	border-radius: 50%;
+	border-top: 10px solid #3498db;
+	width: 40px;
+	height: 40px;
+	-webkit-animation: spin 2s linear infinite; /* Safari */
+	animation: spin 2s linear infinite;
 }
 
 /* Safari */
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+@
+-webkit-keyframes spin { 0% {
+	-webkit-transform: rotate(0deg);
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+100%
+{
+-webkit-transform
+:
+ 
+rotate
+(360deg);
+ 
+}
+}
+@
+keyframes spin { 0% {
+	transform: rotate(0deg);
+}
+100%
+{
+transform
+:
+ 
+rotate
+(360deg);
+ 
+}
 }
 </style>
 </head>
@@ -139,9 +160,14 @@
 									onclick="InventoryVoucher.filter()">Apply</button>
 							</div>
 							<div class="col-sm-1">
-								<br>							
+								<br>
 								<button id="downloadXls" type="button" class="btn btn-success">Download
 									Xls</button>
+							</div>
+							<div class="col-sm-2">
+								<br>
+								<button type="button" class="btn btn-success"
+									onclick="window.print()">Print</button>
 							</div>
 						</div>
 					</form>
@@ -154,13 +180,14 @@
 				</div>
 			</div>
 			<div class="table-responsive">
-				<table id="tblSalesInvoiceReport" class="table  table-striped table-bordered">
+				<table id="tblSalesInvoiceReport"
+					class="table  table-striped table-bordered">
 					<thead>
 						<tr>
 							<th><input type="checkbox" id="selectAll" /><br>Select
 								All</th>
 							<th>Invoice No.</th>
-							<th>Invoice date</th>	
+							<th>Invoice date</th>
 							<th>Customer</th>
 							<th>Amount (without Tax)
 								<p id="totalAmount" style="float: right;"></p>
@@ -171,7 +198,7 @@
 							<th>Total
 								<p id="totalWithTax" style="float: right;"></p>
 							</th>
-							
+
 							<th>Activity date</th>
 							<th>Client date</th>
 							<!-- <th>Invoice PDF</th> -->
