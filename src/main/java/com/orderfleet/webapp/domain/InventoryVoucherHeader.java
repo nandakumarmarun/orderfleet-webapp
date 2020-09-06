@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.domain;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -150,6 +151,12 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "updated_date")
 	private LocalDateTime updatedDate;
+
+	@Column(name = "booking_id")
+	private String bookingId;
+
+	@Column(name = "delivery_date")
+	private LocalDate deliveryDate;
 
 	@ManyToOne
 	private User updatedBy;
@@ -480,6 +487,22 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setProcessFlowStatus(ProcessFlowStatus processFlowStatus) {
 		this.processFlowStatus = processFlowStatus;
+	}
+
+	public String getBookingId() {
+		return bookingId;
+	}
+
+	public void setBookingId(String bookingId) {
+		this.bookingId = bookingId;
+	}
+
+	public LocalDate getDeliveryDate() {
+		return deliveryDate;
+	}
+
+	public void setDeliveryDate(LocalDate deliveryDate) {
+		this.deliveryDate = deliveryDate;
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
@@ -83,6 +84,12 @@ public class SalesPerformanceDTO {
 	private double paymentReceived;
 
 	private LocalDateTime clientDate;
+
+	private String bookingId;
+
+	private String deliveryDate;
+
+	private long deliveryDateDifference;
 
 	public String getPid() {
 		return pid;
@@ -370,6 +377,30 @@ public class SalesPerformanceDTO {
 
 	public void setPaymentReceived(double paymentReceived) {
 		this.paymentReceived = paymentReceived;
+	}
+
+	public String getBookingId() {
+		return bookingId;
+	}
+
+	public void setBookingId(String bookingId) {
+		this.bookingId = bookingId;
+	}
+
+	public long getDeliveryDateDifference() {
+		return deliveryDateDifference;
+	}
+
+	public void setDeliveryDateDifference(long deliveryDateDifference) {
+		this.deliveryDateDifference = deliveryDateDifference;
+	}
+
+	public String getDeliveryDate() {
+		return deliveryDate;
+	}
+
+	public void setDeliveryDate(String deliveryDate) {
+		this.deliveryDate = deliveryDate;
 	}
 
 }

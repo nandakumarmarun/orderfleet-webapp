@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -112,6 +113,9 @@ public class InventoryVoucherHeaderDTO {
 	private boolean updatedStatus;
 	private LocalDateTime clientDate;
 
+	private String bookingId;
+	private LocalDate deliveryDate;
+
 	public InventoryVoucherHeaderDTO() {
 		super();
 	}
@@ -196,6 +200,9 @@ public class InventoryVoucherHeaderDTO {
 
 		this.clientDate = inventoryVoucherHeader.getExecutiveTaskExecution().getSendDate();
 		this.updatedStatus = inventoryVoucherHeader.getUpdatedStatus();
+
+		this.bookingId = inventoryVoucherHeader.getBookingId() != null ? inventoryVoucherHeader.getBookingId() : "";
+		this.deliveryDate = inventoryVoucherHeader.getDeliveryDate();
 	}
 
 	public InventoryVoucherHeaderDTO(InventoryVoucherHeaderHistory inventoryVoucherHeader) {
@@ -627,6 +634,22 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setPaymentReceived(double paymentReceived) {
 		this.paymentReceived = paymentReceived;
+	}
+
+	public String getBookingId() {
+		return bookingId;
+	}
+
+	public void setBookingId(String bookingId) {
+		this.bookingId = bookingId;
+	}
+
+	public LocalDate getDeliveryDate() {
+		return deliveryDate;
+	}
+
+	public void setDeliveryDate(LocalDate deliveryDate) {
+		this.deliveryDate = deliveryDate;
 	}
 
 	@Override

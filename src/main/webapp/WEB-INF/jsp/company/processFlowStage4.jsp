@@ -79,6 +79,7 @@
 									<option value="YESTERDAY">Yesterday</option>
 									<option value="WTD">WTD</option>
 									<option value="MTD">MTD</option>
+									<option value="UPTO90DAYS">UP TO 90 Days</option>
 									<option value="SINGLE">SINGLE DATE</option>
 									<option value="CUSTOM">CUSTOM</option>
 								</select>
@@ -141,6 +142,7 @@
 						<tr>
 							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
 								All</th>
+							<th>Booking Id</th>
 							<th>Employee</th>
 							<th>Receiver</th>
 							<th>Supplier</th>
@@ -150,11 +152,11 @@
 							<th>Volume
 								<p id="totalVolume" style="float: right;"></p>
 							</th>
-							<th>Total Quantity</th>
 							<th>Date</th>
 							<th>Header Details</th>
 							<th>Payment Received</th>
 							<th>Payment(%)</th>
+							<th>Delivery Date</th>
 							<th>Actions</th>
 						</tr>
 					</thead>

@@ -598,7 +598,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
 			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
-			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks ,iv.orderNumber , iv.pdfDownloadStatus ,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate ,iv.processFlowStatus ,iv.paymentReceived from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks ,iv.orderNumber , iv.pdfDownloadStatus ,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate ,iv.processFlowStatus ,iv.paymentReceived,iv.bookingId,iv.deliveryDate from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
 			+ "iv.document.pid in ?2 and iv.processFlowStatus in ?3 and iv.createdDate between ?4 and ?5 Order By iv.createdDate desc")
 	List<Object[]> findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusDateBetweenOrderByCreatedDateDesc(
 			List<Long> userIds, List<String> documentPids, List<ProcessFlowStatus> processStatus,
@@ -608,7 +608,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
 			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
-			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks , iv.orderNumber , iv.pdfDownloadStatus,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate ,iv.processFlowStatus ,iv.paymentReceived from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks , iv.orderNumber , iv.pdfDownloadStatus,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate ,iv.processFlowStatus ,iv.paymentReceived,iv.bookingId,iv.deliveryDate from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
 			+ "iv.receiverAccount.pid = ?2 and iv.document.pid in ?3 and iv.processFlowStatus in ?4 and iv.createdDate between ?5 and ?6 Order By iv.createdDate desc")
 	List<Object[]> findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusDateBetweenOrderByCreatedDateDesc(
 			List<Long> userIds, String accountPid, List<String> documentPids, List<ProcessFlowStatus> processStatus,

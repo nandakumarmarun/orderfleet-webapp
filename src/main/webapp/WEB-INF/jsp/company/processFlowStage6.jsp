@@ -7,7 +7,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Process Flow-Stage 2</title>
+<title>SalesNrich | Process Flow-Stage 6</title>
 <spring:url value="/resources/assets/css/jquery-ui.css"
 	var="jqueryUiCss"></spring:url>
 <link href="${jqueryUiCss}" rel="stylesheet">
@@ -24,7 +24,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Stage 2</h2>
+			<h2>Stage 6</h2>
 			<div class="row col-xs-12"></div>
 			<div class="clearfix"></div>
 			<hr />
@@ -266,7 +266,7 @@
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
 
-	<spring:url value="/resources/app/process-flow-stage2.js"
+	<spring:url value="/resources/app/process-flow-stage6.js"
 		var="inventoryVoucherJs"></spring:url>
 	<script type="text/javascript" src="${inventoryVoucherJs}"></script>
 

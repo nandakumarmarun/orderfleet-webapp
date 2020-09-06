@@ -8,7 +8,9 @@ import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -301,7 +303,10 @@ public class ProcessFlowStage2Resource {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			fDate = LocalDate.parse(fromDate, formatter);
 			tDate = fDate;
-
+		}else if (filterBy.equals("UPTO90DAYS")) {
+			tDate = LocalDate.now();
+			Period days_90 = Period.ofDays(90);
+			fDate = tDate.minus(days_90);
 		}
 		List<SalesPerformanceDTO> salesPerformanceDTOs = getFilterData(employeePids, documentPids, processFlowStatus,
 				accountPid, fDate, tDate);
@@ -343,9 +348,13 @@ public class ProcessFlowStage2Resource {
 		case "READY_TO_DISPATCH_AT_PS":
 			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS);
 			break;
-		case "ALL":
-			processStatus = Arrays.asList(ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL,
-					ProcessFlowStatus.READY_TO_DISPATCH_AT_PS);
+		case "INSTOCK_READYATTSL":
+			processStatus = Arrays.asList(ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL);
+			break;
+		case "READYATPS_DELIVERED":
+			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
+					ProcessFlowStatus.NOT_DELIVERED);
+			break;
 		}
 
 		List<Object[]> inventoryVouchers;
@@ -461,6 +470,23 @@ public class ProcessFlowStage2Resource {
 			salesPerformanceDTO.setSendSalesOrderSapButtonStatus(sendSalesOrderSapButtonStatus);
 			salesPerformanceDTO.setProcessFlowStatus(ProcessFlowStatus.valueOf(ivData[26].toString()));
 			salesPerformanceDTO.setPaymentReceived((double) ivData[27]);
+			
+			salesPerformanceDTO.setBookingId(ivData[28] != null ? ivData[28].toString() : "");
+
+			if (ivData[29] != null) {
+				LocalDate currentdate = LocalDate.now();
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				String date = ivData[29].toString();
+				LocalDate deliveryDate = LocalDate.parse(date, formatter);
+				salesPerformanceDTO.setDeliveryDate(deliveryDate.toString());
+
+				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
+
+				salesPerformanceDTO.setDeliveryDateDifference(noOfDaysBetween);
+			} else {
+				salesPerformanceDTO.setDeliveryDate("");
+			}
+			
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
@@ -799,6 +825,31 @@ public class ProcessFlowStage2Resource {
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
 		inventoryVoucherHeaderDTO.setPaymentReceived((double) paymentReceived);
 		inventoryVoucherService.updateInventoryVoucherHeaderPaymentReceived(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>("success", HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/process-flow-stage-2/updateBookingId", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> updateBookingId(@RequestParam String ivhPid, @RequestParam String bookingId) {
+		log.info("update Booking Id " + ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+		inventoryVoucherHeaderDTO.setBookingId(bookingId);
+		inventoryVoucherService.updateInventoryVoucherHeaderBookingId(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>("success", HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/process-flow-stage-2/updateDeliveryDate", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> updateDeliveryDate(@RequestParam String ivhPid, @RequestParam String deliveryDate) {
+		log.info("update Delivery Date " + ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+
+		// LocalDate dDate = LocalDate.now();
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate dDate = LocalDate.parse(deliveryDate, formatter);
+		inventoryVoucherHeaderDTO.setDeliveryDate(dDate);
+		inventoryVoucherService.updateInventoryVoucherHeaderDeliveryDate(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
 

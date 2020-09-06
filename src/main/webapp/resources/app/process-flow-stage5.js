@@ -227,6 +227,48 @@ if (!this.InventoryVoucher) {
 		});
 	}
 
+	InventoryVoucher.updateBookingId = function(ivhPid) {
+		$.ajax({
+			url : inventoryVoucherContextPath + "/updateBookingId",
+			data : {
+				ivhPid : ivhPid,
+				bookingId : $('#bookingId-' + ivhPid).val()
+			},
+			beforeSend : function() {
+				// Show image container
+				$("#loader").modal('show');
+
+			},
+			method : 'GET',
+			success : function(data) {
+				$("#loader").modal('hide');
+				InventoryVoucher.filter();
+			}
+
+		});
+	}
+
+	InventoryVoucher.updateDeliveryDate = function(ivhPid) {
+		$.ajax({
+			url : inventoryVoucherContextPath + "/updateDeliveryDate",
+			data : {
+				ivhPid : ivhPid,
+				deliveryDate : $('#deliveryDate-' + ivhPid).val()
+			},
+			beforeSend : function() {
+				// Show image container
+				$("#loader").modal('show');
+
+			},
+			method : 'GET',
+			success : function(data) {
+				$("#loader").modal('hide');
+				InventoryVoucher.filter();
+			}
+
+		});
+	}
+
 	InventoryVoucher.filter = function() {
 
 		if ($('#dbDateSearch').val() == "SINGLE") {
@@ -270,7 +312,7 @@ if (!this.InventoryVoucher) {
 					url : inventoryVoucherContextPath + "/filter",
 					type : 'GET',
 					data : {
-						processFlowStatus : "ALL",
+						processFlowStatus : "INSTOCK_READYATTSL",
 						employeePids : empPids,
 						accountPid : $("#dbAccount").val(),
 						filterBy : $("#dbDateSearch").val(),
@@ -313,6 +355,7 @@ if (!this.InventoryVoucher) {
 												paymentPercentage = (paymentReceived / docTotal) * 100;
 											}
 											var bgColor = "";
+											
 											if (paymentPercentage >= 30) {
 												bgColor = "#9DF781";
 											}
@@ -321,6 +364,42 @@ if (!this.InventoryVoucher) {
 												paymentPercentage = 100;
 											}
 
+											
+											if (inventoryVoucher.deliveryDate != "") {
+												
+												var noOfdays = inventoryVoucher.deliveryDateDifference;
+												
+												console.log("No of Days= "+noOfdays);
+												
+												if(noOfdays >= 30 && noOfdays <= 45){
+													bgColor = "#7DFF33";
+												}
+												
+												if(noOfdays >= 15 && noOfdays < 30){
+													bgColor = "#FFFC33";
+												}
+												
+												if(noOfdays > 0 && noOfdays < 15){
+													bgColor = "#FFB833";
+												}
+												
+												if(noOfdays <= 0){
+													bgColor = "#FF3933 ";
+												}
+												
+												
+												
+											}
+
+											
+
+											$(
+													"#deliveryDate-"
+															+ inventoryVoucher.pid)
+													.datepicker({
+														dateFormat : "dd-mm-yy"
+													});
+
 											$('#tBodyInventoryVoucher')
 													.append(
 															"<tr style='background-color:"
@@ -328,6 +407,13 @@ if (!this.InventoryVoucher) {
 																	+ "'><td><input type='checkbox' class='check-one' value='"
 																	+ inventoryVoucher.pid
 																	+ "' />"
+																	+ "</td><td><input type='text' id='bookingId-"
+																	+ inventoryVoucher.pid
+																	+ "' value='"
+																	+ inventoryVoucher.bookingId
+																	+ "'/><br><br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateBookingId(\""
+																	+ inventoryVoucher.pid
+																	+ "\");'  value='update'>"
 																	+ "</td><td>"
 																	+ inventoryVoucher.employeeName
 																	+ "</td><td>"
@@ -335,13 +421,10 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ inventoryVoucher.supplierAccountName
 																	+ "</td><td>"
-																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated
-																			: inventoryVoucher.documentTotal)
+																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated.toFixed(2)
+																			: inventoryVoucher.documentTotal.toFixed(2))
 																	+ "</td><td>"
-																	+ inventoryVoucher.totalVolume
-																	+ "</td><td>"
-																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentVolumeUpdated
-																			: inventoryVoucher.documentVolume)
+																	+ inventoryVoucher.totalVolume.toFixed(2)
 																	+ "</td><td>"
 																	+ convertDateTimeFromServer(inventoryVoucher.createdDate)
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='InventoryVoucher.showModalPopup($(\"#viewModal\"),\""
@@ -358,6 +441,13 @@ if (!this.InventoryVoucher) {
 																	+ paymentPercentage
 																			.toFixed(2)
 																	+ " %"
+																	+ "</td><td><input type='date' id='deliveryDate-"
+																	+ inventoryVoucher.pid
+																	+ "' value='"
+																	+ inventoryVoucher.deliveryDate
+																	+ "'/><br><br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateDeliveryDate(\""
+																	+ inventoryVoucher.pid
+																	+ "\");'  value='update'>"
 																	+ "</td><td>"
 																	+ spanProcessFlowStatus(
 																			inventoryVoucher.pid,
