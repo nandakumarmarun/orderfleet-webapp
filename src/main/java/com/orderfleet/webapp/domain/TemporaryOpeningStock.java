@@ -24,15 +24,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @since July 15, 2016
  */
 @Entity
-@Table(name = "tbl_opening_stock")
-public class OpeningStock implements Serializable {
+@Table(name = "tbl_temporary_opening_stock")
+public class TemporaryOpeningStock implements Serializable {
 
 	private static final long serialVersionUID = -7628249532116947037L;
 	@Id
-	@GenericGenerator(name = "seq_opening_stock_id_GEN", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator", parameters = {
-			@Parameter(name = "sequence_name", value = "seq_opening_stock_id") })
-	@GeneratedValue(generator = "seq_opening_stock_id_GEN")
-	@Column(name = "id", insertable = false, updatable = false, columnDefinition = "bigint DEFAULT nextval('seq_opening_stock_id')")
+	@GenericGenerator(name = "seq_temporary_opening_stock_id_GEN", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator", parameters = {
+			@Parameter(name = "sequence_name", value = "seq_temporary_opening_stock_id") })
+	@GeneratedValue(generator = "seq_temporary_opening_stock_id_GEN")
+	@Column(name = "id", insertable = false, updatable = false, columnDefinition = "bigint DEFAULT nextval('seq_temporary_opening_stock_id')")
 	private Long id;
 
 	@NotNull
@@ -64,9 +64,6 @@ public class OpeningStock implements Serializable {
 	@ManyToOne
 	@NotNull
 	private Company company;
-
-	@ManyToOne
-	private User user;
 
 	@NotNull
 	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
@@ -163,14 +160,6 @@ public class OpeningStock implements Serializable {
 
 	public LocalDateTime getLastModifiedDate() {
 		return lastModifiedDate;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 
 	@Override

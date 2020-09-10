@@ -20,6 +20,7 @@ import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.TaxMaster;
+import com.orderfleet.webapp.domain.TemporaryOpeningStock;
 
 /**
  * Interface for bulk operation that to be implemented manually.
@@ -63,4 +64,7 @@ public interface BulkOperationRepositoryCustom {
 	void bulkSaveProductGroupEcomProducts(List<ProductGroupEcomProduct> saveUpdateProductGroupEcomProducts);
 
 	void bulkPriceLevelAccountProductGroups(List<PriceLevelAccountProductGroup> savePriceLevelAccountProductGroup);
+
+	void bulkSaveTemporaryOpeningStocks(Set<TemporaryOpeningStock> saveOpeningStocks);
+
 }

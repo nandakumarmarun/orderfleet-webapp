@@ -27,6 +27,7 @@ import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.TaxMaster;
+import com.orderfleet.webapp.domain.TemporaryOpeningStock;
 
 @Component
 public final class BulkOperationRepositoryCustomImpl implements BulkOperationRepositoryCustom {
@@ -312,6 +313,24 @@ public final class BulkOperationRepositoryCustomImpl implements BulkOperationRep
 		int i = 0;
 		for (PriceLevelAccountProductGroup entity : savePriceLevelAccountProductGroup) {
 			em.persist(entity);
+			i++;
+			if (i % batchSize == 0) {
+				em.flush();
+				em.clear();
+			}
+		}
+
+	}
+
+	@Override
+	public void bulkSaveTemporaryOpeningStocks(Set<TemporaryOpeningStock> openingStocks) {
+		int i = 0;
+		for (TemporaryOpeningStock entity : openingStocks) {
+			if (entity.getId() == null) {
+				em.persist(entity);
+			} else {
+				em.merge(entity);
+			}
 			i++;
 			if (i % batchSize == 0) {
 				em.flush();

@@ -130,4 +130,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@Query("select user.id,user.firstName from User user where user.id IN ?1 and user.company.id=?#{principal.companyId}")
 	List<Object[]> findByUserIdIn(Set<Long> ids);
 
+	User findByCompanyIdAndLogin(Long companyId, String userLogin);
+
 }

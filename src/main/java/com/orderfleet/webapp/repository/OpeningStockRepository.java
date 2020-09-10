@@ -31,7 +31,7 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 
 	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId}")
 	List<OpeningStock> findAllByCompanyId();
-	
+
 	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?1")
 	List<OpeningStock> findAllByCompanyId(Long companyId);
 
@@ -41,20 +41,20 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 	Optional<OpeningStock> findByProductProfileIdOrderByCreatedDateDesc(Long productProfileId);
 
 	OpeningStock findTop1ByProductProfilePidOrderByCreatedDateDesc(String productProfilePid);
-	
+
 	List<OpeningStock> findByProductProfilePidOrderByCreatedDateDesc(String productProfilePid);
 
 	Optional<OpeningStock> findTopByStockLocation(StockLocation stockLocation);
-	
+
 	Optional<OpeningStock> findTopByStockLocationPid(String stockLocationPid);
 
 	List<OpeningStock> findByStockLocationInOrderByCreatedDateAsc(List<StockLocation> stockLocations);
-	
+
 	List<OpeningStock> findByStockLocation(StockLocation stockLocation);
 
 	@Query("select coalesce(sum(openingStock.quantity),0) from OpeningStock openingStock where openingStock.productProfile.pid = ?1 and openingStock.stockLocation in  ?2")
 	Double findOpeningStockByProductAndStockLocations(String productPid, List<StockLocation> stockLocations);
-	
+
 	@Query("select MAX(openingStock.createdDate) from OpeningStock openingStock where openingStock.productProfile.pid = ?1 and openingStock.stockLocation in  ?2")
 	LocalDateTime findMaxDateByProductAndStockLocations(String productPid, List<StockLocation> stockLocations);
 
@@ -81,26 +81,33 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.productProfile.pid= ?1 and openingStock.activated = ?2 and openingStock.lastModifiedDate > ?3")
 	List<OpeningStock> findByCompanyIdAndProductProfilePidAndOpeningStockActivatedAndLastModifiedDate(String productPid,
 			boolean active, LocalDateTime lastModifiedDate);
-	
+
 	Optional<OpeningStock> findTop1ByProductProfilePidAndStockLocationPidOrderByCreatedDateDesc(String productPid,
 			String stockLocationPid);
-	
+
 	OpeningStock findTop1ByProductProfilePidOrderByLastModifiedDateDesc(String productPid);
-	
+
 	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.productProfile.pid = ?1 and openingStock.stockLocation in  ?2")
-	List<OpeningStock> findAllOpeningStockByProductPidAndStockLocations(String productPid, List<StockLocation> stockLocations);
-	
+	List<OpeningStock> findAllOpeningStockByProductPidAndStockLocations(String productPid,
+			List<StockLocation> stockLocations);
+
 	@Query("select coalesce(sum(openingStock.quantity),0) from OpeningStock openingStock where openingStock.productProfile.pid = ?1 and openingStock.stockLocation.id in ?2 ")
 	Double findSumOpeningStockByProductPidAndStockLocationIdIn(String productPid, Set<Long> stockLocationIds);
 
 	@Transactional
 	@Query(name = "delete from OpeningStock os where  os.stockLocation.id = ?1 and os.company.id = ?2")
-	void deleteByStockLocationIdAndCompanyId(long stockLocationId,long companyId);
+	void deleteByStockLocationIdAndCompanyId(long stockLocationId, long companyId);
 
-	@Query("select openingStock from OpeningStock openingStock where  openingStock.stockLocation.id in ?1") 
+	@Query("select openingStock from OpeningStock openingStock where  openingStock.stockLocation.id in ?1")
 	List<OpeningStock> findOpeningStocksAndStockLocationIdIn(Set<Long> sLocationIds);
 
 	List<OpeningStock> findByStockLocationIn(List<StockLocation> stockLocations);
-	
-	
+
+	@Query("select openingStock from OpeningStock openingStock where  openingStock.stockLocation.id = ?1 Order By openingStock.productProfile.name asc")
+	List<OpeningStock> findOpeningStocksAndStockLocationId(Long id);
+
+	@Transactional
+	@Query(name = "delete from OpeningStock os where  os.company.id in ?1 and os.stockLocation.pid in ?2")
+	void deleteByCompanyIdAndStockLocationPidIn(Long id, List<String> stockLocationPids);
+
 }

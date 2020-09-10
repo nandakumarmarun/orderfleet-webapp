@@ -39,7 +39,7 @@ public interface StockLocationRepository extends JpaRepository<StockLocation, Lo
 	@Query("select stockLocation from StockLocation stockLocation where stockLocation.company.id = ?#{principal.companyId} and stockLocation.activated = ?1 Order By stockLocation.name asc")
 	Page<StockLocation> findAllByCompanyIdAndActivatedStockLocationOrderByName(Pageable pageable, boolean active);
 
-	@Query("select stockLocation from StockLocation stockLocation where stockLocation.company.id = ?#{principal.companyId} and stockLocation.activated = ?1")
+	@Query("select stockLocation from StockLocation stockLocation where stockLocation.company.id = ?#{principal.companyId} and stockLocation.activated = ?1 Order By stockLocation.name asc")
 	List<StockLocation> findAllByCompanyIdAndDeactivatedStockLocation(boolean deactive);
 
 	List<StockLocation> findAllByCompanyId(Long companyId);

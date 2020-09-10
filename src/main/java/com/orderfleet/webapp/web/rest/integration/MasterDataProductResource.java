@@ -299,6 +299,40 @@ public class MasterDataProductResource {
 				}).orElse(new ResponseEntity<>("opening-stock sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
 	}
+	
+	@RequestMapping(value = "/temporary-opening-stock.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> bulkSaveTemporaryOpeningStock(@Valid @RequestBody List<OpeningStockDTO> openingStockDTOs) {
+		log.debug("REST request to save opening stock : {}", openingStockDTOs.size());
+		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+				SyncOperationType.TEMPORARY_OPENING_STOCK).map(so -> {
+
+					Optional<SyncOperation> opSyncSL = syncOperationRepository.findOneByCompanyIdAndOperationType(
+							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.STOCK_LOCATION);
+
+					if (!opSyncSL.get().getCompleted()) {
+						return new ResponseEntity<>("stock-location save processing try after some time.",
+								HttpStatus.BAD_REQUEST);
+					}
+
+					Optional<SyncOperation> opSyncPP = syncOperationRepository.findOneByCompanyIdAndOperationType(
+							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.PRODUCTPROFILE);
+
+					if (!opSyncPP.get().getCompleted()) {
+						return new ResponseEntity<>("product-profile save processing try after some time.",
+								HttpStatus.BAD_REQUEST);
+					}
+
+					// update sync status
+					so.setCompleted(false);
+					so.setLastSyncStartedDate(LocalDateTime.now());
+					syncOperationRepository.save(so);
+					// save/update
+					tpProductProfileManagementService.saveUpdateTemporaryOpeningStock(openingStockDTOs, so);
+					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+				}).orElse(new ResponseEntity<>("opening-stock sync operation not registered for this company",
+						HttpStatus.BAD_REQUEST));
+	}
 
 	@RequestMapping(value = "/price-levels.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
