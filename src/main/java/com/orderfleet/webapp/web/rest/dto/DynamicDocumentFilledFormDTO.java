@@ -19,6 +19,8 @@ import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 public class DynamicDocumentFilledFormDTO {
 
 	private String dynamicDocumentHeaderAccountProfileName;
+	
+	private String dynamicDocumentHeaderAccountTypeName;
 
 	private String dynamicDocumentHeaderAccountProfilePhone1;
 
@@ -44,6 +46,14 @@ public class DynamicDocumentFilledFormDTO {
 
 	public void setDynamicDocumentHeaderAccountProfileName(String dynamicDocumentHeaderAccountProfileName) {
 		this.dynamicDocumentHeaderAccountProfileName = dynamicDocumentHeaderAccountProfileName;
+	}
+	
+	public String getDynamicDocumentHeaderAccountTypeName() {
+		return dynamicDocumentHeaderAccountTypeName;
+	}
+
+	public void setDynamicDocumentHeaderAccountTypeName(String dynamicDocumentHeaderAccountTypeName) {
+		this.dynamicDocumentHeaderAccountTypeName = dynamicDocumentHeaderAccountTypeName;
 	}
 
 	public String getDynamicDocumentHeaderAccountProfilePhone1() {

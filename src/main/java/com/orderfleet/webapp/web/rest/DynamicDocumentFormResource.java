@@ -390,6 +390,7 @@ public class DynamicDocumentFormResource {
 			// Add four new field if include header is true
 			if (isHeaderIncluded && includeAccount) {
 				elementNameToShow.add("Account Profile");
+				elementNameToShow.add("Account Type");
 				elementNameToShow.add("Address");
 				elementNameToShow.add("City");
 				elementNameToShow.add("Location");
@@ -402,6 +403,7 @@ public class DynamicDocumentFormResource {
 
 			} else if (isHeaderIncluded && !includeAccount) {
 				elementNameToShow.add("Account Profile");
+				elementNameToShow.add("Account Type");
 				elementNameToShow.add("Phone Number");
 				elementNameToShow.add("User");
 				elementNameToShow.add("Employee");
@@ -442,6 +444,8 @@ public class DynamicDocumentFormResource {
 
 					elements.put(elementNameToShow.indexOf("Account Profile"),
 							filledForm.getDynamicDocumentHeaderAccountProfileName());
+					elements.put(elementNameToShow.indexOf("Account Type"),
+							filledForm.getDynamicDocumentHeaderAccountTypeName());
 					elements.put(elementNameToShow.indexOf("Phone Number"),
 							filledForm.getDynamicDocumentHeaderAccountProfilePhone1());
 					elements.put(elementNameToShow.indexOf("User"),
@@ -458,6 +462,8 @@ public class DynamicDocumentFormResource {
 
 					elements.put(elementNameToShow.indexOf("Account Profile"),
 							filledForm.getDynamicDocumentHeaderAccountProfileName());
+					elements.put(elementNameToShow.indexOf("Account Type"),
+							filledForm.getDynamicDocumentHeaderAccountTypeName());
 					elements.put(elementNameToShow.indexOf("Address"),
 							filledForm.getDynamicDocumentHeaderAccountProfileAddress());
 					elements.put(elementNameToShow.indexOf("City"),
@@ -704,6 +710,9 @@ public class DynamicDocumentFormResource {
 										: "");
 						dynamicDocumentFilledFormDTO.setDynamicDocumentHeaderAccountProfileAddress(
 								opExecutiveTaskExecution.get()[6] != null ? opExecutiveTaskExecution.get()[6].toString()
+										: "");
+						dynamicDocumentFilledFormDTO.setDynamicDocumentHeaderAccountTypeName(
+								opExecutiveTaskExecution.get()[7] != null ? opExecutiveTaskExecution.get()[7].toString()
 										: "");
 
 					}
