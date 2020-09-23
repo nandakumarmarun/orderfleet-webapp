@@ -24,7 +24,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Stage 2</h2>
+			<h2>${menuItemLabel == null ? 'Stage 2' : menuItemLabel}</h2>
 			<div class="row col-xs-12"></div>
 			<div class="clearfix"></div>
 			<hr />
@@ -142,22 +142,22 @@
 						<tr>
 							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
 								All</th>
+							<th>Actions</th>
 							<th>Booking Id</th>
-							<th>Employee</th>
 							<th>Receiver</th>
-							<th>Supplier</th>
+							<th>Delivery Date</th>
+							<th>Payment Received</th>
+							<th>Payment(%)</th>
 							<th>Amount
 								<p id="totalDocument" style="float: right;"></p>
 							</th>
+							<th>Supplier</th>
 							<th>Volume
 								<p id="totalVolume" style="float: right;"></p>
 							</th>
+							<th>Employee</th>
 							<th>Date</th>
-							<th>Header Details</th>
-							<th>Payment Received</th>
-							<th>Payment(%)</th>
-							<th>Delivery Date</th>
-							<th>Actions</th>
+							<th>Details</th>	
 						</tr>
 					</thead>
 					<tbody id="tBodyInventoryVoucher">

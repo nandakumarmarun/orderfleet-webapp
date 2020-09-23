@@ -97,6 +97,7 @@ import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.InventoryVoucherDetailService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
+import com.orderfleet.webapp.service.UserMenuItemService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
@@ -171,6 +172,9 @@ public class ProcessFlowStage3Resource {
 
 	@Inject
 	private InventoryVoucherDetailService inventoryVoucherDetailService;
+	
+	@Inject
+	private UserMenuItemService userMenuItemService;
 
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
@@ -208,6 +212,7 @@ public class ProcessFlowStage3Resource {
 			model.addAttribute("accounts", accountProfileDTOs);
 		}
 		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
+		model.addAttribute("menuItemLabel", userMenuItemService.findMenuItemLabelView("/web/process-flow-stage-3"));
 
 		return "company/processFlowStage3";
 	}
@@ -470,7 +475,7 @@ public class ProcessFlowStage3Resource {
 			salesPerformanceDTO.setSendSalesOrderSapButtonStatus(sendSalesOrderSapButtonStatus);
 			salesPerformanceDTO.setProcessFlowStatus(ProcessFlowStatus.valueOf(ivData[26].toString()));
 			salesPerformanceDTO.setPaymentReceived((double) ivData[27]);
-			
+
 			salesPerformanceDTO.setBookingId(ivData[28] != null ? ivData[28].toString() : "");
 
 			if (ivData[29] != null) {
@@ -850,6 +855,26 @@ public class ProcessFlowStage3Resource {
 		LocalDate dDate = LocalDate.parse(deliveryDate, formatter);
 		inventoryVoucherHeaderDTO.setDeliveryDate(dDate);
 		inventoryVoucherService.updateInventoryVoucherHeaderDeliveryDate(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>("success", HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/process-flow-stage-3/updateAll", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> updateAll(@RequestParam String ivhPid, @RequestParam String bookingId,
+			@RequestParam long paymentReceived, @RequestParam String deliveryDate) {
+		log.info("update Booking Id,deliveryDate,paymentReceived " + ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+
+		inventoryVoucherHeaderDTO.setBookingId(bookingId);
+
+		if (!deliveryDate.equals("")) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate dDate = LocalDate.parse(deliveryDate, formatter);
+			inventoryVoucherHeaderDTO.setDeliveryDate(dDate);
+		}
+		inventoryVoucherHeaderDTO.setPaymentReceived((double) paymentReceived);
+		inventoryVoucherService
+				.updateInventoryVoucherHeaderBookingIdDeliveryDateAndPaymentReceived(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
 

@@ -269,6 +269,29 @@ if (!this.InventoryVoucher) {
 		});
 	}
 
+	InventoryVoucher.updateAll = function(ivhPid) {
+		$.ajax({
+			url : inventoryVoucherContextPath + "/updateAll",
+			data : {
+				ivhPid : ivhPid,
+				bookingId : $('#bookingId-' + ivhPid).val(),
+				paymentReceived : $('#pmtReceieved-' + ivhPid).val(),
+				deliveryDate : $('#deliveryDate-' + ivhPid).val()
+			},
+			beforeSend : function() {
+				// Show image container
+				$("#loader").modal('show');
+
+			},
+			method : 'GET',
+			success : function(data) {
+				$("#loader").modal('hide');
+				InventoryVoucher.filter();
+			}
+
+		});
+	}
+
 	InventoryVoucher.filter = function() {
 
 		if ($('#dbDateSearch').val() == "SINGLE") {
@@ -355,7 +378,7 @@ if (!this.InventoryVoucher) {
 												paymentPercentage = (paymentReceived / docTotal) * 100;
 											}
 											var bgColor = "";
-											
+
 											if (paymentPercentage >= 30) {
 												bgColor = "#9DF781";
 											}
@@ -364,34 +387,33 @@ if (!this.InventoryVoucher) {
 												paymentPercentage = 100;
 											}
 
-											
 											if (inventoryVoucher.deliveryDate != "") {
-												
+
 												var noOfdays = inventoryVoucher.deliveryDateDifference;
-												
-												console.log("No of Days= "+noOfdays);
-												
-												if(noOfdays >= 30 && noOfdays <= 45){
+
+												console.log("No of Days= "
+														+ noOfdays);
+
+												if (noOfdays >= 30
+														&& noOfdays <= 45) {
 													bgColor = "#7DFF33";
 												}
-												
-												if(noOfdays >= 15 && noOfdays < 30){
+
+												if (noOfdays >= 15
+														&& noOfdays < 30) {
 													bgColor = "#FFFC33";
 												}
-												
-												if(noOfdays > 0 && noOfdays < 15){
+
+												if (noOfdays > 0
+														&& noOfdays < 15) {
 													bgColor = "#FFB833";
 												}
-												
-												if(noOfdays <= 0){
+
+												if (noOfdays <= 0) {
 													bgColor = "#FF3933 ";
 												}
-												
-												
-												
-											}
 
-											
+											}
 
 											$(
 													"#deliveryDate-"
@@ -407,51 +429,50 @@ if (!this.InventoryVoucher) {
 																	+ "'><td><input type='checkbox' class='check-one' value='"
 																	+ inventoryVoucher.pid
 																	+ "' />"
-																	+ "</td><td><input type='text' id='bookingId-"
+																	+ "</td><td>"
+																	+ spanProcessFlowStatus(
+																			inventoryVoucher.pid,
+																			inventoryVoucher.processFlowStatus)
+																	+ "<br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateAll(\""
+																	+ inventoryVoucher.pid
+																	+ "\");'  value='Update'></td><td><input type='text' id='bookingId-"
 																	+ inventoryVoucher.pid
 																	+ "' value='"
 																	+ inventoryVoucher.bookingId
-																	+ "'/><br><br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateBookingId(\""
-																	+ inventoryVoucher.pid
-																	+ "\");'  value='update'>"
-																	+ "</td><td>"
-																	+ inventoryVoucher.employeeName
+																	+ "'/>"
 																	+ "</td><td>"
 																	+ inventoryVoucher.receiverAccountName
+																	+ "</td><td><input type='date' id='deliveryDate-"
+																	+ inventoryVoucher.pid
+																	+ "' value='"
+																	+ inventoryVoucher.deliveryDate
+																	+ "'/>"
+																	+ "</td><td><input type='number' id='pmtReceieved-"
+																	+ inventoryVoucher.pid
+																	+ "' value='"
+																	+ inventoryVoucher.paymentReceived
+																	+ "'/>"
+																	+ "</td><td>"
+																	+ paymentPercentage
+																			.toFixed(2)
+																	+ " %"
+																	+ "</td><td>"
+																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated
+																			.toFixed(2)
+																			: inventoryVoucher.documentTotal
+																					.toFixed(2))
 																	+ "</td><td>"
 																	+ inventoryVoucher.supplierAccountName
 																	+ "</td><td>"
-																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated.toFixed(2)
-																			: inventoryVoucher.documentTotal.toFixed(2))
+																	+ inventoryVoucher.totalVolume
+																			.toFixed(2)
 																	+ "</td><td>"
-																	+ inventoryVoucher.totalVolume.toFixed(2)
+																	+ inventoryVoucher.employeeName
 																	+ "</td><td>"
 																	+ convertDateTimeFromServer(inventoryVoucher.createdDate)
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='InventoryVoucher.showModalPopup($(\"#viewModal\"),\""
 																	+ inventoryVoucher.pid
 																	+ "\",0);'>View Details</button>"
-																	+ "</td><td><input type='number' id='pmtReceieved-"
-																	+ inventoryVoucher.pid
-																	+ "' value='"
-																	+ inventoryVoucher.paymentReceived
-																	+ "'/><br><br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updatePaymentReceived(\""
-																	+ inventoryVoucher.pid
-																	+ "\");'  value='update'>"
-																	+ "</td><td>"
-																	+ paymentPercentage
-																			.toFixed(2)
-																	+ " %"
-																	+ "</td><td><input type='date' id='deliveryDate-"
-																	+ inventoryVoucher.pid
-																	+ "' value='"
-																	+ inventoryVoucher.deliveryDate
-																	+ "'/><br><br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateDeliveryDate(\""
-																	+ inventoryVoucher.pid
-																	+ "\");'  value='update'>"
-																	+ "</td><td>"
-																	+ spanProcessFlowStatus(
-																			inventoryVoucher.pid,
-																			inventoryVoucher.processFlowStatus)
 																	+ "</td></tr>");
 										});
 						$("#lblCounts").text(counts);

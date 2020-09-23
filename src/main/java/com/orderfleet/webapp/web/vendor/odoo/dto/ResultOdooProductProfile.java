@@ -4,94 +4,34 @@ import java.util.List;
 
 public class ResultOdooProductProfile {
 
-	private List<String> taxRate;
+	private long status;
 
-	private String productCode;
+	private String message;
 
-	private String hsnCode;
+	private List<OdooProductProfile> response;
 
-	private long size;
-
-	private double price;
-
-	private List<UnitQtyOdooProductProfile> UnitQty;
-
-	private String name;
-
-	private long id;
-
-	private List<Object[]> sku;
-
-	public List<String> getTaxRate() {
-		return taxRate;
+	public long getStatus() {
+		return status;
 	}
 
-	public void setTaxRate(List<String> taxRate) {
-		this.taxRate = taxRate;
+	public void setStatus(long status) {
+		this.status = status;
 	}
 
-	public String getProductCode() {
-		return productCode;
+	public String getMessage() {
+		return message;
 	}
 
-	public void setProductCode(String productCode) {
-		this.productCode = productCode;
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
-	public String getHsnCode() {
-		return hsnCode;
+	public List<OdooProductProfile> getResponse() {
+		return response;
 	}
 
-	public void setHsnCode(String hsnCode) {
-		this.hsnCode = hsnCode;
-	}
-
-	public long getSize() {
-		return size;
-	}
-
-	public void setSize(long size) {
-		this.size = size;
-	}
-
-	public double getPrice() {
-		return price;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
-	}
-
-	public List<UnitQtyOdooProductProfile> getUnitQty() {
-		return UnitQty;
-	}
-
-	public void setUnitQty(List<UnitQtyOdooProductProfile> unitQty) {
-		UnitQty = unitQty;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public List<Object[]> getSku() {
-		return sku;
-	}
-
-	public void setSku(List<Object[]> sku) {
-		this.sku = sku;
+	public void setResponse(List<OdooProductProfile> response) {
+		this.response = response;
 	}
 
 }

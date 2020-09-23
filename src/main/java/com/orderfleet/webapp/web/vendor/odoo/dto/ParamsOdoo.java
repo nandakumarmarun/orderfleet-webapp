@@ -4,39 +4,37 @@ import java.util.List;
 
 public class ParamsOdoo {
 
-	private List<Object> args;
+	private String db;
+	private String login;
+	private String password;
 
-	private String method;
-
-	private String service;
-
-	public List<Object> getArgs() {
-		return args;
+	public String getDb() {
+		return db;
 	}
 
-	public void setArgs(List<Object> args) {
-		this.args = args;
+	public void setDb(String db) {
+		this.db = db;
 	}
 
-	public String getMethod() {
-		return method;
+	public String getLogin() {
+		return login;
 	}
 
-	public void setMethod(String method) {
-		this.method = method;
+	public void setLogin(String login) {
+		this.login = login;
 	}
 
-	public String getService() {
-		return service;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setService(String service) {
-		this.service = service;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	@Override
 	public String toString() {
-		return "Params [args=" + args + ", method=" + method + ", service=" + service + "]";
+		return "ParamsOdoo [db=" + db + ", login=" + login + ", password=" + password + "]";
 	}
 
 }

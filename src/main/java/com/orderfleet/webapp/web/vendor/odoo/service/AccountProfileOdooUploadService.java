@@ -36,6 +36,7 @@ import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooAccountProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooAccountProfile;
 
 /**
@@ -89,8 +90,11 @@ public class AccountProfileOdooUploadService {
 		this.companyRepository = companyRepository;
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Transactional
-	public void saveUpdateAccountProfiles(final List<ResultOdooAccountProfile> resultAccountProfiles) {
+	public void saveUpdateAccountProfiles(final List<OdooAccountProfile> list) {
+
+		log.info("Saving Account Profiles...");
 		long start = System.nanoTime();
 
 		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
@@ -100,15 +104,14 @@ public class AccountProfileOdooUploadService {
 		// All product must have a division/category, if not, set a default one
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
 		// find all exist account profiles
-		List<String> apNames = resultAccountProfiles.stream().map(apDto -> apDto.getName().toUpperCase())
-				.collect(Collectors.toList());
+		List<String> apNames = list.stream().map(apDto -> apDto.getName().toUpperCase()).collect(Collectors.toList());
 		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
 				apNames);
 
 		List<LocationDTO> locationDtos = new ArrayList<>();
 		List<LocationAccountProfileDTO> locationAccountProfileDtos = new ArrayList<>();
 
-		for (ResultOdooAccountProfile apDto : resultAccountProfiles) {
+		for (OdooAccountProfile apDto : list) {
 			// check exist by name, only one exist with a name
 			Optional<AccountProfile> optionalAP = accountProfiles.stream()
 					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
@@ -129,29 +132,49 @@ public class AccountProfileOdooUploadService {
 
 			}
 
-			if (isValidEmail(apDto.getEmail1())) {
-				accountProfile.setEmail1(apDto.getEmail1());
+			if (apDto.getEmail() != null && !apDto.getEmail().equals("")) {
+				if (isValidEmail(apDto.getEmail())) {
+					accountProfile.setEmail1(apDto.getEmail());
+				}
+			} else {
+				accountProfile.setEmail1("");
 			}
-			accountProfile.setAlias(apDto.getCustomerCode());
-			accountProfile.setTinNo(apDto.getTinNo());
-			accountProfile.setPin(apDto.getPin());
+
+			accountProfile.setAlias(apDto.getRef());
+
+			if (apDto.getTrn() != null && !apDto.getTrn().equals("")) {
+				accountProfile.setTinNo(apDto.getTrn());
+			}
+
 			accountProfile.setDescription(String.valueOf(apDto.getId()));
 
 			accountProfile.setActivated(true);
 
-			if (apDto.getAddress() != null && !apDto.getAddress().equalsIgnoreCase("")) {
-				accountProfile.setAddress(apDto.getAddress());
+			if (apDto.getStreet() != null && !apDto.getStreet().equals("")) {
+				if (apDto.getStreet2() != null && !apDto.getStreet2().equals("")) {
+					accountProfile.setAddress(apDto.getStreet());
+				} else {
+					accountProfile.setAddress(apDto.getStreet() + "," + apDto.getStreet2());
+				}
 			} else {
 				accountProfile.setAddress("No Address");
 			}
 
-			if (apDto.getCity() != null && !apDto.getCity().equalsIgnoreCase("")) {
+			if (apDto.getCity() != null && !apDto.getCity().equals("")) {
 				accountProfile.setCity(apDto.getCity());
 			} else {
 				accountProfile.setCity("No City");
 			}
 
-			accountProfile.setClosingBalance(Double.parseDouble(apDto.getCredit()));
+			if (apDto.getPhone() != null && !apDto.getPhone().equals("")) {
+				accountProfile.setPhone1(apDto.getPhone());
+			} else {
+				accountProfile.setPhone1("");
+			}
+
+			accountProfile.setDescription(String.valueOf(apDto.getId()));
+
+			// accountProfile.setClosingBalance(Double.parseDouble(apDto.getCredit()));
 
 			// account type
 
@@ -166,15 +189,9 @@ public class AccountProfileOdooUploadService {
 
 			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
 			LocationDTO locationDto = new LocationDTO();
-			if (apDto.getLocation().size() > 0) {
-				locationDto.setName(apDto.getLocation().get(0));
-				locationAccountProfileDto.setAccountProfileName(apDto.getName());
-				locationAccountProfileDto.setLocationName(apDto.getLocation().get(0));
-				locationDtos.add(locationDto);
-			} else {
-				locationAccountProfileDto.setAccountProfileName(apDto.getName());
-				locationAccountProfileDto.setLocationName("Territory");
-			}
+
+			locationAccountProfileDto.setAccountProfileName(apDto.getName());
+			locationAccountProfileDto.setLocationName("Territory");
 
 			locationAccountProfileDtos.add(locationAccountProfileDto);
 			accountProfile.setDataSourceType(DataSourceType.TALLY);
@@ -233,6 +250,7 @@ public class AccountProfileOdooUploadService {
 	@Transactional
 	@Async
 	public void saveUpdateLocationAccountProfiles(final List<LocationAccountProfileDTO> locationAccountProfileDTOs) {
+		log.info("Saving Location Account Profiles...");
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);

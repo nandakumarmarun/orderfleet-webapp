@@ -148,7 +148,7 @@ if (!this.StockLocationManagement) {
 			return;
 		}
 
-		if (confirm("Are you sure?")) {
+		if (confirm("Updating Stock Location Will Reset The Opening Stock,Closing Stock And Sales Number")) {
 			$.ajax({
 				url : stockLocationManagementContextPath + "/updateStocks/"
 						+ selectedStockLocation,

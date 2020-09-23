@@ -8,6 +8,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.hibernate.service.spi.ServiceException;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -18,14 +20,19 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.excel.service.AccountProfileUploadService;
@@ -33,9 +40,13 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.ArgsOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAuthentication;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooProductProfile;
 import com.orderfleet.webapp.web.vendor.odoo.service.AccountProfileOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.ProductProfileOdooUploadService;
+
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 
 /**
  * used to upload xls
@@ -48,7 +59,11 @@ import com.orderfleet.webapp.web.vendor.odoo.service.ProductProfileOdooUploadSer
 @RequestMapping("/web")
 public class UploadOdooResource {
 
-	private static String API_URL = "http://117.221.64.88:1214/jsonrpc";
+	private static String CUSTOMER_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/customers";
+
+	private static String AUTHENTICATE_API_URL = "http://nellaracorp.dyndns.org:11214/web/session/authenticate";
+	
+	private static String PRODUCT_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/products";
 
 	private final Logger log = LoggerFactory.getLogger(UploadOdooResource.class);
 
@@ -68,33 +83,45 @@ public class UploadOdooResource {
 
 	@RequestMapping(value = "/upload-odoo/uploadAccountProfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<Void> uploadAccountProfiles() throws IOException {
+	public ResponseEntity<Void> uploadAccountProfiles() throws IOException, JSONException, ParseException {
+
+		// ResponseBodyOdooAuthentication responseBodyOdooAuthentication =
+		// authenticateServer();
 
 		log.debug("Web request to upload Account Profiles ...");
 
-		RequestBodyOdoo requestBody = getRequestBody("get_customers");
 
-		HttpEntity<RequestBodyOdoo> entity = new HttpEntity<>(requestBody, RestClientUtil.createTokenAuthHeaders());
+		String jsonString = getOdooRequestBody();
+
+		HttpEntity<String> entity = new HttpEntity<>(jsonString, RestClientUtil.createTokenAuthHeaders());
+
+
+		log.info(entity.getBody().toString() + "");
 
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		log.info("Get URL: " + API_URL);
+		log.info("Get URL: " + CUSTOMER_API_URL);
 
 		try {
 
-			ResponseBodyOdooAccountProfile responseBodyAccountProfile = restTemplate.postForObject(API_URL, entity,
-					ResponseBodyOdooAccountProfile.class);
-			log.info("Account Profile Size= " + responseBodyAccountProfile.getResult().size() + "------------");
+			ResponseBodyOdooAccountProfile responseBodyAccountProfile = restTemplate.postForObject(CUSTOMER_API_URL,
+					entity, ResponseBodyOdooAccountProfile.class);
+			log.info("Account Profile Size= " + responseBodyAccountProfile.getResult().getResponse().size()
+					+ "------------");
 
-			accountProfileOdooUploadService.saveUpdateAccountProfiles(responseBodyAccountProfile.getResult());
+			accountProfileOdooUploadService
+					.saveUpdateAccountProfiles(responseBodyAccountProfile.getResult().getResponse());
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				log.info(exception.getMessage());
 				throw new ServiceException(exception.getResponseBodyAsString());
 			}
+			log.info(exception.getMessage());
 			throw new ServiceException(exception.getMessage());
 		} catch (Exception exception) {
+			log.info(exception.getMessage());
 			throw new ServiceException(exception.getMessage());
 		}
 
@@ -103,26 +130,35 @@ public class UploadOdooResource {
 
 	@RequestMapping(value = "/upload-odoo/uploadProductProfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<Void> uploadProductProfiles() throws IOException {
+	public ResponseEntity<Void> uploadProductProfiles() throws IOException, JSONException, ParseException {
 
 		log.debug("Web request to upload Product Profiles ...");
+		
+		String jsonString = getOdooRequestBody();
 
-		RequestBodyOdoo requestBody = getRequestBody("get_products");
+		HttpEntity<String> entity = new HttpEntity<>(jsonString, RestClientUtil.createTokenAuthHeaders());
 
-		HttpEntity<RequestBodyOdoo> entity = new HttpEntity<>(requestBody, RestClientUtil.createTokenAuthHeaders());
+
+		log.info(entity.getBody().toString() + "");
+		
+		
+
+		//RequestBodyOdoo requestBody = getRequestBody("get_products");
+
+		//HttpEntity<RequestBodyOdoo> entity = new HttpEntity<>(requestBody, RestClientUtil.createTokenAuthHeaders());
 
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		log.info("Get URL: " + API_URL);
+		log.info("Get URL: " + PRODUCT_API_URL);
 
 		try {
 
-			ResponseBodyOdooProductProfile responseBodyProductProfile = restTemplate.postForObject(API_URL, entity,
+			ResponseBodyOdooProductProfile responseBodyProductProfile = restTemplate.postForObject(PRODUCT_API_URL, entity,
 					ResponseBodyOdooProductProfile.class);
-			log.info("Product Profile Size= " + responseBodyProductProfile.getResult().size() + "------------");
+			log.info("Product Profile Size= " + responseBodyProductProfile.getResult().getResponse().size() + "------------");
 
-			productProfileOdooUploadService.saveUpdateProductProfiles(responseBodyProductProfile.getResult());
+			productProfileOdooUploadService.saveUpdateProductProfiles(responseBodyProductProfile.getResult().getResponse());
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
@@ -138,38 +174,75 @@ public class UploadOdooResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	private RequestBodyOdoo getRequestBody(String getmaster) throws IOException {
-		RequestBodyOdoo requestBody = new RequestBodyOdoo();
+	private RequestBodyOdoo getRequestBody() throws IOException {
 
-		ArgsOdoo args = new ArgsOdoo();
 		ObjectMapper Obj = new ObjectMapper();
 
-		requestBody.setMethod("call");
+		RequestBodyOdoo requestBody = new RequestBodyOdoo();
+
 		requestBody.setJsonrpc("2.0");
 		ParamsOdoo params = new ParamsOdoo();
-		params.setService("object");
-		params.setMethod("execute");
-		List<Object> argsList = new ArrayList<>();
 
-		argsList.add("edappal");
-		argsList.add(1);
-		argsList.add("admin123.");
-		argsList.add("custom.api");
+		params.setDb("edappal");
+		params.setLogin("api_user_1");
+		params.setPassword("api_user_1");
 
-		if (getmaster.equalsIgnoreCase("get_customers")) {
-			argsList.add("get_customers");
-		}
-		if (getmaster.equalsIgnoreCase("get_products")) {
-			argsList.add("get_products");
-		}
-		args.setCompanyId(1);
-		argsList.add(args);
-		params.setArgs(argsList);
 		requestBody.setParams(params);
 		String jsonStr = Obj.writeValueAsString(requestBody);
 
 		log.info("Json String-------------" + jsonStr);
 		return requestBody;
 	}
+	
+
+	private String getOdooRequestBody() throws JSONException, ParseException {
+		JSONParser parser = new JSONParser();
+		String s = "{}";
+		Object params = parser.parse(s);
+
+		JSONObject emptyJsonObject = new JSONObject();
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("jsonrpc", "2.0");
+		jsonObject.put("params", emptyJsonObject);
+
+		return jsonObject.toString();
+	}
+
+	private ResponseBodyOdooAuthentication authenticateServer() throws IOException {
+
+		RequestBodyOdoo request = getRequestBody();
+
+		HttpEntity<RequestBodyOdoo> entity = new HttpEntity<>(request, RestClientUtil.createTokenAuthHeaders());
+
+		log.info(entity.getBody().toString() + "");
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		log.info("Get URL: " + AUTHENTICATE_API_URL);
+
+		try {
+
+			ResponseBodyOdooAuthentication responseBodyAuthentication = restTemplate.postForObject(AUTHENTICATE_API_URL,
+					entity, ResponseBodyOdooAuthentication.class);
+
+			log.info("Authenitcatiuon Response---" + responseBodyAuthentication.toString());
+
+			return responseBodyAuthentication;
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				log.info(exception.getMessage());
+				throw new ServiceException(exception.getResponseBodyAsString());
+			}
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		}
+
+	}
+
 
 }
