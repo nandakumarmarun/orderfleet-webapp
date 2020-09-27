@@ -73,6 +73,9 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Column(name = "description")
 	private String description;
 
+	@Column(name = "customer_id")
+	private String customerId;
+
 	@NotNull
 	@Size(min = 1, max = 500)
 	@Column(name = "address", length = 500, nullable = false)
@@ -206,13 +209,13 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "geo_tagging_type")
 	private GeoTaggingType geoTaggingType;
-	
+
 	@Column(name = "geo_tagged_time")
 	private LocalDateTime geoTaggedTime;
-	
+
 	@ManyToOne
 	private User geoTaggedUser;
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -508,7 +511,7 @@ public class AccountProfile implements Serializable, Cloneable {
 	public void setGstRegistrationType(String gstRegistrationType) {
 		this.gstRegistrationType = gstRegistrationType;
 	}
-	
+
 	public GeoTaggingType getGeoTaggingType() {
 		return geoTaggingType;
 	}
@@ -516,7 +519,7 @@ public class AccountProfile implements Serializable, Cloneable {
 	public void setGeoTaggingType(GeoTaggingType geoTaggingType) {
 		this.geoTaggingType = geoTaggingType;
 	}
-	
+
 	public LocalDateTime getGeoTaggedTime() {
 		return geoTaggedTime;
 	}
@@ -531,6 +534,14 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	public void setGeoTaggedUser(User geoTaggedUser) {
 		this.geoTaggedUser = geoTaggedUser;
+	}
+
+	public String getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
 	}
 
 	@Override

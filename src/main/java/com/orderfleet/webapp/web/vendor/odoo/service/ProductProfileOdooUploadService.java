@@ -20,6 +20,8 @@ import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.UnitOfMeasure;
+import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
@@ -27,15 +29,20 @@ import com.orderfleet.webapp.repository.ProductCategoryRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
+import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
+import com.orderfleet.webapp.repository.UnitOfMeasureRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.ProductProfileService;
+import com.orderfleet.webapp.service.UnitOfMeasureService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
+import com.orderfleet.webapp.web.rest.dto.TPUnitOfMeasureProductDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooProductProfile;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooUnitOfMeasure;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooProductProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.UnitQtyOdooProductProfile;
 
@@ -65,10 +72,16 @@ public class ProductProfileOdooUploadService {
 
 	private final CompanyRepository companyRepository;
 
+	private final UnitOfMeasureRepository unitOfMeasureRepository;
+
+	private final UnitOfMeasureProductRepository unitOfMeasureProductRepository;
+
 	public ProductProfileOdooUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			DivisionRepository divisionRepository, ProductCategoryRepository productCategoryRepository,
 			ProductGroupRepository productGroupRepository, ProductProfileRepository productProfileRepository,
-			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository) {
+			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository,
+			UnitOfMeasureRepository unitOfMeasureRepository,
+			UnitOfMeasureProductRepository unitOfMeasureProductRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.divisionRepository = divisionRepository;
@@ -77,6 +90,8 @@ public class ProductProfileOdooUploadService {
 		this.productProfileRepository = productProfileRepository;
 		this.productGroupProductRepository = productGroupProductRepository;
 		this.companyRepository = companyRepository;
+		this.unitOfMeasureRepository = unitOfMeasureRepository;
+		this.unitOfMeasureProductRepository = unitOfMeasureProductRepository;
 	}
 
 	@Transactional
@@ -94,11 +109,15 @@ public class ProductProfileOdooUploadService {
 		List<ProductProfile> productProfiles = productProfileRepository
 				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
 
+		List<UnitOfMeasure> unitOfMeasures = unitOfMeasureRepository.findAllByCompanyId(true);
+
 		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
 
 		List<ProductGroupDTO> productGroupDtos = new ArrayList<>();
 
 		List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
+
+		List<TPUnitOfMeasureProductDTO> unitOFMeasureProductDTOs = new ArrayList<>();
 
 		// All product must have a division/category, if not, set a default one
 		Division defaultDivision = divisionRepository.findFirstByCompanyId(company.getId());
@@ -157,6 +176,23 @@ public class ProductProfileOdooUploadService {
 				continue;
 			}
 
+			String uomId = String.valueOf(ppDto.getUom());
+
+			Optional<UnitOfMeasure> opUom = unitOfMeasures.stream().filter(so -> so.getUomId().equalsIgnoreCase(uomId))
+					.findAny();
+
+			if (opUom.isPresent()) {
+				productProfile.setSku(opUom.get().getName());
+
+				TPUnitOfMeasureProductDTO unitOfMeasureProductDTO = new TPUnitOfMeasureProductDTO();
+
+				unitOfMeasureProductDTO.setUnitOfMeasureName(opUom.get().getName());
+				unitOfMeasureProductDTO.setProductName(ppDto.getName());
+
+				unitOFMeasureProductDTOs.add(unitOfMeasureProductDTO);
+
+			}
+
 //			if (ppDto.getSku() != null && ppDto.getSku().size() > 0) {
 //				int lastElement = ppDto.getSku().size() - 1;
 //
@@ -194,6 +230,7 @@ public class ProductProfileOdooUploadService {
 //			}
 			productProfile.setUnitQty(1.0);
 			productProfile.setDescription(String.valueOf(ppDto.getId()));
+			productProfile.setProductId(String.valueOf(ppDto.getId()));
 
 			productProfile.setProductCategory(defaultCategory.get());
 
@@ -220,8 +257,8 @@ public class ProductProfileOdooUploadService {
 		saveUpdateProductGroups(productGroupDtos);
 		log.info("Saving product group product profiles");
 		saveUpdateProductGroupProduct(productGroupProductDTOs);
-
-		saveUpdateProductGroupProduct(productGroupProductDTOs);
+		log.info("Saving unit of measures product profiles");
+		saveUpdateUnitOfMeasureProduct(unitOFMeasureProductDTOs);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -329,6 +366,119 @@ public class ProductProfileOdooUploadService {
 		}
 
 		productGroupProductRepository.save(newProductGroupProducts);
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
+	@Transactional
+	@Async
+	public void saveUpdateUnitOfMeasureProduct(List<TPUnitOfMeasureProductDTO> unitOfMeasureProductDTOs) {
+
+		log.info("Saving Unit Of Measure Products.........");
+		long start = System.nanoTime();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		List<UnitOfMeasureProduct> newUnitOfMeasureProducts = new ArrayList<>();
+		List<UnitOfMeasureProduct> unitOfMeasureProducts = unitOfMeasureProductRepository
+				.findAllByCompanyPid(company.getPid());
+
+		// delete all assigned location account profile from tally
+		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+		List<UnitOfMeasure> unitOfMeasures = unitOfMeasureRepository.findByCompanyId(company.getId());
+		List<Long> unitOfMeasureProductsIds = new ArrayList<>();
+
+		for (TPUnitOfMeasureProductDTO pgpDto : unitOfMeasureProductDTOs) {
+			UnitOfMeasureProduct unitOfMeasureProduct = new UnitOfMeasureProduct();
+			// find location
+
+			Optional<UnitOfMeasure> opPg = unitOfMeasures.stream()
+					.filter(pl -> pgpDto.getUnitOfMeasureName().equals(pl.getName())).findFirst();
+			// find accountprofile
+			// System.out.println(loc.get()+"===Location");
+
+			Optional<ProductProfile> opPp = productProfiles.stream()
+					.filter(pp -> pgpDto.getProductName().equals(pp.getName())).findFirst();
+			if (opPp.isPresent()) {
+				List<Long> uomIds = unitOfMeasureProducts.stream()
+						.filter(pgp -> opPp.get().getPid().equals(pgp.getProduct().getPid())).map(pgp -> pgp.getId())
+						.collect(Collectors.toList());
+				if (uomIds.size() != 0) {
+					unitOfMeasureProductsIds.addAll(uomIds);
+				}
+				if (opPg.isPresent()) {
+					unitOfMeasureProduct.setUnitOfMeasure(opPg.get());
+				} else if (opPp.isPresent()) {
+					unitOfMeasureProduct.setUnitOfMeasure(unitOfMeasures.get(0));
+				}
+				unitOfMeasureProduct.setProduct(opPp.get());
+				unitOfMeasureProduct.setCompany(company);
+				newUnitOfMeasureProducts.add(unitOfMeasureProduct);
+			}
+		}
+		if (unitOfMeasureProductsIds.size() != 0) {
+			unitOfMeasureProductRepository.deleteByIdIn(companyId, unitOfMeasureProductsIds);
+		}
+
+		unitOfMeasureProductRepository.save(newUnitOfMeasureProducts);
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
+	@Transactional
+	public void saveUpdateUnitOfMeasure(List<OdooUnitOfMeasure> list) {
+		log.info("Saving Unit Of Measures.........");
+
+		long start = System.nanoTime();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+
+		Set<UnitOfMeasure> saveUpdateUnitOfMeasure = new HashSet<>();
+		// find all exist product profiles
+		Set<String> uomNames = list.stream().map(p -> p.getName()).collect(Collectors.toSet());
+		List<UnitOfMeasure> unitOfMeasures = unitOfMeasureRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),
+				uomNames);
+
+		for (OdooUnitOfMeasure uomDto : list) {
+			// check exist by name, only one exist with a name
+			Optional<UnitOfMeasure> optionalUom = unitOfMeasures.stream()
+					.filter(p -> p.getName().equals(uomDto.getName())).findAny();
+			UnitOfMeasure unitOfMeasure;
+			if (optionalUom.isPresent()) {
+				unitOfMeasure = optionalUom.get();
+
+			} else {
+				unitOfMeasure = new UnitOfMeasure();
+				unitOfMeasure.setPid(UnitOfMeasureService.PID_PREFIX + RandomUtil.generatePid());
+				unitOfMeasure.setCompany(company);
+				unitOfMeasure.setName(uomDto.getName());
+
+			}
+
+			unitOfMeasure.setUomId(String.valueOf(uomDto.getId()));
+
+			Optional<UnitOfMeasure> opUom = saveUpdateUnitOfMeasure.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(uomDto.getName())).findAny();
+			if (opUom.isPresent()) {
+				continue;
+			}
+
+			saveUpdateUnitOfMeasure.add(unitOfMeasure);
+
+		}
+
+		log.info("Saving Unit Of Measures....");
+		unitOfMeasureRepository.save(saveUpdateUnitOfMeasure);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;

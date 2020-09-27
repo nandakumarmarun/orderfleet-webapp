@@ -140,6 +140,11 @@
 										maxlength="55" placeholder="Alias" />
 								</div>
 								<div class="form-group">
+									<label class="control-label" for="field_customerId">Customer Id</label> <input
+										type="text" class="form-control" name="customerId" id="field_customerId"
+										maxlength="55" placeholder="Customer Id" />
+								</div>
+								<div class="form-group">
 									<label class="control-label" for="field_accountType">Account
 										Type</label> <select id="field_accountType" name="accountTypePid"
 										class="form-control"><!-- <option value="-1">Select
@@ -295,6 +300,10 @@
 										<tr>
 											<td>Alias</td>
 											<td id="lbl_alias"></td>
+										</tr>
+										<tr>
+											<td>Customer Id</td>
+											<td id="lbl_customerId"></td>
 										</tr>
 										<tr>
 											<td>Type</td>

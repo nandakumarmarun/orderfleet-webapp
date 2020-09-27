@@ -114,16 +114,18 @@ public class AccountProfileDTO {
 	private String stateName;
 
 	private String countryName;
-	
+
 	private GeoTaggingType geoTaggingType;
-	
+
 	private LocalDateTime geoTaggedTime;
-	
+
 	private String geoTaggedUserName;
-	
+
 	private String geoTaggedUserPid;
-	
+
 	private String geoTaggedUserLogin;
+
+	private String customerId;
 
 	public AccountProfileDTO() {
 		super();
@@ -502,7 +504,7 @@ public class AccountProfileDTO {
 	public void setGeoTaggingType(GeoTaggingType geoTaggingType) {
 		this.geoTaggingType = geoTaggingType;
 	}
-	
+
 	public LocalDateTime getGeoTaggedTime() {
 		return geoTaggedTime;
 	}
@@ -510,7 +512,7 @@ public class AccountProfileDTO {
 	public void setGeoTaggedTime(LocalDateTime geoTaggedTime) {
 		this.geoTaggedTime = geoTaggedTime;
 	}
-	
+
 	public String getGeoTaggedUserName() {
 		return geoTaggedUserName;
 	}
@@ -526,13 +528,21 @@ public class AccountProfileDTO {
 	public void setGeoTaggedUserPid(String geoTaggedUserPid) {
 		this.geoTaggedUserPid = geoTaggedUserPid;
 	}
-	
+
 	public String getGeoTaggedUserLogin() {
 		return geoTaggedUserLogin;
 	}
 
 	public void setGeoTaggedUserLogin(String geoTaggedUserLogin) {
 		this.geoTaggedUserLogin = geoTaggedUserLogin;
+	}
+
+	public String getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
 	}
 
 	@Override

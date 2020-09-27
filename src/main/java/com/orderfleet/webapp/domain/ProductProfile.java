@@ -71,6 +71,9 @@ public class ProductProfile implements Serializable, Cloneable {
 	@Column(name = "description")
 	private String description;
 
+	@Column(name = "product_id")
+	private String productId;
+
 	@NotNull
 	@Column(name = "price", precision = 10, scale = 2, nullable = false)
 	private BigDecimal price;
@@ -408,6 +411,14 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public String getProductId() {
+		return productId;
+	}
+
+	public void setProductId(String productId) {
+		this.productId = productId;
 	}
 
 	@Override

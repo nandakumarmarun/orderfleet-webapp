@@ -163,6 +163,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 			productProfile.setProductDescription(productProfileDTO.getProductDescription());
 			productProfile.setBarcode(productProfileDTO.getBarcode());
 			productProfile.setRemarks(productProfileDTO.getRemarks());
+			productProfile.setProductId(productProfileDTO.getProductId());
 			productProfile = productProfileRepository.save(productProfile);
 			ProductProfileDTO result = productProfileMapper.productProfileToProductProfileDTO(productProfile);
 			return result;

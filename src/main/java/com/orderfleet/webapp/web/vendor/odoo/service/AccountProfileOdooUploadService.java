@@ -131,6 +131,8 @@ public class AccountProfileOdooUploadService {
 				accountProfile.setImportStatus(true);
 
 			}
+			
+			accountProfile.setCustomerId(String.valueOf(apDto.getId()));
 
 			if (apDto.getEmail() != null && !apDto.getEmail().equals("")) {
 				if (isValidEmail(apDto.getEmail())) {

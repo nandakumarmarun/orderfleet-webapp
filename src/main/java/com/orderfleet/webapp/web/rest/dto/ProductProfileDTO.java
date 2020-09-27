@@ -85,6 +85,8 @@ public class ProductProfileDTO {
 
 	private String remarks;
 
+	private String productId;
+
 	public ProductProfileDTO() {
 		super();
 	}
@@ -137,6 +139,7 @@ public class ProductProfileDTO {
 		this.productDescription = profile.getProductDescription();
 		this.barcode = profile.getBarcode();
 		this.remarks = profile.getRemarks();
+		this.productId = profile.getProductId();
 
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
@@ -396,6 +399,14 @@ public class ProductProfileDTO {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public String getProductId() {
+		return productId;
+	}
+
+	public void setProductId(String productId) {
+		this.productId = productId;
 	}
 
 	@Override

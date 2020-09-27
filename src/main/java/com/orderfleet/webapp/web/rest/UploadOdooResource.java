@@ -42,6 +42,7 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAuthentication;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooProductProfile;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUnitOfMeasure;
 import com.orderfleet.webapp.web.vendor.odoo.service.AccountProfileOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.ProductProfileOdooUploadService;
 
@@ -64,6 +65,8 @@ public class UploadOdooResource {
 	private static String AUTHENTICATE_API_URL = "http://nellaracorp.dyndns.org:11214/web/session/authenticate";
 	
 	private static String PRODUCT_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/products";
+	
+	private static String UNIT_OF_MEASURE_API_URL ="http://nellaracorp.dyndns.org:11214/web/api/uoms";
 
 	private final Logger log = LoggerFactory.getLogger(UploadOdooResource.class);
 
@@ -153,6 +156,16 @@ public class UploadOdooResource {
 		log.info("Get URL: " + PRODUCT_API_URL);
 
 		try {
+			
+			
+			ResponseBodyOdooUnitOfMeasure responseBodyUnitOfMeasure = restTemplate.postForObject(UNIT_OF_MEASURE_API_URL, entity,
+					ResponseBodyOdooUnitOfMeasure.class);
+			log.info("UOM Size= " + responseBodyUnitOfMeasure.getResult().getResponse().size() + "------------");
+
+			productProfileOdooUploadService.saveUpdateUnitOfMeasure(responseBodyUnitOfMeasure.getResult().getResponse());
+			
+			
+			
 
 			ResponseBodyOdooProductProfile responseBodyProductProfile = restTemplate.postForObject(PRODUCT_API_URL, entity,
 					ResponseBodyOdooProductProfile.class);

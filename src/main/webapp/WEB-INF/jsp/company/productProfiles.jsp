@@ -197,6 +197,11 @@
 										maxlength="55" placeholder="Alias" />
 								</div>
 								<div class="form-group">
+									<label class="control-label" for="field_productId">Product Id</label> <input
+										type="text" class="form-control" name="productId" id="field_productId"
+										maxlength="55" placeholder="Product Id" />
+								</div>
+								<div class="form-group">
 									<label class="control-label" for="field_category">Category</label>
 									<select id="field_category" name="productCategoryPid"
 										class="form-control">
@@ -313,6 +318,10 @@
 										<tr>
 											<td>Alias</td>
 											<td id="lbl_alias"></td>
+										</tr>
+										<tr>
+											<td>Product Id</td>
+											<td id="lbl_productId"></td>
 										</tr>
 										<tr>
 											<td>Category</td>

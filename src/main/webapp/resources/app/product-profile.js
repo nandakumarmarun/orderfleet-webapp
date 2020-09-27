@@ -28,7 +28,8 @@ if (!this.ProductProfile) {
 		colorImage : null,
 		colorImageContentType : null,
 		description : null,
-		hsnCode : null
+		hsnCode : null,
+		productId : null
 	};
 
 	// Specify the validation rules
@@ -504,6 +505,7 @@ if (!this.ProductProfile) {
 		productProfileModel.taxRate = $('#field_taxRate').val();
 		productProfileModel.size = $('#field_size').val();
 		productProfileModel.hsnCode = $('#field_hsnCode').val();
+		productProfileModel.productId = $('#field_productId').val();
 		console.log(productProfileModel);
 		$.ajax({
 			method : $(el).attr('method'),
@@ -541,6 +543,7 @@ if (!this.ProductProfile) {
 				$('#lbl_size').text(data.size);
 				$('#lbl_hsnCode').text(data.hsnCode);
 				$('#lbl_description').text(data.description);
+				$('#lbl_productId').text(data.productId);
 				$('#lbl_colorImage').html(
 						'<img src="data:image/png;base64,' + data.colorImage
 								+ '"/>');
@@ -569,6 +572,7 @@ if (!this.ProductProfile) {
 						$('#field_taxRate').val(data.taxRate);
 						$('#field_size').val(data.size);
 						$('#field_hsnCode').val(data.hsnCode);
+						$('#field_productId').val(data.productId);
 						// set pid
 						productProfileModel.pid = data.pid;
 
