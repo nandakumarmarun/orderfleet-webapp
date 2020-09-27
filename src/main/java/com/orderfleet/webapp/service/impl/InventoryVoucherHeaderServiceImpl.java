@@ -31,6 +31,7 @@ import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ProductNameTextSettings;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
+import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.ProductNameTextSettingsRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
@@ -559,7 +560,11 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	public void updateInventoryVoucherHeaderProcessFlowStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
 		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
 				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();
+		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+
 		inventoryVoucherHeader.setProcessFlowStatus(inventoryVoucherHeaderDTO.getProcessFlowStatus());
+		inventoryVoucherHeader.setUpdatedDate(LocalDateTime.now());
+		inventoryVoucherHeader.setUpdatedBy(user);
 		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
 	}
 
