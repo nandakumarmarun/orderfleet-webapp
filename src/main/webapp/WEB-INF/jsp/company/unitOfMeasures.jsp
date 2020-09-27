@@ -23,7 +23,7 @@
 				<div class="pull-right">
 					<button type="button" class="btn btn-success"
 						onclick="UnitOfMeasure.showModalPopup($('#myModal'));">Create
-						new Product Group</button>
+						new Unit Of Measure</button>
 				</div>
 			</div>
 			<br> <br>
