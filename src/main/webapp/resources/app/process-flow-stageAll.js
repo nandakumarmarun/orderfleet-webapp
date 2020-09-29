@@ -335,7 +335,7 @@ if (!this.InventoryVoucher) {
 					url : inventoryVoucherContextPath + "/filter",
 					type : 'GET',
 					data : {
-						processFlowStatus : "READYATPS_NOTDELIVERED",
+						processFlowStatus : "ALL",
 						employeePids : empPids,
 						accountPid : $("#dbAccount").val(),
 						filterBy : $("#dbDateSearch").val(),
@@ -433,25 +433,14 @@ if (!this.InventoryVoucher) {
 																	+ spanProcessFlowStatus(
 																			inventoryVoucher.pid,
 																			inventoryVoucher.processFlowStatus)
-																	+ "<br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateAll(\""
-																	+ inventoryVoucher.pid
-																	+ "\");'  value='Update'></td><td><input type='text' id='bookingId-"
-																	+ inventoryVoucher.pid
-																	+ "' value='"
+																	+ "</td><td>"
 																	+ inventoryVoucher.bookingId
-																	+ "'/>"
 																	+ "</td><td>"
 																	+ inventoryVoucher.receiverAccountName
-																	+ "</td><td><input type='date' id='deliveryDate-"
-																	+ inventoryVoucher.pid
-																	+ "' value='"
-																	+ inventoryVoucher.deliveryDate
-																	+ "'/>"
-																	+ "</td><td><input type='number' id='pmtReceieved-"
-																	+ inventoryVoucher.pid
-																	+ "' value='"
+																	+ "</td><td>"
+																	+ convertDateFromServer(inventoryVoucher.deliveryDate)
+																	+ "</td><td>"
 																	+ inventoryVoucher.paymentReceived
-																	+ "'/>"
 																	+ "</td><td>"
 																	+ paymentPercentage
 																			.toFixed(2)
@@ -652,55 +641,44 @@ if (!this.InventoryVoucher) {
 
 	function spanProcessFlowStatus(inventoryVoucherPid, status) {
 
-		var defaultStatus = "'" + 'DEFAULT' + "'";
-		var notDelivered = "'" + 'NOT_DELIVERED' + "'";
-		var delivered = "'" + 'DELIVERED' + "'";
-		var readyToDispatchAtPS = "'" + 'READY_TO_DISPATCH_AT_PS' + "'";
 		var spanProcessFlowStatus = "";
 		var pid = "'" + inventoryVoucherPid + "'";
 		switch (status) {
 		case 'DEFAULT':
-			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'DEFAULT<span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ delivered
-					+ ')" style="cursor: pointer;"><a>DELIVERED</a></li>'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ notDelivered
-					+ ')" style="cursor: pointer;"><a>NOT_DELIVERED</a></li>'
-					+ '</ul></div>';
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'DEFAULT<span></span></span></div>';
+			break;
+		case 'PO_PLACED':
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'PO_PLACED<span></span></span></div>';
+			break;
+		case 'IN_STOCK':
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'IN_STOCK<span></span></span></div>';
+			break;
+		case 'PO_ACCEPTED_AT_TSL':
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'PO_ACCEPTED_AT_TSL<span></span></span></div>';
+			break;
+		case 'UNDER_PRODUCTION':
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'UNDER_PRODUCTION<span></span></span></div>';
+			break;
+		case 'READY_TO_DISPATCH_AT_TSL':
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'READY_TO_DISPATCH_AT_TSL<span></span></span></div>';
 			break;
 		case 'READY_TO_DISPATCH_AT_PS':
-			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'DEFAULT<span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ delivered
-					+ ')" style="cursor: pointer;"><a>DELIVERED</a></li>'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ notDelivered
-					+ ')" style="cursor: pointer;"><a>NOT_DELIVERED</a></li>'
-					+ '</ul></div>';
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'READY_TO_DISPATCH_AT_PS<span></span></span></div>';
+			break;
+		case 'DELIVERED':
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'DELIVERED<span></span></span></div>';
 			break;
 		case 'NOT_DELIVERED':
-			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'NOT_DELIVERED<span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ delivered
-					+ ')" style="cursor: pointer;"><a>DELIVERED</a></li>'
-					+ '</ul></div>';
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'NOT_DELIVERED<span></span></span></div>';
 			break;
 		}
 
@@ -825,6 +803,14 @@ if (!this.InventoryVoucher) {
 	function convertDateTimeFromServer(date) {
 		if (date) {
 			return moment(date).format('MMM DD YYYY, h:mm:ss a');
+		} else {
+			return "";
+		}
+	}
+
+	function convertDateFromServer(date) {
+		if (date) {
+			return moment(date).format('MMM DD, YYYY');
 		} else {
 			return "";
 		}

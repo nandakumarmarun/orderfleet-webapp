@@ -42,9 +42,12 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAuthentication;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooProductProfile;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooStockLocation;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUnitOfMeasure;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUser;
 import com.orderfleet.webapp.web.vendor.odoo.service.AccountProfileOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.ProductProfileOdooUploadService;
+import com.orderfleet.webapp.web.vendor.odoo.service.UserOdooUploadService;
 
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
@@ -63,10 +66,14 @@ public class UploadOdooResource {
 	private static String CUSTOMER_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/customers";
 
 	private static String AUTHENTICATE_API_URL = "http://nellaracorp.dyndns.org:11214/web/session/authenticate";
-	
+
 	private static String PRODUCT_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/products";
-	
-	private static String UNIT_OF_MEASURE_API_URL ="http://nellaracorp.dyndns.org:11214/web/api/uoms";
+
+	private static String UNIT_OF_MEASURE_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/uoms";
+
+	private static String USER_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/users";
+
+	private static String STOCK_LOCATION_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/locations";
 
 	private final Logger log = LoggerFactory.getLogger(UploadOdooResource.class);
 
@@ -75,6 +82,9 @@ public class UploadOdooResource {
 
 	@Inject
 	private ProductProfileOdooUploadService productProfileOdooUploadService;
+
+	@Inject
+	private UserOdooUploadService userOdooUploadService;
 
 	@RequestMapping(value = "/upload-odoo", method = RequestMethod.GET)
 	@Timed
@@ -93,11 +103,9 @@ public class UploadOdooResource {
 
 		log.debug("Web request to upload Account Profiles ...");
 
-
 		String jsonString = getOdooRequestBody();
 
 		HttpEntity<String> entity = new HttpEntity<>(jsonString, RestClientUtil.createTokenAuthHeaders());
-
 
 		log.info(entity.getBody().toString() + "");
 
@@ -136,19 +144,17 @@ public class UploadOdooResource {
 	public ResponseEntity<Void> uploadProductProfiles() throws IOException, JSONException, ParseException {
 
 		log.debug("Web request to upload Product Profiles ...");
-		
+
 		String jsonString = getOdooRequestBody();
 
 		HttpEntity<String> entity = new HttpEntity<>(jsonString, RestClientUtil.createTokenAuthHeaders());
 
-
 		log.info(entity.getBody().toString() + "");
-		
-		
 
-		//RequestBodyOdoo requestBody = getRequestBody("get_products");
+		// RequestBodyOdoo requestBody = getRequestBody("get_products");
 
-		//HttpEntity<RequestBodyOdoo> entity = new HttpEntity<>(requestBody, RestClientUtil.createTokenAuthHeaders());
+		// HttpEntity<RequestBodyOdoo> entity = new HttpEntity<>(requestBody,
+		// RestClientUtil.createTokenAuthHeaders());
 
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -156,22 +162,21 @@ public class UploadOdooResource {
 		log.info("Get URL: " + PRODUCT_API_URL);
 
 		try {
-			
-			
-			ResponseBodyOdooUnitOfMeasure responseBodyUnitOfMeasure = restTemplate.postForObject(UNIT_OF_MEASURE_API_URL, entity,
-					ResponseBodyOdooUnitOfMeasure.class);
+
+			ResponseBodyOdooUnitOfMeasure responseBodyUnitOfMeasure = restTemplate
+					.postForObject(UNIT_OF_MEASURE_API_URL, entity, ResponseBodyOdooUnitOfMeasure.class);
 			log.info("UOM Size= " + responseBodyUnitOfMeasure.getResult().getResponse().size() + "------------");
 
-			productProfileOdooUploadService.saveUpdateUnitOfMeasure(responseBodyUnitOfMeasure.getResult().getResponse());
-			
-			
-			
+			productProfileOdooUploadService
+					.saveUpdateUnitOfMeasure(responseBodyUnitOfMeasure.getResult().getResponse());
 
-			ResponseBodyOdooProductProfile responseBodyProductProfile = restTemplate.postForObject(PRODUCT_API_URL, entity,
-					ResponseBodyOdooProductProfile.class);
-			log.info("Product Profile Size= " + responseBodyProductProfile.getResult().getResponse().size() + "------------");
+			ResponseBodyOdooProductProfile responseBodyProductProfile = restTemplate.postForObject(PRODUCT_API_URL,
+					entity, ResponseBodyOdooProductProfile.class);
+			log.info("Product Profile Size= " + responseBodyProductProfile.getResult().getResponse().size()
+					+ "------------");
 
-			productProfileOdooUploadService.saveUpdateProductProfiles(responseBodyProductProfile.getResult().getResponse());
+			productProfileOdooUploadService
+					.saveUpdateProductProfiles(responseBodyProductProfile.getResult().getResponse());
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
@@ -181,6 +186,94 @@ public class UploadOdooResource {
 		} catch (Exception exception) {
 			System.out.println(exception.getMessage());
 
+			throw new ServiceException(exception.getMessage());
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/upload-odoo/uploadStockLocations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> uploadStockLocations() throws IOException, JSONException, ParseException {
+
+		// ResponseBodyOdooAuthentication responseBodyOdooAuthentication =
+		// authenticateServer();
+
+		log.debug("Web request to upload Stock Locations ...");
+
+		String jsonString = getOdooRequestBody();
+
+		HttpEntity<String> entity = new HttpEntity<>(jsonString, RestClientUtil.createTokenAuthHeaders());
+
+		log.info(entity.getBody().toString() + "");
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		log.info("Get URL: " + STOCK_LOCATION_API_URL);
+
+		try {
+
+			ResponseBodyOdooStockLocation responseBodyStockLocation = restTemplate.postForObject(STOCK_LOCATION_API_URL,
+					entity, ResponseBodyOdooStockLocation.class);
+			log.info("Stock Location Size= " + responseBodyStockLocation.getResult().getResponse().size()
+					+ "------------");
+
+			productProfileOdooUploadService
+					.saveUpdateStockLocations(responseBodyStockLocation.getResult().getResponse());
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				log.info(exception.getMessage());
+				throw new ServiceException(exception.getResponseBodyAsString());
+			}
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/upload-odoo/uploadUsers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> uploadUsers() throws IOException, JSONException, ParseException {
+
+		// ResponseBodyOdooAuthentication responseBodyOdooAuthentication =
+		// authenticateServer();
+
+		log.debug("Web request to upload Users ...");
+
+		String jsonString = getOdooRequestBody();
+
+		HttpEntity<String> entity = new HttpEntity<>(jsonString, RestClientUtil.createTokenAuthHeaders());
+
+		log.info(entity.getBody().toString() + "");
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		log.info("Get URL: " + USER_API_URL);
+
+		try {
+
+			ResponseBodyOdooUser responseBodyUser = restTemplate.postForObject(USER_API_URL, entity,
+					ResponseBodyOdooUser.class);
+			log.info("User Size= " + responseBodyUser.getResult().getResponse().size() + "------------");
+
+			userOdooUploadService.saveUpdateUsers(responseBodyUser.getResult().getResponse());
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				log.info(exception.getMessage());
+				throw new ServiceException(exception.getResponseBodyAsString());
+			}
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+			log.info(exception.getMessage());
 			throw new ServiceException(exception.getMessage());
 		}
 
@@ -206,7 +299,6 @@ public class UploadOdooResource {
 		log.info("Json String-------------" + jsonStr);
 		return requestBody;
 	}
-	
 
 	private String getOdooRequestBody() throws JSONException, ParseException {
 		JSONParser parser = new JSONParser();
@@ -256,6 +348,5 @@ public class UploadOdooResource {
 		}
 
 	}
-
 
 }

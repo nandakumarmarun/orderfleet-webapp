@@ -335,7 +335,7 @@ if (!this.InventoryVoucher) {
 					url : inventoryVoucherContextPath + "/filter",
 					type : 'GET',
 					data : {
-						processFlowStatus : "READYATPS_NOTDELIVERED",
+						processFlowStatus : "DELIVERED",
 						employeePids : empPids,
 						accountPid : $("#dbAccount").val(),
 						filterBy : $("#dbDateSearch").val(),
@@ -653,54 +653,17 @@ if (!this.InventoryVoucher) {
 	function spanProcessFlowStatus(inventoryVoucherPid, status) {
 
 		var defaultStatus = "'" + 'DEFAULT' + "'";
-		var notDelivered = "'" + 'NOT_DELIVERED' + "'";
 		var delivered = "'" + 'DELIVERED' + "'";
-		var readyToDispatchAtPS = "'" + 'READY_TO_DISPATCH_AT_PS' + "'";
 		var spanProcessFlowStatus = "";
 		var pid = "'" + inventoryVoucherPid + "'";
 		switch (status) {
 		case 'DEFAULT':
-			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'DEFAULT<span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ delivered
-					+ ')" style="cursor: pointer;"><a>DELIVERED</a></li>'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ notDelivered
-					+ ')" style="cursor: pointer;"><a>NOT_DELIVERED</a></li>'
-					+ '</ul></div>';
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'DEFAULT<span></span></span></div>';
 			break;
-		case 'READY_TO_DISPATCH_AT_PS':
-			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'DEFAULT<span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ delivered
-					+ ')" style="cursor: pointer;"><a>DELIVERED</a></li>'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ notDelivered
-					+ ')" style="cursor: pointer;"><a>NOT_DELIVERED</a></li>'
-					+ '</ul></div>';
-			break;
-		case 'NOT_DELIVERED':
-			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'NOT_DELIVERED<span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
-					+ pid
-					+ ','
-					+ delivered
-					+ ')" style="cursor: pointer;"><a>DELIVERED</a></li>'
-					+ '</ul></div>';
+		case 'DELIVERED':
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle"  style="cursor: pointer;">'
+					+ 'DELIVERED<span></span></span></div>';
 			break;
 		}
 

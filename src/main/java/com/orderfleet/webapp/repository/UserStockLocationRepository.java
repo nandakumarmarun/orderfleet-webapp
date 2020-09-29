@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.UserStockLocation;
@@ -53,4 +55,11 @@ public interface UserStockLocationRepository extends JpaRepository<UserStockLoca
 	void deleteByCompanyIdAndStockLocationPid(Long companyId, String pid);
 	
 	List<UserStockLocation> findByUserPidAndStockLocationPid(String fromUserPid,String stockLocationPid);
+
+	List<UserStockLocation> findAllByCompanyPid(String pid);
+
+	@Transactional
+	@Modifying
+	@Query("delete from UserStockLocation userStockLocation where userStockLocation.company.id = ?1 and userStockLocation.id in ?2")
+	void deleteByIdIn(Long companyId, List<Long> userStockLocationIds);
 }

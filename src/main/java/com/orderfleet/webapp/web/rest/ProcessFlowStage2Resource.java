@@ -172,7 +172,7 @@ public class ProcessFlowStage2Resource {
 
 	@Inject
 	private InventoryVoucherDetailService inventoryVoucherDetailService;
-	
+
 	@Inject
 	private UserMenuItemService userMenuItemService;
 
@@ -308,7 +308,7 @@ public class ProcessFlowStage2Resource {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			fDate = LocalDate.parse(fromDate, formatter);
 			tDate = fDate;
-		}else if (filterBy.equals("UPTO90DAYS")) {
+		} else if (filterBy.equals("UPTO90DAYS")) {
 			tDate = LocalDate.now();
 			Period days_90 = Period.ofDays(90);
 			fDate = tDate.minus(days_90);
@@ -356,8 +356,17 @@ public class ProcessFlowStage2Resource {
 		case "INSTOCK_READYATTSL":
 			processStatus = Arrays.asList(ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL);
 			break;
-		case "READYATPS_DELIVERED":
-			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
+		case "READYATPS_NOTDELIVERED":
+			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.NOT_DELIVERED);
+			break;
+		case "DELIVERED":
+			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED);
+			break;
+		case "ALL":
+			processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,
+					ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL,
+					ProcessFlowStatus.UNDER_PRODUCTION, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL,
+					ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
 					ProcessFlowStatus.NOT_DELIVERED);
 			break;
 		}
@@ -475,7 +484,7 @@ public class ProcessFlowStage2Resource {
 			salesPerformanceDTO.setSendSalesOrderSapButtonStatus(sendSalesOrderSapButtonStatus);
 			salesPerformanceDTO.setProcessFlowStatus(ProcessFlowStatus.valueOf(ivData[26].toString()));
 			salesPerformanceDTO.setPaymentReceived((double) ivData[27]);
-			
+
 			salesPerformanceDTO.setBookingId(ivData[28] != null ? ivData[28].toString() : "");
 
 			if (ivData[29] != null) {
@@ -491,7 +500,7 @@ public class ProcessFlowStage2Resource {
 			} else {
 				salesPerformanceDTO.setDeliveryDate("");
 			}
-			
+
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
@@ -857,7 +866,7 @@ public class ProcessFlowStage2Resource {
 		inventoryVoucherService.updateInventoryVoucherHeaderDeliveryDate(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/process-flow-stage-2/updateAll", method = RequestMethod.GET)
 	@Timed
 	public ResponseEntity<String> updateAll(@RequestParam String ivhPid, @RequestParam String bookingId,

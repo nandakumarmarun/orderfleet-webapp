@@ -20,8 +20,57 @@ if (!this.uploadOdoo) {
 		$('#uploadProductProfileProfiles').on('click', function() {
 			uploadProductProfiles();
 		});
+		$('#uploadUsers').on('click', function() {
+			uploadUsers();
+		});
+		$('#uploadStockLocations').on('click', function() {
+			uploadStockLocations();
+		});
 	
 	});
+	
+	
+	function uploadUsers() {
+
+		$(".error-msg").html("Uploading Users....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadUsers",
+					method : 'GET',
+					success : function(data) {
+						alert("Upload Users Success")
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading users .................");
+						$(".error-msg").html(
+								"Error uploading users .................");
+					}
+				});
+
+	}
+	
+	function uploadStockLocations() {
+
+		$(".error-msg").html("Uploading Stock Locations....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadStockLocations",
+					method : 'GET',
+					success : function(data) {
+						alert("Upload Stock Location Success")
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading stock Locations .................");
+						$(".error-msg").html(
+								"Error uploading stock locations .................");
+					}
+				});
+
+	}
 
 	function uploadAccountProfiles() {
 
@@ -30,11 +79,6 @@ if (!this.uploadOdoo) {
 				.ajax({
 					url : uploadOdooContextPath + "/uploadAccountProfiles",
 					method : 'GET',
-					success : function(data) {
-						alert("Upload Account Profile Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
 					success : function(data) {
 						alert("Upload Account Profile Success")
 						onSaveSuccess(data);

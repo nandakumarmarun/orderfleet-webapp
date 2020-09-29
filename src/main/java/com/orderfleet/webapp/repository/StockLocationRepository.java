@@ -2,6 +2,7 @@ package com.orderfleet.webapp.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,4 +49,6 @@ public interface StockLocationRepository extends JpaRepository<StockLocation, Lo
 	
 	@Query("select stockLocation from StockLocation stockLocation where stockLocation.company.id = ?#{principal.companyId} and stockLocation.pid in ?1")
 	List<StockLocation> findAllByStockLocationPidIn(List<String>stockLocationPids);
+
+	List<StockLocation> findByCompanyIdAndAliasIgnoreCaseIn(Long id, Set<String> stkAlias);
 }

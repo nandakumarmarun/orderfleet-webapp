@@ -21,6 +21,8 @@ import com.orderfleet.webapp.domain.User;
 public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile, Long> {
 
 	Optional<EmployeeProfile> findByCompanyIdAndNameIgnoreCase(Long id, String name);
+	
+	List<EmployeeProfile> findByCompanyIdAndNameIgnoreCaseIn(Long id, List<String> empNames);
 
 	Optional<EmployeeProfile> findOneByPid(String pid);
 

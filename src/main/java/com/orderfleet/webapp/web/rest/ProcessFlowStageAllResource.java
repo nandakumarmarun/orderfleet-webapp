@@ -119,9 +119,9 @@ import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderResponseDataSap;
  */
 @Controller
 @RequestMapping("/web")
-public class ProcessFlowStage5Resource {
+public class ProcessFlowStageAllResource {
 
-	private final Logger log = LoggerFactory.getLogger(ProcessFlowStage5Resource.class);
+	private final Logger log = LoggerFactory.getLogger(ProcessFlowStageAllResource.class);
 
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
@@ -172,7 +172,7 @@ public class ProcessFlowStage5Resource {
 
 	@Inject
 	private InventoryVoucherDetailService inventoryVoucherDetailService;
-	
+
 	@Inject
 	private UserMenuItemService userMenuItemService;
 
@@ -185,7 +185,7 @@ public class ProcessFlowStage5Resource {
 	 * @throws URISyntaxException if there is an error to generate the pagination
 	 *                            HTTP headers
 	 */
-	@RequestMapping(value = "/process-flow-stage-5", method = RequestMethod.GET)
+	@RequestMapping(value = "/process-flow-stage-all", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
 	public String getAllInventoryVouchers(Pageable pageable, Model model) throws URISyntaxException {
@@ -212,9 +212,9 @@ public class ProcessFlowStage5Resource {
 			model.addAttribute("accounts", accountProfileDTOs);
 		}
 		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
-		model.addAttribute("menuItemLabel", userMenuItemService.findMenuItemLabelView("/web/process-flow-stage-5"));
+		model.addAttribute("menuItemLabel", userMenuItemService.findMenuItemLabelView("/web/process-flow-stage-all"));
 
-		return "company/processFlowStage5";
+		return "company/processFlowStageAll";
 	}
 
 	/**
@@ -224,7 +224,7 @@ public class ProcessFlowStage5Resource {
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         InventoryVoucherDTO, or with status 404 (Not Found)
 	 */
-	@RequestMapping(value = "/process-flow-stage-5/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/process-flow-stage-all/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> getInventoryVoucher(@PathVariable String pid) {
 		log.debug("Web request to get inventoryVoucherDTO by pid : {}", pid);
@@ -279,7 +279,7 @@ public class ProcessFlowStage5Resource {
 		}
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/process-flow-stage-all/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<SalesPerformanceDTO>> filterInventoryVouchers(
 			@RequestParam("employeePids") List<String> employeePids,
@@ -292,17 +292,17 @@ public class ProcessFlowStage5Resource {
 		}
 		LocalDate fDate = LocalDate.now();
 		LocalDate tDate = LocalDate.now();
-		if (filterBy.equals(ProcessFlowStage5Resource.CUSTOM)) {
+		if (filterBy.equals(ProcessFlowStageAllResource.CUSTOM)) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			fDate = LocalDate.parse(fromDate, formatter);
 			tDate = LocalDate.parse(toDate, formatter);
-		} else if (filterBy.equals(ProcessFlowStage5Resource.YESTERDAY)) {
+		} else if (filterBy.equals(ProcessFlowStageAllResource.YESTERDAY)) {
 			fDate = LocalDate.now().minusDays(1);
 			tDate = fDate;
-		} else if (filterBy.equals(ProcessFlowStage5Resource.WTD)) {
+		} else if (filterBy.equals(ProcessFlowStageAllResource.WTD)) {
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			fDate = LocalDate.now().with(fieldISO, 1);
-		} else if (filterBy.equals(ProcessFlowStage5Resource.MTD)) {
+		} else if (filterBy.equals(ProcessFlowStageAllResource.MTD)) {
 			fDate = LocalDate.now().withDayOfMonth(1);
 		} else if (filterBy.equals("SINGLE")) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -369,7 +369,6 @@ public class ProcessFlowStage5Resource {
 					ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
 					ProcessFlowStatus.NOT_DELIVERED);
 			break;
-			
 		}
 
 		List<Object[]> inventoryVouchers;
@@ -522,14 +521,14 @@ public class ProcessFlowStage5Resource {
 		return salesPerformanceDTOs;
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/process-flow-stage-all/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed
 	public List<DocumentDTO> getDocuments(@Valid @RequestParam VoucherType voucherType) {
 		return primarySecondaryDocumentService.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/download-inventory-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/process-flow-stage-all/download-inventory-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public void downloadInventoryXls(@RequestParam("inventoryVoucherHeaderPids") String[] inventoryVoucherHeaderPids,
 			HttpServletResponse response) {
@@ -713,7 +712,7 @@ public class ProcessFlowStage5Resource {
 //		}
 //	}
 
-	@RequestMapping(value = "/process-flow-stage-5/changeStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/process-flow-stage-all/changeStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> changeStatus(@RequestParam String pid,
 			@RequestParam TallyDownloadStatus tallyDownloadStatus) {
@@ -725,7 +724,7 @@ public class ProcessFlowStage5Resource {
 
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/updateInventory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/process-flow-stage-all/updateInventory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> updateInventoryDetail(@RequestParam long id,
 			@RequestParam long quantity, @RequestParam String ivhPid) {
@@ -836,7 +835,7 @@ public class ProcessFlowStage5Resource {
 
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/changeProcessFlowStatus", method = RequestMethod.GET)
+	@RequestMapping(value = "/process-flow-stage-all/changeProcessFlowStatus", method = RequestMethod.GET)
 	@Timed
 	public ResponseEntity<String> changeProcessFlowStatus(@RequestParam String pid,
 			@RequestParam ProcessFlowStatus processFlowStatus) {
@@ -847,7 +846,7 @@ public class ProcessFlowStage5Resource {
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/updatePaymentReceived", method = RequestMethod.GET)
+	@RequestMapping(value = "/process-flow-stage-all/updatePaymentReceived", method = RequestMethod.GET)
 	@Timed
 	public ResponseEntity<String> updatePaymentReceived(@RequestParam String ivhPid,
 			@RequestParam long paymentReceived) {
@@ -858,7 +857,7 @@ public class ProcessFlowStage5Resource {
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/updateBookingId", method = RequestMethod.GET)
+	@RequestMapping(value = "/process-flow-stage-all/updateBookingId", method = RequestMethod.GET)
 	@Timed
 	public ResponseEntity<String> updateBookingId(@RequestParam String ivhPid, @RequestParam String bookingId) {
 		log.info("update Booking Id " + ivhPid);
@@ -868,7 +867,7 @@ public class ProcessFlowStage5Resource {
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/updateDeliveryDate", method = RequestMethod.GET)
+	@RequestMapping(value = "/process-flow-stage-all/updateDeliveryDate", method = RequestMethod.GET)
 	@Timed
 	public ResponseEntity<String> updateDeliveryDate(@RequestParam String ivhPid, @RequestParam String deliveryDate) {
 		log.info("update Delivery Date " + ivhPid);
@@ -882,8 +881,8 @@ public class ProcessFlowStage5Resource {
 		inventoryVoucherService.updateInventoryVoucherHeaderDeliveryDate(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
-	
-	@RequestMapping(value = "/process-flow-stage-5/updateAll", method = RequestMethod.GET)
+
+	@RequestMapping(value = "/process-flow-stage-all/updateAll", method = RequestMethod.GET)
 	@Timed
 	public ResponseEntity<String> updateAll(@RequestParam String ivhPid, @RequestParam String bookingId,
 			@RequestParam long paymentReceived, @RequestParam String deliveryDate) {
@@ -903,7 +902,7 @@ public class ProcessFlowStage5Resource {
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/downloadSalesOrderSap", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/process-flow-stage-all/downloadSalesOrderSap", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> downloadSalesOrderSap(@RequestParam String inventoryPid)
 			throws IOException {
@@ -1086,7 +1085,7 @@ public class ProcessFlowStage5Resource {
 		return salesOrderMasterSap;
 	}
 
-	@RequestMapping(value = "/process-flow-stage-5/downloadPdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/process-flow-stage-all/downloadPdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public void downloadStatus(@RequestParam String inventoryPid, HttpServletResponse response) throws IOException {
 

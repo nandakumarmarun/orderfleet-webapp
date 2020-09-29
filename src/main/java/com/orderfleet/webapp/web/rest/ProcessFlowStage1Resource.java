@@ -356,8 +356,17 @@ public class ProcessFlowStage1Resource {
 		case "INSTOCK_READYATTSL":
 			processStatus = Arrays.asList(ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL);
 			break;
-		case "READYATPS_DELIVERED":
-			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
+		case "READYATPS_NOTDELIVERED":
+			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.NOT_DELIVERED);
+			break;
+		case "DELIVERED":
+			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED);
+			break;
+		case "ALL":
+			processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,
+					ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL,
+					ProcessFlowStatus.UNDER_PRODUCTION, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL,
+					ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
 					ProcessFlowStatus.NOT_DELIVERED);
 			break;
 		}

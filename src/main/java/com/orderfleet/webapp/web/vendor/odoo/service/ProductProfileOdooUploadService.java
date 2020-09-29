@@ -16,32 +16,43 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Division;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.UnitOfMeasure;
 import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
+import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.StockLocationType;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
+import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
 import com.orderfleet.webapp.repository.UnitOfMeasureRepository;
+import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.ProductProfileService;
+import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.UnitOfMeasureService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.TPUnitOfMeasureProductDTO;
+import com.orderfleet.webapp.web.rest.dto.TPUserStockLocationDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooProductProfile;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooStockLocation;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooUnitOfMeasure;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooProductProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.UnitQtyOdooProductProfile;
@@ -76,12 +87,23 @@ public class ProductProfileOdooUploadService {
 
 	private final UnitOfMeasureProductRepository unitOfMeasureProductRepository;
 
+	private final StockLocationRepository stockLocationRepository;
+
+	private final StockLocationService stockLocationService;
+
+	private final UserStockLocationRepository userStockLocationRepository;
+
+	private final EmployeeProfileRepository employeeProfileRepository;
+
 	public ProductProfileOdooUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			DivisionRepository divisionRepository, ProductCategoryRepository productCategoryRepository,
 			ProductGroupRepository productGroupRepository, ProductProfileRepository productProfileRepository,
 			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository,
 			UnitOfMeasureRepository unitOfMeasureRepository,
-			UnitOfMeasureProductRepository unitOfMeasureProductRepository) {
+			UnitOfMeasureProductRepository unitOfMeasureProductRepository,
+			StockLocationRepository stockLocationRepository, StockLocationService stockLocationService,
+			UserStockLocationRepository userStockLocationRepository,
+			EmployeeProfileRepository employeeProfileRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.divisionRepository = divisionRepository;
@@ -92,6 +114,10 @@ public class ProductProfileOdooUploadService {
 		this.companyRepository = companyRepository;
 		this.unitOfMeasureRepository = unitOfMeasureRepository;
 		this.unitOfMeasureProductRepository = unitOfMeasureProductRepository;
+		this.stockLocationRepository = stockLocationRepository;
+		this.stockLocationService = stockLocationService;
+		this.userStockLocationRepository = userStockLocationRepository;
+		this.employeeProfileRepository = employeeProfileRepository;
 	}
 
 	@Transactional
@@ -259,6 +285,75 @@ public class ProductProfileOdooUploadService {
 		saveUpdateProductGroupProduct(productGroupProductDTOs);
 		log.info("Saving unit of measures product profiles");
 		saveUpdateUnitOfMeasureProduct(unitOFMeasureProductDTOs);
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	@Transactional
+	public void saveUpdateStockLocations(final List<OdooStockLocation> list) {
+
+		log.info("Saving Stock Locations.........");
+
+		long start = System.nanoTime();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+
+		Set<StockLocation> saveUpdateStockLocations = new HashSet<>();
+
+		Set<String> stkAlias = list.stream().map(p -> String.valueOf(p.getId())).collect(Collectors.toSet());
+		List<StockLocation> stockLocations = stockLocationRepository
+				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), stkAlias);
+
+		int i = 1;
+
+		List<TPUserStockLocationDTO> tpUserStockLocationDTOs = new ArrayList<>();
+
+		for (OdooStockLocation stkDto : list) {
+			// check exist by name, only one exist with a name
+			Optional<StockLocation> optionalStk = stockLocations.stream()
+					.filter(p -> p.getAlias().equals(String.valueOf(stkDto.getId()))).findAny();
+			StockLocation stockLocation;
+			if (optionalStk.isPresent()) {
+				stockLocation = optionalStk.get();
+				// if not update, skip this iteration.
+			} else {
+				stockLocation = new StockLocation();
+				stockLocation.setPid(StockLocationService.PID_PREFIX + RandomUtil.generatePid());
+				stockLocation.setCompany(company);
+				stockLocation.setAlias(String.valueOf(stkDto.getId()));
+				stockLocation.setActivated(true);
+				stockLocation.setStockLocationType((StockLocationType.ACTUAL));
+			}
+
+			String name = stkDto.getName();
+
+			Optional<StockLocation> opAccP = saveUpdateStockLocations.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(stkDto.getName())).findAny();
+			if (opAccP.isPresent()) {
+				name = stkDto.getName() + "~" + i;
+				i++;
+			}
+
+			stockLocation.setName(name);
+
+			TPUserStockLocationDTO tpUserStockLocationDTO = new TPUserStockLocationDTO();
+
+			tpUserStockLocationDTO.setUserId(String.valueOf(stkDto.getSalesman_id()));
+			tpUserStockLocationDTO.setStockLocationName(name);
+
+			tpUserStockLocationDTOs.add(tpUserStockLocationDTO);
+
+			saveUpdateStockLocations.add(stockLocation);
+
+		}
+
+		stockLocationRepository.save(saveUpdateStockLocations);
+		log.info("Saving User Stock Locations.....");
+		saveUserStockLoctions(tpUserStockLocationDTOs);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -479,6 +574,68 @@ public class ProductProfileOdooUploadService {
 
 		log.info("Saving Unit Of Measures....");
 		unitOfMeasureRepository.save(saveUpdateUnitOfMeasure);
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
+	private void saveUserStockLoctions(List<TPUserStockLocationDTO> tpUserStockLocationDTOs) {
+		log.info("Saving User Stock Locations.........");
+		long start = System.nanoTime();
+
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		List<UserStockLocation> newUserStockLocations = new ArrayList<>();
+		List<UserStockLocation> userStockLocations = userStockLocationRepository.findAllByCompanyPid(company.getPid());
+
+		// delete all assigned location account profile from tally
+		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
+		List<StockLocation> stockLocations = stockLocationRepository.findAllByCompanyId(companyId);
+		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyId(company.getId());
+		List<Long> userStockLocationIds = new ArrayList<>();
+
+		List<String> userPids = new ArrayList<>();
+		for (TPUserStockLocationDTO uslDto : tpUserStockLocationDTOs) {
+			UserStockLocation userStockLocation = new UserStockLocation();
+			// find location
+
+			Optional<StockLocation> opStk = stockLocations.stream()
+					.filter(pl -> uslDto.getStockLocationName().equals(pl.getName())).findFirst();
+
+			Optional<EmployeeProfile> opEmp = employeeProfiles.stream()
+					.filter(pp -> uslDto.getUserId().equals(pp.getAlias())).findFirst();
+			if (opStk.isPresent()) {
+				List<Long> userstkLocationIds = userStockLocations.stream()
+						.filter(pgp -> opStk.get().getPid().equals(pgp.getStockLocation().getPid()))
+						.map(pgp -> pgp.getId()).collect(Collectors.toList());
+				if (userstkLocationIds.size() != 0) {
+					userStockLocationIds.addAll(userstkLocationIds);
+				}
+
+				if (opEmp.isPresent()) {
+					User user = opEmp.get().getUser();
+					if (user == null) {
+						continue;
+					}
+					userPids.add(user.getPid());
+					userStockLocation.setUser(user);
+				} else {
+					continue;
+				}
+
+				userStockLocation.setStockLocation(opStk.get());
+				userStockLocation.setCompany(company);
+				newUserStockLocations.add(userStockLocation);
+			}
+		}
+
+		userStockLocationRepository.deleteByUserPidIn(userPids);
+
+		userStockLocationRepository.save(newUserStockLocations);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;

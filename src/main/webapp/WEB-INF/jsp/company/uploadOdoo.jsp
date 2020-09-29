@@ -18,6 +18,20 @@
 			<div class="row">
 				
 				<hr />
+				
+				<div class="col-md-12">
+					<div class="panel-body">
+						<form role="form" class="form-horizontal form-groups-bordered">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Users</label>
+								<button type="button" class="btn btn-success "
+									id="uploadUsers">Upload Users</button>
+							</div>
+						</form>
+					</div>
+				</div>
+				
+				
 				<div class="col-md-12">
 					<div class="panel-body">
 						<form role="form" class="form-horizontal form-groups-bordered">
@@ -25,6 +39,18 @@
 								<label class="col-sm-2 control-label">Account Profile</label>
 								<button type="button" class="btn btn-success "
 									id="uploadAccountProfiles">Upload Account Profiles</button>
+							</div>	
+						</form>
+					</div>
+				</div>
+				
+				<div class="col-md-12">
+					<div class="panel-body">
+						<form role="form" class="form-horizontal form-groups-bordered">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Stock Locations</label>
+								<button type="button" class="btn btn-success "
+									id="uploadStockLocations">Upload Stock Locations</button>
 							</div>	
 						</form>
 					</div>
@@ -41,6 +67,7 @@
 						</form>
 					</div>
 				</div>
+				
 				<div class="col-md-12">
 					<div class="panel-body">
 						<form role="form" class="form-horizontal form-groups-bordered">
