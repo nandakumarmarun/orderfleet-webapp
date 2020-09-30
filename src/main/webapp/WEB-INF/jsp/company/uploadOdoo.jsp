@@ -50,7 +50,7 @@
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Stock Locations</label>
 								<button type="button" class="btn btn-success "
-									id="uploadStockLocations">Upload Stock Locations</button>
+									id="uploadStockLocations">Upload Stocks</button>
 							</div>
 						</form>
 					</div>
