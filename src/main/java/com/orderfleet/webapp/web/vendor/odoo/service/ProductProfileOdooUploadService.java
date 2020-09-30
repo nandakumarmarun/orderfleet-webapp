@@ -1,13 +1,17 @@
 package com.orderfleet.webapp.web.vendor.odoo.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -17,11 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.PriceLevel;
+import com.orderfleet.webapp.domain.PriceLevelList;
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
+import com.orderfleet.webapp.domain.SyncOperation;
+import com.orderfleet.webapp.domain.TemporaryOpeningStock;
 import com.orderfleet.webapp.domain.UnitOfMeasure;
 import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
 import com.orderfleet.webapp.domain.User;
@@ -31,26 +39,37 @@ import com.orderfleet.webapp.domain.enums.StockLocationType;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
+import com.orderfleet.webapp.repository.PriceLevelListRepository;
+import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
+import com.orderfleet.webapp.repository.TemporaryOpeningStockRepository;
 import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
 import com.orderfleet.webapp.repository.UnitOfMeasureRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.service.OpeningStockService;
+import com.orderfleet.webapp.service.PriceLevelListService;
+import com.orderfleet.webapp.service.PriceLevelService;
 import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.UnitOfMeasureService;
 import com.orderfleet.webapp.service.util.RandomUtil;
+import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
+import com.orderfleet.webapp.web.rest.dto.PriceLevelListDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.TPUnitOfMeasureProductDTO;
 import com.orderfleet.webapp.web.rest.dto.TPUserStockLocationDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooOpeningStock;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooPriceLevel;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooPriceLevelList;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooProductProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooStockLocation;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooUnitOfMeasure;
@@ -95,6 +114,12 @@ public class ProductProfileOdooUploadService {
 
 	private final EmployeeProfileRepository employeeProfileRepository;
 
+	private final PriceLevelRepository priceLevelRepository;
+
+	private final PriceLevelListRepository priceLevelListRepository;
+
+	private final TemporaryOpeningStockRepository temporaryOpeningStockRepository;
+
 	public ProductProfileOdooUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			DivisionRepository divisionRepository, ProductCategoryRepository productCategoryRepository,
 			ProductGroupRepository productGroupRepository, ProductProfileRepository productProfileRepository,
@@ -103,7 +128,9 @@ public class ProductProfileOdooUploadService {
 			UnitOfMeasureProductRepository unitOfMeasureProductRepository,
 			StockLocationRepository stockLocationRepository, StockLocationService stockLocationService,
 			UserStockLocationRepository userStockLocationRepository,
-			EmployeeProfileRepository employeeProfileRepository) {
+			EmployeeProfileRepository employeeProfileRepository, PriceLevelRepository priceLevelRepository,
+			PriceLevelListRepository priceLevelListRepository,
+			TemporaryOpeningStockRepository temporaryOpeningStockRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.divisionRepository = divisionRepository;
@@ -118,6 +145,9 @@ public class ProductProfileOdooUploadService {
 		this.stockLocationService = stockLocationService;
 		this.userStockLocationRepository = userStockLocationRepository;
 		this.employeeProfileRepository = employeeProfileRepository;
+		this.priceLevelRepository = priceLevelRepository;
+		this.priceLevelListRepository = priceLevelListRepository;
+		this.temporaryOpeningStockRepository = temporaryOpeningStockRepository;
 	}
 
 	@Transactional
@@ -307,10 +337,13 @@ public class ProductProfileOdooUploadService {
 		Set<String> stkAlias = list.stream().map(p -> String.valueOf(p.getId())).collect(Collectors.toSet());
 		List<StockLocation> stockLocations = stockLocationRepository
 				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), stkAlias);
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
 
 		int i = 1;
 
 		List<TPUserStockLocationDTO> tpUserStockLocationDTOs = new ArrayList<>();
+
+		List<OpeningStockDTO> openingStockDtos = new ArrayList<>();
 
 		for (OdooStockLocation stkDto : list) {
 			// check exist by name, only one exist with a name
@@ -347,6 +380,21 @@ public class ProductProfileOdooUploadService {
 
 			tpUserStockLocationDTOs.add(tpUserStockLocationDTO);
 
+			for (OdooOpeningStock osList : stkDto.getProduct_qty()) {
+
+				Optional<ProductProfile> optionalPp = productProfiles.stream()
+						.filter(pl -> pl.getProductId().equals(String.valueOf(osList.getId()))).findAny();
+				if (optionalPp.isPresent()) {
+					OpeningStockDTO openingStockDto = new OpeningStockDTO();
+					openingStockDto.setProductProfileName(optionalPp.get().getName());
+					openingStockDto.setStockLocationName(name);
+					openingStockDto.setQuantity(osList.getQty());
+					openingStockDtos.add(openingStockDto);
+
+				}
+
+			}
+
 			saveUpdateStockLocations.add(stockLocation);
 
 		}
@@ -355,6 +403,67 @@ public class ProductProfileOdooUploadService {
 		log.info("Saving User Stock Locations.....");
 		saveUserStockLoctions(tpUserStockLocationDTOs);
 
+		if (openingStockDtos.size() > 0) {
+			saveUpdateTemporaryOpeningStock(openingStockDtos);
+		}
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	@Transactional
+	@Async
+	public void saveUpdateTemporaryOpeningStock(List<OpeningStockDTO> openingStockDTOs) {
+		long start = System.nanoTime();
+
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		Set<TemporaryOpeningStock> saveOpeningStocks = new HashSet<>();
+		// All opening-stock must have a stock-location, if not, set a default
+		// one
+		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(company.getId());
+		// find all exist product profiles
+		Set<String> ppNames = openingStockDTOs.stream().map(os -> os.getProductProfileName())
+				.collect(Collectors.toSet());
+
+		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
+
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
+		// delete all opening stock
+		temporaryOpeningStockRepository.deleteByCompanyId(company.getId());
+		for (OpeningStockDTO osDto : openingStockDTOs) {
+			// only save if account profile exist
+			productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
+					.ifPresent(pp -> {
+						TemporaryOpeningStock openingStock = new TemporaryOpeningStock();
+						openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
+						openingStock.setOpeningStockDate(LocalDateTime.now());
+						openingStock.setCreatedDate(LocalDateTime.now());
+						openingStock.setCompany(company);
+						openingStock.setProductProfile(pp);
+
+						if (osDto.getStockLocationName() == null) {
+							openingStock.setStockLocation(defaultStockLocation);
+						} else {
+							// stock location
+							Optional<StockLocation> optionalStockLocation = StockLocations.stream()
+									.filter(pl -> osDto.getStockLocationName().equals(pl.getName())).findAny();
+							if (optionalStockLocation.isPresent()) {
+								openingStock.setStockLocation(optionalStockLocation.get());
+							} else {
+								openingStock.setStockLocation(defaultStockLocation);
+							}
+						}
+						openingStock.setBatchNumber("123");
+						openingStock.setQuantity(osDto.getQuantity());
+						saveOpeningStocks.add(openingStock);
+					});
+		}
+		bulkOperationRepositoryCustom.bulkSaveTemporaryOpeningStocks(saveOpeningStocks);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -643,5 +752,150 @@ public class ProductProfileOdooUploadService {
 
 		log.info("Sync completed in {} ms", elapsedTime);
 
+	}
+
+	@Transactional
+	public void saveUpdatePriceList(List<OdooPriceLevel> list) {
+
+		log.info("Saving Price Level.........");
+
+		long start = System.nanoTime();
+
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		Set<PriceLevel> saveUpdatePriceLevels = new HashSet<>();
+		// find all priceLevels
+		List<PriceLevel> priceLevels = priceLevelRepository.findByCompanyId(company.getId());
+
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+
+		List<PriceLevelListDTO> priceLevelListDTOs = new ArrayList<>();
+		for (OdooPriceLevel plDto : list) {
+
+			Optional<PriceLevel> optionalPl = priceLevels.stream()
+					.filter(pl -> pl.getName().equals(plDto.getPricelist_name())).findAny();
+
+			PriceLevel priceLevel;
+			if (optionalPl.isPresent()) {
+				priceLevel = optionalPl.get();
+				// if not update, skip this iteration.
+				// if (!priceLevel.getThirdpartyUpdate()) {continue;}
+			} else {
+				priceLevel = new PriceLevel();
+				priceLevel.setPid(PriceLevelService.PID_PREFIX + RandomUtil.generatePid());
+				priceLevel.setName(plDto.getPricelist_name());
+				priceLevel.setCompany(company);
+			}
+			priceLevel.setAlias(String.valueOf(plDto.getPricelist_id()));
+			priceLevel.setActivated(true);
+
+			Optional<PriceLevel> opPl = saveUpdatePriceLevels.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(plDto.getPricelist_name())).findAny();
+			if (opPl.isPresent()) {
+				continue;
+			}
+
+			System.out.println("-------" + plDto.getProduct_list().size());
+
+			for (OdooPriceLevelList plList : plDto.getProduct_list()) {
+				System.out.println("-------" + plList.getProduct_id());
+				Optional<ProductProfile> optionalPp = productProfiles.stream()
+						.filter(pl -> pl.getProductId().equals(String.valueOf(plList.getProduct_id()))).findAny();
+				if (optionalPp.isPresent()) {
+					PriceLevelListDTO priceLevelListDTO = new PriceLevelListDTO(optionalPp.get().getName(),
+							plDto.getPricelist_name(), plList.getPrice(), 0.0, 0.0);
+					priceLevelListDTOs.add(priceLevelListDTO);
+
+				}
+
+			}
+
+			saveUpdatePriceLevels.add(priceLevel);
+		}
+
+		bulkOperationRepositoryCustom.bulkSaveUpdatePriceLevels(saveUpdatePriceLevels);
+
+		if (priceLevelListDTOs.size() > 0) {
+			saveUpdatePriceLevelList(priceLevelListDTOs);
+		}
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
+	@Transactional
+	public void saveUpdatePriceLevelList(final List<PriceLevelListDTO> priceLevelListDTOs) {
+
+		log.info("Saving Price Level Lists.........");
+
+		long start = System.nanoTime();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+
+		Set<PriceLevelList> saveUpdatePriceLevelLists = new HashSet<>();
+		// find all exist priceLevels
+		Set<String> plNames = priceLevelListDTOs.stream().map(pll -> pll.getPriceLevelName())
+				.collect(Collectors.toSet());
+
+		Set<String> ppNames = priceLevelListDTOs.stream().map(pll -> pll.getProductProfileName())
+				.collect(Collectors.toSet());
+
+		List<PriceLevelList> priceLevelLists = priceLevelListRepository
+				.findByCompanyIdAndPriceLevelNameIgnoreCaseIn(company.getId(), plNames);
+		// temporary variables for storing db data for product profile and price
+		// level
+		Map<String, ProductProfile> tempProductProfile = new HashMap<>();
+		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
+
+		List<ProductProfile> productProfiles = productProfileRepository.findByCompanyIdAndNameIn(companyId, ppNames);
+
+		for (PriceLevelListDTO pllDto : priceLevelListDTOs) {
+			// check exist by price-level name and product-profile name, only
+			// one exist with a both same for a company
+			Optional<PriceLevelList> optionalPll = priceLevelLists.stream()
+					.filter(pll -> pll.getPriceLevel().getName().equals(pllDto.getPriceLevelName())
+							&& pll.getProductProfile().getName().equals(pllDto.getProductProfileName()))
+					.findAny();
+			PriceLevelList priceLevelList;
+			if (optionalPll.isPresent()) {
+				priceLevelList = optionalPll.get();
+				// if not update, skip this iteration.
+				// if (!priceLevel.getThirdpartyUpdate()) {continue;}
+			} else {
+				priceLevelList = new PriceLevelList();
+				priceLevelList.setPid(PriceLevelListService.PID_PREFIX + RandomUtil.generatePid());
+				priceLevelList.setCompany(company);
+			}
+			// set product profile and price level, if present
+			Optional<ProductProfile> optionalPP;
+			if (tempProductProfile.containsKey(pllDto.getProductProfileName())) {
+				optionalPP = Optional.of(tempProductProfile.get(pllDto.getProductProfileName()));
+			} else {
+				optionalPP = productProfiles.stream().filter(pl -> pllDto.getProductProfileName().equals(pl.getName()))
+						.findAny();
+			}
+			Optional<PriceLevel> optionalPL = tempPriceLevel.stream()
+					.filter(pl -> pllDto.getPriceLevelName().equals(pl.getName())).findAny();
+			if (optionalPP.isPresent() && optionalPL.isPresent()) {
+				priceLevelList.setProductProfile(optionalPP.get());
+				// put it in map for later access
+				tempProductProfile.put(pllDto.getProductProfileName(), optionalPP.get());
+				priceLevelList.setPriceLevel(optionalPL.get());
+				priceLevelList.setPrice(pllDto.getPrice());
+				priceLevelList.setRangeFrom(pllDto.getRangeFrom());
+				priceLevelList.setRangeTo(pllDto.getRangeTo());
+				saveUpdatePriceLevelLists.add(priceLevelList);
+			}
+		}
+		bulkOperationRepositoryCustom.bulkSaveUpdatePriceLevelLists(saveUpdatePriceLevelLists);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
 	}
 }

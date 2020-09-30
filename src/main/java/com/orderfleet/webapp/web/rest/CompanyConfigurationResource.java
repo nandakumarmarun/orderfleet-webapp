@@ -137,6 +137,10 @@ public class CompanyConfigurationResource {
 					mcDto.setPiecesToQuantity(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.SEND_SALES_ORDER_ODOO)) {
+					mcDto.setSendSalesOrderOdoo(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
 				 * mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue())); anyValueExist =
@@ -162,7 +166,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement,
 			@RequestParam String salesEditEnabled, @RequestParam String gpsVarianceQuery,
 			@RequestParam String sendSalesOrderEmail, @RequestParam String sendSalesOrderSap,
-			@RequestParam String piecesToQuantity) throws URISyntaxException {
+			@RequestParam String piecesToQuantity, @RequestParam String sendSalesOrderOdoo) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -202,6 +206,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_SAP);
 		Optional<CompanyConfiguration> optPiecesToQuantity = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.PIECES_TO_QUANTITY);
+		Optional<CompanyConfiguration> optSendSalesOrderOdoo = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_ODOO);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -223,6 +229,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration sendSalesOrderEmailCompany = null;
 		CompanyConfiguration sendSalesOrderSapCompany = null;
 		CompanyConfiguration piecesToQuantityCompany = null;
+		CompanyConfiguration sendSalesOrderOdooCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -390,6 +397,17 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(piecesToQuantityCompany);
 
+		if (optSendSalesOrderOdoo.isPresent()) {
+			sendSalesOrderOdooCompany = optSendSalesOrderOdoo.get();
+			sendSalesOrderOdooCompany.setValue(sendSalesOrderOdoo);
+		} else {
+			sendSalesOrderOdooCompany = new CompanyConfiguration();
+			sendSalesOrderOdooCompany.setCompany(company);
+			sendSalesOrderOdooCompany.setName(CompanyConfig.SEND_SALES_ORDER_ODOO);
+			sendSalesOrderOdooCompany.setValue(sendSalesOrderOdoo);
+		}
+		companyConfigurationRepository.save(sendSalesOrderOdooCompany);
+
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -451,6 +469,9 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optPiecesToQuantity = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.PIECES_TO_QUANTITY);
 
+		Optional<CompanyConfiguration> optSendSalesOrderOdoo = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_ODOO);
+
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -506,6 +527,9 @@ public class CompanyConfigurationResource {
 		if (optPiecesToQuantity.isPresent()) {
 			companyConfigurationDTO.setPiecesToQuantity(Boolean.valueOf(optPiecesToQuantity.get().getValue()));
 		}
+		if (optSendSalesOrderOdoo.isPresent()) {
+			companyConfigurationDTO.setSendSalesOrderOdoo(Boolean.valueOf(optSendSalesOrderOdoo.get().getValue()));
+		}
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
@@ -554,6 +578,9 @@ public class CompanyConfigurationResource {
 
 		Optional<CompanyConfiguration> optPiecesToQuantity = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.PIECES_TO_QUANTITY);
+
+		Optional<CompanyConfiguration> optSendSalesOrderOdoo = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_ODOO);
 
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
@@ -620,8 +647,12 @@ public class CompanyConfigurationResource {
 					CompanyConfig.SEND_SALES_ORDER_SAP);
 		}
 		if (optPiecesToQuantity.isPresent()) {
-			companyConfigurationRepository.deleteByCompanyIdAndName(optSendSalesOrderSap.get().getCompany().getId(),
+			companyConfigurationRepository.deleteByCompanyIdAndName(optPiecesToQuantity.get().getCompany().getId(),
 					CompanyConfig.PIECES_TO_QUANTITY);
+		}
+		if (optSendSalesOrderOdoo.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optSendSalesOrderOdoo.get().getCompany().getId(),
+					CompanyConfig.SEND_SALES_ORDER_ODOO);
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {

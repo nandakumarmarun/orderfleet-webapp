@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -28,11 +29,8 @@ public class PriceLevelListDTO {
 	private double rangeFrom;
 
 	private double rangeTo;
-	
-	private LocalDateTime lastModifiedDate;
 
-	public PriceLevelListDTO() {
-	}
+	private LocalDateTime lastModifiedDate;
 
 	public PriceLevelListDTO(PriceLevelList priceLevelList) {
 		super();
@@ -44,7 +42,17 @@ public class PriceLevelListDTO {
 		this.price = priceLevelList.getPrice();
 		this.rangeFrom = priceLevelList.getRangeFrom();
 		this.rangeTo = priceLevelList.getRangeTo();
-		this.lastModifiedDate=priceLevelList.getLastModifiedDate();
+		this.lastModifiedDate = priceLevelList.getLastModifiedDate();
+	}
+
+	public PriceLevelListDTO(String productProfileName, String priceLevelName, double price, double rangeFrom,
+			double rangeTo) {
+		super();
+		this.productProfileName = productProfileName;
+		this.priceLevelName = priceLevelName;
+		this.price = price;
+		this.rangeFrom = rangeFrom;
+		this.rangeTo = rangeTo;
 	}
 
 	public String getPid() {

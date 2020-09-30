@@ -21,7 +21,7 @@ import com.orderfleet.webapp.domain.User;
 public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile, Long> {
 
 	Optional<EmployeeProfile> findByCompanyIdAndNameIgnoreCase(Long id, String name);
-	
+
 	List<EmployeeProfile> findByCompanyIdAndNameIgnoreCaseIn(Long id, List<String> empNames);
 
 	Optional<EmployeeProfile> findOneByPid(String pid);
@@ -39,6 +39,9 @@ public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile
 
 	@Query("select employeeProfile from EmployeeProfile employeeProfile where employeeProfile.company.id = ?#{principal.companyId} and employeeProfile.activated = ?1 Order By employeeProfile.name asc")
 	List<EmployeeProfile> findAllByCompanyId(boolean activate);
+
+	@Query("select employeeProfile from EmployeeProfile employeeProfile where employeeProfile.company.id = ?#{principal.companyId} and employeeProfile.activated = ?1 and employeeProfile.user IS NOT NULL Order By employeeProfile.name asc")
+	List<EmployeeProfile> findAllByCompanyIdAndUser(boolean activate);
 
 	@Query("select employeeProfile.profileImage from EmployeeProfile employeeProfile where employeeProfile.user.login = ?#{principal.username}")
 	byte[] findtCurrentUserEmployeeProfileImage();

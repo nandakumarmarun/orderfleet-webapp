@@ -19,6 +19,7 @@ import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
+import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
@@ -27,12 +28,14 @@ import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
+import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
+import com.orderfleet.webapp.service.PriceLevelService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
@@ -71,12 +74,15 @@ public class AccountProfileOdooUploadService {
 
 	private final CompanyRepository companyRepository;
 
+	private final PriceLevelRepository priceLevelRepository;
+
 	public AccountProfileOdooUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
 			AccountProfileService accountProfileService, LocationRepository locationRepository,
 			LocationAccountProfileRepository locationAccountProfileRepository,
 			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
-			LocationService locationService, CompanyRepository companyRepository) {
+			LocationService locationService, CompanyRepository companyRepository,
+			PriceLevelRepository priceLevelRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.accountProfileRepository = accountProfileRepository;
@@ -88,6 +94,7 @@ public class AccountProfileOdooUploadService {
 		this.userRepository = userRepository;
 		this.locationService = locationService;
 		this.companyRepository = companyRepository;
+		this.priceLevelRepository = priceLevelRepository;
 	}
 
 	@SuppressWarnings("unlikely-arg-type")
@@ -111,6 +118,8 @@ public class AccountProfileOdooUploadService {
 		List<LocationDTO> locationDtos = new ArrayList<>();
 		List<LocationAccountProfileDTO> locationAccountProfileDtos = new ArrayList<>();
 
+		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
+
 		for (OdooAccountProfile apDto : list) {
 			// check exist by name, only one exist with a name
 			Optional<AccountProfile> optionalAP = accountProfiles.stream()
@@ -129,9 +138,16 @@ public class AccountProfileOdooUploadService {
 				accountProfile.setAccountStatus(AccountStatus.Unverified);
 				accountProfile.setDataSourceType(DataSourceType.TALLY);
 				accountProfile.setImportStatus(true);
-
 			}
-			
+
+			// price level
+			Optional<PriceLevel> optionalPriceLevel = tempPriceLevel.stream()
+					.filter(pl -> String.valueOf(apDto.getPrice_list_id()).equals(pl.getAlias())).findAny();
+
+			if (optionalPriceLevel.isPresent()) {
+				accountProfile.setDefaultPriceLevel(optionalPriceLevel.get());
+			}
+
 			accountProfile.setCustomerId(String.valueOf(apDto.getId()));
 
 			if (apDto.getEmail() != null && !apDto.getEmail().equals("")) {
@@ -200,7 +216,9 @@ public class AccountProfileOdooUploadService {
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
 
-		if (locationDtos.size() > 0) {
+		if (locationDtos.size() > 0)
+
+		{
 			saveUpdateLocations(locationDtos);
 		}
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);

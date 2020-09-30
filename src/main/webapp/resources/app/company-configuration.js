@@ -54,6 +54,7 @@ if (!this.CompanyConfiguration) {
 		var sendSalesOrderEmail = $('#sendSalesOrderEmail').is(":checked");
 		var sendSalesOrderSap = $('#sendSalesOrderSap').is(":checked");
 		var piecesToQuantity = $('#piecesToQuantity').is(":checked");
+		var sendSalesOrderOdoo = $('#sendSalesOrderOdoo').is(":checked");
 		/* var findLocation = $('#findLocation').is(":checked"); */
 		$.ajax({
 			url : contextPath,
@@ -74,7 +75,8 @@ if (!this.CompanyConfiguration) {
 				gpsVarianceQuery : gpsVarianceQuery,
 				sendSalesOrderEmail : sendSalesOrderEmail,
 				sendSalesOrderSap : sendSalesOrderSap,
-				piecesToQuantity : piecesToQuantity
+				piecesToQuantity : piecesToQuantity,
+				sendSalesOrderOdoo : sendSalesOrderOdoo
 			/* findLocation : findLocation */
 			},
 			success : function(data) {
@@ -121,6 +123,9 @@ if (!this.CompanyConfiguration) {
 								data.sendSalesOrderSap);
 						$("#piecesToQuantity").prop("checked",
 								data.piecesToQuantity);
+						$("#sendSalesOrderOdoo").prop("checked",
+								data.sendSalesOrderOdoo);
+						
 
 						/*
 						 * $("#findLocation").prop("checked",

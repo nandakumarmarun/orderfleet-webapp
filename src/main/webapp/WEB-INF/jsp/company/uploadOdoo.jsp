@@ -31,19 +31,6 @@
 					</div>
 				</div>
 				
-				
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Account Profile</label>
-								<button type="button" class="btn btn-success "
-									id="uploadAccountProfiles">Upload Account Profiles</button>
-							</div>	
-						</form>
-					</div>
-				</div>
-				
 				<div class="col-md-12">
 					<div class="panel-body">
 						<form role="form" class="form-horizontal form-groups-bordered">
@@ -64,6 +51,30 @@
 								<button type="button" class="btn btn-success "
 									id="uploadProductProfileProfiles">Upload Product Profiles</button>
 							</div>
+						</form>
+					</div>
+				</div>
+				
+				<div class="col-md-12">
+					<div class="panel-body">
+						<form role="form" class="form-horizontal form-groups-bordered">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Price Lists</label>
+								<button type="button" class="btn btn-success "
+									id="uploadPriceLists">Upload Price Lists</button>
+							</div>	
+						</form>
+					</div>
+				</div>
+				
+				<div class="col-md-12">
+					<div class="panel-body">
+						<form role="form" class="form-horizontal form-groups-bordered">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Account Profile</label>
+								<button type="button" class="btn btn-success "
+									id="uploadAccountProfiles">Upload Account Profiles</button>
+							</div>	
 						</form>
 					</div>
 				</div>

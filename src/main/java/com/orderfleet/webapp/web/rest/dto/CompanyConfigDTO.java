@@ -27,7 +27,8 @@ public class CompanyConfigDTO {
 	private boolean sendSalesOrderEmail;
 	private boolean findLocation;// do we need to find location
 	private boolean sendSalesOrderSap;// setting for sending sales order to sap
-	private boolean piecesToQuantity; //set pices and rate to quantity and selling rate(SAP)
+	private boolean piecesToQuantity; // set pices and rate to quantity and selling rate(SAP)
+	private boolean sendSalesOrderOdoo; // setting for sending sales order to odoo
 
 	public CompanyConfigDTO() {
 		super();
@@ -175,6 +176,14 @@ public class CompanyConfigDTO {
 
 	public void setPiecesToQuantity(boolean piecesToQuantity) {
 		this.piecesToQuantity = piecesToQuantity;
+	}
+
+	public boolean isSendSalesOrderOdoo() {
+		return sendSalesOrderOdoo;
+	}
+
+	public void setSendSalesOrderOdoo(boolean sendSalesOrderOdoo) {
+		this.sendSalesOrderOdoo = sendSalesOrderOdoo;
 	}
 
 }

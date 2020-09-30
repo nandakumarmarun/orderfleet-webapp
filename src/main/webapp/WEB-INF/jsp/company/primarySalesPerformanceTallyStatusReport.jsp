@@ -15,26 +15,6 @@
 .error {
 	color: red;
 }
-.loader {
-  border: 10px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 10px solid #3498db;
-  width: 40px;
-  height: 40px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
-  animation: spin 2s linear infinite;
-}
-
-/* Safari */
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 </style>
 </head>
 <body class="page-body" data-url="">
@@ -145,29 +125,42 @@
 									<br>
 									<button type="button" class="btn btn-primary"
 										id="sendSalesOrderEmail">Send Sales Order By Email</button>
-										<div class="loader hide">
+<!-- 									<div class="loader hide"></div> -->
 
-										</div>
-										
 								</div>
-								
+
 							</c:if>
-							
+
+							<c:if test="${sendSalesOrderOdooStatus=='true'}">
+								<div class="col-sm-1">
+									<br>
+									<button type="button" class="btn btn-primary"
+										id="sendSalesOrderOdoo">Send Invoices</button>
+<!-- 									<div class="loader hide"></div> -->
+
+								</div>
+
+							</c:if>
+
 							<c:if test="${pdfDownloadStatus=='true'}">
 								<div class="col-sm-1">
 									<br>
-									<button type="button" class="btn btn-success hide packingSlipByCustomerClass"
+									<button type="button"
+										class="btn btn-success hide packingSlipByCustomerClass"
 										id="packingSlipByCustomer">Packing Slip By Customer</button>
-										<div class="loader hide">
+<!-- 									<div class="loader hide"></div> -->
 
-										</div>
-				
 								</div>
-								
+
 							</c:if>
 						</div>
 					</form>
 				</div>
+				<div id='loader' class="modal fade container">
+
+				<img src='/resources/assets/images/Spinner.gif'>
+
+			</div>
 				<div class="col-md-12 col-sm-12 clearfix"
 					style="font-size: 14px; color: black;">
 					<div class="col-sm-2">

@@ -97,8 +97,12 @@ public class UserOdooUploadService {
 
 		// find all exist account profiles
 		List<String> empNames = list.stream().map(apDto -> apDto.getName().toUpperCase()).collect(Collectors.toList());
-		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				empNames);
+		System.out.println("Employee Name Size:----" + empNames.size());
+//		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
+//				empNames);
+		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyId(true);
+
+		System.out.println("Employee Profile Size:----" + employeeProfiles.size());
 		List<Designation> designations = designationRepository.findAllByCompanyId();
 		List<Department> departments = departmentRepository.findAllByCompanyId();
 

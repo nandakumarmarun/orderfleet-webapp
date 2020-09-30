@@ -98,6 +98,7 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 import com.orderfleet.webapp.web.rest.dto.SecondarySalesOrderExcelDTO;
+import com.orderfleet.webapp.web.vendor.odoo.service.SendInvoiceOdooService;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -161,6 +162,9 @@ public class SalesPerformanceReportTallyStatusResource {
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
 
+	@Inject
+	private SendInvoiceOdooService sendInvoiceOdooService;
+
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
 	 *
@@ -212,6 +216,19 @@ public class SalesPerformanceReportTallyStatusResource {
 			}
 		}
 		model.addAttribute("sendSalesOrderEmailStatus", sendSalesOrderEmailStatus);
+
+		boolean sendSalesOrderOdoo = false;
+		Optional<CompanyConfiguration> opCompanyConfigurationOdoo = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_SALES_ORDER_ODOO);
+		if (opCompanyConfigurationOdoo.isPresent()) {
+
+			if (opCompanyConfigurationOdoo.get().getValue().equals("true")) {
+				sendSalesOrderOdoo = true;
+			} else {
+				sendSalesOrderOdoo = false;
+			}
+		}
+		model.addAttribute("sendSalesOrderOdooStatus", sendSalesOrderOdoo);
 
 		boolean pdfDownloadStatus = false;
 		Optional<CompanyConfiguration> opCompanyConfigurationPdf = companyConfigurationRepository
@@ -583,6 +600,18 @@ public class SalesPerformanceReportTallyStatusResource {
 				sendSalesOrderEmail(supplierName, supplierEmail, companyEmail, secondarySalesOrderExcelBySupplierDTOs);
 			}
 		}
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
+	}
+
+	@RequestMapping(value = "/primary-sales-performance-download-status/sendSalesOrderOdoo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> sendSalesOrderOdoo() throws MessagingException {
+
+		log.info("sendSalesOrderOdoo()-----");
+
+		sendInvoiceOdooService.sendSalesOrder();
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 

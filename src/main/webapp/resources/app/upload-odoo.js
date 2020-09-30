@@ -26,6 +26,10 @@ if (!this.uploadOdoo) {
 		$('#uploadStockLocations').on('click', function() {
 			uploadStockLocations();
 		});
+		
+		$('#uploadPriceLists').on('click', function() {
+			uploadPriceLevel();
+		});
 	
 	});
 	
@@ -109,6 +113,27 @@ if (!this.uploadOdoo) {
 						console.log("Error uploading product profiles .................");
 						$(".error-msg").html(
 								"Error uploading product profiles .................");
+					}
+				});
+
+	}
+	
+	function uploadPriceLevel() {
+
+		$(".error-msg").html("Uploading Price List....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadPriceLevel",
+					method : 'GET',
+					success : function(data) {
+						alert("Upload Price Level Success")
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading price list.................");
+						$(".error-msg").html(
+								"Error uploading price list .................");
 					}
 				});
 

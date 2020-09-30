@@ -35,6 +35,10 @@ if (!this.InventoryVoucher) {
 		$('#sendSalesOrderEmail').on('click', function() {
 			sendSalesOrderEmail();
 		});
+		
+		$('#sendSalesOrderOdoo').on('click', function() {
+			sendSalesOrderOdoo();
+		});
 
 		$('#packingSlipByCustomer').on('click', function() {
 			packingSlipByCustomer();
@@ -373,9 +377,43 @@ if (!this.InventoryVoucher) {
 			$.ajax({
 				url : inventoryVoucherContextPath + "/sendSalesOrderEmail",
 				method : 'GET',
+				beforeSend : function() {
+					// Show image container
+					$("#loader").modal('show');
+
+				},
 				success : function(data) {
+					$("#loader").modal('hide');
 					InventoryVoucher.filter();
-					$(".loader").removeClass('show');
+					
+					// onSaveSuccess(data);
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+		}
+
+	}
+	
+	function sendSalesOrderOdoo() {
+
+		$(".loader").addClass('show');
+
+		if (confirm("Are you sure?")) {
+
+			$.ajax({
+				url : inventoryVoucherContextPath + "/sendSalesOrderOdoo",
+				method : 'GET',
+				beforeSend : function() {
+					// Show image container
+					$("#loader").modal('show');
+
+				},
+				success : function(data) {
+					$("#loader").modal('hide');
+					InventoryVoucher.filter();
+					
 					// onSaveSuccess(data);
 				},
 				error : function(xhr, error) {

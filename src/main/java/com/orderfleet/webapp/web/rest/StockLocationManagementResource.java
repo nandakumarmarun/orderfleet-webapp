@@ -108,7 +108,7 @@ public class StockLocationManagementResource {
 		List<TemporaryOpeningStock> temporaryOpeningStocks = temporaryOpeningStockRepository
 				.findAllByCompanyIdAndDeactivatedTemporaryOpeningStock(true);
 
-		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyId(true);
+		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyIdAndUser(true);
 
 		if (stockLocations.size() > 0) {
 

@@ -52,6 +52,7 @@
 						<th>Send Sales Order Email</th>
 						<th>Send Sales Order Sap</th>
 						<th>Pieces To Quantity</th>
+						<th>Send Sales Order Odoo</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -76,6 +77,7 @@
 							<th>${companyConfiguration.sendSalesOrderEmail}</th>
 							<th>${companyConfiguration.sendSalesOrderSap}</th>
 							<th>${companyConfiguration.piecesToQuantity}</th>
+							<th>${companyConfiguration.sendSalesOrderOdoo}</th>
 
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
@@ -235,6 +237,18 @@
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Send Sales Order Odoo</label>
+													<input id="sendSalesOrderOdoo"
+														name='checksSendSalesOrderOdoo"' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+
+
+
 
 
 										<!-- <tr>
