@@ -16,29 +16,17 @@
 			<hr />
 			<h2>Sync Odoo Masters</h2>
 			<div class="row">
-				
+
 				<hr />
-				
+
 				<div class="col-md-12">
 					<div class="panel-body">
 						<form role="form" class="form-horizontal form-groups-bordered">
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Users</label>
-								<button type="button" class="btn btn-success "
-									id="uploadUsers">Upload Users</button>
+								<button type="button" class="btn btn-success " id="uploadUsers">Upload
+									Users</button>
 							</div>
-						</form>
-					</div>
-				</div>
-				
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Stock Locations</label>
-								<button type="button" class="btn btn-success "
-									id="uploadStockLocations">Upload Stock Locations</button>
-							</div>	
 						</form>
 					</div>
 				</div>
@@ -49,12 +37,25 @@
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Product Profile</label>
 								<button type="button" class="btn btn-success "
-									id="uploadProductProfileProfiles">Upload Product Profiles</button>
+									id="uploadProductProfileProfiles">Upload Product
+									Profiles</button>
 							</div>
 						</form>
 					</div>
 				</div>
-				
+
+				<div class="col-md-12">
+					<div class="panel-body">
+						<form role="form" class="form-horizontal form-groups-bordered">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Stock Locations</label>
+								<button type="button" class="btn btn-success "
+									id="uploadStockLocations">Upload Stock Locations</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
 				<div class="col-md-12">
 					<div class="panel-body">
 						<form role="form" class="form-horizontal form-groups-bordered">
@@ -62,11 +63,11 @@
 								<label class="col-sm-2 control-label">Price Lists</label>
 								<button type="button" class="btn btn-success "
 									id="uploadPriceLists">Upload Price Lists</button>
-							</div>	
+							</div>
 						</form>
 					</div>
 				</div>
-				
+
 				<div class="col-md-12">
 					<div class="panel-body">
 						<form role="form" class="form-horizontal form-groups-bordered">
@@ -74,11 +75,11 @@
 								<label class="col-sm-2 control-label">Account Profile</label>
 								<button type="button" class="btn btn-success "
 									id="uploadAccountProfiles">Upload Account Profiles</button>
-							</div>	
+							</div>
 						</form>
 					</div>
 				</div>
-				
+
 				<div class="col-md-12">
 					<div class="panel-body">
 						<form role="form" class="form-horizontal form-groups-bordered">
@@ -90,7 +91,7 @@
 				</div>
 			</div>
 			<hr />
-		
+
 			<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
 			<%-- 	<spring:url value="/web/banks" var="urlBank"></spring:url> --%>
