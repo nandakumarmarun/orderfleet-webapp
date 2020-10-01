@@ -446,7 +446,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			double freeQuantity = 0.0;
 			if (obj[5] != null) {
 				opStock = Double.parseDouble(obj[5].toString());
-				log.info(obj[3] + " opStock : " + opStock);
+//				log.info(obj[3] + " opStock : " + opStock);
 			}
 
 			if (obj[4] != null) {

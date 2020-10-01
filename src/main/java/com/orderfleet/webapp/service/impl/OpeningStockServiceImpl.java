@@ -61,8 +61,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Save a openingStock.
 	 * 
-	 * @param openingStockDTO
-	 *            the entity to save
+	 * @param openingStockDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -82,8 +81,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Update a openingStock.
 	 *
-	 * @param openingStockDTO
-	 *            the entity to update
+	 * @param openingStockDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -96,6 +94,8 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 			openingStock.setStockLocation(
 					stockLocationRepository.findOneByPid(openingStockDTO.getStockLocationPid()).get());
 			openingStock.setBatchNumber(openingStockDTO.getBatchNumber());
+			openingStock.setOpeningStockDate(LocalDateTime.now());
+			openingStock.setCreatedDate(LocalDateTime.now());
 			// openingStock.setCreatedDate(openingStockDTO.getCreatedDate());
 			// openingStock.setOpeningStockDate(openingStockDTO.getOpeningStockDate());
 			openingStock.setQuantity(openingStockDTO.getQuantity());
@@ -108,8 +108,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Get all the OpeningStocks.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -137,8 +136,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Get all the categorys.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -155,8 +153,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Get one openingStock by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -171,8 +168,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Get one openingStock by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -188,8 +184,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Get one openingStock by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -214,8 +209,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Delete the openingStock by id.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete EmployeeProfile : {}", pid);
@@ -233,10 +227,8 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Update the OpeningStock status by pid.
 	 * 
-	 * @param pid
-	 *            the pid of the entity
-	 * @param activate
-	 *            the activate of the entity
+	 * @param pid      the pid of the entity
+	 * @param activate the activate of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -255,13 +247,11 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	 * 
 	 * @since Feb 9, 2017
 	 * 
-	 *        find all openingStockDTOs from OpeningStock by status and company
-	 *        and productProfile.
+	 *        find all openingStockDTOs from OpeningStock by status and company and
+	 *        productProfile.
 	 * 
-	 * @param active
-	 *            the active of the entity
-	 * @param productPid
-	 *            the productPid of the entity
+	 * @param active     the active of the entity
+	 * @param productPid the productPid of the entity
 	 * @return the list of entity
 	 */
 	@Override
@@ -279,11 +269,9 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	 * 
 	 *        find all active company
 	 * 
-	 * @param active
-	 *            the active of the entity
+	 * @param active   the active of the entity
 	 *
-	 * @param pageable
-	 *            the pageable of the entity
+	 * @param pageable the pageable of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -304,8 +292,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	 * 
 	 *        find all deactive company
 	 * 
-	 * @param deactive
-	 *            the deactive of the entity
+	 * @param deactive the deactive of the entity
 	 * @return the list
 	 */
 	@Override
@@ -316,16 +303,15 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 		List<OpeningStockDTO> openingStockDTOs = openingStockMapper.openingStocksToOpeningStockDTOs(openingStocks);
 		return openingStockDTOs;
 	}
-	
+
 	/**
 	 * Save a openingStock.
 	 * 
-	 * @param openingStockDTO
-	 *            the entity to save
+	 * @param openingStockDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
-	public OpeningStockDTO saveOpeningStock(OpeningStockDTO openingStockDTO,Long companyId) {
+	public OpeningStockDTO saveOpeningStock(OpeningStockDTO openingStockDTO, Long companyId) {
 		log.debug("Request to save EmployeeProfile : {}", openingStockDTO);
 		openingStockDTO.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
 		openingStockDTO.setOpeningStockDate(LocalDateTime.now());
@@ -337,10 +323,13 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 		OpeningStockDTO result = openingStockMapper.openingStockToOpeningStockDTO(openingStock);
 		return result;
 	}
+
 	@Override
-	public List<OpeningStockDTO> findByCompanyIdAndProductProfilePidAndOpeningStockActivatedAndLastModifiedDate(String productPid,boolean active,LocalDateTime lastModifiedDate ) {
+	public List<OpeningStockDTO> findByCompanyIdAndProductProfilePidAndOpeningStockActivatedAndLastModifiedDate(
+			String productPid, boolean active, LocalDateTime lastModifiedDate) {
 		List<OpeningStock> openingStocks = openingStockRepository
-				.findByCompanyIdAndProductProfilePidAndOpeningStockActivatedAndLastModifiedDate(productPid, active,lastModifiedDate);
+				.findByCompanyIdAndProductProfilePidAndOpeningStockActivatedAndLastModifiedDate(productPid, active,
+						lastModifiedDate);
 		List<OpeningStockDTO> openingStockDTOs = openingStockMapper.openingStocksToOpeningStockDTOs(openingStocks);
 		return openingStockDTOs;
 	}
