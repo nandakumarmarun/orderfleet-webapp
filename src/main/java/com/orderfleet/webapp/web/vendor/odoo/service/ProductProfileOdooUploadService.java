@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -28,7 +27,6 @@ import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
-import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.TemporaryOpeningStock;
 import com.orderfleet.webapp.domain.UnitOfMeasure;
 import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
@@ -73,8 +71,6 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.OdooPriceLevelList;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooProductProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooStockLocation;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooUnitOfMeasure;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooProductProfile;
-import com.orderfleet.webapp.web.vendor.odoo.dto.UnitQtyOdooProductProfile;
 
 /**
  * Service for save/update account profile related data from third party

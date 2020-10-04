@@ -35,12 +35,10 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
-import com.orderfleet.webapp.service.PriceLevelService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooAccountProfile;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooAccountProfile;
 
 /**
  * Service for save/update account profile related data from third party
@@ -97,7 +95,7 @@ public class AccountProfileOdooUploadService {
 		this.priceLevelRepository = priceLevelRepository;
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
+	
 	@Transactional
 	public void saveUpdateAccountProfiles(final List<OdooAccountProfile> list) {
 
