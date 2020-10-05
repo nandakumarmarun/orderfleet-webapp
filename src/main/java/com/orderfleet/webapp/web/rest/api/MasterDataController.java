@@ -1554,8 +1554,10 @@ public class MasterDataController {
 		List<String> documentPids = voucherNumberGeneratorList.stream().map(vng -> vng.getDocument().getPid())
 				.collect(Collectors.toList());
 		log.info("Call to get the last document number...................");
-		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocument(companyPid, userPid,
-				documentPids);
+		LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid, userPid, documentPids);
+		log.info("Last Date "+lastDate);
+		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid, userPid,
+				documentPids,lastDate);
 		log.info("Company Pid" + companyPid + "\n User Pid : " + userPid + "\n Document Pids : " + documentPids);
 		List<VoucherNumberGeneratorDTO> voucherNumberGeneratorDTOs = new ArrayList<>();
 		// document entry exist in inventory voucher entries

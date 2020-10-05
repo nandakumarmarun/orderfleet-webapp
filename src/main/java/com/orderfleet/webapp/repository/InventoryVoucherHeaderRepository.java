@@ -85,14 +85,26 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "ivh.created_by_id in (?2) and ivh.created_date BETWEEN ?3 AND ?4 and "
 			+ "ivd.product_id = op.product_profile_id order by ivd.product_id";
 
-	public static final String DOCUMENT_NUMBER = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
+//	public static final String DOCUMENT_NUMBER = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
+//			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "
+//			+ "INNER JOIN tbl_document doc on iv.document_id = doc.id "
+//			+ "INNER JOIN tbl_user u on iv.created_by_id = u.id where "
+//			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3) and iv.created_date IN "
+//			+ "(select MAX(ivh.created_date) from tbl_inventory_voucher_header ivh where "
+//			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id)";
+//	
+	public static final String DOCUMENT_NUMBER_OPTIMISED = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
 			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "
 			+ "INNER JOIN tbl_document doc on iv.document_id = doc.id "
 			+ "INNER JOIN tbl_user u on iv.created_by_id = u.id where "
-			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3) and iv.created_date IN "
-			+ "(select MAX(ivh.created_date) from tbl_inventory_voucher_header ivh where "
-			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id)";
-
+			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3) and iv.created_date = ?4";
+	
+	public static final String LAST_DOCUMENT_DATE = "select MAX(ivh.created_date) from tbl_inventory_voucher_header ivh "+
+			"INNER JOIN tbl_company cmp on ivh.company_id = cmp.id   "+
+			"INNER JOIN tbl_document doc on ivh.document_id = doc.id  "+
+			"INNER JOIN tbl_user u on ivh.created_by_id = u.id where  "+
+			"cmp.pid = ?1 and u.pid = ?2  and doc.pid IN (?3) and "+
+			"ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id";
 	public static final String ALL_DOCUMENT_NUMBER = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
 			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "
 			+ "INNER JOIN tbl_document doc on iv.document_id = doc.id "
@@ -473,9 +485,15 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	// iv.document.pid")
 	// List<Object[]> getLastNumberForEachDocument(String companyPid, String
 	// userPid, List<String> documentPids);
-	@Query(value = DOCUMENT_NUMBER, nativeQuery = true)
-	List<Object[]> getLastNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
+//	@Query(value = DOCUMENT_NUMBER, nativeQuery = true)
+//	List<Object[]> getLastNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
 
+	@Query(value = DOCUMENT_NUMBER_OPTIMISED, nativeQuery = true)
+	List<Object[]> getLastNumberForEachDocumentOptimized(String companyPid, String userPid, List<String> documentPids,LocalDateTime lastDate);
+	
+	@Query(value = LAST_DOCUMENT_DATE, nativeQuery = true)
+	LocalDateTime lastDateWithCompanyUserDocument(String companyPid, String userPid, List<String> documentPids);
+	
 	@Query(value = ALL_DOCUMENT_NUMBER, nativeQuery = true)
 	List<Object[]> getAllDocumentNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
 
