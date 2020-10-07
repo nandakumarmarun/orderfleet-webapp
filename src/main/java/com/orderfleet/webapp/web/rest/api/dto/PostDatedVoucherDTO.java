@@ -2,6 +2,9 @@ package com.orderfleet.webapp.web.rest.api.dto;
 
 
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.orderfleet.webapp.domain.PostDatedVoucher;
 
 /**
@@ -28,6 +31,8 @@ public class PostDatedVoucherDTO {
 	private double referenceDocumentAmount;
 
 	private String remark;
+	
+	private List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocation;
 
 	public PostDatedVoucherDTO() {
 		super();
@@ -48,6 +53,10 @@ public class PostDatedVoucherDTO {
 		this.referenceDocumentDate = postDatedVoucher.getReferenceDocumentDate().toString();
 		this.referenceDocumentAmount = postDatedVoucher.getReferenceDocumentAmount();
 		this.remark = postDatedVoucher.getRemark();
+		if(postDatedVoucher.getPostDatedVoucherAllocation() != null){
+			this.postDatedVoucherAllocation = postDatedVoucher.getPostDatedVoucherAllocation()
+					.stream().map(pdcAlloc -> new PostDatedVoucherAllocationDTO(pdcAlloc)).collect(Collectors.toList());
+		}
 	}
 
 
@@ -125,7 +134,15 @@ public class PostDatedVoucherDTO {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
-
+	
+	public List<PostDatedVoucherAllocationDTO> getPostDatedVoucherAllocation() {
+		return postDatedVoucherAllocation;
+	}
+	
+	public void setPostDatedVoucherAllocation(List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocation) {
+		this.postDatedVoucherAllocation = postDatedVoucherAllocation;
+	}
+	
 	
 	
 }

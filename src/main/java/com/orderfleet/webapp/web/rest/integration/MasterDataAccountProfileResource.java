@@ -1,8 +1,17 @@
 package com.orderfleet.webapp.web.rest.integration;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -20,14 +29,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.itextpdf.text.pdf.PdfChunk;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.PostDatedVoucherAllocation;
 import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.TallyConfiguration;
 import com.orderfleet.webapp.domain.enums.SyncOperationType;
+import com.orderfleet.webapp.repository.PostDatedVoucherAllocationRepository;
+import com.orderfleet.webapp.repository.PostDatedVoucherRepository;
 import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.TallyConfigurationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.service.PostDatedVoucherAllocationService;
+import com.orderfleet.webapp.service.PostDatedVoucherService;
 import com.orderfleet.webapp.service.async.TPAccountProfileManagementService;
+import com.orderfleet.webapp.web.rest.api.dto.PostDatedVoucherAllocationDTO;
+import com.orderfleet.webapp.web.rest.api.dto.PostDatedVoucherDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
@@ -58,6 +75,15 @@ public class MasterDataAccountProfileResource {
 	
 	@Inject
 	private TallyDataUploadService tallyDataUploadService;
+	
+	@Inject
+	PostDatedVoucherService postDatedVoucherService;
+	
+	@Inject
+	PostDatedVoucherRepository postDatedVoucherRepository;
+	
+	@Inject
+	PostDatedVoucherAllocationService postDatedVoucherAllocationService;
 
 	@RequestMapping(value = "/account-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -254,5 +280,58 @@ public class MasterDataAccountProfileResource {
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Account-Profile sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
+	}
+	
+	@PostMapping(path = "/post-dated-vouchers", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<?> saveAllPostDatedVouchers(@Valid @RequestBody List<PostDatedVoucherDTO> postDatedVoucherDtos) throws IOException
+	{
+		log.info("API request for post dated voucher -- List size -- {}",postDatedVoucherDtos.size());
+		
+		postDatedVoucherRepository.deleteByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
+		
+		List<PostDatedVoucherDTO> result = new ArrayList<PostDatedVoucherDTO>();
+		
+		Comparator<PostDatedVoucherDTO> accountWiseComparator = 
+				Comparator.comparing(PostDatedVoucherDTO::getReferenceDocumentNumber);
+		postDatedVoucherDtos.sort(accountWiseComparator);
+		result.addAll(postDatedVoucherService.saveAll(postDatedVoucherDtos));
+		
+		List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocationDtos = new ArrayList<>();
+		for(PostDatedVoucherDTO pdc : postDatedVoucherDtos){
+			if(pdc != null && pdc.getPostDatedVoucherAllocation() != null)
+				postDatedVoucherAllocationDtos.addAll(pdc.getPostDatedVoucherAllocation());
+		}
+
+		postDatedVoucherAllocationService.saveAllPDCAllocation(postDatedVoucherAllocationDtos);
+		String pdc = null;
+//		File file = new File("pdc.txt");
+//		FileWriter fw = new FileWriter(file,true);
+//		BufferedWriter bw = new BufferedWriter(fw);
+//		for(PostDatedVoucherDTO dto : postDatedVoucherDtos)
+//		{
+//////			result.add(postDatedVoucherService.save(dto));	
+//			 pdc = 	"\n-------------------------------------------------------------"
+//							+"\n"+dto.getAccountProfileName() +"  Doc Date:  "+dto.getReferenceDocumentDate()+"    Doc No: "+dto.getReferenceDocumentNumber()+"  Doc amt: "+dto.getReferenceDocumentAmount();
+//							
+//							if(dto.getPostDatedVoucherAllocation() == null )
+//								continue;
+//							
+//							for(PostDatedVoucherAllocationDTO allocDto : dto.getPostDatedVoucherAllocation()){
+//								if(allocDto == null)
+//									continue;
+//								pdc += "\n ALLOCATION:  "+allocDto.getAllocReferenceVoucher()+"      AMT : "+allocDto.getAllocReferenceVoucherAmount();
+//							}
+//			bw.write(pdc);
+//		}
+//		bw.close();
+//		fw.close();
+		if(result.size() == postDatedVoucherDtos.size())
+		{
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

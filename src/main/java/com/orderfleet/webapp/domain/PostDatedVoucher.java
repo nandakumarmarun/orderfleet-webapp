@@ -4,17 +4,23 @@ package com.orderfleet.webapp.domain;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -62,6 +68,10 @@ public class PostDatedVoucher implements Serializable,Cloneable{
 	
 	@Column(name = "remarks")
 	private String remark;
+	
+	@OneToMany(fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
+	@JoinColumn(name = "post_dated_voucher_id")
+	private List<PostDatedVoucherAllocation> postDatedVoucherAllocation;
 	
 	@ManyToOne
 	private Company company;
@@ -184,6 +194,14 @@ public class PostDatedVoucher implements Serializable,Cloneable{
 
 	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+	
+	public List<PostDatedVoucherAllocation> getPostDatedVoucherAllocation() {
+		return postDatedVoucherAllocation;
+	}
+
+	public void setPostDatedVoucherAllocation(List<PostDatedVoucherAllocation> postDatedVoucherAllocation) {
+		this.postDatedVoucherAllocation = postDatedVoucherAllocation;
 	}
 
 	@Override

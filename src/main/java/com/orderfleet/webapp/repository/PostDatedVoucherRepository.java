@@ -20,6 +20,8 @@ public interface PostDatedVoucherRepository extends JpaRepository<PostDatedVouch
 	List<PostDatedVoucher> findAllByCompanyId();
 	
 	List<PostDatedVoucher> findAllByAccountProfilePid(String accountPid);
+
+	List<PostDatedVoucher> findAllByCompanyIdAndReferenceDocumentNumberIn(long companyId ,List<String> referenceDocumentNumbers);
 	
 	@Transactional
 	Long deleteByCompanyId(Long companyId);

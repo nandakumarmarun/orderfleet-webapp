@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.PostDatedVoucher;
+import com.orderfleet.webapp.domain.PostDatedVoucherAllocation;
 import com.orderfleet.webapp.repository.PostDatedVoucherRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.PostDatedVoucherService;
@@ -48,37 +49,43 @@ public class PostDatedVoucherController {
 	PostDatedVoucherRepository postDatedVoucherRepository;
 	
 	
-	@PostMapping(path = "/tp/v1/post-dated-vouchers", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<?> saveAllPostDatedVouchers(@Valid @RequestBody List<PostDatedVoucherDTO> postDatedVoucherDtos)
-	{
-		log.debug("API request for post dated voucher -- List size -- {}",postDatedVoucherDtos.size());
-		
-		postDatedVoucherRepository.deleteByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
-		
-		List<PostDatedVoucherDTO> result = new ArrayList<PostDatedVoucherDTO>();
-
-		
-		for(PostDatedVoucherDTO dto : postDatedVoucherDtos)
-		{
-			result.add(postDatedVoucherService.save(dto));	
-		}
-
-		
-		if(result.size() == postDatedVoucherDtos.size())
-		{
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-		else {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
+//	@PostMapping(path = "/tp/v1/post-dated-vouchers", produces = MediaType.APPLICATION_JSON_VALUE)
+//	@Timed
+//	public ResponseEntity<?> saveAllPostDatedVouchers(@Valid @RequestBody List<PostDatedVoucherDTO> postDatedVoucherDtos)
+//	{
+//		log.debug("API request for post dated voucher -- List size -- {}",postDatedVoucherDtos.size());
+//		
+//		postDatedVoucherRepository.deleteByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
+//		
+//		List<PostDatedVoucherDTO> result = new ArrayList<PostDatedVoucherDTO>();
+//
+//		
+//		for(PostDatedVoucherDTO dto : postDatedVoucherDtos)
+//		{
+//			result.add(postDatedVoucherService.save(dto));	
+//		}
+//
+//		
+//		if(result.size() == postDatedVoucherDtos.size())
+//		{
+//			return new ResponseEntity<>(HttpStatus.OK);
+//		}
+//		else {
+//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//	}
 	
 	@GetMapping(path = "/post-dated-vouchers", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<?> findAllPostDatedVoucherByCompany()
 	{
 		List<PostDatedVoucher> postDatedVoucherList = postDatedVoucherRepository.findAllByCompanyId();
+//		for(PostDatedVoucher pdc : postDatedVoucherList){
+//			System.out.println(pdc.getAccountProfile() +" "+pdc.getReferenceDocumentNumber());
+//			for(PostDatedVoucherAllocation pdcAlloc : pdc.getPostDatedVoucherAllocation()){
+//				System.out.println(pdcAlloc.getAllocReferenceVoucher()+" "+pdcAlloc.getVoucherNumber());
+//			}
+//		}
 		
 		List<PostDatedVoucherDTO> postDatedVoucherDtos = postDatedVoucherList.stream().map(
 															postDatedVoucher -> new PostDatedVoucherDTO(postDatedVoucher))
