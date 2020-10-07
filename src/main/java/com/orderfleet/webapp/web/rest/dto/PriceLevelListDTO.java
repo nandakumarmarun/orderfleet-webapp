@@ -32,6 +32,10 @@ public class PriceLevelListDTO {
 
 	private LocalDateTime lastModifiedDate;
 
+	public PriceLevelListDTO() {
+
+	}
+
 	public PriceLevelListDTO(PriceLevelList priceLevelList) {
 		super();
 		this.pid = priceLevelList.getPid();
