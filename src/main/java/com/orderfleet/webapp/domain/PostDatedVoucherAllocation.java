@@ -43,7 +43,6 @@ public class PostDatedVoucherAllocation implements Serializable{
 	@Column(name = "alloc_Reference_Voucher_Amount")
 	private double allocReferenceVoucherAmount;
 	
-	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "post_dated_voucher_id")
 	private PostDatedVoucher postDatedVoucher;

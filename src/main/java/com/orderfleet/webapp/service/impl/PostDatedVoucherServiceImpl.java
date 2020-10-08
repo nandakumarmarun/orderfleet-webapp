@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.PostDatedVoucher;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.PostDatedVoucherAllocationRepository;
 import com.orderfleet.webapp.repository.PostDatedVoucherRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.PostDatedVoucherService;
@@ -38,6 +40,9 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 	
 	@Inject
 	private PostDatedVoucherRepository postDatedVoucherRepository;
+	
+	@Inject
+	private PostDatedVoucherAllocationRepository postDatedVoucherAllocationRepository;
 	
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
@@ -123,6 +128,15 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 		return result;
 	}
 
+	@Override
+	public void deleteAllPostDatedVoucherEntries(long companyId) {
+		// TODO Auto-generated method stub
+		postDatedVoucherAllocationRepository.deleteByCompanyId(companyId);
+		log.info("Deleted Allocations");
+		postDatedVoucherRepository.deleteByCompanyId(companyId);
+		log.info("Deleted post dated vouches");
+	}
+
 	
 	
 	
@@ -133,6 +147,7 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 		return localDate;
 	}
 
+	
 
 	
 }

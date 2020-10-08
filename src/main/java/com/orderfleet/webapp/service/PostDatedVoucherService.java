@@ -18,5 +18,6 @@ public interface PostDatedVoucherService {
 	List<PostDatedVoucherDTO>  saveAll(List<PostDatedVoucherDTO> postDatedVoucherDtos);
 	List<PostDatedVoucherDTO> findAllPostDatedVouchers();
 	List<PostDatedVoucherDTO> findAllPostDatedVoucherByAccountProfilePid(String accountPid);
+	void deleteAllPostDatedVoucherEntries(long companyId);
 	
 }

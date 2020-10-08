@@ -288,21 +288,24 @@ public class MasterDataAccountProfileResource {
 	{
 		log.info("API request for post dated voucher -- List size -- {}",postDatedVoucherDtos.size());
 		
-		postDatedVoucherRepository.deleteByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
+		//postDatedVoucherRepository.deleteByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
+		postDatedVoucherService.deleteAllPostDatedVoucherEntries(SecurityUtils.getCurrentUsersCompanyId());
 		
 		List<PostDatedVoucherDTO> result = new ArrayList<PostDatedVoucherDTO>();
 		
 		Comparator<PostDatedVoucherDTO> accountWiseComparator = 
 				Comparator.comparing(PostDatedVoucherDTO::getReferenceDocumentNumber);
 		postDatedVoucherDtos.sort(accountWiseComparator);
+		log.info("Saving postdated entries......");
 		result.addAll(postDatedVoucherService.saveAll(postDatedVoucherDtos));
-		
+		log.info("Saved all postDatedVouchers");
 		List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocationDtos = new ArrayList<>();
 		for(PostDatedVoucherDTO pdc : postDatedVoucherDtos){
-			if(pdc != null && pdc.getPostDatedVoucherAllocation() != null)
-				postDatedVoucherAllocationDtos.addAll(pdc.getPostDatedVoucherAllocation());
+			log.info(pdc.getPostDatedVoucherAllocationList()+"----");
+			if(pdc != null && pdc.getPostDatedVoucherAllocationList() != null)
+				postDatedVoucherAllocationDtos.addAll(pdc.getPostDatedVoucherAllocationList());
 		}
-
+		log.info("Fetched all postdatedVoucherAllocations.................");
 		postDatedVoucherAllocationService.saveAllPDCAllocation(postDatedVoucherAllocationDtos);
 		String pdc = null;
 //		File file = new File("pdc.txt");

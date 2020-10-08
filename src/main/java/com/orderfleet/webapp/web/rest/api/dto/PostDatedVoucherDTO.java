@@ -32,7 +32,7 @@ public class PostDatedVoucherDTO {
 
 	private String remark;
 	
-	private List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocation;
+	private List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocationList;
 
 	public PostDatedVoucherDTO() {
 		super();
@@ -54,7 +54,7 @@ public class PostDatedVoucherDTO {
 		this.referenceDocumentAmount = postDatedVoucher.getReferenceDocumentAmount();
 		this.remark = postDatedVoucher.getRemark();
 		if(postDatedVoucher.getPostDatedVoucherAllocation() != null){
-			this.postDatedVoucherAllocation = postDatedVoucher.getPostDatedVoucherAllocation()
+			this.postDatedVoucherAllocationList = postDatedVoucher.getPostDatedVoucherAllocation()
 					.stream().map(pdcAlloc -> new PostDatedVoucherAllocationDTO(pdcAlloc)).collect(Collectors.toList());
 		}
 	}
@@ -134,15 +134,13 @@ public class PostDatedVoucherDTO {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
-	
-	public List<PostDatedVoucherAllocationDTO> getPostDatedVoucherAllocation() {
-		return postDatedVoucherAllocation;
+
+	public List<PostDatedVoucherAllocationDTO> getPostDatedVoucherAllocationList() {
+		return postDatedVoucherAllocationList;
 	}
-	
-	public void setPostDatedVoucherAllocation(List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocation) {
-		this.postDatedVoucherAllocation = postDatedVoucherAllocation;
+
+	public void setPostDatedVoucherAllocationList(List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocationList) {
+		this.postDatedVoucherAllocationList = postDatedVoucherAllocationList;
 	}
-	
-	
 	
 }
