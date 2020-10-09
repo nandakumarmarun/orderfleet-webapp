@@ -794,14 +794,17 @@ public class ProductProfileOdooUploadService {
 			System.out.println("-------" + plDto.getProduct_list().size());
 
 			for (OdooPriceLevelList plList : plDto.getProduct_list()) {
-				System.out.println("-------" + plList.getProduct_id());
-				Optional<ProductProfile> optionalPp = productProfiles.stream()
-						.filter(pl -> pl.getProductId().equals(String.valueOf(plList.getProduct_id()))).findAny();
-				if (optionalPp.isPresent()) {
-					PriceLevelListDTO priceLevelListDTO = new PriceLevelListDTO(optionalPp.get().getName(),
-							plDto.getPricelist_name(), plList.getPrice(), 0.0, 0.0);
-					priceLevelListDTOs.add(priceLevelListDTO);
 
+				if (!plList.getProduct_id().equals("false")) {
+					System.out.println("-------" + plList.getProduct_id());
+					Optional<ProductProfile> optionalPp = productProfiles.stream()
+							.filter(pl -> pl.getProductId().equals(plList.getProduct_id())).findAny();
+					if (optionalPp.isPresent()) {
+						PriceLevelListDTO priceLevelListDTO = new PriceLevelListDTO(optionalPp.get().getName(),
+								plDto.getPricelist_name(), plList.getPrice(), 0.0, 0.0);
+						priceLevelListDTOs.add(priceLevelListDTO);
+
+					}
 				}
 
 			}

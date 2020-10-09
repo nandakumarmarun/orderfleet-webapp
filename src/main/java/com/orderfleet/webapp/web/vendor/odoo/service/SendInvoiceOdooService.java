@@ -10,91 +10,49 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.Department;
-import com.orderfleet.webapp.domain.Designation;
-import com.orderfleet.webapp.domain.Document;
-import com.orderfleet.webapp.domain.EmployeeProfile;
-import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
-import com.orderfleet.webapp.domain.GstLedger;
-import com.orderfleet.webapp.domain.InventoryVoucherBatchDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
-import com.orderfleet.webapp.domain.Location;
-import com.orderfleet.webapp.domain.LocationAccountProfile;
-import com.orderfleet.webapp.domain.OrderStatus;
-import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
+import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
 import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.enums.AccountStatus;
+import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
-import com.orderfleet.webapp.domain.enums.DataSourceType;
-import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.AccountTypeRepository;
-import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
-import com.orderfleet.webapp.repository.DepartmentRepository;
-import com.orderfleet.webapp.repository.DesignationRepository;
-import com.orderfleet.webapp.repository.DocumentRepository;
-import com.orderfleet.webapp.repository.EmployeeProfileRepository;
-import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
-import com.orderfleet.webapp.repository.GstLedgerRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
-import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
-import com.orderfleet.webapp.repository.LocationRepository;
-import com.orderfleet.webapp.repository.OpeningStockRepository;
-import com.orderfleet.webapp.repository.OrderStatusRepository;
-import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
+import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
 import com.orderfleet.webapp.repository.UserRepository;
-import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
+import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.AccountProfileService;
-import com.orderfleet.webapp.service.AccountingVoucherHeaderService;
-import com.orderfleet.webapp.service.ActivityService;
-import com.orderfleet.webapp.service.CompanyService;
-import com.orderfleet.webapp.service.DocumentService;
-import com.orderfleet.webapp.service.DynamicDocumentHeaderService;
-import com.orderfleet.webapp.service.EmployeeProfileService;
-import com.orderfleet.webapp.service.ExecutiveTaskSubmissionService;
-import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
-import com.orderfleet.webapp.service.LocationAccountProfileService;
-import com.orderfleet.webapp.service.LocationService;
-import com.orderfleet.webapp.service.ProductProfileService;
-import com.orderfleet.webapp.service.util.RandomUtil;
-import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherBatchDetailDTO;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.LocationDTO;
-import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesOrderDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesOrderItemDTO;
-import com.orderfleet.webapp.web.rest.dto.VatLedgerDTO;
-import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
-import com.orderfleet.webapp.web.tally.dto.GstLedgerDTO;
-import com.orderfleet.webapp.web.vendor.odoo.dto.OdooAccountProfile;
-import com.orderfleet.webapp.web.vendor.odoo.dto.OdooUser;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooAccountProfile;
+import com.orderfleet.webapp.web.util.RestClientUtil;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoiceLine;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseMessageOdooInvoice;
 
 /**
  * Service for save/update account profile related data from third party
@@ -112,61 +70,10 @@ public class SendInvoiceOdooService {
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
 
 	@Inject
-	private AccountProfileService accountProfileService;
-
-	@Inject
-	private AccountingVoucherHeaderService accountingVoucherHeaderService;
-
-	@Inject
-	private InventoryVoucherHeaderService inventoryVoucherHeaderService;
-
-	@Inject
-	private OpeningStockRepository openingStockRepository;
-
-	@Inject
-	private DynamicDocumentHeaderService dynamicDocumentHeaderService;
-
-	@Inject
-	private DocumentRepository documentRepository;
-
-	@Inject
-	private ProductProfileService productProfileService;
-
-	@Inject
-	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
-
-	@Inject
-	private ActivityService activityService;
-
-	@Inject
-	private ExecutiveTaskSubmissionService executiveTaskSubmissionService;
-
-	@Inject
 	private UserRepository userRepository;
 
 	@Inject
-	private DocumentService documentService;
-
-	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
-
-	@Inject
-	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
-
-	@Inject
-	private AccountProfileMapper accountProfileMapper;
-
-	@Inject
-	private LocationAccountProfileService locationAccountProfileService;
-
-	@Inject
-	private GstLedgerRepository gstLedgerRepository;
-
-	@Inject
-	private EmployeeProfileRepository employeeProfileRepository;
-
-	@Inject
-	private CompanyService companyService;
 
 	@Inject
 	private CompanyRepository companyRepository;
@@ -178,28 +85,30 @@ public class SendInvoiceOdooService {
 	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	@Inject
-	private PriceLevelRepository priceLevelRepository;
-
-	@Inject
-	private OrderStatusRepository orderStatusRepository;
-
-	@Inject
 	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
+
+	@Inject
+	private UserStockLocationRepository userStockLocationRepository;
+
+	@Inject
+	private UnitOfMeasureProductRepository unitOfMeasureProductRepository;
+
+	private static String SEND_INVOICES_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/create_invoices";
 
 	@Transactional
 	public void sendSalesOrder() {
 		long start = System.nanoTime();
 
-		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 
 		log.debug("REST request to download sales orders <" + company.getLegalName() + "> : {}");
 
-		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
+		List<OdooInvoice> odooInvoices = new ArrayList<>();
 		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
 		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
 				company.getId());
+
 		if (primarySecDoc.isEmpty()) {
 			log.info("........No PrimarySecondaryDocument configuration Available...........");
 			// return salesOrderDTOs;
@@ -207,7 +116,6 @@ public class SendInvoiceOdooService {
 		List<Long> documentIdList = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
 
-		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
 		List<String> inventoryHeaderPid = new ArrayList<String>();
 		String companyPid = company.getPid();
 
@@ -260,19 +168,16 @@ public class SendInvoiceOdooService {
 
 			}
 
-			List<Document> documents = documentRepository.findAllByCompanyIdAndIdsIn(documentIds);
-			List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyIdAndIdsIn(employeeIds);
-			List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
-					.findAllByCompanyIdAndIdsIn(exeIds);
 			List<AccountProfile> receiverAccountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
-			List<AccountProfile> supplierAccountProfiles = accountProfileRepository
-					.findAllByCompanyIdAndIdsIn(supplierAccountProfileIds);
+
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
-			List<PriceLevel> priceLevels = priceLevelRepository.findAllByCompanyIdAndIdsIn(priceLeveIds);
-			List<OrderStatus> orderStatusList = orderStatusRepository.findAllByCompanyIdAndIdsIn(orderStatusIds);
+
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
 					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
+			List<UserStockLocation> userStockLocations = userStockLocationRepository.findAllByCompanyPid(companyPid);
+			List<UnitOfMeasureProduct> unitOfMeasureProducts = unitOfMeasureProductRepository.findAllByCompanyId();
+
 			Object[] errorPrint = null;
 			try {
 				for (Object[] obj : inventoryVoucherHeaders) {
@@ -280,45 +185,27 @@ public class SendInvoiceOdooService {
 					Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
 							.findAny();
 
-					Optional<Document> opDocument = documents.stream()
-							.filter(doc -> doc.getId() == Long.parseLong(obj[13].toString())).findAny();
-
-					Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
-							.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
-
-					Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
-							.filter(doc -> doc.getId() == Long.parseLong(obj[15].toString())).findAny();
-
 					Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
 							.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
 
-					Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
-							.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
+					Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
+							.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
 
-					PriceLevel priceLevel = null;
-					if (obj[18] != null) {
+					OdooInvoice odooInvoice = new OdooInvoice();
 
-						Optional<PriceLevel> opPriceLevel = priceLevels.stream()
-								.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
-						if (opPriceLevel.isPresent()) {
-							priceLevel = opPriceLevel.get();
-						}
+					LocalDateTime date = null;
+					if (obj[4] != null) {
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+						String[] splitDate = obj[4].toString().split(" ");
+						date = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
+
 					}
 
-					Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
-							.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
-
-					OrderStatus orderStatus = new OrderStatus();
-					if (opOrderStatus.isPresent()) {
-						orderStatus = opOrderStatus.get();
-					}
-
-					SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
-							opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
-							orderStatus);
-
-					salesOrderDTO.setAccountProfileDTO(
-							accountProfileMapper.accountProfileToAccountProfileDTO(opRecAccPro.get()));
+					DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+					odooInvoice.setInvoice_date(date.format(formatter1));
+					odooInvoice.setPartner_id(Long.parseLong(opRecAccPro.get().getCustomerId()));
+					odooInvoice.setReference(obj[6].toString());
+					odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
 
 					List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 							.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
@@ -326,36 +213,39 @@ public class SendInvoiceOdooService {
 							.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId))
 							.collect(Collectors.toList());
 
-					List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
+					List<OdooInvoiceLine> odooInvoiceLines = new ArrayList<OdooInvoiceLine>();
 					for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
-						SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
 
-						List<InventoryVoucherBatchDetailDTO> inventoryVoucherBatchDetailsDTOs = new ArrayList<>();
+						OdooInvoiceLine odooInvoiceLine = new OdooInvoiceLine();
 
-						List<OpeningStockDTO> openingStockDTOs = new ArrayList<>();
-						for (InventoryVoucherBatchDetail inventoryVoucherBatchDetail : inventoryVoucherDetail
-								.getInventoryVoucherBatchDetails()) {
-							openingStockDTOs = openingStockRepository
-									.findByCompanyIdAndProductProfilePidAndBatchNumber(
-											inventoryVoucherBatchDetail.getProductProfile().getPid(),
-											inventoryVoucherBatchDetail.getBatchNumber())
-									.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
+						odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountAmount());
+						if (inventoryVoucherDetail.getFreeQuantity() > 0.0) {
+							odooInvoiceLine.setIs_foc(true);
+						} else {
+							odooInvoiceLine.setIs_foc(false);
+						}
+						odooInvoiceLine
+								.setProduct_id(Long.parseLong(inventoryVoucherDetail.getProduct().getProductId()));
+						odooInvoiceLine.setPrice_unit(inventoryVoucherDetail.getSellingRate());
+						odooInvoiceLine.setQuantity(inventoryVoucherDetail.getQuantity());
+
+						Optional<UnitOfMeasureProduct> opUnitOfMeasure = unitOfMeasureProducts.stream().filter(
+								us -> us.getProduct().getPid().equals(inventoryVoucherDetail.getProduct().getPid()))
+								.findAny();
+
+						if (opUnitOfMeasure.isPresent()) {
+							odooInvoiceLine
+									.setUom_id(Long.parseLong(opUnitOfMeasure.get().getUnitOfMeasure().getUomId()));
 						}
 
-						salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
-						salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(inventoryVoucherBatchDetailsDTOs);
-						salesOrderItemDTOs.add(salesOrderItemDTO);
+						odooInvoiceLines.add(odooInvoiceLine);
 					}
 
-					// List<SalesOrderItemDTO> sortedSalesOrderItems = new
-					// ArrayList<SalesOrderItemDTO>();
-					// sortedSalesOrderItems =
-					// salesOrderItemDTOs.stream().sorted(Comparator.comparingLong(SalesOrderItemDTO::getSortOrder)).collect(Collectors.toList());
-					salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
+					odooInvoice.setInvoice_lines(odooInvoiceLines);
 
 					inventoryHeaderPid.add(obj[9].toString());
 
-					salesOrderDTOs.add(salesOrderDTO);
+					odooInvoices.add(odooInvoice);
 				}
 			} catch (NoSuchElementException | NullPointerException | ArrayIndexOutOfBoundsException e) {
 				int i = 0;
@@ -370,13 +260,52 @@ public class SendInvoiceOdooService {
 				e.printStackTrace();
 				throw new IllegalArgumentException("Data missing in sales order..");
 			}
-//			if (!salesOrderDTOs.isEmpty()) {
-//				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
-//						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
-//				log.debug("updated " + updated + " to PROCESSING");
-//			}
+			if (!odooInvoices.isEmpty()) {
+				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
+				log.debug("updated " + updated + " to PROCESSING");
+			}
 		}
-		System.out.println(salesOrderDTOs.size() + "-----------Sales Order Size");
+		log.info("Sending (" + odooInvoices.size() + ") Invoices to Odoo....");
+
+		RequestBodyOdooInvoice request = new RequestBodyOdooInvoice();
+
+		request.setJsonrpc("2.0");
+
+		ParamsOdooInvoice params = new ParamsOdooInvoice();
+		params.setCreate_multi(true);
+		params.setInvoices(odooInvoices);
+
+		request.setParams(params);
+
+		HttpEntity<RequestBodyOdooInvoice> entity = new HttpEntity<>(request, RestClientUtil.createTokenAuthHeaders());
+
+		log.info(entity.getBody().toString() + "");
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		log.info("Get URL: " + SEND_INVOICES_API_URL);
+
+		try {
+
+			ResponseBodyOdooInvoice responseBodyOdooInvoice = restTemplate.postForObject(SEND_INVOICES_API_URL, entity,
+					ResponseBodyOdooInvoice.class);
+			log.info("Odoo Invoice Created Success Size= " + responseBodyOdooInvoice.getResult().getMessage().size()
+					+ "------------");
+
+			changeServerDownloadStatus(responseBodyOdooInvoice.getResult().getMessage());
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				throw new ServiceException(exception.getResponseBodyAsString());
+			}
+			throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+			System.out.println(exception.getMessage());
+
+			throw new ServiceException(exception.getMessage());
+		}
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -385,141 +314,23 @@ public class SendInvoiceOdooService {
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
-	private SalesOrderDTO ivhObjToSalesOrderDTO(Object[] obj, User user, Document document,
-			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
-			AccountProfile receiverAccountProfile, AccountProfile supplierAccountProfile, PriceLevel priceLevel,
-			OrderStatus orderStatus) {
-		log.info("ivh to salesorder starts");
-		SalesOrderDTO salesOrderDTO = new SalesOrderDTO();
-		salesOrderDTO.setInventoryVoucherHeaderPid(obj[9].toString());
-		salesOrderDTO.setId(Long.parseLong(obj[0].toString()));
-		salesOrderDTO.setLedgerName(receiverAccountProfile.getName());
-		salesOrderDTO.setTrimChar(receiverAccountProfile.getTrimChar());
-		salesOrderDTO.setLedgerAddress(receiverAccountProfile.getAddress());
-		LocalDateTime date = null;
-		if (obj[4] != null) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			String[] splitDate = obj[4].toString().split(" ");
-			date = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
+	private void changeServerDownloadStatus(List<ResponseMessageOdooInvoice> message) {
 
-		}
-		log.info("date split completed");
-		salesOrderDTO.setDate(date);
-		salesOrderDTO.setDocumentName(document.getName());
-		salesOrderDTO.setDocumentAlias(document.getAlias());
-		salesOrderDTO.setDocDiscountAmount(Double.parseDouble(obj[2].toString()));
-		salesOrderDTO.setDocDiscountPercentage(Double.parseDouble(obj[3].toString()));
-		if (receiverAccountProfile.getDefaultPriceLevel() != null) {
-			salesOrderDTO.setPriceLevel(receiverAccountProfile.getDefaultPriceLevel().getName());
-		}
-		salesOrderDTO.setInventoryVoucherHeaderDTO(ivhObjectToivhDTO(obj, user, document, employeeProfile,
-				executiveTaskExecution, receiverAccountProfile, supplierAccountProfile, priceLevel, orderStatus));
-		log.info("function callss.....");
-		salesOrderDTO.setLedgerState(receiverAccountProfile.getStateName());
-		salesOrderDTO.setLedgerCountry(receiverAccountProfile.getCountryName());
-		salesOrderDTO.setLedgerGstType(receiverAccountProfile.getGstRegistrationType());
-		if (employeeProfile != null) {
-			salesOrderDTO.setEmployeeAlias(employeeProfile.getAlias());
-		}
-		salesOrderDTO.setActivityRemarks(
-				executiveTaskExecution.getRemarks() != null ? executiveTaskExecution.getRemarks() : "");
-		return salesOrderDTO;
-	}
+		if (!message.isEmpty()) {
 
-	private InventoryVoucherHeaderDTO ivhObjectToivhDTO(Object[] obj, User user, Document document,
-			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
-			AccountProfile receiverAccountProfile, AccountProfile supplierAccountProfile, PriceLevel priceLevel,
-			OrderStatus orderStatus) {
-		log.info("function starts .... ivhObjectToivhDTO");
-		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
+			List<String> references = new ArrayList<>();
+			for (ResponseMessageOdooInvoice response : message) {
+				references.add(response.getReference());
+			}
 
-		inventoryVoucherHeaderDTO.setPid(obj[9].toString());
-		inventoryVoucherHeaderDTO.setDocumentNumberLocal(obj[5].toString());
-		inventoryVoucherHeaderDTO.setDocumentNumberServer(obj[6].toString());
+			List<String> inventoryHeaderPid = inventoryVoucherHeaderRepository
+					.findAllByDocumentNumberServer(references);
 
-		if (document != null) {
-			inventoryVoucherHeaderDTO.setDocumentPid(document.getPid());
-			inventoryVoucherHeaderDTO.setDocumentName(document.getName());
+			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+					TallyDownloadStatus.COMPLETED, inventoryHeaderPid);
+			log.debug("updated " + updated + " to Completed");
 		}
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		LocalDateTime createdDate = null;
-		LocalDateTime documentDate = null;
-		if (obj[1] != null) {
-			String[] splitDate = obj[1].toString().split(" ");
-			createdDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
-
-		}
-		if (obj[4] != null) {
-			String[] splitDate = obj[4].toString().split(" ");
-			documentDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
-
-		}
-		log.info("date parsing completed");
-		inventoryVoucherHeaderDTO.setCreatedDate(createdDate);
-		inventoryVoucherHeaderDTO.setDocumentDate(documentDate);
-
-		if (receiverAccountProfile != null) {
-			inventoryVoucherHeaderDTO.setReceiverAccountPid(receiverAccountProfile.getPid());
-			inventoryVoucherHeaderDTO.setReceiverAccountName(receiverAccountProfile.getName());
-		}
-
-		inventoryVoucherHeaderDTO.setProcessStatus(obj[22].toString());
-
-		if (supplierAccountProfile != null) {
-			inventoryVoucherHeaderDTO.setSupplierAccountPid(supplierAccountProfile.getPid());
-			inventoryVoucherHeaderDTO.setSupplierAccountName(supplierAccountProfile.getName());
-		}
-
-		if (employeeProfile != null) {
-			inventoryVoucherHeaderDTO.setEmployeePid(employeeProfile.getPid());
-			inventoryVoucherHeaderDTO.setEmployeeName(employeeProfile.getName());
-		}
-		if (user != null) {
-			inventoryVoucherHeaderDTO.setUserName(user.getFirstName());
-		}
-
-		inventoryVoucherHeaderDTO.setDocumentTotal(Double.parseDouble(obj[7].toString()));
-		inventoryVoucherHeaderDTO.setDocumentVolume(Double.parseDouble(obj[8].toString()));
-		inventoryVoucherHeaderDTO.setDocDiscountAmount(Double.parseDouble(obj[2].toString()));
-		inventoryVoucherHeaderDTO.setDocDiscountPercentage(Double.parseDouble(obj[3].toString()));
-		inventoryVoucherHeaderDTO.setStatus(Boolean.valueOf(obj[10].toString()));
-
-		if (priceLevel != null) {
-			inventoryVoucherHeaderDTO.setPriceLevelPid(priceLevel.getPid());
-			inventoryVoucherHeaderDTO.setPriceLevelName(priceLevel.getName());
-		}
-		if (orderStatus != null) {
-			inventoryVoucherHeaderDTO.setOrderStatusId(orderStatus.getId());
-			inventoryVoucherHeaderDTO.setOrderStatusName(orderStatus.getName());
-		}
-
-		if (obj[26] != null) {
-			inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(obj[26].toString()));
-
-		}
-		log.info("setOrderNumber obj[27]");
-		inventoryVoucherHeaderDTO.setOrderNumber(obj[27] == null ? 0 : Long.parseLong(obj[27].toString()));
-
-		inventoryVoucherHeaderDTO.setCustomeraddress(receiverAccountProfile.getAddress());
-		inventoryVoucherHeaderDTO.setCustomerEmail(receiverAccountProfile.getEmail1());
-		inventoryVoucherHeaderDTO.setCustomerPhone(receiverAccountProfile.getPhone1());
-		inventoryVoucherHeaderDTO.setVisitRemarks(
-				executiveTaskExecution.getRemarks() == null ? "" : executiveTaskExecution.getRemarks());
-
-		inventoryVoucherHeaderDTO.setPdfDownloadStatus(Boolean.getBoolean(obj[28].toString()));
-		if (obj[29] != null) {
-			inventoryVoucherHeaderDTO.setSalesManagementStatus(SalesManagementStatus.valueOf(obj[29].toString()));
-
-		}
-		inventoryVoucherHeaderDTO.setDocumentTotalUpdated(Double.parseDouble(obj[30].toString()));
-		inventoryVoucherHeaderDTO.setDocumentVolumeUpdated(Double.parseDouble(obj[31].toString()));
-		inventoryVoucherHeaderDTO.setUpdatedStatus(Boolean.getBoolean(obj[32].toString()));
-		if (inventoryVoucherHeaderDTO.getUpdatedStatus()) {
-			inventoryVoucherHeaderDTO.setDocumentTotal(inventoryVoucherHeaderDTO.getDocumentTotalUpdated());
-			inventoryVoucherHeaderDTO.setDocumentVolume(inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
-		}
-		return inventoryVoucherHeaderDTO;
 	}
 
 }

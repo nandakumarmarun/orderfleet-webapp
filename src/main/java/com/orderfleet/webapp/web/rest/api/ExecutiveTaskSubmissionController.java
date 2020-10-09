@@ -202,19 +202,24 @@ public class ExecutiveTaskSubmissionController {
 					log.info(voucherNumberGeneratorList + " Size is either null or 0");
 					TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 					taskSubmissionResponse.setStatus("Error");
-					taskSubmissionResponse.setMessage(LocalDateTime.now()+" "+"Voucher Number Generator list not found");
+					taskSubmissionResponse
+							.setMessage(LocalDateTime.now() + " " + "Voucher Number Generator list not found");
 					return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 
 				List<String> documentPids = voucherNumberGeneratorList.stream().map(vng -> vng.getDocument().getPid())
 						.collect(Collectors.toList());
-				
+
 //				List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocument(companyPid,
 //						userPid, documentPids);
-				LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid, userPid, documentPids);
-				log.info("Last Date "+lastDate);
-				List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid,
-						userPid, documentPids,lastDate);
+				LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid,
+						userPid, documentPids);
+				log.info("Last Date " + lastDate);
+				if (lastDate == null) {
+					lastDate = LocalDateTime.now();
+				}
+				List<Object[]> objectArray = inventoryVoucherHeaderRepository
+						.getLastNumberForEachDocumentOptimized(companyPid, userPid, documentPids, lastDate);
 
 				List<Object[]> documentVoucherNumberListObject = inventoryVoucherHeaderRepository
 						.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
@@ -246,8 +251,9 @@ public class ExecutiveTaskSubmissionController {
 						TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 						log.debug("----------" + documentNumberLocal
 								+ "  Saving to Server Failed---------Duplicate Found-------");
-						taskSubmissionResponse.setStatus(LocalDateTime.now()+" "+"Error "+documentNumberLocal);
-						taskSubmissionResponse.setMessage(LocalDateTime.now()+" "+"Duplicate found "+documentNumberLocal);
+						taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
+						taskSubmissionResponse
+								.setMessage(LocalDateTime.now() + " " + "Duplicate found " + documentNumberLocal);
 						return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
 					}
 
@@ -273,8 +279,10 @@ public class ExecutiveTaskSubmissionController {
 									log.debug("----------" + documentNumberLocal
 											+ "  Saving to Server Failed---------Not in Sequential Order");
 									TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
-									taskSubmissionResponse.setStatus(LocalDateTime.now()+" "+"Error "+documentNumberLocal);
-									taskSubmissionResponse.setMessage(LocalDateTime.now()+" "+documentNumberLocal+" Not in Sequential Order ");
+									taskSubmissionResponse
+											.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
+									taskSubmissionResponse.setMessage(LocalDateTime.now() + " " + documentNumberLocal
+											+ " Not in Sequential Order ");
 									return new ResponseEntity<>(taskSubmissionResponse,
 											HttpStatus.INTERNAL_SERVER_ERROR);
 								}
@@ -316,13 +324,13 @@ public class ExecutiveTaskSubmissionController {
 			taskSubmissionResponse.setStatus("Success");
 			taskSubmissionResponse.setMessage("Activity submitted successfully...");
 		} catch (DataIntegrityViolationException dive) {
-			taskSubmissionResponse.setStatus(LocalDateTime.now()+" "+"Duplicate Key");
-			taskSubmissionResponse.setMessage(LocalDateTime.now()+" "+dive.getMessage());
+			taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Duplicate Key");
+			taskSubmissionResponse.setMessage(LocalDateTime.now() + " " + dive.getMessage());
 			log.error("Executive task submission DataIntegrityViolationException {}", dive);
 			return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
 		} catch (Exception e) {
 			taskSubmissionResponse.setStatus("Error");
-			taskSubmissionResponse.setMessage(LocalDateTime.now()+" "+e.getMessage());
+			taskSubmissionResponse.setMessage(LocalDateTime.now() + " " + e.getMessage());
 			log.error(e.getMessage());
 			return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}

@@ -1413,7 +1413,7 @@ public class MasterDataController {
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(ecomProductProfileDTOs);
 
 	}
-	
+
 	@GetMapping("/ecom-product-profile-modern")
 	@Timed
 	public ResponseEntity<List<EcomProductProfileDTO>> getEcomProductsModern(
@@ -1423,7 +1423,8 @@ public class MasterDataController {
 		if (lastSyncdate == null) {
 			ecomProductProfileDTOs = ecomProductProfileService.findByCurrentUserForModern();
 		} else {
-			ecomProductProfileDTOs = ecomProductProfileService.findByCurrentUserAndLastModifiedDateForModern(lastSyncdate);
+			ecomProductProfileDTOs = ecomProductProfileService
+					.findByCurrentUserAndLastModifiedDateForModern(lastSyncdate);
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(ecomProductProfileDTOs);
 
@@ -1554,10 +1555,14 @@ public class MasterDataController {
 		List<String> documentPids = voucherNumberGeneratorList.stream().map(vng -> vng.getDocument().getPid())
 				.collect(Collectors.toList());
 		log.info("Call to get the last document number...................");
-		LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid, userPid, documentPids);
-		log.info("Last Date "+lastDate);
-		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid, userPid,
-				documentPids,lastDate);
+		LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid, userPid,
+				documentPids);
+		log.info("Last Date " + lastDate);
+		if (lastDate == null) {
+			lastDate = LocalDateTime.now();
+		}
+		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid,
+				userPid, documentPids, lastDate);
 		log.info("Company Pid" + companyPid + "\n User Pid : " + userPid + "\n Document Pids : " + documentPids);
 		List<VoucherNumberGeneratorDTO> voucherNumberGeneratorDTOs = new ArrayList<>();
 		// document entry exist in inventory voucher entries
@@ -1582,6 +1587,10 @@ public class MasterDataController {
 
 		}
 
+		for (VoucherNumberGeneratorDTO vng : voucherNumberGeneratorDTOs) {
+			log.info(vng.getLastVoucherNumber()+"----");
+		}
+
 		return new ResponseEntity<>(voucherNumberGeneratorDTOs, HttpStatus.OK);
 //		 String str = "abcdDCBA123";
 //		 String strNew = str.replace("a", "");
@@ -1590,7 +1599,7 @@ public class MasterDataController {
 	@RequestMapping(value = "/stockDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<StockDetailsDTO>> filter(@RequestParam("userPid") String userPid,
-			@RequestParam(name="stockLocationPid",required = false) String stockLocationPid) {
+			@RequestParam(name = "stockLocationPid", required = false) String stockLocationPid) {
 		log.debug("API request to fetch users Stock Details (Van sales)");
 
 		long companyId = SecurityUtils.getCurrentUsersCompanyId();
@@ -1599,15 +1608,16 @@ public class MasterDataController {
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
 		List<UserStockLocation> userStockLocations = new ArrayList<>();
 		boolean stockLocationSelected = false;
-		if(stockLocationPid != null && !stockLocationPid.isEmpty()){
-			userStockLocations = userStockLocationRepository.findByUserPidAndStockLocationPid(user.get().getPid(), stockLocationPid);
-			log.info("stock details based on stocklocation and user"+userStockLocations.size());
+		if (stockLocationPid != null && !stockLocationPid.isEmpty()) {
+			userStockLocations = userStockLocationRepository.findByUserPidAndStockLocationPid(user.get().getPid(),
+					stockLocationPid);
+			log.info("stock details based on stocklocation and user" + userStockLocations.size());
 			stockLocationSelected = true;
-		}else{
+		} else {
 			userStockLocations = userStockLocationRepository.findByUserPid(user.get().getPid());
 			log.info("stock details based on  user");
 		}
-		
+
 		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
 				.collect(Collectors.toSet());
 		List<OpeningStock> openingStockUserBased = openingStockRepository
@@ -1617,19 +1627,21 @@ public class MasterDataController {
 			LocalDateTime fromDate = openingStockUserBased.get(0).getCreatedDate();
 			// LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
 			LocalDateTime toDate = LocalDate.now().atTime(23, 59);
-			
-			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate ,usersStockLocations);
-			log.info("stockdetails check 1 :-"+stockDetails.size());
-			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get(),usersStockLocations, stockLocationSelected);
-			log.info("unsaled stockdetails check 2 :-"+unSaled.size());
+
+			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate,
+					usersStockLocations);
+			log.info("stockdetails check 1 :-" + stockDetails.size());
+			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get(), usersStockLocations,
+					stockLocationSelected);
+			log.info("unsaled stockdetails check 2 :-" + unSaled.size());
 
 			for (StockDetailsDTO dto : stockDetails) {
-				
+
 				unSaled.removeIf(unSale -> unSale.getProductName().equals(dto.getProductName()));
 			}
 			stockDetails.addAll(unSaled);
 		}
-		log.info(stockDetails.size()+" size of stockdetails");
+		log.info(stockDetails.size() + " size of stockdetails");
 		stockDetails
 				.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName().compareTo(s2.getProductName()));
 		return new ResponseEntity<>(stockDetails, HttpStatus.OK);

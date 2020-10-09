@@ -4,7 +4,7 @@ public class OdooPriceLevelList {
 
 	private double price;
 
-	private long product_id;
+	private String product_id;
 
 	public double getPrice() {
 		return price;
@@ -14,11 +14,11 @@ public class OdooPriceLevelList {
 		this.price = price;
 	}
 
-	public long getProduct_id() {
+	public String getProduct_id() {
 		return product_id;
 	}
 
-	public void setProduct_id(long product_id) {
+	public void setProduct_id(String product_id) {
 		this.product_id = product_id;
 	}
 
