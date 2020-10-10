@@ -35,6 +35,14 @@
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
 							<div class="col-sm-2">
+								<div class="radio">
+									<label><input type="radio" name="optStatus" value="All"
+										checked="checked">All</label>&nbsp;&nbsp;&nbsp; <label><input
+										type="radio" name="optStatus" value="Not Delivered">Not
+										Delivered</label>
+								</div>
+							</div>
+							<div class="col-sm-2">
 								Employee<select id="dbEmployee" name="employeePid"
 									class="form-control">
 									<option value="no">All Employee</option>
@@ -157,7 +165,7 @@
 							</th>
 							<th>Employee</th>
 							<th>Date</th>
-							<th>Details</th>	
+							<th>Details</th>
 						</tr>
 					</thead>
 					<tbody id="tBodyInventoryVoucher">

@@ -46,6 +46,10 @@ if (!this.InventoryVoucher) {
 		$("#btnApply").on('click', function() {
 			InventoryVoucher.filter();
 		});
+		
+		$('input[type=radio][name=optStatus]').change(function() {
+			InventoryVoucher.filter();
+		});
 
 	});
 
@@ -329,13 +333,25 @@ if (!this.InventoryVoucher) {
 		 * $("#dbAccount").val() + "---" + $("#dbDateSearch").val() + "---" +
 		 * $("#txtFromDate").val() + "---" + $("#txtToDate").val() + "---" +
 		 * $("#dbDocumentType").val() + "---" + docPids);
+		 * 
 		 */
+		
+		var processFlowStatus="ALL";
+		
+		var optStatusValue = $("input[name='optStatus']:checked").val();
+		
+		if(optStatusValue=="Not Delivered")
+		{
+			var processFlowStatus="ALL_NOT_DELIVERED";
+		}
+		
+		
 		$
 				.ajax({
 					url : inventoryVoucherContextPath + "/filter",
 					type : 'GET',
 					data : {
-						processFlowStatus : "ALL",
+						processFlowStatus : processFlowStatus,
 						employeePids : empPids,
 						accountPid : $("#dbAccount").val(),
 						filterBy : $("#dbDateSearch").val(),
