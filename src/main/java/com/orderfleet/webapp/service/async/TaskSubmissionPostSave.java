@@ -1746,7 +1746,7 @@ public class TaskSubmissionPostSave {
 
 	private void sendErrorEmail(String msg, Exception ex) {
 		// send mail
-		mailService.sendExceptionEmail("anish.aitrich@gmail.com", msg, ExceptionUtils.getStackTrace(ex), false, false);
+		mailService.sendExceptionEmail("prashob.aitrich@gmail.com", msg, ExceptionUtils.getStackTrace(ex), false, false);
 	}
 
 }
