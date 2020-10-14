@@ -301,7 +301,6 @@ public class MasterDataAccountProfileResource {
 		log.info("Saved all postDatedVouchers");
 		List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocationDtos = new ArrayList<>();
 		for(PostDatedVoucherDTO pdc : postDatedVoucherDtos){
-			log.info(pdc.getPostDatedVoucherAllocationList()+"----");
 			if(pdc != null && pdc.getPostDatedVoucherAllocationList() != null)
 				postDatedVoucherAllocationDtos.addAll(pdc.getPostDatedVoucherAllocationList());
 		}
@@ -334,7 +333,11 @@ public class MasterDataAccountProfileResource {
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		else {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			List<String> pdcSuccessList = result.stream().map(pdcSucces -> pdcSucces.getAccountProfileName()).collect(Collectors.toList());
+			List<String> pdcAllList = postDatedVoucherDtos.stream().map(pdcAll -> pdcAll.getAccountProfileName()).collect(Collectors.toList());
+			pdcAllList.removeAll(pdcSuccessList);
+			return new ResponseEntity<>(pdcAllList.size()+" Entrie(s) not inserted.\n"
+			+pdcAllList.toString(),HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

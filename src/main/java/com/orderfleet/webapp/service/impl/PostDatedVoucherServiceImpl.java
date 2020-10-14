@@ -55,7 +55,6 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 			
 			Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 			PostDatedVoucher postDatedVoucher = new PostDatedVoucher();
-			log.debug("AccountProfile: "+dto.getAccountProfileName()+"--");
 			Optional<AccountProfile> accountProfile = accountProfileRepository.findByCompanyIdAndNameIgnoreCase
 															(company.getId() , dto.getAccountProfileName());
 			postDatedVoucher.setAccountProfile(accountProfile.get());
@@ -77,15 +76,16 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 	public List<PostDatedVoucherDTO> saveAll(List<PostDatedVoucherDTO> postDatedVoucherDtos) {
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		List<String> names = postDatedVoucherDtos.stream().map(
-							pdc -> pdc.getAccountProfileName()).collect(Collectors.toList());
+							pdc -> pdc.getAccountProfileName().toUpperCase()).collect(Collectors.toList());
 		List<AccountProfile> accountProfiles = 
 				accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),names);
 		List<PostDatedVoucher> postDatedVouchers = new ArrayList<>();
-		
+
 		for(PostDatedVoucherDTO dto : postDatedVoucherDtos){
-				Optional<AccountProfile> accountProfile = accountProfiles.stream().filter(ap -> ap.getName().equals(dto.getAccountProfileName())).findAny();
+				Optional<AccountProfile> opAccountProfile = accountProfiles.stream().filter(ap -> ap.getName().equalsIgnoreCase(dto.getAccountProfileName())).findAny();
+			if(opAccountProfile.isPresent()){
 				PostDatedVoucher postDatedVoucher = new PostDatedVoucher();
-				postDatedVoucher.setAccountProfile(accountProfile.get());
+				postDatedVoucher.setAccountProfile(opAccountProfile.get());
 				postDatedVoucher.setCompany(company);
 				postDatedVoucher.setCreatedDate(LocalDateTime.now());
 				postDatedVoucher.setLastModifiedDate(LocalDateTime.now());
@@ -96,12 +96,12 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 				postDatedVoucher.setReferenceDocumentNumber(dto.getReferenceDocumentNumber());
 				postDatedVoucher.setRemark(dto.getRemark());
 				postDatedVouchers.add(postDatedVoucher);
+			}else{
+				log.error("Account Profile related to PDC not Present "+dto.getAccountProfileName());
+				log.info("--->"+dto.getReferenceDocumentNumber()+" --"+dto.getReferenceVoucher());
+			}
 		}
-		
-		
-		
 		postDatedVouchers = postDatedVoucherRepository.save(postDatedVouchers);
-		
 		log.debug("Saved post Dated Cheques");
 		List<PostDatedVoucherDTO> pdcDto = postDatedVouchers.stream().map(pdc -> 
 									new PostDatedVoucherDTO(pdc)).collect(Collectors.toList());
