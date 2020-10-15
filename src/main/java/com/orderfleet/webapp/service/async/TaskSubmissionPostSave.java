@@ -399,35 +399,39 @@ public class TaskSubmissionPostSave {
 		} else {
 			executiveTaskExecution.setLocation("No Location");
 		}
+// COMMENTING THE TOWER LOCATION API WHILE ORDER TAKING ============================================>>>
 		// tower location
-		String mcc = executiveTaskExecution.getMcc() == null ? "" : executiveTaskExecution.getMcc();
-		String mnc = executiveTaskExecution.getMnc() == null ? "" : executiveTaskExecution.getMnc();
-		String cellId = executiveTaskExecution.getCellId() == null ? "" : executiveTaskExecution.getCellId();
-		String lac = executiveTaskExecution.getLac() == null ? "" : executiveTaskExecution.getLac();
-		if (locationType.equals(LocationType.TowerLocation)
-				|| (mcc.length() > 1 && mnc.length() > 1 && cellId.length() > 1 && lac.length() > 1)) {
-			try {
-				TowerLocation towerLocation = geoLocationService.findAddressFromCellTower(
-						executiveTaskExecution.getMcc(), executiveTaskExecution.getMnc(),
-						executiveTaskExecution.getCellId(), executiveTaskExecution.getLac());
-				executiveTaskExecution.setTowerLocation(towerLocation.getLocation());
-				executiveTaskExecution.setTowerLatitude(towerLocation.getLat());
-				executiveTaskExecution.setTowerLongitude(towerLocation.getLan());
-			} catch (GeoLocationServiceException lae) {
-				log.debug("Exception while calling google Tower geo location API {}", lae);
-				String locationDetails = "Tower Location => mcc:" + executiveTaskExecution.getMcc() + " mnc:"
-						+ executiveTaskExecution.getMnc() + " cellID:" + executiveTaskExecution.getCellId() + " lac:"
-						+ executiveTaskExecution.getLac();
-				String errorMsg = "Exception while calling google Tower geo location API. " + "Company : "
-						+ executiveTaskExecution.getCompany().getLegalName() + " User: "
-						+ executiveTaskExecution.getUser().getLogin() + " Location :"
-						+ executiveTaskExecution.getLocation() + " Location Details :" + locationDetails
-						+ " - ETS Object = " + executiveTaskExecution;
-				sendErrorEmail(errorMsg, lae);
-			}
-		} else {
-			executiveTaskExecution.setTowerLocation("No Location");
-		}
+//		String mcc = executiveTaskExecution.getMcc() == null ? "" : executiveTaskExecution.getMcc();
+//		String mnc = executiveTaskExecution.getMnc() == null ? "" : executiveTaskExecution.getMnc();
+//		String cellId = executiveTaskExecution.getCellId() == null ? "" : executiveTaskExecution.getCellId();
+//		String lac = executiveTaskExecution.getLac() == null ? "" : executiveTaskExecution.getLac();
+//		if (locationType.equals(LocationType.TowerLocation)
+//				|| (mcc.length() > 1 && mnc.length() > 1 && cellId.length() > 1 && lac.length() > 1)) {
+//			try {
+//
+//				TowerLocation towerLocation = geoLocationService.findAddressFromCellTower(
+//						executiveTaskExecution.getMcc(), executiveTaskExecution.getMnc(),
+//						executiveTaskExecution.getCellId(), executiveTaskExecution.getLac());
+//				executiveTaskExecution.setTowerLocation(towerLocation.getLocation());
+//				executiveTaskExecution.setTowerLatitude(towerLocation.getLat());
+//				executiveTaskExecution.setTowerLongitude(towerLocation.getLan());
+//			} catch (GeoLocationServiceException lae) {
+//				log.debug("Exception while calling google Tower geo location API {}", lae);
+//				String locationDetails = "Tower Location => mcc:" + executiveTaskExecution.getMcc() + " mnc:"
+//						+ executiveTaskExecution.getMnc() + " cellID:" + executiveTaskExecution.getCellId() + " lac:"
+//						+ executiveTaskExecution.getLac();
+//				String errorMsg = "Exception while calling google Tower geo location API. " + "Company : "
+//						+ executiveTaskExecution.getCompany().getLegalName() + " User: "
+//						+ executiveTaskExecution.getUser().getLogin() + " Location :"
+//						+ executiveTaskExecution.getLocation() + " Location Details :" + locationDetails
+//						+ " - ETS Object = " + executiveTaskExecution;
+//				sendErrorEmail(errorMsg, lae);
+//			}
+//		} else {
+//			executiveTaskExecution.setTowerLocation("No Location");
+//		}
+		
+		
 		if (locationType.equals(LocationType.NoLocation) || locationType.equals(LocationType.FlightMode)) {
 			executiveTaskExecution.setLocation("No Location");
 		}
@@ -457,7 +461,11 @@ public class TaskSubmissionPostSave {
 				if (executiveTaskExecution.getLatitude() != null
 						&& executiveTaskExecution.getLatitude().compareTo(BigDecimal.ZERO) != 0
 						&& executiveTaskExecution.getLongitude() != null
-						&& executiveTaskExecution.getLongitude().compareTo(BigDecimal.ZERO) != 0) {
+						&& executiveTaskExecution.getLongitude().compareTo(BigDecimal.ZERO) != 0
+						&& executiveTaskExecution.getStartLatitude() != null
+						&& executiveTaskExecution.getStartLatitude().compareTo(BigDecimal.ZERO) != 0
+						&& executiveTaskExecution.getStartLongitude() != null
+						&& executiveTaskExecution.getStartLongitude().compareTo(BigDecimal.ZERO) != 0) {
 					try {
 						executiveTaskExecution.setStartLocation(
 								geoLocationService.findAddressFromLatLng(executiveTaskExecution.getStartLatitude() + ","
@@ -475,18 +483,21 @@ public class TaskSubmissionPostSave {
 						sendErrorEmail(errorMsg, lae);
 					}
 				}
-			} else if (startLocationType.equals(LocationType.TowerLocation)) {
-				TowerLocation towerLocation = geoLocationService.findAddressFromCellTower(
-						executiveTaskExecution.getStartMcc(), executiveTaskExecution.getStartMnc(),
-						executiveTaskExecution.getStartCellId(), executiveTaskExecution.getStartLac());
-				if (towerLocation != null) {
-					executiveTaskExecution.setStartLocation(towerLocation.getLocation());
-					executiveTaskExecution.setStartLatitude(towerLocation.getLat());
-					executiveTaskExecution.setStartLongitude(towerLocation.getLan());
-				} else {
-					executiveTaskExecution.setStartLocation("Unable to find location");
-				}
-			} else if (startLocationType.equals(LocationType.NoLocation)
+			}
+// COMMENTING THE TOWER LOCATION API WHILE ORDER TAKING ============================================>>>
+//			else if (startLocationType.equals(LocationType.TowerLocation)) {
+//				TowerLocation towerLocation = geoLocationService.findAddressFromCellTower(
+//						executiveTaskExecution.getStartMcc(), executiveTaskExecution.getStartMnc(),
+//						executiveTaskExecution.getStartCellId(), executiveTaskExecution.getStartLac());
+//				if (towerLocation != null) {
+//					executiveTaskExecution.setStartLocation(towerLocation.getLocation());
+//					executiveTaskExecution.setStartLatitude(towerLocation.getLat());
+//					executiveTaskExecution.setStartLongitude(towerLocation.getLan());
+//				} else {
+//					executiveTaskExecution.setStartLocation("Unable to find location");
+//				}
+//			}
+			else if (startLocationType.equals(LocationType.NoLocation)
 					|| startLocationType.equals(LocationType.FlightMode)) {
 				executiveTaskExecution.setStartLocation("No Location");
 			}
