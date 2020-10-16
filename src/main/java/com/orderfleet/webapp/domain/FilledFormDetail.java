@@ -31,13 +31,14 @@ public class FilledFormDetail {
 	@Column(name = "id", insertable = false, updatable = false, columnDefinition = "bigint DEFAULT nextval('seq_filled_form_detail_id')")
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "filled_form_id")
 	private FilledForm filledForm;
 
 	@Column(name = "value")
 	private String value;
 
+	//@ManyToOne
 	@ManyToOne
 	@NotNull
 	private FormElement formElement;

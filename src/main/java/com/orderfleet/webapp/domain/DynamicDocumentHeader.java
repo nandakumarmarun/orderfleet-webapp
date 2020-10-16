@@ -83,6 +83,7 @@ public class DynamicDocumentHeader implements Serializable {
 	private EmployeeProfile employee;
 
 	@NotNull
+	//@ManyToOne
 	@ManyToOne
 	private ExecutiveTaskExecution executiveTaskExecution;
 
@@ -90,7 +91,8 @@ public class DynamicDocumentHeader implements Serializable {
 	@NotNull
 	private Company company;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	//@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "dynamic_document_header_id")
 	private List<FilledForm> filledForms;
 

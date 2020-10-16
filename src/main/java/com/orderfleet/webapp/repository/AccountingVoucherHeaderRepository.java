@@ -232,7 +232,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("select av.pid,av.document.name,av.document.pid from AccountingVoucherHeader av where av.company.id = ?#{principal.companyId} and av.executiveTaskExecution.pid = ?1")
 	List<Object[]> findAccountingVoucherHeaderByExecutiveTaskExecutionPid(String exeTasKPid);
 
-	@Query("select avh from AccountingVoucherHeader avh where avh.company.id = ?#{principal.companyId} and avh.pid = ?1 Order By avh.createdDate desc")
+	@Query("select avh from AccountingVoucherHeader avh LEFT JOIN FETCH avh.accountingVoucherDetails where avh.company.id = ?#{principal.companyId} and avh.pid = ?1 Order By avh.createdDate desc")
 	List<AccountingVoucherHeader> findAccountingVoucherHeaderByPid(String accountingVoucherHeaderPid);
 
 	@Query("select av.pid,av.document.name,av.document.pid,av.totalAmount from AccountingVoucherHeader av where av.company.id = ?#{principal.companyId} and av.executiveTaskExecution.id in ?1")
@@ -250,5 +250,11 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("select sum(av.totalAmount) from AccountingVoucherHeader av where av.company.id = ?#{principal.companyId} and av.createdBy.id in ?1 and av.documentDate between ?2 and ?3")
 	Object[] findnetCollectionAmountByUserIdandDateBetween(List<Long> userIds, LocalDateTime fromDate,
 			LocalDateTime toDate);
+
+	@Query(value= "SELECT id,pid,executive_task_execution_id,document_id,account_profile_id,created_date,document_date,total_amount,"
+			+ "outstanding_amount,remarks,created_by_id,employee_id,document_number_local,document_number_server,status,updated_date,"
+			+ "tally_download_status FROM tbl_accounting_voucher_header where tally_download_status ='PENDING' and company_id = ?#{principal.companyId} "
+			+ "order by created_date desc",nativeQuery=true)
+	List<Object[]> findByCompanyIdAndTallyStatusByCreatedDateDesc();
 
 }

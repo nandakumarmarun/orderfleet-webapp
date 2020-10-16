@@ -1,4 +1,4 @@
-package com.orderfleet.webapp.web.vendor.sap.dto;
+package com.orderfleet.webapp.web.vendor.sap.prabhu.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

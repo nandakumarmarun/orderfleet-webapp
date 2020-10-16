@@ -49,7 +49,7 @@ public class FilledForm implements Serializable {
 	@Column(name = "pid", unique = true, nullable = false, updatable = false)
 	private String pid;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "dynamic_document_header_id")
 	private DynamicDocumentHeader dynamicDocumentHeader;
 
@@ -61,12 +61,14 @@ public class FilledForm implements Serializable {
 	@NotNull
 	private Form form;
 
+	//@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "filled_form_id")
 	@OrderBy("id")
 	private List<FilledFormDetail> filledFormDetails;
 
 	@JsonIgnore
+	//@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "tbl_filled_form_file", joinColumns = {
 			@JoinColumn(name = "filled_form_id", referencedColumnName = "id") }, inverseJoinColumns = {

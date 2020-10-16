@@ -112,10 +112,10 @@ public class AccountingVoucherHeaderDTO {
 			this.userName = accountingVoucherHeader.getCreatedBy().getFirstName();
 		}
 
-		if (!accountingVoucherHeader.getAccountingVoucherDetails().isEmpty()) {
-			this.accountingVoucherDetails = accountingVoucherHeader.getAccountingVoucherDetails().stream()
-					.map(AccountingVoucherDetailDTO::new).collect(Collectors.toList());
-		}
+//		if (!accountingVoucherHeader.getAccountingVoucherDetails().isEmpty()) {
+//			this.accountingVoucherDetails = accountingVoucherHeader.getAccountingVoucherDetails().stream()
+//					.map(AccountingVoucherDetailDTO::new).collect(Collectors.toList());
+//		}
 		this.totalAmount = accountingVoucherHeader.getTotalAmount();
 		this.outstandingAmount = accountingVoucherHeader.getOutstandingAmount();
 		this.remarks = accountingVoucherHeader.getRemarks();

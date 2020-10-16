@@ -100,8 +100,8 @@ public class DynamicDocumentHeaderDTO {
 			this.tallyDownloadStatus = dynamicDocumentHeader.getTallyDownloadStatus();
 		}
 
-		this.filledForms = dynamicDocumentHeader.getFilledForms().stream().map(FilledFormDTO::new)
-				.collect(Collectors.toList());
+//		this.filledForms = dynamicDocumentHeader.getFilledForms().stream().map(FilledFormDTO::new)
+//				.collect(Collectors.toList());
 	}
 
 	public DynamicDocumentHeaderDTO(DynamicDocumentHeaderHistory dynamicDocumentHeader) {

@@ -543,7 +543,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select iv.pid,iv.document.name,iv.document.pid from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.executiveTaskExecution.pid = ?1")
 	List<Object[]> findInventoryVoucherHeaderByExecutiveTaskExecutionPid(String exeTasKPid);
 
-	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.pid = ?1 Order By inventoryVoucher.createdDate desc")
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.pid = ?1 Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findInventoryVoucherHeaderByPid(String inventoryVoucherHeaderPid);
 
 	@Query("select iv.pid,iv.document.name,iv.document.pid,iv.documentTotal from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.executiveTaskExecution.id in ?1")

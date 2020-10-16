@@ -39,7 +39,8 @@ public class InventoryVoucherDetail implements Serializable {
 	@Column(name = "id", insertable = false, updatable = false, columnDefinition = "bigint DEFAULT nextval('seq_inventory_voucher_detail_id')")
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	//@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "inventory_voucher_header_id")
 	private InventoryVoucherHeader inventoryVoucherHeader;
 
@@ -115,6 +116,7 @@ public class InventoryVoucherDetail implements Serializable {
 	@JoinColumn(name = "destination_stock_location_id", nullable = true)
 	private StockLocation destinationStockLocation;
 
+	//@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@ManyToOne
 	@JoinColumn(name = "rference_inventory_voucher_header", nullable = true)
 	private InventoryVoucherHeader rferenceInventoryVoucherHeader;

@@ -64,6 +64,7 @@ import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
+import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
@@ -82,7 +83,7 @@ public class LoadServerItemsToMobileController {
 
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
-	
+
 	@Inject
 	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
 
@@ -115,7 +116,7 @@ public class LoadServerItemsToMobileController {
 
 	@Inject
 	private FormFormElementService formFormElementService;
-	
+
 	@Inject
 	private AccountProfileMapper accountProfileMapper;
 
@@ -226,62 +227,65 @@ public class LoadServerItemsToMobileController {
 	}
 
 	@GetMapping("/load-order-related-customers")
-	public ResponseEntity<List<AccountProfileDTO>> getAllOrderTakenCustomers(){
+	public ResponseEntity<List<AccountProfileDTO>> getAllOrderTakenCustomers() {
 		String userLogin = SecurityUtils.getCurrentUserLogin();
 		long userId = userRepository.findOneByLogin(userLogin).get().getId();
-		List<AccountProfile> accountProfiles = executiveTaskExecutionRepository.getAllOrderBasedAndUserBasedCustomer(userId);
+		List<AccountProfile> accountProfiles = executiveTaskExecutionRepository
+				.getAllOrderBasedAndUserBasedCustomer(userId);
 		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfiles);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-	
-	
+
 	@GetMapping("/load-order-related-product-count")
-	public ResponseEntity<List<ProductProfileDTO>> getAllOrderTakenCustomers(
-					@RequestParam String accountPid,@RequestParam String filterBy,
-					@RequestParam(required = false) String fromDate,@RequestParam(required = false) String toDate){
+	public ResponseEntity<List<ProductProfileDTO>> getAllOrderTakenCustomers(@RequestParam String accountPid,
+			@RequestParam String filterBy, @RequestParam(required = false) String fromDate,
+			@RequestParam(required = false) String toDate) {
 		String userLogin = SecurityUtils.getCurrentUserLogin();
 		List<ProductProfileDTO> productQuantityList = new ArrayList<>();
 		if (filterBy.equalsIgnoreCase("TODAY")) {
 			log.info("TODAY------");
-			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,LocalDate.now(), LocalDate.now());
+			productQuantityList = getCustomerRelatedProductDetails(userLogin, accountPid, LocalDate.now(),
+					LocalDate.now());
 		} else if (filterBy.equalsIgnoreCase("YESTERDAY")) {
 			log.info("YESTERDAY------");
 			LocalDate yesterday = LocalDate.now().minusDays(1);
-			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,yesterday, yesterday);
+			productQuantityList = getCustomerRelatedProductDetails(userLogin, accountPid, yesterday, yesterday);
 		} else if (filterBy.equalsIgnoreCase("WTD")) {
 			log.info("WTD------");
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,weekStartDate, LocalDate.now());
+			productQuantityList = getCustomerRelatedProductDetails(userLogin, accountPid, weekStartDate,
+					LocalDate.now());
 		} else if (filterBy.equalsIgnoreCase("MTD")) {
 			log.info("MTD------");
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,monthStartDate, LocalDate.now());
+			productQuantityList = getCustomerRelatedProductDetails(userLogin, accountPid, monthStartDate,
+					LocalDate.now());
 		} else if (filterBy.equalsIgnoreCase("CUSTOM")) {
 			log.info("CUSTOM------" + fromDate + " to " + toDate + "------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toDateTime = LocalDate.parse(toDate, formatter);
-			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,fromDateTime, toDateTime);
+			productQuantityList = getCustomerRelatedProductDetails(userLogin, accountPid, fromDateTime, toDateTime);
 		} else if (filterBy.equalsIgnoreCase("SINGLE")) {
 			log.info("SINGLE------" + fromDate + "-------");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			productQuantityList = getCustomerRelatedProductDetails(userLogin , accountPid ,fromDateTime, fromDateTime);
+			productQuantityList = getCustomerRelatedProductDetails(userLogin, accountPid, fromDateTime, fromDateTime);
 		}
-		
+
 		return new ResponseEntity<>(productQuantityList, HttpStatus.OK);
 	}
-	
-	public List<ProductProfileDTO> getCustomerRelatedProductDetails(String userLogin , String accountProfilePid , 
-							LocalDate fDate , LocalDate tDate) {
+
+	public List<ProductProfileDTO> getCustomerRelatedProductDetails(String userLogin, String accountProfilePid,
+			LocalDate fDate, LocalDate tDate) {
 		LocalDateTime fdateTime = fDate.atTime(0, 0);
 		LocalDateTime tdateTime = tDate.atTime(23, 59);
-		
-		List<Object[]> productQuantity = inventoryVoucherDetailRepository.getProductTotalQuantityForCustomerByDate
-											(userLogin, accountProfilePid,fdateTime, tdateTime);
+
+		List<Object[]> productQuantity = inventoryVoucherDetailRepository
+				.getProductTotalQuantityForCustomerByDate(userLogin, accountProfilePid, fdateTime, tdateTime);
 		List<ProductProfileDTO> productQuantityList = new ArrayList<>();
-		for(Object[] obj : productQuantity) {
+		for (Object[] obj : productQuantity) {
 			ProductProfileDTO productProfileDto = new ProductProfileDTO();
 			productProfileDto.setUnitQty(Double.parseDouble(obj[0].toString()));
 			productProfileDto.setName(obj[1].toString());
@@ -290,7 +294,7 @@ public class LoadServerItemsToMobileController {
 		}
 		return productQuantityList;
 	}
-	
+
 	@GetMapping("/load-server-document-wise-count")
 	public ResponseEntity<List<DocumentDashboardDTO>> getIndividualDocumentWiseCounts() {
 
@@ -812,8 +816,13 @@ public class LoadServerItemsToMobileController {
 		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
 			inventoryVoucherHeaderDTOs.add(new InventoryVoucherHeaderDTO(inventoryVoucherHeader));
 		}
-		log.info("Inventory Voucher Size= " + inventoryVoucherHeaderDTOs.size());
-		return inventoryVoucherHeaderDTOs;
+
+		List<InventoryVoucherHeaderDTO> distinctElements = inventoryVoucherHeaderDTOs.stream().distinct()
+				.collect(Collectors.toList());
+
+		log.info("Inventory Voucher Size= " + distinctElements.size());
+
+		return distinctElements;
 	}
 
 	private List<AccountingVoucherHeaderDTO> getDocumentAccountingItemsDetails(String accountingVoucherHeaderPid) {
@@ -825,8 +834,12 @@ public class LoadServerItemsToMobileController {
 		for (AccountingVoucherHeader accountinVoucherHeader : inventoryVoucherHeaders) {
 			accountingVoucherHeaderDTOs.add(new AccountingVoucherHeaderDTO(accountinVoucherHeader));
 		}
-		log.info("Accounting Voucher Size= " + accountingVoucherHeaderDTOs.size());
-		return accountingVoucherHeaderDTOs;
+
+		List<AccountingVoucherHeaderDTO> distinctElements = accountingVoucherHeaderDTOs.stream().distinct()
+				.collect(Collectors.toList());
+
+		log.info("Accounting Voucher Size= " + distinctElements.size());
+		return distinctElements;
 	}
 
 	private List<DynamicDocumentHeaderDTO> getDocumentDynamicItemsDetails(String dynamicDocumentHeaderPid) {
@@ -838,7 +851,11 @@ public class LoadServerItemsToMobileController {
 		for (DynamicDocumentHeader dynamicDocumentHeader : dynamicHeaders) {
 			dynamicDocumentHeaderDTOs.add(new DynamicDocumentHeaderDTO(dynamicDocumentHeader));
 		}
-		log.info("Dynamic Document Size= " + dynamicDocumentHeaderDTOs.size());
+
+		List<DynamicDocumentHeaderDTO> distinctElements = dynamicDocumentHeaderDTOs.stream().distinct()
+				.collect(Collectors.toList());
+
+		log.info("Dynamic Document Size= " + distinctElements.size());
 		return dynamicDocumentHeaderDTOs;
 	}
 

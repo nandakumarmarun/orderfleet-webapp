@@ -61,8 +61,8 @@ public class ReceiptDTO {
 			this.mode = accountingVoucherDetail.getMode();
 		}
 
-		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
-				accountingVoucherDetail.getAccountingVoucherHeader());
+//		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
+//				accountingVoucherDetail.getAccountingVoucherHeader());
 		this.trimChar = accountingVoucherDetail.getBy().getTrimChar();
 		this.chequeDate = accountingVoucherDetail.getInstrumentDate() == null ? ""
 				: accountingVoucherDetail.getInstrumentDate().toString();
@@ -98,8 +98,8 @@ public class ReceiptDTO {
 		} else {
 			this.mode = accountingVoucherAllocation.getMode();
 		}
-		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
-				accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader());
+//		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
+//				accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader());
 		this.chequeDate = accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate() == null ? ""
 				: accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate().toString();
 		this.employeeName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader()

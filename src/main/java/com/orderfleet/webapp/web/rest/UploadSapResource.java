@@ -24,11 +24,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.web.vendor.sap.dto.ResponseBodySapAccountProfile;
-import com.orderfleet.webapp.web.vendor.sap.dto.ResponseBodySapAccountProfileOpeningBalance;
-import com.orderfleet.webapp.web.vendor.sap.dto.ResponseBodySapProductProfile;
-import com.orderfleet.webapp.web.vendor.sap.service.AccountProfileSapUploadService;
-import com.orderfleet.webapp.web.vendor.sap.service.ProductProfileSapUploadService;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.ResponseBodySapAccountProfile;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.ResponseBodySapAccountProfileOpeningBalance;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.ResponseBodySapProductProfile;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.service.AccountProfileSapUploadService;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.service.ProductProfileSapUploadService;
 
 /**
  * used to upload xls

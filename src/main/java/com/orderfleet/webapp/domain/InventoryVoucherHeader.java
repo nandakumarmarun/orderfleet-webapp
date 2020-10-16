@@ -111,6 +111,7 @@ public class InventoryVoucherHeader implements Serializable {
 	private double docDiscountPercentage;
 
 	@NotNull
+	//@ManyToOne
 	@ManyToOne
 	private ExecutiveTaskExecution executiveTaskExecution;
 
@@ -118,7 +119,8 @@ public class InventoryVoucherHeader implements Serializable {
 	@NotNull
 	private Company company;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	//@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL) 
 	@JoinColumn(name = "inventory_voucher_header_id")
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<InventoryVoucherDetail> inventoryVoucherDetails;

@@ -55,14 +55,17 @@ import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.LocationType;
+import com.orderfleet.webapp.domain.enums.PaymentMode;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.AccountingVoucherDetailRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
@@ -92,6 +95,7 @@ import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.AccountingVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
 import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
@@ -206,6 +210,9 @@ public class TransactionResource {
 	@Inject
 	private DocumentStockLocationSourceRepository documentStockLocationSourceRepository;
 
+	@Inject
+	private AccountingVoucherDetailRepository accountingVoucherDetailRepository;
+
 	// @Inject
 	// private DocumentStockLocationSourceRepository
 	// documentStockLocationSourceRepository;
@@ -260,7 +267,6 @@ public class TransactionResource {
 									inventoryVoucherBatchDetail.getBatchNumber())
 							.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
 				}
-
 
 				salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
 				salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(inventoryVoucherBatchDetailsDTOs);
@@ -367,7 +373,7 @@ public class TransactionResource {
 			Set<Long> userIds = new HashSet<>();
 			Set<Long> orderStatusIds = new HashSet<>();
 			Set<Long> exeIds = new HashSet<>();
-			
+
 			for (Object[] obj : inventoryVoucherHeaders) {
 
 				ivhIds.add(Long.parseLong(obj[0].toString()));
@@ -396,136 +402,137 @@ public class TransactionResource {
 			List<OrderStatus> orderStatusList = orderStatusRepository.findAllByCompanyIdAndIdsIn(orderStatusIds);
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
 					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
-			Object[] errorPrint = null;	
+			Object[] errorPrint = null;
 			try {
-			for (Object[] obj : inventoryVoucherHeaders) {
-				errorPrint = obj;
-				String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
+				for (Object[] obj : inventoryVoucherHeaders) {
+					errorPrint = obj;
+					String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 
-				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
-						.findAny();
+					Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
+							.findAny();
 
-				Optional<Document> opDocument = documents.stream()
-						.filter(doc -> doc.getId() == Long.parseLong(obj[13].toString())).findAny();
+					Optional<Document> opDocument = documents.stream()
+							.filter(doc -> doc.getId() == Long.parseLong(obj[13].toString())).findAny();
 
-				Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
-						.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
+					Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
+							.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
 
-				Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
-						.filter(doc -> doc.getId() == Long.parseLong(obj[15].toString())).findAny();
+					Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
+							.filter(doc -> doc.getId() == Long.parseLong(obj[15].toString())).findAny();
 
-				Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
-						.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
+					Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
+							.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
 
-				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
-						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
+					Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
+							.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
 
-				PriceLevel priceLevel = null;
-				if (obj[18] != null) {
+					PriceLevel priceLevel = null;
+					if (obj[18] != null) {
 
-					Optional<PriceLevel> opPriceLevel = priceLevels.stream()
-							.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
-					if (opPriceLevel.isPresent()) {
-						priceLevel = opPriceLevel.get();
-					}
-				}
-
-				Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
-						.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
-
-				OrderStatus orderStatus = new OrderStatus();
-				if (opOrderStatus.isPresent()) {
-					orderStatus = opOrderStatus.get();
-				}
-
-				SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
-						opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
-						orderStatus);
-
-				salesOrderDTO.setAccountProfileDTO(
-						accountProfileMapper.accountProfileToAccountProfileDTO(opRecAccPro.get()));
-
-				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
-						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
-						.collect(Collectors.toList()).stream()
-						.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());
-
-				List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
-				for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
-					SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
-					if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
-						rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
-								.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
-					}
-					List<InventoryVoucherBatchDetailDTO> inventoryVoucherBatchDetailsDTOs = new ArrayList<>();
-
-					List<OpeningStockDTO> openingStockDTOs = new ArrayList<>();
-					for (InventoryVoucherBatchDetail inventoryVoucherBatchDetail : inventoryVoucherDetail
-							.getInventoryVoucherBatchDetails()) {
-						openingStockDTOs = openingStockRepository
-								.findByCompanyIdAndProductProfilePidAndBatchNumber(
-										inventoryVoucherBatchDetail.getProductProfile().getPid(),
-										inventoryVoucherBatchDetail.getBatchNumber())
-								.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
+						Optional<PriceLevel> opPriceLevel = priceLevels.stream()
+								.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
+						if (opPriceLevel.isPresent()) {
+							priceLevel = opPriceLevel.get();
+						}
 					}
 
-					salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
-					salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(inventoryVoucherBatchDetailsDTOs);
-					salesOrderItemDTOs.add(salesOrderItemDTO);
-				}
-				List<VatLedgerDTO> vatLedgerDTOs = new ArrayList<>();
-				for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
-					VatLedgerDTO vatLedgerDTO = new VatLedgerDTO();
-					vatLedgerDTO.setName(accountProfileDTO.getName());
-					String vatledgerArray[] = accountProfileDTO.getAlias().split("\\,");
-					vatLedgerDTO.setPercentageOfCalculation(vatledgerArray[1]);
-					vatLedgerDTO.setVatClass(vatledgerArray[0]);
-					vatLedgerDTOs.add(vatLedgerDTO);
-				}
-				salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
-				// List<SalesOrderItemDTO> sortedSalesOrderItems = new
-				// ArrayList<SalesOrderItemDTO>();
-				// sortedSalesOrderItems =
-				// salesOrderItemDTOs.stream().sorted(Comparator.comparingLong(SalesOrderItemDTO::getSortOrder)).collect(Collectors.toList());
-				salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
-				List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
+					Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
+							.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
 
-				if (!rferenceInventoryVoucherHeaderExecutiveExecutionPid.equalsIgnoreCase("")) {
-
-					DynamicDocumentHeaderDTO documentHeaderDTOAditonal = dynamicDocumentHeaderService
-							.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
-									rferenceInventoryVoucherHeaderExecutiveExecutionPid, dynamicDocumentAditional);
-					DynamicDocumentHeaderDTO dynamicDocumentHeadersDespatch = dynamicDocumentHeaderService
-							.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(opExe.get().getPid(),
-									dynamicDocumentDespach);
-
-					if (documentHeaderDTOAditonal.getDocumentPid() != null) {
-						documentHeaderDTOs.add(documentHeaderDTOAditonal);
+					OrderStatus orderStatus = new OrderStatus();
+					if (opOrderStatus.isPresent()) {
+						orderStatus = opOrderStatus.get();
 					}
-					if (dynamicDocumentHeadersDespatch.getDocumentPid() != null) {
-						documentHeaderDTOs.add(dynamicDocumentHeadersDespatch);
-					}
-				}
-				salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
-				List<GstLedger> gstLedgerList = new ArrayList<>();
-				gstLedgerList = gstLedgerRepository
-						.findAllByCompanyIdAndActivated(SecurityUtils.getCurrentUsersCompanyId(), true);
-				if (gstLedgerList != null && gstLedgerList.size() != 0) {
-					List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst))
+
+					SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
+							opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
+							orderStatus);
+
+					salesOrderDTO.setAccountProfileDTO(
+							accountProfileMapper.accountProfileToAccountProfileDTO(opRecAccPro.get()));
+
+					List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
+							.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
+							.collect(Collectors.toList()).stream()
+							.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId))
 							.collect(Collectors.toList());
-					salesOrderDTO.setGstLedgerDtos(gstLedgerDtos);
-				}
-				inventoryHeaderPid.add(obj[9].toString());
 
-				salesOrderDTOs.add(salesOrderDTO);
-			}
-			}catch(NoSuchElementException  | NullPointerException  | ArrayIndexOutOfBoundsException e) {
+					List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
+					for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
+						SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
+						if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
+							rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
+									.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
+						}
+						List<InventoryVoucherBatchDetailDTO> inventoryVoucherBatchDetailsDTOs = new ArrayList<>();
+
+						List<OpeningStockDTO> openingStockDTOs = new ArrayList<>();
+						for (InventoryVoucherBatchDetail inventoryVoucherBatchDetail : inventoryVoucherDetail
+								.getInventoryVoucherBatchDetails()) {
+							openingStockDTOs = openingStockRepository
+									.findByCompanyIdAndProductProfilePidAndBatchNumber(
+											inventoryVoucherBatchDetail.getProductProfile().getPid(),
+											inventoryVoucherBatchDetail.getBatchNumber())
+									.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
+						}
+
+						salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
+						salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(inventoryVoucherBatchDetailsDTOs);
+						salesOrderItemDTOs.add(salesOrderItemDTO);
+					}
+					List<VatLedgerDTO> vatLedgerDTOs = new ArrayList<>();
+					for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
+						VatLedgerDTO vatLedgerDTO = new VatLedgerDTO();
+						vatLedgerDTO.setName(accountProfileDTO.getName());
+						String vatledgerArray[] = accountProfileDTO.getAlias().split("\\,");
+						vatLedgerDTO.setPercentageOfCalculation(vatledgerArray[1]);
+						vatLedgerDTO.setVatClass(vatledgerArray[0]);
+						vatLedgerDTOs.add(vatLedgerDTO);
+					}
+					salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
+					// List<SalesOrderItemDTO> sortedSalesOrderItems = new
+					// ArrayList<SalesOrderItemDTO>();
+					// sortedSalesOrderItems =
+					// salesOrderItemDTOs.stream().sorted(Comparator.comparingLong(SalesOrderItemDTO::getSortOrder)).collect(Collectors.toList());
+					salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
+					List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
+
+					if (!rferenceInventoryVoucherHeaderExecutiveExecutionPid.equalsIgnoreCase("")) {
+
+						DynamicDocumentHeaderDTO documentHeaderDTOAditonal = dynamicDocumentHeaderService
+								.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
+										rferenceInventoryVoucherHeaderExecutiveExecutionPid, dynamicDocumentAditional);
+						DynamicDocumentHeaderDTO dynamicDocumentHeadersDespatch = dynamicDocumentHeaderService
+								.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(opExe.get().getPid(),
+										dynamicDocumentDespach);
+
+						if (documentHeaderDTOAditonal.getDocumentPid() != null) {
+							documentHeaderDTOs.add(documentHeaderDTOAditonal);
+						}
+						if (dynamicDocumentHeadersDespatch.getDocumentPid() != null) {
+							documentHeaderDTOs.add(dynamicDocumentHeadersDespatch);
+						}
+					}
+					salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
+					List<GstLedger> gstLedgerList = new ArrayList<>();
+					gstLedgerList = gstLedgerRepository
+							.findAllByCompanyIdAndActivated(SecurityUtils.getCurrentUsersCompanyId(), true);
+					if (gstLedgerList != null && gstLedgerList.size() != 0) {
+						List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst))
+								.collect(Collectors.toList());
+						salesOrderDTO.setGstLedgerDtos(gstLedgerDtos);
+					}
+					inventoryHeaderPid.add(obj[9].toString());
+
+					salesOrderDTOs.add(salesOrderDTO);
+				}
+			} catch (NoSuchElementException | NullPointerException | ArrayIndexOutOfBoundsException e) {
 				int i = 0;
 				log.info("Error Printng");
-				for(Object ob : errorPrint) {
-					log.info(i+"-");
-					if(ob != null) {
-						log.info("--"+ob.toString());
+				for (Object ob : errorPrint) {
+					log.info(i + "-");
+					if (ob != null) {
+						log.info("--" + ob.toString());
 					}
 					i++;
 				}
@@ -568,15 +575,15 @@ public class TransactionResource {
 			empId = employeeProfilesList.stream().filter(emp -> emp.getName().trim().equals(employeeVoucher))
 					.map(emp -> emp.getId()).collect(Collectors.toList());
 		}
-		log.info("EmployeeId found :"+empId);
+		log.info("EmployeeId found :" + empId);
 		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
 		List<String> inventoryHeaderPid = new ArrayList<String>();
 		String companyPid = company.getPid();
-		log.info("Account Types found :"+accountProfileDTOs.size());
+		log.info("Account Types found :" + accountProfileDTOs.size());
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
-		log.info("SalesManagement Company Config:"+optSalesManagement.isPresent());
+		log.info("SalesManagement Company Config:" + optSalesManagement.isPresent());
 		/* List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>(); */
 
 		/*
@@ -641,143 +648,143 @@ public class TransactionResource {
 			List<OrderStatus> orderStatusList = orderStatusRepository.findAllByCompanyIdAndIdsIn(orderStatusIds);
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
 					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
-			Object[] errorPrint = null;	
-		try {
-			log.info("Starting Try block ");
-			for (Object[] obj : inventoryVoucherHeaders) {
-				errorPrint = obj;
-				
-				String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
+			Object[] errorPrint = null;
+			try {
+				log.info("Starting Try block ");
+				for (Object[] obj : inventoryVoucherHeaders) {
+					errorPrint = obj;
 
-				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
-						.findAny();
-				log.info("user empty  :"+ !opUser.isPresent());
-				Optional<Document> opDocument = documents.stream()
-						.filter(doc -> doc.getId() == Long.parseLong(obj[13].toString())).findAny();
-				log.info("document empty :"+ !opDocument.isPresent());
-				Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
-						.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
-				log.info("employee empty :"+ !opEmployeeProfile.isPresent());
-				Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
-						.filter(doc -> doc.getId() == Long.parseLong(obj[15].toString())).findAny();
-				log.info("executive empty :"+ !opExe.isPresent());
-				Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
-						.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
-				log.info("receiver account empty :"+ !opRecAccPro.isPresent());
-				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
-						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
-				log.info("supplier account empty :"+ !opSupAccPro.isPresent());
-				PriceLevel priceLevel = null;
-				if (obj[18] != null) {
-					Optional<PriceLevel> opPriceLevel = priceLevels.stream()
-							.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
+					String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 
-					if (opPriceLevel.isPresent()) {
-						priceLevel = opPriceLevel.get();
-					}
-				}
+					Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
+							.findAny();
+					log.info("user empty  :" + !opUser.isPresent());
+					Optional<Document> opDocument = documents.stream()
+							.filter(doc -> doc.getId() == Long.parseLong(obj[13].toString())).findAny();
+					log.info("document empty :" + !opDocument.isPresent());
+					Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
+							.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
+					log.info("employee empty :" + !opEmployeeProfile.isPresent());
+					Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
+							.filter(doc -> doc.getId() == Long.parseLong(obj[15].toString())).findAny();
+					log.info("executive empty :" + !opExe.isPresent());
+					Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
+							.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
+					log.info("receiver account empty :" + !opRecAccPro.isPresent());
+					Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
+							.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
+					log.info("supplier account empty :" + !opSupAccPro.isPresent());
+					PriceLevel priceLevel = null;
+					if (obj[18] != null) {
+						Optional<PriceLevel> opPriceLevel = priceLevels.stream()
+								.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
 
-				Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
-						.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
-
-				OrderStatus orderStatus = new OrderStatus();
-				if (opOrderStatus.isPresent()) {
-					orderStatus = opOrderStatus.get();
-				}
-				log.info("ivhObjToSalesOrderDTO function starts");
-				SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
-						opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
-						orderStatus);
-
-				salesOrderDTO.setAccountProfileDTO(
-						accountProfileMapper.accountProfileToAccountProfileDTO(opRecAccPro.get()));
-
-				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
-						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
-						.collect(Collectors.toList()).stream()
-						.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());
-				;
-
-				List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
-				log.info("inventory detail loop starts");
-				for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
-					SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
-					if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
-						rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
-								.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
-					}
-					List<InventoryVoucherBatchDetailDTO> inventoryVoucherBatchDetailsDTOs = new ArrayList<>();
-
-					List<OpeningStockDTO> openingStockDTOs = new ArrayList<>();
-					for (InventoryVoucherBatchDetail inventoryVoucherBatchDetail : inventoryVoucherDetail
-							.getInventoryVoucherBatchDetails()) {
-						openingStockDTOs = openingStockRepository
-								.findByCompanyIdAndProductProfilePidAndBatchNumber(
-										inventoryVoucherBatchDetail.getProductProfile().getPid(),
-										inventoryVoucherBatchDetail.getBatchNumber())
-								.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
+						if (opPriceLevel.isPresent()) {
+							priceLevel = opPriceLevel.get();
+						}
 					}
 
-					salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
-					salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(inventoryVoucherBatchDetailsDTOs);
-					salesOrderItemDTOs.add(salesOrderItemDTO);
-				}
-				List<VatLedgerDTO> vatLedgerDTOs = new ArrayList<>();
-				for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
-					VatLedgerDTO vatLedgerDTO = new VatLedgerDTO();
-					vatLedgerDTO.setName(accountProfileDTO.getName());
-					String vatledgerArray[] = accountProfileDTO.getAlias().split("\\,");
-					vatLedgerDTO.setPercentageOfCalculation(vatledgerArray[1]);
-					vatLedgerDTO.setVatClass(vatledgerArray[0]);
-					vatLedgerDTOs.add(vatLedgerDTO);
-				}
-				salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
-				salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
-				List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
+					Optional<OrderStatus> opOrderStatus = orderStatusList.stream()
+							.filter(os -> os.getId() == Long.parseLong(obj[23].toString())).findAny();
 
-				if (!rferenceInventoryVoucherHeaderExecutiveExecutionPid.equalsIgnoreCase("")) {
-
-					DynamicDocumentHeaderDTO documentHeaderDTOAditonal = dynamicDocumentHeaderService
-							.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
-									rferenceInventoryVoucherHeaderExecutiveExecutionPid, dynamicDocumentAditional);
-					DynamicDocumentHeaderDTO dynamicDocumentHeadersDespatch = dynamicDocumentHeaderService
-							.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(opExe.get().getPid(),
-									dynamicDocumentDespach);
-
-					if (documentHeaderDTOAditonal.getDocumentPid() != null) {
-						documentHeaderDTOs.add(documentHeaderDTOAditonal);
+					OrderStatus orderStatus = new OrderStatus();
+					if (opOrderStatus.isPresent()) {
+						orderStatus = opOrderStatus.get();
 					}
-					if (dynamicDocumentHeadersDespatch.getDocumentPid() != null) {
-						documentHeaderDTOs.add(dynamicDocumentHeadersDespatch);
-					}
-				}
-				salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
-				log.info("GST ledger");
-				List<GstLedger> gstLedgerList = new ArrayList<>();
-				gstLedgerList = gstLedgerRepository
-						.findAllByCompanyIdAndActivated(SecurityUtils.getCurrentUsersCompanyId(), true);
-				if (gstLedgerList != null && gstLedgerList.size() != 0) {
-					List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst))
+					log.info("ivhObjToSalesOrderDTO function starts");
+					SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
+							opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
+							orderStatus);
+
+					salesOrderDTO.setAccountProfileDTO(
+							accountProfileMapper.accountProfileToAccountProfileDTO(opRecAccPro.get()));
+
+					List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
+							.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
+							.collect(Collectors.toList()).stream()
+							.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId))
 							.collect(Collectors.toList());
-					salesOrderDTO.setGstLedgerDtos(gstLedgerDtos);
-				}
-				inventoryHeaderPid.add(obj[9].toString());
 
-				salesOrderDTOs.add(salesOrderDTO);
-			}
-		}catch(NoSuchElementException  | NullPointerException  | ArrayIndexOutOfBoundsException e) {
-			int i = 0;
-			log.info("Error Printng");
-			for(Object ob : errorPrint) {
-				log.info(i+"-");
-				if(ob != null) {
-					log.info("--"+ob.toString());
+					List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
+					log.info("inventory detail loop starts");
+					for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
+						SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
+						if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
+							rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
+									.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
+						}
+						List<InventoryVoucherBatchDetailDTO> inventoryVoucherBatchDetailsDTOs = new ArrayList<>();
+
+						List<OpeningStockDTO> openingStockDTOs = new ArrayList<>();
+						for (InventoryVoucherBatchDetail inventoryVoucherBatchDetail : inventoryVoucherDetail
+								.getInventoryVoucherBatchDetails()) {
+							openingStockDTOs = openingStockRepository
+									.findByCompanyIdAndProductProfilePidAndBatchNumber(
+											inventoryVoucherBatchDetail.getProductProfile().getPid(),
+											inventoryVoucherBatchDetail.getBatchNumber())
+									.stream().map(OpeningStockDTO::new).collect(Collectors.toList());
+						}
+
+						salesOrderItemDTO.setOpeningStockDTOs(openingStockDTOs);
+						salesOrderItemDTO.setInventoryVoucherBatchDetailsDTO(inventoryVoucherBatchDetailsDTOs);
+						salesOrderItemDTOs.add(salesOrderItemDTO);
+					}
+					List<VatLedgerDTO> vatLedgerDTOs = new ArrayList<>();
+					for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
+						VatLedgerDTO vatLedgerDTO = new VatLedgerDTO();
+						vatLedgerDTO.setName(accountProfileDTO.getName());
+						String vatledgerArray[] = accountProfileDTO.getAlias().split("\\,");
+						vatLedgerDTO.setPercentageOfCalculation(vatledgerArray[1]);
+						vatLedgerDTO.setVatClass(vatledgerArray[0]);
+						vatLedgerDTOs.add(vatLedgerDTO);
+					}
+					salesOrderDTO.setVatLedgerDTOs(vatLedgerDTOs);
+					salesOrderDTO.setSalesOrderItemDTOs(salesOrderItemDTOs);
+					List<DynamicDocumentHeaderDTO> documentHeaderDTOs = new ArrayList<>();
+
+					if (!rferenceInventoryVoucherHeaderExecutiveExecutionPid.equalsIgnoreCase("")) {
+
+						DynamicDocumentHeaderDTO documentHeaderDTOAditonal = dynamicDocumentHeaderService
+								.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
+										rferenceInventoryVoucherHeaderExecutiveExecutionPid, dynamicDocumentAditional);
+						DynamicDocumentHeaderDTO dynamicDocumentHeadersDespatch = dynamicDocumentHeaderService
+								.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(opExe.get().getPid(),
+										dynamicDocumentDespach);
+
+						if (documentHeaderDTOAditonal.getDocumentPid() != null) {
+							documentHeaderDTOs.add(documentHeaderDTOAditonal);
+						}
+						if (dynamicDocumentHeadersDespatch.getDocumentPid() != null) {
+							documentHeaderDTOs.add(dynamicDocumentHeadersDespatch);
+						}
+					}
+					salesOrderDTO.setDynamicDocumentHeaderDTOs(documentHeaderDTOs);
+					log.info("GST ledger");
+					List<GstLedger> gstLedgerList = new ArrayList<>();
+					gstLedgerList = gstLedgerRepository
+							.findAllByCompanyIdAndActivated(SecurityUtils.getCurrentUsersCompanyId(), true);
+					if (gstLedgerList != null && gstLedgerList.size() != 0) {
+						List<GstLedgerDTO> gstLedgerDtos = gstLedgerList.stream().map(gst -> new GstLedgerDTO(gst))
+								.collect(Collectors.toList());
+						salesOrderDTO.setGstLedgerDtos(gstLedgerDtos);
+					}
+					inventoryHeaderPid.add(obj[9].toString());
+
+					salesOrderDTOs.add(salesOrderDTO);
 				}
-				i++;
+			} catch (NoSuchElementException | NullPointerException | ArrayIndexOutOfBoundsException e) {
+				int i = 0;
+				log.info("Error Printng");
+				for (Object ob : errorPrint) {
+					log.info(i + "-");
+					if (ob != null) {
+						log.info("--" + ob.toString());
+					}
+					i++;
+				}
+				e.printStackTrace();
+				throw new IllegalArgumentException("Data missing in sales order..");
 			}
-			e.printStackTrace();
-			throw new IllegalArgumentException("Data missing in sales order..");
-		}
 			if (!salesOrderDTOs.isEmpty()) {
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
@@ -1294,25 +1301,97 @@ public class TransactionResource {
 		log.debug("REST request to download receipts <" + company.getLegalName() + "> : {}");
 
 		List<ReceiptDTO> receiptDTOs = new ArrayList<>();
-		List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
-				.findByCompanyAndStatusOrderByCreatedDateDesc();
-		for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
-			for (AccountingVoucherDetail accountingVoucherDetail : accountingVoucherHeader
-					.getAccountingVoucherDetails()) {
-				if (accountingVoucherDetail.getAccountingVoucherAllocations().isEmpty()) {
-					ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherDetail);
-					receiptDTOs.add(receiptDTO);
-				} else {
-					for (AccountingVoucherAllocation accountingVoucherAllocation : accountingVoucherDetail
-							.getAccountingVoucherAllocations()) {
-						ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherAllocation);
-						receiptDTO.setHeaderAmount(accountingVoucherHeader.getTotalAmount());
-						receiptDTO.setNarrationMessage(
-								accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
-						receiptDTO.setProvisionalReceiptNo(accountingVoucherDetail.getProvisionalReceiptNo());
+
+//		List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
+//				.findByCompanyAndStatusOrderByCreatedDateDesc();
+
+		/*
+		 * List<AccountingVoucherHeader> accountingVoucherHeaders =
+		 * accountingVoucherHeaderRepository
+		 * .findByCompanyAndStatusOrderByCreatedDateDesc();
+		 */
+
+		List<Object[]> accountingVoucherHeaders = accountingVoucherHeaderRepository
+				.findByCompanyIdAndTallyStatusByCreatedDateDesc();
+
+		if (accountingVoucherHeaders.size() > 0) {
+
+			Set<Long> avhIds = new HashSet<>();
+			Set<String> avhPids = new HashSet<>();
+			Set<Long> documentIds = new HashSet<>();
+			Set<Long> employeeIds = new HashSet<>();
+			Set<Long> accountProfileIds = new HashSet<>();
+			Set<Long> userIds = new HashSet<>();
+			Set<Long> exeIds = new HashSet<>();
+
+			for (Object[] obj : accountingVoucherHeaders) {
+
+				avhIds.add(Long.parseLong(obj[0].toString()));
+				avhPids.add(obj[1].toString());
+				userIds.add(Long.parseLong(obj[10].toString()));
+				documentIds.add(Long.parseLong(obj[3].toString()));
+				employeeIds.add(Long.parseLong(obj[11].toString()));
+				exeIds.add(Long.parseLong(obj[2].toString()));
+				accountProfileIds.add(Long.parseLong(obj[4].toString()));
+
+			}
+
+			List<Document> documents = documentRepository.findAllByCompanyIdAndIdsIn(documentIds);
+			List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyIdAndIdsIn(employeeIds);
+			List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
+					.findAllByCompanyIdAndIdsIn(exeIds);
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+			List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
+					.findAllByAccountingVoucherHeaderPidIn(avhPids);
+
+			for (Object[] obj : accountingVoucherHeaders) {
+
+				String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
+
+				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[10].toString()))
+						.findAny();
+
+				Optional<Document> opDocument = documents.stream()
+						.filter(doc -> doc.getId() == Long.parseLong(obj[3].toString())).findAny();
+
+				Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
+						.filter(emp -> emp.getId() == Long.parseLong(obj[11].toString())).findAny();
+
+				Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
+						.filter(doc -> doc.getId() == Long.parseLong(obj[2].toString())).findAny();
+
+				Optional<AccountProfile> opAccPro = accountProfiles.stream()
+						.filter(a -> a.getId() == Long.parseLong(obj[4].toString())).findAny();
+
+				List<AccountingVoucherDetail> avDetails = accountingVoucherDetails.stream()
+						.filter(ivd -> ivd.getAccountingVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
+						.collect(Collectors.toList()).stream()
+						.sorted(Comparator.comparingLong(AccountingVoucherDetail::getId)).collect(Collectors.toList());
+
+				for (AccountingVoucherDetail accountingVoucherDetail : avDetails) {
+					if (accountingVoucherDetail.getAccountingVoucherAllocations().isEmpty()) {
+						ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherDetail);
+						receiptDTO.setAccountingVoucherHeaderDTO(avdObjectToDto(obj, opUser.get(), opDocument.get(),
+								opEmployeeProfile.get(), opExe.get(), opAccPro.get(), avDetails));
 						receiptDTOs.add(receiptDTO);
+					} else {
+						for (AccountingVoucherAllocation accountingVoucherAllocation : accountingVoucherDetail
+								.getAccountingVoucherAllocations()) {
+							ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherAllocation);
+							receiptDTO.setAccountingVoucherHeaderDTO(avdObjectToDto(obj, opUser.get(), opDocument.get(),
+									opEmployeeProfile.get(), opExe.get(), opAccPro.get(), avDetails));
+							receiptDTO.setHeaderAmount(Double.parseDouble(obj[7].toString()));
+							receiptDTO.setNarrationMessage(
+									accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
+							receiptDTO.setProvisionalReceiptNo(accountingVoucherDetail.getProvisionalReceiptNo());
+							receiptDTOs.add(receiptDTO);
+						}
 					}
+
 				}
+
 			}
 		}
 
@@ -1325,6 +1404,114 @@ public class TransactionResource {
 		}
 		return receiptDTOs;
 	}
+
+	private AccountingVoucherHeaderDTO avdObjectToDto(Object[] obj, User user, Document document,
+			EmployeeProfile employee, ExecutiveTaskExecution executiveTaskExecution, AccountProfile accountProfile,
+			List<AccountingVoucherDetail> avDetails) {
+
+		AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
+
+		accountingVoucherHeaderDTO.setPid(obj[1].toString());
+		accountingVoucherHeaderDTO.setDocumentPid(document.getPid());
+		accountingVoucherHeaderDTO.setDocumentName(document.getName());
+		if (document.getActivityAccount() != null && document.getActivityAccount().equals(AccountTypeColumn.By)) {
+
+			accountingVoucherHeaderDTO.setByAmount(Double.parseDouble(obj[7].toString()));
+		} else if (document.getActivityAccount() != null
+				&& document.getActivityAccount().equals(AccountTypeColumn.To)) {
+			accountingVoucherHeaderDTO.setToAmount(Double.parseDouble(obj[7].toString()));
+		}
+		if (accountProfile != null) {
+			accountingVoucherHeaderDTO.setAccountProfilePid(accountProfile.getPid());
+			accountingVoucherHeaderDTO.setAccountProfileName(accountProfile.getName());
+			accountingVoucherHeaderDTO.setPhone(accountProfile.getPhone1());
+		}
+
+		LocalDateTime createdDate = null;
+		if (obj[5] != null) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String[] splitDate = obj[5].toString().split(" ");
+			createdDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
+		}
+
+		LocalDateTime documentDate = null;
+		if (obj[6] != null) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String[] splitDate = obj[6].toString().split(" ");
+			documentDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
+		}
+
+		accountingVoucherHeaderDTO.setCreatedDate(createdDate);
+		accountingVoucherHeaderDTO.setDocumentDate(documentDate);
+		if (employee != null) {
+			accountingVoucherHeaderDTO.setEmployeePid(employee.getPid());
+			accountingVoucherHeaderDTO.setEmployeeName(employee.getName());
+		}
+		if (user != null) {
+			accountingVoucherHeaderDTO.setUserName(user.getFirstName());
+		}
+
+		accountingVoucherHeaderDTO.setTotalAmount(Double.parseDouble(obj[7].toString()));
+		accountingVoucherHeaderDTO.setOutstandingAmount(Double.parseDouble(obj[8].toString()));
+		accountingVoucherHeaderDTO.setRemarks(obj[9].toString());
+		accountingVoucherHeaderDTO.setDocumentNumberLocal(obj[12].toString());
+		accountingVoucherHeaderDTO.setDocumentNumberServer(obj[13].toString());
+
+		double chequeAmount = 0;
+		double cashAmount = 0;
+		for (AccountingVoucherDetail avd : avDetails) {
+			if (avd.getMode() == PaymentMode.Cheque || avd.getMode() == PaymentMode.Bank) {
+				chequeAmount += avd.getAmount();
+			} else if (avd.getMode() == PaymentMode.Cash) {
+				cashAmount += avd.getAmount();
+			}
+		}
+		accountingVoucherHeaderDTO.setCashAmount(cashAmount);
+		accountingVoucherHeaderDTO.setChequeAmount(chequeAmount);
+
+		return null;
+	}
+
+//	@RequestMapping(value = "/v2/get-receipts.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//	@Timed
+//	public List<ReceiptDTO> downloadReceiptsJson() throws URISyntaxException {
+//
+//		CompanyViewDTO company = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId());
+//		log.debug("REST request to download receipts <" + company.getLegalName() + "> : {}");
+//
+//		List<ReceiptDTO> receiptDTOs = new ArrayList<>();
+//		List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
+//				.findByCompanyAndStatusOrderByCreatedDateDesc();
+//		
+//		for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
+//			for (AccountingVoucherDetail accountingVoucherDetail : accountingVoucherHeader
+//					.getAccountingVoucherDetails()) {
+//				if (accountingVoucherDetail.getAccountingVoucherAllocations().isEmpty()) {
+//					ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherDetail);
+//					receiptDTOs.add(receiptDTO);
+//				} else {
+//					for (AccountingVoucherAllocation accountingVoucherAllocation : accountingVoucherDetail
+//							.getAccountingVoucherAllocations()) {
+//						ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherAllocation);
+//						receiptDTO.setHeaderAmount(accountingVoucherHeader.getTotalAmount());
+//						receiptDTO.setNarrationMessage(
+//								accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
+//						receiptDTO.setProvisionalReceiptNo(accountingVoucherDetail.getProvisionalReceiptNo());
+//						receiptDTOs.add(receiptDTO);
+//					}
+//				}
+//			}
+//		}
+//
+//		if (!receiptDTOs.isEmpty()) {
+//			int updated = accountingVoucherHeaderRepository
+//					.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PROCESSING,
+//							receiptDTOs.stream().map(avh -> avh.getAccountingVoucherHeaderPid())
+//									.collect(Collectors.toList()));
+//			log.debug("updated " + updated + " to PROCESSING");
+//		}
+//		return receiptDTOs;
+//	}
 
 	/**
 	 * POST /update-receipt-status .
@@ -1726,7 +1913,8 @@ public class TransactionResource {
 		if (employeeProfile != null) {
 			salesOrderDTO.setEmployeeAlias(employeeProfile.getAlias());
 		}
-		salesOrderDTO.setActivityRemarks(executiveTaskExecution.getRemarks()!=null?executiveTaskExecution.getRemarks():"");
+		salesOrderDTO.setActivityRemarks(
+				executiveTaskExecution.getRemarks() != null ? executiveTaskExecution.getRemarks() : "");
 		return salesOrderDTO;
 	}
 
@@ -1819,7 +2007,7 @@ public class TransactionResource {
 		inventoryVoucherHeaderDTO.setDocumentTotalUpdated(Double.parseDouble(obj[30].toString()));
 		inventoryVoucherHeaderDTO.setDocumentVolumeUpdated(Double.parseDouble(obj[31].toString()));
 		inventoryVoucherHeaderDTO.setUpdatedStatus(Boolean.getBoolean(obj[32].toString()));
-		if(inventoryVoucherHeaderDTO.getUpdatedStatus()) {
+		if (inventoryVoucherHeaderDTO.getUpdatedStatus()) {
 			inventoryVoucherHeaderDTO.setDocumentTotal(inventoryVoucherHeaderDTO.getDocumentTotalUpdated());
 			inventoryVoucherHeaderDTO.setDocumentVolume(inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
 		}

@@ -103,9 +103,9 @@ import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
-import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderItemDetailsSap;
-import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderMasterSap;
-import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderResponseDataSap;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderItemDetailsSap;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderMasterSap;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderResponseDataSap;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -802,7 +802,7 @@ public class SalesPerformanceManagementResource {
 
 		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)
 				&& inventoryVoucherHeaderDTO.getSalesManagementStatus().equals(SalesManagementStatus.APPROVE)) {
-			log.info("Downloading to sap..............");
+			log.info("Downloading to sap prabhu.............");
 
 			SalesOrderResponseDataSap salesOrderResponseDataSap = sendSalesOrdertoSap(inventoryVoucherHeaderDTO);
 
@@ -840,7 +840,7 @@ public class SalesPerformanceManagementResource {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 //		String API_URL = "http://117.247.186.223:81/Service1.svc/AddOrder"; //old ip address
-		
+
 		String API_URL = "http://59.94.176.87:81/Service1.svc/AddOrder";
 
 //		String API_URL = "http://192.168.10.36:130/Service1.svc/AddOrder";

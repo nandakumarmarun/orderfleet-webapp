@@ -16,5 +16,7 @@ public interface FilledFormDetailRepository extends JpaRepository<FilledFormDeta
 
 	@Query("SELECT ffd.id,ffd.filledForm.id,ffd.formElement.name,ffd.value FROM FilledFormDetail AS ffd WHERE ffd.filledForm.id IN ?1")
 	List<Object[]> findAllByFormIdIn(Set<Long> ffIds);
+
+	List<FilledFormDetail> findByFilledFormPidIn(Set<String> ffPids);
 	
 }

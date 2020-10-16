@@ -39,7 +39,8 @@ public class AccountingVoucherDetail implements Serializable {
 	@Column(name = "id", insertable = false, updatable = false, columnDefinition = "bigint DEFAULT nextval('seq_accounting_voucher_detail_id')")
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	//@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "accounting_voucher_header_id")
 	private AccountingVoucherHeader accountingVoucherHeader;
 

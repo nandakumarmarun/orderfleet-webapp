@@ -1,4 +1,4 @@
-package com.orderfleet.webapp.web.vendor.sap.dto;
+package com.orderfleet.webapp.web.vendor.sap.pravesh.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "itemcode", "itemname", "quantity", "uprice", "taxcode", "warehousecode", "itemtype",
 		"arecieved" })
-public class SalesOrderItemDetailsSap {
+public class SalesOrderItemDetailsSapPravesh {
 
 	@JsonProperty("itemcode")
 	private String itemCode;

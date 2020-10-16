@@ -107,9 +107,9 @@ import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
-import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderItemDetailsSap;
-import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderMasterSap;
-import com.orderfleet.webapp.web.vendor.sap.dto.SalesOrderResponseDataSap;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderItemDetailsSap;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderMasterSap;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderResponseDataSap;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -898,7 +898,7 @@ public class ProcessFlowStage1Resource {
 
 		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)
 				&& inventoryVoucherHeaderDTO.getSalesManagementStatus().equals(SalesManagementStatus.APPROVE)) {
-			log.info("Downloading to sap..............");
+			log.info("Downloading to sap.prabhu..............");
 
 			SalesOrderResponseDataSap salesOrderResponseDataSap = sendSalesOrdertoSap(inventoryVoucherHeaderDTO);
 
