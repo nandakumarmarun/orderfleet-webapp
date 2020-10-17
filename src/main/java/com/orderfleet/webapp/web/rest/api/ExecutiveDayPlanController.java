@@ -2,8 +2,11 @@ package com.orderfleet.webapp.web.rest.api;
 
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -232,6 +235,61 @@ public class ExecutiveDayPlanController {
 			});
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	
+	@Timed
+	@RequestMapping(value = "/executive-day-plan-datewise", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Transactional
+	public ResponseEntity<List<ExecutiveTaskPlanDTO>> getExecutiveTaskPlanDateWise(
+			@RequestParam(required = false, name = "startDate") LocalDate startDate,
+			@RequestParam(required = false, name = "endDate") LocalDate endDate,
+			@RequestParam(required = true, name = "filterBy") String filterBy
+			) {
+		List<ExecutiveTaskPlan> executiveTaskPlanList;
+		String login = SecurityUtils.getCurrentUserLogin();
+		
+		switch(filterBy){
+			case "TD":
+				startDate = LocalDate.now().plusDays(1);
+				endDate = LocalDate.now().plusDays(1);
+				break;
+			case "WFD":
+				startDate = LocalDate.now().plusDays(1);
+				TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+				LocalDate weekEndDate = LocalDate.now().with(fieldISO, 7);
+				endDate = weekEndDate;
+				break;
+			case "MFD":
+				startDate = LocalDate.now().plusDays(1);
+				endDate = LocalDate.now().withDayOfMonth(startDate.getMonth().length(startDate.isLeapYear()));
+				break;
+			case "SINGLE":
+				if(startDate == null){
+					startDate = LocalDate.now();
+					endDate = LocalDate.now();
+				}else{
+					endDate = startDate;
+				}
+				break;
+			case "CUSTOM":
+				if(startDate == null || endDate == null){
+					startDate = LocalDate.now();
+					endDate = LocalDate.now();
+				}
+				break;
+			default :
+				startDate = LocalDate.now();
+				endDate = LocalDate.now();
+				break;
+		}
+
+			executiveTaskPlanList = executiveTaskPlanRepository.findByUserLoginAndPlannedDateBetweenOrderByIdAsc(login,
+					startDate.atTime(0, 0), endDate.atTime(23, 59));
+		
+		return new ResponseEntity<>(
+				executiveTaskPlanList.stream().map(ExecutiveTaskPlanDTO::new).collect(Collectors.toList()),
+				HttpStatus.OK);
 	}
 
 }
