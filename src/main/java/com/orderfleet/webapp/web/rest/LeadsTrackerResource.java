@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.FilledFormDetail;
@@ -68,13 +70,14 @@ import com.orderfleet.webapp.web.rest.dto.DynamicDocumentFilledFormDetailsDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicFormDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.FormDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 @Controller
 @RequestMapping("/web")
 public class LeadsTrackerResource {
 
 	private final Logger log = LoggerFactory.getLogger(DynamicDocumentFormResource.class);
-	
+
 	@Inject
 	private EmployeeHierarchyService employeeHierarchyService;
 
@@ -86,7 +89,7 @@ public class LeadsTrackerResource {
 
 	@Inject
 	private UserRepository userRepository;
-	
+
 	@Inject
 	private UserService userService;
 
@@ -98,28 +101,34 @@ public class LeadsTrackerResource {
 
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
-	
+
 	@Inject
 	private DynamicDocumentHeaderRepository dynamicDocumentHeaderRepository;
-	
+
 	@Inject
 	private EmployeeProfileRepository employeeRepository;
-	
+
 	@Inject
 	private FilledFormDetailRepository filledFormDetailRepository;
-	
+
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
+
+	@Inject
+	private AccountProfileMapper accountProfileMapper;
 
 	private final FormService formService;
 	private final FormFormElementRepository formFormElementRepository;
 	private FilledFormRepository filledFormRepository;
-	
-	public LeadsTrackerResource(FilledFormRepository filledFormRepository, FormService formService, FormFormElementRepository formFormElementRepository) {
+
+	public LeadsTrackerResource(FilledFormRepository filledFormRepository, FormService formService,
+			FormFormElementRepository formFormElementRepository) {
 		super();
 		this.filledFormRepository = filledFormRepository;
 		this.formService = formService;
 		this.formFormElementRepository = formFormElementRepository;
 	}
-	
+
 	@GetMapping("/leads-tracker")
 	@Timed
 	public String getDynamicDocumentForms(Model model) throws URISyntaxException {
@@ -130,39 +139,59 @@ public class LeadsTrackerResource {
 			model.addAttribute("accounts", accountProfileService.findAllByCompany());
 		} else {
 			model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
-			
+
 			Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 			userIds.add(currentUserId);
 			Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserIdIn(userIds);
-			List<Object[]> accountPidNames = locationAccountProfileRepository
-					.findAccountProfilesByLocationIdIn(locationIds);
-			int size = accountPidNames.size();
-			List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
-			for (int i = 0; i < size; i++) {
-				AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
-				accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
-				accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
-				accountProfileDTOs.add(accountProfileDTO);
+//			List<Object[]> accountPidNames = locationAccountProfileRepository
+//					.findAccountProfilesByLocationIdIn(locationIds);
+//			int size = accountPidNames.size();
+//			List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
+//			for (int i = 0; i < size; i++) {
+//				AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
+//				accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
+//				accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
+//				accountProfileDTOs.add(accountProfileDTO);
+//			}
+
+			Set<BigInteger> apIds = locationAccountProfileRepository
+					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+
+			Set<Long> accountProfileIds = new HashSet<>();
+
+			for (BigInteger apId : apIds) {
+				accountProfileIds.add(apId.longValue());
 			}
+
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+
+			// remove duplicates
+			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+
+			List<AccountProfileDTO> accountProfileDTOs = accountProfileMapper
+					.accountProfilesToAccountProfileDTOs(result);
+
 			model.addAttribute("accounts", accountProfileDTOs);
 		}
 		return "company/leads-tracker";
 	}
-	
-	@RequestMapping(value = "/leads-tracker/filter", method = RequestMethod.GET, params = { "documentPid",
-	"formPid" })
+
+	@RequestMapping(value = "/leads-tracker/filter", method = RequestMethod.GET, params = { "documentPid", "formPid" })
 	@Transactional
-	public @ResponseBody DynamicFormDTO getByDocument(@RequestParam("employeePid") String employeePid, @RequestParam("accountPid") String accountPid,
-			@RequestParam(value = "documentPid") String documentPid, @RequestParam(value = "formPid") String formPid,
-			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
+	public @ResponseBody DynamicFormDTO getByDocument(@RequestParam("employeePid") String employeePid,
+			@RequestParam("accountPid") String accountPid, @RequestParam(value = "documentPid") String documentPid,
+			@RequestParam(value = "formPid") String formPid, @RequestParam("filterBy") String filterBy,
+			@RequestParam String fromDate, @RequestParam String toDate,
 			@RequestParam("includeHeader") boolean isHeaderIncluded,
 			@RequestParam("includeAccount") boolean includeAccount) {
-		log.debug("filter dynamic document forms by accountPid : {} documentPid : {} and formPid : {}", accountPid, documentPid, formPid);
-		
+		log.debug("filter dynamic document forms by accountPid : {} documentPid : {} and formPid : {}", accountPid,
+				documentPid, formPid);
+
 		DateTimeFormatter fmt = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 		DateTimeFormatter date = DateTimeFormatter.ofPattern("MMM dd,yyyy");
 		DateTimeFormatter time = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		
+
 		DynamicFormDTO dynamicFormDTO = new DynamicFormDTO();
 		Optional<FormDTO> optionalFormDto = formService.findOneByPid(formPid);
 		if (optionalFormDto.isPresent()) {
@@ -183,7 +212,7 @@ public class LeadsTrackerResource {
 				elementNameToShow.add("Date");
 				elementNameToShow.add("Time");
 				elementNameToShow.add("GPSLocation");
-		
+
 			} else if (isHeaderIncluded && !includeAccount) {
 				elementNameToShow.add("Account Profile");
 				elementNameToShow.add("Account Type");
@@ -203,11 +232,13 @@ public class LeadsTrackerResource {
 						formDTO.getPid());
 			} else if (filterBy.equals("YESTERDAY")) {
 				LocalDate yeasterday = LocalDate.now().minusDays(1);
-				filledForms = getFilterData(employeePid, accountPid,documentPid, yeasterday, yeasterday, formDTO.getPid());
+				filledForms = getFilterData(employeePid, accountPid, documentPid, yeasterday, yeasterday,
+						formDTO.getPid());
 			} else if (filterBy.equals("WTD")) {
 				TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 				LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-				filledForms = getFilterData(employeePid, accountPid, documentPid, weekStartDate, LocalDate.now(), formDTO.getPid());
+				filledForms = getFilterData(employeePid, accountPid, documentPid, weekStartDate, LocalDate.now(),
+						formDTO.getPid());
 			} else if (filterBy.equals("MTD")) {
 				LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
 				filledForms = getFilterData(employeePid, accountPid, documentPid, monthStartDate, LocalDate.now(),
@@ -216,7 +247,8 @@ public class LeadsTrackerResource {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 				LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 				LocalDate toDateTime = LocalDate.parse(toDate, formatter);
-				filledForms = getFilterData(employeePid, accountPid, documentPid, fromDateTime, toDateTime, formDTO.getPid());
+				filledForms = getFilterData(employeePid, accountPid, documentPid, fromDateTime, toDateTime,
+						formDTO.getPid());
 			}
 			List<Map<Integer, String>> elementValues = new ArrayList<>();
 			for (DynamicDocumentFilledFormDTO filledForm : filledForms) {
@@ -224,7 +256,7 @@ public class LeadsTrackerResource {
 				// elementVisible index and value as elementValue
 				Map<Integer, String> elements = new TreeMap<>();
 				if (isHeaderIncluded && !includeAccount) {
-		
+
 					elements.put(elementNameToShow.indexOf("Account Profile"),
 							filledForm.getDynamicDocumentHeaderAccountProfileName());
 					elements.put(elementNameToShow.indexOf("Account Type"),
@@ -242,7 +274,7 @@ public class LeadsTrackerResource {
 					elements.put(elementNameToShow.indexOf("GPSLocation"),
 							filledForm.getDynamicDocumentHeaderTaskExecutionLocation());
 				} else if (isHeaderIncluded && includeAccount) {
-		
+
 					elements.put(elementNameToShow.indexOf("Account Profile"),
 							filledForm.getDynamicDocumentHeaderAccountProfileName());
 					elements.put(elementNameToShow.indexOf("Account Type"),
@@ -266,7 +298,7 @@ public class LeadsTrackerResource {
 					elements.put(elementNameToShow.indexOf("GPSLocation"),
 							filledForm.getDynamicDocumentHeaderTaskExecutionLocation());
 				}
-		
+
 				double abp = 0;
 				double indent = 0;
 				double compliance = 0;
@@ -300,7 +332,7 @@ public class LeadsTrackerResource {
 						} else {
 							elements.put(elementNameToShow.indexOf(ffd.getFormElementName()), ffd.getValue());
 						}
-		
+
 					}
 				}
 				// sort the elements by key
@@ -311,9 +343,9 @@ public class LeadsTrackerResource {
 		}
 		return dynamicFormDTO;
 	}
-	
-	private List<DynamicDocumentFilledFormDTO> getFilterData(String employeePid, String accountPid, String documentPid, LocalDate fDate,
-			LocalDate tDate, String formPid) {
+
+	private List<DynamicDocumentFilledFormDTO> getFilterData(String employeePid, String accountPid, String documentPid,
+			LocalDate fDate, LocalDate tDate, String formPid) {
 
 		long start = System.nanoTime();
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
@@ -334,26 +366,30 @@ public class LeadsTrackerResource {
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
-		
+
 		List<Object[]> filledFormsObjArray = new ArrayList<>();
 		if (userPids.isEmpty()) {
 			if ("-1".equals(accountPid)) {
-				filledFormsObjArray = filledFormRepository.findFilledFormsIdsByDocumentAndFormPidAndCreatedDateBetweenFilterAndOrderByAccount(documentPid, 
-						formPid, fromDate, toDate);
-			}else {
-				filledFormsObjArray = filledFormRepository.findFilledFormsIdsByDocumentAndFormPidAndAccountPidInAndCreatedDateBetween(documentPid, 
-						formPid, fromDate, toDate, accountPid);
-			}			
+				filledFormsObjArray = filledFormRepository
+						.findFilledFormsIdsByDocumentAndFormPidAndCreatedDateBetweenFilterAndOrderByAccount(documentPid,
+								formPid, fromDate, toDate);
+			} else {
+				filledFormsObjArray = filledFormRepository
+						.findFilledFormsIdsByDocumentAndFormPidAndAccountPidInAndCreatedDateBetween(documentPid,
+								formPid, fromDate, toDate, accountPid);
+			}
 		} else if (!userPids.isEmpty()) {
 			if ("-1".equals(accountPid)) {
-				filledFormsObjArray = filledFormRepository.findFilledFormsIdsByDocumentAndFormPidAndUserPidCreatedByAndCreatedDateBetweenFilterAndOrderByAccount(documentPid,
-						formPid, userPids, fromDate, toDate);
+				filledFormsObjArray = filledFormRepository
+						.findFilledFormsIdsByDocumentAndFormPidAndUserPidCreatedByAndCreatedDateBetweenFilterAndOrderByAccount(
+								documentPid, formPid, userPids, fromDate, toDate);
 			} else {
-				filledFormsObjArray  = filledFormRepository.findFilledFormsIdsByDocumentAndFormPidAndUserPidCreatedByAndAccountPidInAndCreatedDateBetween(documentPid,
-						formPid, userPids, fromDate, toDate, accountPid);
+				filledFormsObjArray = filledFormRepository
+						.findFilledFormsIdsByDocumentAndFormPidAndUserPidCreatedByAndAccountPidInAndCreatedDateBetween(
+								documentPid, formPid, userPids, fromDate, toDate, accountPid);
 			}
 		}
-		
+
 		List<DynamicDocumentFilledFormDTO> dynamicDocumentFilledFormDTOs = new ArrayList<>();
 
 		Set<Long> filledFormIds = new HashSet<>();
@@ -401,10 +437,10 @@ public class LeadsTrackerResource {
 //				executiveTaskExecutionObjArray = executiveTaskExecutionRepository
 //						.findByExeIdInAndAccountProfilePidIn(executiveTaskExecutionIds, accountPid);
 //			}
-			
+
 			List<Object[]> executiveTaskExecutionObjArray = executiveTaskExecutionRepository
 					.findByExeIdIn(executiveTaskExecutionIds);
-			
+
 			List<Object[]> employeeArray = employeeRepository.findByEmpIdIn(employeeIds);
 
 			List<Object[]> userArray = userRepository.findByUserIdIn(userIds);

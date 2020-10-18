@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,10 +11,12 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
@@ -45,12 +48,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.io.Files;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
@@ -76,6 +81,7 @@ import com.orderfleet.webapp.web.rest.dto.FormFileDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -136,6 +142,12 @@ public class ReceiptPerformanceReportTallyStatusResource {
 	@Inject
 	private FileManagerService fileManagerService;
 
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
+
+	@Inject
+	private AccountProfileMapper accountProfileMapper;
+
 	/**
 	 * GET /receipt : get all the inventory vouchers.
 	 *
@@ -159,16 +171,34 @@ public class ReceiptPerformanceReportTallyStatusResource {
 			Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 			userIds.add(currentUserId);
 			Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserIdIn(userIds);
-			List<Object[]> accountPidNames = locationAccountProfileRepository
-					.findAccountProfilesByLocationIdIn(locationIds);
-			int size = accountPidNames.size();
-			List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
-			for (int i = 0; i < size; i++) {
-				AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
-				accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
-				accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
-				accountProfileDTOs.add(accountProfileDTO);
+//			List<Object[]> accountPidNames = locationAccountProfileRepository
+//			.findAccountProfilesByLocationIdIn(locationIds);
+//	int size = accountPidNames.size();
+//	List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
+//	for (int i = 0; i < size; i++) {
+//		AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
+//		accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
+//		accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
+//		accountProfileDTOs.add(accountProfileDTO);
+//	}
+
+			Set<BigInteger> apIds = locationAccountProfileRepository
+					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+
+			Set<Long> accountProfileIds = new HashSet<>();
+
+			for (BigInteger apId : apIds) {
+				accountProfileIds.add(apId.longValue());
 			}
+
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+
+			// remove duplicates
+			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+
+			List<AccountProfileDTO> accountProfileDTOs = accountProfileMapper
+					.accountProfilesToAccountProfileDTOs(result);
 			model.addAttribute("accounts", accountProfileDTOs);
 		}
 		model.addAttribute("documents",

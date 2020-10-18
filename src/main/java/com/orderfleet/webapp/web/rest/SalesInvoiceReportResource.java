@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -98,6 +99,7 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 import com.orderfleet.webapp.web.rest.dto.SecondarySalesOrderExcelDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -161,6 +163,9 @@ public class SalesInvoiceReportResource {
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
 
+	@Inject
+	private AccountProfileMapper accountProfileMapper;
+
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
 	 *
@@ -184,16 +189,34 @@ public class SalesInvoiceReportResource {
 			Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 			userIds.add(currentUserId);
 			Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserIdIn(userIds);
-			List<Object[]> accountPidNames = locationAccountProfileRepository
-					.findAccountProfilesByLocationIdIn(locationIds);
-			int size = accountPidNames.size();
-			List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
-			for (int i = 0; i < size; i++) {
-				AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
-				accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
-				accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
-				accountProfileDTOs.add(accountProfileDTO);
+//			List<Object[]> accountPidNames = locationAccountProfileRepository
+//			.findAccountProfilesByLocationIdIn(locationIds);
+//	int size = accountPidNames.size();
+//	List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
+//	for (int i = 0; i < size; i++) {
+//		AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
+//		accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
+//		accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
+//		accountProfileDTOs.add(accountProfileDTO);
+//	}
+
+			Set<BigInteger> apIds = locationAccountProfileRepository
+					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+
+			Set<Long> accountProfileIds = new HashSet<>();
+
+			for (BigInteger apId : apIds) {
+				accountProfileIds.add(apId.longValue());
 			}
+
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+
+			// remove duplicates
+			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+
+			List<AccountProfileDTO> accountProfileDTOs = accountProfileMapper
+					.accountProfilesToAccountProfileDTOs(result);
 
 			model.addAttribute("accounts", accountProfileDTOs);
 
@@ -229,7 +252,6 @@ public class SalesInvoiceReportResource {
 		return "company/salesInvoiceReport";
 	}
 
-	
 	@RequestMapping(value = "/sales-invoice-report/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<SalesPerformanceDTO>> filterInventoryVouchers(
@@ -315,16 +337,18 @@ public class SalesInvoiceReportResource {
 		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
 		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
 				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
-		
-		Map<String, Double> ivTotalWithoutTax = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
-				Collectors.summingDouble(obj -> ( (Double) (obj[4] == null ? 1.0d : obj[4]) 
-												* ( (Double)obj[8]  * ((100 - (Double)obj[10]) / 100) ))) ));
-		
-		Map<String, Double> ivTotalTax = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
-				Collectors.summingDouble(obj -> ( (Double) (obj[4] == null ? 1.0d : obj[4]) 
-												* ( (Double)obj[8]  * ((100 - (Double)obj[10]) / 100) ))  *((Double) obj[7] /100)    ) ));
 
+		Map<String, Double> ivTotalWithoutTax = ivDetails.stream()
+				.collect(Collectors.groupingBy(obj -> obj[0].toString(),
+						Collectors.summingDouble(obj -> ((Double) (obj[4] == null ? 1.0d : obj[4])
+								* ((Double) obj[8] * ((100 - (Double) obj[10]) / 100))))));
 
+		Map<String, Double> ivTotalTax = ivDetails.stream()
+				.collect(
+						Collectors.groupingBy(obj -> obj[0].toString(),
+								Collectors.summingDouble(obj -> ((Double) (obj[4] == null ? 1.0d : obj[4])
+										* ((Double) obj[8] * ((100 - (Double) obj[10]) / 100)))
+										* ((Double) obj[7] / 100))));
 
 		int size = inventoryVouchers.size();
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
@@ -349,9 +373,11 @@ public class SalesInvoiceReportResource {
 			salesPerformanceDTO.setDocumentTotal((double) ivData[14]);
 			salesPerformanceDTO.setDocumentVolume((double) ivData[15]);
 			salesPerformanceDTO.setTotalVolume(ivTotalVolume.get(salesPerformanceDTO.getPid()));
-			salesPerformanceDTO.setTotalWithoutTax(Double.parseDouble(df.format(ivTotalWithoutTax.get(salesPerformanceDTO.getPid()))));
-			salesPerformanceDTO.setTaxTotal(Double.parseDouble(df.format(ivTotalTax.get(salesPerformanceDTO.getPid()))));
-			
+			salesPerformanceDTO.setTotalWithoutTax(
+					Double.parseDouble(df.format(ivTotalWithoutTax.get(salesPerformanceDTO.getPid()))));
+			salesPerformanceDTO
+					.setTaxTotal(Double.parseDouble(df.format(ivTotalTax.get(salesPerformanceDTO.getPid()))));
+
 			salesPerformanceDTO.setPdfDownloadButtonStatus(false);
 			salesPerformanceDTO.setSendSalesOrderEmailStatusColumn(false);
 
@@ -363,12 +389,11 @@ public class SalesInvoiceReportResource {
 			salesPerformanceDTO.setPdfDownloadStatus(Boolean.valueOf(ivData[19].toString()));
 
 			salesPerformanceDTO.setSendSalesOrderEmailStatus(SendSalesOrderEmailStatus.valueOf(ivData[24].toString()));
-			salesPerformanceDTO.setClientDate((LocalDateTime)ivData[25]);
+			salesPerformanceDTO.setClientDate((LocalDateTime) ivData[25]);
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
 	}
-	
 
 	@RequestMapping(value = "/sales-invoice-report/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -382,26 +407,25 @@ public class SalesInvoiceReportResource {
 	public void downloadInventoryXls(@RequestParam("inventoryVoucherHeaderPids") String[] inventoryVoucherHeaderPids,
 			HttpServletResponse response) {
 		log.debug("start downloading....");
-		List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository.findByPidsOrderByCreatedDateDesc(Arrays.asList(inventoryVoucherHeaderPids));
+		List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository
+				.findByPidsOrderByCreatedDateDesc(Arrays.asList(inventoryVoucherHeaderPids));
 		log.debug("inventoryvoucherheaders foudn.....");
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>();
-		
+
 		if (inventoryVouchers.isEmpty()) {
 			return;
-		}else {
+		} else {
 			salesPerformanceDTOs = createSalesPerformanceDTO(inventoryVouchers);
 		}
 		buildExcelDocument(salesPerformanceDTOs, response);
 	}
 
-	private void buildExcelDocument(List<SalesPerformanceDTO> salesPerformanceDTOs,
-			HttpServletResponse response) {
+	private void buildExcelDocument(List<SalesPerformanceDTO> salesPerformanceDTOs, HttpServletResponse response) {
 		log.debug("Downloading Excel report");
 		String excelFileName = "InvoiceDetails" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = { "Invoice Number","Invoice Date",
-				"Customer", "Amt(without tax)", "Tax Total","Total Amount", 
-				"Activity Date","Client Date" };
+		String[] headerColumns = { "Invoice Number", "Invoice Date", "Customer", "Amt(without tax)", "Tax Total",
+				"Total Amount", "Activity Date", "Client Date" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -433,26 +457,25 @@ public class SalesInvoiceReportResource {
 		// Create Other rows and cells with Sales data
 		int rowNum = 1;
 		for (SalesPerformanceDTO salesPerform : salesPerformanceDTOs) {
-				HSSFRow row = worksheet.createRow(rowNum++);
-				row.createCell(0).setCellValue(salesPerform.getDocumentNumberLocal());
-				
-				HSSFCell docDateCell = row.createCell(1);
-				docDateCell.setCellValue(salesPerform.getDocumentDate().toString());
-				docDateCell.setCellStyle(dateCellStyle);
-				row.createCell(2).setCellValue(salesPerform.getReceiverAccountName());
-				row.createCell(3).setCellValue(salesPerform.getTotalWithoutTax());
-				row.createCell(4).setCellValue(salesPerform.getTaxTotal());
-				row.createCell(5).setCellValue(salesPerform.getDocumentTotal());
-			
-				
-				HSSFCell serverDateCell = row.createCell(6);
-				serverDateCell.setCellValue(salesPerform.getCreatedDate().toString());
-				serverDateCell.setCellStyle(dateCellStyle);
-				
-				HSSFCell clientDateCell = row.createCell(7);
-				clientDateCell.setCellValue(salesPerform.getClientDate().toString());
-				clientDateCell.setCellStyle(dateCellStyle);
-			
+			HSSFRow row = worksheet.createRow(rowNum++);
+			row.createCell(0).setCellValue(salesPerform.getDocumentNumberLocal());
+
+			HSSFCell docDateCell = row.createCell(1);
+			docDateCell.setCellValue(salesPerform.getDocumentDate().toString());
+			docDateCell.setCellStyle(dateCellStyle);
+			row.createCell(2).setCellValue(salesPerform.getReceiverAccountName());
+			row.createCell(3).setCellValue(salesPerform.getTotalWithoutTax());
+			row.createCell(4).setCellValue(salesPerform.getTaxTotal());
+			row.createCell(5).setCellValue(salesPerform.getDocumentTotal());
+
+			HSSFCell serverDateCell = row.createCell(6);
+			serverDateCell.setCellValue(salesPerform.getCreatedDate().toString());
+			serverDateCell.setCellStyle(dateCellStyle);
+
+			HSSFCell clientDateCell = row.createCell(7);
+			clientDateCell.setCellValue(salesPerform.getClientDate().toString());
+			clientDateCell.setCellStyle(dateCellStyle);
+
 		}
 	}
 
@@ -476,8 +499,6 @@ public class SalesInvoiceReportResource {
 		}
 	}
 
-	
-	
 	@RequestMapping(value = "/sales-invoice-report/downloadPdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public void downloadStatus(@RequestParam String inventoryPid, HttpServletResponse response) throws IOException {
@@ -499,7 +520,6 @@ public class SalesInvoiceReportResource {
 			}
 		}
 		buildPdf(inventoryVoucherHeaderDtos, response);
-
 
 	}
 

@@ -1,8 +1,10 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -49,7 +51,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 @Transactional
 public class LocationAccountProfileServiceImpl implements LocationAccountProfileService {
 	private final Logger log = LoggerFactory.getLogger(LocationAccountProfileServiceImpl.class);
- 
+
 	@Inject
 	private LocationRepository locationRepository;
 
@@ -67,7 +69,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 
 	@Inject
 	private CompanyRepository companyRepository;
-	
+
 	@Inject
 	private AccountNameTextSettingsRepository accountNameTextSettingsRepository;
 
@@ -136,13 +138,32 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	@Override
 	public List<AccountProfileDTO> findAccountProfilesByCurrentUserLocations() {
 		// current user employee locations
-		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+		// List<Location> locations =
+		// employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
 
+		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByEmployeeProfileIsCurrentUser();
+
+		// List<Long> locationIds = locations.stream().map(p ->
+		// p.getId()).collect((Collectors.toList()));
 		// get accounts in employee locations
 		List<AccountProfile> result = new ArrayList<>();
-		if (!locations.isEmpty()) {
-			List<AccountProfile> accountProfiles = locationAccountProfileRepository
-					.findAccountProfilesByUserLocationsOrderByAccountProfilesName(locations);
+		if (!locationIds.isEmpty()) {
+
+			Set<BigInteger> apIds = locationAccountProfileRepository
+					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+
+			Set<Long> accountProfileIds = new HashSet<>();
+
+			for (BigInteger apId : apIds) {
+				accountProfileIds.add(apId.longValue());
+			}
+
+			// List<AccountProfile> accountProfiles =
+			// locationAccountProfileRepository.findAccountProfilesByUserLocationsOrderByAccountProfilesName(locations);
+
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+
 			// remove duplicates
 			result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
 		}
@@ -179,26 +200,44 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	@Override
 	public Page<AccountProfileDTO> findAccountProfilesByUserLocationsAndAccountProfileActivated(int page, int count) {
 		// current user employee locations
-		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+		// List<Location> locations =
+		// employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
 		// get accounts in employee locations
 		List<AccountProfile> result = new ArrayList<>();
 		log.info("===============================================================");
 		log.info("get accountProfiles..........");
 		log.info("Page : {}" + page);
 		log.info("Count : {}" + count);
-		if (locations.size() > 0) {
-			Page<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
-					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAsc(locations,
-							new PageRequest(page, count));
-			result = accountProfiles.getContent().stream().map(la -> la.getAccountProfile())
-					.collect(Collectors.toList());
-			
+
+		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByEmployeeProfileIsCurrentUser();
+		if (locationIds.size() > 0) {
+
+			int limit = count;
+			int offset = page * count;
+//			Page<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
+//					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAsc(locations,
+//							new PageRequest(page, count));
+
+			List<Object[]> locAccProfiles = locationAccountProfileRepository
+					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAscPaginated(
+							locationIds, limit, offset);
+			// List<LocationAccountProfileDTO> accountProfiles = new ArrayList<>();
+
+			List<String> accountPids = new ArrayList<>();
+
+			for (Object[] objects : locAccProfiles) {
+				accountPids.add(objects[0].toString());
+			}
+
+			result = accountProfileRepository.findAllByAccountProfilePids(accountPids);
+
 		}
 		List<AccountNameTextSettings> accountNameTextSettings = accountNameTextSettingsRepository
 				.findAllByCompanyIdAndEnabledTrue(SecurityUtils.getCurrentUsersCompanyId());
-		Page<AccountProfileDTO> accountProfileDtoPage = new PageImpl<>(accountProfileMapper.accountProfilesToAccountProfileDTOs(result));
-		if (accountNameTextSettings.size() > 0) {	
-			for(AccountProfileDTO dto : accountProfileDtoPage) {
+		Page<AccountProfileDTO> accountProfileDtoPage = new PageImpl<>(
+				accountProfileMapper.accountProfilesToAccountProfileDTOs(result));
+		if (accountNameTextSettings.size() > 0) {
+			for (AccountProfileDTO dto : accountProfileDtoPage) {
 				String name = " (";
 				for (AccountNameTextSettings accountNameText : accountNameTextSettings) {
 					if (accountNameText.getName().equals("ALIAS")) {
@@ -211,10 +250,10 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 				if (name.length() > 1) {
 					name += ")";
 				}
-				dto.setName(dto.getName()+name);
+				dto.setName(dto.getName() + name);
 			}
 		}
-				
+
 		System.out.println("===============================================================");
 		return accountProfileDtoPage;
 	}
@@ -235,9 +274,12 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		// get accounts in employee locations
 		List<LocationAccountProfileDTO> result = new ArrayList<>();
 		if (!locationIds.isEmpty()) {
-			List<Object[]> locAccProfiles = locationAccountProfileRepository.findByLocationInAndAccountProfileActivatedPaginated(locationIds, limit, offset);
+			List<Object[]> locAccProfiles = locationAccountProfileRepository
+					.findByLocationInAndAccountProfileActivatedPaginated(locationIds, limit, offset);
 			for (Object[] objects : locAccProfiles) {
-				LocationAccountProfileDTO locAPDto = new LocationAccountProfileDTO(objects[0].toString(), objects[1].toString() ,objects[2].toString(),objects[3].toString(),((java.sql.Timestamp)objects[4]).toLocalDateTime());
+				LocationAccountProfileDTO locAPDto = new LocationAccountProfileDTO(objects[0].toString(),
+						objects[1].toString(), objects[2].toString(), objects[3].toString(),
+						((java.sql.Timestamp) objects[4]).toLocalDateTime());
 				result.add(locAPDto);
 			}
 		}
@@ -301,8 +343,8 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	 * @since July 26, 2018
 	 */
 	@Override
-	public List<LocationAccountProfileDTO> findByUserLocationsAndAccountProfileActivatedAndLastModified(int limit, int offset,
-			LocalDateTime lastModified) {
+	public List<LocationAccountProfileDTO> findByUserLocationsAndAccountProfileActivatedAndLastModified(int limit,
+			int offset, LocalDateTime lastModified) {
 		// current user employee locations
 		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByEmployeeProfileIsCurrentUser();
 		List<LocationAccountProfileDTO> result = new ArrayList<>();
@@ -310,7 +352,9 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 			List<Object[]> locAccProfiles = locationAccountProfileRepository
 					.findByLocationInAndAccountProfileActivatedPaginated(locationIds, lastModified, limit, offset);
 			for (Object[] objects : locAccProfiles) {
-				LocationAccountProfileDTO locAPDto = new LocationAccountProfileDTO(objects[0].toString(), objects[1].toString() ,objects[2].toString(),objects[3].toString(),((java.sql.Timestamp)objects[4]).toLocalDateTime());
+				LocationAccountProfileDTO locAPDto = new LocationAccountProfileDTO(objects[0].toString(),
+						objects[1].toString(), objects[2].toString(), objects[3].toString(),
+						((java.sql.Timestamp) objects[4]).toLocalDateTime());
 				result.add(locAPDto);
 			}
 		}
@@ -452,7 +496,8 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		// current user's subordinates employee locations
 		List<Location> locations = employeeProfileLocationRepository.findLocationsByUserIdIn(userIds);
 		if (!locations.isEmpty()) {
-			return locationAccountProfileRepository.findAccountProfilePidsByUserLocationsOrderByAccountProfilesName(locations);
+			return locationAccountProfileRepository
+					.findAccountProfilePidsByUserLocationsOrderByAccountProfilesName(locations);
 		}
 		return Collections.emptySet();
 	}
@@ -461,7 +506,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	public List<LocationAccountProfile> findAllLocationAccountProfiles(Long companyId) {
 		List<LocationAccountProfile> locationAccountProfiles = new ArrayList<>();
 		for (Object[] object : locationAccountProfileRepository.findAllLocationAccountProfilesByCompanyId(companyId)) {
-			if(object[1] == null || object[2] == null){
+			if (object[1] == null || object[2] == null) {
 				log.error("Either one of AccountProfilePid or LocationPid is null!");
 				continue;
 			}

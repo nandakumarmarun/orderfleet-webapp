@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.repository;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -55,7 +56,16 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	Page<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAsc(
 			List<Location> locations, Pageable pageable);
-
+	
+	@Query(value = "select ap.pid as accountProfilePid , ap.name as accountProfileName, loc.pid as locationPid, "
+			+ "loc.name as locationName, lap.last_modified_date as lastModifiedDate from tbl_location_account_profile lap "
+			+ "join tbl_account_profile ap on lap.account_profile_id = ap.id join tbl_location loc on lap.location_id = loc.id  "
+			+ "where lap.company_id = ?#{principal.companyId} and lap.location_id in ?1 and ap.activated=true ORDER BY lap.id LIMIT ?2 OFFSET ?3", nativeQuery = true)
+	List<Object[]> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAscPaginated(Set<Long> locationIds,
+			int limit, int offset);
+	
+	
+	
 	List<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAsc(
 			List<Location> locations);
 
@@ -117,6 +127,9 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 order by locationAccountProfile.accountProfile.name asc")
 	List<AccountProfile> findAccountProfilesByUserLocationsOrderByAccountProfilesName(List<Location> locations);
+	
+	@Query(value="select account_profile_id from tbl_location_account_profile where location_id in  ?1",nativeQuery = true)
+	Set<BigInteger> findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(Set<Long> locationIds);
 	
 	@Query("select locationAccountProfile.accountProfile.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 order by locationAccountProfile.accountProfile.name asc")
 	Set<String> findAccountProfilePidsByUserLocationsOrderByAccountProfilesName(List<Location> locations);

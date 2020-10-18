@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,7 +48,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.enums.VoucherType;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
@@ -65,6 +69,7 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -116,15 +121,20 @@ public class SalesPerformanceReportResource {
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
 
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
+
+	@Inject
+	private AccountProfileMapper accountProfileMapper;
+
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of inventory
 	 *         vouchers in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/primary-sales-performance", method = RequestMethod.GET)
 	@Timed
@@ -140,16 +150,34 @@ public class SalesPerformanceReportResource {
 			Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 			userIds.add(currentUserId);
 			Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserIdIn(userIds);
-			List<Object[]> accountPidNames = locationAccountProfileRepository
-					.findAccountProfilesByLocationIdIn(locationIds);
-			int size = accountPidNames.size();
-			List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
-			for (int i = 0; i < size; i++) {
-				AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
-				accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
-				accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
-				accountProfileDTOs.add(accountProfileDTO);
+//			List<Object[]> accountPidNames = locationAccountProfileRepository
+//			.findAccountProfilesByLocationIdIn(locationIds);
+//	int size = accountPidNames.size();
+//	List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
+//	for (int i = 0; i < size; i++) {
+//		AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
+//		accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
+//		accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
+//		accountProfileDTOs.add(accountProfileDTO);
+//	}
+
+			Set<BigInteger> apIds = locationAccountProfileRepository
+					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+
+			Set<Long> accountProfileIds = new HashSet<>();
+
+			for (BigInteger apId : apIds) {
+				accountProfileIds.add(apId.longValue());
 			}
+
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+
+			// remove duplicates
+			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+
+			List<AccountProfileDTO> accountProfileDTOs = accountProfileMapper
+					.accountProfilesToAccountProfileDTOs(result);
 			model.addAttribute("accounts", accountProfileDTOs);
 		}
 		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
@@ -159,8 +187,7 @@ public class SalesPerformanceReportResource {
 	/**
 	 * GET /primary-sales-performance/:id : get the "id" InventoryVoucher.
 	 *
-	 * @param id
-	 *            the id of the InventoryVoucherDTO to retrieve
+	 * @param id the id of the InventoryVoucherDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         InventoryVoucherDTO, or with status 404 (Not Found)
 	 */
@@ -257,7 +284,7 @@ public class SalesPerformanceReportResource {
 				.collect(Collectors.toSet());
 		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
 		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
-				Collectors.summingDouble(obj -> ((Double) (obj[3]==null?1.0d:obj[3]) * (Double) obj[4]))));
+				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
 		int size = inventoryVouchers.size();
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
@@ -299,19 +326,18 @@ public class SalesPerformanceReportResource {
 	@Timed
 	public void downloadInventoryXls(@RequestParam("inventoryVoucherHeaderPids") String[] inventoryVoucherHeaderPids,
 			HttpServletResponse response) {
-		log.debug("fetching inventory voucher header "+LocalDateTime.now());
+		log.debug("fetching inventory voucher header " + LocalDateTime.now());
 		List<Object[]> inventoryVoucherHeaderDTOs = inventoryVoucherService
 				.findByCompanyIdAndInventoryPidIn(Arrays.asList(inventoryVoucherHeaderPids));
 		if (inventoryVoucherHeaderDTOs.isEmpty()) {
 			return;
 		}
-		log.debug("fetched inventory voucher header "+LocalDateTime.now());
-		log.debug("inventory voucher header size"+inventoryVoucherHeaderDTOs.size());
+		log.debug("fetched inventory voucher header " + LocalDateTime.now());
+		log.debug("inventory voucher header size" + inventoryVoucherHeaderDTOs.size());
 		buildExcelDocument(inventoryVoucherHeaderDTOs, response);
 	}
 
-	private void buildExcelDocument(List<Object[]> inventoryVoucherHeaderDTOs,
-			HttpServletResponse response) {
+	private void buildExcelDocument(List<Object[]> inventoryVoucherHeaderDTOs, HttpServletResponse response) {
 		log.debug("Downloading Excel report");
 		String excelFileName = "SalesOrder" + ".xls";
 		String sheetName = "Sheet1";
@@ -321,7 +347,7 @@ public class SalesPerformanceReportResource {
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
-			//createReportRows(worksheet, inventoryVoucherHeaderDTOs);
+			// createReportRows(worksheet, inventoryVoucherHeaderDTOs);
 			createReportRowsFasterWay(worksheet, inventoryVoucherHeaderDTOs);
 			// Resize all columns to fit the content size
 			for (int i = 0; i < headerColumns.length; i++) {
@@ -338,8 +364,6 @@ public class SalesPerformanceReportResource {
 		}
 	}
 
-
-
 	private void createReportRowsFasterWay(HSSFSheet worksheet, List<Object[]> inventoryVoucherObjectArray) {
 		/*
 		 * CreationHelper helps us create instances of various things like DataFormat,
@@ -352,38 +376,38 @@ public class SalesPerformanceReportResource {
 		// Create Other rows and cells with Sales data
 		int rowNum = 1;
 		for (Object[] ivArray : inventoryVoucherObjectArray) {
-				HSSFRow row = worksheet.createRow(rowNum++);
-				row.createCell(0).setCellValue(ivArray[0]!=null?ivArray[0].toString():"");
-				row.createCell(1).setCellValue(ivArray[1]!=null?ivArray[1].toString():"");
-				HSSFCell docDateCell = row.createCell(2);
-				docDateCell.setCellValue(ivArray[2]!=null?ivArray[2].toString():"");
-				docDateCell.setCellStyle(dateCellStyle);
-				row.createCell(3).setCellValue(ivArray[3]!=null?ivArray[3].toString():"");
-				row.createCell(4).setCellValue(ivArray[4]!=null?ivArray[4].toString():"");
+			HSSFRow row = worksheet.createRow(rowNum++);
+			row.createCell(0).setCellValue(ivArray[0] != null ? ivArray[0].toString() : "");
+			row.createCell(1).setCellValue(ivArray[1] != null ? ivArray[1].toString() : "");
+			HSSFCell docDateCell = row.createCell(2);
+			docDateCell.setCellValue(ivArray[2] != null ? ivArray[2].toString() : "");
+			docDateCell.setCellStyle(dateCellStyle);
+			row.createCell(3).setCellValue(ivArray[3] != null ? ivArray[3].toString() : "");
+			row.createCell(4).setCellValue(ivArray[4] != null ? ivArray[4].toString() : "");
 
-				row.createCell(5).setCellValue(ivArray[5]!=null?ivArray[5].toString():"");
-				row.createCell(6).setCellValue(ivArray[6]!=null?ivArray[6].toString():"0");
-				double unitQty = 1.0;
-				if(ivArray[7]!=null) {
-					unitQty = Double.parseDouble(ivArray[7].toString());
-				}
-				row.createCell(7).setCellValue(unitQty);
-				if(ivArray[6] != null) {
-					double totalQty = Double.parseDouble(ivArray[6].toString()) * unitQty;
-					row.createCell(8).setCellValue(totalQty);
-				}
-				row.createCell(9).setCellValue(ivArray[8]!=null?ivArray[8].toString():"0");
-				row.createCell(10).setCellValue(ivArray[9]!=null?Double.parseDouble(ivArray[9].toString()):0.0);
-				row.createCell(11).setCellValue(ivArray[10]!=null?Double.parseDouble(ivArray[10].toString()):0.0);
-				
-				row.createCell(12).setCellValue(ivArray[11]!=null?Double.parseDouble(ivArray[11].toString()):0.0);
-				row.createCell(13).setCellValue(ivArray[12]!=null?Double.parseDouble(ivArray[12].toString()):0.0);
-				row.createCell(14).setCellValue(ivArray[13]!=null?Double.parseDouble(ivArray[13].toString()):0.0);
-
+			row.createCell(5).setCellValue(ivArray[5] != null ? ivArray[5].toString() : "");
+			row.createCell(6).setCellValue(ivArray[6] != null ? ivArray[6].toString() : "0");
+			double unitQty = 1.0;
+			if (ivArray[7] != null) {
+				unitQty = Double.parseDouble(ivArray[7].toString());
 			}
-		
+			row.createCell(7).setCellValue(unitQty);
+			if (ivArray[6] != null) {
+				double totalQty = Double.parseDouble(ivArray[6].toString()) * unitQty;
+				row.createCell(8).setCellValue(totalQty);
+			}
+			row.createCell(9).setCellValue(ivArray[8] != null ? ivArray[8].toString() : "0");
+			row.createCell(10).setCellValue(ivArray[9] != null ? Double.parseDouble(ivArray[9].toString()) : 0.0);
+			row.createCell(11).setCellValue(ivArray[10] != null ? Double.parseDouble(ivArray[10].toString()) : 0.0);
+
+			row.createCell(12).setCellValue(ivArray[11] != null ? Double.parseDouble(ivArray[11].toString()) : 0.0);
+			row.createCell(13).setCellValue(ivArray[12] != null ? Double.parseDouble(ivArray[12].toString()) : 0.0);
+			row.createCell(14).setCellValue(ivArray[13] != null ? Double.parseDouble(ivArray[13].toString()) : 0.0);
+
+		}
+
 	}
-	
+
 	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
 		// Create a Font for styling header cells
 		Font headerFont = worksheet.getWorkbook().createFont();
@@ -403,7 +427,7 @@ public class SalesPerformanceReportResource {
 			cell.setCellStyle(headerCellStyle);
 		}
 	}
-	
+
 	@RequestMapping(value = "/primary-sales-performance/changeStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> changeStatus(@RequestParam String pid) {
@@ -452,8 +476,7 @@ public class SalesPerformanceReportResource {
 //		}
 //	}
 //}	
-	
-	
+
 //	public static void fillReport(HSSFSheet worksheet, List<InventoryVoucherXlsDownloadDTO> xlsDownloadDTOs) {
 //		// Row offset
 //		int startRowIndex = 1;
@@ -542,7 +565,5 @@ public class SalesPerformanceReportResource {
 //			cell17.setCellStyle(bodyCellStyle);
 //		}
 //	}
-
-	
 
 }

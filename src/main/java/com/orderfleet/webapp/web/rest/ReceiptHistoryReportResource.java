@@ -1,12 +1,14 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +52,7 @@ import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesTargetBlockDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesTargetReportSettingDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 /**
  * Web controller for managing SaleReceiptReport.
@@ -93,10 +96,12 @@ public class ReceiptHistoryReportResource {
 
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
-	
+
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
 
+	@Inject
+	private AccountProfileMapper accountProfileMapper;
 
 	/**
 	 * GET /other-tasks : get other-tasks page.
@@ -142,20 +147,38 @@ public class ReceiptHistoryReportResource {
 		}
 		return new ResponseEntity<>(headings, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/receipt-history-report/accountProfile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<AccountProfileDTO> getAccountProfilesByEmployeePid(@RequestParam("employeePid") String userPid) {
-		Set<Long> locationIds =  employeeProfileLocationRepository.findLocationIdsByUserPidIn(Arrays.asList(userPid));
-		List<Object[]> accounts = locationAccountProfileRepository.findAccountProfilesByLocationIdIn(locationIds);
-		List<AccountProfileDTO> accountProfileDtos = new ArrayList<>();
-		for (Object[] accountArray : accounts) {
-			AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
-			accountProfileDTO.setPid(accountArray[0].toString());
-			accountProfileDTO.setName(accountArray[1].toString());
-			accountProfileDtos.add(accountProfileDTO);
+		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserPidIn(Arrays.asList(userPid));
+//		List<Object[]> accountPidNames = locationAccountProfileRepository
+//		.findAccountProfilesByLocationIdIn(locationIds);
+//int size = accountPidNames.size();
+//List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
+//for (int i = 0; i < size; i++) {
+//	AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
+//	accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
+//	accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
+//	accountProfileDTOs.add(accountProfileDTO);
+//}
+
+		Set<BigInteger> apIds = locationAccountProfileRepository
+				.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+
+		Set<Long> accountProfileIds = new HashSet<>();
+
+		for (BigInteger apId : apIds) {
+			accountProfileIds.add(apId.longValue());
 		}
-		return accountProfileDtos;
+
+		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyIdAndIdsIn(accountProfileIds);
+
+// remove duplicates
+		List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+
+		List<AccountProfileDTO> accountProfileDTOs = accountProfileMapper.accountProfilesToAccountProfileDTOs(result);
+		return accountProfileDTOs;
 	}
 
 	/**
@@ -166,17 +189,19 @@ public class ReceiptHistoryReportResource {
 	 */
 	@Timed
 	@RequestMapping(value = "/receipt-history-report/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Map<String, SalesTargetReportSettingDTO>> loadAccountProfiles(@RequestParam String userPid, @RequestParam String accountPid) {
+	public ResponseEntity<Map<String, SalesTargetReportSettingDTO>> loadAccountProfiles(@RequestParam String userPid,
+			@RequestParam String accountPid) {
 		log.debug("Web request to load AccountProfiles ");
 		Map<String, SalesTargetReportSettingDTO> result = new HashMap<>();
-		Set<Long> locationIds =  employeeProfileLocationRepository.findLocationIdsByUserPidIn(Arrays.asList(userPid));
+		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserPidIn(Arrays.asList(userPid));
 		final List<AccountProfile> accountProfiles = new ArrayList<>();
-		if("-1".equals(accountPid)) {
-			accountProfiles.addAll(locationAccountProfileRepository.findAccountProfileByLocationIdIn(new ArrayList<>(locationIds)));
+		if ("-1".equals(accountPid)) {
+			accountProfiles.addAll(
+					locationAccountProfileRepository.findAccountProfileByLocationIdIn(new ArrayList<>(locationIds)));
 		} else {
 			accountProfileRepository.findOneByPid(accountPid).ifPresent(ap -> accountProfiles.add(ap));
 		}
-		
+
 		List<SalesTargetReportSetting> salesTargetReportSettings = salesTargetReportSettingRepository
 				.findAllByCompanyIdAndTargetSettingType(BestPerformanceType.RECEIPT);
 		if (!salesTargetReportSettings.isEmpty() && !accountProfiles.isEmpty()) {
@@ -188,7 +213,8 @@ public class ReceiptHistoryReportResource {
 
 					// find salestargetblocks
 					salesTargetReportSettingSalesTargetBlockRepository
-							.findBySalesTargetReportSettingPidOrderBySortOrder(salesTargetReportSetting.getPid()).forEach(strsStb -> {
+							.findBySalesTargetReportSettingPidOrderBySortOrder(salesTargetReportSetting.getPid())
+							.forEach(strsStb -> {
 								SalesTargetBlockDTO slBlockDTO = setAccountWiseTargetAndAchieved(
 										new SalesTargetBlockDTO(strsStb.getSalesTargetBlock(), strsStb.getSortOrder()),
 										strsStb.getCompany(), accnt.getPid(), salesTargetReportSetting);

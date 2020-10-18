@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -71,6 +73,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.codec.Base64.OutputStream;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
@@ -80,6 +83,7 @@ import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
@@ -104,6 +108,7 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
@@ -176,6 +181,12 @@ public class ProcessFlowStage2Resource {
 	@Inject
 	private UserMenuItemService userMenuItemService;
 
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
+
+	@Inject
+	private AccountProfileMapper accountProfileMapper;
+
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
 	 *
@@ -199,16 +210,34 @@ public class ProcessFlowStage2Resource {
 			Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 			userIds.add(currentUserId);
 			Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserIdIn(userIds);
-			List<Object[]> accountPidNames = locationAccountProfileRepository
-					.findAccountProfilesByLocationIdIn(locationIds);
-			int size = accountPidNames.size();
-			List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
-			for (int i = 0; i < size; i++) {
-				AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
-				accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
-				accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
-				accountProfileDTOs.add(accountProfileDTO);
+//			List<Object[]> accountPidNames = locationAccountProfileRepository
+//			.findAccountProfilesByLocationIdIn(locationIds);
+//	int size = accountPidNames.size();
+//	List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
+//	for (int i = 0; i < size; i++) {
+//		AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
+//		accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
+//		accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
+//		accountProfileDTOs.add(accountProfileDTO);
+//	}
+
+			Set<BigInteger> apIds = locationAccountProfileRepository
+					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+
+			Set<Long> accountProfileIds = new HashSet<>();
+
+			for (BigInteger apId : apIds) {
+				accountProfileIds.add(apId.longValue());
 			}
+
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+
+			// remove duplicates
+			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+
+			List<AccountProfileDTO> accountProfileDTOs = accountProfileMapper
+					.accountProfilesToAccountProfileDTOs(result);
 			model.addAttribute("accounts", accountProfileDTOs);
 		}
 		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
