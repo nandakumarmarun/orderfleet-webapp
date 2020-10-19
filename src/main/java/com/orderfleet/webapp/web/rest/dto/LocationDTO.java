@@ -151,10 +151,10 @@ public class LocationDTO {
 		return Objects.hashCode(pid);
 	}
 
-	@Override
-	public String toString() {
-		return "LocationDTO [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
-				+ description + ", latitude=" + latitude + ", longitude=" + longitude + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "LocationDTO [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
+//				+ description + ", latitude=" + latitude + ", longitude=" + longitude + "]";
+//	}
 
 }

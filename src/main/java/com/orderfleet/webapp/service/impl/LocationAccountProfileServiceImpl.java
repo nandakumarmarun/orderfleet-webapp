@@ -210,28 +210,40 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		log.info("Count : {}" + count);
 
 		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByEmployeeProfileIsCurrentUser();
-		if (locationIds.size() > 0) {
+		long companyId = SecurityUtils.getCurrentUsersCompanyId();
 
-			int limit = count;
-			int offset = page * count;
+		if (locationIds.size() > 0) {
+			Page<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
+					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdOrderByIdAsc(
+							locationIds, companyId, new PageRequest(page, count));
+
+			result = accountProfiles.getContent().stream().map(la -> la.getAccountProfile())
+					.collect(Collectors.toList());
+
+		}
+
+//		if (locationIds.size() > 0) {
+//
+//			int limit = count;
+//			int offset = page * count;
 //			Page<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
 //					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAsc(locations,
 //							new PageRequest(page, count));
-
-			List<Object[]> locAccProfiles = locationAccountProfileRepository
-					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAscPaginated(
-							locationIds, limit, offset);
-			// List<LocationAccountProfileDTO> accountProfiles = new ArrayList<>();
-
-			List<String> accountPids = new ArrayList<>();
-
-			for (Object[] objects : locAccProfiles) {
-				accountPids.add(objects[0].toString());
-			}
-
-			result = accountProfileRepository.findAllByAccountProfilePids(accountPids);
-
-		}
+//
+//			List<Object[]> locAccProfiles = locationAccountProfileRepository
+//					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAscPaginated(
+//							locationIds, limit, offset);
+//			// List<LocationAccountProfileDTO> accountProfiles = new ArrayList<>();
+//
+//			List<String> accountPids = new ArrayList<>();
+//
+//			for (Object[] objects : locAccProfiles) {
+//				accountPids.add(objects[0].toString());
+//			}
+//
+//			result = accountProfileRepository.findAllByAccountProfilePids(accountPids);
+//
+//		}
 		List<AccountNameTextSettings> accountNameTextSettings = accountNameTextSettingsRepository
 				.findAllByCompanyIdAndEnabledTrue(SecurityUtils.getCurrentUsersCompanyId());
 		Page<AccountProfileDTO> accountProfileDtoPage = new PageImpl<>(
@@ -311,14 +323,22 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	public Page<AccountProfileDTO> findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDate(int page,
 			int count, LocalDateTime lastSyncdate) {
 		// current user employee locations
-		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+		// List<Location> locations =
+		// employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+
+		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByEmployeeProfileIsCurrentUser();
+		long companyId = SecurityUtils.getCurrentUsersCompanyId();
 
 		// get accounts in employee locations
 		List<AccountProfile> result = new ArrayList<>();
-		if (locations.size() > 0) {
+		if (locationIds.size() > 0) {
+//			Page<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
+//					.findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDate(locations, true, lastSyncdate,
+//							new PageRequest(page, count));
+
 			Page<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
-					.findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDate(locations, true, lastSyncdate,
-							new PageRequest(page, count));
+					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdAndLastModifiedDateOrderByIdAsc(
+							locationIds, companyId, lastSyncdate, new PageRequest(page, count));
 			result = accountProfiles.getContent().stream().map(la -> la.getAccountProfile())
 					.collect(Collectors.toList());
 		}

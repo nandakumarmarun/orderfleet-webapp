@@ -54,13 +54,13 @@ public class LocationHierarchyDTO {
     }
 
 
-    @Override
-    public String toString() {
-        return "LocationHierarchyDTO{" +
-            "locationId=" + locationId +
-            ", parentId=" + parentId +
-            ", locationName='" + locationName + "'" +
-            ", parentName='" + parentName + "'" +
-            '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "LocationHierarchyDTO{" +
+//            "locationId=" + locationId +
+//            ", parentId=" + parentId +
+//            ", locationName='" + locationName + "'" +
+//            ", parentName='" + parentName + "'" +
+//            '}';
+//    }
 }

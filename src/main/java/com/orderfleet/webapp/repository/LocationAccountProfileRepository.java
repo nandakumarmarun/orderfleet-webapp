@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -28,7 +29,7 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid = ?1 ")
 	List<AccountProfile> findAccountProfileByLocationPid(String locationPid);
-	
+
 	void deleteByLocationPid(String locationPid);
 
 	void deleteByCompanyId(Long companyId);
@@ -56,22 +57,35 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	Page<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAsc(
 			List<Location> locations, Pageable pageable);
-	
+
 	@Query(value = "select ap.pid as accountProfilePid , ap.name as accountProfileName, loc.pid as locationPid, "
 			+ "loc.name as locationName, lap.last_modified_date as lastModifiedDate from tbl_location_account_profile lap "
 			+ "join tbl_account_profile ap on lap.account_profile_id = ap.id join tbl_location loc on lap.location_id = loc.id  "
 			+ "where lap.company_id = ?#{principal.companyId} and lap.location_id in ?1 and ap.activated=true ORDER BY lap.id LIMIT ?2 OFFSET ?3", nativeQuery = true)
-	List<Object[]> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAscPaginated(Set<Long> locationIds,
-			int limit, int offset);
-	
-	
-	
+	List<Object[]> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAscPaginated(
+			Set<Long> locationIds, int limit, int offset);
+
+	// @Query("select distinct locationAccountProfile from LocationAccountProfile
+	// locationAccountProfile where locationAccountProfile.location in ?1 and
+	// locationAccountProfile.accountProfile.activated=?2 and
+	// (locationAccountProfile.lastModifiedDate > ?3) OR
+	// (locationAccountProfile.accountProfile.lastModifiedDate > ?3) OR
+	// (locationAccountProfile.location.lastModifiedDate > ?3) order by
+	// locationAccountProfile.id asc")
+
+	@Query(value = "select ap.pid as accountProfilePid , ap.name as accountProfileName, loc.pid as locationPid, "
+			+ "loc.name as locationName, lap.last_modified_date as lastModifiedDate from tbl_location_account_profile lap "
+			+ "join tbl_account_profile ap on lap.account_profile_id = ap.id join tbl_location loc on lap.location_id = loc.id  "
+			+ "where lap.company_id = ?#{principal.companyId} and lap.location_id in ?1 and ap.activated=true and (lap.last_modified_date > ?2) OR (ap.last_modified_date > ?2) OR (loc.last_modified_date > ?2) ORDER BY lap.id LIMIT ?3 OFFSET ?4", nativeQuery = true)
+	List<Object[]> findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDatePaginated(Set<Long> locationIds,
+			LocalDateTime lastModifiedDate, int limit, int offset);
+
 	List<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationInOrderByIdAsc(
 			List<Location> locations);
 
 	@Query("select DISTINCT(locationAccountProfile.accountProfile) from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.id = ?1 and locationAccountProfile.location.activated=true")
 	List<AccountProfile> findAccountProfileByLocationId(Long locationId);
-	
+
 	@Query("select DISTINCT(locationAccountProfile.accountProfile.id) from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid = ?1 and locationAccountProfile.location.activated=true")
 	Set<Long> findAccountProfileIdByLocationPid(String locationPid);
 
@@ -89,18 +103,18 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 			+ "loc.name as locationName, lap.last_modified_date as lastModifiedDate from tbl_location_account_profile lap "
 			+ "join tbl_account_profile ap on lap.account_profile_id = ap.id join tbl_location loc on lap.location_id = loc.id  "
 			+ "where lap.company_id = ?#{principal.companyId} and lap.location_id in ?1 and ap.activated=true ORDER BY lap.id LIMIT ?2 OFFSET ?3", nativeQuery = true)
-	List<Object[]> findByLocationInAndAccountProfileActivatedPaginated(Set<Long> locationIds,
-			int limit, int offset);
+	List<Object[]> findByLocationInAndAccountProfileActivatedPaginated(Set<Long> locationIds, int limit, int offset);
 
 	@Query(value = "select ap.pid as accountProfilePid , ap.name as accountProfileName, loc.pid as locationPid, "
 			+ "loc.name as locationName, lap.last_modified_date as lastModifiedDate from tbl_location_account_profile lap "
 			+ "join tbl_account_profile ap on lap.account_profile_id = ap.id join tbl_location loc on lap.location_id = loc.id "
 			+ "where lap.company_id = ?#{principal.companyId} and lap.location_id in ?1 and ap.activated=true and "
 			+ "(lap.last_modified_date > ?2) OR (ap.last_modified_date > ?2) OR (loc.last_modified_date > ?2) ORDER BY lap.id LIMIT ?3 OFFSET ?4", nativeQuery = true)
-	List<Object[]> findByLocationInAndAccountProfileActivatedPaginated(Set<Long> locationIds, LocalDateTime lastModifiedDate, int limit, int offset);
-	
+	List<Object[]> findByLocationInAndAccountProfileActivatedPaginated(Set<Long> locationIds,
+			LocalDateTime lastModifiedDate, int limit, int offset);
+
 	List<LocationAccountProfile> findAllByCompanyId(Long companyId);
-	
+
 	List<LocationAccountProfile> findAllByCompanyPid(String companyPid);
 
 	@Query("select distinct locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in ?1 and locationAccountProfile.accountProfile.activated=true order by locationAccountProfile.accountProfile.name asc")
@@ -127,67 +141,79 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 order by locationAccountProfile.accountProfile.name asc")
 	List<AccountProfile> findAccountProfilesByUserLocationsOrderByAccountProfilesName(List<Location> locations);
-	
-	@Query(value="select account_profile_id from tbl_location_account_profile where location_id in  ?1",nativeQuery = true)
+
+	@Query(value = "select account_profile_id from tbl_location_account_profile where location_id in  ?1", nativeQuery = true)
 	Set<BigInteger> findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(Set<Long> locationIds);
-	
+
 	@Query("select locationAccountProfile.accountProfile.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 order by locationAccountProfile.accountProfile.name asc")
 	Set<String> findAccountProfilePidsByUserLocationsOrderByAccountProfilesName(List<Location> locations);
-	
+
 	@Query("select locationAccountProfile.accountProfile.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid in ?1")
 	Set<String> findAccountProfilePidsByLocationPidIn(List<String> locationPids);
-	
+
 	@Query("select locationAccountProfile.accountProfile.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.id in ?1")
 	Set<String> findAccountProfilePidsByLocationIdIn(Set<Long> locationIds);
-	
+
 	@Query("select la.accountProfile.pid, la.accountProfile.name from LocationAccountProfile la where la.location.id in ?1 order by la.accountProfile.name ASC")
 	List<Object[]> findAccountProfilesByLocationIdIn(Set<Long> locationIds);
-	
+
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?#{principal.companyId} and locationAccountProfile.accountProfile.pid = ?1 ")
 	List<LocationAccountProfile> findAllByAccountProfilePid(String accountProfilePid);
-	
+
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid in ?1 and locationAccountProfile.accountProfile.activated = ?2")
-	List<AccountProfile> findAccountProfileByLocationPidInAndAccountProfileActivated(List<String> locationPids,boolean active);
-	
+	List<AccountProfile> findAccountProfileByLocationPidInAndAccountProfileActivated(List<String> locationPids,
+			boolean active);
+
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid = ?1 and locationAccountProfile.accountProfile.activated = ?2")
-	List<AccountProfile> findAccountProfileByLocationPidAndAccountProfileActivated(String locationPid,boolean active);
-	
+	List<AccountProfile> findAccountProfileByLocationPidAndAccountProfileActivated(String locationPid, boolean active);
+
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 and locationAccountProfile.accountProfile.accountType.pid in ?2 and locationAccountProfile.accountProfile.importStatus= ?3 order by locationAccountProfile.accountProfile.name asc")
-	List<AccountProfile> findAccountProfilesByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(List<Location> locations,List<String> accountTypePids,boolean status);
-	
+	List<AccountProfile> findAccountProfilesByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(
+			List<Location> locations, List<String> accountTypePids, boolean status);
+
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 and locationAccountProfile.accountProfile.accountType.pid in ?2 order by locationAccountProfile.accountProfile.name asc")
-	List<AccountProfile> findAccountByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(List<Location> locations,List<String> accountTypePids);
-	
+	List<AccountProfile> findAccountByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(
+			List<Location> locations, List<String> accountTypePids);
+
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 and locationAccountProfile.accountProfile.importStatus = ?2 order by locationAccountProfile.accountProfile.name asc")
-	List<AccountProfile> findAccountByUserLocationsAndImportedStatusOrderByAccountProfilesName(List<Location> locations,boolean status);
-	
+	List<AccountProfile> findAccountByUserLocationsAndImportedStatusOrderByAccountProfilesName(List<Location> locations,
+			boolean status);
+
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 order by locationAccountProfile.accountProfile.name asc")
-	List<AccountProfile> findAccountByUserLocationsAndAllImportedStatusOrderByAccountProfilesName(List<Location> locations);
-	
+	List<AccountProfile> findAccountByUserLocationsAndAllImportedStatusOrderByAccountProfilesName(
+			List<Location> locations);
+
 	LocationAccountProfile findByAccountProfile(AccountProfile accountProfile);
-	
+
 	@Query("select locationAccountProfile.accountProfile.id from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.id in ?1")
 	Set<Long> findAccountProfileIdsByUserLocationIdsIn(Set<Long> locationIds);
-	
+
 	@Query("select lap.id, lap.accountProfile.pid, lap.location.pid from LocationAccountProfile lap where lap.company.id in ?1")
 	List<Object[]> findAllLocationAccountProfilesByCompanyId(Long companyId);
-	
+
 	@Transactional
 	@Modifying
 	@Query("delete from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?1 and locationAccountProfile.id in ?2")
 	void deleteByIdIn(Long companyId, List<Long> ids);
-	
+
 	@Transactional
 	@Modifying
 	@Query("delete from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?1")
 	void deleteByCompany(Long companyId);
-	
+
 	@Transactional
 	@Modifying
 	@Query("delete from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?1 and locationAccountProfile.accountProfile.id NOT IN (?2)")
-	void deleteByCompanyExcludeDefault(Long companyId,List<Long> accountIds);
-	
+	void deleteByCompanyExcludeDefault(Long companyId, List<Long> accountIds);
+
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile  where locationAccountProfile.accountProfile.pid in ?1 and locationAccountProfile.accountProfile.activated = true")
 	List<LocationAccountProfile> findAllLocationByAccountProfilePids(List<String> accountProfilePids);
-	
+
+	Page<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdOrderByIdAsc(
+			Set<Long> locationIds, long companyId, Pageable pageable);
+
+	@Query("select distinct locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in ?1 and locationAccountProfile.accountProfile.activated=true and locationAccountProfile.company.id=?2 and (locationAccountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.accountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.location.lastModifiedDate > ?3) order by locationAccountProfile.id asc")
+	Page<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdAndLastModifiedDateOrderByIdAsc(
+			Set<Long> locationIds, long companyId, LocalDateTime lastSyncdate, Pageable pageable);
+
 }
