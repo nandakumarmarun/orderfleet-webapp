@@ -1469,7 +1469,7 @@ public class TransactionResource {
 		accountingVoucherHeaderDTO.setCashAmount(cashAmount);
 		accountingVoucherHeaderDTO.setChequeAmount(chequeAmount);
 
-		return null;
+		return accountingVoucherHeaderDTO;
 	}
 
 //	@RequestMapping(value = "/v2/get-receipts.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
