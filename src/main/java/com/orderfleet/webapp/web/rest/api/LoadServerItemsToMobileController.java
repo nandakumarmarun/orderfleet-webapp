@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest.api;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -146,6 +147,48 @@ public class LoadServerItemsToMobileController {
 		log.info("Attendance Size= " + attendenceDTOs.size());
 
 		return new ResponseEntity<>(attendenceDTOs, HttpStatus.OK);
+	}
+	
+	@GetMapping("/customer-wise-inventory")
+	public ResponseEntity<List<InventoryVoucherHeaderDTO>> sentCustomerWiseInventory(@RequestParam String filterBy,
+			@RequestParam(required = false) String fromDate, @RequestParam(required = false) String toDate,
+			@RequestParam(required = false) String accountPid) {
+
+		String userLogin = SecurityUtils.getCurrentUserLogin();
+		log.info("Request to load server sent items..." + accountPid+" logged user : "+ userLogin);
+
+		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
+
+		if (filterBy.equalsIgnoreCase("TODAY")) {
+			log.info("TODAY------");
+			inventoryVoucherHeaderDTOs = getInventoryVoucher(LocalDate.now(), LocalDate.now(), accountPid, userLogin);
+		} else if (filterBy.equalsIgnoreCase("YESTERDAY")) {
+			log.info("YESTERDAY------");
+			LocalDate yeasterday = LocalDate.now().minusDays(1);
+			inventoryVoucherHeaderDTOs = getInventoryVoucher(yeasterday, yeasterday, accountPid, userLogin);
+		} else if (filterBy.equalsIgnoreCase("WTD")) {
+			log.info("WTD------");
+			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
+			inventoryVoucherHeaderDTOs = getInventoryVoucher(weekStartDate, LocalDate.now(), accountPid, userLogin);
+		} else if (filterBy.equalsIgnoreCase("MTD")) {
+			log.info("MTD------");
+			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
+			inventoryVoucherHeaderDTOs = getInventoryVoucher(monthStartDate, LocalDate.now(), accountPid, userLogin);
+		} else if (filterBy.equalsIgnoreCase("CUSTOM")) {
+			log.info("CUSTOM------" + fromDate + " to " + toDate + "------");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
+			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
+			inventoryVoucherHeaderDTOs = getInventoryVoucher(fromDateTime, toFateTime, accountPid, userLogin);
+		} else if (filterBy.equalsIgnoreCase("SINGLE")) {
+			log.info("SINGLE------" + fromDate + "-------");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
+			inventoryVoucherHeaderDTOs = getInventoryVoucher(fromDateTime, fromDateTime, accountPid, userLogin);
+		}
+
+		return new ResponseEntity<>(inventoryVoucherHeaderDTOs, HttpStatus.OK);
 	}
 
 	@GetMapping("/load-server-sent-items")
@@ -618,6 +661,75 @@ public class LoadServerItemsToMobileController {
 		documentDashboardDTO.setMonthCount(monthCount);
 
 		return documentDashboardDTO;
+	}
+	
+	private List<InventoryVoucherHeaderDTO> getInventoryVoucher(LocalDate fDate, LocalDate tDate, String accountPid, String userLogin) {
+
+		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
+
+		LocalDateTime fromDate = fDate.atTime(0, 0);
+		LocalDateTime toDate = tDate.atTime(23, 59);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+		log.info("Inventory Voucher UserLogin= {} Account Pid= {}, FromDate={}, toDate ={}", userLogin, accountPid, fromDate, toDate);
+		List<Object[]> inventoryVouchersHeaders = inventoryVoucherHeaderRepository
+				.getCustomerWiseInventoryHeader(userLogin, accountPid, fromDate, toDate);
+		
+		for (Object[] obj : inventoryVouchersHeaders) {
+			InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
+			LocalDateTime createddate = null;
+			if (obj[0] != null) {
+				createddate = LocalDateTime.parse(obj[0].toString(), formatter);
+			}
+			inventoryVoucherHeaderDTO.setCreatedDate(createddate);
+			inventoryVoucherHeaderDTO.setDocDiscountAmount(obj[1] != null ? Double.parseDouble(obj[1].toString()) : 0.0);
+			inventoryVoucherHeaderDTO.setDocDiscountPercentage(obj[2] != null ? Double.parseDouble(obj[2].toString()) : 0.0);
+			LocalDateTime documentdate = null;
+			if (obj[3] != null) {
+				documentdate = LocalDateTime.parse(obj[3].toString(), formatter);
+			}
+			inventoryVoucherHeaderDTO.setDocumentDate(documentdate);
+			
+			inventoryVoucherHeaderDTO.setDocumentNumberLocal(obj[4] != null ? obj[4].toString() : "");
+			inventoryVoucherHeaderDTO.setDocumentNumberServer(obj[5] != null ? obj[5].toString() : "");
+			inventoryVoucherHeaderDTO.setDocumentTotal(obj[6] != null ? Double.parseDouble(obj[6].toString()) : 0.0);
+			inventoryVoucherHeaderDTO.setDocumentVolume(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
+			inventoryVoucherHeaderDTO.setPid(obj[8] != null ? obj[8].toString() : "");
+			inventoryVoucherHeaderDTO.setProcessStatus(obj[9] != null ? obj[9].toString() : "");
+			inventoryVoucherHeaderDTO.setEmployeePid(obj[10] != null ? obj[10].toString() : "");
+			inventoryVoucherHeaderDTO.setEmployeeName(obj[11] != null ? obj[11].toString() : "");
+			inventoryVoucherHeaderDTO.setEmployeeAlias(obj[12] != null ? obj[12].toString() : "");
+			inventoryVoucherHeaderDTO.setReceiverAccountPid(obj[13] != null ? obj[13].toString() : "");
+			inventoryVoucherHeaderDTO.setReceiverAccountName(obj[14] != null ? obj[14].toString() : "");
+			inventoryVoucherHeaderDTO.setReceiverAccountAlias(obj[15] != null ? obj[15].toString() : "");
+			inventoryVoucherHeaderDTO.setSupplierAccountPid(obj[16] != null ? obj[16].toString() : "");
+			inventoryVoucherHeaderDTO.setSupplierAccountName(obj[17] != null ? obj[17].toString() : "");
+			inventoryVoucherHeaderDTO.setDocumentName(obj[18] != null ? obj[18].toString() : "");
+			inventoryVoucherHeaderDTO.setDocumentPid(obj[19] != null ? obj[19].toString() : "");
+			
+			if (inventoryVoucherHeaderDTO.getPid() != null && !inventoryVoucherHeaderDTO.getPid().isEmpty()) {
+				List<Object[]> inventoryVouchersDetail = inventoryVoucherHeaderRepository
+						.getCustomerWiseInventoryDetail(inventoryVoucherHeaderDTO.getPid());
+				List<InventoryVoucherDetailDTO> inventoryVoucherDetails = new ArrayList<>();
+				for (Object[] obj1 : inventoryVouchersDetail) {
+					InventoryVoucherDetailDTO dto = new InventoryVoucherDetailDTO();
+					dto.setProductName(obj1[0] != null ? obj1[0].toString() : "");
+					dto.setQuantity(obj1[1] != null ? Double.parseDouble(obj1[1].toString()) : 0.0);
+					dto.setProductUnitQty(obj1[2] != null ? Double.parseDouble(obj1[2].toString()) : 0.0);
+					dto.setFreeQuantity(obj1[3] != null ? Double.parseDouble(obj1[3].toString()) : 0.0);
+					dto.setSellingRate(obj1[4] != null ? Double.parseDouble(obj1[4].toString()) : 0.0);
+					dto.setTaxPercentage(obj1[5] != null ? Double.parseDouble(obj1[5].toString()) : 0.0);
+					dto.setDiscountAmount(obj1[6] != null ? Double.parseDouble(obj1[6].toString()) : 0.0);
+					dto.setDiscountPercentage(obj1[7] != null ? Double.parseDouble(obj1[7].toString()) : 0.0);
+					dto.setRowTotal(obj1[8] != null ? Double.parseDouble(obj1[8].toString()) : 0.0);
+					dto.setProductPid(obj1[9] != null ? obj1[9].toString() : "");
+					inventoryVoucherDetails.add(dto);
+				}
+				inventoryVoucherHeaderDTO.setInventoryVoucherDetails(inventoryVoucherDetails);
+			}
+			inventoryVoucherHeaderDTOs.add(inventoryVoucherHeaderDTO);
+		}
+		log.info("Inventory Voucher Size= " + inventoryVoucherHeaderDTOs.size());
+		return inventoryVoucherHeaderDTOs;
 	}
 
 	private LoadServerExeTaskDTO getFilterData(LocalDate fDate, LocalDate tDate, String accountPid) {
