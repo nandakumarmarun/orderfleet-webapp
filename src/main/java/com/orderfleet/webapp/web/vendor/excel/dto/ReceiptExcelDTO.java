@@ -49,8 +49,8 @@ public class ReceiptExcelDTO {
 		this.narrationMessage = accountingVoucherDetail.getRemarks();
 		this.userName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
 		this.mode = accountingVoucherDetail.getMode();
-		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
-				accountingVoucherDetail.getAccountingVoucherHeader());
+//		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
+//				accountingVoucherDetail.getAccountingVoucherHeader());
 		this.trimChar = accountingVoucherDetail.getBy().getTrimChar();
 		this.chequeDate = accountingVoucherDetail.getInstrumentDate()==null?"":accountingVoucherDetail.getInstrumentDate().format(formatter);
 		this.employeeName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
@@ -72,8 +72,8 @@ public class ReceiptExcelDTO {
 		this.userName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader()
 				.getEmployee().getName();
 		this.mode = accountingVoucherAllocation.getMode();
-		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
-				accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader());
+//		this.accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO(
+//				accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader());
 		this.chequeDate = accountingVoucherAllocation.getAccountingVoucherDetail()
 				.getInstrumentDate()==null?"":accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate().toString();
 		this.employeeName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader().getEmployee().getName();

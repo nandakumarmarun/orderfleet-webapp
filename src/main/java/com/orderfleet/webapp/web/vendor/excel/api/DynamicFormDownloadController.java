@@ -35,6 +35,7 @@ import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.FormFormElementRepository;
+import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicFormDTO;
 import com.orderfleet.webapp.web.vendor.excel.dto.DynamicExcelDTO;
 import com.orderfleet.webapp.web.vendor.excel.dto.ReceiptExcelDTO;
@@ -53,9 +54,17 @@ public class DynamicFormDownloadController {
 	public List<DynamicExcelDTO> downloadDynamicDocumentsJson() throws URISyntaxException {
 		log.debug("REST request to download dynamic documents : {}");
 		DateTimeFormatter fmt = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
-		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
+		List<DynamicDocumentHeader> documentHeaders = dynamicDocumentHeaderRepository
 				.findByCompanyAndStatusOrderByCreatedDateDesc();
+
+		List<DynamicDocumentHeader> dynamicDocumentHeaders = documentHeaders.stream().distinct()
+				.collect(Collectors.toList());
+
 		List<DynamicExcelDTO> dynamicExcelDtos = new ArrayList<>();
+
+		for (DynamicDocumentHeader ddh : dynamicDocumentHeaders) {
+
+		}
 		for (DynamicDocumentHeader ddh : dynamicDocumentHeaders) {
 			DynamicExcelDTO dynamicExcelDto = new DynamicExcelDTO();
 			Map<String, String> formDetail = new HashedMap<>();
