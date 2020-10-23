@@ -61,6 +61,7 @@ import org.springframework.web.client.RestTemplate;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.io.Files;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -76,6 +77,8 @@ import com.itextpdf.text.pdf.codec.Base64.OutputStream;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.File;
+import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
@@ -86,8 +89,10 @@ import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
+import com.orderfleet.webapp.repository.FilledFormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
@@ -98,12 +103,15 @@ import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
+import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.service.InventoryVoucherDetailService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
 import com.orderfleet.webapp.service.UserMenuItemService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
+import com.orderfleet.webapp.web.rest.dto.FileDTO;
+import com.orderfleet.webapp.web.rest.dto.FormFileDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
@@ -186,6 +194,15 @@ public class ProcessFlowStage7Resource {
 
 	@Inject
 	private AccountProfileMapper accountProfileMapper;
+	
+	@Inject
+	private DynamicDocumentHeaderRepository dynamicDocumentHeaderRepository;
+
+	@Inject
+	private FilledFormRepository filledFormRepository;
+
+	@Inject
+	private FileManagerService fileManagerService;
 
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
@@ -346,6 +363,39 @@ public class ProcessFlowStage7Resource {
 				accountPid, fDate, tDate);
 		return new ResponseEntity<>(salesPerformanceDTOs, HttpStatus.OK);
 	}
+	
+	@Timed
+	@RequestMapping(value = "/process-flow-stage-7/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<FormFileDTO>> getDynamicDocumentImages(@PathVariable String pid) {
+		log.debug("Web request to get DynamicDocument images by pid : {}", pid);
+		List<FilledForm> filledForms = filledFormRepository.findByDynamicDocumentHeaderPid(pid);
+		List<FormFileDTO> formFileDTOs = new ArrayList<>();
+		if (filledForms.size() > 0) {
+			for (FilledForm filledForm : filledForms)
+				if (filledForm.getFiles().size() > 0) {
+					FormFileDTO formFileDTO = new FormFileDTO();
+					formFileDTO.setFormName(filledForm.getForm().getName());
+					formFileDTO.setFiles(new ArrayList<>());
+					Set<File> files = filledForm.getFiles();
+					for (File file : files) {
+						FileDTO fileDTO = new FileDTO();
+						fileDTO.setFileName(file.getFileName());
+						fileDTO.setMimeType(file.getMimeType());
+						java.io.File physicalFile = this.fileManagerService.getPhysicalFileByFile(file);
+						if (physicalFile.exists()) {
+							try {
+								fileDTO.setContent(Files.toByteArray(physicalFile));
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+						formFileDTO.getFiles().add(fileDTO);
+					}
+					formFileDTOs.add(formFileDTO);
+				}
+		}
+		return new ResponseEntity<>(formFileDTOs, HttpStatus.OK);
+	}
 
 	private List<SalesPerformanceDTO> getFilterData(List<String> employeePids, List<String> documentPids,
 			String processFlowStatus, String accountPid, LocalDate fDate, LocalDate tDate) {
@@ -421,6 +471,12 @@ public class ProcessFlowStage7Resource {
 		// fetch voucher details
 		Set<String> ivHeaderPids = inventoryVouchers.parallelStream().map(obj -> obj[0].toString())
 				.collect(Collectors.toSet());
+
+		Set<Long> executiveTaskIds = inventoryVouchers.parallelStream().map(obj -> Long.valueOf(obj[30].toString()))
+				.collect(Collectors.toSet());
+
+		List<Object[]> objeDynamicDocuments = dynamicDocumentHeaderRepository
+				.findAllByExecutiveTaskExecutionIdsIn(executiveTaskIds);
 		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
 //		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
 //				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
@@ -530,20 +586,16 @@ public class ProcessFlowStage7Resource {
 				salesPerformanceDTO.setDeliveryDate("");
 			}
 
-			salesPerformanceDTO.setBookingId(ivData[28] != null ? ivData[28].toString() : "");
+			if (objeDynamicDocuments.size() > 0) {
+				Optional<Object[]> dynamicDoc = objeDynamicDocuments.stream()
+						.filter(o -> o[1].toString().equals(ivData[30].toString())).findAny();
 
-			if (ivData[29] != null) {
-				LocalDate currentdate = LocalDate.now();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-				String date = ivData[29].toString();
-				LocalDate deliveryDate = LocalDate.parse(date, formatter);
-				salesPerformanceDTO.setDeliveryDate(deliveryDate.toString());
-
-				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-
-				salesPerformanceDTO.setDeliveryDateDifference(noOfDaysBetween);
+				if (dynamicDoc.isPresent()) {
+					salesPerformanceDTO.setDynamicDocumentPid(dynamicDoc.get()[0].toString());
+					salesPerformanceDTO.setImageButtonVisible(true);
+				} 
 			} else {
-				salesPerformanceDTO.setDeliveryDate("");
+				salesPerformanceDTO.setImageButtonVisible(false);
 			}
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}

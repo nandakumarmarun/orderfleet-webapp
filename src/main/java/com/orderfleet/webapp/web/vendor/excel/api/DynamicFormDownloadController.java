@@ -62,9 +62,7 @@ public class DynamicFormDownloadController {
 
 		List<DynamicExcelDTO> dynamicExcelDtos = new ArrayList<>();
 
-		for (DynamicDocumentHeader ddh : dynamicDocumentHeaders) {
-
-		}
+	
 		for (DynamicDocumentHeader ddh : dynamicDocumentHeaders) {
 			DynamicExcelDTO dynamicExcelDto = new DynamicExcelDTO();
 			Map<String, String> formDetail = new HashedMap<>();

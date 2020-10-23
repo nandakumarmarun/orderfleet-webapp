@@ -91,6 +91,10 @@ public class SalesPerformanceDTO {
 
 	private long deliveryDateDifference;
 
+	private boolean imageButtonVisible;
+
+	private String dynamicDocumentPid;
+
 	public String getPid() {
 		return pid;
 	}
@@ -401,6 +405,22 @@ public class SalesPerformanceDTO {
 
 	public void setDeliveryDate(String deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public boolean isImageButtonVisible() {
+		return imageButtonVisible;
+	}
+
+	public void setImageButtonVisible(boolean imageButtonVisible) {
+		this.imageButtonVisible = imageButtonVisible;
+	}
+
+	public String getDynamicDocumentPid() {
+		return dynamicDocumentPid;
+	}
+
+	public void setDynamicDocumentPid(String dynamicDocumentPid) {
+		this.dynamicDocumentPid = dynamicDocumentPid;
 	}
 
 }

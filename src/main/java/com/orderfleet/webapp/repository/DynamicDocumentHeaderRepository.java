@@ -176,6 +176,9 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 			+ "where ddh.company_id = ?#{principal.companyId} and ddh.id IN ?1", nativeQuery = true)
 	List<Object[]> findByFilledDynamicDocumentHeaderIdIn(Set<Long> id);
 
+	@Query(value = "select ddh.pid,ddh.executive_task_execution_id from tbl_dynamic_document_header ddh where ddh.executive_task_execution_id in ?1 and ddh.company_id=?#{principal.companyId}", nativeQuery = true)
+	List<Object[]> findAllByExecutiveTaskExecutionIdsIn(Set<Long> executiveTaskIds);
+
 	// @Query("select
 	// dDocument.pid,dDocument.documentNumberLocal,dDocument.documentNumberServer,dDocument.document.pid,"
 	// +
