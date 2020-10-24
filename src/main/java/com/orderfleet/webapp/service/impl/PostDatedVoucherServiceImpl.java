@@ -67,6 +67,9 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 			postDatedVoucher.setReferenceDocumentAmount(dto.getReferenceDocumentAmount());
 			postDatedVoucher.setReferenceDocumentNumber(dto.getReferenceDocumentNumber());
 			postDatedVoucher.setRemark(dto.getRemark());
+			postDatedVoucher.setInstrumentNumber(dto.getInstrumentNumber());
+			postDatedVoucher.setInstrumentDate(convertStringToLocalDate(dto.getInstrumentDate()));
+			postDatedVoucher.setPdcReceiptDate(convertStringToLocalDate(dto.getPdcReceiptDate()));
 			postDatedVoucher = postDatedVoucherRepository.save(postDatedVoucher);
 			log.debug("Saved post Dated Cheques");
 			return new PostDatedVoucherDTO(postDatedVoucher);
@@ -95,6 +98,9 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 				postDatedVoucher.setReferenceDocumentAmount(dto.getReferenceDocumentAmount());
 				postDatedVoucher.setReferenceDocumentNumber(dto.getReferenceDocumentNumber());
 				postDatedVoucher.setRemark(dto.getRemark());
+				postDatedVoucher.setInstrumentNumber(dto.getInstrumentNumber());
+				postDatedVoucher.setInstrumentDate(convertStringToLocalDate(dto.getInstrumentDate()));
+				postDatedVoucher.setPdcReceiptDate(convertStringToLocalDate(dto.getPdcReceiptDate()));
 				postDatedVouchers.add(postDatedVoucher);
 			}else{
 				log.error("Account Profile related to PDC not Present "+dto.getAccountProfileName());
@@ -142,9 +148,12 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 	
 	
 	private LocalDate convertStringToLocalDate(String date) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		LocalDate localDate = LocalDate.parse(date, formatter);
-		return localDate;
+		if (date != null && !date.isEmpty()) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate localDate = LocalDate.parse(date, formatter);
+			return localDate;
+		}
+		return null;
 	}
 
 	

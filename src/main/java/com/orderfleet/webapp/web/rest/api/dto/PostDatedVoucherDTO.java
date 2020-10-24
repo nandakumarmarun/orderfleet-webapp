@@ -33,6 +33,12 @@ public class PostDatedVoucherDTO {
 	private String remark;
 	
 	private List<PostDatedVoucherAllocationDTO> postDatedVoucherAllocationList;
+	
+	private String instrumentNumber;
+	
+	private String instrumentDate;
+	
+	private String pdcReceiptDate;
 
 	public PostDatedVoucherDTO() {
 		super();
@@ -53,14 +59,41 @@ public class PostDatedVoucherDTO {
 		this.referenceDocumentDate = postDatedVoucher.getReferenceDocumentDate().toString();
 		this.referenceDocumentAmount = postDatedVoucher.getReferenceDocumentAmount();
 		this.remark = postDatedVoucher.getRemark();
+		this.instrumentNumber = postDatedVoucher.getInstrumentNumber();
+		this.instrumentDate = postDatedVoucher.getInstrumentDate() != null ? postDatedVoucher.getInstrumentDate().toString(): "";
+		this.pdcReceiptDate = postDatedVoucher.getPdcReceiptDate() != null ? postDatedVoucher.getPdcReceiptDate().toString(): "";
 		if(postDatedVoucher.getPostDatedVoucherAllocation() != null){
 			this.postDatedVoucherAllocationList = postDatedVoucher.getPostDatedVoucherAllocation()
 					.stream().map(pdcAlloc -> new PostDatedVoucherAllocationDTO(pdcAlloc)).collect(Collectors.toList());
 		}
+
+		
 	}
 
 
+	public String getInstrumentNumber() {
+		return instrumentNumber;
+	}
 
+	public void setInstrumentNumber(String instrumentNumber) {
+		this.instrumentNumber = instrumentNumber;
+	}
+
+	public String getInstrumentDate() {
+		return instrumentDate;
+	}
+
+	public void setInstrumentDate(String instrumentDate) {
+		this.instrumentDate = instrumentDate;
+	}
+
+	public String getPdcReceiptDate() {
+		return pdcReceiptDate;
+	}
+
+	public void setPdcReceiptDate(String pdcReceiptDate) {
+		this.pdcReceiptDate = pdcReceiptDate;
+	}
 
 	public Long getId() {
 		return id;

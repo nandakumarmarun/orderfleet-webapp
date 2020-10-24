@@ -68,6 +68,15 @@ public class PostDatedVoucher implements Serializable,Cloneable{
 	
 	@Column(name = "remarks")
 	private String remark;
+
+	@Column(name = "instrument_number")
+	private String instrumentNumber;
+	
+	@Column(name = "pdc_instrument_date")
+	private LocalDate instrumentDate;
+	
+	@Column(name = "pdc_receipt_date")
+	private LocalDate pdcReceiptDate;
 	
 	@OneToMany(fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
 	@JoinColumn(name = "post_dated_voucher_id")
@@ -95,7 +104,8 @@ public class PostDatedVoucher implements Serializable,Cloneable{
 
 	public PostDatedVoucher(Long id, String pid, AccountProfile accountProfile,
 			String receivableBillNumber, String referenceDocumentNumber, LocalDate referenceDocumentDate,
-			double referenceDocumentAmount, String remark, Company company) {
+			double referenceDocumentAmount, String remark, Company company, String instrumentNumber,
+			LocalDate instrumentDate, LocalDate pdcReceiptDate) {
 		super();
 		this.id = id;
 		this.pid = pid;
@@ -106,6 +116,34 @@ public class PostDatedVoucher implements Serializable,Cloneable{
 		this.referenceDocumentAmount = referenceDocumentAmount;
 		this.remark = remark;
 		this.company = company;
+		
+		this.instrumentNumber = instrumentNumber;
+		this.instrumentDate = instrumentDate;
+		this.pdcReceiptDate = pdcReceiptDate;
+	}
+
+	public String getInstrumentNumber() {
+		return instrumentNumber;
+	}
+
+	public void setInstrumentNumber(String instrumentNumber) {
+		this.instrumentNumber = instrumentNumber;
+	}
+
+	public LocalDate getInstrumentDate() {
+		return instrumentDate;
+	}
+
+	public void setInstrumentDate(LocalDate instrumentDate) {
+		this.instrumentDate = instrumentDate;
+	}
+
+	public LocalDate getPdcReceiptDate() {
+		return pdcReceiptDate;
+	}
+
+	public void setPdcReceiptDate(LocalDate pdcReceiptDate) {
+		this.pdcReceiptDate = pdcReceiptDate;
 	}
 
 	public Long getId() {
