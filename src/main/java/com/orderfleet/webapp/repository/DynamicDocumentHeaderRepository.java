@@ -148,7 +148,7 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	@Query("select dDocument.pid,dDocument.document.name,dDocument.document.documentType from DynamicDocumentHeader dDocument where dDocument.executiveTaskExecution.id = ?1 and dDocument.document.pid = ?2")
 	List<Object[]> findByExecutiveTaskExecutionIdAndDocumentPid(Long executiveTaskExecutionId, String documentPid);
 
-	@Query("select dynamicDocumentHeader from DynamicDocumentHeader dynamicDocumentHeader where dynamicDocumentHeader.company.id = ?#{principal.companyId}  and tally_download_status = 'PENDING' Order By dynamicDocumentHeader.createdDate desc")
+	@Query("select dynamicDocumentHeader from DynamicDocumentHeader dynamicDocumentHeader LEFT JOIN FETCH dynamicDocumentHeader.filledForms where dynamicDocumentHeader.company.id = ?#{principal.companyId}  and tally_download_status = 'PENDING' Order By dynamicDocumentHeader.createdDate desc")
 	List<DynamicDocumentHeader> findByCompanyAndStatusOrderByCreatedDateDesc();
 
 	@Transactional
@@ -175,6 +175,9 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	@Query(value = "select ddh.id,ddh.executive_task_execution_id,ddh.created_by_id,ddh.employee_id,ddh.document_date from tbl_dynamic_document_header ddh "
 			+ "where ddh.company_id = ?#{principal.companyId} and ddh.id IN ?1", nativeQuery = true)
 	List<Object[]> findByFilledDynamicDocumentHeaderIdIn(Set<Long> id);
+
+	@Query(value = "select ddh.pid,ddh.executive_task_execution_id from tbl_dynamic_document_header ddh where ddh.executive_task_execution_id in ?1 and ddh.company_id=?#{principal.companyId}", nativeQuery = true)
+	List<Object[]> findAllByExecutiveTaskExecutionIdsIn(Set<Long> executiveTaskIds);
 
 	// @Query("select
 	// dDocument.pid,dDocument.documentNumberLocal,dDocument.documentNumberServer,dDocument.document.pid,"

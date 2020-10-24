@@ -186,19 +186,19 @@ public class AccountProfileSapPraveshUploadService {
 
 			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
 
-			//if (apDto.getLocation() == null && apDto.getLocation().equalsIgnoreCase("")) {
+			if (apDto.getLocation() == null && apDto.getLocation().equalsIgnoreCase("")) {
 				locationAccountProfileDto.setAccountProfileName(apDto.getName());
 				locationAccountProfileDto.setLocationName("Territory");
-//			} else {
-//
-//				locationDTO.setAlias(apDto.getLocation());
-//				locationDTO.setName(apDto.getLocation());
-//
-//				locationDtos.add(locationDTO);
-//
-//				locationAccountProfileDto.setAccountProfileName(apDto.getName());
-//				locationAccountProfileDto.setLocationName(apDto.getLocation());
-//			}
+			} else {
+
+				locationDTO.setAlias(apDto.getLocation());
+				locationDTO.setName(apDto.getLocation());
+
+				locationDtos.add(locationDTO);
+
+				locationAccountProfileDto.setAccountProfileName(apDto.getName());
+				locationAccountProfileDto.setLocationName(apDto.getLocation());
+			}
 
 			locationAccountProfileDtos.add(locationAccountProfileDto);
 			accountProfile.setDataSourceType(DataSourceType.TALLY);

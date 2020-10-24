@@ -422,6 +422,16 @@ if (!this.InventoryVoucher) {
 														dateFormat : "dd-mm-yy"
 													});
 
+											var content = "No Image";
+
+											if (inventoryVoucher.imageButtonVisible) {
+												content = "<button type='button' class='btn btn-blue' onclick='InventoryVoucher.showModalPopup($(\"#imagesModal\"),\""
+														+ inventoryVoucher.dynamicDocumentPid
+														+ "\",1);'>View Images</button>";
+											} else {
+												content = "No Dynamic Document";
+											}
+
 											$('#tBodyInventoryVoucher')
 													.append(
 															"<tr style='background-color:"
@@ -462,7 +472,7 @@ if (!this.InventoryVoucher) {
 																			: inventoryVoucher.documentTotal
 																					.toFixed(2))
 																	+ "</td><td>"
-																	+ inventoryVoucher.supplierAccountName
+																	+ content
 																	+ "</td><td>"
 																	+ inventoryVoucher.totalVolume
 																			.toFixed(2)
@@ -484,6 +494,52 @@ if (!this.InventoryVoucher) {
 							$("#totalVolume").html(
 									"(" + totVolume.toFixed(2) + ")");
 						}
+					}
+				});
+	}
+	
+	function showDynamicDocumentImages(pid) {
+		$
+				.ajax({
+					url : inventoryVoucherContextPath + "/images/" + pid,
+					method : 'GET',
+					success : function(filledFormFiles) {
+						
+						console.log(filledFormFiles.length);
+
+						$('#divDynamicDocumentImages').html("");
+
+						if (filledFormFiles.length > 0) {
+							$
+									.each(
+											filledFormFiles,
+											function(index, filledFormFile) {
+												var table = '<table class="table  table-striped table-bordered"><tr><td style="font-weight: bold;">'
+														+ filledFormFile.formName
+														+ '</td></tr>';
+												$
+														.each(
+																filledFormFile.files,
+																function(index,
+																		file) {
+																	table += '<tr><th>'
+																			+ file.fileName
+																			+ '</th></tr>';
+																	table += '<tr><td><img width="100%" src="data:image/png;base64,'
+																			+ file.content
+																			+ '"/></td></tr>';
+																});
+												table += '</table>';
+												$('#divDynamicDocumentImages')
+														.append(table);
+											});
+						} else {
+							$('#divDynamicDocumentImages').html(
+									"<td><label class='error-msg' style='color: red;'>No Images Found For Dynamic Document</label></td>");
+						}
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
 					}
 				});
 	}
@@ -796,6 +852,9 @@ if (!this.InventoryVoucher) {
 			switch (action) {
 			case 0:
 				showInventoryVoucher(pid);
+				break;
+			case 1:
+				showDynamicDocumentImages(pid);
 				break;
 			}
 		}
