@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +45,7 @@ import com.orderfleet.webapp.domain.Activity;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
+import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserActivity;
@@ -362,7 +364,7 @@ public class InvoiceWiseReportResource {
 		List<String> accountProfilePids;
 
 		List<Long> userIds = getUserIdsUnderCurrentUser(employeePid, inclSubordinate);
-		log.info("User Ids :"+userIds);
+		log.info("User Ids :" + userIds);
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -372,22 +374,73 @@ public class InvoiceWiseReportResource {
 		} else {
 			activityPids = Arrays.asList(activityPid);
 		}
-		
+
 		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
 		log.info("Finding executive Task execution");
 		if (accountPid.equalsIgnoreCase("no")) {
-			//accountProfilePids = getAccountPids(userIds);
-			//if all accounts selected avoid account wise query
+			// accountProfilePids = getAccountPids(userIds);
+			// if all accounts selected avoid account wise query
 			executiveTaskExecutions = executiveTaskExecutionRepository
 					.getByDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
 		} else {
-			//if a specific account is selected load data based on that particular account
+			// if a specific account is selected load data based on that particular account
 			accountProfilePids = Arrays.asList(accountPid);
 			executiveTaskExecutions = executiveTaskExecutionRepository
 					.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
 							accountProfilePids);
 		}
-		log.info("executive task execution looping started :"+executiveTaskExecutions.size());
+
+		Set<Long> exeIds = new HashSet<>();
+		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
+			exeIds.add(executiveTaskExecution.getId());
+		}
+
+		log.info("Finding executive Task execution Inventory Vouchers...");
+		List<Object[]> inventoryVouchers = new ArrayList<>();
+		if (exeIds.size() > 0) {
+			if (documentPid.equals("no")) {
+				inventoryVouchers = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionIdIn(exeIds);
+			} else {
+				inventoryVouchers = inventoryVoucherHeaderRepository
+						.findByExecutiveTaskExecutionIdInAndDocumentPid(exeIds, documentPid);
+			}
+		}
+		log.info("Finding executive Task execution Accounting Vouchers...");
+		List<Object[]> accountingVouchers = new ArrayList<>();
+		if (exeIds.size() > 0) {
+			if (documentPid.equals("no")) {
+				accountingVouchers = accountingVoucherHeaderRepository.findByExecutiveTaskExecutionIdIn(exeIds);
+			} else {
+				accountingVouchers = accountingVoucherHeaderRepository
+						.findByExecutiveTaskExecutionIdInAndDocumentPid(exeIds, documentPid);
+			}
+		}
+
+		log.info("Finding executive Task execution Dynamic Document Vouchers...");
+		List<Object[]> dynamicDocuments = new ArrayList<>();
+		if (exeIds.size() > 0) {
+			if (documentPid.equals("no")) {
+				dynamicDocuments = dynamicDocumentHeaderRepository.findByExecutiveTaskExecutionIdIn(exeIds);
+			} else {
+				dynamicDocuments = dynamicDocumentHeaderRepository
+						.findByExecutiveTaskExecutionIdInAndDocumentPid(exeIds, documentPid);
+			}
+		}
+
+		Set<BigInteger> filledForms = new HashSet<>();
+
+		List<Object[]> filledFormPidAndDynamicDocPid = new ArrayList<>();
+
+		if (dynamicDocuments != null && !dynamicDocuments.isEmpty() && dynamicDocuments.size() > 0) {
+
+			filledForms = filledFormRepository.findfilledForms();
+
+			filledFormPidAndDynamicDocPid = filledFormRepository.findFilleFormPidAndDynamicDocumentHeaderPidByCompany(
+					dynamicDocuments.stream().map(d -> d[0].toString()).collect(Collectors.toSet()));
+
+		}
+
+		log.info("executive task execution looping started :" + executiveTaskExecutions.size());
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			double totalSalesOrderAmount = 0.0;
@@ -401,58 +454,81 @@ public class InvoiceWiseReportResource {
 						executiveTaskExecution.getSendDate());
 				invoiceWiseReportView.setTimeSpend(timeSpend);
 				List<InvoiceWiseReportDetailView> executiveTaskExecutionDetailViews = new ArrayList<>();
-				List<Object[]> inventoryVouchers;
-				if (documentPid.equals("no")) {
-					inventoryVouchers = inventoryVoucherHeaderRepository
-							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
-				} else {
-					inventoryVouchers = inventoryVoucherHeaderRepository
-							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
-				}
-				
+//				List<Object[]> inventoryVouchers;
+//				if (documentPid.equals("no")) {
+//					inventoryVouchers = inventoryVoucherHeaderRepository
+//							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+//				} else {
+//					inventoryVouchers = inventoryVoucherHeaderRepository
+//							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
+//				}
+
 				for (Object[] obj : inventoryVouchers) {
-					InvoiceWiseReportDetailView executiveTaskExecutionDetailView = new InvoiceWiseReportDetailView(
-							obj[0].toString(), obj[1].toString(), Double.valueOf(obj[2].toString()), obj[3].toString());
-					executiveTaskExecutionDetailView.setDocumentVolume(Double.valueOf(obj[4].toString()));
-					if (obj[3].toString().equalsIgnoreCase("INVENTORY_VOUCHER")) {
-						totalSalesOrderAmount += Double.valueOf(obj[2].toString());
-					}
 
-					executiveTaskExecutionDetailViews.add(executiveTaskExecutionDetailView);
+					if (obj[5].toString().equalsIgnoreCase(executiveTaskExecution.getPid())) {
+						InvoiceWiseReportDetailView executiveTaskExecutionDetailView = new InvoiceWiseReportDetailView(
+								obj[0].toString(), obj[1].toString(), Double.valueOf(obj[2].toString()),
+								obj[3].toString());
+						executiveTaskExecutionDetailView.setDocumentVolume(Double.valueOf(obj[4].toString()));
+						if (obj[3].toString().equalsIgnoreCase("INVENTORY_VOUCHER")) {
+							totalSalesOrderAmount += Double.valueOf(obj[2].toString());
+						}
+
+						executiveTaskExecutionDetailViews.add(executiveTaskExecutionDetailView);
+					}
 				}
-				
-				List<Object[]> accountingVouchers = new ArrayList<>();
-				if (documentPid.equals("no")) {
-					accountingVouchers = accountingVoucherHeaderRepository
-							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
-				} else {
-					accountingVouchers = accountingVoucherHeaderRepository
-							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
-				}
+
+//				List<Object[]> accountingVouchers = new ArrayList<>();
+//				if (documentPid.equals("no")) {
+//					accountingVouchers = accountingVoucherHeaderRepository
+//							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+//				} else {
+//					accountingVouchers = accountingVoucherHeaderRepository
+//							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
+//				}
 				for (Object[] obj : accountingVouchers) {
-					executiveTaskExecutionDetailViews.add(new InvoiceWiseReportDetailView(obj[0].toString(),
-							obj[1].toString(), Double.valueOf(obj[2].toString()), obj[3].toString()));
-					if (obj[3].toString().equalsIgnoreCase("ACCOUNTING_VOUCHER")) {
-						totalRecieptAmount += Double.valueOf(obj[2].toString());
+
+					if (obj[4].toString().equalsIgnoreCase(executiveTaskExecution.getPid())) {
+						executiveTaskExecutionDetailViews.add(new InvoiceWiseReportDetailView(obj[0].toString(),
+								obj[1].toString(), Double.valueOf(obj[2].toString()), obj[3].toString()));
+						if (obj[3].toString().equalsIgnoreCase("ACCOUNTING_VOUCHER")) {
+							totalRecieptAmount += Double.valueOf(obj[2].toString());
+						}
 					}
 				}
 
-				List<Object[]> dynamicDocuments;
-				if (documentPid.equals("no")) {
-					dynamicDocuments = dynamicDocumentHeaderRepository
-							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
-				} else {
-					dynamicDocuments = dynamicDocumentHeaderRepository
-							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
-				}
+//				List<Object[]> dynamicDocuments;
+//				if (documentPid.equals("no")) {
+//					dynamicDocuments = dynamicDocumentHeaderRepository
+//							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+//				} else {
+//					dynamicDocuments = dynamicDocumentHeaderRepository
+//							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
+//				}
 				for (Object[] obj : dynamicDocuments) {
-					boolean imageFound = false;
-					// check image saved
-					if (filledFormRepository.existsByHeaderPidIfFiles(obj[0].toString())) {
-						imageFound = true;
+					if (obj[3].toString().equalsIgnoreCase(executiveTaskExecution.getPid())) {
+						boolean imageFound = false;
+						// check image saved
+//						if (filledFormRepository.existsByHeaderPidIfFiles(obj[0].toString())) {
+//							imageFound = true;
+//						}
+
+						for (Object[] objectArray : filledFormPidAndDynamicDocPid) {
+							if (obj[0].toString().equals(objectArray[1].toString())) {
+
+								Optional<BigInteger> opFilledForms = filledForms.stream()
+										.filter(ff -> ff.toString().equals(objectArray[2].toString())).findAny();
+								if (opFilledForms.isPresent()) {
+//									if (opFilledForms.get()[1] != null
+//											&& !(Long.valueOf(opFilledForms.get()[1].toString()) > 0)) {
+									imageFound = true;
+//									}
+								}
+							}
+						}
+						executiveTaskExecutionDetailViews.add(new InvoiceWiseReportDetailView(obj[0].toString(),
+								obj[1].toString(), obj[2].toString(), imageFound));
 					}
-					executiveTaskExecutionDetailViews.add(new InvoiceWiseReportDetailView(obj[0].toString(),
-							obj[1].toString(), obj[2].toString(), imageFound));
 				}
 				// if condition for document wise filter
 				if (!documentPid.equals("no") && executiveTaskExecutionDetailViews.isEmpty()) {
@@ -464,7 +540,7 @@ public class InvoiceWiseReportResource {
 				}
 			}
 		}
-		log.info("executive task execution looping ended :"+executiveTaskExecutions.size());
+		log.info("executive task execution looping ended :" + executiveTaskExecutions.size());
 		return invoiceWiseReportViews;
 
 	}
@@ -708,13 +784,14 @@ public class InvoiceWiseReportResource {
 		if (employeePid.equals("Dashboard Employee") || employeePid.equals("no")) {
 			userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 			if (employeePid.equals("Dashboard Employee")) {
-				List<User> dashboardUsers = dashboardUserRepository.findUsersByCompanyId();
-				List<Long> dashboardUserIds = dashboardUsers.stream().map(User::getId).collect(Collectors.toList());
+//				List<User> dashboardUsers = dashboardUserRepository.findUsersByCompanyId();
+//				List<Long> dashboardUserIds = dashboardUsers.stream().map(User::getId).collect(Collectors.toList());
+				Set<Long> dashboardUserIds = dashboardUserRepository.findUserIdsByCompanyId();
 				Set<Long> uniqueIds = new HashSet<>();
-				log.info("dashboard user ids empty: "+dashboardUserIds.isEmpty());
+				log.info("dashboard user ids empty: " + dashboardUserIds.isEmpty());
 				if (!dashboardUserIds.isEmpty()) {
-					log.info(" user ids empty: "+userIds.isEmpty());
-					log.info("userids :"+userIds.toString());
+					log.info(" user ids empty: " + userIds.isEmpty());
+					log.info("userids :" + userIds.toString());
 					if (!userIds.isEmpty()) {
 						for (Long uid : userIds) {
 							for (Long sid : dashboardUserIds) {
@@ -732,16 +809,17 @@ public class InvoiceWiseReportResource {
 				}
 			} else {
 				if (userIds.isEmpty()) {
-					List<User> users = userRepository.findAllByCompanyId();
-					userIds = users.stream().map(User::getId).collect(Collectors.toList());
+					// List<User> users = userRepository.findAllByCompanyId();
+					// userIds = users.stream().map(User::getId).collect(Collectors.toList());
+					userIds = userRepository.findAllUserIdsByCompanyId();
 				}
 			}
 		} else {
 			if (inclSubordinate) {
 				userIds = employeeHierarchyService.getEmployeeSubordinateIds(employeePid);
 				System.out.println("Testing start for Activity Transaction");
-				System.out.println("employeePid:"+employeePid);
-				System.out.println("userIds:"+userIds.toString());
+				System.out.println("employeePid:" + employeePid);
+				System.out.println("userIds:" + userIds.toString());
 				System.out.println("Testing end for Activity Transaction");
 			} else {
 				Optional<EmployeeProfile> opEmployee = employeeProfileRepository.findOneByPid(employeePid);
@@ -750,8 +828,8 @@ public class InvoiceWiseReportResource {
 				}
 				System.out.println("Testing start for Activity Transaction");
 				System.out.println("--------------------------------------");
-				System.out.println("employeePid:"+employeePid);
-				System.out.println("UserIds:"+userIds.toString());
+				System.out.println("employeePid:" + employeePid);
+				System.out.println("UserIds:" + userIds.toString());
 				System.out.println("Testing end for Activity Transaction");
 			}
 		}

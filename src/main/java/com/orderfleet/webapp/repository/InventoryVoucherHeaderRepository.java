@@ -669,4 +669,10 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query(value = CUSTOMER_WISE_INVENTORY_DETAIL, nativeQuery = true)
 	List<Object[]> getCustomerWiseInventoryDetail(String headerPid);
+
+	@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1")
+	List<Object[]> findByExecutiveTaskExecutionIdIn(Set<Long> exeIds);
+
+	@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1 and inventoryVoucher.document.pid = ?2")
+	List<Object[]> findByExecutiveTaskExecutionIdInAndDocumentPid(Set<Long> exeIds, String documentPid);
 }

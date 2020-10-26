@@ -256,5 +256,13 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 			+ "tally_download_status FROM tbl_accounting_voucher_header where tally_download_status ='PENDING' and company_id = ?#{principal.companyId} "
 			+ "order by created_date desc",nativeQuery=true)
 	List<Object[]> findByCompanyIdAndTallyStatusByCreatedDateDesc();
+	
+	@Query("select accVoucher.pid,accVoucher.document.name,accVoucher.totalAmount,accVoucher.document.documentType,accVoucher.executiveTaskExecution.pid from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1")
+	List<Object[]> findByExecutiveTaskExecutionIdIn(Set<Long> exeIds);
+	
+	@Query("select accVoucher.pid,accVoucher.document.name,accVoucher.totalAmount,accVoucher.document.documentType,accVoucher.executiveTaskExecution.pid from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1 and accVoucher.document.pid = ?2")
+	List<Object[]> findByExecutiveTaskExecutionIdInAndDocumentPid(Set<Long> exeIds, String documentPid);
+	
+	
 
 }
