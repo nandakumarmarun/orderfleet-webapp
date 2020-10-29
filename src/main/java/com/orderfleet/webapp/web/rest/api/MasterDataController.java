@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest.api;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -1555,14 +1556,40 @@ public class MasterDataController {
 		List<String> documentPids = voucherNumberGeneratorList.stream().map(vng -> vng.getDocument().getPid())
 				.collect(Collectors.toList());
 		log.info("Call to get the last document number...................");
-		LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid, userPid,
-				documentPids);
-		log.info("Last Date " + lastDate);
-		if (lastDate == null) {
-			lastDate = LocalDateTime.now();
+
+//		LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid, userPid,
+//				documentPids);
+//		log.info("Last Date " + lastDate);
+//		if (lastDate == null) {
+//			lastDate = LocalDateTime.now();
+//		}
+//		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid,
+//				userPid, documentPids, lastDate);
+
+		List<Object[]> lastDateObjectArray = inventoryVoucherHeaderRepository
+				.lastDatesWithCompanyUserDocuments(companyPid, userPid, documentPids);
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+
+		List<Object[]> objectArray = new ArrayList<>();
+
+		for (Object[] obj : lastDateObjectArray) {
+
+			LocalDateTime lastDate = LocalDateTime.now();
+			if (obj[1] != null) {
+				lastDate = LocalDateTime.parse(obj[1].toString(), formatter);
+			}
+			log.info("Last Date " + lastDate);
+			if (lastDate == null) {
+				lastDate = LocalDateTime.now();
+			}
+			objectArray.addAll(inventoryVoucherHeaderRepository.getLastNumberForEachDocumentsDateOptimized(companyPid,
+					userPid, Long.valueOf(obj[0].toString()), lastDate));
 		}
-		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid,
-				userPid, documentPids, lastDate);
+
+//		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid, userPid, documentPids,
+//				lastDate);
+
 		log.info("Company Pid" + companyPid + "\n User Pid : " + userPid + "\n Document Pids : " + documentPids);
 		List<VoucherNumberGeneratorDTO> voucherNumberGeneratorDTOs = new ArrayList<>();
 		// document entry exist in inventory voucher entries
@@ -1588,7 +1615,7 @@ public class MasterDataController {
 		}
 
 		for (VoucherNumberGeneratorDTO vng : voucherNumberGeneratorDTOs) {
-			log.info(vng.getLastVoucherNumber()+"----");
+			log.info(vng.getLastVoucherNumber() + "----");
 		}
 
 		return new ResponseEntity<>(voucherNumberGeneratorDTOs, HttpStatus.OK);
