@@ -148,14 +148,14 @@ public class LoadServerItemsToMobileController {
 
 		return new ResponseEntity<>(attendenceDTOs, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/customer-wise-inventory")
 	public ResponseEntity<List<InventoryVoucherHeaderDTO>> sentCustomerWiseInventory(@RequestParam String filterBy,
 			@RequestParam(required = false) String fromDate, @RequestParam(required = false) String toDate,
 			@RequestParam(required = false) String accountPid) {
 
 		String userLogin = SecurityUtils.getCurrentUserLogin();
-		log.info("Request to load server sent items..." + accountPid+" logged user : "+ userLogin);
+		log.info("Request to load server sent items..." + accountPid + " logged user : " + userLogin);
 
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
 
@@ -662,33 +662,41 @@ public class LoadServerItemsToMobileController {
 
 		return documentDashboardDTO;
 	}
-	
-	private List<InventoryVoucherHeaderDTO> getInventoryVoucher(LocalDate fDate, LocalDate tDate, String accountPid, String userLogin) {
+
+	private List<InventoryVoucherHeaderDTO> getInventoryVoucher(LocalDate fDate, LocalDate tDate, String accountPid,
+			String userLogin) {
 
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-		log.info("Inventory Voucher UserLogin= {} Account Pid= {}, FromDate={}, toDate ={}", userLogin, accountPid, fromDate, toDate);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		log.info("Inventory Voucher UserLogin= {} Account Pid= {}, FromDate={}, toDate ={}", userLogin, accountPid,
+				fromDate, toDate);
 		List<Object[]> inventoryVouchersHeaders = inventoryVoucherHeaderRepository
 				.getCustomerWiseInventoryHeader(userLogin, accountPid, fromDate, toDate);
-		
+
 		for (Object[] obj : inventoryVouchersHeaders) {
 			InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
 			LocalDateTime createddate = null;
 			if (obj[0] != null) {
-				createddate = LocalDateTime.parse(obj[0].toString(), formatter);
+				String[] cdate = obj[0].toString().split("\\.");
+				createddate = LocalDateTime.parse(cdate[0], formatter);
+				// createddate = LocalDateTime.parse(obj[0].toString(), formatter);
 			}
 			inventoryVoucherHeaderDTO.setCreatedDate(createddate);
-			inventoryVoucherHeaderDTO.setDocDiscountAmount(obj[1] != null ? Double.parseDouble(obj[1].toString()) : 0.0);
-			inventoryVoucherHeaderDTO.setDocDiscountPercentage(obj[2] != null ? Double.parseDouble(obj[2].toString()) : 0.0);
+			inventoryVoucherHeaderDTO
+					.setDocDiscountAmount(obj[1] != null ? Double.parseDouble(obj[1].toString()) : 0.0);
+			inventoryVoucherHeaderDTO
+					.setDocDiscountPercentage(obj[2] != null ? Double.parseDouble(obj[2].toString()) : 0.0);
 			LocalDateTime documentdate = null;
 			if (obj[3] != null) {
-				documentdate = LocalDateTime.parse(obj[3].toString(), formatter);
+				String[] ddate = obj[3].toString().split("\\.");
+				documentdate = LocalDateTime.parse(ddate[0], formatter);
+				// documentdate = LocalDateTime.parse(obj[3].toString(), formatter);
 			}
 			inventoryVoucherHeaderDTO.setDocumentDate(documentdate);
-			
+
 			inventoryVoucherHeaderDTO.setDocumentNumberLocal(obj[4] != null ? obj[4].toString() : "");
 			inventoryVoucherHeaderDTO.setDocumentNumberServer(obj[5] != null ? obj[5].toString() : "");
 			inventoryVoucherHeaderDTO.setDocumentTotal(obj[6] != null ? Double.parseDouble(obj[6].toString()) : 0.0);
@@ -705,7 +713,7 @@ public class LoadServerItemsToMobileController {
 			inventoryVoucherHeaderDTO.setSupplierAccountName(obj[17] != null ? obj[17].toString() : "");
 			inventoryVoucherHeaderDTO.setDocumentName(obj[18] != null ? obj[18].toString() : "");
 			inventoryVoucherHeaderDTO.setDocumentPid(obj[19] != null ? obj[19].toString() : "");
-			
+
 			if (inventoryVoucherHeaderDTO.getPid() != null && !inventoryVoucherHeaderDTO.getPid().isEmpty()) {
 				List<Object[]> inventoryVouchersDetail = inventoryVoucherHeaderRepository
 						.getCustomerWiseInventoryDetail(inventoryVoucherHeaderDTO.getPid());

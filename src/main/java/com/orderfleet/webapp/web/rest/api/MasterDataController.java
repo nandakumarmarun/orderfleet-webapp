@@ -663,7 +663,7 @@ public class MasterDataController {
 	 * GET /product-groups : get all the productGroups.
 	 *
 	 * @return the ResponseEntity with status 200 (OK) and the list of productGroups
-	 *         in body
+	 *         yyy
 	 */
 	@GetMapping(value = "/ecom-product-groups", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -1569,7 +1569,13 @@ public class MasterDataController {
 		List<Object[]> lastDateObjectArray = inventoryVoucherHeaderRepository
 				.lastDatesWithCompanyUserDocuments(companyPid, userPid, documentPids);
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+		DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+
+		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SS");
+
+		DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
 		List<Object[]> objectArray = new ArrayList<>();
 
@@ -1577,7 +1583,20 @@ public class MasterDataController {
 
 			LocalDateTime lastDate = LocalDateTime.now();
 			if (obj[1] != null) {
-				lastDate = LocalDateTime.parse(obj[1].toString(), formatter);
+
+				String[] dateArray = obj[1].toString().split("\\.");
+
+				String date = obj[1].toString();
+
+				if (dateArray[1] == null && dateArray[1].length() == 0) {
+					lastDate = LocalDateTime.parse(date, formatter);
+				} else if (dateArray[1].length() == 1) {
+					lastDate = LocalDateTime.parse(date, formatter1);
+				} else if (dateArray[1].length() == 2) {
+					lastDate = LocalDateTime.parse(date, formatter2);
+				} else {
+					lastDate = LocalDateTime.parse(date, formatter3);
+				}
 			}
 			log.info("Last Date " + lastDate);
 			if (lastDate == null) {
