@@ -207,6 +207,10 @@ public class SendInvoiceOdooService {
 					odooInvoice.setReference(obj[6].toString());
 					odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
 
+					odooInvoice.setJournal_type("sale");
+					odooInvoice.setType("out_invoice");
+					odooInvoice.setRounding_amt(obj[34] != null ? Double.parseDouble(obj[34].toString()) : 0.0);
+
 					List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 							.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
 							.collect(Collectors.toList()).stream()
