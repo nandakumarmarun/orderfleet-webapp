@@ -111,7 +111,7 @@ public class InventoryVoucherHeader implements Serializable {
 	private double docDiscountPercentage;
 
 	@NotNull
-	//@ManyToOne
+	// @ManyToOne
 	@ManyToOne
 	private ExecutiveTaskExecution executiveTaskExecution;
 
@@ -119,8 +119,8 @@ public class InventoryVoucherHeader implements Serializable {
 	@NotNull
 	private Company company;
 
-	//@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL) 
+	// @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "inventory_voucher_header_id")
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<InventoryVoucherDetail> inventoryVoucherDetails;
@@ -194,6 +194,12 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "payment_received", nullable = false, columnDefinition = "double precision DEFAULT 0 ")
 	private double paymentReceived;
+
+	@Column(name = "reference_invoice_number")
+	private String referenceInvoiceNumber;
+
+	@Column(name = "rounded_off", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double roundedOff;
 
 	public Long getId() {
 		return id;
@@ -505,6 +511,22 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setDeliveryDate(LocalDate deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public String getReferenceInvoiceNumber() {
+		return referenceInvoiceNumber;
+	}
+
+	public void setReferenceInvoiceNumber(String referenceInvoiceNumber) {
+		this.referenceInvoiceNumber = referenceInvoiceNumber;
+	}
+
+	public double getRoundedOff() {
+		return roundedOff;
+	}
+
+	public void setRoundedOff(double roundedOff) {
+		this.roundedOff = roundedOff;
 	}
 
 }

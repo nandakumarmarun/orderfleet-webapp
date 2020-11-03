@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javax.persistence.Column;
+
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
 import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
@@ -116,6 +118,10 @@ public class InventoryVoucherHeaderDTO {
 	private String bookingId;
 	private LocalDate deliveryDate;
 
+	private String referenceInvoiceNumber;
+
+	private double roundedOff;
+
 	public InventoryVoucherHeaderDTO() {
 		super();
 	}
@@ -203,6 +209,11 @@ public class InventoryVoucherHeaderDTO {
 
 		this.bookingId = inventoryVoucherHeader.getBookingId() != null ? inventoryVoucherHeader.getBookingId() : "";
 		this.deliveryDate = inventoryVoucherHeader.getDeliveryDate();
+
+		this.roundedOff = inventoryVoucherHeader.getRoundedOff();
+		this.referenceInvoiceNumber = inventoryVoucherHeader.getReferenceInvoiceNumber() != null
+				? inventoryVoucherHeader.getReferenceInvoiceNumber()
+				: "";
 	}
 
 	public InventoryVoucherHeaderDTO(InventoryVoucherHeaderHistory inventoryVoucherHeader) {
@@ -650,6 +661,22 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setDeliveryDate(LocalDate deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public String getReferenceInvoiceNumber() {
+		return referenceInvoiceNumber;
+	}
+
+	public void setReferenceInvoiceNumber(String referenceInvoiceNumber) {
+		this.referenceInvoiceNumber = referenceInvoiceNumber;
+	}
+
+	public double getRoundedOff() {
+		return roundedOff;
+	}
+
+	public void setRoundedOff(double roundedOff) {
+		this.roundedOff = roundedOff;
 	}
 
 	@Override

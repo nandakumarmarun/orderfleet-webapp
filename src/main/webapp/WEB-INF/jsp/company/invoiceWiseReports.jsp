@@ -982,7 +982,7 @@
 												InvoiceWiseReport.downloadXls();
 											});
 
-							//InvoiceWiseReport.filter();
+							InvoiceWiseReport.filter();
 							//if(documentType == null){
 							//execute on normal page load
 

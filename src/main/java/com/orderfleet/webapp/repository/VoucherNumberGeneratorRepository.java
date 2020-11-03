@@ -22,4 +22,7 @@ public interface VoucherNumberGeneratorRepository extends JpaRepository<VoucherN
 
 	@Query("select vng from VoucherNumberGenerator vng where vng.document.pid = ?1 and vng.user.pid = ?2 and vng.company.pid = ?3")
 	VoucherNumberGenerator findByDocumentAndUserAndCompany(String documentPid, String userPid, String companyPid);
+	
+	@Query("select vng from VoucherNumberGenerator vng where vng.user.pid = ?1 and vng.company.pid = ?2 and vng.document.pid = ?3")
+	List<VoucherNumberGenerator> findAllByUserAndCompanyAndDocument(String userPid, String companyPid,String documentPid);
 }

@@ -258,6 +258,7 @@ public class AccountProfileSapUploadService {
 			saveUpdateLocations.add(location);
 		}
 		bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
+		locationRepository.flush();
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table

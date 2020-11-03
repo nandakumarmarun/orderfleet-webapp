@@ -113,12 +113,12 @@ public class AccountProfileSapPraveshUploadService {
 		// All product must have a division/category, if not, set a default one
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
 		// find all exist account profiles
-		
+
 		List<String> apNames = resultAccountProfiles.stream().map(apDto -> apDto.getName())
 				.collect(Collectors.toList());
 //		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
 //				apNames);
-		
+
 		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
 
 		List<LocationDTO> locationDtos = new ArrayList<>();
@@ -186,7 +186,7 @@ public class AccountProfileSapPraveshUploadService {
 
 			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
 
-			if (apDto.getLocation() == null && apDto.getLocation().equalsIgnoreCase("")) {
+			if (apDto.getLocation().equalsIgnoreCase("-No Sales Employee-")) {
 				locationAccountProfileDto.setAccountProfileName(apDto.getName());
 				locationAccountProfileDto.setLocationName("Territory");
 			} else {
@@ -256,6 +256,7 @@ public class AccountProfileSapPraveshUploadService {
 			saveUpdateLocations.add(location);
 		}
 		bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
+		locationRepository.flush();
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table

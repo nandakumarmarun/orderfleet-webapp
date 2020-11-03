@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.repository;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +64,7 @@ public interface FilledFormRepository extends JpaRepository<FilledForm, Long> {
 	List<FilledForm> findFilledFormsByDocumentAndFormPidAndAndCreatedDateBetween(String documentPid, String formPid,
 			List<String> userPids, LocalDateTime fromDate, LocalDateTime toDate);
 
-	@Query(value = "select ff.pid as formFieldPid,ddh.pid from tbl_filled_form ff,tbl_dynamic_document_header ddh where "
+	@Query(value = "select ff.pid as formFieldPid,ddh.pid,ff.id from tbl_filled_form ff,tbl_dynamic_document_header ddh where "
 			+ "ff.dynamic_document_header_id = ddh.id and ddh.pid IN ?1 ", nativeQuery = true)
 	List<Object[]> findFilleFormPidAndDynamicDocumentHeaderPidByCompany(Set<String> dynamicDocHeaderPid);
 
@@ -138,4 +139,12 @@ public interface FilledFormRepository extends JpaRepository<FilledForm, Long> {
 			+ "and ddh.created_date between ?4 and ?5 order by ddh.created_date desc limit 1",  nativeQuery = true)
 	List<Object[]> findFilledFormsIdsByDocumentAndFormPidAndUserPidCreatedByAndAccountPidInAndCreatedDateBetween(String documentPid,
 			String formPid, List<String> userPids, LocalDateTime fromDate, LocalDateTime toDate, String accountPid);
+	
+	@Query(value="SELECT f.pid FROM FilledForm AS f WHERE f.dynamicDocumentHeader.pid IN ?1")
+	List<Object[]> findByDynamicDocumentHeaderPidsIn(Set<String> dynamicDocumentPids);
+	
+	@Query(value="SELECT filled_form_id FROM tbl_filled_form_file",nativeQuery = true)
+	Set<BigInteger> findfilledForms();
+	
+	
 }

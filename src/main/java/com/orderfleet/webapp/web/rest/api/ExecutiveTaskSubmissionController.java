@@ -196,7 +196,7 @@ public class ExecutiveTaskSubmissionController {
 				String userPid = user.getPid();
 
 				List<VoucherNumberGenerator> voucherNumberGeneratorList = voucherNumberGeneratorRepository
-						.findAllByUserAndCompany(userPid, companyPid);
+						.findAllByUserAndCompanyAndDocument(userPid, companyPid,document.get().getPid());
 
 				if (voucherNumberGeneratorList == null || voucherNumberGeneratorList.size() == 0) {
 					log.info(voucherNumberGeneratorList + " Size is either null or 0");

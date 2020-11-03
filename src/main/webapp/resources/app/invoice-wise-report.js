@@ -46,7 +46,7 @@ if (!this.InvoiceWiseReport) {
 		let filterBy = getParameterByName('filterBy');
 		if (filterBy) {
 			$('#dbDateSearch').val(filterBy);
-			//InvoiceWiseReport.filter();
+			InvoiceWiseReport.filter();
 		}
 
 		$('.selectpicker').selectpicker();
