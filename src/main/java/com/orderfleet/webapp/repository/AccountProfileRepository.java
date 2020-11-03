@@ -31,6 +31,8 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	Optional<AccountProfile> findOneByPid(String pid);
 
+	Optional<AccountProfile> findOneByCustomerId(String customerId);
+	
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} order by accountProfile.name asc")
 	List<AccountProfile> findAllByCompanyId();
 
@@ -119,7 +121,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	List<AccountProfile> findByCompanyIdAndUserIdInAndLastModifiedDateBetweenAndDataSourceTypeMobileOrderByLastModifiedDateDesc(
 			Long companyId, List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate,
 			DataSourceType dataSourceType);
-
+	
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.dataSourceType = ?1")
 	List<AccountProfile> findAllByCompanyAndDataSourceType(DataSourceType dataSourceType);
 

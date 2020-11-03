@@ -79,6 +79,18 @@
 						</form>
 					</div>
 				</div>
+				
+				<div class="col-md-12">
+					<div class="panel-body">
+						<form role="form" class="form-horizontal form-groups-bordered">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Outstanding Invoices</label>
+								<button type="button" class="btn btn-success "
+									id="uploadOutstandingInvoice">Upload Outstanding Invoices</button>
+							</div>
+						</form>
+					</div>
+				</div>
 
 				<div class="col-md-12">
 					<div class="panel-body">

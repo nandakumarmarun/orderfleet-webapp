@@ -29,6 +29,10 @@ if (!this.uploadOdoo) {
 		
 		$('#uploadPriceLists').on('click', function() {
 			uploadPriceLevel();
+        });
+        
+        $('#uploadOutstandingInvoice').on('click', function() {
+			uploadOutstandingInvoice();
 		});
 	
 	});
@@ -134,6 +138,27 @@ if (!this.uploadOdoo) {
 						console.log("Error uploading price list.................");
 						$(".error-msg").html(
 								"Error uploading price list .................");
+					}
+				});
+
+	}
+	
+	function uploadOutstandingInvoice() {
+
+		$(".error-msg").html("Uploading Outstanding Invoices....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadOutstandingInvoices",
+					method : 'GET',
+					success : function(data) {
+						alert("Upload Outstanding Invoices Success")
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading outstanding invoices.................");
+						$(".error-msg").html(
+								"Error uploading outstanding invoices .................");
 					}
 				});
 

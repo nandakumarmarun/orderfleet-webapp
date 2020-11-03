@@ -30,12 +30,14 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAuthentication;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooOutstandingInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooPriceLevel;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooProductProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooStockLocation;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUnitOfMeasure;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUser;
 import com.orderfleet.webapp.web.vendor.odoo.service.AccountProfileOdooUploadService;
+import com.orderfleet.webapp.web.vendor.odoo.service.OutstandingInvoiceOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.ProductProfileOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.UserOdooUploadService;
 
@@ -66,8 +68,13 @@ public class UploadOdooResource {
 	private static String STOCK_LOCATION_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/locations";
 	
 	private static String PRICE_LEVEL_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/pricelists";
+	
+	private static String OUTSTANDING_INVOICE_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/outstanding";
 
 	private final Logger log = LoggerFactory.getLogger(UploadOdooResource.class);
+	
+	@Inject
+	private OutstandingInvoiceOdooUploadService outstandingInvoiceOdooUploadService;
 
 	@Inject
 	private AccountProfileOdooUploadService accountProfileOdooUploadService;
@@ -85,6 +92,51 @@ public class UploadOdooResource {
 		log.debug("Web request to get a page of Upload Odoo Masters");
 		return "company/uploadOdoo";
 	}
+	
+	@RequestMapping(value = "/upload-odoo/uploadOutstandingInvoices", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> uploadOutstandingInvoices() throws IOException, JSONException, ParseException {
+
+		// ResponseBodyOdooAuthentication responseBodyOdooAuthentication =
+		// authenticateServer();
+
+		log.debug("Web request to upload Outstanding Invoices ...");
+
+		String jsonString = getOdooRequestBody();
+
+		HttpEntity<String> entity = new HttpEntity<>(jsonString, RestClientUtil.createTokenAuthHeaders());
+
+		log.info(entity.getBody().toString() + "");
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		log.info("Get URL: " + OUTSTANDING_INVOICE_API_URL);
+
+		try {
+			ResponseBodyOdooOutstandingInvoice responseBodyOutstandingInvoice = restTemplate.postForObject(OUTSTANDING_INVOICE_API_URL,
+					entity, ResponseBodyOdooOutstandingInvoice.class);
+			log.info("Account Profile Size= " + responseBodyOutstandingInvoice.getResult().getResponse().size()
+					+ "------------");
+
+			outstandingInvoiceOdooUploadService
+					.saveOutstandingInvoice(responseBodyOutstandingInvoice.getResult().getResponse());
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				log.info(exception.getMessage());
+				throw new ServiceException(exception.getResponseBodyAsString());
+			}
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 
 	@RequestMapping(value = "/upload-odoo/uploadAccountProfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
