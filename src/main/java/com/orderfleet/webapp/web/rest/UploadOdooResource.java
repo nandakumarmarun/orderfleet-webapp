@@ -116,7 +116,7 @@ public class UploadOdooResource {
 		try {
 			ResponseBodyOdooOutstandingInvoice responseBodyOutstandingInvoice = restTemplate.postForObject(OUTSTANDING_INVOICE_API_URL,
 					entity, ResponseBodyOdooOutstandingInvoice.class);
-			log.info("Account Profile Size= " + responseBodyOutstandingInvoice.getResult().getResponse().size()
+			log.info("Outstanding Invoices Size= " + responseBodyOutstandingInvoice.getResult().getResponse().size()
 					+ "------------");
 
 			outstandingInvoiceOdooUploadService

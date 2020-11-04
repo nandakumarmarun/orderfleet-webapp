@@ -30,8 +30,6 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	Optional<AccountProfile> findByCompanyIdAndNameIgnoreCase(Long id, String name);
 
 	Optional<AccountProfile> findOneByPid(String pid);
-
-	Optional<AccountProfile> findOneByCustomerId(String customerId);
 	
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} order by accountProfile.name asc")
 	List<AccountProfile> findAllByCompanyId();
@@ -182,5 +180,8 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.user.id in ?2 and accountProfile.lastModifiedDate between ?3 and ?4  and accountProfile.activated = true order by accountProfile.lastModifiedDate desc")
 	List<AccountProfile> findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(Long companyId,
 			List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and accountProfile.customerId in ?1")
+	List<AccountProfile> findAccountProfileAndCustomerIds(List<String> customerIds);
 
 }

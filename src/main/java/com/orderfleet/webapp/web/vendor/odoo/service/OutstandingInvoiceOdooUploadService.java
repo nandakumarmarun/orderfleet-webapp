@@ -5,8 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,35 +60,38 @@ public class OutstandingInvoiceOdooUploadService {
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		receivablePayableRepository.deleteByCompanyId(company.getId());
-		
 		Set<ReceivablePayable> saveReceivablePayable = new HashSet<>();
 		
+		// create list of customer id value not false
+		List<String> customerIds =  list.stream().map(a -> a.getCustomer_id()).filter(c -> 
+			c != null && !c.equalsIgnoreCase("false") 
+		).collect(Collectors.toList());
+		
+		// create list account profile 
+		List<AccountProfile> accProfiles =  accountProfileRepository.findAccountProfileAndCustomerIds(customerIds);
+		
 		for (OdooOutstandingInvoice ppDto : list) {
-			
-			String customer_id = ppDto.getCustomer_id();
-			if (customer_id != null && !customer_id.equalsIgnoreCase("false")) {
-				Optional<AccountProfile> accountProfile = accountProfileRepository.findOneByCustomerId(customer_id);
-				if(accountProfile.isPresent()) {
+			accProfiles.stream().filter(a -> a.getCustomerId().equalsIgnoreCase(ppDto.getCustomer_id())).findAny()
+				.ifPresent(ap -> {
 					ReceivablePayable receivablePayable = new ReceivablePayable();
 					receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
-					receivablePayable.setAccountProfile(accountProfile.get());
-					receivablePayable.setCompany(company);
-					receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
-					receivablePayable.setReferenceDocumentAmount(ppDto.getAmount_original());
-					receivablePayable.setReferenceDocumentBalanceAmount(ppDto.getAmount_unreconciled());
-					receivablePayable.setReferenceDocumentNumber(ppDto.getInvoice_ref());
-					receivablePayable.setReferenceDocumentDate(convertDate(ppDto.getDate_original()));
-					String dueDate = ppDto.getDate_due();
-					if (dueDate!= null && dueDate != "" && !dueDate.equalsIgnoreCase("false")) {
-						receivablePayable.setBillOverDue(ChronoUnit.DAYS.between(LocalDate.parse(dueDate), LocalDate.now()));
-					}
-					saveReceivablePayable.add(receivablePayable);	
-				}
-			}	
+		             receivablePayable.setAccountProfile(ap);
+		             receivablePayable.setCompany(company);
+		             receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
+		             receivablePayable.setReferenceDocumentAmount(ppDto.getAmount_original());
+		             receivablePayable.setReferenceDocumentBalanceAmount(ppDto.getAmount_unreconciled());
+		             receivablePayable.setReferenceDocumentNumber(ppDto.getInvoice_ref());
+		             receivablePayable.setReferenceDocumentDate(convertDate(ppDto.getDate_original()));
+		             String dueDate = ppDto.getDate_due();
+		             if (dueDate != null && dueDate !=
+		                 "" && !dueDate.equalsIgnoreCase("false")) {
+		                 receivablePayable.setBillOverDue(ChronoUnit.DAYS.between(LocalDate.parse(
+		                     dueDate), LocalDate.now()));
+		             }
+		             saveReceivablePayable.add(receivablePayable);
+				});
 		}
 		bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);
-		
-
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
