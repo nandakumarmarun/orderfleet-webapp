@@ -30,6 +30,18 @@
 						</form>
 					</div>
 				</div>
+				
+				<div class="col-md-12">
+					<div class="panel-body">
+						<form role="form" class="form-horizontal form-groups-bordered">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Tax Lists</label>
+								<button type="button" class="btn btn-success "
+									id="uploadTaxLists">Upload Tax Lists</button>
+							</div>
+						</form>
+					</div>
+				</div>
 
 				<div class="col-md-12">
 					<div class="panel-body">

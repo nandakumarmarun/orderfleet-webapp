@@ -34,11 +34,13 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooOutstandingInvo
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooPriceLevel;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooProductProfile;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooStockLocation;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooTaxList;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUnitOfMeasure;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUser;
 import com.orderfleet.webapp.web.vendor.odoo.service.AccountProfileOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.OutstandingInvoiceOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.ProductProfileOdooUploadService;
+import com.orderfleet.webapp.web.vendor.odoo.service.TaxListOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.UserOdooUploadService;
 
 import net.minidev.json.parser.JSONParser;
@@ -70,6 +72,8 @@ public class UploadOdooResource {
 	private static String PRICE_LEVEL_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/pricelists";
 	
 	private static String OUTSTANDING_INVOICE_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/outstanding";
+	
+	private static String TAX_LIST_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/taxes";
 
 	private final Logger log = LoggerFactory.getLogger(UploadOdooResource.class);
 	
@@ -81,6 +85,9 @@ public class UploadOdooResource {
 
 	@Inject
 	private ProductProfileOdooUploadService productProfileOdooUploadService;
+	
+	@Inject
+	private TaxListOdooUploadService taxListOdooUploadService;
 
 	@Inject
 	private UserOdooUploadService userOdooUploadService;
@@ -91,6 +98,50 @@ public class UploadOdooResource {
 	public String uploadXls(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of Upload Odoo Masters");
 		return "company/uploadOdoo";
+	}
+	
+	@RequestMapping(value = "/upload-odoo/uploadTaxList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> uploadTaxList() throws IOException, JSONException, ParseException {
+
+		// ResponseBodyOdooAuthentication responseBodyOdooAuthentication =
+		// authenticateServer();
+
+		log.debug("Web request to upload Tax List ...");
+
+		String jsonString = getOdooRequestBody();
+
+		HttpEntity<String> entity = new HttpEntity<>(jsonString, RestClientUtil.createTokenAuthHeaders());
+
+		log.info(entity.getBody().toString() + "");
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		log.info("Get URL: " + TAX_LIST_API_URL);
+
+		try {
+			ResponseBodyOdooTaxList responseBodyTaxList = restTemplate.postForObject(TAX_LIST_API_URL,
+					entity, ResponseBodyOdooTaxList.class);
+			log.info("Tax List Size= " + responseBodyTaxList.getResult().getResponse().size()
+					+ "------------");
+
+			taxListOdooUploadService
+					.saveTaxList(responseBodyTaxList.getResult().getResponse());
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				log.info(exception.getMessage());
+				throw new ServiceException(exception.getResponseBodyAsString());
+			}
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/upload-odoo/uploadOutstandingInvoices", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

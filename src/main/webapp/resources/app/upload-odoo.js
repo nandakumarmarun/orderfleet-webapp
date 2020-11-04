@@ -17,6 +17,9 @@ if (!this.uploadOdoo) {
 		$('#uploadAccountProfiles').on('click', function() {
 			uploadAccountProfiles();
 		});
+		$('#uploadTaxLists').on('click', function() {
+			uploadTaxList();
+		});
 		$('#uploadProductProfileProfiles').on('click', function() {
 			uploadProductProfiles();
 		});
@@ -96,6 +99,27 @@ if (!this.uploadOdoo) {
 						console.log("Error uploading account profiles .................");
 						$(".error-msg").html(
 								"Error uploading account profiles .................");
+					}
+				});
+
+	}
+
+	function uploadTaxList() {
+
+		$(".error-msg").html("Uploading Tax List....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadTaxList",
+					method : 'GET',
+					success : function(data) {
+						alert("Upload Tax List Success")
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading tax list .................");
+						$(".error-msg").html(
+								"Error uploading tax list .................");
 					}
 				});
 

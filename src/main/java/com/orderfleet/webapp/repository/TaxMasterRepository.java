@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.TaxMaster;
 
@@ -30,4 +31,7 @@ public interface TaxMasterRepository extends JpaRepository<TaxMaster, Long>{
 	
 	@Query("select taxMaster from TaxMaster taxMaster where taxMaster.company.id = ?1 and taxMaster.vatClass=?2 and taxMaster.vatPercentage=?3 ")
 	TaxMaster findAllByCompanyIdAndVatClassAndVatPercentage(Long companyId,String vatClass ,double vatPercentage);
+	
+	@Transactional
+	Long deleteByCompanyId(Long companyId);
 }
