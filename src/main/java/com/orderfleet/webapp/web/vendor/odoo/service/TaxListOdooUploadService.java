@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.vendor.odoo.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -46,19 +47,28 @@ public class TaxListOdooUploadService {
 
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
-		taxMasterRepository.deleteByCompanyId(company.getId());
+		List<TaxMaster> taxMasters = taxMasterRepository.findAllByCompanyId(company.getId());
 		
 		Set<TaxMaster> saveTaxMasters = new HashSet<>();
 		
 		for (OdooTaxList taxDto : list) {
-			TaxMaster taxMaster = new TaxMaster();
-			taxMaster.setPid(TaxMasterService.PID_PREFIX + RandomUtil.generatePid());
-			double vatPercentage = taxDto.getAmount()* 100;
-			taxMaster.setVatPercentage(vatPercentage);
-			taxMaster.setVatClass(taxDto.getType());
-			taxMaster.setCompany(company);
-			taxMaster.setDescription(""+taxDto.getId());
-			taxMaster.setVatName(taxDto.getName());
+			// check exist by name, only one exist with a name
+			Optional<TaxMaster> optionalTM = taxMasters.stream()
+					.filter(pc -> pc.getVatName().equalsIgnoreCase(taxDto.getName())).findAny();
+			
+			TaxMaster taxMaster;
+			if (optionalTM.isPresent()) {
+				taxMaster = optionalTM.get();
+			} else {
+				taxMaster = new TaxMaster();
+				taxMaster.setPid(TaxMasterService.PID_PREFIX + RandomUtil.generatePid());
+				double vatPercentage = taxDto.getAmount()* 100;
+				taxMaster.setVatPercentage(vatPercentage);
+				taxMaster.setVatClass(taxDto.getType());
+				taxMaster.setCompany(company);
+				taxMaster.setDescription(""+taxDto.getId());
+				taxMaster.setVatName(taxDto.getName());
+			}
 			saveTaxMasters.add(taxMaster);
 		}
 		bulkOperationRepositoryCustom.bulkSaveTaxMasters(saveTaxMasters);

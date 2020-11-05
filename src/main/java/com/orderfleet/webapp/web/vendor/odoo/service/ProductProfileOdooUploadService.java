@@ -27,6 +27,7 @@ import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
+import com.orderfleet.webapp.domain.TaxMaster;
 import com.orderfleet.webapp.domain.TemporaryOpeningStock;
 import com.orderfleet.webapp.domain.UnitOfMeasure;
 import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
@@ -44,6 +45,7 @@ import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
+import com.orderfleet.webapp.repository.TaxMasterRepository;
 import com.orderfleet.webapp.repository.TemporaryOpeningStockRepository;
 import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
 import com.orderfleet.webapp.repository.UnitOfMeasureRepository;
@@ -115,6 +117,8 @@ public class ProductProfileOdooUploadService {
 	private final PriceLevelListRepository priceLevelListRepository;
 
 	private final TemporaryOpeningStockRepository temporaryOpeningStockRepository;
+	
+	private final TaxMasterRepository taxMasterRepository;
 
 	public ProductProfileOdooUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			DivisionRepository divisionRepository, ProductCategoryRepository productCategoryRepository,
@@ -126,7 +130,8 @@ public class ProductProfileOdooUploadService {
 			UserStockLocationRepository userStockLocationRepository,
 			EmployeeProfileRepository employeeProfileRepository, PriceLevelRepository priceLevelRepository,
 			PriceLevelListRepository priceLevelListRepository,
-			TemporaryOpeningStockRepository temporaryOpeningStockRepository) {
+			TemporaryOpeningStockRepository temporaryOpeningStockRepository,
+			TaxMasterRepository taxMasterRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.divisionRepository = divisionRepository;
@@ -144,6 +149,7 @@ public class ProductProfileOdooUploadService {
 		this.priceLevelRepository = priceLevelRepository;
 		this.priceLevelListRepository = priceLevelListRepository;
 		this.temporaryOpeningStockRepository = temporaryOpeningStockRepository;
+		this.taxMasterRepository = taxMasterRepository;
 	}
 
 	@Transactional
@@ -187,7 +193,9 @@ public class ProductProfileOdooUploadService {
 		} else {
 			productCategory = defaultCategory.get();
 		}
-
+		
+		// tax masters
+		List<TaxMaster> alltaxMasters = taxMasterRepository.findAllByCompanyId(companyId);
 		for (OdooProductProfile ppDto : list) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
@@ -206,6 +214,22 @@ public class ProductProfileOdooUploadService {
 				productProfile.setName(ppDto.getName());
 				productProfile.setDivision(defaultDivision);
 				productProfile.setDataSourceType(DataSourceType.TALLY);
+			}
+			
+			// tax
+			Object taxIds = ppDto.getTax_ids();			
+			if (taxIds instanceof List<?>) {
+				List<Integer> taxIdList = (List<Integer>)(Object) taxIds;
+				List<TaxMaster> taxMasters = new ArrayList<>();
+				for (int taxId: taxIdList) {
+					alltaxMasters.stream().filter(a -> a.getDescription().equalsIgnoreCase(""+taxId)).findAny()
+					.ifPresent(ap -> {
+						if (ap != null) {
+							taxMasters.add(ap);
+						}
+					});
+				}
+				productProfile.setTaxMastersList(taxMasters);
 			}
 
 			productProfile.setAlias(ppDto.getDefault_code());
@@ -298,9 +322,8 @@ public class ProductProfileOdooUploadService {
 			productGroupDTO.setAlias(ppDto.getGroup());
 
 			productGroupDtos.add(productGroupDTO);
-
+			
 			saveUpdateProductProfiles.add(productProfile);
-
 		}
 
 		log.info("Saving product profiles");
