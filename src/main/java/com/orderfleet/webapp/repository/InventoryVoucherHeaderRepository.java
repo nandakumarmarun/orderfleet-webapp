@@ -666,6 +666,12 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query("select inventoryVoucher.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.documentNumberServer in ?1")
 	List<String> findAllByDocumentNumberServer(List<String> references);
+	
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.documentNumberServer in ?1")
+	List<InventoryVoucherHeader> findAllHeaderdByDocumentNumberServer(List<String> references);
+	
+//	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.pid = ?1 Order By inventoryVoucher.createdDate desc")
+//	List<InventoryVoucherHeader> findInventoryVoucherHeaderByPid(String inventoryVoucherHeaderPid);
 
 	public static final String CUSTOMER_WISE_INVENTORY_HEADER = "select ivh.created_date, ivh.doc_discount_amount, ivh.doc_discount_percentage, ivh.document_date, "
 			+ "ivh.document_number_local, ivh.document_number_server, ivh.document_total, ivh.document_volume, "

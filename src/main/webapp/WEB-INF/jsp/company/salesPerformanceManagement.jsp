@@ -134,9 +134,21 @@
 								</div>
 
 							</c:if>
+							
+							<c:if test="${sendTransactionsSapPravesh=='true'}">
+								<div class="col-sm-1">
+									<br>
+									<button type="button" class="btn btn-primary"
+										id="sendTransactionsSapPravesh">Send Sales Order To SAP</button>
+									<!-- 									<div class="loader hide"></div> -->
+
+								</div>
+
+							</c:if>
 						</div>
 					</form>
 				</div>
+				
 				<div class="col-md-12 col-sm-12 clearfix"
 					style="font-size: 14px; color: black;">
 					<div class="col-sm-2">

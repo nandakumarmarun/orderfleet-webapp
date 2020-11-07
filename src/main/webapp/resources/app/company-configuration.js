@@ -55,6 +55,7 @@ if (!this.CompanyConfiguration) {
 		var sendSalesOrderSap = $('#sendSalesOrderSap').is(":checked");
 		var piecesToQuantity = $('#piecesToQuantity').is(":checked");
 		var sendSalesOrderOdoo = $('#sendSalesOrderOdoo').is(":checked");
+		var sendTransactionsSapPravesh = $('#sendTransactionsSapPravesh').is(":checked");
 		/* var findLocation = $('#findLocation').is(":checked"); */
 		$.ajax({
 			url : contextPath,
@@ -76,7 +77,8 @@ if (!this.CompanyConfiguration) {
 				sendSalesOrderEmail : sendSalesOrderEmail,
 				sendSalesOrderSap : sendSalesOrderSap,
 				piecesToQuantity : piecesToQuantity,
-				sendSalesOrderOdoo : sendSalesOrderOdoo
+				sendSalesOrderOdoo : sendSalesOrderOdoo,
+				sendTransactionsSapPravesh : sendTransactionsSapPravesh
 			/* findLocation : findLocation */
 			},
 			success : function(data) {
@@ -125,8 +127,10 @@ if (!this.CompanyConfiguration) {
 								data.piecesToQuantity);
 						$("#sendSalesOrderOdoo").prop("checked",
 								data.sendSalesOrderOdoo);
+						$("#sendTransactionsSapPravesh").prop("checked",
+								data.sendTransactionsSapPravesh);
 						
-
+						
 						/*
 						 * $("#findLocation").prop("checked",
 						 * data.findLocation);

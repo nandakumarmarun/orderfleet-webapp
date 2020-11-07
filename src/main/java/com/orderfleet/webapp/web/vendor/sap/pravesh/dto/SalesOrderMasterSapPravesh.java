@@ -7,224 +7,89 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "dbkey", "location", "customercode", "customername", "customer_ref", "postingdate", "valid_until",
-		"docdate", "SalesCommitDate", "remarks", "priority", "itemDetails", "Scode", "ordertype", "discount", "shipto",
-		"billTo" })
+@JsonPropertyOrder({ "customerCode", "customerName", "docDate", "docNum", "Remarks", "salesOrderDetails" })
 public class SalesOrderMasterSapPravesh {
 
-	@JsonProperty("dbkey")
-	private int dbKey;
-	@JsonProperty("location")
-	private String location;
-	@JsonProperty("customercode")
+	@JsonProperty("customerCode")
 	private String customerCode;
-	@JsonProperty("customername")
+	@JsonProperty("customerName")
 	private String customerName;
-	@JsonProperty("customer_ref")
-	private String customerRef;
-	@JsonProperty("postingdate")
-	private String postingDate;
-	@JsonProperty("valid_until")
-	private String validUntil;
-	@JsonProperty("docdate")
+	@JsonProperty("docDate")
 	private String docDate;
-	@JsonProperty("SalesCommitDate")
-	private String salesCommitDate;
-	@JsonProperty("remarks")
+	@JsonProperty("docNum")
+	private String docNum;
+	@JsonProperty("Remarks")
 	private String remarks;
-	@JsonProperty("priority")
-	private String priority;
-	@JsonProperty("itemDetails")
-	private List<SalesOrderItemDetailsSapPravesh> itemDetails;
-	@JsonProperty("Scode")
-	private int sCode;
-	@JsonProperty("ordertype")
-	private String orderType;
-	@JsonProperty("discount")
-	private double discount;
-	@JsonProperty("shipto")
-	private String shipTo;
-	@JsonProperty("billTo")
-	private String billTo;
+	@JsonProperty("salesOrderDetails")
+	private List<SalesOrderItemDetailsSapPravesh> salesOrderDetails;
 
-	@JsonProperty("dbkey")
-	public int getDbKey() {
-		return dbKey;
-	}
-
-	@JsonProperty("dbkey")
-	public void setDbKey(int dbKey) {
-		this.dbKey = dbKey;
-	}
-
-	@JsonProperty("location")
-	public String getLocation() {
-		return location;
-	}
-
-	@JsonProperty("location")
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	@JsonProperty("customercode")
+	@JsonProperty("customerCode")
 	public String getCustomerCode() {
 		return customerCode;
 	}
 
-	@JsonProperty("customercode")
+	@JsonProperty("customerCode")
 	public void setCustomerCode(String customerCode) {
 		this.customerCode = customerCode;
 	}
 
-	@JsonProperty("customername")
+	@JsonProperty("customerName")
 	public String getCustomerName() {
 		return customerName;
 	}
 
-	@JsonProperty("customername")
+	@JsonProperty("customerName")
 	public void setCustomerName(String customerName) {
 		this.customerName = customerName;
 	}
 
-	@JsonProperty("customer_ref")
-	public String getCustomerRef() {
-		return customerRef;
-	}
-
-	@JsonProperty("customer_ref")
-	public void setCustomerRef(String customerRef) {
-		this.customerRef = customerRef;
-	}
-
-	@JsonProperty("postingdate")
-	public String getPostingDate() {
-		return postingDate;
-	}
-
-	@JsonProperty("postingdate")
-	public void setPostingDate(String postingDate) {
-		this.postingDate = postingDate;
-	}
-
-	@JsonProperty("valid_until")
-	public String getValidUntil() {
-		return validUntil;
-	}
-
-	@JsonProperty("valid_until")
-	public void setValidUntil(String validUntil) {
-		this.validUntil = validUntil;
-	}
-
-	@JsonProperty("docdate")
+	@JsonProperty("docDate")
 	public String getDocDate() {
 		return docDate;
 	}
 
-	@JsonProperty("docdate")
+	@JsonProperty("docDate")
 	public void setDocDate(String docDate) {
 		this.docDate = docDate;
 	}
 
-	@JsonProperty("SalesCommitDate")
-	public String getSalesCommitDate() {
-		return salesCommitDate;
+	@JsonProperty("docNum")
+	public String getDocNum() {
+		return docNum;
 	}
 
-	@JsonProperty("SalesCommitDate")
-	public void setSalesCommitDate(String salesCommitDate) {
-		this.salesCommitDate = salesCommitDate;
+	@JsonProperty("docNum")
+	public void setDocNum(String docNum) {
+		this.docNum = docNum;
 	}
 
-	@JsonProperty("remarks")
+	@JsonProperty("Remarks")
 	public String getRemarks() {
 		return remarks;
 	}
 
-	@JsonProperty("remarks")
+	@JsonProperty("Remarks")
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
 
-	@JsonProperty("priority")
-	public String getPriority() {
-		return priority;
+	@JsonProperty("salesOrderDetails")
+	public List<SalesOrderItemDetailsSapPravesh> getSalesOrderDetails() {
+		return salesOrderDetails;
 	}
 
-	@JsonProperty("priority")
-	public void setPriority(String priority) {
-		this.priority = priority;
-	}
-
-	@JsonProperty("itemDetails")
-	public List<SalesOrderItemDetailsSapPravesh> getItemDetails() {
-		return itemDetails;
-	}
-
-	@JsonProperty("itemDetails")
-	public void setItemDetails(List<SalesOrderItemDetailsSapPravesh> itemDetails) {
-		this.itemDetails = itemDetails;
-	}
-
-	@JsonProperty("Scode")
-	public int getsCode() {
-		return sCode;
-	}
-
-	@JsonProperty("Scode")
-	public void setsCode(int sCode) {
-		this.sCode = sCode;
-	}
-
-	@JsonProperty("ordertype")
-	public String getOrderType() {
-		return orderType;
-	}
-
-	@JsonProperty("ordertype")
-	public void setOrderType(String orderType) {
-		this.orderType = orderType;
-	}
-
-	@JsonProperty("discount")
-	public double getDiscount() {
-		return discount;
-	}
-
-	@JsonProperty("discount")
-	public void setDiscount(double discount) {
-		this.discount = discount;
-	}
-
-	@JsonProperty("shipto")
-	public String getShipTo() {
-		return shipTo;
-	}
-
-	@JsonProperty("shipto")
-	public void setShipTo(String shipTo) {
-		this.shipTo = shipTo;
-	}
-
-	@JsonProperty("billTo")
-	public String getBillTo() {
-		return billTo;
-	}
-
-	@JsonProperty("billTo")
-	public void setBillTo(String billTo) {
-		this.billTo = billTo;
+	@JsonProperty("salesOrderDetails")
+	public void setSalesOrderDetails(List<SalesOrderItemDetailsSapPravesh> salesOrderDetails) {
+		this.salesOrderDetails = salesOrderDetails;
 	}
 
 	@Override
 	public String toString() {
-		return "SalesOrderMasterSap [dbKey=" + dbKey + ", location=" + location + ", customerCode=" + customerCode
-				+ ", customerName=" + customerName + ", customerRef=" + customerRef + ", postingDate=" + postingDate
-				+ ", validUntil=" + validUntil + ", docDate=" + docDate + ", salesCommitDate=" + salesCommitDate
-				+ ", remarks=" + remarks + ", priority=" + priority + ", itemDetails=" + itemDetails + ", sCode="
-				+ sCode + ", orderType=" + orderType + ", discount=" + discount + ", shipTo=" + shipTo + ", billTo="
-				+ billTo + "]";
+		return "SalesOrderMasterSapPravesh [customerCode=" + customerCode + ", customerName=" + customerName
+				+ ", docDate=" + docDate + ", docNum=" + docNum + ", remarks=" + remarks + ", salesOrderDetails="
+				+ salesOrderDetails + "]";
 	}
+	
+	
 
 }

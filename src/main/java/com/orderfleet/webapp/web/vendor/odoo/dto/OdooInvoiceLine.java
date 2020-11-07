@@ -64,4 +64,10 @@ public class OdooInvoiceLine {
 		this.is_foc = is_foc;
 	}
 
+	@Override
+	public String toString() {
+		return "OdooInvoiceLine [uom_id=" + uom_id + ", product_id=" + product_id + ", quantity=" + quantity
+				+ ", price_unit=" + price_unit + ", discount=" + discount + ", is_foc=" + is_foc + "]";
+	}
+
 }

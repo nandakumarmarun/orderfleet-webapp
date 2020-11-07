@@ -125,7 +125,7 @@
 									<br>
 									<button type="button" class="btn btn-primary"
 										id="sendSalesOrderEmail">Send Sales Order By Email</button>
-<!-- 									<div class="loader hide"></div> -->
+									<!-- 									<div class="loader hide"></div> -->
 
 								</div>
 
@@ -136,7 +136,7 @@
 									<br>
 									<button type="button" class="btn btn-primary"
 										id="sendSalesOrderOdoo">Send Invoices</button>
-<!-- 									<div class="loader hide"></div> -->
+									<!-- 									<div class="loader hide"></div> -->
 
 								</div>
 
@@ -148,7 +148,7 @@
 									<button type="button"
 										class="btn btn-success hide packingSlipByCustomerClass"
 										id="packingSlipByCustomer">Packing Slip By Customer</button>
-<!-- 									<div class="loader hide"></div> -->
+									<!-- 									<div class="loader hide"></div> -->
 
 								</div>
 
@@ -158,9 +158,9 @@
 				</div>
 				<div id='loader' class="modal fade container">
 
-				<img src='/resources/assets/images/Spinner.gif'>
+					<img src='/resources/assets/images/Spinner.gif'>
 
-			</div>
+				</div>
 				<div class="col-md-12 col-sm-12 clearfix"
 					style="font-size: 14px; color: black;">
 					<div class="col-sm-2">

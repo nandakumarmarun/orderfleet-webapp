@@ -53,6 +53,7 @@
 						<th>Send Sales Order Sap</th>
 						<th>Pieces To Quantity</th>
 						<th>Send Sales Order Odoo</th>
+						<th>Send Transactions Sap Pravesh</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -78,6 +79,7 @@
 							<th>${companyConfiguration.sendSalesOrderSap}</th>
 							<th>${companyConfiguration.piecesToQuantity}</th>
 							<th>${companyConfiguration.sendSalesOrderOdoo}</th>
+							<th>${companyConfiguration.sendTransactionsSapPravesh}</th>
 
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
@@ -247,8 +249,14 @@
 												</div></td>
 										</tr>
 
-
-
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Send Transactions Sap
+														Pravesh</label> <input id="sendTransactionsSapPravesh"
+														name='checksSendTransactionsSapPravesh"' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
 
 
 										<!-- <tr>

@@ -84,4 +84,13 @@ public class OdooInvoice {
 		this.type = type;
 	}
 
+	@Override
+	public String toString() {
+		return "OdooInvoice [location_id=" + location_id + ", partner_id=" + partner_id + ", invoice_date="
+				+ invoice_date + ", reference=" + reference + ", rounding_amt=" + rounding_amt + ", journal_type="
+				+ journal_type + ", type=" + type + ", invoice_lines=" + invoice_lines + "]";
+	}
+	
+	
+
 }
