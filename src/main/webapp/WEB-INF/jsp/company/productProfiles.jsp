@@ -231,7 +231,7 @@
 									<label class="control-label" for="field_unitQty">Unit
 										Quantity</label> <input type="number" class="form-control"
 										name="unitQty" id="field_unitQty" maxlength="20"
-										placeholder="Unit Quantity" />
+										placeholder="Unit Quantity" value="1"/>
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="field_price">Price</label> <input

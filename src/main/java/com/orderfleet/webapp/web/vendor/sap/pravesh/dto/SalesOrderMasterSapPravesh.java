@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "customerCode", "customerName", "docDate", "docNum", "Remarks", "salesOrderDetails" })
+@JsonPropertyOrder({ "customerCode", "customerName", "docDate", "docNum", "refNo", "Remarks", "salesOrderDetails" })
 public class SalesOrderMasterSapPravesh {
 
 	@JsonProperty("customerCode")
@@ -18,6 +18,8 @@ public class SalesOrderMasterSapPravesh {
 	private String docDate;
 	@JsonProperty("docNum")
 	private String docNum;
+	@JsonProperty("refNo")
+	private String refNo;
 	@JsonProperty("Remarks")
 	private String remarks;
 	@JsonProperty("salesOrderDetails")
@@ -63,6 +65,16 @@ public class SalesOrderMasterSapPravesh {
 		this.docNum = docNum;
 	}
 
+	@JsonProperty("refNo")
+	public String getRefNo() {
+		return refNo;
+	}
+
+	@JsonProperty("refNo")
+	public void setRefNo(String refNo) {
+		this.refNo = refNo;
+	}
+
 	@JsonProperty("Remarks")
 	public String getRemarks() {
 		return remarks;
@@ -89,7 +101,5 @@ public class SalesOrderMasterSapPravesh {
 				+ ", docDate=" + docDate + ", docNum=" + docNum + ", remarks=" + remarks + ", salesOrderDetails="
 				+ salesOrderDetails + "]";
 	}
-	
-	
 
 }

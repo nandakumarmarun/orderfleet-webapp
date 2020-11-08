@@ -244,7 +244,8 @@ public class SendTransactionSapPraveshService {
 
 					SalesOrderMasterSapPravesh salesOrder = new SalesOrderMasterSapPravesh();
 
-					salesOrder.setCustomerCode(String.valueOf(opRecAccPro.get().getId())); //Primary key id of account profile
+					salesOrder.setCustomerCode(String.valueOf(opRecAccPro.get().getId())); // Primary key id of account
+																							// profile
 					salesOrder.setCustomerName(opRecAccPro.get().getName());
 
 					LocalDateTime date = null;
@@ -258,6 +259,7 @@ public class SendTransactionSapPraveshService {
 
 					salesOrder.setDocDate(date.format(formatter1));
 					salesOrder.setDocNum(obj[6].toString());
+					salesOrder.setRefNo(obj[6].toString());
 
 					salesOrder.setRemarks(opExe.get().getRemarks());
 
@@ -273,8 +275,11 @@ public class SendTransactionSapPraveshService {
 
 						SalesOrderItemDetailsSapPravesh salesOrderDetail = new SalesOrderItemDetailsSapPravesh();
 
-						salesOrderDetail.setItemCode(inventoryVoucherDetail.getProduct().getAlias());
-						salesOrderDetail.setItemName(inventoryVoucherDetail.getProduct().getName());
+						salesOrderDetail.setItemCode(inventoryVoucherDetail.getProduct().getName());
+						salesOrderDetail.setItemName(inventoryVoucherDetail.getProduct().getAlias() != null
+								&& !inventoryVoucherDetail.getProduct().getAlias().equals("")
+										? inventoryVoucherDetail.getProduct().getAlias()
+										: inventoryVoucherDetail.getProduct().getName());
 						salesOrderDetail.setLineNo(i);
 
 						double quantity = Double.valueOf(inventoryVoucherDetail.getQuantity()) != null
@@ -327,7 +332,7 @@ public class SendTransactionSapPraveshService {
 		HttpEntity<List<SalesOrderMasterSapPravesh>> entity = new HttpEntity<>(salesOrders, createTokenAuthHeaders());
 
 		log.info(entity.getBody().toString() + "");
-		
+
 		ObjectMapper Obj = new ObjectMapper();
 
 		// get Oraganisation object as a json string
@@ -472,7 +477,6 @@ public class SendTransactionSapPraveshService {
 						.collect(Collectors.toList()).stream()
 						.sorted(Comparator.comparingLong(AccountingVoucherDetail::getId)).collect(Collectors.toList());
 
-				
 				for (AccountingVoucherDetail accountingVoucherDetail : avDetails) {
 					if (accountingVoucherDetail.getAccountingVoucherAllocations().isEmpty()) {
 						ReceiptSapPravesh receiptDTO = new ReceiptSapPravesh();
@@ -505,7 +509,8 @@ public class SendTransactionSapPraveshService {
 							ReceiptSapPravesh receiptDTO = new ReceiptSapPravesh();
 
 							receiptDTO.setAmount(accountingVoucherAllocation.getAccountingVoucherDetail().getAmount());
-							receiptDTO.setCustomerCode(String.valueOf(opAccPro.get().getId())); //primary key id of account profile
+							receiptDTO.setCustomerCode(String.valueOf(opAccPro.get().getId())); // primary key id of
+																								// account profile
 							receiptDTO.setCustomerName(opAccPro.get().getName());
 							receiptDTO.setPayMode(
 									accountingVoucherAllocation.getAccountingVoucherDetail().getMode().toString());
@@ -543,7 +548,7 @@ public class SendTransactionSapPraveshService {
 							accountingPids);
 			log.debug("updated " + updated + " to PROCESSING");
 		}
-		
+
 		log.info("Sending (" + receiptDTOs.size() + ") Receipts to SAP....");
 
 		if (receiptDTOs.size() < 1) {
@@ -553,7 +558,7 @@ public class SendTransactionSapPraveshService {
 		HttpEntity<List<ReceiptSapPravesh>> entity = new HttpEntity<>(receiptDTOs, createTokenAuthHeaders());
 
 		log.info(entity.getBody().toString() + "");
-		
+
 		ObjectMapper Obj = new ObjectMapper();
 
 		// get Oraganisation object as a json string
@@ -566,7 +571,6 @@ public class SendTransactionSapPraveshService {
 			e.printStackTrace();
 		}
 
-
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -576,7 +580,7 @@ public class SendTransactionSapPraveshService {
 
 			String authenticateResponse = restTemplate.postForObject(API_URL_RECIPTS, entity, String.class);
 
-			log.info("Success"+"----"+authenticateResponse);
+			log.info("Success" + "----" + authenticateResponse);
 //			log.info("Odoo Invoice Created Success Size= " + responseBodyOdooInvoice.getResult().getMessage().size()
 //					+ "------------");
 //
