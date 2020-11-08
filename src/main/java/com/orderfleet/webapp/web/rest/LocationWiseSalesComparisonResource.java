@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
@@ -36,85 +38,64 @@ import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.ProductGroupLocationTargetRepository;
-import com.orderfleet.webapp.repository.ProductGroupProductRepository;
-import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.LocationService;
+import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskPlanDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationWiseProductGroupPerformanceDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationPerformaceDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
 
 @Controller
 @RequestMapping("/web")
-public class LocationWiseProductGroupComparisonReportResource {
-	private final Logger log = LoggerFactory.getLogger(LocationWiseProductGroupComparisonReportResource.class);
+public class LocationWiseSalesComparisonResource {
+	private final Logger log = LoggerFactory.getLogger(LocationWiseSalesComparisonResource.class);
 	
-	@Inject
-	private ProductGroupRepository productGroupRepository;
-	
-	@Inject
-	private ProductGroupProductRepository productGroupProductRepository;
-
 	@Inject
 	private LocationService locationService;
-
+	
 	@Inject
 	private ProductGroupLocationTargetRepository productGroupLocationTargetRepository;
-
+	
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
-	
+
+	@Inject
+	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
+
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
 
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
-
-	@Inject
-	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
 	
 	@Timed
-	@RequestMapping(value = "/location-wise-product-group-comparison-report", method = RequestMethod.GET)
-	public String getLocationWiseTargetAchievedReport(Model model) {
-		log.debug("Web request to get a page of Location Wise Product Group Comparison Report");
-		model.addAttribute("products", productGroupRepository.findAllByCompanyIdAndDeactivatedProductGroup(true));
-		return "company/locationWiseProductGroupComparisonReport";
+	@RequestMapping(value = "/location-wise-sales-comparison-report", method = RequestMethod.GET)
+	public String getLocationWiseSalesComparisonReport(Model model) {
+		log.debug("Web request to get a page of LocationWiseSalesComparisonReport");
+		return "company/locationWiseSalesComparisonReport";
 	}
 	
-	@RequestMapping(value = "/location-wise-product-group-comparison-report/load-data", method = RequestMethod.GET)
+	@RequestMapping(value = "/location-wise-sales-comparison-report/load-data", method = RequestMethod.GET)
 	@ResponseBody
-	public LocationWiseProductGroupPerformanceDTO performanceTargets(@RequestParam("productGroupPid") String productGroupPid,
+	public LocationWiseProductGroupPerformanceDTO performanceTargets(
 			@RequestParam(value = "fromFirstDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromFirstDate,
 			@RequestParam(value = "toFirstDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toFirstDate,
 			@RequestParam(value = "fromSecondDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromSecondDate,
 			@RequestParam(value = "toSecondDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toSecondDate
-			) {
-		log.info("Location Wise Product Group Comparison Report : {} , and date between {}, {}, {}, {}", productGroupPid,
-				fromFirstDate, toFirstDate, fromSecondDate, toSecondDate);
+	) {
+		log.info("Location Wise Sales Comparison Report : {} , and date between {}, {}, {}, {}", fromFirstDate, toFirstDate, fromSecondDate, toSecondDate);
 		long starttime = System.nanoTime();
-		if (productGroupPid.equals("no")) {
-			return null;
-		}
-
-		Set<Long> productProfileIds = productGroupProductRepository.findProductIdByProductGroupPid(productGroupPid);
-
 		// filter based on product group
 		List<LocationDTO> locations = locationService.findAllLocationsByCompanyAndActivatedLocations();
 		List<String> locationPids = locations.stream().map(a -> a.getPid()).collect(Collectors.toList());
 		List<ProductGroupLocationTarget> firstProductGroupLocationTargets = productGroupLocationTargetRepository
-				.findByLocationPidInAndProductGroupPidAndFromDateGreaterThanEqualAndToDateLessThanEqual(locationPids,
-						productGroupPid, fromFirstDate, toFirstDate);
+				.findByLocationPidInAndFromDateGreaterThanEqualAndToDateLessThanEqual(locationPids,fromFirstDate, toFirstDate);
 		
 		List<ProductGroupLocationTarget> secondProductGroupLocationTargets = productGroupLocationTargetRepository
-				.findByLocationPidInAndProductGroupPidAndFromDateGreaterThanEqualAndToDateLessThanEqual(locationPids,
-						productGroupPid, fromSecondDate, toSecondDate);
-		
-		log.info("Product Group Location Targets {} {} {}", firstProductGroupLocationTargets.size(), secondProductGroupLocationTargets.size(), productProfileIds.size());
-		
+				.findByLocationPidInAndFromDateGreaterThanEqualAndToDateLessThanEqual(locationPids,
+						fromSecondDate, toSecondDate);
 		
 		List<LocationAccountProfile> allLocationAccountProfiles = locationAccountProfileRepository.findAllByAccountProfile();
-		List<InventoryVoucherHeader> allInventoryVoucherHeader =  inventoryVoucherHeaderRepository.findAllByCompanyIdOrderByCreatedDateDesc();
 		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
 		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
 				SecurityUtils.getCurrentUsersCompanyId());
@@ -124,6 +105,13 @@ public class LocationWiseProductGroupComparisonReportResource {
 //		}
 		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
+		
+		List<InventoryVoucherHeader> allInventoryVoucherHeader =  inventoryVoucherHeaderRepository.findAllByCompanyIdOrderByCreatedDateDesc();
+		log.info("All inventory voucher header size {}", allInventoryVoucherHeader.size());
+		
+		
+		
+		log.info("Product Group Location Targets {} {}", firstProductGroupLocationTargets.size(), secondProductGroupLocationTargets.size());
 		
 		// if (!productGroupLocationTargets.isEmpty()) {
 		LocationWiseProductGroupPerformanceDTO locationWiseProductGroupPerformanceDTO = new LocationWiseProductGroupPerformanceDTO();
@@ -181,12 +169,6 @@ public class LocationWiseProductGroupComparisonReportResource {
 					productGroupLocationTargetDTO.setVolume(0);
 					productGroupLocationTargetDTO.setAmount(0);
 				}
-				
-				
-//				productGroupLocationTargetDTO
-//				.setAchievedVolume(getAchievedVolume(location.getPid(), productProfileIds, monthDate));
-				
-				
 				Set<Long> accountProfileIds = allLocationAccountProfiles.stream().filter(a -> a.getLocation().getActivated())
 						.filter(a -> a.getLocation().getPid().equals(location.getPid()))
 						.filter(distinctByKey(LocationAccountProfile::getAccountProfile))
@@ -197,7 +179,7 @@ public class LocationWiseProductGroupComparisonReportResource {
 
 
 				Double achievedVolume = 0D;
-				if (!accountProfileIds.isEmpty() && !productProfileIds.isEmpty()) {
+				if (!accountProfileIds.isEmpty()) {
 					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream()
 					.filter(av -> {
 						if (av.getDocumentDate().isAfter(start.atTime(0, 0)) && av.getDocumentDate().isBefore(end.atTime(23, 59))) {
@@ -215,12 +197,13 @@ public class LocationWiseProductGroupComparisonReportResource {
 
 					if (!ivHeaderIds.isEmpty()) {
 						achievedVolume = inventoryVoucherDetailRepository
-								.sumOfVolumeByAndProductIdsAndHeaderIds(productProfileIds, ivHeaderIds);
+								.sumOfVolumeByAndHeaderIds(ivHeaderIds);
 					}
 				}
 				achievedVolume = achievedVolume == null ? 0 : achievedVolume;
-				productGroupLocationTargetDTO.setAchievedVolume(achievedVolume);
-				
+				productGroupLocationTargetDTO
+				.setAchievedVolume(achievedVolume);
+
 				productGroupLocationTargetList.add(productGroupLocationTargetDTO);
 			}
 			firstProductGroupLocationTargetMap.put(locationName, productGroupLocationTargetList);
@@ -254,9 +237,6 @@ public class LocationWiseProductGroupComparisonReportResource {
 					productGroupLocationTargetDTO.setAmount(0);
 				}
 
-//				productGroupLocationTargetDTO
-//						.setAchievedVolume(getAchievedVolume(location.getPid(), productProfileIds, monthDate));
-				
 				Set<Long> accountProfileIds = allLocationAccountProfiles.stream().filter(a -> a.getLocation().getActivated())
 						.filter(a -> a.getLocation().getPid().equals(location.getPid()))
 						.filter(distinctByKey(LocationAccountProfile::getAccountProfile))
@@ -267,7 +247,7 @@ public class LocationWiseProductGroupComparisonReportResource {
 
 
 				Double achievedVolume = 0D;
-				if (!accountProfileIds.isEmpty() && !productProfileIds.isEmpty()) {
+				if (!accountProfileIds.isEmpty()) {
 					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream()
 					.filter(av -> {
 						if (av.getDocumentDate().isAfter(start.atTime(0, 0)) && av.getDocumentDate().isBefore(end.atTime(23, 59))) {
@@ -285,11 +265,12 @@ public class LocationWiseProductGroupComparisonReportResource {
 
 					if (!ivHeaderIds.isEmpty()) {
 						achievedVolume = inventoryVoucherDetailRepository
-								.sumOfVolumeByAndProductIdsAndHeaderIds(productProfileIds, ivHeaderIds);
+								.sumOfVolumeByAndHeaderIds(ivHeaderIds);
 					}
 				}
 				achievedVolume = achievedVolume == null ? 0 : achievedVolume;
-				productGroupLocationTargetDTO.setAchievedVolume(achievedVolume);
+				productGroupLocationTargetDTO
+				.setAchievedVolume(achievedVolume);
 
 				productGroupLocationTargetList.add(productGroupLocationTargetDTO);
 			}
@@ -328,35 +309,35 @@ public class LocationWiseProductGroupComparisonReportResource {
 		return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
 	
-//	private double getAchievedVolume(String locationPid, Set<Long> productProfileIds, LocalDate initialDate) {
-//
-//		LocalDate start = initialDate.with(TemporalAdjusters.firstDayOfMonth());
-//		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
-//
-//		Set<Long> accountProfileIds = locationAccountProfileRepository.findAccountProfileIdByLocationPid(locationPid);
-//
-//		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
-//		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
-//				SecurityUtils.getCurrentUsersCompanyId());
-//		if (primarySecDoc.isEmpty()) {
-//			log.debug("........No PrimarySecondaryDocument configuration Available...........");
-//			return 0;
-//		}
-//		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
-//				.collect(Collectors.toList());
-//
-//		Double achievedVolume = 0D;
-//		if (!accountProfileIds.isEmpty() && !productProfileIds.isEmpty()) {
-//			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository.findIdByAccountProfileAndDocumentDateBetween(
-//					accountProfileIds, documentIds, start.atTime(0, 0), end.atTime(23, 59));
-//			if (!ivHeaderIds.isEmpty()) {
-//				achievedVolume = inventoryVoucherDetailRepository
-//						.sumOfVolumeByAndProductIdsAndHeaderIds(productProfileIds, ivHeaderIds);
-//			}
-//		}
-//		return achievedVolume == null ? 0 : achievedVolume;
-//
-//	}
+	private double getAchievedVolume(String locationPid, LocalDate initialDate) {
+
+		LocalDate start = initialDate.with(TemporalAdjusters.firstDayOfMonth());
+		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
+
+		Set<Long> accountProfileIds = locationAccountProfileRepository.findAccountProfileIdByLocationPid(locationPid);
+
+		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
+				SecurityUtils.getCurrentUsersCompanyId());
+		if (primarySecDoc.isEmpty()) {
+			log.debug("........No PrimarySecondaryDocument configuration Available...........");
+			return 0;
+		}
+		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
+				.collect(Collectors.toList());
+
+		Double achievedVolume = 0D;
+		if (!accountProfileIds.isEmpty()) {
+			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository.findIdByAccountProfileAndDocumentDateBetween(
+					accountProfileIds, documentIds, start.atTime(0, 0), end.atTime(23, 59));
+			if (!ivHeaderIds.isEmpty()) {
+				achievedVolume = inventoryVoucherDetailRepository
+						.sumOfVolumeByAndHeaderIds(ivHeaderIds);
+			}
+		}
+		return achievedVolume == null ? 0 : achievedVolume;
+
+	}
 
 	private List<LocalDate> monthsDateBetweenDates(LocalDate start, LocalDate end) {
 		List<LocalDate> ret = new ArrayList<>();

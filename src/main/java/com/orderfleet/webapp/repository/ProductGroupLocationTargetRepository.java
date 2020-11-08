@@ -15,6 +15,9 @@ public interface ProductGroupLocationTargetRepository extends JpaRepository<Prod
 
 	List<ProductGroupLocationTarget> findByLocationPidInAndProductGroupPidAndFromDateGreaterThanEqualAndToDateLessThanEqual(
 			List<String> locationPids, String productGroupPid, LocalDate fromDate, LocalDate toDate);
+	
+	List<ProductGroupLocationTarget> findByLocationPidInAndFromDateGreaterThanEqualAndToDateLessThanEqual(
+			List<String> locationPids, LocalDate fromDate, LocalDate toDate);
 
 	Optional<ProductGroupLocationTarget> findOneByPid(String pid);
 
