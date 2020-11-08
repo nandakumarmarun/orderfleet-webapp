@@ -23,4 +23,9 @@ public class ParamsOdooInvoice {
 		this.invoices = invoices;
 	}
 
+	@Override
+	public String toString() {
+		return "ParamsOdooInvoice [create_multi=" + create_multi + ", invoices=" + invoices + "]";
+	}
+
 }

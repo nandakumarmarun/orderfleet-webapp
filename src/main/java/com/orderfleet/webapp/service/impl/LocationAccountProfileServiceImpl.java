@@ -161,11 +161,13 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 			// List<AccountProfile> accountProfiles =
 			// locationAccountProfileRepository.findAccountProfilesByUserLocationsOrderByAccountProfilesName(locations);
 
-			List<AccountProfile> accountProfiles = accountProfileRepository
-					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+			if (accountProfileIds.size() > 0) {
+				List<AccountProfile> accountProfiles = accountProfileRepository
+						.findAllByCompanyIdAndIdsIn(accountProfileIds);
 
-			// remove duplicates
-			result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+				// remove duplicates
+				result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+			}
 		}
 		return accountProfileMapper.accountProfilesToAccountProfileDTOs(result);
 	}

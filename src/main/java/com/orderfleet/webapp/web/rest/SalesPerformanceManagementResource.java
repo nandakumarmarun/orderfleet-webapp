@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -99,6 +100,7 @@ import com.orderfleet.webapp.service.InventoryVoucherDetailService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
@@ -111,6 +113,7 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderItemDetailsSap;
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderMasterSap;
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderResponseDataSap;
+import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPraveshService;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -179,6 +182,9 @@ public class SalesPerformanceManagementResource {
 
 	@Inject
 	private AccountProfileMapper accountProfileMapper;
+	
+	@Inject
+	private SendTransactionSapPraveshService sendTransactionSapPraveshService;
 
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
@@ -247,8 +253,33 @@ public class SalesPerformanceManagementResource {
 			}
 		}
 		model.addAttribute("pdfDownloadStatus", pdfDownloadStatus);
+		
+		boolean sendTransactionsSapPravesh = false;
+		Optional<CompanyConfiguration> opCompanyConfigurationSapPravesh = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(),
+						CompanyConfig.SEND_TRANSACTIONS_SAP_PRAVESH);
+		if (opCompanyConfigurationSapPravesh.isPresent()) {
+
+			if (opCompanyConfigurationSapPravesh.get().getValue().equals("true")) {
+				sendTransactionsSapPravesh = true;
+			} else {
+				sendTransactionsSapPravesh = false;
+			}
+		}
+		model.addAttribute("sendTransactionsSapPravesh", sendTransactionsSapPravesh);
 
 		return "company/salesPerformanceManagement";
+	}
+	
+	@RequestMapping(value = "/sales-performance-management/sendTransactionsSapPravesh", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> sendTransactionsSapPravesh() throws MessagingException {
+
+		log.info("sendSalesOrderSap()-----");
+
+		sendTransactionSapPraveshService.sendSalesOrder();
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 
 	/**

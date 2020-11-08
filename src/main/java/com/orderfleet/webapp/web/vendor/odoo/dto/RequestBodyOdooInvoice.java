@@ -22,4 +22,9 @@ public class RequestBodyOdooInvoice {
 		this.params = params;
 	}
 
+	@Override
+	public String toString() {
+		return "RequestBodyOdooInvoice [jsonrpc=" + jsonrpc + ", params=" + params + "]";
+	}
+
 }

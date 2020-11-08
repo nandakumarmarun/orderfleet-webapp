@@ -200,6 +200,12 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "rounded_off", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double roundedOff;
+	
+	@Column(name = "erp_reference_number")
+	private String erpReferenceNumber;
+	
+	@Column(name = "erp_status")
+	private String erpStatus;
 
 	public Long getId() {
 		return id;
@@ -528,5 +534,23 @@ public class InventoryVoucherHeader implements Serializable {
 	public void setRoundedOff(double roundedOff) {
 		this.roundedOff = roundedOff;
 	}
+
+	public String getErpReferenceNumber() {
+		return erpReferenceNumber;
+	}
+
+	public void setErpReferenceNumber(String erpReferenceNumber) {
+		this.erpReferenceNumber = erpReferenceNumber;
+	}
+
+	public String getErpStatus() {
+		return erpStatus;
+	}
+
+	public void setErpStatus(String erpStatus) {
+		this.erpStatus = erpStatus;
+	}
+	
+	
 
 }

@@ -25,10 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
 import com.orderfleet.webapp.domain.User;
@@ -46,6 +49,7 @@ import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoiceLine;
@@ -171,6 +175,9 @@ public class SendInvoiceOdooService {
 			List<AccountProfile> receiverAccountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
 
+			List<AccountProfile> supplierAccountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
+
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
 
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
@@ -188,6 +195,9 @@ public class SendInvoiceOdooService {
 					Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
 							.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
 
+					Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
+							.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
+
 					Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
 							.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
 
@@ -203,12 +213,19 @@ public class SendInvoiceOdooService {
 
 					DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 					odooInvoice.setInvoice_date(date.format(formatter1));
-					odooInvoice.setPartner_id(Long.parseLong(opRecAccPro.get().getCustomerId()));
 					odooInvoice.setReference(obj[6].toString());
 					odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
 
-					odooInvoice.setJournal_type("sale");
-					odooInvoice.setType("out_invoice");
+					if (obj[33] != null) {
+						odooInvoice.setJournal_type("sale_refund");
+						odooInvoice.setType("out_refund");
+						odooInvoice.setPartner_id(Long.parseLong(opSupAccPro.get().getCustomerId()));
+					} else {
+						odooInvoice.setPartner_id(Long.parseLong(opRecAccPro.get().getCustomerId()));
+						odooInvoice.setJournal_type("sale");
+						odooInvoice.setType("out_invoice");
+					}
+
 					odooInvoice.setRounding_amt(obj[34] != null ? Double.parseDouble(obj[34].toString()) : 0.0);
 
 					List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
@@ -286,6 +303,20 @@ public class SendInvoiceOdooService {
 
 		log.info(entity.getBody().toString() + "");
 
+		ObjectMapper Obj = new ObjectMapper();
+
+		// get Oraganisation object as a json string
+		String jsonStr;
+		try {
+			jsonStr = Obj.writeValueAsString(request);
+			log.info(jsonStr);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// Displaying JSON String
+
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -327,14 +358,36 @@ public class SendInvoiceOdooService {
 				references.add(response.getReference());
 			}
 
-			List<String> inventoryHeaderPid = inventoryVoucherHeaderRepository
-					.findAllByDocumentNumberServer(references);
+//			List<String> inventoryHeaderPid = inventoryVoucherHeaderRepository
+//					.findAllByDocumentNumberServer(references);
 
-			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
-					TallyDownloadStatus.COMPLETED, inventoryHeaderPid);
-			log.debug("updated " + updated + " to Completed");
+			List<InventoryVoucherHeader> inventoryHeaders = inventoryVoucherHeaderRepository
+					.findAllHeaderdByDocumentNumberServer(references);
+
+			List<InventoryVoucherHeader> distinctElements = inventoryHeaders.stream().distinct()
+					.collect(Collectors.toList());
+
+			List<InventoryVoucherHeader> updatedList = new ArrayList<>();
+
+			for (InventoryVoucherHeader ivh : distinctElements) {
+
+				InventoryVoucherHeader newIvh = ivh;
+
+				message.stream().filter(a -> a.getReference().equalsIgnoreCase(ivh.getDocumentNumberServer())).findAny()
+						.ifPresent(a -> {
+							newIvh.setErpReferenceNumber(String.valueOf(a.getId()));
+							newIvh.setErpStatus("Success");
+							newIvh.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
+
+							updatedList.add(newIvh);
+
+						});
+
+			}
+			inventoryVoucherHeaderRepository.save(updatedList);
+//			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+//					TallyDownloadStatus.COMPLETED, inventoryHeaderPid);
+			log.debug("updated " + updatedList.size() + " to Completed");
 		}
-
 	}
-
 }

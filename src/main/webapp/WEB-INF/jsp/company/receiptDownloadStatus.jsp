@@ -139,8 +139,24 @@
 								<br>
 								<button type="button" class="btn btn-success" id="downloadXls">Download</button>
 							</div>
+
+							<c:if test="${sendTransactionsSapPravesh=='true'}">
+								<div class="col-sm-1">
+									<br>
+									<button type="button" class="btn btn-primary"
+										id="sendTransactionsSapPravesh">Send Receipts To SAP</button>
+									<!-- 									<div class="loader hide"></div> -->
+
+								</div>
+
+							</c:if>
 						</div>
 					</form>
+				</div>
+				<div id='loader' class="modal fade container">
+
+					<img src='/resources/assets/images/Spinner.gif'>
+
 				</div>
 				<div class="col-md-12 col-sm-12 clearfix"
 					style="font-size: 14px; color: black;">

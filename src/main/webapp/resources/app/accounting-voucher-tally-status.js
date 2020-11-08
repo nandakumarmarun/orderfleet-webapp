@@ -27,6 +27,10 @@ if (!this.AccountVoucher) {
 		$('#downloadXls').on('click', function() {
 			downloadXls();
 		});
+		
+		$('#sendTransactionsSapPravesh').on('click', function() {
+			sendTransactionsSapPravesh();
+		});
 		/*
 		 * if($("#dbDocumentType").val!="no"){ loadAllDocumentByDocumentType(); }
 		 */
@@ -35,6 +39,34 @@ if (!this.AccountVoucher) {
 		 * loadAllDocumentByDocumentType(); });
 		 */
 	});
+	
+	function sendTransactionsSapPravesh() {
+
+		$(".loader").addClass('show');
+
+		if (confirm("Are you sure?")) {
+
+			$.ajax({
+				url : accountVoucherContextPath + "/sendTransactionsSapPravesh",
+				method : 'GET',
+				beforeSend : function() {
+					// Show image container
+					$("#loader").modal('show');
+
+				},
+				success : function(data) {
+					$("#loader").modal('hide');
+					AccountVoucher.filter();
+					
+					// onSaveSuccess(data);
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+		}
+
+	}
 
 	function loadAllDocumentByDocumentType() {
 		if ($('#dbDocumentType').val() == "no") {

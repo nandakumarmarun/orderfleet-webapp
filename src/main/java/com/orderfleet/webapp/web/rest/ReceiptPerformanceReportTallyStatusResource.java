@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -50,13 +51,16 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.io.Files;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.FilledForm;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
@@ -82,6 +86,7 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
+import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPraveshService;
 
 /**
  * Web controller for managing InventoryVoucher.
@@ -148,6 +153,12 @@ public class ReceiptPerformanceReportTallyStatusResource {
 	@Inject
 	private AccountProfileMapper accountProfileMapper;
 
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
+	
+	@Inject
+	private SendTransactionSapPraveshService sendTransactionSapPraveshService;
+
 	/**
 	 * GET /receipt : get all the inventory vouchers.
 	 *
@@ -204,6 +215,21 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		model.addAttribute("documents",
 				documentRepository.findAllDocumentsByCompanyPidAndDocumentType(DocumentType.ACCOUNTING_VOUCHER,
 						companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid()));
+
+		boolean sendTransactionsSapPravesh = false;
+		Optional<CompanyConfiguration> opCompanyConfigurationSapPravesh = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(),
+						CompanyConfig.SEND_TRANSACTIONS_SAP_PRAVESH);
+		if (opCompanyConfigurationSapPravesh.isPresent()) {
+
+			if (opCompanyConfigurationSapPravesh.get().getValue().equals("true")) {
+				sendTransactionsSapPravesh = true;
+			} else {
+				sendTransactionsSapPravesh = false;
+			}
+		}
+		model.addAttribute("sendTransactionsSapPravesh", sendTransactionsSapPravesh);
+
 		return "company/receiptDownloadStatus";
 	}
 
@@ -225,6 +251,18 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+	}
+	
+	@RequestMapping(value = "/receipt-download-status/sendTransactionsSapPravesh", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<AccountingVoucherHeaderDTO> sendTransactionsSapPravesh() throws MessagingException {
+
+		log.info("sendReceiptSap()-----");
+
+		sendTransactionSapPraveshService.sendReceipt();
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
 	}
 
 	/**

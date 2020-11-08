@@ -46,8 +46,40 @@ if (!this.InventoryVoucher) {
 		$("#btnApply").on('click', function() {
 			InventoryVoucher.filter();
 		});
+		
+		$('#sendTransactionsSapPravesh').on('click', function() {
+			sendTransactionsSapPravesh();
+		});
 
 	});
+	
+	function sendTransactionsSapPravesh() {
+
+		$(".loader").addClass('show');
+
+		if (confirm("Are you sure?")) {
+
+			$.ajax({
+				url : inventoryVoucherContextPath + "/sendTransactionsSapPravesh",
+				method : 'GET',
+				beforeSend : function() {
+					// Show image container
+					$("#loader").modal('show');
+
+				},
+				success : function(data) {
+					$("#loader").modal('hide');
+					InventoryVoucher.filter();
+					
+					// onSaveSuccess(data);
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+		}
+
+	}
 
 	function loadAllDocumentByDocumentType() {
 		if ($('#dbDocumentType').val() == "no") {

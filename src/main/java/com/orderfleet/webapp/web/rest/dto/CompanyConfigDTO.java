@@ -29,6 +29,7 @@ public class CompanyConfigDTO {
 	private boolean sendSalesOrderSap;// setting for sending sales order to sap
 	private boolean piecesToQuantity; // set pices and rate to quantity and selling rate(SAP)
 	private boolean sendSalesOrderOdoo; // setting for sending sales order to odoo
+	private boolean sendTransactionsSapPravesh;
 
 	public CompanyConfigDTO() {
 		super();
@@ -184,6 +185,14 @@ public class CompanyConfigDTO {
 
 	public void setSendSalesOrderOdoo(boolean sendSalesOrderOdoo) {
 		this.sendSalesOrderOdoo = sendSalesOrderOdoo;
+	}
+
+	public boolean isSendTransactionsSapPravesh() {
+		return sendTransactionsSapPravesh;
+	}
+
+	public void setSendTransactionsSapPravesh(boolean sendTransactionsSapPravesh) {
+		this.sendTransactionsSapPravesh = sendTransactionsSapPravesh;
 	}
 
 }
