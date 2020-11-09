@@ -85,7 +85,7 @@ public class LocationWiseSalesComparisonResource {
 			@RequestParam(value = "fromSecondDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromSecondDate,
 			@RequestParam(value = "toSecondDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toSecondDate
 	) {
-		log.info("Location Wise Sales Comparison Report : {} , and date between {}, {}, {}, {}", fromFirstDate, toFirstDate, fromSecondDate, toSecondDate);
+		log.info("Location Wise Sales Comparison Report First date {} - {}, Second Date {} - {}", fromFirstDate, toFirstDate, fromSecondDate, toSecondDate);
 		long starttime = System.nanoTime();
 		// filter based on product group
 		List<LocationDTO> locations = locationService.findAllLocationsByCompanyAndActivatedLocations();
@@ -109,11 +109,7 @@ public class LocationWiseSalesComparisonResource {
 				.collect(Collectors.toList());
 		
 		List<InventoryVoucherHeader> allInventoryVoucherHeader =  inventoryVoucherHeaderRepository.findAllByCompanyIdOrderByCreatedDateDesc();
-		log.info("All inventory voucher header size {}", allInventoryVoucherHeader.size());
-		
-		
-		
-		log.info("Product Group Location Targets {} {}", firstProductGroupLocationTargets.size(), secondProductGroupLocationTargets.size());
+		log.info("Get All inventory voucher header size {}", allInventoryVoucherHeader.size());
 		
 		// if (!productGroupLocationTargets.isEmpty()) {
 		LocationWiseProductGroupPerformanceDTO locationWiseProductGroupPerformanceDTO = new LocationWiseProductGroupPerformanceDTO();
@@ -130,9 +126,7 @@ public class LocationWiseSalesComparisonResource {
 		for (ProductGroupLocationTarget productGroupLocationTarget : secondProductGroupLocationTargets) {
 			secondProductGroupLocationTargetDTOs.add(new ProductGroupLocationTargetDTO(productGroupLocationTarget));
 		}
-		
-		log.info("Product Group Location DTOs {} {}",firstProductGroupLocationTargetDTOs.size(), secondProductGroupLocationTargetDTOs.size());
-		
+				
 		// group by SalesTargetGroupName
 		Map<String, List<ProductGroupLocationTargetDTO>> firstProductGroupLocationTargetByLocationName = firstProductGroupLocationTargetDTOs
 				.parallelStream().collect(Collectors.groupingBy(ProductGroupLocationTargetDTO::getLocationName));
@@ -144,6 +138,7 @@ public class LocationWiseSalesComparisonResource {
 		Map<String, List<ProductGroupLocationTargetDTO>> firstProductGroupLocationTargetMap = new HashMap<>();
 		Map<String, List<ProductGroupLocationTargetDTO>> secondProductGroupLocationTargetMap = new HashMap<>();
 		
+		log.info("FirstProductGroupLocationTargetMap set achievedVolume");
 		for (LocationDTO location : locations) {
 			String locationName = location.getName();
 			List<ProductGroupLocationTargetDTO> productGroupLocationTargetList = new ArrayList<>();
@@ -211,6 +206,7 @@ public class LocationWiseSalesComparisonResource {
 			firstProductGroupLocationTargetMap.put(locationName, productGroupLocationTargetList);
 		}
 
+		log.info("SecondProductGroupLocationTargetMap set achievedVolume");
 		for (LocationDTO location : locations) {
 			String locationName = location.getName();
 			List<ProductGroupLocationTargetDTO> productGroupLocationTargetList = new ArrayList<>();
