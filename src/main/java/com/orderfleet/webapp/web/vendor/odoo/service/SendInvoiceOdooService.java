@@ -120,7 +120,7 @@ public class SendInvoiceOdooService {
 		List<Long> documentIdList = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
 
-		List<String> inventoryHeaderPid = new ArrayList<String>();
+		List<String> inventoryHeaderPids = new ArrayList<String>();
 		String companyPid = company.getPid();
 
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
@@ -161,6 +161,7 @@ public class SendInvoiceOdooService {
 
 				ivhIds.add(Long.parseLong(obj[0].toString()));
 				ivhPids.add(obj[9].toString());
+				inventoryHeaderPids.add(obj[9].toString());
 				userIds.add(Long.parseLong(obj[12].toString()));
 				documentIds.add(Long.parseLong(obj[13].toString()));
 				employeeIds.add(Long.parseLong(obj[14].toString()));
@@ -171,12 +172,18 @@ public class SendInvoiceOdooService {
 				orderStatusIds.add(obj[23] != null ? Long.parseLong(obj[23].toString()) : 0);
 
 			}
+			
+			if (!ivhPids.isEmpty()) {
+				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+						TallyDownloadStatus.PROCESSING, inventoryHeaderPids);
+				log.debug("updated " + updated + " to PROCESSING");
+			}
 
 			List<AccountProfile> receiverAccountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
 
-			List<AccountProfile> supplierAccountProfiles = accountProfileRepository
-					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
+//			List<AccountProfile> supplierAccountProfiles = accountProfileRepository
+//					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
 
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
 
@@ -185,107 +192,76 @@ public class SendInvoiceOdooService {
 			List<UserStockLocation> userStockLocations = userStockLocationRepository.findAllByCompanyPid(companyPid);
 			List<UnitOfMeasureProduct> unitOfMeasureProducts = unitOfMeasureProductRepository.findAllByCompanyId();
 
-			Object[] errorPrint = null;
-			try {
-				for (Object[] obj : inventoryVoucherHeaders) {
+			for (Object[] obj : inventoryVoucherHeaders) {
 
-					Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
+				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
+						.findAny();
+
+				Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
+						.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
+
+				Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
+						.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
+
+				OdooInvoice odooInvoice = new OdooInvoice();
+
+				LocalDateTime date = null;
+				if (obj[4] != null) {
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+					String[] splitDate = obj[4].toString().split(" ");
+					date = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
+
+				}
+
+				DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				odooInvoice.setInvoice_date(date.format(formatter1));
+				odooInvoice.setReference(obj[6].toString());
+				odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
+
+				odooInvoice.setPartner_id(Long.parseLong(opRecAccPro.get().getCustomerId()));
+				odooInvoice.setJournal_type("sale");
+				odooInvoice.setType("out_invoice");
+
+				odooInvoice.setRounding_amt(obj[34] != null ? Double.parseDouble(obj[34].toString()) : 0.0);
+
+				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
+						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
+						.collect(Collectors.toList()).stream()
+						.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());
+
+				List<OdooInvoiceLine> odooInvoiceLines = new ArrayList<OdooInvoiceLine>();
+				for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
+
+					OdooInvoiceLine odooInvoiceLine = new OdooInvoiceLine();
+
+					odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountAmount());
+					if (inventoryVoucherDetail.getFreeQuantity() > 0.0) {
+						odooInvoiceLine.setIs_foc(true);
+					} else {
+						odooInvoiceLine.setIs_foc(false);
+					}
+					odooInvoiceLine.setProduct_id(Long.parseLong(inventoryVoucherDetail.getProduct().getProductId()));
+					odooInvoiceLine.setPrice_unit(inventoryVoucherDetail.getSellingRate());
+					odooInvoiceLine.setQuantity(inventoryVoucherDetail.getQuantity());
+
+					Optional<UnitOfMeasureProduct> opUnitOfMeasure = unitOfMeasureProducts.stream()
+							.filter(us -> us.getProduct().getPid().equals(inventoryVoucherDetail.getProduct().getPid()))
 							.findAny();
 
-					Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
-							.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
-
-					Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
-							.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
-
-					Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
-							.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
-
-					OdooInvoice odooInvoice = new OdooInvoice();
-
-					LocalDateTime date = null;
-					if (obj[4] != null) {
-						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-						String[] splitDate = obj[4].toString().split(" ");
-						date = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
-
+					if (opUnitOfMeasure.isPresent()) {
+						odooInvoiceLine.setUom_id(Long.parseLong(opUnitOfMeasure.get().getUnitOfMeasure().getUomId()));
 					}
 
-					DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-					odooInvoice.setInvoice_date(date.format(formatter1));
-					odooInvoice.setReference(obj[6].toString());
-					odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
-
-					if (obj[33] != null) {
-						odooInvoice.setJournal_type("sale_refund");
-						odooInvoice.setType("out_refund");
-						odooInvoice.setPartner_id(Long.parseLong(opSupAccPro.get().getCustomerId()));
-					} else {
-						odooInvoice.setPartner_id(Long.parseLong(opRecAccPro.get().getCustomerId()));
-						odooInvoice.setJournal_type("sale");
-						odooInvoice.setType("out_invoice");
-					}
-
-					odooInvoice.setRounding_amt(obj[34] != null ? Double.parseDouble(obj[34].toString()) : 0.0);
-
-					List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
-							.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
-							.collect(Collectors.toList()).stream()
-							.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId))
-							.collect(Collectors.toList());
-
-					List<OdooInvoiceLine> odooInvoiceLines = new ArrayList<OdooInvoiceLine>();
-					for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
-
-						OdooInvoiceLine odooInvoiceLine = new OdooInvoiceLine();
-
-						odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountAmount());
-						if (inventoryVoucherDetail.getFreeQuantity() > 0.0) {
-							odooInvoiceLine.setIs_foc(true);
-						} else {
-							odooInvoiceLine.setIs_foc(false);
-						}
-						odooInvoiceLine
-								.setProduct_id(Long.parseLong(inventoryVoucherDetail.getProduct().getProductId()));
-						odooInvoiceLine.setPrice_unit(inventoryVoucherDetail.getSellingRate());
-						odooInvoiceLine.setQuantity(inventoryVoucherDetail.getQuantity());
-
-						Optional<UnitOfMeasureProduct> opUnitOfMeasure = unitOfMeasureProducts.stream().filter(
-								us -> us.getProduct().getPid().equals(inventoryVoucherDetail.getProduct().getPid()))
-								.findAny();
-
-						if (opUnitOfMeasure.isPresent()) {
-							odooInvoiceLine
-									.setUom_id(Long.parseLong(opUnitOfMeasure.get().getUnitOfMeasure().getUomId()));
-						}
-
-						odooInvoiceLines.add(odooInvoiceLine);
-					}
-
-					odooInvoice.setInvoice_lines(odooInvoiceLines);
-
-					inventoryHeaderPid.add(obj[9].toString());
-
-					odooInvoices.add(odooInvoice);
+					odooInvoiceLines.add(odooInvoiceLine);
 				}
-			} catch (NoSuchElementException | NullPointerException | ArrayIndexOutOfBoundsException e) {
-				int i = 0;
-				log.info("Error Printng");
-				for (Object ob : errorPrint) {
-					log.info(i + "-");
-					if (ob != null) {
-						log.info("--" + ob.toString());
-					}
-					i++;
-				}
-				e.printStackTrace();
-				throw new IllegalArgumentException("Data missing in sales order..");
+
+				odooInvoice.setInvoice_lines(odooInvoiceLines);
+
+				//inventoryHeaderPids.add(obj[9].toString());
+
+				odooInvoices.add(odooInvoice);
 			}
-			if (!odooInvoices.isEmpty()) {
-				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
-						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
-				log.debug("updated " + updated + " to PROCESSING");
-			}
+
 		}
 		log.info("Sending (" + odooInvoices.size() + ") Invoices to Odoo....");
 
@@ -305,7 +281,7 @@ public class SendInvoiceOdooService {
 
 		ObjectMapper Obj = new ObjectMapper();
 
-		// get Oraganisation object as a json string
+		// get  object as a json string
 		String jsonStr;
 		try {
 			jsonStr = Obj.writeValueAsString(request);
@@ -333,13 +309,23 @@ public class SendInvoiceOdooService {
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-				throw new ServiceException(exception.getResponseBodyAsString());
+				//throw new ServiceException(exception.getResponseBodyAsString());
+				log.info(exception.getResponseBodyAsString());
+				log.info("-------------------------");
+				log.info(exception.getMessage());
+				log.info("-------------------------");
+				exception.printStackTrace();
 			}
-			throw new ServiceException(exception.getMessage());
+			log.info(exception.getMessage());
+			//throw new ServiceException(exception.getMessage());
 		} catch (Exception exception) {
-			System.out.println(exception.getMessage());
+			
+			log.info(exception.getMessage());
+			log.info("-------------------------");
+			exception.printStackTrace();
+			log.info("-------------------------");
 
-			throw new ServiceException(exception.getMessage());
+			//throw new ServiceException(exception.getMessage());
 		}
 
 		long end = System.nanoTime();
