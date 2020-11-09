@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -305,8 +306,10 @@ public class LocationWiseProductGroupComparisonReportResource {
 		for (LocalDate monthDate : secondMonthsBetweenDates) {
 			secondMonthList.add(monthDate.getMonth().toString());
 		}
-		locationWiseProductGroupPerformanceDTO.setFirstProductGroupLocationTargets(firstProductGroupLocationTargetMap);
-		locationWiseProductGroupPerformanceDTO.setSecondProductGroupLocationTargets(secondProductGroupLocationTargetMap);
+		locationWiseProductGroupPerformanceDTO.setFirstProductGroupLocationTargets(firstProductGroupLocationTargetMap.entrySet().stream().sorted(Map.Entry.comparingByKey())
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)));
+		locationWiseProductGroupPerformanceDTO.setSecondProductGroupLocationTargets(secondProductGroupLocationTargetMap.entrySet().stream().sorted(Map.Entry.comparingByKey())
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)));
 		locationWiseProductGroupPerformanceDTO.setFirstMonthList(firstMonthList);
 		locationWiseProductGroupPerformanceDTO.setSecondMonthList(secondMonthList);
 		/*
