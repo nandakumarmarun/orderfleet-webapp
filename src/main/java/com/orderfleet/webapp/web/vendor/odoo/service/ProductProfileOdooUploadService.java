@@ -117,7 +117,7 @@ public class ProductProfileOdooUploadService {
 	private final PriceLevelListRepository priceLevelListRepository;
 
 	private final TemporaryOpeningStockRepository temporaryOpeningStockRepository;
-	
+
 	private final TaxMasterRepository taxMasterRepository;
 
 	public ProductProfileOdooUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
@@ -130,8 +130,7 @@ public class ProductProfileOdooUploadService {
 			UserStockLocationRepository userStockLocationRepository,
 			EmployeeProfileRepository employeeProfileRepository, PriceLevelRepository priceLevelRepository,
 			PriceLevelListRepository priceLevelListRepository,
-			TemporaryOpeningStockRepository temporaryOpeningStockRepository,
-			TaxMasterRepository taxMasterRepository) {
+			TemporaryOpeningStockRepository temporaryOpeningStockRepository, TaxMasterRepository taxMasterRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.divisionRepository = divisionRepository;
@@ -193,7 +192,7 @@ public class ProductProfileOdooUploadService {
 		} else {
 			productCategory = defaultCategory.get();
 		}
-		
+
 		// tax masters
 		List<TaxMaster> alltaxMasters = taxMasterRepository.findAllByCompanyId(companyId);
 		for (OdooProductProfile ppDto : list) {
@@ -215,19 +214,19 @@ public class ProductProfileOdooUploadService {
 				productProfile.setDivision(defaultDivision);
 				productProfile.setDataSourceType(DataSourceType.TALLY);
 			}
-			
+
 			// tax
-			Object taxIds = ppDto.getTax_ids();			
+			Object taxIds = ppDto.getTax_ids();
 			if (taxIds instanceof List<?>) {
-				List<Integer> taxIdList = (List<Integer>)(Object) taxIds;
+				List<Integer> taxIdList = (List<Integer>) (Object) taxIds;
 				List<TaxMaster> taxMasters = new ArrayList<>();
-				for (int taxId: taxIdList) {
-					alltaxMasters.stream().filter(a -> a.getDescription().equalsIgnoreCase(""+taxId)).findAny()
-					.ifPresent(ap -> {
-						if (ap != null) {
-							taxMasters.add(ap);
-						}
-					});
+				for (int taxId : taxIdList) {
+					alltaxMasters.stream().filter(a -> a.getDescription().equalsIgnoreCase("" + taxId)).findAny()
+							.ifPresent(ap -> {
+								if (ap != null) {
+									taxMasters.add(ap);
+								}
+							});
 				}
 				productProfile.setTaxMastersList(taxMasters);
 			}
@@ -239,6 +238,8 @@ public class ProductProfileOdooUploadService {
 				productProfile.setPrice(BigDecimal.valueOf(0));
 			}
 			productProfile.setMrp(0);
+
+			productProfile.setTaxRate(0);
 
 //			if (ppDto.getTaxRate() != null) {
 //				productProfile
@@ -322,7 +323,7 @@ public class ProductProfileOdooUploadService {
 			productGroupDTO.setAlias(ppDto.getGroup());
 
 			productGroupDtos.add(productGroupDTO);
-			
+
 			saveUpdateProductProfiles.add(productProfile);
 		}
 
