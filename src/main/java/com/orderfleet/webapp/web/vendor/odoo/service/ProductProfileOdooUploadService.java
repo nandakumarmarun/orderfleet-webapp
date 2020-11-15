@@ -216,20 +216,30 @@ public class ProductProfileOdooUploadService {
 			}
 
 			// tax
+			List<TaxMaster> taxMasters = new ArrayList<>();
 			Object taxIds = ppDto.getTax_ids();
 			if (taxIds instanceof List<?>) {
 				List<Integer> taxIdList = (List<Integer>) (Object) taxIds;
-				List<TaxMaster> taxMasters = new ArrayList<>();
+
 				for (int taxId : taxIdList) {
 					alltaxMasters.stream().filter(a -> a.getDescription().equalsIgnoreCase("" + taxId)).findAny()
 							.ifPresent(ap -> {
 								if (ap != null) {
+
 									taxMasters.add(ap);
 								}
 							});
 				}
 				productProfile.setTaxMastersList(taxMasters);
 			}
+
+			double taxRate = 0;
+
+			for (TaxMaster taxmaster : taxMasters) {
+				taxRate += taxmaster.getVatPercentage();
+			}
+
+			productProfile.setTaxRate(taxRate);
 
 			productProfile.setAlias(ppDto.getDefault_code());
 			if (ppDto.getStandard_price() != null && !ppDto.getStandard_price().equals("")) {
@@ -238,8 +248,6 @@ public class ProductProfileOdooUploadService {
 				productProfile.setPrice(BigDecimal.valueOf(0));
 			}
 			productProfile.setMrp(0);
-
-			productProfile.setTaxRate(0);
 
 //			if (ppDto.getTaxRate() != null) {
 //				productProfile
