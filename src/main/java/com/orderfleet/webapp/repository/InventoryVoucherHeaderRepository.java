@@ -98,7 +98,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "INNER JOIN tbl_document doc on iv.document_id = doc.id "
 			+ "INNER JOIN tbl_user u on iv.created_by_id = u.id where "
 			+ "cmp.pid = ?1 and u.pid = ?2 and doc.pid IN(?3) and iv.created_date = ?4";
-	
+
 	public static final String DOCUMENT_NUMBER_OPTIMISED_DATE = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
 			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "
 			+ "INNER JOIN tbl_document doc on iv.document_id = doc.id "
@@ -111,15 +111,14 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "INNER JOIN tbl_user u on ivh.created_by_id = u.id where  "
 			+ "cmp.pid = ?1 and u.pid = ?2  and doc.pid IN (?3) and "
 			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id";
-	
+
 	public static final String LAST_DOCUMENT_PID_DATE = "select ivh.document_id,MAX(ivh.created_date) from tbl_inventory_voucher_header ivh "
 			+ "INNER JOIN tbl_company cmp on ivh.company_id = cmp.id   "
 			+ "INNER JOIN tbl_document doc on ivh.document_id = doc.id  "
 			+ "INNER JOIN tbl_user u on ivh.created_by_id = u.id where  "
 			+ "cmp.pid = ?1 and u.pid = ?2  and doc.pid IN (?3) and "
 			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id";
-	
-	
+
 	public static final String ALL_DOCUMENT_NUMBER = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
 			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "
 			+ "INNER JOIN tbl_document doc on iv.document_id = doc.id "
@@ -435,6 +434,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Modifying(clearAutomatically = true)
+	@Transactional
 	@Query("UPDATE InventoryVoucherHeader iv SET iv.tallyDownloadStatus = ?1  WHERE  iv.company.id = ?#{principal.companyId}  AND iv.pid in ?2")
 	int updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus tallyDownloadStatus,
 			List<String> inventoryPids);
@@ -506,14 +506,14 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query(value = DOCUMENT_NUMBER_OPTIMISED, nativeQuery = true)
 	List<Object[]> getLastNumberForEachDocumentOptimized(String companyPid, String userPid, List<String> documentPids,
 			LocalDateTime lastDate);
-	
+
 	@Query(value = DOCUMENT_NUMBER_OPTIMISED_DATE, nativeQuery = true)
 	List<Object[]> getLastNumberForEachDocumentsDateOptimized(String companyPid, String userPid, long documentId,
 			LocalDateTime lastDate);
 
 	@Query(value = LAST_DOCUMENT_DATE, nativeQuery = true)
 	LocalDateTime lastDateWithCompanyUserDocument(String companyPid, String userPid, List<String> documentPids);
-	
+
 	@Query(value = LAST_DOCUMENT_PID_DATE, nativeQuery = true)
 	List<Object[]> lastDatesWithCompanyUserDocuments(String companyPid, String userPid, List<String> documentPids);
 
@@ -666,10 +666,10 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query("select inventoryVoucher.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.documentNumberServer in ?1")
 	List<String> findAllByDocumentNumberServer(List<String> references);
-	
+
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.documentNumberServer in ?1")
 	List<InventoryVoucherHeader> findAllHeaderdByDocumentNumberServer(List<String> references);
-	
+
 //	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.pid = ?1 Order By inventoryVoucher.createdDate desc")
 //	List<InventoryVoucherHeader> findInventoryVoucherHeaderByPid(String inventoryVoucherHeaderPid);
 

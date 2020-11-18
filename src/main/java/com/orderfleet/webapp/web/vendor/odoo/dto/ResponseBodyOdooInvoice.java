@@ -32,4 +32,11 @@ public class ResponseBodyOdooInvoice {
 		this.result = result;
 	}
 
+	@Override
+	public String toString() {
+		return "ResponseBodyOdooInvoice [jsonrpc=" + jsonrpc + ", id=" + id + ", result=" + result + "]";
+	}
+	
+	
+
 }

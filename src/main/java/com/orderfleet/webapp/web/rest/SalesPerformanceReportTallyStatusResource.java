@@ -321,7 +321,7 @@ public class SalesPerformanceReportTallyStatusResource {
 			@RequestParam("accountPid") String accountPid, @RequestParam("filterBy") String filterBy,
 			@RequestParam("documentPids") List<String> documentPids, @RequestParam String fromDate,
 			@RequestParam String toDate) {
-		log.debug("Web request to filter accounting vouchers");
+		log.debug("Web request to filter inventory vouchers");
 		if (documentPids.isEmpty()) {
 			return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
 		}
@@ -368,9 +368,12 @@ public class SalesPerformanceReportTallyStatusResource {
 		case "COMPLETED":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED);
 			break;
+		case "FAILED":
+			tallyStatus = Arrays.asList(TallyDownloadStatus.FAILED);
+			break;
 		case "ALL":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED, TallyDownloadStatus.PROCESSING,
-					TallyDownloadStatus.PENDING);
+					TallyDownloadStatus.PENDING,TallyDownloadStatus.FAILED);
 			break;
 		}
 
@@ -635,6 +638,19 @@ public class SalesPerformanceReportTallyStatusResource {
 		log.info("sendSalesOrderOdoo()-----");
 
 		sendInvoiceOdooService.sendSalesOrder();
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
+	}
+	
+	
+	@RequestMapping(value = "/primary-sales-performance-download-status/sendSalesReturnOdoo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> sendSalesReturnOdoo() throws MessagingException {
+
+		log.info("sendSalesReturnOdoo()-----");
+
+		sendInvoiceOdooService.sendSalesReturnOdoo();
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 

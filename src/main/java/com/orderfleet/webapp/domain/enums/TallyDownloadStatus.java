@@ -7,5 +7,5 @@ package com.orderfleet.webapp.domain.enums;
  */
 public enum TallyDownloadStatus {
 
-	PENDING , PROCESSING , COMPLETED;
+	PENDING, PROCESSING, COMPLETED, FAILED;
 }

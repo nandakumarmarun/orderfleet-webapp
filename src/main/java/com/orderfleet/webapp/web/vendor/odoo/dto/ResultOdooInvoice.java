@@ -24,4 +24,9 @@ public class ResultOdooInvoice {
 		this.message = message;
 	}
 
+	@Override
+	public String toString() {
+		return "ResultOdooInvoice [status=" + status + ", message=" + message + "]";
+	}
+
 }

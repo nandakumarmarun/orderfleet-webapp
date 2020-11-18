@@ -39,6 +39,10 @@ if (!this.InventoryVoucher) {
 		$('#sendSalesOrderOdoo').on('click', function() {
 			sendSalesOrderOdoo();
 		});
+		
+		$('#sendSalesReturnOdoo').on('click', function() {
+			sendSalesReturnOdoo();
+		});
 
 		$('#packingSlipByCustomer').on('click', function() {
 			packingSlipByCustomer();
@@ -423,6 +427,34 @@ if (!this.InventoryVoucher) {
 		}
 
 	}
+	
+	function sendSalesReturnOdoo() {
+
+		$(".loader").addClass('show');
+
+		if (confirm("Are you sure?")) {
+
+			$.ajax({
+				url : inventoryVoucherContextPath + "/sendSalesReturnOdoo",
+				method : 'GET',
+				beforeSend : function() {
+					// Show image container
+					$("#loader").modal('show');
+
+				},
+				success : function(data) {
+					$("#loader").modal('hide');
+					InventoryVoucher.filter();
+					
+					// onSaveSuccess(data);
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+		}
+
+	}
 
 	InventoryVoucher.downloadSalesorderPdf = function(inventoryPid) {
 
@@ -450,6 +482,7 @@ if (!this.InventoryVoucher) {
 		var pending = "'" + 'PENDING' + "'";
 		var processing = "'" + 'PROCESSING' + "'";
 		var completed = "'" + 'COMPLETED' + "'";
+		var failed = "'" + 'FAILED' + "'";
 		var spanStatus = "";
 		var pid = "'" + inventoryVoucherPid + "'";
 		switch (status) {
@@ -467,6 +500,11 @@ if (!this.InventoryVoucher) {
 					+ ','
 					+ completed
 					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ failed
+					+ ')" style="cursor: pointer;"><a>FAILED</a></li>'
 					+ '</ul></div>';
 			break;
 		case 'PROCESSING':
@@ -483,6 +521,11 @@ if (!this.InventoryVoucher) {
 					+ ','
 					+ completed
 					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ failed
+					+ ')" style="cursor: pointer;"><a>FAILED</a></li>'
 					+ '</ul></div>';
 			break;
 		case 'COMPLETED':
@@ -499,6 +542,32 @@ if (!this.InventoryVoucher) {
 					+ ','
 					+ processing
 					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ failed
+					+ ')" style="cursor: pointer;"><a>FAILED</a></li>'
+					+ '</ul></div>';
+			break;
+		case 'FAILED':
+			spanStatus = '<div class="dropdown"><span class="label label-danger dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
+					+ 'FAILED <span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ pending
+					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ processing
+					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
+					+ '<li onclick="InventoryVoucher.setStatus('
+					+ pid
+					+ ','
+					+ completed
+					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
 					+ '</ul></div>';
 			break;
 		}

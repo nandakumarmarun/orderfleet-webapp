@@ -76,6 +76,7 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseMessageOdooInvoice;
+import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ApiResponseDataSapPravesh;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ReceiptSapPravesh;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.SalesOrderItemDetailsSapPravesh;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.SalesOrderMasterSapPravesh;
@@ -352,9 +353,16 @@ public class SendTransactionSapPraveshService {
 
 		try {
 
-			Void authenticateResponse = restTemplate.postForObject(API_URL_SALES_ORDER, entity, Void.class);
+			// Void authenticateResponse = restTemplate.postForObject(API_URL_SALES_ORDER,
+			// entity, Void.class);
 
-			log.info("Success");
+			ApiResponseDataSapPravesh authenticateResponse = restTemplate.postForObject(API_URL_SALES_ORDER, entity,
+					ApiResponseDataSapPravesh.class);
+
+			log.info("Sap Sales Order Created Success Size" + "----" + authenticateResponse.getId().size());
+
+			changeSalesOrderServerDownloadStatus(authenticateResponse);
+
 //			log.info("Odoo Invoice Created Success Size= " + responseBodyOdooInvoice.getResult().getMessage().size()
 //					+ "------------");
 //
@@ -385,21 +393,35 @@ public class SendTransactionSapPraveshService {
 		return requestHeaders;
 	}
 
-	private void changeServerDownloadStatus(List<ResponseMessageOdooInvoice> message) {
+	private void changeSalesOrderServerDownloadStatus(ApiResponseDataSapPravesh authenticateResponse) {
 
-		if (!message.isEmpty()) {
+		if (authenticateResponse != null) {
 
-			List<String> references = new ArrayList<>();
-			for (ResponseMessageOdooInvoice response : message) {
-				references.add(response.getReference());
+			if (authenticateResponse.getStatus().equals("Success")) {
+
+				List<String> inventoryHeaderPids = authenticateResponse.getId();
+
+				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+						TallyDownloadStatus.COMPLETED, inventoryHeaderPids);
+				log.debug("updated " + updated + " to Completed");
 			}
+		}
 
-			List<String> inventoryHeaderPid = inventoryVoucherHeaderRepository
-					.findAllByDocumentNumberServer(references);
+	}
 
-			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
-					TallyDownloadStatus.COMPLETED, inventoryHeaderPid);
-			log.debug("updated " + updated + " to Completed");
+	private void changeReceiptServerDownloadStatus(ApiResponseDataSapPravesh authenticateResponse) {
+
+		if (authenticateResponse != null) {
+
+			if (authenticateResponse.getStatus().equals("Success")) {
+
+				List<String> accountingHeaderPids = authenticateResponse.getId();
+
+				int updated = accountingVoucherHeaderRepository
+						.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(
+								TallyDownloadStatus.COMPLETED, accountingHeaderPids);
+				log.debug("updated " + updated + " to Completed");
+			}
 		}
 
 	}
@@ -578,13 +600,14 @@ public class SendTransactionSapPraveshService {
 
 		try {
 
-			String authenticateResponse = restTemplate.postForObject(API_URL_RECIPTS, entity, String.class);
+			ApiResponseDataSapPravesh authenticateResponse = restTemplate.postForObject(API_URL_RECIPTS, entity,
+					ApiResponseDataSapPravesh.class);
 
-			log.info("Success" + "----" + authenticateResponse);
+			log.info("Sap Receipt Created Success Size" + "----" + authenticateResponse.getId().size());
 //			log.info("Odoo Invoice Created Success Size= " + responseBodyOdooInvoice.getResult().getMessage().size()
 //					+ "------------");
 //
-//			changeServerDownloadStatus(responseBodyOdooInvoice.getResult().getMessage());
+			changeReceiptServerDownloadStatus(authenticateResponse);
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {

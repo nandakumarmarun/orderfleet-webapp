@@ -111,6 +111,7 @@
 									<option value="PENDING">PENDING</option>
 									<option value="PROCESSING">PROCESSING</option>
 									<option value="COMPLETED">COMPLETED</option>
+									<option value="FAILED">COMPLETED</option>
 								</select>
 							</div>
 							<div class="col-sm-1">
@@ -132,11 +133,12 @@
 							</c:if>
 
 							<c:if test="${sendSalesOrderOdooStatus=='true'}">
-								<div class="col-sm-1">
+								<div class="col-sm-4">
 									<br>
 									<button type="button" class="btn btn-primary"
 										id="sendSalesOrderOdoo">Send Invoices</button>
-									<!-- 									<div class="loader hide"></div> -->
+									<button type="button" class="btn btn-primary"
+										id="sendSalesReturnOdoo">Send Sales Return</button>
 
 								</div>
 
