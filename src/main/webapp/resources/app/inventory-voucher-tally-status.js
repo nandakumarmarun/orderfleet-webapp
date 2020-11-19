@@ -108,6 +108,8 @@ if (!this.InventoryVoucher) {
 								data.docDiscountAmount);
 						$('#lbl_documentDiscountPercentage').text(
 								data.docDiscountPercentage);
+						$('#lbl_roundedOff').text(
+								data.roundedOff);
 
 						$('#tblVoucherDetails').html("");
 						$

@@ -370,13 +370,14 @@ public class SendTransactionSapPraveshService {
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-				throw new ServiceException(exception.getResponseBodyAsString());
+				log.info(exception.getResponseBodyAsString());
+				exception.printStackTrace();
 			}
-			throw new ServiceException(exception.getMessage());
+			exception.printStackTrace();
 		} catch (Exception exception) {
-			System.out.println(exception.getMessage());
+			log.info(exception.getMessage());
 
-			throw new ServiceException(exception.getMessage());
+			exception.printStackTrace();
 		}
 
 		long end = System.nanoTime();
@@ -611,13 +612,14 @@ public class SendTransactionSapPraveshService {
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-				throw new ServiceException(exception.getResponseBodyAsString());
+				log.info(exception.getResponseBodyAsString());
+				exception.printStackTrace();
 			}
-			throw new ServiceException(exception.getMessage());
+			exception.printStackTrace();
 		} catch (Exception exception) {
-			System.out.println(exception.getMessage());
+			log.info(exception.getMessage());
 
-			throw new ServiceException(exception.getMessage());
+			exception.printStackTrace();
 		}
 
 		long end = System.nanoTime();

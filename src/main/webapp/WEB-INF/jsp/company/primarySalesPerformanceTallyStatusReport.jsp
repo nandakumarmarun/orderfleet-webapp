@@ -274,6 +274,10 @@
 								<td>Document Discount Percentage</td>
 								<td id="lbl_documentDiscountPercentage"></td>
 							</tr>
+							<tr>
+								<td>Rounded Off</td>
+								<td id="lbl_roundedOff"></td>
+							</tr>
 						</table>
 						<table class="collaptable table table-striped table-bordered">
 							<thead>
