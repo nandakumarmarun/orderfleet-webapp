@@ -142,7 +142,6 @@ public class AccountProfileController {
 		if (accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty()) {
 			newAccountProfile.setAccountStatus(AccountStatus.Unverified);
 			newAccountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-			newAccountProfile.setDataSourceType(DataSourceType.MOBILE);
 			Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository.findByCompanyPidAndName(
 					companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid(),
 					CompanyConfig.NEW_CUSTOMER_ALIAS);
@@ -168,17 +167,19 @@ public class AccountProfileController {
 					}
 				} else {
 					newAccountProfile.setAlias("N_1");
+					
 				}
 
 			} else {
 				newAccountProfile.setAlias("N_1");
+				
 			}
 
 		} else {
 			newAccountProfile.setId(exisitingAccountProfile.get().getId());
-			newAccountProfile.setDataSourceType(DataSourceType.MOBILE);
 		}
 		// set company
+		newAccountProfile.setDataSourceType(DataSourceType.MOBILE);
 		newAccountProfile.setCompany(company);
 		newAccountProfile.setUser(user);
 

@@ -339,7 +339,7 @@ public class SalesDataDownloadController {
 			salesOrderDTO.setCustomerName(obj[13] != null ? obj[13].toString() : "");
 			salesOrderDTO.setMrp(Double.parseDouble(obj[14] != null ? obj[14].toString() : "0.0"));
 			salesOrderDTO.setDiscPrice(Double.parseDouble(obj[15] != null ? obj[15].toString() : "0.0"));
-			salesOrderDTO.setRemarks(obj[16] != null ? obj[16].toString() : "");
+			salesOrderDTO.setRemarks(obj[17] != null ? obj[17].toString() : "");
 
 			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
 
@@ -372,8 +372,9 @@ public class SalesDataDownloadController {
 				inventoryVoucherHeaderPids.size());
 
 		if (!inventoryVoucherHeaderPids.isEmpty()) {
-			inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+			int updated=inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 					TallyDownloadStatus.COMPLETED, inventoryVoucherHeaderPids);
+			log.debug("updated " + updated + " to Completed");
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}

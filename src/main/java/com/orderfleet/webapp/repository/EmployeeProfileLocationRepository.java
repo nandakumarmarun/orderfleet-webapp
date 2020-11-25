@@ -29,6 +29,8 @@ public interface EmployeeProfileLocationRepository extends JpaRepository<Employe
 	List<Location> findLocationsByEmployeeProfilePid(String employeeProfilePid);
 
 	void deleteByEmployeeProfilePid(String employeeProfilePid);
+	
+	void deleteByEmployeeProfilePidIn(List<String> employeeProfilePids);
 
 	@Query("select employeeProfileLocation.location from EmployeeProfileLocation employeeProfileLocation where employeeProfileLocation.employeeProfile.user.pid = ?1")
 	List<Location> findLocationsByUserPid(String userPid);

@@ -24,20 +24,21 @@
 						<form role="form" class="form-horizontal form-groups-bordered">
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Users</label>
-								<button type="button" class="btn btn-success " id="uploadUsers">Upload
-									Users</button>
+								<button type="button" class="btn btn-success " id="uploadUsers"
+									style="width: 175px; text-align: center;">Upload Users</button>
 							</div>
 						</form>
 					</div>
 				</div>
-				
+
 				<div class="col-md-12">
 					<div class="panel-body">
 						<form role="form" class="form-horizontal form-groups-bordered">
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Tax Lists</label>
 								<button type="button" class="btn btn-success "
-									id="uploadTaxLists">Upload Tax Lists</button>
+									id="uploadTaxLists" style="width: 175px; text-align: center;">Upload
+									Tax Lists</button>
 							</div>
 						</form>
 					</div>
@@ -49,20 +50,9 @@
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Product Profile</label>
 								<button type="button" class="btn btn-success "
-									id="uploadProductProfileProfiles">Upload Product
-									Profiles</button>
-							</div>
-						</form>
-					</div>
-				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Stock Locations</label>
-								<button type="button" class="btn btn-success "
-									id="uploadStockLocations">Upload Stocks</button>
+									id="uploadProductProfileProfiles"
+									style="width: 175px; text-align: center;">Upload
+									Product Profiles</button>
 							</div>
 						</form>
 					</div>
@@ -74,7 +64,8 @@
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Price Lists</label>
 								<button type="button" class="btn btn-success "
-									id="uploadPriceLists">Upload Price Lists</button>
+									id="uploadPriceLists" style="width: 175px; text-align: center;">Upload
+									Price Lists</button>
 							</div>
 						</form>
 					</div>
@@ -86,7 +77,24 @@
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Account Profile</label>
 								<button type="button" class="btn btn-success "
-									id="uploadAccountProfiles">Upload Account Profiles</button>
+									id="uploadAccountProfiles"
+									style="width: 175px; text-align: center;">Upload
+									Account Profiles</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<div class="col-md-12">
+					<div class="panel-body">
+						<form role="form" class="form-horizontal form-groups-bordered">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Outstanding
+									Invoices</label>
+								<button type="button" class="btn btn-success "
+									id="uploadOutstandingInvoice"
+									style="width: 175px; text-align: center;">Upload
+									Outstanding Invoices</button>
 							</div>
 						</form>
 					</div>
@@ -96,9 +104,9 @@
 					<div class="panel-body">
 						<form role="form" class="form-horizontal form-groups-bordered">
 							<div class="form-group">
-								<label class="col-sm-2 control-label">Outstanding Invoices</label>
+								<label class="col-sm-2 control-label">Stock Locations</label>
 								<button type="button" class="btn btn-success "
-									id="uploadOutstandingInvoice">Upload Outstanding Invoices</button>
+									id="uploadStockLocations" style="width:175px;text-align: center;">Upload Stocks</button>
 							</div>
 						</form>
 					</div>

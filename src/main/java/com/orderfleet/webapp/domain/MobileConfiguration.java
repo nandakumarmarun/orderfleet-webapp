@@ -133,10 +133,16 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "find_location", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
 	private boolean findLocation;
-	
+
 	@Column(name = "enable_dynamic_unit", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean enableDynamicUnit;
-	
+
+	@Column(name = "enable_discount_round_off_column", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enableDiscountRoundOffColumn;
+
+	@Column(name = "stock_location_products", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean stockLocationProducts;
+
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -384,7 +390,7 @@ public class MobileConfiguration implements Serializable {
 	public void setSalesOrderDownloadPdf(boolean salesOrderDownloadPdf) {
 		this.salesOrderDownloadPdf = salesOrderDownloadPdf;
 	}
-	
+
 	public boolean getFindLocation() {
 		return findLocation;
 	}
@@ -392,13 +398,29 @@ public class MobileConfiguration implements Serializable {
 	public void setFindLocation(boolean findLocation) {
 		this.findLocation = findLocation;
 	}
-	
+
 	public boolean getEnableDynamicUnit() {
 		return enableDynamicUnit;
 	}
 
 	public void setEnableDynamicUnit(boolean enableDynamicUnit) {
 		this.enableDynamicUnit = enableDynamicUnit;
+	}
+
+	public boolean getEnableDiscountRoundOffColumn() {
+		return enableDiscountRoundOffColumn;
+	}
+
+	public void setEnableDiscountRoundOffColumn(boolean enableDiscountRoundOffColumn) {
+		this.enableDiscountRoundOffColumn = enableDiscountRoundOffColumn;
+	}
+
+	public boolean getStockLocationProducts() {
+		return stockLocationProducts;
+	}
+
+	public void setStockLocationProducts(boolean stockLocationProducts) {
+		this.stockLocationProducts = stockLocationProducts;
 	}
 
 	@Override

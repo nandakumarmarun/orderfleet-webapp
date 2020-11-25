@@ -39,7 +39,9 @@ if (!this.MobileConfiguration) {
 		smartSearch : false,
 		salesOrderDownloadPdf : false,
 		findLocation : true,
-		enableDynamicUnit : false
+		enableDynamicUnit : false,
+		enableDiscountRoundOffColumn : false,
+		stockLocationProducts : false
 	};
 
 	$(document).ready(function() {
@@ -123,11 +125,14 @@ if (!this.MobileConfiguration) {
 		mobileConfigurationDTO.smartSearch = $("#smartSearch").is(":checked");
 		mobileConfigurationDTO.salesOrderDownloadPdf = $(
 				"#salesOrderDownloadPdf").is(":checked");
-		mobileConfigurationDTO.findLocation = $(
-		"#findLocation").is(":checked");
-		mobileConfigurationDTO.enableDynamicUnit = $(
-		"#enableDynamicUnit").is(":checked");
-		
+		mobileConfigurationDTO.findLocation = $("#findLocation").is(":checked");
+		mobileConfigurationDTO.enableDynamicUnit = $("#enableDynamicUnit").is(
+				":checked");
+		mobileConfigurationDTO.enableDiscountRoundOffColumn = $(
+				"#enableDiscountRoundOffColumn").is(":checked");
+		mobileConfigurationDTO.stockLocationProducts = $(
+				"#stockLocationProducts").is(":checked");
+
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -208,8 +213,11 @@ if (!this.MobileConfiguration) {
 									data.findLocation);
 							$('#enableDynamicUnit').prop("checked",
 									data.enableDynamicUnit);
+							$('#enableDiscountRoundOffColumn').prop("checked",
+									data.enableDiscountRoundOffColumn);
+							$('#stockLocationProducts').prop("checked",
+									data.stockLocationProducts);
 
-							
 						}
 
 					},

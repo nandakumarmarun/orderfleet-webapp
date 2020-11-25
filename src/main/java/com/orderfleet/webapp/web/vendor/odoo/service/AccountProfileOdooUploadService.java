@@ -95,7 +95,6 @@ public class AccountProfileOdooUploadService {
 		this.priceLevelRepository = priceLevelRepository;
 	}
 
-	
 	@Transactional
 	public void saveUpdateAccountProfiles(final List<OdooAccountProfile> list) {
 
@@ -202,26 +201,13 @@ public class AccountProfileOdooUploadService {
 			if (opAccP.isPresent()) {
 				continue;
 			}
-
-			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
-			LocationDTO locationDto = new LocationDTO();
-
-			locationAccountProfileDto.setAccountProfileName(apDto.getName());
-			locationAccountProfileDto.setLocationName("Territory");
-
-			locationAccountProfileDtos.add(locationAccountProfileDto);
 			accountProfile.setDataSourceType(DataSourceType.TALLY);
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
 
-		if (locationDtos.size() > 0)
-
-		{
-			saveUpdateLocations(locationDtos);
-		}
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 
-		saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
+		// saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -309,9 +295,8 @@ public class AccountProfileOdooUploadService {
 				newLocationAccountProfiles.add(locationAccountProfile);
 			}
 		}
-		if (locationAccountProfilesIds.size() != 0) {
-			locationAccountProfileRepository.deleteByIdIn(companyId, locationAccountProfilesIds);
-		}
+
+		locationAccountProfileRepository.deleteByCompany(companyId);
 
 		locationAccountProfileRepository.save(newLocationAccountProfiles);
 

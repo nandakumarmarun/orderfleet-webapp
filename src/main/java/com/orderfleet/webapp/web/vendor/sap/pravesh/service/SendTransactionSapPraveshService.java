@@ -17,7 +17,9 @@ import javax.inject.Inject;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,12 +36,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
+import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
 import com.orderfleet.webapp.domain.User;
@@ -98,6 +102,8 @@ public class SendTransactionSapPraveshService {
 	private static String AUTHENTICATION_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEzRjhFREM2QjJCNTU3OUQ0MEVGNDg1QkNBOUNFRDBBIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2MDExMDg1MzMsImV4cCI6MTYzMjY0NDUzMywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIiwiYXVkIjoiQ3VzdG9tZXJTZXJ2aWNlLkFwaSIsImNsaWVudF9pZCI6Im5hc19jbGllbnQiLCJzdWIiOiIwNWEwNzliMC1jZjBiLTQ2ZjctYThlMy1iODk4MjIwODgzMjQiLCJhdXRoX3RpbWUiOjE2MDExMDg1MzMsImlkcCI6ImxvY2FsIiwic2VydmljZS51c2VyIjoiYWRtaW4iLCJqdGkiOiIyOUU0OTRERTg1QjA0RTdBNUM1NjM3NDhCQzIyOTEyRSIsInNpZCI6IkFDOTE4QzNEMkY3MUIzRTRBMERGQzc2MDQ4QzJBMEUzIiwiaWF0IjoxNjAxMTA4NTMzLCJzY29wZSI6WyJvcGVuaWQiLCJwcm9maWxlIiwibmFzLmNsaWVudCIsIm5hcy5zZXJ2aWNlcyJdLCJhbXIiOlsicHdkIl19.x4knTyLtPEwUSnc35EnWSyxINwOLU5YTBeCD_eXDkXmMC1bWQclkdLH18Dgict07qVWyRL9EcYT66j4p7hsUGbZrZP9TLeNpQP5BT6eRSeYvkf2lmvJe1xaCvPYrHpPGvApLJJAmQxCwex7AAW74zJLpl_SdNUf3AHBkBvjr2ibEkDBgRgOTO0Z3n3f43ZxZw3LAi_x8ZRSxITY0mpevTUpDhx2pv5-ehXe7BaCbTxAJ6dBvkAavtmB-W3wp7cnJqSfr2mFpsBzE_Ek_OzAFnu_N1ALi8yE9LpuAPSDj4hVz11i98urPebHA8lEca1yBAPI6goQlKJEB4_NXI5F8CA";
 
 	private final Logger log = LoggerFactory.getLogger(SendTransactionSapPraveshService.class);
+
+	public static int successCount = 0;
 
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
@@ -356,12 +362,20 @@ public class SendTransactionSapPraveshService {
 			// Void authenticateResponse = restTemplate.postForObject(API_URL_SALES_ORDER,
 			// entity, Void.class);
 
-			ApiResponseDataSapPravesh authenticateResponse = restTemplate.postForObject(API_URL_SALES_ORDER, entity,
-					ApiResponseDataSapPravesh.class);
+//			ApiResponseDataSapPravesh authenticateResponse = restTemplate.postForObject(API_URL_SALES_ORDER, entity,
+//					ApiResponseDataSapPravesh.class);
 
-			log.info("Sap Sales Order Created Success Size" + "----" + authenticateResponse.getId().size());
+			ResponseEntity<List<ApiResponseDataSapPravesh>> authenticateResponse = restTemplate.exchange(
+					API_URL_SALES_ORDER, HttpMethod.POST, entity,
+					new ParameterizedTypeReference<List<ApiResponseDataSapPravesh>>() {
+					});
 
-			changeSalesOrderServerDownloadStatus(authenticateResponse);
+			// new ParameterizedTypeReference<List<BitPay>>(){})
+
+			log.info("Sap Sales Order Created Success Size" + "----"
+					+ authenticateResponse.getBody().get(0).getId().size());
+
+			changeSalesOrderServerDownloadStatus(authenticateResponse.getBody().get(0));
 
 //			log.info("Odoo Invoice Created Success Size= " + responseBodyOdooInvoice.getResult().getMessage().size()
 //					+ "------------");
@@ -400,11 +414,47 @@ public class SendTransactionSapPraveshService {
 
 			if (authenticateResponse.getStatus().equals("Success")) {
 
-				List<String> inventoryHeaderPids = authenticateResponse.getId();
+				if (authenticateResponse.getId().size() > 0) {
+					List<String> inventoryHeaderPids = new ArrayList<>();
 
-				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
-						TallyDownloadStatus.COMPLETED, inventoryHeaderPids);
-				log.debug("updated " + updated + " to Completed");
+					for (String id : authenticateResponse.getId()) {
+						inventoryHeaderPids.add(id);
+					}
+
+					List<InventoryVoucherHeader> successInventoryHeaders = new ArrayList<>();
+					List<InventoryVoucherHeader> successdistinctElements = new ArrayList<>();
+
+					if (inventoryHeaderPids.size() > 0) {
+						successInventoryHeaders = inventoryVoucherHeaderRepository
+								.findAllHeaderdByDocumentNumberServer(inventoryHeaderPids);
+						successdistinctElements = successInventoryHeaders.stream().distinct()
+								.collect(Collectors.toList());
+					}
+					log.info("Success Sales Order :----" + successInventoryHeaders.size());
+					List<InventoryVoucherHeader> updatedList = new ArrayList<>();
+					successCount = 0;
+					for (InventoryVoucherHeader ivh : successdistinctElements) {
+
+						InventoryVoucherHeader newIvh = ivh;
+
+						authenticateResponse.getId().stream()
+								.filter(a -> a.equalsIgnoreCase(ivh.getDocumentNumberServer())).findAny()
+								.ifPresent(a -> {
+
+									newIvh.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
+									updatedList.add(newIvh);
+									successCount++;
+								});
+					}
+					inventoryVoucherHeaderRepository.save(updatedList);
+
+					log.debug("updated " + successCount + " to Completed");
+//					int updated = inventoryVoucherHeaderRepository
+//							.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.COMPLETED,
+//									inventoryHeaderPids);
+//				
+//					log.debug("updated " + updated + " to Completed");
+				}
 			}
 		}
 
@@ -416,12 +466,48 @@ public class SendTransactionSapPraveshService {
 
 			if (authenticateResponse.getStatus().equals("Success")) {
 
-				List<String> accountingHeaderPids = authenticateResponse.getId();
+				if (authenticateResponse.getId().size() > 0) {
+					List<String> accountingHeaderPids = new ArrayList<>();
 
-				int updated = accountingVoucherHeaderRepository
-						.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(
-								TallyDownloadStatus.COMPLETED, accountingHeaderPids);
-				log.debug("updated " + updated + " to Completed");
+					for (String id : authenticateResponse.getId()) {
+						accountingHeaderPids.add(id);
+					}
+
+					List<AccountingVoucherHeader> successAccountingVoucherHeaders = new ArrayList<>();
+					List<AccountingVoucherHeader> successdistinctElements = new ArrayList<>();
+
+					if (accountingHeaderPids.size() > 0) {
+						successAccountingVoucherHeaders = accountingVoucherHeaderRepository
+								.findAllHeaderdByDocumentNumberServer(accountingHeaderPids);
+						successdistinctElements = successAccountingVoucherHeaders.stream().distinct()
+								.collect(Collectors.toList());
+					}
+					log.info("Success Receipts :----" + successAccountingVoucherHeaders.size());
+					List<AccountingVoucherHeader> updatedList = new ArrayList<>();
+					successCount = 0;
+					for (AccountingVoucherHeader avh : successdistinctElements) {
+
+						AccountingVoucherHeader newAvh = avh;
+
+						authenticateResponse.getId().stream()
+								.filter(a -> a.equalsIgnoreCase(avh.getDocumentNumberServer())).findAny()
+								.ifPresent(a -> {
+
+									newAvh.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
+									updatedList.add(newAvh);
+									successCount++;
+								});
+					}
+					accountingVoucherHeaderRepository.save(updatedList);
+
+					log.debug("updated " + successCount + " to Completed");
+
+//					int updated = accountingVoucherHeaderRepository
+//							.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(
+//									TallyDownloadStatus.COMPLETED, accountingHeaderPids);
+//					accountingVoucherHeaderRepository.flush();
+//					log.debug("updated " + updated + " to Completed");
+				}
 			}
 		}
 
@@ -601,14 +687,27 @@ public class SendTransactionSapPraveshService {
 
 		try {
 
-			ApiResponseDataSapPravesh authenticateResponse = restTemplate.postForObject(API_URL_RECIPTS, entity,
-					ApiResponseDataSapPravesh.class);
+//			ApiResponseDataSapPravesh authenticateResponse = restTemplate.postForObject(API_URL_RECIPTS, entity,
+//					ApiResponseDataSapPravesh.class);
 
-			log.info("Sap Receipt Created Success Size" + "----" + authenticateResponse.getId().size());
+			ResponseEntity<List<ApiResponseDataSapPravesh>> authenticateResponse = restTemplate.exchange(
+					API_URL_RECIPTS, HttpMethod.POST, entity,
+					new ParameterizedTypeReference<List<ApiResponseDataSapPravesh>>() {
+					});
+
+			// new ParameterizedTypeReference<List<BitPay>>(){})
+
+			// log.info("Sap Sales Order Created Success Size" + "----" +
+			// authenticateResponse.getBody().get(0).getId().size());
+
+			// changeSalesOrderServerDownloadStatus(authenticateResponse.getBody().get(0));
+
+			log.info(
+					"Sap Receipt Created Success Size" + "----" + authenticateResponse.getBody().get(0).getId().size());
 //			log.info("Odoo Invoice Created Success Size= " + responseBodyOdooInvoice.getResult().getMessage().size()
 //					+ "------------");
 //
-			changeReceiptServerDownloadStatus(authenticateResponse);
+			changeReceiptServerDownloadStatus(authenticateResponse.getBody().get(0));
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {

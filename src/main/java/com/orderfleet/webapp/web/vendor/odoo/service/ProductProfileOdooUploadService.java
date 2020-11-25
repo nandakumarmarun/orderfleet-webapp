@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.vendor.odoo.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,13 +14,19 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.EmployeeProfileLocation;
+import com.orderfleet.webapp.domain.Location;
+import com.orderfleet.webapp.domain.LocationAccountProfile;
+import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PriceLevelList;
 import com.orderfleet.webapp.domain.ProductCategory;
@@ -37,7 +44,11 @@ import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.StockLocationType;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
+import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
+import com.orderfleet.webapp.repository.LocationHierarchyRepository;
+import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.PriceLevelListRepository;
 import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
@@ -52,6 +63,9 @@ import com.orderfleet.webapp.repository.UnitOfMeasureRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.service.AccountProfileService;
+import com.orderfleet.webapp.service.LocationAccountProfileService;
+import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.OpeningStockService;
 import com.orderfleet.webapp.service.PriceLevelListService;
 import com.orderfleet.webapp.service.PriceLevelService;
@@ -61,9 +75,13 @@ import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.UnitOfMeasureService;
 import com.orderfleet.webapp.service.util.RandomUtil;
+import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.LocationDTO;
+import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
 import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelListDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
+import com.orderfleet.webapp.web.rest.dto.TPLocationAccountProfilesDTO;
 import com.orderfleet.webapp.web.rest.dto.TPUnitOfMeasureProductDTO;
 import com.orderfleet.webapp.web.rest.dto.TPUserStockLocationDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
@@ -120,6 +138,20 @@ public class ProductProfileOdooUploadService {
 
 	private final TaxMasterRepository taxMasterRepository;
 
+	private final EmployeeProfileLocationRepository employeeProfileLocationRepository;
+
+	private final LocationRepository locationRepository;
+
+	private final LocationAccountProfileRepository locationAccountProfileRepository;
+
+	private final LocationAccountProfileService locationAccountProfileService;
+
+	private final LocationService locationService;
+
+	private final LocationHierarchyRepository locationHierarchyRepository;
+
+	private final AccountProfileService accountProfileService;
+
 	public ProductProfileOdooUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			DivisionRepository divisionRepository, ProductCategoryRepository productCategoryRepository,
 			ProductGroupRepository productGroupRepository, ProductProfileRepository productProfileRepository,
@@ -130,7 +162,11 @@ public class ProductProfileOdooUploadService {
 			UserStockLocationRepository userStockLocationRepository,
 			EmployeeProfileRepository employeeProfileRepository, PriceLevelRepository priceLevelRepository,
 			PriceLevelListRepository priceLevelListRepository,
-			TemporaryOpeningStockRepository temporaryOpeningStockRepository, TaxMasterRepository taxMasterRepository) {
+			TemporaryOpeningStockRepository temporaryOpeningStockRepository, TaxMasterRepository taxMasterRepository,
+			EmployeeProfileLocationRepository employeeProfileLocationRepository, LocationRepository locationRepository,
+			LocationAccountProfileRepository locationAccountProfileRepository,
+			LocationAccountProfileService locationAccountProfileService, LocationService locationService,
+			LocationHierarchyRepository locationHierarchyRepository, AccountProfileService accountProfileService) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.divisionRepository = divisionRepository;
@@ -149,6 +185,13 @@ public class ProductProfileOdooUploadService {
 		this.priceLevelListRepository = priceLevelListRepository;
 		this.temporaryOpeningStockRepository = temporaryOpeningStockRepository;
 		this.taxMasterRepository = taxMasterRepository;
+		this.employeeProfileLocationRepository = employeeProfileLocationRepository;
+		this.locationRepository = locationRepository;
+		this.locationAccountProfileRepository = locationAccountProfileRepository;
+		this.locationAccountProfileService = locationAccountProfileService;
+		this.locationService = locationService;
+		this.locationHierarchyRepository = locationHierarchyRepository;
+		this.accountProfileService = accountProfileService;
 	}
 
 	@Transactional
@@ -214,7 +257,7 @@ public class ProductProfileOdooUploadService {
 				productProfile.setDivision(defaultDivision);
 				productProfile.setDataSourceType(DataSourceType.TALLY);
 			}
-
+			productProfile.setActivated(true);
 			// tax
 			List<TaxMaster> taxMasters = new ArrayList<>();
 			Object taxIds = ppDto.getTax_ids();
@@ -362,16 +405,21 @@ public class ProductProfileOdooUploadService {
 
 		Set<StockLocation> saveUpdateStockLocations = new HashSet<>();
 
-		Set<String> stkAlias = list.stream().map(p -> String.valueOf(p.getId())).collect(Collectors.toSet());
-		List<StockLocation> stockLocations = stockLocationRepository
-				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), stkAlias);
+		// Set<String> stkAlias = list.stream().map(p ->
+		// String.valueOf(p.getId())).collect(Collectors.toSet());
+		List<StockLocation> stockLocations = stockLocationRepository.findAllByCompanyId();
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
 
 		int i = 1;
 
 		List<TPUserStockLocationDTO> tpUserStockLocationDTOs = new ArrayList<>();
+		List<TPLocationAccountProfilesDTO> tpLocationAccountProfieDTOs = new ArrayList<>();
 
 		List<OpeningStockDTO> openingStockDtos = new ArrayList<>();
+
+		List<LocationDTO> locationDtos = new ArrayList<>();
+
+		log.info("Stock Locations........." + stockLocations.size());
 
 		for (OdooStockLocation stkDto : list) {
 			// check exist by name, only one exist with a name
@@ -399,7 +447,28 @@ public class ProductProfileOdooUploadService {
 				i++;
 			}
 
+			System.out.println("Assigning Stocklocation as Locations............");
 			stockLocation.setName(name);
+
+			LocationDTO locationDTO = new LocationDTO();
+
+			locationDTO.setAlias(name);
+			locationDTO.setName(name);
+
+			locationDtos.add(locationDTO);
+
+			if (stkDto.getCustomer_ids().size() > 0) {
+
+				System.out.println("Assigning location account profiles............");
+				TPLocationAccountProfilesDTO tpLocationAccountProfieDTO = new TPLocationAccountProfilesDTO();
+
+				tpLocationAccountProfieDTO.setLocationName(name);
+				tpLocationAccountProfieDTO.setAccountProfileIds(stkDto.getCustomer_ids());
+
+				tpLocationAccountProfieDTOs.add(tpLocationAccountProfieDTO);
+			}
+
+			System.out.println("Assigning User Stocklocation............");
 
 			TPUserStockLocationDTO tpUserStockLocationDTO = new TPUserStockLocationDTO();
 
@@ -411,7 +480,10 @@ public class ProductProfileOdooUploadService {
 			for (OdooOpeningStock osList : stkDto.getProduct_qty()) {
 
 				Optional<ProductProfile> optionalPp = productProfiles.stream()
-						.filter(pl -> pl.getProductId().equals(String.valueOf(osList.getId()))).findAny();
+						.filter(pl -> pl.getProductId() != null
+								? pl.getProductId().equals(String.valueOf(osList.getId()))
+								: "abcd".equals(String.valueOf(osList.getId())))
+						.findAny();
 				if (optionalPp.isPresent()) {
 					OpeningStockDTO openingStockDto = new OpeningStockDTO();
 					openingStockDto.setProductProfileName(optionalPp.get().getName());
@@ -427,9 +499,19 @@ public class ProductProfileOdooUploadService {
 
 		}
 
+		if (locationDtos.size() > 0) {
+			saveUpdateLocations(locationDtos);
+			saveUpdateLocationHierarchy(locationDtos);
+		}
+
+		if (tpLocationAccountProfieDTOs.size() > 0) {
+			savingStockLocationAccountProfiles(tpLocationAccountProfieDTOs);
+		}
+
 		stockLocationRepository.save(saveUpdateStockLocations);
 		log.info("Saving User Stock Locations.....");
 		saveUserStockLoctions(tpUserStockLocationDTOs);
+		saveUserLocations(tpUserStockLocationDTOs);
 
 		if (openingStockDtos.size() > 0) {
 			saveUpdateTemporaryOpeningStock(openingStockDtos);
@@ -782,6 +864,80 @@ public class ProductProfileOdooUploadService {
 
 	}
 
+	private void saveUserLocations(List<TPUserStockLocationDTO> tpUserStockLocationDTOs) {
+		log.info("Saving User Locations.........");
+		long start = System.nanoTime();
+
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		List<EmployeeProfileLocation> newUserLocations = new ArrayList<>();
+		List<EmployeeProfileLocation> userLocations = employeeProfileLocationRepository
+				.findByLocationCompanyPid(company.getPid());
+
+		// delete all assigned location account profile from tally
+		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
+		List<Location> locations = locationRepository.findAllByCompanyId(companyId);
+		List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyId(company.getId());
+		List<Long> userStockLocationIds = new ArrayList<>();
+
+		List<String> userPids = new ArrayList<>();
+		for (TPUserStockLocationDTO uslDto : tpUserStockLocationDTOs) {
+			EmployeeProfileLocation userLocation = new EmployeeProfileLocation();
+			// find location
+
+			Optional<Location> opStk = locations.stream()
+					.filter(pl -> uslDto.getStockLocationName().equals(pl.getName())).findFirst();
+
+			Optional<EmployeeProfile> opEmp = employeeProfiles.stream()
+					.filter(pp -> uslDto.getUserId().equals(pp.getAlias())).findFirst();
+			if (opStk.isPresent()) {
+				List<Long> userstkLocationIds = userLocations.stream()
+						.filter(pgp -> opStk.get().getPid().equals(pgp.getLocation().getPid())).map(pgp -> pgp.getId())
+						.collect(Collectors.toList());
+				if (userstkLocationIds.size() != 0) {
+					userStockLocationIds.addAll(userstkLocationIds);
+				}
+
+				if (opEmp.isPresent()) {
+					EmployeeProfile user = opEmp.get();
+					if (user == null) {
+						continue;
+					}
+					userPids.add(user.getPid());
+					userLocation.setEmployeeProfile(user);
+				} else {
+					continue;
+				}
+
+				userLocation.setLocation(opStk.get());
+				newUserLocations.add(userLocation);
+			}
+		}
+
+		Optional<Location> opLoc = locations.stream().filter(pp -> pp.getName().equals("Territory")).findFirst();
+
+		for (String employeePid : userPids) {
+			Optional<EmployeeProfile> opEmp = employeeProfiles.stream().filter(pp -> pp.getPid().equals(employeePid))
+					.findFirst();
+			if (opEmp.isPresent() && opLoc.isPresent()) {
+				EmployeeProfileLocation userLocation = new EmployeeProfileLocation();
+				userLocation.setEmployeeProfile(opEmp.get());
+				userLocation.setLocation(opLoc.get());
+				newUserLocations.add(userLocation);
+			}
+		}
+		employeeProfileLocationRepository.deleteByEmployeeProfilePidIn(userPids);
+
+		employeeProfileLocationRepository.save(newUserLocations);
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
 	@Transactional
 	public void saveUpdatePriceList(List<OdooPriceLevel> list) {
 
@@ -828,9 +984,11 @@ public class ProductProfileOdooUploadService {
 			for (OdooPriceLevelList plList : plDto.getProduct_list()) {
 
 				if (!plList.getProduct_id().equals("false")) {
-					System.out.println("-------" + plList.getProduct_id());
+
 					Optional<ProductProfile> optionalPp = productProfiles.stream()
-							.filter(pl -> pl.getProductId().equals(plList.getProduct_id())).findAny();
+							.filter(pl -> pl.getProductId() != null ? pl.getProductId().equals(plList.getProduct_id())
+									: "abcd".equals(plList.getProduct_id()))
+							.findAny();
 					if (optionalPp.isPresent()) {
 						PriceLevelListDTO priceLevelListDTO = new PriceLevelListDTO(optionalPp.get().getName(),
 								plDto.getPricelist_name(), plList.getPrice(), 0.0, 0.0);
@@ -928,5 +1086,248 @@ public class ProductProfileOdooUploadService {
 		// update sync table
 
 		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	@Transactional
+	public void saveUpdateLocations(final List<LocationDTO> locationDTOs) {
+
+		log.info("Saving Locations........." + locationDTOs.size());
+		long start = System.nanoTime();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		Set<Location> saveUpdateLocations = new HashSet<>();
+		// find all locations
+		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
+		for (LocationDTO locDto : locationDTOs) {
+			// check exist by name, only one exist with a name
+			Optional<Location> optionalLoc = locations.stream().filter(p -> p.getName().equals(locDto.getName()))
+					.findAny();
+			Location location = new Location();
+			if (optionalLoc.isPresent()) {
+				location = optionalLoc.get();
+				// if not update, skip this iteration.
+				// if (!location.getThirdpartyUpdate()) {continue;}
+			} else {
+				location = new Location();
+				location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
+				location.setName(locDto.getName());
+				location.setCompany(company);
+			}
+			location.setAlias(locDto.getAlias());
+			location.setActivated(true);
+			Optional<Location> opLoc = saveUpdateLocations.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(locDto.getName())).findAny();
+			if (opLoc.isPresent()) {
+				continue;
+			}
+
+			saveUpdateLocations.add(location);
+		}
+		log.info(saveUpdateLocations.size() + "---------------------");
+		// bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
+		List<Location> updated = locationRepository.save(saveUpdateLocations);
+
+		log.info("Saved " + updated.size() + "  Locations---------------------");
+
+		locationRepository.flush();
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	@Transactional
+	@Async
+	public void saveUpdateLocationAccountProfiles(final List<LocationAccountProfileDTO> locationAccountProfileDTOs) {
+
+		log.info("Saving Location Account Profiles........." + locationAccountProfileDTOs.size());
+		long start = System.nanoTime();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		List<LocationAccountProfile> newLocationAccountProfiles = new ArrayList<>();
+		List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileService
+				.findAllLocationAccountProfiles(companyId);
+		// delete all assigned location account profile from tally
+		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
+		List<AccountProfile> accountProfiles = accountProfileService.findAllAccountProfileByCompanyId(companyId);
+		List<Location> locations = locationService.findAllLocationByCompanyId(companyId);
+		List<Long> locationAccountProfilesIds = new ArrayList<>();
+
+		for (LocationAccountProfileDTO locAccDto : locationAccountProfileDTOs) {
+			LocationAccountProfile locationAccountProfile = new LocationAccountProfile();
+			// find location
+
+			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getName()))
+					.findFirst();
+			// find accountprofile
+			// System.out.println(loc.get() + "===Location");
+
+			Optional<AccountProfile> acc = accountProfiles.stream()
+					.filter(ap -> locAccDto.getAccountProfileName().equals(ap.getName())).findFirst();
+			if (acc.isPresent()) {
+				List<Long> locationAccountProfileIds = locationAccountProfiles.stream()
+						.filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
+						.map(lap -> lap.getId()).collect(Collectors.toList());
+				if (locationAccountProfileIds.size() != 0) {
+					locationAccountProfilesIds.addAll(locationAccountProfileIds);
+				}
+				if (loc.isPresent()) {
+					locationAccountProfile.setLocation(loc.get());
+				} else if (acc.isPresent()) {
+					locationAccountProfile.setLocation(locations.get(0));
+				}
+				locationAccountProfile.setAccountProfile(acc.get());
+				locationAccountProfile.setCompany(company);
+				newLocationAccountProfiles.add(locationAccountProfile);
+			}
+		}
+
+		locationAccountProfileRepository.deleteByCompany(companyId);
+		locationAccountProfileRepository.save(newLocationAccountProfiles);
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	@Transactional
+	private void saveUpdateLocationHierarchy(List<LocationDTO> locationDtos) {
+		List<LocationHierarchyDTO> locationHierarchyDTOs = locationDtosToLocationHierarchyDtos(locationDtos);
+
+		log.info("Saving Location Hierarchies.........");
+
+		long start = System.nanoTime();
+
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+
+		Long version;
+		// Only one version of a company hierarchy is active at a time
+		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
+				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
+		if (locationHierarchy.isPresent()) {
+			locationHierarchyRepository.updateLocationHierarchyInactivatedFor(ZonedDateTime.now(),
+					locationHierarchy.get().getVersion());
+			version = locationHierarchy.get().getVersion() + 1;
+		} else {
+			version = 1L;
+		}
+		// find all locations
+		List<Location> locations = locationRepository.findByCompanyIdAndActivatedTrue(companyId);
+		// create hierarchy
+		for (LocationHierarchyDTO locationDTO : locationHierarchyDTOs) {
+
+			// check location exist
+			Optional<Location> optionalLoc = locations.stream()
+					.filter(p -> p.getName().equals(locationDTO.getLocationName())).findAny();
+			if (optionalLoc.isPresent()) {
+				if (locationDTO.getParentName() != null && locationDTO.getParentName().length() > 0) {
+					// check parent location exist
+					Optional<Location> optionalParentLoc = locations.stream()
+							.filter(p -> p.getName().equals(locationDTO.getParentName())).findAny();
+					if (optionalParentLoc.isPresent()) {
+						locationHierarchyRepository.insertLocationHierarchyWithParent(version,
+								optionalLoc.get().getId(), optionalParentLoc.get().getId());
+					}
+				} else {
+					locationHierarchyRepository.insertLocationHierarchyWithNoParent(version, optionalLoc.get().getId());
+				}
+			}
+		}
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
+	@Transactional
+	private void savingStockLocationAccountProfiles(List<TPLocationAccountProfilesDTO> tpLocationAccountProfieDTOs) {
+
+		log.info("Saving Stock Location Account Profiles.........");
+		long start = System.nanoTime();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+
+		List<AccountProfile> accountProfiles = accountProfileService.findAllAccountProfileByCompanyId(companyId);
+
+		List<LocationAccountProfileDTO> locationAccountProfileDTOs = new ArrayList<>();
+
+		Optional<AccountProfile> companyAccountProOptional = accountProfiles.stream()
+				.filter(acp -> acp.getAccountType() != null ? acp.getAccountType().getName().equals("Company")
+						: "abc123".equals("Company"))
+				.findAny();
+		if (companyAccountProOptional.isPresent()) {
+
+			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
+
+			locationAccountProfileDto.setAccountProfileName(companyAccountProOptional.get().getName());
+			locationAccountProfileDto.setLocationName("Territory");
+
+			locationAccountProfileDTOs.add(locationAccountProfileDto);
+		}
+
+		for (TPLocationAccountProfilesDTO tpLocationAccountProfilesDTO : tpLocationAccountProfieDTOs) {
+
+			for (long accountProfileId : tpLocationAccountProfilesDTO.getAccountProfileIds()) {
+
+				Optional<AccountProfile> accountProOptional = accountProfiles.stream()
+						.filter(acp -> acp.getCustomerId() != null
+								? acp.getCustomerId().equals(String.valueOf(accountProfileId))
+								: "abc123".equals(String.valueOf(accountProfileId)))
+						.findAny();
+
+				if (accountProOptional.isPresent()) {
+
+					LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
+
+					locationAccountProfileDto.setAccountProfileName(accountProOptional.get().getName());
+					locationAccountProfileDto.setLocationName(tpLocationAccountProfilesDTO.getLocationName());
+
+					locationAccountProfileDTOs.add(locationAccountProfileDto);
+				}
+			}
+		}
+
+		saveUpdateLocationAccountProfiles(locationAccountProfileDTOs);
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
+	private List<LocationHierarchyDTO> locationDtosToLocationHierarchyDtos(List<LocationDTO> locationDtos) {
+
+		Set<String> locations = new HashSet<>();
+
+		for (LocationDTO locationDTO : locationDtos) {
+
+			locations.add(locationDTO.getName());
+		}
+
+		List<LocationHierarchyDTO> locationHierarchyDTOs = new ArrayList<>();
+
+		LocationHierarchyDTO defaultLocationHierarchyDTO = new LocationHierarchyDTO();
+		defaultLocationHierarchyDTO.setLocationName("Territory");
+		defaultLocationHierarchyDTO.setParentName(null);
+		locationHierarchyDTOs.add(defaultLocationHierarchyDTO);
+
+		for (String location : locations) {
+
+			LocationHierarchyDTO locationHierarchyDTO = new LocationHierarchyDTO();
+
+			locationHierarchyDTO.setLocationName(location);
+			locationHierarchyDTO.setParentName("Territory");
+
+			locationHierarchyDTOs.add(locationHierarchyDTO);
+
+		}
+
+		return locationHierarchyDTOs;
 	}
 }

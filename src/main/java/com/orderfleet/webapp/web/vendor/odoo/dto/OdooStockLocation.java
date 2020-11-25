@@ -12,6 +12,8 @@ public class OdooStockLocation {
 
 	private String name;
 
+	public List<Long> customer_ids;
+
 	public List<OdooOpeningStock> getProduct_qty() {
 		return product_qty;
 	}
@@ -42,6 +44,14 @@ public class OdooStockLocation {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public List<Long> getCustomer_ids() {
+		return customer_ids;
+	}
+
+	public void setCustomer_ids(List<Long> customer_ids) {
+		this.customer_ids = customer_ids;
 	}
 
 }

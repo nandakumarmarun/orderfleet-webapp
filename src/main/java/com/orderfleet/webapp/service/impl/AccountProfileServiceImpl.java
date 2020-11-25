@@ -664,6 +664,8 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	@Override
 	public List<AccountProfile> findAllAccountProfileByCompanyId(Long companyId) {
 		List<AccountProfile> accountProfiles = new ArrayList<>();
+
+		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyId();
 		for (Object[] object : accountProfileRepository.findAllAccountProfileByCompanyId(companyId)) {
 			AccountProfile accountProfile = new AccountProfile();
 			accountProfile.setId((Long) object[0]);
@@ -672,6 +674,17 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			if (object[3] != null) {
 				accountProfile.setAlias(object[3].toString());
 
+			}
+			if (object[4] != null) {
+				accountProfile.setCustomerId(object[4].toString());
+
+			}
+			if (object[5] != null) {
+				Optional<AccountType> opAccType = accountTypes.stream()
+						.filter(ac -> ac.getPid().equals(object[5].toString())).findAny();
+				if (opAccType.isPresent()) {
+					accountProfile.setAccountType(opAccType.get());
+				}
 			}
 			accountProfiles.add(accountProfile);
 		}
@@ -682,14 +695,12 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	@Transactional(readOnly = true)
 	public List<AccountProfileDTO> findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(
 			Long companyId, List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate) {
-		
+
 		List<AccountProfile> accountProfileList = accountProfileRepository
-				.findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(companyId,
-						userIds, fromDate, toDate);
+				.findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(companyId, userIds,
+						fromDate, toDate);
 		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfileList);
 		return result;
 	}
-	
-	
 
 }

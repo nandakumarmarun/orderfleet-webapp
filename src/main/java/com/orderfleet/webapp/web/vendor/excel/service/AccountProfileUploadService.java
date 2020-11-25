@@ -139,19 +139,20 @@ public class AccountProfileUploadService {
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
 		// All product must have a division/category, if not, set a default one
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
-		log.info("Default Account type 123456:"+defaultAccountType.getName());
+		log.info("Default Account type 123456:" + defaultAccountType.getName());
 		// find all exist account profiles
 		List<String> apAlias = accountProfileDTOs.stream().map(apDto -> apDto.getAlias().toUpperCase())
 				.collect(Collectors.toList());
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndAliasIgnoreCaseIn(companyId,
-				apAlias);
+//		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndAliasIgnoreCaseIn(companyId,
+//				apAlias);
+		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
 		// all pricelevels
 		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
 
 		for (AccountProfileDTO apDto : accountProfileDTOs) {
 			// check exist by name, only one exist with a name
 			Optional<AccountProfile> optionalAP = accountProfiles.stream()
-					.filter(pc -> pc.getAlias().equalsIgnoreCase(apDto.getAlias())).findAny();
+					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
 			AccountProfile accountProfile;
 			if (optionalAP.isPresent()) {
 				accountProfile = optionalAP.get();
@@ -160,7 +161,7 @@ public class AccountProfileUploadService {
 			} else {
 				accountProfile = new AccountProfile();
 				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-				accountProfile.setAlias(apDto.getAlias());
+				accountProfile.setName(apDto.getName());
 				accountProfile.setUser(user);
 				accountProfile.setCompany(company);
 				accountProfile.setAccountStatus(AccountStatus.Unverified);
@@ -169,7 +170,7 @@ public class AccountProfileUploadService {
 
 			}
 			accountProfile.setTrimChar(apDto.getTrimChar());
-			accountProfile.setName(apDto.getName());
+			accountProfile.setAlias(apDto.getAlias());
 			if (isValidPhone(apDto.getPhone1())) {
 				accountProfile.setPhone1(apDto.getPhone1());
 			}
@@ -182,7 +183,7 @@ public class AccountProfileUploadService {
 			accountProfile.setTinNo(apDto.getTinNo());
 			accountProfile.setPin(apDto.getPin());
 			accountProfile.setDescription(apDto.getDescription());
-			accountProfile.setActivated(apDto.getActivated());
+			accountProfile.setActivated(true);
 			accountProfile.setAddress(apDto.getAddress());
 			accountProfile.setCity(apDto.getCity());
 			accountProfile.setContactPerson(apDto.getContactPerson());
@@ -210,7 +211,7 @@ public class AccountProfileUploadService {
 				}
 			}
 			// account type
-			log.info("AccountProfileAccount type == null :"+accountProfile.getAccountType());
+			log.info("AccountProfileAccount type == null :" + accountProfile.getAccountType());
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}

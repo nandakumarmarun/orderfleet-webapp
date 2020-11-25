@@ -882,6 +882,8 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setSalesOrderDownloadPdf(false);
 		mobileConfiguration.setFindLocation(true);
 		mobileConfiguration.setEnableDynamicUnit(false);
+		mobileConfiguration.setEnableDiscountRoundOffColumn(false);
+		mobileConfiguration.setStockLocationProducts(false);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 

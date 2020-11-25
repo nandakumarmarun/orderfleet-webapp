@@ -148,7 +148,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile.pid, accountProfile.alias, accountProfile.name, accountProfile.description, accountProfile.address , accountProfile.user.firstName from AccountProfile accountProfile where accountProfile.activated = ?1 and accountProfile.company.id = ?#{principal.companyId} order by accountProfile.name")
 	List<Object[]> findAccountProfileAndCreatedByAndActivated(Boolean activated);
 
-	@Query("select accountProfile.id, accountProfile.pid, accountProfile.name,accountProfile.alias from AccountProfile accountProfile where accountProfile.company.id = ?1 order by accountProfile.name")
+	@Query("select accountProfile.id, accountProfile.pid, accountProfile.name,accountProfile.alias,accountProfile.customerId,accountProfile.accountType.pid from AccountProfile accountProfile where accountProfile.company.id = ?1 order by accountProfile.name")
 	List<Object[]> findAllAccountProfileByCompanyId(Long companyId);
 
 	@Query("select ap.pid as pid, ap.name as name, ap.alias as alias, ap.user.firstName as userName,"

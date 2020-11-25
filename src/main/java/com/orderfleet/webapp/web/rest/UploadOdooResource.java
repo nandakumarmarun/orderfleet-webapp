@@ -57,23 +57,23 @@ import net.minidev.json.parser.ParseException;
 @RequestMapping("/web")
 public class UploadOdooResource {
 
-	private static String CUSTOMER_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/customers";
+	private static String CUSTOMER_API_URL = "http://edappal.nellara.com:1214/web/api/customers";
 
-	private static String AUTHENTICATE_API_URL = "http://nellaracorp.dyndns.org:11214/web/session/authenticate";
+	private static String AUTHENTICATE_API_URL = "http://edappal.nellara.com:1214/web/session/authenticate";
 
-	private static String PRODUCT_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/products";
+	private static String PRODUCT_API_URL = "http://edappal.nellara.com:1214/web/api/products";
 
-	private static String UNIT_OF_MEASURE_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/uoms";
+	private static String UNIT_OF_MEASURE_API_URL = "http://edappal.nellara.com:1214/web/api/uoms";
 
-	private static String USER_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/users";
+	private static String USER_API_URL = "http://edappal.nellara.com:1214/web/api/users";
 
-	private static String STOCK_LOCATION_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/locations";
+	private static String STOCK_LOCATION_API_URL = "http://edappal.nellara.com:1214/web/api/locations";
 	
-	private static String PRICE_LEVEL_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/pricelists";
+	private static String PRICE_LEVEL_API_URL = "http://edappal.nellara.com:1214/web/api/pricelists";
 	
-	private static String OUTSTANDING_INVOICE_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/outstanding";
+	private static String OUTSTANDING_INVOICE_API_URL = "http://edappal.nellara.com:1214/web/api/outstanding";
 	
-	private static String TAX_LIST_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/taxes";
+	private static String TAX_LIST_API_URL = "http://edappal.nellara.com:1214/web/api/taxes";
 
 	private final Logger log = LoggerFactory.getLogger(UploadOdooResource.class);
 	

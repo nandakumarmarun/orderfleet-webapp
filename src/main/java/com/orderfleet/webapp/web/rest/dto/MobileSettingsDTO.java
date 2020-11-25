@@ -75,10 +75,14 @@ public class MobileSettingsDTO {
 	private boolean smartSearch;
 
 	private boolean salesOrderDownloadPdf;
-	
+
 	private boolean findLocation;
-	
+
 	private boolean enableDynamicUnit;
+
+	private boolean enableDiscountRoundOffColumn;
+
+	private boolean stockLocationProducts;
 
 	public MobileSettingsDTO() {
 		super();
@@ -114,6 +118,8 @@ public class MobileSettingsDTO {
 		this.salesOrderDownloadPdf = mobileConfigurationDTO.getSalesOrderDownloadPdf();
 		this.findLocation = mobileConfigurationDTO.getFindLocation();
 		this.enableDynamicUnit = mobileConfigurationDTO.getEnableDynamicUnit();
+		this.enableDiscountRoundOffColumn = mobileConfigurationDTO.getEnableDiscountRoundOffColumn();
+		this.stockLocationProducts = mobileConfigurationDTO.getStockLocationProducts();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -371,5 +377,21 @@ public class MobileSettingsDTO {
 	public void setEnableDynamicUnit(boolean enableDynamicUnit) {
 		this.enableDynamicUnit = enableDynamicUnit;
 	}
-	
+
+	public boolean isEnableDiscountRoundOffColumn() {
+		return enableDiscountRoundOffColumn;
+	}
+
+	public void setEnableDiscountRoundOffColumn(boolean enableDiscountRoundOffColumn) {
+		this.enableDiscountRoundOffColumn = enableDiscountRoundOffColumn;
+	}
+
+	public boolean isStockLocationProducts() {
+		return stockLocationProducts;
+	}
+
+	public void setStockLocationProducts(boolean stockLocationProducts) {
+		this.stockLocationProducts = stockLocationProducts;
+	}
+
 }

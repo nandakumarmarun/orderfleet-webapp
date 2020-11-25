@@ -65,6 +65,8 @@
 						<th>Sales Order Download Pdf</th>
 						<th>Find Location</th>
 						<th>Enable Dynamic Units</th>
+						<th>Enable Discount & Roundoff Column</th>
+						<th>Stock Location Products</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -101,6 +103,9 @@
 							<td>${mobileConfiguration.salesOrderDownloadPdf}</td>
 							<td>${mobileConfiguration.findLocation}</td>
 							<td>${mobileConfiguration.enableDynamicUnit}</td>
+							<td>${mobileConfiguration.enableDiscountRoundOffColumn}</td>
+							<td>${mobileConfiguration.stockLocationProducts}</td>
+
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -322,20 +327,36 @@
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Find Loction
-													</label> <input id="findLocation"
-														name='findLocation' type='checkbox'
+													<label class="control-label">Find Loction </label> <input
+														id="findLocation" name='findLocation' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Enable Dynamic Unit
-													</label> <input id="enableDynamicUnit"
-														name='enableDynamicUnit' type='checkbox'
+													<label class="control-label">Enable Dynamic Unit </label> <input
+														id="enableDynamicUnit" name='enableDynamicUnit'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Enable Discount &
+														Roundoff Column </label> <input id="enableDiscountRoundOffColumn"
+														name='enableDiscountRoundOffColumn' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Stock Location
+														Products</label> <input id="stockLocationProducts"
+														name='stockLocationProducts' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+
+
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Vchr.No Generation

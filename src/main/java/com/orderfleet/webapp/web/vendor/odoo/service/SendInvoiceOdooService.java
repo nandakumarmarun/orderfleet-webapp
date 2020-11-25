@@ -97,7 +97,7 @@ public class SendInvoiceOdooService {
 	@Inject
 	private UnitOfMeasureProductRepository unitOfMeasureProductRepository;
 
-	private static String SEND_INVOICES_API_URL = "http://nellaracorp.dyndns.org:11214/web/api/create_invoices";
+	private static String SEND_INVOICES_API_URL = "http://edappal.nellara.com:1214/web/api/create_invoices";
 
 	public static int successCount = 0;
 	public static int failedCount = 0;

@@ -283,8 +283,10 @@ public class ProductProfileUploadService {
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
 		// find all exist product profiles
 		Set<String> ppAlias = productProfileDTOs.stream().map(p -> p.getAlias()).collect(Collectors.toSet());
-		List<ProductProfile> productProfiles = productProfileRepository
-				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
+//		List<ProductProfile> productProfiles = productProfileRepository
+//				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
+
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
 
 		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
 
@@ -308,7 +310,7 @@ public class ProductProfileUploadService {
 		for (ProductProfileDTO ppDto : productProfileDTOs) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getAlias().equals(ppDto.getAlias())).findAny();
+					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
 			ProductProfile productProfile;
 			if (optionalPP.isPresent()) {
 				productProfile = optionalPP.get();
@@ -320,17 +322,17 @@ public class ProductProfileUploadService {
 				productProfile = new ProductProfile();
 				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
 				productProfile.setCompany(company);
-				productProfile.setAlias(ppDto.getAlias());
+				productProfile.setName(ppDto.getName());
 				productProfile.setDivision(defaultDivision);
 				productProfile.setDataSourceType(DataSourceType.TALLY);
 			}
-			productProfile.setName(ppDto.getName());
+			productProfile.setAlias(ppDto.getAlias());
 			productProfile.setDescription(ppDto.getDescription());
 			productProfile.setPrice(ppDto.getPrice());
 			productProfile.setMrp(ppDto.getMrp());
 			productProfile.setTaxRate(ppDto.getTaxRate());
 			productProfile.setSku(ppDto.getSku());
-			productProfile.setActivated(ppDto.getActivated());
+			productProfile.setActivated(true);
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
 			if (ppDto.getUnitQty() != null) {

@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.api;
 
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Comparator;
@@ -105,10 +106,9 @@ public class ExecutiveDayPlanController {
 	/**
 	 * POST /executive-day-plan : Create a new executiveDayPlan.
 	 * 
-	 * @param executiveDayPlan
-	 *            the executiveTaskPlanDTO to create
-	 * @return the ResponseEntity with status 201 (Created) and with body the
-	 *         new executiveDAyPlanDTO
+	 * @param executiveDayPlan the executiveTaskPlanDTO to create
+	 * @return the ResponseEntity with status 201 (Created) and with body the new
+	 *         executiveDAyPlanDTO
 	 */
 	@Timed
 	@RequestMapping(value = "/executive-day-plan", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -142,12 +142,11 @@ public class ExecutiveDayPlanController {
 	 * GET /executive-day-plan : Users executive-day-plan.
 	 * 
 	 * This will give current user executive-day-plan to mobile devices up to
-	 * current date and change the status to pending If provided custom dates
-	 * give plan between dates Same as Reports -> Day plan in web, don't change
-	 * status
+	 * current date and change the status to pending If provided custom dates give
+	 * plan between dates Same as Reports -> Day plan in web, don't change status
 	 * 
-	 * @return the ResponseEntity with status 201 (Created) and with body the
-	 *         new executiveDayPlanDTO
+	 * @return the ResponseEntity with status 201 (Created) and with body the new
+	 *         executiveDayPlanDTO
 	 */
 	@Timed
 	@RequestMapping(value = "/executive-day-plan", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -170,7 +169,8 @@ public class ExecutiveDayPlanController {
 					.findByCompanyIdUserLoginAndDateBetweenAndAttendanceStatus(login, AttendanceStatus.PRESENT,
 							currentDate.atTime(0, 0), currentDate.atTime(23, 59));
 			if (!attendanceList.isEmpty()) {
-				Attendance attendance = attendanceList.stream().max(Comparator.comparing(Attendance::getPlannedDate)).get();
+				Attendance attendance = attendanceList.stream().max(Comparator.comparing(Attendance::getPlannedDate))
+						.get();
 				if (attendance.getAttendanceStatusSubgroup() != null) {
 					List<RootPlanSubgroupApprove> optionalRootPlanSubGroupApproval = rootPlanSubgroupApproveRepository
 							.findByUserLoginAndAttendanceStatusSubgroupId(SecurityUtils.getCurrentUserLogin(),
@@ -236,57 +236,65 @@ public class ExecutiveDayPlanController {
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
-	
+
 	@Timed
 	@RequestMapping(value = "/executive-day-plan-datewise", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional
 	public ResponseEntity<List<ExecutiveTaskPlanDTO>> getExecutiveTaskPlanDateWise(
-			@RequestParam(required = false, name = "startDate") LocalDate startDate,
-			@RequestParam(required = false, name = "endDate") LocalDate endDate,
-			@RequestParam(required = true, name = "filterBy") String filterBy
-			) {
+			@RequestParam(required = false, name = "startDate") String startDate,
+			@RequestParam(required = false, name = "endDate") String endDate,
+			@RequestParam(required = true, name = "filterBy") String filterBy) {
 		List<ExecutiveTaskPlan> executiveTaskPlanList;
 		String login = SecurityUtils.getCurrentUserLogin();
-		
-		switch(filterBy){
-			case "TD":
-				startDate = LocalDate.now().plusDays(1);
-				endDate = LocalDate.now().plusDays(1);
-				break;
-			case "WFD":
-				startDate = LocalDate.now().plusDays(1);
-				TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
-				LocalDate weekEndDate = LocalDate.now().with(fieldISO, 7);
-				endDate = weekEndDate;
-				break;
-			case "MFD":
-				startDate = LocalDate.now().plusDays(1);
-				endDate = LocalDate.now().withDayOfMonth(startDate.getMonth().length(startDate.isLeapYear()));
-				break;
-			case "SINGLE":
-				if(startDate == null){
-					startDate = LocalDate.now();
-					endDate = LocalDate.now();
-				}else{
-					endDate = startDate;
-				}
-				break;
-			case "CUSTOM":
-				if(startDate == null || endDate == null){
-					startDate = LocalDate.now();
-					endDate = LocalDate.now();
-				}
-				break;
-			default :
-				startDate = LocalDate.now();
-				endDate = LocalDate.now();
-				break;
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate fromDate = LocalDate.now();
+		LocalDate toDate = LocalDate.now();
+		if (startDate != null && !startDate.equals("")) {
+			fromDate = LocalDate.parse(startDate, formatter);
+		}
+		if (endDate != null && !endDate.equals("")) {
+			toDate = LocalDate.parse(endDate, formatter);
 		}
 
-			executiveTaskPlanList = executiveTaskPlanRepository.findByUserLoginAndPlannedDateBetweenOrderByIdAsc(login,
-					startDate.atTime(0, 0), endDate.atTime(23, 59));
-		
+		switch (filterBy) {
+		case "TD":
+			fromDate = LocalDate.now().plusDays(1);
+			toDate = LocalDate.now().plusDays(1);
+			break;
+		case "WFD":
+			fromDate = LocalDate.now().plusDays(1);
+			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+			LocalDate weekEndDate = LocalDate.now().with(fieldISO, 7);
+			toDate = weekEndDate;
+			break;
+		case "MFD":
+			fromDate = LocalDate.now().plusDays(1);
+			toDate = LocalDate.now().withDayOfMonth(fromDate.getMonth().length(fromDate.isLeapYear()));
+			break;
+		case "SINGLE":
+			if (fromDate == null) {
+				fromDate = LocalDate.now();
+				toDate = LocalDate.now();
+			} else {
+				toDate = fromDate;
+			}
+			break;
+		case "CUSTOM":
+			if (fromDate == null || toDate == null) {
+				fromDate = LocalDate.now();
+				toDate = LocalDate.now();
+			}
+			break;
+		default:
+			fromDate = LocalDate.now();
+			toDate = LocalDate.now();
+			break;
+		}
+
+		executiveTaskPlanList = executiveTaskPlanRepository.findByUserLoginAndPlannedDateBetweenOrderByIdAsc(login,
+				fromDate.atTime(0, 0), toDate.atTime(23, 59));
+
 		return new ResponseEntity<>(
 				executiveTaskPlanList.stream().map(ExecutiveTaskPlanDTO::new).collect(Collectors.toList()),
 				HttpStatus.OK);

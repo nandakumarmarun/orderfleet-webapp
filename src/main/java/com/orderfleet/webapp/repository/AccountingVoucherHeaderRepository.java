@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Document;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
@@ -251,18 +252,22 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	Object[] findnetCollectionAmountByUserIdandDateBetween(List<Long> userIds, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
-	@Query(value= "SELECT id,pid,executive_task_execution_id,document_id,account_profile_id,created_date,document_date,total_amount,"
+	@Query(value = "SELECT id,pid,executive_task_execution_id,document_id,account_profile_id,created_date,document_date,total_amount,"
 			+ "outstanding_amount,remarks,created_by_id,employee_id,document_number_local,document_number_server,status,updated_date,"
 			+ "tally_download_status FROM tbl_accounting_voucher_header where tally_download_status ='PENDING' and company_id = ?#{principal.companyId} "
-			+ "order by created_date desc",nativeQuery=true)
+			+ "order by created_date desc", nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusByCreatedDateDesc();
-	
+
 	@Query("select accVoucher.pid,accVoucher.document.name,accVoucher.totalAmount,accVoucher.document.documentType,accVoucher.executiveTaskExecution.pid from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1")
 	List<Object[]> findByExecutiveTaskExecutionIdIn(Set<Long> exeIds);
-	
+
 	@Query("select accVoucher.pid,accVoucher.document.name,accVoucher.totalAmount,accVoucher.document.documentType,accVoucher.executiveTaskExecution.pid from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1 and accVoucher.document.pid = ?2")
 	List<Object[]> findByExecutiveTaskExecutionIdInAndDocumentPid(Set<Long> exeIds, String documentPid);
-	
-	
+
+	@Query("select accVoucher from AccountingVoucherHeader accVoucher LEFT JOIN FETCH accVoucher.accountingVoucherDetails where accVoucher.company.id = ?#{principal.companyId} and accVoucher.documentNumberServer in ?1")
+	List<AccountingVoucherHeader> findAllHeaderdByDocumentNumberServer(List<String> accountingHeaderPids);
+
+	// List<InventoryVoucherHeader>
+	// findAllHeaderdByDocumentNumberServer(List<String> references);
 
 }

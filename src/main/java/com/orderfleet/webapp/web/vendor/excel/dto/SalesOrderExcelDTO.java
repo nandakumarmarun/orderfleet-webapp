@@ -210,4 +210,15 @@ public class SalesOrderExcelDTO {
 		this.remarks = remarks;
 	}
 
+	@Override
+	public String toString() {
+		return "SalesOrderExcelDTO [billNo=" + billNo + ", date=" + date + ", customerCode=" + customerCode
+				+ ", itemCode=" + itemCode + ", quantity=" + quantity + ", mrp=" + mrp + ", rate=" + rate + ", discPer="
+				+ discPer + ", discPrice=" + discPrice + ", compDiscAmt=" + compDiscAmt + ", freeQuantity="
+				+ freeQuantity + ", caseValue=" + caseValue + ", employeeCode=" + employeeCode + ", taxPer=" + taxPer
+				+ ", total=" + total + ", CGSTAmt=" + CGSTAmt + ", SGSTAmt=" + SGSTAmt + ", inventoryPid="
+				+ inventoryPid + ", kfcAmt=" + kfcAmt + ", kfcPer=" + kfcPer + ", remarks=" + remarks
+				+ ", customerName=" + customerName + "]";
+	}
+
 }
