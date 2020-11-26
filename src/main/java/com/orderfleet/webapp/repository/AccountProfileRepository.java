@@ -11,10 +11,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
+import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 import com.orderfleet.webapp.repository.projections.CustomAccountProfiles;
@@ -30,7 +32,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	Optional<AccountProfile> findByCompanyIdAndNameIgnoreCase(Long id, String name);
 
 	Optional<AccountProfile> findOneByPid(String pid);
-	
+
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} order by accountProfile.name asc")
 	List<AccountProfile> findAllByCompanyId();
 
@@ -119,7 +121,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	List<AccountProfile> findByCompanyIdAndUserIdInAndLastModifiedDateBetweenAndDataSourceTypeMobileOrderByLastModifiedDateDesc(
 			Long companyId, List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate,
 			DataSourceType dataSourceType);
-	
+
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.dataSourceType = ?1")
 	List<AccountProfile> findAllByCompanyAndDataSourceType(DataSourceType dataSourceType);
 
@@ -180,8 +182,17 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.user.id in ?2 and accountProfile.lastModifiedDate between ?3 and ?4  and accountProfile.activated = true order by accountProfile.lastModifiedDate desc")
 	List<AccountProfile> findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(Long companyId,
 			List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
-	
+
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and accountProfile.customerId in ?1")
 	List<AccountProfile> findAccountProfileAndCustomerIds(List<String> customerIds);
+
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.dataSourceType = ?1 and accountProfile.accountStatus= ?2 order by accountProfile.createdDate desc ")
+	List<AccountProfile> findAllByCompanyAndDataSourceTypeAndCreatedDateAndAccountStatus(DataSourceType dataSourceType,
+			AccountStatus accountStatus);
+
+	@Modifying(clearAutomatically = true)
+	@Transactional
+	@Query("update AccountProfile accountProfile set accountProfile.accountStatus = ?1 where accountProfile.pid in ?2")
+	int updateAccountProfileStatusUsingPid(AccountStatus verified, List<String> accountProfilePids);
 
 }

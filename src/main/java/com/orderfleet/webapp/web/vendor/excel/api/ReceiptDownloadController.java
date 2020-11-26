@@ -33,6 +33,7 @@ import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
+import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
@@ -43,6 +44,7 @@ import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherDetailRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
@@ -80,6 +82,9 @@ public class ReceiptDownloadController {
 
 	@Inject
 	private UserRepository userRepository;
+
+	@Inject
+	private CompanyRepository companyRepository;
 
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
@@ -301,7 +306,10 @@ public class ReceiptDownloadController {
 	@Timed
 	public ResponseEntity<Void> UpdateReceiptStatus(@Valid @RequestBody List<String> accountingVoucherHeaderPids)
 			throws URISyntaxException {
-		log.debug("REST request to update Accounting Voucher Header Status : {}", accountingVoucherHeaderPids.size());
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+		log.debug("REST request to update Accounting Voucher Header Status (" + company.getLegalName() + ") : {}",
+				accountingVoucherHeaderPids.size());
 		if (!accountingVoucherHeaderPids.isEmpty()) {
 			accountingVoucherHeaderRepository.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(
 					TallyDownloadStatus.COMPLETED, accountingVoucherHeaderPids);

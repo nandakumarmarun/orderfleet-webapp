@@ -1,11 +1,16 @@
 package com.orderfleet.webapp.web.vendor.excel;
 
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +38,15 @@ import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.InventoryVoucherBatchDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.SnrichPartnerCompany;
+import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.AccountStatus;
+import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
@@ -51,6 +60,7 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
+import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherBatchDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
 import com.orderfleet.webapp.web.rest.dto.ReceiptVendorDTO;
@@ -58,6 +68,7 @@ import com.orderfleet.webapp.web.rest.dto.SalesOrderDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesOrderItemDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesOrderVenderDTO;
 import com.orderfleet.webapp.web.rest.dto.VatLedgerDTO;
+import com.orderfleet.webapp.web.vendor.excel.dto.NewlyAddedLedgerDTO;
 import com.orderfleet.webapp.web.vendor.excel.dto.SalesOrderExcelDTO;
 import com.orderfleet.webapp.web.vendor.integre.dto.SalesOrderPid;
 import com.orderfleet.webapp.web.vendor.integre.dto.SalesPidDTO;
@@ -198,6 +209,54 @@ public class SalesDataDownloadController {
 
 	}
 
+	@RequestMapping(value = "/get-newly-added-ledger.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	@Transactional
+	public List<NewlyAddedLedgerDTO> getNewlyAddedLedgerJSON() throws URISyntaxException {
+		log.debug("REST request to download newly added  sales ledgers : {}");
+		List<NewlyAddedLedgerDTO> newlyAddedLedgerDTOs = new ArrayList<>();
+
+		List<AccountProfile> accountProfiles = accountProfileRepository
+				.findAllByCompanyAndDataSourceTypeAndCreatedDateAndAccountStatus(DataSourceType.MOBILE,
+						AccountStatus.Unverified);
+
+		newlyAddedLedgerDTOs = convertAccountProfilesToNewlyAddedLedgerDTO(accountProfiles);
+
+		return newlyAddedLedgerDTOs;
+
+	}
+
+	private List<NewlyAddedLedgerDTO> convertAccountProfilesToNewlyAddedLedgerDTO(
+			List<AccountProfile> accountProfiles) {
+		List<NewlyAddedLedgerDTO> newlyAddedLedgerDTOs = new ArrayList<>();
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		for (AccountProfile accountProfile : accountProfiles) {
+			NewlyAddedLedgerDTO newlyAddedLedgerDTO = new NewlyAddedLedgerDTO();
+
+			newlyAddedLedgerDTO.setAccountStatus(accountProfile.getAccountStatus().toString());
+			newlyAddedLedgerDTO.setAddress(accountProfile.getAddress());
+			newlyAddedLedgerDTO.setAlias(accountProfile.getAlias());
+			newlyAddedLedgerDTO.setCity(accountProfile.getCity());
+			newlyAddedLedgerDTO.setCreatedBy(accountProfile.getUser().getFirstName());
+			newlyAddedLedgerDTO.setCreatedDate(accountProfile.getCreatedDate().format(formatter));
+			newlyAddedLedgerDTO.setDescription(accountProfile.getDescription());
+			newlyAddedLedgerDTO.setEmail1(accountProfile.getEmail1());
+			newlyAddedLedgerDTO.setLocation(accountProfile.getLocation());
+			newlyAddedLedgerDTO.setName(accountProfile.getName());
+			newlyAddedLedgerDTO.setPhone1(accountProfile.getPhone1());
+			newlyAddedLedgerDTO.setPhone2(accountProfile.getPhone2());
+			newlyAddedLedgerDTO.setPid(accountProfile.getPid());
+			newlyAddedLedgerDTO.setPin(accountProfile.getPin());
+			newlyAddedLedgerDTO.setTinNo(accountProfile.getTinNo());
+
+			newlyAddedLedgerDTOs.add(newlyAddedLedgerDTO);
+		}
+
+		return newlyAddedLedgerDTOs;
+	}
+
 	private List<SalesOrderExcelDTO> getInventoryVoucherList(List<Object[]> inventoryVoucherHeaders) {
 
 		List<SalesOrderExcelDTO> salesOrderDTOs = new ArrayList<>();
@@ -220,11 +279,11 @@ public class SalesDataDownloadController {
 					.findByCompanyIdAndAliasIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), obj[2].toString());
 
 			if (apOp.isPresent()) {
-				if(apOp.get().getTinNo() != null) {
-					if(apOp.get().getTinNo().equalsIgnoreCase("")) {
+				if (apOp.get().getTinNo() != null) {
+					if (apOp.get().getTinNo().equalsIgnoreCase("")) {
 						unregisteredCustomer = true;
 					}
-				}else {
+				} else {
 					unregisteredCustomer = true;
 				}
 			}
@@ -359,21 +418,31 @@ public class SalesDataDownloadController {
 	@Timed
 	@Transactional
 	public ResponseEntity<String> updateOrderStatus(@RequestBody List<String> inventoryVoucherHeaderPids) {
-		// Company company
-		// =companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
-		// inventoryVoucherHeaderRepository
-		// .updateAllInventoryVoucherHeaderStatusUsingPid(company.getId(),
-		// inventoryVoucherHeaderPids);
-		// inventoryVoucherHeaderRepository.
-		// updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.PROCESSING,
-		// inventoryVoucherHeaderPids);
-		// return new ResponseEntity<String>("Success",HttpStatus.OK);
-		log.debug("REST request to update Inventory Voucher Header Status (aquatech) : {}",
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+		log.debug("REST request to update Inventory Voucher Header Status (" + company.getLegalName() + ") : {}",
 				inventoryVoucherHeaderPids.size());
 
 		if (!inventoryVoucherHeaderPids.isEmpty()) {
-			int updated=inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 					TallyDownloadStatus.COMPLETED, inventoryVoucherHeaderPids);
+			log.debug("updated " + updated + " to Completed");
+		}
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@PostMapping("/update-newly-added-ledger-status")
+	@Timed
+	@Transactional
+	public ResponseEntity<String> updateNewlyAddedLedger(@RequestBody List<String> accountProfilePids) {
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+		log.debug("REST request to update Inventory Voucher Header Status (" + company.getLegalName() + ") : {}",
+				accountProfilePids.size());
+
+		if (!accountProfilePids.isEmpty()) {
+			int updated = accountProfileRepository.updateAccountProfileStatusUsingPid(AccountStatus.Verified,
+					accountProfilePids);
 			log.debug("updated " + updated + " to Completed");
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
