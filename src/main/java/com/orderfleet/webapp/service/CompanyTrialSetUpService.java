@@ -328,6 +328,8 @@ public class CompanyTrialSetUpService {
 		createPriceLevels(company);
 		createStockLocation(company);
 		createDivision(company);
+		createProductGroup(company);
+		createProductCategory(company);
 		AccountProfile accountProfile = createAccountProfile(company);
 		assignAccountToTerritory(company, accountProfile);
 	}
@@ -1605,6 +1607,28 @@ public class CompanyTrialSetUpService {
 		division.setName("Sales");
 		division.setPid(DivisionService.PID_PREFIX + RandomUtil.generatePid());
 		divisionRepository.save(division);
+	}
+
+	private void createProductGroup(Company company) {
+		ProductGroup productGroup = new ProductGroup();
+		productGroup.setActivated(true);
+		productGroup.setCompany(company);
+		productGroup.setName("General");
+		productGroup.setAlias("General");
+		productGroup.setThirdpartyUpdate(false);
+		productGroup.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
+		productGroupRepository.save(productGroup);
+	}
+
+	private void createProductCategory(Company company) {
+		ProductCategory productCategory = new ProductCategory();
+		productCategory.setActivated(true);
+		productCategory.setCompany(company);
+		productCategory.setName("Not Applicable");
+		productCategory.setAlias("Not Applicable");
+		productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
+		productCategory.setThirdpartyUpdate(false);
+		productCategoryRepository.save(productCategory);
 	}
 
 	// for orderpro users
