@@ -665,7 +665,9 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	public List<AccountProfile> findAllAccountProfileByCompanyId(Long companyId) {
 		List<AccountProfile> accountProfiles = new ArrayList<>();
 
-		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyId();
+		System.out.println(companyId + "------------------------------------");
+		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyId(companyId);
+		System.out.println(accountTypes.size() + "----------------------------");
 		for (Object[] object : accountProfileRepository.findAllAccountProfileByCompanyId(companyId)) {
 			AccountProfile accountProfile = new AccountProfile();
 			accountProfile.setId((Long) object[0]);
@@ -674,6 +676,8 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			if (object[3] != null) {
 				accountProfile.setAlias(object[3].toString());
 
+			} else {
+				accountProfile.setAlias(object[2].toString());
 			}
 			if (object[4] != null) {
 				accountProfile.setCustomerId(object[4].toString());

@@ -256,7 +256,7 @@ public class UploadOdooResource {
 
 		log.info("Get URL: " + PRODUCT_API_URL);
 
-		try {
+//		try {
 
 			ResponseBodyOdooUnitOfMeasure responseBodyUnitOfMeasure = restTemplate
 					.postForObject(UNIT_OF_MEASURE_API_URL, entity, ResponseBodyOdooUnitOfMeasure.class);
@@ -273,16 +273,16 @@ public class UploadOdooResource {
 			productProfileOdooUploadService
 					.saveUpdateProductProfiles(responseBodyProductProfile.getResult().getResponse());
 
-		} catch (HttpClientErrorException exception) {
-			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-				throw new ServiceException(exception.getResponseBodyAsString());
-			}
-			throw new ServiceException(exception.getMessage());
-		} catch (Exception exception) {
-			System.out.println(exception.getMessage());
-
-			throw new ServiceException(exception.getMessage());
-		}
+//		} catch (HttpClientErrorException exception) {
+//			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+//				throw new ServiceException(exception.getResponseBodyAsString());
+//			}
+//			throw new ServiceException(exception.getMessage());
+//		} catch (Exception exception) {
+//			System.out.println(exception.getMessage());
+//
+//			throw new ServiceException(exception.getMessage());
+//		}
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

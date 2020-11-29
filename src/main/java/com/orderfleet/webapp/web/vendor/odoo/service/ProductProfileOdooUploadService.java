@@ -203,11 +203,11 @@ public class ProductProfileOdooUploadService {
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 
-		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
+		List<ProductProfile> saveUpdateProductProfiles = new ArrayList<>();
 		// find all exist product profiles
 		Set<String> ppNames = list.stream().map(p -> p.getName()).collect(Collectors.toSet());
-		List<ProductProfile> productProfiles = productProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
+//				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
 
 		List<UnitOfMeasure> unitOfMeasures = unitOfMeasureRepository.findAllByCompanyId(true);
 
@@ -238,10 +238,14 @@ public class ProductProfileOdooUploadService {
 
 		// tax masters
 		List<TaxMaster> alltaxMasters = taxMasterRepository.findAllByCompanyId(companyId);
+		int i = 1;
 		for (OdooProductProfile ppDto : list) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
+					.filter(p -> (p.getName().equals(ppDto.getName()))
+							&& (p.getProductId() != null ? p.getProductId().equals(String.valueOf(ppDto.getId()))
+									: "abcd".equals(String.valueOf(ppDto.getId()))))
+					.findAny();
 			ProductProfile productProfile;
 			if (optionalPP.isPresent()) {
 				productProfile = optionalPP.get();
@@ -250,12 +254,14 @@ public class ProductProfileOdooUploadService {
 					continue;
 				}
 			} else {
-				productProfile = new ProductProfile();
-				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
-				productProfile.setCompany(company);
-				productProfile.setName(ppDto.getName());
-				productProfile.setDivision(defaultDivision);
-				productProfile.setDataSourceType(DataSourceType.TALLY);
+//				productProfile = new ProductProfile();
+//				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
+//				productProfile.setCompany(company);
+//				productProfile.setName(ppDto.getName());
+//				productProfile.setProductId(String.valueOf(ppDto.getId()));
+//				productProfile.setDivision(defaultDivision);
+//				productProfile.setDataSourceType(DataSourceType.TALLY);
+				continue;
 			}
 			productProfile.setActivated(true);
 			// tax
@@ -301,6 +307,8 @@ public class ProductProfileOdooUploadService {
 			Optional<ProductProfile> opAccP = saveUpdateProductProfiles.stream()
 					.filter(so -> so.getName().equalsIgnoreCase(ppDto.getName())).findAny();
 			if (opAccP.isPresent()) {
+				System.out.println(ppDto.getName());
+				i++;
 				continue;
 			}
 
@@ -321,44 +329,8 @@ public class ProductProfileOdooUploadService {
 
 			}
 
-//			if (ppDto.getSku() != null && ppDto.getSku().size() > 0) {
-//				int lastElement = ppDto.getSku().size() - 1;
-//
-//				Object[] objArray = ppDto.getSku().get(lastElement);
-//
-//				if (objArray != null && objArray.length > 0) {
-//
-//					int lastElementIndex = objArray.length - 1;
-//
-//					String sku = String.valueOf(objArray[lastElementIndex]);
-//
-//					productProfile.setSku(sku);
-//
-//					if (ppDto.getUnitQty() != null && ppDto.getUnitQty().size() > 0) {
-//
-//						List<UnitQtyOdooProductProfile> unitQuantities = ppDto.getUnitQty();
-//
-//						int lastElementIndexUq = unitQuantities.size() - 1;
-//
-//						if (sku.equalsIgnoreCase("KGM")) {
-//							productProfile.setUnitQty(unitQuantities.get(lastElementIndexUq).getKGM());
-//						}
-//
-//						if (sku.equalsIgnoreCase("PCS")) {
-//							productProfile.setUnitQty(unitQuantities.get(lastElementIndexUq).getPCS());
-//						}
-//
-//						if (sku.equalsIgnoreCase("NOS")) {
-//							productProfile.setUnitQty(unitQuantities.get(lastElementIndexUq).getNOS());
-//						}
-//
-//					}
-//				}
-//
-//			}
 			productProfile.setUnitQty(1.0);
 			productProfile.setDescription(String.valueOf(ppDto.getId()));
-			productProfile.setProductId(String.valueOf(ppDto.getId()));
 
 			productProfile.setProductCategory(defaultCategory.get());
 
@@ -379,7 +351,9 @@ public class ProductProfileOdooUploadService {
 		}
 
 		log.info("Saving product profiles");
-		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
+		List<ProductProfile> pprofiles = productProfileRepository.save(saveUpdateProductProfiles);
+		log.info("Saved--" + pprofiles.size() + "---product profiles");
+		// bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
 		log.info("Saving product groups");
 		saveUpdateProductGroups(productGroupDtos);
 		log.info("Saving product group product profiles");

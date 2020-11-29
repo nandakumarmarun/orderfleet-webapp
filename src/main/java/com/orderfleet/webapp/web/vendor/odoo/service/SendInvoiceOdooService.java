@@ -137,14 +137,14 @@ public class SendInvoiceOdooService {
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
 
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
+					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateAscLimit(
 							documentIdList);
 		} else {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
 
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
+					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateAscLimit(documentIdList);
 		}
 		log.debug("IVH size : {}", inventoryVoucherHeaders.size());
 
@@ -222,7 +222,10 @@ public class SendInvoiceOdooService {
 				odooInvoice.setReference(obj[6].toString());
 				odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
 
-				odooInvoice.setPartner_id(Long.parseLong(opRecAccPro.get().getCustomerId()));
+				odooInvoice.setPartner_id(
+						opRecAccPro.get().getCustomerId() != null && !opRecAccPro.get().getCustomerId().equals("")
+								? Long.parseLong(opRecAccPro.get().getCustomerId())
+								: 0);
 				odooInvoice.setJournal_type("sale");
 				odooInvoice.setType("out_invoice");
 
@@ -244,7 +247,10 @@ public class SendInvoiceOdooService {
 					} else {
 						odooInvoiceLine.setIs_foc(false);
 					}
-					odooInvoiceLine.setProduct_id(Long.parseLong(inventoryVoucherDetail.getProduct().getProductId()));
+					odooInvoiceLine.setProduct_id(inventoryVoucherDetail.getProduct().getProductId() != null
+							&& !inventoryVoucherDetail.getProduct().getProductId().equals("")
+									? Long.parseLong(inventoryVoucherDetail.getProduct().getProductId())
+									: 0);
 					odooInvoiceLine.setPrice_unit(inventoryVoucherDetail.getSellingRate());
 					odooInvoiceLine.setQuantity(inventoryVoucherDetail.getQuantity());
 
@@ -493,14 +499,14 @@ public class SendInvoiceOdooService {
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
 
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
+					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateAscLimit(
 							documentIdList);
 		} else {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
 
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
+					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateAscLimit(documentIdList);
 		}
 		log.debug("IVH size : {}", inventoryVoucherHeaders.size());
 
@@ -581,7 +587,10 @@ public class SendInvoiceOdooService {
 				odooInvoice.setReference(obj[6].toString());
 				odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
 
-				odooInvoice.setPartner_id(Long.parseLong(opSupAccPro.get().getCustomerId()));
+				odooInvoice.setPartner_id(
+						opSupAccPro.get().getCustomerId() != null && !opSupAccPro.get().getCustomerId().equals("")
+								? Long.parseLong(opSupAccPro.get().getCustomerId())
+								: 0);
 				odooInvoice.setJournal_type("sale_refund");
 				odooInvoice.setType("out_refund");
 
@@ -603,7 +612,10 @@ public class SendInvoiceOdooService {
 					} else {
 						odooInvoiceLine.setIs_foc(false);
 					}
-					odooInvoiceLine.setProduct_id(Long.parseLong(inventoryVoucherDetail.getProduct().getProductId()));
+					odooInvoiceLine.setProduct_id(inventoryVoucherDetail.getProduct().getProductId() != null
+							&& !inventoryVoucherDetail.getProduct().getProductId().equals("")
+									? Long.parseLong(inventoryVoucherDetail.getProduct().getProductId())
+									: 0);
 					odooInvoiceLine.setPrice_unit(inventoryVoucherDetail.getSellingRate());
 					odooInvoiceLine.setQuantity(inventoryVoucherDetail.getQuantity());
 
@@ -665,6 +677,17 @@ public class SendInvoiceOdooService {
 
 				ResponseBodyOdooInvoice responseBodyOdooInvoice = restTemplate.postForObject(SEND_INVOICES_API_URL,
 						entity, ResponseBodyOdooInvoice.class);
+				log.info(responseBodyOdooInvoice + "");
+
+				// get object as a json string
+				String jsonStr1;
+				try {
+					jsonStr1 = Obj.writeValueAsString(responseBodyOdooInvoice);
+					log.info(jsonStr1);
+				} catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				log.info("Odoo Invoice Created Success Size= " + responseBodyOdooInvoice.getResult().getMessage().size()
 						+ "------------");
 
@@ -682,7 +705,6 @@ public class SendInvoiceOdooService {
 				log.info(exception.getMessage());
 				// throw new ServiceException(exception.getMessage());
 			} catch (Exception exception) {
-
 				log.info(exception.getMessage());
 				log.info("-------------------------");
 				exception.printStackTrace();
