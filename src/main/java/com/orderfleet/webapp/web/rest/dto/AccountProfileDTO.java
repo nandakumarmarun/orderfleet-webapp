@@ -126,6 +126,16 @@ public class AccountProfileDTO {
 	private String geoTaggedUserLogin;
 
 	private String customerId;
+	
+	private String AitrichCode;
+
+	public String getAitrichCode() {
+		return AitrichCode;
+	}
+
+	public void setAitrichCode(String aitrichCode) {
+		AitrichCode = aitrichCode;
+	}
 
 	public AccountProfileDTO() {
 		super();

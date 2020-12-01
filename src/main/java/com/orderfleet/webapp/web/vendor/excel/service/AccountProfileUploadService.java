@@ -148,26 +148,57 @@ public class AccountProfileUploadService {
 		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
 		// all pricelevels
 		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
-
+		
 		for (AccountProfileDTO apDto : accountProfileDTOs) {
-			// check exist by name, only one exist with a name
-			Optional<AccountProfile> optionalAP = accountProfiles.stream()
-					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
 			AccountProfile accountProfile;
-			if (optionalAP.isPresent()) {
-				accountProfile = optionalAP.get();
-				// if not update, skip this iteration. Not implemented now
-				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
+			// check alias exist with AitrichCode
+			if (apDto.getAitrichCode() != null && !apDto.getAitrichCode().equalsIgnoreCase("")) {
+				// if AitrichCode not empty
+				Optional<AccountProfile> optionalAPCode = accountProfiles.stream()
+							.filter(pc -> pc.getAlias().equalsIgnoreCase(apDto.getAitrichCode())).findAny();
+				
+				if (optionalAPCode.isPresent()) {
+					accountProfile = optionalAPCode.get();
+					if (!apDto.getName().equals(accountProfile.getName())) {
+						accountProfile.setName(apDto.getName()); // set new name	
+					}					 
+				}  else {
+					// check exist by name, only one exist with a name
+					Optional<AccountProfile> optionalAP = accountProfiles.stream()
+							.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
+					if (optionalAP.isPresent()) {
+						accountProfile = optionalAP.get();
+						// if not update, skip this iteration. Not implemented now
+						// if (!accountProfile.getThirdpartyUpdate()) { continue; }
+					} else {
+						accountProfile = new AccountProfile();
+						accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+						accountProfile.setName(apDto.getName());
+						accountProfile.setUser(user);
+						accountProfile.setCompany(company);
+						accountProfile.setAccountStatus(AccountStatus.Unverified);
+						accountProfile.setDataSourceType(DataSourceType.TALLY);
+						accountProfile.setImportStatus(true);
+					}
+				}
 			} else {
-				accountProfile = new AccountProfile();
-				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-				accountProfile.setName(apDto.getName());
-				accountProfile.setUser(user);
-				accountProfile.setCompany(company);
-				accountProfile.setAccountStatus(AccountStatus.Unverified);
-				accountProfile.setDataSourceType(DataSourceType.TALLY);
-				accountProfile.setImportStatus(true);
-
+				// check exist by name, only one exist with a name
+				Optional<AccountProfile> optionalAP = accountProfiles.stream()
+						.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
+				if (optionalAP.isPresent()) {
+					accountProfile = optionalAP.get();
+					// if not update, skip this iteration. Not implemented now
+					// if (!accountProfile.getThirdpartyUpdate()) { continue; }
+				} else {
+					accountProfile = new AccountProfile();
+					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+					accountProfile.setName(apDto.getName());
+					accountProfile.setUser(user);
+					accountProfile.setCompany(company);
+					accountProfile.setAccountStatus(AccountStatus.Unverified);
+					accountProfile.setDataSourceType(DataSourceType.TALLY);
+					accountProfile.setImportStatus(true);
+				}
 			}
 			accountProfile.setTrimChar(apDto.getTrimChar());
 			accountProfile.setAlias(apDto.getAlias());
