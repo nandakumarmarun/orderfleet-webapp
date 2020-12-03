@@ -30,33 +30,34 @@ import com.orderfleet.webapp.web.rest.dto.NotificationReplyDTO;
 public class NotificationReplyServiceImpl implements NotificationReplyService {
 
 	private final Logger log = LoggerFactory.getLogger(NotificationReplyServiceImpl.class);
-	
+
 	@Inject
 	private CompanyRepository companyRepository;
-	
+
 	@Inject
 	private UserRepository userRepository;
-	
+
 	@Inject
 	private NotificationRepository notificationRepository;
-	
+
 	@Inject
 	private NotificationReplyRepository notificationReplyRepository;
-	
+
 	@Override
 	public NotificationReply saveNotificationReply(NotificationReplyDTO notificationReplyDTO) {
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
 		NotificationReply notificationReply = new NotificationReply();
 		log.info("Saving Notification reply ...");
-		if(opUser.isPresent()) {
-			notificationReply.setPid(NotificationReplyService.PID_PREFIX +  RandomUtil.generatePid());
+		if (opUser.isPresent()) {
+			notificationReply.setPid(NotificationReplyService.PID_PREFIX + RandomUtil.generatePid());
 			notificationReply.setCompany(company);
 			notificationReply.setCreatedBy(opUser.get());
 			notificationReply.setCreatedDate(LocalDateTime.now());
 			notificationReply.setReplyMessage(notificationReplyDTO.getMessage());
-			Notification notification = notificationRepository.findByPidOrderByCreatedDateDesc(notificationReplyDTO.getNotificationPid());
-			if(notification != null) {
+			Notification notification = notificationRepository
+					.findByPidOrderByCreatedDateDesc(notificationReplyDTO.getNotificationPid());
+			if (notification != null) {
 				notificationReply.setNotification(notification);
 				notificationReply = notificationReplyRepository.save(notificationReply);
 				log.info("Notification reply saved successfully");
@@ -66,11 +67,14 @@ public class NotificationReplyServiceImpl implements NotificationReplyService {
 	}
 
 	@Override
-	public List<NotificationReplyDTO> getAllNotificationReplyByNotificationPidOrderByCreatedDate(String pid) {
+	public List<NotificationReplyDTO> getAllNotificationReplyByNotificationPidOrderByCreatedDate(String pid,
+			String userPid) {
 
-		List<NotificationReply> notificationReplyList = notificationReplyRepository.findAllByNotificationPidOrderByCreatedDate(pid);
+		List<NotificationReply> notificationReplyList = notificationReplyRepository
+				.findAllByNotificationPidAndCreatedByPidOrderByCreatedDate(pid, userPid);
 		List<NotificationReplyDTO> notificationReply = new ArrayList<NotificationReplyDTO>();
-		notificationReply = notificationReplyList.stream().map(notifi -> new NotificationReplyDTO(notifi)).collect(Collectors.toList());
+		notificationReply = notificationReplyList.stream().map(notifi -> new NotificationReplyDTO(notifi))
+				.collect(Collectors.toList());
 		return notificationReply;
 	}
 

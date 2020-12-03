@@ -16,6 +16,6 @@ public interface NotificationReplyService {
 
 	NotificationReply saveNotificationReply(NotificationReplyDTO notificationReplyDTO);
 
-	List<NotificationReplyDTO> getAllNotificationReplyByNotificationPidOrderByCreatedDate(String pid);
+	List<NotificationReplyDTO> getAllNotificationReplyByNotificationPidOrderByCreatedDate(String pid,String userPid);
 
 }
