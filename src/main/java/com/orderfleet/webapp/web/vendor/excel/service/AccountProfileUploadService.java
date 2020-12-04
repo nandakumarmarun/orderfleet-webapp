@@ -148,21 +148,22 @@ public class AccountProfileUploadService {
 		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
 		// all pricelevels
 		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
-		
+
 		for (AccountProfileDTO apDto : accountProfileDTOs) {
 			AccountProfile accountProfile;
 			// check alias exist with AitrichCode
 			if (apDto.getAitrichCode() != null && !apDto.getAitrichCode().equalsIgnoreCase("")) {
 				// if AitrichCode not empty
 				Optional<AccountProfile> optionalAPCode = accountProfiles.stream()
-							.filter(pc -> pc.getAlias().equalsIgnoreCase(apDto.getAitrichCode())).findAny();
-				
+						.filter(pc -> pc.getAlias().equalsIgnoreCase(apDto.getAitrichCode())).findAny();
+
 				if (optionalAPCode.isPresent()) {
 					accountProfile = optionalAPCode.get();
 					if (!apDto.getName().equals(accountProfile.getName())) {
-						accountProfile.setName(apDto.getName()); // set new name	
-					}					 
-				}  else {
+						accountProfile.setName(apDto.getName()); // set new name
+						accountProfile.setCustomerId(apDto.getAlias());
+					}
+				} else {
 					// check exist by name, only one exist with a name
 					Optional<AccountProfile> optionalAP = accountProfiles.stream()
 							.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();

@@ -46,6 +46,7 @@ import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.NotificationDetailRepository;
+import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
@@ -93,9 +94,12 @@ public class NotificationReplyResource {
 
 	@Inject
 	private NotificationDetailRepository notificationDetailRepository;
-	
+
 	@Inject
 	private NotificationReplyService notificationReplyService;
+
+	@Inject
+	private UserRepository userRepository;
 
 	@Inject
 	public NotificationReplyResource(FirebaseService firebaseService, NotificationService notificationService,
@@ -106,7 +110,6 @@ public class NotificationReplyResource {
 		this.userDeviceService = userDeviceService;
 		this.employeeHierarchyService = employeeHierarchyService;
 	}
-	
 
 	@RequestMapping("/notifications-reply")
 	@Timed
@@ -116,12 +119,12 @@ public class NotificationReplyResource {
 		return "company/notification-reply-report";
 	}
 
-	
 	@RequestMapping(value = "/notifications-reply/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@ResponseBody
 
-	public ResponseEntity<Map<String, List<NotificationDetailDto>>> filterNotifications(@RequestParam("filterBy") String filterBy,
+	public ResponseEntity<Map<String, List<NotificationDetailDto>>> filterNotifications(
+			@RequestParam("filterBy") String filterBy,
 			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 			@RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
 		log.debug("Web request to filter notifications report");
@@ -140,41 +143,42 @@ public class NotificationReplyResource {
 			toDate = LocalDate.now();
 		} else if (filterBy.equals(NotificationReplyResource.CUSTOM)) {
 		}
-		
+
 		Map<String, List<NotificationDetailDto>> notifications = getFilterData(fromDate, toDate);
 		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
 
-	private Map<String, List<NotificationDetailDto>> getFilterData(LocalDate fDate,LocalDate tDate) {
+	private Map<String, List<NotificationDetailDto>> getFilterData(LocalDate fDate, LocalDate tDate) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 
 		List<NotificationDetail> notificationDetails = notificationDetailRepository
 				.findByCompanyIdAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate);
 		List<EmployeeProfileDTO> employeeDtos = employeeProfileService.findAllEmployeeByUserIdsIn(
-																				notificationDetails.stream()
-																				.map(NotificationDetail::getUserId).collect(Collectors.toList()));
-		for(EmployeeProfileDTO emp : employeeDtos) {
+				notificationDetails.stream().map(NotificationDetail::getUserId).collect(Collectors.toList()));
+		for (EmployeeProfileDTO emp : employeeDtos) {
 			System.out.println(emp.toString());
 		}
-		List<NotificationDetailDto> notificationDtoList = notificationDetails.stream().
-				map(nD -> new NotificationDetailDto(nD)).collect(Collectors.toList());
-		
-		for(NotificationDetailDto notificationDetailDto : notificationDtoList) {
-			String userName = employeeDtos.stream().filter(emp ->
-														notificationDetailDto.getUserPid().equals(emp.getUserPid()))
-														.findAny().get().getName();
+		List<User> users = userRepository.findAllByCompanyId();
+		List<NotificationDetailDto> notificationDtoList = notificationDetails.stream()
+				.map(nD -> new NotificationDetailDto(nD)).collect(Collectors.toList());
+
+		for (NotificationDetailDto notificationDetailDto : notificationDtoList) {
+			String userName = employeeDtos.stream()
+					.filter(emp -> notificationDetailDto.getUserPid().equals(emp.getUserPid())).findAny().get()
+					.getName();
+			
 			notificationDetailDto.setUserName(userName);
-			List<NotificationReplyDTO> notificationReplyDtos = notificationReplyService.getAllNotificationReplyByNotificationPidOrderByCreatedDate(notificationDetailDto.getNotification().getPid());
+			List<NotificationReplyDTO> notificationReplyDtos = notificationReplyService
+					.getAllNotificationReplyByNotificationPidOrderByCreatedDate(
+							notificationDetailDto.getNotification().getPid(),notificationDetailDto.getUserPid());
 			notificationDetailDto.setNotificationReplyDtoList(notificationReplyDtos);
 		}
 
-		Map<String,List<NotificationDetailDto>> notificationMap = 
-				notificationDtoList.stream().collect(Collectors.groupingBy(no -> 
-															no.getNotification().getPid()
-															+"~"+no.getNotification().getTitle()
-															+"~"+no.getNotification().getMessage()));
-		
+		Map<String, List<NotificationDetailDto>> notificationMap = notificationDtoList.stream()
+				.collect(Collectors.groupingBy(no -> no.getNotification().getPid() + "~"
+						+ no.getNotification().getTitle() + "~" + no.getNotification().getMessage()));
+
 		return notificationMap;
 	}
 

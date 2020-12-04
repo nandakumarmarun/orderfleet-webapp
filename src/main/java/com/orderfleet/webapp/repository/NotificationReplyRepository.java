@@ -10,5 +10,5 @@ import com.orderfleet.webapp.domain.NotificationReply;
 @Repository
 public interface NotificationReplyRepository extends JpaRepository<NotificationReply, Long> {
 
-	List<NotificationReply> findAllByNotificationPidOrderByCreatedDate(String notificationPid);
+	List<NotificationReply> findAllByNotificationPidAndCreatedByPidOrderByCreatedDate(String notificationPid,String userPid);
 }

@@ -28,6 +28,13 @@ public interface NotificationDetailRepository extends JpaRepository<Notification
 	@Transactional
 	@Modifying
 	@Query("UPDATE NotificationDetail notificationDetail SET notificationDetail.messageStatus = ?1,notificationDetail.lastModifiedDate =?3 where  notificationDetail.notification.id IN ?2")
-	int updateNotificationReadStatus(MessageStatus messageStatus, List<Long> notificationIds,LocalDateTime localDateTime);
+	int updateNotificationReadStatus(MessageStatus messageStatus, List<Long> notificationIds,
+			LocalDateTime localDateTime);
+
+	@Transactional
+	@Modifying
+	@Query("UPDATE NotificationDetail notificationDetail SET notificationDetail.messageStatus = ?1,notificationDetail.lastModifiedDate =?3 where  notificationDetail.notification.id IN ?2 and notificationDetail.userPid = ?4")
+	int updateNotificationReadStatusAndUser(MessageStatus read, List<Long> notificationIds, LocalDateTime now,
+			String userPid);
 
 }

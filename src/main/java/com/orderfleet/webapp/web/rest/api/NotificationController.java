@@ -39,6 +39,7 @@ import com.orderfleet.webapp.repository.NotificationReplyRepository;
 import com.orderfleet.webapp.repository.NotificationRepository;
 import com.orderfleet.webapp.repository.TaskRepository;
 import com.orderfleet.webapp.repository.UserDeviceRepository;
+import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.UserTaskAssignmentRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.NotificationReplyService;
@@ -81,6 +82,9 @@ public class NotificationController {
 
 	@Inject
 	private NotificationRepository notificationRepository;
+
+	@Inject
+	private UserRepository userRepository;
 
 	@Inject
 	public NotificationController(NotificationMessageRecipientRepository notificationMessageRecipientRepository,
@@ -156,15 +160,21 @@ public class NotificationController {
 	public ResponseEntity<String> chatReplyNotificationReadStatus(@Valid @RequestBody List<String> notificationPids) {
 		log.debug("Web request to save NotificationReply start");
 
+		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+
 		if (notificationPids == null || notificationPids.size() == 0) {
 			return new ResponseEntity<>("Empty data present", HttpStatus.OK);
 		}
 		log.info(notificationPids.size() + "************" + "notifications updating to read status");
 
 		List<Long> notificationIds = notificationRepository.findNotificationIdByPids(notificationPids);
-		notificationDetailRepository.updateNotificationReadStatus(MessageStatus.READ, notificationIds,
-				LocalDateTime.now());
-		return new ResponseEntity<>("Notification status updated", HttpStatus.OK);
+		if (opUser.isPresent()) {
+			notificationDetailRepository.updateNotificationReadStatusAndUser(MessageStatus.READ, notificationIds,
+					LocalDateTime.now(), opUser.get().getPid());
+			return new ResponseEntity<>("Notification status updated", HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>("No user found", HttpStatus.OK);
+		}
 	}
 
 	private void assignTaskToUser(Task task, User user, LocalDate startDate) {
