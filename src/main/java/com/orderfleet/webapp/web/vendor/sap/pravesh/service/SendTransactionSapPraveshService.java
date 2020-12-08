@@ -223,6 +223,9 @@ public class SendTransactionSapPraveshService {
 			List<AccountProfile> receiverAccountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
 
+			List<AccountProfile> supplierAccountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(supplierAccountProfileIds);
+
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
 
 			List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
@@ -246,6 +249,9 @@ public class SendTransactionSapPraveshService {
 					Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
 							.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
 
+					Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
+							.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
+
 					Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
 							.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
 
@@ -254,6 +260,14 @@ public class SendTransactionSapPraveshService {
 					salesOrder.setCustomerCode(String.valueOf(opRecAccPro.get().getId())); // Primary key id of account
 																							// profile
 					salesOrder.setCustomerName(opRecAccPro.get().getName());
+
+					salesOrder.setCustomerAddr(opRecAccPro.get().getAddress());
+
+					salesOrder
+							.setDealerCode(opSupAccPro.get().getCustomerId() != null ? opSupAccPro.get().getCustomerId()
+									: "No Customer Id");
+
+					salesOrder.setDealerName(opSupAccPro.get().getName());
 
 					LocalDateTime date = null;
 					if (obj[4] != null) {
@@ -591,7 +605,15 @@ public class SendTransactionSapPraveshService {
 						ReceiptSapPravesh receiptDTO = new ReceiptSapPravesh();
 
 						receiptDTO.setAmount(accountingVoucherDetail.getAmount());
-						receiptDTO.setCustomerCode(opAccPro.get().getAlias());
+						receiptDTO.setCustomerCode(String.valueOf(opAccPro.get().getId()));// primary key id of account
+																							// profile
+
+						receiptDTO.setDealerCode("No Dealer");
+
+						receiptDTO.setDealerName("No Dealer");
+
+						receiptDTO.setOrderNo("No Order");
+
 						receiptDTO.setCustomerName(opAccPro.get().getName());
 						receiptDTO.setPayMode(accountingVoucherDetail.getMode().toString());
 						receiptDTO.setPayRefNo(accountingVoucherDetail.getInstrumentNumber());
@@ -621,6 +643,13 @@ public class SendTransactionSapPraveshService {
 							receiptDTO.setCustomerCode(String.valueOf(opAccPro.get().getId())); // primary key id of
 																								// account profile
 							receiptDTO.setCustomerName(opAccPro.get().getName());
+
+							receiptDTO.setDealerCode("No Dealer");
+
+							receiptDTO.setDealerName("No Dealer");
+
+							receiptDTO.setOrderNo("No Order");
+
 							receiptDTO.setPayMode(
 									accountingVoucherAllocation.getAccountingVoucherDetail().getMode().toString());
 							receiptDTO.setPayRefNo(

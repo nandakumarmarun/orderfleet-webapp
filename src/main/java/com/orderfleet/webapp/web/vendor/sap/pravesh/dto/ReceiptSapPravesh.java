@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "ReceiptNo", "customerCode", "customerName", "ReceiptDate", "RefNo", "PayMode", "PayRefNo",
-		"Amount", "SalesMan", "Remarks" })
+@JsonPropertyOrder({ "ReceiptNo", "customerCode", "customerName", "DealerCode", "DealerName", "OrderNo", "ReceiptDate",
+		"RefNo", "PayMode", "PayRefNo", "Amount", "SalesMan", "Remarks" })
 public class ReceiptSapPravesh {
 
 	@JsonProperty("ReceiptNo")
@@ -17,6 +17,12 @@ public class ReceiptSapPravesh {
 	private String customerCode;
 	@JsonProperty("customerName")
 	private String customerName;
+	@JsonProperty("DealerCode")
+	private String dealerCode;
+	@JsonProperty("DealerName")
+	private String dealerName;
+	@JsonProperty("OrderNo")
+	private String orderNo;
 	@JsonProperty("ReceiptDate")
 	private String receiptDate;
 	@JsonProperty("RefNo")
@@ -60,6 +66,36 @@ public class ReceiptSapPravesh {
 	@JsonProperty("customerName")
 	public void setCustomerName(String customerName) {
 		this.customerName = customerName;
+	}
+
+	@JsonProperty("DealerCode")
+	public String getDealerCode() {
+		return dealerCode;
+	}
+
+	@JsonProperty("DealerCode")
+	public void setDealerCode(String dealerCode) {
+		this.dealerCode = dealerCode;
+	}
+
+	@JsonProperty("DealerName")
+	public String getDealerName() {
+		return dealerName;
+	}
+
+	@JsonProperty("DealerName")
+	public void setDealerName(String dealerName) {
+		this.dealerName = dealerName;
+	}
+
+	@JsonProperty("OrderNo")
+	public String getOrderNo() {
+		return orderNo;
+	}
+
+	@JsonProperty("OrderNo")
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
 	}
 
 	@JsonProperty("ReceiptDate")
