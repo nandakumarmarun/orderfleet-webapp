@@ -191,6 +191,12 @@ public class ProductProfileGarudaUploadService {
 
 			productProfile.setProductCategory(defaultCategory.get());
 			
+			StockLocationDTO stockLocationDTO = new StockLocationDTO();
+			stockLocationDTO.setName(ppDto.getStockLocation());
+			stockLocationDTO.setAlias(ppDto.getStockLocation());
+
+			stockLocationDTOs.add(stockLocationDTO);
+			
 			// Price Level 
 			PriceLevelListGarudaDTO wholeSales = new PriceLevelListGarudaDTO();
 			wholeSales.setProductProfileName(ppDto.getName());
@@ -223,11 +229,7 @@ public class ProductProfileGarudaUploadService {
 
 			productGroupDtos.add(productGroupDTO);
 
-			StockLocationDTO stockLocationDTO = new StockLocationDTO();
-			stockLocationDTO.setName(ppDto.getStockLocation());
-			stockLocationDTO.setAlias(ppDto.getStockLocation());
-
-			stockLocationDTOs.add(stockLocationDTO);
+			
 			
 			saveUpdateProductProfiles.add(productProfile);
 		}

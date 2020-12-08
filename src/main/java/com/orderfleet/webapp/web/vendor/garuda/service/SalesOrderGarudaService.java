@@ -131,18 +131,18 @@ public class SalesOrderGarudaService {
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
-			// inventoryVoucherHeaders =
-			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
+		inventoryVoucherHeaders =
+			inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
 
-			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateAscLimit(
-							documentIdList);
+//			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+//					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateAscLimit(
+//							documentIdList);
 		} else {
-			// inventoryVoucherHeaders =
-			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
+			inventoryVoucherHeaders =
+			 inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
 
-			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateAscLimit(documentIdList);
+//			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+//					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateAscLimit(documentIdList);
 		}
 		log.debug("IVH size : {}", inventoryVoucherHeaders.size());
 
