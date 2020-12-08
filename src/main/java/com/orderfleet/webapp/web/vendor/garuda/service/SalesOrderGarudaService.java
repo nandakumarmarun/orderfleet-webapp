@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,92 +15,55 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
-import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
-import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
-import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
-import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
-import com.orderfleet.webapp.repository.UserRepository;
-import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.garuda.dto.SalesOrderDetailGarudaDTO;
 import com.orderfleet.webapp.web.vendor.garuda.dto.SalesOrderGarudaDTO;
-import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoice;
-import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoiceLine;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoice;
-import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoice;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooInvoice;
-import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ApiResponseDataSapPravesh;
-import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.SalesOrderItemDetailsSapPravesh;
-import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.SalesOrderMasterSapPravesh;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPraveshService;
 
 @Service
 public class SalesOrderGarudaService {
-	
+
 	private final Logger log = LoggerFactory.getLogger(SendTransactionSapPraveshService.class);
-	
+
 	@Inject
 	private CompanyRepository companyRepository;
-	
+
 	@Inject
 	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
-	
+
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
-	
+
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
-	
-	@Inject
-	private UserRepository userRepository;
 
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
 
 	@Inject
-	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
-	
-	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
 
 	@Inject
-	private UserStockLocationRepository userStockLocationRepository;
-
-	@Inject
-	private UnitOfMeasureProductRepository unitOfMeasureProductRepository;
+	private EmployeeProfileRepository employeeProfileRepository;
 
 	@Transactional
 	public List<SalesOrderGarudaDTO> sendSalesOrder() {
@@ -131,18 +93,13 @@ public class SalesOrderGarudaService {
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
-		inventoryVoucherHeaders =
-			inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
-
-//			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-//					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateAscLimit(
-//							documentIdList);
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
+							documentIdList);
 		} else {
-			inventoryVoucherHeaders =
-			 inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
+			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
 
-//			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-//					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateAscLimit(documentIdList);
 		}
 		log.debug("IVH size : {}", inventoryVoucherHeaders.size());
 
@@ -184,26 +141,18 @@ public class SalesOrderGarudaService {
 			List<AccountProfile> receiverAccountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
 
-//			List<AccountProfile> supplierAccountProfiles = accountProfileRepository
-//					.findAllByCompanyIdAndIdsIn(receiverAccountProfileIds);
-
-			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+			List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyIdAndIdsIn(employeeIds);
 
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
 					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
-			List<UserStockLocation> userStockLocations = userStockLocationRepository.findAllByCompanyPid(companyPid);
-			List<UnitOfMeasureProduct> unitOfMeasureProducts = unitOfMeasureProductRepository.findAllByCompanyId();
 
 			for (Object[] obj : inventoryVoucherHeaders) {
-
-				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[12].toString()))
-						.findAny();
 
 				Optional<AccountProfile> opRecAccPro = receiverAccountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[16].toString())).findAny();
 
-				Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
-						.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
+				Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
+						.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
 
 				SalesOrderGarudaDTO garudaInvoice = new SalesOrderGarudaDTO();
 
@@ -215,9 +164,15 @@ public class SalesOrderGarudaService {
 
 				}
 
-				DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+				garudaInvoice.setInvoiceNo(obj[6] != null ? obj[6].toString() : "");
+				garudaInvoice.setPid(obj[9] != null ? obj[9].toString() : "");
+				garudaInvoice.setCustomerCode(
+						opRecAccPro.get().getCustomerId() != null ? opRecAccPro.get().getCustomerId() : "");
+				garudaInvoice.setEmployeeName(opEmployeeProfile.get().getName());
 				garudaInvoice.setInvoiceDate(date.format(formatter1));
-				garudaInvoice.setTotal(obj[34] != null ? Double.parseDouble(obj[34].toString()) : 0.0);
+				garudaInvoice.setTotal(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
 
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
@@ -235,12 +190,11 @@ public class SalesOrderGarudaService {
 									? inventoryVoucherDetail.getProduct().getProductId()
 									: ""));
 					garudaInvoiceDetail.setRate(inventoryVoucherDetail.getSellingRate());
+					garudaInvoiceDetail.setMrp(inventoryVoucherDetail.getMrp());
+					garudaInvoiceDetail.setDiscPer(inventoryVoucherDetail.getDiscountPercentage());
+					garudaInvoiceDetail.setTaxPer(inventoryVoucherDetail.getTaxPercentage());
+					garudaInvoiceDetail.setFreeQuantity(inventoryVoucherDetail.getFreeQuantity());
 					garudaInvoiceDetail.setQuantity(inventoryVoucherDetail.getQuantity());
-
-					Optional<UnitOfMeasureProduct> opUnitOfMeasure = unitOfMeasureProducts.stream()
-							.filter(us -> us.getProduct().getPid().equals(inventoryVoucherDetail.getProduct().getPid()))
-							.findAny();
-
 
 					garudaInvoiceDetailList.add(garudaInvoiceDetail);
 				}

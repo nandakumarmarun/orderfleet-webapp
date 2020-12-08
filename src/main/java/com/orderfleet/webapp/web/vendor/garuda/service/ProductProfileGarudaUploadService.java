@@ -72,9 +72,9 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.OdooPriceLevelList;
 
 @Service
 public class ProductProfileGarudaUploadService {
-	
+
 	private final Logger log = LoggerFactory.getLogger(ProductProfileUploadService.class);
-	
+
 	private final CompanyRepository companyRepository;
 	private final BulkOperationRepositoryCustom bulkOperationRepositoryCustom;
 	private final SyncOperationRepository syncOperationRepository;
@@ -120,13 +120,13 @@ public class ProductProfileGarudaUploadService {
 		final Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		final Long companyId = company.getId();
 		List<OpeningStockDTO> openingStockDtos = new ArrayList<>();
-		
+
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
-		
+
 		List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
-		
+
 		List<ProductGroupDTO> productGroupDtos = new ArrayList<>();
-		
+
 		List<StockLocationDTO> stockLocationDTOs = new ArrayList<>();
 
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
@@ -149,16 +149,16 @@ public class ProductProfileGarudaUploadService {
 		} else {
 			productCategory = defaultCategory.get();
 		}
-		
+
 		// Price Level
 		List<PriceLevelListGarudaDTO> wholeSalerList = new ArrayList<>();
 		List<PriceLevelListGarudaDTO> retailerList = new ArrayList<>();
-		
+
 		List<PriceLevel> priceLevels = priceLevelRepository.findByCompanyId(company.getId());
 		Set<PriceLevel> saveUpdatePriceLevels = new HashSet<>();
 
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
-		
+
 		for (ProductProfileGarudaDTO ppDto : productProfileDTOs) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
@@ -180,6 +180,7 @@ public class ProductProfileGarudaUploadService {
 			}
 			// productProfile.setAlias(ppDto.getAlias());
 			// productProfile.setDescription(ppDto.getDescription());
+			productProfile.setProductId(ppDto.getCode());
 			productProfile.setPrice(new BigDecimal(0));
 			productProfile.setMrp(ppDto.getMrp());
 			productProfile.setTaxRate(ppDto.getTaxRate());
@@ -190,26 +191,24 @@ public class ProductProfileGarudaUploadService {
 			}
 
 			productProfile.setProductCategory(defaultCategory.get());
-			
+
 			StockLocationDTO stockLocationDTO = new StockLocationDTO();
 			stockLocationDTO.setName(ppDto.getStockLocation());
 			stockLocationDTO.setAlias(ppDto.getStockLocation());
 
 			stockLocationDTOs.add(stockLocationDTO);
-			
-			// Price Level 
+
+			// Price Level
 			PriceLevelListGarudaDTO wholeSales = new PriceLevelListGarudaDTO();
 			wholeSales.setProductProfileName(ppDto.getName());
 			wholeSales.setPrice(ppDto.getWholesalePrice());
 			wholeSalerList.add(wholeSales);
-			
+
 			PriceLevelListGarudaDTO retailer = new PriceLevelListGarudaDTO();
 			retailer.setProductProfileName(ppDto.getName());
 			retailer.setPrice(ppDto.getRetailPrice());
 			retailerList.add(retailer);
-			
-			
-			
+
 			OpeningStockDTO openingStockDto = new OpeningStockDTO();
 			openingStockDto.setProductProfileName(productProfile.getName());
 			openingStockDto.setStockLocationName(ppDto.getStockLocation());
@@ -229,12 +228,10 @@ public class ProductProfileGarudaUploadService {
 
 			productGroupDtos.add(productGroupDTO);
 
-			
-			
 			saveUpdateProductProfiles.add(productProfile);
 		}
-		
-		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);		
+
+		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
 		log.info("Saving product groups");
 		saveUpdateProductGroups(productGroupDtos);
 		List<StockLocationDTO> stkLocations = stockLocationDTOs.stream().distinct().collect(Collectors.toList());
@@ -244,24 +241,23 @@ public class ProductProfileGarudaUploadService {
 		saveUpdateProductGroupProduct(productGroupProductDTOs);
 		log.info("Saving opening stock");
 		saveUpdateOpeningStock(openingStockDtos);
-		
-		
+
 		// Price List
 		List<PriceLevelGarudaDTO> plListDto = new ArrayList<>();
 		PriceLevelGarudaDTO wholeSaleDTO = new PriceLevelGarudaDTO();
 		wholeSaleDTO.setName("Wholesaler");
 		wholeSaleDTO.setPriceLevelListGarudaDTO(wholeSalerList);
 		plListDto.add(wholeSaleDTO);
-		
+
 		PriceLevelGarudaDTO retailerDTO = new PriceLevelGarudaDTO();
 		retailerDTO.setName("Retailer");
 		retailerDTO.setPriceLevelListGarudaDTO(retailerList);
 		plListDto.add(retailerDTO);
-		
+
 		log.info("PricelevelList Save", plListDto.size());
-		
+
 		if (plListDto.size() > 0) {
-			
+
 			List<PriceLevelListDTO> priceLevelListDTOs = new ArrayList<>();
 			for (PriceLevelGarudaDTO plDto : plListDto) {
 
@@ -317,12 +313,12 @@ public class ProductProfileGarudaUploadService {
 				saveUpdatePriceLevelList(priceLevelListDTOs);
 			}
 		}
-		
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
 	@Transactional
 	@Async
 	public void saveUpdateOpeningStock(List<OpeningStockDTO> openingStockDTOs) {
@@ -379,7 +375,7 @@ public class ProductProfileGarudaUploadService {
 
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
 	@Transactional
 	@Async
 	public void saveUpdateProductGroupProduct(List<TPProductGroupProductDTO> productGroupProductDTOs) {
@@ -439,7 +435,7 @@ public class ProductProfileGarudaUploadService {
 		log.info("Sync completed in {} ms", elapsedTime);
 
 	}
-	
+
 	@Transactional
 	public void saveUpdateStockLocations(final List<StockLocationDTO> list) {
 
@@ -488,7 +484,7 @@ public class ProductProfileGarudaUploadService {
 
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
 	@Transactional
 	public void saveUpdateProductGroups(final List<ProductGroupDTO> productGroupDTOs) {
 		log.info("Saving Product Groups.........");
@@ -537,7 +533,6 @@ public class ProductProfileGarudaUploadService {
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
-	
 	@Transactional
 	public void saveUpdatePriceLevelList(final List<PriceLevelListDTO> priceLevelListDTOs) {
 
@@ -609,13 +604,13 @@ public class ProductProfileGarudaUploadService {
 
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
 	@Transactional
 	@Async
 	public void saveUpdateProductGroupProduct(final List<ProductProfileGarudaDTO> productProfileDTOs, Long cId) {
 		log.info("saveUpdateProductGroupProduct company id {}", cId);
 		long start = System.nanoTime();
-		final Company company =  companyRepository.findOne(cId);
+		final Company company = companyRepository.findOne(cId);
 		final Long companyId = company.getId();
 		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
 //		if (syncOperation.getReset()) {
