@@ -1,15 +1,20 @@
 package com.orderfleet.webapp.web.rest.api;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
@@ -21,7 +26,7 @@ import com.orderfleet.webapp.web.rest.api.dto.AccountProfileGeoLocationTaggingDT
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
- *REST controller for AccountProfileGeoLocation
+ * REST controller for AccountProfileGeoLocation
  *
  * @author fahad
  * @since Jul 6, 2017
@@ -29,38 +34,61 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AccountProfileGeoLocationTaggingController {
+
+	private final Logger log = LoggerFactory.getLogger(MasterDataController.class);
+
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
-	
+
 	@Inject
 	private AccountProfileGeoLocationTaggingService accountProfileGeoLocationTaggingService;
-	
-	@RequestMapping(value="/account-profile-geo-location-tagging",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+
+	@RequestMapping(value = "/account-profile-geo-location-tagging", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<AccountProfileGeoLocationTaggingDTO> saveAccountProfileGeoLocation(@RequestBody AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO) {
+	public ResponseEntity<AccountProfileGeoLocationTaggingDTO> saveAccountProfileGeoLocation(
+			@RequestBody AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO) {
 		System.out.println(accountProfileGeoLocationTaggingDTO);
-			if(accountProfileGeoLocationTaggingDTO.getLatitude()==null){
-				return ResponseEntity.badRequest().headers(
-						HeaderUtil.createFailureAlert("accountProfileGeoLocationTagging", "latitude is null", "latitude has no value"))
-						.body(null); 
-			}
-			if(accountProfileGeoLocationTaggingDTO.getLongitude()==null){
-				return ResponseEntity.badRequest().headers(
-						HeaderUtil.createFailureAlert("accountProfileGeoLocationTagging", "longitude is null", "longitude has no value"))
-						.body(null); 
-			}
-			
-			Optional<AccountProfile> existingAccountProfile = accountProfileRepository
-					.findOneByPid(accountProfileGeoLocationTaggingDTO.getAccountProfilePid());
-			if (!existingAccountProfile.isPresent()) {
-				return ResponseEntity.badRequest().headers(
-						HeaderUtil.createFailureAlert("accountProfile", "Account Profile Not exists", "Account Profile not Present"))
-						.body(null);
-			}
-			accountProfileGeoLocationTaggingDTO.setGeoTaggingType(GeoTaggingType.MOBILE_TAGGED);
-			AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO2=accountProfileGeoLocationTaggingService.save(accountProfileGeoLocationTaggingDTO);
-			
-		return new ResponseEntity<AccountProfileGeoLocationTaggingDTO>(accountProfileGeoLocationTaggingDTO2, HttpStatus.OK);
-		
+		if (accountProfileGeoLocationTaggingDTO.getLatitude() == null) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfileGeoLocationTagging",
+					"latitude is null", "latitude has no value")).body(null);
+		}
+		if (accountProfileGeoLocationTaggingDTO.getLongitude() == null) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfileGeoLocationTagging",
+					"longitude is null", "longitude has no value")).body(null);
+		}
+
+		Optional<AccountProfile> existingAccountProfile = accountProfileRepository
+				.findOneByPid(accountProfileGeoLocationTaggingDTO.getAccountProfilePid());
+		if (!existingAccountProfile.isPresent()) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfile",
+					"Account Profile Not exists", "Account Profile not Present")).body(null);
+		}
+		accountProfileGeoLocationTaggingDTO.setGeoTaggingType(GeoTaggingType.MOBILE_TAGGED);
+		AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO2 = accountProfileGeoLocationTaggingService
+				.save(accountProfileGeoLocationTaggingDTO);
+
+		return new ResponseEntity<AccountProfileGeoLocationTaggingDTO>(accountProfileGeoLocationTaggingDTO2,
+				HttpStatus.OK);
+
+	}
+
+	// Get Account Profile Geo Tagging
+	@RequestMapping(value = "/account-profile-geo-location", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<AccountProfileGeoLocationTaggingDTO>> getAccountProfileGeoLocation(
+			@RequestParam String accountProfilePid) {
+		log.info("Get Account Profile Geo Tagging");
+
+		List<AccountProfileGeoLocationTaggingDTO> geoLocationTaggingDTOs = new ArrayList<AccountProfileGeoLocationTaggingDTO>();
+		Optional<AccountProfile> opAccp = accountProfileRepository.findOneByPid(accountProfilePid);
+
+		if (opAccp.isPresent()) {
+			geoLocationTaggingDTOs = accountProfileGeoLocationTaggingService
+					.getAllAccountProfileGeoLocationTaggingByAccountProfile(opAccp.get().getPid());
+
+		}
+
+		return new ResponseEntity<List<AccountProfileGeoLocationTaggingDTO>>(geoLocationTaggingDTOs, HttpStatus.OK);
+
 	}
 }
