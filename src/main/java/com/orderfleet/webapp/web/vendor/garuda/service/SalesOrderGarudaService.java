@@ -112,7 +112,7 @@ public class SalesOrderGarudaService {
 
 		List<SalesOrderGarudaDTO> garudaInvoicesList = new ArrayList<>();
 		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
-		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_ORDER,
 				company.getId());
 
 		if (primarySecDoc.isEmpty()) {
