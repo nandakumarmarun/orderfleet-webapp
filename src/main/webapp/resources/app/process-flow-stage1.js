@@ -46,8 +46,23 @@ if (!this.InventoryVoucher) {
 		$("#btnApply").on('click', function() {
 			InventoryVoucher.filter();
 		});
+		
+		$('#btnDownload').on('click', function() {
+			var tblProcessFlow = $("#tblProcessFlow tbody");
+			if (tblProcessFlow.children().length == 0) {
+				alert("no values available");
+				return;
+			}
+			var name = "inflow"
+			downloadXls1(name);
+		});
 
 	});
+	
+	function downloadXls1(excelName) {
+		 var table2excel = new Table2Excel();
+	     table2excel.export(document.getElementById('tblProcessFlow'),excelName);
+	}
 
 	function loadAllDocumentByDocumentType() {
 		if ($('#dbDocumentType').val() == "no") {
