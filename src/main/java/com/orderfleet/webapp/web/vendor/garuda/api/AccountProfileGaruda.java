@@ -28,9 +28,6 @@ public class AccountProfileGaruda {
 	private final Logger log = LoggerFactory.getLogger(AccountProfileGaruda.class);
 	
 	@Inject
-	private SyncOperationRepository syncOperationRepository;
-	
-	@Inject
 	private AccountProfileGarudaUploadService accountProfileGarudaUploadService;
 	
 	@RequestMapping(value = "/account-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

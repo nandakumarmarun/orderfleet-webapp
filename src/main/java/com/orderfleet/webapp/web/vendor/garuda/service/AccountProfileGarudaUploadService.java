@@ -128,7 +128,6 @@ public class AccountProfileGarudaUploadService {
 			accountProfile.setClosingBalance(apDto.getClosingBalance());
 			accountProfile.setCustomerId(apDto.getCode());
 			// account type
-			log.info("AccountProfileAccount type == null :" + accountProfile.getAccountType());
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}
@@ -137,7 +136,6 @@ public class AccountProfileGarudaUploadService {
 
 			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
 
-			log.info("Account profile getCode {}", apDto.getCode());
 			if (apDto.getCode() == null || apDto.getCode().equalsIgnoreCase("")) {
 				locationAccountProfileDto.setAccountProfileName(apDto.getName());
 				locationAccountProfileDto.setLocationName("Territory");
