@@ -41,7 +41,8 @@ if (!this.MobileConfiguration) {
 		findLocation : true,
 		enableDynamicUnit : false,
 		enableDiscountRoundOffColumn : false,
-		stockLocationProducts : false
+		stockLocationProducts : false,
+		salesOrderAllocation : false
 	};
 
 	$(document).ready(function() {
@@ -132,6 +133,9 @@ if (!this.MobileConfiguration) {
 				"#enableDiscountRoundOffColumn").is(":checked");
 		mobileConfigurationDTO.stockLocationProducts = $(
 				"#stockLocationProducts").is(":checked");
+		mobileConfigurationDTO.salesOrderAllocation = $(
+		"#salesOrderAllocation").is(":checked");
+		
 
 		$.ajax({
 			url : contextPath,
@@ -217,6 +221,9 @@ if (!this.MobileConfiguration) {
 									data.enableDiscountRoundOffColumn);
 							$('#stockLocationProducts').prop("checked",
 									data.stockLocationProducts);
+							$('#salesOrderAllocation').prop("checked",
+									data.salesOrderAllocation);
+							
 
 						}
 
