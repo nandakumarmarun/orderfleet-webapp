@@ -241,12 +241,10 @@ public class SendInvoiceOdooService {
 
 					OdooInvoiceLine odooInvoiceLine = new OdooInvoiceLine();
 
-					odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountAmount());
-					if (inventoryVoucherDetail.getFreeQuantity() > 0.0) {
-						odooInvoiceLine.setIs_foc(true);
-					} else {
-						odooInvoiceLine.setIs_foc(false);
-					}
+					odooInvoiceLine.setIs_foc(
+							inventoryVoucherDetail.getFreeQuantity() > 0.0 ? inventoryVoucherDetail.getFreeQuantity()
+									: 0.0);
+
 					odooInvoiceLine.setProduct_id(inventoryVoucherDetail.getProduct().getProductId() != null
 							&& !inventoryVoucherDetail.getProduct().getProductId().equals("")
 									? Long.parseLong(inventoryVoucherDetail.getProduct().getProductId())
@@ -607,11 +605,9 @@ public class SendInvoiceOdooService {
 					OdooInvoiceLine odooInvoiceLine = new OdooInvoiceLine();
 
 					odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountAmount());
-					if (inventoryVoucherDetail.getFreeQuantity() > 0.0) {
-						odooInvoiceLine.setIs_foc(true);
-					} else {
-						odooInvoiceLine.setIs_foc(false);
-					}
+					odooInvoiceLine.setIs_foc(
+							inventoryVoucherDetail.getFreeQuantity() > 0.0 ? inventoryVoucherDetail.getFreeQuantity()
+									: 0.0);
 					odooInvoiceLine.setProduct_id(inventoryVoucherDetail.getProduct().getProductId() != null
 							&& !inventoryVoucherDetail.getProduct().getProductId().equals("")
 									? Long.parseLong(inventoryVoucherDetail.getProduct().getProductId())

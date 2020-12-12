@@ -475,6 +475,8 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ content
 																	+ "</td><td>"
+																	+ inventoryVoucher.supplierAccountName
+																	+ "</td><td>"
 																	+ inventoryVoucher.totalVolume
 																			.toFixed(2)
 																	+ "</td><td>"

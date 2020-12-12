@@ -54,7 +54,7 @@ public class AccountingVoucherHeader implements Serializable {
 	private String pid;
 
 	@NotNull
-	//@ManyToOne
+	// @ManyToOne
 	@ManyToOne
 	private ExecutiveTaskExecution executiveTaskExecution;
 
@@ -65,6 +65,12 @@ public class AccountingVoucherHeader implements Serializable {
 	@NotNull
 	@ManyToOne
 	private AccountProfile accountProfile;
+
+	@ManyToOne
+	private AccountProfile supplierAccount;
+
+	@Column(name = "order_ref_no", length = 1000)
+	private String orderReferenceNumber;
 
 	@NotNull
 	@Column(name = "created_date", nullable = false)
@@ -94,7 +100,7 @@ public class AccountingVoucherHeader implements Serializable {
 	@NotNull
 	private Company company;
 
-	//@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	// @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "accounting_voucher_header_id")
 	@Fetch(value = FetchMode.SUBSELECT)
@@ -308,6 +314,22 @@ public class AccountingVoucherHeader implements Serializable {
 
 	public void setFiles(Set<File> files) {
 		this.files = files;
+	}
+
+	public AccountProfile getSupplierAccount() {
+		return supplierAccount;
+	}
+
+	public void setSupplierAccount(AccountProfile supplierAccount) {
+		this.supplierAccount = supplierAccount;
+	}
+
+	public String getOrderReferenceNumber() {
+		return orderReferenceNumber;
+	}
+
+	public void setOrderReferenceNumber(String orderReferenceNumber) {
+		this.orderReferenceNumber = orderReferenceNumber;
 	}
 
 }
