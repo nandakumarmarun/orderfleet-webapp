@@ -79,6 +79,10 @@ public class AccountingVoucherHeaderDTO {
 
 	private Boolean imageButtonVisible = Boolean.FALSE;;
 
+	private String supplierAccountPid;
+
+	private String orderReferenceNumber;
+
 	public AccountingVoucherHeaderDTO() {
 		super();
 	}
@@ -166,6 +170,22 @@ public class AccountingVoucherHeaderDTO {
 
 	public void setPid(String pid) {
 		this.pid = pid;
+	}
+
+	public String getSupplierAccountPid() {
+		return supplierAccountPid;
+	}
+
+	public void setSupplierAccountPid(String supplierAccountPid) {
+		this.supplierAccountPid = supplierAccountPid;
+	}
+
+	public String getOrderReferenceNumber() {
+		return orderReferenceNumber;
+	}
+
+	public void setOrderReferenceNumber(String orderReferenceNumber) {
+		this.orderReferenceNumber = orderReferenceNumber;
 	}
 
 	public String getDocumentPid() {

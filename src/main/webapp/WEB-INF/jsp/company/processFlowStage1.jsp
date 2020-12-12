@@ -112,10 +112,10 @@
 								<button type="button" class="btn btn-info"
 									onclick="InventoryVoucher.filter()">Apply</button>
 							</div>
-							<div class="col-sm-1">
-								<br>
-								<button type="button" class="btn btn-success" id="downloadXls">Download</button>
-							</div>
+<!-- 							<div class="col-sm-1"> -->
+<!-- 								<br> -->
+<!-- 								<button type="button" class="btn btn-success" id="downloadXls">Download</button> -->
+<!-- 							</div> -->
 <!-- 							<div class="col-sm-1"> -->
 <!-- 								<br> -->
 <!-- 								<button type="button" class="btn btn-success" id="btnDownload">Download Xls</button> -->

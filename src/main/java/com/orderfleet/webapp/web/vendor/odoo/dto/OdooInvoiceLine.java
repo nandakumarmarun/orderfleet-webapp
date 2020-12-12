@@ -14,7 +14,7 @@ public class OdooInvoiceLine {
 
 	private double discount;
 
-	private boolean is_foc;
+	private double is_foc;
 
 	public long getUom_id() {
 		return uom_id;
@@ -56,11 +56,11 @@ public class OdooInvoiceLine {
 		this.discount = discount;
 	}
 
-	public boolean getIs_foc() {
+	public double getIs_foc() {
 		return is_foc;
 	}
 
-	public void setIs_foc(boolean is_foc) {
+	public void setIs_foc(double is_foc) {
 		this.is_foc = is_foc;
 	}
 
