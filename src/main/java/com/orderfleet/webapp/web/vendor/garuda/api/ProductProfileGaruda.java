@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.vendor.garuda.dto.ProductProfileGarudaDTO;
 import com.orderfleet.webapp.web.vendor.garuda.service.ProductProfileGarudaUploadService;
 

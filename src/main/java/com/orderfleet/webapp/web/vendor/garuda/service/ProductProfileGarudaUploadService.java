@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -27,24 +30,19 @@ import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
-import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.StockLocationType;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
-import com.orderfleet.webapp.repository.EcomProductProfileProductRepository;
-import com.orderfleet.webapp.repository.EcomProductProfileRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.PriceLevelListRepository;
 import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
-import com.orderfleet.webapp.repository.ProductGroupEcomProductsRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.SyncOperationRepository;
-import com.orderfleet.webapp.repository.TaxMasterRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.OpeningStockService;
@@ -55,20 +53,15 @@ import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.util.RandomUtil;
-import com.orderfleet.webapp.web.ecom.mapper.EcomProductProfileMapper;
 import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelListDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.StockLocationDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
-import com.orderfleet.webapp.web.rest.mapper.TaxMasterMapper;
 import com.orderfleet.webapp.web.vendor.excel.service.ProductProfileUploadService;
 import com.orderfleet.webapp.web.vendor.garuda.dto.PriceLevelGarudaDTO;
 import com.orderfleet.webapp.web.vendor.garuda.dto.PriceLevelListGarudaDTO;
 import com.orderfleet.webapp.web.vendor.garuda.dto.ProductProfileGarudaDTO;
-import com.orderfleet.webapp.web.vendor.odoo.dto.OdooPriceLevel;
-import com.orderfleet.webapp.web.vendor.odoo.dto.OdooPriceLevelList;
 
 @Service
 public class ProductProfileGarudaUploadService {
@@ -234,8 +227,9 @@ public class ProductProfileGarudaUploadService {
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
 		log.info("Saving product groups");
 		saveUpdateProductGroups(productGroupDtos);
-		List<StockLocationDTO> stkLocations = stockLocationDTOs.stream().distinct().collect(Collectors.toList());
-		log.info("Saving Stock Locations....");
+		log.info("Stock Location Size {}", stockLocationDTOs.size());
+		List<StockLocationDTO> stkLocations = stockLocationDTOs.stream().filter(distinctByKey(cpt -> cpt.getName())).collect(Collectors.toList());
+		log.info("Saving Stock Locations.... {}", stkLocations.size());
 		saveUpdateStockLocations(stkLocations);
 		log.info("Saving product group product profiles");
 		saveUpdateProductGroupProduct(productGroupProductDTOs);
@@ -647,5 +641,11 @@ public class ProductProfileGarudaUploadService {
 		double elapsedTime = (end - start) / 1000000.0;
 		log.info("Product Group Product Sync completed in {} ms", elapsedTime);
 	}
+	
+	public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+	    Map<Object,Boolean> seen = new ConcurrentHashMap<>();
+	    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+	}
+
 
 }

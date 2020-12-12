@@ -545,6 +545,12 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("UPDATE InventoryVoucherHeader iv SET iv.tallyDownloadStatus = ?1  WHERE  iv.company.id = ?2  AND iv.pid in ?3")
 	int updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(TallyDownloadStatus tallyDownloadStatus,
 			Long companyId, List<String> inventoryPids);
+	
+	@Transactional
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE InventoryVoucherHeader iv SET iv.tallyDownloadStatus = ?1  WHERE  iv.company.id = ?2  AND iv.documentNumberServer in ?3")
+	int updateInventoryVoucherHeaderDownloadStatusUsingDocumentNumberServerAndCompanyId(TallyDownloadStatus tallyDownloadStatus,
+			Long companyId, List<String> documentNumberServer);
 
 	@Query(value = PRIMARY_SALES_ORDER_EXCEl, nativeQuery = true)
 	List<Object[]> getPrimarySalesOrderForExcel(Long companyId, List<Long> documentIds);

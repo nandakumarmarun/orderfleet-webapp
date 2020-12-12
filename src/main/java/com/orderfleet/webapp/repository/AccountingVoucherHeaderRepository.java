@@ -215,6 +215,12 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("UPDATE AccountingVoucherHeader accVoucher SET accVoucher.tallyDownloadStatus = ?1 WHERE accVoucher.company.id = ?2 AND accVoucher.pid in ?3")
 	int updateAccountingVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus tallyDownloadStatus,
 			long companyId, List<String> accountingPids);
+	
+	@Transactional
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE AccountingVoucherHeader accVoucher SET accVoucher.tallyDownloadStatus = ?1 WHERE accVoucher.company.id = ?2 AND accVoucher.documentNumberServer in ?3")
+	int updateAccountingVoucherHeaderDownloadStatusUsingDocumentNumberServer(TallyDownloadStatus tallyDownloadStatus,
+			long companyId, List<String> docNumberServer);
 
 	@Transactional
 	@Modifying(clearAutomatically = true)

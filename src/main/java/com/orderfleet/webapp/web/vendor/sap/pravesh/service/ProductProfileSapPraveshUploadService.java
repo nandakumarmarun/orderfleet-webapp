@@ -286,7 +286,7 @@ public class ProductProfileSapPraveshUploadService {
 	@Transactional
 	public void saveUpdateStockLocations(final List<StockLocationDTO> list) {
 
-		log.info("Saving Stock Locations.........");
+		log.info("Saving Stock Locations......... {}", list.size());
 
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
