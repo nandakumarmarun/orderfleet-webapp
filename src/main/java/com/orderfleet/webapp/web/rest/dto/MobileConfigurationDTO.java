@@ -47,6 +47,7 @@ public class MobileConfigurationDTO {
 	private boolean enableDynamicUnit;
 	private boolean enableDiscountRoundOffColumn;
 	private boolean stockLocationProducts;
+	private boolean salesOrderAllocation;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -87,6 +88,7 @@ public class MobileConfigurationDTO {
 		this.enableDynamicUnit = mobileConfiguration.getEnableDynamicUnit();
 		this.enableDiscountRoundOffColumn = mobileConfiguration.getEnableDiscountRoundOffColumn();
 		this.stockLocationProducts = mobileConfiguration.getStockLocationProducts();
+		this.salesOrderAllocation = mobileConfiguration.getSalesOrderAllocation();
 	}
 
 	public String getPid() {
@@ -351,6 +353,14 @@ public class MobileConfigurationDTO {
 
 	public void setStockLocationProducts(boolean stockLocationProducts) {
 		this.stockLocationProducts = stockLocationProducts;
+	}
+
+	public boolean getSalesOrderAllocation() {
+		return salesOrderAllocation;
+	}
+
+	public void setSalesOrderAllocation(boolean salesOrderAllocation) {
+		this.salesOrderAllocation = salesOrderAllocation;
 	}
 
 }

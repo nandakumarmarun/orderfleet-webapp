@@ -727,4 +727,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query(value = DOCUMENT_BASED_ORDER_DOWNLOAD_TALLY_LIMIT, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateAscLimit(List<Long> documentIdList);
+
+	@Query("select inventoryVoucher.documentNumberServer,inventoryVoucher.documentTotal,inventoryVoucher.documentDate from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.receiverAccount.pid = ?1 and inventoryVoucher.createdBy.pid = ?2 and inventoryVoucher.company.id = ?#{principal.companyId}")
+	List<Object[]> findAllByCompanyIdAccountPidUserAndDateCreatedDateDesc(String accountPid, String userPid);
 }

@@ -67,6 +67,7 @@
 						<th>Enable Dynamic Units</th>
 						<th>Enable Discount & Roundoff Column</th>
 						<th>Stock Location Products</th>
+						<th>Sales Order Allocation</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -105,6 +106,7 @@
 							<td>${mobileConfiguration.enableDynamicUnit}</td>
 							<td>${mobileConfiguration.enableDiscountRoundOffColumn}</td>
 							<td>${mobileConfiguration.stockLocationProducts}</td>
+							<td>${mobileConfiguration.salesOrderAllocation}</td>
 
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
@@ -352,6 +354,14 @@
 													<label class="control-label">Stock Location
 														Products</label> <input id="stockLocationProducts"
 														name='stockLocationProducts' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Sales Order Allocation</label>
+													<input id="salesOrderAllocation"
+														name='salesOrderAllocation' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

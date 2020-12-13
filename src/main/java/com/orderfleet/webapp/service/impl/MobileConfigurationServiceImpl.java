@@ -75,6 +75,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setEnableDynamicUnit(mobileConfigurationDTO.getEnableDynamicUnit());
 		configuration.setEnableDiscountRoundOffColumn(mobileConfigurationDTO.getEnableDiscountRoundOffColumn());
 		configuration.setStockLocationProducts(mobileConfigurationDTO.getStockLocationProducts());
+		configuration.setSalesOrderAllocation(mobileConfigurationDTO.getSalesOrderAllocation());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -114,6 +115,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setEnableDynamicUnit(mobileConfigurationDTO.getEnableDynamicUnit());
 			configuration.setEnableDiscountRoundOffColumn(mobileConfigurationDTO.getEnableDiscountRoundOffColumn());
 			configuration.setStockLocationProducts(mobileConfigurationDTO.getStockLocationProducts());
+			configuration.setSalesOrderAllocation(mobileConfigurationDTO.getSalesOrderAllocation());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

@@ -140,6 +140,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "enable_discount_round_off_column", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean enableDiscountRoundOffColumn;
 
+	@Column(name = "sales_order_allocation", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean salesOrderAllocation;
+
 	@Column(name = "stock_location_products", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean stockLocationProducts;
 
@@ -421,6 +424,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setStockLocationProducts(boolean stockLocationProducts) {
 		this.stockLocationProducts = stockLocationProducts;
+	}
+
+	public boolean getSalesOrderAllocation() {
+		return salesOrderAllocation;
+	}
+
+	public void setSalesOrderAllocation(boolean salesOrderAllocation) {
+		this.salesOrderAllocation = salesOrderAllocation;
 	}
 
 	@Override

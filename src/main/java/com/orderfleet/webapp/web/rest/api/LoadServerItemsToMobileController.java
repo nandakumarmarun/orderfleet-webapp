@@ -39,6 +39,7 @@ import com.orderfleet.webapp.domain.FormFormElement;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.DocumentType;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
@@ -58,6 +59,7 @@ import com.orderfleet.webapp.web.rest.api.dto.DocumentDashboardDTO;
 import com.orderfleet.webapp.web.rest.api.dto.FormFormElementDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerExeTaskDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerSentItemDTO;
+import com.orderfleet.webapp.web.rest.api.dto.SalesOrderAllocationDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
@@ -117,6 +119,9 @@ public class LoadServerItemsToMobileController {
 
 	@Inject
 	private FormFormElementService formFormElementService;
+
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
 
 	@Inject
 	private AccountProfileMapper accountProfileMapper;
@@ -336,6 +341,46 @@ public class LoadServerItemsToMobileController {
 			productQuantityList.add(productProfileDto);
 		}
 		return productQuantityList;
+	}
+
+	@GetMapping("/customer-wise-sales-order")
+	public ResponseEntity<List<SalesOrderAllocationDTO>> sentCustomerWiseSalesOrder(@RequestParam String accountPid) {
+
+		String userLogin = SecurityUtils.getCurrentUserLogin();
+
+		log.info("Request to customer-wise-sales-order..." + accountPid + " logged user : " + userLogin);
+
+		Optional<User> opUser = userRepository.findOneByLogin(userLogin);
+		Optional<AccountProfile> opAccountProfile = accountProfileRepository.findOneByPid(accountPid);
+
+		List<SalesOrderAllocationDTO> salesOrderAllocationDTOs = new ArrayList<>();
+
+		if (opUser.isPresent() && opAccountProfile.isPresent()) {
+			List<Object[]> objectArray = inventoryVoucherHeaderRepository
+					.findAllByCompanyIdAccountPidUserAndDateCreatedDateDesc(opAccountProfile.get().getPid(),
+							opUser.get().getPid());
+
+			for (Object[] obj : objectArray) {
+				SalesOrderAllocationDTO salesOrderAllocationDTO = new SalesOrderAllocationDTO();
+				salesOrderAllocationDTO.setDocumentNumber(obj[0].toString());
+				salesOrderAllocationDTO.setDocumentAmount(Double.parseDouble(obj[1].toString()));
+
+				LocalDateTime date = null;
+				if (obj[2] != null) {
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+					String[] splitDate = obj[2].toString().split("T");
+					date = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
+				}
+
+				DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+				salesOrderAllocationDTO.setDocumentDate(date.format(formatter1));
+
+				salesOrderAllocationDTOs.add(salesOrderAllocationDTO);
+			}
+		}
+
+		return new ResponseEntity<>(salesOrderAllocationDTOs, HttpStatus.OK);
 	}
 
 	@GetMapping("/load-server-document-wise-count")
