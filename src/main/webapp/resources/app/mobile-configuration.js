@@ -42,7 +42,8 @@ if (!this.MobileConfiguration) {
 		enableDynamicUnit : false,
 		enableDiscountRoundOffColumn : false,
 		stockLocationProducts : false,
-		salesOrderAllocation : false
+		salesOrderAllocation : false,
+		rateWithoutCalculation : false
 	};
 
 	$(document).ready(function() {
@@ -133,9 +134,10 @@ if (!this.MobileConfiguration) {
 				"#enableDiscountRoundOffColumn").is(":checked");
 		mobileConfigurationDTO.stockLocationProducts = $(
 				"#stockLocationProducts").is(":checked");
-		mobileConfigurationDTO.salesOrderAllocation = $(
-		"#salesOrderAllocation").is(":checked");
-		
+		mobileConfigurationDTO.salesOrderAllocation = $("#salesOrderAllocation")
+				.is(":checked");
+		mobileConfigurationDTO.rateWithoutCalculation = $(
+				"#rateWithoutCalculation").is(":checked");
 
 		$.ajax({
 			url : contextPath,
@@ -223,7 +225,8 @@ if (!this.MobileConfiguration) {
 									data.stockLocationProducts);
 							$('#salesOrderAllocation').prop("checked",
 									data.salesOrderAllocation);
-							
+							$('#rateWithoutCalculation').prop("checked",
+									data.rateWithoutCalculation);
 
 						}
 

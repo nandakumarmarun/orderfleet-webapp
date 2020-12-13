@@ -66,12 +66,6 @@ public class AccountingVoucherHeader implements Serializable {
 	@ManyToOne
 	private AccountProfile accountProfile;
 
-	@ManyToOne
-	private AccountProfile supplierAccount;
-
-	@Column(name = "order_ref_no", length = 1000)
-	private String orderReferenceNumber;
-
 	@NotNull
 	@Column(name = "created_date", nullable = false)
 	private LocalDateTime createdDate = LocalDateTime.now();
@@ -314,22 +308,6 @@ public class AccountingVoucherHeader implements Serializable {
 
 	public void setFiles(Set<File> files) {
 		this.files = files;
-	}
-
-	public AccountProfile getSupplierAccount() {
-		return supplierAccount;
-	}
-
-	public void setSupplierAccount(AccountProfile supplierAccount) {
-		this.supplierAccount = supplierAccount;
-	}
-
-	public String getOrderReferenceNumber() {
-		return orderReferenceNumber;
-	}
-
-	public void setOrderReferenceNumber(String orderReferenceNumber) {
-		this.orderReferenceNumber = orderReferenceNumber;
 	}
 
 }

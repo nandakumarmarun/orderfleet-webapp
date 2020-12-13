@@ -668,10 +668,6 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				// Set unique server number
 				accountingVoucherHeader.setDocumentNumberServer(accountingVoucherDTO.getDocumentNumberLocal());
 
-				if (accountingVoucherDTO.getSupplierAccountPid() != null)
-					accountingVoucherHeader.setSupplierAccount(
-							accountProfileRepository.findOneByPid(accountingVoucherDTO.getSupplierAccountPid()).get());
-				accountingVoucherHeader.setOrderReferenceNumber(accountingVoucherDTO.getOrderReferenceNumber());
 
 				// set voucher details
 				List<AccountingVoucherDetail> accountingVoucherDetails = new ArrayList<>();
