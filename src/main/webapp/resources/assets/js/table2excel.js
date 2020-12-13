@@ -2617,7 +2617,7 @@
 	 * fulfill the criteria of an input field cell.
 	 */
 	exports.default = function (cell) {
-	  var span = cell.querySelector('span');
+	  var span = cell.querySelector('div.dropdown span');
 	  
 	  if (span != null) {
 		return { t: 'n', v: span.textContent };
@@ -2730,6 +2730,39 @@
 	  input = cell.querySelector('select');
 	  if (input) return { t: 's', v: input.options[input.selectedIndex].textContent };
 
+	  return null;
+	};
+
+/***/ },
+/* 105 */
+function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	/**
+	 * Generates a cell object for an input field cell.
+	 *
+	 * @param {HTMLTableCellElement} cell - The cell.
+	 *
+	 * @returns {object} - A cell object of the cell or `null` if the cell doesn't
+	 * fulfill the criteria of an input field cell.
+	 */
+	exports.default = function (cell) {
+	  var input = cell.querySelector('input[type="date"]');
+	  function getValue(date) {
+	    var offset = new Date().getTimezoneOffset() * 60000;
+	    return new Date(date - offset).toISOString();
+	  }
+
+	  if (input != null && input.value != null) {
+		var date = new Date(input.value);
+		if (!isNaN(date)) return { t: 'd', v: getValue(date) };
+	  }
+	  
 	  return null;
 	};
 
