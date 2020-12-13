@@ -145,12 +145,15 @@
 	 * to a xlsx-file via its function `export`.
 	 */
 
+	 
 	var Table2Excel = function () {
+		var exCol = [];
 	  /**
 	   * @param {object} options - Overrides the default options.
 	   */
 	  function Table2Excel() {
-	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+		var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+		exCol = options.hasOwnProperty('exlCol')? options.exlCol: [];
 	    (0, _classCallCheck3.default)(this, Table2Excel);
 
 	    (0, _extends3.default)(this, defaultOptions, options);
@@ -222,7 +225,7 @@
 	        throw new Error('Element must be a table');
 	      }
 
-	      return (0, _dataToWorksheet2.default)((0, _tableToData2.default)(table), typeHandlers);
+	      return (0, _dataToWorksheet2.default)((0, _tableToData2.default)(table, exCol), typeHandlers);
 	    }
 
 	    /**
@@ -2295,7 +2298,7 @@
 	 * @param {HTMLTableElment} table - The table.
 	 * @returns { { cells: Array, ranges: Array } } - The table object.
 	 */
-	function tableToData(table) {
+	function tableToData(table, exCol) {
 	  var cells = [];
 	  var ranges = [];
 
@@ -2332,9 +2335,11 @@
 	            c: cells[rowIndex].length + colspan - 1
 	          }
 	        });
-	      }
-
-	      cells[rowIndex].push(cell);
+		  }
+		  
+		  if (!exCol.includes(cell.cellIndex)) { // [0,8,13]
+			cells[rowIndex].push(cell);
+		  }
 
 	      // if we are in a following colspan ...
 	      if (colspan > 1) {
@@ -2612,25 +2617,29 @@
 	 * fulfill the criteria of an input field cell.
 	 */
 	exports.default = function (cell) {
-	  var list = cell.querySelector('ul, ol');
-
-	  if (list) {
-	    var _ret = function () {
-	      var string = '';
-	      var items = (0, _from2.default)(list.querySelectorAll('li'));
-
-	      items.forEach(function (item, index) {
-	        string += item.textContent;
-	        string += index < items.length - 1 ? ', ' : '';
-	      });
-
-	      return {
-	        v: { t: 's', v: string }
-	      };
-	    }();
-
-	    if ((typeof _ret === 'undefined' ? 'undefined' : (0, _typeof3.default)(_ret)) === "object") return _ret.v;
+	  var span = cell.querySelector('span');
+	  
+	  if (span != null) {
+		return { t: 'n', v: span.textContent };
 	  }
+
+	//   if (list) {
+	//     var _ret = function () {
+	//       var string = '';
+	//       var items = (0, _from2.default)(list.querySelectorAll('li'));
+
+	//       items.forEach(function (item, index) {
+	//         string += item.textContent;
+	//         string += index < items.length - 1 ? ', ' : '';
+	//       });
+
+	//       return {
+	//         v: { t: 's', v: string }
+	//       };
+	//     }();
+
+	//     if ((typeof _ret === 'undefined' ? 'undefined' : (0, _typeof3.default)(_ret)) === "object") return _ret.v;
+	//   }
 
 	  return null;
 	};

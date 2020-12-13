@@ -116,10 +116,10 @@
 <!-- 								<br> -->
 <!-- 								<button type="button" class="btn btn-success" id="downloadXls">Download</button> -->
 <!-- 							</div> -->
-<!-- 							<div class="col-sm-1"> -->
-<!-- 								<br> -->
-<!-- 								<button type="button" class="btn btn-success" id="btnDownload">Download Xls</button> -->
-<!-- 							</div> -->
+								<div class="col-sm-1">
+									<br>
+									<button type="button" class="btn btn-success" id="btnDownload">Download Xls</button>
+								</div>
 						</div>
 					</form>
 				</div>

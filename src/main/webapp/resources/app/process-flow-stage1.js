@@ -60,7 +60,7 @@ if (!this.InventoryVoucher) {
 	});
 	
 	function downloadXls1(excelName) {
-		 var table2excel = new Table2Excel();
+		 var table2excel = new Table2Excel({exlCol: [0,8,13]});
 	     table2excel.export(document.getElementById('tblProcessFlow'),excelName);
 	}
 

@@ -116,6 +116,10 @@
 <!-- 								<br> -->
 <!-- 								<button type="button" class="btn btn-success" id="downloadXls">Download</button> -->
 <!-- 							</div> -->
+							<div class="col-sm-1">
+									<br>
+									<button type="button" class="btn btn-success" id="btnDownload">Download Xls</button>
+								</div>
 						</div>
 					</form>
 				</div>
@@ -137,7 +141,7 @@
 			<div class="table-responsive">
 
 
-				<table class="table  table-striped table-bordered">
+				<table id='tblProcessFlow' class="table  table-striped table-bordered">
 					<thead>
 						<tr>
 							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
@@ -301,6 +305,10 @@
 		</div>
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
+	
+	<spring:url value="/resources/assets/js/table2excel.js"
+		var="table2excel"></spring:url>
+	<script type="text/javascript" src="${table2excel}"></script>
 
 	<spring:url value="/resources/app/process-flow-stage6.js"
 		var="inventoryVoucherJs"></spring:url>
