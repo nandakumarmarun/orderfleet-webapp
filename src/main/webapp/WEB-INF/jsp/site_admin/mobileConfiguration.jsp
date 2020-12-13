@@ -68,6 +68,7 @@
 						<th>Enable Discount & Roundoff Column</th>
 						<th>Stock Location Products</th>
 						<th>Sales Order Allocation</th>
+						<th>Rate Without Calculation</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -107,6 +108,7 @@
 							<td>${mobileConfiguration.enableDiscountRoundOffColumn}</td>
 							<td>${mobileConfiguration.stockLocationProducts}</td>
 							<td>${mobileConfiguration.salesOrderAllocation}</td>
+							<td>${mobileConfiguration.rateWithoutCalculation}</td>
 
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
@@ -142,8 +144,9 @@
 										class="form-control selectpicker" data-live-search="true"><option
 											value="-1">Select Company</option>
 										<c:forEach items="${companies}" var="company">
-											<option value="${company.pid}">${company.legalName}</option>
-										</c:forEach>
+											<option value="${company.pid}">${company.legalName}
+										</option>
+							</c:forEach>
 									</select>
 								</div>
 							</div>
@@ -365,8 +368,14 @@
 														class="form-control" />
 												</div></td>
 										</tr>
-
-
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Rate Without Allocation</label>
+													<input id="rateWithoutCalculation"
+														name='rateWithoutCalculation' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Vchr.No Generation

@@ -143,6 +143,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "sales_order_allocation", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean salesOrderAllocation;
 
+	@Column(name = "rate_without_calculation", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean rateWithoutCalculation;
+
 	@Column(name = "stock_location_products", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean stockLocationProducts;
 
@@ -432,6 +435,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setSalesOrderAllocation(boolean salesOrderAllocation) {
 		this.salesOrderAllocation = salesOrderAllocation;
+	}
+
+	public boolean getRateWithoutCalculation() {
+		return rateWithoutCalculation;
+	}
+
+	public void setRateWithoutCalculation(boolean rateWithoutCalculation) {
+		this.rateWithoutCalculation = rateWithoutCalculation;
 	}
 
 	@Override

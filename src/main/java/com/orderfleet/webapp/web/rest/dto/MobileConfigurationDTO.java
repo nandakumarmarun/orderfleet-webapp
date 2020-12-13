@@ -1,5 +1,7 @@
 package com.orderfleet.webapp.web.rest.dto;
 
+import javax.persistence.Column;
+
 import com.orderfleet.webapp.domain.MobileConfiguration;
 import com.orderfleet.webapp.domain.enums.CartType;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
@@ -48,6 +50,7 @@ public class MobileConfigurationDTO {
 	private boolean enableDiscountRoundOffColumn;
 	private boolean stockLocationProducts;
 	private boolean salesOrderAllocation;
+	private boolean rateWithoutCalculation;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -89,6 +92,7 @@ public class MobileConfigurationDTO {
 		this.enableDiscountRoundOffColumn = mobileConfiguration.getEnableDiscountRoundOffColumn();
 		this.stockLocationProducts = mobileConfiguration.getStockLocationProducts();
 		this.salesOrderAllocation = mobileConfiguration.getSalesOrderAllocation();
+		this.rateWithoutCalculation = mobileConfiguration.getRateWithoutCalculation();
 	}
 
 	public String getPid() {
@@ -361,6 +365,14 @@ public class MobileConfigurationDTO {
 
 	public void setSalesOrderAllocation(boolean salesOrderAllocation) {
 		this.salesOrderAllocation = salesOrderAllocation;
+	}
+
+	public boolean getRateWithoutCalculation() {
+		return rateWithoutCalculation;
+	}
+
+	public void setRateWithoutCalculation(boolean rateWithoutCalculation) {
+		this.rateWithoutCalculation = rateWithoutCalculation;
 	}
 
 }

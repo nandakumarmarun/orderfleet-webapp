@@ -86,6 +86,8 @@ public class MobileSettingsDTO {
 
 	private boolean salesOrderAllocation;
 
+	private boolean rateWithoutCalculation;
+
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -123,6 +125,7 @@ public class MobileSettingsDTO {
 		this.enableDiscountRoundOffColumn = mobileConfigurationDTO.getEnableDiscountRoundOffColumn();
 		this.stockLocationProducts = mobileConfigurationDTO.getStockLocationProducts();
 		this.salesOrderAllocation = mobileConfigurationDTO.getSalesOrderAllocation();
+		this.rateWithoutCalculation = mobileConfigurationDTO.getRateWithoutCalculation();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -403,6 +406,14 @@ public class MobileSettingsDTO {
 
 	public void setSalesOrderAllocation(boolean salesOrderAllocation) {
 		this.salesOrderAllocation = salesOrderAllocation;
+	}
+
+	public boolean getRateWithoutCalculation() {
+		return rateWithoutCalculation;
+	}
+
+	public void setRateWithoutCalculation(boolean rateWithoutCalculation) {
+		this.rateWithoutCalculation = rateWithoutCalculation;
 	}
 
 }

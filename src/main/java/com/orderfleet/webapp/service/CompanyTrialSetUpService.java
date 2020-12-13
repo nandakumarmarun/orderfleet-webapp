@@ -887,6 +887,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setEnableDiscountRoundOffColumn(false);
 		mobileConfiguration.setStockLocationProducts(false);
 		mobileConfiguration.setSalesOrderAllocation(false);
+		mobileConfiguration.setRateWithoutCalculation(false);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 

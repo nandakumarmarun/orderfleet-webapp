@@ -552,7 +552,6 @@ public class SendTransactionSapPraveshService {
 			Set<Long> accountProfileIds = new HashSet<>();
 			Set<Long> userIds = new HashSet<>();
 			Set<Long> exeIds = new HashSet<>();
-			Set<Long> supplierIds = new HashSet<>();
 
 			for (Object[] obj : accountingVoucherHeaders) {
 
@@ -563,9 +562,7 @@ public class SendTransactionSapPraveshService {
 				employeeIds.add(Long.parseLong(obj[11].toString()));
 				exeIds.add(Long.parseLong(obj[2].toString()));
 				accountProfileIds.add(Long.parseLong(obj[4].toString()));
-				if (obj[17] != null) {
-					supplierIds.add(Long.parseLong(obj[17].toString()));
-				}
+
 			}
 
 			List<Document> documents = documentRepository.findAllByCompanyIdAndIdsIn(documentIds);
@@ -576,9 +573,6 @@ public class SendTransactionSapPraveshService {
 					.findAllByCompanyIdAndIdsIn(accountProfileIds);
 			List<AccountProfile> supplierAccountProfiles = new ArrayList<>();
 
-			if (supplierIds.size() > 0) {
-				supplierAccountProfiles = accountProfileRepository.findAllByCompanyIdAndIdsIn(supplierIds);
-			}
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
 			List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByAccountingVoucherHeaderPidIn(avhPids);
@@ -623,18 +617,15 @@ public class SendTransactionSapPraveshService {
 						receiptDTO.setCustomerCode(String.valueOf(opAccPro.get().getId()));// primary key id of account
 																							// profile
 
-						if (opSupPro != null && opSupPro.isPresent()) {
-							receiptDTO.setDealerCode(opSupPro.get().getCustomerId());
-
-							receiptDTO.setDealerName(opSupPro.get().getName());
+						if (accountingVoucherDetail.getTo() != null) {
+							receiptDTO.setDealerCode(accountingVoucherDetail.getTo().getCustomerId());
+							receiptDTO.setDealerName(accountingVoucherDetail.getTo().getName());
 						} else {
 							receiptDTO.setDealerCode("No Dealer");
-
 							receiptDTO.setDealerName("No Dealer");
-
 						}
 
-						receiptDTO.setOrderNo(obj[18] != null ? obj[18].toString() : "No Order Reference");
+						receiptDTO.setOrderNo("No Order Allocation");
 
 						receiptDTO.setCustomerName(opAccPro.get().getName());
 						receiptDTO.setPayMode(accountingVoucherDetail.getMode().toString());
@@ -666,18 +657,17 @@ public class SendTransactionSapPraveshService {
 																								// account profile
 							receiptDTO.setCustomerName(opAccPro.get().getName());
 
-							if (opSupPro != null && opSupPro.isPresent()) {
-								receiptDTO.setDealerCode(opSupPro.get().getCustomerId());
-
-								receiptDTO.setDealerName(opSupPro.get().getName());
+							if (accountingVoucherDetail.getTo() != null) {
+								receiptDTO.setDealerCode(accountingVoucherDetail.getTo().getCustomerId());
+								receiptDTO.setDealerName(accountingVoucherDetail.getTo().getName());
 							} else {
 								receiptDTO.setDealerCode("No Dealer");
-
 								receiptDTO.setDealerName("No Dealer");
-
 							}
 
-							receiptDTO.setOrderNo(obj[18] != null ? obj[18].toString() : "No Order Reference");
+							receiptDTO.setOrderNo(accountingVoucherAllocation.getReferenceDocumentNumber() != null
+									? accountingVoucherAllocation.getReferenceDocumentNumber()
+									: "No Order Reference");
 
 							receiptDTO.setPayMode(
 									accountingVoucherAllocation.getAccountingVoucherDetail().getMode().toString());
