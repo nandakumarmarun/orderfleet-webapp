@@ -79,6 +79,7 @@
 									<option value="YESTERDAY">Yesterday</option>
 									<option value="WTD">WTD</option>
 									<option value="MTD">MTD</option>
+									<option value="UPTO90DAYS">UP TO 90 Days</option>
 									<option value="CUSTOM">CUSTOM</option>
 								</select>
 							</div>

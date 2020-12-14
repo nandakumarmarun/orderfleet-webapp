@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.TemporalField;
@@ -247,6 +248,12 @@ public class LeadsTrackerResource {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 				LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 				LocalDate toDateTime = LocalDate.parse(toDate, formatter);
+				filledForms = getFilterData(employeePid, accountPid, documentPid, fromDateTime, toDateTime,
+						formDTO.getPid());
+			} else if (filterBy.equals("UPTO90DAYS")) {
+				LocalDate toDateTime = LocalDate.now();
+				Period days_90 = Period.ofDays(90);
+				LocalDate fromDateTime = toDateTime.minus(days_90);
 				filledForms = getFilterData(employeePid, accountPid, documentPid, fromDateTime, toDateTime,
 						formDTO.getPid());
 			}
