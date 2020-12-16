@@ -322,7 +322,7 @@ public class ProductProfileOdooUploadService {
 
 				TPUnitOfMeasureProductDTO unitOfMeasureProductDTO = new TPUnitOfMeasureProductDTO();
 
-				unitOfMeasureProductDTO.setUnitOfMeasureName(opUom.get().getName());
+				unitOfMeasureProductDTO.setUnitOfMeasureId(opUom.get().getUomId());
 				unitOfMeasureProductDTO.setProductName(ppDto.getName());
 
 				unitOFMeasureProductDTOs.add(unitOfMeasureProductDTO);
@@ -686,7 +686,7 @@ public class ProductProfileOdooUploadService {
 			// find location
 
 			Optional<UnitOfMeasure> opPg = unitOfMeasures.stream()
-					.filter(pl -> pgpDto.getUnitOfMeasureName().equals(pl.getName())).findFirst();
+					.filter(pl -> pgpDto.getUnitOfMeasureId().equals(pl.getUomId())).findAny();
 			// find accountprofile
 			// System.out.println(loc.get()+"===Location");
 
@@ -733,14 +733,13 @@ public class ProductProfileOdooUploadService {
 
 		Set<UnitOfMeasure> saveUpdateUnitOfMeasure = new HashSet<>();
 		// find all exist product profiles
-		Set<String> uomNames = list.stream().map(p -> p.getName()).collect(Collectors.toSet());
-		List<UnitOfMeasure> unitOfMeasures = unitOfMeasureRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),
-				uomNames);
+
+		List<UnitOfMeasure> unitOfMeasures = unitOfMeasureRepository.findByCompanyId(companyId);
 
 		for (OdooUnitOfMeasure uomDto : list) {
 			// check exist by name, only one exist with a name
 			Optional<UnitOfMeasure> optionalUom = unitOfMeasures.stream()
-					.filter(p -> p.getName().equals(uomDto.getName())).findAny();
+					.filter(p -> p.getUomId().equals(String.valueOf(uomDto.getId()))).findAny();
 			UnitOfMeasure unitOfMeasure;
 			if (optionalUom.isPresent()) {
 				unitOfMeasure = optionalUom.get();
@@ -749,11 +748,10 @@ public class ProductProfileOdooUploadService {
 				unitOfMeasure = new UnitOfMeasure();
 				unitOfMeasure.setPid(UnitOfMeasureService.PID_PREFIX + RandomUtil.generatePid());
 				unitOfMeasure.setCompany(company);
-				unitOfMeasure.setName(uomDto.getName());
+				unitOfMeasure.setUomId(String.valueOf(uomDto.getId()));
 
 			}
-
-			unitOfMeasure.setUomId(String.valueOf(uomDto.getId()));
+			unitOfMeasure.setName(uomDto.getName());
 
 			Optional<UnitOfMeasure> opUom = saveUpdateUnitOfMeasure.stream()
 					.filter(so -> so.getName().equalsIgnoreCase(uomDto.getName())).findAny();
