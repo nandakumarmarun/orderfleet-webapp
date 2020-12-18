@@ -86,6 +86,12 @@ public class ProductProfileDTO {
 	private String remarks;
 
 	private String productId;
+	
+
+	
+	private String stockLocationName;
+	
+	private double stockQty;
 
 	public ProductProfileDTO() {
 		super();
@@ -110,6 +116,22 @@ public class ProductProfileDTO {
 
 	// this.inventoryVoucherDetails=inventoryVoucherHeader.getInventoryVoucherDetails().stream().map(InventoryVoucherDetailDTO::new)
 	// .collect(Collectors.toList());
+
+	public String getStockLocationName() {
+		return stockLocationName;
+	}
+
+	public void setStockLocationName(String stockLocationName) {
+		this.stockLocationName = stockLocationName;
+	}
+
+	public double getStockQty() {
+		return stockQty;
+	}
+
+	public void setStockQty(double stockQty) {
+		this.stockQty = stockQty;
+	}
 
 	public ProductProfileDTO(ProductProfile profile) {
 		super();
