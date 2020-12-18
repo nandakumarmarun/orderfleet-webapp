@@ -4,7 +4,7 @@ public class TPUnitOfMeasureProductDTO {
 
 	private String productName;
 
-	private String unitOfMeasureName;
+	private String unitOfMeasureId;
 
 	public String getProductName() {
 		return productName;
@@ -14,12 +14,12 @@ public class TPUnitOfMeasureProductDTO {
 		this.productName = productName;
 	}
 
-	public String getUnitOfMeasureName() {
-		return unitOfMeasureName;
+	public String getUnitOfMeasureId() {
+		return unitOfMeasureId;
 	}
 
-	public void setUnitOfMeasureName(String unitOfMeasureName) {
-		this.unitOfMeasureName = unitOfMeasureName;
+	public void setUnitOfMeasureId(String unitOfMeasureId) {
+		this.unitOfMeasureId = unitOfMeasureId;
 	}
 
 }

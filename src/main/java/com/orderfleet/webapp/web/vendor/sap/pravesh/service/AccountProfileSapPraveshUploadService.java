@@ -153,7 +153,7 @@ public class AccountProfileSapPraveshUploadService {
 				accountProfile.setPhone1(apDto.getPhone());
 			}
 
-			accountProfile.setAlias(apDto.getNumber());
+			accountProfile.setAlias(String.valueOf(apDto.getId()));
 
 			accountProfile.setActivated(true);
 
@@ -168,7 +168,7 @@ public class AccountProfileSapPraveshUploadService {
 			} else {
 				accountProfile.setCity("No City");
 			}
-			accountProfile.setCustomerId(String.valueOf(apDto.getId()));
+			accountProfile.setCustomerId(apDto.getNumber());
 			accountProfile.setClosingBalance(apDto.getOutStandingAmount());
 
 			// account type
