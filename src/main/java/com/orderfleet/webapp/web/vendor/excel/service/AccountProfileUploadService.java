@@ -375,7 +375,7 @@ public class AccountProfileUploadService {
 			LocationAccountProfile locationAccountProfile = new LocationAccountProfile();
 			// find location
 
-			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getAlias()))
+			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getName()))
 					.findFirst();
 			// find accountprofile
 			// System.out.println(loc.get()+"===Location");

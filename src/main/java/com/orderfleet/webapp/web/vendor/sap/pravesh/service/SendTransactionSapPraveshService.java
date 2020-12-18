@@ -597,13 +597,7 @@ public class SendTransactionSapPraveshService {
 				Optional<AccountProfile> opAccPro = accountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[4].toString())).findAny();
 
-				Optional<AccountProfile> opSupPro = null;
-
-				if (obj[17] != null) {
-					opSupPro = supplierAccountProfiles.stream()
-							.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
-				}
-
+				
 				List<AccountingVoucherDetail> avDetails = accountingVoucherDetails.stream()
 						.filter(ivd -> ivd.getAccountingVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
 						.collect(Collectors.toList()).stream()

@@ -87,6 +87,7 @@
 							<th>GSTIN</th>
 							<th>GST Registration Type</th>
 							<th>Created Date</th>
+							<th>Last Updated Date</th>
 							<th>Created By</th>
 							<th>Stage</th>
 							<th>Status</th>

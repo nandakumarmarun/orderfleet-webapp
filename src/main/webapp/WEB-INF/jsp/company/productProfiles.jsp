@@ -119,12 +119,12 @@
 
 				<div class="col-sm-4">
 					<div class="input-group">
-						<input type="text"
-							class="form-control" placeholder="Search" /> <span
+						<input type="text" class="form-control" placeholder="Search" /> <span
 							class="input-group-btn">
 							<button
 								onclick="Orderfleet.searchTable($(this).parent().prev('input').val());"
-								class="btn btn-default entypo-search" type="button" style="font-size: 18px"></button>
+								class="btn btn-default entypo-search" type="button"
+								style="font-size: 18px"></button>
 						</span>
 					</div>
 				</div>
@@ -132,8 +132,8 @@
 			</div>
 			<div class="clearfix"></div>
 			<hr />
-			
-			
+
+
 			<table class="table table-striped table-bordered of-tbl-search"
 				id="tblProductProfile">
 				<thead>
@@ -145,6 +145,8 @@
 						<th>SKU</th>
 						<th>Price</th>
 						<th>Alias</th>
+						<th>Created Date</th>
+						<th>Last Updated Date</th>
 						<th>Status</th>
 						<th>Actions</th>
 
@@ -197,9 +199,9 @@
 										maxlength="55" placeholder="Alias" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="field_productId">Product Id</label> <input
-										type="text" class="form-control" name="productId" id="field_productId"
-										maxlength="55" placeholder="Product Id" />
+									<label class="control-label" for="field_productId">Product
+										Id</label> <input type="text" class="form-control" name="productId"
+										id="field_productId" maxlength="55" placeholder="Product Id" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="field_category">Category</label>
@@ -231,7 +233,7 @@
 									<label class="control-label" for="field_unitQty">Unit
 										Quantity</label> <input type="number" class="form-control"
 										name="unitQty" id="field_unitQty" maxlength="20"
-										placeholder="Unit Quantity" value="1"/>
+										placeholder="Unit Quantity" value="1" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="field_price">Price</label> <input
@@ -256,9 +258,9 @@
 										placeholder="Size" value="0" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="field_hsnCode">HSN Code</label> <input
-										type="text" class="form-control" name="hsnCode" id="field_hsnCode"
-										placeholder="HSNCODE"  />
+									<label class="control-label" for="field_hsnCode">HSN
+										Code</label> <input type="text" class="form-control" name="hsnCode"
+										id="field_hsnCode" placeholder="HSNCODE" />
 								</div>
 								<div class="form-group" id="divColorImage">
 									<label>Choose Color Image</label> <input type="file"
@@ -861,10 +863,10 @@
 											</a>
 										</div>
 									</div>
-									<hr/>
+									<hr />
 								</div>
 							</div>
-							
+
 							<div>
 								<span id="showImages"></span>
 							</div>

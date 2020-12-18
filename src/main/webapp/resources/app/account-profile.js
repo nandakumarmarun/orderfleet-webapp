@@ -404,6 +404,8 @@ function findByfilfter() {
 											+ gstRegistrationType
 											+ "</td><td>"
 											+ convertDateTimeFromServer(accountProfile.createdDate)
+											+ "</td><td>"
+											+ convertDateTimeFromServer(accountProfile.lastModifiedDate)
 											+ "</td><td class='userName'>"
 											+ accountProfile.userName
 											+ "</td><td>"

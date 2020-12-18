@@ -86,11 +86,11 @@ public class ProductProfileDTO {
 	private String remarks;
 
 	private String productId;
-	
 
-	
+	private LocalDateTime createdDate;
+
 	private String stockLocationName;
-	
+
 	private double stockQty;
 
 	public ProductProfileDTO() {
@@ -429,6 +429,14 @@ public class ProductProfileDTO {
 
 	public void setProductId(String productId) {
 		this.productId = productId;
+	}
+
+	public LocalDateTime getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(LocalDateTime createdDate) {
+		this.createdDate = createdDate;
 	}
 
 	@Override

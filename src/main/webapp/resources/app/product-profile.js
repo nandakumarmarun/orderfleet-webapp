@@ -12,7 +12,7 @@ if (!this.ProductProfile) {
 			+ location.pathname;
 	var createEditForm = $("#productProfileForm");
 	var deleteForm = $("#deleteForm");
-	var propid="";
+	var propid = "";
 	var productProfileModel = {
 		pid : null,
 		name : null,
@@ -164,37 +164,40 @@ if (!this.ProductProfile) {
 												productProfileModel.colorImageContentType = file.type;
 											};
 										});
-										
-										// validate image
-						$('#field_image').bind(
-								'change',
-								function() {
-										
-									var val = $(this).val().toLowerCase();
-										var regex = new RegExp("(.*?)\.(docx|doc|pdf|xml|bmp|ppt|xls)$");
-										 if((regex.test(val))) {
-										$(this).val('');
-										alert('Please select image only...!');
-										return;
-										}  
-									
-									var size = this.files[0].size;
-									var file = $(this)[0].files[0];
-									var fileReader = new FileReader();
-									fileReader.readAsDataURL(file);
 
-									fileReader.onload = function(e) {
-										$('#previewImage').attr('src', fileReader.result);
-										var base64Data = e.target.result
-												.substr(e.target.result
-														.indexOf('base64,')
-														+ 'base64,'.length);
-										
-									};
-									changeSpan();
+						// validate image
+						$('#field_image')
+								.bind(
+										'change',
+										function() {
 
-								});
-								
+											var val = $(this).val()
+													.toLowerCase();
+											var regex = new RegExp(
+													"(.*?)\.(docx|doc|pdf|xml|bmp|ppt|xls)$");
+											if ((regex.test(val))) {
+												$(this).val('');
+												alert('Please select image only...!');
+												return;
+											}
+
+											var size = this.files[0].size;
+											var file = $(this)[0].files[0];
+											var fileReader = new FileReader();
+											fileReader.readAsDataURL(file);
+
+											fileReader.onload = function(e) {
+												$('#previewImage').attr('src',
+														fileReader.result);
+												var base64Data = e.target.result
+														.substr(e.target.result
+																.indexOf('base64,')
+																+ 'base64,'.length);
+
+											};
+											changeSpan();
+
+										});
 
 						// add the rule here
 						$.validator.addMethod("valueNotEquals", function(value,
@@ -241,26 +244,27 @@ if (!this.ProductProfile) {
 															$(this).prop(
 																	'checked'));
 										});
-						
-						$('#btnDownload')
-						.on(
-								'click',
-								function() {
-									var tblProductProfile = $("#tblProductProfile tbody");
-									if (tblProductProfile
-											.children().length == 0) {
-										alert("no values available");
-										return;
-									}
-									if (tblProductProfile[0].textContent == "No data available") {
-										alert("no values available");
-										return;
-									}
 
-									downloadXls();
-									$("#tblProductProfile th:last-child, #tblProductProfile td:last-child").show();
-								});
-						
+						$('#btnDownload')
+								.on(
+										'click',
+										function() {
+											var tblProductProfile = $("#tblProductProfile tbody");
+											if (tblProductProfile.children().length == 0) {
+												alert("no values available");
+												return;
+											}
+											if (tblProductProfile[0].textContent == "No data available") {
+												alert("no values available");
+												return;
+											}
+
+											downloadXls();
+											$(
+													"#tblProductProfile th:last-child, #tblProductProfile td:last-child")
+													.show();
+										});
+
 						$('#btnSaveTax').on('click', function() {
 							saveAssignedTax();
 						});
@@ -268,21 +272,21 @@ if (!this.ProductProfile) {
 							uploadFilledFormImage();
 						});
 						$('#btnRemoveImage').click(function() {
-						var result = confirm("are you sure?");
+							var result = confirm("are you sure?");
 							if (result) {
-   							 removeImage();
-								}
-							
+								removeImage();
+							}
+
 						});
 						$('#btnRefresh').click(function() {
 							clearImageShownDiv();
 						});
-						
+
 						$('#slt_status').on('change', function() {
 							findByfilfter();
 						});
 					});
-	
+
 	function findByfilfter() {
 		var active, deactivate;
 		var statusBox = $("#slt_status").val();
@@ -315,12 +319,12 @@ if (!this.ProductProfile) {
 		});
 
 	}
-	
+
 	function saveAssignedTax() {
 
 		var selectedTaxMasters = "";
-		var prodPrfilePid=productProfileModel.pid;
-		
+		var prodPrfilePid = productProfileModel.pid;
+
 		$.each($("input[name='taxMaster']:checked"), function() {
 			selectedTaxMasters += $(this).val() + ",";
 		});
@@ -331,10 +335,11 @@ if (!this.ProductProfile) {
 		}
 		$(".error-msg").html("Please wait...");
 
-		if(selectedTaxMasters != ""){
-			
+		if (selectedTaxMasters != "") {
+
 			$.ajax({
-				url : productProfileContextPath + "/assign-tax-master/"+prodPrfilePid,
+				url : productProfileContextPath + "/assign-tax-master/"
+						+ prodPrfilePid,
 				type : "POST",
 				data : {
 					selectedTax : selectedTaxMasters
@@ -348,25 +353,26 @@ if (!this.ProductProfile) {
 				},
 			});
 		}
-	
+
 	}
 
 	function downloadXls() {
-		
+
 		var status = $('#slt_status').val();
 		console.log(status);
 		window.location.href = productProfileContextPath
-		+ "/download-profile-xls?status="+ status;
-		
-		
-//		// Avoid last column in each row
-//		$("#tblProductProfile th:last-child, #tblProductProfile td:last-child").hide();
-//		var excelName = "productProfile";
-//		 var table2excel = new Table2Excel();
-//		     table2excel.export(document.getElementById('tblProductProfile'),excelName);
-//		     $("#tblProductProfile th:last-child, #tblProductProfile td:last-child").show();
+				+ "/download-profile-xls?status=" + status;
+
+		// // Avoid last column in each row
+		// $("#tblProductProfile th:last-child, #tblProductProfile
+		// td:last-child").hide();
+		// var excelName = "productProfile";
+		// var table2excel = new Table2Excel();
+		// table2excel.export(document.getElementById('tblProductProfile'),excelName);
+		// $("#tblProductProfile th:last-child, #tblProductProfile
+		// td:last-child").show();
 	}
-	
+
 	ProductProfile.checkboxChange = function(e) {
 		if (e.checked) {
 			$('#tBodyFieldProducts').find(
@@ -513,7 +519,7 @@ if (!this.ProductProfile) {
 			contentType : "application/json; charset=utf-8",
 			data : JSON.stringify(productProfileModel),
 			success : function(data) {
-				if($(el).attr('method') == 'PUT'){
+				if ($(el).attr('method') == 'PUT') {
 					$("#myModal").modal("hide");
 					ProductProfile.filterByCategoryAndGroup();
 				} else {
@@ -601,7 +607,7 @@ if (!this.ProductProfile) {
 
 	function uploadImage(pid) {
 		getFilledFormImages(pid);
-		propid=pid;	
+		propid = pid;
 	}
 
 	function showProductProfileImages(pid) {
@@ -665,23 +671,22 @@ if (!this.ProductProfile) {
 		});
 		$('#tBodyProductProfile').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
-		$
-				.ajax({
-					url : productProfileContextPath + "/filterByCategoryGroup",
-					method : 'GET',
-					data : {
-						categoryPids : categoryPids.join(","),
-						groupPids : groupPids.join(",")
-					},
+		$.ajax({
+			url : productProfileContextPath + "/filterByCategoryGroup",
+			method : 'GET',
+			data : {
+				categoryPids : categoryPids.join(","),
+				groupPids : groupPids.join(",")
+			},
 
-					success : function(productProfiles) {
+			success : function(productProfiles) {
 
-						addTableBodyvalues(productProfiles);
-					},
-					error : function(xhr, error) {
-						onError(xhr, error);
-					}
-				});
+				addTableBodyvalues(productProfiles);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
 	}
 
 	function spanActivated(name, price, activated, productPid) {
@@ -736,26 +741,24 @@ if (!this.ProductProfile) {
 	function loadAllProductProfiles() {
 		$('#tBodyProductProfile').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
-		$
-				.ajax({
-					url : productProfileContextPath + "/filterByCategoryGroup",
-					method : 'GET',
-					data : {
-						categoryPids : "",
-						groupPids : ""
-					},
-					success : function(productProfiles) {
-						addTableBodyvalues(productProfiles);
-					},
-					error : function(xhr, error) {
-						onError(xhr, error);
-					}
-				});
+		$.ajax({
+			url : productProfileContextPath + "/filterByCategoryGroup",
+			method : 'GET',
+			data : {
+				categoryPids : "",
+				groupPids : ""
+			},
+			success : function(productProfiles) {
+				addTableBodyvalues(productProfiles);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
 
 	}
-	
-	
-	function addTableBodyvalues(productProfiles){
+
+	function addTableBodyvalues(productProfiles) {
 		$('#tBodyProductProfile').html("");
 		// select box for set size
 		$('#field_products').html("");
@@ -783,14 +786,20 @@ if (!this.ProductProfile) {
 													+ "</td><td>"
 													+ productProfile.divisionName
 													+ "</td><td>"
-													+  (productProfile.unitQty == null ? "" : productProfile.unitQty)
+													+ (productProfile.unitQty == null ? ""
+															: productProfile.unitQty)
 													+ "</td><td>"
 													+ productProfile.sku
 													+ "</td><td>"
 													+ productProfile.price
 													+ "</td><td>"
-													+  (productProfile.alias == null ? "" : productProfile.alias)
-													+ "</td> <td>"
+													+ (productProfile.alias == null ? ""
+															: productProfile.alias)
+													+ "</td><td>"
+													+ convertDateTimeFromServer(productProfile.createdDate)
+													+ "</td><td>"
+													+ convertDateTimeFromServer(productProfile.lastModifiedDate)
+													+ "</td><td>"
 													+ spanActivated(
 															productProfile.name,
 															productProfile.price,
@@ -807,21 +816,15 @@ if (!this.ProductProfile) {
 													+ "\",5);'>Assigned ProductGroups</a></div> <div><a class='btn btn-default dropdown-item' style='width: 100%; text-align: left;' onclick='ProductProfile.showModalPopup($(\"#assignTaxModal\"),\""
 													+ productProfile.pid
 													+ "\",6);'>Assigned Tax</a></div> </div></td></tr>");
-							$('#field_products')
-									.append(
-											'<tr><td><input type="checkbox" value="'
-													+ productProfile.pid
-													+ '" /></td>'
-													+ '<td>'
-													+ productProfile.name
-													+ '</td>'
-													+ '<td>'
-													+ productProfile.size
-													+ '</td>'
-													+ '</tr></tbody>');
-						});	
+							$('#field_products').append(
+									'<tr><td><input type="checkbox" value="'
+											+ productProfile.pid + '" /></td>'
+											+ '<td>' + productProfile.name
+											+ '</td>' + '<td>'
+											+ productProfile.size + '</td>'
+											+ '</tr></tbody>');
+						});
 	}
-	
 
 	function showProductProfileProductGroup(pid) {
 		$('#tblProductGroups').html("");
@@ -830,7 +833,10 @@ if (!this.ProductProfile) {
 			method : 'GET',
 			success : function(response) {
 				$.each(response, function(index, productGroup) {
-					$('#tblProductGroups').append('<tr><td>'+ productGroup.name +'</td><td>'+ productGroup.alias +'</td><td>'+ productGroup.description +'</td></tr>');
+					$('#tblProductGroups').append(
+							'<tr><td>' + productGroup.name + '</td><td>'
+									+ productGroup.alias + '</td><td>'
+									+ productGroup.description + '</td></tr>');
 				});
 			},
 			error : function(xhr, error) {
@@ -838,194 +844,252 @@ if (!this.ProductProfile) {
 			}
 		});
 	}
-	
+
 	function uploadFilledFormImage() {
-	
-	var ImgFilePid= $('#previewImage').attr("alt");
-// var formPid=$("#dbForm").val();
-// 		
-// if(formPid==null || formPid=="no"){
-// alert ("please select Form");
-// return;
-// }
-	var image=$('#field_image')[0].files[0];
-	if(image == null && ImgFilePid ==""){
-		alert ("please select image");
-		return;
+
+		var ImgFilePid = $('#previewImage').attr("alt");
+		// var formPid=$("#dbForm").val();
+		// 		
+		// if(formPid==null || formPid=="no"){
+		// alert ("please select Form");
+		// return;
+		// }
+		var image = $('#field_image')[0].files[0];
+		if (image == null && ImgFilePid == "") {
+			alert("please select image");
+			return;
+		}
+
+		if (image == null && ImgFilePid != "") {
+			$('#previewImage').attr('src', '');
+			$('#previewImage').attr('alt', '');
+			changeSpan();
+			return;
+		}
+
+		if (image != null && ImgFilePid != "") {
+			uploadEditedImageFile(image, ImgFilePid);
+		} else {
+			uploadNewImageFile(image);
+		}
 	}
-	
-	if(image == null && ImgFilePid !=""){
-		$('#previewImage').attr('src','');
-		$('#previewImage').attr('alt','');
-		changeSpan();
-		return;
-	}
-	
-	if(image != null && ImgFilePid !=""){
-		uploadEditedImageFile(image,ImgFilePid);
-	}
-	else{
-		uploadNewImageFile(image);
-	}
-	}
-	
-	function uploadEditedImageFile(image,ImgFilePid){
-		$("#divImgeUpload").html('<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
+
+	function uploadEditedImageFile(image, ImgFilePid) {
+		$("#divImgeUpload")
+				.html(
+						'<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
 		var uploadImage = new FormData();
 		uploadImage.append("file", image);
 		uploadImage.append('productPid', propid);
 		uploadImage.append('ImgFilePid', ImgFilePid);
-		
-			$.ajax({
-				type : 'POST',
-				url : productProfileContextPath + "/upload-edit-image",
-				data :uploadImage,
-				cache : false,
-				contentType : false,
-				processData : false,
-				success : function(data) {
-					$("#divImgeUpload").html("");
-					$.each(data, function(key, filePid) {
-						$("#"+filePid).remove();
-						$("#div"+filePid).html("");
-						var imgesrc=$("#previewImage").attr('src');
-						$("#showImages").append('<div style="width: 250px;" id="div'+filePid+'"; class="col-md-4 zoom"><img title='+image.name+' onclick="ProductProfile.editImage(\''+ filePid +'\');" style="width: 200px; cursor: pointer;" id="'+filePid+'"; class="img-thumbnail" src="' + imgesrc + '" /></div><br/>');
-						$('#previewImage').attr('src','');
-						$('#previewImage').attr('alt','');
-						$("#div"+ImgFilePid).attr('class','');
-						$("#div"+ImgFilePid).remove(); 
-						$('#field_image').val('');
-						changeSpan();
-						});
-				},
-				error : function(xhr, error) {
-					$("#divImgeUpload").html("");
-					onError(xhr, error);
-				}
-			});
-		
+
+		$
+				.ajax({
+					type : 'POST',
+					url : productProfileContextPath + "/upload-edit-image",
+					data : uploadImage,
+					cache : false,
+					contentType : false,
+					processData : false,
+					success : function(data) {
+						$("#divImgeUpload").html("");
+						$
+								.each(
+										data,
+										function(key, filePid) {
+											$("#" + filePid).remove();
+											$("#div" + filePid).html("");
+											var imgesrc = $("#previewImage")
+													.attr('src');
+											$("#showImages")
+													.append(
+															'<div style="width: 250px;" id="div'
+																	+ filePid
+																	+ '"; class="col-md-4 zoom"><img title='
+																	+ image.name
+																	+ ' onclick="ProductProfile.editImage(\''
+																	+ filePid
+																	+ '\');" style="width: 200px; cursor: pointer;" id="'
+																	+ filePid
+																	+ '"; class="img-thumbnail" src="'
+																	+ imgesrc
+																	+ '" /></div><br/>');
+											$('#previewImage').attr('src', '');
+											$('#previewImage').attr('alt', '');
+											$("#div" + ImgFilePid).attr(
+													'class', '');
+											$("#div" + ImgFilePid).remove();
+											$('#field_image').val('');
+											changeSpan();
+										});
+					},
+					error : function(xhr, error) {
+						$("#divImgeUpload").html("");
+						onError(xhr, error);
+					}
+				});
+
 	}
-	
-function uploadNewImageFile(image){
-	$("#divImgeUpload").html('<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
+
+	function uploadNewImageFile(image) {
+		$("#divImgeUpload")
+				.html(
+						'<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
 		var uploadImage = new FormData();
 		uploadImage.append("file", image);
 		uploadImage.append('productPid', propid);
-		$.ajax({
-			type : 'POST',
-			url : productProfileContextPath + "/upload-image",
-			data :uploadImage,
-			cache : false,
-			contentType : false,
-			processData : false,
-			success : function(data) {
-				$("#divImgeUpload").html("");
-				$.each(data, function(key, filePid) {
-				var imgesrc=$("#previewImage").attr('src');
-				$("#showImages").append('<div style="width: 250px;" id="div'+filePid+'"; class="col-md-4 zoom"><img title='+image.name+' onclick="ProductProfile.editImage(\''+ filePid +'\');" style="width: 200px; cursor: pointer;" id="'+filePid+'"; class="img-thumbnail" src="' + imgesrc + '"/></div><br/>');
-				$('#previewImage').attr('src','');
-				$('#previewImage').attr('alt','');
-				$('#field_image').val('');
-				changeSpan();
+		$
+				.ajax({
+					type : 'POST',
+					url : productProfileContextPath + "/upload-image",
+					data : uploadImage,
+					cache : false,
+					contentType : false,
+					processData : false,
+					success : function(data) {
+						$("#divImgeUpload").html("");
+						$
+								.each(
+										data,
+										function(key, filePid) {
+											var imgesrc = $("#previewImage")
+													.attr('src');
+											$("#showImages")
+													.append(
+															'<div style="width: 250px;" id="div'
+																	+ filePid
+																	+ '"; class="col-md-4 zoom"><img title='
+																	+ image.name
+																	+ ' onclick="ProductProfile.editImage(\''
+																	+ filePid
+																	+ '\');" style="width: 200px; cursor: pointer;" id="'
+																	+ filePid
+																	+ '"; class="img-thumbnail" src="'
+																	+ imgesrc
+																	+ '"/></div><br/>');
+											$('#previewImage').attr('src', '');
+											$('#previewImage').attr('alt', '');
+											$('#field_image').val('');
+											changeSpan();
+										});
+					},
+					error : function(xhr, error) {
+						$("#divImgeUpload").html("");
+						onError(xhr, error);
+					}
 				});
-			},
-			error : function(xhr, error) {
-				$("#divImgeUpload").html("");
-				onError(xhr, error);
-			}
-		});
-		
+
 	}
-	
-	function getFilledFormImages(pid){
-		$('#previewImage').attr('src','');
-		$('#previewImage').attr('alt','');
+
+	function getFilledFormImages(pid) {
+		$('#previewImage').attr('src', '');
+		$('#previewImage').attr('alt', '');
 		changeSpan();
-		$("#divImgeUpload").html('<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
-		var formPid=$("#dbForm").val();
-		$.ajax({
-			url : productProfileContextPath + "/images/" + pid,
-			type : 'GET',
-			success : function(forms) {
-				$("#showImages").html('');
-				if(forms!=null){
-					$.each(forms, function(key, form) {
-						$("#showImages").append('<div style="width: 250px;" id="div'+form.filePid+'"; class="col-md-4 zoom"><img title='+form.fileName+' onclick="ProductProfile.editImage(\''+ form.filePid +'\');" style="width: 200px; cursor: pointer;" id="'+form.filePid+'"; class="img-thumbnail" src="data:image/png;base64,' + form.content + '"/></div><br/>');
-					});
-				}
-				$("#divImgeUpload").html("");
-			},
-			error : function(xhr, error) {
-				$("#divImgeUpload").html("");
-				onError(xhr, error);
-			}
-		});
+		$("#divImgeUpload")
+				.html(
+						'<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
+		var formPid = $("#dbForm").val();
+		$
+				.ajax({
+					url : productProfileContextPath + "/images/" + pid,
+					type : 'GET',
+					success : function(forms) {
+						$("#showImages").html('');
+						if (forms != null) {
+							$
+									.each(
+											forms,
+											function(key, form) {
+												$("#showImages")
+														.append(
+																'<div style="width: 250px;" id="div'
+																		+ form.filePid
+																		+ '"; class="col-md-4 zoom"><img title='
+																		+ form.fileName
+																		+ ' onclick="ProductProfile.editImage(\''
+																		+ form.filePid
+																		+ '\');" style="width: 200px; cursor: pointer;" id="'
+																		+ form.filePid
+																		+ '"; class="img-thumbnail" src="data:image/png;base64,'
+																		+ form.content
+																		+ '"/></div><br/>');
+											});
+						}
+						$("#divImgeUpload").html("");
+					},
+					error : function(xhr, error) {
+						$("#divImgeUpload").html("");
+						onError(xhr, error);
+					}
+				});
 	}
-	
-	ProductProfile.editImage=function(filePid){
-		var imgesrc=$("#"+filePid).attr('src');
-		$('#previewImage').attr('src',imgesrc);
-		$('#previewImage').attr('alt',filePid);
+
+	ProductProfile.editImage = function(filePid) {
+		var imgesrc = $("#" + filePid).attr('src');
+		$('#previewImage').attr('src', imgesrc);
+		$('#previewImage').attr('alt', filePid);
 		changeSpan();
 	}
-	
-	function removeImage(){
-		$("#divImgeUpload").html('<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
-		var imagePid =$("#previewImage").attr("alt");
-		var image=$('#field_image')[0].files[0];
-		var productPid=propid;
-		if(imagePid=="" && image==null){
-				alert("please select image");
-				$("#divImgeUpload").html("");
-				return;
+
+	function removeImage() {
+		$("#divImgeUpload")
+				.html(
+						'<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
+		var imagePid = $("#previewImage").attr("alt");
+		var image = $('#field_image')[0].files[0];
+		var productPid = propid;
+		if (imagePid == "" && image == null) {
+			alert("please select image");
+			$("#divImgeUpload").html("");
+			return;
 		}
-		if(imagePid=="" && image!=null){
-			$('#previewImage').attr('src','');
-			$('#previewImage').attr('alt','');
+		if (imagePid == "" && image != null) {
+			$('#previewImage').attr('src', '');
+			$('#previewImage').attr('alt', '');
 			$("#divImgeUpload").html("");
 			$('#field_image').val('');
 			changeSpan();
 			return;
 		}
-		$('#previewImage').attr('src','');
-		$('#previewImage').attr('alt','');
-		$("#"+imagePid).remove(); 
-		$("#div"+imagePid).attr('class','');
-		$("#div"+imagePid).remove(); 
+		$('#previewImage').attr('src', '');
+		$('#previewImage').attr('alt', '');
+		$("#" + imagePid).remove();
+		$("#div" + imagePid).attr('class', '');
+		$("#div" + imagePid).remove();
 		$("#divImgeUpload").html("");
-		
+
 		changeSpan();
-			$.ajax({
-			url : productProfileContextPath + "/delete-image/" + productPid + "/"
-					+ imagePid,
+		$.ajax({
+			url : productProfileContextPath + "/delete-image/" + productPid
+					+ "/" + imagePid,
 			method : 'DELETE',
 			success : function(response) {
 				if (response) {
 					$("#divImgeUpload").html("");
 				}
 			},
-				error : function(xhr, error) {
-					$("#divImgeUpload").html("");
-					onError(xhr, error);
-				}
+			error : function(xhr, error) {
+				$("#divImgeUpload").html("");
+				onError(xhr, error);
+			}
 		});
 	}
-	
-	function clearImageShownDiv(){
-		
-		$('#previewImage').attr('src','');
-		$('#previewImage').attr('alt','');
+
+	function clearImageShownDiv() {
+
+		$('#previewImage').attr('src', '');
+		$('#previewImage').attr('alt', '');
 		$("#divImgeUpload").html("");
 		$("#btnSltImg").text("New Image");
 		$("#btnRefresh").fadeOut("slow");
 		$('#field_image').val('');
 	}
 
-	function changeSpan(){
-		if($("#previewImage").attr('src')!=''){
+	function changeSpan() {
+		if ($("#previewImage").attr('src') != '') {
 			$("#btnSltImg").text("Change Image");
 			$("#btnRefresh").fadeIn("slow");
-		}else{
+		} else {
 			$("#btnSltImg").text("New Image");
 			$("#btnRefresh").fadeOut("slow");
 		}
@@ -1039,8 +1103,7 @@ function uploadNewImageFile(image){
 		// reloading page to see the updated data
 		window.location = productProfileContextPath;
 	}
-	
-	
+
 	ProductProfile.showModalPopup = function(el, id, action) {
 		resetForm();
 		if (id) {
@@ -1066,21 +1129,32 @@ function uploadNewImageFile(image){
 				break;
 			case 6:
 				loadAssignTax(id);
-				productProfileModel.pid=id;
+				productProfileModel.pid = id;
 				break;
 			}
 		}
 		el.modal('show');
 	}
 
-	function loadAssignTax(id){
-		$("#taxcheck input[type='checkbox']").prop("checked",false);
+	function convertDateTimeFromServer(date) {
+		if (date) {
+			return moment(date).format('MMM DD YYYY, h:mm:ss a');
+		} else {
+			return "";
+		}
+	}
+
+	function loadAssignTax(id) {
+		$("#taxcheck input[type='checkbox']").prop("checked", false);
 		$.ajax({
 			url : productProfileContextPath + "/assignTax/" + id,
 			method : 'GET',
 			success : function(response) {
 				$.each(response, function(index, taxMaster) {
-						$("#taxcheck input[type='checkbox'][value="+ taxMaster.pid + "]").prop("checked",true);
+					$(
+							"#taxcheck input[type='checkbox'][value="
+									+ taxMaster.pid + "]")
+							.prop("checked", true);
 				});
 			},
 			error : function(xhr, error) {
@@ -1088,7 +1162,7 @@ function uploadNewImageFile(image){
 			}
 		});
 	}
-	
+
 	function searchTable(inputVal, table) {
 		table.find('tr').each(function(index, row) {
 			var allCells = $(row).find('td');
