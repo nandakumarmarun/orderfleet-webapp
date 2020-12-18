@@ -203,6 +203,7 @@ public class AccountProfileUploadService {
 			}
 			accountProfile.setTrimChar(apDto.getTrimChar());
 			accountProfile.setAlias(apDto.getAlias());
+			accountProfile.setCustomerId(apDto.getAlias());
 			if (isValidPhone(apDto.getPhone1())) {
 				accountProfile.setPhone1(apDto.getPhone1());
 			}
@@ -212,6 +213,7 @@ public class AccountProfileUploadService {
 			if (isValidEmail(apDto.getEmail1())) {
 				accountProfile.setEmail1(apDto.getEmail1());
 			}
+		
 			accountProfile.setTinNo(apDto.getTinNo());
 			accountProfile.setPin(apDto.getPin());
 			accountProfile.setDescription(apDto.getDescription());

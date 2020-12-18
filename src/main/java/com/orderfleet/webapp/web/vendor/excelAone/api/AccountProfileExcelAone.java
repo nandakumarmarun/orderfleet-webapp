@@ -43,7 +43,7 @@ public class AccountProfileExcelAone {
 
 	@Inject
 	private TPAccountProfileManagementService tpAccountProfileManagementService;
-	
+
 	@Inject
 	private AccountProfileUploadService accountProfileUploadService;
 
@@ -118,22 +118,6 @@ public class AccountProfileExcelAone {
 		log.debug("REST request to save location-accountprofiles : {}", locationAccountProfileDTOs.size());
 		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
 				SyncOperationType.LOCATION_ACCOUNT_PROFILE).map(so -> {
-
-					Optional<SyncOperation> opSyncLO = syncOperationRepository.findOneByCompanyIdAndOperationType(
-							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.LOCATION);
-
-					if (!opSyncLO.get().getCompleted()) {
-						return new ResponseEntity<>("location save processing try after some time.",
-								HttpStatus.BAD_REQUEST);
-					}
-
-					Optional<SyncOperation> opSyncAP = syncOperationRepository.findOneByCompanyIdAndOperationType(
-							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.ACCOUNT_PROFILE);
-
-					if (!opSyncAP.get().getCompleted()) {
-						return new ResponseEntity<>("account-profile save processing try after some time.",
-								HttpStatus.BAD_REQUEST);
-					}
 
 					// update sync status
 					so.setCompleted(false);
