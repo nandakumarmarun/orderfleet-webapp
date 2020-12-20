@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -59,7 +58,6 @@ import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
-import com.orderfleet.webapp.repository.GstLedgerRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
@@ -67,19 +65,6 @@ import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.DocumentService;
-import com.orderfleet.webapp.service.ExecutiveTaskSubmissionService;
-import com.orderfleet.webapp.service.LocationAccountProfileService;
-import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
-import com.orderfleet.webapp.web.rest.dto.ReceiptDTO;
-import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
-import com.orderfleet.webapp.web.util.RestClientUtil;
-import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoice;
-import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoiceLine;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoice;
-import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoice;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooInvoice;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseMessageOdooInvoice;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ApiResponseDataSapPravesh;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ReceiptSapPravesh;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.SalesOrderItemDetailsSapPravesh;
@@ -537,10 +522,24 @@ public class SendTransactionSapPraveshService {
 		log.debug("REST request to download receipts <" + company.getLegalName() + "> : {}");
 
 		List<ReceiptSapPravesh> receiptDTOs = new ArrayList<>();
+		
+		String companyPid = company.getPid();
 
-		List<Object[]> accountingVoucherHeaders = accountingVoucherHeaderRepository
-				.findByCompanyIdAndTallyStatusByCreatedDateDesc();
+		Optional<CompanyConfiguration> optReceiptsManagement = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.RECEIPT_MANAGEMENT);
 
+		List<Object[]> accountingVoucherHeaders = new ArrayList<>();
+
+		if (optReceiptsManagement.isPresent() && optReceiptsManagement.get().getValue().equalsIgnoreCase("true")) {
+			accountingVoucherHeaders = accountingVoucherHeaderRepository
+					.findByCompanyIdAndTallyStatusAndSalesManagementStatusByCreatedDateDesc();
+		} else {
+			accountingVoucherHeaders = accountingVoucherHeaderRepository
+					.findByCompanyIdAndTallyStatusByCreatedDateDesc();
+		}
+		
+		log.info("Accounting Voucher Header size {} ", accountingVoucherHeaders.size());
+		
 		List<String> accountingPids = new ArrayList<>();
 
 		if (accountingVoucherHeaders.size() > 0) {

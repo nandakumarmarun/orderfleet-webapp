@@ -113,4 +113,6 @@ public interface AccountingVoucherHeaderService {
 	public List<AccountingVoucherHeaderDTO> getAllByCompanyIdUserPidDocumentPidAndDateBetween(List<String> userPids, 
 			List<String> documentPid, List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
 
+	void updateAccountingVoucherHeaderSalesManagementStatus(AccountingVoucherHeaderDTO accountingVoucherHeaderDTO);
+
 }

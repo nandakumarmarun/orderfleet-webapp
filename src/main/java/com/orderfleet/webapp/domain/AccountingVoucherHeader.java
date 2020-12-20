@@ -28,6 +28,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
@@ -123,6 +124,11 @@ public class AccountingVoucherHeader implements Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tally_download_status", nullable = false, columnDefinition = "character varying DEFAULT 'PENDING'")
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "sales_management_status", nullable = false, columnDefinition = "character varying DEFAULT 'DEFAULT'")
+	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.DEFAULT;
 
 	@Column(name = "imageRefNo")
 	private String imageRefNo;
@@ -292,6 +298,14 @@ public class AccountingVoucherHeader implements Serializable {
 
 	public void setTallyDownloadStatus(TallyDownloadStatus tallyDownloadStatus) {
 		this.tallyDownloadStatus = tallyDownloadStatus;
+	}
+
+	public SalesManagementStatus getSalesManagementStatus() {
+		return salesManagementStatus;
+	}
+
+	public void setSalesManagementStatus(SalesManagementStatus salesManagementStatus) {
+		this.salesManagementStatus = salesManagementStatus;
 	}
 
 	public String getImageRefNo() {

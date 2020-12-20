@@ -13,6 +13,7 @@ import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.AccountingVoucherHeaderHistory;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
+import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
@@ -77,6 +78,8 @@ public class AccountingVoucherHeaderDTO {
 
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
 
+	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.DEFAULT;
+
 	private Boolean imageButtonVisible = Boolean.FALSE;;
 
 	private String supplierAccountPid;
@@ -137,6 +140,10 @@ public class AccountingVoucherHeaderDTO {
 		if (accountingVoucherHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = accountingVoucherHeader.getTallyDownloadStatus();
 		}
+		
+		if (accountingVoucherHeader.getSalesManagementStatus() != null) {
+			this.salesManagementStatus = accountingVoucherHeader.getSalesManagementStatus();
+		}
 
 		if (accountingVoucherHeader.getFiles().size() > 0) {
 			this.imageButtonVisible = true;
@@ -170,6 +177,14 @@ public class AccountingVoucherHeaderDTO {
 
 	public void setPid(String pid) {
 		this.pid = pid;
+	}
+
+	public SalesManagementStatus getSalesManagementStatus() {
+		return salesManagementStatus;
+	}
+
+	public void setSalesManagementStatus(SalesManagementStatus salesManagementStatus) {
+		this.salesManagementStatus = salesManagementStatus;
 	}
 
 	public String getSupplierAccountPid() {

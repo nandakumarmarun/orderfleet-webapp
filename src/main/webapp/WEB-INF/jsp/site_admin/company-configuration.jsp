@@ -47,6 +47,7 @@
 						<th>Sales Pdf Download</th>
 						<th>Visit Based Transaction</th>
 						<th>Sales Management</th>
+						<th>Receipts Management</th>
 						<th>Sales Edit Enabled</th>
 						<th>Gps Variance Query</th>
 						<th>Send Sales Order Email</th>
@@ -73,6 +74,7 @@
 							<td>${companyConfiguration.salesPdfDownload}</td>
 							<td>${companyConfiguration.visitBasedTransaction}</td>
 							<th>${companyConfiguration.salesManagement}</th>
+							<th>${companyConfiguration.receiptsManagement}</th>
 							<th>${companyConfiguration.salesEditEnabled}</th>
 							<th>${companyConfiguration.gpsVarianceQuery}</th>
 							<th>${companyConfiguration.sendSalesOrderEmail}</th>
@@ -195,6 +197,14 @@
 											<td><div class="form-group">
 													<label class="control-label">Sales Management</label> <input
 														id="salesManagement" name='checksSalesManagement"'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Receipts Management</label> <input
+														id="receiptsManagement" name='checksReceiptsManagement"'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>

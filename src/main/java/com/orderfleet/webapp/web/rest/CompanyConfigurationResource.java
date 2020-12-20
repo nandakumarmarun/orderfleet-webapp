@@ -117,6 +117,10 @@ public class CompanyConfigurationResource {
 					mcDto.setSalesManagement(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.RECEIPT_MANAGEMENT)) {
+					mcDto.setReceiptsManagement(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 				if (cc.getName().equals(CompanyConfig.SALES_EDIT_ENABLED)) {
 					mcDto.setSalesEditEnabled(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
@@ -167,7 +171,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String interimSave, @RequestParam String refreshProductGroupProduct,
 			@RequestParam String stageChangeAccountingVoucher, @RequestParam String newCustomerAlias,
 			@RequestParam String chatReply, @RequestParam String salesPdfDownload,
-			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement,
+			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement, @RequestParam String receiptsManagement,
 			@RequestParam String salesEditEnabled, @RequestParam String gpsVarianceQuery,
 			@RequestParam String sendSalesOrderEmail, @RequestParam String sendSalesOrderSap,
 			@RequestParam String piecesToQuantity, @RequestParam String sendSalesOrderOdoo,
@@ -201,6 +205,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.VISIT_BASED_TRANSACTION);
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+		Optional<CompanyConfiguration> optReceiptsManagement = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.RECEIPT_MANAGEMENT);
 		Optional<CompanyConfiguration> optSalesEditEnabled = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_EDIT_ENABLED);
 		Optional<CompanyConfiguration> optGpsVarianceQuery = companyConfigurationRepository
@@ -231,6 +237,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration salesPdfDownloadCompany = null;
 		CompanyConfiguration visitBasedTransactionCompany = null;
 		CompanyConfiguration salesManagementCompany = null;
+		CompanyConfiguration receiptsManagementCompany = null;
 		CompanyConfiguration salesEditEnabledCompany = null;
 		CompanyConfiguration gpsVarianceQueryCompany = null;
 		CompanyConfiguration sendSalesOrderEmailCompany = null;
@@ -349,6 +356,17 @@ public class CompanyConfigurationResource {
 			salesManagementCompany.setValue(salesManagement);
 		}
 		companyConfigurationRepository.save(salesManagementCompany);
+
+		if (optReceiptsManagement.isPresent()) {
+			receiptsManagementCompany = optReceiptsManagement.get();
+			receiptsManagementCompany.setValue(receiptsManagement);
+		} else {
+			receiptsManagementCompany = new CompanyConfiguration();
+			receiptsManagementCompany.setCompany(company);
+			receiptsManagementCompany.setName(CompanyConfig.RECEIPT_MANAGEMENT);
+			receiptsManagementCompany.setValue(receiptsManagement);
+		}
+		companyConfigurationRepository.save(receiptsManagementCompany);
 
 		if (optSalesEditEnabled.isPresent()) {
 			salesEditEnabledCompany = optSalesEditEnabled.get();
@@ -473,6 +491,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.VISIT_BASED_TRANSACTION);
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+		Optional<CompanyConfiguration> optReceiptsManagement = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.RECEIPT_MANAGEMENT);
 		Optional<CompanyConfiguration> optSalesEditEnabled = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_EDIT_ENABLED);
 
@@ -534,6 +554,9 @@ public class CompanyConfigurationResource {
 		if (optSalesManagement.isPresent()) {
 			companyConfigurationDTO.setSalesManagement(Boolean.valueOf(optSalesManagement.get().getValue()));
 		}
+		if (optReceiptsManagement.isPresent()) {
+			companyConfigurationDTO.setReceiptsManagement(Boolean.valueOf(optReceiptsManagement.get().getValue()));
+		}
 		if (optSalesEditEnabled.isPresent()) {
 			companyConfigurationDTO.setSalesEditEnabled(Boolean.valueOf(optSalesEditEnabled.get().getValue()));
 		}
@@ -590,6 +613,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.VISIT_BASED_TRANSACTION);
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+		Optional<CompanyConfiguration> optReceiptsManagement = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.RECEIPT_MANAGEMENT);
 		Optional<CompanyConfiguration> optSalesEditEnabled = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_EDIT_ENABLED);
 
@@ -658,6 +683,10 @@ public class CompanyConfigurationResource {
 		if (optSalesManagement.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optSalesManagement.get().getCompany().getId(),
 					CompanyConfig.SALES_MANAGEMENT);
+		}
+		if (optReceiptsManagement.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optSalesManagement.get().getCompany().getId(),
+					CompanyConfig.RECEIPT_MANAGEMENT);
 		}
 		if (optSalesEditEnabled.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optSalesEditEnabled.get().getCompany().getId(),

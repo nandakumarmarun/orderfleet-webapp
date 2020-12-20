@@ -49,6 +49,7 @@ if (!this.CompanyConfiguration) {
 		var salesPdfDownload = $('#salesPdfDownload').is(":checked");
 		var visitBasedTransaction = $('#visitBasedTransaction').is(":checked");
 		var salesManagement = $('#salesManagement').is(":checked");
+		var receiptsManagement = $('#receiptsManagement').is(":checked");
 		var salesEditEnabled = $('#salesEditEnabled').is(":checked");
 		var gpsVarianceQuery = $('#gpsVarianceQuery').is(":checked");
 		var sendSalesOrderEmail = $('#sendSalesOrderEmail').is(":checked");
@@ -72,6 +73,7 @@ if (!this.CompanyConfiguration) {
 				salesPdfDownload : salesPdfDownload,
 				visitBasedTransaction : visitBasedTransaction,
 				salesManagement : salesManagement,
+				receiptsManagement : receiptsManagement,
 				salesEditEnabled : salesEditEnabled,
 				gpsVarianceQuery : gpsVarianceQuery,
 				sendSalesOrderEmail : sendSalesOrderEmail,
@@ -114,7 +116,9 @@ if (!this.CompanyConfiguration) {
 						$("#visitBasedTransaction").prop("checked",
 								data.visitBasedTransaction);
 						$("#salesManagement").prop("checked",
-								data.salesManagement);
+								data.salesManagement);								
+						$("#receiptsManagement").prop("checked",
+								data.receiptsManagement);
 						$("#salesEditEnabled").prop("checked",
 								data.salesEditEnabled);
 						$("#gpsVarianceQuery").prop("checked",

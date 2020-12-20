@@ -22,6 +22,7 @@ public class CompanyConfigDTO {
 	private boolean salesPdfDownload;// setting for download as pdf button in sales order
 	private boolean visitBasedTransaction;// setting for visit based transaction
 	private boolean salesManagement;// setting for Sales Management
+	private boolean receiptsManagement;// setting for Receipt Management
 	private boolean salesEditEnabled;// setting for KFC
 	private boolean gpsVarianceQuery; // setting for gpsvariance
 	private boolean sendSalesOrderEmail;
@@ -129,6 +130,14 @@ public class CompanyConfigDTO {
 
 	public void setSalesManagement(boolean salesManagement) {
 		this.salesManagement = salesManagement;
+	}
+
+	public boolean isReceiptsManagement() {
+		return receiptsManagement;
+	}
+
+	public void setReceiptsManagement(boolean receiptsManagement) {
+		this.receiptsManagement = receiptsManagement;
 	}
 
 	public boolean getSalesEditEnabled() {

@@ -373,4 +373,14 @@ public class AccountingVoucherHeaderServiceImpl implements AccountingVoucherHead
 		return result;
 	}
 
+	@Override
+	public void updateAccountingVoucherHeaderSalesManagementStatus(
+			AccountingVoucherHeaderDTO accountingVoucherHeaderDTO) {
+		AccountingVoucherHeader accountingVoucherHeader = accountingVoucherHeaderRepository
+				.findOneByPid(accountingVoucherHeaderDTO.getPid()).get();
+		accountingVoucherHeader.setSalesManagementStatus(accountingVoucherHeaderDTO.getSalesManagementStatus());
+		accountingVoucherHeaderRepository.save(accountingVoucherHeader);
+		
+	}
+
 }
