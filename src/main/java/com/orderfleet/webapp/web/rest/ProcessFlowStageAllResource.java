@@ -79,6 +79,7 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.FilledForm;
+import com.orderfleet.webapp.domain.FilledFormDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
@@ -89,6 +90,7 @@ import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
@@ -143,6 +145,9 @@ public class ProcessFlowStageAllResource {
 
 	@Inject
 	private InventoryVoucherHeaderService inventoryVoucherService;
+	
+	@Inject
+	private DocumentRepository documentRepository;
 
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
@@ -194,7 +199,7 @@ public class ProcessFlowStageAllResource {
 
 	@Inject
 	private AccountProfileMapper accountProfileMapper;
-	
+
 	@Inject
 	private DynamicDocumentHeaderRepository dynamicDocumentHeaderRepository;
 
@@ -363,7 +368,7 @@ public class ProcessFlowStageAllResource {
 				accountPid, fDate, tDate);
 		return new ResponseEntity<>(salesPerformanceDTOs, HttpStatus.OK);
 	}
-	
+
 	@Timed
 	@RequestMapping(value = "/process-flow-stage-all/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FormFileDTO>> getDynamicDocumentImages(@PathVariable String pid) {
@@ -976,6 +981,38 @@ public class ProcessFlowStageAllResource {
 			@RequestParam long paymentReceived, @RequestParam String deliveryDate) {
 		log.info("update Booking Id,deliveryDate,paymentReceived " + ivhPid);
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+
+		if (bookingId.equals("")) {
+			Optional<com.orderfleet.webapp.domain.Document> document = documentRepository
+					.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(),
+							"Sales Order Questions");
+
+			if (document.isPresent()) {
+				long executiveTaskExectionId = inventoryVoucherHeaderRepository
+						.findExecutiveTaskExecutionIdByPId(ivhPid);
+				List<Object[]> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
+						.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExectionId, document.get().getPid());
+
+				if (dynamicDocumentHeaders.size() > 0) {
+					Object[] obj = dynamicDocumentHeaders.get(0);
+
+					List<FilledForm> filledForms = filledFormRepository
+							.findByDynamicDocumentHeaderPid(obj[0].toString());
+
+					for (FilledForm filledForm : filledForms) {
+
+						List<FilledFormDetail> filledFormDetails = filledForm.getFilledFormDetails();
+
+						for (FilledFormDetail filledFormDetail : filledFormDetails) {
+
+							if (filledFormDetail.getFormElement().getName().equals("Booking ID")) {
+								bookingId = filledFormDetail.getValue();
+							}
+						}
+					}
+				}
+			}
+		}
 
 		inventoryVoucherHeaderDTO.setBookingId(bookingId);
 
