@@ -77,8 +77,11 @@ import com.itextpdf.text.pdf.codec.Base64.OutputStream;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.FilledForm;
+import com.orderfleet.webapp.domain.FilledFormDetail;
+import com.orderfleet.webapp.domain.FormElement;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
@@ -89,6 +92,7 @@ import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
@@ -104,13 +108,16 @@ import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.FileManagerService;
+import com.orderfleet.webapp.service.FilledFormService;
 import com.orderfleet.webapp.service.InventoryVoucherDetailService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
 import com.orderfleet.webapp.service.UserMenuItemService;
+import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.FileDTO;
+import com.orderfleet.webapp.web.rest.dto.FilledFormDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.FormFileDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
@@ -203,6 +210,9 @@ public class ProcessFlowStage1Resource {
 
 	@Inject
 	private FileManagerService fileManagerService;
+
+	@Inject
+	private DocumentRepository documentRepository;
 
 	/**
 	 * GET /primary-sales-performance : get all the inventory vouchers.
@@ -593,7 +603,7 @@ public class ProcessFlowStage1Resource {
 				if (dynamicDoc.isPresent()) {
 					salesPerformanceDTO.setDynamicDocumentPid(dynamicDoc.get()[0].toString());
 					salesPerformanceDTO.setImageButtonVisible(true);
-				} 
+				}
 			} else {
 				salesPerformanceDTO.setImageButtonVisible(false);
 			}
@@ -970,6 +980,37 @@ public class ProcessFlowStage1Resource {
 		log.info("update Booking Id,deliveryDate,paymentReceived " + ivhPid);
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
 
+		if (bookingId.equals("")) {
+			Optional<com.orderfleet.webapp.domain.Document> document = documentRepository
+					.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(),
+							"Sales Order Questions");
+
+			if (document.isPresent()) {
+				long executiveTaskExectionId = inventoryVoucherHeaderRepository
+						.findExecutiveTaskExecutionIdByPId(ivhPid);
+				List<Object[]> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
+						.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExectionId, document.get().getPid());
+
+				if (dynamicDocumentHeaders.size() > 0) {
+					Object[] obj = dynamicDocumentHeaders.get(0);
+
+					List<FilledForm> filledForms = filledFormRepository
+							.findByDynamicDocumentHeaderPid(obj[0].toString());
+
+					for (FilledForm filledForm : filledForms) {
+
+						List<FilledFormDetail> filledFormDetails = filledForm.getFilledFormDetails();
+
+						for (FilledFormDetail filledFormDetail : filledFormDetails) {
+
+							if (filledFormDetail.getFormElement().getName().equals("Booking ID")) {
+								bookingId = filledFormDetail.getValue();
+							}
+						}
+					}
+				}
+			}
+		}
 		inventoryVoucherHeaderDTO.setBookingId(bookingId);
 
 		if (!deliveryDate.equals("")) {
