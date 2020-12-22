@@ -19,6 +19,9 @@ if (!this.uploadSap) {
 		$('#uploadProductProfileProfiles').on('click', function() {
 			uploadProductProfiles();
 		});
+		$('#uploadOutstanding').on('click', function() {
+			uploadOutstanding();
+		});
 
 	});
 
@@ -68,6 +71,29 @@ if (!this.uploadSap) {
 						$(".error-msg")
 								.html(
 										"Error uploading product profiles .................");
+					}
+				});
+
+	}
+	
+	function uploadOutstanding() {
+
+		$(".error-msg").html("Uploading Outstanding....");
+		$
+				.ajax({
+					url : uploadSapContextPath + "/uploadOutstanding",
+					method : 'GET',
+					success : function(data) {
+						alert("Upload Outstanding Success")
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console
+								.log("Error uploading outstanding .................");
+						$(".error-msg")
+								.html(
+										"Error uploading outstanding .................");
 					}
 				});
 

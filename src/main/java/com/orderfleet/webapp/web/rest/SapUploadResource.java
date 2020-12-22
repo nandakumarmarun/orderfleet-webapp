@@ -34,8 +34,10 @@ import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ResponseBodySapPraveshAccountProfile;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ResponseBodySapPraveshAccountProfileOpeningBalance;
+import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ResponseBodySapPraveshOutstanding;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ResponseBodySapPraveshProductProfile;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.service.AccountProfileSapPraveshUploadService;
+import com.orderfleet.webapp.web.vendor.sap.pravesh.service.OutstandingSapPraveshUploadService;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.service.ProductProfileSapPraveshUploadService;
 
 /**
@@ -52,6 +54,8 @@ public class SapUploadResource {
 	private static String API_URL_ACCOUNT_PROFILE = "http://59.94.176.87:5002/Customer/GetAllCustomers";
 
 	private static String API_URL_PRODUCT_PROFILE = "http://59.94.176.87:5002/Products/GetAllProducts";
+	
+	private static String API_URL_OUTSTANDING = "http://59.94.176.87:5002/Order/Outstanding";
 
 	private static String AUTHENTICATION_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEzRjhFREM2QjJCNTU3OUQ0MEVGNDg1QkNBOUNFRDBBIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2MDExMDg1MzMsImV4cCI6MTYzMjY0NDUzMywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIiwiYXVkIjoiQ3VzdG9tZXJTZXJ2aWNlLkFwaSIsImNsaWVudF9pZCI6Im5hc19jbGllbnQiLCJzdWIiOiIwNWEwNzliMC1jZjBiLTQ2ZjctYThlMy1iODk4MjIwODgzMjQiLCJhdXRoX3RpbWUiOjE2MDExMDg1MzMsImlkcCI6ImxvY2FsIiwic2VydmljZS51c2VyIjoiYWRtaW4iLCJqdGkiOiIyOUU0OTRERTg1QjA0RTdBNUM1NjM3NDhCQzIyOTEyRSIsInNpZCI6IkFDOTE4QzNEMkY3MUIzRTRBMERGQzc2MDQ4QzJBMEUzIiwiaWF0IjoxNjAxMTA4NTMzLCJzY29wZSI6WyJvcGVuaWQiLCJwcm9maWxlIiwibmFzLmNsaWVudCIsIm5hcy5zZXJ2aWNlcyJdLCJhbXIiOlsicHdkIl19.x4knTyLtPEwUSnc35EnWSyxINwOLU5YTBeCD_eXDkXmMC1bWQclkdLH18Dgict07qVWyRL9EcYT66j4p7hsUGbZrZP9TLeNpQP5BT6eRSeYvkf2lmvJe1xaCvPYrHpPGvApLJJAmQxCwex7AAW74zJLpl_SdNUf3AHBkBvjr2ibEkDBgRgOTO0Z3n3f43ZxZw3LAi_x8ZRSxITY0mpevTUpDhx2pv5-ehXe7BaCbTxAJ6dBvkAavtmB-W3wp7cnJqSfr2mFpsBzE_Ek_OzAFnu_N1ALi8yE9LpuAPSDj4hVz11i98urPebHA8lEca1yBAPI6goQlKJEB4_NXI5F8CA";
 
@@ -71,6 +75,9 @@ public class SapUploadResource {
 
 	@Inject
 	private ProductProfileSapPraveshUploadService productProfileSapUploadService;
+
+	@Inject
+	private OutstandingSapPraveshUploadService outstandingSapPraveshUploadService;
 
 	@RequestMapping(value = "/sap-upload", method = RequestMethod.GET)
 	@Timed
@@ -145,6 +152,41 @@ public class SapUploadResource {
 			log.info("Product Profile Size= " + responseBodyProductProfiles.getBody().size() + "------------");
 
 			productProfileSapUploadService.saveUpdateProductProfiles(responseBodyProductProfiles.getBody());
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				throw new ServiceException(exception.getResponseBodyAsString());
+			}
+			throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+			throw new ServiceException(exception.getMessage());
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/sap-upload/uploadOutstanding", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> uploadOutstanding() throws IOException {
+
+		log.debug("Web request to upload Outstanding ...");
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		log.info("Get Outstanding URL: " + API_URL_OUTSTANDING);
+
+		try {
+			
+			HttpEntity<T> entity = new HttpEntity<>(createTokenAuthHeaders());
+
+			ResponseEntity<List<ResponseBodySapPraveshOutstanding>> responseBodyOutstanding = restTemplate
+					.exchange(API_URL_OUTSTANDING, HttpMethod.GET, entity,
+							new ParameterizedTypeReference<List<ResponseBodySapPraveshOutstanding>>() {
+							});
+			log.info("Outstanding Size= " + responseBodyOutstanding.getBody().size() + "------------");
+
+			outstandingSapPraveshUploadService.saveOutstandingInvoice(responseBodyOutstanding.getBody());
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
