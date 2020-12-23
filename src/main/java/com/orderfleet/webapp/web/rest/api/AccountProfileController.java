@@ -145,10 +145,25 @@ public class AccountProfileController {
 			Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository.findByCompanyPidAndName(
 					companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid(),
 					CompanyConfig.NEW_CUSTOMER_ALIAS);
+			List<AccountProfile> listAccountProfiles = accountProfileRepository
+					.findAllByCompanyAndDataSourceTypeAndCreatedDate(DataSourceType.MOBILE);
+
+			String customerId = "N" + company.getId();
+
+			if (listAccountProfiles.size() > 0) {
+				long count = 0;
+				long id = listAccountProfiles.get(0).getId();
+				count++;
+				long cId = id + count;
+
+				customerId = String.valueOf(cId);
+			}
+
+			newAccountProfile.setCustomerId(customerId);
+
 			if (optNewCustomerAlias.isPresent()) {
 				if (optNewCustomerAlias.get().getValue().equalsIgnoreCase("true")) {
-					List<AccountProfile> listAccountProfiles = accountProfileRepository
-							.findAllByCompanyAndDataSourceTypeAndCreatedDate(DataSourceType.MOBILE);
+
 					if (listAccountProfiles.size() > 0) {
 						String alias = listAccountProfiles.get(0).getAlias();
 						if (alias.startsWith("N_")) {
@@ -167,12 +182,12 @@ public class AccountProfileController {
 					}
 				} else {
 					newAccountProfile.setAlias("N_1");
-					
+
 				}
 
 			} else {
 				newAccountProfile.setAlias("N_1");
-				
+
 			}
 
 		} else {
