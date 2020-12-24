@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -70,6 +71,7 @@ public class OutstandingSapPraveshUploadService {
 		log.info("Customer Ids size {}", customerIds.size());
 
 		// create list account profile
+		Map<String, Double> accountBalanceMap = new HashMap<>();
 		List<AccountProfile> accProfiles = accountProfileRepository.findAccountProfileAndCustomerIds(customerIds);
 		List<AccountProfile> dealerProfiles = accountProfileRepository.findAccountProfileAndCustomerIds(dealerIds);
 
@@ -93,9 +95,22 @@ public class OutstandingSapPraveshUploadService {
 				receivablePayable.setReferenceDocumentNumber(ppDto.getOrderNum());
 				receivablePayable.setReferenceDocumentDate(convertDate(ppDto.getDocDate()));
 				saveReceivablePayable.add(receivablePayable);
+
+	             double currBal = accountBalanceMap.containsKey(ppDto.getCustomerId()) ? accountBalanceMap.get(ppDto.getCustomerId()) : 0.0;
+	             accountBalanceMap.put(ppDto.getCustomerId(), currBal + ppDto.getBalance());
 			}
 
 		}
+		log.info("Account balance map size {}", accountBalanceMap.size());
+		for (Map.Entry<String, Double> entry : accountBalanceMap.entrySet()) {
+			// entry.getKey(), entry.getValue());
+			accProfiles.stream().filter(a -> a.getCustomerId().equalsIgnoreCase(entry.getKey())).findAny()
+				.ifPresent(ap -> {
+					ap.setClosingBalance(entry.getValue());
+				});
+		}
+		log.info("Save account profile size {}", saveReceivablePayable.size());
+		accountProfileRepository.save(accProfiles);
 		log.info("Save receivable size {}", saveReceivablePayable.size());
 		bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);
 		long end = System.nanoTime();
