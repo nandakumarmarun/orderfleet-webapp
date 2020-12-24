@@ -88,6 +88,10 @@ public class ReceivablePayable implements Serializable {
 	@JsonIgnore
 	private LocalDateTime lastModifiedDate = LocalDateTime.now();
 
+	@ManyToOne
+	@JoinColumn(name = "supplier_account_profile")
+	private AccountProfile supplierAccountProfile;
+
 	@PreUpdate
 	public void preUpdate() {
 		this.lastModifiedDate = LocalDateTime.now();
@@ -216,8 +220,24 @@ public class ReceivablePayable implements Serializable {
 		return createdDate;
 	}
 
+	public void setCreatedDate(LocalDateTime createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
 	public LocalDateTime getLastModifiedDate() {
 		return lastModifiedDate;
+	}
+
+	public AccountProfile getSupplierAccountProfile() {
+		return supplierAccountProfile;
+	}
+
+	public void setSupplierAccountProfile(AccountProfile supplierAccountProfile) {
+		this.supplierAccountProfile = supplierAccountProfile;
 	}
 
 	@Override

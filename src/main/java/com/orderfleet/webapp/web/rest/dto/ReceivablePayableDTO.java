@@ -35,7 +35,7 @@ public class ReceivablePayableDTO {
 	private double referenceDocumentAmount;
 
 	private double referenceDocumentBalanceAmount;
-	
+
 	private double referenceDocumentFinalBalanceAmount;
 
 	private String remarks;
@@ -43,6 +43,10 @@ public class ReceivablePayableDTO {
 	private Long billOverDue;
 
 	private LocalDateTime lastModifiedDate;
+
+	private String supplierAccountPid;
+
+	private String supplierAccountName;
 
 	private double closingBalance;
 
@@ -67,6 +71,12 @@ public class ReceivablePayableDTO {
 		this.remarks = receivablePayable.getRemarks();
 		this.billOverDue = receivablePayable.getBillOverDue();
 		this.lastModifiedDate = receivablePayable.getLastModifiedDate();
+		this.supplierAccountPid = receivablePayable.getSupplierAccountProfile() != null
+				? receivablePayable.getSupplierAccountProfile().getPid()
+				: "";
+		this.supplierAccountName = receivablePayable.getSupplierAccountProfile() != null
+				? receivablePayable.getSupplierAccountProfile().getName()
+				: "";
 	}
 
 	public String getPid() {
@@ -156,7 +166,7 @@ public class ReceivablePayableDTO {
 	public void setReferenceDocumentBalanceAmount(double referenceDocumentBalanceAmount) {
 		this.referenceDocumentBalanceAmount = referenceDocumentBalanceAmount;
 	}
-	
+
 	public double getReferenceDocumentFinalBalanceAmount() {
 		return referenceDocumentFinalBalanceAmount;
 	}
@@ -197,13 +207,26 @@ public class ReceivablePayableDTO {
 		this.closingBalance = closingBalance;
 	}
 
+	public String getSupplierAccountPid() {
+		return supplierAccountPid;
+	}
+
+	public void setSupplierAccountPid(String supplierAccountPid) {
+		this.supplierAccountPid = supplierAccountPid;
+	}
+
+	public String getSupplierAccountName() {
+		return supplierAccountName;
+	}
+
+	public void setSupplierAccountName(String supplierAccountName) {
+		this.supplierAccountName = supplierAccountName;
+	}
+
 	@Override
 	public String toString() {
 		return "ReceivablePayableDTO [accountName=" + accountName + ", receivablePayableType=" + receivablePayableType
 				+ ", closingBalance=" + closingBalance + "]";
 	}
 
-	
-
-	
 }
