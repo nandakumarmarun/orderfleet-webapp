@@ -200,9 +200,9 @@ public class AccountProfileUploadService {
 					accountProfile.setDataSourceType(DataSourceType.TALLY);
 					accountProfile.setImportStatus(true);
 				}
+				accountProfile.setAlias(apDto.getAlias());
 			}
 			accountProfile.setTrimChar(apDto.getTrimChar());
-			accountProfile.setAlias(apDto.getAlias());
 			accountProfile.setCustomerId(apDto.getAlias());
 			if (isValidPhone(apDto.getPhone1())) {
 				accountProfile.setPhone1(apDto.getPhone1());

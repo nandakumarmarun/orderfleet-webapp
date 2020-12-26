@@ -170,9 +170,9 @@ public class AccountProfileController {
 							String[] stringArray = alias.split("_");
 
 							int i = Integer.parseInt(stringArray[1]);
-
+							
 							i++;
-
+							
 							newAccountProfile.setAlias("N_" + i);
 						} else {
 							newAccountProfile.setAlias("N_1");
