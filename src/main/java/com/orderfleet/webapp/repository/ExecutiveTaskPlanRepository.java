@@ -32,7 +32,7 @@ public interface ExecutiveTaskPlanRepository extends JpaRepository<ExecutiveTask
 
 	@Query("select executiveTaskPlan from ExecutiveTaskPlan executiveTaskPlan where executiveTaskPlan.user.login = ?#{principal.username} order by executiveTaskPlan.id asc")
 	List<ExecutiveTaskPlan> findByUserIsCurrentUser();
-	
+
 	@Query("select executiveTaskPlan from ExecutiveTaskPlan executiveTaskPlan where executiveTaskPlan.plannedDate <= ?1 and executiveTaskPlan.user.login = ?#{principal.username} order by executiveTaskPlan.id asc")
 	List<ExecutiveTaskPlan> findTillCurrentDateAndUserIsCurrentUser(LocalDateTime currentDate);
 
@@ -50,21 +50,28 @@ public interface ExecutiveTaskPlanRepository extends JpaRepository<ExecutiveTask
 
 	List<ExecutiveTaskPlan> findByUserPidAndTaskPlanStatusAndPlannedDateBetween(String userPid,
 			TaskPlanStatus taskPlanStatus, LocalDateTime startDateTime, LocalDateTime endDateTime);
-	
-	List<ExecutiveTaskPlan> findByPlannedDateBetweenOrderByIdAsc(LocalDateTime startDateTime, LocalDateTime endDateTime);
-	
-	List<ExecutiveTaskPlan> findByUserLoginAndPlannedDateBetweenOrderByIdAsc(String login, LocalDateTime startDateTime, LocalDateTime endDateTime);
-	
-	List<ExecutiveTaskPlan> findByUserPidAndPlannedDateBetweenOrderByIdAsc(String userPid, LocalDateTime startDateTime, LocalDateTime endDateTime);
-	
-	List<ExecutiveTaskPlan> findByUserPidAndPlannedDateBetweenOrderByPlannedDateAsc(String userPid, LocalDateTime startDateTime, LocalDateTime endDateTime);
-	
+
+	List<ExecutiveTaskPlan> findByPlannedDateBetweenAndCompanyIdOrderByIdAsc(LocalDateTime startDateTime,
+			LocalDateTime endDateTime, Long companyId);
+
+	List<ExecutiveTaskPlan> findByUserLoginAndPlannedDateBetweenOrderByIdAsc(String login, LocalDateTime startDateTime,
+			LocalDateTime endDateTime);
+
+	List<ExecutiveTaskPlan> findByUserPidAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(String userPid,
+			LocalDateTime startDateTime, LocalDateTime endDateTime, Long companyId);
+
+	List<ExecutiveTaskPlan> findByUserPidInAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(List<String> userPids,
+			LocalDateTime startDateTime, LocalDateTime endDateTime, Long companyId);
+
+	List<ExecutiveTaskPlan> findByUserPidAndPlannedDateBetweenOrderByPlannedDateAsc(String userPid,
+			LocalDateTime startDateTime, LocalDateTime endDateTime);
+
 	List<ExecutiveTaskPlan> findByUserPidAndPlannedDateBetweenAndTaskPlanStatusNot(String userPid,
 			LocalDateTime startDateTime, LocalDateTime endDateTime, TaskPlanStatus taskPlanStatus);
 
 	void deleteByUserPidAndTaskPlanStatusAndPlannedDateBetween(String userPid, TaskPlanStatus taskPlanStatus,
 			LocalDateTime startDateTime, LocalDateTime endDateTime);
-	
+
 	Long countByPlannedDateBetweenAndActivityIn(LocalDateTime startDateTime, LocalDateTime endDateTime,
 			List<Activity> activities);
 
@@ -79,21 +86,24 @@ public interface ExecutiveTaskPlanRepository extends JpaRepository<ExecutiveTask
 	List<ExecutiveTaskPlan> findByUserPidAndPlannedDateBetweenOrderByPlannedDateDesc(String userPid,
 			LocalDateTime startDateTime, LocalDateTime endDateTime);
 
-	List<ExecutiveTaskPlan> findByUserPidInAndPlannedDateBetweenOrderByIdAsc( List<String> userPids,LocalDateTime startDateTime, LocalDateTime endDateTime);
-	
-	//################## start User wise #######################################
+	List<ExecutiveTaskPlan> findByUserPidInAndPlannedDateBetweenOrderByIdAsc(List<String> userPids,
+			LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+	// ################## start User wise #######################################
 	Long countByPlannedDateBetweenAndActivityInAndUserIdIn(LocalDateTime startDateTime, LocalDateTime endDateTime,
 			List<Activity> activities, List<Long> userIds);
-	
-	//################## end User wise #########################################
-	
-	//################## start Account wise #######################################
-	Long countByPlannedDateBetweenAndActivityInAndAccountProfileIn(LocalDateTime startDateTime, LocalDateTime endDateTime,
-			List<Activity> activities, List<AccountProfile> accountProfiles);
 
-	//################## end Account wise #########################################
-	
-	Long countByUserPidAndPlannedDateBetweenAndActivityPid(String userPid, LocalDateTime startDateTime, LocalDateTime endDateTime,String activityPid);
-	
-	void deleteByUserPidAndTaskListPidAndPlannedDateBetween(String userPid, String taskListPid,LocalDateTime startDateTime, LocalDateTime endDateTime);
+	// ################## end User wise #########################################
+
+	// ################## start Account wise #######################################
+	Long countByPlannedDateBetweenAndActivityInAndAccountProfileIn(LocalDateTime startDateTime,
+			LocalDateTime endDateTime, List<Activity> activities, List<AccountProfile> accountProfiles);
+
+	// ################## end Account wise #########################################
+
+	Long countByUserPidAndPlannedDateBetweenAndActivityPid(String userPid, LocalDateTime startDateTime,
+			LocalDateTime endDateTime, String activityPid);
+
+	void deleteByUserPidAndTaskListPidAndPlannedDateBetween(String userPid, String taskListPid,
+			LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

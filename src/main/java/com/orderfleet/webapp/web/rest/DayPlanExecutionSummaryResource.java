@@ -32,9 +32,11 @@ import com.orderfleet.webapp.domain.enums.TaskPlanStatus;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskPlanRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.UserService;
+import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.DayPlanExecutionSummaryDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskPlanDTO;
@@ -73,12 +75,10 @@ public class DayPlanExecutionSummaryResource {
 	/**
 	 * GET /day-plans-execution-summary : get all the DayPlanExecutionReport.
 	 *
-	 * @param pageable
-	 *            the pagination information
-	 * @return the ResponseEntity with status 200 (OK) and the list of users in
-	 *         body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @param pageable the pagination information
+	 * @return the ResponseEntity with status 200 (OK) and the list of users in body
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@Timed
 	@RequestMapping(value = "/day-plans-execution-summary", method = RequestMethod.GET)
@@ -121,25 +121,41 @@ public class DayPlanExecutionSummaryResource {
 		log.debug("Web request to get Executive Task Plan");
 		List<ExecutiveTaskPlan> actualEcutiveTaskPlans = null;
 
+		List<String> userPids = new ArrayList<>();
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
 		if (!employeePid.equals("no")) {
 			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
-		}
-		String userPid = "-1";
-		if (employeeProfileDTO.getPid() != null) {
-			userPid = employeeProfileDTO.getUserPid();
+			if (employeeProfileDTO.getPid() != null) {
+				userPids.add(employeeProfileDTO.getUserPid());
+			}
+		} else {
+			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+			if (userIds.size() > 0) {
+				List<UserDTO> users = userService.findByUserIdIn(userIds);
+				for(UserDTO user:users) {
+					userPids.add(user.getPid());
+				}
+			}
 		}
 
+		actualEcutiveTaskPlans = executiveTaskPlanRepository.findByUserPidInAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(
+				userPids, startDate.atTime(0, 0), endDate.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
+//		String userPid = "-1";
+//		if (employeeProfileDTO.getPid() != null) {
+//			userPid = employeeProfileDTO.getUserPid();
+//		}
+
 		// filter by user and date between
-		if (userPid != null && !"-1".equals(userPid)) {
-			actualEcutiveTaskPlans = executiveTaskPlanRepository.findByUserPidAndPlannedDateBetweenOrderByIdAsc(userPid,
-					startDate.atTime(0, 0), endDate.atTime(23, 59));
-		}
-		// filter by date between
-		if (userPid == null || "-1".equals(userPid)) {
-			actualEcutiveTaskPlans = executiveTaskPlanRepository
-					.findByPlannedDateBetweenOrderByIdAsc(startDate.atTime(0, 0), endDate.atTime(23, 59));
-		}
+//		if (userPid != null && !"-1".equals(userPid)) {
+//			actualEcutiveTaskPlans = executiveTaskPlanRepository
+//					.findByUserPidAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(userPid, startDate.atTime(0, 0),
+//							endDate.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
+//		}
+//		// filter by date between
+//		if (userPid == null || "-1".equals(userPid)) {
+//			actualEcutiveTaskPlans = executiveTaskPlanRepository.findByPlannedDateBetweenAndCompanyIdOrderByIdAsc(
+//					startDate.atTime(0, 0), endDate.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
+//		}
 		Map<LocalDate, Map<String, List<ExecutiveTaskPlan>>> plansGroupedByDateThenByUser = null;
 		// map for UI
 		Map<DayPlanExecutionSummaryDTO, Map<DayPlanExecutionSummaryDTO, List<ExecutiveTaskPlanDTO>>> resultMap = new TreeMap<>();
@@ -265,8 +281,9 @@ public class DayPlanExecutionSummaryResource {
 		List<String> userPids = new ArrayList<>();
 		// filter by user and date between
 		if (userPid != null && !"-1".equals(userPid)) {
-			actualEcutiveTaskPlans = executiveTaskPlanRepository.findByUserPidAndPlannedDateBetweenOrderByIdAsc(userPid,
-					startDate.atTime(0, 0), endDate.atTime(23, 59));
+			actualEcutiveTaskPlans = executiveTaskPlanRepository
+					.findByUserPidAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(userPid, startDate.atTime(0, 0),
+							endDate.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
 		}
 		// filter by date between
 
@@ -288,10 +305,10 @@ public class DayPlanExecutionSummaryResource {
 					}
 				}
 			}
-			if(userIds.isEmpty()){
+			if (userIds.isEmpty()) {
 				uniqueIds.addAll(dashboardUserIds);
 			}
-			
+
 			if (uniqueIds.size() > 0) {
 				userIds = new ArrayList<>(uniqueIds);
 			}
@@ -441,8 +458,9 @@ public class DayPlanExecutionSummaryResource {
 		List<String> userPids;
 		// filter by user and date between
 		if (userPid != null && !"-1".equals(userPid)) {
-			actualEcutiveTaskPlans = executiveTaskPlanRepository.findByUserPidAndPlannedDateBetweenOrderByIdAsc(userPid,
-					startDate.atTime(0, 0), endDate.atTime(23, 59));
+			actualEcutiveTaskPlans = executiveTaskPlanRepository
+					.findByUserPidAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(userPid, startDate.atTime(0, 0),
+							endDate.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
 		}
 		// filter by date between
 		if (userPid == null || "-1".equals(userPid)) {

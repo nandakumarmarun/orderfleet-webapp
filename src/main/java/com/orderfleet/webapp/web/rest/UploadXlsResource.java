@@ -441,9 +441,12 @@ public class UploadXlsResource {
 			int rowNumber = 0;
 			Workbook workbook = WorkbookFactory.create(multipartFile.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
+		
 			for (Row row : sheet) {
 				rowNumber = row.getRowNum();
+				
 				if (rowNumber > 0) {
+					System.out.println(rowNumber+"--------------");
 					rowNumber++;
 					String productProfileName = "";
 

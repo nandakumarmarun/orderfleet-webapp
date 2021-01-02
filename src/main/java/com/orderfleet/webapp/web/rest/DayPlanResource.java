@@ -33,8 +33,11 @@ import com.orderfleet.webapp.repository.ExecutiveTaskPlanRepository;
 import com.orderfleet.webapp.repository.UserTaskAssignmentRepository;
 import com.orderfleet.webapp.repository.UserTaskGroupAssignmentRepository;
 import com.orderfleet.webapp.repository.UserTaskListAssignmentRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
+import com.orderfleet.webapp.service.UserService;
+import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.DayPlanDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 
@@ -50,8 +53,6 @@ public class DayPlanResource {
 
 	private final Logger log = LoggerFactory.getLogger(DayPlanResource.class);
 
-	
-
 	@Inject
 	private ExecutiveTaskPlanRepository executiveTaskPlanRepository;
 
@@ -63,20 +64,22 @@ public class DayPlanResource {
 
 	@Inject
 	private UserTaskListAssignmentRepository userTaskListAssignmentRepository;
-	
+
 	@Inject
 	private EmployeeHierarchyService employeeHierarchyService;
-	
+
 	@Inject
 	private EmployeeProfileService employeeProfileService;
+
+	@Inject
+	private UserService userService;
 
 	/**
 	 * GET /day-plans
 	 *
-	 * @param pageable
-	 *            the pagination information
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @param pageable the pagination information
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@Timed
 	@RequestMapping(value = "/day-plans", method = RequestMethod.GET)
@@ -97,24 +100,45 @@ public class DayPlanResource {
 	public ResponseEntity<List<DayPlanDTO>> filterDayPlans(@RequestParam("employeePid") String employeePid,
 			@RequestParam String date) {
 		log.debug("Web request to filter day plans");
+//		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
+//		if (!employeePid.equals("no")) {
+//			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
+//		}
+//		String userPid = "no";
+//		if (employeeProfileDTO.getPid() != null) {
+//			userPid = employeeProfileDTO.getUserPid();
+//		}
+		List<String> userPids = new ArrayList<>();
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
 		if (!employeePid.equals("no")) {
 			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
+			if (employeeProfileDTO.getPid() != null) {
+				userPids.add(employeeProfileDTO.getUserPid());
+			}
+		} else {
+			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+			if (userIds.size() > 0) {
+				List<UserDTO> users = userService.findByUserIdIn(userIds);
+				for (UserDTO user : users) {
+					userPids.add(user.getPid());
+				}
+			}
 		}
-		String userPid = "no";
-		if (employeeProfileDTO.getPid() != null) {
-			userPid = employeeProfileDTO.getUserPid();
-		}
-		
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); 
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 		LocalDate dateTime = LocalDate.parse(date, formatter);
-		return new ResponseEntity<>(getPlans(userPid, dateTime), HttpStatus.OK);
+		return new ResponseEntity<>(getPlans(userPids, dateTime), HttpStatus.OK);
 	}
 
-	private List<DayPlanDTO> getPlans(String userPid, LocalDate date) {
+	private List<DayPlanDTO> getPlans(List<String> userPids, LocalDate date) {
+
+//		List<ExecutiveTaskPlan> executiveTaskPlans = executiveTaskPlanRepository
+//				.findByUserPidAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(userPid, date.atTime(0, 0),
+//						date.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
 
 		List<ExecutiveTaskPlan> executiveTaskPlans = executiveTaskPlanRepository
-				.findByUserPidAndPlannedDateBetweenOrderByIdAsc(userPid, date.atTime(0, 0), date.atTime(23, 59));
+				.findByUserPidInAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(userPids, date.atTime(0, 0),
+						date.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
 
 		List<DayPlanDTO> dayPlans = new ArrayList<>();
 		for (ExecutiveTaskPlan executiveTaskPlan : executiveTaskPlans) {
@@ -135,16 +159,24 @@ public class DayPlanResource {
 		}
 
 		// find not in user task assignment
-		List<Task> userTaskAssignmentTasks = userTaskAssignmentRepository.findTasksByUserPidAndStartDate(userPid, date);
+		// List<Task> userTaskAssignmentTasks =
+		// userTaskAssignmentRepository.findTasksByUserPidAndStartDate(userPid, date);
+
+		List<Task> userTaskAssignmentTasks = userTaskAssignmentRepository.findTasksByUserPidInAndStartDate(userPids,
+				date);
 		dayPlans = findNotInTaskFromUserTaskAssignments(executiveTaskPlans, userTaskAssignmentTasks, dayPlans);
 
 		// find not in user task group assignment
-		List<TaskGroup> userTaskGroups = userTaskGroupAssignmentRepository.findTaskGroupsByUserPidAndStartDate(userPid,
-				date);
+//		List<TaskGroup> userTaskGroups = userTaskGroupAssignmentRepository.findTaskGroupsByUserPidAndStartDate(userPid,
+//				date);
+		List<TaskGroup> userTaskGroups = userTaskGroupAssignmentRepository
+				.findTaskGroupsByUserPidInAndStartDate(userPids, date);
 		dayPlans = findNotInTaskFromUserTaskGroupAssignments(executiveTaskPlans, userTaskGroups, dayPlans);
 
 		// find not in user task list assignment
-		List<TaskList> userTaskLists = userTaskListAssignmentRepository.findTaskListsByUserPidAndStartDate(userPid,
+//		List<TaskList> userTaskLists = userTaskListAssignmentRepository.findTaskListsByUserPidAndStartDate(userPid,
+//				date);
+		List<TaskList> userTaskLists = userTaskListAssignmentRepository.findTaskListsByUserPidInAndStartDate(userPids,
 				date);
 		dayPlans = findNotInTaskFromUserTaskListAssignments(executiveTaskPlans, userTaskLists, dayPlans);
 

@@ -24,8 +24,11 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskPlanRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
+import com.orderfleet.webapp.service.UserService;
+import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskPlanDTO;
 
@@ -44,14 +47,16 @@ public class DayPlanExecutionReportResource {
 	private final ExecutiveTaskPlanRepository executiveTaskPlanRepository;
 
 	private final ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
-	
+
 	private final EmployeeHierarchyService employeeHierarchyService;
-	
+
 	@Inject
 	private EmployeeProfileService employeeProfileService;
-	
-	public DayPlanExecutionReportResource(
-			ExecutiveTaskPlanRepository executiveTaskPlanRepository,
+
+	@Inject
+	private UserService userService;
+
+	public DayPlanExecutionReportResource(ExecutiveTaskPlanRepository executiveTaskPlanRepository,
 			ExecutiveTaskExecutionRepository executiveTaskExecutionRepository,
 			EmployeeHierarchyService employeeHierarchyService) {
 		super();
@@ -63,12 +68,10 @@ public class DayPlanExecutionReportResource {
 	/**
 	 * GET /day-plan-execution-report : get all the DayPlanExecutionReport.
 	 *
-	 * @param pageable
-	 *            the pagination information
-	 * @return the ResponseEntity with status 200 (OK) and the list of users in
-	 *         body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @param pageable the pagination information
+	 * @return the ResponseEntity with status 200 (OK) and the list of users in body
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@Timed
 	@RequestMapping(value = "/day-plan-execution-report", method = RequestMethod.GET)
@@ -87,21 +90,43 @@ public class DayPlanExecutionReportResource {
 	@Timed
 	@Transactional(readOnly = true)
 	@RequestMapping(value = "/day-plan-execution-report/load", method = RequestMethod.GET)
-	public ResponseEntity<List<ExecutiveTaskPlanDTO>> getExecutiveTaskPlan(@RequestParam("employeePid") String employeePid,
-			@RequestParam String date) {
+	public ResponseEntity<List<ExecutiveTaskPlanDTO>> getExecutiveTaskPlan(
+			@RequestParam("employeePid") String employeePid, @RequestParam String date) {
 		log.debug("Web request to get Executive Task Plan");
+//		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
+//		if (!employeePid.equals("no")) {
+//			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
+//		}
+//		String userPid = "no";
+//		if (employeeProfileDTO.getPid() != null) {
+//			userPid = employeeProfileDTO.getUserPid();
+//		}
+
+		List<String> userPids = new ArrayList<>();
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
 		if (!employeePid.equals("no")) {
 			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
+			if (employeeProfileDTO.getPid() != null) {
+				userPids.add(employeeProfileDTO.getUserPid());
+			}
+		} else {
+			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+			if (userIds.size() > 0) {
+				List<UserDTO> users = userService.findByUserIdIn(userIds);
+				for (UserDTO user : users) {
+					userPids.add(user.getPid());
+				}
+			}
 		}
-		String userPid = "no";
-		if (employeeProfileDTO.getPid() != null) {
-			userPid = employeeProfileDTO.getUserPid();
-		}
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); 
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 		LocalDate dateTime = LocalDate.parse(date, formatter);
+//		List<ExecutiveTaskPlan> actualEcutiveTaskPlans = executiveTaskPlanRepository
+//				.findByUserPidAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(userPid, dateTime.atTime(0, 0),
+//						dateTime.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
 		List<ExecutiveTaskPlan> actualEcutiveTaskPlans = executiveTaskPlanRepository
-				.findByUserPidAndPlannedDateBetweenOrderByIdAsc(userPid, dateTime.atTime(0, 0), dateTime.atTime(23, 59));
+				.findByUserPidInAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(userPids, dateTime.atTime(0, 0),
+						dateTime.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
 		List<ExecutiveTaskPlanDTO> result = new ArrayList<>();
 		if (!actualEcutiveTaskPlans.isEmpty()) {
 			List<ExecutiveTaskPlan> savedExecutedPlan = executiveTaskExecutionRepository

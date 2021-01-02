@@ -140,16 +140,16 @@
 								<button type="button" class="btn btn-success" id="downloadXls">Download</button>
 							</div>
 
-							<c:if test="${sendTransactionsSapPravesh=='true'}">
-								<div class="col-sm-1">
-									<br>
-									<button type="button" class="btn btn-primary"
-										id="sendTransactionsSapPravesh">Send Receipts To SAP</button>
-									<!-- 									<div class="loader hide"></div> -->
+<%-- 							<c:if test="${sendTransactionsSapPravesh=='true'}"> --%>
+<!-- 								<div class="col-sm-1"> -->
+<!-- 									<br> -->
+<!-- 									<button type="button" class="btn btn-primary" -->
+<!-- 										id="sendTransactionsSapPravesh">Send Receipts To SAP</button> -->
+<!-- 																		<div class="loader hide"></div> -->
 
-								</div>
+<!-- 								</div> -->
 
-							</c:if>
+<%-- 							</c:if> --%>
 						</div>
 					</form>
 				</div>

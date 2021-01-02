@@ -448,51 +448,15 @@ if (!this.AccountVoucher) {
 		switch (status) {
 		case 'PENDING':
 			spanStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'PENDING<span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="AccountVoucher.setStatus('
-					+ pid
-					+ ','
-					+ processing
-					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
-					+ '<li onclick="AccountVoucher.setStatus('
-					+ pid
-					+ ','
-					+ completed
-					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
-					+ '</ul></div>';
+					+ 'PENDING</span></div>';
 			break;
 		case 'PROCESSING':
 			spanStatus = '<div class="dropdown"><span class="label label-warning dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'PROCESSING <span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="AccountVoucher.setStatus('
-					+ pid
-					+ ','
-					+ pending
-					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
-					+ '<li onclick="AccountVoucher.setStatus('
-					+ pid
-					+ ','
-					+ completed
-					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
-					+ '</ul></div>';
+					+ 'PROCESSING</span></div>';
 			break;
 		case 'COMPLETED':
 			spanStatus = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'COMPLETED <span class="caret"></span></span>'
-					+ '<ul class="dropdown-menu">'
-					+ '<li onclick="AccountVoucher.setStatus('
-					+ pid
-					+ ','
-					+ pending
-					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
-					+ '<li onclick="AccountVoucher.setStatus('
-					+ pid
-					+ ','
-					+ processing
-					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
-					+ '</ul></div>';
+					+ 'COMPLETED</span></div>';
 			break;
 		}
 

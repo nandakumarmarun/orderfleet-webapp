@@ -245,6 +245,8 @@ public class SendInvoiceOdooService {
 							inventoryVoucherDetail.getFreeQuantity() > 0.0 ? inventoryVoucherDetail.getFreeQuantity()
 									: 0.0);
 
+					odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountPercentage());
+
 					odooInvoiceLine.setProduct_id(inventoryVoucherDetail.getProduct().getProductId() != null
 							&& !inventoryVoucherDetail.getProduct().getProductId().equals("")
 									? Long.parseLong(inventoryVoucherDetail.getProduct().getProductId())
@@ -604,7 +606,7 @@ public class SendInvoiceOdooService {
 
 					OdooInvoiceLine odooInvoiceLine = new OdooInvoiceLine();
 
-					odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountAmount());
+					odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountPercentage());
 					odooInvoiceLine.setIs_foc(
 							inventoryVoucherDetail.getFreeQuantity() > 0.0 ? inventoryVoucherDetail.getFreeQuantity()
 									: 0.0);

@@ -49,4 +49,7 @@ public interface UserTaskGroupAssignmentRepository extends JpaRepository<UserTas
 	@Query("select userTaskGroupAssignment.taskGroup from UserTaskGroupAssignment userTaskGroupAssignment where userTaskGroupAssignment.executiveUser.pid = ?1 and userTaskGroupAssignment.startDate = ?2")
 	List<TaskGroup> findTaskGroupsByUserPidAndStartDate(String userPid, LocalDate startDate);
 
+	@Query("select userTaskGroupAssignment.taskGroup from UserTaskGroupAssignment userTaskGroupAssignment where userTaskGroupAssignment.executiveUser.pid in ?1 and userTaskGroupAssignment.startDate = ?2")
+	List<TaskGroup> findTaskGroupsByUserPidInAndStartDate(List<String> userPids, LocalDate date);
+
 }

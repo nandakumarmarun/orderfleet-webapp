@@ -47,4 +47,7 @@ public interface UserTaskListAssignmentRepository extends JpaRepository<UserTask
 	@Query("select userTaskListAssignment.taskList from UserTaskListAssignment userTaskListAssignment where userTaskListAssignment.executiveUser.pid = ?1 and userTaskListAssignment.startDate = ?2")
 	List<TaskList> findTaskListsByUserPidAndStartDate(String userPid, LocalDate startDate);
 
+	@Query("select userTaskListAssignment.taskList from UserTaskListAssignment userTaskListAssignment where userTaskListAssignment.executiveUser.pid in ?1 and userTaskListAssignment.startDate = ?2")
+	List<TaskList> findTaskListsByUserPidInAndStartDate(List<String> userPids, LocalDate date);
+
 }
