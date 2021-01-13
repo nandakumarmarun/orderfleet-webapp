@@ -219,7 +219,7 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	Page<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdOrderByIdAsc(
 			Set<Long> locationIds, long companyId, Pageable pageable);
 
-	@Query("select distinct locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in ?1 and locationAccountProfile.accountProfile.activated=true and locationAccountProfile.company.id=?2 and (locationAccountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.accountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.location.lastModifiedDate > ?3) order by locationAccountProfile.id asc")
+	@Query("select distinct locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.id in ?1 and locationAccountProfile.accountProfile.activated=true and locationAccountProfile.company.id=?2 and (locationAccountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.accountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.location.lastModifiedDate > ?3) order by locationAccountProfile.id asc")
 	Page<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdAndLastModifiedDateOrderByIdAsc(
 			Set<Long> locationIds, long companyId, LocalDateTime lastSyncdate, Pageable pageable);
 

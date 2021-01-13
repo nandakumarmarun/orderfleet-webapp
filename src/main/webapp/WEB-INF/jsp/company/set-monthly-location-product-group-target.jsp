@@ -116,7 +116,7 @@
 		var="monthPicker"></spring:url>
 	<script type="text/javascript" src="${monthPicker}"></script>
 
-	<spring:url value="/resources/app/set-monthly-product-group-target.js"
+	<spring:url value="/resources/app/set-monthly-location-product-group-target.js"
 		var="setMonthlyProductGroupTargetJs"></spring:url>
 	<script type="text/javascript" src="${setMonthlyProductGroupTargetJs}"></script>
 	

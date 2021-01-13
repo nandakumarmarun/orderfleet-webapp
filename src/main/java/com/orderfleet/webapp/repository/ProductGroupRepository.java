@@ -48,7 +48,7 @@ public interface ProductGroupRepository extends JpaRepository<ProductGroup, Long
 	@Query("select productGroup from ProductGroup productGroup where productGroup.company.pid = ?1 order By productGroup.id asc")
 	List<ProductGroup> findAllByCompanyPidOrderByProductId(String companyPid);
 
-	@Query("select productGroup from ProductGroup productGroup where productGroup.company.pid = ?1 and productGroup.pid in ?2 order By productGroup.id asc")
+	@Query("select productGroup from ProductGroup productGroup where productGroup.company.pid = ?1 and productGroup.pid in ?2 order By productGroup.name asc")
 	List<ProductGroup> findAllByCompanyPidAndGroupPidIn(String companyPid, List<String> groupPids);
 
 	@Query("select productgroup from ProductGroup productgroup where productgroup.company.id = ?1 and UPPER(productgroup.name) in ?2")

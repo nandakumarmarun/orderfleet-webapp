@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.ProductGroupSalesTargetGroup;
 import com.orderfleet.webapp.domain.SalesSummaryAchievment;
 import com.orderfleet.webapp.domain.SalesTargetGroup;
 import com.orderfleet.webapp.repository.ProductGroupSalesTargetGrouprepository;
@@ -31,13 +30,10 @@ import com.orderfleet.webapp.repository.SalesTargetGroupUserTargetRepository;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileLocationService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
-import com.orderfleet.webapp.service.ProductGroupSalesTargetGroupService;
 import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.SalesSummaryAchievmentService;
-import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductGroupSalesTargetGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesSummaryAchievmentDTO;
 
 /**

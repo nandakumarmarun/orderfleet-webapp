@@ -90,7 +90,8 @@ public class InventoryVoucherHeaderDTO {
 
 	private String orderStatusName;
 
-	private String visitRemarks; // executive task execution remarks
+	private String visitRemarks;
+	// executive task execution remarks
 
 	// SaveOrUpdate Dashboard update
 	private Boolean isNew = Boolean.FALSE;
@@ -121,6 +122,10 @@ public class InventoryVoucherHeaderDTO {
 	private String referenceInvoiceNumber;
 
 	private double roundedOff;
+
+	private long inventoryVoucherHeaderId;
+	private long receiverAccountProfileId;
+	private long documentId;
 
 	public InventoryVoucherHeaderDTO() {
 		super();
@@ -677,6 +682,30 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setRoundedOff(double roundedOff) {
 		this.roundedOff = roundedOff;
+	}
+
+	public long getInventoryVoucherHeaderId() {
+		return inventoryVoucherHeaderId;
+	}
+
+	public void setInventoryVoucherHeaderId(long inventoryVoucherHeaderId) {
+		this.inventoryVoucherHeaderId = inventoryVoucherHeaderId;
+	}
+
+	public long getReceiverAccountProfileId() {
+		return receiverAccountProfileId;
+	}
+
+	public void setReceiverAccountProfileId(long receiverAccountProfileId) {
+		this.receiverAccountProfileId = receiverAccountProfileId;
+	}
+
+	public long getDocumentId() {
+		return documentId;
+	}
+
+	public void setDocumentId(long documentId) {
+		this.documentId = documentId;
 	}
 
 	@Override

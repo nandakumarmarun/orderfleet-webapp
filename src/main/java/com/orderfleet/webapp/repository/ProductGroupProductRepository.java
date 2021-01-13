@@ -134,6 +134,9 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 
 	@Query("select productGroupProduct.product.id from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid = ?1 ")
 	Set<Long> findProductIdByProductGroupPid(String productGroupPid);
+	
+	@Query("select productGroupProduct.product.id from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid in ?1 ")
+	Set<Long> findProductIdByProductGroupPidIn(List<String> productGroupPid);
 
 	@Query("select productGroupProduct.product.pid from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid = ?1 ")
 	Set<String> findProductPidByProductGroupPid(String productGroupPid);

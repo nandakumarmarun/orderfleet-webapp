@@ -137,6 +137,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdOrderByCreatedDateDesc();
 
+	@Query("select inventoryVoucher.id,inventoryVoucher.receiverAccount.id,inventoryVoucher.document.id,inventoryVoucher.documentDate from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} Order By inventoryVoucher.createdDate desc")
+	List<Object[]> findAllByCompanyIdAndOrderByCreatedDateDesc();
+
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} Order By inventoryVoucher.createdDate desc")
 	Page<InventoryVoucherHeader> findAllByCompanyIdOrderByCreatedDateDesc(Pageable pageable);
 
@@ -545,12 +548,12 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("UPDATE InventoryVoucherHeader iv SET iv.tallyDownloadStatus = ?1  WHERE  iv.company.id = ?2  AND iv.pid in ?3")
 	int updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(TallyDownloadStatus tallyDownloadStatus,
 			Long companyId, List<String> inventoryPids);
-	
+
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE InventoryVoucherHeader iv SET iv.tallyDownloadStatus = ?1  WHERE  iv.company.id = ?2  AND iv.documentNumberServer in ?3")
-	int updateInventoryVoucherHeaderDownloadStatusUsingDocumentNumberServerAndCompanyId(TallyDownloadStatus tallyDownloadStatus,
-			Long companyId, List<String> documentNumberServer);
+	int updateInventoryVoucherHeaderDownloadStatusUsingDocumentNumberServerAndCompanyId(
+			TallyDownloadStatus tallyDownloadStatus, Long companyId, List<String> documentNumberServer);
 
 	@Query(value = PRIMARY_SALES_ORDER_EXCEl, nativeQuery = true)
 	List<Object[]> getPrimarySalesOrderForExcel(Long companyId, List<Long> documentIds);
@@ -593,7 +596,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status , reference_invoice_number , rounded_off "
 			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and document_id IN(?1) and company_id = ?#{principal.companyId} order by created_date desc";
-	
+
 	public static final String DOCUMENT_BASED_ORDER_DOWNLOAD_TALLY_LIMIT = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status , reference_invoice_number , rounded_off "
@@ -603,7 +606,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status , reference_invoice_number , rounded_off "
 			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and sales_management_status = 'APPROVE' and document_id IN(?1) and company_id = ?#{principal.companyId} order by created_date desc";
-	
+
 	public static final String DOCUMENT_BASED_ORDER_MANAGEMENT_DOWNLOAD_TALLY_LIMIT = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status , reference_invoice_number , rounded_off "
@@ -720,7 +723,6 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1 and inventoryVoucher.document.pid = ?2")
 	List<Object[]> findByExecutiveTaskExecutionIdInAndDocumentPid(Set<Long> exeIds, String documentPid);
 
-	
 	@Query(value = DOCUMENT_BASED_ORDER_MANAGEMENT_DOWNLOAD_TALLY_LIMIT, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateAscLimit(
 			List<Long> documentIdList);
