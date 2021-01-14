@@ -113,6 +113,7 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderItemDetailsSap;
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderMasterSap;
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderResponseDataSap;
+import com.orderfleet.webapp.web.vendor.sap.prabhu.service.SendSalesOrderSapService;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPraveshService;
 
 /**
@@ -179,6 +180,9 @@ public class SalesPerformanceManagementResource {
 
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
+	
+	@Inject
+	private SendSalesOrderSapService sendSalesOrderSapService;
 
 	@Inject
 	private AccountProfileMapper accountProfileMapper;
@@ -857,30 +861,34 @@ public class SalesPerformanceManagementResource {
 			throws IOException {
 
 		log.info("Download to Sap with pid " + inventoryPid);
+		
+		sendSalesOrderSapService.sendSalesOrder(inventoryPid);
 
-		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(inventoryPid).get();
-
-		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)
-				&& inventoryVoucherHeaderDTO.getSalesManagementStatus().equals(SalesManagementStatus.APPROVE)) {
-			log.info("Downloading to sap prabhu.............");
-
-			SalesOrderResponseDataSap salesOrderResponseDataSap = sendSalesOrdertoSap(inventoryVoucherHeaderDTO);
-
-			log.info("Response Data: " + salesOrderResponseDataSap);
-
-			inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.PROCESSING);
-
-			if (salesOrderResponseDataSap.getStatusCode() == 0) {
-				inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
-			}
-
-			if (salesOrderResponseDataSap.getStatusCode() == 1) {
-				inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.PENDING);
-			}
-
-			inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
-
-		}
+//		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(inventoryPid).get();
+//
+//		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)
+//				&& inventoryVoucherHeaderDTO.getSalesManagementStatus().equals(SalesManagementStatus.APPROVE)) {
+//			log.info("Downloading to sap prabhu.............");
+//			
+//			
+//
+//			SalesOrderResponseDataSap salesOrderResponseDataSap = sendSalesOrdertoSap(inventoryVoucherHeaderDTO);
+//
+//			log.info("Response Data: " + salesOrderResponseDataSap);
+//
+//			inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.PROCESSING);
+//
+//			if (salesOrderResponseDataSap.getStatusCode() == 0) {
+//				inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
+//			}
+//
+//			if (salesOrderResponseDataSap.getStatusCode() == 1) {
+//				inventoryVoucherHeaderDTO.setTallyDownloadStatus(TallyDownloadStatus.PENDING);
+//			}
+//
+//			inventoryVoucherService.updateInventoryVoucherHeaderStatus(inventoryVoucherHeaderDTO);
+//
+//		}
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
