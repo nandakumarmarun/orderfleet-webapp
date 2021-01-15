@@ -163,12 +163,14 @@ public class AccountProfileUploadService {
 						accountProfile.setName(apDto.getName()); // set new name
 						accountProfile.setCustomerId(apDto.getAlias());
 					}
+					accountProfile.setDataSourceType(DataSourceType.MOBILE);
 				} else {
 					// check exist by name, only one exist with a name
 					Optional<AccountProfile> optionalAP = accountProfiles.stream()
 							.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
 					if (optionalAP.isPresent()) {
 						accountProfile = optionalAP.get();
+						accountProfile.setDataSourceType(DataSourceType.TALLY);
 						// if not update, skip this iteration. Not implemented now
 						// if (!accountProfile.getThirdpartyUpdate()) { continue; }
 					} else {
@@ -179,6 +181,7 @@ public class AccountProfileUploadService {
 						accountProfile.setCompany(company);
 						accountProfile.setAccountStatus(AccountStatus.Unverified);
 						accountProfile.setDataSourceType(DataSourceType.TALLY);
+						accountProfile.setAlias(apDto.getAlias());
 						accountProfile.setImportStatus(true);
 					}
 				}
@@ -213,7 +216,7 @@ public class AccountProfileUploadService {
 			if (isValidEmail(apDto.getEmail1())) {
 				accountProfile.setEmail1(apDto.getEmail1());
 			}
-		
+
 			accountProfile.setTinNo(apDto.getTinNo());
 			accountProfile.setPin(apDto.getPin());
 			accountProfile.setDescription(apDto.getDescription());
@@ -258,7 +261,6 @@ public class AccountProfileUploadService {
 			// } else {
 			// accountProfile.setAccountType(defaultAccountType);
 			// }
-			accountProfile.setDataSourceType(DataSourceType.TALLY);
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
