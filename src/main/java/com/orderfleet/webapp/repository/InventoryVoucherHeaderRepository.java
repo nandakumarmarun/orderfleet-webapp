@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -667,7 +668,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			List<Long> userIds, List<String> documentPids, List<ProcessFlowStatus> processStatus,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
-	// using for tally download status filtering
+	// using for tally download status filtering accountPid
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
 			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
@@ -679,7 +680,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	List<Object[]> findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusDateBetweenOrderByCreatedDateDesc(
 			List<Long> userIds, String accountPid, List<String> documentPids, List<ProcessFlowStatus> processStatus,
 			LocalDateTime fromDate, LocalDateTime toDate);
-
+	
 	@Query("select sum(inventoryVoucher.documentTotal) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdBy.id in ?1 and inventoryVoucher.createdDate between ?2 and ?3")
 	Object[] findnetSaleAmountByUserIdandDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
 

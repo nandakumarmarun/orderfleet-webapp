@@ -32,6 +32,14 @@ public class FunnelChartDTO {
 		this.value = value;
 		this.backgroundColor = backgroundColor;
 	}
+	
+	public FunnelChartDTO(String label, String formatted, String value, String backgroundColor) {
+		super();
+		this.label = label;
+		this.formattedValue = formatted;
+		this.value = value;
+		this.backgroundColor = backgroundColor;
+	}
 			
 	public String getLabel() {
 		return label;

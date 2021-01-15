@@ -14,7 +14,6 @@ if (!this.InventoryVoucher) {
 	var inventoryPidsPdf = "";
 
 	$(document).ready(function() {
-
 		$('.selectpicker').selectpicker();
 
 		$("#txtToDate").datepicker({
@@ -25,6 +24,18 @@ if (!this.InventoryVoucher) {
 		});
 		// load today data
 		// InventoryVoucher.filter();
+		
+		
+		let deliveryStage = getParameterByName('deliveryStage');
+		if(deliveryStage != null){
+			$("#dbDateSearch option[value='UPTO90DAYS']").attr('selected', 'selected');
+			let exists = 0 != $('#dbStageFilter option[value='+deliveryStage+']').length;
+			if (exists) {
+				$('#dbStageFilter').val(deliveryStage);
+			} else {
+				$('#dbStageFilter').val("no");
+			}
+		}
 
 		$('#selectAll').on('click', function() {
 			selectAllInventoryVoucher(this);
@@ -60,7 +71,6 @@ if (!this.InventoryVoucher) {
 			var name = "process-flow-all"
 			downloadXls1(name);
 		});
-
 	});
 	
 	function downloadXls1(excelName) {
@@ -358,7 +368,12 @@ if (!this.InventoryVoucher) {
 		if (optStatusValue == "Not Delivered") {
 			var processFlowStatus = "ALL_NOT_DELIVERED";
 		}
-
+		/*let deliveryStage = getParameterByName('deliveryStage');
+		if(deliveryStage == null){
+			deliveryStage = '';			
+		}*/
+		let deliveryStage = $('#dbStageFilter').val();
+		
 		$
 				.ajax({
 					url : inventoryVoucherContextPath + "/filter",
@@ -372,6 +387,7 @@ if (!this.InventoryVoucher) {
 						toDate : $("#txtToDate").val(),
 						voucherType : $("#dbDocumentType").val(),
 						documentPids : docPids,
+						deliveryStage: deliveryStage,
 					},
 					success : function(inventoryVouchers) {
 						$("#lblCounts").text("0");
@@ -420,8 +436,8 @@ if (!this.InventoryVoucher) {
 
 												var noOfdays = inventoryVoucher.deliveryDateDifference;
 
-												console.log("No of Days= "
-														+ noOfdays);
+												// console.log("No of Days= "
+														//+ noOfdays);
 
 												if (noOfdays >= 30
 														&& noOfdays <= 45) {

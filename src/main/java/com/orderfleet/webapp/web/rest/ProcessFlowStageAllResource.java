@@ -336,7 +336,7 @@ public class ProcessFlowStageAllResource {
 			@RequestParam("employeePids") List<String> employeePids,
 			@RequestParam("processFlowStatus") String processFlowStatus, @RequestParam("accountPid") String accountPid,
 			@RequestParam("filterBy") String filterBy, @RequestParam("documentPids") List<String> documentPids,
-			@RequestParam String fromDate, @RequestParam String toDate) {
+			@RequestParam String fromDate, @RequestParam String toDate, @RequestParam String deliveryStage) {
 		log.debug("Web request to filter accounting vouchers");
 		if (documentPids.isEmpty()) {
 			return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
@@ -365,7 +365,7 @@ public class ProcessFlowStageAllResource {
 			fDate = tDate.minus(days_90);
 		}
 		List<SalesPerformanceDTO> salesPerformanceDTOs = getFilterData(employeePids, documentPids, processFlowStatus,
-				accountPid, fDate, tDate);
+				accountPid, fDate, tDate, deliveryStage);
 		return new ResponseEntity<>(salesPerformanceDTOs, HttpStatus.OK);
 	}
 
@@ -403,7 +403,7 @@ public class ProcessFlowStageAllResource {
 	}
 
 	private List<SalesPerformanceDTO> getFilterData(List<String> employeePids, List<String> documentPids,
-			String processFlowStatus, String accountPid, LocalDate fDate, LocalDate tDate) {
+			String processFlowStatus, String accountPid, LocalDate fDate, LocalDate tDate, String deliveryStage) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<Long> userIds = employeeProfileRepository.findUserIdByEmployeePidIn(employeePids);
@@ -461,7 +461,7 @@ public class ProcessFlowStageAllResource {
 			break;
 
 		}
-
+		
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
 			inventoryVouchers = inventoryVoucherHeaderRepository
@@ -471,10 +471,62 @@ public class ProcessFlowStageAllResource {
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusDateBetweenOrderByCreatedDateDesc(
 							userIds, accountPid, documentPids, processStatus, fromDate, toDate);
-		}
+		}	
+		
+		
 		if (inventoryVouchers.isEmpty()) {
 			return Collections.emptyList();
 		} else {
+			if (deliveryStage != null && !deliveryStage.isEmpty() && !deliveryStage.equals("no")) {
+				List<Object[]> filterVouchers = inventoryVouchers.stream().filter(u -> {
+					if (u[29] != null) {
+						LocalDate currentdate = LocalDate.now();
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+						String date = u[29].toString();
+						LocalDate deliveryDate = LocalDate.parse(date, formatter);
+						long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
+						if (deliveryStage != null && !deliveryStage.isEmpty()) {
+							switch(deliveryStage) {
+							case "31_to_45_days":
+							{
+								if (noOfDaysBetween >= 30
+										&& noOfDaysBetween <= 45) {
+									return true;
+								}
+								break;
+							}
+							case "15_to_30_days":
+							{
+								if (noOfDaysBetween >= 15
+										&& noOfDaysBetween < 30) {
+									return true;
+								}
+								break;
+							}
+							case "1_to_14_days":
+							{
+								if (noOfDaysBetween > 0
+										&& noOfDaysBetween < 15) {
+									return true;
+								}
+								break;
+							}
+							case "before_today":
+							{
+								if (noOfDaysBetween <= 0) {
+									return true;
+								}
+								break;
+							}
+							}	
+						}
+					}
+					return false;
+				}).collect(Collectors.toList());
+
+				return createSalesPerformanceDTO(filterVouchers);
+			}
+
 			return createSalesPerformanceDTO(inventoryVouchers);
 		}
 	}
