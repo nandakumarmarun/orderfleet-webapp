@@ -206,10 +206,11 @@ public class ProcessFlowFunnelChartResource {
 			return false;
 		}).collect(Collectors.toList());
 		
-		funnelChartDtos.add(new FunnelChartDTO("before_today", "Before Today", r.size()+".00", "#FF3933"));
-		funnelChartDtos.add(new FunnelChartDTO("1_to_14_days", "1 to 14 Days", o.size()+".00", "#FFB833"));
-		funnelChartDtos.add(new FunnelChartDTO("15_to_30_days", "15 to 30 Days", y.size()+".00", "#FFFC33"));
+
 		funnelChartDtos.add(new FunnelChartDTO("31_to_45_days", "31 to 45 Days", g.size()+".00", "#7DFF33"));
+		funnelChartDtos.add(new FunnelChartDTO("15_to_30_days", "15 to 30 Days", y.size()+".00", "#FFFC33"));
+		funnelChartDtos.add(new FunnelChartDTO("1_to_14_days", "1 to 14 Days", o.size()+".00", "#FFB833"));
+		funnelChartDtos.add(new FunnelChartDTO("delivery_by_today_or_delivery_date_crossed", "Delivery By Today or Delivery Date Crossed", r.size()+".00", "#FF3933"));
 		return funnelChartDtos;
 	}	
 }

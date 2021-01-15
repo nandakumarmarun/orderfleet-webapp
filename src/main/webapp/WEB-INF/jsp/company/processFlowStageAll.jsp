@@ -118,7 +118,7 @@
 							<div class="col-sm-2">
 								Stage Filter <select class="form-control" id="dbStageFilter">
 									<option value="no">All</option>
-									<option value="before_today">Before Today</option>
+									<option value="delivery_by_today_or_delivery_date_crossed">Delivery By Today or Delivery Date Crossed</option>
 									<option value="1_to_14_days">1 to 14 Days</option>
 									<option value="15_to_30_days">15 to 30 Days</option>
 									<option value="31_to_45_days">31 to 45 Days</option>

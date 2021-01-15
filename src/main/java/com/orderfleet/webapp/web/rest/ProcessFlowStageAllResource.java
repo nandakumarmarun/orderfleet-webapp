@@ -511,7 +511,7 @@ public class ProcessFlowStageAllResource {
 								}
 								break;
 							}
-							case "before_today":
+							case "delivery_by_today_or_delivery_date_crossed":
 							{
 								if (noOfDaysBetween <= 0) {
 									return true;
