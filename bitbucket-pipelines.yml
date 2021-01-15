@@ -15,7 +15,7 @@ pipelines:
           caches:
             - maven
           script:
-            - java -Xms1024m -Xmx2000m -jar orderfleet-webapp-0.0.1-SNAPSHOT.war --spring.profiles.active=prod --    spring.config.location=file:C:/Users/Administrator/Desktop/deployments_snrich/application-prod.yml
+            - mvn
           after-script:
               # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
             - pipe: atlassian/checkstyle-report:0.2.0
