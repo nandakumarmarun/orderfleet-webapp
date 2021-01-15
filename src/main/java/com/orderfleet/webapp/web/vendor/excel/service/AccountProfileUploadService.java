@@ -170,7 +170,7 @@ public class AccountProfileUploadService {
 							.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
 					if (optionalAP.isPresent()) {
 						accountProfile = optionalAP.get();
-						accountProfile.setDataSourceType(DataSourceType.MOBILE);
+						accountProfile.setDataSourceType(DataSourceType.TALLY);
 						// if not update, skip this iteration. Not implemented now
 						// if (!accountProfile.getThirdpartyUpdate()) { continue; }
 					} else {
@@ -180,7 +180,8 @@ public class AccountProfileUploadService {
 						accountProfile.setUser(user);
 						accountProfile.setCompany(company);
 						accountProfile.setAccountStatus(AccountStatus.Unverified);
-						accountProfile.setDataSourceType(DataSourceType.MOBILE);
+						accountProfile.setDataSourceType(DataSourceType.TALLY);
+						accountProfile.setAlias(apDto.getAlias());
 						accountProfile.setImportStatus(true);
 					}
 				}
@@ -215,7 +216,7 @@ public class AccountProfileUploadService {
 			if (isValidEmail(apDto.getEmail1())) {
 				accountProfile.setEmail1(apDto.getEmail1());
 			}
-		
+
 			accountProfile.setTinNo(apDto.getTinNo());
 			accountProfile.setPin(apDto.getPin());
 			accountProfile.setDescription(apDto.getDescription());
