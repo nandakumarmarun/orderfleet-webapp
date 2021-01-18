@@ -154,7 +154,9 @@ public class ProcessFlowFunnelChartResource {
 				String date = u[29].toString();
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-				if (noOfDaysBetween <= 0) {
+
+				String processflowStatus = u[26].toString();
+				if (noOfDaysBetween <= 0 && !processflowStatus.equals("DELIVERED")) {
 					return true;
 				}
 			}
@@ -206,7 +208,23 @@ public class ProcessFlowFunnelChartResource {
 			return false;
 		}).collect(Collectors.toList());
 		
+		List<Object[]> b = inventoryVouchers.stream().filter(u -> {
+			if (u[29] != null) {
+				LocalDate currentdate = LocalDate.now();
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				String date = u[29].toString();
+				LocalDate deliveryDate = LocalDate.parse(date, formatter);
+				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
+				if (noOfDaysBetween > 45
+						&& noOfDaysBetween <= 90) {
+					return true;
+				}
+			}
+			return false;
+		}).collect(Collectors.toList());
+		
 
+		funnelChartDtos.add(new FunnelChartDTO("above_45_days_upto_90_days", "Above 45 Days (Upto 90 Days)", b.size()+".00", "#f8f8ff"));
 		funnelChartDtos.add(new FunnelChartDTO("31_to_45_days", "31 to 45 Days", g.size()+".00", "#7DFF33"));
 		funnelChartDtos.add(new FunnelChartDTO("15_to_30_days", "15 to 30 Days", y.size()+".00", "#FFFC33"));
 		funnelChartDtos.add(new FunnelChartDTO("1_to_14_days", "1 to 14 Days", o.size()+".00", "#FFB833"));

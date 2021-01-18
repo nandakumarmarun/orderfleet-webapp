@@ -485,8 +485,18 @@ public class ProcessFlowStageAllResource {
 						String date = u[29].toString();
 						LocalDate deliveryDate = LocalDate.parse(date, formatter);
 						long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
+						String processflowStatus = u[26].toString();
+						
 						if (deliveryStage != null && !deliveryStage.isEmpty()) {
 							switch(deliveryStage) {
+							case "above_45_days_upto_90_days":
+							{
+								if (noOfDaysBetween > 45
+										&& noOfDaysBetween <= 90) {
+									return true;
+								}
+								break;
+							}
 							case "31_to_45_days":
 							{
 								if (noOfDaysBetween >= 30
@@ -513,7 +523,7 @@ public class ProcessFlowStageAllResource {
 							}
 							case "delivery_by_today_or_delivery_date_crossed":
 							{
-								if (noOfDaysBetween <= 0) {
+								if (noOfDaysBetween <= 0 && !processflowStatus.equals("DELIVERED")) {
 									return true;
 								}
 								break;

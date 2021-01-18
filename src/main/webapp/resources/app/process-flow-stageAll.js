@@ -438,7 +438,6 @@ if (!this.InventoryVoucher) {
 
 												// console.log("No of Days= "
 														//+ noOfdays);
-
 												if (noOfdays >= 30
 														&& noOfdays <= 45) {
 													bgColor = "#7DFF33";
@@ -454,7 +453,7 @@ if (!this.InventoryVoucher) {
 													bgColor = "#FFB833";
 												}
 
-												if (noOfdays <= 0) {
+												if (noOfdays <= 0 && inventoryVoucher.processFlowStatus !=="DELIVERED") {
 													bgColor = "#FF3933 ";
 												}
 
