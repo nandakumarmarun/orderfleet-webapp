@@ -22,11 +22,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.orderfleet.webapp.domain.BestPerformer;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.EcomProductProfile;
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.repository.BestPerformerRepository;
 import com.orderfleet.webapp.repository.EcomProductProfileRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.UserRepository;
@@ -55,7 +57,10 @@ public class DownloadImageController {
 	private FileManagerService fileManagerService;
 
 	@Inject
-	private UserRepository userRepository;
+	private UserRepository userRepository;	
+
+	@Inject
+	private BestPerformerRepository bestPerformerRepository;
 
 	@RequestMapping(value = "/product-group-image/{productGroupPid}", method = RequestMethod.GET)
 	public @ResponseBody void getproductGroupImage(@PathVariable String productGroupPid, HttpServletRequest request,
@@ -155,6 +160,31 @@ public class DownloadImageController {
 						String.format("inline; filename=\"" + company.getLegalName() + "\""));
 
 				InputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(company.getLogo()));
+				FileCopyUtils.copy(inputStream, response.getOutputStream());
+				return;
+			} else {
+				errorMessage = "Sorry. image not available";
+			}
+		}
+		errorMessage = "Sorry. The file you are looking for does not exist";
+		System.out.println(errorMessage);
+		OutputStream outputStream = response.getOutputStream();
+		outputStream.write(errorMessage.getBytes(Charset.forName("UTF-8")));
+		outputStream.close();
+	}
+	
+	@RequestMapping(value = "/best-performer-upload", method = RequestMethod.GET)
+	public @ResponseBody void getBestPerformerImageCurrentUser(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+		String errorMessage = "";
+		BestPerformer cd = bestPerformerRepository.findOneByCompanyId();
+		if (cd != null) {
+			if (cd.getLogo() != null) {
+				response.setContentType(cd.getLogoContentType());
+//				response.setHeader("Content-Disposition",
+//						String.format("inline; filename=\"" + company.getLegalName() + "\""));
+
+				InputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(cd.getLogo()));
 				FileCopyUtils.copy(inputStream, response.getOutputStream());
 				return;
 			} else {
