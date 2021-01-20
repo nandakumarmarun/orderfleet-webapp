@@ -111,7 +111,7 @@
 									<option value="PENDING">PENDING</option>
 									<option value="PROCESSING">PROCESSING</option>
 									<option value="COMPLETED">COMPLETED</option>
-									<option value="FAILED">COMPLETED</option>
+									<option value="FAILED">FAILED</option>
 								</select>
 							</div>
 							<div class="col-sm-1">
