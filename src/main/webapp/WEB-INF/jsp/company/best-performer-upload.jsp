@@ -22,22 +22,22 @@
 			<div class="clearfix"></div>
 			<hr />
 			<spring:url value="/web/best-performer-upload" var="urlCompany"></spring:url>
-			<form id="bestPerformanceForm" role="form" method="POST" class="form-inline"
-				action="${urlCompany}">
+			<form id="bestPerformanceForm" role="form" method="POST"
+				class="form-inline" action="${urlCompany}">
 				<div class="form-group">
-					<input type="hidden" value="${bestperformer.pid}"  id="bestPerformerPid">
-					<input id="bestPerformerImageInput" type="file" style="display: initial"> 
-					<button id="myFormSubmit" class="btn btn-success">Save</button><br>
-					<img
-					id="previewImage" src="" style="max-height: 100px; margin-top:18px; display: none;"
-					alt="Image preview..."> <br>
-					
+					<input type="hidden" value="${bestperformer.pid}"
+						id="bestPerformerPid"> <input id="bestPerformerImageInput"
+						type="file" style="display: initial">
+					<button id="myFormSubmit" class="btn btn-success">Save</button>
+					<br> <img id="previewImage" src=""
+						style="max-height: 100px; margin-top: 18px; display: none;"
+						alt="Image preview..."> <br>
+
 				</div>
 			</form>
-			
-			<img
-				id="bestPerformerImage" src="" style="max-height: 150px;"
-				alt="Best Performer Image...">
+
+			<img id="bestPerformerImage"
+				style="max-height: 500px; max-width: 500px">
 			<hr />
 			<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>

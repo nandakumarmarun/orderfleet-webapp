@@ -57,7 +57,7 @@ public class DownloadImageController {
 	private FileManagerService fileManagerService;
 
 	@Inject
-	private UserRepository userRepository;	
+	private UserRepository userRepository;
 
 	@Inject
 	private BestPerformerRepository bestPerformerRepository;
@@ -134,7 +134,7 @@ public class DownloadImageController {
 				response.setContentType(file2.getMimeType());
 				response.setHeader("Content-Disposition", "inline; filename=\"" + file2.getFileName() + "\"");
 				response.setContentLength((int) physicalFile.length());
-				try(InputStream inputStream = new BufferedInputStream(new FileInputStream(physicalFile));){
+				try (InputStream inputStream = new BufferedInputStream(new FileInputStream(physicalFile));) {
 					FileCopyUtils.copy(inputStream, response.getOutputStream());
 				}
 				return;
@@ -172,17 +172,21 @@ public class DownloadImageController {
 		outputStream.write(errorMessage.getBytes(Charset.forName("UTF-8")));
 		outputStream.close();
 	}
-	
+
 	@RequestMapping(value = "/best-performer-upload", method = RequestMethod.GET)
 	public @ResponseBody void getBestPerformerImageCurrentUser(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		String errorMessage = "";
+		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+
 		BestPerformer cd = bestPerformerRepository.findOneByCompanyId();
-		if (cd != null) {
+		if (opUser.isPresent() && cd != null) {
+			User user = opUser.get();
+			Company company = user.getCompany();
 			if (cd.getLogo() != null) {
 				response.setContentType(cd.getLogoContentType());
-//				response.setHeader("Content-Disposition",
-//						String.format("inline; filename=\"" + company.getLegalName() + "\""));
+				response.setHeader("Content-Disposition",
+						String.format("inline; filename=\"" + company.getLegalName() + "\""));
 
 				InputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(cd.getLogo()));
 				FileCopyUtils.copy(inputStream, response.getOutputStream());

@@ -39,5 +39,8 @@ public interface SalesTargetGroupProductRepository extends JpaRepository<SalesTa
 	
 	@Query("select salesTargetGroupProduct.product.id, salesTargetGroupProduct.salesTargetGroup.name from SalesTargetGroupProduct salesTargetGroupProduct where salesTargetGroupProduct.salesTargetGroup.pid in ?1 and salesTargetGroupProduct.company.id = ?#{principal.companyId}")
 	Set<Object[]> findProductIdWithSalesTargetGroupNameBySalesTargetGroupPid(List<String> salesTargetGroupPids);
+
+	@Query("select salesTargetGroupProduct from SalesTargetGroupProduct salesTargetGroupProduct where salesTargetGroupProduct.company.id = ?#{principal.companyId}")
+	List<SalesTargetGroupProduct> findAllByCompanyId();
 	
 }

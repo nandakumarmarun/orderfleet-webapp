@@ -24,7 +24,7 @@ public interface SalesTargetGroupRepository extends JpaRepository<SalesTargetGro
 
 	@Query("select salesTargetGroup from SalesTargetGroup salesTargetGroup where salesTargetGroup.company.id = ?#{principal.companyId}")
 	List<SalesTargetGroup> findAllByCompanyId();
-	
+
 	@Query("select salesTargetGroup.pid,salesTargetGroup.name  from SalesTargetGroup salesTargetGroup where salesTargetGroup.company.id = ?#{principal.companyId}")
 	List<Object[]> findSalesTargetGroupPropertyByCompanyId();
 
@@ -36,4 +36,7 @@ public interface SalesTargetGroupRepository extends JpaRepository<SalesTargetGro
 
 	@Query("select salesTargetGroup from SalesTargetGroup salesTargetGroup where salesTargetGroup.company.id = ?#{principal.companyId} and salesTargetGroup.targetSettingType=?1")
 	List<SalesTargetGroup> findAllByCompanyAndTargetSettingType(BestPerformanceType targetSettingType);
+
+	@Query("select salesTargetGroup from SalesTargetGroup salesTargetGroup where salesTargetGroup.company.id = ?#{principal.companyId} and salesTargetGroup.pid in ?1")
+	List<SalesTargetGroup> findAllByCompanyIdAndPidIn(List<String> productGroupPids);
 }
