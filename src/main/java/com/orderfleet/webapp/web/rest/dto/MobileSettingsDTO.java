@@ -87,6 +87,8 @@ public class MobileSettingsDTO {
 	private boolean salesOrderAllocation;
 
 	private boolean rateWithoutCalculation;
+	
+	private boolean showBestPerformerUpload;
 
 	public MobileSettingsDTO() {
 		super();
@@ -126,6 +128,7 @@ public class MobileSettingsDTO {
 		this.stockLocationProducts = mobileConfigurationDTO.getStockLocationProducts();
 		this.salesOrderAllocation = mobileConfigurationDTO.getSalesOrderAllocation();
 		this.rateWithoutCalculation = mobileConfigurationDTO.getRateWithoutCalculation();
+		this.showBestPerformerUpload = mobileConfigurationDTO.isShowBestPerformerUpload();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -414,6 +417,14 @@ public class MobileSettingsDTO {
 
 	public void setRateWithoutCalculation(boolean rateWithoutCalculation) {
 		this.rateWithoutCalculation = rateWithoutCalculation;
+	}
+
+	public boolean isShowBestPerformerUpload() {
+		return showBestPerformerUpload;
+	}
+
+	public void setShowBestPerformerUpload(boolean showBestPerformerUpload) {
+		this.showBestPerformerUpload = showBestPerformerUpload;
 	}
 
 }

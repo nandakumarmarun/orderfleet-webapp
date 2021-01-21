@@ -148,6 +148,9 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "stock_location_products", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean stockLocationProducts;
+	
+	@Column(name = "show_best_performer_upload", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean showBestPerformerUpload;
 
 	@NotNull
 	@ManyToOne
@@ -443,6 +446,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setRateWithoutCalculation(boolean rateWithoutCalculation) {
 		this.rateWithoutCalculation = rateWithoutCalculation;
+	}
+
+	public boolean isShowBestPerformerUpload() {
+		return showBestPerformerUpload;
+	}
+
+	public void setShowBestPerformerUpload(boolean showBestPerformerUpload) {
+		this.showBestPerformerUpload = showBestPerformerUpload;
 	}
 
 	@Override

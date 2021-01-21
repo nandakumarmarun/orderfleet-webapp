@@ -51,6 +51,7 @@ public class MobileConfigurationDTO {
 	private boolean stockLocationProducts;
 	private boolean salesOrderAllocation;
 	private boolean rateWithoutCalculation;
+	private boolean showBestPerformerUpload;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -93,6 +94,7 @@ public class MobileConfigurationDTO {
 		this.stockLocationProducts = mobileConfiguration.getStockLocationProducts();
 		this.salesOrderAllocation = mobileConfiguration.getSalesOrderAllocation();
 		this.rateWithoutCalculation = mobileConfiguration.getRateWithoutCalculation();
+		this.showBestPerformerUpload = mobileConfiguration.isShowBestPerformerUpload();
 	}
 
 	public String getPid() {
@@ -374,5 +376,15 @@ public class MobileConfigurationDTO {
 	public void setRateWithoutCalculation(boolean rateWithoutCalculation) {
 		this.rateWithoutCalculation = rateWithoutCalculation;
 	}
+
+	public boolean isShowBestPerformerUpload() {
+		return showBestPerformerUpload;
+	}
+
+	public void setShowBestPerformerUpload(boolean showBestPerformerUpload) {
+		this.showBestPerformerUpload = showBestPerformerUpload;
+	}
+	
+	
 
 }
