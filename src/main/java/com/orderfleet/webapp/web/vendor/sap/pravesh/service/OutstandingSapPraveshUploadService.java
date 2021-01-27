@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.vendor.sap.pravesh.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,6 +96,7 @@ public class OutstandingSapPraveshUploadService {
 				receivablePayable.setReferenceDocumentBalanceAmount(ppDto.getBalance());
 				receivablePayable.setReferenceDocumentNumber(ppDto.getOrderNum());
 				receivablePayable.setReferenceDocumentDate(convertDate(ppDto.getDocDate()));
+				receivablePayable.setBillOverDue(dueUpdate(convertDate(ppDto.getDocDate())));
 				saveReceivablePayable.add(receivablePayable);
 
 	             double currBal = accountBalanceMap.containsKey(ppDto.getCustomerId()) ? accountBalanceMap.get(ppDto.getCustomerId()) : 0.0;
@@ -127,6 +129,16 @@ public class OutstandingSapPraveshUploadService {
 			LocalDate dateTime = LocalDate.parse(date, formatter);
 			return dateTime;
 		}
-		return null;
+		return LocalDate.now();
+	}
+	
+	public Long dueUpdate(LocalDate referenceDocDate) {
+		if (referenceDocDate != null) {
+			LocalDate currentDate = LocalDate.now();
+			Long differenceInDays = Math
+					.abs(ChronoUnit.DAYS.between(currentDate, referenceDocDate));
+			return differenceInDays;
+		} 
+		return 0L;
 	}
 }
