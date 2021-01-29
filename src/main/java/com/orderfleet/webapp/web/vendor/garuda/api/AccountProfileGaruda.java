@@ -30,7 +30,7 @@ public class AccountProfileGaruda {
 	@Inject
 	private AccountProfileGarudaUploadService accountProfileGarudaUploadService;
 	
-	@RequestMapping(value = "/account-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/account-profile.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<String> bulkSaveAccountProfiles(
 			@Valid @RequestBody List<AccountProfileGarudaDTO> accountProfileDTOs) {
