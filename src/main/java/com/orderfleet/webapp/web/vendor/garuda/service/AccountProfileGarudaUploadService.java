@@ -123,8 +123,10 @@ public class AccountProfileGarudaUploadService {
 			}
 			accountProfile.setTinNo(apDto.getGstNo());
 			accountProfile.setActivated(true);
-			accountProfile.setAddress(apDto.getAddress());
-			accountProfile.setCity(apDto.getCity());
+			String address = apDto.getAddress() != null && !apDto.getAddress().isEmpty() ? apDto.getAddress(): "No Address";
+			accountProfile.setAddress(address);
+			String city = apDto.getCity() != null && !apDto.getCity().isEmpty() ? apDto.getCity(): "No City";
+			accountProfile.setCity(city);
 			accountProfile.setClosingBalance(apDto.getClosingBalance());
 			accountProfile.setCustomerId(apDto.getCode());
 			// account type
