@@ -149,6 +149,10 @@ public class CompanyConfigurationResource {
 					mcDto.setSendTransactionsSapPravesh(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.ADD_COMPOUND_UNIT)) {
+					mcDto.setAddCompoundUnit(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
 				 * mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue())); anyValueExist =
@@ -175,7 +179,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String salesEditEnabled, @RequestParam String gpsVarianceQuery,
 			@RequestParam String sendSalesOrderEmail, @RequestParam String sendSalesOrderSap,
 			@RequestParam String piecesToQuantity, @RequestParam String sendSalesOrderOdoo,
-			@RequestParam String sendTransactionsSapPravesh) throws URISyntaxException {
+			@RequestParam String sendTransactionsSapPravesh, @RequestParam String addCompoundUnit) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -221,6 +225,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_SALES_ORDER_ODOO);
 		Optional<CompanyConfiguration> optSendTransactionsSapPravesh = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TRANSACTIONS_SAP_PRAVESH);
+		Optional<CompanyConfiguration> optAddCompoundUnitConfiguration = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ADD_COMPOUND_UNIT);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -245,6 +251,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration piecesToQuantityCompany = null;
 		CompanyConfiguration sendSalesOrderOdooCompany = null;
 		CompanyConfiguration sendTransactionSapPraveshCompany = null;
+		CompanyConfiguration addCompoundUnitCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -444,6 +451,18 @@ public class CompanyConfigurationResource {
 			sendTransactionSapPraveshCompany.setValue(sendTransactionsSapPravesh);
 		}
 		companyConfigurationRepository.save(sendTransactionSapPraveshCompany);
+		
+
+		if (optAddCompoundUnitConfiguration.isPresent()) {
+			addCompoundUnitCompany = optAddCompoundUnitConfiguration.get();
+			addCompoundUnitCompany.setValue(addCompoundUnit);
+		} else {
+			addCompoundUnitCompany = new CompanyConfiguration();
+			addCompoundUnitCompany.setCompany(company);
+			addCompoundUnitCompany.setName(CompanyConfig.ADD_COMPOUND_UNIT);
+			addCompoundUnitCompany.setValue(addCompoundUnit);
+		}
+		companyConfigurationRepository.save(addCompoundUnitCompany);
 
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
@@ -514,6 +533,9 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optSendTransactionsSapPravesh = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TRANSACTIONS_SAP_PRAVESH);
 
+		Optional<CompanyConfiguration> optAddCompoundUnit = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ADD_COMPOUND_UNIT);
+
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -579,6 +601,10 @@ public class CompanyConfigurationResource {
 			companyConfigurationDTO
 					.setSendTransactionsSapPravesh(Boolean.valueOf(optSendTransactionsSapPravesh.get().getValue()));
 		}
+		if (optAddCompoundUnit.isPresent()) {
+			companyConfigurationDTO
+					.setAddCompoundUnit(Boolean.valueOf(optAddCompoundUnit.get().getValue()));
+		}
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
@@ -635,6 +661,9 @@ public class CompanyConfigurationResource {
 
 		Optional<CompanyConfiguration> optSendTransactionsSapPravesh = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TRANSACTIONS_SAP_PRAVESH);
+
+		Optional<CompanyConfiguration> optAddCompoundUnit = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ADD_COMPOUND_UNIT);
 
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
@@ -717,6 +746,12 @@ public class CompanyConfigurationResource {
 			companyConfigurationRepository.deleteByCompanyIdAndName(
 					optSendTransactionsSapPravesh.get().getCompany().getId(),
 					CompanyConfig.SEND_TRANSACTIONS_SAP_PRAVESH);
+		}
+
+		if (optAddCompoundUnit.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(
+					optSendTransactionsSapPravesh.get().getCompany().getId(),
+					CompanyConfig.ADD_COMPOUND_UNIT);
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {

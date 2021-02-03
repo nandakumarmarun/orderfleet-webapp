@@ -31,6 +31,7 @@ public class CompanyConfigDTO {
 	private boolean piecesToQuantity; // set pices and rate to quantity and selling rate(SAP)
 	private boolean sendSalesOrderOdoo; // setting for sending sales order to odoo
 	private boolean sendTransactionsSapPravesh;
+	private boolean addCompoundUnit;
 
 	public CompanyConfigDTO() {
 		super();
@@ -204,4 +205,11 @@ public class CompanyConfigDTO {
 		this.sendTransactionsSapPravesh = sendTransactionsSapPravesh;
 	}
 
+	public boolean isAddCompoundUnit() {
+		return addCompoundUnit;
+	}
+
+	public void setAddCompoundUnit(boolean addCompoundUnit) {
+		this.addCompoundUnit = addCompoundUnit;
+	}
 }
