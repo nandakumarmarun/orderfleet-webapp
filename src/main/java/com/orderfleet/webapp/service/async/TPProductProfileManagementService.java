@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.service.async;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -286,7 +287,11 @@ public class TPProductProfileManagementService {
 		} else {
 			productCategory = defaultCategory.get();
 		}
-
+		
+		Optional<CompanyConfiguration> optAddCompoundUnit = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ADD_COMPOUND_UNIT);		
+		log.info("Add compound unit for company pid {} is {}",company.getPid() ,optAddCompoundUnit.get().getValue());
+		
 		for (ProductProfileDTO ppDto : productProfileDTOs) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
@@ -308,7 +313,6 @@ public class TPProductProfileManagementService {
 			productProfile.setName(ppDto.getName());
 			productProfile.setAlias(ppDto.getAlias());
 			productProfile.setDescription(ppDto.getDescription());
-			productProfile.setPrice(ppDto.getPrice());
 			productProfile.setMrp(ppDto.getMrp());
 			productProfile.setTaxRate(ppDto.getTaxRate());
 			productProfile.setSku(ppDto.getSku());
@@ -319,9 +323,22 @@ public class TPProductProfileManagementService {
 			productProfile.setProductDescription(ppDto.getProductDescription());
 			productProfile.setBarcode(ppDto.getBarcode());
 			productProfile.setRemarks(ppDto.getRemarks());
-			if (ppDto.getUnitQty() != null) {
-				productProfile.setUnitQty(ppDto.getUnitQty());
+			
+			if (optAddCompoundUnit.isPresent() && optAddCompoundUnit.get().getValue().equalsIgnoreCase("true")) {
+				if (ppDto.getCompoundUnitQty() != null) {
+					Double cUnitQty = ppDto.getCompoundUnitQty();
+					productProfile.setPrice(ppDto.getPrice().multiply(new BigDecimal(cUnitQty)));
+					productProfile.setUnitQty(cUnitQty);
+					productProfile.setCompoundUnitQty(cUnitQty);
+				}
+				
+			} else {
+				if (ppDto.getUnitQty() != null) {
+					productProfile.setUnitQty(ppDto.getUnitQty());
+				}
+				productProfile.setPrice(ppDto.getPrice());
 			}
+			
 			// update category
 			Optional<ProductCategory> optionalCategory = productCategorys.stream()
 					.filter(pl -> ppDto.getProductCategoryName().equals(pl.getName())).findAny();

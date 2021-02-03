@@ -86,6 +86,9 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "unit_qty", columnDefinition = "double precision DEFAULT 1")
 	private Double unitQty = 1d;
+	
+	@Column(name = "compound_unit_qty", columnDefinition = "double precision DEFAULT 1")
+	private Double compoundUnitQty = 1d;
 
 	@Column(name = "tax_rate", columnDefinition = "double precision DEFAULT 0")
 	private double taxRate;
@@ -247,6 +250,14 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public void setUnitQty(Double unitQty) {
 		this.unitQty = unitQty;
+	}
+
+	public Double getCompoundUnitQty() {
+		return compoundUnitQty;
+	}
+
+	public void setCompoundUnitQty(Double compoundUnitQty) {
+		this.compoundUnitQty = compoundUnitQty;
 	}
 
 	public double getTaxRate() {

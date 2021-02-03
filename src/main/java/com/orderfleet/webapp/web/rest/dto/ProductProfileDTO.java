@@ -45,6 +45,8 @@ public class ProductProfileDTO {
 
 	private Double unitQty;
 
+	private Double compoundUnitQty;
+
 	private double taxRate;
 
 	private String productCategoryPid;
@@ -144,6 +146,7 @@ public class ProductProfileDTO {
 		this.mrp = profile.getMrp();
 		this.sku = profile.getSku();
 		this.unitQty = profile.getUnitQty();
+		this.compoundUnitQty = profile.getCompoundUnitQty();
 		this.taxRate = profile.getTaxRate();
 		this.productCategoryPid = profile.getProductCategory().getPid();
 		this.productCategoryName = profile.getProductCategory().getName();
@@ -178,7 +181,7 @@ public class ProductProfileDTO {
 	}
 
 	public ProductProfileDTO(String pid, String name, String alias, String description, BigDecimal price, double mrp,
-			String sku, Double unitQty, double taxRate, String productCategoryPid, String productCategoryName,
+			String sku, Double unitQty, Double compoundUnitQty, double taxRate, String productCategoryPid, String productCategoryName,
 			String divisionPid, String divisionName, byte[] colorImage, String colorImageContentType, String size,
 			String filesPid, boolean activated, LocalDateTime lastModifiedDate, String defaultLedger,
 			List<TaxMasterDTO> productProfileTaxMasterDTOs, StockAvailabilityStatus stockAvailabilityStatus) {
@@ -191,6 +194,7 @@ public class ProductProfileDTO {
 		this.mrp = mrp;
 		this.sku = sku;
 		this.unitQty = unitQty;
+		this.compoundUnitQty = compoundUnitQty;
 		this.taxRate = taxRate;
 		this.productCategoryPid = productCategoryPid;
 		this.productCategoryName = productCategoryName;
@@ -269,6 +273,14 @@ public class ProductProfileDTO {
 
 	public void setUnitQty(Double unitQty) {
 		this.unitQty = unitQty;
+	}
+
+	public Double getCompoundUnitQty() {
+		return compoundUnitQty;
+	}
+
+	public void setCompoundUnitQty(Double compoundUnitQty) {
+		this.compoundUnitQty = compoundUnitQty;
 	}
 
 	public double getTaxRate() {
