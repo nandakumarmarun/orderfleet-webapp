@@ -287,10 +287,9 @@ public class TPProductProfileManagementService {
 		} else {
 			productCategory = defaultCategory.get();
 		}
-		
+
 		Optional<CompanyConfiguration> optAddCompoundUnit = companyConfigurationRepository
-				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ADD_COMPOUND_UNIT);		
-		log.info("Add compound unit for company pid {} is {}",company.getPid() ,optAddCompoundUnit.get().getValue());
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ADD_COMPOUND_UNIT);
 		
 		for (ProductProfileDTO ppDto : productProfileDTOs) {
 			// check exist by name, only one exist with a name
@@ -323,22 +322,41 @@ public class TPProductProfileManagementService {
 			productProfile.setProductDescription(ppDto.getProductDescription());
 			productProfile.setBarcode(ppDto.getBarcode());
 			productProfile.setRemarks(ppDto.getRemarks());
-			
+
 			if (optAddCompoundUnit.isPresent() && optAddCompoundUnit.get().getValue().equalsIgnoreCase("true")) {
-				if (ppDto.getCompoundUnitQty() != null) {
-					Double cUnitQty = ppDto.getCompoundUnitQty();
+
+				if (ppDto.getSku().contains("case of")) {
+					String numberOnly = ppDto.getSku().replaceAll("[^0-9]", "");
+					String value = numberOnly;
+					double convertionValue = Double.parseDouble(value);
+					if (convertionValue == 0) {
+						convertionValue = 1;
+					}
+					productProfile.setCompoundUnitQty(convertionValue);
+
+					Double cUnitQty = convertionValue;
 					productProfile.setPrice(ppDto.getPrice().multiply(new BigDecimal(cUnitQty)));
-					productProfile.setUnitQty(cUnitQty);
+					productProfile.setUnitQty(ppDto.getUnitQty() != null ? ppDto.getUnitQty() : 1d);
 					productProfile.setCompoundUnitQty(cUnitQty);
+
+				} else {
+					if (ppDto.getUnitQty() != null) {
+						productProfile.setUnitQty(ppDto.getUnitQty());
+					} else {
+						productProfile.setUnitQty(1d);
+					}
+					productProfile.setPrice(ppDto.getPrice());
 				}
-				
+
 			} else {
 				if (ppDto.getUnitQty() != null) {
 					productProfile.setUnitQty(ppDto.getUnitQty());
+				} else {
+					productProfile.setUnitQty(1d);
 				}
 				productProfile.setPrice(ppDto.getPrice());
 			}
-			
+
 			// update category
 			Optional<ProductCategory> optionalCategory = productCategorys.stream()
 					.filter(pl -> ppDto.getProductCategoryName().equals(pl.getName())).findAny();
