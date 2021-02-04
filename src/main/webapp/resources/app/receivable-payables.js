@@ -161,11 +161,11 @@ if (!this.ReceivablePayable) {
 																}
 															});
 											$('#rbAmount' + accountPid).text(
-													receivablesBlanaceAmount);
+													receivablesBlanaceAmount.toFixed(2));
 											$('#pbAmount' + accountPid).text(
-													payableBlanaceAmount);
-											var blanaceAmount = receivablesBlanaceAmount
-													- payableBlanaceAmount;
+													payableBlanaceAmount.toFixed(2));
+											var blanaceAmount = (receivablesBlanaceAmount
+													- payableBlanaceAmount).toFixed(2);
 											$('#bAmount' + accountPid).text(
 													blanaceAmount);
 										});

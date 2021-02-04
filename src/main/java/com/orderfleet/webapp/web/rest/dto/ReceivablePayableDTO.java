@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest.dto;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -152,7 +153,9 @@ public class ReceivablePayableDTO {
 	}
 
 	public double getReferenceDocumentAmount() {
-		return referenceDocumentAmount;
+		DecimalFormat decimalFormat = new DecimalFormat("#.##");
+		String formatedTotal = decimalFormat.format(referenceDocumentAmount);
+		return Double.parseDouble(formatedTotal);
 	}
 
 	public void setReferenceDocumentAmount(double referenceDocumentAmount) {
@@ -160,7 +163,9 @@ public class ReceivablePayableDTO {
 	}
 
 	public double getReferenceDocumentBalanceAmount() {
-		return referenceDocumentBalanceAmount;
+		DecimalFormat decimalFormat = new DecimalFormat("#.##");
+		String formatedTotal = decimalFormat.format(referenceDocumentBalanceAmount);
+		return Double.parseDouble(formatedTotal);
 	}
 
 	public void setReferenceDocumentBalanceAmount(double referenceDocumentBalanceAmount) {
@@ -168,7 +173,9 @@ public class ReceivablePayableDTO {
 	}
 
 	public double getReferenceDocumentFinalBalanceAmount() {
-		return referenceDocumentFinalBalanceAmount;
+		DecimalFormat decimalFormat = new DecimalFormat("#.##");
+		String formatedTotal = decimalFormat.format(referenceDocumentFinalBalanceAmount);
+		return Double.parseDouble(formatedTotal);
 	}
 
 	public void setReferenceDocumentFinalBalanceAmount(double referenceDocumentFinalBalanceAmount) {
