@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -184,6 +185,8 @@ public class OverdueReportResource {
 		List<OverdueReportAccountDTO> overdueReportAccDtos = new ArrayList<>();
 		List<AccountProfile> accountProfiles = locationAccountProfileRepository
 				.findAccountProfileByLocationPid(locationPid);
+
+		DecimalFormat decimalFormat = new DecimalFormat("#.##");
 		for (AccountProfile accountProfile : accountProfiles) {
 			OverdueReportAccountDTO overdueReportAccountDTO = new OverdueReportAccountDTO();
 			overdueReportAccountDTO.setPid(accountProfile.getPid());
@@ -198,12 +201,14 @@ public class OverdueReportResource {
 						.filter(r -> overduePeriod.getOverdueFrom() <= r.getBillOverDue()
 								&& overduePeriod.getOverdueTo() >= r.getBillOverDue())
 						.collect(Collectors.summingDouble(rv -> rv.getReferenceDocumentBalanceAmount()));
-				accOverdueReportPeriods.add(new OverdueReportPeriod(overduePeriod.getName(), sum));
+
+				String formatedTotal = decimalFormat.format(sum);
+				accOverdueReportPeriods.add(new OverdueReportPeriod(overduePeriod.getName(), Double.parseDouble(formatedTotal)));
 			}
 			// bill
 			List<OverdueReportBillDTO> overdueReportBills = receivables.stream()
 					.map(r -> new OverdueReportBillDTO(r.getPid(), r.getReferenceDocumentNumber(),
-							r.getReferenceDocumentDate(), r.getReferenceDocumentBalanceAmount()))
+							r.getReferenceDocumentDate(), Double.parseDouble(decimalFormat.format(r.getReferenceDocumentBalanceAmount()))))
 					.collect(Collectors.toList());
 			overdueReportAccountDTO.setOverdueReportBills(overdueReportBills);
 			overdueReportAccountDTO.setOverdueReportPeriods(accOverdueReportPeriods);
