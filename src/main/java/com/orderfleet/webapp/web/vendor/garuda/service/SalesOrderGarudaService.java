@@ -200,7 +200,6 @@ public class SalesOrderGarudaService {
 					garudaInvoiceDetail.setTaxPer(inventoryVoucherDetail.getTaxPercentage());
 					garudaInvoiceDetail.setFreeQuantity(inventoryVoucherDetail.getFreeQuantity());
 					garudaInvoiceDetail.setQuantity(inventoryVoucherDetail.getQuantity());
-					garudaInvoiceDetail.set
 
 					garudaInvoiceDetailList.add(garudaInvoiceDetail);
 				}
