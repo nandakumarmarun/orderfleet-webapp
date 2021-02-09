@@ -14,6 +14,8 @@ public class SalesOrderGarudaDTO {
 	
 	private String employeeName;
 	
+	private String orderType;
+	
 	private Double total;
 	
 	private List<SalesOrderDetailGarudaDTO>  salesOrderdetails;
@@ -32,6 +34,14 @@ public class SalesOrderGarudaDTO {
 
 	public void setInvoiceDate(String invoiceDate) {
 		this.invoiceDate = invoiceDate;
+	}
+
+	public String getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
 	}
 
 	public String getPid() {

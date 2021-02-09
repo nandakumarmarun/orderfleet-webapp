@@ -173,6 +173,11 @@ public class SalesOrderGarudaService {
 				garudaInvoice.setEmployeeName(opEmployeeProfile.get().getName());
 				garudaInvoice.setInvoiceDate(date.format(formatter1));
 				garudaInvoice.setTotal(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
+				
+				if (opRecAccPro.get() != null) {
+					garudaInvoice.setOrderType(opRecAccPro.get().getDefaultPriceLevel().getName());
+				}
+				
 
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
@@ -195,6 +200,7 @@ public class SalesOrderGarudaService {
 					garudaInvoiceDetail.setTaxPer(inventoryVoucherDetail.getTaxPercentage());
 					garudaInvoiceDetail.setFreeQuantity(inventoryVoucherDetail.getFreeQuantity());
 					garudaInvoiceDetail.setQuantity(inventoryVoucherDetail.getQuantity());
+					garudaInvoiceDetail.set
 
 					garudaInvoiceDetailList.add(garudaInvoiceDetail);
 				}
