@@ -32,6 +32,7 @@ public class CompanyConfigDTO {
 	private boolean sendSalesOrderOdoo; // setting for sending sales order to odoo
 	private boolean sendTransactionsSapPravesh;
 	private boolean addCompoundUnit;
+	private boolean updateStockLocation;
 
 	public CompanyConfigDTO() {
 		super();
@@ -211,5 +212,13 @@ public class CompanyConfigDTO {
 
 	public void setAddCompoundUnit(boolean addCompoundUnit) {
 		this.addCompoundUnit = addCompoundUnit;
+	}
+
+	public boolean isUpdateStockLocation() {
+		return updateStockLocation;
+	}
+
+	public void setUpdateStockLocation(boolean updateStockLocation) {
+		this.updateStockLocation = updateStockLocation;
 	}
 }

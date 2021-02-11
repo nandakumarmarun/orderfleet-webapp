@@ -58,6 +58,7 @@ if (!this.CompanyConfiguration) {
 		var sendSalesOrderOdoo = $('#sendSalesOrderOdoo').is(":checked");
 		var sendTransactionsSapPravesh = $('#sendTransactionsSapPravesh').is(":checked");
 		var addCompoundUnit = $('#addCompoundUnit').is(":checked");
+		var updateStockLocation = $('#updateStockLocation').is(":checked");
 		/* var findLocation = $('#findLocation').is(":checked"); */
 		$.ajax({
 			url : contextPath,
@@ -82,7 +83,8 @@ if (!this.CompanyConfiguration) {
 				piecesToQuantity : piecesToQuantity,
 				sendSalesOrderOdoo : sendSalesOrderOdoo,
 				sendTransactionsSapPravesh : sendTransactionsSapPravesh, 
-				addCompoundUnit : addCompoundUnit
+				addCompoundUnit : addCompoundUnit,
+				updateStockLocation : updateStockLocation,
 			/* findLocation : findLocation */
 			},
 			success : function(data) {
@@ -137,6 +139,8 @@ if (!this.CompanyConfiguration) {
 								data.sendTransactionsSapPravesh);
 						$("#addCompoundUnit").prop("checked",
 								data.addCompoundUnit);
+						$("#updateStockLocation").prop("checked",
+								data.updateStockLocation);
 						
 						
 						/*

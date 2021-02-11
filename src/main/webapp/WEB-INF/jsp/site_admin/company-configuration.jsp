@@ -56,6 +56,7 @@
 						<th>Send Sales Order Odoo</th>
 						<th>Send Transactions Sap Pravesh</th>
 						<th>Add Compound Unit</th>
+						<th>Update Stock Location</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -84,6 +85,7 @@
 							<th>${companyConfiguration.sendSalesOrderOdoo}</th>
 							<th>${companyConfiguration.sendTransactionsSapPravesh}</th>
 							<th>${companyConfiguration.addCompoundUnit}</th>
+							<th>${companyConfiguration.updateStockLocation}</th>
 
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
@@ -275,6 +277,16 @@
 													<label class="control-label">Add Compound Unit</label> 
 													<input id="addCompoundUnit"
 														name='checksAddCompoundUnit"' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										
+										
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Update Stock Location</label> 
+													<input id="updateStockLocation"
+														name='checksUpdateStockLocation' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
