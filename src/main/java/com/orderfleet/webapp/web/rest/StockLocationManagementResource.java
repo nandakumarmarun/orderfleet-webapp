@@ -25,12 +25,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.TemporaryOpeningStock;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
@@ -85,6 +88,9 @@ public class StockLocationManagementResource {
 
 	@Inject
 	private UserRepository userRepository;
+
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	@RequestMapping(value = "/stock-location-management", method = RequestMethod.GET)
 	@Timed
@@ -259,12 +265,28 @@ public class StockLocationManagementResource {
 
 		List<ProductProfile> productProfiles = productProfileRepository
 				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
-		// delete all opening stock
-		openingStockRepository.deleteByCompanyIdAndStockLocationPidIn(company.getId(), stockLocationPids);
-		for (OpeningStockDTO osDto : openingStockDTOs) {
-			// only save if account profile exist
-			productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
-					.ifPresent(pp -> {
+		
+		Optional<CompanyConfiguration> optUpdateStockLocation = companyConfigurationRepository
+								.findByCompanyPidAndName(company.getPid(), CompanyConfig.UPDATE_STOCK_LOCATION);
+		
+		boolean stockLocationConfig = false;
+		if (optUpdateStockLocation.isPresent() && optUpdateStockLocation.get().getValue().equalsIgnoreCase("true")) {
+			stockLocationConfig = true;
+		}
+		
+		if (!stockLocationConfig) {
+			// delete all opening stock
+			openingStockRepository.deleteByCompanyIdAndStockLocationPidIn(company.getId(), stockLocationPids);
+		}
+		
+		
+		List<OpeningStock> existingOpeningStocks =  openingStockRepository.findAllExistingStocks(stockLocationPids);
+		
+		if (!stockLocationConfig) {
+			for (OpeningStockDTO osDto : openingStockDTOs) {
+				// only save if account profile exist
+				productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
+						.ifPresent(pp -> {						
 						OpeningStock openingStock = new OpeningStock();
 						openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
 						openingStock.setOpeningStockDate(LocalDateTime.now());
@@ -289,6 +311,45 @@ public class StockLocationManagementResource {
 						openingStock.setQuantity(osDto.getQuantity());
 						saveOpeningStocks.add(openingStock);
 					});
+			}
+		} else {// stock location config true
+			for (OpeningStockDTO osDto : openingStockDTOs) {
+				// only save if account profile exist
+				productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
+						.ifPresent(pp -> {		
+							OpeningStock openingStock = new OpeningStock();
+							Optional<OpeningStock> alreadyExist = existingOpeningStocks.stream().filter(eo -> eo.getProductProfile().getName().equals(pp.getName())).findAny();
+							
+							if (alreadyExist.isPresent()) {
+								openingStock = alreadyExist.get();
+								openingStock.setBatchNumber(osDto.getBatchNumber());
+								openingStock.setQuantity(osDto.getQuantity());
+							} else {
+								openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
+								openingStock.setOpeningStockDate(LocalDateTime.now());
+								openingStock.setCreatedDate(LocalDateTime.now());
+								openingStock.setCompany(company);
+								openingStock.setProductProfile(pp);
+								openingStock.setUser(user);
+
+								if (osDto.getStockLocationName() == null) {
+									openingStock.setStockLocation(defaultStockLocation);
+								} else {
+									// stock location
+									Optional<StockLocation> optionalStockLocation = StockLocations.stream()
+											.filter(pl -> osDto.getStockLocationName().equals(pl.getName())).findAny();
+									if (optionalStockLocation.isPresent()) {
+										openingStock.setStockLocation(optionalStockLocation.get());
+									} else {
+										openingStock.setStockLocation(defaultStockLocation);
+									}
+								}
+								openingStock.setBatchNumber(osDto.getBatchNumber());
+								openingStock.setQuantity(osDto.getQuantity());
+							}
+							saveOpeningStocks.add(openingStock);
+						});
+			}
 		}
 		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
 		long end = System.nanoTime();

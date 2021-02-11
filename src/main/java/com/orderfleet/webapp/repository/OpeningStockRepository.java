@@ -109,5 +109,8 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 	@Transactional
 	@Query(name = "delete from OpeningStock os where  os.company.id in ?1 and os.stockLocation.pid in ?2")
 	void deleteByCompanyIdAndStockLocationPidIn(Long id, List<String> stockLocationPids);
+	
+	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.stockLocation.pid in ?1")
+	List<OpeningStock> findAllExistingStocks(List<String> stockLocationPids);
 
 }
