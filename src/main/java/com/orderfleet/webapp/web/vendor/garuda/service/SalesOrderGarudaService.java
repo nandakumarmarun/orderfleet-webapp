@@ -23,6 +23,7 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
+import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
@@ -33,6 +34,7 @@ import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.vendor.garuda.dto.SalesOrderDetailGarudaDTO;
@@ -61,6 +63,9 @@ public class SalesOrderGarudaService {
 
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
+	
+	@Inject
+	private PriceLevelRepository priceLevelRepository;
 
 	@Inject
 	private EmployeeProfileRepository employeeProfileRepository;
@@ -145,6 +150,9 @@ public class SalesOrderGarudaService {
 
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
 					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
+			
+			List<PriceLevel> priceLevels = priceLevelRepository
+					.findAllByCompanyIdAndIdsIn(priceLeveIds);
 
 			for (Object[] obj : inventoryVoucherHeaders) {
 
@@ -153,6 +161,9 @@ public class SalesOrderGarudaService {
 
 				Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
 						.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
+				
+				Optional<PriceLevel> opPriceLevel = priceLevels.stream()
+						.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
 
 				SalesOrderGarudaDTO garudaInvoice = new SalesOrderGarudaDTO();
 
@@ -174,11 +185,8 @@ public class SalesOrderGarudaService {
 				garudaInvoice.setInvoiceDate(date.format(formatter1));
 				garudaInvoice.setTotal(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
 				
-				if (opRecAccPro.get() != null) {
-					garudaInvoice.setOrderType(opRecAccPro.get().getDefaultPriceLevel().getName());
-				}
+				garudaInvoice.setOrderType(opPriceLevel.get().getName());
 				
-
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
 						.collect(Collectors.toList()).stream()
