@@ -135,8 +135,8 @@ public class ProcessFlowFunnelChartResource {
 
 		LocalDate fDate = LocalDate.now();
 		LocalDate tDate = LocalDate.now();
-		Period days_90 = Period.ofDays(90);
-		fDate = tDate.minus(days_90);
+		Period days_250 = Period.ofDays(250);// day range now 250 days
+		fDate = tDate.minus(days_250);
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		
@@ -216,7 +216,7 @@ public class ProcessFlowFunnelChartResource {
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
 				if (noOfDaysBetween > 45
-						&& noOfDaysBetween <= 90) {
+						&& noOfDaysBetween <= 250) {
 					return true;
 				}
 			}
@@ -224,7 +224,7 @@ public class ProcessFlowFunnelChartResource {
 		}).collect(Collectors.toList());
 		
 
-		funnelChartDtos.add(new FunnelChartDTO("above_45_days_upto_90_days", "Above 45 Days (Upto 90 Days)", b.size()+".00", "#f8f8ff"));
+		funnelChartDtos.add(new FunnelChartDTO("above_45_days_upto_250_days", "Above 45 Days (Upto 250 Days)", b.size()+".00", "#f8f8ff"));
 		funnelChartDtos.add(new FunnelChartDTO("31_to_45_days", "31 to 45 Days", g.size()+".00", "#7DFF33"));
 		funnelChartDtos.add(new FunnelChartDTO("15_to_30_days", "15 to 30 Days", y.size()+".00", "#FFFC33"));
 		funnelChartDtos.add(new FunnelChartDTO("1_to_14_days", "1 to 14 Days", o.size()+".00", "#FFB833"));

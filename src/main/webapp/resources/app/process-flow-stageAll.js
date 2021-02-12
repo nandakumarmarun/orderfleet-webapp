@@ -28,7 +28,7 @@ if (!this.InventoryVoucher) {
 		
 		let deliveryStage = getParameterByName('deliveryStage');
 		if(deliveryStage != null){
-			$("#dbDateSearch option[value='UPTO90DAYS']").attr('selected', 'selected');
+			$("#dbDateSearch option[value='UPTO250DAYS']").attr('selected', 'selected');
 			let exists = 0 != $('#dbStageFilter option[value='+deliveryStage+']').length;
 			if (exists) {
 				$('#dbStageFilter').val(deliveryStage);

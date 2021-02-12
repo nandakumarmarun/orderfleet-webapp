@@ -359,10 +359,10 @@ public class ProcessFlowStageAllResource {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			fDate = LocalDate.parse(fromDate, formatter);
 			tDate = fDate;
-		} else if (filterBy.equals("UPTO90DAYS")) {
+		} else if (filterBy.equals("UPTO250DAYS")) {
 			tDate = LocalDate.now();
-			Period days_90 = Period.ofDays(90);
-			fDate = tDate.minus(days_90);
+			Period days_250 = Period.ofDays(250);
+			fDate = tDate.minus(days_250);
 		}
 		List<SalesPerformanceDTO> salesPerformanceDTOs = getFilterData(employeePids, documentPids, processFlowStatus,
 				accountPid, fDate, tDate, deliveryStage);
@@ -489,10 +489,10 @@ public class ProcessFlowStageAllResource {
 						
 						if (deliveryStage != null && !deliveryStage.isEmpty()) {
 							switch(deliveryStage) {
-							case "above_45_days_upto_90_days":
+							case "above_45_days_upto_250_days":
 							{
 								if (noOfDaysBetween > 45
-										&& noOfDaysBetween <= 90) {
+										&& noOfDaysBetween <= 250) {
 									return true;
 								}
 								break;
@@ -542,6 +542,7 @@ public class ProcessFlowStageAllResource {
 	}
 
 	private List<SalesPerformanceDTO> createSalesPerformanceDTO(List<Object[]> inventoryVouchers) {
+		log.info("create sales performance");
 		// fetch voucher details
 		Set<String> ivHeaderPids = inventoryVouchers.parallelStream().map(obj -> obj[0].toString())
 				.collect(Collectors.toSet());
@@ -549,9 +550,17 @@ public class ProcessFlowStageAllResource {
 		Set<Long> executiveTaskIds = inventoryVouchers.parallelStream().map(obj -> Long.valueOf(obj[30].toString()))
 				.collect(Collectors.toSet());
 
-		List<Object[]> objeDynamicDocuments = dynamicDocumentHeaderRepository
-				.findAllByExecutiveTaskExecutionIdsIn(executiveTaskIds);
-		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
+		List<Object[]> objeDynamicDocuments = new ArrayList<Object[]>();
+		if (executiveTaskIds.size() > 0) {
+			objeDynamicDocuments = dynamicDocumentHeaderRepository
+					.findAllByExecutiveTaskExecutionIdsIn(executiveTaskIds);	
+		}
+		
+		List<Object[]> ivDetails = new ArrayList<Object[]>();
+		if (ivHeaderPids.size() > 0) {
+			ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
+		}
+		
 //		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
 //				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
 
