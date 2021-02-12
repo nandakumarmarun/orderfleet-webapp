@@ -217,7 +217,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	List<InventoryVoucherHeader> findByExecutiveTaskExecutionPidAndDocumentEditableTrue(
 			String executiveTaskExecutionPid);
 
-	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and status=false Order By inventoryVoucher.createdDate desc")
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and status=false Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdAndStatusOrderByCreatedDateDesc();
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?1 and status=false Order By inventoryVoucher.createdDate desc")
