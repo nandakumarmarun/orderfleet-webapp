@@ -145,15 +145,15 @@ public class ReceiptGaruda {
 				for (AccountingVoucherDetail accountingVoucherDetail : avDetails) {
 					if (accountingVoucherDetail.getAccountingVoucherAllocations().isEmpty()) {
 						ReceiptGarudaDTO receiptDTO = new ReceiptGarudaDTO(accountingVoucherDetail);
-						receiptDTO.setAccountingVoucherHeaderDTO(avdObjectToDto(obj, opUser.get(), opDocument.get(),
-								opEmployeeProfile.get(), opExe.get(), opAccPro.get(), avDetails));
+//						receiptDTO.setAccountingVoucherHeaderDTO(avdObjectToDto(obj, opUser.get(), opDocument.get(),
+//								opEmployeeProfile.get(), opExe.get(), opAccPro.get(), avDetails));
 						receiptDTOs.add(receiptDTO);
 					} else {
 						for (AccountingVoucherAllocation accountingVoucherAllocation : accountingVoucherDetail
 								.getAccountingVoucherAllocations()) {
 							ReceiptGarudaDTO receiptDTO = new ReceiptGarudaDTO(accountingVoucherAllocation);
-							receiptDTO.setAccountingVoucherHeaderDTO(avdObjectToDto(obj, opUser.get(), opDocument.get(),
-									opEmployeeProfile.get(), opExe.get(), opAccPro.get(), avDetails));
+//							receiptDTO.setAccountingVoucherHeaderDTO(avdObjectToDto(obj, opUser.get(), opDocument.get(),
+//									opEmployeeProfile.get(), opExe.get(), opAccPro.get(), avDetails));
 //							receiptDTO.setHeaderAmount(Double.parseDouble(obj[7].toString()));
 //							receiptDTO.setNarrationMessage(
 //									accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());

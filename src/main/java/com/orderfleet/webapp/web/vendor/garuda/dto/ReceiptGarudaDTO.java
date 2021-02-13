@@ -32,7 +32,7 @@ public class ReceiptGarudaDTO {
 
 	private String referenceNo;	
 
-	private AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
+	// private AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
 
 	public ReceiptGarudaDTO(AccountingVoucherDetail accountingVoucherDetail) {
 		super();
@@ -163,12 +163,12 @@ public class ReceiptGarudaDTO {
 		this.referenceNo = referenceNo;
 	}
 	
-	public AccountingVoucherHeaderDTO getAccountingVoucherHeaderDTO() {
-		return accountingVoucherHeaderDTO;
-	}
-
-	public void setAccountingVoucherHeaderDTO(AccountingVoucherHeaderDTO accountingVoucherHeaderDTO) {
-		this.accountingVoucherHeaderDTO = accountingVoucherHeaderDTO;
-	}
-	
+//	public AccountingVoucherHeaderDTO getAccountingVoucherHeaderDTO() {
+//		return accountingVoucherHeaderDTO;
+//	}
+//
+//	public void setAccountingVoucherHeaderDTO(AccountingVoucherHeaderDTO accountingVoucherHeaderDTO) {
+//		this.accountingVoucherHeaderDTO = accountingVoucherHeaderDTO;
+//	}
+//	
 }
