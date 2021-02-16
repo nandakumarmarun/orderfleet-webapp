@@ -75,7 +75,7 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.activated = ?1 Order By openingStock.productProfile.name asc")
 	Page<OpeningStock> findAllByCompanyIdAndActivatedOpeningStockOrderByName(Pageable pageable, boolean active);
 
-	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.activated = ?1")
+	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.activated = ?1 Order By openingStock.openingStockDate desc")
 	List<OpeningStock> findAllByCompanyIdAndDeactivatedOpeningStock(boolean deactive);
 
 	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.productProfile.pid= ?1 and openingStock.activated = ?2 and openingStock.lastModifiedDate > ?3")

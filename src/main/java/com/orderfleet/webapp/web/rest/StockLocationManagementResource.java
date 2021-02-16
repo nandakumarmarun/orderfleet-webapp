@@ -3,8 +3,10 @@ package com.orderfleet.webapp.web.rest;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -100,6 +102,7 @@ public class StockLocationManagementResource {
 		return "company/stockLocationManagement";
 	}
 
+	// list current temp stock and live stock
 	@RequestMapping(value = "/stock-location-management/loadStockLocationDetails", method = RequestMethod.GET)
 	public ResponseEntity<List<StockLocationManagementDTO>> loadStockLocationDetails() {
 		log.debug("Web request to get stock location details");
@@ -119,7 +122,6 @@ public class StockLocationManagementResource {
 		if (stockLocations.size() > 0) {
 
 			for (StockLocation stockLocation : stockLocations) {
-
 				StockLocationManagementDTO stockLocationManagementDTO = new StockLocationManagementDTO();
 
 				stockLocationManagementDTO.setStockLocationName(stockLocation.getName());
@@ -138,18 +140,17 @@ public class StockLocationManagementResource {
 				} else {
 					stockLocationManagementDTO.setTemporaryStockLocationDate(null);
 				}
-
 				if (openingStocks.size() > 0) {
-					Optional<OpeningStock> osOptional = openingStocks.stream()
+					OpeningStock osOptional = openingStocks.stream()
 							.filter(os -> os.getStockLocation().getPid().equalsIgnoreCase(stockLocation.getPid()))
-							.findAny();
+							.findAny().orElse(null);
 
-					if (osOptional.isPresent()) {
-						stockLocationManagementDTO.setLiveStockLocationDate(osOptional.get().getOpeningStockDate());
+					if (osOptional != null) {
+						stockLocationManagementDTO.setLiveStockLocationDate(osOptional.getOpeningStockDate());
 
-						if (osOptional.get().getUser() != null) {
+						if (osOptional.getUser() != null) {
 							Optional<EmployeeProfile> osEmployee = employeeProfiles.stream().filter(
-									emp -> emp.getUser().getPid().equalsIgnoreCase(osOptional.get().getUser().getPid()))
+									emp -> emp.getUser().getPid().equalsIgnoreCase(osOptional.getUser().getPid()))
 									.findAny();
 							if (osEmployee.isPresent()) {
 								stockLocationManagementDTO.setUserName(osEmployee.get().getName());
@@ -159,10 +160,7 @@ public class StockLocationManagementResource {
 						} else {
 							stockLocationManagementDTO.setUserName("-");
 						}
-					} else {
-						stockLocationManagementDTO.setLiveStockLocationDate(null);
-						stockLocationManagementDTO.setUserName("-");
-					}
+					} 
 				} else {
 					stockLocationManagementDTO.setLiveStockLocationDate(null);
 					stockLocationManagementDTO.setUserName("-");
@@ -177,6 +175,7 @@ public class StockLocationManagementResource {
 		return null;
 	}
 
+	// show temp stock items based on locationPid
 	@RequestMapping(value = "/stock-location-management/temporaryStockLocation/{stockLoctionPid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<OpeningStockDTO>> getTemporaryOpeningStock(@PathVariable String stockLoctionPid) {
@@ -199,6 +198,7 @@ public class StockLocationManagementResource {
 
 	}
 
+	// show live stock items based on locationPid
 	@RequestMapping(value = "/stock-location-management/liveStockLocation/{stockLoctionPid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<OpeningStockDTO>> getLiveOpeningStock(@PathVariable String stockLoctionPid) {
@@ -221,10 +221,11 @@ public class StockLocationManagementResource {
 
 	}
 
+	// update tem to live on selected Stock location
 	@RequestMapping(value = "/stock-location-management/updateStocks/{selectedStockLocation}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<OpeningStockDTO>> updateLiveOpeningStock(@PathVariable String selectedStockLocation) {
-		log.debug("Web request to update temporary opening stocks to live opening Stocks");
+		log.debug("Web request to update temporary opening stocks to live opening Stocks for "+ selectedStockLocation);
 
 		List<String> stockLocationPids = new ArrayList<>();
 
@@ -234,15 +235,27 @@ public class StockLocationManagementResource {
 			stockLocationPids.add(str);
 		}
 
+		// list of temp stocks of all selected location pids
 		List<TemporaryOpeningStock> temporaryOpeningStocks = temporaryOpeningStockRepository
 				.findTemporaryOpeningStocksAndStockLocationPIdIn(stockLocationPids);
 
+		// same as temp stocks
 		List<OpeningStockDTO> openingStockDtos = convertTemporaryOpeningStockToOpeningStockDto(temporaryOpeningStocks);
 
 		saveOpeningStocks(openingStockDtos, stockLocationPids);
 
 		return new ResponseEntity<>(openingStockDtos, HttpStatus.OK);
 
+	}
+	
+	private Map<String, List<OpeningStock>> formatList(List<String> stockLocationPids) {
+		Map<String, List<OpeningStock>> mp = new HashMap<String, List<OpeningStock>>();
+		List<OpeningStock> existingOpeningStocks =  openingStockRepository.findAllExistingStocks(stockLocationPids);
+		for (String locPids: stockLocationPids) {
+			List<OpeningStock> temp  = existingOpeningStocks.stream().filter(pp -> pp.getStockLocation().getPid().equals(locPids)).collect(Collectors.toList());
+			mp.put(locPids, temp);
+		}
+		return mp;
 	}
 
 	private void saveOpeningStocks(List<OpeningStockDTO> openingStockDTOs, List<String> stockLocationPids) {
@@ -279,8 +292,8 @@ public class StockLocationManagementResource {
 			openingStockRepository.deleteByCompanyIdAndStockLocationPidIn(company.getId(), stockLocationPids);
 		}
 		
-		
-		List<OpeningStock> existingOpeningStocks =  openingStockRepository.findAllExistingStocks(stockLocationPids);
+		 Map<String, List<OpeningStock>> map = formatList(stockLocationPids);
+
 		
 		if (!stockLocationConfig) {
 			for (OpeningStockDTO osDto : openingStockDTOs) {
@@ -313,17 +326,23 @@ public class StockLocationManagementResource {
 					});
 			}
 		} else {// stock location config true
+			log.info("config true "+ stockLocationPids);
+			log.info("Opening stock dto size {}", openingStockDTOs.size());
+			
 			for (OpeningStockDTO osDto : openingStockDTOs) {
 				// only save if account profile exist
 				productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
 						.ifPresent(pp -> {		
 							OpeningStock openingStock = new OpeningStock();
-							Optional<OpeningStock> alreadyExist = existingOpeningStocks.stream().filter(eo -> eo.getProductProfile().getName().equals(pp.getName())).findAny();
-							
+							// Optional<OpeningStock> alreadyExist = entry.getValue().stream().filter(eo -> eo.getProductProfile().getName().equals(pp.getName()) && osDto.getStockLocationPid().equals(entry.getKey())).findAny();
+							Optional<OpeningStock> alreadyExist = map.get(osDto.getStockLocationPid()).stream().filter(eo -> eo.getProductProfile().getName().equals(pp.getName())).findAny();
+
 							if (alreadyExist.isPresent()) {
 								openingStock = alreadyExist.get();
 								openingStock.setBatchNumber(osDto.getBatchNumber());
 								openingStock.setQuantity(osDto.getQuantity());
+								openingStock.setOpeningStockDate(LocalDateTime.now());
+								openingStock.setCreatedDate(LocalDateTime.now());								
 							} else {
 								openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
 								openingStock.setOpeningStockDate(LocalDateTime.now());
@@ -348,8 +367,8 @@ public class StockLocationManagementResource {
 								openingStock.setQuantity(osDto.getQuantity());
 							}
 							saveOpeningStocks.add(openingStock);
-						});
-			}
+				});
+			}			
 		}
 		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
 		long end = System.nanoTime();
