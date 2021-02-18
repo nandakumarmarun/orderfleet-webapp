@@ -285,10 +285,36 @@ if (!this.DynamicDocumentForm) {
 							|| formDetail[18] == null ? "" : formDetail[18];
 					if (value == '') {
 						leadUnspecified += 1;
-					} else if (value == 'Open') {
-						leadOpen +=1;
-					} else if (value == 'Lost') {
-						leadWon +=1;
+					} else if (value == 'Open') {						 
+						if (14 < length) { // follow up date
+							var followUpValue = formDetail[14] == undefined
+								|| formDetail[14] == null ? "" : formDetail[14];
+							var leadStatus = formDetail[18] == undefined
+							|| formDetail[18] == null ? "" : formDetail[18];
+							if (followUpValue != "") {
+								var followUpDate = moment(followUpValue).format('YYYY-MM-DD');
+								if (moment().isSame(followUpDate, 'month')) {
+									// check if follow up date in same month
+									leadOpen +=1;
+								}
+							}
+						}
+					
+					
+					} else if (value == 'Won') { // initial Lost changed to won
+						if (14 < length) { // follow up date
+							var followUpValue = formDetail[14] == undefined
+								|| formDetail[14] == null ? "" : formDetail[14];
+							var leadStatus = formDetail[18] == undefined
+							|| formDetail[18] == null ? "" : formDetail[18];
+							if (followUpValue != "") {
+								var followUpDate = moment(followUpValue).format('YYYY-MM-DD');
+								if (moment().isSame(followUpDate, 'month')) {
+									// check if follow up date in same month
+									leadWon +=1;
+								}
+							}
+						}
 					}
 				}
 
