@@ -627,6 +627,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 								.findTop1ByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
 						if (openingStock != null) {
 							name += openingStock.getQuantity() + ",";
+							productProfileDTO.setStockQty(openingStock.getQuantity());
 						}
 					} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
 						if (productProfileDTO.getProductDescription() != null

@@ -336,7 +336,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			String userPid, List<String> accountPids, LocalDateTime fromDate, LocalDateTime toDate,
 			List<Document> documents);
 
-	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.executiveTaskExecution.user.id = ?1 and inventoryVoucher.documentDate between ?2 and ?3 Order By inventoryVoucher.documentDate desc")
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.executiveTaskExecution.user.id = ?1 and inventoryVoucher.documentDate between ?2 and ?3 Order By inventoryVoucher.documentDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdUserIdAndDateBetweenOrderByDocumentDateDesc(Long userid,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
