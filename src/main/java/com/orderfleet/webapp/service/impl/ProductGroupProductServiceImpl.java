@@ -218,6 +218,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 								.findTop1ByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
 						if (openingStock != null) {
 							name += openingStock.getQuantity() + ",";
+							productProfileDTO.setStockQty(openingStock.getQuantity());
 						}
 					} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
 						if (productProfileDTO.getProductDescription() != null
@@ -272,6 +273,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 								.findTop1ByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
 						if (openingStock != null) {
 							name += openingStock.getQuantity() + ",";
+							productProfileDTO.setStockQty(openingStock.getQuantity());
 						}
 					} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
 						if (productProfileDTO.getProductDescription() != null
@@ -443,6 +445,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 										.findTop1ByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
 								if (openingStock != null) {
 									name += "STK:" + openingStock.getQuantity() + ",";
+									productProfileDTO.setStockQty(openingStock.getQuantity());
 								}
 							} else {
 								Double sum = openingStocks.stream().filter(
@@ -454,6 +457,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 								 * productProfileDTO.getPid(), sLocationIds);
 								 */
 								name += "STK:" + sum + ",";
+								productProfileDTO.setStockQty(sum);
 							}
 
 //							
@@ -546,6 +550,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 									.findTop1ByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
 							if (openingStock != null) {
 								name += openingStock.getQuantity() + ",";
+								productProfileDTO.setStockQty(openingStock.getQuantity());
 							}
 						} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
 							if (productProfileDTO.getProductDescription() != null
