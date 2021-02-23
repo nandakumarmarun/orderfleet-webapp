@@ -111,7 +111,7 @@ public class EcomSalesReportResource {
 
 	@Inject
 	private LocationAccountProfileService locationAccountProfileService;
-	
+
 	@Inject
 	private ProductGroupEcomProductsRepository productGroupEcomProductsRepository;
 
@@ -123,19 +123,18 @@ public class EcomSalesReportResource {
 
 	@Inject
 	private InventoryVoucherHeaderService inventoryVoucherService;
-	
+
 	@Inject
 	private GeoLocationService geoLocationService;
-	
+
 	/**
 	 * GET /ecom-sales-reports : get all the Ecom Sales Report.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the ResponseEntity with status 200 (OK) and the list of executive
 	 *         task execution in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/ecom-sales-reports", method = RequestMethod.GET)
 	@Timed
@@ -161,12 +160,12 @@ public class EcomSalesReportResource {
 		if (opExecutiveeExecution.isPresent()) {
 			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
 			if (execution.getLocationType() == LocationType.GpsLocation) {
-				String location = geoLocationService.findAddressFromLatLng(execution.getLatitude() + "," +
-						execution.getLongitude());
+				String location = geoLocationService
+						.findAddressFromLatLng(execution.getLatitude() + "," + execution.getLongitude());
 				execution.setLocation(location);
 			} else if (execution.getLocationType() == LocationType.TowerLocation) {
-				TowerLocation location = geoLocationService.findAddressFromCellTower(execution.getMcc(), execution.getMnc(),
-						execution.getCellId(), execution.getLac());
+				TowerLocation location = geoLocationService.findAddressFromCellTower(execution.getMcc(),
+						execution.getMnc(), execution.getCellId(), execution.getLac());
 				execution.setLatitude(location.getLat());
 				execution.setLongitude(location.getLan());
 				execution.setLocation(location.getLocation());
@@ -185,20 +184,17 @@ public class EcomSalesReportResource {
 		log.debug("Web request to filter executive task executions");
 		List<ExecutiveTaskExecutionView> executiveTaskExecutions = new ArrayList<>();
 		if (filterBy.equals("TODAY")) {
-			executiveTaskExecutions = getFilterData(employeePid, accountPid, LocalDate.now(),
-					LocalDate.now());
+			executiveTaskExecutions = getFilterData(employeePid, accountPid, LocalDate.now(), LocalDate.now());
 		} else if (filterBy.equals("YESTERDAY")) {
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
 			executiveTaskExecutions = getFilterData(employeePid, accountPid, yeasterday, yeasterday);
 		} else if (filterBy.equals("WTD")) {
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			executiveTaskExecutions = getFilterData(employeePid,accountPid, weekStartDate,
-					LocalDate.now());
+			executiveTaskExecutions = getFilterData(employeePid, accountPid, weekStartDate, LocalDate.now());
 		} else if (filterBy.equals("MTD")) {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			executiveTaskExecutions = getFilterData(employeePid, accountPid, monthStartDate,
-					LocalDate.now());
+			executiveTaskExecutions = getFilterData(employeePid, accountPid, monthStartDate, LocalDate.now());
 		} else if (filterBy.equals("CUSTOM")) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
@@ -212,8 +208,8 @@ public class EcomSalesReportResource {
 		return new ResponseEntity<>(executiveTaskExecutions, HttpStatus.OK);
 	}
 
-	private List<ExecutiveTaskExecutionView> getFilterData(String employeePid, String accountPid,
-			LocalDate fDate, LocalDate tDate) {
+	private List<ExecutiveTaskExecutionView> getFilterData(String employeePid, String accountPid, LocalDate fDate,
+			LocalDate tDate) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<Document> documents = primarySecondaryDocumentRepository
@@ -250,8 +246,9 @@ public class EcomSalesReportResource {
 				if (locations.isEmpty()) {
 					return Collections.emptyList();
 				}
-				List<AccountProfile> accountProfiles = locationAccountProfileRepository.findAccountProfileByLocationIdIn(
-						locations.stream().map(Location::getId).collect(Collectors.toList()));
+				List<AccountProfile> accountProfiles = locationAccountProfileRepository
+						.findAccountProfileByLocationIdIn(
+								locations.stream().map(Location::getId).collect(Collectors.toList()));
 				if (accountProfiles.isEmpty()) {
 					return Collections.emptyList();
 				}
@@ -294,7 +291,8 @@ public class EcomSalesReportResource {
 			List<ExecutiveTaskExecutionDetailView> executiveTaskExecutionDetailViews = new ArrayList<>();
 			for (InventoryVoucherHeader ivh : entry.getValue()) {
 				// Calculate total amount
-				double documentTotal = ivh.getInventoryVoucherDetails().stream().mapToDouble(InventoryVoucherDetail::getRowTotal).sum();
+				double documentTotal = ivh.getInventoryVoucherDetails().stream()
+						.mapToDouble(InventoryVoucherDetail::getRowTotal).sum();
 				ExecutiveTaskExecutionDetailView executiveTaskExecutionDetailView = new ExecutiveTaskExecutionDetailView(
 						ivh.getPid(), ivh.getDocument().getName(), documentTotal,
 						ivh.getDocument().getDocumentType().toString());
@@ -306,12 +304,12 @@ public class EcomSalesReportResource {
 		}
 		return executiveTaskExecutionViews;
 	}
-	
+
 	private List<Long> getUserIdsUnderCurrentUser(String employeePid) {
 		List<Long> userIds;
-		if (employeePid.equals("Dashboard Employee")||employeePid.equals("no")) {
+		if (employeePid.equals("Dashboard Employee") || employeePid.equals("no")) {
 			userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-			if (employeePid.equals("Dashboard Employee")){
+			if (employeePid.equals("Dashboard Employee")) {
 				List<User> dashboardUsers = dashboardUserRepository.findUsersByCompanyId();
 				List<Long> dashboardUserIds = dashboardUsers.stream().map(a -> a.getId()).collect(Collectors.toList());
 				Set<Long> uniqueIds = new HashSet<>();
@@ -327,9 +325,9 @@ public class EcomSalesReportResource {
 				if (!uniqueIds.isEmpty()) {
 					userIds = new ArrayList<>(uniqueIds);
 				}
-				
+
 			}
-		}else {
+		} else {
 			userIds = Collections.emptyList();
 		}
 		return userIds;
@@ -383,26 +381,27 @@ public class EcomSalesReportResource {
 
 	private List<InventoryVoucherHeader> findInventoryVoucherHeaderByUser(String userPid, List<Document> documents,
 			LocalDateTime fromDate, LocalDateTime toDate, List<String> accountProfilePids) {
-		//product groups
+		// product groups
 		List<ProductGroup> productGroups = userProductGroupRepository.findProductGroupsByUserPid(userPid);
-		if(productGroups.isEmpty()) {
+		if (productGroups.isEmpty()) {
 			return Collections.emptyList();
 		}
-		//ecom-product by product group
-		List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository.findByProductGroups(productGroups);
-		if(productGroupEcomProducts.isEmpty()) {
+		// ecom-product by product group
+		List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository
+				.findByProductGroups(productGroups);
+		if (productGroupEcomProducts.isEmpty()) {
 			return Collections.emptyList();
 		}
 		Set<String> ecomProductProfilePids = productGroupEcomProducts.stream().map(p -> p.getEcomProduct().getPid())
 				.collect(Collectors.toSet());
 		List<ProductProfile> productProfiles = ecomProductProfileProductRepository
 				.findProductByEcomProductProfilePidIn(ecomProductProfilePids);
-		if(productProfiles.isEmpty()) {
+		if (productProfiles.isEmpty()) {
 			return Collections.emptyList();
 		}
 		List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
-				.findAllByCompanyIdAndAccountPidInAndProductPidInAndDateBetween(accountProfilePids,
-						productProfiles, documents, fromDate, toDate);
+				.findAllByCompanyIdAndAccountPidInAndProductPidInAndDateBetween(accountProfilePids, productProfiles,
+						documents, fromDate, toDate);
 		// mapped by InventoryVoucherHeader
 		Map<InventoryVoucherHeader, List<InventoryVoucherDetail>> mapInventoryVoucherDetail = inventoryVoucherDetails
 				.parallelStream().collect(Collectors.groupingBy(InventoryVoucherDetail::getInventoryVoucherHeader));
@@ -420,16 +419,16 @@ public class EcomSalesReportResource {
 	/**
 	 * GET /primary-sales-performance/:id : get the "id" InventoryVoucher.
 	 *
-	 * @param id
-	 *            the id of the InventoryVoucherDTO to retrieve
+	 * @param id the id of the InventoryVoucherDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         InventoryVoucherDTO, or with status 404 (Not Found)
 	 */
 	@RequestMapping(value = "/ecom-sales-reports/inventory-voucher/{pid}/{employeePid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<InventoryVoucherHeaderDTO> getInventoryVoucher(@PathVariable String pid, @PathVariable String employeePid) {
+	public ResponseEntity<InventoryVoucherHeaderDTO> getInventoryVoucher(@PathVariable String pid,
+			@PathVariable String employeePid) {
 		log.debug("Web request to get ecom-sales-reports inventoryVoucherDTO by pid : {}", pid);
-		if(employeePid.equals("no") || employeePid.equals("Dashboard Employees")) {
+		if (employeePid.equals("no") || employeePid.equals("Dashboard Employees")) {
 			return inventoryVoucherService.findOneByPid(pid)
 					.map(inventoryVoucherDTO -> new ResponseEntity<>(inventoryVoucherDTO, HttpStatus.OK))
 					.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -441,35 +440,35 @@ public class EcomSalesReportResource {
 		}
 		String userPid = optionalEmp.get().getUserPid();
 		Optional<InventoryVoucherHeaderDTO> opIV = inventoryVoucherService.findOneByPid(pid);
-		if(opIV.isPresent()) {
+		if (opIV.isPresent()) {
 			InventoryVoucherHeaderDTO iv = opIV.get();
-			//product groups
+			// product groups
 			List<ProductGroup> productGroups = userProductGroupRepository.findProductGroupsByUserPid(userPid);
-			if(productGroups.isEmpty()) {
+			if (productGroups.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
-			//ecom-product by product group
-			List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository.findByProductGroups(productGroups);
-			if(productGroupEcomProducts.isEmpty()) {
+			// ecom-product by product group
+			List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository
+					.findByProductGroups(productGroups);
+			if (productGroupEcomProducts.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 			Set<String> ecomProductProfilePids = productGroupEcomProducts.stream().map(p -> p.getEcomProduct().getPid())
 					.collect(Collectors.toSet());
 			List<ProductProfile> productProfiles = ecomProductProfileProductRepository
 					.findProductByEcomProductProfilePidIn(ecomProductProfilePids);
-			if(productProfiles.isEmpty()) {
+			if (productProfiles.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
-			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = iv.getInventoryVoucherDetails().stream().filter(ivd -> {
-				return productProfiles.stream().anyMatch(p -> p.getPid().equals(ivd.getProductPid()));
-			}).collect(Collectors.toList());
+			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = iv.getInventoryVoucherDetails().stream()
+					.filter(ivd -> {
+						return productProfiles.stream().anyMatch(p -> p.getPid().equals(ivd.getProductPid()));
+					}).collect(Collectors.toList());
 			iv.setInventoryVoucherDetails(inventoryVoucherDetailDTOs);
 			return new ResponseEntity<>(iv, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-
-	
 
 }

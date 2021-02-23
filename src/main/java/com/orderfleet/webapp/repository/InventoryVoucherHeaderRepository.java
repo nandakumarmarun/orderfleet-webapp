@@ -144,11 +144,11 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} Order By inventoryVoucher.createdDate desc")
 	Page<InventoryVoucherHeader> findAllByCompanyIdOrderByCreatedDateDesc(Pageable pageable);
 
-	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdDate between ?1 and ?2 and inventoryVoucher.document in ?3 Order By inventoryVoucher.createdDate desc")
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdDate between ?1 and ?2 and inventoryVoucher.document in ?3 Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdAndDateBetweenOrderByCreatedDateDesc(LocalDateTime fromDate,
 			LocalDateTime toDate, List<Document> documents);
 
-	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdBy.id in ?1 and inventoryVoucher.document in ?2 and inventoryVoucher.createdDate between ?3 and ?4 Order By inventoryVoucher.createdDate desc")
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdBy.id in ?1 and inventoryVoucher.document in ?2 and inventoryVoucher.createdDate between ?3 and ?4 Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdAndUserIdInAndDocumentsInAndDateBetweenOrderByCreatedDateDesc(
 			List<Long> userIds, List<Document> documents, LocalDateTime fromDate, LocalDateTime toDate);
 
