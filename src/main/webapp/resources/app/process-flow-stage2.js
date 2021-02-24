@@ -220,6 +220,29 @@ if (!this.InventoryVoucher) {
 
 		});
 	}
+	
+InventoryVoucher.updateRemarks = function(ivhPid) {
+		
+		$.ajax({
+			url : inventoryVoucherContextPath + "/updateRemarks",
+			data : {
+				ivhPid : ivhPid,
+				remarks : $('#remarks-' + ivhPid).val()
+			},
+			beforeSend : function() {
+				// Show image container
+				$("#loader").modal('show');
+
+			},
+			method : 'GET',
+			success : function(data) {
+				$("#loader").modal('hide');
+				InventoryVoucher.filter();
+			}
+
+		});
+		
+	}
 
 	InventoryVoucher.updatePaymentReceived = function(ivhPid) {
 		$.ajax({
@@ -292,6 +315,26 @@ if (!this.InventoryVoucher) {
 				bookingId : $('#bookingId-' + ivhPid).val(),
 				paymentReceived : $('#pmtReceieved-' + ivhPid).val(),
 				deliveryDate : $('#deliveryDate-' + ivhPid).val()
+			},
+			beforeSend : function() {
+				// Show image container
+				$("#loader").modal('show');
+
+			},
+			method : 'GET',
+			success : function(data) {
+				$("#loader").modal('hide');
+				InventoryVoucher.filter();
+			}
+
+		});
+	}
+	
+	InventoryVoucher.reject = function(ivhPid) {
+		$.ajax({
+			url : inventoryVoucherContextPath + "/reject",
+			data : {
+				ivhPid : ivhPid
 			},
 			beforeSend : function() {
 				// Show image container
@@ -461,13 +504,24 @@ if (!this.InventoryVoucher) {
 																			inventoryVoucher.processFlowStatus)
 																	+ "<br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateAll(\""
 																	+ inventoryVoucher.pid
-																	+ "\");'  value='Update'></td><td><input type='text' id='bookingId-"
+																	+ "\");'  value='Update'><br><br><input type='button' class='btn btn-danger'  onClick='InventoryVoucher.reject(\""
+																	+ inventoryVoucher.pid
+																	+ "\");'  value='Reject'></td><td><input type='text' onchange='InventoryVoucher.updateRemarks(\""
+																	+ inventoryVoucher.pid
+																	+ "\");' id='remarks-"
+																	+ inventoryVoucher.pid
+																	+ "' value='"
+																	+ inventoryVoucher.remarks
+																	+ "'/>"
+																	+ "</td><td><input type='text' id='bookingId-"
 																	+ inventoryVoucher.pid
 																	+ "' value='"
 																	+ inventoryVoucher.bookingId
 																	+ "'/>"
 																	+ "</td><td>"
 																	+ inventoryVoucher.receiverAccountName
+																	+ "<br><br>"
+																	+ inventoryVoucher.receiverAccountPhone
 																	+ "</td><td><input type='date' id='deliveryDate-"
 																	+ inventoryVoucher.pid
 																	+ "' value='"
@@ -734,7 +788,7 @@ if (!this.InventoryVoucher) {
 		switch (status) {
 		case 'DEFAULT':
 			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'DEFAULT<span class="caret"></span></span>'
+					+ 'PO_ACCEPTED_AT_TSL<span class="caret"></span></span>'
 					+ '<ul class="dropdown-menu">'
 					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
 					+ pid
@@ -745,7 +799,7 @@ if (!this.InventoryVoucher) {
 			break;
 		case 'PO_PLACED':
 			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-					+ 'DEFAULT <span class="caret"></span></span>'
+					+ 'PO_PLACED <span class="caret"></span></span>'
 					+ '<ul class="dropdown-menu">'
 					+ '<li onclick="InventoryVoucher.setProcessFlowStatus('
 					+ pid
@@ -762,7 +816,7 @@ if (!this.InventoryVoucher) {
 					+ pid
 					+ ','
 					+ placedPO
-					+ ')"  style="cursor: pointer;"><a>DEFAULT</a></li>'
+					+ ')"  style="cursor: pointer;"><a>PO_PLACED</a></li>'
 					+ '</ul></div>';
 			break;
 		}

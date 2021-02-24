@@ -145,7 +145,7 @@ public class ProcessFlowStageAllResource {
 
 	@Inject
 	private InventoryVoucherHeaderService inventoryVoucherService;
-	
+
 	@Inject
 	private DocumentRepository documentRepository;
 
@@ -443,37 +443,41 @@ public class ProcessFlowStageAllResource {
 		case "READYATPS_NOTDELIVERED":
 			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.NOT_DELIVERED);
 			break;
-		case "DELIVERED":
-			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED);
+		case "DELIVERED_INSTALLATIONPLANED":
+			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED, ProcessFlowStatus.INSTALLATION_PLANNED);
+			break;
+		case "INSTALLED":
+			processStatus = Arrays.asList(ProcessFlowStatus.INSTALLED);
 			break;
 		case "ALL":
 			processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,
 					ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL,
 					ProcessFlowStatus.UNDER_PRODUCTION, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL,
 					ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
-					ProcessFlowStatus.NOT_DELIVERED);
+					ProcessFlowStatus.NOT_DELIVERED, ProcessFlowStatus.INSTALLATION_PLANNED,
+					ProcessFlowStatus.INSTALLED);
 			break;
 		case "ALL_NOT_DELIVERED":
 			processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,
 					ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL,
 					ProcessFlowStatus.UNDER_PRODUCTION, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL,
-					ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.NOT_DELIVERED);
+					ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.NOT_DELIVERED,
+					ProcessFlowStatus.INSTALLATION_PLANNED, ProcessFlowStatus.INSTALLED);
 			break;
 
 		}
-		
+
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
 			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusDateBetweenOrderByCreatedDateDesc(userIds,
-							documentPids, processStatus, fromDate, toDate);
+					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(userIds,
+							documentPids, processStatus, fromDate, toDate,false);
 		} else {
 			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusDateBetweenOrderByCreatedDateDesc(
-							userIds, accountPid, documentPids, processStatus, fromDate, toDate);
-		}	
-		
-		
+					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
+							userIds, accountPid, documentPids, processStatus, fromDate, toDate,false);
+		}
+
 		if (inventoryVouchers.isEmpty()) {
 			return Collections.emptyList();
 		} else {
@@ -486,49 +490,40 @@ public class ProcessFlowStageAllResource {
 						LocalDate deliveryDate = LocalDate.parse(date, formatter);
 						long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
 						String processflowStatus = u[26].toString();
-						
+
 						if (deliveryStage != null && !deliveryStage.isEmpty()) {
-							switch(deliveryStage) {
-							case "above_45_days_upto_250_days":
-							{
-								if (noOfDaysBetween > 45
-										&& noOfDaysBetween <= 250) {
+							switch (deliveryStage) {
+							case "above_45_days_upto_250_days": {
+								if (noOfDaysBetween > 45 && noOfDaysBetween <= 250) {
 									return true;
 								}
 								break;
 							}
-							case "31_to_45_days":
-							{
-								if (noOfDaysBetween >= 30
-										&& noOfDaysBetween <= 45) {
+							case "31_to_45_days": {
+								if (noOfDaysBetween >= 30 && noOfDaysBetween <= 45) {
 									return true;
 								}
 								break;
 							}
-							case "15_to_30_days":
-							{
-								if (noOfDaysBetween >= 15
-										&& noOfDaysBetween < 30) {
+							case "15_to_30_days": {
+								if (noOfDaysBetween >= 15 && noOfDaysBetween < 30) {
 									return true;
 								}
 								break;
 							}
-							case "1_to_14_days":
-							{
-								if (noOfDaysBetween > 0
-										&& noOfDaysBetween < 15) {
+							case "1_to_14_days": {
+								if (noOfDaysBetween > 0 && noOfDaysBetween < 15) {
 									return true;
 								}
 								break;
 							}
-							case "delivery_by_today_or_delivery_date_crossed":
-							{
+							case "delivery_by_today_or_delivery_date_crossed": {
 								if (noOfDaysBetween <= 0 && !processflowStatus.equals("DELIVERED")) {
 									return true;
 								}
 								break;
 							}
-							}	
+							}
 						}
 					}
 					return false;
@@ -553,14 +548,14 @@ public class ProcessFlowStageAllResource {
 		List<Object[]> objeDynamicDocuments = new ArrayList<Object[]>();
 		if (executiveTaskIds.size() > 0) {
 			objeDynamicDocuments = dynamicDocumentHeaderRepository
-					.findAllByExecutiveTaskExecutionIdsIn(executiveTaskIds);	
+					.findAllByExecutiveTaskExecutionIdsIn(executiveTaskIds);
 		}
-		
+
 		List<Object[]> ivDetails = new ArrayList<Object[]>();
 		if (ivHeaderPids.size() > 0) {
 			ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
 		}
-		
+
 //		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
 //				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
 

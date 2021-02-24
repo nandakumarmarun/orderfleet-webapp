@@ -55,7 +55,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 @Controller
 @RequestMapping("/web")
 public class ProcessFlowFunnelChartResource {
-	
+
 	private final Logger log = LoggerFactory.getLogger(ProcessFlowFunnelChartResource.class);
 
 	@Inject
@@ -79,8 +79,6 @@ public class ProcessFlowFunnelChartResource {
 	@Inject
 	private PrimarySecondaryDocumentService primarySecondaryDocumentService;
 
-
-
 	@Inject
 	private EmployeeProfileService employeeProfileService;
 
@@ -88,7 +86,7 @@ public class ProcessFlowFunnelChartResource {
 	public String customerJourney(Model model) {
 		return "company/process-flow-funnel-chart";
 	}
-	
+
 	@RequestMapping(value = "/process-flow-funnel-chart/load", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<DashboardChartDTO> getFunnelChartData() {
 		DashboardChartDTO dashboardChartDTO = new DashboardChartDTO();
@@ -97,7 +95,7 @@ public class ProcessFlowFunnelChartResource {
 		dashboardChartDTO.setChartLabel("Sales Funnel");
 		return new ResponseEntity<>(dashboardChartDTO, HttpStatus.OK);
 	}
-	
+
 //	private List<FunnelChartDTO> makeFunnelChart() {
 //		List<FunnelChartDTO> funnelChartDtos = new ArrayList<>();
 //		// List<Object[]> fNameAndCounts = stageHeaderRepository.findFunnelDetails(fDate.atTime(0, 0), tDate.atTime(23, 59));
@@ -110,28 +108,29 @@ public class ProcessFlowFunnelChartResource {
 //		}
 //		return funnelChartDtos;
 //	}
-	
+
 	private List<FunnelChartDTO> makeFunnelChart() {
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 		if (userIds.isEmpty()) {
-			List<String> employeePids = employeeProfileService.findAllByCompany().stream().map(obj -> obj.getPid().toString()).collect(Collectors.toList());
+			List<String> employeePids = employeeProfileService.findAllByCompany().stream()
+					.map(obj -> obj.getPid().toString()).collect(Collectors.toList());
 			userIds = employeeProfileRepository.findUserIdByEmployeePidIn(employeePids);
 		} else {
-			List<String> employeePids = employeeProfileService.findAllEmployeeByUserIdsIn(userIds).stream().map(obj -> obj.getPid().toString()).collect(Collectors.toList());
+			List<String> employeePids = employeeProfileService.findAllEmployeeByUserIdsIn(userIds).stream()
+					.map(obj -> obj.getPid().toString()).collect(Collectors.toList());
 			userIds = employeeProfileRepository.findUserIdByEmployeePidIn(employeePids);
 			Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 			userIds.add(currentUserId);
 		}
-		
-		List<String> documentPids =  primarySecondaryDocumentService.findAllDocumentsByCompanyIdAndVoucherType(VoucherType.PRIMARY_SALES_ORDER).parallelStream().map(obj -> obj.getPid().toString())
-				.collect(Collectors.toList());
-		
+
+		List<String> documentPids = primarySecondaryDocumentService
+				.findAllDocumentsByCompanyIdAndVoucherType(VoucherType.PRIMARY_SALES_ORDER).parallelStream()
+				.map(obj -> obj.getPid().toString()).collect(Collectors.toList());
+
 		List<ProcessFlowStatus> processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,
-				ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL,
-				ProcessFlowStatus.UNDER_PRODUCTION, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL,
-				ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
-				ProcessFlowStatus.NOT_DELIVERED);
-		
+				ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL, ProcessFlowStatus.UNDER_PRODUCTION,
+				ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL, ProcessFlowStatus.READY_TO_DISPATCH_AT_PS,
+				ProcessFlowStatus.DELIVERED, ProcessFlowStatus.NOT_DELIVERED);
 
 		LocalDate fDate = LocalDate.now();
 		LocalDate tDate = LocalDate.now();
@@ -139,14 +138,13 @@ public class ProcessFlowFunnelChartResource {
 		fDate = tDate.minus(days_250);
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
-		
-		
+
 		List<FunnelChartDTO> funnelChartDtos = new ArrayList<>();
-		
+
 		List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository
-				.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusDateBetweenOrderByCreatedDateDesc(userIds,
-						documentPids, processStatus, fromDate, toDate);
-		
+				.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
+						userIds, documentPids, processStatus, fromDate, toDate, false);
+
 		List<Object[]> r = inventoryVouchers.stream().filter(u -> {
 			if (u[29] != null) {
 				LocalDate currentdate = LocalDate.now();
@@ -162,7 +160,7 @@ public class ProcessFlowFunnelChartResource {
 			}
 			return false;
 		}).collect(Collectors.toList());
-		
+
 		List<Object[]> o = inventoryVouchers.stream().filter(u -> {
 			if (u[29] != null) {
 				LocalDate currentdate = LocalDate.now();
@@ -170,14 +168,13 @@ public class ProcessFlowFunnelChartResource {
 				String date = u[29].toString();
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-				if (noOfDaysBetween > 0
-						&& noOfDaysBetween < 15) {
+				if (noOfDaysBetween > 0 && noOfDaysBetween < 15) {
 					return true;
 				}
 			}
 			return false;
 		}).collect(Collectors.toList());
-		
+
 		List<Object[]> y = inventoryVouchers.stream().filter(u -> {
 			if (u[29] != null) {
 				LocalDate currentdate = LocalDate.now();
@@ -185,14 +182,13 @@ public class ProcessFlowFunnelChartResource {
 				String date = u[29].toString();
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-				if (noOfDaysBetween >= 15
-						&& noOfDaysBetween < 30) {
+				if (noOfDaysBetween >= 15 && noOfDaysBetween < 30) {
 					return true;
 				}
 			}
 			return false;
 		}).collect(Collectors.toList());
-		
+
 		List<Object[]> g = inventoryVouchers.stream().filter(u -> {
 			if (u[29] != null) {
 				LocalDate currentdate = LocalDate.now();
@@ -200,14 +196,13 @@ public class ProcessFlowFunnelChartResource {
 				String date = u[29].toString();
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-				if (noOfDaysBetween >= 30
-						&& noOfDaysBetween <= 45) {
+				if (noOfDaysBetween >= 30 && noOfDaysBetween <= 45) {
 					return true;
 				}
 			}
 			return false;
 		}).collect(Collectors.toList());
-		
+
 		List<Object[]> b = inventoryVouchers.stream().filter(u -> {
 			if (u[29] != null) {
 				LocalDate currentdate = LocalDate.now();
@@ -215,20 +210,20 @@ public class ProcessFlowFunnelChartResource {
 				String date = u[29].toString();
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-				if (noOfDaysBetween > 45
-						&& noOfDaysBetween <= 250) {
+				if (noOfDaysBetween > 45 && noOfDaysBetween <= 250) {
 					return true;
 				}
 			}
 			return false;
 		}).collect(Collectors.toList());
-		
 
-		funnelChartDtos.add(new FunnelChartDTO("above_45_days_upto_250_days", "Above 45 Days (Upto 250 Days)", b.size()+".00", "#f8f8ff"));
-		funnelChartDtos.add(new FunnelChartDTO("31_to_45_days", "31 to 45 Days", g.size()+".00", "#7DFF33"));
-		funnelChartDtos.add(new FunnelChartDTO("15_to_30_days", "15 to 30 Days", y.size()+".00", "#FFFC33"));
-		funnelChartDtos.add(new FunnelChartDTO("1_to_14_days", "1 to 14 Days", o.size()+".00", "#FFB833"));
-		funnelChartDtos.add(new FunnelChartDTO("delivery_by_today_or_delivery_date_crossed", "Delivery By Today or Delivery Date Crossed", r.size()+".00", "#FF3933"));
+		funnelChartDtos.add(new FunnelChartDTO("above_45_days_upto_250_days", "Above 45 Days (Upto 250 Days)",
+				b.size() + ".00", "#f8f8ff"));
+		funnelChartDtos.add(new FunnelChartDTO("31_to_45_days", "31 to 45 Days", g.size() + ".00", "#7DFF33"));
+		funnelChartDtos.add(new FunnelChartDTO("15_to_30_days", "15 to 30 Days", y.size() + ".00", "#FFFC33"));
+		funnelChartDtos.add(new FunnelChartDTO("1_to_14_days", "1 to 14 Days", o.size() + ".00", "#FFB833"));
+		funnelChartDtos.add(new FunnelChartDTO("delivery_by_today_or_delivery_date_crossed",
+				"Delivery By Today or Delivery Date Crossed", r.size() + ".00", "#FF3933"));
 		return funnelChartDtos;
-	}	
+	}
 }

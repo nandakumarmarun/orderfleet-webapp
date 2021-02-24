@@ -140,6 +140,10 @@ public interface InventoryVoucherHeaderService {
 	void updateInventoryVoucherHeaderPaymentReceived(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
 
 	void updateInventoryVoucherHeaderBookingId(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
+	
+	void updateInventoryVoucherHeaderRemarks(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
+	
+	void updateInventoryVoucherHeaderRejectedStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
 
 	void updateInventoryVoucherHeaderDeliveryDate(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
 

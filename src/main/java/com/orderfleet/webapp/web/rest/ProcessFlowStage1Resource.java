@@ -448,27 +448,31 @@ public class ProcessFlowStage1Resource {
 		case "READYATPS_NOTDELIVERED":
 			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.NOT_DELIVERED);
 			break;
-		case "DELIVERED":
-			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED);
+		case "DELIVERED_INSTALLATIONPLANED":
+			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED, ProcessFlowStatus.INSTALLATION_PLANNED);
+			break;
+		case "INSTALLED":
+			processStatus = Arrays.asList(ProcessFlowStatus.INSTALLED);
 			break;
 		case "ALL":
 			processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,
 					ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL,
 					ProcessFlowStatus.UNDER_PRODUCTION, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL,
 					ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
-					ProcessFlowStatus.NOT_DELIVERED);
+					ProcessFlowStatus.NOT_DELIVERED, ProcessFlowStatus.INSTALLATION_PLANNED,
+					ProcessFlowStatus.INSTALLED);
 			break;
 		}
 
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
 			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusDateBetweenOrderByCreatedDateDesc(userIds,
-							documentPids, processStatus, fromDate, toDate);
+					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
+							userIds, documentPids, processStatus, fromDate, toDate, false);
 		} else {
 			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusDateBetweenOrderByCreatedDateDesc(
-							userIds, accountPid, documentPids, processStatus, fromDate, toDate);
+					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
+							userIds, accountPid, documentPids, processStatus, fromDate, toDate, false);
 		}
 		if (inventoryVouchers.isEmpty()) {
 			return Collections.emptyList();
@@ -594,6 +598,19 @@ public class ProcessFlowStage1Resource {
 				salesPerformanceDTO.setDeliveryDateDifference(noOfDaysBetween);
 			} else {
 				salesPerformanceDTO.setDeliveryDate("");
+			}
+
+			if (ivData[32] != null) {
+				salesPerformanceDTO.setRemarks(ivData[32].toString().equals("") ? "" : ivData[32].toString());
+			} else {
+				salesPerformanceDTO.setRemarks("");
+			}
+
+			if (ivData[33] != null) {
+				salesPerformanceDTO
+						.setReceiverAccountPhone(ivData[33].toString().equals("") ? "" : ivData[33].toString());
+			} else {
+				salesPerformanceDTO.setReceiverAccountPhone("");
 			}
 
 			if (objeDynamicDocuments.size() > 0) {
@@ -955,6 +972,26 @@ public class ProcessFlowStage1Resource {
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
 		inventoryVoucherHeaderDTO.setBookingId(bookingId);
 		inventoryVoucherService.updateInventoryVoucherHeaderBookingId(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>("success", HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/process-flow-stage-1/updateRemarks", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> updateRemarks(@RequestParam String ivhPid, @RequestParam String remarks) {
+		log.info("update remarks " + ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+		inventoryVoucherHeaderDTO.setRemarks(remarks);
+		inventoryVoucherService.updateInventoryVoucherHeaderRemarks(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>("success", HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/process-flow-stage-1/reject", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> reject(@RequestParam String ivhPid) {
+		log.info("update reject status " + ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+		inventoryVoucherHeaderDTO.setRejectedStatus(true);
+		inventoryVoucherService.updateInventoryVoucherHeaderRejectedStatus(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
 

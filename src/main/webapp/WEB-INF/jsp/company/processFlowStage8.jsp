@@ -24,7 +24,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>${menuItemLabel == null ? 'All Stages' : menuItemLabel}</h2>
+			<h2>${menuItemLabel == null ? 'Stage 8' : menuItemLabel}</h2>
 			<div class="row col-xs-12"></div>
 			<div class="clearfix"></div>
 			<hr />
@@ -34,14 +34,6 @@
 				<div class="col-md-12 col-sm-12 clearfix">
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
-							<div class="col-sm-2">
-								<div class="radio">
-									<label><input type="radio" name="optStatus" value="All"
-										checked="checked">All</label>&nbsp;&nbsp;&nbsp; <label><input
-										type="radio" name="optStatus" value="Not Delivered">Not
-										Delivered</label>
-								</div>
-							</div>
 							<div class="col-sm-2">
 								Employee<select id="dbEmployee" name="employeePid"
 									class="form-control">
@@ -87,7 +79,7 @@
 									<option value="YESTERDAY">Yesterday</option>
 									<option value="WTD">WTD</option>
 									<option value="MTD">MTD</option>
-									<option value="UPTO250DAYS">UP TO 250 Days</option>
+									<option value="UPTO90DAYS">UP TO 90 Days</option>
 									<option value="SINGLE">SINGLE DATE</option>
 									<option value="CUSTOM">CUSTOM</option>
 								</select>
@@ -115,16 +107,6 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-sm-2">
-								Stage Filter <select class="form-control" id="dbStageFilter">
-									<option value="no">All</option>
-									<option value="delivery_by_today_or_delivery_date_crossed">Delivery By Today or Delivery Date Crossed</option>
-									<option value="1_to_14_days">1 to 14 Days</option>
-									<option value="15_to_30_days">15 to 30 Days</option>
-									<option value="31_to_45_days">31 to 45 Days</option>
-									<option value="above_45_days_upto_250_days">Above 45 Days (Upto 250 days)</option>
-								</select>
-							</div>
 							<div class="col-sm-1">
 								<br>
 								<button type="button" class="btn btn-info"
@@ -134,7 +116,7 @@
 <!-- 								<br> -->
 <!-- 								<button type="button" class="btn btn-success" id="downloadXls">Download</button> -->
 <!-- 							</div> -->
-								<div class="col-sm-1">
+							<div class="col-sm-1">
 									<br>
 									<button type="button" class="btn btn-success" id="btnDownload">Download Xls</button>
 								</div>
@@ -159,7 +141,7 @@
 			<div class="table-responsive">
 
 
-				<table  id='tblProcessFlow' class="table  table-striped table-bordered">
+				<table id='tblProcessFlow' class="table  table-striped table-bordered">
 					<thead>
 						<tr>
 							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
@@ -229,7 +211,6 @@
 			</div>
 			<!-- /.modal-dialog -->
 		</div>
-
 
 		<!-- Model Container-->
 		<div class="modal fade container" id="viewModal">
@@ -330,7 +311,7 @@
 		var="table2excel"></spring:url>
 	<script type="text/javascript" src="${table2excel}"></script>
 
-	<spring:url value="/resources/app/process-flow-stageAll.js"
+	<spring:url value="/resources/app/process-flow-stage8.js"
 		var="inventoryVoucherJs"></spring:url>
 	<script type="text/javascript" src="${inventoryVoucherJs}"></script>
 

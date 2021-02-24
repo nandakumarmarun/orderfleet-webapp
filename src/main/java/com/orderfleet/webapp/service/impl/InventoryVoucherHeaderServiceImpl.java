@@ -586,6 +586,23 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	}
 
 	@Override
+	public void updateInventoryVoucherHeaderRemarks(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
+				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();
+		inventoryVoucherHeader.setRemarks(
+				inventoryVoucherHeaderDTO.getRemarks() != null ? inventoryVoucherHeaderDTO.getRemarks() : "");
+		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
+	}
+
+	@Override
+	public void updateInventoryVoucherHeaderRejectedStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
+				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();
+		inventoryVoucherHeader.setRejectedStatus(inventoryVoucherHeaderDTO.getRejectedStatus());
+		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
+	}
+
+	@Override
 	public void updateInventoryVoucherHeaderDeliveryDate(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
 		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
 				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();

@@ -200,12 +200,19 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "rounded_off", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double roundedOff;
-	
+
 	@Column(name = "erp_reference_number")
 	private String erpReferenceNumber;
-	
+
 	@Column(name = "erp_status")
 	private String erpStatus;
+
+	@NotNull
+	@Column(name = "rejected_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean rejectedStatus = false;// whether the inventory voucher is rejected or not
+
+	@Column(name = "remarks")
+	private String remarks;
 
 	public Long getId() {
 		return id;
@@ -550,7 +557,21 @@ public class InventoryVoucherHeader implements Serializable {
 	public void setErpStatus(String erpStatus) {
 		this.erpStatus = erpStatus;
 	}
-	
-	
+
+	public boolean getRejectedStatus() {
+		return rejectedStatus;
+	}
+
+	public void setRejectedStatus(boolean rejectedStatus) {
+		this.rejectedStatus = rejectedStatus;
+	}
+
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
 
 }

@@ -31,6 +31,10 @@ public class SalesPerformanceDTO {
 
 	private String receiverAccountName;
 
+	private String receiverAccountPhone;
+
+	private String remarks;
+
 	private String supplierAccountPid;
 
 	private String supplierAccountName;
@@ -421,6 +425,22 @@ public class SalesPerformanceDTO {
 
 	public void setDynamicDocumentPid(String dynamicDocumentPid) {
 		this.dynamicDocumentPid = dynamicDocumentPid;
+	}
+
+	public String getReceiverAccountPhone() {
+		return receiverAccountPhone;
+	}
+
+	public void setReceiverAccountPhone(String receiverAccountPhone) {
+		this.receiverAccountPhone = receiverAccountPhone;
+	}
+
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
 	}
 
 }

@@ -147,6 +147,7 @@
 							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
 								All</th>
 							<th>Actions</th>
+							<th>Remarks</th>
 							<th>Booking Id</th>
 							<th>Receiver</th>
 							<th>Delivery Date</th>

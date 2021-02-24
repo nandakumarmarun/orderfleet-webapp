@@ -181,7 +181,7 @@ public class ProcessFlowStage7Resource {
 
 	@Inject
 	private CompanyRepository companyRepository;
-	
+
 	@Inject
 	private DocumentRepository documentRepository;
 
@@ -199,7 +199,7 @@ public class ProcessFlowStage7Resource {
 
 	@Inject
 	private AccountProfileMapper accountProfileMapper;
-	
+
 	@Inject
 	private DynamicDocumentHeaderRepository dynamicDocumentHeaderRepository;
 
@@ -368,7 +368,7 @@ public class ProcessFlowStage7Resource {
 				accountPid, fDate, tDate);
 		return new ResponseEntity<>(salesPerformanceDTOs, HttpStatus.OK);
 	}
-	
+
 	@Timed
 	@RequestMapping(value = "/process-flow-stage-7/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FormFileDTO>> getDynamicDocumentImages(@PathVariable String pid) {
@@ -443,27 +443,31 @@ public class ProcessFlowStage7Resource {
 		case "READYATPS_NOTDELIVERED":
 			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.NOT_DELIVERED);
 			break;
-		case "DELIVERED":
-			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED);
+		case "DELIVERED_INSTALLATIONPLANED":
+			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED, ProcessFlowStatus.INSTALLATION_PLANNED);
+			break;
+		case "INSTALLED":
+			processStatus = Arrays.asList(ProcessFlowStatus.INSTALLED);
 			break;
 		case "ALL":
 			processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,
 					ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL,
 					ProcessFlowStatus.UNDER_PRODUCTION, ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL,
 					ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.DELIVERED,
-					ProcessFlowStatus.NOT_DELIVERED);
+					ProcessFlowStatus.NOT_DELIVERED, ProcessFlowStatus.INSTALLATION_PLANNED,
+					ProcessFlowStatus.INSTALLED);
 			break;
 		}
 
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
 			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusDateBetweenOrderByCreatedDateDesc(userIds,
-							documentPids, processStatus, fromDate, toDate);
+					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
+							userIds, documentPids, processStatus, fromDate, toDate, false);
 		} else {
 			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusDateBetweenOrderByCreatedDateDesc(
-							userIds, accountPid, documentPids, processStatus, fromDate, toDate);
+					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
+							userIds, accountPid, documentPids, processStatus, fromDate, toDate, false);
 		}
 		if (inventoryVouchers.isEmpty()) {
 			return Collections.emptyList();
@@ -591,6 +595,19 @@ public class ProcessFlowStage7Resource {
 				salesPerformanceDTO.setDeliveryDate("");
 			}
 
+			if (ivData[32] != null) {
+				salesPerformanceDTO.setRemarks(ivData[32].toString().equals("") ? "" : ivData[32].toString());
+			} else {
+				salesPerformanceDTO.setRemarks("");
+			}
+
+			if (ivData[33] != null) {
+				salesPerformanceDTO
+						.setReceiverAccountPhone(ivData[33].toString().equals("") ? "" : ivData[33].toString());
+			} else {
+				salesPerformanceDTO.setReceiverAccountPhone("");
+			}
+
 			if (objeDynamicDocuments.size() > 0) {
 				Optional<Object[]> dynamicDoc = objeDynamicDocuments.stream()
 						.filter(o -> o[1].toString().equals(ivData[30].toString())).findAny();
@@ -598,7 +615,7 @@ public class ProcessFlowStage7Resource {
 				if (dynamicDoc.isPresent()) {
 					salesPerformanceDTO.setDynamicDocumentPid(dynamicDoc.get()[0].toString());
 					salesPerformanceDTO.setImageButtonVisible(true);
-				} 
+				}
 			} else {
 				salesPerformanceDTO.setImageButtonVisible(false);
 			}
@@ -968,6 +985,26 @@ public class ProcessFlowStage7Resource {
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/process-flow-stage-7/updateRemarks", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> updateRemarks(@RequestParam String ivhPid, @RequestParam String remarks) {
+		log.info("update remarks " + ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+		inventoryVoucherHeaderDTO.setRemarks(remarks);
+		inventoryVoucherService.updateInventoryVoucherHeaderRemarks(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>("success", HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/process-flow-stage-7/reject", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> reject(@RequestParam String ivhPid) {
+		log.info("update reject status " + ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+		inventoryVoucherHeaderDTO.setRejectedStatus(true);
+		inventoryVoucherService.updateInventoryVoucherHeaderRejectedStatus(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>("success", HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/process-flow-stage-7/updateAll", method = RequestMethod.GET)
 	@Timed
 	public ResponseEntity<String> updateAll(@RequestParam String ivhPid, @RequestParam String bookingId,
@@ -1006,7 +1043,7 @@ public class ProcessFlowStage7Resource {
 				}
 			}
 		}
-		
+
 		inventoryVoucherHeaderDTO.setBookingId(bookingId);
 
 		if (!deliveryDate.equals("")) {

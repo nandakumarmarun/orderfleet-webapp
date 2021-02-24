@@ -91,6 +91,8 @@ public class InventoryVoucherHeaderDTO {
 	private String orderStatusName;
 
 	private String visitRemarks;
+
+	private String remarks;
 	// executive task execution remarks
 
 	// SaveOrUpdate Dashboard update
@@ -126,6 +128,7 @@ public class InventoryVoucherHeaderDTO {
 	private long inventoryVoucherHeaderId;
 	private long receiverAccountProfileId;
 	private long documentId;
+	private boolean rejectedStatus;
 
 	public InventoryVoucherHeaderDTO() {
 		super();
@@ -195,6 +198,12 @@ public class InventoryVoucherHeaderDTO {
 		this.customeraddress = inventoryVoucherHeader.getReceiverAccount().getAddress();
 		this.customerEmail = inventoryVoucherHeader.getReceiverAccount().getEmail1();
 		this.customerPhone = inventoryVoucherHeader.getReceiverAccount().getPhone1();
+
+		this.visitRemarks = inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks() == null ? ""
+				: inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks();
+
+		this.remarks = inventoryVoucherHeader.getRemarks() == null ? "" : inventoryVoucherHeader.getRemarks();
+		this.rejectedStatus = inventoryVoucherHeader.getRejectedStatus();
 
 		this.visitRemarks = inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks() == null ? ""
 				: inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks();
@@ -706,6 +715,22 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setDocumentId(long documentId) {
 		this.documentId = documentId;
+	}
+
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+
+	public boolean getRejectedStatus() {
+		return rejectedStatus;
+	}
+
+	public void setRejectedStatus(boolean rejectedStatus) {
+		this.rejectedStatus = rejectedStatus;
 	}
 
 	@Override

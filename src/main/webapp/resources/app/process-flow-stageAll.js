@@ -760,7 +760,7 @@ if (!this.InventoryVoucher) {
 		switch (status) {
 		case 'DEFAULT':
 			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
-					+ 'DEFAULT<span></span></span></div>';
+					+ 'INFLOW<span></span></span></div>';
 			break;
 		case 'PO_PLACED':
 			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
@@ -793,6 +793,14 @@ if (!this.InventoryVoucher) {
 		case 'NOT_DELIVERED':
 			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
 					+ 'NOT_DELIVERED<span></span></span></div>';
+			break;
+		case 'INSTALLATION_PLANNED':
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'INSTALLATION_PLANNED<span></span></span></div>';
+			break;
+		case 'INSTALLED':
+			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
+					+ 'INSTALLED<span></span></span></div>';
 			break;
 		}
 
