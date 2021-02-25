@@ -181,9 +181,10 @@ if (!this.StockLocationManagement) {
 		el.modal('hide');
 	}
 
-	function showTemporaryOpeningStock(pid, name) {
+	function showTemporaryOpeningStock(pid, name) {	
+		$('#thSelectAll').show();
 		$('#btnUpdateField').empty();
-		$('#btnUpdateField').append("<button type=\"button\" class=\"btn btn-success\" id=\"btnUpdateStock\">Update toLive Stock</button>");
+		$('#btnUpdateField').append("<button type=\"button\" class=\"btn btn-success pb-2\" style=\"float: right; margin-bottom: 10px;\" id=\"btnUpdateStock\">Update toLive Stock</button>");
 						
 		$('#btnUpdateStock').on('click', function() {
 			updateLiveOpeningStock(pid);
@@ -196,12 +197,13 @@ if (!this.StockLocationManagement) {
 					+ "/temporaryStockLocation/" + stockLoctionPid,
 			method : 'GET',
 			success : function(data) {
-				showOpeningStockData(data, stockLocation, name);
+				showOpeningStockData(data, stockLocation, name, true);
 			}
 		});
 	}
 
 	function showLiveOpeningStock(pid, name) {
+		$('#thSelectAll').hide();
 		$('#btnUpdateField').empty();
 		var stockLoctionPid = pid;
 		var stockLocation = "Live";
@@ -210,12 +212,12 @@ if (!this.StockLocationManagement) {
 					+ stockLoctionPid,
 			method : 'GET',
 			success : function(data) {
-				showOpeningStockData(data, stockLocation, name);
+				showOpeningStockData(data, stockLocation, name, false);
 			}
 		});
 	}
 
-	function showOpeningStockData(datas, stockLocation, name) {
+	function showOpeningStockData(datas, stockLocation, name, showSelectAll) {
 		$('#selectAll').prop('checked', false);
 
 		$("#lblModalHeading").text(
@@ -232,8 +234,8 @@ if (!this.StockLocationManagement) {
 
 		$('#tbodyOpeningStock').html("");
 		$.each(datas, function(index, data) {
-
-			$('#tbodyOpeningStock').append(
+			if (showSelectAll) {
+				$('#tbodyOpeningStock').append(
 					"<tr>"
 					+"<td><input type='checkbox' name='stockItems' class='check-one' value='"
 					+ data.productProfilePid
@@ -241,6 +243,13 @@ if (!this.StockLocationManagement) {
 					"<td>" + data.productProfileName + "</td><td>"
 							+ data.stockLocationName + "</td><td>"
 							+ data.quantity + "</td></tr>");
+			} else {
+				$('#tbodyOpeningStock').append(
+					"<tr>"
+					+"<td>" + data.productProfileName + "</td><td>"
+							+ data.stockLocationName + "</td><td>"
+							+ data.quantity + "</td></tr>");
+			}
 		});
 
 	}

@@ -88,7 +88,7 @@
 									<table class="table  table-striped table-bordered">
 										<thead>
 											<tr>
-												<th><input type="checkbox" id="selectAll"/>&nbsp;&nbsp;Select All</th>
+												<th id="thSelectAll"><input type="checkbox" id="selectAll"/>&nbsp;&nbsp;Select All</th>
 												<th>Product Profile</th>
 												<th>Stock Location</th>
 												<th>Quantity</th>
