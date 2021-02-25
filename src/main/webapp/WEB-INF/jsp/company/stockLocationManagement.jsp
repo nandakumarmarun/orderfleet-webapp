@@ -37,18 +37,14 @@
 					<tr>
 						<th style="text-align: center;" colspan="2">Opening Stock
 							From Back End ERP</th>
-						<th style="text-align: center;"><button type="button"
-								class="btn btn-success" id="btnUpdateStock">Update to
-								Live Stock</button></th>
+						<th rowspan="2">Stock Locations</th>
 						<th style="text-align: center;" colspan="3">Live Opening
 							Stock</th>
 					</tr>
 					<tr>
 						<th>Opening Stock Time Stamp</th>
 						<th>Opening Stock Details</th>
-						<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Stock
-							Locations</th>
-						<th>Last Approved By</th>
+						<th  rowspan="2">Last Approved By</th>
 						<th>Live Opening Stock Time Stamp</th>
 						<th>Live Opening Stock Details</th>
 					</tr>
@@ -88,9 +84,11 @@
 										</button>
 										<p></p>
 									</div>
+									<div id="btnUpdateField"></div>
 									<table class="table  table-striped table-bordered">
 										<thead>
 											<tr>
+												<th><input type="checkbox" id="selectAll"/>&nbsp;&nbsp;Select All</th>
 												<th>Product Profile</th>
 												<th>Stock Location</th>
 												<th>Quantity</th>

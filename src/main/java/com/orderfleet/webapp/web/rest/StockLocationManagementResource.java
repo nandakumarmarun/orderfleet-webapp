@@ -222,10 +222,11 @@ public class StockLocationManagementResource {
 	}
 
 	// update tem to live on selected Stock location
-	@RequestMapping(value = "/stock-location-management/updateStocks/{selectedStockLocation}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/stock-location-management/updateStocks/{selectedStockLocation}/{selectedProducts}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<List<OpeningStockDTO>> updateLiveOpeningStock(@PathVariable String selectedStockLocation) {
+	public ResponseEntity<List<OpeningStockDTO>> updateLiveOpeningStock(@PathVariable String selectedStockLocation, @PathVariable String selectedProducts) {
 		log.debug("Web request to update temporary opening stocks to live opening Stocks for "+ selectedStockLocation);
+		log.debug("product pids"+ selectedProducts);
 
 		List<String> stockLocationPids = new ArrayList<>();
 
@@ -233,6 +234,15 @@ public class StockLocationManagementResource {
 
 		for (String str : selectStockLocations) {
 			stockLocationPids.add(str);
+		}
+		
+		// selected items to update
+		List<String> stockProductsPids = new ArrayList<>();
+
+		String[] selectedProductsPids = selectedProducts.split(",");
+
+		for (String str : selectedProductsPids) {
+			stockProductsPids.add(str);
 		}
 
 		// list of temp stocks of all selected location pids
@@ -242,7 +252,8 @@ public class StockLocationManagementResource {
 		// same as temp stocks
 		List<OpeningStockDTO> openingStockDtos = convertTemporaryOpeningStockToOpeningStockDto(temporaryOpeningStocks);
 
-		saveOpeningStocks(openingStockDtos, stockLocationPids);
+		
+		saveOpeningStocks(openingStockDtos, stockLocationPids, stockProductsPids);
 
 		return new ResponseEntity<>(openingStockDtos, HttpStatus.OK);
 
@@ -258,7 +269,7 @@ public class StockLocationManagementResource {
 		return mp;
 	}
 
-	private void saveOpeningStocks(List<OpeningStockDTO> openingStockDTOs, List<String> stockLocationPids) {
+	private void saveOpeningStocks(List<OpeningStockDTO> openingStockDTOs, List<String> stockLocationPids, List<String> stockProductsPids ) {
 		long start = System.nanoTime();
 
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
@@ -270,9 +281,15 @@ public class StockLocationManagementResource {
 		// All opening-stock must have a stock-location, if not, set a default
 		// one
 		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(companyId);
+				
 		// find all exist product profiles
-		Set<String> ppNames = openingStockDTOs.stream().map(os -> os.getProductProfileName())
+		Set<OpeningStockDTO> stockDtos = openingStockDTOs.stream().filter(os -> stockProductsPids.contains(os.getProductProfilePid()))
 				.collect(Collectors.toSet());
+		log.info("stockDtos size ", stockDtos.size());
+		
+		Set<String> ppNames = stockDtos.stream().map(os -> os.getProductProfileName())
+				.collect(Collectors.toSet());
+		
 
 		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
 

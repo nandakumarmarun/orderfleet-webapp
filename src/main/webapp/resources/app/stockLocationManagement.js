@@ -59,10 +59,6 @@ if (!this.StockLocationManagement) {
 
 				loadStockLocationDetails();
 
-				$('#btnUpdateStock').on('click', function() {
-					updateLiveOpeningStock();
-				});
-
 				$('#selectAll').on('click', function() {
 					selectAllStocks(this);
 				});
@@ -111,10 +107,9 @@ if (!this.StockLocationManagement) {
 																	+ convertDateTimeFromServer(stockLocationManagement.temporaryStockLocationDate)
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='StockLocationManagement.showModalPopup($(\"#viewModal\"),\""
 																	+ stockLocationManagement.stockLocationPid
-																	+ "\",0);'>View Stocks</button>"
-																	+ "</td><td><input type='checkbox' name='stockLocation' class='check-one' value='"
-																	+ stockLocationManagement.stockLocationPid
-																	+ "' />&nbsp;&nbsp;"
+																	+ "\", 0, \""
+																	+stockLocationManagement.stockLocationName+"\");'>View Stocks</button></td>"
+																	+ "</td><td>"
 																	+ stockLocationManagement.stockLocationName
 																	+ "</td><td>"
 																	+ stockLocationManagement.userName
@@ -122,7 +117,8 @@ if (!this.StockLocationManagement) {
 																	+ convertDateTimeFromServer(stockLocationManagement.liveStockLocationDate)
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='StockLocationManagement.showModalPopup($(\"#viewModal\"),\""
 																	+ stockLocationManagement.stockLocationPid
-																	+ "\",1);'>View Stocks</button>"
+																	+ "\",1, \""
+																	+stockLocationManagement.stockLocationName+"\");'>View Stocks</button>"
 																	+ "</td></tr>");
 										});
 
@@ -134,24 +130,22 @@ if (!this.StockLocationManagement) {
 
 	}
 
-	function updateLiveOpeningStock() {
-		var selectedStockLocation = "";
+	function updateLiveOpeningStock(stkLocPid) {
+		var selectedStockItems = "";
 
-		$.each($("input[name='stockLocation']:checked"), function() {
-			selectedStockLocation += $(this).val() + ",";
+		$.each($("input[name='stockItems']:checked"), function() {
+			selectedStockItems += $(this).val() + ",";
 		});
 
-		console.log(selectedStockLocation);
-
-		if (selectedStockLocation == "") {
-			alert("Please select Stock Locations");
+		if (selectedStockItems == "") {
+			alert("Please select Stock Items");
 			return;
 		}
 
 		if (confirm("Updating Stock Location Will Reset The Opening Stock,Closing Stock And Sales Number")) {
 			$.ajax({
 				url : stockLocationManagementContextPath + "/updateStocks/"
-						+ selectedStockLocation,
+						+ stkLocPid + "/"+ selectedStockItems,
 				method : 'GET',
 				beforeSend : function() {
 					// Show image container
@@ -160,6 +154,7 @@ if (!this.StockLocationManagement) {
 				},
 				success : function(data) {
 					$("#loader").modal('hide');
+					$("#viewModal").modal('hide');					
 					loadStockLocationDetails();
 				}
 			});
@@ -168,14 +163,14 @@ if (!this.StockLocationManagement) {
 
 	}
 
-	StockLocationManagement.showModalPopup = function(el, pid, action) {
+	StockLocationManagement.showModalPopup = function(el, pid, action, name) {
 		if (pid) {
 			switch (action) {
 			case 0:
-				showTemporaryOpeningStock(pid);
+				showTemporaryOpeningStock(pid, name);
 				break;
 			case 1:
-				showLiveOpeningStock(pid);
+				showLiveOpeningStock(pid, name);
 				break;
 			}
 		}
@@ -186,7 +181,14 @@ if (!this.StockLocationManagement) {
 		el.modal('hide');
 	}
 
-	function showTemporaryOpeningStock(pid) {
+	function showTemporaryOpeningStock(pid, name) {
+		$('#btnUpdateField').empty();
+		$('#btnUpdateField').append("<button type=\"button\" class=\"btn btn-success\" id=\"btnUpdateStock\">Update toLive Stock</button>");
+						
+		$('#btnUpdateStock').on('click', function() {
+			updateLiveOpeningStock(pid);
+		});	
+		
 		var stockLoctionPid = pid;
 		var stockLocation = "Back End";
 		$.ajax({
@@ -194,12 +196,13 @@ if (!this.StockLocationManagement) {
 					+ "/temporaryStockLocation/" + stockLoctionPid,
 			method : 'GET',
 			success : function(data) {
-				showOpeningStockData(data, stockLocation);
+				showOpeningStockData(data, stockLocation, name);
 			}
 		});
 	}
 
-	function showLiveOpeningStock(pid) {
+	function showLiveOpeningStock(pid, name) {
+		$('#btnUpdateField').empty();
 		var stockLoctionPid = pid;
 		var stockLocation = "Live";
 		$.ajax({
@@ -207,15 +210,16 @@ if (!this.StockLocationManagement) {
 					+ stockLoctionPid,
 			method : 'GET',
 			success : function(data) {
-				showOpeningStockData(data, stockLocation);
+				showOpeningStockData(data, stockLocation, name);
 			}
 		});
 	}
 
-	function showOpeningStockData(datas, stockLocation) {
+	function showOpeningStockData(datas, stockLocation, name) {
+		$('#selectAll').prop('checked', false);
 
 		$("#lblModalHeading").text(
-				"Opening Stock Details ( " + stockLocation + " )");
+				"Opening Stock Details ( " + stockLocation + " ) "+ name);
 
 		$('#tbodyOpeningStock').html("Loading....");
 
@@ -230,7 +234,11 @@ if (!this.StockLocationManagement) {
 		$.each(datas, function(index, data) {
 
 			$('#tbodyOpeningStock').append(
-					"<tr><td>" + data.productProfileName + "</td><td>"
+					"<tr>"
+					+"<td><input type='checkbox' name='stockItems' class='check-one' value='"
+					+ data.productProfilePid
+					+ "' /></td>"+
+					"<td>" + data.productProfileName + "</td><td>"
 							+ data.stockLocationName + "</td><td>"
 							+ data.quantity + "</td></tr>");
 		});
