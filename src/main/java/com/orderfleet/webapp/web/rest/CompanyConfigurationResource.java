@@ -157,6 +157,10 @@ public class CompanyConfigurationResource {
 					mcDto.setUpdateStockLocation(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.SEND_TO_ODOO)) {
+					mcDto.setSendToOdoo(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
 				 * mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue())); anyValueExist =
@@ -183,7 +187,8 @@ public class CompanyConfigurationResource {
 			@RequestParam String salesEditEnabled, @RequestParam String gpsVarianceQuery,
 			@RequestParam String sendSalesOrderEmail, @RequestParam String sendSalesOrderSap,
 			@RequestParam String piecesToQuantity, @RequestParam String sendSalesOrderOdoo,
-			@RequestParam String sendTransactionsSapPravesh, @RequestParam String addCompoundUnit, @RequestParam String updateStockLocation) throws URISyntaxException {
+			@RequestParam String sendTransactionsSapPravesh, @RequestParam String addCompoundUnit, @RequestParam String updateStockLocation,
+			@RequestParam String sendToOdoo) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -233,6 +238,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ADD_COMPOUND_UNIT);
 		Optional<CompanyConfiguration> optUpdateStockLocation = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.UPDATE_STOCK_LOCATION);
+		Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_ODOO);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -259,6 +266,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration sendTransactionSapPraveshCompany = null;
 		CompanyConfiguration addCompoundUnitCompany = null;
 		CompanyConfiguration updateStockLocationCompany = null;
+		CompanyConfiguration sendToOdooCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -482,6 +490,17 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(updateStockLocationCompany);
 
+		if (optSendToOdoo.isPresent()) {
+			sendToOdooCompany = optSendToOdoo.get();
+			sendToOdooCompany.setValue(sendToOdoo);
+		} else {
+			sendToOdooCompany = new CompanyConfiguration();
+			sendToOdooCompany.setCompany(company);
+			sendToOdooCompany.setName(CompanyConfig.SEND_TO_ODOO);
+			sendToOdooCompany.setValue(sendToOdoo);
+		}
+		companyConfigurationRepository.save(sendToOdooCompany);
+
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -556,6 +575,9 @@ public class CompanyConfigurationResource {
 		
 		Optional<CompanyConfiguration> optUpdateStockLocation = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.UPDATE_STOCK_LOCATION);
+		
+		Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_ODOO);
 
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
@@ -630,6 +652,11 @@ public class CompanyConfigurationResource {
 			companyConfigurationDTO
 					.setUpdateStockLocation(Boolean.valueOf(optUpdateStockLocation.get().getValue()));
 		}
+		if (optSendToOdoo.isPresent()) {
+			companyConfigurationDTO
+					.setSendToOdoo(Boolean.valueOf(optSendToOdoo.get().getValue()));
+		}
+		
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
@@ -692,6 +719,9 @@ public class CompanyConfigurationResource {
 		
 		Optional<CompanyConfiguration> optUpdateStockLocation = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.UPDATE_STOCK_LOCATION);
+		
+		Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_ODOO);
 
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
@@ -786,6 +816,12 @@ public class CompanyConfigurationResource {
 			companyConfigurationRepository.deleteByCompanyIdAndName(
 					optUpdateStockLocation.get().getCompany().getId(),
 					CompanyConfig.UPDATE_STOCK_LOCATION);
+		}
+
+		if (optSendToOdoo.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(
+					optSendToOdoo.get().getCompany().getId(),
+					CompanyConfig.SEND_TO_ODOO);
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {

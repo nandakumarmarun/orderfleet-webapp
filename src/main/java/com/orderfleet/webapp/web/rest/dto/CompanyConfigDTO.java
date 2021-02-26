@@ -33,6 +33,7 @@ public class CompanyConfigDTO {
 	private boolean sendTransactionsSapPravesh;
 	private boolean addCompoundUnit;
 	private boolean updateStockLocation;
+	private boolean sendToOdoo;
 
 	public CompanyConfigDTO() {
 		super();
@@ -220,5 +221,13 @@ public class CompanyConfigDTO {
 
 	public void setUpdateStockLocation(boolean updateStockLocation) {
 		this.updateStockLocation = updateStockLocation;
+	}
+
+	public boolean isSendToOdoo() {
+		return sendToOdoo;
+	}
+
+	public void setSendToOdoo(boolean sendToOdoo) {
+		this.sendToOdoo = sendToOdoo;
 	}
 }
