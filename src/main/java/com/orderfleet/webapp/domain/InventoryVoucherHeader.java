@@ -160,6 +160,9 @@ public class InventoryVoucherHeader implements Serializable {
 	@Column(name = "delivery_date")
 	private LocalDate deliveryDate;
 
+	@Column(name = "booking_date")
+	private LocalDate bookingDate;
+
 	@ManyToOne
 	private User updatedBy;
 
@@ -572,6 +575,14 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public LocalDate getBookingDate() {
+		return bookingDate;
+	}
+
+	public void setBookingDate(LocalDate bookingDate) {
+		this.bookingDate = bookingDate;
 	}
 
 }

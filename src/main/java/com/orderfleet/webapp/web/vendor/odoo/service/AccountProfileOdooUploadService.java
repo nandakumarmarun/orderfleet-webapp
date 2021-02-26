@@ -39,6 +39,7 @@ import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooAccountProfile;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooAccountProfileCreditTerms;
 
 /**
  * Service for save/update account profile related data from third party
@@ -140,6 +141,11 @@ public class AccountProfileOdooUploadService {
 			// price level
 			Optional<PriceLevel> optionalPriceLevel = tempPriceLevel.stream()
 					.filter(pl -> String.valueOf(apDto.getPrice_list_id()).equals(pl.getAlias())).findAny();
+
+			for (OdooAccountProfileCreditTerms creditTerm : apDto.getCredit_terms()) {
+				accountProfile.setCreditLimit(creditTerm.getCredit_limit());
+				accountProfile.setCreditDays(creditTerm.getPayment_term_days());
+			}
 
 			if (optionalPriceLevel.isPresent()) {
 				accountProfile.setDefaultPriceLevel(optionalPriceLevel.get());

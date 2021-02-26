@@ -258,9 +258,9 @@ InventoryVoucher.updateRemarks = function(ivhPid) {
 		
 	}
 
-InventoryVoucher.reject = function(ivhPid) {
+InventoryVoucher.approve = function(ivhPid) {
 	$.ajax({
-		url : inventoryVoucherContextPath + "/reject",
+		url : inventoryVoucherContextPath + "/approve",
 		data : {
 			ivhPid : ivhPid
 		},
@@ -530,18 +530,20 @@ InventoryVoucher.reject = function(ivhPid) {
 																	+ spanProcessFlowStatus(
 																			inventoryVoucher.pid,
 																			inventoryVoucher.processFlowStatus)
-																	+ "<br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateAll(\""
+//																	+ "<br><input type='button' class='btn btn-info'  onClick='InventoryVoucher.updateAll(\""
+//																	+ inventoryVoucher.pid
+//																	+ "\");'  value='Update' disabled='disabled'><br>"
+																	+"<br><input type='button' class='btn btn-success'  onClick='InventoryVoucher.approve(\""
 																	+ inventoryVoucher.pid
-																	+ "\");'  value='Update'><br><br><input type='button' class='btn btn-danger'  onClick='InventoryVoucher.reject(\""
+																	+ "\");'  value='Approve'>" 
+																	+"</td><td><input type='text' onchange='InventoryVoucher.updateRemarks(\""
 																	+ inventoryVoucher.pid
-																	+ "\");'  value='Reject'></td><td><input type='text' onchange='InventoryVoucher.updateRemarks(\""
-																	+ inventoryVoucher.pid
-																	+ "\");' id='remarks-"
+																	+ "\");' disabled='disabled' id='remarks-"
 																	+ inventoryVoucher.pid
 																	+ "' value='"
 																	+ inventoryVoucher.remarks
 																	+ "'/>"
-																	+ "</td><td><input type='text' id='bookingId-"
+																	+ "</td><td><input disabled='disabled' type='text' id='bookingId-"
 																	+ inventoryVoucher.pid
 																	+ "' value='"
 																	+ inventoryVoucher.bookingId
@@ -550,12 +552,12 @@ InventoryVoucher.reject = function(ivhPid) {
 																	+ inventoryVoucher.receiverAccountName
 																	+ "<br><br>"
 																	+ inventoryVoucher.receiverAccountPhone
-																	+ "</td><td><input type='date' id='deliveryDate-"
+																	+ "</td><td><input type='date' disabled='disabled' id='deliveryDate-"
 																	+ inventoryVoucher.pid
 																	+ "' value='"
 																	+ inventoryVoucher.deliveryDate
 																	+ "'/>"
-																	+ "</td><td><input type='number' id='pmtReceieved-"
+																	+ "</td><td><input type='number' disabled='disabled' id='pmtReceieved-"
 																	+ inventoryVoucher.pid
 																	+ "' value='"
 																	+ inventoryVoucher.paymentReceived

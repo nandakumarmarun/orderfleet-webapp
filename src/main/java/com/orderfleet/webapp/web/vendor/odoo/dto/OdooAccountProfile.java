@@ -1,5 +1,7 @@
 package com.orderfleet.webapp.web.vendor.odoo.dto;
 
+import java.util.List;
+
 public class OdooAccountProfile {
 
 	private long price_list_id;
@@ -29,6 +31,8 @@ public class OdooAccountProfile {
 	private String ref;
 
 	private String email;
+
+	private List<OdooAccountProfileCreditTerms> credit_terms;
 
 	public long getPrice_list_id() {
 		return price_list_id;
@@ -140,6 +144,14 @@ public class OdooAccountProfile {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public List<OdooAccountProfileCreditTerms> getCredit_terms() {
+		return credit_terms;
+	}
+
+	public void setCredit_terms(List<OdooAccountProfileCreditTerms> credit_terms) {
+		this.credit_terms = credit_terms;
 	}
 
 }

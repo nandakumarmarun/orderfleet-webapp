@@ -3,8 +3,10 @@ package com.orderfleet.webapp.web.vendor.odoo.service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,12 +67,13 @@ public class OutstandingInvoiceOdooUploadService {
 				.filter(c -> c != null && !c.equalsIgnoreCase("false")).collect(Collectors.toList());
 
 		// create list account profile
+		Map<String, Double> accountBalanceMap = new HashMap<>();
 		List<AccountProfile> accProfiles = accountProfileRepository.findAccountProfileAndCustomerIds(customerIds);
-
 		for (OdooOutstandingInvoice ppDto : list) {
 			accProfiles.stream().filter(a -> a.getCustomerId().equalsIgnoreCase(ppDto.getCustomer_id())).findAny()
 					.ifPresent(ap -> {
 						ReceivablePayable receivablePayable = new ReceivablePayable();
+
 						receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
 						receivablePayable.setAccountProfile(ap);
 						receivablePayable.setCompany(company);
@@ -85,9 +88,24 @@ public class OutstandingInvoiceOdooUploadService {
 						} else {
 							receivablePayable.setBillOverDue(dueUpdate(convertDate(ppDto.getDate_original())));
 						}
+						double currBal = accountBalanceMap.containsKey(ppDto.getCustomer_id())
+								? accountBalanceMap.get(ppDto.getCustomer_id())
+								: 0.0;
+						accountBalanceMap.put(ppDto.getCustomer_id(), currBal + ppDto.getAmount_unreconciled());
+
 						saveReceivablePayable.add(receivablePayable);
 					});
 		}
+		log.info("Account balance map size {}", accountBalanceMap.size());
+		for (Map.Entry<String, Double> entry : accountBalanceMap.entrySet()) {
+			// entry.getKey(), entry.getValue());
+			accProfiles.stream().filter(a -> a.getCustomerId().equalsIgnoreCase(entry.getKey())).findAny()
+				.ifPresent(ap -> {
+					ap.setClosingBalance(entry.getValue());
+				});
+		}
+		log.info("Save account profile size {}", saveReceivablePayable.size());
+		accountProfileRepository.save(accProfiles);
 		bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;

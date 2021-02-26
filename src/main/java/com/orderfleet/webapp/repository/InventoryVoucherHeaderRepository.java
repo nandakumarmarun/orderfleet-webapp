@@ -666,7 +666,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "iv.document.pid in ?2 and iv.processFlowStatus in ?3 and iv.createdDate between ?4 and ?5 and iv.rejectedStatus= ?6 Order By iv.createdDate desc")
 	List<Object[]> findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
 			List<Long> userIds, List<String> documentPids, List<ProcessFlowStatus> processStatus,
-			LocalDateTime fromDate, LocalDateTime toDate,boolean rejectedStatus);
+			LocalDateTime fromDate, LocalDateTime toDate, boolean rejectedStatus);
 
 	// using for tally download status filtering accountPid
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
@@ -675,11 +675,11 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks , iv.orderNumber , iv.pdfDownloadStatus,"
 			+ "iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,"
 			+ "iv.executiveTaskExecution.sendDate ,iv.processFlowStatus ,iv.paymentReceived,iv.bookingId,iv.deliveryDate,"
-			+ "iv.executiveTaskExecution.id,iv.executiveTaskExecution.pid from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+			+ "iv.executiveTaskExecution.id,iv.executiveTaskExecution.pid,iv.remarks,iv.receiverAccount.phone1 from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
 			+ "iv.receiverAccount.pid = ?2 and iv.document.pid in ?3 and iv.processFlowStatus in ?4 and iv.createdDate between ?5 and ?6 and iv.rejectedStatus= ?7 Order By iv.createdDate desc")
 	List<Object[]> findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
 			List<Long> userIds, String accountPid, List<String> documentPids, List<ProcessFlowStatus> processStatus,
-			LocalDateTime fromDate, LocalDateTime toDate,boolean rejectedStatus);
+			LocalDateTime fromDate, LocalDateTime toDate, boolean rejectedStatus);
 
 	@Query("select sum(inventoryVoucher.documentTotal) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdBy.id in ?1 and inventoryVoucher.createdDate between ?2 and ?3")
 	Object[] findnetSaleAmountByUserIdandDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);

@@ -120,6 +120,7 @@ public class InventoryVoucherHeaderDTO {
 
 	private String bookingId;
 	private LocalDate deliveryDate;
+	private LocalDate bookingDate;
 
 	private String referenceInvoiceNumber;
 
@@ -223,6 +224,7 @@ public class InventoryVoucherHeaderDTO {
 
 		this.bookingId = inventoryVoucherHeader.getBookingId() != null ? inventoryVoucherHeader.getBookingId() : "";
 		this.deliveryDate = inventoryVoucherHeader.getDeliveryDate();
+		this.bookingDate = inventoryVoucherHeader.getBookingDate();
 
 		this.roundedOff = inventoryVoucherHeader.getRoundedOff();
 		this.referenceInvoiceNumber = inventoryVoucherHeader.getReferenceInvoiceNumber() != null
@@ -623,6 +625,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public LocalDateTime getClientDate() {
 		return clientDate;
+	}
+
+	public LocalDate getBookingDate() {
+		return bookingDate;
+	}
+
+	public void setBookingDate(LocalDate bookingDate) {
+		this.bookingDate = bookingDate;
 	}
 
 	public void setClientDate(LocalDateTime clientDate) {

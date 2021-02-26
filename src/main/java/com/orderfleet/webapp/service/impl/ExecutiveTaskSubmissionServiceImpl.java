@@ -446,6 +446,14 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						? inventoryVoucherDTO.getReferenceInvoiceNumber()
 						: "");
 
+				inventoryVoucherHeader.setBookingDate(
+						inventoryVoucherDTO.getBookingDate() != null ? inventoryVoucherDTO.getBookingDate()
+								: LocalDate.now());
+				inventoryVoucherHeader.setBookingId(
+						inventoryVoucherDTO.getBookingId() == null || inventoryVoucherDTO.getBookingId().equals("") ? ""
+								: inventoryVoucherDTO.getBookingId());
+				inventoryVoucherHeader.setDeliveryDate(inventoryVoucherDTO.getDeliveryDate());
+
 				InventoryVoucherHeader lastInventoryVoucher = inventoryVoucherHeaderRepository
 						.findTop1ByCreatedByLoginOrderByCreatedDateDesc(SecurityUtils.getCurrentUserLogin());
 
@@ -667,7 +675,6 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				accountingVoucherHeader.setDocumentNumberLocal(accountingVoucherDTO.getDocumentNumberLocal());
 				// Set unique server number
 				accountingVoucherHeader.setDocumentNumberServer(accountingVoucherDTO.getDocumentNumberLocal());
-
 
 				// set voucher details
 				List<AccountingVoucherDetail> accountingVoucherDetails = new ArrayList<>();

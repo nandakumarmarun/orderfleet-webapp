@@ -383,7 +383,7 @@ function findByfilfter() {
 													+ "</span></td><td>"
 											+ accountProfile.accountTypeName
 											+ "</td><td>"
-											+ accountProfile.closingBalance
+											+ accountProfile.closingBalance.toFixed(2)
 											+ "</td><td>"
 											+ accountProfile.address
 											+ "</td><td>"

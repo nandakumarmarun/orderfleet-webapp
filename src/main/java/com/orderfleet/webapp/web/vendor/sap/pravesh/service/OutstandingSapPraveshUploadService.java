@@ -99,8 +99,10 @@ public class OutstandingSapPraveshUploadService {
 				receivablePayable.setBillOverDue(dueUpdate(convertDate(ppDto.getDocDate())));
 				saveReceivablePayable.add(receivablePayable);
 
-	             double currBal = accountBalanceMap.containsKey(ppDto.getCustomerId()) ? accountBalanceMap.get(ppDto.getCustomerId()) : 0.0;
-	             accountBalanceMap.put(ppDto.getCustomerId(), currBal + ppDto.getBalance());
+				double currBal = accountBalanceMap.containsKey(ppDto.getCustomerId())
+						? accountBalanceMap.get(ppDto.getCustomerId())
+						: 0.0;
+				accountBalanceMap.put(ppDto.getCustomerId(), currBal + ppDto.getBalance());
 			}
 
 		}
