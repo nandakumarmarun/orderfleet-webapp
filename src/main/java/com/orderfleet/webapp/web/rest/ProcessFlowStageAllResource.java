@@ -470,12 +470,12 @@ public class ProcessFlowStageAllResource {
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
 			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(userIds,
-							documentPids, processStatus, fromDate, toDate,false);
+					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
+							userIds, documentPids, processStatus, fromDate, toDate, false);
 		} else {
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
-							userIds, accountPid, documentPids, processStatus, fromDate, toDate,false);
+							userIds, accountPid, documentPids, processStatus, fromDate, toDate, false);
 		}
 
 		if (inventoryVouchers.isEmpty()) {
@@ -662,6 +662,19 @@ public class ProcessFlowStageAllResource {
 				salesPerformanceDTO.setDeliveryDateDifference(noOfDaysBetween);
 			} else {
 				salesPerformanceDTO.setDeliveryDate("");
+			}
+
+			if (ivData[32] != null) {
+				salesPerformanceDTO.setRemarks(ivData[32].toString().equals("") ? "" : ivData[32].toString());
+			} else {
+				salesPerformanceDTO.setRemarks("");
+			}
+
+			if (ivData[33] != null) {
+				salesPerformanceDTO
+						.setReceiverAccountPhone(ivData[33].toString().equals("") ? "" : ivData[33].toString());
+			} else {
+				salesPerformanceDTO.setReceiverAccountPhone("");
 			}
 
 			if (objeDynamicDocuments.size() > 0) {
@@ -1023,6 +1036,26 @@ public class ProcessFlowStageAllResource {
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
 		inventoryVoucherHeaderDTO.setBookingId(bookingId);
 		inventoryVoucherService.updateInventoryVoucherHeaderBookingId(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>("success", HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/process-flow-stage-all/updateRemarks", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> updateRemarks(@RequestParam String ivhPid, @RequestParam String remarks) {
+		log.info("update remarks " + ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+		inventoryVoucherHeaderDTO.setRemarks(remarks);
+		inventoryVoucherService.updateInventoryVoucherHeaderRemarks(inventoryVoucherHeaderDTO);
+		return new ResponseEntity<>("success", HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/process-flow-stage-all/reject", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> reject(@RequestParam String ivhPid) {
+		log.info("update reject status " + ivhPid);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
+		inventoryVoucherHeaderDTO.setRejectedStatus(true);
+		inventoryVoucherService.updateInventoryVoucherHeaderRejectedStatus(inventoryVoucherHeaderDTO);
 		return new ResponseEntity<>("success", HttpStatus.OK);
 	}
 

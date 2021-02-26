@@ -231,6 +231,8 @@ public class SendInvoiceOdooService {
 
 				odooInvoice.setRounding_amt(obj[34] != null ? Double.parseDouble(obj[34].toString()) : 0.0);
 
+				odooInvoice.setOrigin(obj[6].toString());
+
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
 						.collect(Collectors.toList()).stream()
@@ -595,6 +597,8 @@ public class SendInvoiceOdooService {
 				odooInvoice.setType("out_refund");
 
 				odooInvoice.setRounding_amt(obj[34] != null ? Double.parseDouble(obj[34].toString()) : 0.0);
+
+				odooInvoice.setOrigin(obj[33] != null ? obj[33].toString() : obj[6].toString());
 
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))

@@ -137,9 +137,9 @@ if (!this.ReceivablePayable) {
 																					"<tr><td>"
 																							+ receivablePayable.referenceDocumentNumber
 																							+ "</td><td>"
-																							+ receivablePayable.referenceDocumentAmount
+																							+ receivablePayable.referenceDocumentAmount.toFixed(2)
 																							+ "</td><td align='right'>"
-																							+ receivablePayable.referenceDocumentBalanceAmount
+																							+ receivablePayable.referenceDocumentBalanceAmount.toFixed(2)
 																							+ "</td><td align='right'>"
 																							+ receivablePayable.referenceDocumentDate
 																							+ "</td></tr>");
@@ -152,9 +152,9 @@ if (!this.ReceivablePayable) {
 																					"<tr><td>"
 																							+ receivablePayable.referenceDocumentNumber
 																							+ "</td><td>"
-																							+ receivablePayable.referenceDocumentAmount
+																							+ receivablePayable.referenceDocumentAmount.toFixed(2)
 																							+ "</td><td align='right'>"
-																							+ receivablePayable.referenceDocumentBalanceAmount
+																							+ receivablePayable.referenceDocumentBalanceAmount.toFixed(2)
 																							+ "</td><td align='right'>"
 																							+ receivablePayable.referenceDocumentDate
 																							+ "</td></tr>");

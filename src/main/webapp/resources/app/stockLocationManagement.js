@@ -108,7 +108,8 @@ if (!this.StockLocationManagement) {
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='StockLocationManagement.showModalPopup($(\"#viewModal\"),\""
 																	+ stockLocationManagement.stockLocationPid
 																	+ "\", 0, \""
-																	+stockLocationManagement.stockLocationName+"\");'>View Stocks</button></td>"
+																	+ stockLocationManagement.stockLocationName
+																	+ "\");'>View Stocks</button></td>"
 																	+ "</td><td>"
 																	+ stockLocationManagement.stockLocationName
 																	+ "</td><td>"
@@ -118,7 +119,8 @@ if (!this.StockLocationManagement) {
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='StockLocationManagement.showModalPopup($(\"#viewModal\"),\""
 																	+ stockLocationManagement.stockLocationPid
 																	+ "\",1, \""
-																	+stockLocationManagement.stockLocationName+"\");'>View Stocks</button>"
+																	+ stockLocationManagement.stockLocationName
+																	+ "\");'>View Stocks</button>"
 																	+ "</td></tr>");
 										});
 
@@ -145,7 +147,7 @@ if (!this.StockLocationManagement) {
 		if (confirm("Updating Stock Location Will Reset The Opening Stock,Closing Stock And Sales Number")) {
 			$.ajax({
 				url : stockLocationManagementContextPath + "/updateStocks/"
-						+ stkLocPid + "/"+ selectedStockItems,
+						+ stkLocPid + "/" + selectedStockItems,
 				method : 'GET',
 				beforeSend : function() {
 					// Show image container
@@ -154,7 +156,7 @@ if (!this.StockLocationManagement) {
 				},
 				success : function(data) {
 					$("#loader").modal('hide');
-					$("#viewModal").modal('hide');					
+					$("#viewModal").modal('hide');
 					loadStockLocationDetails();
 				}
 			});
@@ -181,15 +183,17 @@ if (!this.StockLocationManagement) {
 		el.modal('hide');
 	}
 
-	function showTemporaryOpeningStock(pid, name) {	
+	function showTemporaryOpeningStock(pid, name) {
 		$('#thSelectAll').show();
 		$('#btnUpdateField').empty();
-		$('#btnUpdateField').append("<button type=\"button\" class=\"btn btn-success pb-2\" style=\"float: right; margin-bottom: 10px;\" id=\"btnUpdateStock\">Update toLive Stock</button>");
-						
+		$('#btnUpdateField')
+				.append(
+						"<button type=\"button\" class=\"btn btn-success pb-2\" style=\"float: right; margin-bottom: 10px;\" id=\"btnUpdateStock\">Update To Live Stock</button>");
+
 		$('#btnUpdateStock').on('click', function() {
 			updateLiveOpeningStock(pid);
-		});	
-		
+		});
+
 		var stockLoctionPid = pid;
 		var stockLocation = "Back End";
 		$.ajax({
@@ -221,7 +225,7 @@ if (!this.StockLocationManagement) {
 		$('#selectAll').prop('checked', false);
 
 		$("#lblModalHeading").text(
-				"Opening Stock Details ( " + stockLocation + " ) "+ name);
+				"Opening Stock Details ( " + stockLocation + " ) " + name);
 
 		$('#tbodyOpeningStock').html("Loading....");
 
@@ -233,24 +237,34 @@ if (!this.StockLocationManagement) {
 		}
 
 		$('#tbodyOpeningStock').html("");
-		$.each(datas, function(index, data) {
-			if (showSelectAll) {
-				$('#tbodyOpeningStock').append(
-					"<tr>"
-					+"<td><input type='checkbox' name='stockItems' class='check-one' value='"
-					+ data.productProfilePid
-					+ "' /></td>"+
-					"<td>" + data.productProfileName + "</td><td>"
-							+ data.stockLocationName + "</td><td>"
-							+ data.quantity + "</td></tr>");
-			} else {
-				$('#tbodyOpeningStock').append(
-					"<tr>"
-					+"<td>" + data.productProfileName + "</td><td>"
-							+ data.stockLocationName + "</td><td>"
-							+ data.quantity + "</td></tr>");
-			}
-		});
+		$
+				.each(
+						datas,
+						function(index, data) {
+							if (showSelectAll) {
+								$('#tbodyOpeningStock')
+										.append(
+												"<tr>"
+														+ "<td><input type='checkbox' name='stockItems' class='check-one' value='"
+														+ data.productProfilePid
+														+ "' /></td>"
+														+ "<td>"
+														+ data.productProfileName
+														+ "</td><td>"
+														+ data.stockLocationName
+														+ "</td><td>"
+														+ data.quantity
+														+ "</td></tr>");
+							} else {
+								$('#tbodyOpeningStock').append(
+										"<tr>" + "<td>"
+												+ data.productProfileName
+												+ "</td><td>"
+												+ data.stockLocationName
+												+ "</td><td>" + data.quantity
+												+ "</td></tr>");
+							}
+						});
 
 	}
 
