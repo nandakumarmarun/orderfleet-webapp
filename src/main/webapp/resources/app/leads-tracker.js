@@ -235,6 +235,8 @@ if (!this.DynamicDocumentForm) {
 				$("#lblTotalLeads").text("0");
 				$("#lblOpen").text("0");
 				$("#lblWon").text("0");
+				$("#lblLost").text("0");
+				$("#lblClosed").text("0");
 				$("#lblUnspecified").text("0");
 				$("#lblHot").text("0");
 				$("#lblWarm").text("0");
@@ -265,7 +267,7 @@ if (!this.DynamicDocumentForm) {
 
 	function createTableBody(elementValues, length) {
 		if (elementValues != null && elementValues.length > 0) {
-			var counts = 0, leadOpen = 0, leadWon = 0, leadUnspecified = 0, hot = 0, 
+			var counts = 0, leadOpen = 0, leadWon = 0,leadLost =0, leadUnspecified = 0, hot = 0, 
 			warm = 0, cold = 0, unspecifiedFollowUp = 0;
 			var temp = 0;
 			$.each(elementValues, function(index, formDetail) {
@@ -315,6 +317,20 @@ if (!this.DynamicDocumentForm) {
 								}
 							}
 						}
+					} else if (value == 'Lost') { // initial Lost changed to won
+						if (14 < length) { // follow up date
+							var followUpValue = formDetail[14] == undefined
+								|| formDetail[14] == null ? "" : formDetail[14];
+							var leadStatus = formDetail[18] == undefined
+							|| formDetail[18] == null ? "" : formDetail[18];
+							if (followUpValue != "") {
+								var followUpDate = moment(followUpValue).format('YYYY-MM-DD');
+								if (moment().isSame(followUpDate, 'month')) {
+									// check if follow up date in same month
+									leadLost +=1;
+								}
+							}
+						}
 					}
 				}
 
@@ -349,6 +365,8 @@ if (!this.DynamicDocumentForm) {
 			$("#lblTotalLeads").text(counts);
 			$("#lblOpen").text(leadOpen);
 			$("#lblWon").text(leadWon);
+			$("#lblLost").text(leadLost);
+			$("#lblClosed").text(leadWon+leadLost);
 			$("#lblUnspecified").text(leadUnspecified);
 			$("#lblHot").text(hot);
 			$("#lblWarm").text(warm);

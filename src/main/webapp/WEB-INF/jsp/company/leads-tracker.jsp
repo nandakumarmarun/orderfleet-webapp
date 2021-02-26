@@ -131,6 +131,8 @@
 					    <td><label>Total Leads : </label><label id="lblTotalLeads">0</label></td>
 					    <td><label>Open : </label><label id="lblOpen">0</label></td>
 					    <td><label>Won : </label><label id="lblWon">0</label></td>
+					    <td><label>Lost : </label><label id="lblLost">0</label></td>
+					    <td><label>Closed : </label><label id="lblClosed">0</label></td>
 					    <td><label>Unspecified : </label><label id="lblUnspecified">0</label></td>
 					    <td><label>Hot : </label><label id="lblHot">0</label></td>
 					    <td><label>Warm : </label><label id="lblWarm">0</label></td>
