@@ -254,6 +254,8 @@ if (!this.StockLocationManagement) {
 														+ data.stockLocationName
 														+ "</td><td>"
 														+ data.quantity
+														+ "</td><td>"
+														+ convertDateTimeFromServer(data.lastModifiedDate)
 														+ "</td></tr>");
 							} else {
 								$('#tbodyOpeningStock').append(
@@ -261,7 +263,10 @@ if (!this.StockLocationManagement) {
 												+ data.productProfileName
 												+ "</td><td>"
 												+ data.stockLocationName
-												+ "</td><td>" + data.quantity
+												+ "</td><td>" 
+												+ data.quantity
+												+ "</td><td>"
+												+ convertDateTimeFromServer(data.lastModifiedDate)
 												+ "</td></tr>");
 							}
 						});

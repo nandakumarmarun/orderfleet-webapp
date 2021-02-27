@@ -92,6 +92,7 @@
 												<th>Product Profile</th>
 												<th>Stock Location</th>
 												<th>Quantity</th>
+												<th>Uploaded Time</th>
 											</tr>
 										</thead>
 										<tbody id="tbodyOpeningStock">
