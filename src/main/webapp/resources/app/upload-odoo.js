@@ -14,6 +14,9 @@ if (!this.uploadOdoo) {
 	$(document).ready(function() {
 
 
+		$('#uploadAll').on('click', function() {
+			uploadAll();
+		});
 		$('#uploadAccountProfiles').on('click', function() {
 			uploadAccountProfiles();
 		});
@@ -39,6 +42,27 @@ if (!this.uploadOdoo) {
 		});
 	
 	});
+	
+	function uploadAll() {
+
+		$(".error-msg").html("Uploading All Masters....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadAll",
+					method : 'GET',
+					success : function(data) {
+						alert("Upload All Masters Success")
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading All Masters .................");
+						$(".error-msg").html(
+								"Error uploading All Masters .................");
+					}
+				});
+
+	}
 	
 	
 	function uploadUsers() {
