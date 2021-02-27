@@ -7,9 +7,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -21,12 +24,19 @@ import javax.script.ScriptException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Attendance;
@@ -45,6 +55,7 @@ import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.OpeningStock;
+import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.SalesTargetGroupUserTarget;
@@ -57,8 +68,10 @@ import com.orderfleet.webapp.domain.TaskReferenceDocument;
 import com.orderfleet.webapp.domain.TaskSetting;
 import com.orderfleet.webapp.domain.TaskUserNotificationSetting;
 import com.orderfleet.webapp.domain.TaskUserSetting;
+import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserDevice;
+import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.UserTaskAssignment;
 import com.orderfleet.webapp.domain.UserTaskExecutionLog;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
@@ -76,6 +89,7 @@ import com.orderfleet.webapp.domain.enums.TaskCreatedType;
 import com.orderfleet.webapp.domain.enums.TaskPlanStatus;
 import com.orderfleet.webapp.domain.enums.TaskPlanType;
 import com.orderfleet.webapp.domain.enums.TaskStatus;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.domain.model.FirebaseData;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.geolocation.api.GeoLocationServiceException;
@@ -89,9 +103,11 @@ import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskPlanRepository;
 import com.orderfleet.webapp.repository.FormElementRepository;
+import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
+import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.SalesTargetGroupDocumentRepository;
@@ -106,7 +122,10 @@ import com.orderfleet.webapp.repository.TaskRepository;
 import com.orderfleet.webapp.repository.TaskSettingRepository;
 import com.orderfleet.webapp.repository.TaskUserNotificationSettingRepository;
 import com.orderfleet.webapp.repository.TaskUserSettingRepository;
+import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
 import com.orderfleet.webapp.repository.UserDeviceRepository;
+import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.repository.UserTaskAssignmentRepository;
 import com.orderfleet.webapp.repository.UserTaskExecutionLogRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -140,6 +159,15 @@ import com.orderfleet.webapp.web.rest.dto.KilometerCalculationDTO;
 import com.orderfleet.webapp.web.rest.dto.MapDistanceApiDTO;
 import com.orderfleet.webapp.web.rest.dto.MapDistanceDTO;
 import com.orderfleet.webapp.web.rest.dto.UserDistanceDTO;
+import com.orderfleet.webapp.web.util.RestClientUtil;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoiceLine;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOneOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOneOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOneOdooInvoice;
 
 /**
  * Service for update after save documents(ETS).
@@ -264,10 +292,27 @@ public class TaskSubmissionPostSave {
 	private ExecutiveTaskExecutionSmsService executiveTaskExecutionSmsService;
 
 	@Inject
-	private OpeningStockRepository openingStockRepository;
+	private OpeningStockRepository openingStockRepository;	
+
+	@Inject
+	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
+
+	@Inject
+	private UserStockLocationRepository userStockLocationRepository;
+
+	@Inject
+	private UserRepository userRepository;	
+
+	@Inject
+	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;	
+
+	@Inject
+	private UnitOfMeasureProductRepository unitOfMeasureProductRepository;
 
 	private FirebaseRequest firebaseRequest;
 	private List<UserDevice> userDevices;
+	
+	private static String SEND_INVOICE_API_URL = "http://edappal.nellara.com:1214/web/api/create_invoice";
 
 	@Async
 	@Transactional
@@ -330,6 +375,18 @@ public class TaskSubmissionPostSave {
 			if (company.getSmsApiKey() != null && !company.getSmsApiKey().isEmpty()) {
 				executiveTaskExecutionSmsService.sendSms(tsTransactionWrapper);
 			}
+			
+			Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository.findByCompanyPidAndName(
+					executiveTaskExecution.getCompany().getPid(), CompanyConfig.SEND_TO_ODOO);
+			// send inventory voucher to odoo
+			if (optSendToOdoo.isPresent()) {
+				if (Boolean.valueOf(optSendToOdoo.get().getValue())) {
+					if (inventoryVouchers != null && inventoryVouchers.size()>0) {
+						InventoryVoucherHeader ivh = inventoryVouchers.get(0);	
+						sendInvoiceToOdoo(ivh);
+					}
+				}				
+			}
 
 //			if (inventoryVouchers != null) {
 //				updateOpeningStockOfSourceStockLocation(inventoryVouchers);
@@ -346,6 +403,177 @@ public class TaskSubmissionPostSave {
 					+ executiveTaskExecution.getAccountProfile().getName();
 			log.error(errorMsg);
 			sendErrorEmail(errorMsg, ex);
+		}
+	}
+	
+	private void sendInvoiceToOdoo(InventoryVoucherHeader ivh) {
+		Long companyId = ivh.getCompany().getId();
+		log.info("send invoice to odoo for company id : {}", companyId);
+		List<PrimarySecondaryDocument> primarySecDocSales = new ArrayList<>();
+		List<PrimarySecondaryDocument> primarySecDocSalesReturn = new ArrayList<>();
+		primarySecDocSales = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES, companyId);
+		primarySecDocSalesReturn = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_RETURN, companyId);
+
+		if (primarySecDocSales.isEmpty()) {
+			log.info("........No PrimarySecondaryDocument configuration Available...........");
+			// return salesOrderDTOs;
+		}
+		List<Long> documentIdListSales = primarySecDocSales.stream().map(psd -> psd.getDocument().getId())
+				.collect(Collectors.toList());
+
+		List<Long> documentIdListSalesReturn = primarySecDocSalesReturn.stream().map(psd -> psd.getDocument().getId())
+				.collect(Collectors.toList());
+		
+		AccountProfile opRecAccPro = ivh.getReceiverAccount();
+		AccountProfile opSupAccPro = ivh.getReceiverAccount();
+		String companyPid = ivh.getCompany().getPid();
+		
+		List<UserStockLocation> userStockLocations = userStockLocationRepository.findAllByCompanyPid(companyPid);
+
+		List<UnitOfMeasureProduct> unitOfMeasureProducts = unitOfMeasureProductRepository.findAllByCompanyId();
+
+		Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
+				.filter(us -> us.getUser().getPid().equals(ivh.getCreatedBy().getPid())).findAny();
+		
+
+		Set<String> ivhPids = new HashSet<>();
+		ivhPids.add(ivh.getPid());
+		List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
+				.findAllByInventoryVoucherHeaderPidIn(ivhPids);
+		 
+		ParamsOneOdooInvoice invoice = new ParamsOneOdooInvoice();
+		invoice.setCreate(true);
+		DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		invoice.setInvoice_date(ivh.getDocumentDate() != null ? ivh.getDocumentDate().format(formatter1): "");
+		invoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
+		invoice.setRounding_amt(ivh.getRoundedOff());
+		invoice.setReference(ivh.getDocumentNumberServer());		
+		 
+		if (documentIdListSales.contains(ivh.getDocument().getId())) { // Primary Sales
+			invoice.setInvoice_type("out_invoice");
+			invoice.setJournal_type("sale");
+			invoice.setPartner_id(opRecAccPro.getCustomerId() != null && !opRecAccPro.getCustomerId().equals("")
+					? Long.parseLong(opRecAccPro.getCustomerId())
+					: 0);
+			
+			invoice.setOrigin(ivh.getDocumentNumberServer());
+		} else if (documentIdListSalesReturn.contains(ivh.getDocument().getId())) {  // Primary Sales Return
+			invoice.setInvoice_type("out_refund");
+			invoice.setJournal_type("sale_refund");
+			invoice.setPartner_id(
+					opSupAccPro.getCustomerId() != null && !opSupAccPro.getCustomerId().equals("")
+							? Long.parseLong(opSupAccPro.getCustomerId())
+							: 0);
+			invoice.setOrigin(ivh.getReferenceInvoiceNumber() != null ? ivh.getReferenceInvoiceNumber(): ivh.getDocumentNumberServer());
+		}
+		
+		
+		List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
+				.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(ivh.getId().toString()))
+				.collect(Collectors.toList()).stream()
+				.sorted(Comparator.comparingLong(InventoryVoucherDetail::getId)).collect(Collectors.toList());
+
+		List<OdooInvoiceLine> odooInvoiceLines = new ArrayList<OdooInvoiceLine>();
+		for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
+
+			OdooInvoiceLine odooInvoiceLine = new OdooInvoiceLine();
+
+			odooInvoiceLine.setIs_foc(
+					inventoryVoucherDetail.getFreeQuantity() > 0.0 ? inventoryVoucherDetail.getFreeQuantity()
+							: 0.0);
+
+			odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountPercentage());
+
+			odooInvoiceLine.setProduct_id(inventoryVoucherDetail.getProduct().getProductId() != null
+					&& !inventoryVoucherDetail.getProduct().getProductId().equals("")
+							? Long.parseLong(inventoryVoucherDetail.getProduct().getProductId())
+							: 0);
+			odooInvoiceLine.setPrice_unit(inventoryVoucherDetail.getSellingRate());
+			odooInvoiceLine.setQuantity(inventoryVoucherDetail.getQuantity());
+
+			Optional<UnitOfMeasureProduct> opUnitOfMeasure = unitOfMeasureProducts.stream()
+					.filter(us -> us.getProduct().getPid().equals(inventoryVoucherDetail.getProduct().getPid()))
+					.findAny();
+
+			if (opUnitOfMeasure.isPresent()) {
+				odooInvoiceLine.setUom_id(Long.parseLong(opUnitOfMeasure.get().getUnitOfMeasure().getUomId()));
+			}
+
+			odooInvoiceLines.add(odooInvoiceLine);
+		}
+
+		invoice.setInvoice_lines(odooInvoiceLines);
+		
+		log.info("Sending Invoice to Odoo....");
+
+		RequestBodyOneOdooInvoice request = new RequestBodyOneOdooInvoice();
+
+		request.setJsonrpc("2.0");
+
+		request.setParams(invoice);
+		
+		HttpEntity<RequestBodyOneOdooInvoice> entity = new HttpEntity<>(request,
+				RestClientUtil.createTokenAuthHeaders());
+
+		log.info(entity.getBody().toString() + "");
+		
+		ObjectMapper Obj = new ObjectMapper();
+
+		// get object as a json string
+		String jsonStr;
+		try {
+			jsonStr = Obj.writeValueAsString(request);
+			log.info(jsonStr);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		log.info("Get URL: " + SEND_INVOICE_API_URL);
+
+		try {
+
+			ResponseBodyOneOdooInvoice responseBodyOneOdooInvoice = restTemplate.postForObject(SEND_INVOICE_API_URL,
+					entity, ResponseBodyOneOdooInvoice.class);
+			log.info(responseBodyOneOdooInvoice + "");
+
+			// get object as a json string
+			String jsonStr1;
+			try {
+				jsonStr1 = Obj.writeValueAsString(responseBodyOneOdooInvoice);
+				log.info(jsonStr1);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			log.info("Odoo Invoice Created Success Size= " + responseBodyOneOdooInvoice.getResult().getMessage()
+					+ "------------");
+
+			// changeServerDownloadStatus(responseBodyOdooInvoice.getResult().getMessage());
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				// throw new ServiceException(exception.getResponseBodyAsString());
+				log.info(exception.getResponseBodyAsString());
+				log.info("-------------------------");
+				log.info(exception.getMessage());
+				log.info("-------------------------");
+				exception.printStackTrace();
+			}
+			log.info(exception.getMessage());
+			// throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+
+			log.info(exception.getMessage());
+			log.info("-------------------------");
+			exception.printStackTrace();
+			log.info("-------------------------");
+
+			// throw new ServiceException(exception.getMessage());
 		}
 	}
 
