@@ -49,13 +49,17 @@ import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoiceLine;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOneOdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOneOdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOneOdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseMessageOdooInvoice;
 
 /**

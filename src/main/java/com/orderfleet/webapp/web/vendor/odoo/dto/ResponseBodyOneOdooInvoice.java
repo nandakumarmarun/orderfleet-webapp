@@ -4,8 +4,9 @@ public class ResponseBodyOneOdooInvoice {
 	private String jsonrpc;
 
 	private long id;
-
-	private ResultOneOdooInvoice result;
+	
+	private ResultOdooInvoice result;
+	// private ResultOneOdooInvoice result;
 
 	public String getJsonrpc() {
 		return jsonrpc;
@@ -23,11 +24,11 @@ public class ResponseBodyOneOdooInvoice {
 		this.id = id;
 	}
 
-	public ResultOneOdooInvoice getResult() {
+	public ResultOdooInvoice getResult() {
 		return result;
 	}
 
-	public void setResult(ResultOneOdooInvoice result) {
+	public void setResult(ResultOdooInvoice result) {
 		this.result = result;
 	}
 
@@ -35,4 +36,6 @@ public class ResponseBodyOneOdooInvoice {
 	public String toString() {
 		return "ResponseBodyOneOdooInvoice [jsonrpc=" + jsonrpc + ", id=" + id + ", result=" + result + "]";
 	}
+
+	
 }
