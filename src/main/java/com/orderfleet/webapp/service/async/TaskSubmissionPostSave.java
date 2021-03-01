@@ -135,6 +135,7 @@ import com.orderfleet.webapp.web.rest.dto.MapDistanceApiDTO;
 import com.orderfleet.webapp.web.rest.dto.MapDistanceDTO;
 import com.orderfleet.webapp.web.rest.dto.UserDistanceDTO;
 import com.orderfleet.webapp.web.vendor.odoo.service.SendInvoiceOdooService;
+import com.orderfleet.webapp.web.vendor.odoo.service.SendTransactionOdooService;
 
 /**
  * Service for update after save documents(ETS).
@@ -257,9 +258,9 @@ public class TaskSubmissionPostSave {
 
 	@Inject
 	private ExecutiveTaskExecutionSmsService executiveTaskExecutionSmsService;
-	
+
 	@Inject
-	private SendInvoiceOdooService sendInvoiceOdooService;
+	private SendTransactionOdooService sendTransactionOdooService;
 
 	private FirebaseRequest firebaseRequest;
 	private List<UserDevice> userDevices;
@@ -325,14 +326,14 @@ public class TaskSubmissionPostSave {
 			if (company.getSmsApiKey() != null && !company.getSmsApiKey().isEmpty()) {
 				executiveTaskExecutionSmsService.sendSms(tsTransactionWrapper);
 			}
-			
-			Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository.findByCompanyPidAndName(
-					executiveTaskExecution.getCompany().getPid(), CompanyConfig.SEND_TO_ODOO);
+
+			Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository
+					.findByCompanyPidAndName(executiveTaskExecution.getCompany().getPid(), CompanyConfig.SEND_TO_ODOO);
 			// send inventory voucher to odoo
 			if (optSendToOdoo.isPresent()) {
 				if (Boolean.valueOf(optSendToOdoo.get().getValue())) {
-					sendInvoiceOdooService.sendInvoicesToOdoo(tsTransactionWrapper);
-				}				
+					sendTransactionOdooService.sendInvoicesToOdoo(tsTransactionWrapper);
+				}
 			}
 
 //			if (inventoryVouchers != null) {
@@ -352,7 +353,7 @@ public class TaskSubmissionPostSave {
 			sendErrorEmail(errorMsg, ex);
 		}
 	}
-	
+
 //	private void updateOpeningStockOfSourceStockLocation(List<InventoryVoucherHeader> inventoryVouchers) {
 //
 //		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVouchers) {
@@ -434,8 +435,7 @@ public class TaskSubmissionPostSave {
 //		} else {
 //			executiveTaskExecution.setTowerLocation("No Location");
 //		}
-		
-		
+
 		if (locationType.equals(LocationType.NoLocation) || locationType.equals(LocationType.FlightMode)) {
 			executiveTaskExecution.setLocation("No Location");
 		}
@@ -614,8 +614,7 @@ public class TaskSubmissionPostSave {
 				sendTaskNotificationToUsers(executiveTaskExecution, dynamicDocumentHeader.getDocument(),
 						dynamicDocumentHeader.getPid(), dynamicDocumentHeader.getDocumentNumberServer(),
 						datePickerFormElements, null, null, filledFormDetailList);
-				if (executiveTaskExecution.getCompany().getId() == 304935L 
-						&& datePickerFormElements.size() == 1) {
+				if (executiveTaskExecution.getCompany().getId() == 304935L && datePickerFormElements.size() == 1) {
 					saveTaskAndUserTaskAutomatically(executiveTaskExecution, dynamicDocumentHeader,
 							datePickerFormElements);
 				}
@@ -1297,8 +1296,8 @@ public class TaskSubmissionPostSave {
 		LocalDate startDate = null;
 
 		for (FilledFormDetail filledFormDetail : datePickerFormElements) {
-			log.info("Filled From Value ~ : "+filledFormDetail.getValue());
-			if(filledFormDetail.getValue() == null || "".equals(filledFormDetail.getValue())){
+			log.info("Filled From Value ~ : " + filledFormDetail.getValue());
+			if (filledFormDetail.getValue() == null || "".equals(filledFormDetail.getValue())) {
 				log.info("Task Not Created ~ Date null");
 				return;
 			}
@@ -1761,7 +1760,8 @@ public class TaskSubmissionPostSave {
 
 	private void sendErrorEmail(String msg, Exception ex) {
 		// send mail
-		mailService.sendExceptionEmail("prashob.aitrich@gmail.com", msg, ExceptionUtils.getStackTrace(ex), false, false);
+		mailService.sendExceptionEmail("prashob.aitrich@gmail.com", msg, ExceptionUtils.getStackTrace(ex), false,
+				false);
 	}
 
 }
