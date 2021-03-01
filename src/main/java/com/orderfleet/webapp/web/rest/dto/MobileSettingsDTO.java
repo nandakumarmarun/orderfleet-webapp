@@ -89,6 +89,8 @@ public class MobileSettingsDTO {
 	private boolean rateWithoutCalculation;
 	
 	private boolean showBestPerformerUpload;
+	
+	private boolean belowPriceLevel;
 
 	public MobileSettingsDTO() {
 		super();
@@ -129,6 +131,7 @@ public class MobileSettingsDTO {
 		this.salesOrderAllocation = mobileConfigurationDTO.getSalesOrderAllocation();
 		this.rateWithoutCalculation = mobileConfigurationDTO.getRateWithoutCalculation();
 		this.showBestPerformerUpload = mobileConfigurationDTO.isShowBestPerformerUpload();
+		this.belowPriceLevel = mobileConfigurationDTO.isBelowPriceLevel();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -427,4 +430,11 @@ public class MobileSettingsDTO {
 		this.showBestPerformerUpload = showBestPerformerUpload;
 	}
 
+	public boolean isBelowPriceLevel() {
+		return belowPriceLevel;
+	}
+
+	public void setBelowPriceLevel(boolean belowPriceLevel) {
+		this.belowPriceLevel = belowPriceLevel;
+	}
 }

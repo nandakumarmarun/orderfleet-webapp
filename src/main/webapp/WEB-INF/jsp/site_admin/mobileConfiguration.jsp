@@ -70,6 +70,7 @@
 						<th>Sales Order Allocation</th>
 						<th>Rate Without Calculation</th>
 						<th>Show Best Performer Upload</th>
+						<th>Below Price Level</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -111,6 +112,7 @@
 							<td>${mobileConfiguration.salesOrderAllocation}</td>
 							<td>${mobileConfiguration.rateWithoutCalculation}</td>
 							<td>${mobileConfiguration.showBestPerformerUpload}</td>
+							<td>${mobileConfiguration.belowPriceLevel}</td>
 
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
@@ -335,6 +337,12 @@
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Show Best Performer Upload</label> <input id="showBestPerformerUpload" name='showBestPerformerUpload'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Below Price Level</label> <input id="belowPriceLevel" name='belowPriceLevel'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>

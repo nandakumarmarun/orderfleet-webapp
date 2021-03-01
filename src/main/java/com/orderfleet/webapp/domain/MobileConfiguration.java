@@ -151,6 +151,9 @@ public class MobileConfiguration implements Serializable {
 	
 	@Column(name = "show_best_performer_upload", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean showBestPerformerUpload;
+	
+	@Column(name = "below_price_level", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean belowPriceLevel;
 
 	@NotNull
 	@ManyToOne
@@ -454,6 +457,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setShowBestPerformerUpload(boolean showBestPerformerUpload) {
 		this.showBestPerformerUpload = showBestPerformerUpload;
+	}
+
+	public boolean isBelowPriceLevel() {
+		return belowPriceLevel;
+	}
+
+	public void setBelowPriceLevel(boolean belowPriceLevel) {
+		this.belowPriceLevel = belowPriceLevel;
 	}
 
 	@Override

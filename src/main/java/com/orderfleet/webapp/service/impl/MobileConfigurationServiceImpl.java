@@ -78,6 +78,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setSalesOrderAllocation(mobileConfigurationDTO.getSalesOrderAllocation());
 		configuration.setRateWithoutCalculation(mobileConfigurationDTO.getRateWithoutCalculation());
 		configuration.setShowBestPerformerUpload(mobileConfigurationDTO.isShowBestPerformerUpload());
+		configuration.setBelowPriceLevel(mobileConfigurationDTO.isBelowPriceLevel());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -120,6 +121,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setSalesOrderAllocation(mobileConfigurationDTO.getSalesOrderAllocation());
 			configuration.setRateWithoutCalculation(mobileConfigurationDTO.getRateWithoutCalculation());
 			configuration.setShowBestPerformerUpload(mobileConfigurationDTO.isShowBestPerformerUpload());
+			configuration.setBelowPriceLevel(mobileConfigurationDTO.isBelowPriceLevel());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

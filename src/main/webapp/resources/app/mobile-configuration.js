@@ -44,7 +44,8 @@ if (!this.MobileConfiguration) {
 		stockLocationProducts : false,
 		salesOrderAllocation : false,
 		rateWithoutCalculation : false,
-		showBestPerformerUpload : false
+		showBestPerformerUpload : false,
+		belowPriceLevel : false
 	};
 
 	$(document).ready(function() {
@@ -141,6 +142,8 @@ if (!this.MobileConfiguration) {
 				"#rateWithoutCalculation").is(":checked");
 		mobileConfigurationDTO.showBestPerformerUpload = $(
 				"#showBestPerformerUpload").is(":checked");
+		mobileConfigurationDTO.belowPriceLevel = $(
+				"#belowPriceLevel").is(":checked");
 
 		$.ajax({
 			url : contextPath,
@@ -232,6 +235,8 @@ if (!this.MobileConfiguration) {
 									data.rateWithoutCalculation);
 							$('#showBestPerformerUpload').prop("checked",
 									data.showBestPerformerUpload);
+							$('#belowPriceLevel').prop("checked",
+									data.belowPriceLevel);
 
 						}
 

@@ -889,6 +889,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setSalesOrderAllocation(false);
 		mobileConfiguration.setRateWithoutCalculation(false);
 		mobileConfiguration.setShowBestPerformerUpload(false);
+		mobileConfiguration.setBelowPriceLevel(false);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 
