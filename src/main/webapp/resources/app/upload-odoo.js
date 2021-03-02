@@ -44,25 +44,9 @@ if (!this.uploadOdoo) {
 	});
 	
 	function uploadAll() {
-
-		$(".error-msg").html("Uploading All Masters....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadAll",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload All Masters Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading All Masters .................");
-						$(".error-msg").html(
-								"Error uploading All Masters .................");
-					}
-				});
-
+		uploadUsers1();
 	}
+	
 	
 	
 	function uploadUsers() {
@@ -76,6 +60,26 @@ if (!this.uploadOdoo) {
 						alert("Upload Users Success")
 						onSaveSuccess(data);
 						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading users .................");
+						$(".error-msg").html(
+								"Error uploading users .................");
+					}
+				});
+
+	}
+	
+	function uploadUsers1() {
+
+		$(".error-msg").html("Uploading Users....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadUsers",
+					method : 'GET',
+					success : function(data) {
+						$(".error-msg").html("");
+						uploadTaxList1();
 					},
 					error : function(xhr, error) {
 						console.log("Error uploading users .................");
@@ -106,6 +110,27 @@ if (!this.uploadOdoo) {
 				});
 
 	}
+	
+	function uploadStockLocations1() {
+
+		$(".error-msg").html("Uploading Stock Locations....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadStockLocations",
+					method : 'GET',
+					success : function(data) {
+						$(".error-msg").html("");
+						alert("Upload All Masters Success")
+						onSaveSuccess(data);
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading stock Locations .................");
+						$(".error-msg").html(
+								"Error uploading stock locations .................");
+					}
+				});
+
+	}
 
 	function uploadAccountProfiles() {
 
@@ -127,6 +152,26 @@ if (!this.uploadOdoo) {
 				});
 
 	}
+	
+	function uploadAccountProfiles1() {
+
+		$(".error-msg").html("Uploading Account Profiles....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadAccountProfiles",
+					method : 'GET',
+					success : function(data) {
+						$(".error-msg").html("");
+						uploadOutstandingInvoice1();
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading account profiles .................");
+						$(".error-msg").html(
+								"Error uploading account profiles .................");
+					}
+				});
+
+	}
 
 	function uploadTaxList() {
 
@@ -139,6 +184,26 @@ if (!this.uploadOdoo) {
 						alert("Upload Tax List Success")
 						onSaveSuccess(data);
 						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading tax list .................");
+						$(".error-msg").html(
+								"Error uploading tax list .................");
+					}
+				});
+
+	}
+	
+	function uploadTaxList1() {
+
+		$(".error-msg").html("Uploading Tax List....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadTaxList",
+					method : 'GET',
+					success : function(data) {
+						$(".error-msg").html("");
+						uploadProductProfiles1();
 					},
 					error : function(xhr, error) {
 						console.log("Error uploading tax list .................");
@@ -170,6 +235,26 @@ if (!this.uploadOdoo) {
 
 	}
 	
+	function uploadProductProfiles1() {
+
+		$(".error-msg").html("Uploading Product Profiles....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadProductProfiles",
+					method : 'GET',
+					success : function(data) {
+						$(".error-msg").html("");
+						uploadPriceLevel1();
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading product profiles .................");
+						$(".error-msg").html(
+								"Error uploading product profiles .................");
+					}
+				});
+
+	}
+	
 	function uploadPriceLevel() {
 
 		$(".error-msg").html("Uploading Price List....");
@@ -191,6 +276,26 @@ if (!this.uploadOdoo) {
 
 	}
 	
+	function uploadPriceLevel1() {
+
+		$(".error-msg").html("Uploading Price List....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadPriceLevel",
+					method : 'GET',
+					success : function(data) {
+						$(".error-msg").html("");
+						uploadAccountProfiles1();
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading price list.................");
+						$(".error-msg").html(
+								"Error uploading price list .................");
+					}
+				});
+
+	}
+	
 	function uploadOutstandingInvoice() {
 
 		$(".error-msg").html("Uploading Outstanding Invoices....");
@@ -202,6 +307,27 @@ if (!this.uploadOdoo) {
 						alert("Upload Outstanding Invoices Success")
 						onSaveSuccess(data);
 						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading outstanding invoices.................");
+						$(".error-msg").html(
+								"Error uploading outstanding invoices .................");
+					}
+				});
+
+	}
+	
+	
+	function uploadOutstandingInvoice1() {
+
+		$(".error-msg").html("Uploading Outstanding Invoices....");
+		$
+				.ajax({
+					url : uploadOdooContextPath + "/uploadOutstandingInvoices",
+					method : 'GET',
+					success : function(data) {
+						$(".error-msg").html("");
+						uploadStockLocations1();
 					},
 					error : function(xhr, error) {
 						console.log("Error uploading outstanding invoices.................");
