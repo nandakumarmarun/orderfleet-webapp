@@ -230,6 +230,12 @@
 												No.</span>
 										</label>
 									</div>
+									<div class="form-group" id="addNewCustomer">
+										<label for="addNewCustomer"> <input type="checkbox"
+											id="field_addNewCustomer" /> &nbsp;<span>Add New
+												Customer</span>
+										</label>
+									</div>
 
 								</div>
 							</div>

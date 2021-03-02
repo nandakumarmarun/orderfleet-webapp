@@ -131,6 +131,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setQrCodeEnabled(documentDTO.getQrCodeEnabled());
 			document.setOrderNoEnabled(documentDTO.getOrderNoEnabled());
 			document.setVoucherNumberGenerationType(documentDTO.getVoucherNumberGenerationType());
+			document.setAddNewCustomer(documentDTO.getAddNewCustomer());
 			document = documentRepository.save(document);
 			DocumentDTO result = documentMapper.documentToDocumentDTO(document);
 			return result;

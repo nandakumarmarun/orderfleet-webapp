@@ -24,11 +24,12 @@ if (!this.Document) {
 		editable : true,
 		batchEnabled : false,
 		promptStockLocation : false,
-		photoMandatory:false,
-		isTakeImageFromGallery:false,
-		qrCodeEnabled :false,
+		photoMandatory : false,
+		isTakeImageFromGallery : false,
+		qrCodeEnabled : false,
 		orderNoEnabled : false,
-		voucherNumberGenerationType : 'TYPE_1'
+		voucherNumberGenerationType : 'TYPE_1',
+		addNewCustomer : false
 
 	};
 
@@ -183,16 +184,22 @@ if (!this.Document) {
 		documentModel.batchEnabled = $('#field_batchEnabled').prop('checked');
 		documentModel.promptStockLocation = $('#field_promptStockLocation')
 				.prop('checked');
-		if(documentType == "ACCOUNTING_VOUCHER"){
-		documentModel.singleVoucherMode = $('#field_singleVoucherMode').prop(
-				'checked');
+		if (documentType == "ACCOUNTING_VOUCHER") {
+			documentModel.singleVoucherMode = $('#field_singleVoucherMode')
+					.prop('checked');
 		}
-		documentModel.photoMandatory = $('#field_photoMandatory').prop('checked');
-		documentModel.isTakeImageFromGallery = $('#field_isTakeImageFromGallery').prop('checked');
+		documentModel.photoMandatory = $('#field_photoMandatory').prop(
+				'checked');
+		documentModel.isTakeImageFromGallery = $(
+				'#field_isTakeImageFromGallery').prop('checked');
 		documentModel.qrCodeEnabled = $('#field_qrCodeEnabled').prop('checked');
-		documentModel.orderNoEnabled = $('#field_orderNoEnabled').prop('checked');
+		documentModel.orderNoEnabled = $('#field_orderNoEnabled').prop(
+				'checked');
+
 		documentModel.voucherNumberGenerationType = $(
-		"#field_voucherNumberGenerationType").val();
+				"#field_voucherNumberGenerationType").val();
+		documentModel.addNewCustomer = $('#field_addNewCustomer').prop(
+				'checked');
 		console.log(documentModel);
 		$.ajax({
 			method : $(el).attr('method'),
@@ -200,7 +207,8 @@ if (!this.Document) {
 			contentType : "application/json; charset=utf-8",
 			data : JSON.stringify(documentModel),
 			success : function(data) {
-				onSaveSuccess(data);
+				console.log(data);
+				// onSaveSuccess(data);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -216,7 +224,8 @@ if (!this.Document) {
 				$('#lbl_name').text(data.name);
 				$('#lbl_documentPrefix').text(data.documentPrefix);
 				$('#lbl_alias').text((data.alias == null ? "" : data.alias));
-				$('#lbl_description').text((data.description == null ? "" : data.description));
+				$('#lbl_description').text(
+						(data.description == null ? "" : data.description));
 				$('#lbl_documentType').text(data.documentType);
 				$('#lbl_activityAccount').text(data.activityAccount);
 			},
@@ -227,40 +236,53 @@ if (!this.Document) {
 	}
 
 	function editDocument(id) {
-		$.ajax({
-			url : documentContextPath + "/" + id,
-			method : 'GET',
-			success : function(data) {
-				console.log(data);
-				$('#field_name').val(data.name);
-				$('#field_documentPrefix').val(data.documentPrefix);
-				$('#field_alias').val((data.alias == null ? "" : data.alias));
-				$('#field_description').val((data.description == null ? "" : data.description));
-				$('#field_documentType').val(data.documentType);
-				Document.onChangeDocumentType();
-				if (data.activityAccount != null)
-					$('#field_activityAccount').val(data.activityAccount);
-				$('#field_save').prop("checked", data.save);
-				$('#field_editable').prop("checked", data.editable);
-				$('#field_batchEnabled').prop("checked", data.batchEnabled);
-				$('#field_promptStockLocation').prop("checked",
-						data.promptStockLocation);
-				$('#field_singleVoucherMode').prop("checked",
-						data.singleVoucherMode);
-				$('#field_photoMandatory').prop("checked",data.photoMandatory);
-				$('#field_isTakeImageFromGallery').prop("checked",data.isTakeImageFromGallery);
-				$('#field_qrCodeEnabled').prop("checked",data.qrCodeEnabled);
-				$('#field_orderNoEnabled').prop("checked",data.orderNoEnabled);
-				$('#field_voucherNumberGenerationType').val(
-						data.voucherNumberGenerationType);
-				console.log("===========")
-				console.log(data.orderNoEnabled);
-				documentModel.pid = data.pid;
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			}
-		});
+		$
+				.ajax({
+					url : documentContextPath + "/" + id,
+					method : 'GET',
+					success : function(data) {
+						console.log(data);
+						$('#field_name').val(data.name);
+						$('#field_documentPrefix').val(data.documentPrefix);
+						$('#field_alias').val(
+								(data.alias == null ? "" : data.alias));
+						$('#field_description').val(
+								(data.description == null ? ""
+										: data.description));
+						$('#field_documentType').val(data.documentType);
+						Document.onChangeDocumentType();
+						if (data.activityAccount != null)
+							$('#field_activityAccount').val(
+									data.activityAccount);
+						$('#field_save').prop("checked", data.save);
+						$('#field_editable').prop("checked", data.editable);
+						$('#field_batchEnabled').prop("checked",
+								data.batchEnabled);
+						$('#field_promptStockLocation').prop("checked",
+								data.promptStockLocation);
+						$('#field_singleVoucherMode').prop("checked",
+								data.singleVoucherMode);
+						$('#field_photoMandatory').prop("checked",
+								data.photoMandatory);
+						$('#field_isTakeImageFromGallery').prop("checked",
+								data.isTakeImageFromGallery);
+						$('#field_qrCodeEnabled').prop("checked",
+								data.qrCodeEnabled);
+						$('#field_orderNoEnabled').prop("checked",
+								data.orderNoEnabled);
+						$('#field_voucherNumberGenerationType').val(
+								data.voucherNumberGenerationType);
+						$("#field_addNewCustomer").prop("checked",
+								data.addNewCustomer);
+
+						console.log("===========")
+						console.log(data.addNewCustomer);
+						documentModel.pid = data.pid;
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
 	}
 
 	function deleteDocument(actionurl, id) {
