@@ -19,123 +19,70 @@
 
 				<hr />
 				
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Upload All Masters</label>
+				<div class="col-md-12 col-sm-12 clearfix">
+					<form role="form" class="form-horizontal form-groups-bordered">
+						<div class="form-group">
+							<div class="col-sm-3">
+								<br>
 								<button type="button" class="btn btn-success " id="uploadAll"
-									style="width: 175px; text-align: center;">Upload All Masters</button>
+									style="width: 175px; text-align: center;">Upload Masters</button>
 							</div>
-						</form>
-					</div>
-				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Users</label>
-								<button type="button" class="btn btn-success " id="uploadUsers"
-									style="width: 175px; text-align: center;">Upload Users</button>
+							<div class="col-md-9">
+								<div class="panel-body">
+										<div class="form-group">
+											<label class="error-msg" style="color: red;text-align:center;"></label>
+										</div>
+								</div>
 							</div>
-						</form>
-					</div>
+						</div>
+					</form>
 				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Tax Lists</label>
-								<button type="button" class="btn btn-success "
-									id="uploadTaxLists" style="width: 175px; text-align: center;">Upload
-									Tax Lists</button>
-							</div>
-						</form>
-					</div>
+				
+				
 				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Product Profile</label>
-								<button type="button" class="btn btn-success "
-									id="uploadProductProfileProfiles"
-									style="width: 175px; text-align: center;">Upload
-									Product Profiles</button>
-							</div>
-						</form>
-					</div>
+				
+				<div class="table-responsive">
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th style="width:10%;"><input type="checkbox" id="selectAll" />&nbsp;&nbsp; Select All</th>
+								<th>Masters</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="users"></input></td>
+								<td>Users</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="taxlist"></input></td>
+								<td>Tax Lists</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="product_profiles"></input></td>
+								<td>Product Profiles</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="pricelist"></input></td>
+								<td>Price Lists</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="account_profiles"></input></td>
+								<td>Account Profiles</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="outstanding"></input></td>
+								<td>Outstanding Invoices</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="stocks"></input></td>
+								<td>Stocks</td>
+							</tr>
+							
+						</tbody>
+					</table>
 				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Price Lists</label>
-								<button type="button" class="btn btn-success "
-									id="uploadPriceLists" style="width: 175px; text-align: center;">Upload
-									Price Lists</button>
-							</div>
-						</form>
-					</div>
-				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Account Profile</label>
-								<button type="button" class="btn btn-success "
-									id="uploadAccountProfiles"
-									style="width: 175px; text-align: center;">Upload
-									Account Profiles</button>
-							</div>
-						</form>
-					</div>
-				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Outstanding
-									Invoices</label>
-								<button type="button" class="btn btn-success "
-									id="uploadOutstandingInvoice"
-									style="width: 175px; text-align: center;">Upload
-									Outstanding Invoices</button>
-							</div>
-						</form>
-					</div>
-				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Stock Locations</label>
-								<button type="button" class="btn btn-success "
-									id="uploadStockLocations"
-									style="width: 175px; text-align: center;">Upload
-									Stocks</button>
-							</div>
-						</form>
-					</div>
-				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="error-msg" style="color: red;"></label>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
+				
 			<hr />
 
 			<!-- Footer -->

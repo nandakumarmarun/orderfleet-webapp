@@ -10,332 +10,87 @@ if (!this.uploadOdoo) {
 
 	var uploadOdooContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
+			
+	var ajaxes = [
+		{name: 'users', path: '/uploadUsers', alias: 'Users'},
+		{name: 'taxlist', path: '/uploadTaxList', alias: 'Tax List'},
+		{name: 'product_profiles', path: '/uploadProductProfiles', alias: 'Product Profiles'},
+		{name: 'pricelist', path: '/uploadPriceLevel', alias: 'Price List'},
+		{name: 'account_profiles', path: '/uploadAccountProfiles', alias: 'Account Profiles'},
+		{name: 'outstanding', path: '/uploadOutstandingInvoices', alias: 'Outstanding'},
+		{name: 'stocks', path: '/uploadStockLocations', alias: 'Stock Locations'},
+	];
+	
+	function findUrl(name) {
+		for (let i=0; i<ajaxes.length; i++) {
+			if (ajaxes[i].name === name) {
+				return ajaxes[i];
+			}
+		}
+		return null;
+	}
 
 	$(document).ready(function() {
-
-
+		$('#selectAll').on('click', function() {
+			selectAllStocks(this);
+		});
 		$('#uploadAll').on('click', function() {
 			uploadAll();
 		});
-		$('#uploadAccountProfiles').on('click', function() {
-			uploadAccountProfiles();
-		});
-		$('#uploadTaxLists').on('click', function() {
-			uploadTaxList();
-		});
-		$('#uploadProductProfileProfiles').on('click', function() {
-			uploadProductProfiles();
-		});
-		$('#uploadUsers').on('click', function() {
-			uploadUsers();
-		});
-		$('#uploadStockLocations').on('click', function() {
-			uploadStockLocations();
-		});
-		
-		$('#uploadPriceLists').on('click', function() {
-			uploadPriceLevel();
-        });
-        
-        $('#uploadOutstandingInvoice').on('click', function() {
-			uploadOutstandingInvoice();
-		});
-	
 	});
 	
+	$(".check-one").change(function(){
+    	if ($('.check-one:checked').length == $('.check-one').length) {
+    		$('#selectAll').prop('checked', true);
+	    } else {
+	    	$('#selectAll').prop('checked', false);
+	    }
+	});
+	
+	function selectAllStocks(checkbox) {
+		$('.check-one').prop('checked', checkbox.checked);
+	}
+	
+	
+	var selectedMasters = [];
 	function uploadAll() {
-		uploadUsers1();
+		selectedMasters = [];
+		$.each($("input[name='uploadMasters']:checked"), function() {
+			let v = findUrl($(this).val());
+			if (v != null) {
+				selectedMasters.push(v);
+			}
+		});
+		
+		if (selectedMasters.length == 0) {
+			alert("Please select Masters to Upload");
+			return;
+		}
+		
+		doAjax(selectedMasters.reverse());
 	}
 	
-	
-	
-	function uploadUsers() {
-
-		$(".error-msg").html("Uploading Users....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadUsers",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload Users Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading users .................");
-						$(".error-msg").html(
-								"Error uploading users .................");
-					}
-				});
-
-	}
-	
-	function uploadUsers1() {
-
-		$(".error-msg").html("Uploading Users....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadUsers",
-					method : 'GET',
-					success : function(data) {
-						$(".error-msg").html("");
-						uploadTaxList1();
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading users .................");
-						$(".error-msg").html(
-								"Error uploading users .................");
-					}
-				});
-
-	}
-	
-	function uploadStockLocations() {
-
-		$(".error-msg").html("Uploading Stock Locations....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadStockLocations",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload Stock Location Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading stock Locations .................");
-						$(".error-msg").html(
-								"Error uploading stock locations .................");
-					}
-				});
-
-	}
-	
-	function uploadStockLocations1() {
-
-		$(".error-msg").html("Uploading Stock Locations....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadStockLocations",
-					method : 'GET',
-					success : function(data) {
-						$(".error-msg").html("");
-						alert("Upload All Masters Success")
-						onSaveSuccess(data);
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading stock Locations .................");
-						$(".error-msg").html(
-								"Error uploading stock locations .................");
-					}
-				});
-
-	}
-
-	function uploadAccountProfiles() {
-
-		$(".error-msg").html("Uploading Account Profiles....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadAccountProfiles",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload Account Profile Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading account profiles .................");
-						$(".error-msg").html(
-								"Error uploading account profiles .................");
-					}
-				});
-
-	}
-	
-	function uploadAccountProfiles1() {
-
-		$(".error-msg").html("Uploading Account Profiles....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadAccountProfiles",
-					method : 'GET',
-					success : function(data) {
-						$(".error-msg").html("");
-						uploadOutstandingInvoice1();
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading account profiles .................");
-						$(".error-msg").html(
-								"Error uploading account profiles .................");
-					}
-				});
-
-	}
-
-	function uploadTaxList() {
-
-		$(".error-msg").html("Uploading Tax List....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadTaxList",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload Tax List Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading tax list .................");
-						$(".error-msg").html(
-								"Error uploading tax list .................");
-					}
-				});
-
-	}
-	
-	function uploadTaxList1() {
-
-		$(".error-msg").html("Uploading Tax List....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadTaxList",
-					method : 'GET',
-					success : function(data) {
-						$(".error-msg").html("");
-						uploadProductProfiles1();
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading tax list .................");
-						$(".error-msg").html(
-								"Error uploading tax list .................");
-					}
-				});
-
-	}
-
-	function uploadProductProfiles() {
-
-		$(".error-msg").html("Uploading Product Profiles....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadProductProfiles",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload Product Profile Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading product profiles .................");
-						$(".error-msg").html(
-								"Error uploading product profiles .................");
-					}
-				});
-
-	}
-	
-	function uploadProductProfiles1() {
-
-		$(".error-msg").html("Uploading Product Profiles....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadProductProfiles",
-					method : 'GET',
-					success : function(data) {
-						$(".error-msg").html("");
-						uploadPriceLevel1();
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading product profiles .................");
-						$(".error-msg").html(
-								"Error uploading product profiles .................");
-					}
-				});
-
-	}
-	
-	function uploadPriceLevel() {
-
-		$(".error-msg").html("Uploading Price List....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadPriceLevel",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload Price Level Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading price list.................");
-						$(".error-msg").html(
-								"Error uploading price list .................");
-					}
-				});
-
-	}
-	
-	function uploadPriceLevel1() {
-
-		$(".error-msg").html("Uploading Price List....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadPriceLevel",
-					method : 'GET',
-					success : function(data) {
-						$(".error-msg").html("");
-						uploadAccountProfiles1();
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading price list.................");
-						$(".error-msg").html(
-								"Error uploading price list .................");
-					}
-				});
-
-	}
-	
-	function uploadOutstandingInvoice() {
-
-		$(".error-msg").html("Uploading Outstanding Invoices....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadOutstandingInvoices",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload Outstanding Invoices Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading outstanding invoices.................");
-						$(".error-msg").html(
-								"Error uploading outstanding invoices .................");
-					}
-				});
-
-	}
-	
-	
-	function uploadOutstandingInvoice1() {
-
-		$(".error-msg").html("Uploading Outstanding Invoices....");
-		$
-				.ajax({
-					url : uploadOdooContextPath + "/uploadOutstandingInvoices",
-					method : 'GET',
-					success : function(data) {
-						$(".error-msg").html("");
-						uploadStockLocations1();
-					},
-					error : function(xhr, error) {
-						console.log("Error uploading outstanding invoices.................");
-						$(".error-msg").html(
-								"Error uploading outstanding invoices .................");
-					}
-				});
-
+	function doAjax(selectedMasters) {
+		if (selectedMasters.length > 0) {
+			var m = selectedMasters.pop()
+			$(".error-msg").html("Uploading "+m.alias+"....");
+	        $.ajax({
+	            url      : uploadOdooContextPath + m.path,
+	            method : 'GET',
+	            success  : function (serverResponse) {
+					$(".error-msg").html("Uploading "+m.alias+" success....");                
+	                doAjax(selectedMasters);
+	            },
+	            error : function(xhr, error) {
+					$(".error-msg").html(
+							"Error uploading "+m.alias);
+					selectedMasters = [];
+				}
+	        });
+		} else {
+			alert("Upload Complete")
+			onSaveSuccess(selectedMasters);
+		}
 	}
 
 	
