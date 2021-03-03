@@ -122,6 +122,9 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "order_no_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean orderNoEnabled;
 
+	@Column(name = "add_new_customer", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean addNewCustomer;
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "voucher_number_generation_type", nullable = false, columnDefinition = "character varying DEFAULT 'TYPE_1'")
@@ -306,6 +309,14 @@ public class Document implements Serializable, Cloneable {
 
 	public void setVoucherNumberGenerationType(VoucherNumberGenerationType voucherNumberGenerationType) {
 		this.voucherNumberGenerationType = voucherNumberGenerationType;
+	}
+
+	public boolean getAddNewCustomer() {
+		return addNewCustomer;
+	}
+
+	public void setAddNewCustomer(boolean addNewCustomer) {
+		this.addNewCustomer = addNewCustomer;
 	}
 
 	@Override

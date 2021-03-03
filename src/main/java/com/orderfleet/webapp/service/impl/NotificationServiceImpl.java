@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,8 @@ import com.orderfleet.webapp.web.rest.dto.NotificationDTO;
 @Service
 @Transactional
 public class NotificationServiceImpl implements NotificationService {
+
+	private final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
 	@Inject
 	private NotificationRepository notificationRepository;
@@ -98,7 +102,7 @@ public class NotificationServiceImpl implements NotificationService {
 		List<NotificationDTO> result = notifications.stream().map(NotificationDTO::new).collect(Collectors.toList());
 		return result;
 	}
-	
+
 	@Override
 	public void updateNotificationWithFirebaseResponse(Notification notification, String[] usersFcmKeys,
 			FirebaseResponse response) {
@@ -117,7 +121,9 @@ public class NotificationServiceImpl implements NotificationService {
 			if (opNotificationDetail.isPresent()) {
 				NotificationDetail notificationDetail = opNotificationDetail.get();
 				if (result.getError() != null && !result.getError().isEmpty()) {
+					log.info("Notification Fire Base Error:- " + result.getError());
 					switch (result.getError()) {
+
 					case "NotRegistered":
 						notificationDetail.setMessageStatus(MessageStatus.FAILED);
 						notificationDetail.setFailedReason(
@@ -125,8 +131,7 @@ public class NotificationServiceImpl implements NotificationService {
 						break;
 					case "InvalidRegistration":
 						notificationDetail.setMessageStatus(MessageStatus.FAILED);
-						notificationDetail.setFailedReason(
-								"Malformed registration token");
+						notificationDetail.setFailedReason("Malformed registration token");
 						break;
 					default:
 						notificationDetail.setMessageStatus(MessageStatus.FAILED);
@@ -135,7 +140,7 @@ public class NotificationServiceImpl implements NotificationService {
 						break;
 					}
 					notificationDetailRepository.save(notificationDetail);
-				}else{
+				} else {
 					notificationDetail.setMessageStatus(MessageStatus.SUCCESS);
 					notificationDetailRepository.save(notificationDetail);
 				}

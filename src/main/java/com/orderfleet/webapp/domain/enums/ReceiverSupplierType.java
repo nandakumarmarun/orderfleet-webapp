@@ -7,5 +7,5 @@ package com.orderfleet.webapp.domain.enums;
  * @since August 11, 2016
  */
 public enum ReceiverSupplierType {
-	Supplier, Receiver, Both
+	Supplier, Receiver, Both , None
 }

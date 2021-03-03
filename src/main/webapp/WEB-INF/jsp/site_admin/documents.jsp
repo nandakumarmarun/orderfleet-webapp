@@ -30,15 +30,15 @@
 						new Document</button>
 				</div>
 				<div class="col-sm-4">
-					
-						<select id="field_mainCompany" name="mainCompanyPid"
-							class="form-control selectpicker" data-live-search="true"><option value="-1">Select
-								Company</option>
-							<c:forEach items="${companies}" var="company">
-								<option value="${company.pid}">${company.legalName}</option>
-							</c:forEach>
-						</select>
-					
+
+					<select id="field_mainCompany" name="mainCompanyPid"
+						class="form-control selectpicker" data-live-search="true"><option
+							value="-1">Select Company</option>
+						<c:forEach items="${companies}" var="company">
+							<option value="${company.pid}">${company.legalName}</option>
+						</c:forEach>
+					</select>
+
 				</div>
 			</div>
 			<div class="clearfix"></div>
@@ -107,7 +107,7 @@
 									</button>
 									<p></p>
 								</div>
-								
+
 								<div class="form-group">
 									<select id="field_company" name="companyPid"
 										class="form-control"><option value="-1">Select
@@ -118,7 +118,7 @@
 									</select>
 								</div>
 								<div class="clearfix"></div>
-								
+
 								<div class="modal-body" style="overflow: auto;">
 									<div class="form-group">
 										<label class="control-label" for="field_name">Name</label> <input
@@ -156,22 +156,22 @@
 										</select>
 									</div>
 									<div class="form-group">
-										<label class="control-label" for="field_paymentMode">Payment Mode</label>
-										<select id="field_paymentMode" name="paymentMode"
-											class="form-control"
-											onchange="">
+										<label class="control-label" for="field_paymentMode">Payment
+											Mode</label> <select id="field_paymentMode" name="paymentMode"
+											class="form-control" onchange="">
 											<c:forEach items="${paymentModes}" var="paymentMode">
-												<option value="${paymentMode}" ${paymentMode == 'ALL' ? 'selected' : '' }>${paymentMode}</option>
+												<option value="${paymentMode}"
+													${paymentMode == 'ALL' ? 'selected' : '' }>${paymentMode}</option>
 											</c:forEach>
 										</select>
 									</div>
 									<div class="form-group">
-										<label class="control-label" for="field_stockFlow">Stock Flow</label>
-										<select id="field_stockFlow" name="stockFlow"
-											class="form-control"
-											onchange="">
+										<label class="control-label" for="field_stockFlow">Stock
+											Flow</label> <select id="field_stockFlow" name="stockFlow"
+											class="form-control" onchange="">
 											<c:forEach items="${stockFlows}" var="stockFlow">
-												<option value="${stockFlow}" ${stockFlow == 'NONE' ? 'selected' : '' }>${stockFlow}</option>
+												<option value="${stockFlow}"
+													${stockFlow == 'NONE' ? 'selected' : '' }>${stockFlow}</option>
 											</c:forEach>
 										</select>
 									</div>
@@ -221,13 +221,18 @@
 										</label>
 									</div>
 									<div class="form-group" id="qrCodeEnabled">
-										<label for="qrCodeEnabled"> <input
-											type="checkbox" id="field_qrCodeEnabled" /> &nbsp;<span>QR-code Enable</span>
+										<label for="qrCodeEnabled"> <input type="checkbox"
+											id="field_qrCodeEnabled" /> &nbsp;<span>QR-code
+												Enable</span>
 										</label>
 									</div>
-									
-									
-									
+									<div class="form-group" id="addNewCustomer">
+										<label for="addNewCustomer"> <input type="checkbox"
+											id="field_addNewCustomer" /> &nbsp;<span>Add New
+												Customer</span>
+										</label>
+									</div>
+
 								</div>
 							</div>
 							<div class="modal-footer">

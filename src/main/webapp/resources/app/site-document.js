@@ -30,10 +30,11 @@ if (!this.Document) {
 		companyPid : null,
 		companyName : null,
 		stockFlow : null,
-		qrCodeEnabled :false,
+		qrCodeEnabled : false,
 		orderNoEnabled : false,
-		voucherNumberGenerationType : 'TYPE_1'
-		
+		voucherNumberGenerationType : 'TYPE_1',
+		addNewCustomer : false
+
 	};
 
 	// Specify the validation rules
@@ -145,9 +146,8 @@ if (!this.Document) {
 					findByCompanyfilfter();
 				});
 			});
-			
-			
-			function loadDocumentTables(documents) {
+
+	function loadDocumentTables(documents) {
 
 		$('#documentTbody').html(
 				"<tr><td colspan='5' align='center'>Please wait...</td></tr>");
@@ -189,7 +189,6 @@ if (!this.Document) {
 
 						});
 	}
-			
 
 	function findByCompanyfilfter() {
 		var companyPid = $("#field_mainCompany").val();
@@ -203,7 +202,7 @@ if (!this.Document) {
 			type : "GET",
 			success : function(data) {
 				loadDocumentTables(data);
-				
+
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -273,6 +272,8 @@ if (!this.Document) {
 		documentModel.isTakeImageFromGallery = $(
 				'#field_isTakeImageFromGallery').prop('checked');
 		documentModel.qrCodeEnabled = $('#field_qrCodeEnabled').prop('checked');
+		documentModel.addNewCustomer = $('#field_addNewCustomer').prop(
+				'checked');
 
 		$.ajax({
 			method : $(el).attr('method'),
@@ -344,7 +345,11 @@ if (!this.Document) {
 						$("#field_company").val(data.companyPid);
 
 						$("#field_company").prop('disabled', true);
-						$("#field_qrCodeEnabled").prop("checked",data.qrCodeEnabled);
+						$("#field_qrCodeEnabled").prop("checked",
+								data.qrCodeEnabled);
+						$("#field_addNewCustomer").prop("checked",
+								data.addNewCustomer);
+
 						documentModel.pid = data.pid;
 					},
 					error : function(xhr, error) {

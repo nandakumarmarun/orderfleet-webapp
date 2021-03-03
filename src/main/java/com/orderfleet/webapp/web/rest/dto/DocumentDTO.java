@@ -82,6 +82,8 @@ public class DocumentDTO implements Cloneable {
 
 	private boolean orderNoEnabled;
 
+	private boolean addNewCustomer;
+
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 
 	public DocumentDTO() {
@@ -112,6 +114,7 @@ public class DocumentDTO implements Cloneable {
 		this.qrCodeEnabled = document.getQrCodeEnabled();
 		this.orderNoEnabled = document.getOrderNoEnabled();
 		this.voucherNumberGenerationType = document.getVoucherNumberGenerationType();
+		this.addNewCustomer = document.getAddNewCustomer();
 	}
 
 	public DocumentDTO(Document document, boolean activityDocRequired, int activityDocSortOrder) {
@@ -140,6 +143,7 @@ public class DocumentDTO implements Cloneable {
 		this.qrCodeEnabled = document.getQrCodeEnabled();
 		this.orderNoEnabled = document.getOrderNoEnabled();
 		this.voucherNumberGenerationType = document.getVoucherNumberGenerationType();
+		this.addNewCustomer = document.getAddNewCustomer();
 	}
 
 	public String getPid() {
@@ -372,6 +376,14 @@ public class DocumentDTO implements Cloneable {
 
 	public void setVoucherNumberGenerationType(VoucherNumberGenerationType voucherNumberGenerationType) {
 		this.voucherNumberGenerationType = voucherNumberGenerationType;
+	}
+
+	public boolean getAddNewCustomer() {
+		return addNewCustomer;
+	}
+
+	public void setAddNewCustomer(boolean addNewCustomer) {
+		this.addNewCustomer = addNewCustomer;
 	}
 
 	@Override

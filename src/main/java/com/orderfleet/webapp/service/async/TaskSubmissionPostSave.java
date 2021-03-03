@@ -330,11 +330,11 @@ public class TaskSubmissionPostSave {
 			Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository
 					.findByCompanyPidAndName(executiveTaskExecution.getCompany().getPid(), CompanyConfig.SEND_TO_ODOO);
 			// send inventory voucher to odoo
-			if (optSendToOdoo.isPresent()) {
-				if (Boolean.valueOf(optSendToOdoo.get().getValue())) {
-					sendTransactionOdooService.sendInvoicesToOdoo(tsTransactionWrapper);
-				}
-			}
+//			if (optSendToOdoo.isPresent()) {
+//				if (Boolean.valueOf(optSendToOdoo.get().getValue())) {
+//					sendTransactionOdooService.sendInvoicesToOdoo(tsTransactionWrapper);
+//				}
+//			}
 
 //			if (inventoryVouchers != null) {
 //				updateOpeningStockOfSourceStockLocation(inventoryVouchers);
