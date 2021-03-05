@@ -100,37 +100,6 @@ public class UploadOdooResource {
 		return "company/uploadOdoo";
 	}
 	
-	@RequestMapping(value = "/upload-odoo/uploadAll", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<Void> uploadAll() throws IOException, JSONException, ParseException {
-
-		// ResponseBodyOdooAuthentication responseBodyOdooAuthentication =
-		// authenticateServer();
-
-		log.debug("Web request to upload All Masters ...");
-		try {
-			uploadUsers();
-			uploadTaxList();
-			uploadProductProfiles();
-			uploadPriceLevel();
-			uploadAccountProfiles();
-			uploadOutstandingInvoices();
-			uploadStockLocations();
-		} catch (HttpClientErrorException exception) {
-			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-				log.info(exception.getMessage());
-				throw new ServiceException(exception.getResponseBodyAsString());
-			}
-			log.info(exception.getMessage());
-			throw new ServiceException(exception.getMessage());
-		} catch (Exception exception) {
-			log.info(exception.getMessage());
-			throw new ServiceException(exception.getMessage());
-		}
-
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-	
 	@RequestMapping(value = "/upload-odoo/uploadTaxList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Void> uploadTaxList() throws IOException, JSONException, ParseException {

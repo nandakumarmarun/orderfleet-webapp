@@ -10,67 +10,82 @@ if (!this.uploadSap) {
 
 	var uploadSapContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
-
-	$(document).ready(function() {
-
-		$('#uploadAccountProfiles').on('click', function() {
-			uploadAccountProfiles();
-		});
-		$('#uploadProductProfileProfiles').on('click', function() {
-			uploadProductProfiles();
-		});
-
-	});
-
-	function uploadAccountProfiles() {
-
-		$(".error-msg").html("Uploading Account Profiles....");
-		$
-				.ajax({
-					url : uploadSapContextPath + "/uploadAccountProfiles",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload Account Profile Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					success : function(data) {
-						alert("Upload Account Profile Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console
-								.log("Error uploading account profiles .................");
-						$(".error-msg")
-								.html(
-										"Error uploading account profiles .................");
-					}
-				});
-
+			
+	var ajaxes = [
+		{name: 'account_profiles', path: '/uploadAccountProfiles', alias: 'Account Profiles'},
+		{name: 'product_profiles', path: '/uploadProductProfiles', alias: 'Product Profiles'}
+	];
+	
+	function findUrl(name) {
+		for (let i=0; i<ajaxes.length; i++) {
+			if (ajaxes[i].name === name) {
+				return ajaxes[i];
+			}
+		}
+		return null;
 	}
 
-	function uploadProductProfiles() {
-
-		$(".error-msg").html("Uploading Product Profiles....");
-		$
-				.ajax({
-					url : uploadSapContextPath + "/uploadProductProfiles",
-					method : 'GET',
-					success : function(data) {
-						alert("Upload Product Profile Success")
-						onSaveSuccess(data);
-						$(".error-msg").html("");
-					},
-					error : function(xhr, error) {
-						console
-								.log("Error uploading product profiles .................");
-						$(".error-msg")
-								.html(
-										"Error uploading product profiles .................");
-					}
-				});
-
+	$(document).ready(function() {
+		$('#selectAll').on('click', function() {
+			selectAllStocks(this);
+		});
+		$('#uploadAll').on('click', function() {
+			uploadAll();
+		});
+	});
+	
+	$(".check-one").change(function(){
+    	if ($('.check-one:checked').length == $('.check-one').length) {
+    		$('#selectAll').prop('checked', true);
+	    } else {
+	    	$('#selectAll').prop('checked', false);
+	    }
+	});
+	
+	function selectAllStocks(checkbox) {
+		$('.check-one').prop('checked', checkbox.checked);
+	}
+	
+	
+	var selectedMasters = [];
+	function uploadAll() {
+		selectedMasters = [];
+		$.each($("input[name='uploadMasters']:checked"), function() {
+			let v = findUrl($(this).val());
+			if (v != null) {
+				selectedMasters.push(v);
+			}
+		});
+		
+		if (selectedMasters.length == 0) {
+			alert("Please select Masters to Upload");
+			return;
+		}
+		
+		doAjax(selectedMasters.reverse());
+	}
+	
+	function doAjax(selectedMasters) {
+		if (selectedMasters.length > 0) {
+			var m = selectedMasters.pop()
+			$(".error-msg").html("Uploading "+m.alias+"....");
+	        $.ajax({
+	            url      : uploadSapContextPath + m.path,
+	            method : 'GET',
+	            success  : function (serverResponse) {
+					$(".error-msg").html("Uploading "+m.alias+" success....");                
+	                doAjax(selectedMasters);
+	            },
+	            error : function(xhr, error) {
+					$(".error-msg").html(
+							"Error uploading "+m.alias);
+					selectedMasters = [];
+				}
+	        });
+		} else {
+			alert("Upload Complete")
+			onSaveSuccess(selectedMasters);
+		}
 	}
 
 	function onSaveSuccess(result) {

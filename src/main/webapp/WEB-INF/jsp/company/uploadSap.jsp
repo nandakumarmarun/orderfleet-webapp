@@ -18,37 +18,47 @@
 			<div class="row">
 				
 				<hr />
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Account Profile</label>
-								<button type="button" class="btn btn-success "
-									id="uploadAccountProfiles">Upload Account Profiles</button>
-							</div>	
-						</form>
-					</div>
-				</div>
-
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Product Profile</label>
-								<button type="button" class="btn btn-success "
-									id="uploadProductProfileProfiles">Upload Product Profiles</button>
+				
+				<div class="col-md-12 col-sm-12 clearfix">
+					<form role="form" class="form-horizontal form-groups-bordered">
+						<div class="form-group">
+							<div class="col-sm-3">
+								<br>
+								<button type="button" class="btn btn-success " id="uploadAll"
+									style="width: 175px; text-align: center;">Upload Masters</button>
 							</div>
-						</form>
-					</div>
-				</div>
-				<div class="col-md-12">
-					<div class="panel-body">
-						<form role="form" class="form-horizontal form-groups-bordered">
-							<div class="form-group">
-								<label class="error-msg" style="color: red;"></label>
+							<div class="col-md-9">
+								<div class="panel-body">
+										<div class="form-group">
+											<label class="error-msg" style="color: red;text-align:center;"></label>
+										</div>
+								</div>
 							</div>
-						</form>
-					</div>
+						</div>
+					</form>
+				</div>
+				
+				
+				</div>
+				<div class="table-responsive">
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th style="width:10%;"><input type="checkbox" id="selectAll" />&nbsp;&nbsp; Select All</th>
+								<th>Masters</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="account_profiles"></input></td>
+								<td>Account Profiles</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="product_profiles"></input></td>
+								<td>Product Profiles</td>
+							</tr>							
+						</tbody>
+					</table>
 				</div>
 			</div>
 			<hr />
