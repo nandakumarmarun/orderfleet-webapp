@@ -142,16 +142,31 @@ public class SendTransactionSapPraveshService {
 		log.debug("REST request to download sales orders <" + company.getLegalName() + "> : {}");
 
 		List<SalesOrderMasterSapPravesh> salesOrders = new ArrayList<>();
-		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
-		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_ORDER,
-				company.getId());
+//		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
+//		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_ORDER,
+//				company.getId());
+//		
+		List<PrimarySecondaryDocument> primarySecDocPrimarySales = new ArrayList<>();
+		List<PrimarySecondaryDocument> primarySecDocSecondarySales = new ArrayList<>();
+		primarySecDocPrimarySales = primarySecondaryDocumentRepository
+				.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_ORDER, companyId);
+		primarySecDocSecondarySales = primarySecondaryDocumentRepository
+				.findByVoucherTypeAndCompany(VoucherType.SECONDARY_SALES_ORDER, companyId);
 
-		if (primarySecDoc.isEmpty()) {
+		if (primarySecDocPrimarySales.isEmpty()) {
 			log.info("........No PrimarySecondaryDocument configuration Available...........");
 			// return salesOrderDTOs;
 		}
-		List<Long> documentIdList = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
+		List<Long> primarySalesDocumentIdList = primarySecDocPrimarySales.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
+
+		List<Long> secondarySalesDocumentIdList = primarySecDocSecondarySales.stream()
+				.map(psd -> psd.getDocument().getId()).collect(Collectors.toList());
+
+		List<Long> documentIdList = new ArrayList<>();
+
+		documentIdList.addAll(primarySalesDocumentIdList);
+		documentIdList.addAll(secondarySalesDocumentIdList);
 
 		List<String> inventoryHeaderPid = new ArrayList<String>();
 		String companyPid = company.getPid();
@@ -242,11 +257,30 @@ public class SendTransactionSapPraveshService {
 
 					SalesOrderMasterSapPravesh salesOrder = new SalesOrderMasterSapPravesh();
 
-					salesOrder.setCustomerCode(String.valueOf(opRecAccPro.get().getId())); // Primary key id of account
-																							// profile
-					salesOrder.setCustomerName(opRecAccPro.get().getName());
+					Optional<Long> opPrimarySales = primarySalesDocumentIdList.stream()
+							.filter(id -> id == Long.parseLong(obj[13].toString())).findAny();
 
-					salesOrder.setCustomerAddr(opRecAccPro.get().getAddress());
+					Optional<Long> opSecondarySales = secondarySalesDocumentIdList.stream()
+							.filter(id -> id == Long.parseLong(obj[13].toString())).findAny();
+
+					if (opPrimarySales.isPresent()) {
+						salesOrder.setCustomerCode(opRecAccPro.get().getCustomerId()); // Primary key id of
+																						// account
+						// profile
+						salesOrder.setCustomerName(opRecAccPro.get().getName());
+
+						salesOrder.setCustomerAddr(opRecAccPro.get().getAddress());
+					}
+
+					if (opSecondarySales.isPresent()) {
+						salesOrder.setCustomerCode(String.valueOf(opRecAccPro.get().getId())); // Primary key id of
+																								// account
+						// profile
+						salesOrder.setCustomerName(opRecAccPro.get().getName());
+
+						salesOrder.setCustomerAddr(opRecAccPro.get().getAddress());
+
+					}
 
 					salesOrder
 							.setDealerCode(opSupAccPro.get().getCustomerId() != null ? opSupAccPro.get().getCustomerId()
@@ -522,7 +556,7 @@ public class SendTransactionSapPraveshService {
 		log.debug("REST request to download receipts <" + company.getLegalName() + "> : {}");
 
 		List<ReceiptSapPravesh> receiptDTOs = new ArrayList<>();
-		
+
 		String companyPid = company.getPid();
 
 		Optional<CompanyConfiguration> optReceiptsManagement = companyConfigurationRepository
@@ -537,9 +571,9 @@ public class SendTransactionSapPraveshService {
 			accountingVoucherHeaders = accountingVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusByCreatedDateDesc();
 		}
-		
+
 		log.info("Accounting Voucher Header size {} ", accountingVoucherHeaders.size());
-		
+
 		List<String> accountingPids = new ArrayList<>();
 
 		if (accountingVoucherHeaders.size() > 0) {
@@ -596,7 +630,6 @@ public class SendTransactionSapPraveshService {
 				Optional<AccountProfile> opAccPro = accountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[4].toString())).findAny();
 
-				
 				List<AccountingVoucherDetail> avDetails = accountingVoucherDetails.stream()
 						.filter(ivd -> ivd.getAccountingVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
 						.collect(Collectors.toList()).stream()

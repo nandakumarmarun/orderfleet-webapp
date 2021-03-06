@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -216,15 +217,43 @@ public class SalesTargetGroupAchievedReportResource {
 //					.findAllByCompanyIdOrderByCreatedDateDesc();
 
 		List<Object[]> allInventoryVoucherHeaderObject = inventoryVoucherHeaderRepository
-				.findAllByCompanyIdAndOrderByCreatedDateDesc();
+				.findAllByCompanyIdAndOrderByCreatedDateDescOptimised();
 
 		List<InventoryVoucherHeaderDTO> allInventoryVoucherHeader = new ArrayList<>();
+
+		String str = "2016-03-04 11:30";
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+		DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+
+		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SS");
+
+		DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
 		for (Object[] obj : allInventoryVoucherHeaderObject) {
 
 			InventoryVoucherHeaderDTO ivh = new InventoryVoucherHeaderDTO();
 
-			LocalDateTime documentDate = LocalDateTime.parse(obj[3].toString());
+			LocalDateTime documentDate = LocalDateTime.now();
+
+			if (obj[3] != null) {
+
+				String[] dateArray = obj[3].toString().split("\\.");
+
+				String date = obj[3].toString();
+
+				if (dateArray[1] == null && dateArray[1].length() == 0) {
+					documentDate = LocalDateTime.parse(date, formatter);
+				} else if (dateArray[1].length() == 1) {
+					documentDate = LocalDateTime.parse(date, formatter1);
+				} else if (dateArray[1].length() == 2) {
+					documentDate = LocalDateTime.parse(date, formatter2);
+				} else {
+					documentDate = LocalDateTime.parse(date, formatter3);
+				}
+			}
+
 			ivh.setDocumentDate(documentDate);
 			ivh.setInventoryVoucherHeaderId(Long.parseLong(obj[0].toString()));
 			ivh.setReceiverAccountProfileId(Long.parseLong(obj[1].toString()));
@@ -318,6 +347,7 @@ public class SalesTargetGroupAchievedReportResource {
 				salesTargetGroupUserTargetMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(
 						Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)));
 		// salesPerformaceDTO.setSalesProductGroupUserTargets(salesProductGroupUserTargetMap);
+		log.info("Returning SalesPerformanceDTO " + salesPerformaceDTO);
 		return salesPerformaceDTO;
 
 	}
