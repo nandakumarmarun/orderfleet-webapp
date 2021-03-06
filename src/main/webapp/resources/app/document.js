@@ -20,6 +20,7 @@ if (!this.Document) {
 		documentType : null,
 		activityAccount : null,
 		description : null,
+		termsAndConditions : null,
 		save : true,
 		editable : true,
 		batchEnabled : false,
@@ -29,8 +30,8 @@ if (!this.Document) {
 		qrCodeEnabled : false,
 		orderNoEnabled : false,
 		voucherNumberGenerationType : 'TYPE_1',
-		addNewCustomer : false
-
+		addNewCustomer : false,
+		termsAndConditionsColumn : false
 	};
 
 	// Specify the validation rules
@@ -177,6 +178,7 @@ if (!this.Document) {
 		documentModel.documentPrefix = $('#field_documentPrefix').val();
 		documentModel.alias = $('#field_alias').val();
 		documentModel.description = $('#field_description').val();
+		documentModel.termsAndConditions = $('#field_terms_and_conditions').val();
 		documentModel.documentType = $('#field_documentType').val();
 		documentModel.activityAccount = $('#field_activityAccount').val();
 		documentModel.save = $('#field_save').prop('checked');
@@ -200,6 +202,8 @@ if (!this.Document) {
 				"#field_voucherNumberGenerationType").val();
 		documentModel.addNewCustomer = $('#field_addNewCustomer').prop(
 				'checked');
+		documentModel.termsAndConditionsColumn = $('#field_termsAndConditionColumn').prop(
+				'checked');
 		console.log(documentModel);
 		$.ajax({
 			method : $(el).attr('method'),
@@ -208,7 +212,7 @@ if (!this.Document) {
 			data : JSON.stringify(documentModel),
 			success : function(data) {
 				console.log(data);
-				// onSaveSuccess(data);
+				onSaveSuccess(data);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);
@@ -226,6 +230,8 @@ if (!this.Document) {
 				$('#lbl_alias').text((data.alias == null ? "" : data.alias));
 				$('#lbl_description').text(
 						(data.description == null ? "" : data.description));
+				$('#lbl_terms_and_conditions').text(
+						(data.termsAndConditions == null ? "" : data.termsAndConditions));
 				$('#lbl_documentType').text(data.documentType);
 				$('#lbl_activityAccount').text(data.activityAccount);
 			},
@@ -249,6 +255,9 @@ if (!this.Document) {
 						$('#field_description').val(
 								(data.description == null ? ""
 										: data.description));
+						$('#field_terms_and_conditions').val(
+								(data.termsAndConditions == null ? ""
+										: data.termsAndConditions));
 						$('#field_documentType').val(data.documentType);
 						Document.onChangeDocumentType();
 						if (data.activityAccount != null)
@@ -274,6 +283,8 @@ if (!this.Document) {
 								data.voucherNumberGenerationType);
 						$("#field_addNewCustomer").prop("checked",
 								data.addNewCustomer);
+						$("#field_termsAndConditionColumn").prop("checked",
+								data.termsAndConditionsColumn);
 
 						console.log("===========")
 						console.log(data.addNewCustomer);

@@ -35,6 +35,8 @@ public class DocumentDTO implements Cloneable {
 	private String alias;
 
 	private String description;
+	
+	private String termsAndConditions;
 
 	private DocumentType documentType;
 
@@ -83,6 +85,8 @@ public class DocumentDTO implements Cloneable {
 	private boolean orderNoEnabled;
 
 	private boolean addNewCustomer;
+	
+	private boolean termsAndConditionsColumn;
 
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 
@@ -97,6 +101,7 @@ public class DocumentDTO implements Cloneable {
 		this.documentPrefix = document.getDocumentPrefix();
 		this.alias = document.getAlias();
 		this.description = document.getDescription();
+		this.termsAndConditions = document.getTermsAndConditions();
 		this.documentType = document.getDocumentType();
 		this.activityAccount = document.getActivityAccount();
 		this.save = document.getSave();
@@ -115,6 +120,7 @@ public class DocumentDTO implements Cloneable {
 		this.orderNoEnabled = document.getOrderNoEnabled();
 		this.voucherNumberGenerationType = document.getVoucherNumberGenerationType();
 		this.addNewCustomer = document.getAddNewCustomer();
+		this.termsAndConditionsColumn = document.isTermsAndConditionsColumn();
 	}
 
 	public DocumentDTO(Document document, boolean activityDocRequired, int activityDocSortOrder) {
@@ -124,6 +130,7 @@ public class DocumentDTO implements Cloneable {
 		this.documentPrefix = document.getDocumentPrefix();
 		this.alias = document.getAlias();
 		this.description = document.getDescription();
+		this.termsAndConditions = document.getTermsAndConditions();
 		this.documentType = document.getDocumentType();
 		this.activityAccount = document.getActivityAccount();
 		this.save = document.getSave();
@@ -144,6 +151,23 @@ public class DocumentDTO implements Cloneable {
 		this.orderNoEnabled = document.getOrderNoEnabled();
 		this.voucherNumberGenerationType = document.getVoucherNumberGenerationType();
 		this.addNewCustomer = document.getAddNewCustomer();
+		this.termsAndConditionsColumn = document.isTermsAndConditionsColumn();
+	}
+
+	public String getTermsAndConditions() {
+		return termsAndConditions;
+	}
+
+	public void setTermsAndConditions(String termsAndConditions) {
+		this.termsAndConditions = termsAndConditions;
+	}
+
+	public boolean isTermsAndConditionsColumn() {
+		return termsAndConditionsColumn;
+	}
+
+	public void setTermsAndConditionsColumn(boolean termsAndConditionsColumn) {
+		this.termsAndConditionsColumn = termsAndConditionsColumn;
 	}
 
 	public String getPid() {
@@ -411,17 +435,18 @@ public class DocumentDTO implements Cloneable {
 	@Override
 	public String toString() {
 		return "DocumentDTO [pid=" + pid + ", name=" + name + ", documentPrefix=" + documentPrefix + ", alias=" + alias
-				+ ", description=" + description + ", documentType=" + documentType + ", activityAccount="
-				+ activityAccount + ", save=" + save + ", sourceStockLocationPid=" + sourceStockLocationPid
-				+ ", sourceStockLocationName=" + sourceStockLocationName + ", destinationStockLocationPid="
-				+ destinationStockLocationPid + ", destinationStockLocationName=" + destinationStockLocationName
-				+ ", editable=" + editable + ", batchEnabled=" + batchEnabled + ", promptStockLocation="
-				+ promptStockLocation + ", activityDocRequired=" + activityDocRequired + ", activityDocSortOrder="
-				+ activityDocSortOrder + ", singleVoucherMode=" + singleVoucherMode + ", photoMandatory="
-				+ photoMandatory + ", isTakeImageFromGallery=" + isTakeImageFromGallery + ", lastModifiedDate="
-				+ lastModifiedDate + ", companyName=" + companyName + ", companyPid=" + companyPid + ", imageOption="
-				+ imageOption + ", mode=" + mode + ", stockFlow=" + stockFlow + ", qrCodeEnabled=" + qrCodeEnabled
-				+ "]";
+				+ ", description=" + description + ", termsAndConditions=" + termsAndConditions + ", documentType="
+				+ documentType + ", activityAccount=" + activityAccount + ", save=" + save + ", sourceStockLocationPid="
+				+ sourceStockLocationPid + ", sourceStockLocationName=" + sourceStockLocationName
+				+ ", destinationStockLocationPid=" + destinationStockLocationPid + ", destinationStockLocationName="
+				+ destinationStockLocationName + ", editable=" + editable + ", batchEnabled=" + batchEnabled
+				+ ", promptStockLocation=" + promptStockLocation + ", activityDocRequired=" + activityDocRequired
+				+ ", activityDocSortOrder=" + activityDocSortOrder + ", singleVoucherMode=" + singleVoucherMode
+				+ ", photoMandatory=" + photoMandatory + ", isTakeImageFromGallery=" + isTakeImageFromGallery
+				+ ", lastModifiedDate=" + lastModifiedDate + ", companyName=" + companyName + ", companyPid="
+				+ companyPid + ", imageOption=" + imageOption + ", mode=" + mode + ", stockFlow=" + stockFlow
+				+ ", qrCodeEnabled=" + qrCodeEnabled + ", orderNoEnabled=" + orderNoEnabled + ", addNewCustomer="
+				+ addNewCustomer + ", termsAndConditionsColumn=" + termsAndConditionsColumn
+				+ ", voucherNumberGenerationType=" + voucherNumberGenerationType + "]";
 	}
-
 }

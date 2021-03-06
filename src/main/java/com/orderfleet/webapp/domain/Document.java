@@ -66,6 +66,9 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "description")
 	private String description;
 
+	@Column(name = "terms_and_conditions")
+	private String termsAndConditions;
+	
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "document_type", nullable = false)
@@ -124,6 +127,9 @@ public class Document implements Serializable, Cloneable {
 
 	@Column(name = "add_new_customer", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean addNewCustomer;
+
+	@Column(name = "terms_and_conditions_column", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean termsAndConditionsColumn;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -317,6 +323,22 @@ public class Document implements Serializable, Cloneable {
 
 	public void setAddNewCustomer(boolean addNewCustomer) {
 		this.addNewCustomer = addNewCustomer;
+	}
+
+	public String getTermsAndConditions() {
+		return termsAndConditions;
+	}
+
+	public void setTermsAndConditions(String termsAndConditions) {
+		this.termsAndConditions = termsAndConditions;
+	}
+
+	public boolean isTermsAndConditionsColumn() {
+		return termsAndConditionsColumn;
+	}
+
+	public void setTermsAndConditionsColumn(boolean termsAndConditionsColumn) {
+		this.termsAndConditionsColumn = termsAndConditionsColumn;
 	}
 
 	@Override

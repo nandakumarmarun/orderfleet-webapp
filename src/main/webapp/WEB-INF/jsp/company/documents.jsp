@@ -180,6 +180,12 @@
 											placeholder="Description"></textarea>
 									</div>
 									<div class="form-group">
+										<label class="control-label" for="field_terms_and_conditions">Terms & Conditions</label>
+										<textarea class="form-control" name="terms_and_conditions"
+											maxlength="250" id="field_terms_and_conditions"
+											placeholder="Terms & Conditions"></textarea>
+									</div>
+									<div class="form-group">
 										<label for="save"> <input type="checkbox"
 											id="field_save" /> &nbsp;<span>Save</span>
 										</label>
@@ -234,6 +240,11 @@
 										<label for="addNewCustomer"> <input type="checkbox"
 											id="field_addNewCustomer" /> &nbsp;<span>Add New
 												Customer</span>
+										</label>
+									</div>									
+									<div class="form-group" id="termsAndConditionColumn">
+										<label for="termsAndConditionColumn"> <input type="checkbox"
+											id="field_termsAndConditionColumn" /> &nbsp;<span>Terms & Condition Column</span>
 										</label>
 									</div>
 
@@ -318,6 +329,13 @@
 										</dt>
 										<dd>
 											<span id="lbl_description"></span>
+										</dd>
+										<hr />
+										<dt>
+											<span>Terms & Conditions</span>
+										</dt>
+										<dd>
+											<span id="lbl_terms_and_conditions"></span>
 										</dd>
 										<hr />
 									</dl>

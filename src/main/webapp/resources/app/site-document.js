@@ -21,6 +21,7 @@ if (!this.Document) {
 		activityAccount : null,
 		mode : null,
 		description : null,
+		termsAndConditions : null,
 		save : true,
 		editable : true,
 		batchEnabled : false,
@@ -33,7 +34,8 @@ if (!this.Document) {
 		qrCodeEnabled : false,
 		orderNoEnabled : false,
 		voucherNumberGenerationType : 'TYPE_1',
-		addNewCustomer : false
+		addNewCustomer : false,
+		termsAndConditionsColumn : false
 
 	};
 
@@ -253,6 +255,7 @@ if (!this.Document) {
 		documentModel.documentPrefix = $('#field_documentPrefix').val();
 		documentModel.alias = $('#field_alias').val();
 		documentModel.description = $('#field_description').val();
+		documentModel.termsAndConditions = $('#field_terms_and_conditions').val();
 		documentModel.documentType = $('#field_documentType').val();
 		documentModel.mode = $('#field_paymentMode').val();
 		documentModel.stockFlow = $('#field_stockFlow').val();
@@ -273,6 +276,8 @@ if (!this.Document) {
 				'#field_isTakeImageFromGallery').prop('checked');
 		documentModel.qrCodeEnabled = $('#field_qrCodeEnabled').prop('checked');
 		documentModel.addNewCustomer = $('#field_addNewCustomer').prop(
+				'checked');
+		documentModel.termsAndConditionsColumn = $('#field_termsAndConditionColumn').prop(
 				'checked');
 
 		$.ajax({
@@ -299,6 +304,8 @@ if (!this.Document) {
 				$('#lbl_alias').text((data.alias == null ? "" : data.alias));
 				$('#lbl_description').text(
 						(data.description == null ? "" : data.description));
+				$('#lbl_terms_and_conditions').text(
+						(data.termsAndConditions == null ? "" : data.termsAndConditions));
 				$('#lbl_documentType').text(data.documentType);
 				$('#lbl_paymentMode').text(data.mode);
 				$('#lbl_activityAccount').text(data.activityAccount);
@@ -323,6 +330,9 @@ if (!this.Document) {
 						$('#field_description').val(
 								(data.description == null ? ""
 										: data.description));
+						$('#field_terms_and_conditions').val(
+								(data.termsAndConditions == null ? ""
+										: data.termsAndConditions));
 						$('#field_documentType').val(data.documentType);
 						$('#field_paymentMode').val(data.mode);
 						$('#field_stockFlow').val(data.stockFlow);
@@ -349,6 +359,8 @@ if (!this.Document) {
 								data.qrCodeEnabled);
 						$("#field_addNewCustomer").prop("checked",
 								data.addNewCustomer);
+						$("#field_termsAndConditionColumn").prop("checked",
+								data.termsAndConditionsColumn);
 
 						documentModel.pid = data.pid;
 					},

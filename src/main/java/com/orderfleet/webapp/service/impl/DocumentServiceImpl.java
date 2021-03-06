@@ -117,6 +117,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setDocumentPrefix(documentDTO.getDocumentPrefix());
 			document.setAlias(documentDTO.getAlias());
 			document.setDescription(documentDTO.getDescription());
+			document.setTermsAndConditions(documentDTO.getTermsAndConditions());
 			document.setDocumentType(documentDTO.getDocumentType());
 			document.setActivityAccount(documentDTO.getActivityAccount());
 			document.setSave(documentDTO.getSave());
@@ -132,6 +133,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setOrderNoEnabled(documentDTO.getOrderNoEnabled());
 			document.setVoucherNumberGenerationType(documentDTO.getVoucherNumberGenerationType());
 			document.setAddNewCustomer(documentDTO.getAddNewCustomer());
+			document.setTermsAndConditionsColumn(documentDTO.isTermsAndConditionsColumn());
 			document = documentRepository.save(document);
 			DocumentDTO result = documentMapper.documentToDocumentDTO(document);
 			return result;
