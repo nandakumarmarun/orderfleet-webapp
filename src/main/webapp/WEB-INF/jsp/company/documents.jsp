@@ -182,7 +182,7 @@
 									<div class="form-group">
 										<label class="control-label" for="field_terms_and_conditions">Terms & Conditions</label>
 										<textarea class="form-control" name="terms_and_conditions"
-											maxlength="250" id="field_terms_and_conditions"
+											 id="field_terms_and_conditions"
 											placeholder="Terms & Conditions"></textarea>
 									</div>
 									<div class="form-group">
