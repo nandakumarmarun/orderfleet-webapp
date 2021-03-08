@@ -26,4 +26,10 @@ public class SalesPerformaceAchivementDTO {
 		this.salesProductGroupUserTargets = salesProductGroupUserTargets;
 	}
 
+	@Override
+	public String toString() {
+		return "SalesPerformaceAchivementDTO [monthList=" + monthList + ", salesProductGroupUserTargets="
+				+ salesProductGroupUserTargets + "]";
+	}
+
 }

@@ -66,9 +66,9 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "terms_and_conditions")
+	@Column(name = "terms_and_conditions", length = 15000)
 	private String termsAndConditions;
-	
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "document_type", nullable = false)
