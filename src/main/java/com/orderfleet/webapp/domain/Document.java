@@ -125,7 +125,7 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "order_no_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean orderNoEnabled;
 
-	@Column(name = "add_new_customer", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	@Column(name = "add_new_customer", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
 	private boolean addNewCustomer;
 
 	@Column(name = "terms_and_conditions_column", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
