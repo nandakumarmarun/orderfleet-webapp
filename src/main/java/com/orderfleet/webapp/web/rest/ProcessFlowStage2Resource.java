@@ -412,7 +412,14 @@ public class ProcessFlowStage2Resource {
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
 		}
-
+		
+		if (documentPids != null && documentPids.size() >0) {
+			if (documentPids.get(0).equals("all")) { // check docType all
+				List<VoucherType> docTypes = primarySecondaryDocumentService.findAllVoucherTypesByCompanyId();
+				documentPids = primarySecondaryDocumentService.findAllDocumentsByCompanyIdAndVoucherTypeIn(docTypes)
+						.stream().map(vo -> vo.getPid()).collect(Collectors.toList());
+			}
+		}
 		List<ProcessFlowStatus> processStatus = null;
 
 		switch (processFlowStatus) {

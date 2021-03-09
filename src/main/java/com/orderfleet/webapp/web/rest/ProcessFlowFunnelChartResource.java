@@ -124,7 +124,7 @@ public class ProcessFlowFunnelChartResource {
 		}
 
 		List<String> documentPids = primarySecondaryDocumentService
-				.findAllDocumentsByCompanyIdAndVoucherType(VoucherType.PRIMARY_SALES_ORDER).parallelStream()
+				.findAllDocumentsByCompanyIdAndVoucherTypeIn(Arrays.asList(VoucherType.PRIMARY_SALES_ORDER, VoucherType.SECONDARY_SALES_ORDER)).parallelStream()
 				.map(obj -> obj.getPid().toString()).collect(Collectors.toList());
 
 		List<ProcessFlowStatus> processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,

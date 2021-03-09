@@ -24,6 +24,8 @@ public interface PrimarySecondaryDocumentService {
 	List<DocumentDTO> findAllDocumentsByCompanyId();
 	
 	List<DocumentDTO> findAllDocumentsByCompanyIdAndVoucherType(VoucherType voucherType);
+	
+	List<DocumentDTO> findAllDocumentsByCompanyIdAndVoucherTypeIn(List<VoucherType> voucherTypes);
 
 	Page<PrimarySecondaryDocument> findAllByCompanyIdAndActivedTrue(Pageable pageable);
 	

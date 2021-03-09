@@ -43,8 +43,10 @@ if (!this.InventoryVoucher) {
 		$('#downloadXls').on('click', function() {
 			downloadXls();
 		});
-		if ($("#dbDocumentType").val != "no") {
-			loadAllDocumentByDocumentType();
+		if ($("#dbDocumentType").val != "-1") {
+			// loadAllDocumentByDocumentType();
+			
+			InventoryVoucher.filter();
 		}
 		$("#dbDocumentType").change(function() {
 			loadAllDocumentByDocumentType();
@@ -79,9 +81,9 @@ if (!this.InventoryVoucher) {
 	}
 
 	function loadAllDocumentByDocumentType() {
-		if ($('#dbDocumentType').val() == "no") {
+		if ($('#dbDocumentType').val() == "-1") {
 			$("#dbDocument").html("<option>All</option>");
-			alert("Please Select Document Type");
+			InventoryVoucher.filter();
 			return;
 		}
 		var documentType = $('#dbDocumentType').val();
@@ -377,10 +379,6 @@ InventoryVoucher.reject = function(ivhPid) {
 				return;
 			}
 		}
-		if ($("#dbDocumentType").val() == "no") {
-			alert("Please Select Document Type")
-			return;
-		}
 
 		let docPids = $('#dbDocument').val();
 		let empPids = $('#dbEmployee').val();
@@ -388,6 +386,10 @@ InventoryVoucher.reject = function(ivhPid) {
 			docPids = $('#dbDocument option').map(function() {
 				return $(this).val();
 			}).get().join(',');
+		}
+		// all doc types 
+		if ($("#dbDocumentType").val() == "-1") {
+			docPids = "all";
 		}
 		if ("no" == empPids) {
 			empPids = $('#dbEmployee option').map(function() {

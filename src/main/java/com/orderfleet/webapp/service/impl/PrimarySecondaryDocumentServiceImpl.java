@@ -87,6 +87,15 @@ public class PrimarySecondaryDocumentServiceImpl implements PrimarySecondaryDocu
 		List<DocumentDTO> result = documentMapper.documentsToDocumentDTOs(documents);
 		return result;
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<DocumentDTO> findAllDocumentsByCompanyIdAndVoucherTypeIn(List<VoucherType> voucherTypes) {
+		log.debug("Request to get all PrimarySalesDocuments");
+		List<Document> documents = primarySecondaryDocumentRepository.findDocumentsByVoucherTypeInAndCompanyId(voucherTypes);
+		List<DocumentDTO> result = documentMapper.documentsToDocumentDTOs(documents);
+		return result;
+	}
 
 	@Override
 	@Transactional(readOnly = true)

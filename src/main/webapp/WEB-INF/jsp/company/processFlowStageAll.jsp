@@ -67,9 +67,12 @@
 									<c:if test="${empty voucherTypes}">
 										<option value="no">Select DocumentType</option>
 									</c:if>
+									<c:if test="${not empty voucherTypes}">
+									<option value="-1">All DocumentType</option>
 									<c:forEach items="${voucherTypes}" var="voucherType">
 										<option value="${voucherType}">${voucherType}</option>
 									</c:forEach>
+									</c:if>
 
 								</select>
 							</div>
