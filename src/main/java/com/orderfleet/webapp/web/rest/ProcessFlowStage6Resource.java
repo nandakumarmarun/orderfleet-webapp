@@ -412,8 +412,8 @@ public class ProcessFlowStage6Resource {
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
 		}
-		
-		if (documentPids != null && documentPids.size() >0) {
+
+		if (documentPids != null && documentPids.size() > 0) {
 			if (documentPids.get(0).equals("all")) { // check docType all
 				List<VoucherType> docTypes = primarySecondaryDocumentService.findAllVoucherTypesByCompanyId();
 				documentPids = primarySecondaryDocumentService.findAllDocumentsByCompanyIdAndVoucherTypeIn(docTypes)
@@ -450,6 +450,10 @@ public class ProcessFlowStage6Resource {
 			break;
 		case "READYATPS_NOTDELIVERED":
 			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.NOT_DELIVERED);
+			break;
+		case "INSTOCK_READYATPS_NOTDELIVERED":
+			processStatus = Arrays.asList(ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.READY_TO_DISPATCH_AT_PS,
+					ProcessFlowStatus.NOT_DELIVERED);
 			break;
 		case "DELIVERED_INSTALLATIONPLANED":
 			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED, ProcessFlowStatus.INSTALLATION_PLANNED);
