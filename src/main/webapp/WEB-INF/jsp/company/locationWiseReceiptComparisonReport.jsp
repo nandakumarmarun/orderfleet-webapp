@@ -4,7 +4,8 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Location Wise Product Group Comparison Report</title>
+<title>SalesNrich | Location Wise Product Group Comparison
+	Report</title>
 
 <!-- jQuery UI-->
 <spring:url value="/resources/assets/css/jquery-ui.css"
@@ -43,6 +44,7 @@
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
 							<div class="col-sm-2 ">
+								<label>First Quarter From</label>
 								<div class="input-group">
 									<input type="text" class="form-control" id="txtFirstFromMonth"
 										placeholder="From Month" style="background-color: #fff;"
@@ -53,6 +55,7 @@
 								</div>
 							</div>
 							<div class="col-sm-2">
+								<label>First Quarter From To</label>
 								<div class="input-group">
 									<input type="text" class="form-control" id="txtFirstToMonth"
 										placeholder="To Month" style="background-color: #fff;"
@@ -64,6 +67,7 @@
 								</div>
 							</div>
 							<div class="col-sm-2 ">
+								<label>Second Quarter From</label>
 								<div class="input-group">
 									<input type="text" class="form-control" id="txtSecondFromMonth"
 										placeholder="From Month" style="background-color: #fff;"
@@ -74,6 +78,7 @@
 								</div>
 							</div>
 							<div class="col-sm-2">
+								<label>Second Quarter To</label>
 								<div class="input-group">
 									<input type="text" class="form-control" id="txtSecondToMonth"
 										placeholder="To Month" style="background-color: #fff;"
@@ -84,6 +89,7 @@
 									</div>
 								</div>
 							</div>
+							<br>
 							<div class="col-sm-1">
 								<button id="applyBtn" type="button" class="btn btn-info">Apply</button>
 							</div>
@@ -159,9 +165,11 @@
 		var="reportcommonjsfileJS"></spring:url>
 	<script type="text/javascript" src="${reportcommonjsfileJS}"></script>
 
-	<spring:url value="/resources/app/location-wise-receipt-comparison-report.js"
+	<spring:url
+		value="/resources/app/location-wise-receipt-comparison-report.js"
 		var="locationWiseReceiptComparisonReportJs"></spring:url>
-	<script type="text/javascript" src="${locationWiseReceiptComparisonReportJs}"></script>
+	<script type="text/javascript"
+		src="${locationWiseReceiptComparisonReportJs}"></script>
 
 
 </body>

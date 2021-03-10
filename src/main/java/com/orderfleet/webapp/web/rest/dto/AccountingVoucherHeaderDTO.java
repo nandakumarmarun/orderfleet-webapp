@@ -24,11 +24,17 @@ import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
  */
 public class AccountingVoucherHeaderDTO {
 
+	private long id;
+
 	private String pid;
 
 	private String documentPid;
 
 	private String documentName;
+
+	private long documentId;
+
+	private long accountProfileId;
 
 	private String accountProfilePid;
 
@@ -140,7 +146,7 @@ public class AccountingVoucherHeaderDTO {
 		if (accountingVoucherHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = accountingVoucherHeader.getTallyDownloadStatus();
 		}
-		
+
 		if (accountingVoucherHeader.getSalesManagementStatus() != null) {
 			this.salesManagementStatus = accountingVoucherHeader.getSalesManagementStatus();
 		}
@@ -169,6 +175,30 @@ public class AccountingVoucherHeaderDTO {
 		this.remarks = accountingVoucherHeader.getRemarks();
 		this.documentNumberLocal = accountingVoucherHeader.getDocumentNumberLocal();
 		this.documentNumberServer = accountingVoucherHeader.getDocumentNumberServer();
+	}
+
+	public long getDocumentId() {
+		return documentId;
+	}
+
+	public void setDocumentId(long documentId) {
+		this.documentId = documentId;
+	}
+
+	public long getAccountProfileId() {
+		return accountProfileId;
+	}
+
+	public void setAccountProfileId(long accountProfileId) {
+		this.accountProfileId = accountProfileId;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public String getPid() {

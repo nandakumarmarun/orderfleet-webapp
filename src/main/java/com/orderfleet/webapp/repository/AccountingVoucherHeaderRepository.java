@@ -215,7 +215,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("UPDATE AccountingVoucherHeader accVoucher SET accVoucher.tallyDownloadStatus = ?1 WHERE accVoucher.company.id = ?2 AND accVoucher.pid in ?3")
 	int updateAccountingVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus tallyDownloadStatus,
 			long companyId, List<String> accountingPids);
-	
+
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE AccountingVoucherHeader accVoucher SET accVoucher.tallyDownloadStatus = ?1 WHERE accVoucher.company.id = ?2 AND accVoucher.documentNumberServer in ?3")
@@ -263,7 +263,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 			+ "tally_download_status FROM tbl_accounting_voucher_header where tally_download_status ='PENDING' and company_id = ?#{principal.companyId} "
 			+ "order by created_date desc", nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusByCreatedDateDesc();
-	
+
 	@Query(value = "SELECT id,pid,executive_task_execution_id,document_id,account_profile_id,created_date,document_date,total_amount,"
 			+ "outstanding_amount,remarks,created_by_id,employee_id,document_number_local,document_number_server,status,updated_date,"
 			+ "tally_download_status FROM tbl_accounting_voucher_header where tally_download_status ='PENDING' and sales_management_status = 'APPROVE' and company_id = ?#{principal.companyId} "
@@ -278,6 +278,15 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 
 	@Query("select accVoucher from AccountingVoucherHeader accVoucher LEFT JOIN FETCH accVoucher.accountingVoucherDetails where accVoucher.company.id = ?#{principal.companyId} and accVoucher.documentNumberServer in ?1")
 	List<AccountingVoucherHeader> findAllHeaderdByDocumentNumberServer(List<String> accountingHeaderPids);
+
+	@Query("select accountingVoucherHeader.id,accountingVoucherHeader.accountProfile.id,accountingVoucherHeader.document.id,accountingVoucherHeader.documentDate,accountingVoucherHeader.totalAmount from AccountingVoucherHeader accountingVoucherHeader where accountingVoucherHeader.company.id = ?#{principal.companyId} Order By accountingVoucherHeader.createdDate desc")
+	List<Object[]> findAllByCompanyIdAndOrderByCreatedDateDesc();
+
+	// @Query("select
+	// inventoryVoucher.id,inventoryVoucher.receiverAccount.id,inventoryVoucher.document.id,inventoryVoucher.documentDate
+	// from InventoryVoucherHeader inventoryVoucher where
+	// inventoryVoucher.company.id = ?#{principal.companyId} Order By
+	// inventoryVoucher.createdDate desc")
 
 	// List<InventoryVoucherHeader>
 	// findAllHeaderdByDocumentNumberServer(List<String> references);
