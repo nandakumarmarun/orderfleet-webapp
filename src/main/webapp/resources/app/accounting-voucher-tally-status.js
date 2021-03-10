@@ -27,7 +27,9 @@ if (!this.AccountVoucher) {
 		$('#downloadXls').on('click', function() {
 			downloadXls();
 		});
-		
+		$('#sendReceiptOdoo').on('click', function() {
+			sendReceiptOdoo();
+		});
 		$('#sendTransactionsSapPravesh').on('click', function() {
 			sendTransactionsSapPravesh();
 		});
@@ -39,6 +41,34 @@ if (!this.AccountVoucher) {
 		 * loadAllDocumentByDocumentType(); });
 		 */
 	});
+	
+	function sendReceiptOdoo() {
+
+		$(".loader").addClass('show');
+
+		if (confirm("Are you sure?")) {
+
+			$.ajax({
+				url : accountVoucherContextPath + "/sendReceiptOdoo",
+				method : 'GET',
+				beforeSend : function() {
+					// Show image container
+					$("#loader").modal('show');
+
+				},
+				success : function(data) {
+					$("#loader").modal('hide');
+					InventoryVoucher.filter();
+					
+					// onSaveSuccess(data);
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+		}
+
+	}
 	
 	function sendTransactionsSapPravesh() {
 

@@ -135,6 +135,16 @@
 								<button type="button" class="btn btn-info"
 									onclick="AccountVoucher.filter()">Apply</button>
 							</div>
+							
+							<c:if test="${sendReceiptOdooStatus=='true'}">
+								<div class="col-sm-4">
+									<br>
+									<button type="button" class="btn btn-primary"
+										id="sendReceiptOdoo">Send Receipts</button>
+
+								</div>
+
+							</c:if>
 							<div class="col-sm-1">
 								<br>
 								<button type="button" class="btn btn-success" id="downloadXls">Download</button>

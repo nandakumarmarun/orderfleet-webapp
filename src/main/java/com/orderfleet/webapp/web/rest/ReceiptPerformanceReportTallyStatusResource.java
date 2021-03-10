@@ -86,6 +86,7 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
+import com.orderfleet.webapp.web.vendor.odoo.service.SendReceiptOdooService;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPraveshService;
 
 /**
@@ -158,6 +159,9 @@ public class ReceiptPerformanceReportTallyStatusResource {
 	
 	@Inject
 	private SendTransactionSapPraveshService sendTransactionSapPraveshService;
+	
+	@Inject
+	private SendReceiptOdooService sendReceiptOdooService;
 
 	/**
 	 * GET /receipt : get all the inventory vouchers.
@@ -229,6 +233,19 @@ public class ReceiptPerformanceReportTallyStatusResource {
 			}
 		}
 		model.addAttribute("sendTransactionsSapPravesh", sendTransactionsSapPravesh);
+		
+		boolean sendSalesOrderOdoo = false;
+		Optional<CompanyConfiguration> opCompanyConfigurationOdoo = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_SALES_ORDER_ODOO);
+		if (opCompanyConfigurationOdoo.isPresent()) {
+
+			if (opCompanyConfigurationOdoo.get().getValue().equals("true")) {
+				sendSalesOrderOdoo = true;
+			} else {
+				sendSalesOrderOdoo = false;
+			}
+		}
+		model.addAttribute("sendReceiptOdooStatus", sendSalesOrderOdoo);
 
 		return "company/receiptDownloadStatus";
 	}
@@ -264,6 +281,18 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
 	}
+	
+	@RequestMapping(value = "/receipt-download-status/sendReceiptOdoo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> sendReceiptOdoo() throws MessagingException {
+
+		log.info("sendReceiptOdoo()-----");
+
+		sendReceiptOdooService.sendReceipt();
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
+	}	
 
 	/**
 	 * GET /receipt-download-status/images/:pid : get the "id" FormFileDTO.
