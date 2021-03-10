@@ -444,6 +444,10 @@ public class ProcessFlowStageRejectAllResource {
 		case "READYATPS_NOTDELIVERED":
 			processStatus = Arrays.asList(ProcessFlowStatus.READY_TO_DISPATCH_AT_PS, ProcessFlowStatus.NOT_DELIVERED);
 			break;
+		case "INSTOCK_READYATPS_NOTDELIVERED":
+			processStatus = Arrays.asList(ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.READY_TO_DISPATCH_AT_PS,
+					ProcessFlowStatus.NOT_DELIVERED);
+			break;
 		case "DELIVERED_INSTALLATIONPLANED":
 			processStatus = Arrays.asList(ProcessFlowStatus.DELIVERED, ProcessFlowStatus.INSTALLATION_PLANNED);
 			break;

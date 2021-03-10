@@ -50,13 +50,16 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.accountProfile.pid = ?1 and locationAccountProfile.company.id = ?2")
 	List<LocationAccountProfile> findAllByCompanyAccountProfilePid(String accountProfilePid, Long companyId);
-	
+
 	/*
 	 * @Query("select DISTINCT(locationAccountProfile.accountProfile) from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.activated=true"
 	 * ) List<AccountProfile> findAllAccountProfile();
 	 */
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?#{principal.companyId} ")
 	List<LocationAccountProfile> findAllByAccountProfile();
+
+	@Query("select locationAccountProfile.location.activated,locationAccountProfile.location.pid,locationAccountProfile.accountProfile.id from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?#{principal.companyId} ")
+	List<Object[]> findAllByAccountProfileOptimised();
 
 	@Query("select distinct locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in ?1 and locationAccountProfile.accountProfile.activated=true")
 	Page<AccountProfile> findAccountProfilesByUserLocationsAndAccountProfileActivated(List<Location> locations,

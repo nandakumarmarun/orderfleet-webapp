@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +44,7 @@ import com.orderfleet.webapp.repository.ProductGroupLocationTargetRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskPlanDTO;
+import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationWiseProductGroupPerformanceDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
@@ -51,13 +53,13 @@ import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
 @RequestMapping("/web")
 public class LocationWiseSalesComparisonResource {
 	private final Logger log = LoggerFactory.getLogger(LocationWiseSalesComparisonResource.class);
-	
+
 	@Inject
 	private LocationService locationService;
-	
+
 	@Inject
 	private ProductGroupLocationTargetRepository productGroupLocationTargetRepository;
-	
+
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
 
@@ -69,35 +71,35 @@ public class LocationWiseSalesComparisonResource {
 
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
-	
+
 	@Timed
 	@RequestMapping(value = "/location-wise-sales-comparison-report", method = RequestMethod.GET)
 	public String getLocationWiseSalesComparisonReport(Model model) {
 		log.debug("Web request to get a page of LocationWiseSalesComparisonReport");
 		return "company/locationWiseSalesComparisonReport";
 	}
-	
+
 	@RequestMapping(value = "/location-wise-sales-comparison-report/load-data", method = RequestMethod.GET)
 	@ResponseBody
 	public LocationWiseProductGroupPerformanceDTO performanceTargets(
 			@RequestParam(value = "fromFirstDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromFirstDate,
 			@RequestParam(value = "toFirstDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toFirstDate,
 			@RequestParam(value = "fromSecondDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromSecondDate,
-			@RequestParam(value = "toSecondDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toSecondDate
-	) {
-		log.info("Location Wise Sales Comparison Report First date {} - {}, Second Date {} - {}", fromFirstDate, toFirstDate, fromSecondDate, toSecondDate);
+			@RequestParam(value = "toSecondDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toSecondDate) {
+		log.info("Location Wise Sales Comparison Report First date {} - {}, Second Date {} - {}", fromFirstDate,
+				toFirstDate, fromSecondDate, toSecondDate);
 		long starttime = System.nanoTime();
 		// filter based on product group
 		List<LocationDTO> locations = locationService.findAllLocationsByCompanyAndActivatedLocations();
 		List<String> locationPids = locations.stream().map(a -> a.getPid()).collect(Collectors.toList());
 		List<ProductGroupLocationTarget> firstProductGroupLocationTargets = productGroupLocationTargetRepository
-				.findByLocationPidInAndFromDateGreaterThanEqualAndToDateLessThanEqual(locationPids,fromFirstDate, toFirstDate);
-		
+				.findByLocationPidInAndFromDateGreaterThanEqualAndToDateLessThanEqual(locationPids, fromFirstDate,
+						toFirstDate);
+
 		List<ProductGroupLocationTarget> secondProductGroupLocationTargets = productGroupLocationTargetRepository
-				.findByLocationPidInAndFromDateGreaterThanEqualAndToDateLessThanEqual(locationPids,
-						fromSecondDate, toSecondDate);
-		
-		List<LocationAccountProfile> allLocationAccountProfiles = locationAccountProfileRepository.findAllByAccountProfile();
+				.findByLocationPidInAndFromDateGreaterThanEqualAndToDateLessThanEqual(locationPids, fromSecondDate,
+						toSecondDate);
+
 		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
 		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
 				SecurityUtils.getCurrentUsersCompanyId());
@@ -107,10 +109,34 @@ public class LocationWiseSalesComparisonResource {
 //		}
 		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
-		
-		List<InventoryVoucherHeader> allInventoryVoucherHeader =  inventoryVoucherHeaderRepository.findAllByCompanyIdOrderByCreatedDateDesc();
-		log.info("Get All inventory voucher header size {}", allInventoryVoucherHeader.size());
-		
+
+//		List<LocationAccountProfile> allLocationAccountProfiles = locationAccountProfileRepository.findAllByAccountProfile();
+//		
+//		List<InventoryVoucherHeader> allInventoryVoucherHeader =  inventoryVoucherHeaderRepository.findAllByCompanyIdOrderByCreatedDateDesc();
+
+		List<Object[]> allLocationAccountProfiles = locationAccountProfileRepository.findAllByAccountProfileOptimised();
+
+//		List<InventoryVoucherHeader> allInventoryVoucherHeader = inventoryVoucherHeaderRepository
+//				.findAllByCompanyIdOrderByCreatedDateDesc();
+
+		List<Object[]> allInventoryVoucherHeaderObject = inventoryVoucherHeaderRepository
+				.findAllByCompanyIdAndOrderByCreatedDateDesc();
+
+		List<InventoryVoucherHeaderDTO> allInventoryVoucherHeader = new ArrayList<>();
+
+		for (Object[] obj : allInventoryVoucherHeaderObject) {
+
+			InventoryVoucherHeaderDTO ivh = new InventoryVoucherHeaderDTO();
+
+			LocalDateTime documentDate = LocalDateTime.parse(obj[3].toString());
+			ivh.setDocumentDate(documentDate);
+			ivh.setInventoryVoucherHeaderId(Long.parseLong(obj[0].toString()));
+			ivh.setReceiverAccountProfileId(Long.parseLong(obj[1].toString()));
+			ivh.setDocumentId(Long.parseLong(obj[2].toString()));
+
+			allInventoryVoucherHeader.add(ivh);
+		}
+
 		// if (!productGroupLocationTargets.isEmpty()) {
 		LocationWiseProductGroupPerformanceDTO locationWiseProductGroupPerformanceDTO = new LocationWiseProductGroupPerformanceDTO();
 		// Get months date between the date
@@ -122,22 +148,22 @@ public class LocationWiseSalesComparisonResource {
 		for (ProductGroupLocationTarget productGroupLocationTarget : firstProductGroupLocationTargets) {
 			firstProductGroupLocationTargetDTOs.add(new ProductGroupLocationTargetDTO(productGroupLocationTarget));
 		}
-		
+
 		for (ProductGroupLocationTarget productGroupLocationTarget : secondProductGroupLocationTargets) {
 			secondProductGroupLocationTargetDTOs.add(new ProductGroupLocationTargetDTO(productGroupLocationTarget));
 		}
-				
+
 		// group by SalesTargetGroupName
 		Map<String, List<ProductGroupLocationTargetDTO>> firstProductGroupLocationTargetByLocationName = firstProductGroupLocationTargetDTOs
 				.parallelStream().collect(Collectors.groupingBy(ProductGroupLocationTargetDTO::getLocationName));
-		
+
 		Map<String, List<ProductGroupLocationTargetDTO>> secondProductGroupLocationTargetByLocationName = secondProductGroupLocationTargetDTOs
 				.parallelStream().collect(Collectors.groupingBy(ProductGroupLocationTargetDTO::getLocationName));
 
 		// actual sales user target
 		Map<String, List<ProductGroupLocationTargetDTO>> firstProductGroupLocationTargetMap = new HashMap<>();
 		Map<String, List<ProductGroupLocationTargetDTO>> secondProductGroupLocationTargetMap = new HashMap<>();
-		
+
 		log.info("FirstProductGroupLocationTargetMap set achievedVolume");
 		for (LocationDTO location : locations) {
 			String locationName = location.getName();
@@ -166,40 +192,65 @@ public class LocationWiseSalesComparisonResource {
 					productGroupLocationTargetDTO.setVolume(0);
 					productGroupLocationTargetDTO.setAmount(0);
 				}
-				Set<Long> accountProfileIds = allLocationAccountProfiles.stream().filter(a -> a.getLocation().getActivated())
-						.filter(a -> a.getLocation().getPid().equals(location.getPid()))
-						.filter(distinctByKey(LocationAccountProfile::getAccountProfile))
-						.map(m -> m.getAccountProfile().getId()).collect(Collectors.toSet());
-				
+//				Set<Long> accountProfileIds = allLocationAccountProfiles.stream().filter(a -> a.getLocation().getActivated())
+//						.filter(a -> a.getLocation().getPid().equals(location.getPid()))
+//						.filter(distinctByKey(LocationAccountProfile::getAccountProfile))
+//						.map(m -> m.getAccountProfile().getId()).collect(Collectors.toSet());
+
+				Set<Long> accountProfileIds = allLocationAccountProfiles.stream()
+						.filter(a -> Boolean.valueOf(a[0].toString()))
+						.filter(a -> a[1].toString().equals(location.getPid())).map(m -> Long.valueOf(m[2].toString()))
+						.collect(Collectors.toSet());
+
 				LocalDate start = monthDate.with(TemporalAdjusters.firstDayOfMonth());
 				LocalDate end = monthDate.with(TemporalAdjusters.lastDayOfMonth());
 
-
 				Double achievedVolume = 0D;
+//				if (!accountProfileIds.isEmpty()) {
+//					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream().filter(av -> {
+//						if (av.getDocumentDate().isAfter(start.atTime(0, 0))
+//								&& av.getDocumentDate().isBefore(end.atTime(23, 59))) {
+//							return true;
+//						}
+//						return false;
+//					}).filter(a -> {
+//						Optional<Long> t = accountProfileIds.stream()
+//								.filter(ap -> ap.equals(a.getReceiverAccount().getId())).findAny();
+//						return t.isPresent();
+//					}).filter(d -> {
+//						Optional<Long> t = documentIds.stream().filter(di -> di.equals(d.getDocument().getId()))
+//								.findAny();
+//						return t.isPresent();
+//					}).map(m -> m.getId()).collect(Collectors.toSet());
+//
+//					if (!ivHeaderIds.isEmpty()) {
+//						achievedVolume = inventoryVoucherDetailRepository.sumOfVolumeByAndHeaderIds(ivHeaderIds);
+//					}
+//				}
+
 				if (!accountProfileIds.isEmpty()) {
-					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream()
-					.filter(av -> {
-						if (av.getDocumentDate().isAfter(start.atTime(0, 0)) && av.getDocumentDate().isBefore(end.atTime(23, 59))) {
+					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream().filter(av -> {
+						if (av.getDocumentDate().isAfter(start.atTime(0, 0))
+								&& av.getDocumentDate().isBefore(end.atTime(23, 59))) {
 							return true;
 						}
 						return false;
-					})
-					.filter(a -> {
-						Optional<Long> t = accountProfileIds.stream().filter(ap -> ap.equals(a.getReceiverAccount().getId())).findAny();
+					}).filter(a -> {
+						Optional<Long> t = accountProfileIds.stream()
+								.filter(ap -> ap.equals(a.getReceiverAccountProfileId())).findAny();
 						return t.isPresent();
 					}).filter(d -> {
-						Optional<Long> t = documentIds.stream().filter(di -> di.equals(d.getDocument().getId())).findAny();
+						Optional<Long> t = documentIds.stream().filter(di -> di.equals(d.getDocumentId())).findAny();
 						return t.isPresent();
-					}).map(m -> m.getId()).collect(Collectors.toSet());
+					}).map(m -> m.getInventoryVoucherHeaderId()).collect(Collectors.toSet());
 
 					if (!ivHeaderIds.isEmpty()) {
-						achievedVolume = inventoryVoucherDetailRepository
-								.sumOfVolumeByAndHeaderIds(ivHeaderIds);
+						achievedVolume = inventoryVoucherDetailRepository.sumOfVolumeByAndHeaderIds(ivHeaderIds);
 					}
 				}
+
 				achievedVolume = achievedVolume == null ? 0 : achievedVolume;
-				productGroupLocationTargetDTO
-				.setAchievedVolume(achievedVolume);
+				productGroupLocationTargetDTO.setAchievedVolume(achievedVolume);
 
 				productGroupLocationTargetList.add(productGroupLocationTargetDTO);
 			}
@@ -235,40 +286,64 @@ public class LocationWiseSalesComparisonResource {
 					productGroupLocationTargetDTO.setAmount(0);
 				}
 
-				Set<Long> accountProfileIds = allLocationAccountProfiles.stream().filter(a -> a.getLocation().getActivated())
-						.filter(a -> a.getLocation().getPid().equals(location.getPid()))
-						.filter(distinctByKey(LocationAccountProfile::getAccountProfile))
-						.map(m -> m.getAccountProfile().getId()).collect(Collectors.toSet());
-				
+//				Set<Long> accountProfileIds = allLocationAccountProfiles.stream()
+//						.filter(a -> a.getLocation().getActivated())
+//						.filter(a -> a.getLocation().getPid().equals(location.getPid()))
+//						.filter(distinctByKey(LocationAccountProfile::getAccountProfile))
+//						.map(m -> m.getAccountProfile().getId()).collect(Collectors.toSet());
+
+				Set<Long> accountProfileIds = allLocationAccountProfiles.stream()
+						.filter(a -> Boolean.valueOf(a[0].toString()))
+						.filter(a -> a[1].toString().equals(location.getPid())).map(m -> Long.valueOf(m[2].toString()))
+						.collect(Collectors.toSet());
+
 				LocalDate start = monthDate.with(TemporalAdjusters.firstDayOfMonth());
 				LocalDate end = monthDate.with(TemporalAdjusters.lastDayOfMonth());
 
-
 				Double achievedVolume = 0D;
+//				if (!accountProfileIds.isEmpty()) {
+//					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream().filter(av -> {
+//						if (av.getDocumentDate().isAfter(start.atTime(0, 0))
+//								&& av.getDocumentDate().isBefore(end.atTime(23, 59))) {
+//							return true;
+//						}
+//						return false;
+//					}).filter(a -> {
+//						Optional<Long> t = accountProfileIds.stream()
+//								.filter(ap -> ap.equals(a.getReceiverAccount().getId())).findAny();
+//						return t.isPresent();
+//					}).filter(d -> {
+//						Optional<Long> t = documentIds.stream().filter(di -> di.equals(d.getDocument().getId()))
+//								.findAny();
+//						return t.isPresent();
+//					}).map(m -> m.getId()).collect(Collectors.toSet());
+//
+//					if (!ivHeaderIds.isEmpty()) {
+//						achievedVolume = inventoryVoucherDetailRepository.sumOfVolumeByAndHeaderIds(ivHeaderIds);
+//					}
+//				}
 				if (!accountProfileIds.isEmpty()) {
-					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream()
-					.filter(av -> {
-						if (av.getDocumentDate().isAfter(start.atTime(0, 0)) && av.getDocumentDate().isBefore(end.atTime(23, 59))) {
+					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream().filter(av -> {
+						if (av.getDocumentDate().isAfter(start.atTime(0, 0))
+								&& av.getDocumentDate().isBefore(end.atTime(23, 59))) {
 							return true;
 						}
 						return false;
-					})
-					.filter(a -> {
-						Optional<Long> t = accountProfileIds.stream().filter(ap -> ap.equals(a.getReceiverAccount().getId())).findAny();
+					}).filter(a -> {
+						Optional<Long> t = accountProfileIds.stream()
+								.filter(ap -> ap.equals(a.getReceiverAccountProfileId())).findAny();
 						return t.isPresent();
 					}).filter(d -> {
-						Optional<Long> t = documentIds.stream().filter(di -> di.equals(d.getDocument().getId())).findAny();
+						Optional<Long> t = documentIds.stream().filter(di -> di.equals(d.getDocumentId())).findAny();
 						return t.isPresent();
-					}).map(m -> m.getId()).collect(Collectors.toSet());
+					}).map(m -> m.getInventoryVoucherHeaderId()).collect(Collectors.toSet());
 
 					if (!ivHeaderIds.isEmpty()) {
-						achievedVolume = inventoryVoucherDetailRepository
-								.sumOfVolumeByAndHeaderIds(ivHeaderIds);
+						achievedVolume = inventoryVoucherDetailRepository.sumOfVolumeByAndHeaderIds(ivHeaderIds);
 					}
 				}
 				achievedVolume = achievedVolume == null ? 0 : achievedVolume;
-				productGroupLocationTargetDTO
-				.setAchievedVolume(achievedVolume);
+				productGroupLocationTargetDTO.setAchievedVolume(achievedVolume);
 
 				productGroupLocationTargetList.add(productGroupLocationTargetDTO);
 			}
@@ -284,12 +359,14 @@ public class LocationWiseSalesComparisonResource {
 		for (LocalDate monthDate : secondMonthsBetweenDates) {
 			secondMonthList.add(monthDate.getMonth().toString());
 		}
-		
-		locationWiseProductGroupPerformanceDTO.setFirstProductGroupLocationTargets(firstProductGroupLocationTargetMap.entrySet().stream().sorted(Map.Entry.comparingByKey())
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)));
-		
-		locationWiseProductGroupPerformanceDTO.setSecondProductGroupLocationTargets(secondProductGroupLocationTargetMap.entrySet().stream().sorted(Map.Entry.comparingByKey())
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)));
+
+		locationWiseProductGroupPerformanceDTO.setFirstProductGroupLocationTargets(
+				firstProductGroupLocationTargetMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(
+						Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)));
+
+		locationWiseProductGroupPerformanceDTO.setSecondProductGroupLocationTargets(
+				secondProductGroupLocationTargetMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(
+						Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)));
 		locationWiseProductGroupPerformanceDTO.setFirstMonthList(firstMonthList);
 		locationWiseProductGroupPerformanceDTO.setSecondMonthList(secondMonthList);
 		/*
@@ -304,13 +381,12 @@ public class LocationWiseSalesComparisonResource {
 		 * } return null;
 		 */
 	}
-	
 
 	private static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
 		Map<Object, Boolean> map = new ConcurrentHashMap<>();
 		return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
-	
+
 	private double getAchievedVolume(String locationPid, LocalDate initialDate) {
 
 		LocalDate start = initialDate.with(TemporalAdjusters.firstDayOfMonth());
@@ -333,8 +409,7 @@ public class LocationWiseSalesComparisonResource {
 			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository.findIdByAccountProfileAndDocumentDateBetween(
 					accountProfileIds, documentIds, start.atTime(0, 0), end.atTime(23, 59));
 			if (!ivHeaderIds.isEmpty()) {
-				achievedVolume = inventoryVoucherDetailRepository
-						.sumOfVolumeByAndHeaderIds(ivHeaderIds);
+				achievedVolume = inventoryVoucherDetailRepository.sumOfVolumeByAndHeaderIds(ivHeaderIds);
 			}
 		}
 		return achievedVolume == null ? 0 : achievedVolume;

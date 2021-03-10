@@ -395,7 +395,7 @@ InventoryVoucher.updateRemarks = function(ivhPid) {
 					url : inventoryVoucherContextPath + "/filter",
 					type : 'GET',
 					data : {
-						processFlowStatus : "INSTOCK_READYATTSL",
+						processFlowStatus : "READY_TO_DISPATCH_AT_TSL",
 						employeePids : empPids,
 						accountPid : $("#dbAccount").val(),
 						filterBy : $("#dbDateSearch").val(),

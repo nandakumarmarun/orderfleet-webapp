@@ -226,16 +226,16 @@ public class SalesProductGroupTargetAchievedReportResource {
 
 		log.info("Get All inventory voucher header size {}", allInventoryVoucherHeader.size());
 
-		List<ProductGroupProduct> productGroupProducts = productGroupProductRepository
-				.findAllByCompanyIdAndActivated(true);
+		List<Object[]> productGroupProducts = productGroupProductRepository.findAllObjectsByCompanyIdAndActivated(true);
+
 		// actual sales user target
 		Map<String, List<SalesProductGroupUserTargetDTO>> salesProductGroupUserTargetMap = new HashMap<>();
 		for (ProductGroup productGroup : productGroups) {
 //				productProfileIds = productGroupProductRepository.findProductIdByProductGroupPid(productGroup.getPid());
 
 			productProfileIds = productGroupProducts.stream()
-					.filter(pgp -> pgp.getProductGroup().getPid().equals(productGroup.getPid()))
-					.map(psd -> psd.getProduct().getId()).collect(Collectors.toSet());
+					.filter(pgp -> pgp[0].toString().equals(productGroup.getPid()))
+					.map(psd -> Long.valueOf(psd[1].toString())).collect(Collectors.toSet());
 
 			// productGroupProductRepository.findProductIdByProductGroupPid(productGroup.getPid());
 			String groupName = productGroup.getName();
