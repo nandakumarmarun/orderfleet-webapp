@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -446,13 +447,23 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						? inventoryVoucherDTO.getReferenceInvoiceNumber()
 						: "");
 
-				inventoryVoucherHeader.setBookingDate(
-						inventoryVoucherDTO.getBookingDate() != null ? inventoryVoucherDTO.getBookingDate()
-								: LocalDate.now());
+				if (inventoryVoucherDTO.getBookingDate() != null && !inventoryVoucherDTO.getBookingDate().equals("")) {
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+					LocalDate bookingDate = LocalDate.parse(inventoryVoucherDTO.getBookingDate(), formatter);
+					inventoryVoucherHeader.setBookingDate(bookingDate);
+				}
+
+				if (inventoryVoucherDTO.getDeliveryDateDocument() != null
+						&& !inventoryVoucherDTO.getDeliveryDateDocument().equals("")) {
+
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+					LocalDate deliveryDate = LocalDate.parse(inventoryVoucherDTO.getDeliveryDateDocument(), formatter);
+					inventoryVoucherHeader.setDeliveryDate(deliveryDate);
+				}
 				inventoryVoucherHeader.setBookingId(
 						inventoryVoucherDTO.getBookingId() == null || inventoryVoucherDTO.getBookingId().equals("") ? ""
 								: inventoryVoucherDTO.getBookingId());
-				inventoryVoucherHeader.setDeliveryDate(inventoryVoucherDTO.getDeliveryDate());
 
 				InventoryVoucherHeader lastInventoryVoucher = inventoryVoucherHeaderRepository
 						.findTop1ByCreatedByLoginOrderByCreatedDateDesc(SecurityUtils.getCurrentUserLogin());
