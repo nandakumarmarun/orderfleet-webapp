@@ -162,6 +162,8 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "booking_date")
 	private LocalDate bookingDate;
+	
+	
 
 	@ManyToOne
 	private User updatedBy;
