@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 
 import org.hibernate.service.spi.ServiceException;
 import org.json.JSONException;
@@ -25,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
@@ -40,6 +42,7 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUser;
 import com.orderfleet.webapp.web.vendor.odoo.service.AccountProfileOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.OutstandingInvoiceOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.ProductProfileOdooUploadService;
+import com.orderfleet.webapp.web.vendor.odoo.service.SendInvoiceOdooService;
 import com.orderfleet.webapp.web.vendor.odoo.service.TaxListOdooUploadService;
 import com.orderfleet.webapp.web.vendor.odoo.service.UserOdooUploadService;
 
@@ -90,7 +93,10 @@ public class UploadOdooResource {
 	private TaxListOdooUploadService taxListOdooUploadService;
 
 	@Inject
-	private UserOdooUploadService userOdooUploadService;
+	private UserOdooUploadService userOdooUploadService;	
+
+	@Inject
+	private SendInvoiceOdooService sendInvoiceOdooService;
 
 	@RequestMapping(value = "/upload-odoo", method = RequestMethod.GET)
 	@Timed
@@ -98,6 +104,18 @@ public class UploadOdooResource {
 	public String uploadXls(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of Upload Odoo Masters");
 		return "company/uploadOdoo";
+	}
+	
+	@RequestMapping(value = "/upload-odoo/sendSalesOrderOdoo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> sendSalesOrderOdoo() throws MessagingException {
+
+		log.info("sendSalesOrderOdoo()-----");
+
+		sendInvoiceOdooService.sendSalesOrder();
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
 	}
 	
 	@RequestMapping(value = "/upload-odoo/uploadTaxList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

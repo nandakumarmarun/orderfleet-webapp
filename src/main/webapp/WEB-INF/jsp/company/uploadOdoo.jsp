@@ -21,7 +21,18 @@
 				
 				<div class="col-md-12 col-sm-12 clearfix">
 					<form role="form" class="form-horizontal form-groups-bordered">
-						<div class="form-group">
+						<div class="row">
+							<div class="col-sm-3">
+								<button type="button" class="btn btn-success" style="width: 175px; text-align: center;"
+										id="sendSalesOrderOdoo">Sync Sales</button>
+							</div>
+							<div class="col-md-9">
+								<div class="row">
+									<label class="error-msg-sales" style="color: red;text-align:center;"></label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
 							<div class="col-sm-3">
 								<br>
 								<button type="button" class="btn btn-success " id="uploadAll"

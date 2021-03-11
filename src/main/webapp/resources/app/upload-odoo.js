@@ -37,7 +37,31 @@ if (!this.uploadOdoo) {
 		$('#uploadAll').on('click', function() {
 			uploadAll();
 		});
+		$('#sendSalesOrderOdoo').on('click', function() {
+			sendSalesOrderOdoo();
+		});
 	});
+	
+	function sendSalesOrderOdoo() {
+		if (confirm("Are you sure?")) {
+			$(".error-msg-sales").html("Syncing....");
+			$.ajax({
+				url : uploadOdooContextPath + "/sendSalesOrderOdoo",
+				method : 'GET',
+				success : function(data) {
+					$(".error-msg-sales").html("Syncing successfull....");   
+					alert("Upload Complete")
+					onSaveSuccess(data);
+				},
+				error : function(xhr, error) {
+					$(".error-msg-sales").html(
+							"Syncing failed ");
+					onError(xhr, error);
+				}
+			});
+		}
+
+	}
 	
 	$(".check-one").change(function(){
     	if ($('.check-one:checked').length == $('.check-one').length) {
