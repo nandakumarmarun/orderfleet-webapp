@@ -225,9 +225,9 @@ public class InventoryVoucherHeaderDTO {
 
 		this.bookingId = inventoryVoucherHeader.getBookingId() != null ? inventoryVoucherHeader.getBookingId() : "";
 		this.deliveryDate = inventoryVoucherHeader.getDeliveryDate();
-		this.bookingDate = inventoryVoucherHeader.getBookingDate().toString();
+		// this.bookingDate = inventoryVoucherHeader.getBookingDate().toString();
 		//this.bookingDate = inventoryVoucherHeader.getBookingDate();
-		this.deliveryDateDocument=inventoryVoucherHeader.getDeliveryDate().toString();
+		// this.deliveryDateDocument=inventoryVoucherHeader.getDeliveryDate().toString();
 		
 
 		this.roundedOff = inventoryVoucherHeader.getRoundedOff();
