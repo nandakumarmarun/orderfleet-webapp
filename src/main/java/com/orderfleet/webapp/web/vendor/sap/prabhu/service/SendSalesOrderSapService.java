@@ -601,14 +601,14 @@ public class SendSalesOrderSapService {
 			SalesOrderItemDetailsSap salesOrderItemDetailsSap = new SalesOrderItemDetailsSap();
 			double quantity = inventoryVoucherDetailDTO.getQuantity();
 			String itemType = inventoryVoucherDetailDTO.getItemtype() != null ? inventoryVoucherDetailDTO.getItemtype()
-					: "MT";
+					: "MTS";
 			if (opPiecesToQuantity.isPresent()) {
 				if (opPiecesToQuantity.get().getValue().equals("true")) {
 
 					if (inventoryVoucherDetailDTO.getProductSKU() != null
-							&& inventoryVoucherDetailDTO.getProductSKU().equalsIgnoreCase("MT")) {
+							&& inventoryVoucherDetailDTO.getProductSKU().equalsIgnoreCase("MTS")) {
 						quantity = (quantity * inventoryVoucherDetailDTO.getProductUnitQty()) / 1000; // Quantity into
-																										// MT;
+																										// MTS;
 						itemType = inventoryVoucherDetailDTO.getProductSKU();
 					} else if (inventoryVoucherDetailDTO.getProductSKU() != null
 							&& inventoryVoucherDetailDTO.getProductSKU().equalsIgnoreCase("Pcs")) {
@@ -623,7 +623,7 @@ public class SendSalesOrderSapService {
 			salesOrderItemDetailsSap.setuPrice(String.valueOf("0.0"));
 			salesOrderItemDetailsSap.setTaxCode("");
 			salesOrderItemDetailsSap.setWareHouseCode("PSO2");
-			salesOrderItemDetailsSap.setItemtype("MT");
+			salesOrderItemDetailsSap.setItemtype("MTS");
 			// salesOrderItemDetailsSap.setItemtype(itemType);
 			salesOrderItemDetailsSap.setArecieved("");
 
