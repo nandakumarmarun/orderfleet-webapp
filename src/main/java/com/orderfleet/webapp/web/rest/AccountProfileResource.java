@@ -1,15 +1,32 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.tomcat.jni.Local;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +57,7 @@ import com.orderfleet.webapp.service.PriceLevelService;
 
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
@@ -408,5 +426,121 @@ public class AccountProfileResource {
 
 		return new ResponseEntity<>(result, HttpStatus.OK);
 
+	}
+	
+	@RequestMapping(value = "/accountProfiles/download-profile-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public void downloadProductProfileXls(@RequestParam String status,HttpServletResponse response) {
+		List<AccountProfileDTO> accountProfileDTOs = new ArrayList<AccountProfileDTO>();
+		boolean active= false, deactivate=false;
+		if (status.equals("All")) {
+			active = true;
+			deactivate = true;
+		} else if (status.equals("Active")) {
+			active = true;
+			deactivate = false;
+		} else if (status.equals("Deactive")) {
+			deactivate = true;
+			active = false;
+		} 
+		
+		if (active == true && deactivate == true) {
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+		} else if (active) {
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+		} else if (deactivate) {
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+		}
+		buildExcelDocument(accountProfileDTOs, response);
+	}
+	
+	private void buildExcelDocument(List<AccountProfileDTO> accountProfileDTOs,
+			HttpServletResponse response) {
+		log.debug("Downloading Excel report");
+		String excelFileName = "accountProfile" + ".xls";
+		String sheetName = "Sheet1";
+		String[] headerColumns = {"Name", "Alias", "CustomerId", "Type", "Closing Balance", "Address", "Phone1", "Email1", "WhatsApp No", "Account Status",
+				"GSTIN", "GST Registration Type", "Created Date", "Last Updated Date", "Created By", "Stage", "Status"};
+		try(HSSFWorkbook workbook = new HSSFWorkbook()){
+			HSSFSheet worksheet = workbook.createSheet(sheetName);
+			createHeaderRow(worksheet, headerColumns);
+			createReportRows(worksheet, accountProfileDTOs);
+			// Resize all columns to fit the content size
+	        for(int i = 0; i < headerColumns.length; i++) {
+	        	worksheet.autoSizeColumn(i);
+	        }
+			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
+			response.setContentType("application/vnd.ms-excel");
+			//Writes the report to the output stream
+			ServletOutputStream outputStream = response.getOutputStream();
+			worksheet.getWorkbook().write(outputStream);
+			outputStream.flush();
+		} catch (IOException ex) {
+			log.error("IOException on downloading Product profiles {}", ex.getMessage());
+		}
+	}
+	
+	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
+		// Create a Font for styling header cells
+        Font headerFont = worksheet.getWorkbook().createFont();
+        headerFont.setFontName("Arial");
+        headerFont.setBold(true);
+        headerFont.setFontHeightInPoints((short) 12);
+        headerFont.setColor(IndexedColors.BLACK.getIndex());
+        // Create a CellStyle with the font
+        HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
+        headerCellStyle.setFont(headerFont);
+        // Create a Row
+     	HSSFRow headerRow = worksheet.createRow(0);
+     	// Create cells
+		for(int i = 0; i < headerColumns.length; i++) {
+			HSSFCell cell = headerRow.createCell(i);
+            cell.setCellValue(headerColumns[i]);
+            cell.setCellStyle(headerCellStyle);
+        }
+	}
+	
+	private void createReportRows(HSSFSheet worksheet, List<AccountProfileDTO> accountProfileDTO) {
+		/* CreationHelper helps us create instances of various things like DataFormat, 
+        Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way */
+		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
+		// Create Cell Style for formatting Date
+		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
+        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
+        // Create Other rows and cells with Sales data
+        int rowNum = 1;
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss a");
+    	for (AccountProfileDTO ap: accountProfileDTO) {
+    		HSSFRow row = worksheet.createRow(rowNum++);
+    		row.createCell(0).setCellValue(ap.getName().replace("#13;#10;", " "));
+    		row.createCell(1).setCellValue(ap.getAlias());
+    		row.createCell(2).setCellValue(ap.getCustomerId());
+    		row.createCell(3).setCellValue(ap.getAccountTypeName());
+    		row.createCell(4).setCellValue(String.format("%.2f", ap.getClosingBalance()));
+    		row.createCell(5).setCellValue(ap.getAddress());
+    		row.createCell(6).setCellValue(ap.getPhone1() == null ? "" :ap.getPhone1());
+    		row.createCell(7).setCellValue(ap.getEmail1() == null ? "" :ap.getEmail1());
+    		row.createCell(8).setCellValue(ap.getWhatsAppNo() == null ? "" :ap.getWhatsAppNo());
+    		row.createCell(9).setCellValue(ap.getAccountStatus().toString());
+    		row.createCell(10).setCellValue(ap.getTinNo() == null ? "" :ap.getTinNo());
+    		row.createCell(11).setCellValue(ap.getGstRegistrationType() == null ? "" :ap.getGstRegistrationType());
+    		LocalDateTime ldt = ap.getCreatedDate();
+    		if (ldt != null) {
+    			row.createCell(12).setCellValue(ldt.format(df));
+    		} else {
+    			row.createCell(12).setCellValue("");
+    		}
+    		LocalDateTime lmdt = ap.getLastModifiedDate();
+    		if (lmdt != null) {
+    			row.createCell(13).setCellValue(lmdt.format(df));
+    		} else {
+    			row.createCell(13).setCellValue("");
+    		}
+    		row.createCell(14).setCellValue(ap.getUserName() == null ? "" :ap.getUserName());
+    		row.createCell(15).setCellValue(ap.getLeadToCashStage() == null ? "" :ap.getLeadToCashStage());
+    		row.createCell(16).setCellValue(ap.getActivated() ? "Activated" :"Deactivated");
+		}
+		
 	}
 }

@@ -211,13 +211,17 @@ if (!this.AccountProfile) {
 	});
 
 	function downloadXls() {
-		// Avoid last column in each row
+		var status = $('#slt_status').val();
+		console.log(status);
+		window.location.href = accountProfileContextPath
+				+ "/download-profile-xls?status=" + status;
+		/*// Avoid last column in each row
 		$("#tblAccountProfile th:last-child, #tblAccountProfile td:last-child").hide();
 		
 		var excelName = "accountProfile";
 		 var table2excel = new Table2Excel();
 		     table2excel.export(document.getElementById('tblAccountProfile'),excelName);
-		 $("#tblAccountProfile th:last-child, #tblAccountProfile td:last-child").show();
+		 $("#tblAccountProfile th:last-child, #tblAccountProfile td:last-child").show();*/
 	}
 	
 	function activateAssignedAccountProfile() {
