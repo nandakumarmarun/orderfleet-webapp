@@ -301,7 +301,7 @@ public class ProductProfileUploadService {
 
 		List<ProductGroupDTO> productGroupDtos = new ArrayList<>();
 
-		List<StockLocationDTO> stockLocationDTOs = new ArrayList<>();		
+		List<StockLocationDTO> stockLocationDTOs = new ArrayList<>();
 
 		List<OpeningStockDTO> openingStockDtos = new ArrayList<>();
 
@@ -354,31 +354,38 @@ public class ProductProfileUploadService {
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
 
-			productProfile.setUnitQty(ppDto.getUnitQty());
-			
+			productProfile.setUnitQty(ppDto.getUnitQty() != null ? ppDto.getUnitQty() : 1.0);
 
-			StockLocationDTO stockLocationDTO = new StockLocationDTO();
-			stockLocationDTO.setName(ppDto.getStockLocationName());
-			stockLocationDTO.setAlias(ppDto.getStockLocationName());
-
-			stockLocationDTOs.add(stockLocationDTO);
-
-			// update category
-			// Optional<ProductCategory> optionalCategory = productCategorys.stream()
-			// .filter(pl -> ppDto.getProductCategoryName().equals(pl.getName())).findAny();
-
-			// if (optionalCategory.isPresent()) {
-			// productProfile.setProductCategory(optionalCategory.get());
-			// } else {
 			productProfile.setProductCategory(defaultCategory.get());
-			
-			OpeningStockDTO openingStockDto = new OpeningStockDTO();
-			openingStockDto.setProductProfileName(productProfile.getName());
-			openingStockDto.setStockLocationName(ppDto.getStockLocationName());
-			openingStockDto.setQuantity(ppDto.getStockQty());
-			openingStockDtos.add(openingStockDto);
 
+			if (ppDto.getStockLocationName() != null && !ppDto.getStockLocationName().equals("")) {
+
+				StockLocationDTO stockLocationDTO = new StockLocationDTO();
+				stockLocationDTO.setName(ppDto.getStockLocationName());
+				stockLocationDTO.setAlias(ppDto.getStockLocationName());
+
+				stockLocationDTOs.add(stockLocationDTO);
+
+				// update category
+				// Optional<ProductCategory> optionalCategory = productCategorys.stream()
+				// .filter(pl -> ppDto.getProductCategoryName().equals(pl.getName())).findAny();
+
+				// if (optionalCategory.isPresent()) {
+				// productProfile.setProductCategory(optionalCategory.get());
+				// } else {
+
+				OpeningStockDTO openingStockDto = new OpeningStockDTO();
+				openingStockDto.setProductProfileName(productProfile.getName());
+				openingStockDto.setStockLocationName(ppDto.getStockLocationName());
+				openingStockDto.setQuantity(ppDto.getStockQty());
+				openingStockDtos.add(openingStockDto);
+			}
 			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
+
+			if (ppDto.getProductCategoryName() != null && !ppDto.getProductCategoryName().equals("")) {
+			} else {
+				ppDto.setProductCategoryName("General");
+			}
 
 			productGroupProductDTO.setGroupName(ppDto.getProductCategoryName());
 			productGroupProductDTO.setProductName(ppDto.getName());
@@ -394,20 +401,24 @@ public class ProductProfileUploadService {
 			saveUpdateProductProfiles.add(productProfile);
 
 		}
-		
+
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
 		log.info("Saving product groups");
 		saveUpdateProductGroups(productGroupDtos);
 		log.info("Stock Location Size {}", stockLocationDTOs.size());
-		List<StockLocationDTO> stkLocations = stockLocationDTOs.stream().filter(distinctByKey(cpt -> cpt.getName())).collect(Collectors.toList());
-		log.info("Saving Stock Locations.... {}", stkLocations.size());
-		saveUpdateStockLocations(stkLocations);
+
+		if (stockLocationDTOs.size() > 0) {
+			List<StockLocationDTO> stkLocations = stockLocationDTOs.stream().filter(distinctByKey(cpt -> cpt.getName()))
+					.collect(Collectors.toList());
+			log.info("Saving Stock Locations.... {}", stkLocations.size());
+			saveUpdateStockLocations(stkLocations);
+		}
 		log.info("Saving product group product profiles");
 		saveUpdateProductGroupProduct(productGroupProductDTOs);
-		log.info("Saving opening stock");
-		saveUpdateOpeningStock(openingStockDtos);
-		
-		
+		if (openingStockDtos.size() > 0) {
+			log.info("Saving opening stock");
+			saveUpdateOpeningStock(openingStockDtos);
+		}
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -1129,7 +1140,7 @@ public class ProductProfileUploadService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Product Group Product Sync completed in {} ms", elapsedTime);
 	}
-	
+
 	@Transactional
 	@Async
 	public void saveUpdateOpeningStock(List<OpeningStockDTO> openingStockDTOs) {
@@ -1458,10 +1469,10 @@ public class ProductProfileUploadService {
 		double elapsedTime = (end - start) / 1000000.0;
 		log.info("Product Group Product Sync completed in {} ms", elapsedTime);
 	}
-	
+
 	public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-	    Map<Object,Boolean> seen = new ConcurrentHashMap<>();
-	    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+		Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
 
 }

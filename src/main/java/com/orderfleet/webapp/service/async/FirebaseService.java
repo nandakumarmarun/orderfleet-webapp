@@ -49,10 +49,11 @@ public class FirebaseService {
 	private final Logger log = LoggerFactory.getLogger(FirebaseService.class);
 
 	private static final String AUTH_KEY = "AIzaSyB_KOvF4OXz0C6gM7kLE8BrIhgBjs2QLsg";
+//	private static final String AUTH_KEY = "AAAAeVBzrLY:APA91bHTKgxvkBi-KqGYigSO-MBtRlIMercMOVH1h5DuIDcSFzVlclt6_Eskh7n-DJKuKMceLQfBstMPRoDvLij9kd0tiQRxWm09HMLaUyAYNsa60CtmhK6JJawwfkO-ok2uuQ_ZAXLQ"; // Modern
 	private static final String FIREBASE_URL = "https://fcm.googleapis.com/fcm/send";
-	
+
 	private NotificationMessageRepository notificationMessageRepository;
-	
+
 	@Inject
 	public FirebaseService(NotificationMessageRepository notificationMessageRepository) {
 		super();
@@ -60,7 +61,8 @@ public class FirebaseService {
 	}
 
 	@Async
-	public NotificationMessage sendNotificationToUsers(FirebaseRequest firebaseRequest, List<UserDevice> userDevices, String createdBy) {
+	public NotificationMessage sendNotificationToUsers(FirebaseRequest firebaseRequest, List<UserDevice> userDevices,
+			String createdBy) {
 		log.debug("Send notifications to '{}' with content={}", firebaseRequest.getRegistrationIds(),
 				firebaseRequest.getData());
 		String notificationPid = NotificationMessageService.PID_PREFIX + RandomUtil.generatePid();
@@ -73,9 +75,10 @@ public class FirebaseService {
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 			// Make the network request
-			ResponseEntity<FirebaseResponse> response =  restTemplate.exchange(FIREBASE_URL, HttpMethod.POST,
+			ResponseEntity<FirebaseResponse> response = restTemplate.exchange(FIREBASE_URL, HttpMethod.POST,
 					new HttpEntity<FirebaseRequest>(firebaseRequest, requestHeaders), FirebaseResponse.class);
-			log.debug("Successfully pushed notifications to devices'{}'", Arrays.toString(firebaseRequest.getRegistrationIds()));
+			log.debug("Successfully pushed notifications to devices'{}'",
+					Arrays.toString(firebaseRequest.getRegistrationIds()));
 			return saveToDB(notificationPid, response.getBody(), firebaseRequest.getData(), userDevices, createdBy);
 		} catch (Exception e) {
 			log.warn("Notification could not be sent to devices '{}'",
@@ -83,7 +86,7 @@ public class FirebaseService {
 		}
 		return null;
 	}
-	
+
 	public FirebaseResponse sendSynchronousNotificationToUsers(FirebaseRequest firebaseRequest, String createdBy) {
 		log.debug("Send notifications to '{}' with content={}", firebaseRequest.getRegistrationIds(),
 				firebaseRequest.getData());
@@ -101,10 +104,12 @@ public class FirebaseService {
 		return response.getBody();
 	}
 
-	private NotificationMessage saveToDB(String notificationPid, FirebaseResponse firebaseResponse, FirebaseData firebaseData, List<UserDevice> userDevices, String createdBy) {
-		log.debug("Firebase response => {} , Success :- {} Failed :- {}, ", firebaseResponse,firebaseResponse.getSuccess(), firebaseResponse.getFailure());
+	private NotificationMessage saveToDB(String notificationPid, FirebaseResponse firebaseResponse,
+			FirebaseData firebaseData, List<UserDevice> userDevices, String createdBy) {
+		log.debug("Firebase response => {} , Success :- {} Failed :- {}, ", firebaseResponse,
+				firebaseResponse.getSuccess(), firebaseResponse.getFailure());
 		log.debug("Saving to database.");
-		
+
 		NotificationMessage notificationMessage = new NotificationMessage();
 		notificationMessage.setPid(notificationPid);
 		notificationMessage.setCreatedBy(createdBy);
@@ -112,7 +117,7 @@ public class FirebaseService {
 		notificationMessage.setNotificationType(firebaseData.getMessageType());
 		notificationMessage.setExpiryDate(LocalDateTime.now().plusMonths(1));
 		notificationMessage.setCompany(userDevices.get(0).getCompany());
-		
+
 		Set<NotificationMessageRecipient> messageRecipients = new HashSet<>();
 		for (UserDevice userDevice : userDevices) {
 			NotificationMessageRecipient recipient = new NotificationMessageRecipient();
