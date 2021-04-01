@@ -122,6 +122,7 @@ public class InventoryVoucherHeaderDTO {
 	private LocalDate deliveryDate;
 	private String bookingDate;
 	private String deliveryDateDocument;
+	private String validationDays;
 
 	private String referenceInvoiceNumber;
 
@@ -645,6 +646,13 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setBookingDate(String bookingDate) {
 		this.bookingDate = bookingDate;
+	}
+
+	public String getValidationDays() {
+		return validationDays;
+	}
+	public void setValidationDays(String validationDays) {
+		this.validationDays = validationDays;
 	}
 
 	public void setClientDate(LocalDateTime clientDate) {

@@ -453,7 +453,10 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 					LocalDate bookingDate = LocalDate.parse(inventoryVoucherDTO.getBookingDate(), formatter);
 					inventoryVoucherHeader.setBookingDate(bookingDate);
 				}
-
+				inventoryVoucherHeader.setValidationDays(
+						inventoryVoucherDTO.getValidationDays() == null || inventoryVoucherDTO.getValidationDays().equals("") ? ""
+								: inventoryVoucherDTO.getValidationDays());
+				
 				if (inventoryVoucherDTO.getDeliveryDateDocument() != null
 						&& !inventoryVoucherDTO.getDeliveryDateDocument().equals("")) {
 

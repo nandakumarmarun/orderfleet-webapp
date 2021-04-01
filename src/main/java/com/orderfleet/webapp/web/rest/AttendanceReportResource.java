@@ -84,7 +84,7 @@ public class AttendanceReportResource {
 	private FileManagerService fileManagerService;
 
 	/**
-	 * GET /attendance-report : get attendance list.
+	 * GET /attendance-report : get attendance list. 
 	 *
 	 */
 	@RequestMapping(value = "/attendance-report/all", method = RequestMethod.GET)

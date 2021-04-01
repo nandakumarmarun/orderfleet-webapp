@@ -163,6 +163,9 @@ public class InventoryVoucherHeader implements Serializable {
 	@Column(name = "booking_date")
 	private LocalDate bookingDate;
 	
+	@Column(name="validation_days")
+	private String validationDays;
+	
 	
 
 	@ManyToOne
@@ -585,6 +588,12 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setBookingDate(LocalDate bookingDate) {
 		this.bookingDate = bookingDate;
+	}
+	public String getValidationDays() {
+		return validationDays;
+	}
+	public void setValidationDays(String validationDays) {
+		this.validationDays = validationDays;
 	}
 
 }
