@@ -135,6 +135,7 @@ import com.orderfleet.webapp.web.rest.dto.MapDistanceApiDTO;
 import com.orderfleet.webapp.web.rest.dto.MapDistanceDTO;
 import com.orderfleet.webapp.web.rest.dto.UserDistanceDTO;
 import com.orderfleet.webapp.web.vendor.odoo.service.SendInvoiceOdooService;
+import com.orderfleet.webapp.web.vendor.odoo.service.SendReceiptOdooService;
 import com.orderfleet.webapp.web.vendor.odoo.service.SendTransactionOdooService;
 
 /**
@@ -262,6 +263,9 @@ public class TaskSubmissionPostSave {
 	@Inject
 	private SendTransactionOdooService sendTransactionOdooService;
 
+	@Inject
+	private SendReceiptOdooService sendReceiptOdooService;
+
 	private FirebaseRequest firebaseRequest;
 	private List<UserDevice> userDevices;
 
@@ -329,12 +333,15 @@ public class TaskSubmissionPostSave {
 
 			Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository
 					.findByCompanyPidAndName(executiveTaskExecution.getCompany().getPid(), CompanyConfig.SEND_TO_ODOO);
-			// send inventory voucher to odoo
-//			if (optSendToOdoo.isPresent()) {
-//				if (Boolean.valueOf(optSendToOdoo.get().getValue())) {
-//					sendTransactionOdooService.sendInvoicesToOdoo(tsTransactionWrapper);
-//				}
-//			}
+			// send accounting voucher to odoo
+			if (optSendToOdoo.isPresent()) {
+				if (Boolean.valueOf(optSendToOdoo.get().getValue())) {
+					if (accountingVouchers.size() > 0) {
+						sendReceiptOdooService.sendReceiptAsync(accountingVouchers);
+						// sendTransactionOdooService.sendInvoicesToOdoo(tsTransactionWrapper);
+					}
+				}
+			}
 
 //			if (inventoryVouchers != null) {
 //				updateOpeningStockOfSourceStockLocation(inventoryVouchers);

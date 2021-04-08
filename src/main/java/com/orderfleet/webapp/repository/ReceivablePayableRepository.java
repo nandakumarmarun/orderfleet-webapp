@@ -34,6 +34,8 @@ public interface ReceivablePayableRepository extends JpaRepository<ReceivablePay
 	Page<ReceivablePayable> findAllByCompanyId(Pageable pageable);
 
 	List<ReceivablePayable> findAllByAccountProfilePid(String accountPid);
+	
+	List<ReceivablePayable> findAllByAccountProfilePidIn(List<String> accountPids);
 
 	Optional<ReceivablePayable> findOneByAccountProfilePidAndReferenceDocumentNumber(String accountPid,
 			String referenceDocumentNumber);

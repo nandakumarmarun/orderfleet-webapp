@@ -74,6 +74,9 @@ public class ReceivablePayable implements Serializable {
 	@Column(name = "remarks")
 	private String remarks;
 
+	@Column(name = "receivable_payable_id")
+	private String receivablePayableId;
+
 	@Column(name = "BILL_OVER_DUE")
 	private Long billOverDue;
 
@@ -234,6 +237,14 @@ public class ReceivablePayable implements Serializable {
 
 	public AccountProfile getSupplierAccountProfile() {
 		return supplierAccountProfile;
+	}
+
+	public String getReceivablePayableId() {
+		return receivablePayableId;
+	}
+
+	public void setReceivablePayableId(String receivablePayableId) {
+		this.receivablePayableId = receivablePayableId;
 	}
 
 	public void setSupplierAccountProfile(AccountProfile supplierAccountProfile) {

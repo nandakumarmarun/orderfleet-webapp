@@ -80,6 +80,7 @@ public class OutstandingInvoiceOdooUploadService {
 						receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
 						receivablePayable.setReferenceDocumentAmount(ppDto.getAmount_original());
 						receivablePayable.setReferenceDocumentBalanceAmount(ppDto.getAmount_unreconciled());
+						receivablePayable.setReceivablePayableId(String.valueOf(ppDto.getId()));
 						receivablePayable.setReferenceDocumentNumber(ppDto.getInvoice_ref());
 						receivablePayable.setReferenceDocumentDate(convertDate(ppDto.getDate_original()));
 						String dueDate = ppDto.getDate_due();
@@ -100,9 +101,9 @@ public class OutstandingInvoiceOdooUploadService {
 		for (Map.Entry<String, Double> entry : accountBalanceMap.entrySet()) {
 			// entry.getKey(), entry.getValue());
 			accProfiles.stream().filter(a -> a.getCustomerId().equalsIgnoreCase(entry.getKey())).findAny()
-				.ifPresent(ap -> {
-					ap.setClosingBalance(entry.getValue());
-				});
+					.ifPresent(ap -> {
+						ap.setClosingBalance(entry.getValue());
+					});
 		}
 		log.info("Save account profile size {}", saveReceivablePayable.size());
 		accountProfileRepository.save(accProfiles);

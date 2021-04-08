@@ -4,28 +4,28 @@ import java.util.List;
 
 public class ParamsReceiptOdoo {
 	private boolean create;
-	
+
 	private String payment_type;
-	
+
 	private long partner_id;
-	
+
 	private double paid_amount;
-	
+
 	private String transaction_type;
-	
+
 	private long location_id;
-	
+
 	private long salesman_id;
-	
+
 	private String reference;
-	
+
 	private String cheque_number;
-	
+
 	private String cheque_date;
-	
+
 	private boolean pdc_state;
-	
-	private List<Long> voucher_lines;
+
+	private List<OdooVoucherLine> voucher_lines;
 
 	public boolean isCreate() {
 		return create;
@@ -91,11 +91,11 @@ public class ParamsReceiptOdoo {
 		this.reference = reference;
 	}
 
-	public List<Long> getVoucher_lines() {
+	public List<OdooVoucherLine> getVoucher_lines() {
 		return voucher_lines;
 	}
 
-	public void setVoucher_lines(List<Long> voucher_lines) {
+	public void setVoucher_lines(List<OdooVoucherLine> voucher_lines) {
 		this.voucher_lines = voucher_lines;
 	}
 
@@ -114,9 +114,6 @@ public class ParamsReceiptOdoo {
 	public void setCheque_date(String cheque_date) {
 		this.cheque_date = cheque_date;
 	}
-	
-	
-
 
 	public boolean isPdc_state() {
 		return pdc_state;
@@ -134,7 +131,5 @@ public class ParamsReceiptOdoo {
 				+ cheque_number + ", cheque_date=" + cheque_date + ", pdc_state=" + pdc_state + ", voucher_lines="
 				+ voucher_lines + "]";
 	}
-
-
 
 }

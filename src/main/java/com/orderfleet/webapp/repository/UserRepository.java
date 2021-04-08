@@ -135,4 +135,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	User findByCompanyIdAndLogin(Long companyId, String userLogin);
 
+	List<User> findAllByCompanyIdAndIdIn(Long companyId, Set<Long> userIds);
+
 }
