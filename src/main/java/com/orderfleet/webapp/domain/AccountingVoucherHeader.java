@@ -124,7 +124,7 @@ public class AccountingVoucherHeader implements Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tally_download_status", nullable = false, columnDefinition = "character varying DEFAULT 'PENDING'")
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
-	
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "sales_management_status", nullable = false, columnDefinition = "character varying DEFAULT 'DEFAULT'")
@@ -132,6 +132,9 @@ public class AccountingVoucherHeader implements Serializable {
 
 	@Column(name = "imageRefNo")
 	private String imageRefNo;
+
+	@Column(name = "erp_ref_no")
+	private String erpRefNo;
 
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -322,6 +325,14 @@ public class AccountingVoucherHeader implements Serializable {
 
 	public void setFiles(Set<File> files) {
 		this.files = files;
+	}
+
+	public String getErpRefNo() {
+		return erpRefNo;
+	}
+
+	public void setErpRefNo(String erpRefNo) {
+		this.erpRefNo = erpRefNo;
 	}
 
 }

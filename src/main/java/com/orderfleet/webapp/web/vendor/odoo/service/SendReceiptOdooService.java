@@ -28,6 +28,7 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserStockLocation;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
@@ -43,6 +44,9 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsReceiptOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooReceipt;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooReceipt;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseMessageOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooReceipt;
 
 @Service
 public class SendReceiptOdooService {
@@ -217,15 +221,20 @@ public class SendReceiptOdooService {
 		String companyPid = accountingVouchers.get(0).getCompany().getPid();
 		Long companyId = accountingVouchers.get(0).getCompany().getId();
 
+		System.out.println(accountingVouchers.get(0).getDocumentNumberServer() + "-------------------");
+
+		AccountingVoucherHeader obj = accountingVoucherHeaderRepository.findTop1ByCreatedByLoginOrderByCreatedDateDesc(
+				accountingVouchers.get(0).getEmployee().getUser().getLogin());
+
 		DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 		Set<Long> userIds = new HashSet<>();
 		List<String> accountPids = new ArrayList<>();
 
-		for (AccountingVoucherHeader obj : accountingVouchers) {
-			userIds.add(obj.getEmployee().getUser().getId());
-			accountPids.add(obj.getAccountProfile().getPid());
-		}
+//		for (AccountingVoucherHeader obj : accountingVouchers) {
+		userIds.add(obj.getEmployee().getUser().getId());
+		accountPids.add(obj.getAccountProfile().getPid());
+//		}
 
 		List<User> users = userRepository.findAllByCompanyIdAndIdIn(companyId, userIds);
 
@@ -234,73 +243,86 @@ public class SendReceiptOdooService {
 		List<ReceivablePayable> receivablePayables = receivablePayableRepository
 				.findAllByAccountProfilePidIn(accountPids);
 
-		for (AccountingVoucherHeader obj : accountingVouchers) {
-			Optional<User> opUser = users.stream()
-					.filter(u -> u.getId() == Long.parseLong(obj.getCreatedBy().getId().toString())).findAny();
+//		for (AccountingVoucherHeader obj : accountingVouchers) {
+		Optional<User> opUser = users.stream()
+				.filter(u -> u.getId() == Long.parseLong(obj.getCreatedBy().getId().toString())).findAny();
 
-			Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
-					.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
-			ParamsReceiptOdoo odooInvoice = new ParamsReceiptOdoo();
+		Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
+				.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
+		ParamsReceiptOdoo odooInvoice = new ParamsReceiptOdoo();
 
-			odooInvoice.setCreate(true);
-			odooInvoice.setPayment_type("partner_payment");
-			odooInvoice.setPartner_id(obj.getAccountProfile().getCustomerId() != null
-					&& !obj.getAccountProfile().getCustomerId().equals("")
-							? Long.parseLong(obj.getAccountProfile().getCustomerId())
-							: 0);
-			odooInvoice.setPaid_amount(obj.getTotalAmount());
-			odooInvoice.setTransaction_type(
-					obj.getAccountingVoucherDetails() != null && obj.getAccountingVoucherDetails().size() > 0
-							? obj.getAccountingVoucherDetails().get(0).getMode().toString()
-							: "");
-			odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
-			odooInvoice.setSalesman_id(0);
-			odooInvoice.setReference(obj.getDocumentNumberServer());
-			odooInvoice.setCheque_number(
-					obj.getAccountingVoucherDetails() != null && obj.getAccountingVoucherDetails().size() > 0
-							? obj.getAccountingVoucherDetails().get(0).getInstrumentNumber().toString()
-							: "");
+		odooInvoice.setCreate(true);
+		odooInvoice.setPayment_type("partner_payment");
+		odooInvoice.setPartner_id(
+				obj.getAccountProfile().getCustomerId() != null && !obj.getAccountProfile().getCustomerId().equals("")
+						? Long.parseLong(obj.getAccountProfile().getCustomerId())
+						: 0);
+		odooInvoice.setPaid_amount(obj.getTotalAmount());
+		odooInvoice.setTransaction_type(
+				obj.getAccountingVoucherDetails() != null && obj.getAccountingVoucherDetails().size() > 0
+						? obj.getAccountingVoucherDetails().get(0).getMode().toString().toLowerCase()
+						: "");
+		odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
+		odooInvoice.setSalesman_id(obj.getEmployee().getAlias() != null && !obj.getEmployee().getAlias().equals("")
+				? Long.valueOf(obj.getEmployee().getAlias())
+				: 0);
+		odooInvoice.setReference(obj.getDocumentNumberServer());
+		odooInvoice.setCheque_number(
+				obj.getAccountingVoucherDetails() != null && obj.getAccountingVoucherDetails().size() > 0
+						? obj.getAccountingVoucherDetails().get(0).getInstrumentNumber().toString()
+						: "");
 
-			odooInvoice.setCheque_date(
-					obj.getAccountingVoucherDetails() != null && obj.getAccountingVoucherDetails().size() > 0
-							? obj.getAccountingVoucherDetails().get(0).getInstrumentDate().format(formatter1)
-							: "");
-			odooInvoice.setPdc_state(false);
+		odooInvoice.setCheque_date(
+				obj.getAccountingVoucherDetails() != null && obj.getAccountingVoucherDetails().size() > 0
+						? obj.getAccountingVoucherDetails().get(0).getInstrumentDate().format(formatter1)
+						: "");
+		odooInvoice.setPdc_state(false);
 
-			List<OdooVoucherLine> odooVoucherLines = new ArrayList<>();
+		List<OdooVoucherLine> odooVoucherLines = new ArrayList<>();
 
-			if (obj.getAccountingVoucherDetails().size() > 0) {
-				if (obj.getAccountingVoucherDetails().get(0).getAccountingVoucherAllocations().size() > 0) {
-					for (AccountingVoucherAllocation accountingVoucherAllocation : obj.getAccountingVoucherDetails()
-							.get(0).getAccountingVoucherAllocations()) {
-						OdooVoucherLine odooVoucherLine = new OdooVoucherLine();
-						odooVoucherLine.setAmount(accountingVoucherAllocation.getAmount());
+		if (obj.getAccountingVoucherDetails().size() > 0) {
 
-						Optional<ReceivablePayable> opRecPay = receivablePayables.stream()
-								.filter(u -> u.getPid().equals(accountingVoucherAllocation.getReceivablePayablePid()))
-								.findAny();
-						if (opRecPay.isPresent()) {
-							odooVoucherLine.setVoucher_id(opRecPay.get().getReceivablePayableId() != null
-									&& opRecPay.get().getReceivablePayableId().equals("")
-											? Long.parseLong(opRecPay.get().getReceivablePayableId())
-											: 0);
-						}
+			if (obj.getAccountingVoucherDetails().get(0).getAccountingVoucherAllocations() != null
+					&& obj.getAccountingVoucherDetails().get(0).getAccountingVoucherAllocations().size() > 0) {
+				for (AccountingVoucherAllocation accountingVoucherAllocation : obj.getAccountingVoucherDetails().get(0)
+						.getAccountingVoucherAllocations()) {
+					OdooVoucherLine odooVoucherLine = new OdooVoucherLine();
+					odooVoucherLine.setAmount(accountingVoucherAllocation.getAmount());
 
-						odooVoucherLines.add(odooVoucherLine);
-
+					Optional<ReceivablePayable> opRecPay = receivablePayables.stream()
+							.filter(u -> u.getPid().equals(accountingVoucherAllocation.getReceivablePayablePid()))
+							.findAny();
+					if (opRecPay.isPresent()) {
+						odooVoucherLine.setVoucher_id(opRecPay.get().getReceivablePayableId() != null
+								&& !opRecPay.get().getReceivablePayableId().equals("")
+										? Long.parseLong(opRecPay.get().getReceivablePayableId())
+										: 0);
 					}
+
+					odooVoucherLines.add(odooVoucherLine);
+
 				}
+			} else {
+				OdooVoucherLine odooVoucherLine = new OdooVoucherLine();
+				odooVoucherLine.setAmount(0);
+				odooVoucherLine.setVoucher_id(0);
+				odooVoucherLines.add(odooVoucherLine);
 			}
-			odooInvoice.setVoucher_lines(odooVoucherLines);
-			// odooInvoices.add(odooInvoice);
-			sendToOdooSingle(odooInvoice, obj.getPid());
 		}
+		odooInvoice.setVoucher_lines(odooVoucherLines);
+		// odooInvoices.add(odooInvoice);
+		sendToOdooSingle(odooInvoice, obj);
+//		}
 
 	}
 
-	private void sendToOdooSingle(ParamsReceiptOdoo odooParam, String accountingVoucherPid) {
+	private void sendToOdooSingle(ParamsReceiptOdoo odooParam, AccountingVoucherHeader accountingVoucher) {
 
-		log.info("Sending (" + odooParam.getReference() + ") Invoices to Odoo....");
+		log.info("Sending (" + odooParam.getReference() + ") Invoices to Odoo...." + accountingVoucher.getId());
+
+		accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.PROCESSING);
+		accountingVoucherHeaderRepository.save(accountingVoucher);
+		log.debug("updated to PROCESSING");
 
 		RequestBodyOdooReceipt request = new RequestBodyOdooReceipt();
 
@@ -333,24 +355,23 @@ public class SendReceiptOdooService {
 
 		try {
 
-//			ResponseBodyOdooInvoice responseBodyOdooInvoice = restTemplate.postForObject(SEND_RECEIPT_API_URL, entity,
-//					ResponseBodyOdooInvoice.class);
-//			log.info(responseBodyOdooInvoice + "");
-//
-//			// get object as a json string
-//			String jsonStr1;
-//			try {
-//				jsonStr1 = Obj.writeValueAsString(responseBodyOdooInvoice);
-//				log.info(jsonStr1);
-//			} catch (JsonProcessingException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//
-//			log.info("Odoo Invoice Created Success Size= " + responseBodyOdooInvoice.getResult().getMessage().size()
-//					+ "------------");
+			ResponseBodyOdooReceipt responseBodyOdooReceipt = restTemplate.postForObject(SEND_RECEIPT_API_URL, entity,
+					ResponseBodyOdooReceipt.class);
+			log.info(responseBodyOdooReceipt + "");
 
-			// changeServerDownloadStatus(responseBodyOdooInvoice.getResult().getMessage());
+			// get object as a json string
+			String jsonStr1;
+			try {
+				jsonStr1 = Obj.writeValueAsString(responseBodyOdooReceipt);
+				log.info(jsonStr1);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			log.info("Odoo Receipt Created Success");
+
+			changeServerDownloadStatus(responseBodyOdooReceipt.getResult(), accountingVoucher);
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
@@ -372,6 +393,19 @@ public class SendReceiptOdooService {
 
 			// throw new ServiceException(exception.getMessage());
 		}
+
+	}
+
+	private void changeServerDownloadStatus(ResultOdooReceipt response, AccountingVoucherHeader accountingVoucher) {
+
+		if (response != null) {
+			accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
+			accountingVoucher.setErpRefNo(String.valueOf(response.getMessage()));
+		} else {
+			accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.FAILED);
+		}
+
+		log.debug("updated to " + accountingVoucher.getTallyDownloadStatus());
 
 	}
 }
