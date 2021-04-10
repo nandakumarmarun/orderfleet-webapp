@@ -68,7 +68,7 @@ if (!this.LoginLogOut) {
 		// to work since the cloned table isn't visible)
 		clonedTable.find('[style*="display: none"]').remove();
 
-		var excelName = "tblLoginLogOutReport";
+		var excelName = "LoginLogOutReport";
 
 		clonedTable.table2excel({
 			// exclude CSS class
