@@ -34,12 +34,12 @@ if (!this.LoginLogOut) {
 		});
 
 		$('#btnDownload').on('click', function() {
-			var tblAttendanceReport = $("#tblAttendanceReport tbody");
-			if (tblAttendanceReport.children().length == 0) {
+			var tblLoginLogOut = $("#tblLoginLogOut tbody");
+			if (tblLoginLogOut.children().length == 0) {
 				alert("no values available");
 				return;
 			}
-			if (tblAttendanceReport[0].textContent == "No data available") {
+			if (tblLoginLogOut[0].textContent == "No data available") {
 				alert("no values available");
 				return;
 			}
@@ -63,12 +63,12 @@ if (!this.LoginLogOut) {
 
 	function downloadXls() {
 		// When the stripped button is clicked, clone the existing source
-		var clonedTable = $("#tblAttendanceReport").clone();
+		var clonedTable = $("#tblLoginLogOut").clone();
 		// Strip your empty characters from the cloned table (hidden didn't seem
 		// to work since the cloned table isn't visible)
 		clonedTable.find('[style*="display: none"]').remove();
 
-		var excelName = "attendanceReport";
+		var excelName = "tblLoginLogOutReport";
 
 		clonedTable.table2excel({
 			// exclude CSS class
