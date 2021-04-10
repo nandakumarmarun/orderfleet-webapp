@@ -195,4 +195,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("update AccountProfile accountProfile set accountProfile.accountStatus = ?1 where accountProfile.pid in ?2")
 	int updateAccountProfileStatusUsingPid(AccountStatus verified, List<String> accountProfilePids);
 
+	@Query("select accountProfile.pid from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId}")
+	List<String> findAllPidsByCompany();
+
 }

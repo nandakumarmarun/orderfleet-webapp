@@ -28,7 +28,7 @@
 
 			<form class="form-group">
 				<div class="col-md-12">
-					<div class="input-group col-md-4" style="float: left;">
+					<div class="input-group col-md-4" style="float: right;">
 						<span class="input-group-addon btn btn-default"
 							onclick="$(this).next('input').val('');$('#ofModalSearch').modal('show', {backdrop: 'static'});"><i
 							class="glyphicon glyphicon-filter"></i></span> <input type="text"
@@ -37,11 +37,25 @@
 						<button id="btnSearch" class="btn btn-info" type="button">Search</button>
 					</div>
 
-					<div class="input-group col-md-4" style="float: right;">
-						<input name='includeStockLocationDetails'
-							id="includeStockLocationDetails" type='checkbox' value='no' />
-						Include Stock Location Details
+
+					<div class="col-sm-2">
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input"
+								id="inclSubOrdinates" checked="checked"> <label
+								class="form-check-label" for="inclSubOrdinates">Include
+								Subordinate</label>
+						</div>
 					</div>
+
+					<div class="col-sm-3">
+						<div class="form-check">
+							<input name='includeStockLocationDetails'
+								id="includeStockLocationDetails" type='checkbox' value='no' />
+							<label class="form-check-label" for="inclStock"> Include
+								Stock Location Details</label>
+						</div>
+					</div>
+
 				</div>
 			</form>
 
@@ -50,14 +64,8 @@
 				<div class="col-md-12 col-sm-12 clearfix">
 					<form role="form" class="form-horizontal form-groups-bordered">
 						<div class="form-group">
-							<div class="col-sm-1">
-								<div class="form-check">
-									<input type="checkbox" class="form-check-input"
-										id="inclSubOrdinates" checked="checked"> <label
-										class="form-check-label" for="inclSubOrdinates">Include
-										Subordinate</label>
-								</div>
-							</div>
+
+
 							<div class="col-sm-3">
 								Employee
 								<div class=" input-group">
@@ -80,14 +88,22 @@
 												Employee</a>
 										</div>
 									</div>
-									<select id="dbEmployee" name="employeePid"
-										class="form-control">
+									<select id="dbEmployee" name="employeePid" class="form-control">
 										<option value="Dashboard Employee">All Dashboard
 											Employees</option>
 									</select>
 								</div>
 							</div>
-						
+
+							<div class="col-sm-2">
+								Account <select id="dbAccount" name="accountPid"
+									class="form-control selectpicker" data-live-search="true">
+									<option value="-1">All Account</option>
+									<c:forEach items="${accounts}" var="account">
+										<option value="${account.pid}">${account.name}</option>
+									</c:forEach>
+								</select>
+							</div>
 							<div class="col-sm-2">
 								Document Type <select id="dbDocumentType" name="documentType"
 									class="form-control">
@@ -142,19 +158,19 @@
 				</div>
 			</div>
 
-			
+
 
 			<div class="table-responsive">
-			
-			<div class="col-md-12 col-sm-12 clearfix"
-				style="font-size: 14px; color: black;">
-				<div class="col-sm-3"></div>
-				<div class="col-sm-3"></div>
-				<div class="col-sm-3"></div>
-				<div class="col-sm-3">
-					<label>Total : </label> <label id="lblTotal">0</label>
+
+				<div class="col-md-12 col-sm-12 clearfix"
+					style="font-size: 14px; color: black;">
+					<div class="col-sm-3"></div>
+					<div class="col-sm-3"></div>
+					<div class="col-sm-3"></div>
+					<div class="col-sm-3">
+						<label>Total : </label> <label id="lblTotal">0</label>
+					</div>
 				</div>
-			</div>
 				<table class="table  table-striped table-bordered"
 					id="tblItemWiseSale">
 					<thead id="tHeadItemWiseSale">
@@ -197,7 +213,8 @@
 													<b>&nbsp;</b>
 												</div>
 											</li>
-											<li class="active"><a href="#pProfile">Product Profile</a></li>
+											<li class="active"><a href="#pProfile">Product
+													Profile</a></li>
 											<li class=""><a href="#pCategory">Product Category</a></li>
 											<li class=""><a href="#pGroup">Product Group</a></li>
 											<li class=""><a href="#stockLocation">stock Location</a></li>
@@ -219,8 +236,7 @@
 											<div class="search-results-pane" id="pProfile"
 												style="display: block;">
 												<div class="row">
-													<c:forEach items="${productProfiles}"
-														var="productProfile">
+													<c:forEach items="${productProfiles}" var="productProfile">
 														<div class="col-md-4">
 															<div class="checkbox">
 																<label> <input type="checkbox"
@@ -363,7 +379,7 @@
 	<spring:url value="/resources/assets/js/custom/jquery.aCollapTable.js"
 		var="aCollapTable"></spring:url>
 	<script type="text/javascript" src="${aCollapTable}"></script>
-	
+
 	<spring:url value="/resources/app/report-common-js-file.js"
 		var="reportcommonjsfileJS"></spring:url>
 	<script type="text/javascript" src="${reportcommonjsfileJS}"></script>

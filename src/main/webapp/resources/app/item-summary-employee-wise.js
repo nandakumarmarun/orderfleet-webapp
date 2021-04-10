@@ -4,22 +4,22 @@ if (!this.ItemSummaryEmployeeWise) {
 
 (function() {
 	'use strict';
-	
+
 	var ContextPath = location.protocol + '//' + location.host
-	+ location.pathname;
-	
+			+ location.pathname;
+
 	$(document).ready(function() {
 		var employeePid = getParameterByName('user-key-pid');
 		getEmployees(employeePid);
-		
+
 		$("#dbDocumentType").change(function() {
 			loadAllDocumentByDocumentType();
 		});
-		
+
 		$("#dbDateSearch").change(function() {
 			ItemSummaryEmployeeWise.showDatePicker();
 		});
-		
+
 		$('#downloadXls').on('click', function() {
 			var tblItemWiseSummary = $("#tblItemWiseSummary tbody");
 			if (tblItemWiseSummary.children().length == 0) {
@@ -28,9 +28,9 @@ if (!this.ItemSummaryEmployeeWise) {
 			}
 			downloadXls();
 		});
-		
+
 	});
-	
+
 	ItemSummaryEmployeeWise.changeToSort = function() {
 		$("#sortClass").attr('class', 'active');
 		$("#filterClass").attr('class', '');
@@ -44,7 +44,7 @@ if (!this.ItemSummaryEmployeeWise) {
 		$("#sort").css("display", "none");
 		$("#filter").css("display", "block");
 	}
-	
+
 	function downloadXls() {
 		// When the stripped button is clicked, clone the existing source
 		var clonedTable = $("#tblItemWiseSummary").clone();
@@ -65,7 +65,7 @@ if (!this.ItemSummaryEmployeeWise) {
 		// exclude_inputs : true
 		});
 	}
-	
+
 	function loadAllDocumentByDocumentType() {
 		if ($('#dbDocumentType').val() == "no") {
 			$("#dbDocument").html("<option>All</option>");
@@ -90,10 +90,11 @@ if (!this.ItemSummaryEmployeeWise) {
 			}
 		});
 	}
-	
+
 	ItemSummaryEmployeeWise.filter = function() {
 		var value = "";
 		var empPids = $('#dbEmployee').val();
+		var accountPids = $('#dbAccount').val();
 		$('#lblTotal').text("0");
 		if ($("#includeStockLocationDetails").is(':checked')) {
 			value = $('#includeStockLocationDetails').val();
@@ -103,13 +104,19 @@ if (!this.ItemSummaryEmployeeWise) {
 				return;
 			}
 		}
-		
-		if("no" == empPids || "Dashboard Employee" == empPids){
-			empPids = $('#dbEmployee option').map(function() {
-		        return $(this).val();
-		    }).get().join(',');
+
+		if ("no" == accountPids) {
+			accountPids = $('#dbAccount option').map(function() {
+				return $(this).val();
+			}).get().join(',');
 		}
-		
+
+		if ("no" == empPids || "Dashboard Employee" == empPids) {
+			empPids = $('#dbEmployee option').map(function() {
+				return $(this).val();
+			}).get().join(',');
+		}
+
 		if ($("#dbDocumentType").val() == "no") {
 			alert("Please Select Document Type")
 			return;
@@ -124,9 +131,8 @@ if (!this.ItemSummaryEmployeeWise) {
 					.html(
 							"<tr><td colspan='4' align='center'>Please wait...</td></tr>");
 		} else {
-			$('#tHeadItemWiseSummary')
-					.html(
-							"<tr><th>Item</th><th>Quantity</th></tr>");
+			$('#tHeadItemWiseSummary').html(
+					"<tr><th>Item</th><th>Quantity</th></tr>");
 			$('#tBodyItemWiseSummary')
 					.html(
 							"<tr><td colspan='2' align='center'>Please wait...</td></tr>");
@@ -149,7 +155,8 @@ if (!this.ItemSummaryEmployeeWise) {
 						profilePids : "",
 						territoryPids : "",
 						employeePid : empPids,
-						statusSearch :$("#dbStatusSearch").val()
+						statusSearch : $("#dbStatusSearch").val(),
+						accountPids : $('#dbAccount').val()
 					},
 					success : function(itemWiseSummaries) {
 						$('#tBodyItemWiseSummary').html("");
@@ -186,16 +193,14 @@ if (!this.ItemSummaryEmployeeWise) {
 															+ "</td><tr>";
 												});
 							} else {
-								$
-										.each(
-												itemWiseSummaries,
-												function(key, itemWiseSummary) {
-													rows += "<tr><td>"
-															+ itemWiseSummary.productName
-															+ "</td><td>"
-															+ itemWiseSummary.quantity
-															+ "</td></tr>";
-												});
+								$.each(itemWiseSummaries, function(key,
+										itemWiseSummary) {
+									rows += "<tr><td>"
+											+ itemWiseSummary.productName
+											+ "</td><td>"
+											+ itemWiseSummary.quantity
+											+ "</td></tr>";
+								});
 							}
 						}
 						$('#tBodyItemWiseSummary').html(rows);
@@ -204,8 +209,8 @@ if (!this.ItemSummaryEmployeeWise) {
 						onError(xhr, error);
 					}
 				});
-	}								
-	
+	}
+
 	ItemSummaryEmployeeWise.filterByCategoryAndGroup = function() {
 		var value = "";
 		if ($("#includeStockLocationDetails").is(':checked')) {
@@ -230,15 +235,17 @@ if (!this.ItemSummaryEmployeeWise) {
 		$("#pGroup").find('input[type="checkbox"]:checked').each(function() {
 			groupPids.push($(this).val());
 		});
-		$("#stockLocation").find('input[type="checkbox"]:checked').each(function() {
-			stockLocations.push($(this).val());
-		});
+		$("#stockLocation").find('input[type="checkbox"]:checked').each(
+				function() {
+					stockLocations.push($(this).val());
+				});
 		$("#pProfile").find('input[type="checkbox"]:checked').each(function() {
 			profilePids.push($(this).val());
 		});
-		$("#pTerritory").find('input[type="checkbox"]:checked').each(function() {
-			territoryPids.push($(this).val());
-		});
+		$("#pTerritory").find('input[type="checkbox"]:checked').each(
+				function() {
+					territoryPids.push($(this).val());
+				});
 		var rows = "";
 		$('#tHeadItemWiseSummary').html("");
 		if (value == "no") {
@@ -249,9 +256,8 @@ if (!this.ItemSummaryEmployeeWise) {
 					.html(
 							"<tr><td colspan='4' align='center'>Please wait...</td></tr>");
 		} else {
-			$('#tHeadItemWiseSummary')
-					.html(
-							"<tr><th>Item</th><th>Quantity</th></tr>");
+			$('#tHeadItemWiseSummary').html(
+					"<tr><th>Item</th><th>Quantity</th></tr>");
 			$('#tBodyItemWiseSummary')
 					.html(
 							"<tr><td colspan='2' align='center'>Please wait...</td></tr>");
@@ -274,9 +280,8 @@ if (!this.ItemSummaryEmployeeWise) {
 						profilePids : profilePids.join(","),
 						territoryPids : territoryPids.join(","),
 						employeePid : $('#dbEmployee').val(),
-						statusSearch :$("#dbStatusSearch").val()
-						
-						
+						statusSearch : $("#dbStatusSearch").val()
+
 					},
 					success : function(itemWiseSummaries) {
 						$('#tBodyItemWiseSummary').html("");
@@ -284,12 +289,12 @@ if (!this.ItemSummaryEmployeeWise) {
 						if (itemWiseSummaries.length == 0) {
 							if (value == "no") {
 								$('#tBodyItemWiseSummary')
-								.html(
-										"<tr><td colspan='4' align='center'>No data available</td></tr>");
+										.html(
+												"<tr><td colspan='4' align='center'>No data available</td></tr>");
 							} else {
 								$('#tBodyItemWiseSummary')
-								.html(
-										"<tr><td colspan='2' align='center'>No data available</td></tr>");
+										.html(
+												"<tr><td colspan='2' align='center'>No data available</td></tr>");
 							}
 							return;
 						} else {
@@ -298,7 +303,8 @@ if (!this.ItemSummaryEmployeeWise) {
 										.each(
 												itemWiseSummaries,
 												function(key, itemWiseSummary) {
-													console.log(itemWiseSummary);
+													console
+															.log(itemWiseSummary);
 													rows += "<tr><td>"
 															+ itemWiseSummary.productName
 															+ "</td><td>"
@@ -312,17 +318,15 @@ if (!this.ItemSummaryEmployeeWise) {
 															+ "</td></tr>";
 												});
 							} else {
-								$
-										.each(
-												itemWiseSummaries,
-												function(key, itemWiseSummary) {
-													console.log(itemWiseSummary);
-													rows += "<tr><td>"
-															+ itemWiseSummary.productName
-															+ "</td><td>"
-															+ itemWiseSummary.quantity
-															+ "</td></tr>";
-												});
+								$.each(itemWiseSummaries, function(key,
+										itemWiseSummary) {
+									console.log(itemWiseSummary);
+									rows += "<tr><td>"
+											+ itemWiseSummary.productName
+											+ "</td><td>"
+											+ itemWiseSummary.quantity
+											+ "</td></tr>";
+								});
 							}
 						}
 						$('#tBodyItemWiseSummary').html(rows);
@@ -332,7 +336,7 @@ if (!this.ItemSummaryEmployeeWise) {
 					}
 				});
 	}
-	
+
 	ItemSummaryEmployeeWise.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");
@@ -417,5 +421,5 @@ if (!this.ItemSummaryEmployeeWise) {
 			}
 		}
 	}
-	
+
 })();

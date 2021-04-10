@@ -32,8 +32,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.enums.VoucherType;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.custom.InventoryVoucherDetailCustomRepository;
+import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
 import com.orderfleet.webapp.service.ProductCategoryService;
@@ -46,30 +48,35 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 @RequestMapping("/web")
 public class ItemSummaryEmployeeWiseResource {
 
-private final Logger log = LoggerFactory.getLogger(ItemSummaryEmployeeWiseResource.class);
-	
+	private final Logger log = LoggerFactory.getLogger(ItemSummaryEmployeeWiseResource.class);
+
 	@Inject
 	private PrimarySecondaryDocumentService primarySecondaryDocumentService;
-	
+
 	@Inject
 	private ProductCategoryService productCategoryService;
-	
+
 	@Inject
 	private ProductGroupService productGroupService;
-	
+
 	@Inject
 	private ProductProfileService productProfileService;
-	
+
 	@Inject
 	private LocationService locationService;
-	
+
 	@Inject
 	private StockLocationRepository stockLocationRepository;
-	
+
 	@Inject
 	private InventoryVoucherDetailCustomRepository inventoryVoucherDetailCustomRepository;
-	
-	
+
+	@Inject
+	private AccountProfileService accountProfileService;
+
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
+
 	@RequestMapping(value = "/item-summary-employee-wise", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -80,58 +87,73 @@ private final Logger log = LoggerFactory.getLogger(ItemSummaryEmployeeWiseResour
 		model.addAttribute("productGroups", productGroupService.findAllByCompany());
 		model.addAttribute("productProfiles", productProfileService.findAllByCompany());
 		model.addAttribute("stockLocations", stockLocationRepository.findAllByCompanyId());
-		model.addAttribute("locations",locationService.findAllByCompany());
+		model.addAttribute("locations", locationService.findAllByCompany());
+		model.addAttribute("accounts", accountProfileService.findAllByCompany());
 		return "company/item-summary-employee-wise";
 	}
-	
+
 	@RequestMapping(value = "/item-summary-employee-wise/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed
 	public List<DocumentDTO> getDocuments(@Valid @RequestParam VoucherType voucherType) throws URISyntaxException {
-		List<DocumentDTO> documentDTOs = primarySecondaryDocumentService.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
+		List<DocumentDTO> documentDTOs = primarySecondaryDocumentService
+				.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
 		return documentDTOs;
 	}
-	
+
 	@RequestMapping(value = "/item-summary-employee-wise/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional(readOnly = true)
-	public ResponseEntity<List<InventoryVoucherDetailDTO>> filterInventoryVoucherHeaders(@RequestParam String sort,@RequestParam String order,@RequestParam String categoryPids, @RequestParam String groupPids,
+	public ResponseEntity<List<InventoryVoucherDetailDTO>> filterInventoryVoucherHeaders(@RequestParam String sort,
+			@RequestParam String order, @RequestParam String categoryPids, @RequestParam String groupPids,
 			@RequestParam("voucherType") VoucherType voucherType, @RequestParam("documentPid") String documentPid,
 			@RequestParam("filterBy") String filterBy,
 			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-			@RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,@RequestParam String stockLocations, @RequestParam String profilePids,
-			@RequestParam("territoryPids") String territoryPids,@RequestParam("statusSearch") String status, @RequestParam("employeePid") String employeePids) {
-		
+			@RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+			@RequestParam String stockLocations, @RequestParam String profilePids,
+			@RequestParam("territoryPids") String territoryPids, @RequestParam("statusSearch") String status,
+			@RequestParam("employeePid") String employeePids, @RequestParam String accountPids) {
+
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
-		
+
 		if (filterBy.equals("TODAY")) {
-			inventoryVoucherDetailDTOs = getFilterData(sort,order,categoryPids,groupPids,voucherType,documentPid, LocalDate.now(), LocalDate.now(),stockLocations,profilePids,territoryPids, employeePids,status);
-		} 
-		else if (filterBy.equals("YESTERDAY")) {
+			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
+					LocalDate.now(), LocalDate.now(), stockLocations, profilePids, territoryPids, employeePids, status,
+					accountPids);
+		} else if (filterBy.equals("YESTERDAY")) {
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			inventoryVoucherDetailDTOs = getFilterData(sort,order,categoryPids,groupPids,voucherType,documentPid, yeasterday, yeasterday,stockLocations,profilePids,territoryPids, employeePids,status);
+			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
+					yeasterday, yeasterday, stockLocations, profilePids, territoryPids, employeePids, status,
+					accountPids);
 		} else if (filterBy.equals("WTD")) {
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			inventoryVoucherDetailDTOs = getFilterData(sort,order,categoryPids,groupPids,voucherType,documentPid, weekStartDate, LocalDate.now(),stockLocations,profilePids,territoryPids, employeePids,status);
+			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
+					weekStartDate, LocalDate.now(), stockLocations, profilePids, territoryPids, employeePids, status,
+					accountPids);
 		} else if (filterBy.equals("MTD")) {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			inventoryVoucherDetailDTOs = getFilterData(sort,order,categoryPids,groupPids,voucherType,documentPid, monthStartDate, LocalDate.now(),stockLocations,profilePids,territoryPids, employeePids,status);
+			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
+					monthStartDate, LocalDate.now(), stockLocations, profilePids, territoryPids, employeePids, status,
+					accountPids);
 		} else if (filterBy.equals("CUSTOM")) {
-			inventoryVoucherDetailDTOs = getFilterData(sort,order,categoryPids,groupPids,voucherType,documentPid, fromDate, toDate,stockLocations,profilePids,territoryPids, employeePids,status);
+			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
+					fromDate, toDate, stockLocations, profilePids, territoryPids, employeePids, status, accountPids);
 		}
 		return new ResponseEntity<>(inventoryVoucherDetailDTOs, HttpStatus.OK);
-		
+
 	}
-	
-	private List<InventoryVoucherDetailDTO> getFilterData(String sort,String order,String categoryPids,String groupPids,VoucherType voucherType,String documentPid, LocalDate fDate,
-			LocalDate tDate,String stockLocations,String profilePids,String territoryPids, String employeePids, String status) {
-		
+
+	private List<InventoryVoucherDetailDTO> getFilterData(String sort, String order, String categoryPids,
+			String groupPids, VoucherType voucherType, String documentPid, LocalDate fDate, LocalDate tDate,
+			String stockLocations, String profilePids, String territoryPids, String employeePids, String status,
+			String accountPids) {
+
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
-		
+
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
-		
+
 		List<String> stockLocationPids = new ArrayList<>();
 		List<String> productCategoryPids = new ArrayList<>();
 		List<String> productGroupPids = new ArrayList<>();
@@ -139,89 +161,89 @@ private final Logger log = LoggerFactory.getLogger(ItemSummaryEmployeeWiseResour
 		List<String> productTerritoryPids = new ArrayList<>();
 		List<String> documentPids = new ArrayList<>();
 		List<String> employeePidList = new ArrayList<>();
-		
+		List<String> accountPidList = new ArrayList<>();
+
 		stockLocationPids = stockLocations != "" ? Arrays.asList(stockLocations.split(",")) : stockLocationPids;
 		productCategoryPids = categoryPids != "" ? Arrays.asList(categoryPids.split(",")) : productCategoryPids;
 		productGroupPids = groupPids != "" ? Arrays.asList(groupPids.split(",")) : productGroupPids;
 		productProfilePids = profilePids != "" ? Arrays.asList(profilePids.split(",")) : productProfilePids;
 		productTerritoryPids = territoryPids != "" ? Arrays.asList(territoryPids.split(",")) : productTerritoryPids;
-		employeePidList = employeePids !="" ? Arrays.asList(employeePids.split(",")):employeePidList;
-		
-		if(documentPid.equals("no")){
+		employeePidList = employeePids != "" ? Arrays.asList(employeePids.split(",")) : employeePidList;
+		accountPidList = !accountPids.equals("-1") ? Arrays.asList(accountPids)
+				: accountProfileRepository.findAllPidsByCompany();
+
+		if (documentPid.equals("no")) {
 			List<DocumentDTO> documentDTOs = primarySecondaryDocumentService
 					.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
-			
-			for(DocumentDTO documentDTO:documentDTOs){
+
+			for (DocumentDTO documentDTO : documentDTOs) {
 				documentPids.add(documentDTO.getPid());
 			}
-		}else{
+		} else {
 			documentPids = Arrays.asList(documentPid.split(","));
 		}
-		
-		inventoryVoucherDetailDTOs = inventoryVoucherDetailCustomRepository.getInventoryDetailListBy(productCategoryPids, 
-				productGroupPids, productProfilePids, stockLocationPids, fromDate, toDate, documentPids, 
-				productTerritoryPids, employeePidList ,status);
-		
+
+		inventoryVoucherDetailDTOs = inventoryVoucherDetailCustomRepository.getInventoryDetailListBy(
+				productCategoryPids, productGroupPids, productProfilePids, stockLocationPids, fromDate, toDate,
+				documentPids, productTerritoryPids, employeePidList, status, accountPidList);
+
 		return filterByCumulative(filterBySortAndOrder(sort, order, inventoryVoucherDetailDTOs));
 	}
-	
+
 	private List<InventoryVoucherDetailDTO> filterBySortAndOrder(String sort, String order,
-			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs){
-		
-		if(sort.equals("date")){
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate).reversed());
-			}else{
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate));
+			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs) {
+
+		if (sort.equals("date")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate));
+			}
+		} else if (sort.equals("item")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductName).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductName));
+			}
+		} else if (sort.equals("quantity")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity));
+			}
+		} else if (sort.equals("category")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory));
 			}
 		}
-		else if (sort.equals("item")) {
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getProductName).reversed());
-				}else{
-					inventoryVoucherDetailDTOs.sort
-					(Comparator.comparing(InventoryVoucherDetailDTO::getProductName));
-				}
-		}else if (sort.equals("quantity")) {
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity).reversed());
-				}else{
-					inventoryVoucherDetailDTOs.sort
-					(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity));
-				}
-		}else if(sort.equals("category")){
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory).reversed());
-				}else{
-					inventoryVoucherDetailDTOs.sort
-					(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory));
-				}
-		}
 		return inventoryVoucherDetailDTOs;
-		
+
 	}
-	
-	private List<InventoryVoucherDetailDTO> filterByCumulative(List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs){
-		
+
+	private List<InventoryVoucherDetailDTO> filterByCumulative(
+			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs) {
+
 		Set<InventoryVoucherDetailDTO> ivdSet = new HashSet<>();
 		List<InventoryVoucherDetailDTO> ivdDTOs = new ArrayList<>();
-		
-		inventoryVoucherDetailDTOs.forEach(ivd ->ivdSet.add(ivd));
-		
-		ivdSet.forEach(ivdset ->{
-		double cumulative = inventoryVoucherDetailDTOs.stream().filter(ivd ->ivd.getProductName().equals(ivdset.getProductName()))
-			.mapToDouble(InventoryVoucherDetailDTO::getQuantity).sum();
-		InventoryVoucherDetailDTO ivdDTO = new InventoryVoucherDetailDTO();
-		ivdDTO.setProductName(ivdset.getProductName());
-		ivdDTO.setQuantity(cumulative);
-		ivdDTOs.add(ivdDTO);
+
+		inventoryVoucherDetailDTOs.forEach(ivd -> ivdSet.add(ivd));
+
+		ivdSet.forEach(ivdset -> {
+			double cumulative = inventoryVoucherDetailDTOs.stream()
+					.filter(ivd -> ivd.getProductName().equals(ivdset.getProductName()))
+					.mapToDouble(InventoryVoucherDetailDTO::getQuantity).sum();
+			InventoryVoucherDetailDTO ivdDTO = new InventoryVoucherDetailDTO();
+			ivdDTO.setProductName(ivdset.getProductName());
+			ivdDTO.setQuantity(cumulative);
+			ivdDTOs.add(ivdDTO);
 		});
-		
+
 		return ivdDTOs;
 	}
 }

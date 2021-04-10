@@ -11,7 +11,7 @@ if (!this.ItemWiseSale) {
 	$(document).ready(function() {
 		var employeePid = getParameterByName('user-key-pid');
 		getEmployees(employeePid);
-		
+
 		$("#dbDocumentType").change(function() {
 			loadAllDocumentByDocumentType();
 		});
@@ -92,6 +92,7 @@ if (!this.ItemWiseSale) {
 	ItemWiseSale.filter = function() {
 		var value = "";
 		var empPids = $('#dbEmployee').val();
+		var accountPids = $('#dbAccount').val();
 		$('#lblTotal').text("0");
 		if ($("#includeStockLocationDetails").is(':checked')) {
 			value = $('#includeStockLocationDetails').val();
@@ -101,11 +102,18 @@ if (!this.ItemWiseSale) {
 				return;
 			}
 		}
-		if("no" == empPids || "Dashboard Employee" == empPids){
+		if ("no" == empPids || "Dashboard Employee" == empPids) {
 			empPids = $('#dbEmployee option').map(function() {
-		        return $(this).val();
-		    }).get().join(',');
+				return $(this).val();
+			}).get().join(',');
 		}
+
+		if ("-1" == accountPids) {
+			accountPids = $('#dbAccount option').map(function() {
+				return $(this).val();
+			}).get().join(',');
+		}
+
 		
 		if ($("#dbDocumentType").val() == "no") {
 			alert("Please Select Document Type")
@@ -116,14 +124,14 @@ if (!this.ItemWiseSale) {
 		if (value == "no") {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>Employee</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>Quantity</th><th>Amount</th></tr>");
+							"<tr><th>Date</th><th>Employee</th><th>Account Profile</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>Quantity</th><th>Amount</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='8' align='center'>Please wait...</td></tr>");
 		} else {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>Employee</th><th>Category</th><th>Item</th><th>Quantity</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
+							"<tr><th>Date</th><th>Employee</th><th>Account Profile</th><th>Category</th><th>Item</th><th>Quantity</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='7' align='center'>Please wait...</td></tr>");
@@ -145,7 +153,8 @@ if (!this.ItemWiseSale) {
 						stockLocations : "",
 						employeePid : empPids,
 						inclSubordinate : $('#inclSubOrdinates').is(":checked"),
-						profilePids : ""
+						profilePids : "",
+						accountPids : $("#dbAccount").val(),
 					},
 					success : function(itemWiseSales) {
 						$('#tBodyItemWiseSale').html("");
@@ -174,6 +183,8 @@ if (!this.ItemWiseSale) {
 															+ "</td><td>"
 															+ itemWiseSale.employeeName
 															+ "</td><td>"
+															+ itemWiseSale.accountName
+															+ "</td><td>"
 															+ (itemWiseSale.sourceStockLocationName == null ? ""
 																	: itemWiseSale.sourceStockLocationName)
 															+ "</td><td>"
@@ -199,6 +210,8 @@ if (!this.ItemWiseSale) {
 															+ convertDateTimeFromServer(itemWiseSale.createdDate)
 															+ "</td><td>"
 															+ itemWiseSale.employeeName
+															+ "</td><td>"
+															+ itemWiseSale.accountName
 															+ "</td><td>"
 															+ itemWiseSale.productCategory
 															+ "</td><td>"
@@ -245,9 +258,10 @@ if (!this.ItemWiseSale) {
 		$("#pGroup").find('input[type="checkbox"]:checked').each(function() {
 			groupPids.push($(this).val());
 		});
-		$("#stockLocation").find('input[type="checkbox"]:checked').each(function() {
-			stockLocations.push($(this).val());
-		});
+		$("#stockLocation").find('input[type="checkbox"]:checked').each(
+				function() {
+					stockLocations.push($(this).val());
+				});
 		$("#pProfile").find('input[type="checkbox"]:checked').each(function() {
 			profilePids.push($(this).val());
 		});
@@ -286,8 +300,7 @@ if (!this.ItemWiseSale) {
 						profilePids : profilePids.join(","),
 						employeePid : $('#dbEmployee').val(),
 						inclSubordinate : $('#inclSubOrdinates').is(":checked")
-						
-						
+
 					},
 					success : function(itemWiseSales) {
 						$('#tBodyItemWiseSale').html("");
