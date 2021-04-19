@@ -398,9 +398,13 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		case "COMPLETED":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED);
 			break;
+		case "FAILED":
+			tallyStatus = Arrays.asList(TallyDownloadStatus.FAILED);
+			break;	
+			
 		case "ALL":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED, TallyDownloadStatus.PROCESSING,
-					TallyDownloadStatus.PENDING);
+					TallyDownloadStatus.PENDING,TallyDownloadStatus.FAILED);
 			break;
 		}
 

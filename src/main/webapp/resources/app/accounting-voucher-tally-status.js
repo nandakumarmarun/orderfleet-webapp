@@ -372,6 +372,8 @@ if (!this.AccountVoucher) {
 		var pending = "'" + 'PENDING' + "'";
 		var processing = "'" + 'PROCESSING' + "'";
 		var completed = "'" + 'COMPLETED' + "'";
+		var failed = "'" + 'FAILED' + "'";
+		
 		var spanStatus = "";
 		var pid = "'" + accountVoucherPid + "'";
 		switch (status) {
@@ -389,6 +391,11 @@ if (!this.AccountVoucher) {
 					+ ','
 					+ completed
 					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ failed
+					+ ')" style="cursor: pointer;"><a>FAILED</a></li>'
 					+ '</ul></div>';
 			break;
 		case 'PROCESSING':
@@ -405,6 +412,11 @@ if (!this.AccountVoucher) {
 					+ ','
 					+ completed
 					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ failed
+					+ ')" style="cursor: pointer;"><a>FAILED</a></li>'
 					+ '</ul></div>';
 			break;
 		case 'COMPLETED':
@@ -421,6 +433,32 @@ if (!this.AccountVoucher) {
 					+ ','
 					+ processing
 					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ failed
+					+ ')" style="cursor: pointer;"><a>FAILED</a></li>'
+					+ '</ul></div>';
+			break;
+			case 'FAILED':
+			spanStatus = '<div class="dropdown"><span class="label label-danger dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
+					+ 'FAILED <span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ pending
+					+ ')"  style="cursor: pointer;"><a>PENDING</a></li>'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ processing
+					+ ')" style="cursor: pointer;"><a>PROCESSING</a></li>'
+					+ '<li onclick="AccountVoucher.setStatus('
+					+ pid
+					+ ','
+					+ completed
+					+ ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
 					+ '</ul></div>';
 			break;
 		}
