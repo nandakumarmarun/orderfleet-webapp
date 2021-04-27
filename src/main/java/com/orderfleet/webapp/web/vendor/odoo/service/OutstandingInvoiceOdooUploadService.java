@@ -69,6 +69,7 @@ public class OutstandingInvoiceOdooUploadService {
 		// create list account profile
 		Map<String, Double> accountBalanceMap = new HashMap<>();
 		List<AccountProfile> accProfiles = accountProfileRepository.findAccountProfileAndCustomerIds(customerIds);
+		List<AccountProfile> accProfilesNotInList = accountProfileRepository.findAccountProfileAndCustomerIdsNotIn(customerIds);
 		for (OdooOutstandingInvoice ppDto : list) {
 			accProfiles.stream().filter(a -> a.getCustomerId().equalsIgnoreCase(ppDto.getCustomer_id())).findAny()
 					.ifPresent(ap -> {
@@ -105,6 +106,10 @@ public class OutstandingInvoiceOdooUploadService {
 						ap.setClosingBalance(entry.getValue());
 					});
 		}
+		log.info("Update Not In CustomerIds Account Profile Closing Balance zero "+ accProfilesNotInList.size());
+		accProfilesNotInList.forEach(f -> f.setClosingBalance(0));
+		accountProfileRepository.save(accProfilesNotInList);
+
 		log.info("Save account profile size {}", saveReceivablePayable.size());
 		accountProfileRepository.save(accProfiles);
 		bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);

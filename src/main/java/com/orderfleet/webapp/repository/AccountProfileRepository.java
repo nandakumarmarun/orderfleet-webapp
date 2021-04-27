@@ -186,6 +186,9 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and accountProfile.customerId in ?1")
 	List<AccountProfile> findAccountProfileAndCustomerIds(List<String> customerIds);
 
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and accountProfile.customerId not in ?1")
+	List<AccountProfile> findAccountProfileAndCustomerIdsNotIn(List<String> customerIds);
+
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.dataSourceType = ?1 and accountProfile.accountStatus= ?2 order by accountProfile.createdDate desc ")
 	List<AccountProfile> findAllByCompanyAndDataSourceTypeAndCreatedDateAndAccountStatus(DataSourceType dataSourceType,
 			AccountStatus accountStatus);
