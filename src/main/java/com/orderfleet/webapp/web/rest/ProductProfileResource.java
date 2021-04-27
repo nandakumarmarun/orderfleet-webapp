@@ -15,6 +15,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.domain.ProductGroupProduct;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
@@ -429,6 +430,7 @@ public class ProductProfileResource {
 	@RequestMapping(value = "/productProfiles/download-profile-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public void downloadProductProfileXls(@RequestParam String status,HttpServletResponse response) {
+		List<ProductGroupProduct> productGroupProducts =  productGroupProductService.findAllByCompany();
 		List<ProductProfileDTO> productProfileDTOs = new ArrayList<ProductProfileDTO>();
 		switch (status)
 		{
@@ -445,20 +447,21 @@ public class ProductProfileResource {
 //			productProfileDTOs = productProfileService.findAllByCompany();
 			break;
 		}
-		buildExcelDocument(productProfileDTOs, response);
+		buildExcelDocument(productGroupProducts, productProfileDTOs, response);
 	}
 	
-	private void buildExcelDocument(List<ProductProfileDTO> productProfileDTOs,
-			HttpServletResponse response) {
+	private void buildExcelDocument(List<ProductGroupProduct> productGroupProducts,
+									List<ProductProfileDTO> productProfileDTOs,
+									HttpServletResponse response) {
 		log.debug("Downloading Excel report");
 		String excelFileName = "productProfile" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = {"Name", "Category", "Division", "Unit Quantity", "SKU", "Price", "Alias", "Status",
+		String[] headerColumns = {"Name", "Category", "Group", "Division", "Unit Quantity", "SKU", "Price", "Alias", "Status",
 				"Product Id", "MRP", "Tax Rate", "Size", "HSN Code", "Description", "Product Code"};
 		try(HSSFWorkbook workbook = new HSSFWorkbook()){
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
-			createReportRows(worksheet, productProfileDTOs);
+			createReportRows(worksheet, productProfileDTOs, productGroupProducts);
 			// Resize all columns to fit the content size
 	        for(int i = 0; i < headerColumns.length; i++) {
 	        	worksheet.autoSizeColumn(i);
@@ -474,7 +477,7 @@ public class ProductProfileResource {
 		}
 	}
 	
-	private void createReportRows(HSSFSheet worksheet, List<ProductProfileDTO> productProfileDTOs) {
+	private void createReportRows(HSSFSheet worksheet, List<ProductProfileDTO> productProfileDTOs, List<ProductGroupProduct> productGroupProducts) {
 		/* CreationHelper helps us create instances of various things like DataFormat, 
         Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way */
 		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
@@ -484,22 +487,32 @@ public class ProductProfileResource {
         // Create Other rows and cells with Sales data
         int rowNum = 1;
     	for (ProductProfileDTO pp: productProfileDTOs) {
+    		// find product group
+			Optional<ProductGroupProduct> temp =  productGroupProducts.stream()
+					.filter(pGroup -> pGroup.getProduct().getPid().equals(pp.getPid())).findAny();
+			String productGroup ="";
+			if (temp.isPresent()) {
+				productGroup = temp.get().getProductGroup().getName();
+			}
+
+
     		HSSFRow row = worksheet.createRow(rowNum++);
     		row.createCell(0).setCellValue(pp.getName().replace("#13;#10;", " "));
     		row.createCell(1).setCellValue(pp.getProductCategoryName());
-    		row.createCell(2).setCellValue(pp.getDivisionName());
-    		row.createCell(3).setCellValue(pp.getUnitQty() == null ? "" : pp.getUnitQty().toString());
-    		row.createCell(4).setCellValue(pp.getSku() == null ? "" : pp.getSku());
-    		row.createCell(5).setCellValue(pp.getPrice().doubleValue());
-    		row.createCell(6).setCellValue(pp.getAlias());
-    		row.createCell(7).setCellValue(pp.getActivated() == true ? "Activated" : "Deactivated");
-			row.createCell(8).setCellValue(pp.getProductId());
-			row.createCell(9).setCellValue(pp.getMrp());
-			row.createCell(10).setCellValue(pp.getTaxRate());
-			row.createCell(11).setCellValue(pp.getSize());
-			row.createCell(12).setCellValue(pp.getHsnCode());
-			row.createCell(13).setCellValue(pp.getDescription());
-			row.createCell(14).setCellValue(pp.getProductCode());
+    		row.createCell(2).setCellValue(productGroup);
+    		row.createCell(3).setCellValue(pp.getDivisionName());
+    		row.createCell(4).setCellValue(pp.getUnitQty() == null ? "" : pp.getUnitQty().toString());
+    		row.createCell(5).setCellValue(pp.getSku() == null ? "" : pp.getSku());
+    		row.createCell(6).setCellValue(pp.getPrice().doubleValue());
+    		row.createCell(7).setCellValue(pp.getAlias());
+    		row.createCell(8).setCellValue(pp.getActivated() == true ? "Activated" : "Deactivated");
+			row.createCell(9).setCellValue(pp.getProductId());
+			row.createCell(10).setCellValue(pp.getMrp());
+			row.createCell(11).setCellValue(pp.getTaxRate());
+			row.createCell(12).setCellValue(pp.getSize());
+			row.createCell(13).setCellValue(pp.getHsnCode());
+			row.createCell(14).setCellValue(pp.getDescription());
+			row.createCell(15).setCellValue(pp.getProductCode());
 		}
 		
 	}
