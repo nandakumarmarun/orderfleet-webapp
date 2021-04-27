@@ -89,6 +89,8 @@ public class ProductProfileDTO {
 
 	private String productId;
 
+	private String productCode;
+
 	private LocalDateTime createdDate;
 
 	private String stockLocationName;
@@ -165,6 +167,7 @@ public class ProductProfileDTO {
 		this.barcode = profile.getBarcode();
 		this.remarks = profile.getRemarks();
 		this.productId = profile.getProductId();
+		this.productCode = profile.getProductCode();
 
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
@@ -433,6 +436,14 @@ public class ProductProfileDTO {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public String getProductCode() {
+		return productCode;
+	}
+
+	public void setProductCode(String productCode) {
+		this.productCode = productCode;
 	}
 
 	public String getProductId() {

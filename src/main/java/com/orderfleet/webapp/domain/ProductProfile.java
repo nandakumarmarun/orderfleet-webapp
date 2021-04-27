@@ -74,6 +74,9 @@ public class ProductProfile implements Serializable, Cloneable {
 	@Column(name = "product_id")
 	private String productId;
 
+	@Column(name = "product_code")
+	private String productCode;
+
 	@NotNull
 	@Column(name = "price", precision = 10, scale = 2, nullable = false)
 	private BigDecimal price;
@@ -278,6 +281,14 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public ProductCategory getProductCategory() {
 		return productCategory;
+	}
+
+	public String getProductCode() {
+		return productCode;
+	}
+
+	public void setProductCode(String productCode) {
+		this.productCode = productCode;
 	}
 
 	public void setProductCategory(ProductCategory productCategory) {

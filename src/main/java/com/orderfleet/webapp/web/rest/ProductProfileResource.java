@@ -453,7 +453,8 @@ public class ProductProfileResource {
 		log.debug("Downloading Excel report");
 		String excelFileName = "productProfile" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = {"Name", "Category", "Division", "Unit Quantity", "SKU", "Price", "Alias", "Status"};
+		String[] headerColumns = {"Name", "Category", "Division", "Unit Quantity", "SKU", "Price", "Alias", "Status",
+				"Product Id", "MRP", "Tax Rate", "Size", "HSN Code", "Description", "Product Code"};
 		try(HSSFWorkbook workbook = new HSSFWorkbook()){
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -492,6 +493,13 @@ public class ProductProfileResource {
     		row.createCell(5).setCellValue(pp.getPrice().doubleValue());
     		row.createCell(6).setCellValue(pp.getAlias());
     		row.createCell(7).setCellValue(pp.getActivated() == true ? "Activated" : "Deactivated");
+			row.createCell(8).setCellValue(pp.getProductId());
+			row.createCell(9).setCellValue(pp.getMrp());
+			row.createCell(10).setCellValue(pp.getTaxRate());
+			row.createCell(11).setCellValue(pp.getSize());
+			row.createCell(12).setCellValue(pp.getHsnCode());
+			row.createCell(13).setCellValue(pp.getDescription());
+			row.createCell(14).setCellValue(pp.getProductCode());
 		}
 		
 	}
