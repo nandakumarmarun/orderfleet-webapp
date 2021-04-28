@@ -295,16 +295,20 @@ public class SendReceiptOdooService {
 						.getAccountingVoucherAllocations()) {
 					OdooVoucherLine odooVoucherLine = new OdooVoucherLine();
 					odooVoucherLine.setAmount(accountingVoucherAllocation.getAmount());
+					odooVoucherLine.setVoucher_id(accountingVoucherAllocation.getReceivablePayableId() != null
+							&& !accountingVoucherAllocation.getReceivablePayableId().equals("")
+							? Long.parseLong(accountingVoucherAllocation.getReceivablePayableId())
+							: 0);
 
-					Optional<ReceivablePayable> opRecPay = receivablePayables.stream()
-							.filter(u -> u.getPid().equals(accountingVoucherAllocation.getReceivablePayablePid()))
-							.findAny();
-					if (opRecPay.isPresent()) {
-						odooVoucherLine.setVoucher_id(opRecPay.get().getReceivablePayableId() != null
-								&& !opRecPay.get().getReceivablePayableId().equals("")
-										? Long.parseLong(opRecPay.get().getReceivablePayableId())
-										: 0);
-					}
+//					Optional<ReceivablePayable> opRecPay = receivablePayables.stream()
+//							.filter(u -> u.getReceivablePayableId().equals(accountingVoucherAllocation.getReceivablePayableId()))
+//							.findAny();
+//					if (opRecPay.isPresent()) {
+//						odooVoucherLine.setVoucher_id(opRecPay.get().getReceivablePayableId() != null
+//								&& !opRecPay.get().getReceivablePayableId().equals("")
+//										? Long.parseLong(opRecPay.get().getReceivablePayableId())
+//										: 0);
+//					}
 
 					odooVoucherLines.add(odooVoucherLine);
 
