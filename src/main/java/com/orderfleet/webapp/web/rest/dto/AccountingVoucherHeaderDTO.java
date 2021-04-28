@@ -92,6 +92,8 @@ public class AccountingVoucherHeaderDTO {
 
 	private String orderReferenceNumber;
 
+	private boolean sendToOdoo;
+
 	public AccountingVoucherHeaderDTO() {
 		super();
 	}
@@ -439,6 +441,14 @@ public class AccountingVoucherHeaderDTO {
 
 	public void setImageRefNo(String imageRefNo) {
 		this.imageRefNo = imageRefNo;
+	}
+
+	public boolean getSendToOdoo() {
+		return sendToOdoo;
+	}
+
+	public void setSendToOdoo(boolean sendToOdoo) {
+		this.sendToOdoo = sendToOdoo;
 	}
 
 	@Override

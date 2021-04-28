@@ -337,7 +337,7 @@ public class TaskSubmissionPostSave {
 			if (optSendToOdoo.isPresent()) {
 				if (Boolean.valueOf(optSendToOdoo.get().getValue())) {
 					if (accountingVouchers.size() > 0) {
-						Thread.sleep(10000);
+						Thread.sleep(30000);
 						sendReceiptOdooService.sendReceiptAsync(accountingVouchers);
 						// sendTransactionOdooService.sendInvoicesToOdoo(tsTransactionWrapper);
 					}

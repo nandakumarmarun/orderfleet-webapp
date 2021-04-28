@@ -248,6 +248,9 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	Optional<AccountingVoucherHeader> findOneByExecutiveTaskExecutionPidAndImageRefNo(String executiveTaskExecutionPid,
 			String imageRefNo);
 
+	@Query("select avh from AccountingVoucherHeader avh LEFT JOIN FETCH avh.accountingVoucherDetails where avh.company.id = ?#{principal.companyId} and avh.documentNumberServer = ?1 Order By avh.createdDate desc")
+	AccountingVoucherHeader findAccountingVoucherHeaderByDocumentNumber(String documentNumberServer);
+
 	@Query(value = "select count(*),doc.pid from tbl_accounting_voucher_header avh "
 			+ "inner join tbl_document doc on avh.document_id = doc.id "
 			+ "where avh.company_id = ?#{principal.companyId} and avh.created_by_id = ?1 "

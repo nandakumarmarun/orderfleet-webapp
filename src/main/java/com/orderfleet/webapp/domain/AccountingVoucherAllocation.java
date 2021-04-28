@@ -61,6 +61,9 @@ public class AccountingVoucherAllocation implements Serializable {
 	@Column(name = "remarks", length = 1000)
 	private String remarks;
 
+	@Column(name = "receivable_payable_id")
+	private String receivablePayableId;
+
 	public AccountingVoucherAllocation() {
 	}
 
@@ -138,6 +141,14 @@ public class AccountingVoucherAllocation implements Serializable {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public String getReceivablePayableId() {
+		return receivablePayableId;
+	}
+
+	public void setReceivablePayableId(String receivablePayableId) {
+		this.receivablePayableId = receivablePayableId;
 	}
 
 }

@@ -129,8 +129,8 @@
 									<option value="PROCESSING">PROCESSING</option>
 									<option value="COMPLETED">COMPLETED</option>
 									<option value="FAILED">FAILED</option>
-									
-									
+
+
 								</select>
 							</div>
 							<div class="col-sm-1">
@@ -138,31 +138,22 @@
 								<button type="button" class="btn btn-info"
 									onclick="AccountVoucher.filter()">Apply</button>
 							</div>
-							
-							<c:if test="${sendReceiptOdooStatus=='true'}">
-								<div class="col-sm-4">
-									<br>
-									<button type="button" class="btn btn-primary"
-										id="sendReceiptOdoo">Send Receipts</button>
 
-								</div>
-
-							</c:if>
 							<div class="col-sm-1">
 								<br>
 								<button type="button" class="btn btn-success" id="downloadXls">Download</button>
 							</div>
 
-<%-- 							<c:if test="${sendTransactionsSapPravesh=='true'}"> --%>
-<!-- 								<div class="col-sm-1"> -->
-<!-- 									<br> -->
-<!-- 									<button type="button" class="btn btn-primary" -->
-<!-- 										id="sendTransactionsSapPravesh">Send Receipts To SAP</button> -->
-<!-- 																		<div class="loader hide"></div> -->
+							<%-- 							<c:if test="${sendTransactionsSapPravesh=='true'}"> --%>
+							<!-- 								<div class="col-sm-1"> -->
+							<!-- 									<br> -->
+							<!-- 									<button type="button" class="btn btn-primary" -->
+							<!-- 										id="sendTransactionsSapPravesh">Send Receipts To SAP</button> -->
+							<!-- 																		<div class="loader hide"></div> -->
 
-<!-- 								</div> -->
+							<!-- 								</div> -->
 
-<%-- 							</c:if> --%>
+							<%-- 							</c:if> --%>
 						</div>
 					</form>
 				</div>

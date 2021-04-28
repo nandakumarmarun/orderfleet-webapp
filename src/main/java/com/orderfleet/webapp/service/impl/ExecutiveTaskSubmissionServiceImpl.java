@@ -453,10 +453,10 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 					LocalDate bookingDate = LocalDate.parse(inventoryVoucherDTO.getBookingDate(), formatter);
 					inventoryVoucherHeader.setBookingDate(bookingDate);
 				}
-				inventoryVoucherHeader.setValidationDays(
-						inventoryVoucherDTO.getValidationDays() == null || inventoryVoucherDTO.getValidationDays().equals("") ? ""
+				inventoryVoucherHeader.setValidationDays(inventoryVoucherDTO.getValidationDays() == null
+						|| inventoryVoucherDTO.getValidationDays().equals("") ? ""
 								: inventoryVoucherDTO.getValidationDays());
-				
+
 				if (inventoryVoucherDTO.getDeliveryDateDocument() != null
 						&& !inventoryVoucherDTO.getDeliveryDateDocument().equals("")) {
 
@@ -741,8 +741,11 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 							accountingVoucherAllocation.setRemarks(accountingVoucherAllocationDTO.getRemarks());
 							accountingVoucherAllocation
 									.setVoucherNumber(accountingVoucherAllocationDTO.getVoucherNumber());
-							accountingVoucherAllocation
-									.setReceivablePayablePid(accountingVoucherAllocationDTO.getReceivablePayablePid());
+							if (accountingVoucherAllocationDTO.getReceivablePayablePid() != null
+									&& !accountingVoucherAllocationDTO.getReceivablePayablePid().equals("")) {
+								accountingVoucherAllocation.setReceivablePayablePid(
+										accountingVoucherAllocationDTO.getReceivablePayablePid());
+							}
 							if (accountingVoucherAllocationDTO.getReferenceDocumentNumber() != null) {
 								Optional<ReceivablePayable> receivablePayable = receivablePayableRepository
 										.findOneByAccountProfilePidAndReferenceDocumentNumber(

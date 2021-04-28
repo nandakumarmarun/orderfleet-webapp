@@ -156,10 +156,10 @@ public class ReceiptPerformanceReportTallyStatusResource {
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
-	
+
 	@Inject
 	private SendTransactionSapPraveshService sendTransactionSapPraveshService;
-	
+
 	@Inject
 	private SendReceiptOdooService sendReceiptOdooService;
 
@@ -233,10 +233,10 @@ public class ReceiptPerformanceReportTallyStatusResource {
 			}
 		}
 		model.addAttribute("sendTransactionsSapPravesh", sendTransactionsSapPravesh);
-		
+
 		boolean sendSalesOrderOdoo = false;
 		Optional<CompanyConfiguration> opCompanyConfigurationOdoo = companyConfigurationRepository
-				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_SALES_ORDER_ODOO);
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_TO_ODOO);
 		if (opCompanyConfigurationOdoo.isPresent()) {
 
 			if (opCompanyConfigurationOdoo.get().getValue().equals("true")) {
@@ -269,7 +269,7 @@ public class ReceiptPerformanceReportTallyStatusResource {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	@RequestMapping(value = "/receipt-download-status/sendTransactionsSapPravesh", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<AccountingVoucherHeaderDTO> sendTransactionsSapPravesh() throws MessagingException {
@@ -281,7 +281,7 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
 	}
-	
+
 	@RequestMapping(value = "/receipt-download-status/sendReceiptOdoo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> sendReceiptOdoo() throws MessagingException {
@@ -292,7 +292,7 @@ public class ReceiptPerformanceReportTallyStatusResource {
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
-	}	
+	}
 
 	/**
 	 * GET /receipt-download-status/images/:pid : get the "id" FormFileDTO.
@@ -336,6 +336,23 @@ public class ReceiptPerformanceReportTallyStatusResource {
 			formFileDTOs.add(formFileDTO);
 		}
 		return new ResponseEntity<>(formFileDTOs, HttpStatus.OK);
+
+	}
+
+	@Timed
+	@RequestMapping(value = "/receipt-download-status/sendReceiptToOdoo/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<AccountingVoucherHeaderDTO>> sendReceiptToOdoo(@PathVariable String pid) {
+		log.debug("Web request to get Receipts by pid : {}", pid);
+
+		List<AccountingVoucherHeader> accountingVouchers = accountingVoucherHeaderRepository
+				.findAccountingVoucherHeaderByPid(pid);
+		if (accountingVouchers.size() > 0) {
+			sendReceiptOdooService.sendReceiptAsync(accountingVouchers);
+		}
+
+		List<AccountingVoucherHeaderDTO> accountingVoucherHeaderDTOs = new ArrayList<>();
+
+		return new ResponseEntity<>(accountingVoucherHeaderDTOs, HttpStatus.OK);
 
 	}
 
@@ -400,11 +417,11 @@ public class ReceiptPerformanceReportTallyStatusResource {
 			break;
 		case "FAILED":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.FAILED);
-			break;	
-			
+			break;
+
 		case "ALL":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED, TallyDownloadStatus.PROCESSING,
-					TallyDownloadStatus.PENDING,TallyDownloadStatus.FAILED);
+					TallyDownloadStatus.PENDING, TallyDownloadStatus.FAILED);
 			break;
 		}
 
@@ -420,6 +437,23 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		if (accountVouchers.isEmpty()) {
 			return Collections.emptyList();
 		} else {
+
+			boolean sendToOdoo = false;
+			Optional<CompanyConfiguration> opCompanyConfigurationOdoo = companyConfigurationRepository
+					.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_TO_ODOO);
+			if (opCompanyConfigurationOdoo.isPresent()) {
+
+				if (opCompanyConfigurationOdoo.get().getValue().equals("true")) {
+					sendToOdoo = true;
+				} else {
+					sendToOdoo = false;
+				}
+			}
+
+			for (AccountingVoucherHeaderDTO accountingVoucherHeader : accountVouchers) {
+				accountingVoucherHeader.setSendToOdoo(sendToOdoo);
+			}
+
 			return accountVouchers;
 		}
 	}

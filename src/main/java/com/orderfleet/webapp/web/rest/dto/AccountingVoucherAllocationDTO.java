@@ -25,6 +25,8 @@ public class AccountingVoucherAllocationDTO {
 
 	private String remarks;
 
+	private String receivablePayableId;
+
 	public AccountingVoucherAllocationDTO() {
 	}
 
@@ -37,6 +39,10 @@ public class AccountingVoucherAllocationDTO {
 		this.mode = accountingVoucherAllocation.getMode();
 		this.amount = accountingVoucherAllocation.getAmount();
 		this.remarks = accountingVoucherAllocation.getRemarks();
+		this.receivablePayableId = accountingVoucherAllocation.getReceivablePayableId() != null
+				&& !accountingVoucherAllocation.getReceivablePayableId().equals("")
+						? accountingVoucherAllocation.getReceivablePayableId()
+						: "";
 	}
 
 	public String getReceivablePayablePid() {
@@ -93,6 +99,14 @@ public class AccountingVoucherAllocationDTO {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public String getReceivablePayableId() {
+		return receivablePayableId;
+	}
+
+	public void setReceivablePayableId(String receivablePayableId) {
+		this.receivablePayableId = receivablePayableId;
 	}
 
 }

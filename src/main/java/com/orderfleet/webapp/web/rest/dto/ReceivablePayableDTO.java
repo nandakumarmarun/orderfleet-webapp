@@ -49,6 +49,8 @@ public class ReceivablePayableDTO {
 
 	private String supplierAccountName;
 
+	private String receivablePayableId;
+
 	private double closingBalance;
 
 	public ReceivablePayableDTO() {
@@ -78,6 +80,9 @@ public class ReceivablePayableDTO {
 		this.supplierAccountName = receivablePayable.getSupplierAccountProfile() != null
 				? receivablePayable.getSupplierAccountProfile().getName()
 				: "";
+		this.receivablePayableId = receivablePayable.getReceivablePayableId() != null
+				&& !receivablePayable.getReceivablePayableId().equals("") ? receivablePayable.getReceivablePayableId()
+						: "";
 	}
 
 	public String getPid() {
@@ -228,6 +233,14 @@ public class ReceivablePayableDTO {
 
 	public void setSupplierAccountName(String supplierAccountName) {
 		this.supplierAccountName = supplierAccountName;
+	}
+
+	public String getReceivablePayableId() {
+		return receivablePayableId;
+	}
+
+	public void setReceivablePayableId(String receivablePayableId) {
+		this.receivablePayableId = receivablePayableId;
 	}
 
 	@Override

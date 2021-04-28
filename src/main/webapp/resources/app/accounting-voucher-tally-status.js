@@ -41,7 +41,35 @@ if (!this.AccountVoucher) {
 		 * loadAllDocumentByDocumentType(); });
 		 */
 	});
-	
+
+	AccountVoucher.sendReceiptToOdoo = function(pid) {
+
+		$(".loader").addClass('show');
+
+		if (confirm("Are you sure?")) {
+
+			$.ajax({
+				url : accountVoucherContextPath + "/sendReceiptToOdoo/" + pid,
+				method : 'GET',
+				beforeSend : function() {
+					// Show image container
+					$("#loader").modal('show');
+
+				},
+				success : function(data) {
+					$("#loader").modal('hide');
+					AccountVoucher.filter();
+
+					// onSaveSuccess(data);
+				},
+				error : function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+		}
+
+	}
+
 	function sendReceiptOdoo() {
 
 		$(".loader").addClass('show');
@@ -59,7 +87,7 @@ if (!this.AccountVoucher) {
 				success : function(data) {
 					$("#loader").modal('hide');
 					InventoryVoucher.filter();
-					
+
 					// onSaveSuccess(data);
 				},
 				error : function(xhr, error) {
@@ -69,31 +97,33 @@ if (!this.AccountVoucher) {
 		}
 
 	}
-	
+
 	function sendTransactionsSapPravesh() {
 
 		$(".loader").addClass('show');
 
 		if (confirm("Are you sure?")) {
 
-			$.ajax({
-				url : accountVoucherContextPath + "/sendTransactionsSapPravesh",
-				method : 'GET',
-				beforeSend : function() {
-					// Show image container
-					$("#loader").modal('show');
+			$
+					.ajax({
+						url : accountVoucherContextPath
+								+ "/sendTransactionsSapPravesh",
+						method : 'GET',
+						beforeSend : function() {
+							// Show image container
+							$("#loader").modal('show');
 
-				},
-				success : function(data) {
-					$("#loader").modal('hide');
-					AccountVoucher.filter();
-					
-					// onSaveSuccess(data);
-				},
-				error : function(xhr, error) {
-					onError(xhr, error);
-				}
-			});
+						},
+						success : function(data) {
+							$("#loader").modal('hide');
+							AccountVoucher.filter();
+
+							// onSaveSuccess(data);
+						},
+						error : function(xhr, error) {
+							onError(xhr, error);
+						}
+					});
 		}
 
 	}
@@ -291,6 +321,14 @@ if (!this.AccountVoucher) {
 												content = "<td>No Image</td>";
 											}
 
+											var sendToOdooButton = "";
+
+											if (accountVoucher.sendToOdoo) {
+												sendToOdooButton = "<br><br><button type='button' class='btn btn-primary' onclick='AccountVoucher.sendReceiptToOdoo(\""
+														+ accountVoucher.pid
+														+ "\")'>Send Receipt</button>";
+											}
+
 											$('#tBodyAccountVoucher')
 													.append(
 															"<tr><td><input type='checkbox' class='check-one' value='"
@@ -312,7 +350,9 @@ if (!this.AccountVoucher) {
 																			accountVoucher.tallyDownloadStatus)
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='AccountVoucher.showModalPopup($(\"#viewModal\"),\""
 																	+ accountVoucher.pid
-																	+ "\",0);'>View Details</button></td>"
+																	+ "\",0);'>View Details</button>"
+																	+ sendToOdooButton
+																	+ "</td>"
 																	+ content
 																	+ "</tr>");
 										});
@@ -373,7 +413,7 @@ if (!this.AccountVoucher) {
 		var processing = "'" + 'PROCESSING' + "'";
 		var completed = "'" + 'COMPLETED' + "'";
 		var failed = "'" + 'FAILED' + "'";
-		
+
 		var spanStatus = "";
 		var pid = "'" + accountVoucherPid + "'";
 		switch (status) {
@@ -440,7 +480,7 @@ if (!this.AccountVoucher) {
 					+ ')" style="cursor: pointer;"><a>FAILED</a></li>'
 					+ '</ul></div>';
 			break;
-			case 'FAILED':
+		case 'FAILED':
 			spanStatus = '<div class="dropdown"><span class="label label-danger dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
 					+ 'FAILED <span class="caret"></span></span>'
 					+ '<ul class="dropdown-menu">'

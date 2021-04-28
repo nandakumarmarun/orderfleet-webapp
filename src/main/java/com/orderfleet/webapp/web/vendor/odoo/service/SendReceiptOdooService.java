@@ -221,10 +221,17 @@ public class SendReceiptOdooService {
 		String companyPid = accountingVouchers.get(0).getCompany().getPid();
 		Long companyId = accountingVouchers.get(0).getCompany().getId();
 
-		System.out.println(accountingVouchers.get(0).getDocumentNumberServer() + "-------------------");
+		String documentNumber = accountingVouchers.get(0).getDocumentNumberServer() + "";
 
-		AccountingVoucherHeader obj = accountingVoucherHeaderRepository.findTop1ByCreatedByLoginOrderByCreatedDateDesc(
-				accountingVouchers.get(0).getEmployee().getUser().getLogin());
+		log.info(documentNumber + "--Document Number");
+
+		AccountingVoucherHeader obj = accountingVouchers.get(0);
+				
+//				accountingVoucherHeaderRepository
+//				.findAccountingVoucherHeaderByDocumentNumber(documentNumber);
+
+//				accountingVoucherHeaderRepository.findTop1ByCreatedByLoginOrderByCreatedDateDesc(
+//				accountingVouchers.get(0).getEmployee().getUser().getLogin());
 
 		DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -355,23 +362,23 @@ public class SendReceiptOdooService {
 
 		try {
 
-			ResponseBodyOdooReceipt responseBodyOdooReceipt = restTemplate.postForObject(SEND_RECEIPT_API_URL, entity,
-					ResponseBodyOdooReceipt.class);
-			log.info(responseBodyOdooReceipt + "");
-
-			// get object as a json string
-			String jsonStr1;
-			try {
-				jsonStr1 = Obj.writeValueAsString(responseBodyOdooReceipt);
-				log.info(jsonStr1);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			log.info("Odoo Receipt Created Success");
-
-			changeServerDownloadStatus(responseBodyOdooReceipt.getResult(), accountingVoucher);
+//			ResponseBodyOdooReceipt responseBodyOdooReceipt = restTemplate.postForObject(SEND_RECEIPT_API_URL, entity,
+//					ResponseBodyOdooReceipt.class);
+//			log.info(responseBodyOdooReceipt + "");
+//
+//			// get object as a json string
+//			String jsonStr1;
+//			try {
+//				jsonStr1 = Obj.writeValueAsString(responseBodyOdooReceipt);
+//				log.info(jsonStr1);
+//			} catch (JsonProcessingException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//
+//			log.info("Odoo Receipt Created Success");
+//
+//			changeServerDownloadStatus(responseBodyOdooReceipt.getResult(), accountingVoucher);
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {

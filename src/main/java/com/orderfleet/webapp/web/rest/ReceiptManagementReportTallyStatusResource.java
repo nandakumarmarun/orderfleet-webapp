@@ -89,7 +89,6 @@ import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPr
 public class ReceiptManagementReportTallyStatusResource {
 
 	private final Logger log = LoggerFactory.getLogger(ReceiptManagementReportTallyStatusResource.class);
-	
 
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
@@ -146,10 +145,10 @@ public class ReceiptManagementReportTallyStatusResource {
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
-	
+
 	@Inject
 	private SendTransactionSapPraveshService sendTransactionSapPraveshService;
-	
+
 	@RequestMapping(value = "/receipt-management", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -200,8 +199,7 @@ public class ReceiptManagementReportTallyStatusResource {
 
 		boolean sendTransactionsSapPravesh = false;
 		Optional<CompanyConfiguration> opCompanyConfigurationSapPravesh = companyConfigurationRepository
-				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(),
-						CompanyConfig.SEND_TRANSACTIONS_SAP_PRAVESH);
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_TO_ODOO);
 		if (opCompanyConfigurationSapPravesh.isPresent()) {
 
 			if (opCompanyConfigurationSapPravesh.get().getValue().equals("true")) {
@@ -214,7 +212,7 @@ public class ReceiptManagementReportTallyStatusResource {
 
 		return "company/receiptManagement";
 	}
-	
+
 	@RequestMapping(value = "/receipt-management/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<AccountingVoucherHeaderDTO>> filterInventoryVouchers(
@@ -247,7 +245,7 @@ public class ReceiptManagementReportTallyStatusResource {
 				tallyDownloadStatus, accountPid, fDate, tDate);
 		return new ResponseEntity<>(receiptStatusDTOs, HttpStatus.OK);
 	}
-	
+
 	private List<AccountingVoucherHeaderDTO> getFilterData(List<String> employeePids, String documentPid,
 			String tallyDownloadStatus, String accountPid, LocalDate fDate, LocalDate tDate) {
 
@@ -295,7 +293,7 @@ public class ReceiptManagementReportTallyStatusResource {
 			return accountVouchers;
 		}
 	}
-	
+
 	/**
 	 * GET /receipt/:id : get the "id" InventoryVoucher.
 	 *
@@ -315,7 +313,7 @@ public class ReceiptManagementReportTallyStatusResource {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	@RequestMapping(value = "/receipt-management/sendTransactionsSapPravesh", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<AccountingVoucherHeaderDTO> sendTransactionsSapPravesh() throws MessagingException {
@@ -372,7 +370,7 @@ public class ReceiptManagementReportTallyStatusResource {
 		return new ResponseEntity<>(formFileDTOs, HttpStatus.OK);
 
 	}
-	
+
 	@RequestMapping(value = "/receipt-management/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed
@@ -397,7 +395,7 @@ public class ReceiptManagementReportTallyStatusResource {
 		}
 		buildExcelDocument(accountingVoucherHeaderDTOs, response);
 	}
-	
+
 	private void buildExcelDocument(List<AccountingVoucherHeaderDTO> accountingVoucherHeaderDTOs,
 			HttpServletResponse response) {
 		log.debug("Downloading Excel report");
@@ -423,7 +421,7 @@ public class ReceiptManagementReportTallyStatusResource {
 			log.error("IOException on downloading Receipt {}", ex.getMessage());
 		}
 	}
-	
+
 	private void createReportRows(HSSFSheet worksheet, List<AccountingVoucherHeaderDTO> accountingVoucherHeaderDTOs) {
 		/*
 		 * CreationHelper helps us create instances of various things like DataFormat,
@@ -480,7 +478,7 @@ public class ReceiptManagementReportTallyStatusResource {
 			cell.setCellStyle(headerCellStyle);
 		}
 	}
-	
+
 	@RequestMapping(value = "/receipt-management/changeStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<AccountingVoucherHeaderDTO> changeStatus(@RequestParam String pid,
