@@ -741,11 +741,10 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 							accountingVoucherAllocation.setRemarks(accountingVoucherAllocationDTO.getRemarks());
 							accountingVoucherAllocation
 									.setVoucherNumber(accountingVoucherAllocationDTO.getVoucherNumber());
-							if (accountingVoucherAllocationDTO.getReceivablePayablePid() != null
-									&& !accountingVoucherAllocationDTO.getReceivablePayablePid().equals("")) {
-								accountingVoucherAllocation.setReceivablePayablePid(
-										accountingVoucherAllocationDTO.getReceivablePayablePid());
-							}
+							accountingVoucherAllocation
+									.setReceivablePayablePid(accountingVoucherAllocationDTO.getReceivablePayablePid());
+							accountingVoucherAllocation
+									.setReceivablePayableId(accountingVoucherAllocationDTO.getReceivablePayableId());
 							if (accountingVoucherAllocationDTO.getReferenceDocumentNumber() != null) {
 								Optional<ReceivablePayable> receivablePayable = receivablePayableRepository
 										.findOneByAccountProfilePidAndReferenceDocumentNumber(

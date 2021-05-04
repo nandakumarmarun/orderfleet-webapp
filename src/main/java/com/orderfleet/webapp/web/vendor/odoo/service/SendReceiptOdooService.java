@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
+import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.ReceivablePayable;
@@ -30,6 +31,7 @@ import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.AccountingVoucherDetailRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.ReceivablePayableRepository;
@@ -63,6 +65,9 @@ public class SendReceiptOdooService {
 
 	@Inject
 	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
+
+	@Inject
+	private AccountingVoucherDetailRepository accountingVoucherDetailRepository;
 
 	@Inject
 	private ReceivablePayableRepository receivablePayableRepository;
@@ -226,7 +231,7 @@ public class SendReceiptOdooService {
 		log.info(documentNumber + "--Document Number");
 
 		AccountingVoucherHeader obj = accountingVouchers.get(0);
-				
+
 //				accountingVoucherHeaderRepository
 //				.findAccountingVoucherHeaderByDocumentNumber(documentNumber);
 
@@ -297,8 +302,8 @@ public class SendReceiptOdooService {
 					odooVoucherLine.setAmount(accountingVoucherAllocation.getAmount());
 					odooVoucherLine.setVoucher_id(accountingVoucherAllocation.getReceivablePayableId() != null
 							&& !accountingVoucherAllocation.getReceivablePayableId().equals("")
-							? Long.parseLong(accountingVoucherAllocation.getReceivablePayableId())
-							: 0);
+									? Long.parseLong(accountingVoucherAllocation.getReceivablePayableId())
+									: 0);
 
 //					Optional<ReceivablePayable> opRecPay = receivablePayables.stream()
 //							.filter(u -> u.getReceivablePayableId().equals(accountingVoucherAllocation.getReceivablePayableId()))
@@ -332,6 +337,17 @@ public class SendReceiptOdooService {
 		log.info("Sending (" + odooParam.getReference() + ") Invoices to Odoo...." + accountingVoucher.getId());
 
 		accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.PROCESSING);
+
+		Set<String> accountingVoucherPids = new HashSet<>();
+
+		accountingVoucherPids.add(accountingVoucher.getPid());
+
+		List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
+				.findAllByAccountingVoucherHeaderPidIn(accountingVoucherPids);
+
+		if (accountingVoucherDetails.size() > 0) {
+			accountingVoucher.setAccountingVoucherDetails(accountingVoucherDetails);
+		}
 		accountingVoucherHeaderRepository.save(accountingVoucher);
 		log.debug("updated to PROCESSING");
 
@@ -366,23 +382,23 @@ public class SendReceiptOdooService {
 
 		try {
 
-//			ResponseBodyOdooReceipt responseBodyOdooReceipt = restTemplate.postForObject(SEND_RECEIPT_API_URL, entity,
-//					ResponseBodyOdooReceipt.class);
-//			log.info(responseBodyOdooReceipt + "");
-//
-//			// get object as a json string
-//			String jsonStr1;
-//			try {
-//				jsonStr1 = Obj.writeValueAsString(responseBodyOdooReceipt);
-//				log.info(jsonStr1);
-//			} catch (JsonProcessingException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//
-//			log.info("Odoo Receipt Created Success");
-//
-//			changeServerDownloadStatus(responseBodyOdooReceipt.getResult(), accountingVoucher);
+			ResponseBodyOdooReceipt responseBodyOdooReceipt = restTemplate.postForObject(SEND_RECEIPT_API_URL, entity,
+					ResponseBodyOdooReceipt.class);
+			log.info(responseBodyOdooReceipt + "");
+
+			// get object as a json string
+			String jsonStr1;
+			try {
+				jsonStr1 = Obj.writeValueAsString(responseBodyOdooReceipt);
+				log.info(jsonStr1);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			log.info("Odoo Receipt Created Success");
+
+			changeServerDownloadStatus(responseBodyOdooReceipt.getResult(), accountingVoucher);
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
@@ -408,6 +424,17 @@ public class SendReceiptOdooService {
 	}
 
 	private void changeServerDownloadStatus(ResultOdooReceipt response, AccountingVoucherHeader accountingVoucher) {
+
+		Set<String> accountingVoucherPids = new HashSet<>();
+
+		accountingVoucherPids.add(accountingVoucher.getPid());
+
+		List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
+				.findAllByAccountingVoucherHeaderPidIn(accountingVoucherPids);
+
+		if (accountingVoucherDetails.size() > 0) {
+			accountingVoucher.setAccountingVoucherDetails(accountingVoucherDetails);
+		}
 
 		if (response != null) {
 			accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);

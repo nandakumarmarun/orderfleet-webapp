@@ -109,4 +109,12 @@ public class AccountingVoucherAllocationDTO {
 		this.receivablePayableId = receivablePayableId;
 	}
 
+	@Override
+	public String toString() {
+		return "AccountingVoucherAllocationDTO [receivablePayablePid=" + receivablePayablePid + ", voucherNumber="
+				+ voucherNumber + ", referenceNumber=" + referenceNumber + ", referenceDocumentNumber="
+				+ referenceDocumentNumber + ", mode=" + mode + ", amount=" + amount + ", remarks=" + remarks
+				+ ", receivablePayableId=" + receivablePayableId + "]";
+	}
+
 }
