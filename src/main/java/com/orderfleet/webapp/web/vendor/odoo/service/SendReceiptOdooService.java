@@ -443,6 +443,8 @@ public class SendReceiptOdooService {
 			accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.FAILED);
 		}
 
+		accountingVoucherHeaderRepository.save(accountingVoucher);
+
 		log.debug("updated to " + accountingVoucher.getTallyDownloadStatus());
 
 	}
