@@ -35,6 +35,9 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 	@Query("select productGroupProduct.product from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid in ?1 ")
 	List<ProductProfile> findProductByProductGroupPidIn(List<String> productGroupPids);
 
+	@Query("select productGroupProduct.product.pid from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid in ?1 ")
+	List<String> findProductPidsByProductGroupPidIn(List<String> productGroupPids);
+
 	@Query("select productGroupProduct.product from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid in ?1 and productGroupProduct.product.productCategory.pid in ?2")
 	List<ProductProfile> findProductByProductGroupPidInAndProductCategoryPidIn(List<String> productGroupPids,
 			List<String> productCategoryPids);
@@ -67,7 +70,7 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 
 	@Query("select productGroupProduct from ProductGroupProduct productGroupProduct where productGroupProduct.company.id = ?#{principal.companyId} and productGroupProduct.productGroup.activated = ?1")
 	List<ProductGroupProduct> findAllByCompanyIdAndActivated(boolean active);
-	
+
 	@Query("select productGroupProduct.productGroup.pid,productGroupProduct.product.id from ProductGroupProduct productGroupProduct where productGroupProduct.company.id = ?#{principal.companyId} and productGroupProduct.productGroup.activated = ?1")
 	List<Object[]> findAllObjectsByCompanyIdAndActivated(boolean active);
 
@@ -137,7 +140,7 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 
 	@Query("select productGroupProduct.product.id from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid = ?1 ")
 	Set<Long> findProductIdByProductGroupPid(String productGroupPid);
-	
+
 	@Query("select productGroupProduct.product.id from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid in ?1 ")
 	Set<Long> findProductIdByProductGroupPidIn(List<String> productGroupPid);
 

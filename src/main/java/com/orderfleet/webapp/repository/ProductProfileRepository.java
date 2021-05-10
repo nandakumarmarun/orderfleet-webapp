@@ -32,6 +32,9 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} order by productProfile.name asc")
 	List<ProductProfile> findAllByCompanyId();
 
+	@Query("select productProfile.pid,productProfile.name,productProfile.price from ProductProfile productProfile where productProfile.pid in ?1 and productProfile.company.id = ?#{principal.companyId} order by productProfile.name asc")
+	List<Object[]> findAllNameAndPriceByCompanyIdAndPidIn(List<String> productPids);
+
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and productProfile.activated=true order by productProfile.name asc")
 	List<ProductProfile> findAllByCompanyIdActivatedTrue();
 
@@ -88,7 +91,7 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	List<ProductProfile> findByCompanyIdAndNameIn(Long companyId, Set<String> names);
 
 	List<ProductProfile> findByCompanyIdAndNameIgnoreCaseIn(Long id, Set<String> ppNames);
-	
+
 	List<ProductProfile> findByCompanyIdAndAliasIgnoreCaseIn(Long id, Set<String> ppAlias);
 
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and productProfile.productCategory in ?1 and productProfile.activated = ?2 and productProfile.lastModifiedDate > ?3")
@@ -102,18 +105,19 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and productProfile.activated = ?1 and productProfile.stockAvailabilityStatus=?2 Order By productProfile.name asc")
 	List<ProductProfile> findAllByCompanyIdAndActivatedAndStockAvailabilityStatusProductProfileOrderByName(
 			boolean active, StockAvailabilityStatus status);
-	
+
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?1 order by productProfile.name asc")
 	List<ProductProfile> findAllByCompanyId(Long companyId);
-	
+
 	@Query("select productProfile.name from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and activated=true and productProfile.productCategory.pid=?1 and productProfile.createdDate <= ?2 Order By productProfile.name asc")
-	List<String> findProductNamesByCompanyIdAndActivatedTrueAndCategoryPidAndCreatedLessThan(String categoryPid, LocalDateTime toDate);
+	List<String> findProductNamesByCompanyIdAndActivatedTrueAndCategoryPidAndCreatedLessThan(String categoryPid,
+			LocalDateTime toDate);
 
 	@Query("select productProfile.name from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and activated=true and productProfile.createdDate <= ?1 Order By productProfile.name asc")
 	List<String> findProductNamesByCompanyIdAndActivatedTrueAndCreatedLessThan(LocalDateTime toDate);
 
-	List<ProductProfile> findByPidInAndActivated(List<String> profilePids,boolean active);
-	
+	List<ProductProfile> findByPidInAndActivated(List<String> profilePids, boolean active);
+
 	@Modifying
 	@Query("update ProductProfile productProfile set productProfile.activated = false where productProfile.company.id = ?1")
 	void deactivateAllProductProfile(Long companyId);

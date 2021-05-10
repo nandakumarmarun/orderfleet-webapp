@@ -1910,6 +1910,7 @@ public class TransactionResource {
 		salesOrderDTO.setLedgerState(receiverAccountProfile.getStateName());
 		salesOrderDTO.setLedgerCountry(receiverAccountProfile.getCountryName());
 		salesOrderDTO.setLedgerGstType(receiverAccountProfile.getGstRegistrationType());
+		salesOrderDTO.setLedgerPinCode(receiverAccountProfile.getPin() != null ? receiverAccountProfile.getPin() : "");
 		if (employeeProfile != null) {
 			salesOrderDTO.setEmployeeAlias(employeeProfile.getAlias());
 		}

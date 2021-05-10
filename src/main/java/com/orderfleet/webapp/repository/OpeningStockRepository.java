@@ -91,6 +91,10 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 	List<OpeningStock> findAllOpeningStockByProductPidAndStockLocations(String productPid,
 			List<StockLocation> stockLocations);
 
+	@Query("select openingStock.productProfile.pid,openingStock.quantity from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.productProfile.pid in ?1 and openingStock.stockLocation.pid in  ?2")
+	List<Object[]> findAllOpeningStockByProductPidInAndStockLocationsIn(List<String> productPids,
+			List<String> stockLocationPids);
+
 	@Query("select coalesce(sum(openingStock.quantity),0) from OpeningStock openingStock where openingStock.productProfile.pid = ?1 and openingStock.stockLocation.id in ?2 ")
 	Double findSumOpeningStockByProductPidAndStockLocationIdIn(String productPid, Set<Long> stockLocationIds);
 
@@ -109,7 +113,7 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 	@Transactional
 	@Query(name = "delete from OpeningStock os where  os.company.id in ?1 and os.stockLocation.pid in ?2")
 	void deleteByCompanyIdAndStockLocationPidIn(Long id, List<String> stockLocationPids);
-	
+
 	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.stockLocation.pid in ?1")
 	List<OpeningStock> findAllExistingStocks(List<String> stockLocationPids);
 

@@ -24,6 +24,7 @@ public class SalesOrderDTO {
 	private String ledgerState;
 	private String ledgerCountry;
 	private String ledgerGstType;
+	private String ledgerPinCode;
 	private String priceLevel;
 	private String narration;
 	private String selectedVats;
@@ -67,6 +68,9 @@ public class SalesOrderDTO {
 		this.ledgerState = inventoryVoucherHeader.getReceiverAccount().getStateName();
 		this.ledgerCountry = inventoryVoucherHeader.getReceiverAccount().getCountryName();
 		this.ledgerGstType = inventoryVoucherHeader.getReceiverAccount().getGstRegistrationType();
+		this.ledgerPinCode = inventoryVoucherHeader.getReceiverAccount().getPin() != null
+				? inventoryVoucherHeader.getReceiverAccount().getPin()
+				: "";
 		if (inventoryVoucherHeader.getEmployee() != null) {
 			this.employeeAlias = inventoryVoucherHeader.getEmployee().getAlias();
 		}
@@ -243,6 +247,14 @@ public class SalesOrderDTO {
 
 	public String getLedgerCountry() {
 		return ledgerCountry;
+	}
+
+	public String getLedgerPinCode() {
+		return ledgerPinCode;
+	}
+
+	public void setLedgerPinCode(String ledgerPinCode) {
+		this.ledgerPinCode = ledgerPinCode;
 	}
 
 	public void setLedgerCountry(String ledgerCountry) {

@@ -23,22 +23,26 @@ public interface UserProductGroupRepository extends JpaRepository<UserProductGro
 
 	@Query("select userProductGroup.productGroup from UserProductGroup userProductGroup where userProductGroup.user.pid = ?1 ")
 	List<ProductGroup> findProductGroupsByUserPid(String userPid);
-	
+
 	List<UserProductGroup> findByUserPid(String userPid);
 
 	void deleteByUserPid(String userPid);
-	
+
 	@Query("select userProductGroup.productGroup from UserProductGroup userProductGroup where userProductGroup.user.login = ?#{principal.username} and userProductGroup.productGroup.activated = ?1 and userProductGroup.company.id = ?#{principal.companyId}")
 	List<ProductGroup> findProductGroupsByUserIsCurrentUserAndProductGroupsActivated(boolean active);
 
 	@Query("select userProductGroup.productGroup from UserProductGroup userProductGroup where userProductGroup.user.login = ?#{principal.username} and userProductGroup.productGroup.activated = ?1 and userProductGroup.productGroup.lastModifiedDate > ?2 and userProductGroup.company.id = ?#{principal.companyId}")
-	List<ProductGroup> findProductGroupsByUserIsCurrentUserAndProductGroupActivatedAndProductGroupLastModifiedDate(boolean active,LocalDateTime lastModifiedDate);
+	List<ProductGroup> findProductGroupsByUserIsCurrentUserAndProductGroupActivatedAndProductGroupLastModifiedDate(
+			boolean active, LocalDateTime lastModifiedDate);
 
 	void deleteByUserPidIn(List<String> userPids);
-	
+
 	@Query("select userProductGroup from UserProductGroup userProductGroup where userProductGroup.productGroup.pid IN ?1")
 	List<UserProductGroup> findByProductGroupPids(List<String> productGroupPids);
-	
+
 	List<String> findUserPidByCompanyPid(String pid);
+
+	@Query("select userProductGroup.productGroup.pid from UserProductGroup userProductGroup where userProductGroup.user.pid = ?1 and userProductGroup.company.id = ?#{principal.companyId}")
+	List<String> findProductGroupPidByUserPid(String userPid);
 
 }

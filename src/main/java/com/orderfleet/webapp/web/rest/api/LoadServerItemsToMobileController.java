@@ -37,6 +37,7 @@ import com.orderfleet.webapp.domain.FormElement;
 import com.orderfleet.webapp.domain.FormElementValue;
 import com.orderfleet.webapp.domain.FormFormElement;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
+import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
@@ -50,13 +51,19 @@ import com.orderfleet.webapp.repository.FormElementValueRepository;
 import com.orderfleet.webapp.repository.FormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.OpeningStockRepository;
+import com.orderfleet.webapp.repository.ProductGroupProductRepository;
+import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.UserDocumentRepository;
+import com.orderfleet.webapp.repository.UserProductGroupRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.DocumentFormsService;
 import com.orderfleet.webapp.service.FormFormElementService;
 import com.orderfleet.webapp.web.rest.api.dto.DocumentDashboardDTO;
 import com.orderfleet.webapp.web.rest.api.dto.FormFormElementDTO;
+import com.orderfleet.webapp.web.rest.api.dto.LoadProductListDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerExeTaskDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerSentItemDTO;
 import com.orderfleet.webapp.web.rest.api.dto.SalesOrderAllocationDTO;
@@ -124,7 +131,22 @@ public class LoadServerItemsToMobileController {
 	private AccountProfileRepository accountProfileRepository;
 
 	@Inject
+	private ProductProfileRepository productProfileRepository;
+
+	@Inject
+	private OpeningStockRepository openingStockRepository;
+
+	@Inject
+	private UserStockLocationRepository userStockLocationRepository;
+
+	@Inject
+	private ProductGroupProductRepository productGroupProductRepository;
+
+	@Inject
 	private AccountProfileMapper accountProfileMapper;
+
+	@Inject
+	private UserProductGroupRepository userProductGroupRepository;
 
 	@GetMapping("/load-server-attendence")
 	public ResponseEntity<List<AttendanceDTO>> sentAttendenceDownload() {
@@ -152,6 +174,89 @@ public class LoadServerItemsToMobileController {
 		log.info("Attendance Size= " + attendenceDTOs.size());
 
 		return new ResponseEntity<>(attendenceDTOs, HttpStatus.OK);
+	}
+
+	@GetMapping("/load-product-list")
+	public ResponseEntity<List<LoadProductListDTO>> sentAProductList() {
+
+		log.info("Request to load product list...");
+
+		List<LoadProductListDTO> productLists = new ArrayList<>();
+
+		Optional<User> user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+
+		String userPid = "";
+
+		List<String> userProductGroupPids = new ArrayList<>();
+		List<String> userStockLocationPids = new ArrayList<>();
+
+		if (user.isPresent()) {
+			userPid = user.get().getPid();
+			userProductGroupPids = userProductGroupRepository.findProductGroupPidByUserPid(userPid);
+			userStockLocationPids = userStockLocationRepository.findStockLocationPidsByUserPid(userPid);
+		}
+
+		log.info("Product Group Pid Size= " + userProductGroupPids.size() + "---Stock Location Pid Size ="
+				+ userStockLocationPids.size());
+		if (userProductGroupPids.size() > 0) {
+
+			List<String> productPids = productGroupProductRepository
+					.findProductPidsByProductGroupPidIn(userProductGroupPids);
+
+			log.info("Product Pid Size= " + productPids.size() + "---Stock Location Pid Size ="
+					+ userStockLocationPids.size());
+
+			List<Object[]> productProfileObjects = productProfileRepository
+					.findAllNameAndPriceByCompanyIdAndPidIn(productPids);
+
+			List<Object[]> openingStocks = new ArrayList<>();
+
+			if (productPids.size() > 0 && userStockLocationPids.size() > 0) {
+
+				openingStocks = openingStockRepository.findAllOpeningStockByProductPidInAndStockLocationsIn(productPids,
+						userStockLocationPids);
+			}
+
+			if (productProfileObjects.size() > 0) {
+
+				log.info("productProfileObjects Size= " + productPids.size() + "---openingStocks Pid Size ="
+						+ userStockLocationPids.size());
+
+				for (Object[] product : productProfileObjects) {
+					LoadProductListDTO productListDTO = new LoadProductListDTO();
+
+					productListDTO.setProductName(product[1] != null ? product[1].toString() : "");
+
+					productListDTO.setProductPrice(product[2] != null ? Double.parseDouble(product[2].toString()) : 0);
+
+					if (openingStocks.size() > 0) {
+
+						Optional<Object[]> opStock = openingStocks.stream()
+								.filter(op -> op[0].toString().equals(product[0].toString())).findAny();
+
+						if (opStock.isPresent()) {
+							log.info("Opening Stock True");
+							productListDTO.setProductStock(
+									opStock.get()[1] != null ? Double.parseDouble(opStock.get()[1].toString()) : 0);
+
+						} else {
+							productListDTO.setProductStock(0);
+						}
+
+					} else {
+						productListDTO.setProductStock(0);
+					}
+
+					productLists.add(productListDTO);
+
+				}
+
+			}
+		}
+
+		log.info("Produc Size= " + productLists.size());
+
+		return new ResponseEntity<>(productLists, HttpStatus.OK);
 	}
 
 	@GetMapping("/customer-wise-inventory")
