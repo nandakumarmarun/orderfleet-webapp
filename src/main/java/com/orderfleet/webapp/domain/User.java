@@ -160,6 +160,12 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	
 	@Column(name = "discontinued_mobile_completed_date")
 	private LocalDateTime discontinuedMobileCompletedDate;
+	
+	@Column(name = "user_id")
+	private String userId;
+
+	@Column(name = "user_code")
+	private String userCode;
 
 	public Long getId() {
 		return id;
@@ -361,6 +367,24 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setDiscontinuedMobileCompletedDate(LocalDateTime discontinuedMobileCompletedDate) {
 		this.discontinuedMobileCompletedDate = discontinuedMobileCompletedDate;
+	}
+	
+	
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getUserCode() {
+		return userCode;
+	}
+
+	public void setUserCode(String userCode) {
+		this.userCode = userCode;
 	}
 
 	@Override

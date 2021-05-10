@@ -75,6 +75,10 @@ public class UnitOfMeasure implements Serializable, Cloneable {
 	@Size(max = 55)
 	@Column(name = "uom_id", length = 55)
 	private String uomId;
+	
+	@Size(max = 55)
+	@Column(name = "uom_code", length = 55)
+	private String uomCode;
 
 	@NotNull
 	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
@@ -188,6 +192,15 @@ public class UnitOfMeasure implements Serializable, Cloneable {
 
 	public void setUomId(String uomId) {
 		this.uomId = uomId;
+	}
+	
+
+	public String getUomCode() {
+		return uomCode;
+	}
+
+	public void setUomCode(String uomCode) {
+		this.uomCode = uomCode;
 	}
 
 	public void setCreatedDate(LocalDateTime createdDate) {

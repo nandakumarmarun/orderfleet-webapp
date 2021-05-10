@@ -73,7 +73,14 @@ public class ProductCategory implements Serializable, Cloneable {
 	@NotNull
 	@Column(name = "thirdparty_update", nullable = false, columnDefinition = "boolean DEFAULT 'true'")
 	private boolean thirdpartyUpdate = true;
+	
 
+	@Column(name = "product_category_id")
+	private String productCategoryId;
+	
+	@Column(name = "product_category_code")
+	private String productCategoryCode;
+	
 	@Column(name = "created_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	@JsonIgnore
 	private LocalDateTime createdDate = LocalDateTime.now();
@@ -174,6 +181,23 @@ public class ProductCategory implements Serializable, Cloneable {
 	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}
+	
+
+	public String getProductCategoryId() {
+		return productCategoryId;
+	}
+
+	public void setProductCategoryId(String productCategoryId) {
+		this.productCategoryId = productCategoryId;
+	}
+
+	public String getProductCategoryCode() {
+		return productCategoryCode;
+	}
+
+	public void setProductCategoryCode(String productCategoryCode) {
+		this.productCategoryCode = productCategoryCode;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -195,10 +219,15 @@ public class ProductCategory implements Serializable, Cloneable {
 		return Objects.hashCode(id);
 	}
 
+	
+
 	@Override
 	public String toString() {
-		return "ProductCategory{" + ", id='" + id + "'" + ", pid='" + pid + "'" + ", name='" + name + "'" + ", alias='"
-				+ alias + "'" + ", description='" + description + "'" + '}';
+		return "ProductCategory [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
+				+ description + ", company=" + company + ", activated=" + activated + ", dataSourceType="
+				+ dataSourceType + ", thirdpartyUpdate=" + thirdpartyUpdate + ", productCategoryId=" + productCategoryId
+				+ ", productCategoryCode=" + productCategoryCode + ", createdDate=" + createdDate
+				+ ", lastModifiedDate=" + lastModifiedDate + "]";
 	}
 
 	@Override

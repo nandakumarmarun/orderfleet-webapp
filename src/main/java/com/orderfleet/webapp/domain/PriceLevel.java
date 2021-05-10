@@ -53,6 +53,13 @@ public class PriceLevel implements Serializable {
 
 	@Column(name = "description")
 	private String description;
+	
+	@Column(name = "price_level_id")
+	private String priceLevelId;
+
+	@Column(name = "price_level_code")
+	private String priceLevelCode;
+
 
 	@NotNull
 	@ManyToOne
@@ -117,6 +124,23 @@ public class PriceLevel implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+
+	public String getPriceLevelId() {
+		return priceLevelId;
+	}
+
+	public void setPriceLevelId(String priceLevelId) {
+		this.priceLevelId = priceLevelId;
+	}
+
+	public String getPriceLevelCode() {
+		return priceLevelCode;
+	}
+
+	public void setPriceLevelCode(String priceLevelCode) {
+		this.priceLevelCode = priceLevelCode;
+	}
 
 	public Company getCompany() {
 		return company;
@@ -173,6 +197,10 @@ public class PriceLevel implements Serializable {
 	@Override
 	public String toString() {
 		return "PriceLevel [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
-				+ description + ", company=" + company + ", activated=" + activated + "]";
+				+ description + ", priceLevelId=" + priceLevelId + ", priceLevelCode=" + priceLevelCode + ", company="
+				+ company + ", activated=" + activated + "]";
 	}
+
+	
+	
 }

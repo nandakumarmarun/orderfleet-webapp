@@ -59,6 +59,13 @@ public class Location implements Serializable, Cloneable {
 
 	@Column(name = "description")
 	private String description;
+	
+	@Column(name = "location_id")
+	private String locationId;
+	
+	@Column(name = "location_code")
+	private String locationCode;
+	
 
 	@ManyToOne
 	@NotNull
@@ -153,6 +160,23 @@ public class Location implements Serializable, Cloneable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+
+	public String getLocationId() {
+		return locationId;
+	}
+
+	public void setLocationId(String locationId) {
+		this.locationId = locationId;
+	}
+
+	public String getLocationCode() {
+		return locationCode;
+	}
+
+	public void setLocationCode(String locationCode) {
+		this.locationCode = locationCode;
+	}
 
 	public Company getCompany() {
 		return company;
@@ -198,11 +222,12 @@ public class Location implements Serializable, Cloneable {
 		return Objects.hashCode(id);
 	}
 
+	
 	@Override
 	public String toString() {
-		return "Location{" + "id=" + id + ", pid='" + pid + "'" + ", name='" + name + "'" + ", alias='" + alias + "'"
-				+ ", description='" + description + "'" + ", latitude='" + latitude + "'" + ", longitude='" + longitude
-				+ "'" + '}';
+		return "Location [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", latitude=" + latitude
+				+ ", longitude=" + longitude + ", description=" + description + ", locationId=" + locationId
+				+ ", locationCode=" + locationCode + "]";
 	}
 
 	@Override

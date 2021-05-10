@@ -67,6 +67,12 @@ public class ProductGroup implements Serializable, Cloneable {
 
 	@Column(name = "description")
 	private String description;
+	
+	@Column(name = "product_group_id")
+	private String productGroupId;
+
+	@Column(name = "product_group_code")
+	private String productGroupCode;
 
 	@ManyToOne
 	@NotNull
@@ -154,6 +160,24 @@ public class ProductGroup implements Serializable, Cloneable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	
+
+	public String getProductGroupId() {
+		return productGroupId;
+	}
+
+	public void setProductGroupId(String productGroupId) {
+		this.productGroupId = productGroupId;
+	}
+
+	public String getProductGroupCode() {
+		return productGroupCode;
+	}
+
+	public void setProductGroupCode(String productGroupCode) {
+		this.productGroupCode = productGroupCode;
 	}
 
 	public Company getCompany() {
@@ -252,10 +276,13 @@ public class ProductGroup implements Serializable, Cloneable {
 
 	
 
+	
+
 	@Override
 	public String toString() {
 		return "ProductGroup [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
-				+ description + ", company=" + company + ", image=" + Arrays.toString(image) + ", imageContentType="
+				+ description + ", productGroupId=" + productGroupId + ", productGroupCode=" + productGroupCode
+				+ ", company=" + company + ", image=" + Arrays.toString(image) + ", imageContentType="
 				+ imageContentType + ", activated=" + activated + ", dataSourceType=" + dataSourceType
 				+ ", thirdpartyUpdate=" + thirdpartyUpdate + ", createdDate=" + createdDate + ", lastModifiedDate="
 				+ lastModifiedDate + ", taxMastersList=" + taxMastersList + ", taxRate=" + taxRate + "]";

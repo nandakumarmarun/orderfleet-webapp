@@ -56,6 +56,12 @@ public class StockLocation implements Serializable, Cloneable {
 
 	@Column(name = "description")
 	private String description;
+	
+	@Column(name = "stock_location_id")
+	private String stockLocationId;
+	
+	@Column(name = "stock_location_code")
+	private String stockLocationCode;
 
 	@ManyToOne
 	@NotNull
@@ -130,6 +136,23 @@ public class StockLocation implements Serializable, Cloneable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+
+	public String getStockLocationId() {
+		return stockLocationId;
+	}
+
+	public void setStockLocationId(String stockLocationId) {
+		this.stockLocationId = stockLocationId;
+	}
+
+	public String getStockLocationCode() {
+		return stockLocationCode;
+	}
+
+	public void setStockLocationCode(String stockLocationCode) {
+		this.stockLocationCode = stockLocationCode;
+	}
 
 	public Company getCompany() {
 		return company;
@@ -175,15 +198,19 @@ public class StockLocation implements Serializable, Cloneable {
 		return Objects.hashCode(id);
 	}
 
-	@Override
-	public String toString() {
-		return "StockLocation [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
-				+ description + ", company=" + company + ", stockLocationType=" + stockLocationType + ", activated="
-				+ activated + "]";
-	}
+	
+	
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		return super.clone();
+	}
+
+	@Override
+	public String toString() {
+		return "StockLocation [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
+				+ description + ", stockLocationId=" + stockLocationId + ", stockLocationCode=" + stockLocationCode
+				+ ", company=" + company + ", stockLocationType=" + stockLocationType + ", activated=" + activated
+				+ "]";
 	}
 }

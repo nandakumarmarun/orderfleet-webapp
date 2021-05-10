@@ -54,6 +54,13 @@ public class EmployeeProfile implements Serializable, Cloneable {
 	@Size(max = 55)
 	@Column(name = "alias", length = 55)
 	private String alias;
+	
+	@Column(name = "employee_profile_id")
+	private String employeeProfileId;
+
+	@Column(name = "employee_profile_code")
+	private String employeeProfileCode;
+	
 
 	// id of third party system like rosh
 	@Column(name = "reference_id")
@@ -156,6 +163,23 @@ public class EmployeeProfile implements Serializable, Cloneable {
 
 	public void setAlias(String alias) {
 		this.alias = alias;
+	}
+	
+
+	public String getEmployeeProfileId() {
+		return employeeProfileId;
+	}
+
+	public void setEmployeeProfileId(String employeeProfileId) {
+		this.employeeProfileId = employeeProfileId;
+	}
+
+	public String getEmployeeProfileCode() {
+		return employeeProfileCode;
+	}
+
+	public void setEmployeeProfileCode(String employeeProfileCode) {
+		this.employeeProfileCode = employeeProfileCode;
 	}
 
 	public String getReferenceId() {
