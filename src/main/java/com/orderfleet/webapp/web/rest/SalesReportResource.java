@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
@@ -7,6 +8,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -17,7 +19,9 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +31,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
+import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
@@ -40,11 +47,17 @@ import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
+import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.repository.custom.InventoryVoucherDetailCustomRepository;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
+import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
+import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.ProductGroupService;
+import com.orderfleet.webapp.service.ProductProfileService;
+import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.report.dto.SalesReportDTO;
 
@@ -66,7 +79,7 @@ public class SalesReportResource {
 
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
-	
+
 	@Inject
 	private AccountProfileService accountProfileService;
 
@@ -93,6 +106,16 @@ public class SalesReportResource {
 
 	@Inject
 	private ProductGroupProductRepository productGroupProductRepository;
+	@Inject
+	private PrimarySecondaryDocumentService primarySecondaryDocumentService;
+	@Inject
+	private InventoryVoucherDetailCustomRepository inventoryVoucherDetailCustomRepository;
+	@Inject
+	private ProductCategoryService productCategoryService;
+	@Inject
+	private ProductProfileService productProfileService;
+	@Inject
+	private StockLocationRepository stockLocationRepository;
 
 	@RequestMapping(value = "/sales-report", method = RequestMethod.GET)
 	@Timed
@@ -106,19 +129,85 @@ public class SalesReportResource {
 			model.addAttribute("accounts", locationAccountProfileService.findAccountProfilesByCurrentUserLocations());
 		}
 		model.addAttribute("productGroups", productGroupService.findAllByCompany());
+		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
+		model.addAttribute("productCategories", productCategoryService.findAllByCompany());
+		model.addAttribute("productGroups", productGroupService.findAllByCompany());
+		model.addAttribute("productProfiles", productProfileService.findAllByCompany());
+		model.addAttribute("accounts", accountProfileService.findAllByCompany());
+		List<StockLocation> companyStockLocations = stockLocationRepository.findAllByCompanyId();
+		model.addAttribute("stockLocations", companyStockLocations);
+
 		return "company/sales-report/sales-report";
+	}
+	
+	@RequestMapping(value = "/not-ordered-products", method = RequestMethod.GET)
+	@Timed
+	@Transactional(readOnly = true)
+	public String notOrderedProductReport(Model model) {
+		// user under current user
+		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+		if (userIds.isEmpty()) {
+			model.addAttribute("accounts", accountProfileService.findAllByCompanyAndActivated(true));
+		} else {
+			model.addAttribute("accounts", locationAccountProfileService.findAccountProfilesByCurrentUserLocations());
+		}
+		model.addAttribute("productGroups", productGroupService.findAllByCompany());
+		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
+		model.addAttribute("productCategories", productCategoryService.findAllByCompany());
+		model.addAttribute("productGroups", productGroupService.findAllByCompany());
+		model.addAttribute("productProfiles", productProfileService.findAllByCompany());
+		model.addAttribute("accounts", accountProfileService.findAllByCompany());
+		List<StockLocation> companyStockLocations = stockLocationRepository.findAllByCompanyId();
+		model.addAttribute("stockLocations", companyStockLocations);
+
+		return "company/sales-report/notOrderedProducts";
+	}
+	@RequestMapping(value = "/userwise-product-group-summary", method = RequestMethod.GET)
+	@Timed
+	@Transactional(readOnly = true)
+	public String userwiseProductGroupSummary(Model model) {
+		// user under current user
+		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+		if (userIds.isEmpty()) {
+			model.addAttribute("accounts", accountProfileService.findAllByCompanyAndActivated(true));
+		} else {
+			model.addAttribute("accounts", locationAccountProfileService.findAccountProfilesByCurrentUserLocations());
+		}
+		model.addAttribute("productGroups", productGroupService.findAllByCompany());
+		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
+		model.addAttribute("productCategories", productCategoryService.findAllByCompany());
+		model.addAttribute("productGroups", productGroupService.findAllByCompany());
+		model.addAttribute("productProfiles", productProfileService.findAllByCompany());
+		model.addAttribute("accounts", accountProfileService.findAllByCompany());
+		List<StockLocation> companyStockLocations = stockLocationRepository.findAllByCompanyId();
+		model.addAttribute("stockLocations", companyStockLocations);
+
+		return "company/sales-report/userwiseProductGroupSummary";
+	}
+
+	@RequestMapping(value = "/sales-report/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	@Timed
+	public List<DocumentDTO> getDocuments(@Valid @RequestParam VoucherType voucherType) throws URISyntaxException {
+
+		List<DocumentDTO> documentDTOs = primarySecondaryDocumentService
+				.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
+
+		return documentDTOs;
 	}
 
 	@RequestMapping(value = "/sales-report/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<InventoryVoucherDetailDTO>> filterInventoryVouchers(@RequestParam String pGroupPid,
+
 			@RequestParam("employeePid") String employeePid, @RequestParam("accountPid") String accountPid,
 			@RequestParam("filterBy") String filterBy, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate,
-			@RequestParam boolean inclSubordinate) {
+			@RequestParam boolean inclSubordinate, @RequestParam("voucherType") VoucherType voucherType) {
 		if (filterBy.equals(SalesReportResource.TODAY)) {
 			fromDate = LocalDate.now();
 			toDate = fromDate;
+
 		} else if (filterBy.equals(SalesReportResource.YESTERDAY)) {
 			fromDate = LocalDate.now().minusDays(1);
 			toDate = fromDate;
@@ -130,17 +219,21 @@ public class SalesReportResource {
 		} else if (filterBy.equals(SalesReportResource.MTD)) {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
 			fromDate = monthStartDate;
+
 			toDate = LocalDate.now();
 		} else if (filterBy.equals(SalesReportResource.CUSTOM)) {
 
 		}
-		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid, accountPid,
-				fromDate, toDate, inclSubordinate);
+
+		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid,
+				accountPid, fromDate, toDate, inclSubordinate, voucherType);
+
 		if (!"no".equalsIgnoreCase(pGroupPid)) {
 			Set<String> productPids = productGroupProductRepository.findProductPidByProductGroupPid(pGroupPid);
 			inventoryVoucherDetailDtos = inventoryVoucherDetailDtos.stream()
-					.filter(ivd -> productPids.stream().anyMatch(pid -> pid.equals(ivd.getProductPid()))).collect(Collectors.toList());
-		} 
+					.filter(ivd -> productPids.stream().anyMatch(pid -> pid.equals(ivd.getProductPid())))
+					.collect(Collectors.toList());
+		}
 		return new ResponseEntity<>(inventoryVoucherDetailDtos, HttpStatus.OK);
 	}
 
@@ -150,7 +243,7 @@ public class SalesReportResource {
 	public ResponseEntity<List<String>> filterNotOrderedProducts(@RequestParam String pGroupPid,
 			@RequestParam("employeePid") String employeePid, @RequestParam("accountPid") String accountPid,
 			@RequestParam("filterBy") String filterBy, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate,
-			@RequestParam boolean inclSubordinate) {
+			@RequestParam boolean inclSubordinate, @RequestParam("voucherType") VoucherType voucherType) {
 		if (filterBy.equals(SalesReportResource.TODAY)) {
 			fromDate = LocalDate.now();
 			toDate = LocalDate.now();
@@ -165,8 +258,8 @@ public class SalesReportResource {
 			fromDate = LocalDate.now().withDayOfMonth(1);
 			toDate = LocalDate.now();
 		}
-		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid, accountPid,
-				fromDate, toDate, inclSubordinate);
+		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid,
+				accountPid, fromDate, toDate, inclSubordinate, voucherType);
 		List<String> productNames;
 		if ("no".equals(pGroupPid)) {
 			productNames = productProfileRepository
@@ -187,7 +280,7 @@ public class SalesReportResource {
 	public ResponseEntity<SalesReportDTO> filterInventoryVouchersUserwiseGroupSummary(@RequestParam String pGroupNames,
 			@RequestParam("employeePid") String employeePid, @RequestParam("accountPid") String accountPid,
 			@RequestParam("filterBy") String filterBy, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate,
-			@RequestParam boolean inclSubordinate) {
+			@RequestParam boolean inclSubordinate, @RequestParam("voucherType") VoucherType voucherType) {
 		if (filterBy.equals(SalesReportResource.TODAY)) {
 			fromDate = LocalDate.now();
 			toDate = LocalDate.now();
@@ -207,12 +300,12 @@ public class SalesReportResource {
 			return null;
 		}
 		List<List<String>> reportValues = getEmployeeWiseGroupSummary(reportHeaderNames, employeePid, accountPid,
-				fromDate, toDate, inclSubordinate);
+				fromDate, toDate, inclSubordinate, voucherType);
 		return new ResponseEntity<>(new SalesReportDTO(reportHeaderNames, reportValues), HttpStatus.OK);
 	}
 
 	private List<InventoryVoucherDetailDTO> filterByEmployeeAccountAndDate(String employeePid, String accountPid,
-			LocalDate fDate, LocalDate tDate, boolean inclSubordinate) {
+			LocalDate fDate, LocalDate tDate, boolean inclSubordinate, VoucherType voucherType) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<String> accountProfilePids;
@@ -225,28 +318,30 @@ public class SalesReportResource {
 		} else {
 			accountProfilePids = Arrays.asList(accountPid);
 		}
-		List<Document> documents = primarySecondaryDocumentRepository.findAllDocumentsByCompanyId();
+		List<Document> documents = primarySecondaryDocumentRepository
+				.findDocumentsByVoucherTypeAndCompanyId(voucherType);
 		List<Long> documentIds = documents.stream().map(Document::getId).collect(Collectors.toList());
 
-		List<Object[]> ivDetailDtos = inventoryVoucherDetailRepository.findByAccountPidInAndEmployeeIdInAndDocumentIdInDateBetween(
-				accountProfilePids, userIds, documentIds, fromDate, toDate);
+		List<Object[]> ivDetailDtos = inventoryVoucherDetailRepository
+				.findByAccountPidInAndEmployeeIdInAndDocumentIdInDateBetween(accountProfilePids, userIds, documentIds,
+						fromDate, toDate);
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
-		if(!ivDetailDtos.isEmpty()) {
+		if (!ivDetailDtos.isEmpty()) {
 			for (Object[] object : ivDetailDtos) {
 				InventoryVoucherDetailDTO ivDetailDto = new InventoryVoucherDetailDTO();
 				ivDetailDto.setEmployeeName(object[0].toString());
 				ivDetailDto.setProductPid(object[1].toString());
 				ivDetailDto.setProductName(object[2].toString());
-				ivDetailDto.setProductUnitQty(object[3] == null ? 1d : (Double)object[3]);
-				ivDetailDto.setQuantity((Double)object[4]);
+				ivDetailDto.setProductUnitQty(object[3] == null ? 1d : (Double) object[3]);
+				ivDetailDto.setQuantity((Double) object[4]);
 				ivDetailDto.setAccountName(object[5].toString());
-				ivDetailDto.setCreatedDate((LocalDateTime)object[6]);
+				ivDetailDto.setCreatedDate((LocalDateTime) object[6]);
 				ivDetailDto.setVisitRemarks(object[7] == null ? null : object[7].toString());
 				inventoryVoucherDetailDTOs.add(ivDetailDto);
 			}
 		}
 		return inventoryVoucherDetailDTOs;
-		
+
 	}
 
 	private List<String> filterNotOrderedProduct(Set<String> orderedProductNames, List<String> productNames) {
@@ -258,13 +353,13 @@ public class SalesReportResource {
 	}
 
 	private List<List<String>> getEmployeeWiseGroupSummary(List<String> reportHeaderNames, String employeePid,
-			String accountPid, LocalDate fDate, LocalDate tDate, boolean inclSubordinate) {
-		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid, accountPid,
-				fDate, tDate, inclSubordinate);
+			String accountPid, LocalDate fDate, LocalDate tDate, boolean inclSubordinate, VoucherType voucherType) {
+		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid,
+				accountPid, fDate, tDate, inclSubordinate, voucherType);
 		// group employee wise
 		Map<String, List<InventoryVoucherDetailDTO>> employeeWiseGrouped = inventoryVoucherDetailDtos.stream()
-				.collect(Collectors.groupingBy(InventoryVoucherDetailDTO::getEmployeeName,
-						TreeMap::new, Collectors.mapping(ivd -> ivd, Collectors.toList())));
+				.collect(Collectors.groupingBy(InventoryVoucherDetailDTO::getEmployeeName, TreeMap::new,
+						Collectors.mapping(ivd -> ivd, Collectors.toList())));
 		// get products by productGroup
 		List<ProductGroupProduct> productGroupsProducts = productGroupProductRepository
 				.findByProductGroupProductActivatedAndCompanyId();
@@ -282,8 +377,7 @@ public class SalesReportResource {
 					boolean idExists = productGroupByProducts.getOrDefault(headerName, new ArrayList<>())
 							.contains(ivd.getProductPid());
 					if (idExists) {
-						volume += ivd.getQuantity()
-								* (ivd.getProductUnitQty() == null ? 1 : ivd.getProductUnitQty());
+						volume += ivd.getQuantity() * (ivd.getProductUnitQty() == null ? 1 : ivd.getProductUnitQty());
 					}
 				}
 				values.add(volume + "");

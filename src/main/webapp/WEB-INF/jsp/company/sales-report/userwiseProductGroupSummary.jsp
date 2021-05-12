@@ -7,7 +7,7 @@
 <html lang="en">
 <head>
 <jsp:include page="/WEB-INF/jsp/fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Sales report</title>
+<title>SalesNrich | UserWise Product Group Summary</title>
 <style type="text/css">
 .error {
 	color: red;
@@ -23,15 +23,15 @@
 			<hr />
 			<div class="row">
 				<div class="col-md-6 col-sm-6 clearfix">
-					<h2 id="title">Sales Report</h2>
+					<h2 id="title">UserWise Product Group Summary</h2>
 				</div>
 				<div class="col-md-6 col-sm-6 clearfix">
 					<div class="form-group">
 						Report Name<select id="dbReportName" class="form-control" disabled="disabled">
-							<option value="Sales Report">Sales Report</option>
+							<!-- <option value="Sales Report">Sales Report</option> -->
 							<!-- <option value="Not Ordered Products">Not Ordered
-								Products</option>
-							<option value="User Wise Product Group Summary">Userwise Product Group Summary</option> -->
+								Products</option> -->
+							 <option value="User Wise Product Group Summary">Userwise Product Group Summary</option> 
 						</select>
 					</div>
 				</div>

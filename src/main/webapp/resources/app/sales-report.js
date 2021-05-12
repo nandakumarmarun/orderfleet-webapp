@@ -9,6 +9,10 @@ if (!this.SalesReport) {
 	$(document).ready(function() {
 		var employeePid = getParameterByName('user-key-pid');
 		getEmployees(employeePid); // common js
+		
+		$("#dbDocumentType").change(function() {
+			loadAllDocumentByDocumentType();
+		});
 
 		$('#downloadXls').on('click', function() {
 			var tblSale = $("#tblSalesReport tbody");
@@ -70,16 +74,19 @@ if (!this.SalesReport) {
 				return;
 			}
 		}
+		
 		if ($('#dbDateSearch').val() == "CUSTOM") {
 			if ($("#txtFromDate").val() == "" || $("#txtToDate").val() == "") {
 				return;
 			}
 		}
 		loadReports($('#dbReportName').val());
+		
 	}
 	
 	function getSalesReport() {
 		$('#tBodySalesReport').html("<tr><td colspan='9' align='center'>Please wait...</td></tr>");
+	    console.log($("#dbDocument").val())
 		$
 				.ajax({
 					url : salesReportContextPath + "/web/sales-report/filter",
@@ -88,11 +95,13 @@ if (!this.SalesReport) {
 						pGroupPid : $('#dbProductGroup').val(),
 						employeePid : $('#dbEmployee').val(),
 						accountPid : $("#dbAccount").val(),
+						voucherType : $("#dbDocumentType").val(),
 						filterBy : $("#dbDateSearch").val(),
 						fromDate : $("#txtFromDate").val(),
 						toDate : $("#txtToDate").val(),
 						inclSubordinate : $('#inclSubOrdinates').is(":checked")
 					},
+					
 					success : function(sales) {
 						$('#tHeadSalesReport').html('<tr><th style="min-width: 80px;">Employee</th><th>Account Profile</th><th>Item</th><th>Quantity</th><th>Unit Qty</th><th>Total Qty</th><th>Date</th><th>Visit Remarks</th></tr>');
 						$('#tBodySalesReport').html("");
@@ -131,6 +140,7 @@ if (!this.SalesReport) {
 					}
 				});
 	}
+	
 
 	function getSalesNotOrderedReport() {
 		$('#tBodySalesReport').html("<tr><td colspan='9' align='center'>Please wait...</td></tr>");
@@ -142,6 +152,7 @@ if (!this.SalesReport) {
 				employeePid : $('#dbEmployee').val(),
 				accountPid : $("#dbAccount").val(),
 				filterBy : $("#dbDateSearch").val(),
+				voucherType : $("#dbDocumentType").val(),
 				fromDate : $("#txtFromDate").val(),
 				toDate : $("#txtToDate").val(),
 				inclSubordinate : $('#inclSubOrdinates').is(":checked")
@@ -187,10 +198,12 @@ if (!this.SalesReport) {
 						pGroupNames : groupNames.toString(),
 						employeePid : $('#dbEmployee').val(),
 						accountPid : $("#dbAccount").val(),
+						voucherType : $("#dbDocumentType").val(),
 						filterBy : $("#dbDateSearch").val(),
 						fromDate : $("#txtFromDate").val(),
 						toDate : $("#txtToDate").val(),
-						inclSubordinate : $('#inclSubOrdinates').is(":checked")
+						voucherType : $("#dbDocumentType").val(),
+                        inclSubordinate : $('#inclSubOrdinates').is(":checked")
 					},
 					success : function(sales) {
 						console.log(sales);
@@ -266,6 +279,30 @@ if (!this.SalesReport) {
 		} else {
 			return "";
 		}
+	}
+	function loadAllDocumentByDocumentType() {
+		if ($('#dbDocumentType').val() == "no") {
+			$("#dbDocument").html("<option>All</option>");
+			alert("Please Select Document Type");
+			return;
+		}
+		var documentType = $('#dbDocumentType').val();
+		$("#dbDocument").html("<option>Documents loading...</option>")
+		$.ajax({
+			url : salesReportContextPath + "/web/sales-report/load-document",
+			type : 'GET',
+			data : {
+				voucherType : documentType,
+			},
+			success : function(documents) {
+				$("#dbDocument").html("<option value='no'>All</option>")
+				$.each(documents, function(key, document) {
+					$("#dbDocument").append(
+							"<option value='" + document.pid + "'>"
+									+ document.name + "</option>");
+				});
+			}
+		});
 	}
 
 })();
