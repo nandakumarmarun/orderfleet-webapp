@@ -1024,7 +1024,14 @@ public class ProcessFlowStage3Resource {
 		log.info("update Booking Id,deliveryDate,paymentReceived " + ivhPid);
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
 
-		if (bookingId.equals("")) {
+		if (bookingId == null) {
+			bookingId = "";
+		}
+		if (deliveryDate == null) {
+			deliveryDate = "";
+		}
+
+		if (bookingId.equals("") || deliveryDate.equals("")) {
 			Optional<com.orderfleet.webapp.domain.Document> document = documentRepository
 					.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(),
 							"Sales Order Questions");
@@ -1047,8 +1054,23 @@ public class ProcessFlowStage3Resource {
 
 						for (FilledFormDetail filledFormDetail : filledFormDetails) {
 
-							if (filledFormDetail.getFormElement().getName().equals("Booking ID")) {
-								bookingId = filledFormDetail.getValue();
+							if (bookingId.equals("")) {
+								if (filledFormDetail.getFormElement().getName().equals("Booking ID")) {
+									bookingId = filledFormDetail.getValue();
+									if (bookingId == null) {
+										bookingId = "";
+									}
+								}
+
+							}
+							if (deliveryDate.equals("")) {
+								if (filledFormDetail.getFormElement().getName().equals("Expected Delivery Date")) {
+									deliveryDate = filledFormDetail.getValue();
+									if (deliveryDate == null) {
+										deliveryDate = "";
+									}
+								}
+
 							}
 						}
 					}
