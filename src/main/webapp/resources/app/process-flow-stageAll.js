@@ -824,7 +824,7 @@ InventoryVoucher.reject = function(ivhPid) {
 			break;
 		case 'IN_STOCK':
 			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
-					+ 'IN_STOCK<span></span></span></div>';
+					+ 'READY_TO_DISPATCH_AT_PS<span></span></span></div>';
 			break;
 		case 'PO_ACCEPTED_AT_TSL':
 			spanProcessFlowStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle">'
