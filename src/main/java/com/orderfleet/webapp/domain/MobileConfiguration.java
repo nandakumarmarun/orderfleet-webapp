@@ -154,6 +154,10 @@ public class MobileConfiguration implements Serializable {
 	
 	@Column(name = "below_price_level", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean belowPriceLevel;
+	
+	@Column(name = "amount_to_three_decimal", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean amountToThreeDecimal;
+
 
 	@NotNull
 	@ManyToOne
@@ -465,6 +469,16 @@ public class MobileConfiguration implements Serializable {
 
 	public void setBelowPriceLevel(boolean belowPriceLevel) {
 		this.belowPriceLevel = belowPriceLevel;
+	}
+	
+	
+
+	public boolean getAmountToThreeDecimal() {
+		return amountToThreeDecimal;
+	}
+
+	public void setAmountToThreeDecimal(boolean amountToThreeDecimal) {
+		this.amountToThreeDecimal = amountToThreeDecimal;
 	}
 
 	@Override

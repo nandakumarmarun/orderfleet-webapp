@@ -890,6 +890,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setRateWithoutCalculation(false);
 		mobileConfiguration.setShowBestPerformerUpload(false);
 		mobileConfiguration.setBelowPriceLevel(false);
+		mobileConfiguration.setAmountToThreeDecimal(false);
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 

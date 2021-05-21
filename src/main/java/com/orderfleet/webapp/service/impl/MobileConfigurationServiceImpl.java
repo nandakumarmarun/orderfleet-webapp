@@ -79,6 +79,9 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setRateWithoutCalculation(mobileConfigurationDTO.getRateWithoutCalculation());
 		configuration.setShowBestPerformerUpload(mobileConfigurationDTO.isShowBestPerformerUpload());
 		configuration.setBelowPriceLevel(mobileConfigurationDTO.isBelowPriceLevel());
+		configuration.setAmountToThreeDecimal(mobileConfigurationDTO.getAmountToThreeDecimal());
+
+		
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -122,6 +125,9 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setRateWithoutCalculation(mobileConfigurationDTO.getRateWithoutCalculation());
 			configuration.setShowBestPerformerUpload(mobileConfigurationDTO.isShowBestPerformerUpload());
 			configuration.setBelowPriceLevel(mobileConfigurationDTO.isBelowPriceLevel());
+			configuration.setAmountToThreeDecimal(mobileConfigurationDTO.getAmountToThreeDecimal());
+
+			
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

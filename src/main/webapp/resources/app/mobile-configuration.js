@@ -45,7 +45,8 @@ if (!this.MobileConfiguration) {
 		salesOrderAllocation : false,
 		rateWithoutCalculation : false,
 		showBestPerformerUpload : false,
-		belowPriceLevel : false
+		belowPriceLevel : false,
+		amountToThreeDecimal:false
 	};
 
 	$(document).ready(function() {
@@ -144,6 +145,9 @@ if (!this.MobileConfiguration) {
 				"#showBestPerformerUpload").is(":checked");
 		mobileConfigurationDTO.belowPriceLevel = $(
 				"#belowPriceLevel").is(":checked");
+		mobileConfigurationDTO.amountToThreeDecimal = $(
+		"#amountToThreeDecimal").is(":checked");
+
 
 		$.ajax({
 			url : contextPath,
@@ -237,6 +241,8 @@ if (!this.MobileConfiguration) {
 									data.showBestPerformerUpload);
 							$('#belowPriceLevel').prop("checked",
 									data.belowPriceLevel);
+							$('#amountToThreeDecimal').prop("checked",
+									data.amountToThreeDecimal);
 
 						}
 

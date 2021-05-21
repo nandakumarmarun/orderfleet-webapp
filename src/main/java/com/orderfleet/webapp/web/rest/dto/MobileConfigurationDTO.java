@@ -53,6 +53,9 @@ public class MobileConfigurationDTO {
 	private boolean rateWithoutCalculation;
 	private boolean showBestPerformerUpload;
 	private boolean belowPriceLevel;
+	private boolean amountToThreeDecimal;
+
+	
 
 	public MobileConfigurationDTO() {
 		super();
@@ -97,6 +100,7 @@ public class MobileConfigurationDTO {
 		this.rateWithoutCalculation = mobileConfiguration.getRateWithoutCalculation();
 		this.showBestPerformerUpload = mobileConfiguration.isShowBestPerformerUpload();
 		this.belowPriceLevel = mobileConfiguration.isBelowPriceLevel();
+		this.amountToThreeDecimal=mobileConfiguration.getAmountToThreeDecimal();
 	}
 
 	public String getPid() {
@@ -394,4 +398,13 @@ public class MobileConfigurationDTO {
 	public void setBelowPriceLevel(boolean belowPriceLevel) {
 		this.belowPriceLevel = belowPriceLevel;
 	}
+
+	public boolean getAmountToThreeDecimal() {
+		return amountToThreeDecimal;
+	}
+
+	public void setAmountToThreeDecimal(boolean amountToThreeDecimal) {
+		this.amountToThreeDecimal = amountToThreeDecimal;
+	}
+	
 }

@@ -71,7 +71,9 @@
 						<th>Rate Without Calculation</th>
 						<th>Show Best Performer Upload</th>
 						<th>Below Price Level</th>
+						<th>Amount To Three Decimal</th>
 						<th>Action</th>
+						
 					</tr>
 				</thead>
 				<tbody>
@@ -113,6 +115,9 @@
 							<td>${mobileConfiguration.rateWithoutCalculation}</td>
 							<td>${mobileConfiguration.showBestPerformerUpload}</td>
 							<td>${mobileConfiguration.belowPriceLevel}</td>
+							<td>${mobileConfiguration.amountToThreeDecimal}</td>
+							
+							
 
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
@@ -389,6 +394,14 @@
 													<label class="control-label">Rate Without Allocation</label>
 													<input id="rateWithoutCalculation"
 														name='rateWithoutCalculation' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Amount to Three Decimal</label>
+													<input id="amountToThreeDecimal"
+														name='amountToThreeDecimal' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

@@ -91,6 +91,8 @@ public class MobileSettingsDTO {
 	private boolean showBestPerformerUpload;
 	
 	private boolean belowPriceLevel;
+	
+	private boolean amountToThreeDecimal;
 
 	public MobileSettingsDTO() {
 		super();
@@ -132,6 +134,8 @@ public class MobileSettingsDTO {
 		this.rateWithoutCalculation = mobileConfigurationDTO.getRateWithoutCalculation();
 		this.showBestPerformerUpload = mobileConfigurationDTO.isShowBestPerformerUpload();
 		this.belowPriceLevel = mobileConfigurationDTO.isBelowPriceLevel();
+		this.amountToThreeDecimal=mobileConfigurationDTO.getAmountToThreeDecimal();
+		
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -437,4 +441,13 @@ public class MobileSettingsDTO {
 	public void setBelowPriceLevel(boolean belowPriceLevel) {
 		this.belowPriceLevel = belowPriceLevel;
 	}
+
+	public boolean getAmountToThreeDecimal() {
+		return amountToThreeDecimal;
+	}
+
+	public void setAmountToThreeDecimal(boolean amountToThreeDecimal) {
+		this.amountToThreeDecimal = amountToThreeDecimal;
+	}
+	
 }
