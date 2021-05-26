@@ -170,6 +170,13 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	@Column(name = "contact_person")
 	private String contactPerson;
+	
+	/*
+	 * @Column(name="location_radius") private double locationRadius;
+	 */
+    
+    @Column(name = "location_radius", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double locationRadius;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -219,6 +226,8 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	@ManyToOne
 	private User geoTaggedUser;
+	
+	
 
 	public Long getId() {
 		return id;
@@ -554,6 +563,15 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	public void setCustomerCode(String customerCode) {
 		this.customerCode = customerCode;
+	}
+	
+
+	public double getLocationRadius() {
+		return locationRadius;
+	}
+
+	public void setLocationRadius(double locationRadius) {
+		this.locationRadius = locationRadius;
 	}
 
 	@Override

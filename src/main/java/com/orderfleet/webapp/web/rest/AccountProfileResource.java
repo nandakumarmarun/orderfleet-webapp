@@ -44,9 +44,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -90,6 +92,9 @@ public class AccountProfileResource {
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
+
 	/**
 	 * POST /accountProfiles : Create a new accountProfile.
 	 *
@@ -104,6 +109,7 @@ public class AccountProfileResource {
 	@Timed
 	public ResponseEntity<AccountProfileDTO> createAccountProfile(
 			@Valid @RequestBody AccountProfileDTO accountProfileDTO) throws URISyntaxException {
+		log.info("location radius"+accountProfileDTO.getLocationRadius());
 		log.debug("Web request to save AccountProfile : {}", accountProfileDTO);
 		if (accountProfileDTO.getPid() != null) {
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfile", "idexists",
@@ -160,6 +166,24 @@ public class AccountProfileResource {
 		return ResponseEntity.ok()
 				.headers(HeaderUtil.createEntityUpdateAlert("accountProfile", accountProfileDTO.getPid().toString()))
 				.body(result);
+	}
+
+	@RequestMapping(value = "/accountProfiles/saveLocationRadius", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<AccountProfile>> updateLocationRadius(
+			@RequestParam("locationRadius") double locationRadius) {
+		log.debug("Web request to update location radius*  " + locationRadius);
+
+		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
+
+		for (AccountProfile accountProfileslist : accountProfiles) {
+			accountProfileslist.setLocationRadius(locationRadius);
+		}
+
+		accountProfileRepository.save(accountProfiles);
+
+		return new ResponseEntity<>(accountProfiles, HttpStatus.OK);
+
 	}
 
 	/**
@@ -427,12 +451,12 @@ public class AccountProfileResource {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 
 	}
-	
+
 	@RequestMapping(value = "/accountProfiles/download-profile-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public void downloadProductProfileXls(@RequestParam String status,HttpServletResponse response) {
+	public void downloadProductProfileXls(@RequestParam String status, HttpServletResponse response) {
 		List<AccountProfileDTO> accountProfileDTOs = new ArrayList<AccountProfileDTO>();
-		boolean active= false, deactivate=false;
+		boolean active = false, deactivate = false;
 		if (status.equals("All")) {
 			active = true;
 			deactivate = true;
@@ -442,8 +466,8 @@ public class AccountProfileResource {
 		} else if (status.equals("Deactive")) {
 			deactivate = true;
 			active = false;
-		} 
-		
+		}
+
 		if (active == true && deactivate == true) {
 			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
 			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
@@ -454,25 +478,25 @@ public class AccountProfileResource {
 		}
 		buildExcelDocument(accountProfileDTOs, response);
 	}
-	
-	private void buildExcelDocument(List<AccountProfileDTO> accountProfileDTOs,
-			HttpServletResponse response) {
+
+	private void buildExcelDocument(List<AccountProfileDTO> accountProfileDTOs, HttpServletResponse response) {
 		log.debug("Downloading Excel report");
 		String excelFileName = "accountProfile" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = {"Name", "Alias", "CustomerId", "Type", "Closing Balance", "Address", "Phone1", "Email1", "WhatsApp No", "Account Status",
-				"GSTIN", "GST Registration Type", "Created Date", "Last Updated Date", "Created By", "Stage", "Status"};
-		try(HSSFWorkbook workbook = new HSSFWorkbook()){
+		String[] headerColumns = { "Name", "Alias", "CustomerId", "Type", "Closing Balance", "Address", "Phone1",
+				"Email1", "WhatsApp No", "Account Status", "GSTIN", "GST Registration Type", "Created Date",
+				"Last Updated Date", "Created By", "Stage", "Status" };
+		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
 			createReportRows(worksheet, accountProfileDTOs);
 			// Resize all columns to fit the content size
-	        for(int i = 0; i < headerColumns.length; i++) {
-	        	worksheet.autoSizeColumn(i);
-	        }
+			for (int i = 0; i < headerColumns.length; i++) {
+				worksheet.autoSizeColumn(i);
+			}
 			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
 			response.setContentType("application/vnd.ms-excel");
-			//Writes the report to the output stream
+			// Writes the report to the output stream
 			ServletOutputStream outputStream = response.getOutputStream();
 			worksheet.getWorkbook().write(outputStream);
 			outputStream.flush();
@@ -480,67 +504,69 @@ public class AccountProfileResource {
 			log.error("IOException on downloading Product profiles {}", ex.getMessage());
 		}
 	}
-	
+
 	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
 		// Create a Font for styling header cells
-        Font headerFont = worksheet.getWorkbook().createFont();
-        headerFont.setFontName("Arial");
-        headerFont.setBold(true);
-        headerFont.setFontHeightInPoints((short) 12);
-        headerFont.setColor(IndexedColors.BLACK.getIndex());
-        // Create a CellStyle with the font
-        HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
-        headerCellStyle.setFont(headerFont);
-        // Create a Row
-     	HSSFRow headerRow = worksheet.createRow(0);
-     	// Create cells
-		for(int i = 0; i < headerColumns.length; i++) {
+		Font headerFont = worksheet.getWorkbook().createFont();
+		headerFont.setFontName("Arial");
+		headerFont.setBold(true);
+		headerFont.setFontHeightInPoints((short) 12);
+		headerFont.setColor(IndexedColors.BLACK.getIndex());
+		// Create a CellStyle with the font
+		HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
+		headerCellStyle.setFont(headerFont);
+		// Create a Row
+		HSSFRow headerRow = worksheet.createRow(0);
+		// Create cells
+		for (int i = 0; i < headerColumns.length; i++) {
 			HSSFCell cell = headerRow.createCell(i);
-            cell.setCellValue(headerColumns[i]);
-            cell.setCellStyle(headerCellStyle);
-        }
+			cell.setCellValue(headerColumns[i]);
+			cell.setCellStyle(headerCellStyle);
+		}
 	}
-	
+
 	private void createReportRows(HSSFSheet worksheet, List<AccountProfileDTO> accountProfileDTO) {
-		/* CreationHelper helps us create instances of various things like DataFormat, 
-        Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way */
+		/*
+		 * CreationHelper helps us create instances of various things like DataFormat,
+		 * Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way
+		 */
 		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
 		// Create Cell Style for formatting Date
 		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
-        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
-        // Create Other rows and cells with Sales data
-        int rowNum = 1;
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss a");
-    	for (AccountProfileDTO ap: accountProfileDTO) {
-    		HSSFRow row = worksheet.createRow(rowNum++);
-    		row.createCell(0).setCellValue(ap.getName().replace("#13;#10;", " "));
-    		row.createCell(1).setCellValue(ap.getAlias());
-    		row.createCell(2).setCellValue(ap.getCustomerId());
-    		row.createCell(3).setCellValue(ap.getAccountTypeName());
-    		row.createCell(4).setCellValue(String.format("%.2f", ap.getClosingBalance()));
-    		row.createCell(5).setCellValue(ap.getAddress());
-    		row.createCell(6).setCellValue(ap.getPhone1() == null ? "" :ap.getPhone1());
-    		row.createCell(7).setCellValue(ap.getEmail1() == null ? "" :ap.getEmail1());
-    		row.createCell(8).setCellValue(ap.getWhatsAppNo() == null ? "" :ap.getWhatsAppNo());
-    		row.createCell(9).setCellValue(ap.getAccountStatus().toString());
-    		row.createCell(10).setCellValue(ap.getTinNo() == null ? "" :ap.getTinNo());
-    		row.createCell(11).setCellValue(ap.getGstRegistrationType() == null ? "" :ap.getGstRegistrationType());
-    		LocalDateTime ldt = ap.getCreatedDate();
-    		if (ldt != null) {
-    			row.createCell(12).setCellValue(ldt.format(df));
-    		} else {
-    			row.createCell(12).setCellValue("");
-    		}
-    		LocalDateTime lmdt = ap.getLastModifiedDate();
-    		if (lmdt != null) {
-    			row.createCell(13).setCellValue(lmdt.format(df));
-    		} else {
-    			row.createCell(13).setCellValue("");
-    		}
-    		row.createCell(14).setCellValue(ap.getUserName() == null ? "" :ap.getUserName());
-    		row.createCell(15).setCellValue(ap.getLeadToCashStage() == null ? "" :ap.getLeadToCashStage());
-    		row.createCell(16).setCellValue(ap.getActivated() ? "Activated" :"Deactivated");
+		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
+		// Create Other rows and cells with Sales data
+		int rowNum = 1;
+		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss a");
+		for (AccountProfileDTO ap : accountProfileDTO) {
+			HSSFRow row = worksheet.createRow(rowNum++);
+			row.createCell(0).setCellValue(ap.getName().replace("#13;#10;", " "));
+			row.createCell(1).setCellValue(ap.getAlias());
+			row.createCell(2).setCellValue(ap.getCustomerId());
+			row.createCell(3).setCellValue(ap.getAccountTypeName());
+			row.createCell(4).setCellValue(String.format("%.2f", ap.getClosingBalance()));
+			row.createCell(5).setCellValue(ap.getAddress());
+			row.createCell(6).setCellValue(ap.getPhone1() == null ? "" : ap.getPhone1());
+			row.createCell(7).setCellValue(ap.getEmail1() == null ? "" : ap.getEmail1());
+			row.createCell(8).setCellValue(ap.getWhatsAppNo() == null ? "" : ap.getWhatsAppNo());
+			row.createCell(9).setCellValue(ap.getAccountStatus().toString());
+			row.createCell(10).setCellValue(ap.getTinNo() == null ? "" : ap.getTinNo());
+			row.createCell(11).setCellValue(ap.getGstRegistrationType() == null ? "" : ap.getGstRegistrationType());
+			LocalDateTime ldt = ap.getCreatedDate();
+			if (ldt != null) {
+				row.createCell(12).setCellValue(ldt.format(df));
+			} else {
+				row.createCell(12).setCellValue("");
+			}
+			LocalDateTime lmdt = ap.getLastModifiedDate();
+			if (lmdt != null) {
+				row.createCell(13).setCellValue(lmdt.format(df));
+			} else {
+				row.createCell(13).setCellValue("");
+			}
+			row.createCell(14).setCellValue(ap.getUserName() == null ? "" : ap.getUserName());
+			row.createCell(15).setCellValue(ap.getLeadToCashStage() == null ? "" : ap.getLeadToCashStage());
+			row.createCell(16).setCellValue(ap.getActivated() ? "Activated" : "Deactivated");
 		}
-		
+
 	}
 }

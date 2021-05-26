@@ -12,6 +12,8 @@ if (!this.AccountProfile) {
 			+ location.pathname;
 	var createEditForm = $("#accountProfileForm");
 	var deleteForm = $("#deleteForm");
+	var locationRadius=$("#locationRadiusForm");
+
 	var accountProfileModel = {
 		pid : null,
 		name : null,
@@ -35,6 +37,7 @@ if (!this.AccountProfile) {
 		defaultDiscountPercentage:null,
 		closingBalance:0,
 		tinNo : null,
+		locationRadius:0,
 		customerId :null
 		
 	};
@@ -79,7 +82,12 @@ if (!this.AccountProfile) {
 		},
 		description : {
 			maxlength : 250
+		},
+		locationRadius : {
+			maxlength : 250
 		}
+		
+		
 	};
 
 	// Specify the validation error messages
@@ -119,7 +127,11 @@ if (!this.AccountProfile) {
 		},
 		description : {
 			maxlength : "This field cannot be longer than 250 characters."
+		},
+		 locationRadius : {
+			maxlength : "This field cannot be longer than 250 characters."
 		}
+		
 	};
 
 	$(document).ready(function() {
@@ -128,6 +140,16 @@ if (!this.AccountProfile) {
 		$('#btnSearch').click(function() {
 			searchTable($("#search").val());
 		});
+		
+		$('#setLocationRadius').click(function() {
+			$(".error-msg").html("");
+			$("#locationRadiusModal").modal('show');
+		});
+		
+		$('#saveLocationRadius').click(function() {
+			saveLocationRadius();
+		});
+		
 
 		// add the rule here
 		$.validator.addMethod("valueNotEquals", function(value, element, arg) {
@@ -141,7 +163,9 @@ if (!this.AccountProfile) {
 				createUpdateAccountProfile(form);
 			}
 		});
-
+		
+		
+		
 		deleteForm.submit(function(e) {
 			// prevent Default functionality
 			e.preventDefault();
@@ -209,6 +233,31 @@ if (!this.AccountProfile) {
 
 		$('#slt_status').val("Active");
 	});
+	
+	function saveLocationRadius(){
+		
+		$(".error-msg").html("Please Wait!..Saving..");
+	
+	   var locationRadius  = $('#field_locationradius').val();
+		
+		$
+		.ajax({
+			url : accountProfileContextPath + "/saveLocationRadius",
+			method : 'GET',
+			data:{
+				locationRadius : locationRadius
+			},
+			success : function(accountProfiles) {
+				$("#locationRadiusModal").modal('hide');
+				$(".error-msg").html("");
+			},
+			error : function(xhr, error) {
+				$(".error-msg").html("Saving Failed.Error");
+				onError(xhr, error);
+			}
+		});
+		
+	}
 
 	function downloadXls() {
 		var status = $('#slt_status').val();
@@ -581,6 +630,8 @@ function findByfilfter() {
 		accountProfileModel.closingBalance=$('#field_closingBalance').val();
 		accountProfileModel.tinNo=$('#field_tinNo').val();
 		accountProfileModel.customerId=$('#field_customerId').val();
+		accountProfileModel.locationRadius=$('#fld_location_radius').val();
+
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -594,6 +645,39 @@ function findByfilfter() {
 			}
 		});
 	}
+	
+	
+	function locationRadius(el) 
+	{
+		accountProfileModel.locationRadius = $('#field_locationradius').val();
+		$.ajax({
+			method : $(el).attr('method'),
+			url : $(el).attr('action'),
+		
+			contentType : "application/json; charset=utf-8",
+			data : JSON.stringify(accountProfileModel),
+			success : function(data) {
+				onSaveSuccess(data);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+
+	}
+	  /*function locationRadius(id) {
+		$.ajax({
+			url : accountProfileContextPath + "/accountProfiles/locationRadius" + id,
+			method : 'GET',
+			success : function(data) {
+				$('#field_locationradius').text(data.locationRadius);
+				
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+	}*/
 
 	function showAccountProfile(id) {
 		$.ajax({
@@ -617,6 +701,8 @@ function findByfilfter() {
 				$('#lbl_creditDays').text((data.creditDays == null ? "" : data.creditDays));
 				$('#lbl_creditLimit').text((data.creditLimit == null ? "" : data.creditLimit));
 				$('#lbl_contactPerson').text((data.contactPerson == null ? "" : data.contactPerson));
+				$('#lbl_locationRadius').text((data.locationRadius == null ? "" : data.locationRadius));
+
 				$('#lbl_defaultDiscountPercentage').text((data.defaultDiscountPercentage == null ? 0 : data.defaultDiscountPercentage));
 				$('#lbl_closingBalance').text((data.closingBalance == null ? 0 : data.closingBalance));
 				$('#lbl_tinNo').text((data.tinNo == null ? "" : data.tinNo));
@@ -655,6 +741,9 @@ function findByfilfter() {
 				$('#field_closingBalance').val(data.closingBalance);
 				$('#field_tinNo').val(data.tinNo);
 				$('#field_customerId').val(data.customerId);
+				$('#fld_location_radius').val(data.locationRadius);
+
+				     
 				
 				// set pid
 				accountProfileModel.pid = data.pid;
@@ -705,6 +794,11 @@ function findByfilfter() {
 			case 3:
 				showAccountProfileLocation(id);
 				break;
+			case 4:
+                  locationRadius(id);
+				locationRadius.attr('method','PUT');
+				saveLocationRadius();
+				
 			}
 		}
 		el.modal('show');

@@ -39,6 +39,8 @@ public class AccountProfileDTO {
 	private String accountTypeName;
 
 	private String gstRegistrationType;
+	
+	private double locationRadius;
 
 	@NotNull
 	@Size(min = 1, max = 500)
@@ -177,6 +179,7 @@ public class AccountProfileDTO {
 //		this.hasDefaultAccountInventory = hasDefaultAccountInventory;
 //		this.promptStockLocationInventory = promptStockLocationInventory;
 		this.dataSourceType = customAccount.getDataSourceType();
+		this.locationRadius=customAccount.getlocationRadius();
 	}
 
 	public String getPid() {
@@ -553,6 +556,17 @@ public class AccountProfileDTO {
 
 	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
+	}
+	
+
+	
+
+	public double getLocationRadius() {
+		return locationRadius;
+	}
+
+	public void setLocationRadius(double locationRadius) {
+		this.locationRadius = locationRadius;
 	}
 
 	@Override

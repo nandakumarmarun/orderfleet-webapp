@@ -103,6 +103,11 @@ public interface CustomAccountProfiles {
 
 	@Value("#{target.trimChar}")
 	String getTrimChar();
+	
+	@Value("#{target.locationRadius}")
+	double getlocationRadius();
+	
+	
 
 //	@Value("#{target.hasDefaultAccountInventory}")
 //	boolean getHasDefaultAccountInventory();

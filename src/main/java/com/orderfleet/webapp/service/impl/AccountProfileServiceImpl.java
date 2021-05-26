@@ -153,6 +153,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			accountProfile.setClosingBalance(accountProfileDTO.getClosingBalance());
 			accountProfile.setTinNo(accountProfileDTO.getTinNo());
 			accountProfile.setCustomerId(accountProfileDTO.getCustomerId());
+			accountProfile.setLocationRadius(accountProfileDTO.getLocationRadius());
 			if (accountProfileDTO.getGeoTaggingType() != null) {
 				accountProfile.setGeoTaggingType(accountProfileDTO.getGeoTaggingType());
 				accountProfile.setGeoTaggedTime(accountProfileDTO.getGeoTaggedTime());
