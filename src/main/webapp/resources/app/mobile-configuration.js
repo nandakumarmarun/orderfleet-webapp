@@ -46,7 +46,8 @@ if (!this.MobileConfiguration) {
 		rateWithoutCalculation : false,
 		showBestPerformerUpload : false,
 		belowPriceLevel : false,
-		amountToThreeDecimal:false
+		amountToThreeDecimal:false,
+		enableGeoFencing:false
 	};
 
 	$(document).ready(function() {
@@ -147,6 +148,9 @@ if (!this.MobileConfiguration) {
 				"#belowPriceLevel").is(":checked");
 		mobileConfigurationDTO.amountToThreeDecimal = $(
 		"#amountToThreeDecimal").is(":checked");
+		mobileConfigurationDTO.enableGeoFencing = $(
+		"#enableGeoFencing").is(":checked");
+
 
 
 		$.ajax({
@@ -243,6 +247,8 @@ if (!this.MobileConfiguration) {
 									data.belowPriceLevel);
 							$('#amountToThreeDecimal').prop("checked",
 									data.amountToThreeDecimal);
+							$('#enableGeoFencing').prop("checked",
+									data.enableGeoFencing);
 
 						}
 

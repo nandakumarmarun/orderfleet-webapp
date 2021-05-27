@@ -80,6 +80,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setShowBestPerformerUpload(mobileConfigurationDTO.isShowBestPerformerUpload());
 		configuration.setBelowPriceLevel(mobileConfigurationDTO.isBelowPriceLevel());
 		configuration.setAmountToThreeDecimal(mobileConfigurationDTO.getAmountToThreeDecimal());
+		configuration.setEnableGeoFencing(mobileConfigurationDTO.getEnableGeoFencing());
+
 
 		
 		configuration = mobileConfigurationRepository.save(configuration);
@@ -126,6 +128,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setShowBestPerformerUpload(mobileConfigurationDTO.isShowBestPerformerUpload());
 			configuration.setBelowPriceLevel(mobileConfigurationDTO.isBelowPriceLevel());
 			configuration.setAmountToThreeDecimal(mobileConfigurationDTO.getAmountToThreeDecimal());
+			configuration.setEnableGeoFencing(mobileConfigurationDTO.getEnableGeoFencing());
+
 
 			
 			configuration = mobileConfigurationRepository.save(configuration);
@@ -169,6 +173,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		log.debug("Request to delete MobileConfigurations");
 		mobileConfigurationRepository.deleteByPid(pid);
 	}
+	
 
 	@Override
 	public Optional<MobileConfigurationDTO> findOneByCompanyId(Long companyId) {

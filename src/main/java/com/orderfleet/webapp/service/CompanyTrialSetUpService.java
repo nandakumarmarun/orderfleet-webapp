@@ -891,7 +891,8 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setShowBestPerformerUpload(false);
 		mobileConfiguration.setBelowPriceLevel(false);
 		mobileConfiguration.setAmountToThreeDecimal(false);
-		mobileConfigurationRepository.save(mobileConfiguration);
+		mobileConfiguration.setEnableGeoFencing(false);
+        mobileConfigurationRepository.save(mobileConfiguration);
 	}
 
 	private List<AccountType> createAccountTypes(Company company) {

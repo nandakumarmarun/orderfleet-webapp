@@ -157,6 +157,9 @@ public class MobileConfiguration implements Serializable {
 	
 	@Column(name = "amount_to_three_decimal", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean amountToThreeDecimal;
+	
+	@Column(name = "enable_geo_fencing", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enableGeoFencing;
 
 
 	@NotNull
@@ -479,6 +482,15 @@ public class MobileConfiguration implements Serializable {
 
 	public void setAmountToThreeDecimal(boolean amountToThreeDecimal) {
 		this.amountToThreeDecimal = amountToThreeDecimal;
+	}
+	
+
+	public boolean getEnableGeoFencing() {
+		return enableGeoFencing;
+	}
+
+	public void setEnableGeoFencing(boolean enableGeoFencing) {
+		this.enableGeoFencing = enableGeoFencing;
 	}
 
 	@Override

@@ -72,6 +72,9 @@
 						<th>Show Best Performer Upload</th>
 						<th>Below Price Level</th>
 						<th>Amount To Three Decimal</th>
+						<th>Enable Geo Fencing</th>
+						
+						
 						<th>Action</th>
 						
 					</tr>
@@ -116,6 +119,8 @@
 							<td>${mobileConfiguration.showBestPerformerUpload}</td>
 							<td>${mobileConfiguration.belowPriceLevel}</td>
 							<td>${mobileConfiguration.amountToThreeDecimal}</td>
+							<td>${mobileConfiguration.enableGeoFencing}</td>
+							
 							
 							
 
@@ -402,6 +407,14 @@
 													<label class="control-label">Amount to Three Decimal</label>
 													<input id="amountToThreeDecimal"
 														name='amountToThreeDecimal' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Enable Geo Fencing</label>
+													<input id="enableGeoFencing"
+														name='enableGeoFencing' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

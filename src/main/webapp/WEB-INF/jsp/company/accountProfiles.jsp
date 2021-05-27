@@ -263,7 +263,7 @@
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="field_locationradius">Location Radius</label> <input
-										type="number" class="form-control" name="locationRadius" id="fld_location_radius"
+										type="number" class="form-control" name="locationRadius" id="fld_locationradius"
 										maxlength="100" placeholder="Location Radius" />
 								</div>
 								

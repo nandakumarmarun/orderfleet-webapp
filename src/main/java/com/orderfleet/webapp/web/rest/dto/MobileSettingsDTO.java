@@ -93,6 +93,10 @@ public class MobileSettingsDTO {
 	private boolean belowPriceLevel;
 	
 	private boolean amountToThreeDecimal;
+	
+	private boolean enableGeoFencing;
+
+	
 
 	public MobileSettingsDTO() {
 		super();
@@ -135,6 +139,8 @@ public class MobileSettingsDTO {
 		this.showBestPerformerUpload = mobileConfigurationDTO.isShowBestPerformerUpload();
 		this.belowPriceLevel = mobileConfigurationDTO.isBelowPriceLevel();
 		this.amountToThreeDecimal=mobileConfigurationDTO.getAmountToThreeDecimal();
+		this.enableGeoFencing=mobileConfigurationDTO.getEnableGeoFencing();
+
 		
 	}
 
@@ -449,5 +455,14 @@ public class MobileSettingsDTO {
 	public void setAmountToThreeDecimal(boolean amountToThreeDecimal) {
 		this.amountToThreeDecimal = amountToThreeDecimal;
 	}
+
+	public boolean getEnableGeoFencing() {
+		return enableGeoFencing;
+	}
+
+	public void setEnableGeoFencing(boolean enableGeoFencing) {
+		this.enableGeoFencing = enableGeoFencing;
+	}
+	
 	
 }
