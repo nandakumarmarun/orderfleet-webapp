@@ -152,10 +152,10 @@ public class LocationHierarchy implements Serializable {
 		return Objects.hashCode(id);
 	}
 
-	@Override
-	public String toString() {
-		return "LocationHierarchy{" + "id=" + id + ", location='" + location + "'" + ", parent='" + parent + "'"
-				+ ", activated='" + activated + "'" + ", activatedDate='" + activatedDate + "'" + ", inactivatedDate='"
-				+ inactivatedDate + "'" + ", version='" + version + "'" + '}';
-	}
+//	@Override
+//	public String toString() {
+//		return "LocationHierarchy{" + "id=" + id + ", location='" + location + "'" + ", parent='" + parent + "'"
+//				+ ", activated='" + activated + "'" + ", activatedDate='" + activatedDate + "'" + ", inactivatedDate='"
+//				+ inactivatedDate + "'" + ", version='" + version + "'" + '}';
+//	}
 }

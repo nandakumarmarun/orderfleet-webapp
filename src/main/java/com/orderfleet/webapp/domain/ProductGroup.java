@@ -67,7 +67,7 @@ public class ProductGroup implements Serializable, Cloneable {
 
 	@Column(name = "description")
 	private String description;
-	
+
 	@Column(name = "product_group_id")
 	private String productGroupId;
 
@@ -105,7 +105,7 @@ public class ProductGroup implements Serializable, Cloneable {
 	@Column(name = "last_modified_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	@JsonIgnore
 	private LocalDateTime lastModifiedDate = LocalDateTime.now();
-	
+
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "tbl_product_group_tax_master", joinColumns = {
@@ -113,8 +113,8 @@ public class ProductGroup implements Serializable, Cloneable {
 					@JoinColumn(name = "tax_master_id", referencedColumnName = "id") })
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<TaxMaster> taxMastersList = new ArrayList<>();
-	
-	@Column(name = "tax_rate", columnDefinition = "double precision DEFAULT 0")
+
+	@Column(name = "tax_rate", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double taxRate;
 
 	@PreUpdate
@@ -161,8 +161,6 @@ public class ProductGroup implements Serializable, Cloneable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	
 
 	public String getProductGroupId() {
 		return productGroupId;
@@ -235,7 +233,6 @@ public class ProductGroup implements Serializable, Cloneable {
 	public LocalDateTime getLastModifiedDate() {
 		return lastModifiedDate;
 	}
-	
 
 	public List<TaxMaster> getTaxMastersList() {
 		return taxMastersList;
@@ -244,7 +241,6 @@ public class ProductGroup implements Serializable, Cloneable {
 	public void setTaxMastersList(List<TaxMaster> taxMastersList) {
 		this.taxMastersList = taxMastersList;
 	}
-	
 
 	public double getTaxRate() {
 		return taxRate;
@@ -273,10 +269,6 @@ public class ProductGroup implements Serializable, Cloneable {
 	public int hashCode() {
 		return Objects.hashCode(id);
 	}
-
-	
-
-	
 
 	@Override
 	public String toString() {

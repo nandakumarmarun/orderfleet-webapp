@@ -39,7 +39,7 @@ public class InventoryVoucherDetail implements Serializable {
 	@Column(name = "id", insertable = false, updatable = false, columnDefinition = "bigint DEFAULT nextval('seq_inventory_voucher_detail_id')")
 	private Long id;
 
-	//@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	// @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@ManyToOne
 	@JoinColumn(name = "inventory_voucher_header_id")
 	private InventoryVoucherHeader inventoryVoucherHeader;
@@ -116,7 +116,7 @@ public class InventoryVoucherDetail implements Serializable {
 	@JoinColumn(name = "destination_stock_location_id", nullable = true)
 	private StockLocation destinationStockLocation;
 
-	//@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	// @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@ManyToOne
 	@JoinColumn(name = "rference_inventory_voucher_header", nullable = true)
 	private InventoryVoucherHeader rferenceInventoryVoucherHeader;
@@ -135,6 +135,9 @@ public class InventoryVoucherDetail implements Serializable {
 	@NotNull
 	@Column(name = "updated_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean updatedStatus = false;// whether the inventory voucher detail is updated or not
+
+	@Column(name = "volume", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double volume;
 
 	public InventoryVoucherDetail() {
 	}
@@ -173,6 +176,7 @@ public class InventoryVoucherDetail implements Serializable {
 		this.rferenceInventoryVoucherDetail = rferenceInventoryVoucherDetail;
 		this.remarks = remarks;
 		this.inventoryVoucherBatchDetails = inventoryVoucherBatchDetails;
+		this.volume = product.getUnitQty() != null ? product.getUnitQty() * quantity : quantity * 1;
 	}
 
 	public Long getId() {
@@ -413,6 +417,14 @@ public class InventoryVoucherDetail implements Serializable {
 
 	public void setItemtype(String itemtype) {
 		this.itemtype = itemtype;
+	}
+
+	public double getVolume() {
+		return volume;
+	}
+
+	public void setVolume(double volume) {
+		this.volume = volume;
 	}
 
 }

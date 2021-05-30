@@ -34,6 +34,7 @@ public class CompanyConfigDTO {
 	private boolean addCompoundUnit;
 	private boolean updateStockLocation;
 	private boolean sendToOdoo;
+	private boolean enableProductGroupTax;
 
 	public CompanyConfigDTO() {
 		super();
@@ -230,4 +231,13 @@ public class CompanyConfigDTO {
 	public void setSendToOdoo(boolean sendToOdoo) {
 		this.sendToOdoo = sendToOdoo;
 	}
+
+	public boolean getEnableProductGroupTax() {
+		return enableProductGroupTax;
+	}
+
+	public void setEnableProductGroupTax(boolean enableProductGroupTax) {
+		this.enableProductGroupTax = enableProductGroupTax;
+	}
+
 }

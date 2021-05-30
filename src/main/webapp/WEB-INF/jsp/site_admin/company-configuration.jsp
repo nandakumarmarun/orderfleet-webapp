@@ -58,6 +58,7 @@
 						<th>Add Compound Unit</th>
 						<th>Update Stock Location</th>
 						<th>Send To Odoo</th>
+						<th>Product Group Tax</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -88,6 +89,7 @@
 							<th>${companyConfiguration.addCompoundUnit}</th>
 							<th>${companyConfiguration.updateStockLocation}</th>
 							<th>${companyConfiguration.sendToOdoo}</th>
+							<th>${companyConfiguration.enableProductGroupTax}</th>
 
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
@@ -206,7 +208,7 @@
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
-										
+
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Receipts Management</label> <input
@@ -273,34 +275,42 @@
 														class="form-control" />
 												</div></td>
 										</tr>
-										
+
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Add Compound Unit</label> 
-													<input id="addCompoundUnit"
-														name='checksAddCompoundUnit"' type='checkbox'
-														class="form-control" />
+													<label class="control-label">Add Compound Unit</label> <input
+														id="addCompoundUnit" name='checksAddCompoundUnit"'
+														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
-										
-										
+
+
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Update Stock Location</label> 
+													<label class="control-label">Update Stock Location</label>
 													<input id="updateStockLocation"
 														name='checksUpdateStockLocation' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
-										
+
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Send To Odoo</label> 
-													<input id="sendToOdoo"
-														name='checksSendToOdoo' type='checkbox'
+													<label class="control-label">Send To Odoo</label> <input
+														id="sendToOdoo" name='checksSendToOdoo' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Product Group Tax</label> <input
+														id="productGroupTax" name='checksProductGroupTax'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+
+
 
 
 										<!-- <tr>

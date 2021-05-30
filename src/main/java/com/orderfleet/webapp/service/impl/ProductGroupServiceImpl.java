@@ -60,15 +60,14 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 
 	@Inject
 	private ProductGroupEcomProductsRepository productGroupEcomProductsRepository;
-	
+
 	@Inject
 	private TaxMasterRepository taxMasterRepository;
 
 	/**
 	 * Save a productGroup.
 	 * 
-	 * @param productGroupDTO
-	 *            the entity to save
+	 * @param productGroupDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -87,8 +86,7 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	/**
 	 * Update a productGroup.
 	 * 
-	 * @param productGroup
-	 *            the entity to update
+	 * @param productGroup the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -109,8 +107,7 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	/**
 	 * Get all the productGroups.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -124,8 +121,7 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	/**
 	 * Get all the productGroups.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -142,8 +138,7 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	/**
 	 * Get one productGroup by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -158,8 +153,7 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	/**
 	 * Get one productGroup by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -176,8 +170,7 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	/**
 	 * Get one productGroup by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -194,8 +187,7 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	/**
 	 * Delete the productGroup by id.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete ProductGroup : {}", pid);
@@ -217,6 +209,13 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	public void saveTaxRate(SetTaxRate setTaxRate) {
 		List<ProductProfile> productProfiles = productGroupProductRepository
 				.findProductsByProductGroupPids(setTaxRate.getProductGroups());
+
+		List<ProductGroup> productGroups = productGroupRepository.findAllByCompanyPidAndGroupPidIn(
+				productProfiles.get(0).getCompany().getPid(), setTaxRate.getProductGroups());
+		for (ProductGroup productGroup : productGroups) {
+			productGroup.setTaxRate(setTaxRate.getTaxRate());
+		}
+		productGroupRepository.save(productGroups);
 		productProfileRepository.updateTaxRate(setTaxRate.getTaxRate(), productProfiles);
 	}
 
@@ -224,18 +223,16 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	public void saveUnitQuantity(SetTaxRate setUnitQty) {
 		List<ProductProfile> productProfiles = productGroupProductRepository
 				.findProductsByProductGroupPids(setUnitQty.getProductGroups());
-		if(!productProfiles.isEmpty()) {
-			productProfileRepository.updateUnitQuantity(setUnitQty.getTaxRate(), productProfiles);	
+		if (!productProfiles.isEmpty()) {
+			productProfileRepository.updateUnitQuantity(setUnitQty.getTaxRate(), productProfiles);
 		}
 	}
-	
+
 	/**
 	 * Update the productGroup status by pid.
 	 * 
-	 * @param pid
-	 *            the pid of the entity
-	 * @param active
-	 *            the active of the entity
+	 * @param pid    the pid of the entity
+	 * @param active the active of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -268,11 +265,9 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	 * 
 	 *        find all active company
 	 * 
-	 * @param active
-	 *            the active of the entity
+	 * @param active   the active of the entity
 	 * 
-	 * @param pageable
-	 *            the pageable of the entity
+	 * @param pageable the pageable of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -293,8 +288,7 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	 * 
 	 *        find all deactive company
 	 * 
-	 * @param deactive
-	 *            the deactive of the entity
+	 * @param deactive the deactive of the entity
 	 * @return the list
 	 */
 	@Override
@@ -305,34 +299,31 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 		List<ProductGroupDTO> productGroupDTOs = productGroupMapper.productGroupsToProductGroupDTOs(productGroups);
 		return productGroupDTOs;
 	}
-	
+
 	/**
 	 * Get one productGroup by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<ProductGroupDTO> findByCompanyIdAndName(Long companyId,String name) {
+	public Optional<ProductGroupDTO> findByCompanyIdAndName(Long companyId, String name) {
 		log.debug("Request to get ProductGroup by name : {}", name);
-		return productGroupRepository.findByCompanyIdAndNameIgnoreCase(companyId, name)
-				.map(productGroup -> {
-					ProductGroupDTO productGroupDTO = productGroupMapper.productGroupToProductGroupDTO(productGroup);
-					return productGroupDTO;
-				});
+		return productGroupRepository.findByCompanyIdAndNameIgnoreCase(companyId, name).map(productGroup -> {
+			ProductGroupDTO productGroupDTO = productGroupMapper.productGroupToProductGroupDTO(productGroup);
+			return productGroupDTO;
+		});
 	}
 
 	/**
 	 * Save a productGroup.
 	 * 
-	 * @param productGroupDTO
-	 *            the entity to save
+	 * @param productGroupDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
-	public ProductGroupDTO saveProductGroup(Long companyId,ProductGroupDTO productGroupDTO) {
+	public ProductGroupDTO saveProductGroup(Long companyId, ProductGroupDTO productGroupDTO) {
 		log.debug("Request to save ProductGroup : {}", productGroupDTO);
 		// set pid
 		productGroupDTO.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
@@ -346,13 +337,13 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 
 	@Override
 	public ProductGroupDTO updateProductGroupThirdpartyUpdate(String pid, boolean Thirdparty) {
-		
-		return productGroupRepository.findOneByPid(pid).map(productGroup ->{
+
+		return productGroupRepository.findOneByPid(pid).map(productGroup -> {
 			System.out.println(Thirdparty);
 			productGroup.setThirdpartyUpdate(Thirdparty);
-			 productGroup=productGroupRepository.save(productGroup);
-			 System.out.println(productGroup);
-			ProductGroupDTO productGroupDTO=productGroupMapper.productGroupToProductGroupDTO(productGroup);
+			productGroup = productGroupRepository.save(productGroup);
+			System.out.println(productGroup);
+			ProductGroupDTO productGroupDTO = productGroupMapper.productGroupToProductGroupDTO(productGroup);
 			return productGroupDTO;
 		}).orElse(null);
 	}
@@ -360,22 +351,22 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 	@Override
 	public void saveTaxMaster(List<String> taxmasterPids, List<String> productGroupPids) {
 		log.debug("Request to save ProductGroup by taxmasterPids : {}", taxmasterPids);
-		List<TaxMaster>taxMasters=new ArrayList<>();
-		for(String taxPid:taxmasterPids){
-			TaxMaster taxMaster=taxMasterRepository.findOneByPid(taxPid).get();
+		List<TaxMaster> taxMasters = new ArrayList<>();
+		for (String taxPid : taxmasterPids) {
+			TaxMaster taxMaster = taxMasterRepository.findOneByPid(taxPid).get();
 			taxMasters.add(taxMaster);
 		}
-		for(String pid:productGroupPids){
-		ProductGroup productGroup=productGroupRepository.findOneByPid(pid).get();
-		productGroup.setTaxMastersList(taxMasters);
-		productGroupRepository.save(productGroup);
-		List<ProductProfile> productProfiles=productGroupProductRepository.findProductByProductGroupPid(pid);
-		for(ProductProfile productProfile:productProfiles){
-			productProfile.setTaxMastersList(taxMasters);
-			productProfileRepository.save(productProfile);
+		for (String pid : productGroupPids) {
+			ProductGroup productGroup = productGroupRepository.findOneByPid(pid).get();
+			productGroup.setTaxMastersList(taxMasters);
+			productGroupRepository.save(productGroup);
+			List<ProductProfile> productProfiles = productGroupProductRepository.findProductByProductGroupPid(pid);
+			for (ProductProfile productProfile : productProfiles) {
+				productProfile.setTaxMastersList(taxMasters);
+				productProfileRepository.save(productProfile);
+			}
 		}
 	}
-}
 
 	@Override
 	public List<ProductGroupDTO> findAllProductGroupByCompanyOrderByName() {
@@ -394,10 +385,10 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 
 	@Override
 	public List<ProductGroupDTO> findAllProductGroupByCompanyPidAndGroupPid(String companyPid, List<String> groupPids) {
-		List<ProductGroup> productGroups = productGroupRepository.findAllByCompanyPidAndGroupPidIn(companyPid, groupPids);
+		List<ProductGroup> productGroups = productGroupRepository.findAllByCompanyPidAndGroupPidIn(companyPid,
+				groupPids);
 		List<ProductGroupDTO> productGroupDTOs = productGroupMapper.productGroupsToProductGroupDTOs(productGroups);
 		return productGroupDTOs;
 	}
-	
-	
+
 }

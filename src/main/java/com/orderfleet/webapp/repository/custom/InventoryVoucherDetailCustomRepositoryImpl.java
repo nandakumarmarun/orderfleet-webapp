@@ -33,7 +33,7 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 		StringBuilder subQueryString = new StringBuilder("select " + "ivd.inventoryVoucherHeader.createdDate,"
 				+ "ivd.inventoryVoucherHeader.employee.name," + "ivd.inventoryVoucherHeader.receiverAccount.name,"
 				+ "ivd.product.productCategory.name," + "ivd.product.name," + "ivd.quantity," + "ivd.sellingRate,"
-				+ "ivd.rowTotal," + "ivd.product.pid ");
+				+ "ivd.rowTotal," + "ivd.product.pid," + "ivd.product.unitQty," + "ivd.volume ");
 		if (!stockLocationPids.isEmpty()) {
 			subQueryString.append(",ivd.sourceStockLocation.name," + "ivd.destinationStockLocation.name ");
 		}
@@ -113,9 +113,11 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			ivd.setRowTotal((double) object[7]);
 			ivd.setProductPid((String) object[8]);
 			if (!stockLocationPids.isEmpty()) {
-				ivd.setSourceStockLocationName((String) object[9]);
-				ivd.setDestinationStockLocationName((String) object[10]);
+				ivd.setSourceStockLocationName((String) object[11]);
+				ivd.setDestinationStockLocationName((String) object[12]);
 			}
+			ivd.setProductUnitQty(object[9] != null ? Double.valueOf(object[9].toString()) : 1);
+			ivd.setVolume(Double.valueOf(object[10].toString()));
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
 

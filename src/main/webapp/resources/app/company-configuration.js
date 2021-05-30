@@ -56,10 +56,12 @@ if (!this.CompanyConfiguration) {
 		var sendSalesOrderSap = $('#sendSalesOrderSap').is(":checked");
 		var piecesToQuantity = $('#piecesToQuantity').is(":checked");
 		var sendSalesOrderOdoo = $('#sendSalesOrderOdoo').is(":checked");
-		var sendTransactionsSapPravesh = $('#sendTransactionsSapPravesh').is(":checked");
+		var sendTransactionsSapPravesh = $('#sendTransactionsSapPravesh').is(
+				":checked");
 		var addCompoundUnit = $('#addCompoundUnit').is(":checked");
 		var updateStockLocation = $('#updateStockLocation').is(":checked");
 		var sendToOdoo = $('#sendToOdoo').is(":checked");
+		var productGroupTax = $('#productGroupTax').is(":checked");
 		/* var findLocation = $('#findLocation').is(":checked"); */
 		$.ajax({
 			url : contextPath,
@@ -83,10 +85,11 @@ if (!this.CompanyConfiguration) {
 				sendSalesOrderSap : sendSalesOrderSap,
 				piecesToQuantity : piecesToQuantity,
 				sendSalesOrderOdoo : sendSalesOrderOdoo,
-				sendTransactionsSapPravesh : sendTransactionsSapPravesh, 
+				sendTransactionsSapPravesh : sendTransactionsSapPravesh,
 				addCompoundUnit : addCompoundUnit,
 				updateStockLocation : updateStockLocation,
-				sendToOdoo : sendToOdoo
+				sendToOdoo : sendToOdoo,
+				productGroupTax : productGroupTax
 			/* findLocation : findLocation */
 			},
 			success : function(data) {
@@ -122,7 +125,7 @@ if (!this.CompanyConfiguration) {
 						$("#visitBasedTransaction").prop("checked",
 								data.visitBasedTransaction);
 						$("#salesManagement").prop("checked",
-								data.salesManagement);								
+								data.salesManagement);
 						$("#receiptsManagement").prop("checked",
 								data.receiptsManagement);
 						$("#salesEditEnabled").prop("checked",
@@ -143,10 +146,10 @@ if (!this.CompanyConfiguration) {
 								data.addCompoundUnit);
 						$("#updateStockLocation").prop("checked",
 								data.updateStockLocation);
-						$("#sendToOdoo").prop("checked",
-								data.sendToOdoo);
-						
-						
+						$("#sendToOdoo").prop("checked", data.sendToOdoo);
+						$("#productGroupTax").prop("checked",
+								data.enableProductGroupTax);
+
 						/*
 						 * $("#findLocation").prop("checked",
 						 * data.findLocation);

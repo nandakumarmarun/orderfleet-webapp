@@ -223,12 +223,12 @@ public class Location implements Serializable, Cloneable {
 	}
 
 	
-	@Override
-	public String toString() {
-		return "Location [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", latitude=" + latitude
-				+ ", longitude=" + longitude + ", description=" + description + ", locationId=" + locationId
-				+ ", locationCode=" + locationCode + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "Location [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", latitude=" + latitude
+//				+ ", longitude=" + longitude + ", description=" + description + ", locationId=" + locationId
+//				+ ", locationCode=" + locationCode + "]";
+//	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {

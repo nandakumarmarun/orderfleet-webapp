@@ -81,8 +81,14 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 	@Query("select lh.location from LocationHierarchy lh where lh.parent.id = ?1 and lh.activated = true")
 	List<Location> findLocationByParentIdAndActivatedTrue(Long parentLocationId);
 	
+	@Query("select lh.location from LocationHierarchy lh where lh.parent.id in ?1 and lh.activated = true")
+	List<Location> findLocationByParentIdsAndActivatedTrue(List<Long> parentLocationIdw);
+	
 	@Query("select lh.parent from LocationHierarchy lh where lh.location.id = ?1 and lh.activated = true")
 	Location findParentLocationByLocationIdAndActivatedTrue(Long locationId);
+	
+	@Query("select lh.parent from LocationHierarchy lh where lh.location.pid in ?1 and lh.activated = true")
+	List<Location> findParentLocationsByLocationIdAndActivatedTrue(List<String> locationPids);
 	
 	//Only for Trial Setup
 	@Modifying

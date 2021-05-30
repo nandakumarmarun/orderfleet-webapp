@@ -109,6 +109,12 @@ public class InventoryVoucherDetailDTO {
 
 	private String stockLocationName;
 
+	private String documentName;
+
+	private double volume;
+
+	private String locations;
+
 	public InventoryVoucherDetailDTO() {
 	}
 
@@ -461,6 +467,14 @@ public class InventoryVoucherDetailDTO {
 		this.accountPid = accountPid;
 	}
 
+	public String getDocumentName() {
+		return documentName;
+	}
+
+	public void setDocumentName(String documentName) {
+		this.documentName = documentName;
+	}
+
 	public String getAccountName() {
 		return accountName;
 	}
@@ -547,6 +561,22 @@ public class InventoryVoucherDetailDTO {
 
 	public void setStockLocationName(String stockLocationName) {
 		this.stockLocationName = stockLocationName;
+	}
+
+	public double getVolume() {
+		return volume;
+	}
+
+	public void setVolume(double volume) {
+		this.volume = volume;
+	}
+
+	public String getLocations() {
+		return locations;
+	}
+
+	public void setLocations(String locations) {
+		this.locations = locations;
 	}
 
 	@Override

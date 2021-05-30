@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.orderfleet.webapp.domain.Location;
@@ -74,4 +75,6 @@ public interface LocationHierarchyService {
     List<MBLocationHierarchyDTO> findByCompanyAndActivatedTrue();
     
     List<MBLocationHierarchyDTO> findByUserAndActivatedTrue();
+
+	List<LocationDTO> findChildLocationsByParentIds(List<Long> parentIds);
 }

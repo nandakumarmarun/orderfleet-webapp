@@ -187,6 +187,13 @@ public class LocationHierarchyServiceImpl implements LocationHierarchyService {
 		List<Location> locations = locationHierarchyRepository.findLocationByParentIdAndActivatedTrue(parentLocId);
 		return locationMapper.locationsToLocationDTOs(locations);
 	}
+	
+	@Override
+	public List<LocationDTO> findChildLocationsByParentIds(List<Long> parentLocIds) {
+		// get child locations from location hierarchy
+		List<Location> locations = locationHierarchyRepository.findLocationByParentIdsAndActivatedTrue(parentLocIds);
+		return locationMapper.locationsToLocationDTOs(locations);
+	}
 
 	@Override
 	public LocationDTO findParentLocation(Long locationId) {

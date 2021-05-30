@@ -262,6 +262,7 @@ public class TPProductProfileManagementService {
 	@Transactional
 	public void saveUpdateProductProfiles(final List<ProductProfileDTO> productProfileDTOs,
 			final SyncOperation syncOperation) {
+		log.info("Saving Product Profiles:----" + productProfileDTOs.size());
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
@@ -271,6 +272,16 @@ public class TPProductProfileManagementService {
 				ppNames);
 
 		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
+
+		List<ProductGroupProduct> productGroupProducts = new ArrayList<>();
+
+		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.PRODUCT_GROUP_TAX);
+		if (optProductGroupTax.isPresent() && optProductGroupTax.get().getValue().equalsIgnoreCase("true")) {
+
+			productGroupProducts = productGroupProductRepository.findByProductGroupProductActivatedAndCompanyId();
+
+		}
 
 		// All product must have a division/category, if not, set a default one
 		Division defaultDivision = divisionRepository.findFirstByCompanyId(company.getId());
@@ -290,7 +301,7 @@ public class TPProductProfileManagementService {
 
 		Optional<CompanyConfiguration> optAddCompoundUnit = companyConfigurationRepository
 				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ADD_COMPOUND_UNIT);
-		
+
 		for (ProductProfileDTO ppDto : productProfileDTOs) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
@@ -322,6 +333,22 @@ public class TPProductProfileManagementService {
 			productProfile.setProductDescription(ppDto.getProductDescription());
 			productProfile.setBarcode(ppDto.getBarcode());
 			productProfile.setRemarks(ppDto.getRemarks());
+
+			if (optProductGroupTax.isPresent() && optProductGroupTax.get().getValue().equalsIgnoreCase("true")) {
+
+				if (productGroupProducts.size() > 0) {
+					Optional<ProductGroupProduct> opPgp = productGroupProducts.stream()
+							.filter(pgp -> pgp.getProduct().getName().equals(ppDto.getName())).findAny();
+
+					if (opPgp.isPresent()) {
+						double taxRate = opPgp.get().getProductGroup().getTaxRate();
+
+						if (taxRate > 0 && ppDto.getTaxRate() == 0) {
+							productProfile.setTaxRate(taxRate);
+						}
+					}
+				}
+			}
 
 			if (optAddCompoundUnit.isPresent() && optAddCompoundUnit.get().getValue().equalsIgnoreCase("true")) {
 

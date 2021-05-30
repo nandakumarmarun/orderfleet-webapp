@@ -108,6 +108,7 @@ public class SalesReportResource {
 	private ProductGroupProductRepository productGroupProductRepository;
 	@Inject
 	private PrimarySecondaryDocumentService primarySecondaryDocumentService;
+	
 	@Inject
 	private InventoryVoucherDetailCustomRepository inventoryVoucherDetailCustomRepository;
 	@Inject

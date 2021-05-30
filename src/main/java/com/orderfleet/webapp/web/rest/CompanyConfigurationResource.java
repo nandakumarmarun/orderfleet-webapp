@@ -161,6 +161,10 @@ public class CompanyConfigurationResource {
 					mcDto.setSendToOdoo(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.PRODUCT_GROUP_TAX)) {
+					mcDto.setEnableProductGroupTax(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
 				 * mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue())); anyValueExist =
@@ -183,12 +187,13 @@ public class CompanyConfigurationResource {
 			@RequestParam String interimSave, @RequestParam String refreshProductGroupProduct,
 			@RequestParam String stageChangeAccountingVoucher, @RequestParam String newCustomerAlias,
 			@RequestParam String chatReply, @RequestParam String salesPdfDownload,
-			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement, @RequestParam String receiptsManagement,
-			@RequestParam String salesEditEnabled, @RequestParam String gpsVarianceQuery,
-			@RequestParam String sendSalesOrderEmail, @RequestParam String sendSalesOrderSap,
-			@RequestParam String piecesToQuantity, @RequestParam String sendSalesOrderOdoo,
-			@RequestParam String sendTransactionsSapPravesh, @RequestParam String addCompoundUnit, @RequestParam String updateStockLocation,
-			@RequestParam String sendToOdoo) throws URISyntaxException {
+			@RequestParam String visitBasedTransaction, @RequestParam String salesManagement,
+			@RequestParam String receiptsManagement, @RequestParam String salesEditEnabled,
+			@RequestParam String gpsVarianceQuery, @RequestParam String sendSalesOrderEmail,
+			@RequestParam String sendSalesOrderSap, @RequestParam String piecesToQuantity,
+			@RequestParam String sendSalesOrderOdoo, @RequestParam String sendTransactionsSapPravesh,
+			@RequestParam String addCompoundUnit, @RequestParam String updateStockLocation,
+			@RequestParam String sendToOdoo, @RequestParam String productGroupTax) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -240,6 +245,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.UPDATE_STOCK_LOCATION);
 		Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_ODOO);
+		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.PRODUCT_GROUP_TAX);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -267,6 +274,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration addCompoundUnitCompany = null;
 		CompanyConfiguration updateStockLocationCompany = null;
 		CompanyConfiguration sendToOdooCompany = null;
+		CompanyConfiguration productGroupTaxCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -466,7 +474,6 @@ public class CompanyConfigurationResource {
 			sendTransactionSapPraveshCompany.setValue(sendTransactionsSapPravesh);
 		}
 		companyConfigurationRepository.save(sendTransactionSapPraveshCompany);
-		
 
 		if (optAddCompoundUnitConfiguration.isPresent()) {
 			addCompoundUnitCompany = optAddCompoundUnitConfiguration.get();
@@ -500,6 +507,17 @@ public class CompanyConfigurationResource {
 			sendToOdooCompany.setValue(sendToOdoo);
 		}
 		companyConfigurationRepository.save(sendToOdooCompany);
+
+		if (optProductGroupTax.isPresent()) {
+			productGroupTaxCompany = optProductGroupTax.get();
+			productGroupTaxCompany.setValue(productGroupTax);
+		} else {
+			productGroupTaxCompany = new CompanyConfiguration();
+			productGroupTaxCompany.setCompany(company);
+			productGroupTaxCompany.setName(CompanyConfig.PRODUCT_GROUP_TAX);
+			productGroupTaxCompany.setValue(productGroupTax);
+		}
+		companyConfigurationRepository.save(productGroupTaxCompany);
 
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
@@ -572,12 +590,15 @@ public class CompanyConfigurationResource {
 
 		Optional<CompanyConfiguration> optAddCompoundUnit = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ADD_COMPOUND_UNIT);
-		
+
 		Optional<CompanyConfiguration> optUpdateStockLocation = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.UPDATE_STOCK_LOCATION);
-		
+
 		Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_ODOO);
+
+		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.PRODUCT_GROUP_TAX);
 
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
@@ -645,18 +666,18 @@ public class CompanyConfigurationResource {
 					.setSendTransactionsSapPravesh(Boolean.valueOf(optSendTransactionsSapPravesh.get().getValue()));
 		}
 		if (optAddCompoundUnit.isPresent()) {
-			companyConfigurationDTO
-					.setAddCompoundUnit(Boolean.valueOf(optAddCompoundUnit.get().getValue()));
+			companyConfigurationDTO.setAddCompoundUnit(Boolean.valueOf(optAddCompoundUnit.get().getValue()));
 		}
 		if (optUpdateStockLocation.isPresent()) {
-			companyConfigurationDTO
-					.setUpdateStockLocation(Boolean.valueOf(optUpdateStockLocation.get().getValue()));
+			companyConfigurationDTO.setUpdateStockLocation(Boolean.valueOf(optUpdateStockLocation.get().getValue()));
 		}
 		if (optSendToOdoo.isPresent()) {
-			companyConfigurationDTO
-					.setSendToOdoo(Boolean.valueOf(optSendToOdoo.get().getValue()));
+			companyConfigurationDTO.setSendToOdoo(Boolean.valueOf(optSendToOdoo.get().getValue()));
 		}
-		
+		if (optProductGroupTax.isPresent()) {
+			companyConfigurationDTO.setEnableProductGroupTax(Boolean.valueOf(optProductGroupTax.get().getValue()));
+		}
+
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
@@ -716,12 +737,15 @@ public class CompanyConfigurationResource {
 
 		Optional<CompanyConfiguration> optAddCompoundUnit = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ADD_COMPOUND_UNIT);
-		
+
 		Optional<CompanyConfiguration> optUpdateStockLocation = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.UPDATE_STOCK_LOCATION);
-		
+
 		Optional<CompanyConfiguration> optSendToOdoo = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_ODOO);
+
+		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.PRODUCT_GROUP_TAX);
 
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
@@ -807,21 +831,23 @@ public class CompanyConfigurationResource {
 		}
 
 		if (optAddCompoundUnit.isPresent()) {
-			companyConfigurationRepository.deleteByCompanyIdAndName(
-					optAddCompoundUnit.get().getCompany().getId(),
+			companyConfigurationRepository.deleteByCompanyIdAndName(optAddCompoundUnit.get().getCompany().getId(),
 					CompanyConfig.ADD_COMPOUND_UNIT);
 		}
 
 		if (optUpdateStockLocation.isPresent()) {
-			companyConfigurationRepository.deleteByCompanyIdAndName(
-					optUpdateStockLocation.get().getCompany().getId(),
+			companyConfigurationRepository.deleteByCompanyIdAndName(optUpdateStockLocation.get().getCompany().getId(),
 					CompanyConfig.UPDATE_STOCK_LOCATION);
 		}
 
 		if (optSendToOdoo.isPresent()) {
-			companyConfigurationRepository.deleteByCompanyIdAndName(
-					optSendToOdoo.get().getCompany().getId(),
+			companyConfigurationRepository.deleteByCompanyIdAndName(optSendToOdoo.get().getCompany().getId(),
 					CompanyConfig.SEND_TO_ODOO);
+		}
+
+		if (optProductGroupTax.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optProductGroupTax.get().getCompany().getId(),
+					CompanyConfig.PRODUCT_GROUP_TAX);
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {

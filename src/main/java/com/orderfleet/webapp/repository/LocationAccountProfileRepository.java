@@ -149,6 +149,12 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.accountProfile in  ?1 ")
 	List<LocationAccountProfile> findLocationAccountProfileByAccountProfileIn(List<AccountProfile> accountProfiles);
 
+	@Query("select locationAccountProfile.accountProfile.pid,locationAccountProfile.location.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.accountProfile in  ?1 ")
+	List<Object[]> findLocationAccountProfileByAccountProfilesIn(List<AccountProfile> accountProfiles);
+
+	@Query("select locationAccountProfile.location from LocationAccountProfile locationAccountProfile where locationAccountProfile.accountProfile.pid =  ?1 ")
+	List<Location> findLocationAccountProfileByAccountProfileIn(String accountPid);
+
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 order by locationAccountProfile.accountProfile.name asc")
 	List<AccountProfile> findAccountProfilesByUserLocationsOrderByAccountProfilesName(List<Location> locations);
 
@@ -225,5 +231,8 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	@Query("select distinct locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.id in ?1 and locationAccountProfile.accountProfile.activated=true and locationAccountProfile.company.id=?2 and (locationAccountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.accountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.location.lastModifiedDate > ?3) order by locationAccountProfile.id asc")
 	Page<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdAndLastModifiedDateOrderByIdAsc(
 			Set<Long> locationIds, long companyId, LocalDateTime lastSyncdate, Pageable pageable);
+
+	@Query("select lap.id, lap.accountProfile.id, lap.location.id,lap.accountProfile.pid, lap.location.pid from LocationAccountProfile lap where lap.accountProfile.pid in ?1")
+	List<Object[]> findAccontProfileIdAndLocationIdByAccountProfileIds(List<String> accountProfilePids);
 
 }

@@ -171,9 +171,9 @@
 	<spring:url value="/resources/app/sales-report.js" var="saleReportJs"></spring:url>
 	<script type="text/javascript" src="${saleReportJs}"></script>
 
-	<spring:url value="/resources/assets/js/jquery.table2excel.min.js"
-		var="table2excelMin"></spring:url>
-	<script type="text/javascript" src="${table2excelMin}"></script>
+	<spring:url value="/resources/assets/js/table2excel.js"
+		var="table2excel"></spring:url>
+	<script type="text/javascript" src="${table2excel}"></script>
 
 	<spring:url value="/resources/assets/js/moment.js" var="momentJs"></spring:url>
 	<script type="text/javascript" src="${momentJs}"></script>
