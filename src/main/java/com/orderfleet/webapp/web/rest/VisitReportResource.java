@@ -7,6 +7,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -29,12 +30,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.InventoryVoucherDetail;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
+import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
@@ -68,7 +73,10 @@ public class VisitReportResource {
 
 	@Inject
 	private UserRepository userRepository;
-	
+
+	@Inject
+	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
+
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
@@ -104,40 +112,64 @@ public class VisitReportResource {
 			toDate = LocalDate.now();
 		} else if (filterBy.equals(VisitReportResource.CUSTOM)) {
 		}
-		return new ResponseEntity<>(createVisitReportByEmployeeDocumentAndDate(documents,employeePid, fromDate, toDate, inclSubordinate), HttpStatus.OK);
+		return new ResponseEntity<>(
+				createVisitReportByEmployeeDocumentAndDate(documents, employeePid, fromDate, toDate, inclSubordinate),
+				HttpStatus.OK);
 	}
 
-	private VisitReportDTO createVisitReportByEmployeeDocumentAndDate(List<Document> documents, String employeePid, LocalDate fDate, LocalDate tDate,
-			boolean inclSubordinate) {
+	private VisitReportDTO createVisitReportByEmployeeDocumentAndDate(List<Document> documents, String employeePid,
+			LocalDate fDate, LocalDate tDate, boolean inclSubordinate) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<Long> userIds = getUserIdsUnderEmployee(employeePid, inclSubordinate);
 		if (userIds.isEmpty()) {
 			return null;
 		}
-		List<Object[]> etExtecutions = executiveTaskExecutionRepository.findByUserIdInAndDateBetween(userIds, fromDate, toDate);
-		if(etExtecutions.isEmpty()) {
+		List<Object[]> etExtecutions = executiveTaskExecutionRepository.findByUserIdInAndDateBetween(userIds, fromDate,
+				toDate);
+		if (etExtecutions.isEmpty()) {
 			return null;
 		}
+
 		// group employee wise
-		Map<String, List<Long>> employeeWiseGrouped = etExtecutions.stream()
-						.collect(Collectors.groupingBy(obj -> (String)obj[1], TreeMap::new, Collectors.mapping(ete -> (Long)ete[0],Collectors.toList())));
-		//get all inventory vouchers under executions
+		Map<String, List<Long>> employeeWiseGrouped = etExtecutions.stream().collect(Collectors.groupingBy(
+				obj -> (String) obj[1], TreeMap::new, Collectors.mapping(ete -> (Long) ete[0], Collectors.toList())));
+		// get all inventory vouchers under executions
 		List<Long> eteIds = employeeWiseGrouped.values().stream().flatMap(List::stream).collect(Collectors.toList());
-		List<Object[]> ivhDtos = inventoryVoucherHeaderRepository.findByDocumentsAndExecutiveTaskExecutionIdIn(documents, eteIds);
+		List<Object[]> ivhDtos = inventoryVoucherHeaderRepository
+				.findByDocumentsAndExecutiveTaskExecutionIdIn(documents, eteIds);
+		// Object ivhDtosvolume
+		// =inventoryVoucherHeaderRepository.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdIn(documents,fromDate,toDate,userIds);
+		Set<String> ivhPids = new HashSet<>();
+
+		for (Object[] ivh : ivhDtos) {
+			ivhPids.add(ivh[4].toString());
+		}
+		List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetailRepository
+				.findAllByInventoryVoucherHeaderPidIn(ivhPids);
+
 		List<List<String>> reportValues = new ArrayList<>();
 		for (Map.Entry<String, List<Long>> entry : employeeWiseGrouped.entrySet()) {
 			List<String> values = new ArrayList<>();
 			String employeeName = entry.getKey();
 			long totalVisit = entry.getValue().size();
-			long saleVisit = ivhDtos.stream().filter(obj -> ((String)obj[0]).equals(employeeName)).count();
+			long saleVisit = ivhDtos.stream().filter(obj -> ((String) obj[0]).equals(employeeName)).count();
+			double totalVolume = ivDetails.stream()
+					.filter(ivd -> ivd.getInventoryVoucherHeader().getEmployee().getName().equals(employeeName))
+					.mapToDouble(InventoryVoucherDetail::getVolume).sum();
 			long unProductiveCount = totalVisit - saleVisit;
+
 			values.add(employeeName);
 			values.add(totalVisit + "");
-			values.add(saleVisit+"");
+			values.add(saleVisit + "");
 			values.add(unProductiveCount + "");
+			values.add(totalVolume + "");
+
+			// values.add(ivhDtosvolume +"");
+			// values.add(tvolume+"");
 			reportValues.add(values);
 		}
+
 		return new VisitReportDTO(Arrays.asList("Visits", "Sales Order"), reportValues);
 	}
 
@@ -184,5 +216,4 @@ public class VisitReportResource {
 		return userIds;
 	}
 
-	
 }

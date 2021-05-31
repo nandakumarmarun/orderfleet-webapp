@@ -265,7 +265,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	List<Object[]> findByDocumentsAndDateBetweenAndUserIdInOrderByEmployeeNameAsc(List<Document> documents,
 			LocalDateTime fromDate, LocalDateTime toDate, List<Long> userIds);
 
-	@Query("select inventoryVoucher.employee.name, inventoryVoucher.employee.user.login, inventoryVoucher.document.name  from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.document in ?1 and inventoryVoucher.executiveTaskExecution.id in ?2")
+	@Query("select inventoryVoucher.employee.name, inventoryVoucher.employee.user.login, inventoryVoucher.document.name,inventoryVoucher.id,inventoryVoucher.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.document in ?1 and inventoryVoucher.executiveTaskExecution.id in ?2")
 	List<Object[]> findByDocumentsAndExecutiveTaskExecutionIdIn(List<Document> documents, List<Long> eteIds);
 
 	@Query("select count(inventoryVoucher),sum(inventoryVoucher.documentTotal),sum(inventoryVoucher.documentVolume) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.document in ?1 and inventoryVoucher.createdDate between ?2 and ?3 and inventoryVoucher.createdBy.id in ?4")

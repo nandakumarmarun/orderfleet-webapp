@@ -93,7 +93,8 @@ if (!this.VisitsReport) {
 						$.each(visits.reportHeaders, function(indx, name){
 							headerRow += '<th>'+ name +'</th>'
 						});
-						headerRow += '<th>No Order</th></tr>';
+						headerRow += '<th>No Order</th><th>Volume</th></tr>';
+
 						$('#tHeadVisitReport').html(headerRow);
 						
 						if(visits.reportValues.length == 0){
