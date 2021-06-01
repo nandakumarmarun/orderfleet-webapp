@@ -892,6 +892,8 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setBelowPriceLevel(false);
 		mobileConfiguration.setAmountToThreeDecimal(false);
 		mobileConfiguration.setEnableGeoFencing(false);
+		mobileConfiguration.setReceiptAllocationMandatory(false);
+
         mobileConfigurationRepository.save(mobileConfiguration);
 	}
 

@@ -95,6 +95,8 @@ public class MobileSettingsDTO {
 	private boolean amountToThreeDecimal;
 	
 	private boolean enableGeoFencing;
+	
+	private boolean receiptAllocationMandatory;
 
 	
 
@@ -140,6 +142,8 @@ public class MobileSettingsDTO {
 		this.belowPriceLevel = mobileConfigurationDTO.isBelowPriceLevel();
 		this.amountToThreeDecimal=mobileConfigurationDTO.getAmountToThreeDecimal();
 		this.enableGeoFencing=mobileConfigurationDTO.getEnableGeoFencing();
+		this.receiptAllocationMandatory=mobileConfigurationDTO.getReceiptAllocationMandatory();
+
 
 		
 	}
@@ -462,6 +466,14 @@ public class MobileSettingsDTO {
 
 	public void setEnableGeoFencing(boolean enableGeoFencing) {
 		this.enableGeoFencing = enableGeoFencing;
+	}
+
+	public boolean getReceiptAllocationMandatory() {
+		return receiptAllocationMandatory;
+	}
+
+	public void setReceiptAllocationMandatory(boolean receiptAllocationMandatory) {
+		this.receiptAllocationMandatory = receiptAllocationMandatory;
 	}
 	
 	

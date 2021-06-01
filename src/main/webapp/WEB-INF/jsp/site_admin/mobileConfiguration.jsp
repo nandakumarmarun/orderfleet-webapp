@@ -73,6 +73,9 @@
 						<th>Below Price Level</th>
 						<th>Amount To Three Decimal</th>
 						<th>Enable Geo Fencing</th>
+					    <th>Receipt Allocation Mandatory</th>
+						
+						
 						
 						
 						<th>Action</th>
@@ -120,6 +123,8 @@
 							<td>${mobileConfiguration.belowPriceLevel}</td>
 							<td>${mobileConfiguration.amountToThreeDecimal}</td>
 							<td>${mobileConfiguration.enableGeoFencing}</td>
+							<td>${mobileConfiguration.receiptAllocationMandatory}</td>
+							
 							
 							
 							
@@ -415,6 +420,14 @@
 													<label class="control-label">Enable Geo Fencing</label>
 													<input id="enableGeoFencing"
 														name='enableGeoFencing' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Receipt Allocation Mandatory</label>
+													<input id="receiptAllocationMandatory"
+														name='receiptAllocationMandatory' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

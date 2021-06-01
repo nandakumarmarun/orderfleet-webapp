@@ -161,6 +161,8 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "enable_geo_fencing", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean enableGeoFencing;
 
+	@Column(name = "receipt_allocation_mandatory", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean receiptAllocationMandatory;
 
 	@NotNull
 	@ManyToOne
@@ -491,6 +493,16 @@ public class MobileConfiguration implements Serializable {
 
 	public void setEnableGeoFencing(boolean enableGeoFencing) {
 		this.enableGeoFencing = enableGeoFencing;
+	}
+	
+	
+
+	public boolean getReceiptAllocationMandatory() {
+		return receiptAllocationMandatory;
+	}
+
+	public void setReceiptAllocationMandatory(boolean receiptAllocationMandatory) {
+		this.receiptAllocationMandatory = receiptAllocationMandatory;
 	}
 
 	@Override

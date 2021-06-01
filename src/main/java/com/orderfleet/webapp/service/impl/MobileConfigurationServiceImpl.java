@@ -81,6 +81,9 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setBelowPriceLevel(mobileConfigurationDTO.isBelowPriceLevel());
 		configuration.setAmountToThreeDecimal(mobileConfigurationDTO.getAmountToThreeDecimal());
 		configuration.setEnableGeoFencing(mobileConfigurationDTO.getEnableGeoFencing());
+		configuration.setReceiptAllocationMandatory(mobileConfigurationDTO.getReceiptAllocationMandatory());
+
+		
 
 
 		
@@ -129,6 +132,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setBelowPriceLevel(mobileConfigurationDTO.isBelowPriceLevel());
 			configuration.setAmountToThreeDecimal(mobileConfigurationDTO.getAmountToThreeDecimal());
 			configuration.setEnableGeoFencing(mobileConfigurationDTO.getEnableGeoFencing());
+			configuration.setReceiptAllocationMandatory(mobileConfigurationDTO.getReceiptAllocationMandatory());
+
 
 
 			

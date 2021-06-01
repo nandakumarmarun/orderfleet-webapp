@@ -47,7 +47,9 @@ if (!this.MobileConfiguration) {
 		showBestPerformerUpload : false,
 		belowPriceLevel : false,
 		amountToThreeDecimal:false,
-		enableGeoFencing:false
+		enableGeoFencing:false,
+		receiptAllocationMandatory:false
+		
 	};
 
 	$(document).ready(function() {
@@ -150,6 +152,8 @@ if (!this.MobileConfiguration) {
 		"#amountToThreeDecimal").is(":checked");
 		mobileConfigurationDTO.enableGeoFencing = $(
 		"#enableGeoFencing").is(":checked");
+		mobileConfigurationDTO.receiptAllocationMandatory = $(
+		"#receiptAllocationMandatory").is(":checked");
 
 
 
@@ -249,6 +253,11 @@ if (!this.MobileConfiguration) {
 									data.amountToThreeDecimal);
 							$('#enableGeoFencing').prop("checked",
 									data.enableGeoFencing);
+							$('#receiptAllocationMandatory').prop("checked",
+									data.receiptAllocationMandatory);
+							
+							
+							
 
 						}
 
