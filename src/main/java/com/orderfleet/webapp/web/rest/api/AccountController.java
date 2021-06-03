@@ -297,6 +297,7 @@ public class AccountController {
 				userDto.setEmployeeName(opEmployeeProfile.get().getName());
 				userDto.setEmployeeAlias(
 						opEmployeeProfile.get().getAlias() != null ? opEmployeeProfile.get().getAlias() : "0");
+				userDto.setMobile(opEmployeeProfile.get().getPhone() != null ? opEmployeeProfile.get().getPhone() : "");
 			} else {
 				userDto.setEmployeeName(userDto.getFirstName());
 				userDto.setEmployeeAlias("0");
