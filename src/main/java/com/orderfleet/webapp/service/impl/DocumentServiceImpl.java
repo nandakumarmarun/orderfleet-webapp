@@ -134,6 +134,9 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setVoucherNumberGenerationType(documentDTO.getVoucherNumberGenerationType());
 			document.setAddNewCustomer(documentDTO.getAddNewCustomer());
 			document.setTermsAndConditionsColumn(documentDTO.isTermsAndConditionsColumn());
+			document.setHasTelephonicOrder(documentDTO.getHasTelephonicOrder());
+
+			
 			document = documentRepository.save(document);
 			DocumentDTO result = documentMapper.documentToDocumentDTO(document);
 			return result;

@@ -35,7 +35,8 @@ if (!this.Document) {
 		orderNoEnabled : false,
 		voucherNumberGenerationType : 'TYPE_1',
 		addNewCustomer : false,
-		termsAndConditionsColumn : false
+		termsAndConditionsColumn : false,
+		hasTelephonicOrder:false
 
 	};
 
@@ -279,6 +280,8 @@ if (!this.Document) {
 				'checked');
 		documentModel.termsAndConditionsColumn = $('#field_termsAndConditionColumn').prop(
 				'checked');
+		documentModel.hasTelephonicOrder = $('#field_hasTelephonicOrder').prop(
+		'checked');
 
 		$.ajax({
 			method : $(el).attr('method'),
@@ -361,6 +364,8 @@ if (!this.Document) {
 								data.addNewCustomer);
 						$("#field_termsAndConditionColumn").prop("checked",
 								data.termsAndConditionsColumn);
+						$("#field_hasTelephonicOrder").prop("checked",
+								data.hasTelephonicOrder);
 
 						documentModel.pid = data.pid;
 					},

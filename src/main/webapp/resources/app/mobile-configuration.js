@@ -47,6 +47,7 @@ if (!this.MobileConfiguration) {
 		showBestPerformerUpload : false,
 		belowPriceLevel : false,
 		amountToThreeDecimal:false,
+		blockActivity:false,
 		enableGeoFencing:false,
 		receiptAllocationMandatory:false
 		
@@ -154,6 +155,8 @@ if (!this.MobileConfiguration) {
 		"#enableGeoFencing").is(":checked");
 		mobileConfigurationDTO.receiptAllocationMandatory = $(
 		"#receiptAllocationMandatory").is(":checked");
+		mobileConfigurationDTO.blockActivity = $(
+		"#blockActivity").is(":checked");
 
 
 
@@ -255,6 +258,8 @@ if (!this.MobileConfiguration) {
 									data.enableGeoFencing);
 							$('#receiptAllocationMandatory').prop("checked",
 									data.receiptAllocationMandatory);
+							$('#blockActivity').prop("checked",
+									data.blockActivity);
 							
 							
 							

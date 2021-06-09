@@ -87,6 +87,8 @@ public class DocumentDTO implements Cloneable {
 	private boolean addNewCustomer;
 	
 	private boolean termsAndConditionsColumn;
+	
+	private boolean hasTelephonicOrder;
 
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 
@@ -121,6 +123,9 @@ public class DocumentDTO implements Cloneable {
 		this.voucherNumberGenerationType = document.getVoucherNumberGenerationType();
 		this.addNewCustomer = document.getAddNewCustomer();
 		this.termsAndConditionsColumn = document.isTermsAndConditionsColumn();
+		this.hasTelephonicOrder = document.getHasTelephonicOrder();
+
+		
 	}
 
 	public DocumentDTO(Document document, boolean activityDocRequired, int activityDocSortOrder) {
@@ -152,6 +157,8 @@ public class DocumentDTO implements Cloneable {
 		this.voucherNumberGenerationType = document.getVoucherNumberGenerationType();
 		this.addNewCustomer = document.getAddNewCustomer();
 		this.termsAndConditionsColumn = document.isTermsAndConditionsColumn();
+		this.hasTelephonicOrder = document.getHasTelephonicOrder();
+
 	}
 
 	public String getTermsAndConditions() {
@@ -168,6 +175,15 @@ public class DocumentDTO implements Cloneable {
 
 	public void setTermsAndConditionsColumn(boolean termsAndConditionsColumn) {
 		this.termsAndConditionsColumn = termsAndConditionsColumn;
+	}
+	
+
+	public boolean getHasTelephonicOrder() {
+		return hasTelephonicOrder;
+	}
+
+	public void setHasTelephonicOrder(boolean hasTelephonicOrder) {
+		this.hasTelephonicOrder = hasTelephonicOrder;
 	}
 
 	public String getPid() {
@@ -446,7 +462,26 @@ public class DocumentDTO implements Cloneable {
 				+ ", lastModifiedDate=" + lastModifiedDate + ", companyName=" + companyName + ", companyPid="
 				+ companyPid + ", imageOption=" + imageOption + ", mode=" + mode + ", stockFlow=" + stockFlow
 				+ ", qrCodeEnabled=" + qrCodeEnabled + ", orderNoEnabled=" + orderNoEnabled + ", addNewCustomer="
+				+ addNewCustomer + ", termsAndConditionsColumn=" + termsAndConditionsColumn + ", hasTelephonicOrder="
+				+ hasTelephonicOrder + ", voucherNumberGenerationType=" + voucherNumberGenerationType + "]";
+	}
+
+/*	@Override
+	public String toString() {
+		return "DocumentDTO [pid=" + pid + ", name=" + name + ", documentPrefix=" + documentPrefix + ", alias=" + alias
+				+ ", description=" + description + ", termsAndConditions=" + termsAndConditions + ", documentType="
+				+ documentType + ", activityAccount=" + activityAccount + ", save=" + save + ", sourceStockLocationPid="
+				+ sourceStockLocationPid + ", sourceStockLocationName=" + sourceStockLocationName
+				+ ", destinationStockLocationPid=" + destinationStockLocationPid + ", destinationStockLocationName="
+				+ destinationStockLocationName + ", editable=" + editable + ", batchEnabled=" + batchEnabled
+				+ ", promptStockLocation=" + promptStockLocation + ", activityDocRequired=" + activityDocRequired
+				+ ", activityDocSortOrder=" + activityDocSortOrder + ", singleVoucherMode=" + singleVoucherMode
+				+ ", photoMandatory=" + photoMandatory + ", isTakeImageFromGallery=" + isTakeImageFromGallery
+				+ ", lastModifiedDate=" + lastModifiedDate + ", companyName=" + companyName + ", companyPid="
+				+ companyPid + ", imageOption=" + imageOption + ", mode=" + mode + ", stockFlow=" + stockFlow
+				+ ", qrCodeEnabled=" + qrCodeEnabled + ", orderNoEnabled=" + orderNoEnabled + ", addNewCustomer="
 				+ addNewCustomer + ", termsAndConditionsColumn=" + termsAndConditionsColumn
 				+ ", voucherNumberGenerationType=" + voucherNumberGenerationType + "]";
-	}
+	} */
+	
 }

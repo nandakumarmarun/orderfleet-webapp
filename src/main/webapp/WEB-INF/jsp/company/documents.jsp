@@ -247,6 +247,12 @@
 											id="field_termsAndConditionColumn" /> &nbsp;<span>Terms & Condition Column</span>
 										</label>
 									</div>
+									<div class="form-group" id="hasTelephonicOrder">
+										<label for="hasTelephonicOrder"> <input type="checkbox"
+											id="field_hasTelephonicOrder" /> &nbsp;<span>Has Telephonic Order</span>
+										</label>
+									</div>
+									
 
 								</div>
 							</div>
@@ -336,6 +342,13 @@
 										</dt>
 										<dd>
 											<span id="lbl_terms_and_conditions"></span>
+										</dd>
+										<hr />
+										<dt>
+											<span>Has Telephonic Order</span>
+										</dt>
+										<dd>
+											<span id="lbl_has_telephonic_Order"></span>
 										</dd>
 										<hr />
 									</dl>

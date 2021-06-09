@@ -163,6 +163,10 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "receipt_allocation_mandatory", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean receiptAllocationMandatory;
+	
+	@Column(name = "block_activity", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean blockActivity;
+	
 
 	@NotNull
 	@ManyToOne
@@ -503,6 +507,15 @@ public class MobileConfiguration implements Serializable {
 
 	public void setReceiptAllocationMandatory(boolean receiptAllocationMandatory) {
 		this.receiptAllocationMandatory = receiptAllocationMandatory;
+	}
+	
+
+	public boolean getBlockActivity() {
+		return blockActivity;
+	}
+
+	public void setBlockActivity(boolean blockActivity) {
+		this.blockActivity = blockActivity;
 	}
 
 	@Override

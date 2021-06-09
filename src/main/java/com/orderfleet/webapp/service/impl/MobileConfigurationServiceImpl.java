@@ -82,6 +82,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setAmountToThreeDecimal(mobileConfigurationDTO.getAmountToThreeDecimal());
 		configuration.setEnableGeoFencing(mobileConfigurationDTO.getEnableGeoFencing());
 		configuration.setReceiptAllocationMandatory(mobileConfigurationDTO.getReceiptAllocationMandatory());
+		configuration.setBlockActivity(mobileConfigurationDTO.getBlockActivity());
+
 
 		
 
@@ -133,6 +135,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setAmountToThreeDecimal(mobileConfigurationDTO.getAmountToThreeDecimal());
 			configuration.setEnableGeoFencing(mobileConfigurationDTO.getEnableGeoFencing());
 			configuration.setReceiptAllocationMandatory(mobileConfigurationDTO.getReceiptAllocationMandatory());
+			configuration.setBlockActivity(mobileConfigurationDTO.getBlockActivity());
+
 
 
 

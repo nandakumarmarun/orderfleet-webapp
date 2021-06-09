@@ -130,6 +130,9 @@ public class Document implements Serializable, Cloneable {
 
 	@Column(name = "terms_and_conditions_column", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean termsAndConditionsColumn;
+	
+	@Column(name = "has_telephonic_order", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean hasTelephonicOrder;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -339,6 +342,15 @@ public class Document implements Serializable, Cloneable {
 
 	public void setTermsAndConditionsColumn(boolean termsAndConditionsColumn) {
 		this.termsAndConditionsColumn = termsAndConditionsColumn;
+	}
+	
+
+	public boolean getHasTelephonicOrder() {
+		return hasTelephonicOrder;
+	}
+
+	public void setHasTelephonicOrder(boolean hasTelephonicOrder) {
+		this.hasTelephonicOrder = hasTelephonicOrder;
 	}
 
 	@Override

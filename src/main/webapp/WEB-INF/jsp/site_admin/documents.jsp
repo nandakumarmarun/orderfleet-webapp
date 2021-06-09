@@ -187,6 +187,7 @@
 											 id="field_terms_and_conditions"
 											placeholder="Terms & Conditions"></textarea>
 									</div>
+									
 									<div class="form-group">
 										<label for="save"> <input type="checkbox"
 											id="field_save" /> &nbsp;<span>Save</span>
@@ -241,6 +242,11 @@
 									<div class="form-group" id="termsAndConditionColumn">
 										<label for="termsAndConditionColumn"> <input type="checkbox"
 											id="field_termsAndConditionColumn" /> &nbsp;<span>Terms & Condition Column</span>
+										</label>
+									</div>
+									<div class="form-group" id="hasTelephonicOrder">
+										<label for="hasTelephonicOrder"> <input type="checkbox"
+											id="field_hasTelephonicOrder" /> &nbsp;<span>Has Telephonic Order</span>
 										</label>
 									</div>
 

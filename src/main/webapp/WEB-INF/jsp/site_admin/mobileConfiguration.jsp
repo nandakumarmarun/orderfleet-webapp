@@ -72,8 +72,11 @@
 						<th>Show Best Performer Upload</th>
 						<th>Below Price Level</th>
 						<th>Amount To Three Decimal</th>
+						<th>Block Activity</th>
+						
 						<th>Enable Geo Fencing</th>
 					    <th>Receipt Allocation Mandatory</th>
+					    
 						
 						
 						
@@ -122,6 +125,7 @@
 							<td>${mobileConfiguration.showBestPerformerUpload}</td>
 							<td>${mobileConfiguration.belowPriceLevel}</td>
 							<td>${mobileConfiguration.amountToThreeDecimal}</td>
+							<td>${mobileConfiguration.blockActivity}</td>
 							<td>${mobileConfiguration.enableGeoFencing}</td>
 							<td>${mobileConfiguration.receiptAllocationMandatory}</td>
 							
@@ -412,6 +416,14 @@
 													<label class="control-label">Amount to Three Decimal</label>
 													<input id="amountToThreeDecimal"
 														name='amountToThreeDecimal' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Block Activity</label>
+													<input id="blockActivity"
+														name='blockActivity' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
