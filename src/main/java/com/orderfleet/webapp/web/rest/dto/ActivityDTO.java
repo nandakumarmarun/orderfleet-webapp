@@ -60,6 +60,12 @@ public class ActivityDTO {
 	private String companyPid;
 
 	private String companyName;
+	
+	private boolean geoFencing;
+	
+	private boolean hasTelephonicOrder;
+
+
 
 	private ContactManagement contactManagement;
 
@@ -78,6 +84,10 @@ public class ActivityDTO {
 		this.lastModifiedDate = activity.getLastModifiedDate();
 		this.targetDisplayOnDayplan = activity.getTargetDisplayOnDayplan();
 		this.hasSecondarySales = activity.getHasSecondarySales();
+		this.geoFencing = activity.getGeoFencing();
+		this.hasTelephonicOrder = activity.getHasTelephonicOrder();
+
+
 		// eagerly load the association
 		this.activityAccountTypes = activity.getActivityAccountTypes().stream().map(AccountTypeDTO::new)
 				.collect(Collectors.toSet());
@@ -98,6 +108,11 @@ public class ActivityDTO {
 		this.completePlans = activity.getCompletePlans();
 		this.lastModifiedDate = activity.getLastModifiedDate();
 		this.hasSecondarySales = activity.getHasSecondarySales();
+		this.geoFencing = activity.getGeoFencing();
+		this.hasTelephonicOrder = activity.getHasTelephonicOrder();
+
+
+		
 		// eagerly load the
 		// association
 		this.activityAccountTypes = activity.getActivityAccountTypes().stream().map(AccountTypeDTO::new)
@@ -270,6 +285,23 @@ public class ActivityDTO {
 	public void setHasSecondarySales(boolean hasSecondarySales) {
 		this.hasSecondarySales = hasSecondarySales;
 	}
+	
+
+	public boolean getGeoFencing() {
+		return geoFencing;
+	}
+
+	public void setGeoFencing(boolean geoFencing) {
+		this.geoFencing = geoFencing;
+	}
+
+	public boolean getHasTelephonicOrder() {
+		return hasTelephonicOrder;
+	}
+
+	public void setHasTelephonicOrder(boolean hasTelephonicOrder) {
+		this.hasTelephonicOrder = hasTelephonicOrder;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -296,13 +328,16 @@ public class ActivityDTO {
 	@Override
 	public String toString() {
 		return "ActivityDTO [pid=" + pid + ", name=" + name + ", alias=" + alias + ", description=" + description
-				+ ", hasDefaultAccount=" + hasDefaultAccount + ", activityAccountTypes=" + activityAccountTypes
-				+ ", documents=" + documents + ", planThrouchOnly=" + planThrouchOnly + ", excludeAccountsInPlan="
-				+ excludeAccountsInPlan + ", activated=" + activated + ", completePlans=" + completePlans
-				+ ", saveActivityDuration=" + saveActivityDuration + ", targetDisplayOnDayplan="
-				+ targetDisplayOnDayplan + ", sortOrder=" + sortOrder + ", lastModifiedDate=" + lastModifiedDate
-				+ ", interimSave=" + interimSave + ", companyPid=" + companyPid + ", companyName=" + companyName
-				+ ", contactManagement=" + contactManagement + "]";
+				+ ", hasDefaultAccount=" + hasDefaultAccount + ", hasSecondarySales=" + hasSecondarySales
+				+ ", activityAccountTypes=" + activityAccountTypes + ", documents=" + documents + ", planThrouchOnly="
+				+ planThrouchOnly + ", excludeAccountsInPlan=" + excludeAccountsInPlan + ", activated=" + activated
+				+ ", completePlans=" + completePlans + ", saveActivityDuration=" + saveActivityDuration
+				+ ", targetDisplayOnDayplan=" + targetDisplayOnDayplan + ", sortOrder=" + sortOrder
+				+ ", lastModifiedDate=" + lastModifiedDate + ", interimSave=" + interimSave + ", companyPid="
+				+ companyPid + ", companyName=" + companyName + ", geoFencing=" + geoFencing + ", hasTelephonicOrder="
+				+ hasTelephonicOrder + ", contactManagement=" + contactManagement + "]";
 	}
+
+	
 
 }

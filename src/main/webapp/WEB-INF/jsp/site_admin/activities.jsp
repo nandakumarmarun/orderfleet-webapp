@@ -163,6 +163,18 @@
 										style="width: 4%;" />
 								</div>
 								<div class="form-group">
+									<label class="control-label" for="geoFencing">Geo Fencing
+										</label> <input type="checkbox" class="form-control"
+										name="geoFencing" id="geoFencing"
+										style="width: 4%;" />
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="hasTelephonicOrder">Has Telephonic Order
+										</label> <input type="checkbox" class="form-control"
+										name="hasTelephonicOrder" id="hasTelephonicOrder"
+										style="width: 4%;" />
+								</div>
+								<div class="form-group">
 									<label class="control-label" for="field_description">Description</label>
 									<textarea class="form-control" name="description"
 										maxlength="250" id="field_description"

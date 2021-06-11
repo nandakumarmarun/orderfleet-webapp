@@ -194,6 +194,10 @@ public class ActivityServiceImpl implements ActivityService {
 			activity.setCompletePlans(activityDTO.getCompletePlans());
 			activity.setContactManagement(activityDTO.getContactManagement());
 			activity.setHasSecondarySales(activityDTO.getHasSecondarySales());
+			activity.setGeoFencing(activityDTO.getGeoFencing());
+			activity.setHasTelephonicOrder(activityDTO.getHasTelephonicOrder());
+
+
 			activity = activityRepository.save(activity);
 			ActivityDTO result = activityMapper.activityToActivityDTO(activity);
 			return result;

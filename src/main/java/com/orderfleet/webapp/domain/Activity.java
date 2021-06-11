@@ -84,6 +84,16 @@ public class Activity implements Serializable {
 	@NotNull
 	@Column(name = "has_secondary_sales", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean hasSecondarySales;
+	
+	@NotNull
+	@Column(name = "geo_fencing", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean geoFencing;
+	
+	@NotNull
+	@Column(name = "has_telephonic_order", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean hasTelephonicOrder;
+
+
 
 	@NotNull
 	@Column(name = "target_display_on_day_plan", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
@@ -218,6 +228,23 @@ public class Activity implements Serializable {
 	public void setHasSecondarySales(boolean hasSecondarySales) {
 		this.hasSecondarySales = hasSecondarySales;
 	}
+	
+
+	public boolean getGeoFencing() {
+		return geoFencing;
+	}
+
+	public void setGeoFencing(boolean geoFencing) {
+		this.geoFencing = geoFencing;
+	}
+
+	public boolean getHasTelephonicOrder() {
+		return hasTelephonicOrder;
+	}
+
+	public void setHasTelephonicOrder(boolean hasTelephonicOrder) {
+		this.hasTelephonicOrder = hasTelephonicOrder;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -244,8 +271,12 @@ public class Activity implements Serializable {
 		return "Activity [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", description="
 				+ description + ", hasDefaultAccount=" + hasDefaultAccount + ", completePlans=" + completePlans
 				+ ", company=" + company + ", activityAccountTypes=" + activityAccountTypes + ", activated=" + activated
-				+ ", createdDate=" + createdDate + ", lastModifiedDate=" + lastModifiedDate + ", hasSecondarySales="
-				+ hasSecondarySales + "]";
+				+ ", hasSecondarySales=" + hasSecondarySales + ", geoFencing=" + geoFencing + ", hasTelephonicOrder="
+				+ hasTelephonicOrder + ", targetDisplayOnDayplan=" + targetDisplayOnDayplan + ", createdDate="
+				+ createdDate + ", lastModifiedDate=" + lastModifiedDate + ", contactManagement=" + contactManagement
+				+ "]";
 	}
+
+	
 
 }
