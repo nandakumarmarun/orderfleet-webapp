@@ -19,8 +19,8 @@
 			<div class="row col-xs-12">
 				<div class="pull-right">
 					<button type="button" class="btn btn-success"
-						onclick="TaxMaster.showModalPopup($('#myModal'));">Create new
-						Tax Master</button>
+						onclick="TaxMaster.showModalPopup($('#myModal'));">Create
+						new Tax Master</button>
 				</div>
 			</div>
 			<br> <br>
@@ -32,7 +32,6 @@
 						<th>Vat Name</th>
 						<th>Class</th>
 						<th>Vat Percentage</th>
-						<th>Description</th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -43,7 +42,6 @@
 							<td>${taxMaster.vatName}</td>
 							<td>${taxMaster.vatClass == null ? "" : taxMaster.vatClass}</td>
 							<td>${taxMaster.vatPercentage == null ? "" : taxMaster.vatPercentage}</td>
-							<td>${taxMaster.description == null ? "" : taxMaster.description}</td>
 							<td>
 								<button type="button" class="btn btn-blue"
 									onclick="TaxMaster.showModalPopup($('#viewModal'),'${taxMaster.pid}',0);">View</button>
@@ -56,14 +54,15 @@
 					</c:forEach>
 				</tbody>
 			</table>
-			
+
 			<hr />
 			<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
 
 			<spring:url value="/web/taxMasters" var="urlTaxMaster"></spring:url>
 
-			<form id="taxMasterForm" role="form" method="post" action="${urlTaxMaster}">
+			<form id="taxMasterForm" role="form" method="post"
+				action="${urlTaxMaster}">
 				<!-- Model Container-->
 				<div class="modal fade container" id="myModal">
 					<!-- model Dialog -->
@@ -89,22 +88,35 @@
 
 								<div class="modal-body" style="overflow: auto;">
 									<div class="form-group">
-										<label class="control-label" for="field_vatName">Vat Name</label> <input
-											autofocus="autofocus" type="text" class="form-control"
-											name="vatName" id="field_vatName" maxlength="255"
-											placeholder="Vat Name" />
+										<label class="control-label" for="field_vatName">Vat
+											Name</label> <input autofocus="autofocus" type="text"
+											class="form-control" name="vatName" id="field_vatName"
+											maxlength="255" placeholder="Vat Name" />
+									</div>
+
+									<div class="form-group">
+										<label class="control-label" for="field_taxId">Tax Id</label>
+										<input type="text" class="form-control" name="taxId"
+											id="field_taxId" placeholder="Tax Id" />
+									</div>
+
+									<div class="form-group">
+										<label class="control-label" for="field_taxCode">Tax
+											Code</label> <input type="text" class="form-control" name="taxCode"
+											id="field_taxCode" placeholder="Tax Code" />
 									</div>
 									<div class="form-group">
-										<label class="control-label" for="field_class">Class</label>
-										<input type="text" class="form-control" name="class"
+										<label class="control-label" for="field_class">Class</label> <input
+											type="text" class="form-control" name="class"
 											id="field_class" placeholder="Class" />
 									</div>
-										<div class="form-group">
-										<label class="control-label" for="field_vatPercentage">Vat Percentage</label> <input
-											type="number" step="any" class="form-control" name="vatPercentage"
-											id="field_vatPercentage"  placeholder="Vat Percentage" />
+									<div class="form-group">
+										<label class="control-label" for="field_vatPercentage">Vat
+											Percentage</label> <input type="number" step="any"
+											class="form-control" name="vatPercentage"
+											id="field_vatPercentage" placeholder="Vat Percentage" />
 									</div>
-										<div class="form-group">
+									<div class="form-group">
 										<label class="control-label" for="field_description">Description</label>
 										<input type="text" class="form-control" name="description"
 											id="field_description" placeholder="Description" />
@@ -157,6 +169,20 @@
 										</dt>
 										<dd>
 											<span id="lbl_vatName"></span>
+										</dd>
+										<hr />
+										<dt>
+											<span>Tax Id</span>
+										</dt>
+										<dd>
+											<span id="lbl_taxId"></span>
+										</dd>
+										<hr />
+										<dt>
+											<span>Tax Code</span>
+										</dt>
+										<dd>
+											<span id="lbl_taxCode"></span>
 										</dd>
 										<hr />
 										<dt>
@@ -239,7 +265,7 @@
 				</div>
 				<!-- /.Model Container-->
 			</form>
-		
+
 		</div>
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>

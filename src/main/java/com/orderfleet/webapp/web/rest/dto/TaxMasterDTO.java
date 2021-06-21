@@ -22,6 +22,8 @@ public class TaxMasterDTO implements Serializable {
 	private double vatPercentage;
 	private String companyName;
 	private String companyPid;
+	private String taxId;
+	private String taxCode;
 
 	public TaxMasterDTO() {
 		super();
@@ -35,7 +37,9 @@ public class TaxMasterDTO implements Serializable {
 		this.vatPercentage = taxMaster.getVatPercentage();
 		this.companyName = taxMaster.getCompany().getLegalName();
 		this.companyPid = taxMaster.getCompany().getPid();
-		this.vatClass=taxMaster.getVatClass();
+		this.vatClass = taxMaster.getVatClass();
+		this.taxCode = taxMaster.getTaxCode();
+		this.taxId = taxMaster.getTaxId();
 	}
 
 	public String getPid() {
@@ -92,6 +96,22 @@ public class TaxMasterDTO implements Serializable {
 
 	public void setVatClass(String vatClass) {
 		this.vatClass = vatClass;
+	}
+
+	public String getTaxId() {
+		return taxId;
+	}
+
+	public void setTaxId(String taxId) {
+		this.taxId = taxId;
+	}
+
+	public String getTaxCode() {
+		return taxCode;
+	}
+
+	public void setTaxCode(String taxCode) {
+		this.taxCode = taxCode;
 	}
 
 	@Override

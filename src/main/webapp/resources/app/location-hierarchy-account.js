@@ -135,7 +135,7 @@ TerritoryWiseSales.view= function(){
 								
 								// var location=levelArray[i].replace(" ", "_");
 								
-								levelTd += "<td>"+levelArray[i]+".</td>";
+								levelTd += "<td>"+levelArray[i].replace(/\s+/g,'_')+"</td>";
 								}else{
 									levelTd += "<td>-</td>";
 								}

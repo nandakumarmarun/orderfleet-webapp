@@ -14,8 +14,10 @@ if (!this.TaxMaster) {
 		vatName : null,
 		vatPercentage : null,
 		description : null,
-		vatClass:null
-		
+		vatClass : null,
+		taxId : null,
+		taxCode : null
+
 	};
 
 	// Specify the validation rules
@@ -24,7 +26,7 @@ if (!this.TaxMaster) {
 			required : true,
 			maxlength : 255
 		},
-		
+
 	};
 
 	// Specify the validation error messages
@@ -33,39 +35,41 @@ if (!this.TaxMaster) {
 			required : "This field is required.",
 			maxlength : "This field cannot be longer than 255 characters."
 		},
-		
+
 	};
 
-	$(document).ready(function() {
-		createEditForm.validate({
-			rules : validationRules,
-			messages : validationMessages,
-			submitHandler : function(form) {
-				createUpdateTaxMaster(form);
-			}
-		});
-
-		deleteForm.submit(function(e) {
-			// prevent Default functionality
-			e.preventDefault();
-			// pass the action-url of the form
-			deleteTaxMaster(e.currentTarget.action);
-		});
-		
-		
-		$('input:checkbox.allcheckbox').click(
-				function() {
-					$(this).closest('table').find(
-							'tbody tr td input[type="checkbox"]').prop(
-							'checked', $(this).prop('checked'));
+	$(document).ready(
+			function() {
+				createEditForm.validate({
+					rules : validationRules,
+					messages : validationMessages,
+					submitHandler : function(form) {
+						createUpdateTaxMaster(form);
+					}
 				});
-	});
+
+				deleteForm.submit(function(e) {
+					// prevent Default functionality
+					e.preventDefault();
+					// pass the action-url of the form
+					deleteTaxMaster(e.currentTarget.action);
+				});
+
+				$('input:checkbox.allcheckbox').click(
+						function() {
+							$(this).closest('table').find(
+									'tbody tr td input[type="checkbox"]').prop(
+									'checked', $(this).prop('checked'));
+						});
+			});
 
 	function createUpdateTaxMaster(el) {
 		taxMasterModel.vatName = $('#field_vatName').val();
 		taxMasterModel.vatPercentage = $('#field_vatPercentage').val();
 		taxMasterModel.description = $('#field_description').val();
 		taxMasterModel.vatClass = $('#field_class').val();
+		taxMasterModel.taxId = $('#field_taxId').val();
+		taxMasterModel.taxCode = $('#field_taxCode').val();
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -81,37 +85,59 @@ if (!this.TaxMaster) {
 	}
 
 	function showTaxMaster(id) {
-		$.ajax({
-			url : taxMasterContextPath + "/" + id,
-			method : 'GET',
-			success : function(data) {
-				$('#lbl_vatName').text(data.vatName);
-				$('#lbl_vatPercentage').text((data.vatPercentage == null ? "" : data.vatPercentage));
-				$('#lbl_description').text((data.description == null ? "" : data.description));
-				$('#lbl_class').text((data.vatClass == null ? "" : data.vatClass));
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			}
-		});
+		$
+				.ajax({
+					url : taxMasterContextPath + "/" + id,
+					method : 'GET',
+					success : function(data) {
+						$('#lbl_vatName').text(data.vatName);
+						$('#lbl_vatPercentage').text(
+								(data.vatPercentage == null ? ""
+										: data.vatPercentage));
+						$('#lbl_description').text(
+								(data.description == null ? ""
+										: data.description));
+						$('#lbl_class').text(
+								(data.vatClass == null ? "" : data.vatClass));
+						$('#lbl_taxId').text(
+								(data.taxId == null ? ""
+										: data.taxId));
+						$('#lbl_taxCode').text(
+								(data.taxCode == null ? ""
+										: data.taxCode));
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
 	}
 
 	function editTaxMaster(id) {
-		$.ajax({
-			url : taxMasterContextPath + "/" + id,
-			method : 'GET',
-			success : function(data) {
-				$('#field_vatName').val(data.vatName);
-				$('#field_vatPercentage').val((data.vatPercentage == null ? "" : data.vatPercentage));
-				$('#field_description').val((data.description == null ? "" : data.description));
-				$('#field_class').val((data.vatClass == null ? "" : data.vatClass));
-				// set pid
-				taxMasterModel.pid = data.pid;
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			}
-		});
+		$
+				.ajax({
+					url : taxMasterContextPath + "/" + id,
+					method : 'GET',
+					success : function(data) {
+						$('#field_vatName').val(data.vatName);
+						$('#field_vatPercentage').val(
+								(data.vatPercentage == null ? ""
+										: data.vatPercentage));
+						$('#field_description').val(
+								(data.description == null ? ""
+										: data.description));
+						$('#field_class').val(
+								(data.vatClass == null ? "" : data.vatClass));
+						$('#field_taxCode').val(
+								(data.taxCode == null ? "" : data.taxCode));
+						$('#field_taxId').val(
+								(data.taxId == null ? "" : data.taxId));
+						// set pid
+						taxMasterModel.pid = data.pid;
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
 	}
 
 	function deleteTaxMaster(actionurl, id) {

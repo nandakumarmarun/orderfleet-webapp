@@ -58,6 +58,9 @@ public class TaxListOdooUploadService {
 			TaxMaster taxMaster;
 			if (optionalTM.isPresent()) {
 				taxMaster = optionalTM.get();
+				if (optionalTM.get().getTaxId().equals(String.valueOf(taxDto.getId()))) {
+					taxMaster.setVatName(taxDto.getName() + ".");
+				}
 			} else {
 				taxMaster = new TaxMaster();
 				taxMaster.setPid(TaxMasterService.PID_PREFIX + RandomUtil.generatePid());
@@ -68,6 +71,7 @@ public class TaxListOdooUploadService {
 			taxMaster.setVatClass(taxDto.getType());
 			taxMaster.setCompany(company);
 			taxMaster.setDescription("" + taxDto.getId());
+			taxMaster.setTaxId("" + taxDto.getId());
 			saveTaxMasters.add(taxMaster);
 		}
 		bulkOperationRepositoryCustom.bulkSaveTaxMasters(saveTaxMasters);

@@ -23,11 +23,11 @@ if (!this.SalesReport) {
 			downloadXls();
 		});
 		
-		//report name
+		// report name
 		$('#dbReportName').change( function() {
 			SalesReport.filter();
 		});
-		//load default
+		// load default
 		SalesReport.filter();
 	});
 	
@@ -45,14 +45,18 @@ if (!this.SalesReport) {
 	}
 
 	function downloadXls() {
-		var clonedTable = $("#tblSalesReport").clone();
-		clonedTable.find('[style*="display: none"]').remove();
+// var clonedTable = $("#tblSalesReport").clone();
+// clonedTable.find('[style*="display: none"]').remove();
 
 		var excelName = $("#dbReportName option:selected").text();
+		
+		
+		 var table2excel = new Table2Excel();
+		     table2excel.export(document.getElementById('tblSalesReport'),excelName);
 
-		clonedTable.table2excel({
-			filename : excelName, // do not include extension
-		});
+// clonedTable.table2excel({
+// filename : excelName, // do not include extension
+// });
 	}
 
 	function getParameterByName(name, url) {

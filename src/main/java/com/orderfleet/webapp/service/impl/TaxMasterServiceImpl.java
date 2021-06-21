@@ -49,6 +49,8 @@ public class TaxMasterServiceImpl implements TaxMasterService {
 		// set pid
 		taxMasterDTO.setPid(TaxMasterService.PID_PREFIX + RandomUtil.generatePid());
 		TaxMaster taxMaster = taxMasterMapper.taxMasterDTOToTaxMaster(taxMasterDTO);
+		taxMaster.setTaxId(taxMasterDTO.getTaxId());
+		taxMaster.setTaxCode(taxMasterDTO.getTaxCode());
 		// set company
 		taxMaster.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		taxMaster = taxMasterRepository.save(taxMaster);
@@ -68,11 +70,13 @@ public class TaxMasterServiceImpl implements TaxMasterService {
 	@Override
 	public TaxMasterDTO updateTaxMaster(TaxMasterDTO taxMasterDTO) {
 		return taxMasterRepository.findOneByPid(taxMasterDTO.getPid()).map(taxMaster -> {
-		taxMaster.setVatName(taxMasterDTO.getVatName());
-		taxMaster.setDescription(taxMasterDTO.getDescription());
-		taxMaster.setVatPercentage(taxMasterDTO.getVatPercentage());
-		taxMaster.setVatClass(taxMasterDTO.getVatClass());
-		taxMaster = taxMasterRepository.save(taxMaster);
+			taxMaster.setVatName(taxMasterDTO.getVatName());
+			taxMaster.setDescription(taxMasterDTO.getDescription());
+			taxMaster.setTaxId(taxMasterDTO.getTaxId());
+			taxMaster.setTaxCode(taxMasterDTO.getTaxCode());
+			taxMaster.setVatPercentage(taxMasterDTO.getVatPercentage());
+			taxMaster.setVatClass(taxMasterDTO.getVatClass());
+			taxMaster = taxMasterRepository.save(taxMaster);
 			TaxMasterDTO result = taxMasterMapper.taxMasterToTaxMasterDTO(taxMaster);
 			return result;
 		}).orElse(null);
@@ -98,7 +102,6 @@ public class TaxMasterServiceImpl implements TaxMasterService {
 		taxMasterRepository.findOneByPid(pid).ifPresent(taxMaster -> {
 			taxMasterRepository.delete(taxMaster.getId());
 		});
-	}		
-	
+	}
 
 }

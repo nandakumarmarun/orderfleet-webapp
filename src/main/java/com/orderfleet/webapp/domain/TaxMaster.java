@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-
 /**
  * a tax master used to handle product taxs.
  *
@@ -44,28 +43,35 @@ public class TaxMaster implements Serializable {
 
 	@Column(name = "description")
 	private String description;
-	
+
 	@Column(name = "vat_class")
 	private String vatClass;
 
 	@Column(name = "vat_percentage")
 	private double vatPercentage;
 
+	@Column(name = "tax_id")
+	private String taxId;
+
+	@Column(name = "tax_code")
+	private String taxCode;
+
 	@ManyToOne
 	@NotNull
 	private Company company;
-	
+
 	public TaxMaster() {
 		super();
 	}
 
-	public TaxMaster(Long id, String pid, String vatName, String description, String vatClass,double vatPercentage, Company company) {
+	public TaxMaster(Long id, String pid, String vatName, String description, String vatClass, double vatPercentage,
+			Company company) {
 		super();
 		this.id = id;
 		this.pid = pid;
 		this.vatName = vatName;
 		this.description = description;
-		this.vatClass=vatClass;
+		this.vatClass = vatClass;
 		this.vatPercentage = vatPercentage;
 		this.company = company;
 	}
@@ -117,7 +123,6 @@ public class TaxMaster implements Serializable {
 	public void setCompany(Company company) {
 		this.company = company;
 	}
-	
 
 	public String getVatClass() {
 		return vatClass;
@@ -125,6 +130,22 @@ public class TaxMaster implements Serializable {
 
 	public void setVatClass(String vatClass) {
 		this.vatClass = vatClass;
+	}
+
+	public String getTaxId() {
+		return taxId;
+	}
+
+	public void setTaxId(String taxId) {
+		this.taxId = taxId;
+	}
+
+	public String getTaxCode() {
+		return taxCode;
+	}
+
+	public void setTaxCode(String taxCode) {
+		this.taxCode = taxCode;
 	}
 
 	@Override
