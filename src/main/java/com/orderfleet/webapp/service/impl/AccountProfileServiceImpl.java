@@ -30,11 +30,14 @@ import com.orderfleet.webapp.domain.enums.StageNameType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.CounrtyCRepository;
+import com.orderfleet.webapp.repository.DistrictCRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.StageHeaderRepository;
+import com.orderfleet.webapp.repository.StateCRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.projections.CustomAccountProfiles;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -68,6 +71,15 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 
 	@Inject
 	private AccountTypeRepository accountTypeRepository;
+	
+	@Inject
+	private CounrtyCRepository countrycrepository;
+	
+	@Inject
+	private StateCRepository statecrepository;
+	
+    @Inject
+    private DistrictCRepository districtcrepository;
 
 	@Inject
 	private PriceLevelRepository priceLevelRepository;
@@ -100,6 +112,10 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 		accountProfileDTO.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid()); // set
 																								// pid
 		AccountProfile accountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
+		accountProfile.setCountryc(countrycrepository.findOne(accountProfileDTO.getCountryId()));
+		accountProfile.setStatec(statecrepository.findOne(Long.valueOf(accountProfileDTO.getStateId())));
+		accountProfile.setDistrictc(districtcrepository.findOne(Long.valueOf(accountProfileDTO.getDistrictId())));
+
 		log.info("AccountProfile Type 111 :" + accountProfile.getAccountType().getName());
 		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
 		if (opUser.isPresent()) {
@@ -125,12 +141,17 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	@Override
 	public AccountProfileDTO update(AccountProfileDTO accountProfileDTO) {
 		log.debug("Request to Update AccountProfile : {}", accountProfileDTO);
+		log.debug("counrty id",accountProfileDTO.getCountryId());
 
 		return accountProfileRepository.findOneByPid(accountProfileDTO.getPid()).map(accountProfile -> {
 			accountProfile.setName(accountProfileDTO.getName());
 			accountProfile.setAlias(accountProfileDTO.getAlias());
 			accountProfile
 					.setAccountType(accountTypeRepository.findOneByPid(accountProfileDTO.getAccountTypePid()).get());
+			accountProfile.setCountryc(countrycrepository.findOne(accountProfileDTO.getCountryId()));
+			accountProfile.setStatec(statecrepository.findOne(Long.valueOf(accountProfileDTO.getStateId())));
+			accountProfile.setDistrictc(districtcrepository.findOne(Long.valueOf(accountProfileDTO.getDistrictId())));
+
 			accountProfile.setAddress(accountProfileDTO.getAddress());
 			accountProfile.setCity(accountProfileDTO.getCity());
 			accountProfile.setDescription(accountProfileDTO.getDescription());
@@ -154,6 +175,14 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			accountProfile.setTinNo(accountProfileDTO.getTinNo());
 			accountProfile.setCustomerId(accountProfileDTO.getCustomerId());
 			accountProfile.setLocationRadius(accountProfileDTO.getLocationRadius());
+			/*accountProfile.setCountryc(accountProfileDTO.getCountryc());
+			accountProfile.setStatec(accountProfileDTO.getStatec());
+			accountProfile.setDistrictc(accountProfileDTO.getDistrictc());*/
+
+
+
+			
+			
 			if (accountProfileDTO.getGeoTaggingType() != null) {
 				accountProfile.setGeoTaggingType(accountProfileDTO.getGeoTaggingType());
 				accountProfile.setGeoTaggedTime(accountProfileDTO.getGeoTaggedTime());

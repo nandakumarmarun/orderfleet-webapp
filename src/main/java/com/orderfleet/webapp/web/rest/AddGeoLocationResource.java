@@ -44,7 +44,7 @@ import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 
 /**
- *Controller For Add Geo Location
+ * Controller For Add Geo Location
  *
  * @author fahad
  * @since Jul 5, 2017
@@ -54,161 +54,165 @@ import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 public class AddGeoLocationResource {
 
 	private final Logger log = LoggerFactory.getLogger(AddGeoLocationResource.class);
-	
+
 	@Inject
 	private AccountProfileService accountProfileService;
-	
+
 	@Inject
 	private AccountTypeService accountTypeService;
-	
+
 	@Inject
 	private AccountProfileGeoLocationTaggingService accountProfileGeoLocationTaggingService;
-	
 
 	@RequestMapping(value = "/add-geo-location", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
 	public String getAllAccountProfiles(Model model) throws URISyntaxException {
-		
+
 		model.addAttribute("accountTypes", accountTypeService.findAllByCompany());
-		model.addAttribute("deactivatedAccountProfiles",
-				accountProfileService.findAllByCompanyAndActivated(false));
+		model.addAttribute("deactivatedAccountProfiles", accountProfileService.findAllByCompanyAndActivated(false));
 		return "company/addGeoLocation";
 	}
-	
+
 	@RequestMapping(value = "/add-geo-location/filterByAccountType", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<AccountProfileDTO>> filterAccountProfilesByAccountTypes(
-			@RequestParam String accountTypePids,@RequestParam String importedStatus,@RequestParam String geoTag) throws URISyntaxException {
+			@RequestParam String accountTypePids, @RequestParam String importedStatus, @RequestParam String geoTag)
+			throws URISyntaxException {
 		List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
 		boolean imports;
-		log.info("GeoTagg ----- "+geoTag);
-			//Not selected
+		log.info("GeoTagg ----- " + geoTag);
+		// Not selected
 		if (accountTypePids.isEmpty() && importedStatus.isEmpty()) {
 			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
-			if("true".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType()==null);
-				accountProfileDTOs.sort((a1,a2)-> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
-			}else if("false".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType()!=null);
-			}else {
-				//do nothing
+			if ("true".equals(geoTag)) {
+				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() == null);
+				accountProfileDTOs.sort((a1, a2) -> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
+			} else if ("false".equals(geoTag)) {
+				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() != null);
+			} else {
+				// do nothing
 			}
 			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 		}
-		
-		//Both selected
+
+		// Both selected
 		if (!accountTypePids.isEmpty() && !importedStatus.isEmpty()) {
-			if(importedStatus.equals("true")){
-				imports=true;
-				accountProfileDTOs.addAll(accountProfileService
-						.findAccountProfileByAccountTypePidInAndActivatedAndImportStatus(Arrays.asList(accountTypePids.split(",")), imports));
-			}else if (importedStatus.equals("false"))  {
-				imports=false;
-				accountProfileDTOs.addAll(accountProfileService
-						.findAccountProfileByAccountTypePidInAndActivatedAndImportStatus(Arrays.asList(accountTypePids.split(",")), imports));
-			}else{
+			if (importedStatus.equals("true")) {
+				imports = true;
+				accountProfileDTOs
+						.addAll(accountProfileService.findAccountProfileByAccountTypePidInAndActivatedAndImportStatus(
+								Arrays.asList(accountTypePids.split(",")), imports));
+			} else if (importedStatus.equals("false")) {
+				imports = false;
+				accountProfileDTOs
+						.addAll(accountProfileService.findAccountProfileByAccountTypePidInAndActivatedAndImportStatus(
+								Arrays.asList(accountTypePids.split(",")), imports));
+			} else {
 				accountProfileDTOs.addAll(accountProfileService
 						.findAccountProfileByAccountTypePidInAndActivated(Arrays.asList(accountTypePids.split(","))));
 			}
-			
-			if("true".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType()==null);
-				accountProfileDTOs.sort((a1,a2)-> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
-			}else if("false".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType()!=null);
-			}else {
-				//do nothing
+
+			if ("true".equals(geoTag)) {
+				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() == null);
+				accountProfileDTOs.sort((a1, a2) -> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
+			} else if ("false".equals(geoTag)) {
+				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() != null);
+			} else {
+				// do nothing
 			}
 			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 		}
-		
-		//ImportStatus Selected
+
+		// ImportStatus Selected
 		if (accountTypePids.isEmpty() && !importedStatus.isEmpty()) {
-			if(importedStatus.equals("true")){
-				imports=true;
-				accountProfileDTOs.addAll(accountProfileService
-						.findAllByCompanyAndAccountImportStatusAndActivated(imports));
-			}else if (importedStatus.equals("false")) {
-				imports=false; 
-				accountProfileDTOs.addAll(accountProfileService
-						.findAllByCompanyAndAccountImportStatusAndActivated(imports));
-			}else{
+			if (importedStatus.equals("true")) {
+				imports = true;
+				accountProfileDTOs
+						.addAll(accountProfileService.findAllByCompanyAndAccountImportStatusAndActivated(imports));
+			} else if (importedStatus.equals("false")) {
+				imports = false;
+				accountProfileDTOs
+						.addAll(accountProfileService.findAllByCompanyAndAccountImportStatusAndActivated(imports));
+			} else {
 				accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
 			}
-			
-			if("true".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType()==null);
-				accountProfileDTOs.sort((a1,a2)-> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
-			}else if("false".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType()!=null);
-			}else {
-				//do nothing
+
+			if ("true".equals(geoTag)) {
+				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() == null);
+				accountProfileDTOs.sort((a1, a2) -> a2.getGeoTaggedTime() != null && a1.getGeoTaggedTime() != null
+						? a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime())
+						: 0);
+			} else if ("false".equals(geoTag)) {
+				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() != null);
+			} else {
+				// do nothing
 			}
 			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 		}
-		
-		//	AccountType Selected	
+
+		// AccountType Selected
 		if (!accountTypePids.isEmpty() && importedStatus.isEmpty()) {
 			accountProfileDTOs.addAll(accountProfileService
 					.findAccountProfileByAccountTypePidInAndActivated(Arrays.asList(accountTypePids.split(","))));
-			
-			if("true".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType()==null);
-				accountProfileDTOs.sort((a1,a2)-> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
-			}else if("false".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType()!=null);
-			}else {
-				//do nothing
+
+			if ("true".equals(geoTag)) {
+				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() == null);
+				accountProfileDTOs.sort((a1, a2) -> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
+			} else if ("false".equals(geoTag)) {
+				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() != null);
+			} else {
+				// do nothing
 			}
 			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/add-geo-location/download-account-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public void downloadProductProfileXls(@RequestParam String geoTag,HttpServletResponse response) {
+	public void downloadProductProfileXls(@RequestParam String geoTag, HttpServletResponse response) {
 		List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
 		accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
-		
-		switch (geoTag)
-		{
+
+		switch (geoTag) {
 		case "all":
-			//do nothing
+			// do nothing
 			break;
 		case "true":
 			accountProfileDTOs.removeIf(accDto -> accDto.getGeoTaggingType() == null);
-			accountProfileDTOs.sort((a1,a2)-> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
+			accountProfileDTOs.sort((a1, a2) ->a2.getGeoTaggedTime() != null && a1.getGeoTaggedTime() != null
+					? a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime())
+					: 0 );
 			break;
 		case "false":
 			accountProfileDTOs.removeIf(accDto -> accDto.getGeoTaggingType() != null);
 			break;
 		}
-		if(accountProfileDTOs.size() != 0) {
+		if (accountProfileDTOs.size() != 0) {
 			buildExcelDocument(accountProfileDTOs, response);
 		}
-		
+
 	}
-	
-	private void buildExcelDocument(List<AccountProfileDTO> accountProfileDTOs,
-			HttpServletResponse response) {
+
+	private void buildExcelDocument(List<AccountProfileDTO> accountProfileDTOs, HttpServletResponse response) {
 		log.debug("Downloading Geo Tag Excel report");
 		String excelFileName = "geotag_accounts" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = {"Customer", "Tag Type", "Tag Time", "Tagged User", "Geo Location", "Latitude", "Longitude"};
-		try(HSSFWorkbook workbook = new HSSFWorkbook()){
+		String[] headerColumns = { "Customer", "Tag Type", "Tag Time", "Tagged User", "Geo Location", "Latitude",
+				"Longitude" };
+		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
 			createReportRows(worksheet, accountProfileDTOs);
 			// Resize all columns to fit the content size
-	        for(int i = 0; i < headerColumns.length; i++) {
-	        	worksheet.autoSizeColumn(i);
-	        }
+			for (int i = 0; i < headerColumns.length; i++) {
+				worksheet.autoSizeColumn(i);
+			}
 			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
 			response.setContentType("application/vnd.ms-excel");
-			//Writes the report to the output stream
+			// Writes the report to the output stream
 			ServletOutputStream outputStream = response.getOutputStream();
 			worksheet.getWorkbook().write(outputStream);
 			outputStream.flush();
@@ -216,79 +220,86 @@ public class AddGeoLocationResource {
 			log.error("IOException on downloading Geo tagged profiles {}", ex.getMessage());
 		}
 	}
-	
+
 	private void createReportRows(HSSFSheet worksheet, List<AccountProfileDTO> accountProfileDTOs) {
-		/* CreationHelper helps us create instances of various things like DataFormat, 
-        Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way */
+		/*
+		 * CreationHelper helps us create instances of various things like DataFormat,
+		 * Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way
+		 */
 		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
 		// Create Cell Style for formatting Date
 		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
-        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
-        // Create Other rows and cells with Sales data
-        int rowNum = 1;
-    	for (AccountProfileDTO ap: accountProfileDTOs) {
-    		HSSFRow row = worksheet.createRow(rowNum++);
-    		row.createCell(0).setCellValue(ap.getName().replace("#13;#10;", " "));
-    		row.createCell(1).setCellValue(ap.getGeoTaggingType() == null ? "" : ap.getGeoTaggingType().toString());
-    		String formatDateTime = null;
-    		if(ap.getGeoTaggedTime() != null) {
-    			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
-            	formatDateTime = ap.getGeoTaggedTime().format(formatter);
-    		}
-    		row.createCell(2).setCellValue(ap.getGeoTaggedTime() == null ? "" : formatDateTime);
-    		row.createCell(3).setCellValue(ap.getGeoTaggedUserLogin() == null ? "" : ap.getGeoTaggedUserLogin());
-    		row.createCell(4).setCellValue(ap.getLocation() == null ? "" : ap.getLocation().toString());
-    		row.createCell(5).setCellValue(ap.getLatitude() == null ? "" : ap.getLatitude().toString());
-    		row.createCell(6).setCellValue(ap.getLongitude() == null ? "" : ap.getLongitude().toString());
+		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
+		// Create Other rows and cells with Sales data
+		int rowNum = 1;
+		for (AccountProfileDTO ap : accountProfileDTOs) {
+			HSSFRow row = worksheet.createRow(rowNum++);
+			row.createCell(0).setCellValue(ap.getName().replace("#13;#10;", " "));
+			row.createCell(1).setCellValue(ap.getGeoTaggingType() == null ? "" : ap.getGeoTaggingType().toString());
+			String formatDateTime = null;
+			if (ap.getGeoTaggedTime() != null) {
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
+				formatDateTime = ap.getGeoTaggedTime().format(formatter);
+			}
+			row.createCell(2).setCellValue(ap.getGeoTaggedTime() == null ? "" : formatDateTime);
+			row.createCell(3).setCellValue(ap.getGeoTaggedUserLogin() == null ? "" : ap.getGeoTaggedUserLogin());
+			row.createCell(4).setCellValue(ap.getLocation() == null ? "" : ap.getLocation().toString());
+			row.createCell(5).setCellValue(ap.getLatitude() == null ? "" : ap.getLatitude().toString());
+			row.createCell(6).setCellValue(ap.getLongitude() == null ? "" : ap.getLongitude().toString());
 
 		}
-		
+
 	}
 
 	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
 		// Create a Font for styling header cells
-        Font headerFont = worksheet.getWorkbook().createFont();
-        headerFont.setFontName("Arial");
-        headerFont.setBold(true);
-        headerFont.setFontHeightInPoints((short) 14);
-        headerFont.setColor(IndexedColors.RED.getIndex());
-        // Create a CellStyle with the font
-        HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
-        headerCellStyle.setFont(headerFont);
-        // Create a Row
-     	HSSFRow headerRow = worksheet.createRow(0);
-     	// Create cells
-		for(int i = 0; i < headerColumns.length; i++) {
+		Font headerFont = worksheet.getWorkbook().createFont();
+		headerFont.setFontName("Arial");
+		headerFont.setBold(true);
+		headerFont.setFontHeightInPoints((short) 14);
+		headerFont.setColor(IndexedColors.RED.getIndex());
+		// Create a CellStyle with the font
+		HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
+		headerCellStyle.setFont(headerFont);
+		// Create a Row
+		HSSFRow headerRow = worksheet.createRow(0);
+		// Create cells
+		for (int i = 0; i < headerColumns.length; i++) {
 			HSSFCell cell = headerRow.createCell(i);
-            cell.setCellValue(headerColumns[i]);
-            cell.setCellStyle(headerCellStyle);
-        }
+			cell.setCellValue(headerColumns[i]);
+			cell.setCellStyle(headerCellStyle);
+		}
 	}
-	
+
 	@RequestMapping(value = "/add-geo-location/getAccountProfileGeoLocation", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<List<AccountProfileGeoLocationTaggingDTO>> getAllGeoLocationTaggingByAccountProfile(@RequestParam String accountProfilePid) {
-		List<AccountProfileGeoLocationTaggingDTO>accountProfileGeoLocationTaggingDTOs=accountProfileGeoLocationTaggingService.getAllAccountProfileGeoLocationTaggingByAccountProfile(accountProfilePid);
-		return new ResponseEntity<List<AccountProfileGeoLocationTaggingDTO>>(accountProfileGeoLocationTaggingDTOs, HttpStatus.OK);
-		
+	public ResponseEntity<List<AccountProfileGeoLocationTaggingDTO>> getAllGeoLocationTaggingByAccountProfile(
+			@RequestParam String accountProfilePid) {
+		List<AccountProfileGeoLocationTaggingDTO> accountProfileGeoLocationTaggingDTOs = accountProfileGeoLocationTaggingService
+				.getAllAccountProfileGeoLocationTaggingByAccountProfile(accountProfilePid);
+		return new ResponseEntity<List<AccountProfileGeoLocationTaggingDTO>>(accountProfileGeoLocationTaggingDTOs,
+				HttpStatus.OK);
+
 	}
-	
-	@RequestMapping(value="/add-geo-location/saveGeoLocation" ,method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+
+	@RequestMapping(value = "/add-geo-location/saveGeoLocation", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<AccountProfileDTO> attachAccountProfile(@RequestParam("geoLocationPid") String geoLocationPid,@RequestParam("accountProfilePid") String accountProfilePid) {
-		AccountProfileDTO accountProfileDTO=accountProfileService.findOneByPid(accountProfilePid).get();
-		AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO=accountProfileGeoLocationTaggingService.findOneByPid(geoLocationPid).get();
+	public ResponseEntity<AccountProfileDTO> attachAccountProfile(@RequestParam("geoLocationPid") String geoLocationPid,
+			@RequestParam("accountProfilePid") String accountProfilePid) {
+		AccountProfileDTO accountProfileDTO = accountProfileService.findOneByPid(accountProfilePid).get();
+		AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO = accountProfileGeoLocationTaggingService
+				.findOneByPid(geoLocationPid).get();
 		accountProfileDTO.setLatitude(accountProfileGeoLocationTaggingDTO.getLatitude());
 		accountProfileDTO.setLongitude(accountProfileGeoLocationTaggingDTO.getLongitude());
 		accountProfileDTO.setLocation(accountProfileGeoLocationTaggingDTO.getLocation());
 		accountProfileDTO.setGeoTaggingType(GeoTaggingType.WEB_TAGGED_MOBILE);
 		accountProfileDTO.setGeoTaggedTime(LocalDateTime.now());
 		accountProfileDTO.setGeoTaggedUserLogin(SecurityUtils.getCurrentUserLogin());
-		accountProfileDTO=accountProfileService.update(accountProfileDTO);
+		accountProfileDTO = accountProfileService.update(accountProfileDTO);
 		return new ResponseEntity<AccountProfileDTO>(accountProfileDTO, HttpStatus.OK);
-		
+
 	}
-	
+
 	@RequestMapping(value = "/add-geo-location/attachAccountProfile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<AccountProfileDTO> attachAccountProfile(

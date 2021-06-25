@@ -227,7 +227,16 @@ public class AccountProfile implements Serializable, Cloneable {
 	@ManyToOne
 	private User geoTaggedUser;
 	
+	@ManyToOne
+	private CountryC countryc;
 	
+	@ManyToOne
+	private StateC statec;
+	
+	@ManyToOne
+	private DistrictC districtc;
+	
+
 
 	public Long getId() {
 		return id;
@@ -573,7 +582,35 @@ public class AccountProfile implements Serializable, Cloneable {
 	public void setLocationRadius(double locationRadius) {
 		this.locationRadius = locationRadius;
 	}
+	
+	
 
+
+	
+	public CountryC getCountryc() {
+		return countryc;
+	}
+
+	public void setCountryc(CountryC countryc) {
+		this.countryc = countryc;
+	}
+
+	public StateC getStatec() {
+		return statec;
+	}
+
+	public void setStatec(StateC statec) {
+		this.statec = statec;
+	}
+
+	public DistrictC getDistrictc() {
+		return districtc;
+	}
+
+	public void setDistrictc(DistrictC districtc) {
+		this.districtc = districtc;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

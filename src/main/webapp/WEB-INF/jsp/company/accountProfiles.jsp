@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib tagdir="/WEB-INF/tags/util" prefix="util"%>
 
+
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
@@ -24,6 +25,8 @@
 		<jsp:include page="../fragments/m_navbar.jsp"></jsp:include>
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
+
+
 
 			<h2>Account Profiles</h2>
 			<hr />
@@ -58,6 +61,40 @@
 						</select>
 					</div>
 				</div>
+
+				<%-- <div class="col-sm-2">
+								Counrty <select id="dbCountry" name="country"
+									class="form-control">
+									<option value="no">All</option>
+									<c:forEach items="${countries}" var="country">
+										<option value="${country.id}">${country.name}</option>
+									</c:forEach>
+								</select>
+							</div>
+							
+							<div class="col-sm-2">
+								States <select id="dbState" name="state"
+									class="form-control">
+									<option value="no">All</option>
+									<c:forEach items="${states}" var="state">
+										<option value="${state.id}">${state.name}</option>
+									</c:forEach>
+								</select>
+							</div>
+							
+							<div class="col-sm-2">
+								Districts <select id="dbDistrict" name="district"
+									class="form-control">
+									<option value="no">All</option>
+									<c:forEach items="${districts}" var="district">
+										<option value="${district.id}">${district.name}</option>
+									</c:forEach>
+								</select>
+							</div> --%>
+
+
+
+
 				<div class="col-sm-4 ">
 					<div class="input-group">
 						<input type="text" class="form-control" placeholder="Search...."
@@ -69,10 +106,16 @@
 					</div>
 				</div>
 
+
+
+
 				<div class="col-sm-2">
 					<button type="button" class="btn btn-primary"
 						id="setLocationRadius">Set Default Location Radius</button>
 				</div>
+
+
+
 
 
 			</div>
@@ -173,6 +216,36 @@
 									</select>
 								</div>
 								<div class="form-group">
+									<label class="control-label" for="dbCountrycreate">Counrty
+									</label> <select id="dbCountrycreate" name="countryid"
+										class="form-control"><option value="-1">Select
+											Country</option>
+										<c:forEach items="${countries}" var="country">
+											<option value="${country.id}">${country.name}</option>
+										</c:forEach>
+									</select>
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="dbStatecreate">State
+									</label> <select id="dbStatecreate" name="stateid" class="form-control"><option
+											value="-1">Select State</option>
+										<c:forEach items="${states}" var="state">
+											<option value="${state.id}">${state.name}</option>
+										</c:forEach>
+									</select>
+								</div>
+
+								<div class="form-group">
+									<label class="control-label" for="dbDistrictcreate">District
+									</label> <select id="dbDistrictcreate" name="districtid"
+										class="form-control"><option value="-1">Select
+											District</option>
+										<c:forEach items="${districts}" var="district">
+											<option value="${district.id}">${district.name}</option>
+										</c:forEach>
+									</select>
+								</div>
+								<div class="form-group">
 									<label class="control-label" for="field_city">City</label> <input
 										type="text" class="form-control" name="city" id="field_city"
 										maxlength="100" placeholder="City" />
@@ -262,11 +335,14 @@
 										placeholder="Contact Person"></textarea>
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="field_locationradius">Location Radius</label> <input
-										type="number" class="form-control" name="locationRadius" id="fld_locationradius"
-										maxlength="100" placeholder="Location Radius" />
+									<label class="control-label" for="field_locationradius">Location
+										Radius</label> <input type="number" class="form-control"
+										name="locationRadius" id="fld_locationradius" maxlength="100"
+										placeholder="Location Radius" />
 								</div>
-								
+								<div>
+									<label class="error-msg" style="color: red;"></label>
+								</div>
 
 							</div>
 							<div class="modal-footer">

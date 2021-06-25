@@ -45,10 +45,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountProfile;
+import com.orderfleet.webapp.domain.CountryC;
+import com.orderfleet.webapp.domain.DistrictC;
+import com.orderfleet.webapp.domain.StateC;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.CounrtyCRepository;
+import com.orderfleet.webapp.repository.DistrictCRepository;
+import com.orderfleet.webapp.repository.StateCRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -58,8 +64,11 @@ import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.PriceLevelService;
 
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.CountryCDTO;
+import com.orderfleet.webapp.web.rest.dto.DistrictCDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.StateCDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
@@ -95,6 +104,15 @@ public class AccountProfileResource {
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
 
+	@Inject
+	private CounrtyCRepository countryCRepository;
+
+	@Inject
+	private DistrictCRepository districtCRepository;
+
+	@Inject
+	private StateCRepository stateCRepository;
+
 	/**
 	 * POST /accountProfiles : Create a new accountProfile.
 	 *
@@ -109,7 +127,7 @@ public class AccountProfileResource {
 	@Timed
 	public ResponseEntity<AccountProfileDTO> createAccountProfile(
 			@Valid @RequestBody AccountProfileDTO accountProfileDTO) throws URISyntaxException {
-		log.info("location radius"+accountProfileDTO.getLocationRadius());
+		log.info("location radius" + accountProfileDTO.getLocationRadius());
 		log.debug("Web request to save AccountProfile : {}", accountProfileDTO);
 		if (accountProfileDTO.getPid() != null) {
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfile", "idexists",
@@ -186,6 +204,27 @@ public class AccountProfileResource {
 
 	}
 
+	@RequestMapping(value = "/accountProfiles/loadStates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<StateCDTO>> loadStates(@RequestParam("countryId") String countryId) {
+		log.debug("Web request to load states by country*  ");
+
+		List<StateC> statesList = stateCRepository.findAllByCountryId(Long.valueOf(countryId));
+		List<StateCDTO> states = converttostatedto(statesList);
+		return new ResponseEntity<>(states, HttpStatus.OK);
+
+	}
+	@RequestMapping(value = "/accountProfiles/loadDistricts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<DistrictCDTO>> loadDistricts(@RequestParam("stateId") String stateId) {
+		log.debug("Web request to load districts by states*  ");
+
+		List<DistrictC> districtsList = districtCRepository.findAllByStateId(Long.valueOf(stateId));
+		List<DistrictCDTO> districts = converttodistrictdto(districtsList);
+		return new ResponseEntity<>(districts, HttpStatus.OK);
+
+	}
+
 	/**
 	 * GET /accountProfiles : get all the accountProfiles.
 	 *
@@ -202,7 +241,52 @@ public class AccountProfileResource {
 		model.addAttribute("accountTypes", accountTypeService.findAllByCompany());
 		model.addAttribute("priceLevels", priceLevelService.findAllByCompany());
 		model.addAttribute("deactivatedAccountProfiles", accountProfileService.findAllByCompanyAndActivated(false));
+		List<CountryC> countriesList = countryCRepository.findAllCountries();
+		List<CountryCDTO> countries = converttodto(countriesList);
+		model.addAttribute("countries", countries);
+		List<StateC> statesList = stateCRepository.findAllStates();
+		List<StateCDTO> states = converttostatedto(statesList);
+		model.addAttribute("states", states);
+
+		List<DistrictC> districtsList = districtCRepository.findAllDistricts();
+		List<DistrictCDTO> districts = converttodistrictdto(districtsList);
+		model.addAttribute("districts", districts);
+
 		return "company/accountProfiles";
+	}
+
+	private List<DistrictCDTO> converttodistrictdto(List<DistrictC> districtsList) {
+		List<DistrictCDTO> districtdtos = new ArrayList<>();
+
+		for (DistrictC district : districtsList) {
+			DistrictCDTO districtcdto = new DistrictCDTO(district);
+			districtdtos.add(districtcdto);
+
+		}
+
+		return districtdtos;
+	}
+
+	private List<StateCDTO> converttostatedto(List<StateC> statesList) {
+		List<StateCDTO> statecdtos = new ArrayList<>();
+
+		for (StateC state : statesList) {
+			StateCDTO statecdto = new StateCDTO(state);
+			statecdtos.add(statecdto);
+
+		}
+		return statecdtos;
+	}
+
+	private List<CountryCDTO> converttodto(List<CountryC> countriesList) {
+		List<CountryCDTO> countrycdtos = new ArrayList<>();
+
+		for (CountryC country : countriesList) {
+			CountryCDTO counrtycdto = new CountryCDTO(country);
+			countrycdtos.add(counrtycdto);
+
+		}
+		return countrycdtos;
 	}
 
 	/**

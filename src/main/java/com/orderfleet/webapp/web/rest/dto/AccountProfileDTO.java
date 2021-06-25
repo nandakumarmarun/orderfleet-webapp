@@ -39,7 +39,7 @@ public class AccountProfileDTO {
 	private String accountTypeName;
 
 	private String gstRegistrationType;
-	
+
 	private double locationRadius;
 
 	@NotNull
@@ -116,6 +116,8 @@ public class AccountProfileDTO {
 	private String stateName;
 
 	private String countryName;
+	
+	private String districtName;
 
 	private GeoTaggingType geoTaggingType;
 
@@ -128,8 +130,16 @@ public class AccountProfileDTO {
 	private String geoTaggedUserLogin;
 
 	private String customerId;
-	
+
 	private String AitrichCode;
+
+	private Long countryId;
+	
+
+
+	private Long stateId;
+
+	private Long districtId;
 
 	public String getAitrichCode() {
 		return AitrichCode;
@@ -179,7 +189,7 @@ public class AccountProfileDTO {
 //		this.hasDefaultAccountInventory = hasDefaultAccountInventory;
 //		this.promptStockLocationInventory = promptStockLocationInventory;
 		this.dataSourceType = customAccount.getDataSourceType();
-		this.locationRadius=customAccount.getlocationRadius();
+		this.locationRadius = customAccount.getlocationRadius();
 	}
 
 	public String getPid() {
@@ -557,9 +567,6 @@ public class AccountProfileDTO {
 	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
-	
-
-	
 
 	public double getLocationRadius() {
 		return locationRadius;
@@ -567,6 +574,40 @@ public class AccountProfileDTO {
 
 	public void setLocationRadius(double locationRadius) {
 		this.locationRadius = locationRadius;
+	}
+
+
+	public Long getStateId() {
+		return stateId;
+	}
+
+	public void setStateId(Long stateId) {
+		this.stateId = stateId;
+	}
+
+	public Long getDistrictId() {
+		return districtId;
+	}
+
+	public void setDistrictId(Long districtId) {
+		this.districtId = districtId;
+	}
+	
+
+	public Long getCountryId() {
+		return countryId;
+	}
+
+	public void setCountryId(Long countryId) {
+		this.countryId = countryId;
+	}
+
+	public String getDistrictName() {
+		return districtName;
+	}
+
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
 	}
 
 	@Override
