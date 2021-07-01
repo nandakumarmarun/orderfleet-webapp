@@ -133,6 +133,8 @@ public class InventoryVoucherHeaderDTO {
 	private long documentId;
 	private boolean rejectedStatus;
 
+	private String salesLedgerName;
+
 	public InventoryVoucherHeaderDTO() {
 		super();
 	}
@@ -227,9 +229,8 @@ public class InventoryVoucherHeaderDTO {
 		this.bookingId = inventoryVoucherHeader.getBookingId() != null ? inventoryVoucherHeader.getBookingId() : "";
 		this.deliveryDate = inventoryVoucherHeader.getDeliveryDate();
 		// this.bookingDate = inventoryVoucherHeader.getBookingDate().toString();
-		//this.bookingDate = inventoryVoucherHeader.getBookingDate();
+		// this.bookingDate = inventoryVoucherHeader.getBookingDate();
 		// this.deliveryDateDocument=inventoryVoucherHeader.getDeliveryDate().toString();
-		
 
 		this.roundedOff = inventoryVoucherHeader.getRoundedOff();
 		this.referenceInvoiceNumber = inventoryVoucherHeader.getReferenceInvoiceNumber() != null
@@ -651,6 +652,7 @@ public class InventoryVoucherHeaderDTO {
 	public String getValidationDays() {
 		return validationDays;
 	}
+
 	public void setValidationDays(String validationDays) {
 		this.validationDays = validationDays;
 	}
@@ -761,6 +763,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setRejectedStatus(boolean rejectedStatus) {
 		this.rejectedStatus = rejectedStatus;
+	}
+
+	public String getSalesLedgerName() {
+		return salesLedgerName;
+	}
+
+	public void setSalesLedgerName(String salesLedgerName) {
+		this.salesLedgerName = salesLedgerName;
 	}
 
 	@Override

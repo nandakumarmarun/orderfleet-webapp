@@ -865,9 +865,11 @@ public class LoadServerItemsToMobileController {
 			inventoryVoucherHeaderDTO.setDocumentPid(obj[19] != null ? obj[19].toString() : "");
 
 			if (inventoryVoucherHeaderDTO.getPid() != null && !inventoryVoucherHeaderDTO.getPid().isEmpty()) {
+				System.out.println(inventoryVoucherHeaderDTO.getPid()+"-----inventory Pid");
 				List<Object[]> inventoryVouchersDetail = inventoryVoucherHeaderRepository
 						.getCustomerWiseInventoryDetail(inventoryVoucherHeaderDTO.getPid());
 				List<InventoryVoucherDetailDTO> inventoryVoucherDetails = new ArrayList<>();
+				System.out.println(inventoryVoucherDetails.size()+"-----------------------------------------");
 				for (Object[] obj1 : inventoryVouchersDetail) {
 					InventoryVoucherDetailDTO dto = new InventoryVoucherDetailDTO();
 					dto.setProductName(obj1[0] != null ? obj1[0].toString() : "");

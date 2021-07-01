@@ -53,11 +53,14 @@ import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.OrderStatus;
 import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
+import com.orderfleet.webapp.domain.SalesLedger;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
@@ -80,6 +83,7 @@ import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.OrderStatusRepository;
 import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
+import com.orderfleet.webapp.repository.SalesLedgerRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -93,6 +97,8 @@ import com.orderfleet.webapp.service.ExecutiveTaskSubmissionService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.ProductProfileService;
+import com.orderfleet.webapp.service.SalesLedgerService;
+import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherDetailDTO;
@@ -212,6 +218,9 @@ public class TransactionResource {
 
 	@Inject
 	private AccountingVoucherDetailRepository accountingVoucherDetailRepository;
+
+	@Inject
+	private SalesLedgerRepository salesLedgerRepository;
 
 	// @Inject
 	// private DocumentStockLocationSourceRepository
@@ -1735,6 +1744,46 @@ public class TransactionResource {
 			ActivityDTO activityDto = this.getActivityByName("Sales Data Transfer");
 			DocumentDTO documentDto = this.getDocumentByName("sales");
 			LocalDateTime documentDate = inventoryVoucherHeaderDTOs.get(0).getDocumentDate();
+
+			List<String> salesLedgerNames = inventoryVoucherHeaderDTOs.stream()
+					.map(InventoryVoucherHeaderDTO::getSalesLedgerName).collect(Collectors.toList());
+			List<SalesLedger> salesLedgers = new ArrayList<>();
+
+			if (salesLedgerNames.size() > 0) {
+
+				log.info("Saving SalesLedgers......");
+
+				List<SalesLedger> dbSalesLedgers = salesLedgerRepository.findAllByCompanyId();
+
+				List<SalesLedger> newSalesLedgers = new ArrayList<>();
+
+				for (String ledgerName : salesLedgerNames) {
+					SalesLedger salesLedger;
+					Optional<SalesLedger> optionalSL = dbSalesLedgers.stream()
+							.filter(pc -> pc.getName().equalsIgnoreCase(ledgerName)).findFirst();
+					if (optionalSL.isPresent()) {
+						salesLedger = optionalSL.get();
+					} else {
+						salesLedger = new SalesLedger();
+						salesLedger.setPid(SalesLedgerService.PID_PREFIX + RandomUtil.generatePid());
+						salesLedger.setName(ledgerName);
+						salesLedger.setCompany(opUser.get().getCompany());
+						salesLedger.setActivated(true);
+					}
+					Optional<SalesLedger> duplicateSL = newSalesLedgers.stream()
+							.filter(pc -> pc.getName().equalsIgnoreCase(ledgerName)).findFirst();
+					if (duplicateSL.isPresent()) {
+						continue;
+					}
+
+					newSalesLedgers.add(salesLedger);
+				}
+
+				salesLedgers = salesLedgerRepository.save(newSalesLedgers);
+
+				log.info("Saved SalesLedgers Size ......" + salesLedgers.size());
+
+			}
 
 			// delete InventoryVoucherHeaders for avoidind duplicates and for
 			// new or updated sales vouchers

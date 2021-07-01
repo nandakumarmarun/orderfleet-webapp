@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "id", "number", "name", "outStandingAmount", "status", "address", "city", "phone", "email",
-		"location" })
+		"location", "divisionId", "divisionName" })
 public class ResponseBodySapPraveshAccountProfile {
 
 	@JsonProperty("id")
@@ -29,6 +29,10 @@ public class ResponseBodySapPraveshAccountProfile {
 	private String email;
 	@JsonProperty("location")
 	private String location;
+	@JsonProperty("divisionId")
+	private String divisionId;
+	@JsonProperty("divisionName")
+	private String divisionName;
 
 	@JsonProperty("id")
 	public long getId() {
@@ -128,6 +132,26 @@ public class ResponseBodySapPraveshAccountProfile {
 	@JsonProperty("location")
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	@JsonProperty("divisionId")
+	public String getDivisionId() {
+		return divisionId;
+	}
+
+	@JsonProperty("divisionId")
+	public void setDivisionId(String divisionId) {
+		this.divisionId = divisionId;
+	}
+
+	@JsonProperty("divisionName")
+	public String getDivisionName() {
+		return divisionName;
+	}
+
+	@JsonProperty("divisionName")
+	public void setDivisionName(String divisionName) {
+		this.divisionName = divisionName;
 	}
 
 }

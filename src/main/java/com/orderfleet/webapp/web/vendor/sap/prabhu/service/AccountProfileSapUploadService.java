@@ -42,6 +42,7 @@ import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.ResponseBodySapAccountProfile;
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.ResponseBodySapAccountProfileOpeningBalance;
+import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ResponseBodySapPraveshAccountProfile;
 
 
 /**
@@ -99,9 +100,132 @@ public class AccountProfileSapUploadService {
 		this.locationHierarchyRepository = locationHierarchyRepository;
 	}
 
+//	@Transactional
+//	public void saveUpdateAccountProfiles(final List<ResponseBodySapAccountProfile> resultAccountProfiles,
+//			final List<ResponseBodySapAccountProfileOpeningBalance> resultAccountProfileOpeningBalances)
+//			throws Exception {
+//		log.info("Saving Account Profiles.........");
+//
+//		long start = System.nanoTime();
+//
+//		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		Company company = companyRepository.findOne(companyId);
+//		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
+//
+//		// All product must have a division/category, if not, set a default one
+//		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
+//		// find all exist account profiles
+//		List<String> apNames = resultAccountProfiles.stream().map(apDto -> apDto.getStr2().toUpperCase())
+//				.collect(Collectors.toList());
+//		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
+//				apNames);
+//
+//		List<LocationDTO> locationDtos = new ArrayList<>();
+//		List<LocationAccountProfileDTO> locationAccountProfileDtos = new ArrayList<>();
+//
+//		for (ResponseBodySapAccountProfile apDto : resultAccountProfiles) {
+//			// check exist by name, only one exist with a name
+//			Optional<AccountProfile> optionalAP = accountProfiles.stream()
+//					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getStr2())).findAny();
+//			AccountProfile accountProfile;
+//			if (optionalAP.isPresent()) {
+//				accountProfile = optionalAP.get();
+//				// if not update, skip this iteration. Not implemented now
+//				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
+//			} else {
+//				accountProfile = new AccountProfile();
+//				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+//				accountProfile.setName(apDto.getStr2());
+//				accountProfile.setUser(user);
+//				accountProfile.setCompany(company);
+//				accountProfile.setAccountStatus(AccountStatus.Unverified);
+//				accountProfile.setDataSourceType(DataSourceType.TALLY);
+//				accountProfile.setImportStatus(true);
+//
+//			}
+//
+//			if (isValidEmail(apDto.getEmail())) {
+//				accountProfile.setEmail1(apDto.getEmail());
+//			}
+//
+//			if (isValidPhone(apDto.getCellular())) {
+//				accountProfile.setPhone1(apDto.getCellular());
+//			}
+//
+//			accountProfile.setAlias(apDto.getStr1());
+//
+//			accountProfile.setActivated(true);
+//
+//			if (apDto.getAddress() != null && !apDto.getAddress().equalsIgnoreCase("")) {
+//				accountProfile.setAddress(apDto.getAddress());
+//			} else {
+//				accountProfile.setAddress("No Address");
+//			}
+//
+//			accountProfile.setCity("No City");
+//
+//			// account type
+//
+//			if (accountProfile.getAccountType() == null) {
+//				accountProfile.setAccountType(defaultAccountType);
+//			}
+//			Optional<AccountProfile> opAccP = saveUpdateAccountProfiles.stream()
+//					.filter(so -> so.getName().equalsIgnoreCase(apDto.getStr2())).findAny();
+//			if (opAccP.isPresent()) {
+//				continue;
+//			}
+//
+//			if (resultAccountProfileOpeningBalances != null) {
+//				Optional<ResponseBodySapAccountProfileOpeningBalance> opResult = resultAccountProfileOpeningBalances
+//						.stream().filter(pc -> pc.getName().equalsIgnoreCase(apDto.getStr2())).findAny();
+//
+//				if (opResult.isPresent()) {
+//					accountProfile.setClosingBalance(Double.parseDouble(opResult.get().getOpeningBalance()));
+//				}
+//			}
+//
+//			LocationDTO locationDTO = new LocationDTO();
+//
+//			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
+//
+//			if (apDto.getSalesEmployeeCode().equalsIgnoreCase("-1")) {
+//				locationAccountProfileDto.setAccountProfileName(apDto.getStr2());
+//				locationAccountProfileDto.setLocationName("Territory");
+//			} else {
+//
+//				locationDTO.setAlias(apDto.getSalesEmployeeCode());
+//				locationDTO.setName(apDto.getSalesEmployeeName());
+//
+//				locationDtos.add(locationDTO);
+//
+//				locationAccountProfileDto.setAccountProfileName(apDto.getStr2());
+//				locationAccountProfileDto.setLocationName(apDto.getSalesEmployeeName());
+//			}
+//
+//			locationAccountProfileDtos.add(locationAccountProfileDto);
+//			accountProfile.setDataSourceType(DataSourceType.TALLY);
+//			saveUpdateAccountProfiles.add(accountProfile);
+//		}
+//
+//		if (locationDtos.size() > 0) {
+//			saveUpdateLocations(locationDtos);
+//			saveUpdateLocationHierarchy(locationDtos);
+//		}
+//		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+//
+//		saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
+//
+//		long end = System.nanoTime();
+//		double elapsedTime = (end - start) / 1000000.0;
+//		// update sync table
+//
+//		log.info("Sync completed in {} ms", elapsedTime);
+//	}
+	
+	
 	@Transactional
-	public void saveUpdateAccountProfiles(final List<ResponseBodySapAccountProfile> resultAccountProfiles,
-			final List<ResponseBodySapAccountProfileOpeningBalance> resultAccountProfileOpeningBalances)
+	public void saveUpdateAccountProfiles(final List<ResponseBodySapAccountProfile> resultAccountProfiles)
 			throws Exception {
 		log.info("Saving Account Profiles.........");
 
@@ -115,10 +239,13 @@ public class AccountProfileSapUploadService {
 		// All product must have a division/category, if not, set a default one
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
 		// find all exist account profiles
-		List<String> apNames = resultAccountProfiles.stream().map(apDto -> apDto.getStr2().toUpperCase())
+
+		List<String> apNames = resultAccountProfiles.stream().map(apDto -> apDto.getName())
 				.collect(Collectors.toList());
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				apNames);
+//		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
+//				apNames);
+
+		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
 
 		List<LocationDTO> locationDtos = new ArrayList<>();
 		List<LocationAccountProfileDTO> locationAccountProfileDtos = new ArrayList<>();
@@ -126,7 +253,7 @@ public class AccountProfileSapUploadService {
 		for (ResponseBodySapAccountProfile apDto : resultAccountProfiles) {
 			// check exist by name, only one exist with a name
 			Optional<AccountProfile> optionalAP = accountProfiles.stream()
-					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getStr2())).findAny();
+					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
 			AccountProfile accountProfile;
 			if (optionalAP.isPresent()) {
 				accountProfile = optionalAP.get();
@@ -135,7 +262,7 @@ public class AccountProfileSapUploadService {
 			} else {
 				accountProfile = new AccountProfile();
 				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-				accountProfile.setName(apDto.getStr2());
+				accountProfile.setName(apDto.getName());
 				accountProfile.setUser(user);
 				accountProfile.setCompany(company);
 				accountProfile.setAccountStatus(AccountStatus.Unverified);
@@ -148,11 +275,11 @@ public class AccountProfileSapUploadService {
 				accountProfile.setEmail1(apDto.getEmail());
 			}
 
-			if (isValidPhone(apDto.getCellular())) {
-				accountProfile.setPhone1(apDto.getCellular());
+			if (isValidPhone(apDto.getPhone())) {
+				accountProfile.setPhone1(apDto.getPhone());
 			}
 
-			accountProfile.setAlias(apDto.getStr1());
+			accountProfile.setAlias(String.valueOf(apDto.getId()));
 
 			accountProfile.setActivated(true);
 
@@ -162,7 +289,13 @@ public class AccountProfileSapUploadService {
 				accountProfile.setAddress("No Address");
 			}
 
-			accountProfile.setCity("No City");
+			if (apDto.getCity() != null && !apDto.getCity().equalsIgnoreCase("")) {
+				accountProfile.setCity(apDto.getCity());
+			} else {
+				accountProfile.setCity("No City");
+			}
+			accountProfile.setCustomerId(apDto.getNumber());
+			accountProfile.setClosingBalance(apDto.getOutStandingAmount());
 
 			// account type
 
@@ -170,36 +303,27 @@ public class AccountProfileSapUploadService {
 				accountProfile.setAccountType(defaultAccountType);
 			}
 			Optional<AccountProfile> opAccP = saveUpdateAccountProfiles.stream()
-					.filter(so -> so.getName().equalsIgnoreCase(apDto.getStr2())).findAny();
+					.filter(so -> so.getName().equalsIgnoreCase(apDto.getName())).findAny();
 			if (opAccP.isPresent()) {
 				continue;
-			}
-
-			if (resultAccountProfileOpeningBalances != null) {
-				Optional<ResponseBodySapAccountProfileOpeningBalance> opResult = resultAccountProfileOpeningBalances
-						.stream().filter(pc -> pc.getName().equalsIgnoreCase(apDto.getStr2())).findAny();
-
-				if (opResult.isPresent()) {
-					accountProfile.setClosingBalance(Double.parseDouble(opResult.get().getOpeningBalance()));
-				}
 			}
 
 			LocationDTO locationDTO = new LocationDTO();
 
 			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
 
-			if (apDto.getSalesEmployeeCode().equalsIgnoreCase("-1")) {
-				locationAccountProfileDto.setAccountProfileName(apDto.getStr2());
+			if (apDto.getLocation().equalsIgnoreCase("-No Sales Employee-")) {
+				locationAccountProfileDto.setAccountProfileName(apDto.getName());
 				locationAccountProfileDto.setLocationName("Territory");
 			} else {
 
-				locationDTO.setAlias(apDto.getSalesEmployeeCode());
-				locationDTO.setName(apDto.getSalesEmployeeName());
+				locationDTO.setAlias(apDto.getLocation());
+				locationDTO.setName(apDto.getLocation());
 
 				locationDtos.add(locationDTO);
 
-				locationAccountProfileDto.setAccountProfileName(apDto.getStr2());
-				locationAccountProfileDto.setLocationName(apDto.getSalesEmployeeName());
+				locationAccountProfileDto.setAccountProfileName(apDto.getName());
+				locationAccountProfileDto.setLocationName(apDto.getLocation());
 			}
 
 			locationAccountProfileDtos.add(locationAccountProfileDto);
@@ -221,6 +345,7 @@ public class AccountProfileSapUploadService {
 
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
+
 
 	@Transactional
 	public void saveUpdateLocations(final List<LocationDTO> locationDTOs) {

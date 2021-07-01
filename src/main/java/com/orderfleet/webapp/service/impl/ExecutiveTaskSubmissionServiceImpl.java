@@ -59,6 +59,7 @@ import com.orderfleet.webapp.domain.OrderStatus;
 import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.ReceivablePayable;
+import com.orderfleet.webapp.domain.SalesLedger;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
@@ -97,6 +98,7 @@ import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.ReceivablePayableRepository;
 import com.orderfleet.webapp.repository.ReferenceDocumentRepository;
+import com.orderfleet.webapp.repository.SalesLedgerRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -232,6 +234,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private SalesLedgerRepository salesLedgerRepository;
 
 	@Override
 	public ExecutiveTaskSubmissionTransactionWrapper executiveTaskSubmission(
@@ -404,6 +409,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			documentWiseCount = inventoryVoucherHeaderRepository
 					.findCountOfInventoryVoucherHeader(SecurityUtils.getCurrentUsersCompanyId());
 			List<OrderStatus> orderStatus = orderStatusRepository.findAllByCompanyId();
+			List<SalesLedger> salesLedgers = salesLedgerRepository.findAllByCompanyId();
 
 			List<InventoryVoucherHeader> inventoryVouchers = new ArrayList<>();
 			for (InventoryVoucherHeaderDTO inventoryVoucherDTO : inventoryVoucherDTOs) {
@@ -432,6 +438,19 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						}
 					}
 				}
+
+				if (inventoryVoucherDTO.getSalesLedgerName() != null
+						&& !inventoryVoucherDTO.getSalesLedgerName().equals("")) {
+					if (salesLedgers.size() > 0) {
+						Optional<SalesLedger> opSl = salesLedgers.stream()
+								.filter(sl -> sl.getName().equals(inventoryVoucherDTO.getSalesLedgerName())).findAny();
+						if (opSl.isPresent()) {
+							inventoryVoucherHeader.setSalesLedger(opSl.get());
+						}
+					}
+
+				}
+
 				inventoryVoucherHeader.setDocument(document);
 				inventoryVoucherHeader.setDocumentDate(inventoryVoucherDTO.getDocumentDate());
 				// set unique server and local number
@@ -591,9 +610,17 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						referenceInventoryVoucherHeader.setStatus(Boolean.TRUE);
 					}
 
-					if (inventoryVoucherDetailDTO.getReferenceInventoryVoucherDetailId() != null)
-						referenceInventoryVoucherDetail = inventoryVoucherDetailRepository
-								.findOne(inventoryVoucherDetailDTO.getReferenceInventoryVoucherDetailId());
+					if (inventoryVoucherDetailDTO.getReferenceInventoryVoucherDetailId() != null) {
+//						referenceInventoryVoucherDetail = inventoryVoucherDetailRepository
+//								.findOne(inventoryVoucherDetailDTO.getReferenceInventoryVoucherDetailId());
+
+						List<InventoryVoucherDetail> details = inventoryVoucherDetailRepository
+								.findAllById(inventoryVoucherDetailDTO.getReferenceInventoryVoucherDetailId());
+
+						if (details.size() > 0) {
+							referenceInventoryVoucherDetail = details.get(0);
+						}
+					}
 
 					Optional<ProductProfile> opProductProfile = productProfileRepository
 							.findOneByPid(inventoryVoucherDetailDTO.getProductPid());

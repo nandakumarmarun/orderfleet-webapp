@@ -51,7 +51,9 @@ import com.orderfleet.webapp.web.vendor.sap.pravesh.service.ProductProfileSapPra
 @RequestMapping("/web")
 public class SapUploadResource {
 
-	private static String API_URL_ACCOUNT_PROFILE = "http://59.94.176.87:5002/Customer/GetAllCustomers";
+	//private static String API_URL_ACCOUNT_PROFILE = "http://59.94.176.87:5002/Customer/GetAllCustomers";
+	
+	private static String API_URL_ACCOUNT_PROFILE = "http://59.94.176.87:5002/Customer/GetAllCustomers_Pravesh";
 
 	private static String API_URL_PRODUCT_PROFILE = "http://59.94.176.87:5002/Products/GetAllProducts";
 	

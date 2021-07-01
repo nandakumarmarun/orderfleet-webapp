@@ -339,4 +339,6 @@ public interface InventoryVoucherDetailRepository extends JpaRepository<Inventor
 	@Query(value = CUSTOMER_BASED_PRODUCTS , nativeQuery = true)
 	List<Object[]> getProductTotalQuantityForCustomerByDate(String userLogin,String accountProfilePid ,
 			LocalDateTime fromDate, LocalDateTime toDate );
+
+	List<InventoryVoucherDetail> findAllById(Long referenceInventoryVoucherDetailId);
 }

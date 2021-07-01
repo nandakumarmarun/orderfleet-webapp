@@ -58,8 +58,12 @@ public class TaxListOdooUploadService {
 			TaxMaster taxMaster;
 			if (optionalTM.isPresent()) {
 				taxMaster = optionalTM.get();
-				if (optionalTM.get().getTaxId().equals(String.valueOf(taxDto.getId()))) {
-					taxMaster.setVatName(taxDto.getName() + ".");
+				if (optionalTM.get().getDescription() != null) {
+					if (!optionalTM.get().getDescription().equals(String.valueOf(taxDto.getId()))) {
+						taxMaster = new TaxMaster();
+						taxMaster.setPid(TaxMasterService.PID_PREFIX + RandomUtil.generatePid());
+						taxMaster.setVatName(taxDto.getName() + ".");
+					}
 				}
 			} else {
 				taxMaster = new TaxMaster();

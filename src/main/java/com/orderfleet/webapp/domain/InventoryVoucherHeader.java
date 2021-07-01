@@ -162,14 +162,15 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "booking_date")
 	private LocalDate bookingDate;
-	
-	@Column(name="validation_days")
+
+	@Column(name = "validation_days")
 	private String validationDays;
-	
-	
 
 	@ManyToOne
 	private User updatedBy;
+
+	@ManyToOne
+	private SalesLedger salesLedger;
 
 	// status for tally download
 	@NotNull
@@ -589,11 +590,21 @@ public class InventoryVoucherHeader implements Serializable {
 	public void setBookingDate(LocalDate bookingDate) {
 		this.bookingDate = bookingDate;
 	}
+
 	public String getValidationDays() {
 		return validationDays;
 	}
+
 	public void setValidationDays(String validationDays) {
 		this.validationDays = validationDays;
+	}
+
+	public SalesLedger getSalesLedger() {
+		return salesLedger;
+	}
+
+	public void setSalesLedger(SalesLedger salesLedger) {
+		this.salesLedger = salesLedger;
 	}
 
 }

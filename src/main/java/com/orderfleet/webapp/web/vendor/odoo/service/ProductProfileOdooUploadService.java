@@ -271,13 +271,16 @@ public class ProductProfileOdooUploadService {
 				List<Integer> taxIdList = (List<Integer>) (Object) taxIds;
 
 				for (int taxId : taxIdList) {
-					alltaxMasters.stream().filter(a -> a.getTaxId().equalsIgnoreCase("" + taxId)).findAny()
-							.ifPresent(ap -> {
+
+					alltaxMasters.stream()
+							.filter(a -> a.getTaxId() != null ? a.getTaxId().equalsIgnoreCase("" + taxId) : false)
+							.findAny().ifPresent(ap -> {
 								if (ap != null) {
 
 									taxMasters.add(ap);
 								}
 							});
+
 				}
 				productProfile.setTaxMastersList(taxMasters);
 			}
