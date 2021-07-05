@@ -24,7 +24,7 @@ if (!this.VoucherNumberGenerator) {
 	// Specify the validation rules
 	var validationRules = {
 		prefix : {
-			maxlength : 10
+			maxlength : 55
 		},
 		userPid : {
 			valueNotEquals : "no"
@@ -37,7 +37,7 @@ if (!this.VoucherNumberGenerator) {
 	// Specify the validation error messages
 	var validationMessages = {
 		prefix : {
-			maxlength : "This field cannot be longer than 10 characters."
+			maxlength : "This field cannot be longer than 55 characters."
 		},
 		userPid : {
 			valueNotEquals : "This field is required."

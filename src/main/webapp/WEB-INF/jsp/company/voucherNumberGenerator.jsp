@@ -109,7 +109,7 @@
 									<div class="form-group">
 										<label class="control-label" for="field_prefix">Prefix</label>
 										<input type="text" class="form-control" name="prefix"
-											id="field_prefix" maxlength="10" placeholder="Prefix" />
+											id="field_prefix" maxlength="55" placeholder="Prefix" />
 									</div>
 									<div class="form-group">
 										<label class="control-label" for="field_startWith">startWith</label>
