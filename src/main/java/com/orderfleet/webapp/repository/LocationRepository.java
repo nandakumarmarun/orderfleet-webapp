@@ -22,6 +22,10 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	
 	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.activatedLocations=?1 order by location.name asc")
 	List<Location> findAllLocationsByCompanyAndActivatedLocations(boolean activated);
+	
+	
+	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.name=?1 ")
+	Location findByName(String name);
 
 	Optional<Location> findByCompanyIdAndNameIgnoreCase(Long id, String name);
 
@@ -35,6 +39,10 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 
 	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.id not in (select locationHierarchy.location.id from LocationHierarchy locationHierarchy where locationHierarchy.company.id = ?#{principal.companyId} and locationHierarchy.activated=true)")
 	List<Location> findByCompanyIdAndIdNotIn();
+	
+
+	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.id  in (select locationHierarchy.location.id from LocationHierarchy locationHierarchy where locationHierarchy.company.id = ?#{principal.companyId} and locationHierarchy.activated=true)")
+	List<Location> findByCompanyIdAndIdIn();
 
 	List<Location> findAllByCompanyPid(String companyPid);
 

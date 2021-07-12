@@ -158,4 +158,6 @@ public interface LocationService {
 	
 	List<LocationDTO> findAllByUserAndLocationActivatedLastModified(boolean active,
 			LocalDateTime lastModifiedDate);
+
+	List<LocationDTO>findAllByCompanyAndIdInLocationHierarchy();
 }

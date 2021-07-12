@@ -527,11 +527,13 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	@Override
 	public List<LocationAccountProfile> findAllLocationAccountProfiles(Long companyId) {
 		List<LocationAccountProfile> locationAccountProfiles = new ArrayList<>();
-		for (Object[] object : locationAccountProfileRepository.findAllLocationAccountProfilesByCompanyId(companyId)) {
+		List<Object[]> list= locationAccountProfileRepository.findAllLocationAccountProfilesByCompanyId(companyId);
+		for (Object[] object : list) {
 			if (object[1] == null || object[2] == null) {
 				log.error("Either one of AccountProfilePid or LocationPid is null!");
 				continue;
 			}
+			
 			LocationAccountProfile locationAccountProfile = new LocationAccountProfile();
 			AccountProfile accountProfile = new AccountProfile();
 			Location location = new Location();

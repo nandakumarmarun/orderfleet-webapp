@@ -44,13 +44,14 @@
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
 			<h2>Employee Hierarchy</h2>
-			<div class="row col-xs-12">
+			<!-- <div class="row col-xs-12">
 				<div class="pull-right">
 					<button type="button" class="btn btn-success"
 						onclick="EmployeeHierarchy.showModalPopup($('#myModal'));">Add
 					</button>
 				</div>
-			</div>
+			</div>  -->
+		 	<h4>Click on employee to edit Hierarchy </h4> 
 			<div id="spinner" class="spinner" style="display: none;">
 				<img id="img-spinner"
 					src="../../../resources/assets/images/ajax-loader.gif"

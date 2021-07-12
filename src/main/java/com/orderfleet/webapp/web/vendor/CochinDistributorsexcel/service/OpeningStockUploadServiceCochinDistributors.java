@@ -1,4 +1,4 @@
-package com.orderfleet.webapp.web.vendor.excel.service;
+package com.orderfleet.webapp.web.vendor.CochinDistributorsexcel.service;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -22,10 +22,13 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.LocationHierarchy;
+import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PriceLevelAccountProductGroup;
 import com.orderfleet.webapp.domain.ProductGroup;
+import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.ReceivablePayable;
+import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
@@ -36,10 +39,13 @@ import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationHierarchyRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
+import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.PriceLevelAccountProductGroupRepository;
 import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
+import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.ReceivablePayableRepository;
+import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
@@ -47,14 +53,17 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
+import com.orderfleet.webapp.service.OpeningStockService;
 import com.orderfleet.webapp.service.PriceLevelAccountProductGroupService;
 import com.orderfleet.webapp.service.PriceLevelService;
 import com.orderfleet.webapp.service.ReceivablePayableService;
+import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
+import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelAccountProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
 
@@ -66,9 +75,9 @@ import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
  * </p>
  */
 @Service
-public class AccountProfileUploadService {
+public class OpeningStockUploadServiceCochinDistributors {
 
-	private final Logger log = LoggerFactory.getLogger(AccountProfileUploadService.class);
+	private final Logger log = LoggerFactory.getLogger(OpeningStockUploadServiceCochinDistributors.class);
 
 	private final BulkOperationRepositoryCustom bulkOperationRepositoryCustom;
 
@@ -100,7 +109,15 @@ public class AccountProfileUploadService {
 
 	private final LocationService locationService;
 
-	public AccountProfileUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
+	private final StockLocationRepository stockLocationRepository;
+
+	private final StockLocationService stockLocationService;
+
+	private final OpeningStockRepository openingStockRepository;
+
+	private final ProductProfileRepository productProfileRepository;
+
+	public OpeningStockUploadServiceCochinDistributors(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			SyncOperationRepository syncOperationRepository, PriceLevelRepository priceLevelRepository,
 			AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
 			AccountProfileService accountProfileService, LocationRepository locationRepository,
@@ -110,7 +127,9 @@ public class AccountProfileUploadService {
 			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
 			ProductGroupRepository productGroupRepository,
 			PriceLevelAccountProductGroupRepository priceLevelAccountProductGroupRepository,
-			LocationService locationService) {
+			LocationService locationService, StockLocationRepository stockLocationRepository,
+			StockLocationService stockLocationService, OpeningStockRepository openingStockRepository,
+			ProductProfileRepository productProfileRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.syncOperationRepository = syncOperationRepository;
@@ -127,144 +146,76 @@ public class AccountProfileUploadService {
 		this.productGroupRepository = productGroupRepository;
 		this.priceLevelAccountProductGroupRepository = priceLevelAccountProductGroupRepository;
 		this.locationService = locationService;
+		this.stockLocationRepository = stockLocationRepository;
+		this.stockLocationService = stockLocationService;
+		this.openingStockRepository = openingStockRepository;
+		this.productProfileRepository = productProfileRepository;
 	}
 
 	@Transactional
-	public void saveUpdateAccountProfiles(final List<AccountProfileDTO> accountProfileDTOs,
+	@Async
+	public void saveUpdateOpeningStock(final List<OpeningStockDTO> openingStockDTOs,
 			final SyncOperation syncOperation) {
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
-		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 		final Long companyId = company.getId();
-		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
-		// All product must have a division/category, if not, set a default one
-		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
-		log.info("Default Account type 123456:" + defaultAccountType.getName());
-		// find all exist account profiles
-		List<String> apAlias = accountProfileDTOs.stream().map(apDto -> apDto.getAlias().toUpperCase())
-				.collect(Collectors.toList());
-//		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndAliasIgnoreCaseIn(companyId,
-//				apAlias);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
-		// all pricelevels
-		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
+		Set<OpeningStock> saveOpeningStocks = new HashSet<>();
+		// All opening-stock must have a stock-location, if not, set a default
+		// one
+		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(company.getId());
+		// find all exist product profiles
 
-		for (AccountProfileDTO apDto : accountProfileDTOs) {
-			AccountProfile accountProfile;
-			// check alias exist with AitrichCode
-			if (apDto.getAitrichCode() != null && !apDto.getAitrichCode().equalsIgnoreCase("")) {
-				// if AitrichCode not empty
-				Optional<AccountProfile> optionalAPCode = accountProfiles.stream()
-						.filter(pc -> pc.getAlias().equalsIgnoreCase(apDto.getAitrichCode())).findAny();
+		long stockLocationId = 0L;
 
-				if (optionalAPCode.isPresent()) {
-					accountProfile = optionalAPCode.get();
-					if (!apDto.getName().equals(accountProfile.getName())) {
-						accountProfile.setName(apDto.getName()); // set new name
-						accountProfile.setCustomerId(apDto.getAlias());
-					}
-					accountProfile.setDataSourceType(DataSourceType.MOBILE);
-				} else {
-					// check exist by name, only one exist with a name
-					Optional<AccountProfile> optionalAP = accountProfiles.stream()
-							.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
-					if (optionalAP.isPresent()) {
-						accountProfile = optionalAP.get();
-						accountProfile.setDataSourceType(DataSourceType.TALLY);
-						// if not update, skip this iteration. Not implemented now
-						// if (!accountProfile.getThirdpartyUpdate()) { continue; }
-					} else {
-						accountProfile = new AccountProfile();
-						accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-						accountProfile.setName(apDto.getName());
-						accountProfile.setUser(user);
-						accountProfile.setCompany(company);
-						accountProfile.setAccountStatus(AccountStatus.Unverified);
-						accountProfile.setDataSourceType(DataSourceType.TALLY);
-						accountProfile.setAlias(apDto.getAlias());
-						accountProfile.setImportStatus(true);
-					}
-				}
-			} else {
-				// check exist by name, only one exist with a name
-				Optional<AccountProfile> optionalAP = accountProfiles.stream()
-						.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
-				if (optionalAP.isPresent()) {
-					accountProfile = optionalAP.get();
-					// if not update, skip this iteration. Not implemented now
-					// if (!accountProfile.getThirdpartyUpdate()) { continue; }
-				} else {
-					accountProfile = new AccountProfile();
-					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-					accountProfile.setName(apDto.getName());
-					accountProfile.setUser(user);
-					accountProfile.setCompany(company);
-					accountProfile.setAccountStatus(AccountStatus.Unverified);
-					accountProfile.setDataSourceType(DataSourceType.TALLY);
-					accountProfile.setImportStatus(true);
-				}
-				accountProfile.setAlias(apDto.getAlias());
+		if (defaultStockLocation != null) {
+			String stockLocationName = openingStockDTOs.get(0).getStockLocationName();
+			if (defaultStockLocation.getName().equalsIgnoreCase(stockLocationName)) {
+				stockLocationId = defaultStockLocation.getId();
 			}
-			accountProfile.setTrimChar(apDto.getTrimChar());
-			accountProfile.setCustomerId(apDto.getAlias());
-			if (isValidPhone(apDto.getPhone1())) {
-				accountProfile.setPhone1(apDto.getPhone1());
-			}
-			if (isValidPhone(apDto.getPhone2())) {
-				accountProfile.setPhone2(apDto.getPhone2());
-			}
-			if (isValidEmail(apDto.getEmail1())) {
-				accountProfile.setEmail1(apDto.getEmail1());
-			}
-
-			accountProfile.setTinNo(apDto.getTinNo());
-			accountProfile.setPin(apDto.getPin());
-			accountProfile.setDescription(apDto.getDescription());
-			accountProfile.setActivated(true);
-			accountProfile.setAddress(apDto.getAddress());
-			accountProfile.setCity(apDto.getCity());
-			accountProfile.setContactPerson(apDto.getContactPerson());
-			accountProfile.setDefaultDiscountPercentage(apDto.getDefaultDiscountPercentage());
-			accountProfile.setClosingBalance(apDto.getClosingBalance());
-			if (apDto.getDefaultPriceLevelName() != null && !apDto.getDefaultPriceLevelName().equalsIgnoreCase("")) {
-				// price level
-				Optional<PriceLevel> optionalPriceLevel = tempPriceLevel.stream()
-						.filter(pl -> apDto.getDefaultPriceLevelName().equals(pl.getName())).findAny();
-
-				if (optionalPriceLevel.isPresent()) {
-					accountProfile.setDefaultPriceLevel(optionalPriceLevel.get());
-				} else {
-					// create new price level
-					if (apDto.getDefaultPriceLevelName().length() > 0) {
-						PriceLevel priceLevel = new PriceLevel();
-						priceLevel.setPid(PriceLevelService.PID_PREFIX + RandomUtil.generatePid());
-						priceLevel.setName(apDto.getDefaultPriceLevelName());
-						priceLevel.setActivated(true);
-						priceLevel.setCompany(company);
-						priceLevel = priceLevelRepository.save(priceLevel);
-						tempPriceLevel.add(priceLevel);
-						accountProfile.setDefaultPriceLevel(priceLevel);
-					}
-				}
-			}
-			// account type
-			log.info("AccountProfileAccount type == null :" + accountProfile.getAccountType());
-			if (accountProfile.getAccountType() == null) {
-				accountProfile.setAccountType(defaultAccountType);
-			}
-
-			// Optional<AccountType> optionalAccountType = accountTypes.stream()
-			// .filter(atn ->
-			// apDto.getAccountTypeName().equals(atn.getName())).findAny();
-			// if (optionalAccountType.isPresent()) {
-			// accountProfile.setAccountType(optionalAccountType.get());
-			// } else {
-			// accountProfile.setAccountType(defaultAccountType);
-			// }
-			saveUpdateAccountProfiles.add(accountProfile);
 		}
-		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
-		//accountProfileRepository.save(saveUpdateAccountProfiles);
+
+		if (stockLocationId != 0) {
+			openingStockRepository.deleteByStockLocationIdAndCompanyId(stockLocationId, companyId);
+		}
+
+		Set<String> ppAlias = openingStockDTOs.stream().map(os -> os.getProductProfileName())
+				.collect(Collectors.toSet());
+
+		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
+
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
+
+		for (OpeningStockDTO osDto : openingStockDTOs) {
+			// only save if account profile exist
+			productProfiles.stream().filter(pp -> pp.getAlias().equals(osDto.getProductProfileName())).findAny()
+					.ifPresent(pp -> {
+						OpeningStock openingStock = new OpeningStock();
+						openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
+						openingStock.setOpeningStockDate(LocalDateTime.now());
+						openingStock.setCreatedDate(LocalDateTime.now());
+						openingStock.setCompany(company);
+						openingStock.setProductProfile(pp);
+
+						if (osDto.getStockLocationName() == null) {
+							openingStock.setStockLocation(defaultStockLocation);
+						} else {
+							// stock location
+							Optional<StockLocation> optionalStockLocation = StockLocations.stream()
+									.filter(pl -> osDto.getStockLocationName().equals(pl.getAlias())).findAny();
+							if (optionalStockLocation.isPresent()) {
+								openingStock.setStockLocation(optionalStockLocation.get());
+							} else {
+								openingStock.setStockLocation(defaultStockLocation);
+							}
+						}
+						openingStock.setQuantity(osDto.getQuantity());
+						if (osDto.getQuantity() != 0.0) {
+							saveOpeningStocks.add(openingStock);
+						}
+					});
+		}
+		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -272,8 +223,7 @@ public class AccountProfileUploadService {
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
-		log.info("Sync completed in {} ms", elapsedTime);  
-		
+		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
 	@Transactional
@@ -323,8 +273,8 @@ public class AccountProfileUploadService {
 		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
 				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
 		if (locationHierarchy.isPresent()) {
-			locationHierarchyRepository.updateLocationHierarchyInactivatedExceptTerritory(ZonedDateTime.now(),
-					locationHierarchy.get().getVersion(), companyId);
+			locationHierarchyRepository.updateLocationHierarchyInactivatedFor(ZonedDateTime.now(),
+					locationHierarchy.get().getVersion());
 			version = locationHierarchy.get().getVersion() + 1;
 		} else {
 			version = 1L;
@@ -364,7 +314,6 @@ public class AccountProfileUploadService {
 	@Async
 	public void saveUpdateLocationAccountProfiles(final List<LocationAccountProfileDTO> locationAccountProfileDTOs,
 			final SyncOperation syncOperation) {
-		log.debug("=======--------save update location account profile=======--------");
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		final Long companyId = syncOperation.getCompany().getId();
@@ -377,44 +326,36 @@ public class AccountProfileUploadService {
 		List<Location> locations = locationService.findAllLocationByCompanyId(companyId);
 		List<Long> locationAccountProfilesIds = new ArrayList<>();
 
-		log.debug("location account profile DTOSSS---------------- =====: {} ", locationAccountProfileDTOs.size());
-
 		for (LocationAccountProfileDTO locAccDto : locationAccountProfileDTOs) {
 
-			LocationAccountProfile locationAccountProfile = new LocationAccountProfile();
+			LocationAccountProfile profile = new LocationAccountProfile();
 			// find location
-
-			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getAlias()))
-					.findFirst();
+			Optional<Location> loc = locations.stream()
+					.filter(pl -> locAccDto.getLocationName().equalsIgnoreCase(pl.getAlias())).findAny();
 			// find accountprofile
-			// System.out.println(loc.get()+"===Location");
-
 			Optional<AccountProfile> acc = accountProfiles.stream()
-					.filter(ap -> locAccDto.getAccountProfileName().equals(ap.getName())).findFirst();
-			if (acc.isPresent()) {
+					.filter(ap -> locAccDto.getAccountProfileName().equalsIgnoreCase(ap.getAlias())).findAny();
+
+			if (loc.isPresent() && acc.isPresent()) {
+
 				List<Long> locationAccountProfileIds = locationAccountProfiles.stream()
 						.filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
 						.map(lap -> lap.getId()).collect(Collectors.toList());
 				if (locationAccountProfileIds.size() != 0) {
 					locationAccountProfilesIds.addAll(locationAccountProfileIds);
 				}
-				if (loc.isPresent()) {
-					locationAccountProfile.setLocation(loc.get());
-				} else if (acc.isPresent()) {
-					locationAccountProfile.setLocation(locations.get(0));
-				}
-				locationAccountProfile.setAccountProfile(acc.get());
-				locationAccountProfile.setCompany(company);
-				newLocationAccountProfiles.add(locationAccountProfile);
+
+				profile.setLocation(loc.get());
+				profile.setAccountProfile(acc.get());
+				profile.setCompany(company);
+				newLocationAccountProfiles.add(profile);
 			}
 		}
-		log.info("new location account profile{}", newLocationAccountProfiles.size());
-
 		if (locationAccountProfilesIds.size() != 0) {
 			locationAccountProfileRepository.deleteByIdIn(companyId, locationAccountProfilesIds);
 		}
-		List<LocationAccountProfile> savedlaps = locationAccountProfileRepository.save(newLocationAccountProfiles);
-		log.info("size of {}",savedlaps.size());
+
+		locationAccountProfileRepository.save(newLocationAccountProfiles);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;

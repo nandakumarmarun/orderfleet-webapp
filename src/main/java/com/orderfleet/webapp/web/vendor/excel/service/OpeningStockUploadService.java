@@ -178,17 +178,17 @@ public class OpeningStockUploadService {
 			openingStockRepository.deleteByStockLocationIdAndCompanyId(stockLocationId, companyId);
 		}
 
-		Set<String> ppAlias = openingStockDTOs.stream().map(os -> os.getProductProfileName())
+		Set<String> ppNames = openingStockDTOs.stream().map(os -> os.getProductProfileName())
 				.collect(Collectors.toSet());
 
 		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
 
 		List<ProductProfile> productProfiles = productProfileRepository
-				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
+				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
 
 		for (OpeningStockDTO osDto : openingStockDTOs) {
 			// only save if account profile exist
-			productProfiles.stream().filter(pp -> pp.getAlias().equals(osDto.getProductProfileName())).findAny()
+			productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
 					.ifPresent(pp -> {
 						OpeningStock openingStock = new OpeningStock();
 						openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
@@ -202,7 +202,7 @@ public class OpeningStockUploadService {
 						} else {
 							// stock location
 							Optional<StockLocation> optionalStockLocation = StockLocations.stream()
-									.filter(pl -> osDto.getStockLocationName().equals(pl.getAlias())).findAny();
+									.filter(pl -> osDto.getStockLocationName().equals(pl.getName())).findAny();
 							if (optionalStockLocation.isPresent()) {
 								openingStock.setStockLocation(optionalStockLocation.get());
 							} else {
@@ -215,7 +215,8 @@ public class OpeningStockUploadService {
 						}
 					});
 		}
-		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+	//	bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+		openingStockRepository.save(saveOpeningStocks);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table

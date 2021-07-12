@@ -195,6 +195,13 @@ public class LocationServiceImpl implements LocationService {
 		List<LocationDTO> result = locationMapper.locationsToLocationDTOs(locations);
 		return result;
 	}
+	
+	public List<LocationDTO> findAllByCompanyAndIdInLocationHierarchy() {
+		log.debug("Request to get all Locations by locations  in the list of ids");
+		List<Location> locations = locationRepository.findByCompanyIdAndIdIn();
+		List<LocationDTO> result = locationMapper.locationsToLocationDTOs(locations);
+		return result;
+	}
 
 	/**
 	 * @author Fahad

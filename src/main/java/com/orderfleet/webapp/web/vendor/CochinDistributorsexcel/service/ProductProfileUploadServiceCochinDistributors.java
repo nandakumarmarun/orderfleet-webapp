@@ -1,4 +1,4 @@
-package com.orderfleet.webapp.web.vendor.excel.service;
+package com.orderfleet.webapp.web.vendor.CochinDistributorsexcel.service;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -123,9 +123,9 @@ import com.orderfleet.webapp.web.vendor.garuda.dto.ProductProfileGarudaDTO;
  * </p>
  */
 @Service
-public class ProductProfileUploadService {
+public class ProductProfileUploadServiceCochinDistributors {
 
-	private final Logger log = LoggerFactory.getLogger(ProductProfileUploadService.class);
+	private final Logger log = LoggerFactory.getLogger(ProductProfileUploadServiceCochinDistributors.class);
 
 	private final BulkOperationRepositoryCustom bulkOperationRepositoryCustom;
 
@@ -166,7 +166,7 @@ public class ProductProfileUploadService {
 	@Autowired
 	private StockLocationService stockLocationService;
 
-	public ProductProfileUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
+	public ProductProfileUploadServiceCochinDistributors(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			SyncOperationRepository syncOperationRepository, DivisionRepository divisionRepository,
 			ProductCategoryRepository productCategoryRepository, ProductGroupRepository productGroupRepository,
 			ProductProfileRepository productProfileRepository,
@@ -287,8 +287,6 @@ public class ProductProfileUploadService {
 	@Transactional
 	public void saveUpdateProductProfiles(final List<ProductProfileDTO> productProfileDTOs,
 			final SyncOperation syncOperation) {
-		
-		log.info("----saveupdateProductProfile-----");
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
@@ -355,7 +353,6 @@ public class ProductProfileUploadService {
 			productProfile.setActivated(true);
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
-		
 
 			productProfile.setUnitQty(ppDto.getUnitQty() != null ? ppDto.getUnitQty() : 1.0);
 
@@ -404,42 +401,24 @@ public class ProductProfileUploadService {
 			saveUpdateProductProfiles.add(productProfile);
 
 		}
-		productProfileRepository.save(saveUpdateProductProfiles);
-	}
-	
-
-	@Transactional
-	public void saveUpdateProductStockLocation(final List<ProductProfileDTO> productProfileDTOs,
-			final SyncOperation syncOperation) {
-		long start = System.nanoTime();
-		final Company company = syncOperation.getCompany();
-		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
-		// find all exist product profiles
-		Set<String> ppAlias = productProfileDTOs.stream().map(p -> p.getAlias()).collect(Collectors.toSet());
-//			List<ProductProfile> productProfiles = productProfileRepository
-//					.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
-
-		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
-
-		//List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
-
-		for (ProductProfileDTO ppDto : productProfileDTOs) {
-			// check exist by name, only one exist with a name
-			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
-			ProductProfile productProfile;
-			if (optionalPP.isPresent()) {
-				productProfile = optionalPP.get();
-
-			   productProfile.setUnitQty(ppDto.getUnitQty());
-
-				saveUpdateProductProfiles.add(productProfile);
-			}
-
-		}
 
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
+		log.info("Saving product groups");
+		saveUpdateProductGroups(productGroupDtos);
+		log.info("Stock Location Size {}", stockLocationDTOs.size());
 
+		if (stockLocationDTOs.size() > 0) {
+			List<StockLocationDTO> stkLocations = stockLocationDTOs.stream().filter(distinctByKey(cpt -> cpt.getName()))
+					.collect(Collectors.toList());
+			log.info("Saving Stock Locations.... {}", stkLocations.size());
+			saveUpdateStockLocations(stkLocations);
+		}
+		log.info("Saving product group product profiles");
+		saveUpdateProductGroupProduct(productGroupProductDTOs);
+		if (openingStockDtos.size() > 0) {
+			log.info("Saving opening stock");
+			saveUpdateOpeningStock(openingStockDtos);
+		}
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -449,50 +428,7 @@ public class ProductProfileUploadService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	@Transactional
-	public void saveUpdateProductPrice(final List<ProductProfileDTO> productProfileDTOs,
-			final SyncOperation syncOperation) {
-		long start = System.nanoTime();
-		final Company company = syncOperation.getCompany();
-		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
-		// find all exist product profiles
-		Set<String> ppAlias = productProfileDTOs.stream().map(p -> p.getAlias()).collect(Collectors.toSet());
-//			List<ProductProfile> productProfiles = productProfileRepository
-//					.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
 
-		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
-
-		List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
-
-		for (ProductProfileDTO ppDto : productProfileDTOs) {
-			// check exist by name, only one exist with a name
-			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
-			ProductProfile productProfile;
-			if (optionalPP.isPresent()) {
-				productProfile = optionalPP.get();
-
-				productProfile.setPrice(ppDto.getPrice());
-				productProfile.setTaxRate(ppDto.getTaxRate());
-
-				saveUpdateProductProfiles.add(productProfile);
-			}
-
-		}
-
-		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
-
-		long end = System.nanoTime();
-		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
-		syncOperation.setCompleted(true);
-		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
-		syncOperation.setLastSyncTime(elapsedTime);
-		syncOperationRepository.save(syncOperation);
-		log.info("Sync completed in {} ms", elapsedTime);
-	}
-	
-	
 	@Transactional
 	public void saveUpdateProductProfiles(final TPProductProfileCustomDTO productProfileCustomDTO,
 			final SyncOperation syncOperation) {
