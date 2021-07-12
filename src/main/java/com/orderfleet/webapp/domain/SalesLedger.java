@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.domain;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -14,6 +15,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A Bank
@@ -59,6 +62,14 @@ public class SalesLedger implements Serializable {
 	@NotNull
 	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
 	private boolean activated = true;
+
+	@Column(name = "created_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@JsonIgnore
+	private LocalDateTime createdDate = LocalDateTime.now();
+
+	@Column(name = "last_modified_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@JsonIgnore
+	private LocalDateTime lastModifiedDate = LocalDateTime.now();
 
 	@ManyToOne
 	@NotNull
@@ -132,6 +143,38 @@ public class SalesLedger implements Serializable {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public LocalDateTime getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(LocalDateTime createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public LocalDateTime getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public String getSalesLedgerId() {
+		return salesLedgerId;
+	}
+
+	public void setSalesLedgerId(String salesLedgerId) {
+		this.salesLedgerId = salesLedgerId;
+	}
+
+	public String getSalesLedgerCode() {
+		return salesLedgerCode;
+	}
+
+	public void setSalesLedgerCode(String salesLedgerCode) {
+		this.salesLedgerCode = salesLedgerCode;
 	}
 
 	@Override
