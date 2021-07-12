@@ -741,4 +741,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query("select inventoryVoucher.executiveTaskExecution.id from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.pid = ?1  and inventoryVoucher.company.id = ?#{principal.companyId}")
 	Long findExecutiveTaskExecutionIdByPId(String ivhPid);
+
+	@Query("select sum(inventoryVoucher.documentTotal) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.salesLedger.id in ?1 and inventoryVoucher.id in ?2")
+	Double sumOfAmountByAndSalesLedgerIdsAndHeaderIds(Set<Long> salesLedgerIds, Set<Long> ivHeaderIds);
 }
