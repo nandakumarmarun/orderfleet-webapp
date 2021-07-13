@@ -104,6 +104,8 @@ public class OpeningStockCsvUploadService {
 
 	private final ProductProfileRepository productProfileRepository;
 
+	private final OpeningStockRepository openingStockRepository;
+
 	public OpeningStockCsvUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			SyncOperationRepository syncOperationRepository, PriceLevelRepository priceLevelRepository,
 			AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
@@ -133,7 +135,8 @@ public class OpeningStockCsvUploadService {
 		this.locationService = locationService;
 		this.stockLocationRepository = stockLocationRepository;
 		this.stockLocationService = stockLocationService;
-		this.productProfileRepository=productProfileRepository;
+		this.productProfileRepository = productProfileRepository;
+		this.openingStockRepository = openingStockRepository;
 	}
 
 	@Transactional
@@ -183,7 +186,8 @@ public class OpeningStockCsvUploadService {
 						saveOpeningStocks.add(openingStock);
 					});
 		}
-		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+		// bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+		openingStockRepository.save(saveOpeningStocks);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table

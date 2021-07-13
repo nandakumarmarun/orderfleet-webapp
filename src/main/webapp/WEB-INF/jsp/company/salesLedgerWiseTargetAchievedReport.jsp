@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Sales Target Vs Achieved Report</title>
+<title>SalesNrich | Sales Ledger Target Vs Achieved Report</title>
 
 <!-- jQuery UI-->
 <spring:url value="/resources/assets/css/jquery-ui.css"
