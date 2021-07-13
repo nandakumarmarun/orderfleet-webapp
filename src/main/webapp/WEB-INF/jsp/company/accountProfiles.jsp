@@ -109,11 +109,11 @@
 
 
 
-				<div class="col-sm-2">
+				<!-- <div class="col-sm-2">
 					<button type="button" class="btn btn-primary"
 						id="setLocationRadius">Set Default Location Radius</button>
-				</div>
-
+				</div> 
+ -->
 
 
 
@@ -334,12 +334,12 @@
 										maxlength="250" id="field_contactPerson"
 										placeholder="Contact Person"></textarea>
 								</div>
-								<div class="form-group">
+								<!-- <div class="form-group">
 									<label class="control-label" for="field_locationradius">Location
 										Radius</label> <input type="number" class="form-control"
 										name="locationRadius" id="fld_locationradius" maxlength="100"
 										placeholder="Location Radius" />
-								</div>
+								</div> -->
 								<div>
 									<label class="error-msg" style="color: red;"></label>
 								</div>
@@ -358,9 +358,9 @@
 				<!-- /.Model Container-->
 			</form>
 
-			<!-- Model Container-->
-			<div class="modal fade container" id="locationRadiusModal">
-				<!-- model Dialog -->
+		<!-- 	<!-- Model Container-->
+			<!-- <div class="modal fade container" id="locationRadiusModal">
+				model Dialog
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -394,13 +394,13 @@
 								<button id="saveLocationRadius" class="btn btn-success">Save</button>
 							</div>
 						</div>
-						<!-- /.modal-content -->
+						/.modal-content
 					</div>
-					<!-- /.modal-dialog -->
+					/.modal-dialog
 				</div>
-				<!-- /.Model Container-->
+				/.Model Container -->
 
-
+ -->
 
 				<form name="viewForm" role="form">
 					<!-- Model Container-->
@@ -513,10 +513,10 @@
 												<td>Contact Person</td>
 												<td id="lbl_contactPerson"></td>
 											</tr>
-											<tr>
+											<!-- <tr>
 												<td>Contact Person</td>
 												<td id="lbl_locationRadius"></td>
-											</tr>
+											</tr> -->
 										</table>
 									</div>
 								</div>

@@ -12,7 +12,7 @@ if (!this.AccountProfile) {
 			+ location.pathname;
 	var createEditForm = $("#accountProfileForm");
 	var deleteForm = $("#deleteForm");
-	var locationRadius = $("#locationRadiusForm");
+	/*var locationRadius = $("#locationRadiusForm");*/
 
 	var accountProfileModel = {
 		pid : null,
@@ -37,7 +37,7 @@ if (!this.AccountProfile) {
 		defaultDiscountPercentage : null,
 		closingBalance : 0,
 		tinNo : null,
-		locationRadius : 0,
+		/*locationRadius : 0,*/
 		customerId : null,
 		countryId : null,
 		stateId : null,
@@ -96,9 +96,9 @@ if (!this.AccountProfile) {
 		description : {
 			maxlength : 250
 		},
-		locationRadius : {
+		/*locationRadius : {
 			maxlength : 250
-		}
+		}*/
 
 	};
 
@@ -141,9 +141,9 @@ if (!this.AccountProfile) {
 		description : {
 			maxlength : "This field cannot be longer than 250 characters."
 		},
-		locationRadius : {
+		/*locationRadius : {
 			maxlength : "This field cannot be longer than 250 characters."
-		}
+		}*/
 
 	};
 
@@ -158,15 +158,15 @@ if (!this.AccountProfile) {
 							searchTable($("#search").val());
 						});
 
-						$('#setLocationRadius').click(function() {
+						/*$('#setLocationRadius').click(function() {
 							$(".error-msg").html("");
 							$("#locationRadiusModal").modal('show');
 						});
-
-						$('#saveLocationRadius').click(function() {
+*/
+						/*$('#saveLocationRadius').click(function() {
 							saveLocationRadius();
 						});
-
+*/
 						$("#dbCountry").change(function() {
 							loadStates();
 						});
@@ -395,7 +395,7 @@ if (!this.AccountProfile) {
 
 	}
 
-	function saveLocationRadius() {
+	/*function saveLocationRadius() {
 
 		$(".error-msg").html("Please Wait!..Saving..");
 
@@ -417,7 +417,7 @@ if (!this.AccountProfile) {
 			}
 		});
 
-	}
+	}*/
 
 	function downloadXls() {
 		var status = $('#slt_status').val();
@@ -835,7 +835,7 @@ if (!this.AccountProfile) {
 		});
 	}
 
-	function locationRadius(el) {
+/*	function locationRadius(el) {
 		accountProfileModel.locationRadius = $('#field_locationradius').val();
 		$.ajax({
 			method : $(el).attr('method'),
@@ -851,7 +851,7 @@ if (!this.AccountProfile) {
 			}
 		});
 
-	}
+	}*/
 	/*
 	 * function locationRadius(id) { $.ajax({ url : accountProfileContextPath +
 	 * "/accountProfiles/locationRadius" + id, method : 'GET', success :
@@ -956,7 +956,7 @@ if (!this.AccountProfile) {
 				$('#field_closingBalance').val(data.closingBalance);
 				$('#field_tinNo').val(data.tinNo);
 				$('#field_customerId').val(data.customerId);
-				$('#fld_location_radius').val(data.locationRadius);
+			/*	$('#fld_location_radius').val(data.locationRadius);*/
 
 				// set pid
 				accountProfileModel.pid = data.pid;
