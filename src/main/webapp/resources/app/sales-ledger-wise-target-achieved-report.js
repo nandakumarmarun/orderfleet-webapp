@@ -91,6 +91,8 @@ if (!this.SalesTargetAchievedReport) {
 	}
 	
 	function fillTargetData(targetData) {
+		
+		console.log(targetData);
 		$("#tblSalesTargetAchievedReport tbody").html("");
 		
 		var count = targetData.monthList.length;
@@ -106,6 +108,7 @@ if (!this.SalesTargetAchievedReport) {
 		newRowContent += newRowContent;
 		$("#txtRowHeader").html(newRowContent);
 		
+		
 		var performanceRow = "";
 		$.each(targetData.salesLedgerWiseTargets, function(salesLedgerName, targets) {
 			
@@ -113,7 +116,7 @@ if (!this.SalesTargetAchievedReport) {
 			var achivedRow = "";
 			var targetTotal = 0;
 			var achivedTotal = 0;
-		var monthlyTargetTotal = 0;
+		// var monthlyTargetTotal = 0;
 
 			for(var i = 0, size = targets.length; i < size ; i++) {
 				
@@ -138,7 +141,7 @@ if (!this.SalesTargetAchievedReport) {
 			targetRow += "<td>"+targetTotal1 +"</td>";
 			achivedRow += "<td>"+ achivedTotal1 +"</td>";
 			
-			 monthlyTargetTotal += targetTotal1;
+			 // monthlyTargetTotal += targetTotal1;
 			 // monthlyAchivedTotal += achivedTotal1;
 			
 			performanceRow += targetRow += achivedRow;
@@ -160,18 +163,19 @@ if (!this.SalesTargetAchievedReport) {
 			}
 			performanceRow += "</tr>"
 			}
-			console.log(monthlyTargetTotal);
+			// console.log(monthlyTargetTotal);
 			// performanceRow += monthlyTargetTotal += monthlyAchivedTotal;
+			
 		});
 		
-		var total = 0;
-	    $('#tblBody tr').each(function() {
-	        total += +$('td', this).eq(index).text(); // + will convert string
-														// to number
-	    });
+		
+	   
 		// performanceRow += "<tr><td style='color:
 		// white;background-color:black;'>Total</td></tr>"
 		$("#tblBody").html(performanceRow);
+		 
+		 
+		
 		var rr="<td style='text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;'>Total</td>";
 		$("#tblFoot").html(rr);
 	}

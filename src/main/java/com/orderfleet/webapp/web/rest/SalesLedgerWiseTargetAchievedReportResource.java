@@ -180,13 +180,13 @@ public class SalesLedgerWiseTargetAchievedReportResource {
 			return null;
 		}
 
-		Double achievedAmount = 0D;
 		// user's account profile
 		Set<Long> salesLedgerIds = employeeProfileSalesLedgerRepository
 				.findSalesLedgerIdsByUserPidIn(Arrays.asList(userPid));
 
 		// filter based on product group
-		List<SalesLedger> salesLedgers = salesLedgerRepository.findAllCompanyAndSalesLedgerActivated(true);
+		List<SalesLedger> salesLedgers = salesLedgerRepository
+				.findAllCompanyAndSalesLedgerActivatedandSalesLedgerIdsIn(true, salesLedgerIds);
 		List<String> allSalesLedgerPids = salesLedgers.stream().map(a -> a.getPid()).collect(Collectors.toList());
 		List<SalesLedgerWiseTarget> salesLedgerWiseTargets = salesLedgerWiseTargetRepository
 				.findBySalesLedgerPidInAndFromDateGreaterThanEqualAndToDateLessThanEqual(allSalesLedgerPids, fromDate,
@@ -236,20 +236,18 @@ public class SalesLedgerWiseTargetAchievedReportResource {
 
 		log.info("Get All inventory voucher header size {}", allInventoryVoucherHeader.size());
 
-		List<Object[]> productGroupProducts = productGroupProductRepository.findAllObjectsByCompanyIdAndActivated(true);
-
 		// actual sales user target
 		Map<String, List<SalesLedgerWiseTargetDTO>> salesSalesLedgerWiseTargetMap = new HashMap<>();
+		
+		Double ta = 0D;
+		Double aa = 0D;
 		for (SalesLedger salesLedger : salesLedgers) {
-//				productProfileIds = productGroupProductRepository.findProductIdByProductGroupPid(productGroup.getPid());
 
-//			productProfileIds = salesLedgerIds.stream()
-//					.filter(pgp -> pgp.equals(salesLedger.getId()))
-//					.map(psd -> Long.valueOf(psd[1].toString())).collect(Collectors.toSet());
-
-			// productGroupProductRepository.findProductIdByProductGroupPid(productGroup.getPid());
 			String groupName = salesLedger.getName();
 			List<SalesLedgerWiseTargetDTO> salesSalesLedgerWiseTargetList = new ArrayList<>();
+			Double Tamountttt = 0D;
+			Double Aamountttt = 0D;
+
 			for (LocalDate monthDate : monthsBetweenDates) {
 				String month = monthDate.getMonth().toString();
 				// group by month, one month has only one
@@ -266,6 +264,7 @@ public class SalesLedgerWiseTargetAchievedReportResource {
 						if (salesLedgerWiseTargetByMonth != null && salesLedgerWiseTargetByMonth.get(month) != null) {
 							salesSalesLedgerWiseTargetDTO = salesLedgerWiseTargetByMonth.get(month).get(0);
 						}
+
 					}
 				}
 				// no target saved, add a default one
@@ -276,13 +275,15 @@ public class SalesLedgerWiseTargetAchievedReportResource {
 					salesSalesLedgerWiseTargetDTO.setAmount(0);
 				}
 
-				LocalDate start = monthDate.with(TemporalAdjusters.firstDayOfMonth());
-				LocalDate end = monthDate.with(TemporalAdjusters.lastDayOfMonth());
-				Double achievedVolume = 0D;
+				Tamountttt += salesSalesLedgerWiseTargetDTO.getAmount();
+
+				LocalDate start = monthDate.with(TemporalAdjusters.firstDayOfMonth()).minusDays(1);
+				LocalDate end = monthDate.with(TemporalAdjusters.lastDayOfMonth()).plusDays(1);
+				Double achievedAmount = 0D;
 				if (!salesLedgerIds.isEmpty()) {
 					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream().filter(av -> {
-						if (av.getDocumentDate().isAfter(start.atTime(0, 0))
-								&& av.getDocumentDate().isBefore(end.atTime(23, 59))) {
+						if (av.getDocumentDate().isAfter(start.atTime(23, 59))
+								&& av.getDocumentDate().isBefore(end.atTime(0, 0))) {
 							return true;
 						}
 						return false;
@@ -293,23 +294,36 @@ public class SalesLedgerWiseTargetAchievedReportResource {
 
 					if (!ivHeaderIds.isEmpty()) {
 						achievedAmount = inventoryVoucherHeaderRepository
-								.sumOfAmountByAndSalesLedgerIdsAndHeaderIds(salesLedgerIds, ivHeaderIds);
+								.sumOfAmountByAndSalesLedgerIdAndHeaderIds(salesLedger.getId(), ivHeaderIds);
 					}
 				}
 
 				achievedAmount = achievedAmount == null ? 0 : achievedAmount;
 				salesSalesLedgerWiseTargetDTO.setAchievedAmount(achievedAmount);
 
+				Aamountttt += salesSalesLedgerWiseTargetDTO.getAchievedAmount();
+
 				salesSalesLedgerWiseTargetList.add(salesSalesLedgerWiseTargetDTO);
 			}
+			log.info(Tamountttt + "----" + Aamountttt);
+			ta +=Tamountttt;
+			aa+=Aamountttt;
 			salesSalesLedgerWiseTargetMap.put(groupName, salesSalesLedgerWiseTargetList);
 		}
+		log.info(ta + "----" + aa);
 		List<String> monthList = new ArrayList<>();
 		for (LocalDate monthDate : monthsBetweenDates) {
 			monthList.add(monthDate.getMonth().toString());
 		}
 		salesPerformaceDTO.setMonthList(monthList);
-
+		
+		log.info(salesSalesLedgerWiseTargetMap.size()+"");
+		
+		int total = 0;
+		for (List<SalesLedgerWiseTargetDTO> l : salesSalesLedgerWiseTargetMap.values()) {
+		    total += total;
+		}
+        log.info(total+"");
 		salesPerformaceDTO.setSalesLedgerWiseTargets(
 				salesSalesLedgerWiseTargetMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(
 						Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)));
