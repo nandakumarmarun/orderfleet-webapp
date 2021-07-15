@@ -741,7 +741,6 @@ public class SendInvoiceOdooService {
 	}
 
 	public void sendInvoiceAsync(List<InventoryVoucherHeader> inventoryVouchers) {
-
 		String companyPid = inventoryVouchers.get(0).getCompany().getPid();
 		Long companyId = inventoryVouchers.get(0).getCompany().getId();
 
@@ -760,12 +759,8 @@ public class SendInvoiceOdooService {
 			// return salesOrderDTOs;
 		}
 		Document document = primarySecDoc.get(0).getDocument();
-		
-		log.info(document.getName()+"--------------------------------------------");
 
 		if (document.getPid().equals(obj.getDocument().getPid())) {
-			
-			log.info("--------------------------------------------"+document.getName());
 
 			DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -779,7 +774,8 @@ public class SendInvoiceOdooService {
 
 			List<UserStockLocation> userStockLocations = userStockLocationRepository.findAllByCompanyPid(companyPid);
 
-			List<UnitOfMeasureProduct> unitOfMeasureProducts = unitOfMeasureProductRepository.findAllByCompanyId();
+			List<UnitOfMeasureProduct> unitOfMeasureProducts = unitOfMeasureProductRepository
+					.findAllByCompanyPid(companyPid);
 
 			Optional<User> opUser = users.stream()
 					.filter(u -> u.getId() == Long.parseLong(obj.getCreatedBy().getId().toString())).findAny();
@@ -944,7 +940,7 @@ public class SendInvoiceOdooService {
 
 		if (response != null) {
 
-			if (!String.valueOf(response.getStatus()).equals("503")) {
+			if (String.valueOf(response.getStatus()).equals("503")) {
 				inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
 				inventoryVoucher.setErpReferenceNumber(String.valueOf(response.getMessage()));
 			} else {
