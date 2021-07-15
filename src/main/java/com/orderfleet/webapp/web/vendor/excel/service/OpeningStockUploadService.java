@@ -156,6 +156,7 @@ public class OpeningStockUploadService {
 	@Async
 	public void saveUpdateOpeningStock(final List<OpeningStockDTO> openingStockDTOs,
 			final SyncOperation syncOperation) {
+		System.out.println("=========saveupdateOpening Stock  ================");
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		final Long companyId = company.getId();
@@ -175,27 +176,33 @@ public class OpeningStockUploadService {
 		}
 
 		if (stockLocationId != 0) {
+			
 			openingStockRepository.deleteByStockLocationIdAndCompanyId(stockLocationId, companyId);
 		}
 
-		Set<String> ppNames = openingStockDTOs.stream().map(os -> os.getProductProfileName())
+		Set<String> ppAlias= openingStockDTOs.stream().map(os -> os.getProductProfileName())
 				.collect(Collectors.toSet());
 
 		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
 
 		List<ProductProfile> productProfiles = productProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
+				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
+		
+		log.info("----------product profile sizeee {}",productProfiles.size());
 
 		for (OpeningStockDTO osDto : openingStockDTOs) {
+			
 			// only save if account profile exist
-			productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
+			productProfiles.stream().filter(pp -> pp.getAlias().equals(osDto.getProductProfileName())).findAny()
 					.ifPresent(pp -> {
+						
 						OpeningStock openingStock = new OpeningStock();
 						openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
 						openingStock.setOpeningStockDate(LocalDateTime.now());
 						openingStock.setCreatedDate(LocalDateTime.now());
 						openingStock.setCompany(company);
 						openingStock.setProductProfile(pp);
+						log.info("------------product profile -----------");
 
 						if (osDto.getStockLocationName() == null) {
 							openingStock.setStockLocation(defaultStockLocation);
@@ -209,14 +216,18 @@ public class OpeningStockUploadService {
 								openingStock.setStockLocation(defaultStockLocation);
 							}
 						}
-						openingStock.setQuantity(osDto.getQuantity());
+					    openingStock.setQuantity(osDto.getQuantity());
+					  
 						if (osDto.getQuantity() != 0.0) {
+							
+							
 							saveOpeningStocks.add(openingStock);
 						}
 					});
 		}
-	//	bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
-		openingStockRepository.save(saveOpeningStocks);
+		log.info("-----------save -----opening ------stocks -----{}",saveOpeningStocks.size());
+		//bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+	    openingStockRepository.save(saveOpeningStocks);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
