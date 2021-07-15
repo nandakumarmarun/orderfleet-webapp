@@ -342,7 +342,7 @@ public class TaskSubmissionPostSave {
 
 					if (inventoryVouchers != null) {
 						if (inventoryVouchers.size() > 0) {
-							Thread.sleep(60000);
+							Thread.sleep(30000);
 							sendInvoiceOdooService.sendInvoiceAsync(inventoryVouchers);
 							// sendTransactionOdooService.sendInvoicesToOdoo(tsTransactionWrapper);
 						}
