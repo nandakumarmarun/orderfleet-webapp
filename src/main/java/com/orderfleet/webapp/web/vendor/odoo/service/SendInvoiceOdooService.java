@@ -942,7 +942,7 @@ public class SendInvoiceOdooService {
 
 		if (response != null) {
 
-			if (String.valueOf(response.getStatus()).equals("503")) {
+			if (!String.valueOf(response.getStatus()).equals("503")) {
 				inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
 				inventoryVoucher.setErpReferenceNumber(String.valueOf(response.getMessage()));
 			} else {
