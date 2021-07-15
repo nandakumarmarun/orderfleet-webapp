@@ -41,13 +41,14 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooVoucherLine;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoiceMulti;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsReceiptOdoo;
-import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoiceMulti;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooReceipt;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooInvoice;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooReceipt;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseMessageOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooReceipt;
 
 @Service
@@ -382,8 +383,8 @@ public class SendReceiptOdooService {
 
 		try {
 
-			ResponseBodyOdooReceipt responseBodyOdooReceipt = restTemplate.postForObject(SEND_RECEIPT_API_URL, entity,
-					ResponseBodyOdooReceipt.class);
+			ResponseBodyOdoo responseBodyOdooReceipt = restTemplate.postForObject(SEND_RECEIPT_API_URL, entity,
+					ResponseBodyOdoo.class);
 			log.info(responseBodyOdooReceipt + "");
 
 			// get object as a json string
@@ -423,7 +424,7 @@ public class SendReceiptOdooService {
 
 	}
 
-	private void changeServerDownloadStatus(ResultOdooReceipt response, AccountingVoucherHeader accountingVoucher) {
+	private void changeServerDownloadStatus(ResultOdoo response, AccountingVoucherHeader accountingVoucher) {
 
 		Set<String> accountingVoucherPids = new HashSet<>();
 

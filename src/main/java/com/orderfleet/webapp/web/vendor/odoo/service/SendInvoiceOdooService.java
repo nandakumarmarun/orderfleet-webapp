@@ -28,11 +28,15 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderfleet.webapp.domain.AccountProfile;
+import com.orderfleet.webapp.domain.AccountingVoucherDetail;
+import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
+import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserStockLocation;
@@ -55,12 +59,19 @@ import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoiceLine;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdooInvoiceMulti;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOneOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsReceiptOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooInvoiceMulti;
+import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdooReceipt;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOneOdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOneOdooInvoice;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseMessageOdooInvoice;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdoo;
+import com.orderfleet.webapp.web.vendor.odoo.dto.ResultOdooReceipt;
 
 /**
  * Service for save/update account profile related data from third party
@@ -102,6 +113,8 @@ public class SendInvoiceOdooService {
 	private UnitOfMeasureProductRepository unitOfMeasureProductRepository;
 
 	private static String SEND_INVOICES_API_URL = "http://edappal.nellara.com:1214/web/api/create_invoices";
+
+	private static String SEND_SINGLE_INVOICE_API_URL = "http://edappal.nellara.com:1214/web/api/create_invoice";
 
 	public static int successCount = 0;
 	public static int failedCount = 0;
@@ -280,17 +293,17 @@ public class SendInvoiceOdooService {
 
 			log.info("Sending (" + odooInvoices.size() + ") Invoices to Odoo....");
 
-			RequestBodyOdooInvoice request = new RequestBodyOdooInvoice();
+			RequestBodyOdooInvoiceMulti request = new RequestBodyOdooInvoiceMulti();
 
 			request.setJsonrpc("2.0");
 
-			ParamsOdooInvoice params = new ParamsOdooInvoice();
+			ParamsOdooInvoiceMulti params = new ParamsOdooInvoiceMulti();
 			params.setCreate_multi(true);
 			params.setInvoices(odooInvoices);
 
 			request.setParams(params);
 
-			HttpEntity<RequestBodyOdooInvoice> entity = new HttpEntity<>(request,
+			HttpEntity<RequestBodyOdooInvoiceMulti> entity = new HttpEntity<>(request,
 					RestClientUtil.createTokenAuthHeaders());
 
 			log.info(entity.getBody().toString() + "");
@@ -645,17 +658,17 @@ public class SendInvoiceOdooService {
 
 			log.info("Sending (" + odooInvoices.size() + ") Invoices to Odoo....");
 
-			RequestBodyOdooInvoice request = new RequestBodyOdooInvoice();
+			RequestBodyOdooInvoiceMulti request = new RequestBodyOdooInvoiceMulti();
 
 			request.setJsonrpc("2.0");
 
-			ParamsOdooInvoice params = new ParamsOdooInvoice();
+			ParamsOdooInvoiceMulti params = new ParamsOdooInvoiceMulti();
 			params.setCreate_multi(true);
 			params.setInvoices(odooInvoices);
 
 			request.setParams(params);
 
-			HttpEntity<RequestBodyOdooInvoice> entity = new HttpEntity<>(request,
+			HttpEntity<RequestBodyOdooInvoiceMulti> entity = new HttpEntity<>(request,
 					RestClientUtil.createTokenAuthHeaders());
 
 			log.info(entity.getBody().toString() + "");
@@ -724,6 +737,222 @@ public class SendInvoiceOdooService {
 		// update sync table
 
 		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+
+	public void sendInvoiceAsync(List<InventoryVoucherHeader> inventoryVouchers) {
+		String companyPid = inventoryVouchers.get(0).getCompany().getPid();
+		Long companyId = inventoryVouchers.get(0).getCompany().getId();
+
+		String documentNumber = inventoryVouchers.get(0).getDocumentNumberServer() + "";
+
+		log.info(documentNumber + "--Document Number");
+
+		InventoryVoucherHeader obj = inventoryVouchers.get(0);
+
+		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
+				companyId);
+
+		if (primarySecDoc.isEmpty()) {
+			log.info("........No PrimarySecondaryDocument configuration Available...........");
+			// return salesOrderDTOs;
+		}
+		Document document = primarySecDoc.get(0).getDocument();
+
+		if (document.getPid().equals(obj.getDocument().getPid())) {
+
+			DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+			Set<Long> userIds = new HashSet<>();
+			List<String> accountPids = new ArrayList<>();
+
+			userIds.add(obj.getEmployee().getUser().getId());
+			accountPids.add(obj.getReceiverAccount().getPid());
+
+			List<User> users = userRepository.findAllByCompanyIdAndIdIn(companyId, userIds);
+
+			List<UserStockLocation> userStockLocations = userStockLocationRepository.findAllByCompanyPid(companyPid);
+
+			List<UnitOfMeasureProduct> unitOfMeasureProducts = unitOfMeasureProductRepository.findAllByCompanyId();
+
+			Optional<User> opUser = users.stream()
+					.filter(u -> u.getId() == Long.parseLong(obj.getCreatedBy().getId().toString())).findAny();
+
+			Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
+					.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
+
+			ParamsOdooInvoice odooInvoice = new ParamsOdooInvoice();
+
+			odooInvoice.setInvoice_date(obj.getDocumentDate().format(formatter1));
+
+			odooInvoice.setReference(obj.getDocumentNumberServer());
+			odooInvoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
+
+			odooInvoice.setPartner_id(obj.getReceiverAccount().getCustomerId() != null
+					&& !obj.getReceiverAccount().getCustomerId().equals("")
+							? Long.parseLong(obj.getReceiverAccount().getCustomerId())
+							: 0);
+			odooInvoice.setJournal_type("sale");
+			odooInvoice.setType("out_invoice");
+
+			odooInvoice.setRounding_amt(obj.getRoundedOff());
+
+			List<OdooInvoiceLine> odooInvoiceLines = new ArrayList<OdooInvoiceLine>();
+			for (InventoryVoucherDetail inventoryVoucherDetail : obj.getInventoryVoucherDetails()) {
+
+				OdooInvoiceLine odooInvoiceLine = new OdooInvoiceLine();
+
+				odooInvoiceLine.setIs_foc(
+						inventoryVoucherDetail.getFreeQuantity() > 0.0 ? inventoryVoucherDetail.getFreeQuantity()
+								: 0.0);
+
+				odooInvoiceLine.setDiscount(inventoryVoucherDetail.getDiscountPercentage());
+
+				odooInvoiceLine.setProduct_id(inventoryVoucherDetail.getProduct().getProductId() != null
+						&& !inventoryVoucherDetail.getProduct().getProductId().equals("")
+								? Long.parseLong(inventoryVoucherDetail.getProduct().getProductId())
+								: 0);
+				odooInvoiceLine.setPrice_unit(inventoryVoucherDetail.getSellingRate());
+				odooInvoiceLine.setQuantity(inventoryVoucherDetail.getQuantity());
+
+				Optional<UnitOfMeasureProduct> opUnitOfMeasure = unitOfMeasureProducts.stream()
+						.filter(us -> us.getProduct().getPid().equals(inventoryVoucherDetail.getProduct().getPid()))
+						.findAny();
+
+				if (opUnitOfMeasure.isPresent()) {
+					odooInvoiceLine.setUom_id(Long.parseLong(opUnitOfMeasure.get().getUnitOfMeasure().getUomId()));
+				}
+
+				odooInvoiceLines.add(odooInvoiceLine);
+			}
+
+			odooInvoice.setInvoice_lines(odooInvoiceLines);
+
+			sendToOdooSingle(odooInvoice, obj);
+		}
+
+	}
+
+	private void sendToOdooSingle(ParamsOdooInvoice odooParam, InventoryVoucherHeader inventoryVoucher) {
+		log.info("Sending (" + odooParam.getReference() + ") Invoices to Odoo...." + inventoryVoucher.getId());
+
+		inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.PROCESSING);
+
+		Set<String> inventoryVoucherPids = new HashSet<>();
+
+		inventoryVoucherPids.add(inventoryVoucher.getPid());
+
+		List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
+				.findAllByInventoryVoucherHeaderPidIn(inventoryVoucherPids);
+
+		if (inventoryVoucherDetails.size() > 0) {
+			inventoryVoucher.setInventoryVoucherDetails(inventoryVoucherDetails);
+		}
+		inventoryVoucherHeaderRepository.save(inventoryVoucher);
+		log.debug("updated to PROCESSING");
+
+		RequestBodyOdooInvoice request = new RequestBodyOdooInvoice();
+
+		request.setJsonrpc("2.0");
+
+		request.setParams(odooParam);
+
+		HttpEntity<RequestBodyOdooInvoice> entity = new HttpEntity<>(request, RestClientUtil.createTokenAuthHeaders());
+
+		log.info(entity.getBody().toString() + "");
+
+		ObjectMapper Obj = new ObjectMapper();
+
+		// get object as a json string
+		String jsonStr;
+		try {
+			jsonStr = Obj.writeValueAsString(request);
+			log.info(jsonStr);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// Displaying JSON String
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		log.info("Get URL: " + SEND_SINGLE_INVOICE_API_URL);
+
+		try {
+
+			ResponseBodyOdoo responseBodyOdooInvoice = restTemplate.postForObject(SEND_SINGLE_INVOICE_API_URL, entity,
+					ResponseBodyOdoo.class);
+			log.info(responseBodyOdooInvoice + "");
+
+			// get object as a json string
+			String jsonStr1;
+			try {
+				jsonStr1 = Obj.writeValueAsString(responseBodyOdooInvoice);
+				log.info(jsonStr1);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			log.info("Odoo Invoice Created Success");
+
+			changeServerDownloadStatus(responseBodyOdooInvoice.getResult(), inventoryVoucher);
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				// throw new ServiceException(exception.getResponseBodyAsString());
+				log.info(exception.getResponseBodyAsString());
+				log.info("-------------------------");
+				log.info(exception.getMessage());
+				log.info("-------------------------");
+				exception.printStackTrace();
+			}
+			log.info(exception.getMessage());
+			// throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+
+			log.info(exception.getMessage());
+			log.info("-------------------------");
+			exception.printStackTrace();
+			log.info("-------------------------");
+
+			// throw new ServiceException(exception.getMessage());
+		}
+
+	}
+
+	private void changeServerDownloadStatus(ResultOdoo response, InventoryVoucherHeader inventoryVoucher) {
+
+		Set<String> inventoryVoucherPids = new HashSet<>();
+
+		inventoryVoucherPids.add(inventoryVoucher.getPid());
+
+		List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
+				.findAllByInventoryVoucherHeaderPidIn(inventoryVoucherPids);
+
+		if (inventoryVoucherDetails.size() > 0) {
+			inventoryVoucher.setInventoryVoucherDetails(inventoryVoucherDetails);
+		}
+
+		if (response != null) {
+
+			if (response.getStatus() != 503) {
+				inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
+				inventoryVoucher.setErpReferenceNumber(String.valueOf(response.getMessage()));
+			} else {
+				inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.FAILED);
+				inventoryVoucher.setErpReferenceNumber(String.valueOf(response.getMessage()));
+			}
+		} else {
+			inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.FAILED);
+		}
+
+		inventoryVoucherHeaderRepository.save(inventoryVoucher);
+
+		log.debug("updated to " + inventoryVoucher.getTallyDownloadStatus());
 
 	}
 }

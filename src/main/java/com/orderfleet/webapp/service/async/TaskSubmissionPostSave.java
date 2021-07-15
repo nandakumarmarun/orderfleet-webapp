@@ -262,6 +262,9 @@ public class TaskSubmissionPostSave {
 
 	@Inject
 	private SendTransactionOdooService sendTransactionOdooService;
+	
+	@Inject
+	private SendInvoiceOdooService sendInvoiceOdooService;
 
 	@Inject
 	private SendReceiptOdooService sendReceiptOdooService;
@@ -336,6 +339,12 @@ public class TaskSubmissionPostSave {
 			// send accounting voucher to odoo
 			if (optSendToOdoo.isPresent()) {
 				if (Boolean.valueOf(optSendToOdoo.get().getValue())) {
+					
+					if (inventoryVouchers.size() > 0) {
+						Thread.sleep(60000);
+						sendInvoiceOdooService.sendInvoiceAsync(inventoryVouchers);
+						// sendTransactionOdooService.sendInvoicesToOdoo(tsTransactionWrapper);
+					}
 					if (accountingVouchers.size() > 0) {
 						Thread.sleep(30000);
 						sendReceiptOdooService.sendReceiptAsync(accountingVouchers);

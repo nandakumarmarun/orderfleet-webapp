@@ -1,12 +1,12 @@
 package com.orderfleet.webapp.web.vendor.odoo.dto;
 
-public class ResponseBodyOdooReceipt {
+public class ResponseBodyOdoo {
 
 	private String jsonrpc;
 
 	private long id;
 
-	private ResultOdooReceipt result;
+	private ResultOdoo result;
 
 	public String getJsonrpc() {
 		return jsonrpc;
@@ -24,11 +24,11 @@ public class ResponseBodyOdooReceipt {
 		this.id = id;
 	}
 
-	public ResultOdooReceipt getResult() {
+	public ResultOdoo getResult() {
 		return result;
 	}
 
-	public void setResult(ResultOdooReceipt result) {
+	public void setResult(ResultOdoo result) {
 		this.result = result;
 	}
 
