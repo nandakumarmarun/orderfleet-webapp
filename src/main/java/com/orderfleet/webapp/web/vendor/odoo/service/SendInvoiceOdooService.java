@@ -785,6 +785,8 @@ public class SendInvoiceOdooService {
 
 			ParamsOdooInvoice odooInvoice = new ParamsOdooInvoice();
 
+			odooInvoice.setCreate(true);
+
 			odooInvoice.setInvoice_date(obj.getDocumentDate().format(formatter1));
 
 			odooInvoice.setReference(obj.getDocumentNumberServer());
