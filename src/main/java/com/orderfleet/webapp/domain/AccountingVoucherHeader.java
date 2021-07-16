@@ -136,6 +136,9 @@ public class AccountingVoucherHeader implements Serializable {
 	@Column(name = "erp_ref_no")
 	private String erpRefNo;
 
+	@Column(name = "erp_status")
+	private String erpStatus;
+
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "tbl_receipt_file", joinColumns = {
@@ -333,6 +336,14 @@ public class AccountingVoucherHeader implements Serializable {
 
 	public void setErpRefNo(String erpRefNo) {
 		this.erpRefNo = erpRefNo;
+	}
+
+	public String getErpStatus() {
+		return erpStatus;
+	}
+
+	public void setErpStatus(String erpStatus) {
+		this.erpStatus = erpStatus;
 	}
 
 }

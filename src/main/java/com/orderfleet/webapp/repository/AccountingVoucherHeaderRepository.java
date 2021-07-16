@@ -285,6 +285,9 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("select accountingVoucherHeader.id,accountingVoucherHeader.accountProfile.id,accountingVoucherHeader.document.id,accountingVoucherHeader.documentDate,accountingVoucherHeader.totalAmount from AccountingVoucherHeader accountingVoucherHeader where accountingVoucherHeader.company.id = ?#{principal.companyId} Order By accountingVoucherHeader.createdDate desc")
 	List<Object[]> findAllByCompanyIdAndOrderByCreatedDateDesc();
 
+	@Query("select accVoucher from AccountingVoucherHeader accVoucher LEFT JOIN FETCH accVoucher.accountingVoucherDetails where accVoucher.company.pid = ?2 and accVoucher.documentNumberServer = ?1")
+	AccountingVoucherHeader findOneHeaderByDocumentNumberServerAndCompanyPid(String reference, String companyPid);
+
 	// @Query("select
 	// inventoryVoucher.id,inventoryVoucher.receiverAccount.id,inventoryVoucher.document.id,inventoryVoucher.documentDate
 	// from InventoryVoucherHeader inventoryVoucher where

@@ -6,7 +6,7 @@ public class ResultOdoo {
 
 	private long status;
 
-	private String message;
+	private ResponseMessageOdoo message;
 
 	public long getStatus() {
 		return status;
@@ -16,11 +16,11 @@ public class ResultOdoo {
 		this.status = status;
 	}
 
-	public String getMessage() {
+	public ResponseMessageOdoo getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
+	public void setMessage(ResponseMessageOdoo message) {
 		this.message = message;
 	}
 

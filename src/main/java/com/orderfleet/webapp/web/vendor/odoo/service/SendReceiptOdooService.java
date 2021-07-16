@@ -26,6 +26,7 @@ import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserStockLocation;
@@ -399,7 +400,7 @@ public class SendReceiptOdooService {
 
 			log.info("Odoo Receipt Created Success");
 
-			changeServerDownloadStatus(responseBodyOdooReceipt.getResult(), accountingVoucher);
+			changeServerDownloadStatus(responseBodyOdooReceipt.getResult(), accountingVoucher.getCompany().getPid());
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
@@ -424,29 +425,41 @@ public class SendReceiptOdooService {
 
 	}
 
-	private void changeServerDownloadStatus(ResultOdoo response, AccountingVoucherHeader accountingVoucher) {
-
-		Set<String> accountingVoucherPids = new HashSet<>();
-
-		accountingVoucherPids.add(accountingVoucher.getPid());
-
-		List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
-				.findAllByAccountingVoucherHeaderPidIn(accountingVoucherPids);
-
-		if (accountingVoucherDetails.size() > 0) {
-			accountingVoucher.setAccountingVoucherDetails(accountingVoucherDetails);
-		}
+	private void changeServerDownloadStatus(ResultOdoo response, String companyPid) {
 
 		if (response != null) {
-			accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
-			accountingVoucher.setErpRefNo(String.valueOf(response.getMessage()));
-		} else {
-			accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.FAILED);
+
+			if (response.getMessage() != null) {
+				log.debug("updating tally download status of " + response.getMessage().getReference());
+
+				AccountingVoucherHeader accountingVoucher = accountingVoucherHeaderRepository
+						.findOneHeaderByDocumentNumberServerAndCompanyPid(response.getMessage().getReference(),
+								companyPid);
+
+				Set<String> accountingVoucherPids = new HashSet<>();
+
+				accountingVoucherPids.add(accountingVoucher.getPid());
+
+				List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
+						.findAllByAccountingVoucherHeaderPidIn(accountingVoucherPids);
+
+				if (accountingVoucherDetails.size() > 0) {
+					accountingVoucher.setAccountingVoucherDetails(accountingVoucherDetails);
+				}
+
+				if (!String.valueOf(response.getStatus()).equals("503")) {
+					accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
+					accountingVoucher.setErpRefNo(response.getMessage().getId());
+					accountingVoucher.setErpStatus("Success");
+				} else {
+					accountingVoucher.setTallyDownloadStatus(TallyDownloadStatus.FAILED);
+					accountingVoucher.setErpRefNo(String.valueOf(0));
+					accountingVoucher.setErpStatus(response.getMessage().getId());
+				}
+				accountingVoucherHeaderRepository.save(accountingVoucher);
+
+				log.debug("updated to " + accountingVoucher.getTallyDownloadStatus());
+			}
 		}
-
-		accountingVoucherHeaderRepository.save(accountingVoucher);
-
-		log.debug("updated to " + accountingVoucher.getTallyDownloadStatus());
-
 	}
 }

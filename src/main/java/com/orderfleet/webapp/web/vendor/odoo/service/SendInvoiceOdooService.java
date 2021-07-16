@@ -902,7 +902,7 @@ public class SendInvoiceOdooService {
 
 			log.info("Odoo Invoice Created Success");
 
-			changeServerDownloadStatus(responseBodyOdooInvoice.getResult(), inventoryVoucher);
+			changeServerDownloadStatus(responseBodyOdooInvoice.getResult(), inventoryVoucher.getCompany().getPid());
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
@@ -927,35 +927,42 @@ public class SendInvoiceOdooService {
 
 	}
 
-	private void changeServerDownloadStatus(ResultOdoo response, InventoryVoucherHeader inventoryVoucher) {
-
-		Set<String> inventoryVoucherPids = new HashSet<>();
-
-		inventoryVoucherPids.add(inventoryVoucher.getPid());
-
-		List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
-				.findAllByInventoryVoucherHeaderPidIn(inventoryVoucherPids);
-
-		if (inventoryVoucherDetails.size() > 0) {
-			inventoryVoucher.setInventoryVoucherDetails(inventoryVoucherDetails);
-		}
+	private void changeServerDownloadStatus(ResultOdoo response, String companyPid) {
 
 		if (response != null) {
+			if (response.getMessage() != null) {
+				log.debug("updating tally download status of " + response.getMessage().getReference());
 
-			if (!String.valueOf(response.getStatus()).equals("503")) {
-				inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
-				inventoryVoucher.setErpReferenceNumber(String.valueOf(response.getMessage()));
-			} else {
-				inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.FAILED);
-				inventoryVoucher.setErpReferenceNumber(String.valueOf(response.getMessage()));
+				InventoryVoucherHeader inventoryVoucher = inventoryVoucherHeaderRepository
+						.findOneHeaderByDocumentNumberServerAndCompanyPid(response.getMessage().getReference(),companyPid);
+
+				Set<String> inventoryVoucherPids = new HashSet<>();
+
+				inventoryVoucherPids.add(inventoryVoucher.getPid());
+
+				List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
+						.findAllByInventoryVoucherHeaderPidIn(inventoryVoucherPids);
+
+				if (inventoryVoucherDetails.size() > 0) {
+					inventoryVoucher.setInventoryVoucherDetails(inventoryVoucherDetails);
+				}
+
+				if (!String.valueOf(response.getStatus()).equals("503")) {
+					log.info("SUCESS");
+					inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.COMPLETED);
+					inventoryVoucher.setErpReferenceNumber(response.getMessage().getId());
+					inventoryVoucher.setErpStatus("Success");
+				} else {
+					log.info("FAILED");
+					inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.FAILED);
+					inventoryVoucher.setErpReferenceNumber(String.valueOf(0));
+					inventoryVoucher.setErpStatus(response.getMessage().getId());
+				}
+				inventoryVoucherHeaderRepository.save(inventoryVoucher);
+
+				log.debug("updated to " + inventoryVoucher.getTallyDownloadStatus());
 			}
-		} else {
-			inventoryVoucher.setTallyDownloadStatus(TallyDownloadStatus.FAILED);
 		}
-
-		inventoryVoucherHeaderRepository.save(inventoryVoucher);
-
-		log.debug("updated to " + inventoryVoucher.getTallyDownloadStatus());
 
 	}
 }
