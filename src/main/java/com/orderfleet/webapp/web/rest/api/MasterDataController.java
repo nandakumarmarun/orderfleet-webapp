@@ -1634,7 +1634,8 @@ public class MasterDataController {
 		}
 
 		for (VoucherNumberGeneratorDTO vng : voucherNumberGeneratorDTOs) {
-			log.info(vng.getLastVoucherNumber() + "----");
+			log.info("Last Voucher-Number" + vng.getLastVoucherNumber());
+			vng.setLastVoucherNumber(vng.getLastVoucherNumber().replaceAll("\\n", ""));
 		}
 
 		return new ResponseEntity<>(voucherNumberGeneratorDTOs, HttpStatus.OK);
