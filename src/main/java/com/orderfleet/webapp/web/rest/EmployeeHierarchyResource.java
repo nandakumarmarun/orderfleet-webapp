@@ -76,6 +76,7 @@ public class EmployeeHierarchyResource {
 	public String getEmployeeHierarchyViewPage(Model model) throws URISyntaxException  {
 		log.debug("Web request to get a page of EmployeeHierarchyViewPage");
 		model.addAttribute("employees", employeeProfileService.findAllByCompany());
+		
 		return "company/employee-hierarchy-view";
 	}
 	
@@ -210,11 +211,14 @@ public class EmployeeHierarchyResource {
 					"employeeHierarchy must have an Parent ID")).body(null);
 		}
 		// if this employee has active children. Then do not update
-		Long children = employeeHierarchyService.countByParentIdAndActivatedTrue(employeeId);
-		if (children != null) {
-			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("employeeHierarchy",
-					"childrenexists", "This Employee cannot updated. It has active children.")).body(null);
-		}
+		/*
+		 * Long children =
+		 * employeeHierarchyService.countByParentIdAndActivatedTrue(employeeId); if
+		 * (children != null) { return
+		 * ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(
+		 * "employeeHierarchy", "childrenexists",
+		 * "This Employee cannot updated. It has active children.")).body(null); }
+		 */
 		// update
 		EmployeeHierarchyDTO result = employeeHierarchyService.update(employeeId, parentId);
 		if (result == null) {
