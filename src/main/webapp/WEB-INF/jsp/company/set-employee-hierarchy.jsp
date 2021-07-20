@@ -16,13 +16,13 @@
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
 			<h2>Set Employee Hierarchy Root</h2>
-			<!-- <div class="row col-xs-12">
+			 <div class="row col-xs-12">
 				<div class="pull-right">
 					<button type="button" class="btn btn-success"
 						onclick="SetEmployeeHierarchy.showModalPopup($('#myModal'));">Add/Edit
 						Root</button>
 				</div>
-			</div> -->
+			</div>
 			<div class="clearfix"></div>
 			<hr />
 			<table class="table  table-striped table-bordered">
