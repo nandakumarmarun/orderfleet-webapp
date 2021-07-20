@@ -264,7 +264,6 @@ public class AccountProfileUploadService {
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
-		//accountProfileRepository.save(saveUpdateAccountProfiles);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -272,8 +271,7 @@ public class AccountProfileUploadService {
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
-		log.info("Sync completed in {} ms", elapsedTime);  
-		
+		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
 	@Transactional
@@ -364,7 +362,6 @@ public class AccountProfileUploadService {
 	@Async
 	public void saveUpdateLocationAccountProfiles(final List<LocationAccountProfileDTO> locationAccountProfileDTOs,
 			final SyncOperation syncOperation) {
-		log.debug("=======--------save update location account profile=======--------");
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		final Long companyId = syncOperation.getCompany().getId();
@@ -377,20 +374,18 @@ public class AccountProfileUploadService {
 		List<Location> locations = locationService.findAllLocationByCompanyId(companyId);
 		List<Long> locationAccountProfilesIds = new ArrayList<>();
 
-		log.debug("location account profile DTOSSS---------------- =====: {} ", locationAccountProfileDTOs.size());
-
 		for (LocationAccountProfileDTO locAccDto : locationAccountProfileDTOs) {
 
 			LocationAccountProfile locationAccountProfile = new LocationAccountProfile();
 			// find location
 
-			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getAlias()))
+			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getName()))
 					.findFirst();
 			// find accountprofile
 			// System.out.println(loc.get()+"===Location");
 
 			Optional<AccountProfile> acc = accountProfiles.stream()
-					.filter(ap -> locAccDto.getAccountProfileName().equals(ap.getName())).findFirst();
+					.filter(ap -> locAccDto.getAccountProfileName().equals(ap.getAlias())).findFirst();
 			if (acc.isPresent()) {
 				List<Long> locationAccountProfileIds = locationAccountProfiles.stream()
 						.filter(lap -> acc.get().getPid().equals(lap.getAccountProfile().getPid()))
@@ -408,13 +403,11 @@ public class AccountProfileUploadService {
 				newLocationAccountProfiles.add(locationAccountProfile);
 			}
 		}
-		log.info("new location account profile{}", newLocationAccountProfiles.size());
-
 		if (locationAccountProfilesIds.size() != 0) {
 			locationAccountProfileRepository.deleteByIdIn(companyId, locationAccountProfilesIds);
 		}
-		List<LocationAccountProfile> savedlaps = locationAccountProfileRepository.save(newLocationAccountProfiles);
-		log.info("size of {}",savedlaps.size());
+
+		locationAccountProfileRepository.save(newLocationAccountProfiles);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
