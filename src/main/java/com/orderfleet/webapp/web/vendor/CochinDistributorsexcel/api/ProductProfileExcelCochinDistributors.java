@@ -37,6 +37,7 @@ import com.orderfleet.webapp.web.rest.integration.dto.GSTProductGroupDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductProfileCustomDTO;
 import com.orderfleet.webapp.web.rest.tallypartner.DocumentUserWiseUpdateController;
+import com.orderfleet.webapp.web.vendor.CochinDistributorsexcel.service.ProductProfileUploadServiceCochinDistributors;
 import com.orderfleet.webapp.web.vendor.excel.service.ProductProfileUploadService;
 
 @RestController
@@ -52,7 +53,7 @@ public class ProductProfileExcelCochinDistributors {
 	// private ProductProfileUploadService productProfileUploadService;
 
 	@Inject
-	private ProductProfileUploadService productProfileUploadService;
+	private ProductProfileUploadServiceCochinDistributors productProfileUploadService;
 
 	@Inject
 	private DocumentUserWiseUpdateController documentUserWiseUpdateController;

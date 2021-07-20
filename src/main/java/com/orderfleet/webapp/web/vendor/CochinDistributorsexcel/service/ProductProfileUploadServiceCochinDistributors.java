@@ -1,7 +1,6 @@
 package com.orderfleet.webapp.web.vendor.CochinDistributorsexcel.service;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +11,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -22,45 +20,29 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.EcomProductProfile;
 import com.orderfleet.webapp.domain.EcomProductProfileProduct;
 import com.orderfleet.webapp.domain.GSTProductGroup;
-import com.orderfleet.webapp.domain.Location;
-import com.orderfleet.webapp.domain.LocationAccountProfile;
-import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.PriceLevel;
-import com.orderfleet.webapp.domain.PriceLevelAccountProductGroup;
 import com.orderfleet.webapp.domain.PriceLevelList;
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupEcomProduct;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
-import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.TaxMaster;
-import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
-import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
 import com.orderfleet.webapp.domain.enums.StockLocationType;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
 import com.orderfleet.webapp.repository.EcomProductProfileProductRepository;
 import com.orderfleet.webapp.repository.EcomProductProfileRepository;
-import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
-import com.orderfleet.webapp.repository.LocationHierarchyRepository;
-import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
-import com.orderfleet.webapp.repository.PriceLevelAccountProductGroupRepository;
 import com.orderfleet.webapp.repository.PriceLevelListRepository;
 import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
@@ -68,45 +50,31 @@ import com.orderfleet.webapp.repository.ProductGroupEcomProductsRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
-import com.orderfleet.webapp.repository.ReceivablePayableRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.TaxMasterRepository;
-import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.EcomProductProfileService;
-import com.orderfleet.webapp.service.LocationAccountProfileService;
-import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.OpeningStockService;
-import com.orderfleet.webapp.service.PriceLevelAccountProductGroupService;
 import com.orderfleet.webapp.service.PriceLevelListService;
 import com.orderfleet.webapp.service.PriceLevelService;
 import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.ProductProfileService;
-import com.orderfleet.webapp.service.ReceivablePayableService;
 import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.TaxMasterService;
-import com.orderfleet.webapp.service.async.TPProductProfileManagementService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.ecom.mapper.EcomProductProfileMapper;
-import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.EcomProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.EcomProductProfileProductDTO;
-import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.LocationDTO;
-import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
 import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
-import com.orderfleet.webapp.web.rest.dto.PriceLevelAccountProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelListDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductCategoryDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupEcomProductDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
 import com.orderfleet.webapp.web.rest.dto.StockLocationDTO;
 import com.orderfleet.webapp.web.rest.dto.TaxMasterDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.GSTProductGroupDTO;
@@ -287,6 +255,8 @@ public class ProductProfileUploadServiceCochinDistributors {
 	@Transactional
 	public void saveUpdateProductProfiles(final List<ProductProfileDTO> productProfileDTOs,
 			final SyncOperation syncOperation) {
+		
+		log.info("----saveupdateProductProfile-----");
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
@@ -353,6 +323,7 @@ public class ProductProfileUploadServiceCochinDistributors {
 			productProfile.setActivated(true);
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
+		
 
 			productProfile.setUnitQty(ppDto.getUnitQty() != null ? ppDto.getUnitQty() : 1.0);
 
@@ -401,24 +372,42 @@ public class ProductProfileUploadServiceCochinDistributors {
 			saveUpdateProductProfiles.add(productProfile);
 
 		}
+		productProfileRepository.save(saveUpdateProductProfiles);
+	}
+	
+
+	@Transactional
+	public void saveUpdateProductStockLocation(final List<ProductProfileDTO> productProfileDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
+		// find all exist product profiles
+		Set<String> ppAlias = productProfileDTOs.stream().map(p -> p.getAlias()).collect(Collectors.toSet());
+//			List<ProductProfile> productProfiles = productProfileRepository
+//					.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
+
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
+
+		//List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
+
+		for (ProductProfileDTO ppDto : productProfileDTOs) {
+			// check exist by name, only one exist with a name
+			Optional<ProductProfile> optionalPP = productProfiles.stream()
+					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
+			ProductProfile productProfile;
+			if (optionalPP.isPresent()) {
+				productProfile = optionalPP.get();
+
+			   productProfile.setUnitQty(ppDto.getUnitQty());
+
+				saveUpdateProductProfiles.add(productProfile);
+			}
+
+		}
 
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
-		log.info("Saving product groups");
-		saveUpdateProductGroups(productGroupDtos);
-		log.info("Stock Location Size {}", stockLocationDTOs.size());
 
-		if (stockLocationDTOs.size() > 0) {
-			List<StockLocationDTO> stkLocations = stockLocationDTOs.stream().filter(distinctByKey(cpt -> cpt.getName()))
-					.collect(Collectors.toList());
-			log.info("Saving Stock Locations.... {}", stkLocations.size());
-			saveUpdateStockLocations(stkLocations);
-		}
-		log.info("Saving product group product profiles");
-		saveUpdateProductGroupProduct(productGroupProductDTOs);
-		if (openingStockDtos.size() > 0) {
-			log.info("Saving opening stock");
-			saveUpdateOpeningStock(openingStockDtos);
-		}
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -428,7 +417,50 @@ public class ProductProfileUploadServiceCochinDistributors {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
+	@Transactional
+	public void saveUpdateProductPrice(final List<ProductProfileDTO> productProfileDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
+		// find all exist product profiles
+		Set<String> ppAlias = productProfileDTOs.stream().map(p -> p.getAlias()).collect(Collectors.toSet());
+//			List<ProductProfile> productProfiles = productProfileRepository
+//					.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
 
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
+
+		List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
+
+		for (ProductProfileDTO ppDto : productProfileDTOs) {
+			// check exist by name, only one exist with a name
+			Optional<ProductProfile> optionalPP = productProfiles.stream()
+					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
+			ProductProfile productProfile;
+			if (optionalPP.isPresent()) {
+				productProfile = optionalPP.get();
+
+				productProfile.setPrice(ppDto.getPrice());
+				productProfile.setTaxRate(ppDto.getTaxRate());
+
+				saveUpdateProductProfiles.add(productProfile);
+			}
+
+		}
+
+		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+	
+	
 	@Transactional
 	public void saveUpdateProductProfiles(final TPProductProfileCustomDTO productProfileCustomDTO,
 			final SyncOperation syncOperation) {
