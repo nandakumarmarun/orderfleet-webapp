@@ -156,12 +156,15 @@ public class TPAccountProfileManagementService {
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
 		// All product must have a division/category, if not, set a default one
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
-		log.info("Default Account Type TPAPMS:"+defaultAccountType.getName());
+		log.info("Default Account Type TPAPMS:" + defaultAccountType.getName());
 		// find all exist account profiles
 		List<String> apNames = accountProfileDTOs.stream().map(apDto -> apDto.getName().toUpperCase())
 				.collect(Collectors.toList());
 		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
 				apNames);
+
+		log.info("Db accounts: " + accountProfiles.size());
+		log.info("Tally  accounts: " + accountProfileDTOs.size());
 		// all pricelevels
 		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
 
@@ -236,7 +239,7 @@ public class TPAccountProfileManagementService {
 				}
 			}
 			// account type
-			
+
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}
@@ -252,6 +255,7 @@ public class TPAccountProfileManagementService {
 			accountProfile.setDataSourceType(DataSourceType.TALLY);
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
+		log.info("Saving...accountProfileDTOs.Account Profiles" + saveUpdateAccountProfiles.size());
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
