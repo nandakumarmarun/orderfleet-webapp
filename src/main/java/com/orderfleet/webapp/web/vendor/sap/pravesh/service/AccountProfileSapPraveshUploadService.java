@@ -187,8 +187,17 @@ public class AccountProfileSapPraveshUploadService {
 			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
 
 			if (apDto.getLocation().equalsIgnoreCase("-No Sales Employee-")) {
+				locationDTO.setAlias("No Sales Employee");
+				locationDTO.setName("No Sales Employee");
+
+				locationDtos.add(locationDTO);
+
 				locationAccountProfileDto.setAccountProfileName(apDto.getName());
-				locationAccountProfileDto.setLocationName("Territory");
+				locationAccountProfileDto.setLocationName("No Sales Employee");
+				
+				
+//				locationAccountProfileDto.setAccountProfileName(apDto.getName());
+//				locationAccountProfileDto.setLocationName("Territory");
 			} else {
 
 				locationDTO.setAlias(apDto.getLocation());

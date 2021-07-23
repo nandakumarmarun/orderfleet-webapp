@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -327,33 +328,46 @@ public class TerritoryWiseSalesReportResource {
 	public ResponseEntity<List<InventoryVoucherDetailDTO>> filterAccountProfileByLocation(
 			@RequestParam("employeePid") String employeePid, @RequestParam("locationIds") String locationIds,
 			@RequestParam("documentPid") String documentPid, @RequestParam("filterBy") String filterBy,
-			@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, @RequestParam int noOfLevels) {
+			@RequestParam String fromDate, @RequestParam String toDate, @RequestParam int noOfLevels) {
+
+		LocalDate fDate = LocalDate.now();
+		LocalDate tDate = LocalDate.now();
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MM-yyyy");
+
+		if (fromDate != null && !fromDate.equals("")) {
+			fDate = LocalDate.parse(fromDate, formatter);
+		}
+
+		if (toDate != null && !toDate.equals("")) {
+			tDate = LocalDate.parse(toDate, formatter);
+		}
 
 		log.info("Web Request to get all Sales Data By filter " + filterBy);
 
 		if (filterBy.equals(TerritoryWiseSalesReportResource.TODAY)) {
-			fromDate = LocalDate.now();
-			toDate = fromDate;
+			fDate = LocalDate.now();
+			tDate = fDate;
 
 		} else if (filterBy.equals(TerritoryWiseSalesReportResource.YESTERDAY)) {
-			fromDate = LocalDate.now().minusDays(1);
-			toDate = fromDate;
+			fDate = LocalDate.now().minusDays(1);
+			tDate = fDate;
 		} else if (filterBy.equals(TerritoryWiseSalesReportResource.WTD)) {
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			fromDate = weekStartDate;
-			toDate = LocalDate.now();
+			fDate = weekStartDate;
+			tDate = LocalDate.now();
 		} else if (filterBy.equals(TerritoryWiseSalesReportResource.MTD)) {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			fromDate = monthStartDate;
+			fDate = monthStartDate;
 
-			toDate = LocalDate.now();
+			tDate = LocalDate.now();
 		} else if (filterBy.equals(TerritoryWiseSalesReportResource.CUSTOM)) {
 
 		}
 
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid,
-				locationIds, fromDate, toDate, documentPid, noOfLevels);
+				locationIds, fDate, tDate, documentPid, noOfLevels);
 
 		log.info("Sales Report Size " + inventoryVoucherDetailDtos.size());
 
