@@ -196,7 +196,7 @@ public class ExecutiveTaskSubmissionController {
 				String userPid = user.getPid();
 
 				List<VoucherNumberGenerator> voucherNumberGeneratorList = voucherNumberGeneratorRepository
-						.findAllByUserAndCompanyAndDocument(userPid, companyPid,document.get().getPid());
+						.findAllByUserAndCompanyAndDocument(userPid, companyPid, document.get().getPid());
 
 				if (voucherNumberGeneratorList == null || voucherNumberGeneratorList.size() == 0) {
 					log.info(voucherNumberGeneratorList + " Size is either null or 0");
@@ -273,7 +273,8 @@ public class ExecutiveTaskSubmissionController {
 							}
 							if (dbDocumentNumberLocalPrefix != null) {
 								String[] dbDocumentNumberLocal = obj[0].toString().split(dbDocumentNumberLocalPrefix);
-								long dbDocumentNumberLocalCount = Long.parseLong(dbDocumentNumberLocal[1].toString());
+								long dbDocumentNumberLocalCount = Long
+										.parseLong(dbDocumentNumberLocal[1].toString().replaceAll("\\s", ""));
 								if ((documentNumberLocalPrefix.equals(dbDocumentNumberLocalPrefix))
 										&& ((dbDocumentNumberLocalCount + 1) != documentNumberLocalCount)) {
 									log.debug("----------" + documentNumberLocal
