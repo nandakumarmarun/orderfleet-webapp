@@ -35,6 +35,10 @@ public class UserDTO {
 
 	private String companyPhoneNo;
 
+	private String companyAddress;
+
+	private String companyEmail;
+
 	@NotNull
 	@Pattern(regexp = Constants.LOGIN_REGEX)
 	@Size(min = 1, max = 50)
@@ -83,13 +87,14 @@ public class UserDTO {
 				user.getFirstName(), user.getLastName(), user.getEmail(), user.getMobile(), user.getActivated(),
 				user.getLangKey(), user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()),
 				user.getShowAllUsersData(), user.getDashboardUIType(), user.getDiscontinued(), user.getDeviceKey(),
-				user.getCompany().getGstNo(), user.getCompany().getPhoneNo());
+				user.getCompany().getGstNo(), user.getCompany().getPhoneNo(), user.getCompany().getAddress1(),
+				user.getCompany().getEmail());
 	}
 
 	public UserDTO(String pid, String companyPid, String companyName, String login, String firstName, String lastName,
 			String email, String mobile, boolean activated, String langKey, Set<String> authorities,
 			boolean showAllUserData, DashboardUIType dashboardUIType, boolean discontinued, String deviceKey,
-			String gstNumber, String companyPhoneNo) {
+			String gstNumber, String companyPhoneNo, String companyAddress, String companyEmail) {
 		this.pid = pid;
 		this.companyPid = companyPid;
 		this.companyName = companyName;
@@ -107,6 +112,8 @@ public class UserDTO {
 		this.deviceKey = deviceKey;
 		this.gstNumber = gstNumber;
 		this.companyPhoneNo = companyPhoneNo;
+		this.companyAddress = companyAddress;
+		this.companyEmail = companyEmail;
 	}
 
 	public UserDTO(String pid, String firstName, String lastName) {
@@ -273,6 +280,30 @@ public class UserDTO {
 
 	public void setEmployeeAlias(String employeeAlias) {
 		this.employeeAlias = employeeAlias;
+	}
+
+	public String getCompanyAddress() {
+		return companyAddress;
+	}
+
+	public void setCompanyAddress(String companyAddress) {
+		this.companyAddress = companyAddress;
+	}
+
+	public void setLangKey(String langKey) {
+		this.langKey = langKey;
+	}
+
+	public void setDeviceKey(String deviceKey) {
+		this.deviceKey = deviceKey;
+	}
+
+	public String getCompanyEmail() {
+		return companyEmail;
+	}
+
+	public void setCompanyEmail(String companyEmail) {
+		this.companyEmail = companyEmail;
 	}
 
 	@Override

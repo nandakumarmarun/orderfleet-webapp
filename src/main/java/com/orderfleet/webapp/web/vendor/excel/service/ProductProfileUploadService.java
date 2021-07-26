@@ -353,6 +353,7 @@ public class ProductProfileUploadService {
 			productProfile.setActivated(true);
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
+			productProfile.setHsnCode(ppDto.getHsnCode());
 
 			productProfile.setUnitQty(ppDto.getUnitQty() != null ? ppDto.getUnitQty() : 1.0);
 

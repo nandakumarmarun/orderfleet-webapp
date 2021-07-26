@@ -49,9 +49,10 @@ public class ManagedUserDTO extends UserDTO {
 			String firstName, String lastName, String email, String mobile, boolean activated, String langKey,
 			Set<String> authorities, ZonedDateTime createdDate, String lastModifiedBy, ZonedDateTime lastModifiedDate,
 			boolean showAllUserData, DashboardUIType dashboardUIType, boolean discontinued, String deviceKey,
-			String gstNumber, String companyPhoneNo) {
+			String gstNumber, String companyPhoneNo, String companyAddress, String companyEmail) {
 		super(pid, companyPid, companyName, login, firstName, lastName, email, mobile, activated, langKey, authorities,
-				showAllUserData, dashboardUIType, discontinued, deviceKey, gstNumber, companyPhoneNo);
+				showAllUserData, dashboardUIType, discontinued, deviceKey, gstNumber, companyPhoneNo, companyAddress,
+				companyEmail);
 		this.pid = pid;
 		this.createdDate = createdDate;
 		this.lastModifiedBy = lastModifiedBy;
