@@ -44,7 +44,6 @@ import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.ResponseBodySapAccountPro
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.ResponseBodySapAccountProfileOpeningBalance;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.ResponseBodySapPraveshAccountProfile;
 
-
 /**
  * Service for save/update account profile related data from third party
  * softwares like tally.
@@ -222,8 +221,7 @@ public class AccountProfileSapUploadService {
 //
 //		log.info("Sync completed in {} ms", elapsedTime);
 //	}
-	
-	
+
 	@Transactional
 	public void saveUpdateAccountProfiles(final List<ResponseBodySapAccountProfile> resultAccountProfiles)
 			throws Exception {
@@ -313,7 +311,7 @@ public class AccountProfileSapUploadService {
 			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
 
 			if (apDto.getLocation().equalsIgnoreCase("-No Sales Employee-")) {
-				
+
 				locationDTO.setAlias("No Sales Employee");
 				locationDTO.setName("No Sales Employee");
 
@@ -321,8 +319,7 @@ public class AccountProfileSapUploadService {
 
 				locationAccountProfileDto.setAccountProfileName(apDto.getName());
 				locationAccountProfileDto.setLocationName("No Sales Employee");
-				
-				
+
 //				locationAccountProfileDto.setAccountProfileName(apDto.getName());
 //				locationAccountProfileDto.setLocationName("Territory");
 			} else {
@@ -355,7 +352,6 @@ public class AccountProfileSapUploadService {
 
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-
 
 	@Transactional
 	public void saveUpdateLocations(final List<LocationDTO> locationDTOs) {
@@ -392,7 +388,8 @@ public class AccountProfileSapUploadService {
 
 			saveUpdateLocations.add(location);
 		}
-		bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
+		locationRepository.save(saveUpdateLocations);
+		// bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
 		locationRepository.flush();
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;

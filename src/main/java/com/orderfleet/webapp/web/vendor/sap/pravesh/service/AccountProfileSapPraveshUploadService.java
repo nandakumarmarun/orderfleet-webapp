@@ -264,7 +264,8 @@ public class AccountProfileSapPraveshUploadService {
 
 			saveUpdateLocations.add(location);
 		}
-		bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
+		locationRepository.save(saveUpdateLocations);
+		// bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
 		locationRepository.flush();
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
