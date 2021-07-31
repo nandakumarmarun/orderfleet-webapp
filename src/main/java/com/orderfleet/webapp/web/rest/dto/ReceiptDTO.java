@@ -33,6 +33,7 @@ public class ReceiptDTO {
 	private String employeeName;
 	private String provisionalReceiptNo;
 	private String employeeAlias;
+	private String godownName;
 
 	public ReceiptDTO() {
 		super();
@@ -124,7 +125,7 @@ public class ReceiptDTO {
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
-	
+
 	public double getDetailAmount() {
 		return detailAmount;
 	}
@@ -132,7 +133,7 @@ public class ReceiptDTO {
 	public void setDetailAmount(double detailAmount) {
 		this.detailAmount = detailAmount;
 	}
-	
+
 	public Long getDetailId() {
 		return detailId;
 	}
@@ -275,6 +276,14 @@ public class ReceiptDTO {
 
 	public void setEmployeeAlias(String employeeAlias) {
 		this.employeeAlias = employeeAlias;
+	}
+
+	public String getGodownName() {
+		return godownName;
+	}
+
+	public void setGodownName(String godownName) {
+		this.godownName = godownName;
 	}
 
 	@Override

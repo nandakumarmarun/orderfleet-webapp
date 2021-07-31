@@ -56,6 +56,7 @@ import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.SalesLedger;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
@@ -1352,6 +1353,8 @@ public class TransactionResource {
 			List<AccountProfile> accountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(accountProfileIds);
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+			List<UserStockLocation> userStockLocations = userStockLocationRepository
+					.findAllByCompanyPid(company.getPid());
 			List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByAccountingVoucherHeaderPidIn(avhPids);
 
@@ -1361,6 +1364,9 @@ public class TransactionResource {
 
 				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[10].toString()))
 						.findAny();
+
+				Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
+						.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
 
 				Optional<Document> opDocument = documents.stream()
 						.filter(doc -> doc.getId() == Long.parseLong(obj[3].toString())).findAny();
@@ -1384,6 +1390,9 @@ public class TransactionResource {
 						ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherDetail);
 						receiptDTO.setAccountingVoucherHeaderDTO(avdObjectToDto(obj, opUser.get(), opDocument.get(),
 								opEmployeeProfile.get(), opExe.get(), opAccPro.get(), avDetails));
+						if (opUserStockLocation.isPresent()) {
+							receiptDTO.setGodownName(opUserStockLocation.get().getStockLocation().getName());
+						}
 						receiptDTOs.add(receiptDTO);
 					} else {
 						for (AccountingVoucherAllocation accountingVoucherAllocation : accountingVoucherDetail
@@ -1395,6 +1404,9 @@ public class TransactionResource {
 							receiptDTO.setNarrationMessage(
 									accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
 							receiptDTO.setProvisionalReceiptNo(accountingVoucherDetail.getProvisionalReceiptNo());
+							if (opUserStockLocation.isPresent()) {
+								receiptDTO.setGodownName(opUserStockLocation.get().getStockLocation().getName());
+							}
 							receiptDTOs.add(receiptDTO);
 						}
 					}
