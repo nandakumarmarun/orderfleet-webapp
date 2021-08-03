@@ -44,6 +44,7 @@ public class SalesOrderDTO {
 	private InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
 	private List<GstLedgerDTO> gstLedgerDtos;
 	private String activityRemarks;
+	private String godownName;
 
 	public SalesOrderDTO() {
 		super();
@@ -155,6 +156,14 @@ public class SalesOrderDTO {
 
 	public void setVatLedgerDTOs(List<VatLedgerDTO> vatLedgerDTOs) {
 		this.vatLedgerDTOs = vatLedgerDTOs;
+	}
+
+	public String getGodownName() {
+		return godownName;
+	}
+
+	public void setGodownName(String godownName) {
+		this.godownName = godownName;
 	}
 
 	public String getInventoryVoucherHeaderPid() {

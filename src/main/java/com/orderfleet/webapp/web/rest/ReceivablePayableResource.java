@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -85,7 +86,7 @@ public class ReceivablePayableResource {
 	@GetMapping("/receivable-payables/load")
 	public ResponseEntity<Map<String, List<ReceivablePayableDTO>>> receivablePayableReport(
 			@RequestParam String accountPid, @RequestParam("filterBy") String filterBy, @RequestParam String fromDate,
-			@RequestParam String toDate) {
+			@RequestParam String toDate, @RequestParam String billedDueDateFilter) {
 		log.debug("REST request to get all receivablePayable");
 
 		List<ReceivablePayableDTO> receivablePayableDTOs = null;
@@ -99,26 +100,90 @@ public class ReceivablePayableResource {
 //		}
 
 		if (filterBy.equals("TODAY")) {
-			receivablePayableDTOs = getFilterData(accountPid, LocalDate.now(), LocalDate.now());
+
+			receivablePayableDTOs = getFilterData(accountPid, LocalDate.now(), LocalDate.now(), billedDueDateFilter);
+
 		} else if (filterBy.equals("YESTERDAY")) {
+
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			receivablePayableDTOs = getFilterData(accountPid, yeasterday, yeasterday);
+			receivablePayableDTOs = getFilterData(accountPid, yeasterday, yeasterday, billedDueDateFilter);
+
 		} else if (filterBy.equals("WTD")) {
+
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			receivablePayableDTOs = getFilterData(accountPid, weekStartDate, LocalDate.now());
+			receivablePayableDTOs = getFilterData(accountPid, weekStartDate, LocalDate.now(), billedDueDateFilter);
+
 		} else if (filterBy.equals("MTD")) {
+
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			receivablePayableDTOs = getFilterData(accountPid, monthStartDate, LocalDate.now());
+			receivablePayableDTOs = getFilterData(accountPid, monthStartDate, LocalDate.now(), billedDueDateFilter);
+
 		} else if (filterBy.equals("CUSTOM")) {
+
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-			receivablePayableDTOs = getFilterData(accountPid, fromDateTime, toFateTime);
+			receivablePayableDTOs = getFilterData(accountPid, fromDateTime, toFateTime, billedDueDateFilter);
+
 		} else if (filterBy.equals("SINGLE")) {
+
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			receivablePayableDTOs = getFilterData(accountPid, fromDateTime, fromDateTime);
+			receivablePayableDTOs = getFilterData(accountPid, fromDateTime, fromDateTime, billedDueDateFilter);
+
+		} else if (filterBy.equals("0TO15DAYS")) {
+
+			LocalDate tDate = LocalDate.now();
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivablePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("16TO30DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(16);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivablePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("31TO45DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(31);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivablePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("46TO60DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(46);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivablePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("61TO75DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(61);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivablePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("75TO90DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(76);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivablePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
 		}
 
 		Map<String, List<ReceivablePayableDTO>> result = receivablePayableDTOs.parallelStream()
@@ -126,12 +191,14 @@ public class ReceivablePayableResource {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-	private List<ReceivablePayableDTO> getFilterData(String accountPid, LocalDate fromDate, LocalDate toDate) {
+	private List<ReceivablePayableDTO> getFilterData(String accountPid, LocalDate fromDate, LocalDate toDate,
+			String billedDueDateFilter) {
 
 		/*
 		 * LocalDateTime fromDate = fDate.atTime(0, 0); LocalDateTime toDate =
 		 * tDate.atTime(23, 59);
 		 */
+		log.info("From Date  ====> " + fromDate + "\t To Date ====>" + toDate);
 
 		List<ReceivablePayableDTO> receivablePayableDTOs = null;
 
@@ -152,7 +219,8 @@ public class ReceivablePayableResource {
 	@RequestMapping(value = "/receivable-payables/download-receivalbes-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public void downloadProductProfileXls(@RequestParam String accountPid, @RequestParam String filterBy,
-			@RequestParam String fromDate, @RequestParam String toDate, HttpServletResponse response) {
+			@RequestParam String fromDate, @RequestParam String toDate, @RequestParam String billedDueDateFilter,
+			HttpServletResponse response) {
 		List<ReceivablePayableDTO> receivalbePayableDTOs = new ArrayList<ReceivablePayableDTO>();
 
 //		if (accountPid.equals("no")) {
@@ -162,26 +230,90 @@ public class ReceivablePayableResource {
 //		}
 
 		if (filterBy.equals("TODAY")) {
-			receivalbePayableDTOs = getFilterData(accountPid, LocalDate.now(), LocalDate.now());
+
+			receivalbePayableDTOs = getFilterData(accountPid, LocalDate.now(), LocalDate.now(), billedDueDateFilter);
+
 		} else if (filterBy.equals("YESTERDAY")) {
+
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			receivalbePayableDTOs = getFilterData(accountPid, yeasterday, yeasterday);
+			receivalbePayableDTOs = getFilterData(accountPid, yeasterday, yeasterday, billedDueDateFilter);
+
 		} else if (filterBy.equals("WTD")) {
+
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			receivalbePayableDTOs = getFilterData(accountPid, weekStartDate, LocalDate.now());
+			receivalbePayableDTOs = getFilterData(accountPid, weekStartDate, LocalDate.now(), billedDueDateFilter);
+
 		} else if (filterBy.equals("MTD")) {
+
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			receivalbePayableDTOs = getFilterData(accountPid, monthStartDate, LocalDate.now());
+			receivalbePayableDTOs = getFilterData(accountPid, monthStartDate, LocalDate.now(), billedDueDateFilter);
+
 		} else if (filterBy.equals("CUSTOM")) {
+
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-			receivalbePayableDTOs = getFilterData(accountPid, fromDateTime, toFateTime);
+			receivalbePayableDTOs = getFilterData(accountPid, fromDateTime, toFateTime, billedDueDateFilter);
+
 		} else if (filterBy.equals("SINGLE")) {
+
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			receivalbePayableDTOs = getFilterData(accountPid, fromDateTime, fromDateTime);
+			receivalbePayableDTOs = getFilterData(accountPid, fromDateTime, fromDateTime, billedDueDateFilter);
+
+		} else if (filterBy.equals("0TO15DAYS")) {
+
+			LocalDate tDate = LocalDate.now();
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivalbePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("16TO30DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(30);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivalbePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("31TO45DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(45);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivalbePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("46TO60DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(60);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivalbePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("61TO75DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(75);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivalbePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
+		} else if (filterBy.equals("75TO90DAYS")) {
+
+			LocalDate tDate1 = LocalDate.now();
+			Period days = Period.ofDays(90);
+			LocalDate tDate = tDate1.minus(days);
+			Period days_15 = Period.ofDays(15);
+			LocalDate fDate = tDate.minus(days_15);
+			receivalbePayableDTOs = getFilterData(accountPid, fDate, tDate, billedDueDateFilter);
+
 		}
 
 		buildExcelDocument(receivalbePayableDTOs, response);

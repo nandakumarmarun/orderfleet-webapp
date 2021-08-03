@@ -243,10 +243,10 @@ public class ReceivablePayableDTO {
 		this.receivablePayableId = receivablePayableId;
 	}
 
-	@Override
-	public String toString() {
-		return "ReceivablePayableDTO [accountName=" + accountName + ", receivablePayableType=" + receivablePayableType
-				+ ", closingBalance=" + closingBalance + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "ReceivablePayableDTO [accountName=" + accountName + ", receivablePayableType=" + receivablePayableType
+//				+ ", closingBalance=" + closingBalance + "]";
+//	}
 
 }

@@ -654,6 +654,8 @@ public class TransactionResource {
 			List<AccountProfile> supplierAccountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(supplierAccountProfileIds);
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+			List<UserStockLocation> userStockLocations = userStockLocationRepository
+					.findAllByCompanyPid(company.getPid());
 			List<PriceLevel> priceLevels = priceLevelRepository.findAllByCompanyIdAndIdsIn(priceLeveIds);
 			List<OrderStatus> orderStatusList = orderStatusRepository.findAllByCompanyIdAndIdsIn(orderStatusIds);
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
@@ -685,6 +687,10 @@ public class TransactionResource {
 							.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
 					log.info("supplier account empty :" + !opSupAccPro.isPresent());
 					PriceLevel priceLevel = null;
+
+					Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
+							.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
+
 					if (obj[18] != null) {
 						Optional<PriceLevel> opPriceLevel = priceLevels.stream()
 								.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
@@ -706,6 +712,9 @@ public class TransactionResource {
 							opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
 							orderStatus);
 
+					if (opUserStockLocation.isPresent()) {
+						salesOrderDTO.setGodownName(opUserStockLocation.get().getStockLocation().getName());
+					}
 					salesOrderDTO.setAccountProfileDTO(
 							accountProfileMapper.accountProfileToAccountProfileDTO(opRecAccPro.get()));
 
@@ -895,6 +904,8 @@ public class TransactionResource {
 			List<AccountProfile> supplierAccountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(supplierAccountProfileIds);
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+			List<UserStockLocation> userStockLocations1 = userStockLocationRepository
+					.findAllByCompanyPid(company.getPid());
 			List<PriceLevel> priceLevels = priceLevelRepository.findAllByCompanyIdAndIdsIn(priceLeveIds);
 			List<OrderStatus> orderStatusList = orderStatusRepository.findAllByCompanyIdAndIdsIn(orderStatusIds);
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
@@ -922,6 +933,9 @@ public class TransactionResource {
 				Optional<AccountProfile> opSupAccPro = supplierAccountProfiles.stream()
 						.filter(a -> a.getId() == Long.parseLong(obj[17].toString())).findAny();
 
+				Optional<UserStockLocation> opUserStockLocation = userStockLocations1.stream()
+						.filter(us -> us.getUser().getPid().equals(opUser.get().getPid())).findAny();
+
 				PriceLevel priceLevel = null;
 				if (obj[18] != null) {
 
@@ -943,6 +957,10 @@ public class TransactionResource {
 				SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
 						opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
 						orderStatus);
+				
+				if (opUserStockLocation.isPresent()) {
+					salesOrderDTO.setGodownName(opUserStockLocation.get().getStockLocation().getName());
+				}
 
 				salesOrderDTO.setAccountProfileDTO(
 						accountProfileMapper.accountProfileToAccountProfileDTO(opRecAccPro.get()));

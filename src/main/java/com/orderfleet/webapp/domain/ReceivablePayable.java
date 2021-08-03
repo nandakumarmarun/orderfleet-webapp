@@ -76,13 +76,12 @@ public class ReceivablePayable implements Serializable {
 
 	@Column(name = "receivable_payable_id")
 	private String receivablePayableId;
-	
+
 	@Column(name = "receivable_payable_code")
 	private String receivablePayableCode;
 
 	@Column(name = "BILL_OVER_DUE")
 	private Long billOverDue;
-	
 
 	@ManyToOne
 	private Company company;
@@ -250,7 +249,6 @@ public class ReceivablePayable implements Serializable {
 	public void setReceivablePayableId(String receivablePayableId) {
 		this.receivablePayableId = receivablePayableId;
 	}
-	
 
 	public String getReceivablePayableCode() {
 		return receivablePayableCode;

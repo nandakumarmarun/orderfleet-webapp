@@ -48,6 +48,12 @@
 									<option value="MTD">MTD</option>
 									<option value="SINGLE">Single Date</option>
 									<option value="CUSTOM">CUSTOM</option>
+									<option value="0TO15DAYS">0-15 DAYS</option>
+									<option value="16TO30DAYS">16-30 DAYS</option>
+									<option value="31TO45DAYS">31-45 DAYS</option>
+									<option value="46TO60DAYS">46-60 DAYS</option>
+									<option value="61TO75DAYS">61-75 DAYS</option>
+									<option value="75TO90DAYS">76-90 DAYS</option>
 								</select>
 							</div>
 							<div class="col-sm-2 hide custom_date1">
@@ -73,6 +79,12 @@
 									</div>
 								</div>
 							</div>
+							<div class="col-sm-2">
+								<br /> <select class="form-control" id="dbBilledDueDates">
+									<option value="BILLEDDATE">BILLED DATE</option>
+									<option value="DUE DATE">DUE DATE</option>
+								</select>
+							</div>
 							<div class="col-sm-1">
 								<br />
 								<button type="button" class="btn btn-info"
@@ -87,6 +99,16 @@
 							</div>
 						</div>
 					</form>
+				</div>
+				<hr />
+				<div class="col-md-12 col-sm-12 clearfix"
+					style="font-size: 14px; color: black;">
+					<div class="col-sm-5">
+						<label>Receivable Total : </label> <label id="lblReceivableTotal">0</label>
+					</div>
+					<div class="col-sm-5">
+						<label>Payable Total : </label> <label id="lblPayableTotal">0</label>
+					</div>
 				</div>
 			</div>
 			<div class="table-responsive">

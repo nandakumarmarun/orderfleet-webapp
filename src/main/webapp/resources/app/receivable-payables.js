@@ -78,14 +78,20 @@ if (!this.ReceivablePayable) {
 						accountPid : $('#dbAccount').val(),
 						filterBy : $("#dbDateSearch").val(),
 						fromDate : $("#txtFromDate").val(),
-						toDate : $("#txtToDate").val()
+						toDate : $("#txtToDate").val(),
+						billedDueDateFilter : $("#dbBilledDueDates").val()
 					},
 					success : function(receivablePayableMap) {
+
+						var receivableTotal = 0;
+						var payableTotal = 0;
 						$('#tBodyReceivablePayable').html("");
 						if (jQuery.isEmptyObject(receivablePayableMap)) {
 							$('#tBodyReceivablePayable')
 									.html(
 											"<tr><td colspan='4' align='center'>No data available</td></tr>");
+							$('#lblReceivableTotal').text('0');
+							$('#lblPayableTotal').text('0');
 							return;
 						}
 						$
@@ -102,7 +108,7 @@ if (!this.ReceivablePayable) {
 																	+ "</td><td id='bAmount"
 																	+ accountPid
 																	+ "' align='right' style='font-weight: bold;'>"
-																	+"</td><td>"
+																	+ "</td><td>"
 																	+ receivablePayable1.accountType
 																	+ "</td><td>"
 																	+ receivablePayable1.accountAddress
@@ -130,6 +136,8 @@ if (!this.ReceivablePayable) {
 																	receivablePayable) {
 																if (receivablePayable.receivablePayableType == "Receivable") {
 																	receivablesBlanaceAmount += receivablePayable.referenceDocumentBalanceAmount;
+
+																	receivableTotal += receivablesBlanaceAmount;
 																	$(
 																			'#tblReceivable'
 																					+ accountPid)
@@ -137,14 +145,18 @@ if (!this.ReceivablePayable) {
 																					"<tr><td>"
 																							+ receivablePayable.referenceDocumentNumber
 																							+ "</td><td>"
-																							+ receivablePayable.referenceDocumentAmount.toFixed(2)
+																							+ receivablePayable.referenceDocumentAmount
+																									.toFixed(2)
 																							+ "</td><td align='right'>"
-																							+ receivablePayable.referenceDocumentBalanceAmount.toFixed(2)
+																							+ receivablePayable.referenceDocumentBalanceAmount
+																									.toFixed(2)
 																							+ "</td><td align='right'>"
 																							+ receivablePayable.referenceDocumentDate
 																							+ "</td></tr>");
 																} else if (receivablePayable.receivablePayableType == "Payable") {
 																	payableBlanaceAmount += receivablePayable.referenceDocumentBalanceAmount;
+
+																	payableTotal += payableBlanaceAmount;
 																	$(
 																			'#tblPayable'
 																					+ accountPid)
@@ -152,23 +164,31 @@ if (!this.ReceivablePayable) {
 																					"<tr><td>"
 																							+ receivablePayable.referenceDocumentNumber
 																							+ "</td><td>"
-																							+ receivablePayable.referenceDocumentAmount.toFixed(2)
+																							+ receivablePayable.referenceDocumentAmount
+																									.toFixed(2)
 																							+ "</td><td align='right'>"
-																							+ receivablePayable.referenceDocumentBalanceAmount.toFixed(2)
+																							+ receivablePayable.referenceDocumentBalanceAmount
+																									.toFixed(2)
 																							+ "</td><td align='right'>"
 																							+ receivablePayable.referenceDocumentDate
 																							+ "</td></tr>");
 																}
 															});
 											$('#rbAmount' + accountPid).text(
-													receivablesBlanaceAmount.toFixed(2));
+													receivablesBlanaceAmount
+															.toFixed(2));
 											$('#pbAmount' + accountPid).text(
-													payableBlanaceAmount.toFixed(2));
-											var blanaceAmount = (receivablesBlanaceAmount
-													- payableBlanaceAmount).toFixed(2);
+													payableBlanaceAmount
+															.toFixed(2));
+											var blanaceAmount = (receivablesBlanaceAmount - payableBlanaceAmount)
+													.toFixed(2);
 											$('#bAmount' + accountPid).text(
 													blanaceAmount);
 										});
+
+						$('#lblReceivableTotal').text(
+								receivableTotal.toFixed(2));
+						$('#lblPayableTotal').text(payableTotal.toFixed(2));
 					}
 				});
 	}
@@ -218,12 +238,14 @@ if (!this.ReceivablePayable) {
 		var filterBy = $("#dbDateSearch").val();
 		var fromDate = $("#txtFromDate").val();
 		var toDate = $("#txtToDate").val();
+		var billedDueDateFilter = $("#dbBilledDueDates").val();
 
 		console.log(status);
 		window.location.href = receivablePayableContextPath
 				+ "/download-receivalbes-xls?accountPid=" + accPid
 				+ "&filterBy=" + filterBy + "&fromDate=" + fromDate
-				+ "&toDate=" + toDate;
+				+ "&toDate=" + toDate + "&billedDueDateFilter="
+				+ billedDueDateFilter;
 	}
 
 	function addErrorAlert(message, key, data) {
