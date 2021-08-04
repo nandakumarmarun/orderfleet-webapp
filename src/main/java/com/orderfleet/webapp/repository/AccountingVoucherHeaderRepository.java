@@ -288,6 +288,10 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("select accVoucher from AccountingVoucherHeader accVoucher LEFT JOIN FETCH accVoucher.accountingVoucherDetails where accVoucher.company.pid = ?2 and accVoucher.documentNumberServer = ?1")
 	AccountingVoucherHeader findOneHeaderByDocumentNumberServerAndCompanyPid(String reference, String companyPid);
 
+	@Query("select avh.id,avh.pid,avh.createdDate,avh.documnetDate,avh.accountProfile.pid,avh.accountProfile.name,avh.document.pid,avh.document.name,avh.totalAmount,avh.documentNumberServer from AccountingVoucherHeader avh where avh.createdBy.login = ?1 and avh.accountProfile.pid = ?2 and and avh.createdDate between ?3 and ?4 Order By avh.createdDate desc")
+	List<Object[]> getCustomerWiseAccountingVoucherHeader(String userLogin, String accountPid, LocalDateTime fromDate,
+			LocalDateTime toDate);
+
 	// @Query("select
 	// inventoryVoucher.id,inventoryVoucher.receiverAccount.id,inventoryVoucher.document.id,inventoryVoucher.documentDate
 	// from InventoryVoucherHeader inventoryVoucher where
