@@ -257,40 +257,40 @@ public class ExecutiveTaskSubmissionController {
 						return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
 					}
 
-					if (documentNumberLocalPrefix != null) {
-						log.info("documentNumberLocal " + documentNumberLocal);
-						log.info("documentNumberLocalPrefix " + documentNumberLocalPrefix);
-						String[] splitDocumentNumberLocal = documentNumberLocal.split(documentNumberLocalPrefix);
-						log.info("splitDocumentNumberLocal 0 -- " + splitDocumentNumberLocal[0]);
-						log.info("splitDocumentNumberLocal 1 -- " + splitDocumentNumberLocal[1]);
-						long documentNumberLocalCount = Long.parseLong(splitDocumentNumberLocal[1].toString());
-						for (Object[] obj : objectArray) {
-							String dbDocumentNumberLocalPrefix = null;
-							for (VoucherNumberGenerator voucherNumberGenerator : voucherNumberGeneratorList) {
-								if (voucherNumberGenerator.getDocument().getPid().equals(obj[1].toString())) {
-									dbDocumentNumberLocalPrefix = voucherNumberGenerator.getPrefix();
-								}
-							}
-							if (dbDocumentNumberLocalPrefix != null) {
-								String[] dbDocumentNumberLocal = obj[0].toString().split(dbDocumentNumberLocalPrefix);
-								long dbDocumentNumberLocalCount = Long
-										.parseLong(dbDocumentNumberLocal[1].toString().replaceAll("\\s", ""));
-								if ((documentNumberLocalPrefix.equals(dbDocumentNumberLocalPrefix))
-										&& ((dbDocumentNumberLocalCount + 1) != documentNumberLocalCount)) {
-									log.debug("----------" + documentNumberLocal
-											+ "  Saving to Server Failed---------Not in Sequential Order");
-									TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
-									taskSubmissionResponse
-											.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
-									taskSubmissionResponse.setMessage(LocalDateTime.now() + " " + documentNumberLocal
-											+ " Not in Sequential Order ");
-									return new ResponseEntity<>(taskSubmissionResponse,
-											HttpStatus.INTERNAL_SERVER_ERROR);
-								}
-							}
-						}
-						log.debug("----------" + documentNumberLocal + " Saving to Server Success---------");
-					}
+//					if (documentNumberLocalPrefix != null) {
+//						log.info("documentNumberLocal " + documentNumberLocal);
+//						log.info("documentNumberLocalPrefix " + documentNumberLocalPrefix);
+//						String[] splitDocumentNumberLocal = documentNumberLocal.split(documentNumberLocalPrefix);
+//						log.info("splitDocumentNumberLocal 0 -- " + splitDocumentNumberLocal[0]);
+//						log.info("splitDocumentNumberLocal 1 -- " + splitDocumentNumberLocal[1]);
+//						long documentNumberLocalCount = Long.parseLong(splitDocumentNumberLocal[1].toString());
+//						for (Object[] obj : objectArray) {
+//							String dbDocumentNumberLocalPrefix = null;
+//							for (VoucherNumberGenerator voucherNumberGenerator : voucherNumberGeneratorList) {
+//								if (voucherNumberGenerator.getDocument().getPid().equals(obj[1].toString())) {
+//									dbDocumentNumberLocalPrefix = voucherNumberGenerator.getPrefix();
+//								}
+//							}
+//							if (dbDocumentNumberLocalPrefix != null) {
+//								String[] dbDocumentNumberLocal = obj[0].toString().split(dbDocumentNumberLocalPrefix);
+//								long dbDocumentNumberLocalCount = Long
+//										.parseLong(dbDocumentNumberLocal[1].toString().replaceAll("\\s", ""));
+//								if ((documentNumberLocalPrefix.equals(dbDocumentNumberLocalPrefix))
+//										&& ((dbDocumentNumberLocalCount + 1) != documentNumberLocalCount)) {
+//									log.debug("----------" + documentNumberLocal
+//											+ "  Saving to Server Failed---------Not in Sequential Order");
+//									TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
+//									taskSubmissionResponse
+//											.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
+//									taskSubmissionResponse.setMessage(LocalDateTime.now() + " " + documentNumberLocal
+//											+ " Not in Sequential Order ");
+//									return new ResponseEntity<>(taskSubmissionResponse,
+//											HttpStatus.INTERNAL_SERVER_ERROR);
+//								}
+//							}
+//						}
+//						log.debug("----------" + documentNumberLocal + " Saving to Server Success---------");
+//					}
 				}
 			}
 		}

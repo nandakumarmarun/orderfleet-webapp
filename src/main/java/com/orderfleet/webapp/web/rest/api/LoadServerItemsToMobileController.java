@@ -40,6 +40,7 @@ import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.DocumentType;
+import com.orderfleet.webapp.domain.enums.PaymentMode;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.AttendanceRepository;
@@ -68,6 +69,7 @@ import com.orderfleet.webapp.web.rest.api.dto.LoadServerExeTaskDTO;
 import com.orderfleet.webapp.web.rest.api.dto.LoadServerSentItemDTO;
 import com.orderfleet.webapp.web.rest.api.dto.SalesOrderAllocationDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.AccountingVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
@@ -862,7 +864,7 @@ public class LoadServerItemsToMobileController {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		log.info("Inventory Voucher UserLogin= {} Account Pid= {}, FromDate={}, toDate ={}", userLogin, accountPid,
+		log.info("Accounting Voucher UserLogin= {} Account Pid= {}, FromDate={}, toDate ={}", userLogin, accountPid,
 				fromDate, toDate);
 		List<Object[]> accountingVouchersHeaders = accountingVoucherHeaderRepository
 				.getCustomerWiseAccountingVoucherHeader(userLogin, accountPid, fromDate, toDate);
@@ -871,6 +873,7 @@ public class LoadServerItemsToMobileController {
 			AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
 			LocalDateTime createddate = null;
 
+			accountingVoucherHeaderDTO.setPid(obj[1].toString());
 			accountingVoucherHeaderDTO.setCreatedDate(LocalDateTime.parse(obj[2].toString()));
 			accountingVoucherHeaderDTO.setDocumentDate(LocalDateTime.parse(obj[3].toString()));
 			accountingVoucherHeaderDTO.setAccountProfilePid(obj[4].toString());
@@ -880,37 +883,34 @@ public class LoadServerItemsToMobileController {
 			accountingVoucherHeaderDTO.setTotalAmount(Double.parseDouble(obj[8].toString()));
 			accountingVoucherHeaderDTO.setDocumentNumberLocal(obj[9].toString());
 			accountingVoucherHeaderDTO.setDocumentNumberServer(obj[9].toString());
-			
-//			accountingVoucherHeaderDTO.setEmployeeName(avh.getEmployee().getName());
-//			accountingVoucherHeaderDTO.setEmployeePid(avh.getEmployee().getPid());
-//			accountingVoucherHeaderDTO.setPid(avh.getPid());
-			
 
-//			for()
-//				
-//
-//			if (accountingVoucherHeaderDTO.getPid() != null && !accountingVoucherHeaderDTO.getPid().isEmpty()) {
-//				System.out.println(accountingVoucherHeaderDTO.getPid()+"-----inventory Pid");
-//				List<Object[]> inventoryVouchersDetail = inventoryVoucherHeaderRepository
-//						.getCustomerWiseInventoryDetail(accountingVoucherHeaderDTO.getPid());
-//				List<InventoryVoucherDetailDTO> inventoryVoucherDetails = new ArrayList<>();
-//				System.out.println(inventoryVoucherDetails.size()+"-----------------------------------------");
-//				for (Object[] obj1 : inventoryVouchersDetail) {
-//					InventoryVoucherDetailDTO dto = new InventoryVoucherDetailDTO();
-//					dto.setProductName(obj1[0] != null ? obj1[0].toString() : "");
-//					dto.setQuantity(obj1[1] != null ? Double.parseDouble(obj1[1].toString()) : 0.0);
-//					dto.setProductUnitQty(obj1[2] != null ? Double.parseDouble(obj1[2].toString()) : 0.0);
-//					dto.setFreeQuantity(obj1[3] != null ? Double.parseDouble(obj1[3].toString()) : 0.0);
-//					dto.setSellingRate(obj1[4] != null ? Double.parseDouble(obj1[4].toString()) : 0.0);
-//					dto.setTaxPercentage(obj1[5] != null ? Double.parseDouble(obj1[5].toString()) : 0.0);
-//					dto.setDiscountAmount(obj1[6] != null ? Double.parseDouble(obj1[6].toString()) : 0.0);
-//					dto.setDiscountPercentage(obj1[7] != null ? Double.parseDouble(obj1[7].toString()) : 0.0);
-//					dto.setRowTotal(obj1[8] != null ? Double.parseDouble(obj1[8].toString()) : 0.0);
-//					dto.setProductPid(obj1[9] != null ? obj1[9].toString() : "");
-//					inventoryVoucherDetails.add(dto);
-//				}
-//				accountingVoucherHeaderDTO.setInventoryVoucherDetails(inventoryVoucherDetails);
-//			}
+			if (accountingVoucherHeaderDTO.getPid() != null && !accountingVoucherHeaderDTO.getPid().isEmpty()) {
+
+				log.info((accountingVoucherHeaderDTO.getPid() + "-----accounting Pid"));
+
+				List<Object[]> accountingVouchersDetail = accountingVoucherHeaderRepository
+						.getCustomerWiseAccountingDetail(accountingVoucherHeaderDTO.getPid());
+
+				List<AccountingVoucherDetailDTO> accountingVoucherDetails = new ArrayList<>();
+
+				System.out.println(accountingVouchersDetail.size() + "-----------------------------------------");
+
+				for (Object[] obj1 : accountingVouchersDetail) {
+
+					AccountingVoucherDetailDTO dto = new AccountingVoucherDetailDTO();
+					dto.setMode(obj1[0] != null ? PaymentMode.valueOf(obj1[0].toString()) : PaymentMode.Cash);
+					dto.setAmount(obj1[1] != null ? Double.parseDouble(obj1[1].toString()) : 0.0);
+					dto.setByAccountPid(obj1[2] != null ? obj1[2].toString() : "");
+					dto.setByAccountName(obj1[3] != null ? obj1[3].toString() : "");
+					dto.setToAccountPid(obj1[4] != null ? obj1[4].toString() : "");
+					dto.setToAccountName(obj1[5] != null ? obj1[5].toString() : "");
+					dto.setVoucherNumber(obj1[6] != null ? obj1[6].toString() : "");
+					dto.setVoucherDate(LocalDateTime.parse(obj1[7].toString()));
+					dto.setReferenceNumber(obj1[8] != null ? obj1[8].toString() : "");
+					accountingVoucherDetails.add(dto);
+				}
+				accountingVoucherHeaderDTO.setAccountingVoucherDetails(accountingVoucherDetails);
+			}
 			accountingVoucherHeaderDTOs.add(accountingVoucherHeaderDTO);
 		}
 		log.info("Accounting Voucher Size= " + accountingVoucherHeaderDTOs.size());
