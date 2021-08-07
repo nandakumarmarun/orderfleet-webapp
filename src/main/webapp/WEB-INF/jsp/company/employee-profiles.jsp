@@ -54,6 +54,8 @@
 						<th>Phone</th>
 						<th>Email</th>
 						<th>Address</th>
+						<th>OrgEmpId</th>
+						
 						<!-- <th>Profile Image</th> -->
 						<th>Status</th>
 						<th>Actions</th>
@@ -69,6 +71,8 @@
 							<td>${employeeProfile.phone == null ? "" : employeeProfile.phone}</td>
 							<td>${employeeProfile.email == null ? "" : employeeProfile.email}</td>
 							<td>${employeeProfile.address == null ? "" : employeeProfile.address}</td>
+							<td>${employeeProfile.orgEmpId == null ? "" : employeeProfile.orgEmpId}</td>
+							
 							<%-- <td>${employeeProfile.encodedBase64Image}</td> --%>
 							<td><span class="label ${employeeProfile.activated? 'label-success':'label-danger' }"
 							onclick="EmployeeProfile.setActive('${employeeProfile.name}',
@@ -135,6 +139,11 @@
 									<label class="control-label" for="field_address">Address</label>
 									<textarea class="form-control" name="address" maxlength="500"
 										id="field_address" placeholder="Address"></textarea>
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="field_org_emp_id">orgEmpId</label>
+									<textarea class="form-control" name="orgEmpId" maxlength="500"
+										id="field_org_emp_id" placeholder="orgEmpId"></textarea>
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="field_designation">Designation</label>
@@ -245,6 +254,10 @@
 										<tr>
 											<td>Address</td>
 											<td><span id="lbl_address"></span></td>
+										</tr>
+										<tr>
+											<td>Address</td>
+											<td><span id="lbl_org_emp_id"></span></td>
 										</tr>
 									</table>
 									<!-- <table class="table  table-striped table-bordered">

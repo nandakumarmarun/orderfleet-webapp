@@ -96,7 +96,8 @@ public class EmployeeProfileServiceImpl implements EmployeeProfileService {
 			employeeProfile.setEmail(employeeProfileDTO.getEmail());
 			employeeProfile.setPhone(employeeProfileDTO.getPhone());
 			employeeProfile.setAddress(employeeProfileDTO.getAddress());
-			employeeProfile.setProfileImage(employeeProfileDTO.getProfileImage());
+			employeeProfile.setOrgEmpId(employeeProfileDTO.getOrgEmpId());
+            employeeProfile.setProfileImage(employeeProfileDTO.getProfileImage());
 			employeeProfile = employeeProfileRepository.save(employeeProfile);
 			return employeeProfileMapper.employeeProfileToEmployeeProfileDTO(employeeProfile);
 		}).orElse(null);

@@ -1,54 +1,25 @@
-package com.orderfleet.webapp.web.rest.dto;
+package com.orderfleet.webapp.web.vendor.excelPravesh.dto;
 
-import java.util.Base64;
 import java.util.Objects;
 
-import javax.persistence.Lob;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-/**
- * A DTO for the EmployeeProfile entity.
- * 
- * @author Shaheer
- * @since June 06, 2016
- */
-public class EmployeeProfileDTO {
+public class EmployeeProfileExcelDTO {
 
 	private String pid;
 
-	@NotNull
-	@Size(min = 1, max = 255)
 	private String name;
 
-	@Size(max = 55)
-	private String alias;
-	
-	private String referenceId;
+	private String code;
 
-	@NotNull
 	private String address;
 
-	@Size(max = 20)
 	private String phone;
 
-	@Size(max = 100)
 	private String email;
 
-	@Size(max = 5000000)
-	@Lob
-	private byte[] profileImage;
-
-	private String profileImageContentType;
-
-	private String encodedBase64Image;
-
-	@NotNull
 	private String designationPid;
 
 	private String designationName;
 
-	@NotNull
 	private String departmentPid;
 
 	private String departmentName;
@@ -60,16 +31,6 @@ public class EmployeeProfileDTO {
 	private String userPid;
 
 	private boolean activated;
-	
-	private String orgEmpId;
-
-	public boolean getActivated() {
-		return activated;
-	}
-
-	public void setActivated(boolean activated) {
-		this.activated = activated;
-	}
 
 	public String getPid() {
 		return pid;
@@ -83,32 +44,16 @@ public class EmployeeProfileDTO {
 		return name;
 	}
 
-	public String getOrgEmpId() {
-		return orgEmpId;
-	}
-
-	public void setOrgEmpId(String orgEmpId) {
-		this.orgEmpId = orgEmpId;
-	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public String getAlias() {
-		return alias;
+	public String getCode() {
+		return code;
 	}
 
-	public void setAlias(String alias) {
-		this.alias = alias;
-	}
-
-	public String getReferenceId() {
-		return referenceId;
-	}
-
-	public void setReferenceId(String referenceId) {
-		this.referenceId = referenceId;
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getAddress() {
@@ -135,31 +80,6 @@ public class EmployeeProfileDTO {
 		this.email = email;
 	}
 
-	public byte[] getProfileImage() {
-		return profileImage;
-	}
-
-	public void setProfileImage(byte[] profileImage) {
-		this.profileImage = profileImage;
-	}
-
-	public String getProfileImageContentType() {
-		return profileImageContentType;
-	}
-
-	public void setProfileImageContentType(String profileImageContentType) {
-		this.profileImageContentType = profileImageContentType;
-	}
-
-	public String getEncodedBase64Image() {
-		return encodedBase64Image;
-	}
-
-	public void setEncodedBase64Image(byte[] image) {
-		String encodedImage = Base64.getEncoder().encodeToString(image);
-		this.encodedBase64Image = encodedImage;
-	}
-
 	public String getDesignationPid() {
 		return designationPid;
 	}
@@ -168,20 +88,20 @@ public class EmployeeProfileDTO {
 		this.designationPid = designationPid;
 	}
 
-	public String getDepartmentPid() {
-		return departmentPid;
-	}
-
-	public void setDepartmentPid(String departmentPid) {
-		this.departmentPid = departmentPid;
-	}
-
 	public String getDesignationName() {
 		return designationName;
 	}
 
 	public void setDesignationName(String designationName) {
 		this.designationName = designationName;
+	}
+
+	public String getDepartmentPid() {
+		return departmentPid;
+	}
+
+	public void setDepartmentPid(String departmentPid) {
+		this.departmentPid = departmentPid;
 	}
 
 	public String getDepartmentName() {
@@ -216,6 +136,15 @@ public class EmployeeProfileDTO {
 		this.userPid = userPid;
 	}
 
+	public boolean isActivated() {
+		return activated;
+	}
+
+	public void setActivated(boolean activated) {
+		this.activated = activated;
+	}
+
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -225,9 +154,9 @@ public class EmployeeProfileDTO {
 			return false;
 		}
 
-		EmployeeProfileDTO employeeProfileDTO = (EmployeeProfileDTO) o;
+		EmployeeProfileExcelDTO employeeProfileVendorDTO = (EmployeeProfileExcelDTO) o;
 
-		if (!Objects.equals(pid, employeeProfileDTO.pid))
+		if (!Objects.equals(pid, employeeProfileVendorDTO.pid))
 			return false;
 
 		return true;

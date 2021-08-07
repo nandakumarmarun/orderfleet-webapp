@@ -18,6 +18,9 @@ public class OpeningStockDTO {
 	private LocalDateTime openingStockDate;
 	private boolean activated;
 	private LocalDateTime lastModifiedDate;
+	
+	//private double freeStock;
+	private double reservedStock;
 
 	public boolean getActivated() {
 		return activated;
@@ -30,17 +33,29 @@ public class OpeningStockDTO {
 	public OpeningStockDTO() {
 		super();
 	}
+	
+
+	
+
+	
+	public double getReservedStock() {
+		return reservedStock;
+	}
+
+	public void setReservedStock(double reservedStock) {
+		this.reservedStock = reservedStock;
+	}
 
 	public OpeningStockDTO(OpeningStock openingStock) {
 		this(openingStock.getPid(), openingStock.getBatchNumber(), openingStock.getStockLocation().getPid(),
 				openingStock.getStockLocation().getName(), openingStock.getProductProfile().getPid(),
 				openingStock.getProductProfile().getName(), openingStock.getQuantity(), openingStock.getCreatedDate(),
-				openingStock.getOpeningStockDate(), openingStock.getLastModifiedDate());
+				openingStock.getOpeningStockDate(), openingStock.getLastModifiedDate(),openingStock.getReservedStock());
 	}
 
 	public OpeningStockDTO(String pid, String batchNumber, String stockLocationPid, String stockLocationName,
 			String productProfilePid, String productProfileName, double quantity, LocalDateTime createdDate,
-			LocalDateTime openingStockDate, LocalDateTime lastModifiedDate) {
+			LocalDateTime openingStockDate, LocalDateTime lastModifiedDate,double reservedStock) {
 		super();
 		this.pid = pid;
 		this.batchNumber = batchNumber;
@@ -52,6 +67,9 @@ public class OpeningStockDTO {
 		this.createdDate = createdDate;
 		this.openingStockDate = openingStockDate;
 		this.lastModifiedDate = lastModifiedDate;
+		
+	
+		this.reservedStock=reservedStock;
 	}
 
 	public String getPid() {
@@ -161,7 +179,14 @@ public class OpeningStockDTO {
 		return "OpeningStockDTO [pid=" + pid + ", batchNumber=" + batchNumber + ", stockLocationPid=" + stockLocationPid
 				+ ", stockLocationName=" + stockLocationName + ", productProfilePid=" + productProfilePid
 				+ ", productProfileName=" + productProfileName + ", quantity=" + quantity + ", createdDate="
-				+ createdDate + ", openingStockDate=" + openingStockDate + ", activated=" + activated + "]";
+				+ createdDate + ", openingStockDate=" + openingStockDate + ", activated=" + activated
+				+ ", lastModifiedDate=" + lastModifiedDate + ", reservedStock=" + reservedStock + "]";
 	}
+
+	
+
+
+
+	
 
 }

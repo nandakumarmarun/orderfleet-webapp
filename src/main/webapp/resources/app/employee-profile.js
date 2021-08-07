@@ -17,6 +17,7 @@ if (!this.EmployeeProfile) {
 		name : null,
 		alias : null,
 		address : null,
+		orgEmpId:null,
 		phone : null,
 		email : null,
 		designationPid : null,
@@ -175,6 +176,7 @@ if (!this.EmployeeProfile) {
 		employeeProfileModel.name = $('#field_name').val();
 		employeeProfileModel.alias = $('#field_alias').val();
 		employeeProfileModel.address = $('#field_address').val();
+		employeeProfileModel.orgEmpId = $('#field_org_emp_id').val();
 		employeeProfileModel.designationPid = $('#field_designation').val();
 		employeeProfileModel.departmentPid = $('#field_department').val();
 		employeeProfileModel.phone = $('#field_phone').val();
@@ -225,6 +227,8 @@ if (!this.EmployeeProfile) {
 				$('#lbl_phone').text((data.phone == null ? "" : data.phone));
 				$('#lbl_email').text((data.email == null ? "" : data.email));
 				$('#lbl_address').text((data.address == null ? "" : data.address));
+				$('#lbl_org_emp_id').text((data.orgEmpId == null ? "" : data.orgEmpId));
+				
 				if (data.profileImage != null) {
 					$('#profileImageView').attr('src',
 							'data:image/png;base64,' + data.profileImage);
@@ -250,6 +254,9 @@ if (!this.EmployeeProfile) {
 				$('#field_phone').val((data.phone == null ? "" : data.phone));
 				$('#field_email').val((data.email == null ? "" : data.email));
 				$('#field_address').val((data.address == null ? "" : data.address));
+				$('#field_org_emp_id').val((data.orgEmpId == null ? "" : data.orgEmpId));
+
+				
 				if (data.profileImage != null) {
 					$('#previewImage').attr('src',
 							'data:image/png;base64,' + data.profileImage);
@@ -279,11 +286,12 @@ if (!this.EmployeeProfile) {
 		});
 	}
 
-	EmployeeProfile.setActive=function(name,address,desPId,depPid,pid,active){
+	EmployeeProfile.setActive=function(name,address,orgEmpId,desPId,depPid,pid,active){
 		employeeProfileModel.pid=pid;
 		employeeProfileModel.activated=active;
 		employeeProfileModel.name=name;
 		employeeProfileModel.address=address;
+		employeeProfileModel.orgEmpId=orgEmpId;
 		employeeProfileModel.departmentPid=depPid;
 		employeeProfileModel.designationPid=desPId;
 		if(confirm("Are you confirm?")){

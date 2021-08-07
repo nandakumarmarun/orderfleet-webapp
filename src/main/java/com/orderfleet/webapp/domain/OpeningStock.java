@@ -52,6 +52,16 @@ public class OpeningStock implements Serializable {
 
 	@Column(name = "quantity")
 	private double quantity;
+	
+	
+	
+
+	@Column(name = "reserved_stock" , columnDefinition = "double precision DEFAULT 0")
+	private double reservedStock;
+	
+	//@Column(name = "free_stock" , columnDefinition = "double precision DEFAULT 0")
+	///private double freeStock;
+	
 
 	@NotNull
 	@Column(name = "created_date", nullable = false)
@@ -172,12 +182,29 @@ public class OpeningStock implements Serializable {
 	public void setUser(User user) {
 		this.user = user;
 	}
+	
 
+	public double getReservedStock() {
+		return reservedStock;
+	}
+
+	public void setReservedStock(double reservedStock) {
+		this.reservedStock = reservedStock;
+	}
+
+	
 	@Override
 	public String toString() {
 		return "OpeningStock [id=" + id + ", pid=" + pid + ", productProfile=" + productProfile + ", batchNumber="
-				+ batchNumber + ", stockLocation=" + stockLocation + ", quantity=" + quantity + ", createdDate="
-				+ createdDate + ", openingStockDate=" + openingStockDate + ", company=" + company + ", activated="
-				+ activated + "]";
+				+ batchNumber + ", stockLocation=" + stockLocation + ", quantity=" + quantity + ", reservedStock="
+				+ reservedStock + ", createdDate=" + createdDate + ", openingStockDate=" + openingStockDate
+				+ ", company=" + company + ", user=" + user + ", activated=" + activated + ", lastModifiedDate="
+				+ lastModifiedDate + "]";
 	}
+
+	
+
+	
+
+	
 }

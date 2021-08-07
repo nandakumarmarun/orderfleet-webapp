@@ -61,6 +61,9 @@ public class EmployeeProfile implements Serializable, Cloneable {
 	@Column(name = "employee_profile_code")
 	private String employeeProfileCode;
 	
+	@Column(name = "org_emp_Id")
+	private String orgEmpId;
+	
 
 	// id of third party system like rosh
 	@Column(name = "reference_id")
@@ -193,6 +196,16 @@ public class EmployeeProfile implements Serializable, Cloneable {
 	public String getAddress() {
 		return address;
 	}
+	
+	
+
+	public String getOrgEmpId() {
+		return orgEmpId;
+	}
+
+	public void setOrgEmpId(String orgEmpId) {
+		this.orgEmpId = orgEmpId;
+	}
 
 	public void setAddress(String address) {
 		this.address = address;
@@ -312,11 +325,15 @@ public class EmployeeProfile implements Serializable, Cloneable {
 
 	@Override
 	public String toString() {
-		return "EmployeeProfile [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias + ", referenceId="
-				+ referenceId + ", address=" + address + ", phone=" + phone + ", email=" + email + ", createdDate="
-				+ createdDate + ", lastUpdatedDate=" + lastUpdatedDate + ",  company=" + company.getLegalName()
-				+ ", designation=" + designation + ", department=" + department + ", user=" + user + ", activated="
-				+ activated + "]";
+		return "EmployeeProfile [id=" + id + ", pid=" + pid + ", name=" + name + ", alias=" + alias
+				+ ", employeeProfileId=" + employeeProfileId + ", employeeProfileCode=" + employeeProfileCode
+				+ ", orgEmpId=" + orgEmpId + ", referenceId=" + referenceId + ", address=" + address + ", phone="
+				+ phone + ", email=" + email + ", createdDate=" + createdDate + ", lastUpdatedDate=" + lastUpdatedDate
+				+ ", profileImage=" + Arrays.toString(profileImage) + ", profileImageContentType="
+				+ profileImageContentType + ", company=" + company + ", designation=" + designation + ", department="
+				+ department + ", user=" + user + ", activated=" + activated + "]";
 	}
+
+
 
 }

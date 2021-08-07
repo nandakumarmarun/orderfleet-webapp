@@ -67,6 +67,7 @@
 						<th>Batch Number</th>
 						<th>Stock Location</th>
 						<th>Quantity</th>
+						<th>Reserved Stock</th>
 						<th>Opening Stock Date</th>
 						<th>Status</th>
 						<th>Actions</th>
@@ -81,6 +82,7 @@
 							<td>${openingStock.batchNumber}</td>
 							<td>${openingStock.stockLocationName}</td>
 							<td>${openingStock.quantity}</td>
+							<td> ${openingStock.reservedStock}</td>
 							<td><javatime:format
 									value="${openingStock.openingStockDate}" style="MS" /></td>
 							<td><span
