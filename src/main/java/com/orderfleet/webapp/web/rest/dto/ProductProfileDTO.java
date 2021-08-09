@@ -184,10 +184,11 @@ public class ProductProfileDTO {
 	}
 
 	public ProductProfileDTO(String pid, String name, String alias, String description, BigDecimal price, double mrp,
-			String sku, Double unitQty, Double compoundUnitQty, double taxRate, String productCategoryPid, String productCategoryName,
-			String divisionPid, String divisionName, byte[] colorImage, String colorImageContentType, String size,
-			String filesPid, boolean activated, LocalDateTime lastModifiedDate, String defaultLedger,
-			List<TaxMasterDTO> productProfileTaxMasterDTOs, StockAvailabilityStatus stockAvailabilityStatus) {
+			String sku, Double unitQty, Double compoundUnitQty, double taxRate, String productCategoryPid,
+			String productCategoryName, String divisionPid, String divisionName, byte[] colorImage,
+			String colorImageContentType, String size, String filesPid, boolean activated,
+			LocalDateTime lastModifiedDate, String defaultLedger, List<TaxMasterDTO> productProfileTaxMasterDTOs,
+			StockAvailabilityStatus stockAvailabilityStatus) {
 		super();
 		this.pid = pid;
 		this.name = name;

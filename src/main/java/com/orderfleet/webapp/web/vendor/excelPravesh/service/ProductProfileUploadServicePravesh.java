@@ -255,7 +255,7 @@ public class ProductProfileUploadServicePravesh {
 	@Transactional
 	public void saveUpdateProductProfiles(final List<ProductProfileDTO> productProfileDTOs,
 			final SyncOperation syncOperation) {
-		
+
 		log.info("----saveupdateProductProfile-----");
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
@@ -324,9 +324,6 @@ public class ProductProfileUploadServicePravesh {
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
 			/*------------------------------------------------*/
-			productProfile.setFreeStock(ppDto.getFreeStock());
-			productProfile.setReservedStock(ppDto.getReservedStock());
-		
 
 			productProfile.setUnitQty(ppDto.getUnitQty() != null ? ppDto.getUnitQty() : 1.0);
 
@@ -377,7 +374,6 @@ public class ProductProfileUploadServicePravesh {
 		}
 		productProfileRepository.save(saveUpdateProductProfiles);
 	}
-	
 
 	@Transactional
 	public void saveUpdateProductStockLocation(final List<ProductProfileDTO> productProfileDTOs,
@@ -392,7 +388,7 @@ public class ProductProfileUploadServicePravesh {
 
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
 
-		//List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
+		// List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
 
 		for (ProductProfileDTO ppDto : productProfileDTOs) {
 			// check exist by name, only one exist with a name
@@ -402,7 +398,7 @@ public class ProductProfileUploadServicePravesh {
 			if (optionalPP.isPresent()) {
 				productProfile = optionalPP.get();
 
-			   productProfile.setUnitQty(ppDto.getUnitQty());
+				productProfile.setUnitQty(ppDto.getUnitQty());
 
 				saveUpdateProductProfiles.add(productProfile);
 			}
@@ -420,6 +416,7 @@ public class ProductProfileUploadServicePravesh {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
+
 	@Transactional
 	public void saveUpdateProductPrice(final List<ProductProfileDTO> productProfileDTOs,
 			final SyncOperation syncOperation) {
@@ -462,8 +459,7 @@ public class ProductProfileUploadServicePravesh {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
-	
+
 	@Transactional
 	public void saveUpdateProductProfiles(final TPProductProfileCustomDTO productProfileCustomDTO,
 			final SyncOperation syncOperation) {
@@ -522,12 +518,9 @@ public class ProductProfileUploadServicePravesh {
 				productProfile.setTaxRate(ppDto.getTaxRate());
 				productProfile.setSku(ppDto.getSku());
 				productProfile.setActivated(ppDto.getActivated());
-				productProfile.setFreeStock(ppDto.getFreeStock());
-				productProfile.setReservedStock(ppDto.getReservedStock());
-				
-				
-				
-				
+//				productProfile.setFreeStock(ppDto.getFreeStock());
+//				productProfile.setReservedStock(ppDto.getReservedStock());
+
 				if (ppDto.getUnitQty() != null) {
 					productProfile.setUnitQty(ppDto.getUnitQty());
 				}
@@ -698,7 +691,7 @@ public class ProductProfileUploadServicePravesh {
 						openingStock.setCreatedDate(LocalDateTime.now());
 						openingStock.setCompany(company);
 						openingStock.setProductProfile(pp);
-						//openingStock.setFreeStock(osDto.getFreeStock());
+						// openingStock.setFreeStock(osDto.getFreeStock());
 						openingStock.setReservedStock(osDto.getReservedStock());
 
 						if (osDto.getStockLocationName() == null) {
