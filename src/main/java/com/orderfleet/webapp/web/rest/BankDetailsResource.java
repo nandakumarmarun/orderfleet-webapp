@@ -137,9 +137,9 @@ public class BankDetailsResource {
 	@Timed
 	public ResponseEntity<BankDetailsDTO> getBank(@PathVariable String pid) {
 		log.debug("Web request to get BankDetails by pid : {}", pid);
-//		return bankDetailsService.findOneByPid(pid).map(bankDetailsDTO -> new ResponseEntity<>(bankDetailsDTO, HttpStatus.OK))
-//				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-		return null;
+		return bankDetailsService.findOneByPid(pid)
+				.map(bankDetailsDTO -> new ResponseEntity<>(bankDetailsDTO, HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	/**

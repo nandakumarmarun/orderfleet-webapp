@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
@@ -47,6 +48,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.CountryC;
 import com.orderfleet.webapp.domain.DistrictC;
+import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.StateC;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
@@ -54,6 +56,7 @@ import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CounrtyCRepository;
 import com.orderfleet.webapp.repository.DistrictCRepository;
+import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.StateCRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -66,6 +69,7 @@ import com.orderfleet.webapp.service.PriceLevelService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.CountryCDTO;
 import com.orderfleet.webapp.web.rest.dto.DistrictCDTO;
+import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.StateCDTO;
@@ -94,6 +98,9 @@ public class AccountProfileResource {
 
 	@Inject
 	private LocationAccountProfileService locationAccountProfileService;
+
+	@Inject
+	private LocationAccountProfileRepository locationAccountProfileRepository;
 
 	@Inject
 	private EmployeeHierarchyService employeeHierarchyService;
@@ -214,6 +221,7 @@ public class AccountProfileResource {
 		return new ResponseEntity<>(states, HttpStatus.OK);
 
 	}
+
 	@RequestMapping(value = "/accountProfiles/loadDistricts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<DistrictCDTO>> loadDistricts(@RequestParam("stateId") String stateId) {
@@ -560,20 +568,28 @@ public class AccountProfileResource {
 		} else if (deactivate) {
 			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
 		}
-		buildExcelDocument(accountProfileDTOs, response);
+
+		List<String> accountProfilePids = accountProfileDTOs.stream().map(AccountProfileDTO::getPid)
+				.collect(Collectors.toList());
+
+		List<Object[]> locationAccountProfileObjects = locationAccountProfileRepository
+				.findAllLocationObjectsByAccountProfilePids(accountProfilePids);
+
+		buildExcelDocument(accountProfileDTOs, locationAccountProfileObjects, response);
 	}
 
-	private void buildExcelDocument(List<AccountProfileDTO> accountProfileDTOs, HttpServletResponse response) {
+	private void buildExcelDocument(List<AccountProfileDTO> accountProfileDTOs, List<Object[]> locationAccountProfiles,
+			HttpServletResponse response) {
 		log.debug("Downloading Excel report");
 		String excelFileName = "accountProfile" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = { "Name", "Alias", "CustomerId", "Type", "Closing Balance", "Address", "Phone1",
-				"Email1", "WhatsApp No", "Account Status", "GSTIN", "GST Registration Type", "Created Date",
-				"Last Updated Date", "Created By", "Stage", "Status" };
+		String[] headerColumns = { "Name", "Alias", "CustomerId", "Location/Territory", "Type", "Closing Balance",
+				"Address", "Phone1", "Email1", "WhatsApp No", "Account Status", "GSTIN", "GST Registration Type",
+				"Created Date", "Last Updated Date", "Created By", "Stage", "Status" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
-			createReportRows(worksheet, accountProfileDTOs);
+			createReportRows(worksheet, accountProfileDTOs, locationAccountProfiles);
 			// Resize all columns to fit the content size
 			for (int i = 0; i < headerColumns.length; i++) {
 				worksheet.autoSizeColumn(i);
@@ -609,7 +625,8 @@ public class AccountProfileResource {
 		}
 	}
 
-	private void createReportRows(HSSFSheet worksheet, List<AccountProfileDTO> accountProfileDTO) {
+	private void createReportRows(HSSFSheet worksheet, List<AccountProfileDTO> accountProfileDTO,
+			List<Object[]> locationAccountProfiles) {
 		/*
 		 * CreationHelper helps us create instances of various things like DataFormat,
 		 * Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way
@@ -626,30 +643,41 @@ public class AccountProfileResource {
 			row.createCell(0).setCellValue(ap.getName().replace("#13;#10;", " "));
 			row.createCell(1).setCellValue(ap.getAlias());
 			row.createCell(2).setCellValue(ap.getCustomerId());
-			row.createCell(3).setCellValue(ap.getAccountTypeName());
-			row.createCell(4).setCellValue(String.format("%.2f", ap.getClosingBalance()));
-			row.createCell(5).setCellValue(ap.getAddress());
-			row.createCell(6).setCellValue(ap.getPhone1() == null ? "" : ap.getPhone1());
-			row.createCell(7).setCellValue(ap.getEmail1() == null ? "" : ap.getEmail1());
-			row.createCell(8).setCellValue(ap.getWhatsAppNo() == null ? "" : ap.getWhatsAppNo());
-			row.createCell(9).setCellValue(ap.getAccountStatus().toString());
-			row.createCell(10).setCellValue(ap.getTinNo() == null ? "" : ap.getTinNo());
-			row.createCell(11).setCellValue(ap.getGstRegistrationType() == null ? "" : ap.getGstRegistrationType());
+
+			Optional<Object[]> opLap = locationAccountProfiles.stream()
+					.filter(lap -> lap[2].toString().equals(ap.getPid())).findFirst();
+
+			if (opLap.isPresent()) {
+				row.createCell(3).setCellValue(opLap.get()[1].toString());
+			} else {
+				row.createCell(3).setCellValue("");
+			}
+
+			row.createCell(4).setCellValue(ap.getAccountTypeName());
+			row.createCell(5).setCellValue(String.format("%.2f", ap.getClosingBalance()));
+			row.createCell(6).setCellValue(ap.getAddress());
+			row.createCell(7).setCellValue(ap.getPhone1() == null ? "" : ap.getPhone1());
+			row.createCell(8).setCellValue(ap.getEmail1() == null ? "" : ap.getEmail1());
+			row.createCell(9).setCellValue(ap.getWhatsAppNo() == null ? "" : ap.getWhatsAppNo());
+			row.createCell(10).setCellValue(ap.getAccountStatus().toString());
+			row.createCell(11).setCellValue(ap.getTinNo() == null ? "" : ap.getTinNo());
+			row.createCell(12).setCellValue(ap.getGstRegistrationType() == null ? "" : ap.getGstRegistrationType());
 			LocalDateTime ldt = ap.getCreatedDate();
 			if (ldt != null) {
-				row.createCell(12).setCellValue(ldt.format(df));
-			} else {
-				row.createCell(12).setCellValue("");
-			}
-			LocalDateTime lmdt = ap.getLastModifiedDate();
-			if (lmdt != null) {
-				row.createCell(13).setCellValue(lmdt.format(df));
+				row.createCell(13).setCellValue(ldt.format(df));
 			} else {
 				row.createCell(13).setCellValue("");
 			}
-			row.createCell(14).setCellValue(ap.getUserName() == null ? "" : ap.getUserName());
-			row.createCell(15).setCellValue(ap.getLeadToCashStage() == null ? "" : ap.getLeadToCashStage());
-			row.createCell(16).setCellValue(ap.getActivated() ? "Activated" : "Deactivated");
+			LocalDateTime lmdt = ap.getLastModifiedDate();
+			if (lmdt != null) {
+				row.createCell(14).setCellValue(lmdt.format(df));
+			} else {
+				row.createCell(14).setCellValue("");
+			}
+			row.createCell(15).setCellValue(ap.getUserName() == null ? "" : ap.getUserName());
+			row.createCell(16).setCellValue(ap.getLeadToCashStage() == null ? "" : ap.getLeadToCashStage());
+			row.createCell(17).setCellValue(ap.getActivated() ? "Activated" : "Deactivated");
+
 		}
 
 	}

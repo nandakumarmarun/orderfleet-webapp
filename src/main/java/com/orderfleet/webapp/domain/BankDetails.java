@@ -40,27 +40,31 @@ public class BankDetails implements Serializable {
 
 	@Size(min = 1, max = 255)
 	@Column(name = "bank_name", length = 255)
-	private String BankName;
+	private String bankName;
 
 	@Size(max = 255)
-	@Column(name = "account_number", length = 55)
+	@Column(name = "account_number", length = 255)
 	private String accountNumber;
 
 	@Size(max = 255)
-	@Column(name = "account_holder_name", length = 55)
+	@Column(name = "account_holder_name", length = 255)
 	private String accountHolderName;
 
 	@Size(max = 255)
-	@Column(name = "ifsc_code", length = 55)
+	@Column(name = "ifsc_code", length = 255)
 	private String ifscCode;
 
 	@Size(max = 255)
-	@Column(name = "swift_code", length = 55)
+	@Column(name = "swift_code", length = 255)
 	private String swiftCode;
 
 	@Size(max = 255)
-	@Column(name = "phone", length = 55)
+	@Column(name = "phone", length = 255)
 	private String phoneNumber;
+
+	@Size(max = 255)
+	@Column(name = "branch", length = 255)
+	private String branch;
 
 	@ManyToOne
 	@NotNull
@@ -83,11 +87,11 @@ public class BankDetails implements Serializable {
 	}
 
 	public String getBankName() {
-		return BankName;
+		return bankName;
 	}
 
 	public void setBankName(String bankName) {
-		BankName = bankName;
+		this.bankName = bankName;
 	}
 
 	public String getAccountNumber() {
@@ -136,6 +140,14 @@ public class BankDetails implements Serializable {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public String getBranch() {
+		return branch;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
 	}
 
 }

@@ -70,12 +70,17 @@ public class BankDetailsServiceImpl implements BankDetailsService {
 	 * @return the persisted entity
 	 */
 	@Override
-	public BankDetailsDTO update(BankDetailsDTO bankDTO) {
-		log.debug("Request to Update BankDetails : {}", bankDTO);
-		return bankDetailsRepository.findOneByPid(bankDTO.getPid()).map(bankDetails -> {
-//			bankDetails.setName(bankDTO.getName());
-//			bankDetails.setAlias(bankDTO.getAlias());
-//			bankDetails.setDescription(bankDTO.getDescription());
+	public BankDetailsDTO update(BankDetailsDTO bankDetailsDTO) {
+
+		log.debug("Request to Update BankDetails : {}", bankDetailsDTO);
+		return bankDetailsRepository.findOneByPid(bankDetailsDTO.getPid()).map(bankDetails -> {
+			bankDetails.setAccountHolderName(bankDetailsDTO.getAccountHolderName());
+			bankDetails.setAccountNumber(bankDetailsDTO.getAccountNumber());
+			bankDetails.setBankName(bankDetailsDTO.getBankName());
+			bankDetails.setIfscCode(bankDetailsDTO.getIfscCode());
+			bankDetails.setPhoneNumber(bankDetailsDTO.getPhoneNumber());
+			bankDetails.setSwiftCode(bankDetailsDTO.getSwiftCode());
+			bankDetails.setBranch(bankDetailsDTO.getBranch());
 
 			bankDetails = bankDetailsRepository.save(bankDetails);
 			BankDetailsDTO result = bankToBankDetailsDTO(bankDetails);
@@ -197,6 +202,7 @@ public class BankDetailsServiceImpl implements BankDetailsService {
 		bankDetails.setPhoneNumber(bankDetailsDTO.getPhoneNumber());
 		bankDetails.setPid(bankDetailsDTO.getPid());
 		bankDetails.setSwiftCode(bankDetailsDTO.getSwiftCode());
+		bankDetails.setBranch(bankDetailsDTO.getBranch());
 
 		return bankDetails;
 	}
@@ -211,6 +217,7 @@ public class BankDetailsServiceImpl implements BankDetailsService {
 		bankDetailsDTO.setPhoneNumber(bankDetails.getPhoneNumber());
 		bankDetailsDTO.setPid(bankDetails.getPid());
 		bankDetailsDTO.setSwiftCode(bankDetails.getSwiftCode());
+		bankDetailsDTO.setBranch(bankDetails.getBranch());
 
 		return bankDetailsDTO;
 	}

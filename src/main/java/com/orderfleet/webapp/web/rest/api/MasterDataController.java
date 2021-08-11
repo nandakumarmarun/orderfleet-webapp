@@ -57,6 +57,7 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.ActivityGroupService;
 import com.orderfleet.webapp.service.AttendanceStatusSubgroupService;
+import com.orderfleet.webapp.service.BankDetailsService;
 import com.orderfleet.webapp.service.CompetitorProfileService;
 import com.orderfleet.webapp.service.DocumentAccountTypeService;
 import com.orderfleet.webapp.service.DocumentAccountingVoucherColumnService;
@@ -125,6 +126,7 @@ import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
 import com.orderfleet.webapp.web.rest.dto.ActivityGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ActivityStageDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceStatusSubgroupDTO;
+import com.orderfleet.webapp.web.rest.dto.BankDetailsDTO;
 import com.orderfleet.webapp.web.rest.dto.CompetitorProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentAccountTypeDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
@@ -383,6 +385,9 @@ public class MasterDataController {
 	@Inject
 	private StockLocationRepository stockLocationRepository;
 
+	@Inject
+	private BankDetailsService bankDetailsService;
+
 	/**
 	 * GET /account-types : get all accountTypes.
 	 *
@@ -444,6 +449,14 @@ public class MasterDataController {
 		log.debug("REST request to get all location-hierarchies");
 		List<MBLocationHierarchyDTO> locationHierarchyDTOs = locationHierarchyService.findByUserAndActivatedTrue();
 		return ResponseEntity.ok().body(locationHierarchyDTOs);
+	}
+
+	@Timed
+	@GetMapping("/bank-details")
+	public ResponseEntity<List<BankDetailsDTO>> getBankDetails() throws URISyntaxException {
+		log.debug("REST request to get all Bank Details");
+		List<BankDetailsDTO> bankDetailsDtos = bankDetailsService.findAllByCompany();
+		return ResponseEntity.ok().body(bankDetailsDtos);
 	}
 
 	/**

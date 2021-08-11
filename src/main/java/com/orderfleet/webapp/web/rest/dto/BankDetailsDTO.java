@@ -28,7 +28,7 @@ public class BankDetailsDTO {
 
 	private String pid;
 
-	private String BankName;
+	private String bankName;
 
 	private String accountNumber;
 
@@ -41,6 +41,8 @@ public class BankDetailsDTO {
 	private String phoneNumber;
 
 	private String companyPid;
+
+	private String branch;
 
 	public Long getId() {
 		return id;
@@ -59,11 +61,11 @@ public class BankDetailsDTO {
 	}
 
 	public String getBankName() {
-		return BankName;
+		return bankName;
 	}
 
 	public void setBankName(String bankName) {
-		BankName = bankName;
+		this.bankName = bankName;
 	}
 
 	public String getAccountNumber() {
@@ -112,6 +114,14 @@ public class BankDetailsDTO {
 
 	public void setCompanyPid(String companyPid) {
 		this.companyPid = companyPid;
+	}
+
+	public String getBranch() {
+		return branch;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
 	}
 
 }
