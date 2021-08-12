@@ -193,6 +193,7 @@ public class TPAccountProfileManagementService {
 				accountProfile.setImportStatus(true);
 			}
 			accountProfile.setTrimChar(apDto.getTrimChar());
+			accountProfile.setTinNo(apDto.getTinNo());
 			accountProfile.setAlias(apDto.getAlias());
 			if (isValidPhone(apDto.getPhone1())) {
 				accountProfile.setPhone1(apDto.getPhone1());
