@@ -192,6 +192,7 @@ public class TPAccountProfileManagementService {
 				accountProfile.setDataSourceType(DataSourceType.TALLY);
 				accountProfile.setImportStatus(true);
 			}
+			accountProfile.setCustomerId(apDto.getCustomerId());
 			accountProfile.setTrimChar(apDto.getTrimChar());
 			accountProfile.setTinNo(apDto.getTinNo());
 			accountProfile.setAlias(apDto.getAlias());
