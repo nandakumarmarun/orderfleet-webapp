@@ -35,13 +35,15 @@ public class ProductGroupDTO {
 
 	private String imageContentType;
 
+	private String productGroupId;
+
 	@NotNull
 	private boolean activated = true;
 
 	private boolean thirdpartyUpdate;
 
 	private LocalDateTime lastModifiedDate;
-	
+
 	private List<TaxMasterDTO> productGroupTaxMasterDTOs;
 
 	public ProductGroupDTO() {
@@ -61,14 +63,16 @@ public class ProductGroupDTO {
 		this.alias = productGroup.getAlias();
 		this.description = productGroup.getDescription();
 		this.lastModifiedDate = productGroup.getLastModifiedDate();
-		List<TaxMasterDTO>taxMasterDTOs=new ArrayList<>();
-		if(productGroup.getTaxMastersList().isEmpty()){
-			this.productGroupTaxMasterDTOs=taxMasterDTOs;
-		}else{
-			this.productGroupTaxMasterDTOs = productGroup.getTaxMastersList().stream().map(TaxMasterDTO::new).collect(Collectors.toList());
+		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
+		if (productGroup.getTaxMastersList().isEmpty()) {
+			this.productGroupTaxMasterDTOs = taxMasterDTOs;
+		} else {
+			this.productGroupTaxMasterDTOs = productGroup.getTaxMastersList().stream().map(TaxMasterDTO::new)
+					.collect(Collectors.toList());
 		}
+		this.productGroupId = productGroup.getProductGroupId();
 	}
-	
+
 	public ProductGroupDTO(String pid, String name, String alias, String description, LocalDateTime lastModifiedDate) {
 		super();
 		this.pid = pid;
@@ -78,20 +82,20 @@ public class ProductGroupDTO {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
-	public ProductGroupDTO(String pid, String name, String alias, String description, byte[] image, String imageContentType,
-		boolean activated, boolean thirdpartyUpdate, LocalDateTime lastModifiedDate) {
-	super();
-	this.pid = pid;
-	this.name = name;
-	this.alias = alias;
-	this.description = description;
-	this.image = image;
-	this.imageContentType = imageContentType;
-	this.activated = activated;
-	this.thirdpartyUpdate = thirdpartyUpdate;
-	this.lastModifiedDate = lastModifiedDate;
+	public ProductGroupDTO(String pid, String name, String alias, String description, byte[] image,
+			String imageContentType, boolean activated, boolean thirdpartyUpdate, LocalDateTime lastModifiedDate) {
+		super();
+		this.pid = pid;
+		this.name = name;
+		this.alias = alias;
+		this.description = description;
+		this.image = image;
+		this.imageContentType = imageContentType;
+		this.activated = activated;
+		this.thirdpartyUpdate = thirdpartyUpdate;
+		this.lastModifiedDate = lastModifiedDate;
 
-}
+	}
 
 	public String getPid() {
 		return pid;
@@ -149,13 +153,20 @@ public class ProductGroupDTO {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
-	
 	public List<TaxMasterDTO> getProductGroupTaxMasterDTOs() {
 		return productGroupTaxMasterDTOs;
 	}
 
 	public void setProductGroupTaxMasterDTOs(List<TaxMasterDTO> productGroupTaxMasterDTOs) {
 		this.productGroupTaxMasterDTOs = productGroupTaxMasterDTOs;
+	}
+
+	public String getProductGroupId() {
+		return productGroupId;
+	}
+
+	public void setProductGroupId(String productGroupId) {
+		this.productGroupId = productGroupId;
 	}
 
 	@Override
@@ -204,5 +215,4 @@ public class ProductGroupDTO {
 				+ ", productGroupTaxMasterDTOs=" + productGroupTaxMasterDTOs + "]";
 	}
 
-	
 }

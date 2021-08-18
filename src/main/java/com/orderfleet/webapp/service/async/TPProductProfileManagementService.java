@@ -244,6 +244,7 @@ public class TPProductProfileManagementService {
 				productGroup.setCompany(company);
 			}
 			productGroup.setAlias(pgDto.getAlias());
+			productGroup.setProductGroupId(pgDto.getProductGroupId());
 			productGroup.setDescription(pgDto.getDescription());
 			productGroup.setActivated(pgDto.getActivated());
 			saveUpdateProductGroups.add(productGroup);
@@ -322,6 +323,7 @@ public class TPProductProfileManagementService {
 			}
 			productProfile.setName(ppDto.getName());
 			productProfile.setAlias(ppDto.getAlias());
+			productProfile.setProductId(ppDto.getProductId());
 			productProfile.setDescription(ppDto.getDescription());
 			productProfile.setMrp(ppDto.getMrp());
 			productProfile.setTaxRate(ppDto.getTaxRate());

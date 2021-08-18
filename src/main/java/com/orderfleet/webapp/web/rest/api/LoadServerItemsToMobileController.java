@@ -866,8 +866,16 @@ public class LoadServerItemsToMobileController {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		log.info("Accounting Voucher UserLogin= {} Account Pid= {}, FromDate={}, toDate ={}", userLogin, accountPid,
 				fromDate, toDate);
+		List<String> accountPids = new ArrayList<>();
+		if (accountPid != null && !accountPid.equals("")) {
+			accountPids.add(accountPid);
+		} else {
+			accountPids = accountProfileRepository.findAllPidsByCompany();
+		}
+		log.info("Account Profile Size =" + accountPids.size());
 		List<Object[]> accountingVouchersHeaders = accountingVoucherHeaderRepository
-				.getCustomerWiseAccountingVoucherHeader(userLogin, accountPid, fromDate, toDate);
+				.getCustomerWiseAccountingVoucherHeader(userLogin, accountPids, fromDate, toDate);
+		log.info("Accounting Voucher Size :- " + accountingVouchersHeaders.size());
 
 		for (Object[] obj : accountingVouchersHeaders) {
 			AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
@@ -886,14 +894,15 @@ public class LoadServerItemsToMobileController {
 
 			if (accountingVoucherHeaderDTO.getPid() != null && !accountingVoucherHeaderDTO.getPid().isEmpty()) {
 
-				log.info((accountingVoucherHeaderDTO.getPid() + "-----accounting Pid"));
+				// log.info((accountingVoucherHeaderDTO.getPid() + "-----accounting Pid"));
 
 				List<Object[]> accountingVouchersDetail = accountingVoucherHeaderRepository
 						.getCustomerWiseAccountingDetail(accountingVoucherHeaderDTO.getPid());
 
 				List<AccountingVoucherDetailDTO> accountingVoucherDetails = new ArrayList<>();
 
-				System.out.println(accountingVouchersDetail.size() + "-----------------------------------------");
+				// System.out.println(accountingVouchersDetail.size() +
+				// "-----------------------------------------");
 
 				for (Object[] obj1 : accountingVouchersDetail) {
 
@@ -927,29 +936,39 @@ public class LoadServerItemsToMobileController {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		log.info("Inventory Voucher UserLogin= {} Account Pid= {}, FromDate={}, toDate ={}", userLogin, accountPid,
 				fromDate, toDate);
+
+		List<String> accountPids = new ArrayList<>();
+		if (accountPid != null && !accountPid.equals("")) {
+			accountPids.add(accountPid);
+		} else {
+			accountPids = accountProfileRepository.findAllPidsByCompany();
+		}
+		log.info("Account Profile Size =" + accountPids.size());
+
 		List<Object[]> inventoryVouchersHeaders = inventoryVoucherHeaderRepository
-				.getCustomerWiseInventoryHeader(userLogin, accountPid, fromDate, toDate);
+				.getCustomerWiseInventoryHeader(userLogin, accountPids, fromDate, toDate);
+		log.info("Inventory Voucher Header Size =" + inventoryVouchersHeaders.size());
 
 		for (Object[] obj : inventoryVouchersHeaders) {
 			InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
-			LocalDateTime createddate = null;
-			if (obj[0] != null) {
-				String[] cdate = obj[0].toString().split("\\.");
-				createddate = LocalDateTime.parse(cdate[0], formatter);
-				// createddate = LocalDateTime.parse(obj[0].toString(), formatter);
-			}
-			inventoryVoucherHeaderDTO.setCreatedDate(createddate);
+//			LocalDateTime createddate = null;
+//			if (obj[0] != null) {
+//				String[] cdate = obj[0].toString().split("\\.");
+//				createddate = LocalDateTime.parse(cdate[0], formatter);
+//				// createddate = LocalDateTime.parse(obj[0].toString(), formatter);
+//			}
+			inventoryVoucherHeaderDTO.setCreatedDate(LocalDateTime.parse(obj[0].toString()));
 			inventoryVoucherHeaderDTO
 					.setDocDiscountAmount(obj[1] != null ? Double.parseDouble(obj[1].toString()) : 0.0);
 			inventoryVoucherHeaderDTO
 					.setDocDiscountPercentage(obj[2] != null ? Double.parseDouble(obj[2].toString()) : 0.0);
-			LocalDateTime documentdate = null;
-			if (obj[3] != null) {
-				String[] ddate = obj[3].toString().split("\\.");
-				documentdate = LocalDateTime.parse(ddate[0], formatter);
-				// documentdate = LocalDateTime.parse(obj[3].toString(), formatter);
-			}
-			inventoryVoucherHeaderDTO.setDocumentDate(documentdate);
+//			LocalDateTime documentdate = null;
+//			if (obj[3] != null) {
+//				String[] ddate = obj[3].toString().split("\\.");
+//				documentdate = LocalDateTime.parse(ddate[0], formatter);
+//				// documentdate = LocalDateTime.parse(obj[3].toString(), formatter);
+//			}
+			inventoryVoucherHeaderDTO.setDocumentDate(LocalDateTime.parse(obj[3].toString()));
 
 			inventoryVoucherHeaderDTO.setDocumentNumberLocal(obj[4] != null ? obj[4].toString() : "");
 			inventoryVoucherHeaderDTO.setDocumentNumberServer(obj[5] != null ? obj[5].toString() : "");
@@ -969,11 +988,11 @@ public class LoadServerItemsToMobileController {
 			inventoryVoucherHeaderDTO.setDocumentPid(obj[19] != null ? obj[19].toString() : "");
 
 			if (inventoryVoucherHeaderDTO.getPid() != null && !inventoryVoucherHeaderDTO.getPid().isEmpty()) {
-				System.out.println(inventoryVoucherHeaderDTO.getPid() + "-----inventory Pid");
+//				System.out.println(inventoryVoucherHeaderDTO.getPid() + "-----inventory Pid");
 				List<Object[]> inventoryVouchersDetail = inventoryVoucherHeaderRepository
 						.getCustomerWiseInventoryDetail(inventoryVoucherHeaderDTO.getPid());
 				List<InventoryVoucherDetailDTO> inventoryVoucherDetails = new ArrayList<>();
-				System.out.println(inventoryVoucherDetails.size() + "-----------------------------------------");
+//				System.out.println(inventoryVoucherDetails.size() + "-----------------------------------------");
 				for (Object[] obj1 : inventoryVouchersDetail) {
 					InventoryVoucherDetailDTO dto = new InventoryVoucherDetailDTO();
 					dto.setProductName(obj1[0] != null ? obj1[0].toString() : "");

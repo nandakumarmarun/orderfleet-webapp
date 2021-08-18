@@ -698,29 +698,23 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 //	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.pid = ?1 Order By inventoryVoucher.createdDate desc")
 //	List<InventoryVoucherHeader> findInventoryVoucherHeaderByPid(String inventoryVoucherHeaderPid);
 
-	public static final String CUSTOMER_WISE_INVENTORY_HEADER = "select ivh.created_date, ivh.doc_discount_amount, ivh.doc_discount_percentage, ivh.document_date, "
-			+ "ivh.document_number_local, ivh.document_number_server, ivh.document_total, ivh.document_volume, "
-			+ "ivh.pid as ivh_pid, ivh.process_status, emp.pid as emp_pid, emp.name as emp_name, emp.alias as emp_alias, "
-			+ "rec_acc.pid as rec_acc_pid, rec_acc.name as rec_acc_name, rec_acc.alias as rec_acc_alias, "
-			+ "sup_acc.pid as sup_acc_pid, sup_acc.name as sup_acc_name, " + "doc.name as docname, doc.pid as docpid "
-			+ "from tbl_inventory_voucher_header ivh " + "INNER JOIN tbl_user users on ivh.created_by_id = users.id "
-			+ "INNER JOIN tbl_account_profile rec_acc on ivh.receiver_account_id = rec_acc.id "
-			+ "INNER JOIN tbl_account_profile sup_acc on ivh.supplier_account_id = sup_acc.id "
-			+ "INNER JOIN tbl_employee_profile emp on ivh.employee_id = emp.id "
-			+ "INNER JOIN tbl_document doc on ivh.document_id = doc.id " + "where users.login=?1 and rec_acc.pid=?2 "
-			+ "and ivh.created_date between ?3 and ?4 Order By ivh.created_date desc";
+	public static final String CUSTOMER_WISE_INVENTORY_HEADER = "select ivh.createdDate, ivh.docDiscountAmount, ivh.docDiscountPercentage, ivh.documentDate, "
+			+ "ivh.documentNumberLocal, ivh.documentNumberServer, ivh.documentTotal, ivh.documentVolume, "
+			+ "ivh.pid, ivh.processStatus, ivh.employee.pid, ivh.employee.name, ivh.employee.alias, "
+			+ "ivh.receiverAccount.pid, ivh.receiverAccount.name, ivh.receiverAccount.alias, "
+			+ "ivh.supplierAccount.pid, ivh.supplierAccount.name, " + "ivh.document.name, ivh.document.pid "
+			+ "from InventoryVoucherHeader ivh where ivh.createdBy.login =?1 and ivh.receiverAccount.pid in ?2 "
+			+ "and ivh.createdDate between ?3 and ?4 Order By ivh.createdDate desc";
 
-	@Query(value = CUSTOMER_WISE_INVENTORY_HEADER, nativeQuery = true)
-	List<Object[]> getCustomerWiseInventoryHeader(String userName, String accountPid, LocalDateTime fromDate,
+	@Query(value = CUSTOMER_WISE_INVENTORY_HEADER)
+	List<Object[]> getCustomerWiseInventoryHeader(String userName, List<String> accountPids, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
-	public static final String CUSTOMER_WISE_INVENTORY_DETAIL = "SELECT product.name, ivd.quantity, product.unit_qty, ivd.free_quantity, ivd.selling_rate, "
-			+ "ivd.tax_percentage, ivd.discount_amount, ivd.discount_percentage, ivd.row_total, product.pid "
-			+ "	FROM public.tbl_inventory_voucher_detail ivd "
-			+ "	INNER JOIN tbl_product_profile product on ivd.product_id=product.id "
-			+ "	where inventory_voucher_header_id = " + "	(SELECT id FROM tbl_inventory_voucher_header WHERE pid=?1)";
+	public static final String CUSTOMER_WISE_INVENTORY_DETAIL = "SELECT ivd.product.name, ivd.quantity, ivd.product.unitQty, ivd.freeQuantity, ivd.sellingRate, "
+			+ "ivd.taxPercentage, ivd.discountAmount, ivd.discountPercentage, ivd.rowTotal, ivd.product.pid "
+			+ "	FROM InventoryVoucherDetail ivd where ivd.inventoryVoucherHeader.pid =?1";
 
-	@Query(value = CUSTOMER_WISE_INVENTORY_DETAIL, nativeQuery = true)
+	@Query(value = CUSTOMER_WISE_INVENTORY_DETAIL)
 	List<Object[]> getCustomerWiseInventoryDetail(String headerPid);
 
 	@Query(value = OPTIMISED_INVENTORY_QUERY, nativeQuery = true)

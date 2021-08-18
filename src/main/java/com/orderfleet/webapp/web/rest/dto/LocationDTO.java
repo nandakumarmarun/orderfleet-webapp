@@ -34,6 +34,8 @@ public class LocationDTO {
 
 	private BigDecimal longitude;
 
+	private String locationId;
+
 	@NotNull
 	private boolean activated;
 
@@ -55,6 +57,7 @@ public class LocationDTO {
 		this.longitude = location.getLongitude();
 		this.activated = location.getActivated();
 		this.lastModifiedDate = location.getLastModifiedDate();
+		this.locationId = location.getLocationId();
 	}
 
 	public boolean getActivated() {
@@ -127,6 +130,14 @@ public class LocationDTO {
 
 	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public String getLocationId() {
+		return locationId;
+	}
+
+	public void setLocationId(String locationId) {
+		this.locationId = locationId;
 	}
 
 	@Override

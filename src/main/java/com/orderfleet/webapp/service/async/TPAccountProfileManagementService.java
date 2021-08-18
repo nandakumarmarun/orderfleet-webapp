@@ -292,6 +292,7 @@ public class TPAccountProfileManagementService {
 				location.setCompany(company);
 			}
 			location.setActivated(locDto.getActivated());
+			location.setLocationId(locDto.getLocationId());
 			saveUpdateLocations.add(location);
 		}
 		bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
