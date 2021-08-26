@@ -190,11 +190,11 @@ public class ProductProfileUploadServicePravesh {
 			} else {
 				productCategory = new ProductCategory();
 				productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
-				productCategory.setAlias(pcDto.getAlias());
+				productCategory.setName(pcDto.getName());
 				productCategory.setDataSourceType(DataSourceType.TALLY);
 				productCategory.setCompany(company);
 			}
-			productCategory.setName(pcDto.getName());
+			productCategory.setAlias(pcDto.getAlias());
 			productCategory.setDescription(pcDto.getDescription());
 			productCategory.setActivated(pcDto.getActivated());
 			saveUpdateProductCategories.add(productCategory);
@@ -275,6 +275,8 @@ public class ProductProfileUploadServicePravesh {
 
 		List<OpeningStockDTO> openingStockDtos = new ArrayList<>();
 
+		List<ProductCategoryDTO> productCategoryDtos = new ArrayList<>();
+
 		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
 
 		// All product must have a division/category, if not, set a default one
@@ -323,11 +325,25 @@ public class ProductProfileUploadServicePravesh {
 			productProfile.setActivated(true);
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
+
 			/*------------------------------------------------*/
 
 			productProfile.setUnitQty(ppDto.getUnitQty() != null ? ppDto.getUnitQty() : 1.0);
 
-			productProfile.setProductCategory(defaultCategory.get());
+			Optional<ProductCategory> optionalPPC = productCategorys.stream()
+					.filter(p -> p.getName().equals(ppDto.getProductCategoryName())).findAny();
+
+			if (optionalPPC.isPresent()) {
+				productProfile.setProductCategory(optionalPPC.get());
+			} else {
+
+				productProfile.setProductCategory(defaultCategory.get());
+			}
+			
+		
+
+			
+			
 
 			if (ppDto.getStockLocationName() != null && !ppDto.getStockLocationName().equals("")) {
 
@@ -353,26 +369,39 @@ public class ProductProfileUploadServicePravesh {
 			}
 			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
 
-			if (ppDto.getProductCategoryName() != null && !ppDto.getProductCategoryName().equals("")) {
+			if (ppDto.getProductGroup() != null && !ppDto.getProductGroup().equals("")) {
+				productGroupProductDTO.setGroupName(ppDto.getProductGroup());
 			} else {
-				ppDto.setProductCategoryName("General");
+				ppDto.setProductGroup("General");
 			}
-
-			productGroupProductDTO.setGroupName(ppDto.getProductCategoryName());
 			productGroupProductDTO.setProductName(ppDto.getName());
 
 			productGroupProductDTOs.add(productGroupProductDTO);
 
 			ProductGroupDTO productGroupDTO = new ProductGroupDTO();
-			productGroupDTO.setName(ppDto.getProductCategoryName());
-			productGroupDTO.setAlias(ppDto.getProductCategoryName());
+			productGroupDTO.setName(ppDto.getProductGroup());
+			productGroupDTO.setAlias(ppDto.getProductGroup());
 
 			productGroupDtos.add(productGroupDTO);
+			
+			ProductCategoryDTO  productCategoryDTO = new ProductCategoryDTO();
+			productCategoryDTO.setName(ppDto.getProductCategoryName());
+			productCategoryDtos.add(productCategoryDTO);
+
 			// }
 			saveUpdateProductProfiles.add(productProfile);
 
 		}
+		log.info("Saving product groups");
+		saveUpdateProductGroups(productGroupDtos);
+		log.info("Saving product group product profiles");
+		saveUpdateProductGroupProduct(productGroupProductDTOs);
+		log.info("Saving product categories");
+		saveUpdateProductCategories(productCategoryDtos, syncOperation);
+
+		log.info("Saving  product profiles");
 		productProfileRepository.save(saveUpdateProductProfiles);
+
 	}
 
 	@Transactional
@@ -1236,7 +1265,7 @@ public class ProductProfileUploadServicePravesh {
 
 	@Transactional
 	@Async
-	public void saveUpdateProductGroupProduct(List<TPProductGroupProductDTO> productGroupProductDTOs) {
+	public void saveUpdateProductGroupProducts(List<TPProductGroupProductDTO> productGroupProductDTOs) {
 
 		log.info("Saving Product Group Products.........");
 		long start = System.nanoTime();
@@ -1509,6 +1538,66 @@ public class ProductProfileUploadServicePravesh {
 	public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
 		Map<Object, Boolean> seen = new ConcurrentHashMap<>();
 		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+	}
+
+	@Transactional
+	@Async
+	public void saveUpdateProductGroupProduct(List<TPProductGroupProductDTO> productGroupProductDTOs) {
+
+		log.info("Saving Product Group Products.........");
+		long start = System.nanoTime();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		List<ProductGroupProduct> newProductGroupProducts = new ArrayList<>();
+		List<ProductGroupProduct> productGroupProducts = productGroupProductRepository
+				.findAllByCompanyPid(company.getPid());
+
+		// delete all assigned location account profile from tally
+		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
+		List<Long> productGroupProductsIds = new ArrayList<>();
+
+		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
+			ProductGroupProduct productGroupProduct = new ProductGroupProduct();
+			// find location
+
+			Optional<ProductGroup> opPg = productGroups.stream()
+					.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findFirst();
+			// find accountprofile
+			// System.out.println(loc.get()+"===Location");
+
+			Optional<ProductProfile> opPp = productProfiles.stream()
+					.filter(pp -> pgpDto.getProductName().equals(pp.getName())).findFirst();
+			if (opPp.isPresent()) {
+				List<Long> productGroupProductIds = productGroupProducts.stream()
+						.filter(pgp -> opPp.get().getPid().equals(pgp.getProduct().getPid())).map(pgp -> pgp.getId())
+						.collect(Collectors.toList());
+				if (productGroupProductIds.size() != 0) {
+					productGroupProductsIds.addAll(productGroupProductIds);
+				}
+				if (opPg.isPresent()) {
+					productGroupProduct.setProductGroup(opPg.get());
+				} else if (opPp.isPresent()) {
+					productGroupProduct.setProductGroup(productGroups.get(0));
+				}
+				productGroupProduct.setProduct(opPp.get());
+				productGroupProduct.setCompany(company);
+				newProductGroupProducts.add(productGroupProduct);
+			}
+		}
+		if (productGroupProductsIds.size() != 0) {
+			productGroupProductRepository.deleteByIdIn(companyId, productGroupProductsIds);
+		}
+
+		productGroupProductRepository.save(newProductGroupProducts);
+
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+
+		log.info("Sync completed in {} ms", elapsedTime);
+
 	}
 
 }

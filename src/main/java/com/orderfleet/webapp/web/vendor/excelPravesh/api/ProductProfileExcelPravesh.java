@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.vendor.excelPravesh.api;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,41 +56,89 @@ public class ProductProfileExcelPravesh {
 
 	@Inject
 	private ProductProfileUploadServiceCochinDistributors productProfileUploadService;
-	
+
 	@Inject
-	private ProductProfileUploadServicePravesh  productProfileUploadServicePravesh;
+	private ProductProfileUploadServicePravesh productProfileUploadServicePravesh;
 
 	@Inject
 	private DocumentUserWiseUpdateController documentUserWiseUpdateController;
-
-	
 
 	@RequestMapping(value = "/product-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<String> bulkSaveProductProfiles(
 			@Valid @RequestBody List<ProductProfileDTO> productProfileDTOs) {
-		
+
 		log.debug("REST request to save ProductProfiles : {}", productProfileDTOs.size());
 		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
 				SyncOperationType.PRODUCTPROFILE).map(so -> {
 					// update sync status
-					
+
 					log.debug("----------------------------------------", productProfileDTOs.size());
 					so.setCompleted(false);
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
+
+					List<ProductCategoryDTO> productCategoryDtos = new ArrayList<>();
+
+					for (ProductProfileDTO ProductProfileDTO : productProfileDTOs) {
+						ProductCategoryDTO productCategoryDTO = new ProductCategoryDTO();
+
+						productCategoryDTO.setName(ProductProfileDTO.getProductCategoryName());
+
+						Optional<ProductCategoryDTO> opPc = productCategoryDtos.stream()
+								.filter(pcs -> ProductProfileDTO.getProductCategoryName().equals(pcs.getName()))
+								.findAny();
+						if (opPc.isPresent()) {
+							continue;
+						}
+
+						productCategoryDtos.add(productCategoryDTO);
+
+					}
+
+					productProfileUploadServicePravesh.saveUpdateProductCategories(productCategoryDtos, so);
 					productProfileUploadServicePravesh.saveUpdateProductProfiles(productProfileDTOs, so);
-					productProfileUploadServicePravesh.saveUpdateProductGroupProductExcel(productProfileDTOs, so);
+
+					// productProfileUploadServicePravesh.saveUpdateProductGroupProductExcel(productProfileDTOs,
+					// so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Product-Profile sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
-		
+
 	}
-	
-	
-	
-	
+
+	/*
+	 * @RequestMapping(value = "/product-group_product-profile.json", method =
+	 * RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	 * 
+	 * @Timed public ResponseEntity<String> bulkSaveProductGroupProductProfile(
+	 * 
+	 * @Valid @RequestBody List<TPProductGroupProductDTO> productGroupProductDTOs) {
+	 * log.debug("REST request to save product-group_Product-Profiles : {}",
+	 * productGroupProductDTOs.size()); return
+	 * syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.
+	 * getCurrentUsersCompanyId(),
+	 * SyncOperationType.PRODUCTGROUP_PRODUCTPROFILE).map(so -> {
+	 * 
+	 * Optional<SyncOperation> opSyncPP =
+	 * syncOperationRepository.findOneByCompanyIdAndOperationType(
+	 * SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.PRODUCTPROFILE);
+	 * 
+	 * if (!opSyncPP.get().getCompleted()) { return new
+	 * ResponseEntity<>("product-profile save processing try after some time.",
+	 * HttpStatus.BAD_REQUEST); }
+	 * 
+	 * // update sync status so.setCompleted(false);
+	 * so.setLastSyncStartedDate(LocalDateTime.now());
+	 * syncOperationRepository.save(so); // save/update
+	 * productProfileUploadServicePravesh.saveUpdateProductGroupProducts(
+	 * productGroupProductDTOs); return new ResponseEntity<>("Uploaded",
+	 * HttpStatus.OK); }) .orElse(new ResponseEntity<>(
+	 * "Product-group-Product-profile sync operation not registered for this company"
+	 * , HttpStatus.BAD_REQUEST)); }
+	 */
+
 //		
 //		
 //		
@@ -130,7 +179,7 @@ public class ProductProfileExcelPravesh {
 //								HttpStatus.BAD_REQUEST);
 //					}
 
-					// update sync status
+	// update sync status
 //					
 //					so.setCompleted(false);
 //					so.setLastSyncStartedDate(LocalDateTime.now());
@@ -142,112 +191,111 @@ public class ProductProfileExcelPravesh {
 //						HttpStatus.BAD_REQUEST));
 	// }
 
-	
-	
-	/*@RequestMapping(value = "/stock-locations.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<String> bulkSavestockLocations(@Valid @RequestBody List<StockLocationDTO> stockLocationDTOs) {
-		log.debug("REST request to save Stock Locations : {}", stockLocationDTOs.size());
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.STOCK_LOCATION).map(so -> {
-					// update sync status
-					so.setCompleted(false);
-					so.setLastSyncStartedDate(LocalDateTime.now());
-					syncOperationRepository.save(so);
-					// save/update
-					productProfileUploadService.saveUpdateStockLocations(stockLocationDTOs, so);
+	/*
+	 * @RequestMapping(value = "/stock-locations.json", method = RequestMethod.POST,
+	 * produces = MediaType.APPLICATION_JSON_VALUE)
+	 * 
+	 * @Timed public ResponseEntity<String>
+	 * bulkSavestockLocations(@Valid @RequestBody List<StockLocationDTO>
+	 * stockLocationDTOs) { log.debug("REST request to save Stock Locations : {}",
+	 * stockLocationDTOs.size()); return
+	 * syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.
+	 * getCurrentUsersCompanyId(), SyncOperationType.STOCK_LOCATION).map(so -> { //
+	 * update sync status so.setCompleted(false);
+	 * so.setLastSyncStartedDate(LocalDateTime.now());
+	 * syncOperationRepository.save(so); // save/update
+	 * productProfileUploadService.saveUpdateStockLocations(stockLocationDTOs, so);
+	 * 
+	 * if (so.getUser()) {
+	 * documentUserWiseUpdateController.assignSaveUserStockLocations();
+	 * so.setUser(false); so.setCompleted(true); syncOperationRepository.save(so); }
+	 * if (so.getDocument()) {
+	 * documentUserWiseUpdateController.assighnStockLocationDestination();
+	 * documentUserWiseUpdateController.assighnStockLocationSource(); }
+	 * 
+	 * return new ResponseEntity<>("Uploaded", HttpStatus.OK); }).orElse(new
+	 * ResponseEntity<>
+	 * ("Stock-location sync operation not registered for this company",
+	 * HttpStatus.BAD_REQUEST)); }
+	 * 
+	 * @RequestMapping(value = "/opening-stock.json", method = RequestMethod.POST,
+	 * produces = MediaType.APPLICATION_JSON_VALUE)
+	 * 
+	 * @Timed public ResponseEntity<String> bulkSaveOpeningStock(@Valid @RequestBody
+	 * List<OpeningStockDTO> openingStockDTOs) {
+	 * log.debug("REST request to save opening stock : {}",
+	 * openingStockDTOs.size()); return
+	 * syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.
+	 * getCurrentUsersCompanyId(), SyncOperationType.OPENING_STOCK).map(so -> {
+	 * 
+	 * Optional<SyncOperation> opSyncSL =
+	 * syncOperationRepository.findOneByCompanyIdAndOperationType(
+	 * SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.STOCK_LOCATION);
+	 * 
+	 * if (!opSyncSL.get().getCompleted()) { return new
+	 * ResponseEntity<>("stock-location save processing try after some time.",
+	 * HttpStatus.BAD_REQUEST); }
+	 * 
+	 * Optional<SyncOperation> opSyncPP =
+	 * syncOperationRepository.findOneByCompanyIdAndOperationType(
+	 * SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.PRODUCTPROFILE);
+	 * 
+	 * if (!opSyncPP.get().getCompleted()) { return new
+	 * ResponseEntity<>("product-profile save processing try after some time.",
+	 * HttpStatus.BAD_REQUEST); }
+	 * 
+	 * // update sync status so.setCompleted(false);
+	 * so.setLastSyncStartedDate(LocalDateTime.now());
+	 * syncOperationRepository.save(so); // save/update
+	 * productProfileUploadService.saveUpdateOpeningStock(openingStockDTOs, so);
+	 * return new ResponseEntity<>("Uploaded", HttpStatus.OK); }).orElse(new
+	 * ResponseEntity<>
+	 * ("opening-stock sync operation not registered for this company",
+	 * HttpStatus.BAD_REQUEST)); }
+	 */
 
-					if (so.getUser()) {
-						documentUserWiseUpdateController.assignSaveUserStockLocations();
-						so.setUser(false);
-						so.setCompleted(true);
-						syncOperationRepository.save(so);
-					}
-					if (so.getDocument()) {
-						documentUserWiseUpdateController.assighnStockLocationDestination();
-						documentUserWiseUpdateController.assighnStockLocationSource();
-					}
+	/*
+	 * @RequestMapping(value = "/ecom-product-profile-product.json", method =
+	 * RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	 * 
+	 * @Timed public ResponseEntity<String> bulkSaveEcomProductProfileProduct(
+	 * 
+	 * @Valid @RequestBody List<EcomProductProfileProductDTO> ppDTOs) {
+	 * log.debug("REST request to save ecom product profile product: {}",
+	 * ppDTOs.size()); return
+	 * syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.
+	 * getCurrentUsersCompanyId(),
+	 * SyncOperationType.ECOM_PRODUCT_PROFILE_PRODUCT).map(so -> { // update sync
+	 * status so.setCompleted(false);
+	 * so.setLastSyncStartedDate(LocalDateTime.now());
+	 * syncOperationRepository.save(so); // save/update
+	 * productProfileUploadService.saveUpdateEcomProductProfileProducts(ppDTOs, so);
+	 * return new ResponseEntity<>("Uploaded", HttpStatus.OK); }) .orElse(new
+	 * ResponseEntity<>(
+	 * "ECOM_PRODUCT_PROFILE_PRODUCT sync operation not registered for this company"
+	 * , HttpStatus.BAD_REQUEST)); }
+	 */
 
-					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
-				}).orElse(new ResponseEntity<>("Stock-location sync operation not registered for this company",
-						HttpStatus.BAD_REQUEST));
-	}
-
-	@RequestMapping(value = "/opening-stock.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<String> bulkSaveOpeningStock(@Valid @RequestBody List<OpeningStockDTO> openingStockDTOs) {
-		log.debug("REST request to save opening stock : {}", openingStockDTOs.size());
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.OPENING_STOCK).map(so -> {
-
-					Optional<SyncOperation> opSyncSL = syncOperationRepository.findOneByCompanyIdAndOperationType(
-							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.STOCK_LOCATION);
-
-					if (!opSyncSL.get().getCompleted()) {
-						return new ResponseEntity<>("stock-location save processing try after some time.",
-								HttpStatus.BAD_REQUEST);
-					}
-
-					Optional<SyncOperation> opSyncPP = syncOperationRepository.findOneByCompanyIdAndOperationType(
-							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.PRODUCTPROFILE);
-
-					if (!opSyncPP.get().getCompleted()) {
-						return new ResponseEntity<>("product-profile save processing try after some time.",
-								HttpStatus.BAD_REQUEST);
-					}
-
-					// update sync status
-					so.setCompleted(false);
-					so.setLastSyncStartedDate(LocalDateTime.now());
-					syncOperationRepository.save(so);
-					// save/update
-					productProfileUploadService.saveUpdateOpeningStock(openingStockDTOs, so);
-					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
-				}).orElse(new ResponseEntity<>("opening-stock sync operation not registered for this company",
-						HttpStatus.BAD_REQUEST));
-	}
-*/
-	
-
-
-/*	@RequestMapping(value = "/ecom-product-profile-product.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<String> bulkSaveEcomProductProfileProduct(
-			@Valid @RequestBody List<EcomProductProfileProductDTO> ppDTOs) {
-		log.debug("REST request to save ecom product profile product: {}", ppDTOs.size());
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.ECOM_PRODUCT_PROFILE_PRODUCT).map(so -> {
-					// update sync status
-					so.setCompleted(false);
-					so.setLastSyncStartedDate(LocalDateTime.now());
-					syncOperationRepository.save(so);
-					// save/update
-					productProfileUploadService.saveUpdateEcomProductProfileProducts(ppDTOs, so);
-					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
-				})
-				.orElse(new ResponseEntity<>(
-						"ECOM_PRODUCT_PROFILE_PRODUCT sync operation not registered for this company",
-						HttpStatus.BAD_REQUEST));
-	}*/
-
-/*	@RequestMapping(value = "/product-group-ecom-product.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<String> bulkSaveProductGroupEcomProductProfile(
-			@Valid @RequestBody List<ProductGroupEcomProductDTO> ppDTOs) {
-		log.debug("REST request to save product group ecom product profile : {}", ppDTOs.size());
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.PRODUCT_GROUP_ECOM_PRODUCT).map(so -> {
-					// update sync status
-					so.setCompleted(false);
-					so.setLastSyncStartedDate(LocalDateTime.now());
-					syncOperationRepository.save(so);
-					// save/update
-					productProfileUploadService.saveUpdateProductGroupEcomProductProfiles(ppDTOs, so);
-					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
-				})
-				.orElse(new ResponseEntity<>(
-						"PRODUCT_GROUP_ECOM_PRODUCT sync operation not registered for this company",
-						HttpStatus.BAD_REQUEST));
-	}*/
+	/*
+	 * @RequestMapping(value = "/product-group-ecom-product.json", method =
+	 * RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	 * 
+	 * @Timed public ResponseEntity<String> bulkSaveProductGroupEcomProductProfile(
+	 * 
+	 * @Valid @RequestBody List<ProductGroupEcomProductDTO> ppDTOs) {
+	 * log.debug("REST request to save product group ecom product profile : {}",
+	 * ppDTOs.size()); return
+	 * syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.
+	 * getCurrentUsersCompanyId(),
+	 * SyncOperationType.PRODUCT_GROUP_ECOM_PRODUCT).map(so -> { // update sync
+	 * status so.setCompleted(false);
+	 * so.setLastSyncStartedDate(LocalDateTime.now());
+	 * syncOperationRepository.save(so); // save/update
+	 * productProfileUploadService.saveUpdateProductGroupEcomProductProfiles(ppDTOs,
+	 * so); return new ResponseEntity<>("Uploaded", HttpStatus.OK); }) .orElse(new
+	 * ResponseEntity<>(
+	 * "PRODUCT_GROUP_ECOM_PRODUCT sync operation not registered for this company",
+	 * HttpStatus.BAD_REQUEST)); }
+	 */
 
 }

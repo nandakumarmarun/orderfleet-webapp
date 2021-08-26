@@ -182,6 +182,11 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "remarks")
 	private String remarks;
+	
+	@Column(name = "product_group")
+	private String productGroup;
+	
+	
 
 	public Long getId() {
 		return id;
@@ -441,6 +446,15 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public void setProductId(String productId) {
 		this.productId = productId;
+	}
+	
+
+	public String getProductGroup() {
+		return productGroup;
+	}
+
+	public void setProductGroup(String productGroup) {
+		this.productGroup = productGroup;
 	}
 
 	@Override
