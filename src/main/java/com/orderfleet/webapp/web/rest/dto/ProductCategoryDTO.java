@@ -31,6 +31,8 @@ public class ProductCategoryDTO {
 
 	private boolean thirdpartyUpdate;
 
+	private String productCategoryId;
+
 	private LocalDateTime lastModifiedDate;
 
 	public ProductCategoryDTO() {
@@ -98,6 +100,14 @@ public class ProductCategoryDTO {
 
 	public void setThirdpartyUpdate(boolean thirdpartyUpdate) {
 		this.thirdpartyUpdate = thirdpartyUpdate;
+	}
+
+	public String getProductCategoryId() {
+		return productCategoryId;
+	}
+
+	public void setProductCategoryId(String productCategoryId) {
+		this.productCategoryId = productCategoryId;
 	}
 
 	public LocalDateTime getLastModifiedDate() {

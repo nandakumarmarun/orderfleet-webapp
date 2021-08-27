@@ -114,7 +114,6 @@ if (!this.ItemWiseSale) {
 			}).get().join(',');
 		}
 
-		
 		if ($("#dbDocumentType").val() == "no") {
 			alert("Please Select Document Type")
 			return;
@@ -124,7 +123,7 @@ if (!this.ItemWiseSale) {
 		if (value == "no") {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>Employee</th><th>Account Profile</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>Quantity</th><th>Amount</th></tr>");
+							"<tr><th>Date</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>Quantity</th><th>Amount</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='8' align='center'>Please wait...</td></tr>");
@@ -184,6 +183,8 @@ if (!this.ItemWiseSale) {
 															+ itemWiseSale.employeeName
 															+ "</td><td>"
 															+ itemWiseSale.accountName
+															+ "</td><td>"
+															+ itemWiseSale.supplierAccountName
 															+ "</td><td>"
 															+ (itemWiseSale.sourceStockLocationName == null ? ""
 																	: itemWiseSale.sourceStockLocationName)

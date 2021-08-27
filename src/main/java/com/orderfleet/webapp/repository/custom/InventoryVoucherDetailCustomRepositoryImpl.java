@@ -32,8 +32,9 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 
 		StringBuilder subQueryString = new StringBuilder("select " + "ivd.inventoryVoucherHeader.createdDate,"
 				+ "ivd.inventoryVoucherHeader.employee.name," + "ivd.inventoryVoucherHeader.receiverAccount.name,"
-				+ "ivd.product.productCategory.name," + "ivd.product.name," + "ivd.quantity," + "ivd.sellingRate,"
-				+ "ivd.rowTotal," + "ivd.product.pid," + "ivd.product.unitQty," + "ivd.volume ");
+				+ "ivd.inventoryVoucherHeader.supplierAccount.name," + "ivd.product.productCategory.name,"
+				+ "ivd.product.name," + "ivd.quantity," + "ivd.sellingRate," + "ivd.rowTotal," + "ivd.product.pid,"
+				+ "ivd.product.unitQty," + "ivd.volume ");
 		if (!stockLocationPids.isEmpty()) {
 			subQueryString.append(",ivd.sourceStockLocation.name," + "ivd.destinationStockLocation.name ");
 		}
@@ -106,18 +107,19 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			ivd.setCreatedDate((LocalDateTime) object[0]);
 			ivd.setEmployeeName((String) object[1]);
 			ivd.setAccountName((String) object[2]);
-			ivd.setProductCategory((String) object[3]);
-			ivd.setProductName((String) object[4]);
-			ivd.setQuantity((double) object[5]);
-			ivd.setSellingRate((double) object[6]);
-			ivd.setRowTotal((double) object[7]);
-			ivd.setProductPid((String) object[8]);
+			ivd.setSupplierAccountName((String) object[3]);
+			ivd.setProductCategory((String) object[4]);
+			ivd.setProductName((String) object[5]);
+			ivd.setQuantity((double) object[6]);
+			ivd.setSellingRate((double) object[7]);
+			ivd.setRowTotal((double) object[8]);
+			ivd.setProductPid((String) object[9]);
 			if (!stockLocationPids.isEmpty()) {
-				ivd.setSourceStockLocationName((String) object[11]);
-				ivd.setDestinationStockLocationName((String) object[12]);
+				ivd.setSourceStockLocationName((String) object[10]);
+				ivd.setDestinationStockLocationName((String) object[11]);
 			}
-			ivd.setProductUnitQty(object[9] != null ? Double.valueOf(object[9].toString()) : 1);
-			ivd.setVolume(Double.valueOf(object[10].toString()));
+			ivd.setProductUnitQty(object[12] != null ? Double.valueOf(object[12].toString()) : 1);
+			ivd.setVolume(Double.valueOf(object[13].toString()));
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
 

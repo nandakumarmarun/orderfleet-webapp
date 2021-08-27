@@ -115,6 +115,8 @@ public class InventoryVoucherDetailDTO {
 
 	private String locations;
 
+	private String supplierAccountName;
+
 	public InventoryVoucherDetailDTO() {
 	}
 
@@ -577,6 +579,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setLocations(String locations) {
 		this.locations = locations;
+	}
+
+	public String getSupplierAccountName() {
+		return supplierAccountName;
+	}
+
+	public void setSupplierAccountName(String supplierAccountName) {
+		this.supplierAccountName = supplierAccountName;
 	}
 
 	@Override

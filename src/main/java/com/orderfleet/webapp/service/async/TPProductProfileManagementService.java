@@ -201,6 +201,7 @@ public class TPProductProfileManagementService {
 				productCategory.setDataSourceType(DataSourceType.TALLY);
 				productCategory.setCompany(company);
 			}
+			productCategory.setProductCategoryId(pcDto.getProductCategoryId());
 			productCategory.setAlias(pcDto.getAlias());
 			productCategory.setDescription(pcDto.getDescription());
 			productCategory.setActivated(pcDto.getActivated());
