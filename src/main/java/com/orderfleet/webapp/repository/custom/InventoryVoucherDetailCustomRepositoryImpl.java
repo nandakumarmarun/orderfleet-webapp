@@ -115,11 +115,11 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			ivd.setRowTotal((double) object[8]);
 			ivd.setProductPid((String) object[9]);
 			if (!stockLocationPids.isEmpty()) {
-				ivd.setSourceStockLocationName((String) object[10]);
-				ivd.setDestinationStockLocationName((String) object[11]);
+				ivd.setSourceStockLocationName((String) object[12]);
+				ivd.setDestinationStockLocationName((String) object[13]);
 			}
-			ivd.setProductUnitQty(object[12] != null ? Double.valueOf(object[12].toString()) : 1);
-			ivd.setVolume(Double.valueOf(object[13].toString()));
+			ivd.setProductUnitQty(object[10] != null ? Double.valueOf(object[10].toString()) : 1);
+			ivd.setVolume(Double.valueOf(object[11].toString()));
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
 

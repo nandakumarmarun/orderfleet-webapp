@@ -130,7 +130,7 @@ if (!this.ItemWiseSale) {
 		} else {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>Employee</th><th>Account Profile</th><th>Category</th><th>Item</th><th>Quantity</th><th>Unit Quantity</th><th>Voulume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
+							"<tr><th>Date</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Category</th><th>Item</th><th>Quantity</th><th>Unit Quantity</th><th>Voulume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='7' align='center'>Please wait...</td></tr>");
@@ -217,6 +217,8 @@ if (!this.ItemWiseSale) {
 															+ itemWiseSale.employeeName
 															+ "</td><td>"
 															+ itemWiseSale.accountName
+															+ "</td><td>"
+															+ itemWiseSale.supplierAccountName
 															+ "</td><td>"
 															+ itemWiseSale.productCategory
 															+ "</td><td>"
