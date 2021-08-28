@@ -196,7 +196,8 @@ public class ProductProfileUploadServicePravesh {
 			}
 			productCategory.setAlias(pcDto.getAlias());
 			productCategory.setDescription(pcDto.getDescription());
-			productCategory.setActivated(pcDto.getActivated());
+			productCategory.setActivated(true);
+			//productCategory.setActivated(pcDto.getActivated());
 			saveUpdateProductCategories.add(productCategory);
 		}
 		bulkOperationRepositoryCustom.bulkSaveProductCategory(saveUpdateProductCategories);
@@ -238,7 +239,9 @@ public class ProductProfileUploadServicePravesh {
 			}
 			productGroup.setAlias(pgDto.getAlias());
 			productGroup.setDescription(pgDto.getDescription());
-			productGroup.setActivated(pgDto.getActivated());
+			productGroup.setActivated(true);
+			//productGroup.setActivated(pgDto.getActivated());
+			
 			saveUpdateProductGroups.add(productGroup);
 		}
 		bulkOperationRepositoryCustom.bulkSaveProductGroup(saveUpdateProductGroups);
@@ -322,7 +325,8 @@ public class ProductProfileUploadServicePravesh {
 			productProfile.setMrp(ppDto.getMrp());
 			productProfile.setTaxRate(ppDto.getTaxRate());
 			productProfile.setSku(ppDto.getSku());
-			productProfile.setActivated(true);
+			productProfile.setActivated(ppDto.getActivated());
+			//productProfile.setActivated(true);
 			productProfile.setTrimChar(ppDto.getTrimChar());
 			productProfile.setSize(ppDto.getSize());
 
@@ -375,18 +379,16 @@ public class ProductProfileUploadServicePravesh {
 				ppDto.setProductGroup("General");
 			}
 			productGroupProductDTO.setProductName(ppDto.getName());
-
-			productGroupProductDTOs.add(productGroupProductDTO);
+		    productGroupProductDTOs.add(productGroupProductDTO);
 
 			ProductGroupDTO productGroupDTO = new ProductGroupDTO();
 			productGroupDTO.setName(ppDto.getProductGroup());
 			productGroupDTO.setAlias(ppDto.getProductGroup());
-
+			productGroupDTO.setActivated(true);
+			//productGroupDTO.setActivated(ppDto.getActivated());
 			productGroupDtos.add(productGroupDTO);
 			
-			ProductCategoryDTO  productCategoryDTO = new ProductCategoryDTO();
-			productCategoryDTO.setName(ppDto.getProductCategoryName());
-			productCategoryDtos.add(productCategoryDTO);
+			
 
 			// }
 			saveUpdateProductProfiles.add(productProfile);
@@ -394,13 +396,12 @@ public class ProductProfileUploadServicePravesh {
 		}
 		log.info("Saving product groups");
 		saveUpdateProductGroups(productGroupDtos);
+		
+	     log.info("Saving  product profiles");
+		productProfileRepository.save(saveUpdateProductProfiles);
+		
 		log.info("Saving product group product profiles");
 		saveUpdateProductGroupProduct(productGroupProductDTOs);
-		log.info("Saving product categories");
-		saveUpdateProductCategories(productCategoryDtos, syncOperation);
-
-		log.info("Saving  product profiles");
-		productProfileRepository.save(saveUpdateProductProfiles);
 
 	}
 
