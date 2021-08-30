@@ -31,4 +31,10 @@ public interface ClientAppLogFilesRepository extends JpaRepository<ClientAppLogF
 	Optional<ClientAppLogFiles> findOneByLogDateAndFileNameAndCompanyId(LocalDate currentDate, String originalFilename,
 			Long id);
 
+	@Query("select cl from ClientAppLogFiles cl where cl.company.id = ?#{principal.companyId} order by cl.logDate")
+	List<ClientAppLogFiles> findAllByCompanyId();
+
+	@Query("select cl from ClientAppLogFiles cl where cl.company.id = ?#{principal.companyId} and cl.createdDate between ?1 and ?2 order by cl.logDate")
+	List<ClientAppLogFiles> findAllByCompanyIdAndCreatedDateDesc(LocalDateTime fromDate, LocalDateTime toDate);
+
 }

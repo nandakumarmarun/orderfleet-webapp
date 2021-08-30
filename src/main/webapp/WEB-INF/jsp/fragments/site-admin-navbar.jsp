@@ -70,8 +70,9 @@
 
 <spring:url value="/web/user-growth-report" var="userGrowthReport"></spring:url>
 
-<spring:url value="/web/company-integration-module" var="companyIntegrationModule"></spring:url>
-
+<spring:url value="/web/company-integration-module"
+	var="companyIntegrationModule"></spring:url>
+<spring:url value="/web/client-app-log-files" var="clientAppLogFiles"></spring:url>
 
 <li class="has-sub"><a href=""> <i class="entypo-users"></i> <span
 		class="title">Administration</span>
@@ -97,11 +98,11 @@
 
 		<li><a href="${companyPerformanceConfig}"><span class="title">Company
 					Performance Config</span> </a></li>
-					
+
 		<li><a href="${companyIntegrationModule}"><span class="title">Company
-					Integration Module</span> </a></li>		
-					
-					
+					Integration Module</span> </a></li>
+
+
 	</ul></li>
 <li class="has-sub"><a href=""><i class="entypo-users"></i> <span
 		class="title">Configure Company</span> </a>
@@ -206,6 +207,11 @@
 <li><a href="${userDeviceKey}"> <i class="entypo-users"></i> <span
 		class="title">User Device Key Update</span>
 </a></li>
+
+<li><a href="${clientAppLogFiles}"> <i class="entypo-users"></i>
+		<span class="title">Clientapp Log Files</span>
+</a></li>
+
 
 <li><a href="${companyInvoiceConfiguration}"> <i
 		class="entypo-users"></i> <span class="title">Company Invoice
