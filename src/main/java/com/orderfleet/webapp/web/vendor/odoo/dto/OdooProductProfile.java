@@ -12,6 +12,8 @@ public class OdooProductProfile {
 
 	private String standard_price;
 
+	private String hsn_code;
+
 	private long id;
 
 	private long uom;
@@ -80,6 +82,14 @@ public class OdooProductProfile {
 
 	public void setTax_ids(Object tax_ids) {
 		this.tax_ids = tax_ids;
+	}
+
+	public String getHsn_code() {
+		return hsn_code;
+	}
+
+	public void setHsn_code(String hsn_code) {
+		this.hsn_code = hsn_code;
 	}
 
 }

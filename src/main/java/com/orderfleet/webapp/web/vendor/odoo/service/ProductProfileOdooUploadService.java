@@ -301,6 +301,9 @@ public class ProductProfileOdooUploadService {
 			}
 			productProfile.setMrp(0);
 
+			if (ppDto.getHsn_code() != null && !ppDto.getHsn_code().equals("")) {
+				productProfile.setHsnCode(ppDto.getHsn_code());
+			}
 //			if (ppDto.getTaxRate() != null) {
 //				productProfile
 //						.setTaxRate(ppDto.getTaxRate().size() > 0 ? Double.valueOf(ppDto.getTaxRate().get(0)) : 5);
