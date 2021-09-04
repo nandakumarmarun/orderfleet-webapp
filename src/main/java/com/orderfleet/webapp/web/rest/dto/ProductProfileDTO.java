@@ -51,7 +51,7 @@ public class ProductProfileDTO {
 
 	private String productCategoryPid;
 
-	private String productCategoryName; 
+	private String productCategoryName;
 
 	private String divisionPid;
 
@@ -96,8 +96,10 @@ public class ProductProfileDTO {
 	private String stockLocationName;
 
 	private double stockQty;
-	
+
 	private String productGroup;
+
+	private double purchaseCost;
 
 	public ProductProfileDTO() {
 		super();
@@ -170,8 +172,8 @@ public class ProductProfileDTO {
 		this.remarks = profile.getRemarks();
 		this.productId = profile.getProductId();
 		this.productCode = profile.getProductCode();
-		this.productGroup=profile.getProductGroup();
-
+		this.productGroup = profile.getProductGroup();
+		this.purchaseCost = profile.getPurchaseCost();
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
 		this.productProfileTaxMasterDTOs = profile.getTaxMastersList() == null || profile.getTaxMastersList().isEmpty()
@@ -191,7 +193,7 @@ public class ProductProfileDTO {
 			String productCategoryName, String divisionPid, String divisionName, byte[] colorImage,
 			String colorImageContentType, String size, String filesPid, boolean activated,
 			LocalDateTime lastModifiedDate, String defaultLedger, List<TaxMasterDTO> productProfileTaxMasterDTOs,
-			StockAvailabilityStatus stockAvailabilityStatus,String productGroup) {
+			StockAvailabilityStatus stockAvailabilityStatus, String productGroup) {
 		super();
 		this.pid = pid;
 		this.name = name;
@@ -216,7 +218,7 @@ public class ProductProfileDTO {
 		this.defaultLedger = defaultLedger;
 		this.productProfileTaxMasterDTOs = productProfileTaxMasterDTOs;
 		this.stockAvailabilityStatus = stockAvailabilityStatus;
-		this.productGroup=productGroup;
+		this.productGroup = productGroup;
 	}
 
 	public String getPid() {
@@ -466,8 +468,6 @@ public class ProductProfileDTO {
 	public void setCreatedDate(LocalDateTime createdDate) {
 		this.createdDate = createdDate;
 	}
-	
-	
 
 	public String getProductGroup() {
 		return productGroup;
@@ -475,6 +475,14 @@ public class ProductProfileDTO {
 
 	public void setProductGroup(String productGroup) {
 		this.productGroup = productGroup;
+	}
+
+	public double getPurchaseCost() {
+		return purchaseCost;
+	}
+
+	public void setPurchaseCost(double purchaseCost) {
+		this.purchaseCost = purchaseCost;
 	}
 
 	@Override

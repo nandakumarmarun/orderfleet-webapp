@@ -343,7 +343,9 @@ public class ProductProfileUploadPRService {
 				productProfile.setDivision(defaultDivision);
 				productProfile.setDataSourceType(DataSourceType.TALLY);
 			}
-			productProfile.setProductId(ppDto.getAlias());
+			productProfile.setProductCode(ppDto.getProductCode());
+			productProfile.setProductId(ppDto.getProductId());
+			productProfile.setPurchaseCost(ppDto.getPurchaseCost());
 			productProfile.setAlias(ppDto.getAlias());
 			productProfile.setDescription(ppDto.getDescription());
 			productProfile.setPrice(ppDto.getPrice());

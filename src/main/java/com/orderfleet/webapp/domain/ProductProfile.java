@@ -89,7 +89,7 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "unit_qty", columnDefinition = "double precision DEFAULT 1")
 	private Double unitQty = 1d;
-	
+
 	@Column(name = "compound_unit_qty", columnDefinition = "double precision DEFAULT 1")
 	private Double compoundUnitQty = 1d;
 
@@ -182,11 +182,12 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "remarks")
 	private String remarks;
-	
+
 	@Column(name = "product_group")
 	private String productGroup;
-	
-	
+
+	@Column(name = "purchase_cost", columnDefinition = "double precision DEFAULT 0")
+	private double purchaseCost;
 
 	public Long getId() {
 		return id;
@@ -447,10 +448,17 @@ public class ProductProfile implements Serializable, Cloneable {
 	public void setProductId(String productId) {
 		this.productId = productId;
 	}
-	
 
 	public String getProductGroup() {
 		return productGroup;
+	}
+
+	public double getPurchaseCost() {
+		return purchaseCost;
+	}
+
+	public void setPurchaseCost(double purchaseCost) {
+		this.purchaseCost = purchaseCost;
 	}
 
 	public void setProductGroup(String productGroup) {
