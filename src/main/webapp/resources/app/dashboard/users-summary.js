@@ -100,6 +100,14 @@ function makeUserTileHeaderHtml(userData) {
 function makeUserTileFooterHtml(userData) {
 	let lastLocation = userData.lastLocation != null ? userData.lastLocation
 			: '';
+
+	if (lastLocation == "No Location" && userData.latitude != 0) {
+		lastLocation = "<span class='btn btn-success'  id='"
+				+ userData.taskExecutionPid
+				+ "' onClick='getLocation(this)' >get location</span>";
+
+	}
+	console.log(lastLocation);
 	var mockLocation = "";
 	if (userData.mockLocationStatus) {
 		mockLocation = "Mock Location Is Enabled"
@@ -125,9 +133,28 @@ function makeUserTileFooterHtml(userData) {
 			+ lastAccountLocation + "</font></p>";
 	html += "<p class='time'><font id='lastTime" + userData.userPid + "'>"
 			+ formatDate(userData.lastTime, 'HH:mm') + "</font></p>"
-			+ "</div></div><br><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+ mockLocation +"</p></div></div>";
+			+ "</div></div><br><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+			+ mockLocation + "</p></div></div>";
 
 	return html;
+}
+
+function getLocation(obj) {
+	var pid = $(obj).attr("id");
+	$(obj).html("loading...");
+	$.ajax({
+		url : appContextPath + "/web/dashboard/users-summary/updateLocation/"
+				+ pid,
+		method : 'GET',
+		success : function(data) {
+			$(obj).html(data.location);
+			$(obj).removeClass("btn-success");
+			$(obj).removeClass("btn");
+		},
+		error : function(xhr, error) {
+			onError(xhr, error);
+		}
+	});
 }
 
 function getTileColor(lastOrderTime) {

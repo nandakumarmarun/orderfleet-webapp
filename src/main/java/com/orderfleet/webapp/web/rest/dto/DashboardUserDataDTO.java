@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -60,6 +61,8 @@ public class DashboardUserDataDTO<T> {
 
 	private String attendanceSubGroupName;
 	private String attendanceSubGroupCode;
+	private String taskExecutionPid;
+	private BigDecimal latitude;
 
 	// Set Customer Time Spent for Dashboard
 	private Long customerTimeSpentTime;
@@ -260,6 +263,22 @@ public class DashboardUserDataDTO<T> {
 		this.customerTimeSpentBoolean = customerTimeSpentBoolean;
 	}
 
+	public String getTaskExecutionPid() {
+		return taskExecutionPid;
+	}
+
+	public void setTaskExecutionPid(String taskExecutionPid) {
+		this.taskExecutionPid = taskExecutionPid;
+	}
+
+	public BigDecimal getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(BigDecimal latitude) {
+		this.latitude = latitude;
+	}
+
 	public void setEmployeeData(DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData, String userPid) {
 		// set employee profile name and image
 		employeeProfileRepository.findByUserPid(userPid).ifPresent(employeeProfile -> {
@@ -330,6 +349,8 @@ public class DashboardUserDataDTO<T> {
 			dashboardUserData.setIsGpsOff(executiveTaskExecution.getIsGpsOff());
 			dashboardUserData.setIsMobileDataOff(executiveTaskExecution.getIsMobileDataOff());
 			dashboardUserData.setMockLocationStatus(executiveTaskExecution.getMockLocationStatus());
+			dashboardUserData.setTaskExecutionPid(executiveTaskExecution.getPid());
+			dashboardUserData.setLatitude(executiveTaskExecution.getLatitude());
 		}
 	}
 
