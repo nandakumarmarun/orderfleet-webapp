@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Activity;
@@ -62,6 +63,7 @@ import com.orderfleet.webapp.domain.enums.DashboardItemType;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.TargetType;
 import com.orderfleet.webapp.domain.enums.TaskPlanType;
+import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
@@ -109,6 +111,7 @@ import com.orderfleet.webapp.web.rest.dto.DashboardChartDTO;
 import com.orderfleet.webapp.web.rest.dto.DashboardHeaderSummaryDTO;
 import com.orderfleet.webapp.web.rest.dto.DashboardSummaryDTO;
 import com.orderfleet.webapp.web.rest.dto.DashboardUserDataDTO;
+import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.websocket.dto.DashboardAttendanceDTO;
 
 /**
@@ -246,6 +249,9 @@ public class DashboardResource {
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	private GeoLocationService geoLocationService;
+
 	/**
 	 * GET /web/dashboard : get dashboard page.
 	 * 
@@ -362,6 +368,31 @@ public class DashboardResource {
 			@RequestParam(value = "territoryId", required = false) Long territoryId) {
 		log.info("Web request to get dashboard user wise data");
 		return new ResponseEntity<>(loadDashboardUserWiseData(date, territoryId), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/dashboard/users-summary/updateLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
+		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
+		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
+		if (opExecutiveeExecution.isPresent()) {
+			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
+
+			if (execution.getLatitude() != BigDecimal.ZERO) {
+				System.out.println("-------lat != 0");
+				String location = geoLocationService
+						.findAddressFromLatLng(execution.getLatitude() + "," + execution.getLongitude());
+				System.out.println("-------" + location);
+				execution.setLocation(location);
+
+			} else {
+				System.out.println("-------No Location");
+				execution.setLocation("No Location");
+			}
+			execution = executiveTaskExecutionRepository.save(execution);
+			executionView = new InvoiceWiseReportView(execution);
+		}
+		return new ResponseEntity<>(executionView, HttpStatus.OK);
 	}
 
 	@Transactional(readOnly = true)
@@ -660,8 +691,7 @@ public class DashboardResource {
 				dashboardUsers = dashboardUserService.findUsersByUserIdIn(userIds);
 			}
 		}
-		
-		
+
 		return dashboardUsers;
 	}
 
