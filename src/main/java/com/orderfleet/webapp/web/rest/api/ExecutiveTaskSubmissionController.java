@@ -74,6 +74,7 @@ import com.orderfleet.webapp.web.rest.api.dto.TaskSubmissionResponse;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
 import com.orderfleet.webapp.web.rest.dto.DashboardWebSocketDataDTO;
+import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
@@ -193,9 +194,9 @@ public class ExecutiveTaskSubmissionController {
 			VoucherNumberGenerationType inventoryVoucherGenerationType = inventoryDocument.get()
 					.getVoucherNumberGenerationType();
 
-			List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders = executiveTaskSubmissionDTO.getInventoryVouchers();
-
 			if (inventoryVoucherGenerationType == VoucherNumberGenerationType.TYPE_2) {
+				List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders = executiveTaskSubmissionDTO
+						.getInventoryVouchers();
 
 				List<VoucherNumberGenerator> voucherNumberGeneratorList = voucherNumberGeneratorRepository
 						.findAllByUserAndCompanyAndDocument(userPid, companyPid, inventoryDocument.get().getPid());
@@ -244,7 +245,7 @@ public class ExecutiveTaskSubmissionController {
 						}
 					}
 					String documentNumberLocal = inventoryVoucherHeaderDTO.getDocumentNumberLocal();
-					log.debug("----------" + documentNumberLocal + " Saving Vansales Inventory to Server---------");
+					log.debug("----------" + documentNumberLocal + " Saving vansales order to Server---------");
 
 					Optional<String> opExist = documentVoucherNumberList.stream()
 							.filter(ol -> ol.equalsIgnoreCase(documentNumberLocal)).findAny();
@@ -252,7 +253,7 @@ public class ExecutiveTaskSubmissionController {
 					if (opExist.isPresent()) {
 						TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 						log.debug("----------" + documentNumberLocal
-								+ "  Saving to Server Failed---------Duplicate Found-------");
+								+ "  Saving van sales order to Server Failed---------Duplicate Found-------");
 						taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
 						taskSubmissionResponse
 								.setMessage(LocalDateTime.now() + " " + "Duplicate found " + documentNumberLocal);
@@ -312,10 +313,14 @@ public class ExecutiveTaskSubmissionController {
 					}
 				}
 
+				List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders = executiveTaskSubmissionDTO
+						.getInventoryVouchers();
+
 				for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaders) {
 
 					String documentNumberLocal = inventoryVoucherHeaderDTO.getDocumentNumberLocal();
-					log.debug("----------" + documentNumberLocal + " Saving Inventory Voucher to Server---------");
+					log.debug("----------" + documentNumberLocal + " Saving Inventory Voucher to Server---------"
+							+ user.getLogin());
 
 					Optional<String> opExist = documentVoucherNumberList.stream()
 							.filter(ol -> ol.equalsIgnoreCase(documentNumberLocal)).findAny();
@@ -360,7 +365,8 @@ public class ExecutiveTaskSubmissionController {
 			for (AccountingVoucherHeaderDTO accountingVoucherHeaderDTO : accountingVoucherHeaders) {
 
 				String documentNumberLocal = accountingVoucherHeaderDTO.getDocumentNumberLocal();
-				log.debug("----------" + documentNumberLocal + " Saving Accounting Voucher to Server---------");
+				log.debug("----------" + documentNumberLocal + " Saving Accounting Voucher to Server---------"
+						+ user.getLogin());
 
 				Optional<String> opExist = documentVoucherNumberList.stream()
 						.filter(ol -> ol.equalsIgnoreCase(documentNumberLocal)).findAny();
@@ -378,12 +384,59 @@ public class ExecutiveTaskSubmissionController {
 			}
 		}
 
+		Optional<Document> dynamicVoucherDocument = null;
+		if (executiveTaskSubmissionDTO.getDynamicDocuments().size() != 0) {
+			dynamicVoucherDocument = documentRepository
+					.findOneByPid(executiveTaskSubmissionDTO.getDynamicDocuments().get(0).getDocumentPid());
+		}
+		List<DynamicDocumentHeaderDTO> dynamicVoucherHeaders = executiveTaskSubmissionDTO.getDynamicDocuments();
+		if (dynamicVoucherDocument != null && dynamicVoucherDocument.isPresent()) {
+
+			List<String> documentPids = new ArrayList<String>();
+
+			documentPids.add(dynamicVoucherDocument.get().getPid());
+
+			List<Object[]> documentVoucherNumberListObject = dynamicDocumentHeaderRepository
+					.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
+
+			List<String> documentVoucherNumberList = new ArrayList<>();
+
+			if (documentVoucherNumberListObject.size() > 0) {
+
+				for (Object[] obj : documentVoucherNumberListObject) {
+					documentVoucherNumberList.add(obj[0].toString());
+				}
+			}
+
+			for (DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO : dynamicVoucherHeaders) {
+
+				String documentNumberLocal = dynamicDocumentHeaderDTO.getDocumentNumberLocal();
+				log.debug("----------" + documentNumberLocal + " Saving Dynamic Document :- "
+						+ dynamicVoucherDocument.get().getName() + " to Server---------" + user.getLogin());
+
+				Optional<String> opExist = documentVoucherNumberList.stream()
+						.filter(ol -> ol.equalsIgnoreCase(documentNumberLocal)).findAny();
+
+				if (opExist.isPresent()) {
+					TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
+					log.debug(
+							"----------" + documentNumberLocal + "  Saving :- " + dynamicVoucherDocument.get().getName()
+									+ " to Server Failed---------Duplicate Found-------");
+					taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
+					taskSubmissionResponse
+							.setMessage(LocalDateTime.now() + " " + "Duplicate found " + documentNumberLocal);
+					return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
+
+				}
+			}
+		}
+
 		TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 
 		try {
-			System.out.println("......................");
-			System.out.println(executiveTaskSubmissionDTO.toString());
-			System.out.println("......................");
+			log.info("......................");
+			log.info(executiveTaskSubmissionDTO.toString());
+			log.info("......................");
 			ExecutiveTaskExecutionDTO executionDTO = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO();
 			if (executionDTO.getInterimSave()) {
 				deleteOldAllExecutions(executionDTO);

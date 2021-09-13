@@ -178,14 +178,15 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 
 	@Query(value = "select ddh.pid,ddh.executive_task_execution_id from tbl_dynamic_document_header ddh where ddh.executive_task_execution_id in ?1 and ddh.company_id=?#{principal.companyId}", nativeQuery = true)
 	List<Object[]> findAllByExecutiveTaskExecutionIdsIn(Set<Long> executiveTaskIds);
-	
+
 	@Query("select dDocument.pid,dDocument.document.name,dDocument.document.documentType,dDocument.executiveTaskExecution.pid from DynamicDocumentHeader dDocument where dDocument.executiveTaskExecution.id IN ?1")
 	List<Object[]> findByExecutiveTaskExecutionIdIn(Set<Long> executiveTaskIds);
-	
+
 	@Query("select dDocument.pid,dDocument.document.name,dDocument.document.documentType,dDocument.executiveTaskExecution.pid from DynamicDocumentHeader dDocument where dDocument.executiveTaskExecution.id IN ?1 and dDocument.document.pid = ?2")
 	List<Object[]> findByExecutiveTaskExecutionIdInAndDocumentPid(Set<Long> executiveTaskIds, String documentPid);
 
-	
+	@Query("SELECT dd.documentNumberServer,dd.document.pid,dd.createdDate from DynamicDocumentHeader dd where dd.company.pid = ?1 and dd.createdBy.pid = ?2 and dd.document.pid IN(?3)")
+	List<Object[]> getAllDocumentNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
 
 	// @Query("select
 	// dDocument.pid,dDocument.documentNumberLocal,dDocument.documentNumberServer,dDocument.document.pid,"

@@ -242,7 +242,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	public ExecutiveTaskSubmissionTransactionWrapper executiveTaskSubmission(
 			ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO) {
 		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
-		log.info("============================ order processing  start : " + user.getLogin()
+		log.info("============================ Transaction processing  start : " + user.getLogin()
 				+ "============================");
 		Company company = user.getCompany();
 		EmployeeProfile employeeProfile = employeeProfileRepository.findEmployeeProfileByUser(user);
@@ -262,7 +262,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		updateExecutiveTaskPlanStatus(executiveTaskExecution);
 
 		TaskSubmissionResponse submissionResponse = createResponseObject(executiveTaskExecution);
-		log.info("============================ order processing  completed : " + user.getLogin()
+		log.info("============================ Transaction processing  completed : " + user.getLogin()
 				+ "============================");
 		return new ExecutiveTaskSubmissionTransactionWrapper(submissionResponse, executiveTaskExecution,
 				inventoryVouchers, accountingVouchers, dynamicDocuments,
@@ -302,6 +302,8 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	private ExecutiveTaskExecution saveExecutiveTaskExecution(Company company, User user,
 			ExecutiveTaskExecutionDTO executiveTaskExecutionDTO) {
 		ExecutiveTaskExecution executiveTaskExecution = new ExecutiveTaskExecution();
+
+		log.info("----Saving Executive task Execution Started----- " + user.getLogin());
 
 		// set pid
 		executiveTaskExecution.setPid(ExecutiveTaskExecutionService.PID_PREFIX + RandomUtil.generatePid());
@@ -380,6 +382,8 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		// set company
 		executiveTaskExecution.setCompany(company);
 		executiveTaskExecution = executiveTaskExecutionRepository.save(executiveTaskExecution);
+
+		log.info("----Saving Executive task Execution Completed----- " + user.getLogin());
 		return executiveTaskExecution;
 	}
 
@@ -397,6 +401,8 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
 			List<InventoryVoucherHeaderDTO> inventoryVoucherDTOs) {
 
+		log.info("----Saving Inventory Vocucher Started----- " + user.getLogin());
+
 		Optional<CompanyConfiguration> opPiecesToQuantity = companyConfigurationRepository
 				.findByCompanyPidAndName(company.getPid(), CompanyConfig.PIECES_TO_QUANTITY);
 		if (inventoryVoucherDTOs != null && inventoryVoucherDTOs.size() > 0) {
@@ -413,6 +419,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 
 			List<InventoryVoucherHeader> inventoryVouchers = new ArrayList<>();
 			for (InventoryVoucherHeaderDTO inventoryVoucherDTO : inventoryVoucherDTOs) {
+
+				String documentNumberLocal = inventoryVoucherDTO.getDocumentNumberLocal();
+				log.debug("----------Inventory Voucher Document Number:- " + documentNumberLocal);
 
 				InventoryVoucherHeader inventoryVoucherHeader = new InventoryVoucherHeader();
 				// set pid
@@ -669,6 +678,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				inventoryVouchers.add(inventoryVoucherHeaderRepository.save(inventoryVoucherHeader));
 
 			}
+			log.info("----Saving Inventory Voucher Completed----- " + user.getLogin());
 			return inventoryVouchers;
 		}
 		return null;
@@ -687,9 +697,14 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	private List<AccountingVoucherHeader> saveAccountingVouchers(Company company, User user,
 			EmployeeProfile employeeProfile, ExecutiveTaskExecution executiveTaskExecution,
 			List<AccountingVoucherHeaderDTO> accountingVoucherDTOs) {
+
+		log.info("----Saving Accounting Voucher Startrd----- " + user.getLogin());
 		if (accountingVoucherDTOs != null && !accountingVoucherDTOs.isEmpty()) {
 			List<AccountingVoucherHeader> accountingVouchers = new ArrayList<>();
 			for (AccountingVoucherHeaderDTO accountingVoucherDTO : accountingVoucherDTOs) {
+
+				String documentNumberLocal = accountingVoucherDTO.getDocumentNumberLocal();
+				log.debug("----------Accounting Voucher Document Number:- " + documentNumberLocal);
 				AccountingVoucherHeader accountingVoucherHeader = new AccountingVoucherHeader();
 
 				AccountProfile accountProfile = accountProfileRepository
@@ -810,7 +825,12 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				 * messageDTOs.add(messageDTO);
 				 */
 			}
-			return accountingVoucherHeaderRepository.save(accountingVouchers);
+
+			List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
+					.save(accountingVouchers);
+
+			log.info("----Saving Accounting Voucher Completed----- " + user.getLogin());
+			return accountingVoucherHeaders;
 		}
 		return null;
 	}
@@ -827,11 +847,15 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	 */
 	private List<DynamicDocumentHeader> saveDynamicForms(Company company, User user, EmployeeProfile employeeProfile,
 			ExecutiveTaskExecution executiveTaskExecution, List<DynamicDocumentHeaderDTO> dynamicDocumentHeaderDTOs) {
+
+		log.info("----Saving Dynamic Document Startrd----- " + user.getLogin());
 		if (dynamicDocumentHeaderDTOs != null && dynamicDocumentHeaderDTOs.size() > 0) {
 
 			List<DynamicDocumentHeader> dynamicDocumentHeaders = new ArrayList<>();
 			for (DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO : dynamicDocumentHeaderDTOs) {
 
+				String documentNumberLocal = dynamicDocumentHeaderDTO.getDocumentNumberLocal();
+				log.debug("----------Dynamic Document Form Document Number:- " + documentNumberLocal);
 				DynamicDocumentHeader dynamicDocumentHeader = new DynamicDocumentHeader();
 				// set pid
 				dynamicDocumentHeader.setPid(DynamicDocumentHeaderService.PID_PREFIX + RandomUtil.generatePid());
@@ -907,7 +931,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				dynamicDocumentHeader.setFilledForms(filledForms);
 				dynamicDocumentHeaders.add(dynamicDocumentHeader);
 			}
-			return dynamicDocumentHeaderRepository.save(dynamicDocumentHeaders);
+			List<DynamicDocumentHeader> dynamicDocuments = dynamicDocumentHeaderRepository.save(dynamicDocumentHeaders);
+			log.info("----Saving Dynamic Document Completed----- " + user.getLogin());
+			return dynamicDocuments;
 		}
 		return null;
 	}
@@ -2052,6 +2078,8 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		List<InventoryVoucherHeaderDTO> newInventoryVoucherHeaderDTOs = new ArrayList<>();
 
 		for (InventoryVoucherHeaderDTO inventoryVoucherDTO : newInventoryVoucherDTOs) {
+			String documentNumberLocal = inventoryVoucherDTO.getDocumentNumberLocal();
+			log.debug("----------Inventory Voucher Document Number:- " + documentNumberLocal);
 			Optional<InventoryVoucherHeader> optionalIVH = oldInventoryVoucherHeaders.stream().filter(
 					pc -> pc.getDocumentNumberLocal().equalsIgnoreCase(inventoryVoucherDTO.getDocumentNumberLocal()))
 					.findAny();
@@ -2153,6 +2181,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		List<AccountingVoucherHeaderDTO> headerDTOs = new ArrayList<>();
 		List<AccountingVoucherHeader> accountingVoucherHeaders = new ArrayList<>();
 		for (AccountingVoucherHeaderDTO accountingVoucherDTO : newAccountingVouchers) {
+
+			String documentNumberLocal = accountingVoucherDTO.getDocumentNumberLocal();
+			log.debug("----------Accounting Voucher Document Number:- " + documentNumberLocal);
 			Optional<AccountingVoucherHeader> optionalAVH = oldAccountingVoucherHeaders.stream().filter(
 					pc -> pc.getDocumentNumberLocal().equalsIgnoreCase(accountingVoucherDTO.getDocumentNumberLocal()))
 					.findAny();
@@ -2187,7 +2218,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						}
 						Optional<AccountProfile> toAccountProfile = accountProfileRepository
 								.findOneByPid(accountingVoucherDetailDTO.getToAccountPid());
-						if (byAccountProfile.isPresent()) {
+						if (toAccountProfile.isPresent()) {
 							accountingVoucherDetail.setTo(toAccountProfile.get());
 						}
 						accountingVoucherDetail.setInstrumentDate(accountingVoucherDetailDTO.getInstrumentDate());
@@ -2281,6 +2312,8 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			Optional<DynamicDocumentHeader> optionalDDH = oldDynamicDocumentHeaders.stream().filter(pc -> pc
 					.getDocumentNumberLocal().equalsIgnoreCase(dynamicDocumentHeaderDTO.getDocumentNumberLocal()))
 					.findAny();
+			String documentNumberLocal = dynamicDocumentHeaderDTO.getDocumentNumberLocal();
+			log.debug("----------Dynamic Document Number:- " + documentNumberLocal);
 			if (optionalDDH.isPresent()) {
 				DynamicDocumentHeader dynamicDocumentHeader = optionalDDH.get();
 				dynamicDocumentHeader.setDocumentDate(dynamicDocumentHeaderDTO.getDocumentDate());
