@@ -71,6 +71,7 @@ import com.orderfleet.webapp.service.impl.FileManagerException;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
 import com.orderfleet.webapp.web.rest.api.dto.TaskSubmissionResponse;
+import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
 import com.orderfleet.webapp.web.rest.dto.DashboardWebSocketDataDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
@@ -175,28 +176,29 @@ public class ExecutiveTaskSubmissionController {
 		 * VoucherNumberGenerationType inventoryVoucherGenerationType =
 		 * mobileConfiguration .getVoucherNumberGenerationType();
 		 */
-		Optional<Document> document = null;
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		String companyPid = company.getPid();
+
+		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+
+		String userPid = user.getPid();
+
+		Optional<Document> inventoryDocument = null;
 		if (executiveTaskSubmissionDTO.getInventoryVouchers().size() != 0) {
-			document = documentRepository
+			inventoryDocument = documentRepository
 					.findOneByPid(executiveTaskSubmissionDTO.getInventoryVouchers().get(0).getDocumentPid());
 		}
 
-		if (document != null && document.isPresent()) {
-			VoucherNumberGenerationType inventoryVoucherGenerationType = document.get()
+		if (inventoryDocument != null && inventoryDocument.isPresent()) {
+			VoucherNumberGenerationType inventoryVoucherGenerationType = inventoryDocument.get()
 					.getVoucherNumberGenerationType();
+
+			List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders = executiveTaskSubmissionDTO.getInventoryVouchers();
+
 			if (inventoryVoucherGenerationType == VoucherNumberGenerationType.TYPE_2) {
-				List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders = executiveTaskSubmissionDTO
-						.getInventoryVouchers();
-
-				Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
-				String companyPid = company.getPid();
-
-				User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
-
-				String userPid = user.getPid();
 
 				List<VoucherNumberGenerator> voucherNumberGeneratorList = voucherNumberGeneratorRepository
-						.findAllByUserAndCompanyAndDocument(userPid, companyPid, document.get().getPid());
+						.findAllByUserAndCompanyAndDocument(userPid, companyPid, inventoryDocument.get().getPid());
 
 				if (voucherNumberGeneratorList == null || voucherNumberGeneratorList.size() == 0) {
 					log.info(voucherNumberGeneratorList + " Size is either null or 0");
@@ -242,7 +244,7 @@ public class ExecutiveTaskSubmissionController {
 						}
 					}
 					String documentNumberLocal = inventoryVoucherHeaderDTO.getDocumentNumberLocal();
-					log.debug("----------" + documentNumberLocal + " Saving to Server---------");
+					log.debug("----------" + documentNumberLocal + " Saving Vansales Inventory to Server---------");
 
 					Optional<String> opExist = documentVoucherNumberList.stream()
 							.filter(ol -> ol.equalsIgnoreCase(documentNumberLocal)).findAny();
@@ -292,8 +294,90 @@ public class ExecutiveTaskSubmissionController {
 //						log.debug("----------" + documentNumberLocal + " Saving to Server Success---------");
 //					}
 				}
+			} else {
+
+				List<String> documentPids = new ArrayList<String>();
+
+				documentPids.add(inventoryDocument.get().getPid());
+
+				List<Object[]> documentVoucherNumberListObject = inventoryVoucherHeaderRepository
+						.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
+
+				List<String> documentVoucherNumberList = new ArrayList<>();
+
+				if (documentVoucherNumberListObject.size() > 0) {
+
+					for (Object[] obj : documentVoucherNumberListObject) {
+						documentVoucherNumberList.add(obj[0].toString());
+					}
+				}
+
+				for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaders) {
+
+					String documentNumberLocal = inventoryVoucherHeaderDTO.getDocumentNumberLocal();
+					log.debug("----------" + documentNumberLocal + " Saving Inventory Voucher to Server---------");
+
+					Optional<String> opExist = documentVoucherNumberList.stream()
+							.filter(ol -> ol.equalsIgnoreCase(documentNumberLocal)).findAny();
+
+					if (opExist.isPresent()) {
+						TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
+						log.debug("----------" + documentNumberLocal
+								+ "  Saving Inventory Voucher to Server Failed---------Duplicate Found-------");
+						taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
+						taskSubmissionResponse
+								.setMessage(LocalDateTime.now() + " " + "Duplicate found " + documentNumberLocal);
+						return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
+					}
+				}
 			}
 		}
+
+		Optional<Document> accountingVoucherDocument = null;
+		if (executiveTaskSubmissionDTO.getAccountingVouchers().size() != 0) {
+			accountingVoucherDocument = documentRepository
+					.findOneByPid(executiveTaskSubmissionDTO.getAccountingVouchers().get(0).getDocumentPid());
+		}
+		List<AccountingVoucherHeaderDTO> accountingVoucherHeaders = executiveTaskSubmissionDTO.getAccountingVouchers();
+		if (accountingVoucherDocument != null && accountingVoucherDocument.isPresent()) {
+
+			List<String> documentPids = new ArrayList<String>();
+
+			documentPids.add(accountingVoucherDocument.get().getPid());
+
+			List<Object[]> documentVoucherNumberListObject = accountingVoucherHeaderRepository
+					.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
+
+			List<String> documentVoucherNumberList = new ArrayList<>();
+
+			if (documentVoucherNumberListObject.size() > 0) {
+
+				for (Object[] obj : documentVoucherNumberListObject) {
+					documentVoucherNumberList.add(obj[0].toString());
+				}
+			}
+
+			for (AccountingVoucherHeaderDTO accountingVoucherHeaderDTO : accountingVoucherHeaders) {
+
+				String documentNumberLocal = accountingVoucherHeaderDTO.getDocumentNumberLocal();
+				log.debug("----------" + documentNumberLocal + " Saving Accounting Voucher to Server---------");
+
+				Optional<String> opExist = documentVoucherNumberList.stream()
+						.filter(ol -> ol.equalsIgnoreCase(documentNumberLocal)).findAny();
+
+				if (opExist.isPresent()) {
+					TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
+					log.debug("----------" + documentNumberLocal
+							+ "  Saving Accounting Voucher to Server Failed---------Duplicate Found-------");
+					taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
+					taskSubmissionResponse
+							.setMessage(LocalDateTime.now() + " " + "Duplicate found " + documentNumberLocal);
+					return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
+
+				}
+			}
+		}
+
 		TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 
 		try {

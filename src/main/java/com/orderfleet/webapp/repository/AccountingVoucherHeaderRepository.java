@@ -295,6 +295,9 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("select avd.mode,avd.amount,avd.by.pid,avd.by.name,avd.to.pid,avd.to.name,avd.voucherNumber,avd.voucherDate,avd.referenceNumber from AccountingVoucherDetail avd where avd.accountingVoucherHeader.pid = ?1")
 	List<Object[]> getCustomerWiseAccountingDetail(String accountingVoucherHeaderPid);
 
+	@Query("SELECT av.documentNumberServer,av.document.pid,av.createdDate from AccountingVoucherHeader av where av.company.pid = ?1 and av.createdBy.pid = ?2 and av.document.pid IN(?3)")
+	List<Object[]> getAllDocumentNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
+
 	// @Query("select
 	// avh.id,avh.pid,avh.createdDate,avh.documnetDate,avh.accountProfile.pid,avh.accountProfile.name,avh.document.pid,avh.document.name,avh.totalAmount,avh.documentNumberServer
 	// from AccountingVoucherHeader avh where avh.createdBy.login = ?1 and
