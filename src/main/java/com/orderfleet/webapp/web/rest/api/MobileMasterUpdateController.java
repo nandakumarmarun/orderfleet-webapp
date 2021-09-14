@@ -23,24 +23,23 @@ import com.orderfleet.webapp.service.MobileMasterDetailService;
 import com.orderfleet.webapp.service.MobileMasterUpdateService;
 import com.orderfleet.webapp.web.rest.dto.MobileMasterUpdateDTO;
 
-
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MobileMasterUpdateController {
 
 	private final Logger log = LoggerFactory.getLogger(MobileMasterUpdateController.class);
-	
+
 	@Autowired
-	MobileMasterUpdateService mobileMasterUpdateService; 
+	MobileMasterUpdateService mobileMasterUpdateService;
 	@Autowired
 	MobileMasterDetailService mobileMasterDetailService;
-	
+
 	@Autowired
 	MobileMasterUpdateRepository mobileMasterUpdateRepository;
-	
+
 	@Autowired
-	MobileMasterDetailRepository mobileMasterDetailRepository; 
-	
+	MobileMasterDetailRepository mobileMasterDetailRepository;
+
 	@RequestMapping(value = "/mobile-master-update-status", method = RequestMethod.POST, 
 						produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -54,20 +53,15 @@ public class MobileMasterUpdateController {
 		}
 		
 		System.out.println("MobileMasterUpdateId :"+mobileMasterUpdate.getId());
-		if(mobileMasterUpdate != null) {
-			
-			List<MobileMasterDetail> mmdList = mobileMasterDetailService.convertMobileMasterDetails(
-								mobileMasterUpdateDTO.getMobileMasterDetailDtos(), mobileMasterUpdate);
-			if(mmdList != null && mmdList.size()>0) {
-				//mmdList = mobileMasterDetailService.saveMobileMasterDetails(mmdList);
-				mobileMasterUpdate.setMobileMasterDetails(mmdList);
-				mobileMasterUpdate = mobileMasterUpdateService.saveMobileMasterUpdate(mobileMasterUpdate);
-				return new ResponseEntity<>(true,HttpStatus.CREATED);
-			}else {
-				return new ResponseEntity<>(false,HttpStatus.CONFLICT);
-			}
-		}else {
-			return new ResponseEntity<>(false,HttpStatus.CONFLICT);
-		}
+		List<MobileMasterDetail> mmdList = mobileMasterDetailService
+				.convertMobileMasterDetails(mobileMasterUpdateDTO.getMobileMasterDetailDtos(), mobileMasterUpdate);
+		if (mmdList != null && mmdList.size() > 0) {
+			mobileMasterUpdate.setMobileMasterDetails(mmdList);
+			mobileMasterUpdate = mobileMasterUpdateService.saveMobileMasterUpdate(mobileMasterUpdate);
+			return new ResponseEntity<>(true, HttpStatus.CREATED);
+		} else {
+			return new ResponseEntity<>(false, HttpStatus.CONFLICT);
+		}L̥
+		
 	}
 }

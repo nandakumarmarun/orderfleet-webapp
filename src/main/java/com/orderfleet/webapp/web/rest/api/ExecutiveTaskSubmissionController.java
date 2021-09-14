@@ -257,7 +257,7 @@ public class ExecutiveTaskSubmissionController {
 						taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
 						taskSubmissionResponse
 								.setMessage(LocalDateTime.now() + " " + "Duplicate found " + documentNumberLocal);
-						return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
+						return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.NOT_MODIFIED);
 					}
 
 //					if (documentNumberLocalPrefix != null) {
@@ -332,7 +332,7 @@ public class ExecutiveTaskSubmissionController {
 						taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
 						taskSubmissionResponse
 								.setMessage(LocalDateTime.now() + " " + "Duplicate found " + documentNumberLocal);
-						return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
+						return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.NOT_MODIFIED);
 					}
 				}
 			}
@@ -378,7 +378,7 @@ public class ExecutiveTaskSubmissionController {
 					taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
 					taskSubmissionResponse
 							.setMessage(LocalDateTime.now() + " " + "Duplicate found " + documentNumberLocal);
-					return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
+					return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.NOT_MODIFIED);
 
 				}
 			}
@@ -425,7 +425,7 @@ public class ExecutiveTaskSubmissionController {
 					taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Error " + documentNumberLocal);
 					taskSubmissionResponse
 							.setMessage(LocalDateTime.now() + " " + "Duplicate found " + documentNumberLocal);
-					return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.CONFLICT);
+					return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.NOT_MODIFIED);
 
 				}
 			}

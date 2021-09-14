@@ -113,12 +113,19 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "cmp.pid = ?1 and u.pid = ?2  and doc.pid IN (?3) and "
 			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id";
 
-	public static final String LAST_DOCUMENT_PID_DATE = "select ivh.document_id,MAX(ivh.created_date) from tbl_inventory_voucher_header ivh "
+//	public static final String LAST_DOCUMENT_PID_DATE = "select ivh.document_id,MAX(ivh.created_date) from tbl_inventory_voucher_header ivh "
+//			+ "INNER JOIN tbl_company cmp on ivh.company_id = cmp.id   "
+//			+ "INNER JOIN tbl_document doc on ivh.document_id = doc.id  "
+//			+ "INNER JOIN tbl_user u on ivh.created_by_id = u.id where  "
+//			+ "cmp.pid = ?1 and u.pid = ?2  and doc.pid IN (?3) and "
+//			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id";
+
+	public static final String LAST_DOCUMENT_PID_DATE = "select max(cast(coalesce(nullif(SPLIT_PART(ivh.document_number_local, ?4 , 2),''),'0') as bigint)) from tbl_inventory_voucher_header ivh "
 			+ "INNER JOIN tbl_company cmp on ivh.company_id = cmp.id   "
 			+ "INNER JOIN tbl_document doc on ivh.document_id = doc.id  "
 			+ "INNER JOIN tbl_user u on ivh.created_by_id = u.id where  "
-			+ "cmp.pid = ?1 and u.pid = ?2  and doc.pid IN (?3) and "
-			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id group by ivh.document_id";
+			+ "cmp.pid = ?1 and u.pid = ?2  and doc.pid = ?3 and "
+			+ "ivh.company_id = cmp.id and ivh.created_by_id = u.id and ivh.document_id = doc.id";
 
 	public static final String ALL_DOCUMENT_NUMBER = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
 			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "
@@ -518,8 +525,11 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query(value = LAST_DOCUMENT_DATE, nativeQuery = true)
 	LocalDateTime lastDateWithCompanyUserDocument(String companyPid, String userPid, List<String> documentPids);
 
+//	@Query(value = LAST_DOCUMENT_PID_DATE, nativeQuery = true)
+//	List<Object[]> lastDatesWithCompanyUserDocuments(String companyPid, String userPid, List<String> documentPids);
+
 	@Query(value = LAST_DOCUMENT_PID_DATE, nativeQuery = true)
-	List<Object[]> lastDatesWithCompanyUserDocuments(String companyPid, String userPid, List<String> documentPids);
+	Long getHigestDocumentNumberwithoutPrefix(String companyPid, String userPid, String documentPid, String prefix);
 
 	@Query(value = ALL_DOCUMENT_NUMBER, nativeQuery = true)
 	List<Object[]> getAllDocumentNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);

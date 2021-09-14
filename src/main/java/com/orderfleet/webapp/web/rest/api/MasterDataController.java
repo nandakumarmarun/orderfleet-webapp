@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest.api;
 
+import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -120,6 +121,7 @@ import com.orderfleet.webapp.web.rest.api.dto.KnowledgeBaseFilesDTO;
 import com.orderfleet.webapp.web.rest.api.dto.MBLocationHierarchyDTO;
 import com.orderfleet.webapp.web.rest.api.dto.PostDatedVoucherDTO;
 import com.orderfleet.webapp.web.rest.api.dto.RootPlanHeaderUserTaskListDTO;
+import com.orderfleet.webapp.web.rest.api.dto.UserTaskListDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountTypeDTO;
 import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
@@ -1579,66 +1581,68 @@ public class MasterDataController {
 //		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid,
 //				userPid, documentPids, lastDate);
 
-		List<Object[]> lastDateObjectArray = inventoryVoucherHeaderRepository
-				.lastDatesWithCompanyUserDocuments(companyPid, userPid, documentPids);
+//		List<Object[]> lastDateObjectArray = inventoryVoucherHeaderRepository
+//				.lastDatesWithCompanyUserDocuments(companyPid, userPid, documentPids);
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-		DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-
-		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SS");
-
-		DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-		List<Object[]> objectArray = new ArrayList<>();
-
-		for (Object[] obj : lastDateObjectArray) {
-
-			LocalDateTime lastDate = LocalDateTime.now();
-			if (obj[1] != null) {
-
-				String[] dateArray = obj[1].toString().split("\\.");
-
-				String date = obj[1].toString();
-
-				if (dateArray[1] == null && dateArray[1].length() == 0) {
-					lastDate = LocalDateTime.parse(date, formatter);
-				} else if (dateArray[1].length() == 1) {
-					lastDate = LocalDateTime.parse(date, formatter1);
-				} else if (dateArray[1].length() == 2) {
-					lastDate = LocalDateTime.parse(date, formatter2);
-				} else {
-					lastDate = LocalDateTime.parse(date, formatter3);
-				}
-			}
-			log.info("Last Date " + lastDate);
-			if (lastDate == null) {
-				lastDate = LocalDateTime.now();
-			}
-			objectArray.addAll(inventoryVoucherHeaderRepository.getLastNumberForEachDocumentsDateOptimized(companyPid,
-					userPid, Long.valueOf(obj[0].toString()), lastDate));
-		}
-
-//		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid, userPid, documentPids,
-//				lastDate);
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//
+//		DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+//
+//		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SS");
+//
+//		DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+//
+//		List<Object[]> objectArray = new ArrayList<>();
+//
+//		for (Object[] obj : lastDateObjectArray) {
+//
+//			LocalDateTime lastDate = LocalDateTime.now();
+//			if (obj[1] != null) {
+//
+//				String[] dateArray = obj[1].toString().split("\\.");
+//
+//				String date = obj[1].toString();
+//
+//				if (dateArray[1] == null && dateArray[1].length() == 0) {
+//					lastDate = LocalDateTime.parse(date, formatter);
+//				} else if (dateArray[1].length() == 1) {
+//					lastDate = LocalDateTime.parse(date, formatter1);
+//				} else if (dateArray[1].length() == 2) {
+//					lastDate = LocalDateTime.parse(date, formatter2);
+//				} else {
+//					lastDate = LocalDateTime.parse(date, formatter3);
+//				}
+//			}
+//			log.info("Last Date " + lastDate);
+//			if (lastDate == null) {
+//				lastDate = LocalDateTime.now();
+//			}
+//			objectArray.addAll(inventoryVoucherHeaderRepository.getLastNumberForEachDocumentsDateOptimized(companyPid,
+//					userPid, Long.valueOf(obj[0].toString()), lastDate));
+//		}
+//
+////		List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocumentOptimized(companyPid, userPid, documentPids,
+////				lastDate);
 
 		log.info("Company Pid" + companyPid + "\n User Pid : " + userPid + "\n Document Pids : " + documentPids);
 		List<VoucherNumberGeneratorDTO> voucherNumberGeneratorDTOs = new ArrayList<>();
 		// document entry exist in inventory voucher entries
 		boolean documentExit = false;
 		for (VoucherNumberGenerator vng : voucherNumberGeneratorList) {
-			documentExit = false;
-			for (Object[] obj : objectArray) {
-				log.info(obj[1].toString() + "---" + vng.getDocument().getPid());
-				if (vng.getDocument().getPid().equals(obj[1])) {
+			Long lastHighestDocumentNumberwithoutPrefix = inventoryVoucherHeaderRepository
+					.getHigestDocumentNumberwithoutPrefix(companyPid, userPid, vng.getDocument().getPid(),
+							vng.getPrefix());
 
-					voucherNumberGeneratorDTOs.add(new VoucherNumberGeneratorDTO(vng.getId(), vng.getUser().getPid(),
-							vng.getUser().getFirstName(), vng.getDocument().getPid(), vng.getDocument().getName(),
-							vng.getPrefix(), vng.getStartwith(), obj[0].toString()));
-					documentExit = true;
-				}
-			}
-			if (!documentExit) {
+			if (lastHighestDocumentNumberwithoutPrefix != null && lastHighestDocumentNumberwithoutPrefix != 0) {
+
+				String lastVoucherNumber = vng.getPrefix() + lastHighestDocumentNumberwithoutPrefix;
+
+				voucherNumberGeneratorDTOs.add(new VoucherNumberGeneratorDTO(vng.getId(), vng.getUser().getPid(),
+						vng.getUser().getFirstName(), vng.getDocument().getPid(), vng.getDocument().getName(),
+						vng.getPrefix(), vng.getStartwith(), lastVoucherNumber));
+				documentExit = true;
+
+			} else {
 				voucherNumberGeneratorDTOs.add(new VoucherNumberGeneratorDTO(vng.getId(), vng.getUser().getPid(),
 						vng.getUser().getFirstName(), vng.getDocument().getPid(), vng.getDocument().getName(),
 						vng.getPrefix(), vng.getStartwith(), vng.getPrefix() + "0"));
@@ -1647,7 +1651,7 @@ public class MasterDataController {
 		}
 
 		for (VoucherNumberGeneratorDTO vng : voucherNumberGeneratorDTOs) {
-			log.info("Last Voucher-Number" + vng.getLastVoucherNumber());
+			log.info("Last Voucher-Number :  ->L̥L̥" + vng.getLastVoucherNumber());
 			vng.setLastVoucherNumber(vng.getLastVoucherNumber().replaceAll("\\n", ""));
 		}
 
