@@ -29,6 +29,7 @@ public class SalesOrderExcelDTO {
 	private Double kfcPer;
 	private String remarks;
 	private String customerName;
+	private String productName;
 
 	public SalesOrderExcelDTO() {
 
@@ -208,6 +209,14 @@ public class SalesOrderExcelDTO {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
 
 	@Override

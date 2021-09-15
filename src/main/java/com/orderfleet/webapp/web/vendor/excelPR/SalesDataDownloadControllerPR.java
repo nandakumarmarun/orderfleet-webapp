@@ -273,7 +273,7 @@ public class SalesDataDownloadControllerPR {
 			String dateAsString = df.format(obj[1]);
 
 			salesOrderDTO.setDate(dateAsString != null ? dateAsString : "");
-			salesOrderDTO.setCustomerCode(obj[2] != null ? obj[2].toString() : "");
+			// salesOrderDTO.setCustomerCode(obj[2] != null ? obj[2].toString() : "");
 
 			Optional<AccountProfile> apOp = accountProfileRepository
 					.findByCompanyIdAndAliasIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), obj[2].toString());
@@ -287,7 +287,7 @@ public class SalesDataDownloadControllerPR {
 					unregisteredCustomer = true;
 				}
 			}
-			salesOrderDTO.setItemCode(obj[3] != null ? obj[3].toString() : "");
+			// salesOrderDTO.setItemCode(obj[3] != null ? obj[3].toString() : "");
 			salesOrderDTO.setQuantity(obj[4] != null ? Double.parseDouble(obj[4].toString()) : 0.0);
 			salesOrderDTO.setRate(obj[5] != null ? Double.parseDouble(obj[5].toString()) : 0.0);
 			salesOrderDTO.setDiscPer(obj[6] != null ? Double.parseDouble(obj[6].toString()) : 0.0);
@@ -356,6 +356,9 @@ public class SalesDataDownloadControllerPR {
 			salesOrderDTO.setFreeQuantity(freeQty);
 			salesOrderDTO.setMrp(mrp);
 			salesOrderDTO.setCustomerName(obj[13] != null ? obj[13].toString() : "");
+			salesOrderDTO.setCustomerCode(obj[17] != null ? obj[17].toString() : "");
+			salesOrderDTO.setItemCode(obj[18] != null ? obj[18].toString() : "");
+			salesOrderDTO.setProductName(obj[19] != null ? obj[19].toString() : "");
 			inventoryHeaderPid.add(obj[9] != null ? obj[9].toString() : "");
 			System.out.println("================================================================");
 			System.out.println(salesOrderDTO.toString());
