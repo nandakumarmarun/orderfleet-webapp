@@ -5,82 +5,91 @@ if (!this.KilometerCalculation) {
 (function() {
 	'use strict';
 
-	var kilometerCalculationPath = location.protocol + '//'
-			+ location.host + location.pathname;
+	var kilometerCalculationPath = location.protocol + '//' + location.host
+			+ location.pathname;
 
-	$(document).ready(function() {
+	$(document)
+			.ready(
+					function() {
 
-		$("#txtToDate").datepicker({
-			dateFormat : "dd-mm-yy"
-		});
-		$("#txtFromDate").datepicker({
-			dateFormat : "dd-mm-yy"
-		});
-		$('#btnSearch').click(function() {
-			searchTable($("#search").val());
-		});
+						$("#txtToDate").datepicker({
+							dateFormat : "dd-mm-yy"
+						});
+						$("#txtFromDate").datepicker({
+							dateFormat : "dd-mm-yy"
+						});
+						$('#btnSearch').click(function() {
+							searchTable($("#search").val());
+						});
 
-		
-// GeoLocationVariance.filter();
-		$('#btnDownload').on('click', function() {
-			var tbltblKilometerCalculation = $("#tblKilometerCalculation tbody");
-			if (tbltblKilometerCalculation.children().length == 0) {
-				alert("no values available");
-				return;
-			}	
-			var excelName = "kilometer_report";
-			var instance = $('#tblKilometerCalculation').tableExport({
-				formats: ['xlsx'],
-				filename: excelName,
-				exportButtons: false
-			});
-			var exportData = instance.getExportData()['tblKilometerCalculation']['xlsx'];
-		    instance.export2file(exportData.data, exportData.mimeType, exportData.filename, exportData.fileExtension);
-		});
-	
-	});
+						// GeoLocationVariance.filter();
+						$('#btnDownload')
+								.on(
+										'click',
+										function() {
+											var tbltblKilometerCalculation = $("#tblKilometerCalculation tbody");
+											if (tbltblKilometerCalculation
+													.children().length == 0) {
+												alert("no values available");
+												return;
+											}
+											var excelName = "kilometer_report";
+											var instance = $(
+													'#tblKilometerCalculation')
+													.tableExport({
+														formats : [ 'xlsx' ],
+														filename : excelName,
+														exportButtons : false
+													});
+											var exportData = instance
+													.getExportData()['tblKilometerCalculation']['xlsx'];
+											instance.export2file(
+													exportData.data,
+													exportData.mimeType,
+													exportData.filename,
+													exportData.fileExtension);
+										});
 
-	
-	
-/*	function downloadXls(excelName) {
-		 var table2excel = new Table2Excel();
-	     table2excel.export(document.getElementById('tblKilometerCalculation'),excelName);
-	}*/
-		
-//		$('#dbUser').on('change', function() {
-//			$('#dbAccountProfile').html("Loading...");
-//			
-//			$
-//			.ajax({
-//				url : kilometerCalculationPath + "/get-account-profile",
-//				type : 'GET',
-//				data : {
-//					userPid : $("#dbUser").val(),
-//				},
-//				success : function(data) {
-//					$('#dbAccountProfile').html("");
-//					if (data.length == 0) {
-//						$('#dbAccountProfile').append($('<option>', { 
-//					        val: "no",
-//					        text : "No Account Profiles"
-//					    }));
-//						return;
-//					}
-//					$('#dbAccountProfile').append($('<option>', { 
-//				        val: "no",
-//				        text : "All Account Profile"
-//				    }));
-//					$.each(data, function (index,accountProfile ) {
-//					    $('#dbAccountProfile').append($('<option>', { 
-//					        val: accountProfile.pid,
-//					        text : accountProfile.name 
-//					    }));
-//					});
-//				},
-//				
-//		});
-//		});
-	
+					});
+
+	/*
+	 * function downloadXls(excelName) { var table2excel = new Table2Excel();
+	 * table2excel.export(document.getElementById('tblKilometerCalculation'),excelName); }
+	 */
+
+	// $('#dbUser').on('change', function() {
+	// $('#dbAccountProfile').html("Loading...");
+	//			
+	// $
+	// .ajax({
+	// url : kilometerCalculationPath + "/get-account-profile",
+	// type : 'GET',
+	// data : {
+	// userPid : $("#dbUser").val(),
+	// },
+	// success : function(data) {
+	// $('#dbAccountProfile').html("");
+	// if (data.length == 0) {
+	// $('#dbAccountProfile').append($('<option>', {
+	// val: "no",
+	// text : "No Account Profiles"
+	// }));
+	// return;
+	// }
+	// $('#dbAccountProfile').append($('<option>', {
+	// val: "no",
+	// text : "All Account Profile"
+	// }));
+	// $.each(data, function (index,accountProfile ) {
+	// $('#dbAccountProfile').append($('<option>', {
+	// val: accountProfile.pid,
+	// text : accountProfile.name
+	// }));
+	// });
+	// },
+	//				
+	// });
+	// });
 	KilometerCalculation.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");
@@ -113,7 +122,7 @@ if (!this.KilometerCalculation) {
 					type : 'GET',
 					data : {
 						userPid : $("#dbUser").val(),
-						//accountProfilePid : $("#dbAccountProfile").val(),
+						// accountProfilePid : $("#dbAccountProfile").val(),
 						filterBy : $("#dbDateSearch").val(),
 						fromDate : $("#txtFromDate").val(),
 						toDate : $("#txtToDate").val()
@@ -133,50 +142,85 @@ if (!this.KilometerCalculation) {
 											"<tr><td colspan='9' align='center'>No data available</td></tr>");
 							return;
 						}
-						
-						
-						
-						
+
 						$
 								.each(
 										data,
 										function(index, kilometerCalc) {
+											let lastlocation = kilometerCalc.location == null ? ""
+													: kilometerCalc.location;
+
+											if (lastlocation == "No Location") {
+												lastlocation = "<span class='btn btn-success'  id='"
+														+ kilometerCalc.taskExecutionPid
+														+ "' onClick='KilometerCalculation.getLocation(this)' >get location</span>";
+
+											}
+
 											$('#tBodyKilometerCalculation')
 													.append(
 															"<tr><td>"
 																	+ kilometerCalc.employeeName
 																	+ "</td><td>"
-																	+ (kilometerCalc.accountProfileName==null ?"Attendance":kilometerCalc.accountProfileName)
+																	+ (kilometerCalc.accountProfileName == null ? "Attendance"
+																			: kilometerCalc.accountProfileName)
 																	+ "</td><td class='tableexport-string target'>"
-																	+(kilometerCalc.punchingDate == null?"":formatDate(kilometerCalc.punchingDate, 'MMM DD YYYY, hh:mm:ss'))
+																	+ (kilometerCalc.punchingDate == null ? ""
+																			: formatDate(
+																					kilometerCalc.punchingDate,
+																					'MMM DD YYYY, hh:mm:ss'))
 																	+ "</td><td>"
-																	+ (kilometerCalc.location == null ? "":kilometerCalc.location)
+																	+ lastlocation
 																	+ "</td><td>"
-																	+ kilometerCalc.metres.toFixed(2)
+																	+ kilometerCalc.metres
+																			.toFixed(2)
 																	+ "</td><td>"
-																	+ kilometerCalc.kilometre.toFixed(2)
+																	+ kilometerCalc.kilometre
+																			.toFixed(2)
 																	+ "</td></tr>");
-											
+
 											totalDistance += kilometerCalc.kilometre;
 											totalEntries += 1;
-											if(kilometerCalc.location === 'Attendance') {
-												attendanceEntries +=1 ;
+											if (kilometerCalc.location === 'Attendance') {
+												attendanceEntries += 1;
 											}
-												
+
 										});
-						
+
 						farePerKilometre = $(dbFareType).val();
-						if(farePerKilometre == 'no'){
+						if (farePerKilometre == 'no') {
 							farePerKilometre = 0;
 						}
-						$('#lblTotalKilo').text(totalDistance.toFixed(2) + "KM");
+						$('#lblTotalKilo')
+								.text(totalDistance.toFixed(2) + "KM");
 						$('#lblSub').text(totalEntries - attendanceEntries);
-						$('#lblTotalFare').text((totalDistance * farePerKilometre).toFixed(2));
+						$('#lblTotalFare').text(
+								(totalDistance * farePerKilometre).toFixed(2));
 
 					}
 				});
 	}
-	
+
+	KilometerCalculation.getLocation = function(obj) {
+		var pid = $(obj).attr("id");
+		$(obj).html("loading...");
+		$.ajax({
+			url : kilometerCalculationPath + "/updateLocationExeTask/"
+					+ pid,
+			method : 'GET',
+			success : function(data) {
+				$(obj).html(data.location);
+				$(obj).removeClass("btn-success");
+				$(obj).removeClass("btn");
+
+				KilometerCalculation.filter();
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+	}
+
 	function onSaveSuccess(result) {
 		// reloading page to see the updated data
 		window.location = kilometerCalculationPath;

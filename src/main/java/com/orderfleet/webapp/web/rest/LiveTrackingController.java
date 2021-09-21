@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,13 +11,21 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
+import com.orderfleet.webapp.geolocation.api.GeoLocationService;
+import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AttendanceService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
@@ -25,6 +34,7 @@ import com.orderfleet.webapp.service.ExecutiveTaskExecutionService;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
+import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.rest.dto.LiveTrackingDTO;
 
 /**
@@ -51,11 +61,42 @@ public class LiveTrackingController {
 	@Inject
 	private AttendanceService attendanceService;
 
+	@Inject
+	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
+
+	@Inject
+	private GeoLocationService geoLocationService;
+
 	@RequestMapping("/live-tracking")
 	public String executives(Model model) {
 		log.info("liveTracking.........................");
 		model.addAttribute("companyId", SecurityUtils.getCurrentUsersCompanyId());
 		return "company/liveTracking";
+	}
+
+	@RequestMapping(value = "/updateLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
+		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
+		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
+		if (opExecutiveeExecution.isPresent()) {
+			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
+
+			if (execution.getLatitude() != BigDecimal.ZERO) {
+				System.out.println("-------lat != 0");
+				String location = geoLocationService
+						.findAddressFromLatLng(execution.getLatitude() + "," + execution.getLongitude());
+				System.out.println("-------" + location);
+				execution.setLocation(location);
+
+			} else {
+				System.out.println("-------No Location");
+				execution.setLocation("No Location");
+			}
+			execution = executiveTaskExecutionRepository.save(execution);
+			executionView = new InvoiceWiseReportView(execution);
+		}
+		return new ResponseEntity<>(executionView, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getUsersDetails", method = RequestMethod.GET)

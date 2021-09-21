@@ -63,7 +63,8 @@ function loadUsersDetails(dashboardUserPid) {
 													+ '<div class="panel-body route-details-li"><ul id="ul'
 													+ userData.userPid
 													+ '"></ul></div></div></div>';
-											markPoints(userData.trackingPoints,userData.employeeName);
+											markPoints(userData.trackingPoints,
+													userData.employeeName);
 										});
 					} else {
 						console.log("no data.......");
@@ -99,7 +100,7 @@ function updateUserRouteDetails(taskExecution) {
 	});
 	// mark point
 	if (selectedUserPid == "no" || selectedUserPid == taskExecution.userPid) {
-		createMarker(taskExecution,0,taskExecution.employeeName);
+		createMarker(taskExecution, 0, taskExecution.employeeName);
 	}
 }
 
@@ -115,7 +116,7 @@ function onSelectUser(userPid, obj) {
 		if (userData.userPid == userPid) {
 			var trackingPoints = userData.trackingPoints.slice();
 			createUserMapOptionsAndRefreshMap(trackingPoints);
-			markPoints(userData.trackingPoints,userData.employeeName);
+			markPoints(userData.trackingPoints, userData.employeeName);
 			drawRoute(trackingPoints);
 			return;
 		}
@@ -145,7 +146,7 @@ function createUserMapOptionsAndRefreshMap(trackingPoints) {
 	map = new google.maps.Map(document.getElementById('map-canvas'),
 			userMapOptions);
 }
-
+var taskUserPid = "";
 function showUserRouteHistory(userPid) {
 	$('#ul' + userPid).html("<li>Please wait...</li>");
 	$
@@ -153,6 +154,7 @@ function showUserRouteHistory(userPid) {
 					userDataList,
 					function(index, userData) {
 						if (userData.userPid == userPid) {
+							taskUserPid = userPid;
 							var trackingPoints = userData.trackingPoints;
 							if (trackingPoints.length > 0) {
 								var list = "";
@@ -161,11 +163,20 @@ function showUserRouteHistory(userPid) {
 												trackingPoints,
 												function(index, trackingPoint) {
 													var location;
-													if(trackingPoint.locationType == "TowerLocation"){
+													if (trackingPoint.locationType == "TowerLocation") {
 														location = trackingPoint.towerLocation;
-													}else{
+													} else {
 														location = trackingPoint.location;
 													}
+
+													if (location == "No Location"
+															&& trackingPoint.latitude != 0) {
+														location = "<span class='btn btn-success'  id='"
+																+ trackingPoint.pid
+																+ "' onClick='getLocation(this)' >get location</span>";
+
+													}
+
 													var li = "<li style='cursor: pointer;' onclick='zoomToLocation("
 															+ trackingPoint.latitude
 															+ ", "
@@ -189,6 +200,26 @@ function showUserRouteHistory(userPid) {
 					});
 }
 
+function getLocation(obj) {
+	var pid = $(obj).attr("id");
+	$(obj).html("loading...");
+	$.ajax({
+		url : contextPath + "/web/updateLocation/" + pid,
+		method : 'GET',
+		success : function(data) {
+			$(obj).html(data.location);
+			$(obj).removeClass("btn-success");
+			$(obj).removeClass("btn");
+
+			window.location = contextPath + "/web/live-tracking?user-key-pid="
+					+ taskUserPid;
+		},
+		error : function(xhr, error) {
+			onError(xhr, error);
+		}
+	});
+}
+
 function zoomToLocation(lat, lng) {
 	console.log("latitude : " + lat);
 	console.log("longitude : " + lng);
@@ -201,30 +232,32 @@ function zoomToLocation(lat, lng) {
 }
 
 var endPointNumber = 0;
-function markPoints(trackingPoints,employeeName) {
+function markPoints(trackingPoints, employeeName) {
 	endPointNumber = trackingPoints.length;
 	var number = 0;
 	$.each(trackingPoints, function(index, trackingPoint) {
 		number = number + 1;
-		createMarker(trackingPoint, number,employeeName);
+		createMarker(trackingPoint, number, employeeName);
 	});
 }
 
-function createMarker(trackingPoint, number,employeeName) {
-	if (trackingPoint.locationType == "GpsLocation" || trackingPoint.locationType == "TowerLocation") {
+function createMarker(trackingPoint, number, employeeName) {
+	if (trackingPoint.locationType == "GpsLocation"
+			|| trackingPoint.locationType == "TowerLocation") {
 
-		var contentString = createContentString(trackingPoint, number,employeeName);
+		var contentString = createContentString(trackingPoint, number,
+				employeeName);
 		var lat = 0;
 		var lng = 0;
-		if (trackingPoint.locationType == "TowerLocation"){
-			if(trackingPoint.towerLatitude != null){
+		if (trackingPoint.locationType == "TowerLocation") {
+			if (trackingPoint.towerLatitude != null) {
 				lat = trackingPoint.towerLatitude;
 				lng = trackingPoint.towerLongitude;
-			}else{
+			} else {
 				lat = trackingPoint.latitude;
 				lng = trackingPoint.longitude;
 			}
-		}else{
+		} else {
 			lat = trackingPoint.latitude;
 			lng = trackingPoint.longitude;
 		}
@@ -248,12 +281,14 @@ function createMarker(trackingPoint, number,employeeName) {
 			marker.setIcon(contextPath
 					+ '/resources/assets/images/map/tower.png');
 		} else {
-			if(trackingPoint.accountProfileName == "Attendance"){
-				marker.setIcon('http://chart.apis.google.com/chart?chst=d_map_spin&chld=.7|0|008000|12|_|'
-						+ number + '');
-			}else{
-				marker.setIcon('http://chart.apis.google.com/chart?chst=d_map_spin&chld=.7|0|FE7569|12|_|'
-							+ number + '');
+			if (trackingPoint.accountProfileName == "Attendance") {
+				marker
+						.setIcon('http://chart.apis.google.com/chart?chst=d_map_spin&chld=.7|0|008000|12|_|'
+								+ number + '');
+			} else {
+				marker
+						.setIcon('http://chart.apis.google.com/chart?chst=d_map_spin&chld=.7|0|FE7569|12|_|'
+								+ number + '');
 			}
 		}
 
@@ -273,19 +308,19 @@ function createMarker(trackingPoint, number,employeeName) {
 	}
 }
 
-function createContentString(trackingPoint, number,employeeName) {
+function createContentString(trackingPoint, number, employeeName) {
 	var locationIcon = locationIcons(trackingPoint);
-/*	if (trackingPoint.locationType == "GpsLocation") {
-		locationIcon = '<img src="' + contextPath
-				+ '/resources/assets/images/map/location.png" width="20px" />'
-	} else if (trackingPoint.locationType == "TowerLocation") {
-		locationIcon = '<img src="' + contextPath
-				+ '/resources/assets/images/map/tower.png" width="20px" />'
-	}*/
+	/*
+	 * if (trackingPoint.locationType == "GpsLocation") { locationIcon = '<img
+	 * src="' + contextPath + '/resources/assets/images/map/location.png"
+	 * width="20px" />' } else if (trackingPoint.locationType ==
+	 * "TowerLocation") { locationIcon = '<img src="' + contextPath +
+	 * '/resources/assets/images/map/tower.png" width="20px" />' }
+	 */
 	var location;
-	if(trackingPoint.locationType == "TowerLocation"){
+	if (trackingPoint.locationType == "TowerLocation") {
 		location = trackingPoint.towerLocation;
-	}else{
+	} else {
 		location = trackingPoint.location;
 	}
 	return '<div id="content"><table class="table table-striped table-bed ">'
@@ -293,8 +328,7 @@ function createContentString(trackingPoint, number,employeeName) {
 			+ '<tr><td>Employee</td><td>' + employeeName
 			+ '</td></tr><tr><td>Account</td><td>'
 			+ trackingPoint.accountProfileName + '<tr><td>Location</td><td>'
-			+ location + " " + locationIcon
-			+ '</td></tr><tr><td>Date</td><td>'
+			+ location + " " + locationIcon + '</td></tr><tr><td>Date</td><td>'
 			+ convertDateTime(trackingPoint.date)
 			+ '</td></tr><tr><td>Number</td><td>' + number
 			+ '</td></tr></table></div>';
@@ -310,18 +344,15 @@ function locationIcons(userData) {
 					+ contextPath
 					+ '/resources/assets/images/map/location.png" width="20px">';
 		} else if (userData.locationType == "TowerLocation") {
-			images = '<img src="'
-					+ contextPath
+			images = '<img src="' + contextPath
 					+ '/resources/assets/images/map/tower.png" width="20px">';
 		} else if (userData.locationType == "FlightMode") {
-			images = '<img src="'
-					+ contextPath
+			images = '<img src="' + contextPath
 					+ '/resources/assets/images/map/flight.png" width="20px">';
 		}
 		// check gsp is Off
 		if (userData.isGpsOff && userData.locationType != "GpsLocation") {
-			images += ' <img src="'
-					+ contextPath
+			images += ' <img src="' + contextPath
 					+ '/resources/assets/images/map/gps-off.png" width="20px">';
 		}
 		// check Mobile Data is Off
@@ -437,11 +468,11 @@ var dvRendererOptions = {
 function removeDuplicatesFromPoints(points) {
 	var arr = {};
 	for (var i = 0; i < points.length; i++) {
-		if(points[i]['longitude'] == 0){
+		if (points[i]['longitude'] == 0) {
 			points[i]['latitude'] = points[i]['towerLatitude'];
 			points[i]['longitude'] = points[i]['towerLongitude'];
 			arr[points[i]['towerLongitude']] = points[i];
-		}else{
+		} else {
 			arr[points[i]['longitude']] = points[i];
 		}
 	}
