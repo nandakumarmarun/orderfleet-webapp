@@ -28,8 +28,7 @@ public class KilometerCalculationDTO {
 	private String taskExecutionPid;
 	private String accountProfileName;
 	private String location;
-	
-	
+
 	public KilometerCalculationDTO() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -42,19 +41,22 @@ public class KilometerCalculationDTO {
 		this.date = kilometreCalculation.getDate();
 		this.startLocation = kilometreCalculation.getStartLocation();
 		this.endLocation = kilometreCalculation.getEndLocation();
-		this.userName = kilometreCalculation.getUser().getFirstName()+" "+kilometreCalculation.getUser().getLastName();
-		UserPid = kilometreCalculation.getUser().getPid();
+		this.userName = kilometreCalculation.getUser().getFirstName() + " "
+				+ kilometreCalculation.getUser().getLastName();
+		this.UserPid = kilometreCalculation.getUser().getPid();
 		this.createdDate = kilometreCalculation.getCreatedDate();
-		this.lastModifiedDate =kilometreCalculation.getLastModifiedDate();
+		this.lastModifiedDate = kilometreCalculation.getLastModifiedDate();
 		this.employeePid = kilometreCalculation.getEmployee().getPid();
 		this.employeeName = kilometreCalculation.getEmployee().getName();
-		this.taskExecutionPid = kilometreCalculation.getExecutiveTaskExecution() == null ? null:kilometreCalculation.getExecutiveTaskExecution().getPid();
-		this.accountProfileName = kilometreCalculation.getExecutiveTaskExecution() == null ? null:kilometreCalculation.getExecutiveTaskExecution().getAccountProfile().getName();
+		this.taskExecutionPid = kilometreCalculation.getExecutiveTaskExecution() == null ? null
+				: kilometreCalculation.getExecutiveTaskExecution().getPid();
+		this.accountProfileName = kilometreCalculation.getExecutiveTaskExecution() == null ? null
+				: kilometreCalculation.getExecutiveTaskExecution().getAccountProfile().getName();
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
-	    this.punchingDate = dateFormatter.format(kilometreCalculation.getCreatedDate());
-	    this.location = kilometreCalculation.getExecutiveTaskExecution() == null ? null:kilometreCalculation.getExecutiveTaskExecution().getLocation();
-	    
-	    
+		this.punchingDate = dateFormatter.format(kilometreCalculation.getCreatedDate());
+		this.location = kilometreCalculation.getExecutiveTaskExecution() == null ? null
+				: kilometreCalculation.getExecutiveTaskExecution().getLocation();
+
 	}
 
 	public double getKilometre() {
@@ -177,8 +179,4 @@ public class KilometerCalculationDTO {
 		this.location = location;
 	}
 
-	
-	
-	
-	
 }

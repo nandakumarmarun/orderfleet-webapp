@@ -4,6 +4,7 @@ package com.orderfleet.webapp.web.rest;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -30,9 +31,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.KilometreCalculation;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
+import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.KilometreCalculationRepository;
 import com.orderfleet.webapp.service.DistanceFareService;
@@ -68,6 +71,9 @@ public class KilometerCalculationResource {
 
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
+
+	@Inject
+	private AttendanceRepository attendanceRepository;
 
 	@Inject
 	private GeoLocationService geoLocationService;
@@ -145,6 +151,17 @@ public class KilometerCalculationResource {
 
 		List<KilometerCalculationDTO> result = kilometreCalculations.stream().map(KilometerCalculationDTO::new)
 				.collect(Collectors.toList());
+
+		for (KilometerCalculationDTO kilocalc : result) {
+			if (kilocalc.getLocation() == null) {
+				LocalDateTime fromDate = kilocalc.getDate().atTime(0, 0);
+				LocalDateTime toDate = kilocalc.getDate().atTime(23, 59);
+
+				List<Attendance> attendance = attendanceRepository
+						.findAllByCompanyIdUserPidAndDateBetween(kilocalc.getUserPid(), fromDate, toDate);
+				kilocalc.setLocation(attendance.get(0).getLocation());
+			}
+		}
 
 		result = result.stream().sorted(Comparator.comparing(KilometerCalculationDTO::getDate).reversed())
 				.collect(Collectors.toList());

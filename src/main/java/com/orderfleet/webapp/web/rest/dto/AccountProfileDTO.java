@@ -116,7 +116,7 @@ public class AccountProfileDTO {
 	private String stateName;
 
 	private String countryName;
-	
+
 	private String districtName;
 
 	private GeoTaggingType geoTaggingType;
@@ -134,8 +134,8 @@ public class AccountProfileDTO {
 	private String AitrichCode;
 
 	private Long countryId;
-	
 
+	private String customerCode;
 
 	private Long stateId;
 
@@ -576,7 +576,6 @@ public class AccountProfileDTO {
 		this.locationRadius = locationRadius;
 	}
 
-
 	public Long getStateId() {
 		return stateId;
 	}
@@ -592,7 +591,6 @@ public class AccountProfileDTO {
 	public void setDistrictId(Long districtId) {
 		this.districtId = districtId;
 	}
-	
 
 	public Long getCountryId() {
 		return countryId;
@@ -608,6 +606,14 @@ public class AccountProfileDTO {
 
 	public void setDistrictName(String districtName) {
 		this.districtName = districtName;
+	}
+
+	public String getCustomerCode() {
+		return customerCode;
+	}
+
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
 	}
 
 	@Override

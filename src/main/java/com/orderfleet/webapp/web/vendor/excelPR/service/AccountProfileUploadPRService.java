@@ -152,16 +152,19 @@ public class AccountProfileUploadPRService {
 		for (AccountProfileDTO apDto : accountProfileDTOs) {
 			AccountProfile accountProfile;
 			// check alias exist with AitrichCode
-			if (apDto.getAitrichCode() != null && !apDto.getAitrichCode().equalsIgnoreCase("")) {
+			if (apDto.getCustomerId() != null && !apDto.getCustomerId().equalsIgnoreCase("")) {
 				// if AitrichCode not empty
 				Optional<AccountProfile> optionalAPCode = accountProfiles.stream()
-						.filter(pc -> pc.getAlias().equalsIgnoreCase(apDto.getAitrichCode())).findAny();
+						.filter(pc -> pc.getCustomerId() != null && !pc.getCustomerId().equals("")
+								? pc.getCustomerId().equalsIgnoreCase(apDto.getCustomerId())
+								: false)
+						.findAny();
 
 				if (optionalAPCode.isPresent()) {
 					accountProfile = optionalAPCode.get();
 					if (!apDto.getName().equals(accountProfile.getName())) {
 						accountProfile.setName(apDto.getName()); // set new name
-						accountProfile.setCustomerId(apDto.getAlias());
+						accountProfile.setCustomerId(apDto.getCustomerId());
 					}
 					accountProfile.setDataSourceType(DataSourceType.MOBILE);
 				} else {
@@ -206,7 +209,7 @@ public class AccountProfileUploadPRService {
 				accountProfile.setAlias(apDto.getAlias());
 			}
 			accountProfile.setTrimChar(apDto.getTrimChar());
-			accountProfile.setCustomerId(apDto.getAlias());
+			accountProfile.setCustomerId(apDto.getCustomerId());
 			if (isValidPhone(apDto.getPhone1())) {
 				accountProfile.setPhone1(apDto.getPhone1());
 			}
@@ -216,7 +219,7 @@ public class AccountProfileUploadPRService {
 			if (isValidEmail(apDto.getEmail1())) {
 				accountProfile.setEmail1(apDto.getEmail1());
 			}
-
+			accountProfile.setCustomerCode(apDto.getCustomerCode());
 			accountProfile.setTinNo(apDto.getTinNo());
 			accountProfile.setPin(apDto.getPin());
 			accountProfile.setDescription(apDto.getDescription());
