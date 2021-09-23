@@ -38,6 +38,7 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
@@ -84,7 +85,9 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 			AccountProfile accountProfile = accountProfileRepository.findOneByPid(accountProfilePid).get();
 			locationAccountProfile.add(new LocationAccountProfile(location, accountProfile, company));
 		}
-		locationAccountProfileRepository.deleteByLocationPid(locationPid);
+		if (accountProfiles.length > 1) {
+			locationAccountProfileRepository.deleteByLocationPid(locationPid);
+		}
 		locationAccountProfileRepository.save(locationAccountProfile);
 	}
 
@@ -414,6 +417,24 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	}
 
 	@Override
+	public List<LocationDTO> findAllLocationByAccountProfilePid(String accountProfilePid) {
+		List<Location> locationList = locationAccountProfileRepository
+				.findAllLocationByAccountProfilePid(accountProfilePid);
+		List<LocationDTO> result = convertLocationToLocationDTO(locationList);
+		return result;
+	}
+
+	private List<LocationDTO> convertLocationToLocationDTO(List<Location> locationList) {
+		List<LocationDTO> result = new ArrayList<>();
+
+		for (Location loc : locationList) {
+			result.add(new LocationDTO(loc));
+		}
+
+		return result;
+	}
+
+	@Override
 	public List<AccountProfileDTO> findAccountProfileByLocationPidAndActivated(String locationPid, boolean activated) {
 		List<AccountProfile> accountProfileList = locationAccountProfileRepository
 				.findAccountProfileByLocationPidAndAccountProfileActivated(locationPid, activated);
@@ -527,13 +548,13 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	@Override
 	public List<LocationAccountProfile> findAllLocationAccountProfiles(Long companyId) {
 		List<LocationAccountProfile> locationAccountProfiles = new ArrayList<>();
-		List<Object[]> list= locationAccountProfileRepository.findAllLocationAccountProfilesByCompanyId(companyId);
+		List<Object[]> list = locationAccountProfileRepository.findAllLocationAccountProfilesByCompanyId(companyId);
 		for (Object[] object : list) {
 			if (object[1] == null || object[2] == null) {
 				log.error("Either one of AccountProfilePid or LocationPid is null!");
 				continue;
 			}
-			
+
 			LocationAccountProfile locationAccountProfile = new LocationAccountProfile();
 			AccountProfile accountProfile = new AccountProfile();
 			Location location = new Location();

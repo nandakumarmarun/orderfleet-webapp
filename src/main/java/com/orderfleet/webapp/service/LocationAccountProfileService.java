@@ -11,6 +11,7 @@ import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 
 /**
  * Spring Data JPA repository for the LocationAccountProfile entity.
@@ -75,4 +76,6 @@ public interface LocationAccountProfileService {
 	Set<String> findAccountProfilePidsByUsers(List<Long> userIds);
 	
 	List<LocationAccountProfile> findAllLocationAccountProfiles(Long companyId);
+
+	List<LocationDTO> findAllLocationByAccountProfilePid(String accountProfilePid);
 }

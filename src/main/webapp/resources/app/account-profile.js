@@ -222,6 +222,10 @@ if (!this.AccountProfile) {
 							activateAssignedAccountProfile();
 						});
 
+						$('#btnSaveLocations').on('click', function() {
+							saveAssignedLocations();
+						});
+
 						$('input:checkbox.allcheckbox')
 								.click(
 										function() {
@@ -395,7 +399,7 @@ if (!this.AccountProfile) {
 
 	}
 
-	 function saveLocationRadius() {
+	function saveLocationRadius() {
 
 		$(".error-msg").html("Please Wait!..Saving..");
 
@@ -644,8 +648,90 @@ if (!this.AccountProfile) {
 													+ accountProfile.pid
 													+ "\",1);'></i>&nbsp;<a class='btn btn-info entypo-location' title='Assigned Locations' onclick='AccountProfile.showModalPopup($(\"#locationModal\"),\""
 													+ accountProfile.pid
-													+ "\",3);'></a></td></tr>");
+													+ "\",3);'></a><br><br><button type='button' class='btn btn-info' onclick='AccountProfile.assignLocations($(\"#assignLocationModal\"),\""
+													+ accountProfile.pid
+													+ "\");'>Assign Location</button></td></tr>");
 						});
+	}
+
+	var accProfilePid = "";
+
+	AccountProfile.assignLocations = function(el, pid, type) {
+		// locationModel.pid = pid;
+
+		accProfilePid = pid;
+
+		$("input[name='filter'][value='all']").prop("checked", true);
+		$("#search").val("");
+		searchTable("");
+
+		// clear all check box
+		$("#divLocations input:checkbox").attr('checked', false);
+		$(".error-msg").html("");
+
+		$.ajax({
+			url : accountProfileContextPath + "/locations",
+			type : "GET",
+			data : {
+				accountProfilePid : accProfilePid
+			},
+			success : function(locations) {
+				if (locations) {
+					$.each(locations, function(index, location) {
+						$(
+								"#divLocations input:checkbox[value="
+										+ location.pid + "]").prop("checked",
+								true);
+					});
+				}
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+		el.modal('show');
+
+	}
+
+	function saveAssignedLocations() {
+
+		$(".error-msg").html("");
+		var selectedLocations = "";
+
+		$.each($("input[name='location']:checked"), function() {
+			selectedLocations += $(this).val() + ",";
+		});
+
+		console.log(selectedLocations);
+
+		var str_array = selectedLocations.split(',');
+
+		console.log(str_array.length);
+
+		if ((str_array.length - 1) > 1) {
+			$(".error-msg").html("Please select only one Location");
+			return;
+		}
+
+		if (selectedLocations == "") {
+			$(".error-msg").html("Please select Locations");
+			return;
+		}
+		$(".error-msg").html("Please wait.....");
+		$.ajax({
+			url : accountProfileContextPath + "/assign-locations",
+			type : "POST",
+			data : {
+				locationPid : selectedLocations,
+				assignedAccountProfiles : accProfilePid
+			},
+			success : function(status) {
+				$("#assignLocationModal").modal("hide");
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			},
+		});
 	}
 
 	function spanVerify(name2, city2, address2, accountStatus2,
@@ -934,29 +1020,24 @@ if (!this.AccountProfile) {
 				$('#field_accountType').val(data.accountTypePid);
 				if (data.defaultPriceLevelPid)
 					$('#field_priceLevel').val(data.defaultPriceLevelPid);
-				if(data.countryId!=null)
-				{
+				if (data.countryId != null) {
 					$('#dbCountrycreate').val(data.countryId);
-				}else
-				{
+				} else {
 					$('#dbCountrycreate').val('-1');
 				}
-				if(data.stateId!=null)
-				{
+				if (data.stateId != null) {
 					$('#dbStatecreate').val(data.stateId);
-				}else{
+				} else {
 					$('#dbStatecreate').val('-1');
 				}
-				//$('#dbStatecreate').val(data.stateId);
-				if(data.districtId!=null){
-					
+				// $('#dbStatecreate').val(data.stateId);
+				if (data.districtId != null) {
+
 					$('#dbDistrictcreate').val(data.districtId);
-					
-				}else{
+
+				} else {
 					$('#dbDistrictcreate').val('-1');
 				}
-				
-				
 
 				$('#field_city').val(data.city);
 				$('#field_location').val(data.location);

@@ -32,6 +32,11 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	void deleteByLocationPid(String locationPid);
 
+	@Transactional
+	@Modifying
+	@Query(value = "delete from tbl_location_account_profile where company_id= ?1 and account_profile_id= ?2 ", nativeQuery = true)
+	void deleteByAccountProfilePid(long companyId, long accountProfileId);
+
 	void deleteByCompanyId(Long companyId);
 
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?#{principal.companyId}")
@@ -175,6 +180,9 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?#{principal.companyId} and locationAccountProfile.accountProfile.pid = ?1 ")
 	List<LocationAccountProfile> findAllByAccountProfilePid(String accountProfilePid);
+
+	@Query("select locationAccountProfile.location from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?#{principal.companyId} and locationAccountProfile.accountProfile.pid = ?1 ")
+	List<Location> findAllLocationByAccountProfilePid(String accountProfilePid);
 
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid in ?1 and locationAccountProfile.accountProfile.activated = ?2")
 	List<AccountProfile> findAccountProfileByLocationPidInAndAccountProfileActivated(List<String> locationPids,

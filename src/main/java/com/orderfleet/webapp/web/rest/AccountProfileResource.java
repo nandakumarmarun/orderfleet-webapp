@@ -64,6 +64,7 @@ import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
+import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.PriceLevelService;
 
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
@@ -71,6 +72,7 @@ import com.orderfleet.webapp.web.rest.dto.CountryCDTO;
 import com.orderfleet.webapp.web.rest.dto.DistrictCDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.StateCDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
@@ -119,6 +121,9 @@ public class AccountProfileResource {
 
 	@Inject
 	private StateCRepository stateCRepository;
+
+	@Inject
+	private LocationService locationService;
 
 	/**
 	 * POST /accountProfiles : Create a new accountProfile.
@@ -249,6 +254,7 @@ public class AccountProfileResource {
 		model.addAttribute("accountTypes", accountTypeService.findAllByCompany());
 		model.addAttribute("priceLevels", priceLevelService.findAllByCompany());
 		model.addAttribute("deactivatedAccountProfiles", accountProfileService.findAllByCompanyAndActivated(false));
+		model.addAttribute("locations", locationService.findAllByCompanyAndLocationActivated(true));
 		List<CountryC> countriesList = countryCRepository.findAllCountries();
 		List<CountryCDTO> countries = converttodto(countriesList);
 		model.addAttribute("countries", countries);
@@ -325,6 +331,28 @@ public class AccountProfileResource {
 		return accountProfileService.findOneByPid(pid)
 				.map(accountProfileDTO -> new ResponseEntity<>(accountProfileDTO, HttpStatus.OK))
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	}
+
+	@RequestMapping(value = "/accountProfiles/locations", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<List<LocationDTO>> locationAccountProfiles(@RequestParam String accountProfilePid) {
+		log.debug("REST request to location Account Profiles : {}", accountProfilePid);
+		List<LocationDTO> locationDTOs = locationAccountProfileService
+				.findAllLocationByAccountProfilePid(accountProfilePid);
+		return new ResponseEntity<>(locationDTOs, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/accountProfiles/assign-locations", method = RequestMethod.POST)
+	@Timed
+	public ResponseEntity<Void> saveAssignedLocations(@RequestParam String locationPid,
+			@RequestParam String assignedAccountProfiles) {
+		log.debug("REST request to save assigned Account Profiles : {}", locationPid);
+		String[] locationPids = locationPid.split(",");
+		AccountProfile accountProfile = accountProfileRepository.findOneByPid(assignedAccountProfiles).get();
+		locationAccountProfileRepository.deleteByAccountProfilePid(SecurityUtils.getCurrentUsersCompanyId(),
+				accountProfile.getId());
+		locationAccountProfileService.save(locationPids[0], assignedAccountProfiles);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	/**
