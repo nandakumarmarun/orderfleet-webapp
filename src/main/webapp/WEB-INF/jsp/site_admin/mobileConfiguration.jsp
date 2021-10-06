@@ -73,16 +73,11 @@
 						<th>Below Price Level</th>
 						<th>Amount To Three Decimal</th>
 						<th>Block Activity</th>
-						
 						<th>Enable Geo Fencing</th>
-					    <th>Receipt Allocation Mandatory</th>
-					    
-						
-						
-						
-						
+						<th>Receipt Allocation Mandatory</th>
+						<th>Sales Order Mandatory</th>
 						<th>Action</th>
-						
+
 					</tr>
 				</thead>
 				<tbody>
@@ -128,10 +123,7 @@
 							<td>${mobileConfiguration.blockActivity}</td>
 							<td>${mobileConfiguration.enableGeoFencing}</td>
 							<td>${mobileConfiguration.receiptAllocationMandatory}</td>
-							
-							
-							
-							
+							<td>${mobileConfiguration.salesOrderMandatory}</td>
 
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
@@ -168,8 +160,8 @@
 											value="-1">Select Company</option>
 										<c:forEach items="${companies}" var="company">
 											<option value="${company.pid}">${company.legalName}
-										</option>
-							</c:forEach>
+											</option>
+										</c:forEach>
 									</select>
 								</div>
 							</div>
@@ -355,13 +347,16 @@
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Show Best Performer Upload</label> <input id="showBestPerformerUpload" name='showBestPerformerUpload'
-														type='checkbox' class="form-control" />
+													<label class="control-label">Show Best Performer
+														Upload</label> <input id="showBestPerformerUpload"
+														name='showBestPerformerUpload' type='checkbox'
+														class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Below Price Level</label> <input id="belowPriceLevel" name='belowPriceLevel'
+													<label class="control-label">Below Price Level</label> <input
+														id="belowPriceLevel" name='belowPriceLevel'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
@@ -405,40 +400,45 @@
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Rate Without Allocation</label>
-													<input id="rateWithoutCalculation"
+													<label class="control-label">Sales Order Mandatory</label>
+													<input id="salesOrderMandatory" name='salesOrderMandatory'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Rate Without
+														Allocation</label> <input id="rateWithoutCalculation"
 														name='rateWithoutCalculation' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Amount to Three Decimal</label>
-													<input id="amountToThreeDecimal"
+													<label class="control-label">Amount to Three
+														Decimal</label> <input id="amountToThreeDecimal"
 														name='amountToThreeDecimal' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Block Activity</label>
-													<input id="blockActivity"
-														name='blockActivity' type='checkbox'
+													<label class="control-label">Block Activity</label> <input
+														id="blockActivity" name='blockActivity' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Enable Geo Fencing</label>
-													<input id="enableGeoFencing"
-														name='enableGeoFencing' type='checkbox'
-														class="form-control" />
+													<label class="control-label">Enable Geo Fencing</label> <input
+														id="enableGeoFencing" name='enableGeoFencing'
+														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Receipt Allocation Mandatory</label>
-													<input id="receiptAllocationMandatory"
+													<label class="control-label">Receipt Allocation
+														Mandatory</label> <input id="receiptAllocationMandatory"
 														name='receiptAllocationMandatory' type='checkbox'
 														class="form-control" />
 												</div></td>

@@ -57,12 +57,7 @@ public class MobileConfigurationDTO {
 	private boolean enableGeoFencing;
 	private boolean receiptAllocationMandatory;
 	private boolean blockActivity;
-
-	
-
-	
-
-	
+	private boolean salesOrderMandatory;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -107,13 +102,11 @@ public class MobileConfigurationDTO {
 		this.rateWithoutCalculation = mobileConfiguration.getRateWithoutCalculation();
 		this.showBestPerformerUpload = mobileConfiguration.isShowBestPerformerUpload();
 		this.belowPriceLevel = mobileConfiguration.isBelowPriceLevel();
-		this.amountToThreeDecimal=mobileConfiguration.getAmountToThreeDecimal();
-		this.enableGeoFencing=mobileConfiguration.getEnableGeoFencing();
-		this.receiptAllocationMandatory=mobileConfiguration.getReceiptAllocationMandatory();
-		this.blockActivity=mobileConfiguration.getBlockActivity();
-
-		
-
+		this.amountToThreeDecimal = mobileConfiguration.getAmountToThreeDecimal();
+		this.enableGeoFencing = mobileConfiguration.getEnableGeoFencing();
+		this.receiptAllocationMandatory = mobileConfiguration.getReceiptAllocationMandatory();
+		this.blockActivity = mobileConfiguration.getBlockActivity();
+		this.salesOrderMandatory = mobileConfiguration.getSalesOrderMandatory();
 
 	}
 
@@ -444,7 +437,13 @@ public class MobileConfigurationDTO {
 	public void setBlockActivity(boolean blockActivity) {
 		this.blockActivity = blockActivity;
 	}
-	
-	
-	
+
+	public boolean getSalesOrderMandatory() {
+		return salesOrderMandatory;
+	}
+
+	public void setSalesOrderMandatory(boolean salesOrderMandatory) {
+		this.salesOrderMandatory = salesOrderMandatory;
+	}
+
 }

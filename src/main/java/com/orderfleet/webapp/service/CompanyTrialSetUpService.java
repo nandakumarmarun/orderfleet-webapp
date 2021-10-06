@@ -894,10 +894,9 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setEnableGeoFencing(false);
 		mobileConfiguration.setReceiptAllocationMandatory(false);
 		mobileConfiguration.setBlockActivity(false);
+		mobileConfiguration.setSalesOrderMandatory(false);
 
-		
-
-        mobileConfigurationRepository.save(mobileConfiguration);
+		mobileConfigurationRepository.save(mobileConfiguration);
 	}
 
 	private List<AccountType> createAccountTypes(Company company) {

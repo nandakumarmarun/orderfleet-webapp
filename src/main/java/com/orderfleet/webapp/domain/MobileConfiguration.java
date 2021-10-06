@@ -148,25 +148,27 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "stock_location_products", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean stockLocationProducts;
-	
+
 	@Column(name = "show_best_performer_upload", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean showBestPerformerUpload;
-	
+
 	@Column(name = "below_price_level", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean belowPriceLevel;
-	
+
 	@Column(name = "amount_to_three_decimal", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean amountToThreeDecimal;
-	
+
 	@Column(name = "enable_geo_fencing", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean enableGeoFencing;
 
 	@Column(name = "receipt_allocation_mandatory", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean receiptAllocationMandatory;
-	
+
 	@Column(name = "block_activity", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean blockActivity;
-	
+
+	@Column(name = "sales_order_mandatory", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean salesOrderMandatory;
 
 	@NotNull
 	@ManyToOne
@@ -479,8 +481,6 @@ public class MobileConfiguration implements Serializable {
 	public void setBelowPriceLevel(boolean belowPriceLevel) {
 		this.belowPriceLevel = belowPriceLevel;
 	}
-	
-	
 
 	public boolean getAmountToThreeDecimal() {
 		return amountToThreeDecimal;
@@ -489,7 +489,6 @@ public class MobileConfiguration implements Serializable {
 	public void setAmountToThreeDecimal(boolean amountToThreeDecimal) {
 		this.amountToThreeDecimal = amountToThreeDecimal;
 	}
-	
 
 	public boolean getEnableGeoFencing() {
 		return enableGeoFencing;
@@ -498,8 +497,6 @@ public class MobileConfiguration implements Serializable {
 	public void setEnableGeoFencing(boolean enableGeoFencing) {
 		this.enableGeoFencing = enableGeoFencing;
 	}
-	
-	
 
 	public boolean getReceiptAllocationMandatory() {
 		return receiptAllocationMandatory;
@@ -508,7 +505,6 @@ public class MobileConfiguration implements Serializable {
 	public void setReceiptAllocationMandatory(boolean receiptAllocationMandatory) {
 		this.receiptAllocationMandatory = receiptAllocationMandatory;
 	}
-	
 
 	public boolean getBlockActivity() {
 		return blockActivity;
@@ -516,6 +512,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setBlockActivity(boolean blockActivity) {
 		this.blockActivity = blockActivity;
+	}
+
+	public boolean getSalesOrderMandatory() {
+		return salesOrderMandatory;
+	}
+
+	public void setSalesOrderMandatory(boolean salesOrderMandatory) {
+		this.salesOrderMandatory = salesOrderMandatory;
 	}
 
 	@Override

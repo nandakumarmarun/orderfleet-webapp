@@ -59,6 +59,7 @@
 						<th>Update Stock Location</th>
 						<th>Send To Odoo</th>
 						<th>Product Group Tax</th>
+						<th>Alias To Name</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -90,6 +91,7 @@
 							<th>${companyConfiguration.updateStockLocation}</th>
 							<th>${companyConfiguration.sendToOdoo}</th>
 							<th>${companyConfiguration.enableProductGroupTax}</th>
+							<th>${companyConfiguration.aliasToName}</th>
 
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
@@ -307,6 +309,14 @@
 													<label class="control-label">Product Group Tax</label> <input
 														id="productGroupTax" name='checksProductGroupTax'
 														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Alias To Name</label> <input
+														id="aliasToName" name='checksAliasToName' type='checkbox'
+														class="form-control" />
 												</div></td>
 										</tr>
 

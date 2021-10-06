@@ -83,12 +83,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setEnableGeoFencing(mobileConfigurationDTO.getEnableGeoFencing());
 		configuration.setReceiptAllocationMandatory(mobileConfigurationDTO.getReceiptAllocationMandatory());
 		configuration.setBlockActivity(mobileConfigurationDTO.getBlockActivity());
+		configuration.setSalesOrderMandatory(mobileConfigurationDTO.getSalesOrderMandatory());
 
-
-		
-
-
-		
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -136,11 +132,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setEnableGeoFencing(mobileConfigurationDTO.getEnableGeoFencing());
 			configuration.setReceiptAllocationMandatory(mobileConfigurationDTO.getReceiptAllocationMandatory());
 			configuration.setBlockActivity(mobileConfigurationDTO.getBlockActivity());
+			configuration.setSalesOrderMandatory(mobileConfigurationDTO.getSalesOrderMandatory());
 
-
-
-
-			
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;
@@ -182,7 +175,6 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		log.debug("Request to delete MobileConfigurations");
 		mobileConfigurationRepository.deleteByPid(pid);
 	}
-	
 
 	@Override
 	public Optional<MobileConfigurationDTO> findOneByCompanyId(Long companyId) {

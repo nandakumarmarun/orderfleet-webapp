@@ -247,12 +247,20 @@ public class TransactionResource {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndStatusOrderByCreatedDateDesc();
 		log.info("Retrived inventory voucher headers");
+
+		CompanyViewDTO company = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+		String companyPid = company.getPid();
+
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
 		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
 
 			String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
 
 			// seting inventory heder to salesOrderDTO
 			SalesOrderDTO salesOrderDTO = new SalesOrderDTO(inventoryVoucherHeader);
+
 			salesOrderDTO.setAccountProfileDTO(accountProfileMapper
 					.accountProfileToAccountProfileDTO(inventoryVoucherHeader.getReceiverAccount()));
 
@@ -262,6 +270,9 @@ public class TransactionResource {
 					.compareTo(i2.getProduct().getName()));
 			for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader.getInventoryVoucherDetails()) {
 				SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
+				if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+					salesOrderItemDTO.setProductName(inventoryVoucherDetail.getProduct().getAlias());
+				}
 				if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
 					rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
 							.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
@@ -352,6 +363,9 @@ public class TransactionResource {
 
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
 
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
@@ -470,6 +484,11 @@ public class TransactionResource {
 					List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
 					for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
 						SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
+
+						if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+							salesOrderItemDTO.setProductName(inventoryVoucherDetail.getProduct().getAlias());
+						}
+
 						if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
 							rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
 									.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
@@ -594,6 +613,9 @@ public class TransactionResource {
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
 		log.info("SalesManagement Company Config:" + optSalesManagement.isPresent());
+
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
 		/* List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>(); */
 
 		/*
@@ -728,6 +750,9 @@ public class TransactionResource {
 					log.info("inventory detail loop starts");
 					for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
 						SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
+						if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+							salesOrderItemDTO.setProductName(inventoryVoucherDetail.getProduct().getAlias());
+						}
 						if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
 							rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
 									.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
@@ -845,6 +870,9 @@ public class TransactionResource {
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
 
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
+
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
 			// inventoryVoucherHeaders =
@@ -957,7 +985,7 @@ public class TransactionResource {
 				SalesOrderDTO salesOrderDTO = ivhObjToSalesOrderDTO(obj, opUser.get(), opDocument.get(),
 						opEmployeeProfile.get(), opExe.get(), opRecAccPro.get(), opSupAccPro.get(), priceLevel,
 						orderStatus);
-				
+
 				if (opUserStockLocation.isPresent()) {
 					salesOrderDTO.setGodownName(opUserStockLocation.get().getStockLocation().getName());
 				}
@@ -973,6 +1001,9 @@ public class TransactionResource {
 				List<SalesOrderItemDTO> salesOrderItemDTOs = new ArrayList<SalesOrderItemDTO>();
 				for (InventoryVoucherDetail inventoryVoucherDetail : ivDetails) {
 					SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
+					if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+						salesOrderItemDTO.setProductName(inventoryVoucherDetail.getProduct().getAlias());
+					}
 					if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
 						rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
 								.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();
@@ -1219,6 +1250,11 @@ public class TransactionResource {
 		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
 
+		CompanyViewDTO company = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		String companyPid = company.getPid();
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
+
 		// List<DocumentDTO>
 		// primarySecondaryDocument=primarySecondaryDocumentService.findAllDocumentsByCompanyIdAndVoucherType(VoucherType.PRIMARY_SALES_ORDER);
 
@@ -1236,6 +1272,9 @@ public class TransactionResource {
 			}
 			for (InventoryVoucherDetail inventoryVoucherDetail : inventoryVoucherHeader.getInventoryVoucherDetails()) {
 				SalesOrderItemDTO salesOrderItemDTO = new SalesOrderItemDTO(inventoryVoucherDetail);
+				if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+					salesOrderItemDTO.setProductName(inventoryVoucherDetail.getProduct().getAlias());
+				}
 				if (inventoryVoucherDetail.getRferenceInventoryVoucherHeader() != null) {
 					rferenceInventoryVoucherHeaderExecutiveExecutionPid = inventoryVoucherDetail
 							.getRferenceInventoryVoucherHeader().getExecutiveTaskExecution().getPid();

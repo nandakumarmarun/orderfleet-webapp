@@ -46,11 +46,12 @@ if (!this.MobileConfiguration) {
 		rateWithoutCalculation : false,
 		showBestPerformerUpload : false,
 		belowPriceLevel : false,
-		amountToThreeDecimal:false,
-		blockActivity:false,
-		enableGeoFencing:false,
-		receiptAllocationMandatory:false
-		
+		amountToThreeDecimal : false,
+		blockActivity : false,
+		enableGeoFencing : false,
+		receiptAllocationMandatory : false,
+		salesOrderMandatory : false
+
 	};
 
 	$(document).ready(function() {
@@ -147,18 +148,18 @@ if (!this.MobileConfiguration) {
 				"#rateWithoutCalculation").is(":checked");
 		mobileConfigurationDTO.showBestPerformerUpload = $(
 				"#showBestPerformerUpload").is(":checked");
-		mobileConfigurationDTO.belowPriceLevel = $(
-				"#belowPriceLevel").is(":checked");
-		mobileConfigurationDTO.amountToThreeDecimal = $(
-		"#amountToThreeDecimal").is(":checked");
-		mobileConfigurationDTO.enableGeoFencing = $(
-		"#enableGeoFencing").is(":checked");
+		mobileConfigurationDTO.belowPriceLevel = $("#belowPriceLevel").is(
+				":checked");
+		mobileConfigurationDTO.amountToThreeDecimal = $("#amountToThreeDecimal")
+				.is(":checked");
+		mobileConfigurationDTO.enableGeoFencing = $("#enableGeoFencing").is(
+				":checked");
 		mobileConfigurationDTO.receiptAllocationMandatory = $(
-		"#receiptAllocationMandatory").is(":checked");
-		mobileConfigurationDTO.blockActivity = $(
-		"#blockActivity").is(":checked");
-
-
+				"#receiptAllocationMandatory").is(":checked");
+		mobileConfigurationDTO.blockActivity = $("#blockActivity").is(
+				":checked");
+		mobileConfigurationDTO.salesOrderMandatory = $("#salesOrderMandatory")
+				.is(":checked");
 
 		$.ajax({
 			url : contextPath,
@@ -260,9 +261,8 @@ if (!this.MobileConfiguration) {
 									data.receiptAllocationMandatory);
 							$('#blockActivity').prop("checked",
 									data.blockActivity);
-							
-							
-							
+							$('#salesOrderMandatory').prop("checked",
+									data.salesOrderMandatory);
 
 						}
 

@@ -87,20 +87,20 @@ public class MobileSettingsDTO {
 	private boolean salesOrderAllocation;
 
 	private boolean rateWithoutCalculation;
-	
+
 	private boolean showBestPerformerUpload;
-	
+
 	private boolean belowPriceLevel;
-	
+
 	private boolean amountToThreeDecimal;
-	
+
 	private boolean enableGeoFencing;
-	
+
 	private boolean receiptAllocationMandatory;
-	
+
 	private boolean blockActivity;
 
-	
+	private boolean salesOrderMandatory;
 
 	public MobileSettingsDTO() {
 		super();
@@ -142,15 +142,11 @@ public class MobileSettingsDTO {
 		this.rateWithoutCalculation = mobileConfigurationDTO.getRateWithoutCalculation();
 		this.showBestPerformerUpload = mobileConfigurationDTO.isShowBestPerformerUpload();
 		this.belowPriceLevel = mobileConfigurationDTO.isBelowPriceLevel();
-		this.amountToThreeDecimal=mobileConfigurationDTO.getAmountToThreeDecimal();
-		this.enableGeoFencing=mobileConfigurationDTO.getEnableGeoFencing();
-		this.receiptAllocationMandatory=mobileConfigurationDTO.getReceiptAllocationMandatory();
-		this.blockActivity=mobileConfigurationDTO.getBlockActivity();
-
-		
-
-
-		
+		this.amountToThreeDecimal = mobileConfigurationDTO.getAmountToThreeDecimal();
+		this.enableGeoFencing = mobileConfigurationDTO.getEnableGeoFencing();
+		this.receiptAllocationMandatory = mobileConfigurationDTO.getReceiptAllocationMandatory();
+		this.blockActivity = mobileConfigurationDTO.getBlockActivity();
+		this.salesOrderMandatory = mobileConfigurationDTO.getSalesOrderMandatory();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -488,6 +484,13 @@ public class MobileSettingsDTO {
 	public void setBlockActivity(boolean blockActivity) {
 		this.blockActivity = blockActivity;
 	}
-	
-	
+
+	public boolean getSalesOrderMandatory() {
+		return salesOrderMandatory;
+	}
+
+	public void setSalesOrderMandatory(boolean salesOrderMandatory) {
+		this.salesOrderMandatory = salesOrderMandatory;
+	}
+
 }

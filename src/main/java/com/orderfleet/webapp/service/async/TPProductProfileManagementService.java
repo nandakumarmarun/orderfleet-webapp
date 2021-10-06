@@ -268,6 +268,18 @@ public class TPProductProfileManagementService {
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
+
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
+
+		if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+			for (ProductProfileDTO ppDto : productProfileDTOs) {
+				String name = ppDto.getName();
+				ppDto.setName(ppDto.getAlias());
+				ppDto.setAlias(name);
+			}
+		}
+
 		// find all exist product profiles
 		Set<String> ppNames = productProfileDTOs.stream().map(p -> p.getName()).collect(Collectors.toSet());
 		List<ProductProfile> productProfiles = productProfileRepository.findByCompanyIdAndNameIn(company.getId(),
@@ -279,6 +291,7 @@ public class TPProductProfileManagementService {
 
 		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
 				.findByCompanyPidAndName(company.getPid(), CompanyConfig.PRODUCT_GROUP_TAX);
+
 		if (optProductGroupTax.isPresent() && optProductGroupTax.get().getValue().equalsIgnoreCase("true")) {
 
 			productGroupProducts = productGroupProductRepository.findByProductGroupProductActivatedAndCompanyId();

@@ -165,6 +165,10 @@ public class CompanyConfigurationResource {
 					mcDto.setEnableProductGroupTax(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.ALIAS_TO_NAME)) {
+					mcDto.setAliasToName(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
 				 * mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue())); anyValueExist =
@@ -193,7 +197,8 @@ public class CompanyConfigurationResource {
 			@RequestParam String sendSalesOrderSap, @RequestParam String piecesToQuantity,
 			@RequestParam String sendSalesOrderOdoo, @RequestParam String sendTransactionsSapPravesh,
 			@RequestParam String addCompoundUnit, @RequestParam String updateStockLocation,
-			@RequestParam String sendToOdoo, @RequestParam String productGroupTax) throws URISyntaxException {
+			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName)
+			throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -247,6 +252,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_ODOO);
 		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.PRODUCT_GROUP_TAX);
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -275,6 +282,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration updateStockLocationCompany = null;
 		CompanyConfiguration sendToOdooCompany = null;
 		CompanyConfiguration productGroupTaxCompany = null;
+		CompanyConfiguration aliasToNameCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -519,6 +527,17 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(productGroupTaxCompany);
 
+		if (optAliasToName.isPresent()) {
+			aliasToNameCompany = optAliasToName.get();
+			aliasToNameCompany.setValue(aliasToName);
+		} else {
+			aliasToNameCompany = new CompanyConfiguration();
+			aliasToNameCompany.setCompany(company);
+			aliasToNameCompany.setName(CompanyConfig.ALIAS_TO_NAME);
+			aliasToNameCompany.setValue(aliasToName);
+		}
+		companyConfigurationRepository.save(aliasToNameCompany);
+
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -600,6 +619,9 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.PRODUCT_GROUP_TAX);
 
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
+
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -677,6 +699,9 @@ public class CompanyConfigurationResource {
 		if (optProductGroupTax.isPresent()) {
 			companyConfigurationDTO.setEnableProductGroupTax(Boolean.valueOf(optProductGroupTax.get().getValue()));
 		}
+		if (optAliasToName.isPresent()) {
+			companyConfigurationDTO.setAliasToName(Boolean.valueOf(optAliasToName.get().getValue()));
+		}
 
 		/*
 		 * if (optFindLocation.isPresent()) {
@@ -747,6 +772,8 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.PRODUCT_GROUP_TAX);
 
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -848,6 +875,11 @@ public class CompanyConfigurationResource {
 		if (optProductGroupTax.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optProductGroupTax.get().getCompany().getId(),
 					CompanyConfig.PRODUCT_GROUP_TAX);
+		}
+
+		if (optAliasToName.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optAliasToName.get().getCompany().getId(),
+					CompanyConfig.ALIAS_TO_NAME);
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {
