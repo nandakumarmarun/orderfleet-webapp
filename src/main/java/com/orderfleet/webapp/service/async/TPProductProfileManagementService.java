@@ -275,7 +275,7 @@ public class TPProductProfileManagementService {
 		if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
 			for (ProductProfileDTO ppDto : productProfileDTOs) {
 				String name = ppDto.getName();
-				ppDto.setName(ppDto.getAlias());
+				ppDto.setName(ppDto.getAlias() != null && !ppDto.getAlias().equals("") ? ppDto.getAlias() : name);
 				ppDto.setAlias(name);
 			}
 		}
