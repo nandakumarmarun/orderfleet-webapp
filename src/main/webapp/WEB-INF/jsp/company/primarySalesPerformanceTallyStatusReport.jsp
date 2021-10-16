@@ -181,6 +181,7 @@
 								<th>Supplier</th>
 							</c:if>
 							<th>Receiver</th>
+							<th>Customer Location</th>
 							<th>Document</th>
 							<th>Amount
 								<p id="totalDocument" style="float: right;"></p>

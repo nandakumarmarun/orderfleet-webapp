@@ -373,7 +373,7 @@ public class SalesPerformanceReportTallyStatusResource {
 			break;
 		case "ALL":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED, TallyDownloadStatus.PROCESSING,
-					TallyDownloadStatus.PENDING,TallyDownloadStatus.FAILED);
+					TallyDownloadStatus.PENDING, TallyDownloadStatus.FAILED);
 			break;
 		}
 
@@ -460,6 +460,7 @@ public class SalesPerformanceReportTallyStatusResource {
 
 			salesPerformanceDTO.setSendSalesOrderEmailStatus(SendSalesOrderEmailStatus.valueOf(ivData[24].toString()));
 
+			salesPerformanceDTO.setReceiverAccountLocation(ivData[26] != null ? ivData[26].toString() : "");
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
@@ -489,9 +490,9 @@ public class SalesPerformanceReportTallyStatusResource {
 		log.debug("Downloading Excel report");
 		String excelFileName = "SalesOrder" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = { "Order No", "Salesman", "Order Date", "Customer", "Supplier", "Product Name",
-				"Quantity", "Unit Quantity", "Total Quantity", "Free Quantity", "Selling Rate", "Discount Amount",
-				"Discount Percentage", "Tax Amount", "Row Total" };
+		String[] headerColumns = { "Order No", "Salesman", "Order Date", "Customer", "Customer Location", "Supplier",
+				"Product Name", "Quantity", "Unit Quantity", "Total Quantity", "Free Quantity", "Selling Rate",
+				"Discount Amount", "Discount Percentage", "Tax Amount", "Row Total" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -531,18 +532,19 @@ public class SalesPerformanceReportTallyStatusResource {
 				docDateCell.setCellValue(ivh.getDocumentDate().toString());
 				docDateCell.setCellStyle(dateCellStyle);
 				row.createCell(3).setCellValue(ivh.getReceiverAccountName());
-				row.createCell(4).setCellValue(ivh.getSupplierAccountName());
+				row.createCell(4).setCellValue(ivh.getReceiverAccountLocation());
+				row.createCell(5).setCellValue(ivh.getSupplierAccountName());
 
-				row.createCell(5).setCellValue(ivd.getProductName());
-				row.createCell(6).setCellValue(ivd.getQuantity());
-				row.createCell(7).setCellValue(ivd.getProductUnitQty());
-				row.createCell(8).setCellValue((ivd.getQuantity() * ivd.getProductUnitQty()));
-				row.createCell(9).setCellValue(ivd.getFreeQuantity());
-				row.createCell(10).setCellValue(ivd.getSellingRate());
-				row.createCell(11).setCellValue(ivd.getDiscountAmount());
-				row.createCell(12).setCellValue(ivd.getDiscountPercentage());
-				row.createCell(13).setCellValue(ivd.getTaxAmount());
-				row.createCell(14).setCellValue(ivd.getRowTotal());
+				row.createCell(6).setCellValue(ivd.getProductName());
+				row.createCell(7).setCellValue(ivd.getQuantity());
+				row.createCell(8).setCellValue(ivd.getProductUnitQty());
+				row.createCell(9).setCellValue((ivd.getQuantity() * ivd.getProductUnitQty()));
+				row.createCell(10).setCellValue(ivd.getFreeQuantity());
+				row.createCell(11).setCellValue(ivd.getSellingRate());
+				row.createCell(12).setCellValue(ivd.getDiscountAmount());
+				row.createCell(13).setCellValue(ivd.getDiscountPercentage());
+				row.createCell(14).setCellValue(ivd.getTaxAmount());
+				row.createCell(15).setCellValue(ivd.getRowTotal());
 			}
 		}
 	}
@@ -642,8 +644,7 @@ public class SalesPerformanceReportTallyStatusResource {
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
 	}
-	
-	
+
 	@RequestMapping(value = "/primary-sales-performance-download-status/sendSalesReturnOdoo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> sendSalesReturnOdoo() throws MessagingException {

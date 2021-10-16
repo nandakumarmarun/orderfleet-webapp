@@ -376,6 +376,8 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ inventoryVoucher.receiverAccountName
 																	+ "</td><td>"
+																	+ inventoryVoucher.receiverAccountLocation
+																	+ "</td><td>"
 																	+ inventoryVoucher.documentName
 																	+ "</td><td>"
 																	+ (inventoryVoucher.updatedStatus ? inventoryVoucher.documentTotalUpdated

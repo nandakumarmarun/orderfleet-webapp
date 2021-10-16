@@ -33,6 +33,8 @@ public class SalesPerformanceDTO {
 
 	private String receiverAccountPhone;
 
+	private String receiverAccountLocation;
+
 	private String remarks;
 
 	private String supplierAccountPid;
@@ -441,6 +443,14 @@ public class SalesPerformanceDTO {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public String getReceiverAccountLocation() {
+		return receiverAccountLocation;
+	}
+
+	public void setReceiverAccountLocation(String receiverAccountLocation) {
+		this.receiverAccountLocation = receiverAccountLocation;
 	}
 
 }

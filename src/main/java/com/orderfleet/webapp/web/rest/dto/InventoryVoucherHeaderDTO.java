@@ -126,6 +126,8 @@ public class InventoryVoucherHeaderDTO {
 
 	private String referenceInvoiceNumber;
 
+	private String receiverAccountLocation;
+
 	private double roundedOff;
 
 	private long inventoryVoucherHeaderId;
@@ -155,6 +157,8 @@ public class InventoryVoucherHeaderDTO {
 			this.receiverAccountName = inventoryVoucherHeader.getReceiverAccount().getName();
 			this.receiverAccountAlias = inventoryVoucherHeader.getReceiverAccount().getAlias() == null ? ""
 					: inventoryVoucherHeader.getReceiverAccount().getAlias();
+			this.receiverAccountLocation = inventoryVoucherHeader.getReceiverAccount().getLocation() == null ? ""
+					: inventoryVoucherHeader.getReceiverAccount().getLocation();
 		}
 		this.processStatus = inventoryVoucherHeader.getProcessStatus();
 		if (!inventoryVoucherHeader.getInventoryVoucherDetails().isEmpty()) {
@@ -257,6 +261,8 @@ public class InventoryVoucherHeaderDTO {
 		this.documentDate = inventoryVoucherHeader.getDocumentDate();
 		this.receiverAccountPid = inventoryVoucherHeader.getReceiverAccount().getPid();
 		this.receiverAccountName = inventoryVoucherHeader.getReceiverAccount().getName();
+		this.receiverAccountLocation = inventoryVoucherHeader.getReceiverAccount().getLocation() == null ? ""
+				: inventoryVoucherHeader.getReceiverAccount().getLocation();
 		if (inventoryVoucherHeader.getSupplierAccount() != null) {
 			this.supplierAccountPid = inventoryVoucherHeader.getSupplierAccount().getPid();
 			this.supplierAccountName = inventoryVoucherHeader.getSupplierAccount().getName();
@@ -427,6 +433,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getReceiverAccountLocation() {
+		return receiverAccountLocation;
+	}
+
+	public void setReceiverAccountLocation(String receiverAccountLocation) {
+		this.receiverAccountLocation = receiverAccountLocation;
 	}
 
 	public SalesManagementStatus getSalesManagementStatus() {

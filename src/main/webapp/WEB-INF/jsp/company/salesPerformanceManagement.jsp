@@ -174,6 +174,7 @@
 								All</th>
 							<th>Employee</th>
 							<th>Receiver</th>
+							<th>Customer Location</th>
 							<th>Document</th>
 							<th>Amount
 								<p id="totalDocument" style="float: right;"></p>
