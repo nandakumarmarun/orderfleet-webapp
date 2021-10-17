@@ -12,6 +12,7 @@ import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Component;
 
+import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 
@@ -34,7 +35,9 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 				+ "ivd.inventoryVoucherHeader.employee.name," + "ivd.inventoryVoucherHeader.receiverAccount.name,"
 				+ "ivd.inventoryVoucherHeader.supplierAccount.name," + "ivd.product.productCategory.name,"
 				+ "ivd.product.name," + "ivd.quantity," + "ivd.sellingRate," + "ivd.rowTotal," + "ivd.product.pid,"
-				+ "ivd.product.unitQty," + "ivd.volume ");
+				+ "ivd.product.unitQty," + "ivd.volume," + "ivd.inventoryVoucherHeader.receiverAccount.location,"
+				+ "ivd.inventoryVoucherHeader.supplierAccount.location,"
+				+ "ivd.inventoryVoucherHeader.document.activityAccount");
 		if (!stockLocationPids.isEmpty()) {
 			subQueryString.append(",ivd.sourceStockLocation.name," + "ivd.destinationStockLocation.name ");
 		}
@@ -120,6 +123,10 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			}
 			ivd.setProductUnitQty(object[10] != null ? Double.valueOf(object[10].toString()) : 1);
 			ivd.setVolume(Double.valueOf(object[11].toString()));
+			ivd.setCustomerLocation(object[12] != null ? object[12].toString() : "");
+			if (AccountTypeColumn.valueOf(object[14].toString()).equals(AccountTypeColumn.Supplier)) {
+				ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
+			}
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
 

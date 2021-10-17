@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
+import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 
 /**
  * A DTO for the InventoryVoucherDetailDTO entity.
@@ -117,6 +118,8 @@ public class InventoryVoucherDetailDTO {
 
 	private String supplierAccountName;
 
+	private String customerLocation;
+
 	public InventoryVoucherDetailDTO() {
 	}
 
@@ -162,6 +165,22 @@ public class InventoryVoucherDetailDTO {
 				this.employeeName = inventoryVoucherDetail.getInventoryVoucherHeader().getEmployee().getName();
 			}
 		}
+
+		if (inventoryVoucherDetail.getInventoryVoucherHeader() != null) {
+			this.customerLocation = inventoryVoucherDetail.getInventoryVoucherHeader().getReceiverAccount()
+					.getLocation() != null
+							? inventoryVoucherDetail.getInventoryVoucherHeader().getReceiverAccount().getLocation()
+							: "";
+			if (inventoryVoucherDetail.getInventoryVoucherHeader().getDocument().getActivityAccount()
+					.equals(AccountTypeColumn.Supplier)) {
+				this.customerLocation = inventoryVoucherDetail.getInventoryVoucherHeader().getSupplierAccount()
+						.getLocation() != null
+								? inventoryVoucherDetail.getInventoryVoucherHeader().getSupplierAccount().getLocation()
+								: "";
+			}
+
+		}
+
 		if (inventoryVoucherDetail.getSourceStockLocation() != null) {
 			this.sourceStockLocationPid = inventoryVoucherDetail.getSourceStockLocation().getPid();
 			this.sourceStockLocationName = inventoryVoucherDetail.getSourceStockLocation().getName();
@@ -587,6 +606,18 @@ public class InventoryVoucherDetailDTO {
 
 	public void setSupplierAccountName(String supplierAccountName) {
 		this.supplierAccountName = supplierAccountName;
+	}
+
+	public String getCustomerLocation() {
+		return customerLocation;
+	}
+
+	public void setCustomerLocation(String customerLocation) {
+		this.customerLocation = customerLocation;
+	}
+
+	public void setRatePerPiece(double ratePerPiece) {
+		this.ratePerPiece = ratePerPiece;
 	}
 
 	@Override
