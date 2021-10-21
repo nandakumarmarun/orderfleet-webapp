@@ -141,6 +141,7 @@
 						<th>Name</th>
 						<th>Category</th>
 						<th>Division</th>
+						<th>Units</th>
 						<th>Unit Quantity</th>
 						<th>SKU</th>
 						<th>Price</th>
@@ -228,6 +229,16 @@
 										Keeping Unit</label> <input type="text" class="form-control"
 										name="sku" id="field_sku" maxlength="20"
 										placeholder="Stock Keeping Unit" />
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="field_units">units</label>
+									<select id="field_units" name="unitsPid"
+										class="form-control">
+										<option value="-1">Select units</option>
+										<c:forEach items="${unitlist}" var="units">
+											<option value="${units.pid}">${units.name}</option>
+										</c:forEach>
+									</select>
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="field_unitQty">Unit
@@ -332,6 +343,10 @@
 										<tr>
 											<td>Division</td>
 											<td id="lbl_division"></td>
+										</tr>
+										<tr>
+											<td>units</td>
+											<td id="lbl_units"></td>
 										</tr>
 										<tr>
 											<td>Unit Quantity</td>

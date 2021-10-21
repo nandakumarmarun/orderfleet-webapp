@@ -19,6 +19,7 @@ if (!this.ProductProfile) {
 		alias : null,
 		productCategoryPid : null,
 		divisionPid : null,
+		unitsPid : null,
 		sku : null,
 		unitQty : null,
 		taxRate : null,
@@ -45,6 +46,9 @@ if (!this.ProductProfile) {
 			valueNotEquals : "-1"
 		},
 		divisionPid : {
+			valueNotEquals : "-1"
+		},
+		unitsPid : {
 			valueNotEquals : "-1"
 		},
 		sku : {
@@ -503,6 +507,7 @@ if (!this.ProductProfile) {
 		productProfileModel.alias = $('#field_alias').val();
 		productProfileModel.productCategoryPid = $('#field_category').val();
 		productProfileModel.divisionPid = $('#field_division').val();
+		productProfileModel.unitsPid = $('#field_units').val();
 		productProfileModel.sku = $('#field_sku').val();
 		productProfileModel.unitQty = $('#field_unitQty').val();
 		productProfileModel.price = $('#field_price').val();
@@ -541,6 +546,7 @@ if (!this.ProductProfile) {
 				$('#lbl_alias').text(data.alias);
 				$('#lbl_category').text(data.productCategoryName);
 				$('#lbl_division').text(data.divisionName);
+				$('#lbl_units').text(data.unitsName);
 				$('#lbl_unitQty').text(data.unitQty);
 				$('#lbl_sku').text(data.sku);
 				$('#lbl_price').text(data.price);
@@ -570,6 +576,7 @@ if (!this.ProductProfile) {
 						$('#field_alias').val(data.alias);
 						$('#field_category').val(data.productCategoryPid);
 						$('#field_division').val(data.divisionPid);
+						$('#field_units').val(data.unitsPid);
 						$('#field_sku').val(data.sku);
 						$('#field_unitQty').val(data.unitQty);
 						$('#field_price').val(data.price);
@@ -785,6 +792,8 @@ if (!this.ProductProfile) {
 													+ productProfile.productCategoryName
 													+ "</td><td>"
 													+ productProfile.divisionName
+													+ "</td><td>"
+													+ (productProfile.unitsName == null ? "" : productProfile.unitsName)
 													+ "</td><td>"
 													+ (productProfile.unitQty == null ? ""
 															: productProfile.unitQty)

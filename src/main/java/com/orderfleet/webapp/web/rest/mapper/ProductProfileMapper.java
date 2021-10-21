@@ -10,8 +10,10 @@ import org.mapstruct.Mapping;
 import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.Units;
 import com.orderfleet.webapp.repository.DivisionRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
+import com.orderfleet.webapp.repository.UnitsRepository;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 
 /**
@@ -28,12 +30,17 @@ public abstract class ProductProfileMapper {
 
 	@Inject
 	private ProductCategoryRepository productCategoryRepository;
+	
+	@Inject
+	private UnitsRepository unitsRepository;
 
 	@Mapping(target = "filesPid", ignore = true)
 	@Mapping(source = "division.pid", target = "divisionPid")
 	@Mapping(source = "division.name", target = "divisionName")
 	@Mapping(source = "productCategory.pid", target = "productCategoryPid")
 	@Mapping(source = "productCategory.name", target = "productCategoryName")
+	@Mapping(source = "units.pid", target = "unitsPid")
+	@Mapping(source = "units.name", target = "unitsName")
 //	@Mapping(source = "stockAvailabilityStatus", target = "stockAvailabilityStatus")
 	public abstract ProductProfileDTO productProfileToProductProfileDTO(ProductProfile productProfile);
 
@@ -62,5 +69,12 @@ public abstract class ProductProfileMapper {
 			return null;
 		}
 		return productCategoryRepository.findOneByPid(pid).map(category -> category).orElse(null);
+	}
+	
+	public Units unitsFromPid(String pid) {
+		if(pid == null || pid.trim().length() == 0) {
+			return null;
+		}
+		return unitsRepository.findOneByPid(pid).map(units -> units).orElse(null);
 	}
 }

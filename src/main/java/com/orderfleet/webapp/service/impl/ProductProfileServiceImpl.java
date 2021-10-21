@@ -39,6 +39,7 @@ import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductNameTextSettingsRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.TaxMasterRepository;
+import com.orderfleet.webapp.repository.UnitsRepository;
 import com.orderfleet.webapp.repository.UserProductCategoryRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.FileManagerService;
@@ -101,6 +102,8 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	@Inject
 	private DocumentStockLocationSourceRepository documentStockLocationSourceRepository;
 
+	@Inject 
+	private UnitsRepository unitsRepository;
 	/**
 	 * Save a productProfile.
 	 *
@@ -110,8 +113,11 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	@Override
 	public ProductProfileDTO save(ProductProfileDTO productProfileDTO) {
 		log.debug("Request to save ProductProfile : {}", productProfileDTO);
+		log.debug("serviseunitypid",  productProfileDTO.getUnitsPid());
+		System.out.println("uspid"+ productProfileDTO.getUnitsPid());
 		productProfileDTO.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid()); // set
 		ProductProfile productProfile = productProfileMapper.productProfileDTOToProductProfile(productProfileDTO);
+		productProfile.setUnits(unitsRepository.findOneByPid(productProfileDTO.getUnitsPid()).get());
 		// set company
 		productProfile.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		productProfile.setLastModifiedDate(LocalDateTime.now());
@@ -147,6 +153,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 			productProfile.setProductCategory(
 					productCategoryRepository.findOneByPid(productProfileDTO.getProductCategoryPid()).get());
 			productProfile.setDivision(divisionRepository.findOneByPid(productProfileDTO.getDivisionPid()).get());
+			productProfile.setUnits(unitsRepository.findOneByPid(productProfileDTO.getUnitsPid()).get());
 			productProfile.setSku(productProfileDTO.getSku());
 			productProfile.setUnitQty(productProfileDTO.getUnitQty());
 			productProfile.setPrice(productProfileDTO.getPrice());

@@ -48,6 +48,7 @@ import com.orderfleet.webapp.service.ProductGroupProductService;
 import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.service.TaxMasterService;
+import com.orderfleet.webapp.service.UnitsService;
 import com.orderfleet.webapp.service.impl.FileManagerException;
 import com.orderfleet.webapp.web.rest.dto.FileDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
@@ -84,6 +85,9 @@ public class ProductProfileResource {
 
 	@Inject
 	private ProductGroupService productGroupService;
+	
+	@Inject
+	private UnitsService unitservise;
 
 	@Inject
 	private ProductGroupProductService productGroupProductService;
@@ -108,6 +112,7 @@ public class ProductProfileResource {
 	public ResponseEntity<ProductProfileDTO> createProductProfile(
 			@Valid @RequestBody ProductProfileDTO productProfileDTO) throws URISyntaxException {
 		log.debug("Web request to save ProductProfile : {}", productProfileDTO);
+		log.debug("UNITSID : {}", productProfileDTO.getUnitsPid());
 		if (productProfileDTO.getPid() != null) {
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("productProfile", "idexists",
 					"A new product profile cannot already have an ID")).body(null);
@@ -118,6 +123,7 @@ public class ProductProfileResource {
 					.body(null);
 		}
 		productProfileDTO.setActivated(true);
+		System.out.println("uId"+ productProfileDTO.getUnitsPid());
 		ProductProfileDTO result = productProfileService.save(productProfileDTO);
 		return ResponseEntity.created(new URI("/web/productProfiles/" + result.getPid()))
 				.headers(HeaderUtil.createEntityCreationAlert("productProfile", result.getPid().toString()))
@@ -187,6 +193,7 @@ public class ProductProfileResource {
 		model.addAttribute("productProfiles",
 				productProfileService.findAllByCompanyAndActivatedProductProfileOrderByName(true));
 		model.addAttribute("taxMasters", taxmasterService.findAllByCompany());
+		model.addAttribute("unitlist", unitservise.findAll());
 		model.addAttribute("deactivatedProductProfiles",
 				productProfileService.findAllByCompanyAndActivatedProductProfileOrderByName(false));
 		return "company/productProfiles";
