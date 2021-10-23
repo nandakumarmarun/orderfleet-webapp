@@ -124,13 +124,14 @@ public class ProcessFlowFunnelChartResource {
 		}
 
 		List<String> documentPids = primarySecondaryDocumentService
-				.findAllDocumentsByCompanyIdAndVoucherTypeIn(Arrays.asList(VoucherType.PRIMARY_SALES_ORDER, VoucherType.SECONDARY_SALES_ORDER)).parallelStream()
-				.map(obj -> obj.getPid().toString()).collect(Collectors.toList());
+				.findAllDocumentsByCompanyIdAndVoucherTypeIn(
+						Arrays.asList(VoucherType.PRIMARY_SALES_ORDER, VoucherType.SECONDARY_SALES_ORDER))
+				.parallelStream().map(obj -> obj.getPid().toString()).collect(Collectors.toList());
 
 		List<ProcessFlowStatus> processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,
 				ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL, ProcessFlowStatus.UNDER_PRODUCTION,
 				ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL, ProcessFlowStatus.READY_TO_DISPATCH_AT_PS,
-				ProcessFlowStatus.DELIVERED, ProcessFlowStatus.NOT_DELIVERED);
+				ProcessFlowStatus.NOT_DELIVERED);
 
 		LocalDate fDate = LocalDate.now();
 		LocalDate tDate = LocalDate.now();
