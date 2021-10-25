@@ -488,8 +488,9 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		log.debug("Downloading Excel report");
 		String excelFileName = "Receipt" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = { "Account Profile", "Phone Number", "Employee", "Send Date", "Received Date",
-				"Check Date", "Mode", "Check Number", "Amount", "Bank Name", "Expense Type", "Remarks" };
+		String[] headerColumns = { "Account Profile", "Phone Number", "Employee", "Send Date", "Send Time",
+				"Received Date", "Received Time", "Cheque Date", "Mode", "Cheque Number", "Amount", "Bank Name",
+				"Expense Type", "Remarks" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -520,6 +521,8 @@ public class ReceiptPerformanceReportTallyStatusResource {
 		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
 		// Create Other rows and cells with Sales data
 		int rowNum = 1;
+		DateTimeFormatter date = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		DateTimeFormatter time = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		for (AccountingVoucherHeaderDTO avh : accountingVoucherHeaderDTOs) {
 			for (AccountingVoucherDetailDTO avd : avh.getAccountingVoucherDetails()) {
 				HSSFRow row = worksheet.createRow(rowNum++);
@@ -527,20 +530,35 @@ public class ReceiptPerformanceReportTallyStatusResource {
 				row.createCell(1).setCellValue(avh.getPhone());
 				row.createCell(2).setCellValue(avh.getEmployeeName());
 				HSSFCell docDateCell = row.createCell(3);
-				docDateCell.setCellValue(avd.getVoucherDate().toString());
-				docDateCell.setCellStyle(dateCellStyle);
-				HSSFCell docDateCell2 = row.createCell(4);
-				docDateCell2.setCellValue(avh.getCreatedDate().toString());
-				docDateCell2.setCellStyle(dateCellStyle);
-				HSSFCell docDateCell3 = row.createCell(5);
-				docDateCell3.setCellValue(avd.getInstrumentDate().toString());
-				docDateCell3.setCellStyle(dateCellStyle);
-				row.createCell(6).setCellValue(avd.getMode().name());
-				row.createCell(7).setCellValue(avd.getInstrumentNumber());
-				row.createCell(8).setCellValue(avd.getAmount());
-				row.createCell(9).setCellValue(avd.getBankName());
-				row.createCell(10).setCellValue(avd.getIncomeExpenseHeadName());
-				row.createCell(11).setCellValue(avd.getRemarks());
+				// docDateCell.setCellValue(avd.getVoucherDate().toLocalDate().toString());
+				// docDateCell.setCellStyle(dateCellStyle);
+				docDateCell.setCellValue(date.format(avd.getVoucherDate()).toString());
+				HSSFCell docTimeCell = row.createCell(4);
+				docTimeCell.setCellValue(time.format(avd.getVoucherDate()).toString());
+
+				HSSFCell docDateCel2 = row.createCell(5);
+				// docDateCell.setCellValue(avd.getVoucherDate().toLocalDate().toString());
+				// docDateCell.setCellStyle(dateCellStyle);
+				docDateCel2.setCellValue(date.format(avh.getCreatedDate()).toString());
+				HSSFCell docTimeCel2 = row.createCell(6);
+				docTimeCel2.setCellValue(time.format(avh.getCreatedDate()).toString());
+
+//				HSSFCell docDateCell2 = row.createCell(4);
+//				docDateCell2.setCellValue(avh.getCreatedDate().toLocalDate().toString());
+//				docDateCell2.setCellStyle(dateCellStyle);
+//				HSSFCell docDateCell3 = row.createCell(5);
+//				docDateCell3.setCellValue(avd.getInstrumentDate().toLocalDate().toString());
+//				docDateCell3.setCellStyle(dateCellStyle);
+				HSSFCell docDateCell3 = row.createCell(7);
+				docDateCell3.setCellValue(date.format(avd.getInstrumentDate()).toString());
+//				docDateCell3.setCellValue(avd.getInstrumentDate().toLocalDate().toString());
+//				docDateCell3.setCellStyle(dateCellStyle);
+				row.createCell(8).setCellValue(avd.getMode().name());
+				row.createCell(9).setCellValue(avd.getInstrumentNumber());
+				row.createCell(10).setCellValue(avd.getAmount());
+				row.createCell(11).setCellValue(avd.getBankName());
+				row.createCell(12).setCellValue(avd.getIncomeExpenseHeadName());
+				row.createCell(13).setCellValue(avd.getRemarks());
 
 			}
 		}
