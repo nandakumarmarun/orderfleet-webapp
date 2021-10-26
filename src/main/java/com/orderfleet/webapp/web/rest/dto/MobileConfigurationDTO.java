@@ -58,6 +58,8 @@ public class MobileConfigurationDTO {
 	private boolean receiptAllocationMandatory;
 	private boolean blockActivity;
 	private boolean salesOrderMandatory;
+	private boolean rateWithTax;
+	
 
 	public MobileConfigurationDTO() {
 		super();
@@ -107,6 +109,7 @@ public class MobileConfigurationDTO {
 		this.receiptAllocationMandatory = mobileConfiguration.getReceiptAllocationMandatory();
 		this.blockActivity = mobileConfiguration.getBlockActivity();
 		this.salesOrderMandatory = mobileConfiguration.getSalesOrderMandatory();
+		this.rateWithTax = mobileConfiguration.getRateWithTax();
 
 	}
 
@@ -444,6 +447,14 @@ public class MobileConfigurationDTO {
 
 	public void setSalesOrderMandatory(boolean salesOrderMandatory) {
 		this.salesOrderMandatory = salesOrderMandatory;
+	}
+
+	public boolean getRateWithTax() {
+		return rateWithTax;
+	}
+
+	public void setRateWithTax(boolean rateWithTax) {
+		this.rateWithTax = rateWithTax;
 	}
 
 }

@@ -170,6 +170,8 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "sales_order_mandatory", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean salesOrderMandatory;
 
+	@Column(name = "rate_with_tax", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean rateWithTax;
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -520,6 +522,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setSalesOrderMandatory(boolean salesOrderMandatory) {
 		this.salesOrderMandatory = salesOrderMandatory;
+	}
+
+	public boolean getRateWithTax() {
+		return rateWithTax;
+	}
+
+	public void setRateWithTax(boolean rateWithTax) {
+		this.rateWithTax = rateWithTax;
 	}
 
 	@Override

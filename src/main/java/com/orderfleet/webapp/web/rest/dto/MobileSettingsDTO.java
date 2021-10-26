@@ -101,6 +101,8 @@ public class MobileSettingsDTO {
 	private boolean blockActivity;
 
 	private boolean salesOrderMandatory;
+	
+	private boolean rateWithTax;
 
 	public MobileSettingsDTO() {
 		super();
@@ -147,6 +149,7 @@ public class MobileSettingsDTO {
 		this.receiptAllocationMandatory = mobileConfigurationDTO.getReceiptAllocationMandatory();
 		this.blockActivity = mobileConfigurationDTO.getBlockActivity();
 		this.salesOrderMandatory = mobileConfigurationDTO.getSalesOrderMandatory();
+		this.rateWithTax= mobileConfigurationDTO.getRateWithTax();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -491,6 +494,14 @@ public class MobileSettingsDTO {
 
 	public void setSalesOrderMandatory(boolean salesOrderMandatory) {
 		this.salesOrderMandatory = salesOrderMandatory;
+	}
+
+	public boolean getRateWithTax() {
+		return rateWithTax;
+	}
+
+	public void setRateWithTax(boolean rateWithTax) {
+		this.rateWithTax = rateWithTax;
 	}
 
 }

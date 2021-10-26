@@ -895,6 +895,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setReceiptAllocationMandatory(false);
 		mobileConfiguration.setBlockActivity(false);
 		mobileConfiguration.setSalesOrderMandatory(false);
+		mobileConfiguration.setRateWithTax(false);
 
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}

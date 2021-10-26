@@ -84,6 +84,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setReceiptAllocationMandatory(mobileConfigurationDTO.getReceiptAllocationMandatory());
 		configuration.setBlockActivity(mobileConfigurationDTO.getBlockActivity());
 		configuration.setSalesOrderMandatory(mobileConfigurationDTO.getSalesOrderMandatory());
+		configuration.setRateWithTax(mobileConfigurationDTO.getRateWithTax());
 
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
@@ -133,6 +134,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setReceiptAllocationMandatory(mobileConfigurationDTO.getReceiptAllocationMandatory());
 			configuration.setBlockActivity(mobileConfigurationDTO.getBlockActivity());
 			configuration.setSalesOrderMandatory(mobileConfigurationDTO.getSalesOrderMandatory());
+			configuration.setRateWithTax(mobileConfigurationDTO.getRateWithTax());
 
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);

@@ -50,7 +50,8 @@ if (!this.MobileConfiguration) {
 		blockActivity : false,
 		enableGeoFencing : false,
 		receiptAllocationMandatory : false,
-		salesOrderMandatory : false
+		salesOrderMandatory : false,
+		rateWithTax : false
 
 	};
 
@@ -160,6 +161,8 @@ if (!this.MobileConfiguration) {
 				":checked");
 		mobileConfigurationDTO.salesOrderMandatory = $("#salesOrderMandatory")
 				.is(":checked");
+		mobileConfigurationDTO.rateWithTax = $("#rateWithTax")
+		.is(":checked");
 
 		$.ajax({
 			url : contextPath,
@@ -263,7 +266,8 @@ if (!this.MobileConfiguration) {
 									data.blockActivity);
 							$('#salesOrderMandatory').prop("checked",
 									data.salesOrderMandatory);
-
+							$('#rateWithTax').prop("checked",
+									data.rateWithTax);
 						}
 
 					},
