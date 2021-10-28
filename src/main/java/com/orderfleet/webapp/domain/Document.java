@@ -130,7 +130,7 @@ public class Document implements Serializable, Cloneable {
 
 	@Column(name = "terms_and_conditions_column", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean termsAndConditionsColumn;
-	
+
 	@Column(name = "has_telephonic_order", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean hasTelephonicOrder;
 
@@ -138,6 +138,9 @@ public class Document implements Serializable, Cloneable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "voucher_number_generation_type", nullable = false, columnDefinition = "character varying DEFAULT 'TYPE_1'")
 	private VoucherNumberGenerationType voucherNumberGenerationType;
+
+	@Column(name = "rate_With_Tax", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean rateWithTax;
 
 	@PreUpdate
 	public void preUpdate() {
@@ -343,7 +346,6 @@ public class Document implements Serializable, Cloneable {
 	public void setTermsAndConditionsColumn(boolean termsAndConditionsColumn) {
 		this.termsAndConditionsColumn = termsAndConditionsColumn;
 	}
-	
 
 	public boolean getHasTelephonicOrder() {
 		return hasTelephonicOrder;
@@ -351,6 +353,14 @@ public class Document implements Serializable, Cloneable {
 
 	public void setHasTelephonicOrder(boolean hasTelephonicOrder) {
 		this.hasTelephonicOrder = hasTelephonicOrder;
+	}
+
+	public boolean getRateWithTax() {
+		return rateWithTax;
+	}
+
+	public void setRateWithTax(boolean rateWithTax) {
+		this.rateWithTax = rateWithTax;
 	}
 
 	@Override

@@ -252,7 +252,11 @@
 											id="field_hasTelephonicOrder" /> &nbsp;<span>Has Telephonic Order</span>
 										</label>
 									</div>
-									
+									<div class="form-group" id="rateWithTax">
+										<label for="rateWithTax"> <input type="checkbox"
+											id="field_rateWithTax" /> &nbsp;<span>Rate With Tax</span>
+										</label>
+									</div>
 
 								</div>
 							</div>
@@ -351,6 +355,12 @@
 											<span id="lbl_has_telephonic_Order"></span>
 										</dd>
 										<hr />
+										<dt>
+											<span>Rate With Tax</span>
+										</dt>
+										<dd>
+											<span id="lbl_rate_With_Tax"></span>
+										</dd>
 									</dl>
 								</div>
 							</div>

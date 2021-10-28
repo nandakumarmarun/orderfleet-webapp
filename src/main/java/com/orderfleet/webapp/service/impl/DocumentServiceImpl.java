@@ -135,6 +135,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setAddNewCustomer(documentDTO.getAddNewCustomer());
 			document.setTermsAndConditionsColumn(documentDTO.isTermsAndConditionsColumn());
 			document.setHasTelephonicOrder(documentDTO.getHasTelephonicOrder());
+			document.setRateWithTax(documentDTO.getRateWithTax());
 
 			
 			document = documentRepository.save(document);

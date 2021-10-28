@@ -32,7 +32,8 @@ if (!this.Document) {
 		voucherNumberGenerationType : 'TYPE_1',
 		addNewCustomer : false,
 		termsAndConditionsColumn : false,
-		hasTelephonicOrder:false
+		hasTelephonicOrder:false,
+		rateWithTax:false
 		
 	};
 
@@ -208,6 +209,8 @@ if (!this.Document) {
 				'checked');
 		documentModel.hasTelephonicOrder = $('#field_hasTelephonicOrder').prop(
 		'checked');
+		documentModel.rateWithTax = $('#field_rateWithTax').prop(
+		'checked');
 		console.log(documentModel);
 		$.ajax({
 			method : $(el).attr('method'),
@@ -291,6 +294,8 @@ if (!this.Document) {
 								data.termsAndConditionsColumn);
 						$("#field_hasTelephonicOrder").prop("checked",
 								data.hasTelephonicOrder);
+						$("#field_rateWithTax").prop("checked",
+								data.rateWithTax);
 
 						console.log("===========")
 						console.log(data.addNewCustomer);
