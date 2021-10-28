@@ -882,6 +882,9 @@ public class InvoiceWiseReportLiteResource {
 				optionalExecutiveTaskExecution.get().setAccountProfile(optionalAccountProfile.get());
 				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
 				// save InventoryVoucherHeader
+				String id="INV_QUERY_121";
+				String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
 				List<InventoryVoucherHeader> newInventoryVoucherHeaders = new ArrayList<>();
@@ -934,6 +937,9 @@ public class InvoiceWiseReportLiteResource {
 				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
 
 				// save InventoryVoucherHeader
+				String id="INV_QUERY_121";
+				String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
 				List<InventoryVoucherHeader> newInventoryVoucherHeaders = new ArrayList<>();

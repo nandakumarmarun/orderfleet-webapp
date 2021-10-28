@@ -315,10 +315,16 @@ public class SalesInvoiceReportResource {
 
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
+			String id="INV_QUERY_157";
+			String description=" Selecting inv Vouchers by using useridin ,docIn and TallyDownload Status";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(userIds,
 							documentPids, tallyStatus, fromDate, toDate);
 		} else {
+			String id="INV_QUERY_160";
+			String description=" Selecting inv Vouchers by using useridin ,AccountPid ,docIn and TallyDownload Status";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
 							userIds, accountPid, documentPids, tallyStatus, fromDate, toDate);
@@ -407,6 +413,9 @@ public class SalesInvoiceReportResource {
 	public void downloadInventoryXls(@RequestParam("inventoryVoucherHeaderPids") String[] inventoryVoucherHeaderPids,
 			HttpServletResponse response) {
 		log.debug("start downloading....");
+		String id="INV_QUERY_159";
+		String description=" Downloading invVouchers by using Pid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository
 				.findByPidsOrderByCreatedDateDesc(Arrays.asList(inventoryVoucherHeaderPids));
 		log.debug("inventoryvoucherheaders foudn.....");

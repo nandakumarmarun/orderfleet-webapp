@@ -174,7 +174,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select sum(inventoryVoucher.documentTotal) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.createdBy.login = ?#{principal.username} and inventoryVoucher.document in ?1 and inventoryVoucher.createdDate between ?2 and ?3")
 	Double getCurrentUserAchievedAmount(List<Document> documents, LocalDateTime fromDate, LocalDateTime toDate);
 
-	@Query("select sum(inventoryVoucher.documentVolume) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.createdBy.login = ?#{principal.username} and inventoryVoucher.document in ?1 and inventoryVoucher.createdDate between ?2 and ?3")
+  @Query("select sum(inventoryVoucher.documentVolume) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.createdBy.login = ?#{principal.username} and inventoryVoucher.document in ?1 and inventoryVoucher.createdDate between ?2 and ?3")
 	Double getCurrentUserAchievedVolume(List<Document> documents, LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Query("select count(inventoryVoucher.id) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.sendSalesOrderEmailStatus = ?1")
@@ -225,7 +225,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			String executiveTaskExecutionPid);
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and status=false Order By inventoryVoucher.createdDate desc")
-	List<InventoryVoucherHeader> findAllByCompanyIdAndStatusOrderByCreatedDateDesc();
+   List<InventoryVoucherHeader> findAllByCompanyIdAndStatusOrderByCreatedDateDesc();
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?1 and status=false Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdAndStatusOrderByCreatedDateDesc(long companyId);
@@ -253,7 +253,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	InventoryVoucherHeader findTop1ByCreatedByLoginOrderByCreatedDateDesc(String userLogin);
 
 	@Query("select sum(inventoryVoucher.documentTotal),sum(inventoryVoucher.documentVolume)  from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.accountProfile.pid in ?1 and inventoryVoucher.createdDate between ?2 and ?3  and inventoryVoucher.document in ?4 ")
-	Object getAmountAndVolumeByAccountInAndDocumentsInDateBetween(List<String> accountPids, LocalDateTime fromDate,
+Object getAmountAndVolumeByAccountInAndDocumentsInDateBetween(List<String> accountPids, LocalDateTime fromDate,
 			LocalDateTime toDate, List<Document> documents);
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and status=false and inventoryVoucher.document in ?1 Order By inventoryVoucher.createdDate desc")
@@ -312,7 +312,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	List<InventoryVoucherHeader> findAllByCompanyIdAndDateBetweenAndStatusOrderByCreatedDateDesc(LocalDateTime fromDate,
 			LocalDateTime toDate, List<Document> documents, boolean status);
 
-	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdBy.pid = ?1 and inventoryVoucher.createdDate between ?2 and ?3 and inventoryVoucher.document in ?4 and inventoryVoucher.status = ?5 Order By inventoryVoucher.createdDate desc")
+@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdBy.pid = ?1 and inventoryVoucher.createdDate between ?2 and ?3 and inventoryVoucher.document in ?4 and inventoryVoucher.status = ?5 Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdUserPidAndDateBetweenAndStatusOrderByCreatedDateDesc(String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents, boolean status);
 
@@ -325,7 +325,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			String userPid, String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents,
 			boolean status);
 
-	@Query("select count(inventoryVoucher),sum(inventoryVoucher.documentTotal),sum(inventoryVoucher.documentVolume) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdDate between ?1 and ?2 and inventoryVoucher.document.pid in ?3")
+@Query("select count(inventoryVoucher),sum(inventoryVoucher.documentTotal),sum(inventoryVoucher.documentVolume) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdDate between ?1 and ?2 and inventoryVoucher.document.pid in ?3")
 	Object getCountAndAmountAndVolumeByDateBetweenAndDocumentPid(LocalDateTime fromDate, LocalDateTime toDate,
 			String documentPid);
 
@@ -358,7 +358,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select inventoryVoucher.documentDate,inventoryVoucher.employee.name,inventoryVoucher.receiverAccount.name,inventoryVoucher.documentTotal,inventoryVoucher.orderStatus.name from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.documentDate between ?1 and ?2 Order By inventoryVoucher.documentDate desc")
 	List<Object[]> findAllByCompanyIdDateBetweenOrderByDocumentDateDesc(LocalDateTime fromDate, LocalDateTime toDate);
 
-	@Query("select inventoryVoucher.documentDate,inventoryVoucher.employee.name,inventoryVoucher.receiverAccount.name,inventoryVoucher.documentTotal,inventoryVoucher.orderStatus.name from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.employee.pid = ?1 and inventoryVoucher.documentDate between ?2 and ?3 Order By inventoryVoucher.documentDate desc")
+@Query("select inventoryVoucher.documentDate,inventoryVoucher.employee.name,inventoryVoucher.receiverAccount.name,inventoryVoucher.documentTotal,inventoryVoucher.orderStatus.name from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.employee.pid = ?1 and inventoryVoucher.documentDate between ?2 and ?3 Order By inventoryVoucher.documentDate desc")
 	List<Object[]> findAllByCompanyIdEmployeePidAndDateBetweenOrderByDocumentDateDesc(String employeePid,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
@@ -418,7 +418,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			List<Long> userIds, List<String> documentPids, List<TallyDownloadStatus> tallyDownloadStatus,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
-	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
+     @Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
 			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
 			+ "iv.documentVolume, iv.status , iv.executiveTaskExecution.remarks, iv.orderNumber , iv.pdfDownloadStatus,iv.salesManagementStatus from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
@@ -483,11 +483,11 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			Set<Long> accountIds, String documentPid, List<Boolean> tallyStatus, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
-	@Query("select iv.id from InventoryVoucherHeader iv where iv.createdBy.pid = ?1 and iv.document.id in ?2 and iv.documentDate between ?3 and ?4")
+ @Query("select iv.id from InventoryVoucherHeader iv where iv.createdBy.pid = ?1 and iv.document.id in ?2 and iv.documentDate between ?3 and ?4")
 	Set<Long> findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(String userPid, Set<Long> documentIds,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
-	@Query("select iv.id from InventoryVoucherHeader iv where iv.receiverAccount.id in ?1 and iv.document.id in ?2 and iv.documentDate between ?3 and ?4")
+@Query("select iv.id from InventoryVoucherHeader iv where iv.receiverAccount.id in ?1 and iv.document.id in ?2 and iv.documentDate between ?3 and ?4")
 	Set<Long> findIdByAccountProfileAndDocumentDateBetween(Set<Long> accountProfileIds, List<Long> documentIds,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
@@ -502,7 +502,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query(value = SALES_ORDER_TALLY, nativeQuery = true)
 	List<Object[]> getSalesOrdersForTally(Long companyId, Set<Long> documentIds);
 
-	@Query(value = SALES_ORDER_VENDOR, nativeQuery = true)
+ @Query(value = SALES_ORDER_VENDOR, nativeQuery = true)
 	List<Object[]> getSalesOrderForVendor(long companyId, List<Long> documentId);
 
 	// @Query("select MAX(iv.documentNumberLocal),iv.document.pid "
@@ -699,7 +699,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select inventoryVoucher.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.documentNumberServer in ?1")
 	List<String> findAllByDocumentNumberServer(List<String> references);
 
-	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.documentNumberServer in ?1")
+       @Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.documentNumberServer in ?1")
 	List<InventoryVoucherHeader> findAllHeaderdByDocumentNumberServer(List<String> inventoryHeaderPids);
 
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.pid = ?2 and inventoryVoucher.documentNumberServer = ?1")
@@ -715,8 +715,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "ivh.supplierAccount.pid, ivh.supplierAccount.name, " + "ivh.document.name, ivh.document.pid "
 			+ "from InventoryVoucherHeader ivh where ivh.createdBy.login =?1 and ivh.receiverAccount.pid in ?2 "
 			+ "and ivh.createdDate between ?3 and ?4 Order By ivh.createdDate desc";
-
-	@Query(value = CUSTOMER_WISE_INVENTORY_HEADER)
+  @Query(value = CUSTOMER_WISE_INVENTORY_HEADER)
 	List<Object[]> getCustomerWiseInventoryHeader(String userName, List<String> accountPids, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
@@ -733,14 +732,14 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1")
 	List<Object[]> findByExecutiveTaskExecutionIdIn(Set<Long> exeIds);
 
-	@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1 and inventoryVoucher.document.pid = ?2")
+@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1 and inventoryVoucher.document.pid = ?2")
 	List<Object[]> findByExecutiveTaskExecutionIdInAndDocumentPid(Set<Long> exeIds, String documentPid);
 
 	@Query(value = DOCUMENT_BASED_ORDER_MANAGEMENT_DOWNLOAD_TALLY_LIMIT, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateAscLimit(
 			List<Long> documentIdList);
 
-	@Query(value = DOCUMENT_BASED_ORDER_DOWNLOAD_TALLY_LIMIT, nativeQuery = true)
+ @Query(value = DOCUMENT_BASED_ORDER_DOWNLOAD_TALLY_LIMIT, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateAscLimit(List<Long> documentIdList);
 
 	@Query("select inventoryVoucher.documentNumberServer,inventoryVoucher.documentTotal,inventoryVoucher.documentDate from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.receiverAccount.pid = ?1 and inventoryVoucher.createdBy.pid = ?2 and inventoryVoucher.company.id = ?#{principal.companyId}")

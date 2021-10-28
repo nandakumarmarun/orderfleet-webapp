@@ -379,10 +379,16 @@ public class SalesPerformanceReportTallyStatusResource {
 
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
+			String id="INV_QUERY_157";
+			String description=" Selecting inv Vouchers by using useridin ,docIn and TallyDownload Status";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(userIds,
 							documentPids, tallyStatus, fromDate, toDate);
 		} else {
+			String id="INV_QUERY_160";
+			String description=" Selecting inv Vouchers by using useridin ,AccountPid ,docIn and TallyDownload Status";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
 							userIds, accountPid, documentPids, tallyStatus, fromDate, toDate);
@@ -596,6 +602,9 @@ public class SalesPerformanceReportTallyStatusResource {
 	public ResponseEntity<InventoryVoucherHeaderDTO> sendSalesOrderEmail() throws MessagingException {
 
 		log.info("sendSalesOrderEmail()-----");
+		String id="INV_QUERY_185";
+		String description="Getting secondary sales for excel";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> inventoryVoucherHeaderObjects = inventoryVoucherHeaderRepository
 				.getSecondarySalesForExcel(SecurityUtils.getCurrentUsersCompanyId());
 
@@ -695,7 +704,9 @@ public class SalesPerformanceReportTallyStatusResource {
 
 		List<String> succesOrders = (ArrayList<String>) secondarySalesOrderExcelBySupplierDTOs.stream()
 				.map(so -> so.getInventoryPid()).collect(Collectors.toList());
-
+		String id="INV_QUERY_195";
+		String description="Updating InventoryVoucherHeaderSendSalesOrderEmailStatus by pid and companyId";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderSendSalesOrderEmailStatusUsingPidAndCompanyId(
 				SendSalesOrderEmailStatus.SENT, SecurityUtils.getCurrentUsersCompanyId(), succesOrders);
 
@@ -858,6 +869,9 @@ public class SalesPerformanceReportTallyStatusResource {
 
 			for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaderDtos)
 				if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
+					String id="INV_QUERY_187";
+					String description="Updating pdf download status by pid";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
 
 				}

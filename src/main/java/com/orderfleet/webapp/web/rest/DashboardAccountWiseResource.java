@@ -363,16 +363,25 @@ public class DashboardAccountWiseResource {
 		if (!accountProfiles.isEmpty()) {
 			if (dashboardItem.getTaskPlanType().equals(TaskPlanType.BOTH)) {
 				// get both document
+				String id="INV_QUERY_132";
+				String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId & inv_voucher doc=1& createDateBetween is 2&3 & created by id=4 and receiver account in=4";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndAccountProfileIn(documents, from, to,
 								accountProfiles);
 			} else if (dashboardItem.getTaskPlanType().equals(TaskPlanType.PLANNED)) {
 				// get documents under planned activities
+				String id="INV_QUERY_133";
+				String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId & inv_voucher doc=1& createDateBetween is 2&3 & created by id=4 and receiver account in=4 &executiveTaskExecution.executiveTaskPlan IS NOT NULL ";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndAccountProfileInAndTaskPlanIsNotNull(
 								documents, from, to, accountProfiles);
 			} else if (dashboardItem.getTaskPlanType().equals(TaskPlanType.UN_PLANNED)) {
 				// get documents under un planned activities
+				String id="INV_QUERY_134";
+				String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId & inv_voucher doc=1& createDateBetween is 2&3 & created by id=4 and receiver account in=4 &executiveTaskExecution.executiveTaskPlan IS NULL ";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndAccountProfileInAndTaskPlanIsNull(documents,
 								from, to, accountProfiles);

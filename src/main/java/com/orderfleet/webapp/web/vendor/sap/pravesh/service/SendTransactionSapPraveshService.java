@@ -179,14 +179,18 @@ public class SendTransactionSapPraveshService {
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_192";
+			String description="Finding invVou by companyId,tallyDownloadStatus,salesManagementStatus and document";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
 							documentIdList);
 		} else {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_191";
+			String description="Finding invVou by companyId,tallyDownloadStatus and document";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
 		}
@@ -358,6 +362,13 @@ public class SendTransactionSapPraveshService {
 				throw new IllegalArgumentException("Data missing in sales order..");
 			}
 			if (!salesOrders.isEmpty()) {
+				String id="INV_QUERY_161";
+				String description=" Updating invVou Header by Tally download status using pid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
 				log.debug("updated " + updated + " to PROCESSING");
@@ -458,6 +469,10 @@ public class SendTransactionSapPraveshService {
 					List<InventoryVoucherHeader> successdistinctElements = new ArrayList<>();
 
 					if (inventoryHeaderPids.size() > 0) {
+						String id="INV_QUERY_200";
+						String description="Find all headers by documnetNumberServer";
+						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 						successInventoryHeaders = inventoryVoucherHeaderRepository
 								.findAllHeaderdByDocumentNumberServer(inventoryHeaderPids);
 						successdistinctElements = successInventoryHeaders.stream().distinct()

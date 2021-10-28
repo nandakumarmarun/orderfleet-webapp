@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +52,7 @@ import com.orderfleet.webapp.web.rest.report.dto.VisitReportDTO;
 @RequestMapping("/web")
 public class VisitReportResource {
 
+	private final Logger log = LoggerFactory.getLogger( VisitReportResource.class);
 	private static final String TODAY = "TODAY";
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
@@ -136,6 +139,9 @@ public class VisitReportResource {
 				obj -> (String) obj[1], TreeMap::new, Collectors.mapping(ete -> (Long) ete[0], Collectors.toList())));
 		// get all inventory vouchers under executions
 		List<Long> eteIds = employeeWiseGrouped.values().stream().flatMap(List::stream).collect(Collectors.toList());
+		String id="INV_QUERY_128";
+		String description="Selecting empl name,empl user login,doc name,id,pid from inv_voucher_header by using condition doc in=1 & excutive TaskExecution=2 in inv_voucher";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> ivhDtos = inventoryVoucherHeaderRepository
 				.findByDocumentsAndExecutiveTaskExecutionIdIn(documents, eteIds);
 		// Object ivhDtosvolume

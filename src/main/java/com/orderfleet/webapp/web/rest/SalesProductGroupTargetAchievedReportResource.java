@@ -205,7 +205,9 @@ public class SalesProductGroupTargetAchievedReportResource {
 
 //			List<InventoryVoucherHeader> allInventoryVoucherHeader = inventoryVoucherHeaderRepository
 //					.findAllByCompanyIdOrderByCreatedDateDesc();
-
+		String id="INV_QUERY_102";
+		String description="Selecting Inventory voucher id,receiver account id,document id and document date from invntory voucher header by validating company id and order by create date in descending order and getting result asa list of object";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> allInventoryVoucherHeaderObject = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndOrderByCreatedDateDesc();
 
@@ -319,6 +321,13 @@ public class SalesProductGroupTargetAchievedReportResource {
 		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
 		Double achievedAmount = 0D;
 		if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
+			String id="INV_QUERY_166";
+			String description="Listing inv Vouchers by using AccountPid,DocPid and Doc date between and tallydownloadStaus";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository
 					.findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(userPid, documentIds,
 							start.atTime(0, 0), end.atTime(23, 59));

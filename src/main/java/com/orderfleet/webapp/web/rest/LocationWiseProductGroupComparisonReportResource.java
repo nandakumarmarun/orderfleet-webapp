@@ -121,6 +121,9 @@ public class LocationWiseProductGroupComparisonReportResource {
 //		List<InventoryVoucherHeader> allInventoryVoucherHeader = inventoryVoucherHeaderRepository
 //				.findAllByCompanyIdOrderByCreatedDateDesc();
 
+		String id="INV_QUERY_102";
+		String description="Selecting Inventory voucher id,receiver account id,document id and document date from invntory voucher header by validating company id and order by create date in descending order and getting result asa list of object";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> allInventoryVoucherHeaderObject = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndOrderByCreatedDateDesc();
 

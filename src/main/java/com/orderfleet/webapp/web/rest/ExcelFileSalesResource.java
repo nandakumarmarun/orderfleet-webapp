@@ -299,10 +299,16 @@ public class ExcelFileSalesResource {
 
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
+			String id="INV_QUERY_157";
+			String description=" Selecting inv Vouchers by using useridin ,docIn and TallyDownload Status";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(userIds,
 							documentPids, tallyStatus, fromDate, toDate);
 		} else {
+			String id="INV_QUERY_160";
+			String description=" Selecting inv Vouchers by using useridin ,AccountPid ,docIn and TallyDownload Status";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
 							userIds, accountPid, documentPids, tallyStatus, fromDate, toDate);
@@ -382,12 +388,19 @@ public class ExcelFileSalesResource {
 	public void downloadInventoryXls(@RequestParam("inventoryVoucherHeaderPids") String[] inventoryVoucherHeaderPids,
 			HttpServletResponse response) {
 		List<String> ivhList = Arrays.asList(inventoryVoucherHeaderPids);
+		String id="INV_QUERY_186";
+		String description="Getting excel file for sales";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> inventoryObject = inventoryVoucherHeaderRepository.getExcelFileSales(ivhList);
 		if (inventoryObject.isEmpty()) {
 			return;
 		}
 		//buildExcelDocument(inventoryObject, response);
 		buildCSVDocument(inventoryObject, response);
+		String id1="INV_QUERY_181";
+		String description1="Updating inv Vou header TallydownloadStatus using pid and Companyid";
+		log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
+
 		inventoryVoucherHeaderRepository.
 			updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
 					TallyDownloadStatus.COMPLETED, SecurityUtils.getCurrentUsersCompanyId(), ivhList);
@@ -465,7 +478,9 @@ public class ExcelFileSalesResource {
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(inventoryPid).get();
 
 		buildPdf(inventoryVoucherHeaderDTO, response);
-
+		String id="INV_QUERY_187";
+		String description="Updating pdf download status by pid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
 				inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
 			

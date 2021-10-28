@@ -505,6 +505,10 @@ public class LoadServerItemsToMobileController {
 		List<SalesOrderAllocationDTO> salesOrderAllocationDTOs = new ArrayList<>();
 
 		if (opUser.isPresent() && opAccountProfile.isPresent()) {
+			String id="INV_QUERY_209";
+			String description="finding all invVoucher header by companyid and accountPid user";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 			List<Object[]> objectArray = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAccountPidUserAndDateCreatedDateDesc(opAccountProfile.get().getPid(),
 							opUser.get().getPid());
@@ -572,6 +576,9 @@ public class LoadServerItemsToMobileController {
 
 			if (mapEntry.getKey() == DocumentType.INVENTORY_VOUCHER) {
 				log.info("INVENTORY_VOUCHER");
+				String id="INV_QUERY_196";
+				String description="Finidng count of each inventory type document";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<Object[]> monthArray = inventoryVoucherHeaderRepository
 						.findCountOfEachInventoryTypeDocuments(user.getId(), mfDate, mtDate);
 				List<Object[]> weekArray = inventoryVoucherHeaderRepository
@@ -944,7 +951,9 @@ public class LoadServerItemsToMobileController {
 			accountPids = accountProfileRepository.findAllPidsByCompany();
 		}
 		log.info("Account Profile Size =" + accountPids.size());
-
+		String id="INV_QUERY_202";
+		String description="Getting customer wise Inventory Header";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> inventoryVouchersHeaders = inventoryVoucherHeaderRepository
 				.getCustomerWiseInventoryHeader(userLogin, accountPids, fromDate, toDate);
 		log.info("Inventory Voucher Header Size =" + inventoryVouchersHeaders.size());
@@ -989,6 +998,9 @@ public class LoadServerItemsToMobileController {
 
 			if (inventoryVoucherHeaderDTO.getPid() != null && !inventoryVoucherHeaderDTO.getPid().isEmpty()) {
 //				System.out.println(inventoryVoucherHeaderDTO.getPid() + "-----inventory Pid");
+				String id1="INV_QUERY_203";
+				String description1="Getting customer wise Inventory Details";
+				log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 				List<Object[]> inventoryVouchersDetail = inventoryVoucherHeaderRepository
 						.getCustomerWiseInventoryDetail(inventoryVoucherHeaderDTO.getPid());
 				List<InventoryVoucherDetailDTO> inventoryVoucherDetails = new ArrayList<>();
@@ -1098,7 +1110,9 @@ public class LoadServerItemsToMobileController {
 	private List<InventoryVoucherHeaderDTO> getDocumentInventoryItems(String exeTasKPid) {
 
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
-
+		String id="INV_QUERY_188";
+		String description="Finding invVouHeader By executiveTaskExecutionPid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> inventoryVouchersObject = inventoryVoucherHeaderRepository
 				.findInventoryVoucherHeaderByExecutiveTaskExecutionPid(exeTasKPid);
 
@@ -1134,6 +1148,9 @@ public class LoadServerItemsToMobileController {
 	private List<InventoryVoucherHeaderDTO> getDocumentInventoryItemsByExeIdIn(Set<Long> exeIds) {
 
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
+		String id="INV_QUERY_190";
+		String description="Finding invVouHeader By executiveTaskExecutionIdIn";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 
 		List<Object[]> inventoryVouchersObject = inventoryVoucherHeaderRepository
 				.findInventoryVoucherHeaderByExecutiveTaskExecutionIdIn(exeIds);
@@ -1204,7 +1221,9 @@ public class LoadServerItemsToMobileController {
 
 	private List<InventoryVoucherHeaderDTO> getDocumentInventoryItemsDetails(String inventoryVoucherHeaderPid) {
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
-
+		String id="INV_QUERY_189";
+		String description="finding invVouHeader by Pid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findInventoryVoucherHeaderByPid(inventoryVoucherHeaderPid);
 

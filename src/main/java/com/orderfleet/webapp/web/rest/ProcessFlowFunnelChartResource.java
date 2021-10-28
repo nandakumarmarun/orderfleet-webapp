@@ -141,6 +141,10 @@ public class ProcessFlowFunnelChartResource {
 		LocalDateTime toDate = tDate.atTime(23, 59);
 
 		List<FunnelChartDTO> funnelChartDtos = new ArrayList<>();
+		String id="INV_QUERY_197";
+		String description="Finding invVouchers by UserId and docPid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 
 		List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository
 				.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(

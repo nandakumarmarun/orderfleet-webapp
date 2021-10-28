@@ -79,6 +79,10 @@ public class SalesOrderTallyController {
 		List<VoucherType> voucherTypes = Arrays.asList(VoucherType.PRIMARY_SALES, VoucherType.PRIMARY_SALES_ORDER);
 		List<PrimarySecondaryDocument> psDocuments = primarySecondaryDocumentRepository.findByVoucherTypesAndCompany(voucherTypes, tallyConfig.getCompany().getId());
 		Set<Long> documentIds = psDocuments.stream().map(psd -> psd.getDocument().getId()).collect(Collectors.toSet());
+		String id="INV_QUERY_169";
+		String description="Listing sales orders from tally";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		List<Object[]> salesOrders = inventoryVoucherHeaderRepository.getSalesOrdersForTally(tallyConfig.getCompany().getId(), documentIds);
 		List<GstLedger> gstLedgers = gstLedgerRepository.findAllByCompanyIdAndActivated(tallyConfig.getCompany().getId(), true);
 		List<GstLedgerDTO> gstLedgerDTOs = gstLedgers.stream().map(GstLedgerDTO::new).collect(Collectors.toList());
@@ -148,6 +152,9 @@ public class SalesOrderTallyController {
 			List<String> inventoryHeaderPid = new ArrayList<>(inventoryVoucherHeaderPids);
 			log.info("SET SIZE : " + inventoryVoucherHeaderPids.size());
 			log.info("LIST SIZE : " + inventoryHeaderPid.size());
+			String id1="INV_QUERY_181";
+			String description1="Updating inv Vou header TallydownloadStatus using pid and Companyid";
+			log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 			int updated = inventoryVoucherHeaderRepository.
 								updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
 										TallyDownloadStatus.PROCESSING,tallyConfig.getCompany().getId(), inventoryHeaderPid);
@@ -182,6 +189,9 @@ public class SalesOrderTallyController {
 		
 		if(tallyConfiguration.isPresent()){
 			if (!inventoryVoucherHeaderPids.isEmpty()) {
+				String id="INV_QUERY_181";
+				String description="Updating inv Vou header TallydownloadStatus using pid and Companyid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
 						TallyDownloadStatus.COMPLETED,tallyConfiguration.get().getCompany().getId(),inventoryVoucherHeaderPids);
 			}

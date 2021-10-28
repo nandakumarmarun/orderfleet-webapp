@@ -77,6 +77,9 @@ public class YTDReportResource {
 			ytdReportMonth.setTc(executiveTaskExecutionRepository.countByDateBetween(start, end));
 
 			// set producive count(PC), Amount and Volume in a month
+			String id="INV_QUERY_117";
+			String description="Selecting count of inventoryvoucher ,sumof doc total and doc volume in inv_voucherHeader by validating companyId and createDateBetween";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			Object obj = inventoryVoucherHeaderRepository.getCountAndAmountAndVolumeByDateBetween(start, end);
 			Object[] countKgAndAmount = (Object[]) obj;
 

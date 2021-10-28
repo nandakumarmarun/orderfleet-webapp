@@ -109,6 +109,9 @@ public class SalesDataDownloadControllerAone {
 		List<String> inventoryHeaderPid = new ArrayList<String>();
 
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		String id="INV_QUERY_177";
+		String description="Getting sales order for excel";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 
 		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.getSalesOrderForExcel(company.getId());
@@ -139,7 +142,9 @@ public class SalesDataDownloadControllerAone {
 		}
 		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
-
+		String id="INV_QUERY_184";
+		String description="Getting primary sales for excel";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.getPrimarySalesForExcel(company.getId(), documentIds);
 
@@ -168,7 +173,9 @@ public class SalesDataDownloadControllerAone {
 		}
 		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
-
+		String id="INV_QUERY_183";
+		String description="Getting primary sales order for excel";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.getPrimarySalesOrderForExcel(company.getId(), documentIds);
 
@@ -198,7 +205,9 @@ public class SalesDataDownloadControllerAone {
 		}
 		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
-
+		String id="INV_QUERY_178";
+		String description="Getting Primary Secondary sales orders for excel ";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.getPrimarySecondarySalesOrderForExcel(company.getId(), documentIds);
 
@@ -365,6 +374,13 @@ public class SalesDataDownloadControllerAone {
 		}
 
 		if (!salesOrderDTOs.isEmpty()) {
+			String id="INV_QUERY_161";
+			String description=" Updating invVou Header by Tally download status using pid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 					TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
 			log.debug("updated " + updated + " to PROCESSING");
@@ -407,6 +423,13 @@ public class SalesDataDownloadControllerAone {
 		}
 
 		if (!salesOrderDTOs.isEmpty()) {
+			String id="INV_QUERY_161";
+			String description=" Updating invVou Header by Tally download status using pid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 					TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
 			log.debug("updated " + updated + " to PROCESSING");
@@ -424,6 +447,13 @@ public class SalesDataDownloadControllerAone {
 				inventoryVoucherHeaderPids.size());
 
 		if (!inventoryVoucherHeaderPids.isEmpty()) {
+			String id="INV_QUERY_161";
+			String description=" Updating invVou Header by Tally download status using pid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 					TallyDownloadStatus.COMPLETED, inventoryVoucherHeaderPids);
 			log.debug("updated " + updated + " to Completed");
@@ -471,6 +501,13 @@ public class SalesDataDownloadControllerAone {
 		log.debug("REST request to download sales orders pid :");
 		SnrichPartnerCompany snrichPartnerCompany = snrichPartnerCompanyRepository.findByDbCompany(companyId);
 		Company company = snrichPartnerCompany.getCompany();
+		String id="INV_QUERY_168";
+		String description="Listing Inv Voucher HeaderIds by status";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 		List<SalesPidDTO> inventoryVoucherHeaderPids = inventoryVoucherHeaderRepository.findPidByStatus(company.getId())
 				.stream().map(pid -> new SalesPidDTO(pid)).collect(Collectors.toList());
 
@@ -486,6 +523,13 @@ public class SalesDataDownloadControllerAone {
 		SnrichPartnerCompany snrichPartnerCompany = snrichPartnerCompanyRepository.findByDbCompany(companyId);
 		Company company = snrichPartnerCompany.getCompany();
 		SalesOrderPid salesOrderPid = new SalesOrderPid();
+		String id="INV_QUERY_168";
+		String description="Listing Inv Voucher HeaderIds by status";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 		salesOrderPid.setSalesPid(inventoryVoucherHeaderRepository.findPidByStatus(company.getId()));
 
 		log.debug("REST request to download sales order pids : " + salesOrderPid);
@@ -499,6 +543,13 @@ public class SalesDataDownloadControllerAone {
 		log.debug("REST request to download sales orders pid :");
 		SnrichPartnerCompany snrichPartnerCompany = snrichPartnerCompanyRepository.findByDbCompany(companyId);
 		Company company = snrichPartnerCompany.getCompany();
+		String id="INV_QUERY_168";
+		String description="Listing Inv Voucher HeaderIds by status";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 		List<SalesPidDTO> inventoryVoucherHeaderPids = inventoryVoucherHeaderRepository.findPidByStatus(company.getId())
 				.stream().map(pid -> new SalesPidDTO(pid)).collect(Collectors.toList());
 

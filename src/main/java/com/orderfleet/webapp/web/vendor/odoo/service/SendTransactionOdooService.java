@@ -97,6 +97,13 @@ public class SendTransactionOdooService {
 			
 
 			if (ivh != null) {
+				String id="INV_QUERY_161";
+				String description=" Updating invVou Header by Tally download status using pid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, Arrays.asList(ivh.getPid()));
 				log.debug("updated " + updated + " to PROCESSING");
@@ -284,6 +291,10 @@ public class SendTransactionOdooService {
 			List<InventoryVoucherHeader> successdistinctElements = new ArrayList<>();
 
 			if (successReferences.size() > 0) {
+				String id="INV_QUERY_200";
+				String description="Find all headers by documnetNumberServer";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 				successInventoryHeaders = inventoryVoucherHeaderRepository
 						.findAllHeaderdByDocumentNumberServer(successReferences);
 				successdistinctElements = successInventoryHeaders.stream().distinct().collect(Collectors.toList());

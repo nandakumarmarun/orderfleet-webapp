@@ -152,14 +152,18 @@ public class SendInvoiceOdooService {
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_207";
+			String description="Finding By companyId,Tally status and sales mgmt Status";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateAscLimit(
 							documentIdList);
 		} else {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_208";
+			String description="Finding by Tally status,CompanyId and DocOrder";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateAscLimit(documentIdList);
 		}
@@ -195,6 +199,13 @@ public class SendInvoiceOdooService {
 			}
 
 			if (!ivhPids.isEmpty()) {
+				String id="INV_QUERY_161";
+				String description=" Updating invVou Header by Tally download status using pid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPids);
 				log.debug("updated " + updated + " to PROCESSING");
@@ -406,6 +417,10 @@ public class SendInvoiceOdooService {
 			List<InventoryVoucherHeader> successdistinctElements = new ArrayList<>();
 
 			if (successReferences.size() > 0) {
+				String id="INV_QUERY_200";
+				String description="Find all headers by documnetNumberServer";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 				successInventoryHeaders = inventoryVoucherHeaderRepository
 						.findAllHeaderdByDocumentNumberServer(successReferences);
 				successdistinctElements = successInventoryHeaders.stream().distinct().collect(Collectors.toList());
@@ -516,14 +531,18 @@ public class SendInvoiceOdooService {
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_207";
+			String description="Finding By companyId,Tally status and sales mgmt Status";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateAscLimit(
 							documentIdList);
 		} else {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_208";
+			String description="Finding by Tally status,CompanyId and DocOrder";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateAscLimit(documentIdList);
 		}
@@ -559,6 +578,13 @@ public class SendInvoiceOdooService {
 			}
 
 			if (!ivhPids.isEmpty()) {
+				String id="INV_QUERY_161";
+				String description=" Updating invVou Header by Tally download status using pid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPids);
 				log.debug("updated " + updated + " to PROCESSING");
@@ -932,7 +958,9 @@ public class SendInvoiceOdooService {
 		if (response != null) {
 			if (response.getMessage() != null) {
 				log.debug("updating tally download status of " + response.getMessage().getReference());
-
+				String id="INV_QUERY_201";
+				String description="Finding one header by DocNoServer and companyId";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				InventoryVoucherHeader inventoryVoucher = inventoryVoucherHeaderRepository
 						.findOneHeaderByDocumentNumberServerAndCompanyPid(response.getMessage().getReference(),companyPid);
 

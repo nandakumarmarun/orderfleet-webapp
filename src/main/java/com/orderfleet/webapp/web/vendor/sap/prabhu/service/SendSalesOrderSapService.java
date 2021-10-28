@@ -165,7 +165,9 @@ public class SendSalesOrderSapService {
 		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)
 				&& inventoryVoucherHeaderDTO.getSalesManagementStatus().equals(SalesManagementStatus.APPROVE)) {
 			log.info("Downloading to sap prabhu.............");
-
+			String id="INV_QUERY_161";
+			String description=" Updating invVou Header by Tally download status using pid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			int updated = inventoryVoucherHeaderRepository
 					.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.PROCESSING, ivhPids);
 			log.debug("updated " + updated + " to PROCESSING");
@@ -250,6 +252,9 @@ public class SendSalesOrderSapService {
 		if (authenticateResponse != null) {
 
 			if (authenticateResponse.getStatus().equals("Success")) {
+				String id="INV_QUERY_161";
+				String description=" Updating invVou Header by Tally download status using pid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.COMPLETED, ivhPids);
 				log.debug("updated " + updated + " to COMPLETED");

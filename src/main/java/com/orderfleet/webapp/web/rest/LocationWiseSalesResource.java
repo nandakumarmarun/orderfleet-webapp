@@ -317,12 +317,18 @@ public class LocationWiseSalesResource {
 		if (userPid.equals("no") && locationPid.equals("no")) {
 			inventoryVouchers = inventoryVoucherService.findAllByCompanyIdAndDateBetween(fromDate, toDate, documents);
 		} else if (!userPid.equals("no") && locationPid.equals("no")) {
+			long id=106;
+			String description="Selecting inventory voucher from inventoryVocherHeader and validating using company id and createBy Pid,createDate betwen,documentIn and order by createddate in desc order";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherService.findAllByCompanyIdUserPidAndDateBetween(userPid, fromDate,
 					toDate, documents);
 		} else if (!locationPid.equals("no") && userPid.equals("no")) {
 			inventoryVouchers = inventoryVoucherService.findAllByCompanyIdLocationPidAndDateBetween(locationPid,
 					fromDate, toDate, documents);
 		} else if (!userPid.equals("no") && !locationPid.equals("no")) {
+			long id=108;
+			String description="Selecting inventory voucher from inventoryVocherHeader and validating using company id and createBypid,receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherService.findAllByCompanyIdUserPidLocationPidAndDateBetween(userPid,
 					locationPid, fromDate, toDate, documents);
 		}

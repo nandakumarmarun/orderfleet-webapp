@@ -231,6 +231,13 @@ public class UserCustomerGroupsTargetAchievedReportResource {
 		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
 		Double achievedAmount = 0D;
 		if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
+			String id="INV_QUERY_166";
+			String description="Listing inv Vouchers by using AccountPid,DocPid and Doc date between and tallydownloadStaus";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository
 					.findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(userPid, documentIds,
 							start.atTime(0, 0), end.atTime(23, 59));

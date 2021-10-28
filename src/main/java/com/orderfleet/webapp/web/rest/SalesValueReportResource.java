@@ -175,6 +175,9 @@ public class SalesValueReportResource {
 		List<SalesValueReportDTO> salesValueReportDTOs = new ArrayList<>();
 		for (PurchaseHistoryConfigDate purchaseHistoryConfigDate : dates) {
 			// get inventory Voucher Details
+			String id="INV_QUERY_135";
+			String description="selecting sum of docTotal,docvolume of inv_voucher from inv_voucher_header where executivetaskexecution.accProfile.pid=1 and create date between2&3 and doc in ";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			Object object = inventoryVoucherHeaderRepository.getAmountAndVolumeByAccountPidAndDocumentDateBetween(
 					accountProfileDTO.getPid(), purchaseHistoryConfigDate.getStartDate(),
 					purchaseHistoryConfigDate.getEndDate(), documents);

@@ -452,11 +452,17 @@ public class ExecutiveTaskExecutionResource {
 						executiveTaskExecution.getEndTime());
 				executiveTaskExecutionView.setTimeSpend(timeSpend);
 				List<ExecutiveTaskExecutionDetailView> executiveTaskExecutionDetailViews = new ArrayList<>();
+				String id="INV_QUERY_116";
+				String description="Selecting inventory voucherPid,document name,doc Total,doc.docTypeand doc volume from inventoryvoucherHeader by applying condition executive taskexecution id =1";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<Object[]> inventoryVouchers;
 				if (documentPid.equals("no")) {
 					inventoryVouchers = inventoryVoucherHeaderRepository
 							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
 				} else {
+					String id1="INV_QUERY_153";
+					String description1=" Selecting Pid,DocName,DocTotal,DocVolume,DocType of invVoucher from inv_Vou_Header validate using  executiveTaskexceution id and docPid";
+					log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 					inventoryVouchers = inventoryVoucherHeaderRepository
 							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
 				}
@@ -824,6 +830,9 @@ public class ExecutiveTaskExecutionResource {
 				optionalExecutiveTaskExecution.get().setAccountProfile(optionalAccountProfile.get());
 				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
 				// save InventoryVoucherHeader
+				String id="INV_QUERY_121";
+				String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
 				List<InventoryVoucherHeader> newInventoryVoucherHeaders = new ArrayList<>();
@@ -876,6 +885,9 @@ public class ExecutiveTaskExecutionResource {
 				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
 
 				// save InventoryVoucherHeader
+				String id="INV_QUERY_121";
+				String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
 				List<InventoryVoucherHeader> newInventoryVoucherHeaders = new ArrayList<>();

@@ -284,6 +284,9 @@ public class PerformanceReportMobileServiceImpl implements PerformanceReportMobi
 
 	private SalesTargetBlockDTO setSumOfAccountWiseAchievedBetweenDate(SalesTargetBlockDTO salesTargetBlockDTO,
 			List<String> accountPids, List<Document> documents, LocalDate startDate, LocalDate endDate) {
+		String id="INV_QUERY_124";
+		String description="selecting sum of docTotal,docvolume of inv_voucher from inv_voucher_header where executivetaskexecution.accProfile.pid and create date between and doc in ";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		Object sumOfAccountWiseAchieved = inventoryVoucherHeaderRepository
 				.getAmountAndVolumeByAccountInAndDocumentsInDateBetween(accountPids, startDate.atTime(0, 0),
 						endDate.atTime(23, 59), documents);

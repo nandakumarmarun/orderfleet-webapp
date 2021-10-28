@@ -194,6 +194,13 @@ public class LocationWiseTargetAchievedReportResource {
 
 		Double achievedVolume = 0D;
 		if (!accountProfileIds.isEmpty() && !productProfileIds.isEmpty()) {
+			String id="INV_QUERY_167";
+			String description="Selecting inv HeaderIds using accountProfiles and doc date between";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository.findIdByAccountProfileAndDocumentDateBetween(
 					accountProfileIds, documentIds, start.atTime(0, 0), end.atTime(23, 59));
 			if (!ivHeaderIds.isEmpty()) {

@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ import com.orderfleet.webapp.repository.UserBalanceRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.FinancialClosingHeaderService;
+import com.orderfleet.webapp.web.rest.SalesProductGroupTargetAchievedReportResource;
 import com.orderfleet.webapp.web.rest.dto.FinancialClosingReportDTO;
 import com.orderfleet.webapp.web.rest.dto.FinancialClosingReportHolder;
 
@@ -38,6 +41,7 @@ import com.orderfleet.webapp.web.rest.dto.FinancialClosingReportHolder;
 @Transactional
 public class FinancialClosingHeaderServiceImpl implements FinancialClosingHeaderService {
 	
+	private final Logger log = LoggerFactory.getLogger(FinancialClosingHeaderServiceImpl.class);
 	@Inject
 	private UserRepository userRepository;
 	
@@ -125,6 +129,9 @@ public class FinancialClosingHeaderServiceImpl implements FinancialClosingHeader
 					}
 
 				} else if (fcReport.getDocumentType().equals(DocumentType.INVENTORY_VOUCHER)) {
+					String id="INV_QUERY_142";
+					String description="Selecting inv voucher from iv_vouc_header by validating companyId ,create dateBetween,doc pid and  createBypid";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					List<InventoryVoucherHeader> ivHeaders = inventoryVoucherHeaderRepository
 							.getByDocumentPidAndDateBetweenAndUserPid(fcReport.getDocumentPid(), from, currentDate,
 									empUser.getPid());

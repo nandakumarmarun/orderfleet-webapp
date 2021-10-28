@@ -233,6 +233,9 @@ public class InventoryVoucherTransactionResource {
 		String documentNumber = System.currentTimeMillis() + "_" + SecurityUtils.getCurrentUserLogin() + "_"
 				+ document.get().getDocumentPrefix();
 		// find previous document number
+		String id="INV_QUERY_123";
+		String description="finding the doc number by createdLogin and order by created date in desc ";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
 				.findTop1ByCreatedByLoginOrderByCreatedDateDesc(SecurityUtils.getCurrentUserLogin());
 
@@ -296,6 +299,9 @@ public class InventoryVoucherTransactionResource {
 	@Transactional(readOnly = true)
 	@RequestMapping(value = "/previous-document-number", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String getPreviousDocumentNumber() {
+		String id="INV_QUERY_123";
+		String description="finding the doc number by createdLogin and order by created date in desc ";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
 				.findTop1ByCreatedByLoginOrderByCreatedDateDesc(SecurityUtils.getCurrentUserLogin());
 		if (inventoryVoucherHeader != null) {
@@ -321,6 +327,9 @@ public class InventoryVoucherTransactionResource {
 
 	private List<InventoryVoucherHeaderDTO> getInventoryVouchers(String accountPid, String documentPid) {
 		List<InventoryVoucherHeaderDTO> inventoryVouchers = new ArrayList<>();
+		String id="INV_QUERY_122";
+		String description="listing inv_voucher by using executivetaskexecution profile pid  and docPid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findByExecutiveTaskExecutionAccountProfilePidAndDocumentPid(accountPid, documentPid);
 		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {

@@ -215,16 +215,27 @@ public class ExecutiveTaskSubmissionController {
 
 //				List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocument(companyPid,
 //						userPid, documentPids);
-				LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid,
+				String id="INV_QUERY_172";
+				String description="Getting last date from company user document";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid,
 						userPid, documentPids);
 				log.info("Last Date " + lastDate);
 				if (lastDate == null) {
 					lastDate = LocalDateTime.now();
 				}
+				String id1="INV_QUERY_171";
+				String description1="Listing last number from each document optimised";
+				log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 				List<Object[]> objectArray = inventoryVoucherHeaderRepository
 						.getLastNumberForEachDocumentOptimized(companyPid, userPid, documentPids, lastDate);
 
-				List<Object[]> documentVoucherNumberListObject = inventoryVoucherHeaderRepository
+				String id11="INV_QUERY_174";
+				String description11="Listing all doc number for Each document";
+				log.info("{ Query Id:- "+id11+" Query Description:- "+description11+" }");
+
+		List<Object[]> documentVoucherNumberListObject = inventoryVoucherHeaderRepository
 						.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
 
 				List<String> documentVoucherNumberList = new ArrayList<>();
@@ -759,6 +770,9 @@ public class ExecutiveTaskSubmissionController {
 				.findByCompanyIdAndClientTransactionKey(executionDTO.getClientTransactionKey());
 		if (opExecutiveTaskExecution.isPresent()) {
 
+			String id="INV_QUERY_121";
+			String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			List<InventoryVoucherHeader> oldInventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByExecutiveTaskExecutionPid(opExecutiveTaskExecution.get().getPid());
 

@@ -231,9 +231,15 @@ public class EcomSalesReportResource {
 		if (userPid.equals("no") && accountPid.equals("no")) {
 			// user under current user
 			if (userIds.isEmpty()) {
+				String id="INV_QUERY_104";
+				String description="Selecting inventory voucher from inventory voucher header and using left join fetch fetching inventory voucher details by validating companyId and using condition create date between and document in and order by create date in descending order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate, documents);
 			} else {
+				String id="INV_QUERY_105";
+				String description="Selecting inventory voucher from Inventory voucherheader and using left join fetch fetching inventory vouchr details by validating company id and createBy.id in,documentin and createDate between";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdAndUserIdInAndDocumentsInAndDateBetweenOrderByCreatedDateDesc(userIds,
 								documents, fromDate, toDate);
@@ -260,6 +266,9 @@ public class EcomSalesReportResource {
 
 			} else if (userPid.equals("no") && !accountPid.equals("no")) {
 				// Account selected
+				String id="INV_QUERY_107";
+				String description="Selecting inventory voucher from inventoryVocherHeader and validating using company id and receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdAccountPidAndDateBetweenOrderByCreatedDateDesc(accountPid, fromDate, toDate,
 								documents);

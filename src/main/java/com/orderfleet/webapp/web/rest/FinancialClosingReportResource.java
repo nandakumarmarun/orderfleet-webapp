@@ -212,6 +212,9 @@ public class FinancialClosingReportResource {
 			}
 
 		} else if (closingSetting.getDocument().getDocumentType().equals(DocumentType.INVENTORY_VOUCHER)) {
+			String id="INV_QUERY_110";
+			String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate and createByPid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			obj = inventoryVoucherHeaderRepository.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUser(documents,
 					from, to, userPid);
 		} else if (closingSetting.getDocument().getDocumentType().equals(DocumentType.ACCOUNTING_VOUCHER)) {

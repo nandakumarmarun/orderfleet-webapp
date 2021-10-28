@@ -120,6 +120,12 @@ public class DataDownloadController {
 		}
 		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
+		String id="INV_QUERY_170";
+		String description="Listing sales orders for vendor";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
 
 		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.getSalesOrderForVendor(company.getId(), documentIds);
@@ -154,6 +160,9 @@ public class DataDownloadController {
 			salesSno++;
 
 		}
+		String id1="INV_QUERY_181";
+		String description1="Updating inv Vou header TallydownloadStatus using pid and Companyid";
+		log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 		inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
 				TallyDownloadStatus.PROCESSING, company.getId(),
 				salesOrderDTOs.stream().map(so -> so.getInventoryPid()).collect(Collectors.toList()));
@@ -181,6 +190,9 @@ public class DataDownloadController {
 		}
 		List<Long> documentIds = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
+		String id="INV_QUERY_170";
+		String description="Listing sales orders for vendor";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 
 		List<Object[]> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.getSalesOrderForVendor(company.getId(), documentIds);
@@ -215,6 +227,9 @@ public class DataDownloadController {
 			salesSno++;
 
 		}
+		String id1="INV_QUERY_181";
+		String description1="Updating inv Vou header TallydownloadStatus using pid and Companyid";
+		log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 		inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
 				TallyDownloadStatus.PROCESSING, company.getId(),
 				salesOrderDTOs.stream().map(so -> so.getInventoryPid()).collect(Collectors.toList()));
@@ -229,7 +244,9 @@ public class DataDownloadController {
 			return new ResponseEntity<String>("Failed - Company doesnot exist", HttpStatus.EXPECTATION_FAILED);
 		}
 		Company company = snrichPartnerCompany.getCompany();
-
+		String id="INV_QUERY_181";
+		String description="Updating inv Vou header TallydownloadStatus using pid and Companyid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
 				TallyDownloadStatus.COMPLETED, company.getId(), inventoryVoucherHeaderPids);
 		return new ResponseEntity<String>("Success", HttpStatus.OK);

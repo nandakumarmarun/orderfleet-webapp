@@ -263,10 +263,16 @@ public class SalesPerformanceReportResource {
 		}
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
+			String id="INV_QUERY_156";
+			String description=" Listing invVouchers by finding useridin& docIn";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndDocumentPidInAndStatusDateBetweenOrderByCreatedDateDesc(userIds, documentPids,
 							tallyStatus, fromDate, toDate);
 		} else {
+			String id="INV_QUERY_158";
+			String description=" Selecting inv vouchers by using userIdin ,Docin and Account Pid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndStatusDateBetweenOrderByCreatedDateDesc(userIds,
 							accountPid, documentPids, tallyStatus, fromDate, toDate);

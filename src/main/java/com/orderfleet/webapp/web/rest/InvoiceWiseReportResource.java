@@ -399,8 +399,14 @@ public class InvoiceWiseReportResource {
 		List<Object[]> inventoryVouchers = new ArrayList<>();
 		if (exeIds.size() > 0) {
 			if (documentPid.equals("no")) {
+				String id="INV_QUERY_205";
+				String description="Getting invVouchers By Executive task executionId";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVouchers = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionIdIn(exeIds);
 			} else {
+				String id="INV_QUERY_206";
+				String description="Getting invVouchers By Executive task executionId and DocPid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVouchers = inventoryVoucherHeaderRepository
 						.findByExecutiveTaskExecutionIdInAndDocumentPid(exeIds, documentPid);
 			}
@@ -875,6 +881,9 @@ public class InvoiceWiseReportResource {
 				optionalExecutiveTaskExecution.get().setAccountProfile(optionalAccountProfile.get());
 				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
 				// save InventoryVoucherHeader
+				String id="INV_QUERY_121";
+				String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
 				List<InventoryVoucherHeader> newInventoryVoucherHeaders = new ArrayList<>();
@@ -927,6 +936,9 @@ public class InvoiceWiseReportResource {
 				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
 
 				// save InventoryVoucherHeader
+				String id="INV_QUERY_121";
+				String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
 				List<InventoryVoucherHeader> newInventoryVoucherHeaders = new ArrayList<>();

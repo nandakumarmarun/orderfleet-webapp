@@ -164,6 +164,9 @@ public class DayPlanExecutionConfigController {
 			lastYear.setTargetAmount(Double.valueOf(lastYearTarget[1].toString()));
 		}
 		// set acheived
+		String id="INV_QUERY_115";
+		String description="selecting sum of documentTotal,docVolume from inventryVoucherHeader and validating  using executiveTaskExecution.accountprofile.pid ,createDate and documentIn";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		Object lastYearSumOfAccountWiseAchieved = inventoryVoucherHeaderRepository
 				.getAmountAndVolumeByAccountPidAndDateBetween(accountPid, lastYearStartDate.atTime(0, 0),
 						lastYearEndDate.atTime(23, 59), psDocuments);

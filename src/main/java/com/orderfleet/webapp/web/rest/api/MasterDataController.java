@@ -1629,6 +1629,10 @@ public class MasterDataController {
 		// document entry exist in inventory voucher entries
 		boolean documentExit = false;
 		for (VoucherNumberGenerator vng : voucherNumberGeneratorList) {
+			String id="INV_QUERY_173";
+			String description="Getting the highest Doc number without the prefix";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 			Long lastHighestDocumentNumberwithoutPrefix = inventoryVoucherHeaderRepository
 					.getHigestDocumentNumberwithoutPrefix(companyPid, userPid, vng.getDocument().getPid(),
 							vng.getPrefix());

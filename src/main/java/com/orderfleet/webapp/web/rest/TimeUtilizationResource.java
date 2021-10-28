@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +47,7 @@ import com.orderfleet.webapp.web.rest.dto.TimeUtilizationView;
 @Controller
 @RequestMapping("/web")
 public class TimeUtilizationResource {
-
+	private final Logger log = LoggerFactory.getLogger(TimeUtilizationResource.class);
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
@@ -294,6 +296,9 @@ public class TimeUtilizationResource {
 			String timeSpend=findTimeSpend(executiveTaskExecution.getStartTime(), executiveTaskExecution.getEndTime());
 			executiveTaskExecutionView.setTimeSpend(timeSpend);
 			List<ExecutiveTaskExecutionDetailView> executiveTaskExecutionDetailViews = new ArrayList<ExecutiveTaskExecutionDetailView>();
+			String id="INV_QUERY_116";
+			String description="Selecting inventory voucherPid,document name,doc Total,doc.docTypeand doc volume from inventoryvoucherHeader by applying condition executive taskexecution id =1";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
 			for (Object[] obj : inventoryVouchers) {

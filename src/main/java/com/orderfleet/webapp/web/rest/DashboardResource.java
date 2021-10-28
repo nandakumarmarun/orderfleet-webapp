@@ -551,6 +551,9 @@ public class DashboardResource {
 			if (dashboardItem.getDocumentType().equals(DocumentType.INVENTORY_VOUCHER)) {
 				if (!userIds.isEmpty()) {
 					// filter documents by user documents
+					long id=126;
+					String description="Selecting inv_voucher doc from inv voucher header where inv voucher header.createByid in=1";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					Set<Document> userDocuments = inventoryVoucherHeaderService.findDocumentsByUserIdIn(userIds);
 					dashboardItem.getDocuments().retainAll(userDocuments);
 				}
@@ -735,6 +738,9 @@ public class DashboardResource {
 
 	private void putNumberCircleOnInventoryDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary,
 			String taskExecutionPid) {
+		String id="INV_QUERY_121";
+		String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(taskExecutionPid);
 		if (!inventoryVoucherHeaders.isEmpty()) {
@@ -869,6 +875,9 @@ public class DashboardResource {
 			LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
 		if (!userIds.isEmpty()) {
 			// filter documents by user documents
+			long id=126;
+			String description="Selecting inv_voucher doc from inv voucher header where inv voucher header.createByid in=1";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			Set<Document> userDocuments = inventoryVoucherHeaderService.findDocumentsByUserIdIn(userIds);
 			dashboardItem.getDocuments().retainAll(userDocuments);
 		}
@@ -888,14 +897,23 @@ public class DashboardResource {
 			if (dashboardItem.getTaskPlanType().equals(TaskPlanType.BOTH)) {
 				if (userPid == null) {
 					if (!userIds.isEmpty()) {
+						String id="INV_QUERY_129";
+						String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId & inv_voucher doc=1& createDate between is 2& 3& created by id=4";
+						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 						obj = inventoryVoucherHeaderRepository
 								.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdIn(documents, from, to,
 										userIds);
 					} else {
+						String id="INV_QUERY_109";
+						String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentinand createdate";
+						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 						obj = inventoryVoucherHeaderRepository
 								.getCountAmountAndVolumeByDocumentsAndDateBetween(documents, from, to);
 					}
 				} else {
+					String id="INV_QUERY_110";
+					String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate and createByPid";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					obj = inventoryVoucherHeaderRepository
 							.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUser(documents, from, to, userPid);
 				}
@@ -913,14 +931,23 @@ public class DashboardResource {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
+				String id="INV_QUERY_130";
+				String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId & inv_voucher doc=1& createDateBetween  is 2&3 & created by id=4 & executiveTaskExecution.executiveTaskPlan IS NOT NULL";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNotNull(documents,
 								from, to, userIds);
 			} else {
+				String id="INV_QUERY_113";
+				String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate,and where executivetaskexecution.executiveTaskplan=null";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndTaskPlanIsNotNull(documents, from, to);
 			}
 		} else {
+			String id="INV_QUERY_114";
+			String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate ,CreateByPid and where executivetaskexecution.executiveTaskplan=null";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			obj = inventoryVoucherHeaderRepository
 					.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserAndTaskPlanIsNotNull(documents, from, to,
 							userPid);
@@ -933,14 +960,23 @@ public class DashboardResource {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
+				String id="INV_QUERY_131";
+				String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId & inv_voucher doc=1& createDateBetween is 2&3 & created by id=4 & executiveTaskExecution.executiveTaskPlan IS NULL";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNull(documents, from,
 								to, userIds);
 			} else {
+				String id="INV_QUERY_111";
+				String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate and where executivetaskexecution.executiveTaskplan=null";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndTaskPlanIsNull(documents, from, to);
 			}
 		} else {
+			String id="INV_QUERY_112";
+			String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate,createBypid and where executivetaskexecution.executiveTaskplan=null";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			obj = inventoryVoucherHeaderRepository
 					.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserAndTaskPlanIsNull(documents, from, to,
 							userPid);
@@ -1116,6 +1152,9 @@ public class DashboardResource {
 			LocalDateTime from, LocalDateTime to, List<Long> userIds, String userPid) {
 		if (!userIds.isEmpty()) {
 			// filter documents by user documents
+			long id=126;
+			String description="Selecting inv_voucher doc from inv voucher header where inv voucher header.createByid in=1";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			Set<Document> userDocuments = inventoryVoucherHeaderService.findDocumentsByUserIdIn(userIds);
 			dashboardItem.getDocuments().retainAll(userDocuments);
 		}

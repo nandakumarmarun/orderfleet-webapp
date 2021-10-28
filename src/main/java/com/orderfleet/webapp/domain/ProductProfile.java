@@ -107,10 +107,10 @@ public class ProductProfile implements Serializable, Cloneable {
 	@ManyToOne
 	@NotNull
 	private Division division;
-	
+
 	@ManyToOne
 	private Units units;
-	
+
 	@Size(max = 50000)
 	@Lob
 	@Column(name = "color_image")
@@ -192,7 +192,6 @@ public class ProductProfile implements Serializable, Cloneable {
 	@Column(name = "purchase_cost", columnDefinition = "double precision DEFAULT 0")
 	private double purchaseCost;
 
-	
 	public Units getUnits() {
 		return units;
 	}

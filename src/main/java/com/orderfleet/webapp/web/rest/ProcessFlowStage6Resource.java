@@ -473,10 +473,16 @@ public class ProcessFlowStage6Resource {
 
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
+			String id="INV_QUERY_197";
+			String description="Finding invVouchers by UserId and docPid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
 							userIds, documentPids, processStatus, fromDate, toDate, false);
 		} else {
+			String id="INV_QUERY_198";
+			String description="finding by UserIdIn ,AccountPidIn and DocumentPid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
 							userIds, accountPid, documentPids, processStatus, fromDate, toDate, false);
@@ -1037,6 +1043,9 @@ public class ProcessFlowStage6Resource {
 							"Sales Order Questions");
 
 			if (document.isPresent()) {
+				String id="INV_QUERY_210";
+				String description="Finding the Executive TaskExecutionId by Pid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				long executiveTaskExectionId = inventoryVoucherHeaderRepository
 						.findExecutiveTaskExecutionIdByPId(ivhPid);
 				List<Object[]> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
@@ -1299,6 +1308,9 @@ public class ProcessFlowStage6Resource {
 
 			for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaderDtos)
 				if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
+					String id="INV_QUERY_187";
+					String description="Updating pdf download status by pid";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
 
 				}

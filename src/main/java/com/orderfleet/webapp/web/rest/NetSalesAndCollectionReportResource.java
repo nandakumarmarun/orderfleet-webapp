@@ -196,6 +196,9 @@ public class NetSalesAndCollectionReportResource {
 			netSalesAndCollectionDTO.setNetSaleAmount(0.0);
 			return netSalesAndCollectionDTO;
 		}
+		String id="INV_QUERY_199";
+		String description="Finding net sales amount by UserId";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 
 		Object[] netSaleAmount = inventoryVoucherHeaderRepository.findnetSaleAmountByUserIdandDateBetween(userIds,
 				fromDate, toDate);

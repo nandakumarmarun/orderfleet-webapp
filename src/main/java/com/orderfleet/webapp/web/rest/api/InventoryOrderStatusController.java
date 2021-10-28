@@ -48,11 +48,17 @@ public class InventoryOrderStatusController {
 		if (opUser.isPresent()) {
 			User user = opUser.get();
 			if (fromDate != null && toDate != null) {
+				String id="INV_QUERY_143";
+				String description="Selecting in_vou from inv_vou_header using leftjoinFetch fetching inv_vou_details by validating companyid and excutive task execution userId and DocDateBetween and ordering by Doc Date in Desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdUserIdAndDateBetweenOrderByDocumentDateDesc(user.getId(), fromDate, toDate);
 				inventoryVoucherHeaderDTOs = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 						.collect(Collectors.toList());
 			} else {
+				String id="INV_QUERY_144";
+				String description="selecting inv_vou_headers using companyId,executive TakExecutionUserId and orderBy DocDate in Desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findTop3ByCompanyIdAndExecutiveTaskExecutionUserPidOrderByDocumentDateDesc(
 								user.getCompany().getId(), user.getPid());

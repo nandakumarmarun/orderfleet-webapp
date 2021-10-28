@@ -43,6 +43,9 @@ public class SalesDataUpdateGaruda {
 				invoiceNumbers.size());
 
 		if (!invoiceNumbers.isEmpty()) {
+			String id="INV_QUERY_182";
+			String description="Updating invVouHeader downloadstatus using docNo and companyId";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderDownloadStatusUsingDocumentNumberServerAndCompanyId(
 					TallyDownloadStatus.COMPLETED, company.getId(), invoiceNumbers);
 			log.debug("updated " + updated + " to Completed");

@@ -412,7 +412,11 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			// not required
 
 			List<Object[]> documentWiseCount = new ArrayList<Object[]>(); // count ,pid ,document_id
-			documentWiseCount = inventoryVoucherHeaderRepository
+			String id="INV_QUERY_175";
+			String description="Listing doc Wise Count of invVouHeaders";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+	documentWiseCount = inventoryVoucherHeaderRepository
 					.findCountOfInventoryVoucherHeader(SecurityUtils.getCurrentUsersCompanyId());
 			List<OrderStatus> orderStatus = orderStatusRepository.findAllByCompanyId();
 			List<SalesLedger> salesLedgers = salesLedgerRepository.findAllByCompanyId();
@@ -495,7 +499,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				inventoryVoucherHeader.setBookingId(
 						inventoryVoucherDTO.getBookingId() == null || inventoryVoucherDTO.getBookingId().equals("") ? ""
 								: inventoryVoucherDTO.getBookingId());
-
+				String ids="INV_QUERY_123";
+				String descriptions="finding the doc number by createdLogin and order by created date in desc ";
+				log.info("{ Query Id:- "+ids+" Query Description:- "+descriptions+" }");
 				InventoryVoucherHeader lastInventoryVoucher = inventoryVoucherHeaderRepository
 						.findTop1ByCreatedByLoginOrderByCreatedDateDesc(SecurityUtils.getCurrentUserLogin());
 
@@ -1009,6 +1015,13 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		}
 		Set<Long> accountIds = locationAccountProfileRepository.findAccountProfileIdByLocationPid(territoryPid);
 		if (!accountIds.isEmpty()) {
+			String id="INV_QUERY_165";
+			String description="Listing inv Vouchers by using AccountPid,DocPid and Doc date between and tallydownloadStaus";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 			List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByAccountIdInAndDocumentPidAndTallyStatusAndDocumentDateBetweenOrderByDocumentDateDesc(
 							accountIds, refDocumentPid, tallyStatusList, startDate.atTime(0, 0),
@@ -1104,15 +1117,30 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			LocalDate endDate, String processStatus, Set<Long> refDocumentIds) {
 		List<Object[]> inventoryVouchers = null;
 		if (processStatus == null || processStatus.isEmpty()) {
+			String id="INV_QUERY_162";
+			String description=" Listing inv Vou by suing accountPidIn and DocIn";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByAccountPidInAndDocumentPidInOrderByDocumentDateDesc(accountPid, refDocumentIds);
 		} else {
 			if ("Pending".equals(processStatus)) {
-				inventoryVouchers = inventoryVoucherHeaderRepository
+				String id="INV_QUERY_163";
+				String description=" Listing inv Vouchers by using AccountPid,DocPid and Tally down loadStatus";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+    		inventoryVouchers = inventoryVoucherHeaderRepository
 						.findByAccountPidInAndDocumentPidInAndTallyStatusAndDocumentDateBetweenOrderByDocumentDateDesc(
 								accountPid, refDocumentIds, Boolean.FALSE, startDate.atTime(0, 0),
 								endDate.atTime(23, 59));
 			} else {
+				String id="INV_QUERY_164";
+				String description="Listing inv Vouchers by using AccountPid,DocPid and Doc date between";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 				inventoryVouchers = inventoryVoucherHeaderRepository
 						.findByAccountPidInAndDocumentPidInAndDocumentDateBetweenOrderByDocumentDateDesc(accountPid,
 								refDocumentIds, startDate.atTime(0, 0), endDate.atTime(23, 59));
@@ -1264,9 +1292,15 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		List<InventoryVoucherHeaderDTO> inventoryVouchers = new ArrayList<>();
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = null;
 		if (documentPid != null) {
+			String id="INV_QUERY_118";
+			String description="Selecting inv_vouchers by using Executivetaskexecutionpid and docpid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByExecutiveTaskExecutionPidAndDocumentPid(executiveTaskExecutionPid, documentPid);
 		} else {
+			String id="INV_QUERY_119";
+			String description="Selecting Inv_voucher headers by using Executivetaskexecutionpid and Doc Editabletrue";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByExecutiveTaskExecutionPidAndDocumentEditableTrue(executiveTaskExecutionPid);
 		}
@@ -1954,7 +1988,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				// update Executive Task Execution
 				executiveTaskExecution = updateExecutiveTaskExecution(
 						executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO(), opExecutiveTaskExecution.get());
-
+				String id="INV_QUERY_121";
+				String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<InventoryVoucherHeader> oldInventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(executiveTaskExecution.getPid());
 

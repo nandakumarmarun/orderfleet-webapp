@@ -237,6 +237,9 @@ public class ActivityTimeSpendResource {
 						executiveTaskExecution.getEndTime());
 				executiveTaskExecutionView.setTimeSpend(timeSpend);
 				List<ExecutiveTaskExecutionDetailView> executiveTaskExecutionDetailViews = new ArrayList<ExecutiveTaskExecutionDetailView>();
+				String id="INV_QUERY_116";
+				String description="Selecting inventory voucherPid,document name,doc Total,doc.docTypeand doc volume from inventoryvoucherHeader by applying condition executive taskexecution id =1";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<Object[]> inventoryVouchers = new ArrayList<>();
 
 				inventoryVouchers = inventoryVoucherHeaderRepository

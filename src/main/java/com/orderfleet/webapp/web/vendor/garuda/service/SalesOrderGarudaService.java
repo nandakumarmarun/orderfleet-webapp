@@ -98,10 +98,16 @@ public class SalesOrderGarudaService {
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
+			String id="INV_QUERY_192";
+			String description="Finding invVou by companyId,tallyDownloadStatus,salesManagementStatus and document";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
 							documentIdList);
 		} else {
+			String id="INV_QUERY_191";
+			String description="Finding invVou by companyId,tallyDownloadStatus and document";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
 
@@ -138,6 +144,13 @@ public class SalesOrderGarudaService {
 			}
 
 			if (!ivhPids.isEmpty()) {
+				String id="INV_QUERY_161";
+				String description=" Updating invVou Header by Tally download status using pid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPids);
 				log.debug("updated " + updated + " to PROCESSING");

@@ -244,6 +244,9 @@ public class TransactionResource {
 		List<SalesOrderDTO> salesOrderDTOs = new ArrayList<>();
 		List<AccountProfileDTO> accountProfileDTOs = accountProfileService.findAllByAccountTypeName("VAT");
 		log.info("Retrived account profiles");
+		String id="INV_QUERY_120";
+		String description="Selecting inventoryvoucher & using leftjoin fetch fetching inv_voucherdetails  from inv_voucher_header by calculating companyid and set status as false 7 order by create date in desc order";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndStatusOrderByCreatedDateDesc();
 		log.info("Retrived inventory voucher headers");
@@ -372,14 +375,18 @@ public class TransactionResource {
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_192";
+			String description="Finding invVou by companyId,tallyDownloadStatus,salesManagementStatus and document";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
 							documentIdList);
 		} else {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_191";
+			String description="Finding invVou by companyId,tallyDownloadStatus and document";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
 		}
@@ -569,6 +576,13 @@ public class TransactionResource {
 				throw new IllegalArgumentException("Data missing in sales order..");
 			}
 			if (!salesOrderDTOs.isEmpty()) {
+				String id="INV_QUERY_161";
+				String description=" Updating invVou Header by Tally download status using pid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
 				log.debug("updated " + updated + " to PROCESSING");
@@ -632,9 +646,15 @@ public class TransactionResource {
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
+			String id="INV_QUERY_193";
+			String description="Finding invVou by companyId,tallyDownloadStatus,salesManagementStatus and employee";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndEmployeeOrderByCreatedDateDesc(empId);
 		} else {
+			String id="INV_QUERY_194";
+			String description="finding invVou by companyId,tallyStatusOrder, and employee";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusOrderAndEmployeeByCreatedDateDesc(empId);
 		}
@@ -830,6 +850,13 @@ public class TransactionResource {
 				throw new IllegalArgumentException("Data missing in sales order..");
 			}
 			if (!salesOrderDTOs.isEmpty()) {
+				String id="INV_QUERY_161";
+				String description=" Updating invVou Header by Tally download status using pid";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPid);
 				log.debug("updated " + updated + " to PROCESSING");
@@ -877,14 +904,18 @@ public class TransactionResource {
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusAndSalesManagementStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_192";
+			String description="Finding invVou by companyId,tallyDownloadStatus,salesManagementStatus and document";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
 							documentIdList);
 		} else {
 			// inventoryVoucherHeaders =
 			// inventoryVoucherHeaderRepository.findByCompanyIdAndTallyStatusOrderByCreatedDateDesc();
-
+			String id="INV_QUERY_191";
+			String description="Finding invVou by companyId,tallyDownloadStatus and document";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
 		}
@@ -1259,7 +1290,9 @@ public class TransactionResource {
 		// primarySecondaryDocument=primarySecondaryDocumentService.findAllDocumentsByCompanyIdAndVoucherType(VoucherType.PRIMARY_SALES_ORDER);
 
 		// PRIMARY_SALES_ORDER
-
+		String id="INV_QUERY_125";
+		String description="Selecting inv voucher from inv voucherHeader by validating comanyId and setting status as false and doc in =1 and order br createdate in desc";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndStatusAndDocumentsOrderByCreatedDateDesc(documentDTOs);
 		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
@@ -1663,6 +1696,13 @@ public class TransactionResource {
 				inventoryVoucherHeaderPids.size());
 
 		if (!inventoryVoucherHeaderPids.isEmpty()) {
+			String id="INV_QUERY_161";
+			String description=" Updating invVou Header by Tally download status using pid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
+
+
 			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 					TallyDownloadStatus.COMPLETED, inventoryVoucherHeaderPids);
 			log.debug("updated " + updated + " to COMPLETED");
@@ -1856,6 +1896,9 @@ public class TransactionResource {
 
 			// delete InventoryVoucherHeaders for avoidind duplicates and for
 			// new or updated sales vouchers
+			String id="INV_QUERY_127";
+			String description="Selecting inv_voucher from iv_voucher_header by validating company id,docDate=1,executive Task execution accountpid=2and doc.pid=3 order by create date in desc a";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAndDocumentDateAndActivityAndDocumentOrderByCreatedDateDesc(documentDate,
 							activityDto.getPid(), documentDto.getPid());

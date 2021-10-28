@@ -72,9 +72,9 @@ public class ProductProfileDTO {
 	private LocalDateTime lastModifiedDate;
 
 	private String defaultLedger;
-	
+
 	private String unitsPid;
-	
+
 	private String unitsName;
 
 	private List<TaxMasterDTO> productProfileTaxMasterDTOs;
@@ -162,8 +162,8 @@ public class ProductProfileDTO {
 		this.productCategoryName = profile.getProductCategory().getName();
 		this.divisionPid = profile.getDivision().getPid();
 		this.divisionName = profile.getDivision().getName();
-		this.unitsPid = profile.getUnits()!=null?profile.getUnits().getPid():"";	
-		this.unitsName = profile.getUnits()!=null? profile.getUnits().getName():"";
+		this.unitsPid = profile.getUnits() != null ? profile.getUnits().getPid() : "";
+		this.unitsName = profile.getUnits() != null ? profile.getUnits().getName() : "";
 		this.colorImage = profile.getColorImage();
 		this.colorImageContentType = profile.getColorImageContentType();
 		this.size = profile.getSize() == null || profile.getSize().equalsIgnoreCase("") ? null : profile.getSize();
@@ -199,7 +199,7 @@ public class ProductProfileDTO {
 			String productCategoryName, String divisionPid, String divisionName, byte[] colorImage,
 			String colorImageContentType, String size, String filesPid, boolean activated,
 			LocalDateTime lastModifiedDate, String defaultLedger, List<TaxMasterDTO> productProfileTaxMasterDTOs,
-			StockAvailabilityStatus stockAvailabilityStatus, String productGroup,String unitpid, String unitName) {
+			StockAvailabilityStatus stockAvailabilityStatus, String productGroup, String unitpid, String unitName) {
 		super();
 		this.pid = pid;
 		this.name = name;
@@ -216,7 +216,7 @@ public class ProductProfileDTO {
 		this.divisionPid = divisionPid;
 		this.divisionName = divisionName;
 		this.unitsPid = unitpid;
-		this.unitsName= unitName;
+		this.unitsName = unitName;
 		this.colorImage = colorImage;
 		this.colorImageContentType = colorImageContentType;
 		this.size = size;
@@ -232,8 +232,6 @@ public class ProductProfileDTO {
 	public String getPid() {
 		return pid;
 	}
-
-	
 
 	public String getUnitsPid() {
 		return unitsPid;

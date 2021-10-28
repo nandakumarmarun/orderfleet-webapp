@@ -270,6 +270,9 @@ public class SalesValueReportUploadXlsResource {
 
 	private void createInventoryDetails(ExecutiveTaskExecution executiveTaskExecution, ProductProfile productProfile,
 			double qty) {
+		String id="INV_QUERY_121";
+		String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<InventoryVoucherHeader> inventoryVoucherHeader = inventoryVoucherHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(executiveTaskExecution.getPid());
 		if (!inventoryVoucherHeader.isEmpty()) {

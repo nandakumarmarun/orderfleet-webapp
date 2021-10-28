@@ -107,6 +107,9 @@ public class DocumentWiseYTDReportResource {
 			// end));
 
 			// set producive count(PC), Amount and Volume in a month
+			String id="INV_QUERY_140";
+			String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId ,createdateBetween & doc pid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			Object obj = inventoryVoucherHeaderRepository.getCountAndAmountAndVolumeByDateBetweenAndDocumentPid(start,
 					end, documentPid);
 			Object[] countKgAndAmount = (Object[]) obj;

@@ -11,6 +11,8 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.OrderStatusService;
 import com.orderfleet.webapp.service.SetOrderStatusInventoryService;
+import com.orderfleet.webapp.service.impl.InventoryVoucherHeaderServiceImpl;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.OrderStatusDTO;
 
@@ -37,6 +40,7 @@ import com.orderfleet.webapp.web.rest.dto.OrderStatusDTO;
 @RequestMapping("/web")
 public class SetOrderStatusInventoryResource {
 
+	private final Logger log = LoggerFactory.getLogger(SetOrderStatusInventoryResource.class);
 	@Inject
 	private AccountProfileService accountProfileService;
 
@@ -114,30 +118,54 @@ public class SetOrderStatusInventoryResource {
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 		if(employeePid.equals("no")) {
 			if (statusId == -1 && accountPid.equals("no")) {
+				String id="INV_QUERY_145";
+				String description="Selecting inv_vou DocDate,employeename,Receiveraccountname,docTotal,OrderStatusname from invVouHeader  by validating companyId and DocdateBetween and orderby docDate in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdDateBetweenOrderByDocumentDateDesc(fromDate, toDate);
 			} else if (statusId != -1 && accountPid.equals("no")) {
+				String id="INV_QUERY_147";
+				String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,orderStatus id and docDtaeBetween and Order by DocDate in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdOrderStatusAndDateBetweenOrderByDocumentDateDesc(statusId, fromDate, toDate);
 			} else if (statusId == -1 && !accountPid.equals("no")) {
+				String id="INV_QUERY_148";
+				String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,receiver AccountPid and docDtaeBetween and Order by DocDate in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdAccountPidAndDateBetweenOrderByDocumentDateDesc(accountPid, fromDate, toDate);
 			} else if (statusId != -1 && !accountPid.equals("no")) {
+				String id="INV_QUERY_149";
+				String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,orderStatus id,receiver AccountPid and docDtaeBetween and Order by DocDate in desc order";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdOrderStatusIdAccountPidAndDateBetweenOrderByDocumentDateDesc( accountPid,statusId,
 								fromDate, toDate);
 			}
 			}else {
 				if (statusId == -1 && accountPid.equals("no")) {
+					String id="INV_QUERY_146";
+					String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId and docDtaeBetween and Order by DocDate in desc order";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 							.findAllByCompanyIdEmployeePidAndDateBetweenOrderByDocumentDateDesc(employeePid,fromDate, toDate);
 				} else if (statusId != -1 && accountPid.equals("no")) {
+					String id="INV_QUERY_150";
+					String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,employee pid,orderStatus id and docDtaeBetween and Order by DocDate in desc order";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 							.findAllByCompanyIdEmployeePidOrderStatusIdAndDateBetweenOrderByDocumentDateDesc(employeePid,statusId, fromDate, toDate);
 				} else if (statusId == -1 && !accountPid.equals("no")) {
+					String id="INV_QUERY_152";
+					String description=" Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,employee pid,receiver AccountPid and docDtaeBetween and Order by DocDate in desc order";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 							.findAllByCompanyIdEmployeePidAccountPidAndDateBetweenOrderByDocumentDateDesc(employeePid,accountPid, fromDate, toDate);
 				} else if (statusId != -1 && !accountPid.equals("no")) {
+					String id="INV_QUERY_151";
+					String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,employee pid,orderStatus id,receiver AccountPid and docDtaeBetween and Order by DocDate in desc order";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 							.findAllByCompanyIdEmployeePidOrderStatusIdAccountPidAndDateBetweenOrderByDocumentDateDesc(employeePid,statusId, accountPid,
 									fromDate, toDate);

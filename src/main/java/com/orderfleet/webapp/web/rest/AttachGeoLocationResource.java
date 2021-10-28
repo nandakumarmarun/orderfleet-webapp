@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +46,7 @@ import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.UserService;
+import com.orderfleet.webapp.service.impl.InventoryVoucherHeaderServiceImpl;
 import com.orderfleet.webapp.web.rest.api.dto.AccountProfileGeoLocationTaggingDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.AttachGeoLocationView;
@@ -56,6 +59,7 @@ import com.orderfleet.webapp.web.rest.dto.VisitGeoLocationView;
 @RequestMapping("/web")
 public class AttachGeoLocationResource {
 
+	private final Logger log = LoggerFactory.getLogger( AttachGeoLocationResource .class);
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
@@ -294,6 +298,9 @@ public class AttachGeoLocationResource {
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			VisitGeoLocationView visitGeoLocationView = new VisitGeoLocationView(executiveTaskExecution);
 			List<ExecutiveTaskExecutionDetailView> executiveTaskExecutionDetailViews = new ArrayList<>();
+			String id="INV_QUERY_116";
+			String description="Selecting inventory voucherPid,document name,doc Total,doc.docTypeand doc volume from inventoryvoucherHeader by applying condition executive taskexecution id =1";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
 			for (Object[] obj : inventoryVouchers) {
