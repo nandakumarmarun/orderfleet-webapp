@@ -80,7 +80,7 @@
 							'${employeeProfile.designationPid}',
 							'${employeeProfile.departmentPid}',
 							'${employeeProfile.pid}',
-							'${ !employeeProfile.activated}')"
+							'${!employeeProfile.activated}')"
 							style="cursor:pointer;">${employeeProfile.activated? "Activated" : "Deactivated"}</span></td>
 							<td>
 								<button type="button" class="btn btn-blue"
