@@ -286,14 +286,14 @@ if (!this.EmployeeProfile) {
 		});
 	}
 
-	EmployeeProfile.setActive=function(name,address,orgEmpId,desPId,depPid,pid,active){
+	EmployeeProfile.setActive=function(name,address,desPId,depPid,pid,active){
 		employeeProfileModel.pid=pid;
 		employeeProfileModel.activated=active;
 		employeeProfileModel.name=name;
 		employeeProfileModel.address=address;
-		employeeProfileModel.orgEmpId=orgEmpId;
 		employeeProfileModel.departmentPid=depPid;
 		employeeProfileModel.designationPid=desPId;
+		console.log(employeeProfileModel);
 		if(confirm("Are you confirm?")){
 			$.ajax({
 				url:employeeProfileContextPath+"/changeStatus",
