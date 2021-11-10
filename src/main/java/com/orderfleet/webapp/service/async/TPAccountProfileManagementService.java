@@ -270,6 +270,146 @@ public class TPAccountProfileManagementService {
 	}
 
 	@Transactional
+	public void saveUpdateAccountProfilesId(final List<AccountProfileDTO> accountProfileDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+
+		Optional<User> opUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		User userObject = new User();
+		if (opUser.isPresent()) {
+			userObject = opUser.get();
+		} else {
+			userObject = userRepository.findOneByLogin("siteadmin").get();
+		}
+		final User user = userObject;
+		final Long companyId = company.getId();
+		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
+		// All product must have a division/category, if not, set a default one
+		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
+		log.info("Default Account Type TPAPMS:" + defaultAccountType.getName());
+		// find all exist account profiles
+		List<String> apNames = accountProfileDTOs.stream().map(apDto -> apDto.getName().toUpperCase())
+				.collect(Collectors.toList());
+		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
+				apNames);
+
+		log.info("Db accounts: " + accountProfiles.size());
+		log.info("Tally  accounts: " + accountProfileDTOs.size());
+		// all pricelevels
+		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
+
+		// account type
+		// List<AccountType> accountTypes =
+		// accountTypeRepository.findAllByCompanyId(company.getId());
+
+		for (AccountProfileDTO apDto : accountProfileDTOs) {
+			Optional<AccountProfile> optionalAP = null;
+			// check exist by name, only one exist with a name
+			if(apDto.getCustomerId() == null) {
+				optionalAP = accountProfiles.stream()
+					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findFirst();
+			}else {
+				optionalAP = accountProfiles.stream()
+						.filter(pc -> pc.getCustomerId() !=null ? pc.getCustomerId().equalsIgnoreCase(apDto.getCustomerId()) : false).findFirst();
+			}
+			 
+			AccountProfile accountProfile;
+			if (optionalAP.isPresent()) {
+				accountProfile = optionalAP.get();
+				accountProfile.setName(apDto.getName());
+				// if not update, skip this iteration. Not implemented now
+				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
+			} else {
+				accountProfile = new AccountProfile();
+				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+				accountProfile.setCustomerId(apDto.getCustomerId());
+				accountProfile.setUser(user);
+				accountProfile.setCompany(company);
+				accountProfile.setAccountStatus(AccountStatus.Unverified);
+				accountProfile.setDataSourceType(DataSourceType.TALLY);
+				accountProfile.setImportStatus(true);
+			}
+			accountProfile.setName(apDto.getName());
+			accountProfile.setTrimChar(apDto.getTrimChar());
+			accountProfile.setTinNo(apDto.getTinNo());
+			accountProfile.setAlias(apDto.getAlias());
+			if (isValidPhone(apDto.getPhone1())) {
+				accountProfile.setPhone1(apDto.getPhone1());
+			} else {
+				accountProfile.setPhone1("");
+			}
+			if (isValidPhone(apDto.getPhone2())) {
+				accountProfile.setPhone2(apDto.getPhone2());
+			} else {
+				accountProfile.setPhone2("");
+			}
+			if (isValidEmail(apDto.getEmail1())) {
+				accountProfile.setEmail1(apDto.getEmail1());
+			}
+			accountProfile.setPin(apDto.getPin());
+			accountProfile.setDescription(apDto.getDescription());
+			accountProfile.setActivated(apDto.getActivated());
+			accountProfile.setAddress(apDto.getAddress());
+			accountProfile.setCity(apDto.getCity());
+			accountProfile.setContactPerson(apDto.getContactPerson());
+			accountProfile.setStateName(apDto.getStateName());
+			accountProfile.setCountryName(apDto.getCountryName());
+			accountProfile.setGstRegistrationType(
+					apDto.getGstRegistrationType() == null ? "Regular" : apDto.getGstRegistrationType());
+			if (apDto.getDefaultPriceLevelName() != null && !apDto.getDefaultPriceLevelName().equalsIgnoreCase("")) {
+				// price level
+				Optional<PriceLevel> optionalPriceLevel = tempPriceLevel.stream()
+						.filter(pl -> apDto.getDefaultPriceLevelName().equals(pl.getName())).findAny();
+
+				if (optionalPriceLevel.isPresent()) {
+					accountProfile.setDefaultPriceLevel(optionalPriceLevel.get());
+				} else {
+					// create new price level
+					if (apDto.getDefaultPriceLevelName().length() > 0) {
+						PriceLevel priceLevel = new PriceLevel();
+						priceLevel.setPid(PriceLevelService.PID_PREFIX + RandomUtil.generatePid());
+						priceLevel.setName(apDto.getDefaultPriceLevelName());
+						priceLevel.setActivated(true);
+						priceLevel.setCompany(company);
+						priceLevel = priceLevelRepository.save(priceLevel);
+						tempPriceLevel.add(priceLevel);
+						accountProfile.setDefaultPriceLevel(priceLevel);
+					}
+				}
+			}
+			// account type
+
+			if (accountProfile.getAccountType() == null) {
+				accountProfile.setAccountType(defaultAccountType);
+			}
+
+			// Optional<AccountType> optionalAccountType = accountTypes.stream()
+			// .filter(atn ->
+			// apDto.getAccountTypeName().equals(atn.getName())).findAny();
+			// if (optionalAccountType.isPresent()) {
+			// accountProfile.setAccountType(optionalAccountType.get());
+			// } else {
+			// accountProfile.setAccountType(defaultAccountType);
+			// }
+			accountProfile.setDataSourceType(DataSourceType.TALLY);
+			saveUpdateAccountProfiles.add(accountProfile);
+		}
+		log.info("Saving...accountProfileDTOs.Account Profiles" + saveUpdateAccountProfiles.size());
+		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+	
+	
+	
+	@Transactional
 	public void saveUpdateLocations(final List<LocationDTO> locationDTOs, final SyncOperation syncOperation) {
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
@@ -306,6 +446,50 @@ public class TPAccountProfileManagementService {
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
+	@Transactional
+	public void saveUpdateLocationsId(final List<LocationDTO> locationDTOs, final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		Set<Location> saveUpdateLocations = new HashSet<>();
+		// find all locations
+		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
+		for (LocationDTO locDto : locationDTOs) {
+			Optional<Location> optionalLoc = null;
+			// check exist by name, only one exist with a name
+			if(locDto.getLocationId()== null) {
+				 optionalLoc = locations.stream().filter(p -> p.getName().equals(locDto.getName()))
+							.findAny();
+			}else {
+				 optionalLoc = locations.stream().filter(p -> p.getLocationId() != null ? p.getLocationId().equals(locDto.getLocationId()) : false)
+							.findAny();
+			}
+			Location location;
+			if (optionalLoc.isPresent()) {
+				location = optionalLoc.get();
+				// if not update, skip this iteration.
+				// if (!location.getThirdpartyUpdate()) {continue;}
+			} else {
+				location = new Location();
+				location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
+				location.setLocationId(locDto.getLocationId());
+				location.setCompany(company);
+			}
+			location.setActivated(locDto.getActivated());
+			location.setName(locDto.getName());
+			saveUpdateLocations.add(location);
+		}
+		bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	
 	@Transactional
 	public void saveUpdateLocationHierarchy(final List<LocationHierarchyDTO> locationHierarchyDTOs,
 			final SyncOperation syncOperation) {
