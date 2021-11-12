@@ -219,6 +219,57 @@ public class TPProductProfileManagementService {
 	}
 
 	@Transactional
+	public void saveUpdateProductCategoriesId(final List<ProductCategoryDTO> productCategoryDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		Set<ProductCategory> saveUpdateProductCategories = new HashSet<>();
+		// find all product category
+		List<ProductCategory> productCategories = productCategoryRepository.findByCompanyId(company.getId());
+		for (ProductCategoryDTO pcDto : productCategoryDTOs) {
+			Optional<ProductCategory> optionalPC = null;
+			// check exist by name, only one exist with a name
+			if (pcDto.getProductCategoryId() == null) {
+				optionalPC = productCategories.stream().filter(pc -> pc.getName().equals(pcDto.getName())).findAny();
+			} else {
+				optionalPC = productCategories.stream()
+						.filter(pc -> pc.getProductCategoryId() != null
+								? pc.getProductCategoryId().equals(pcDto.getProductCategoryId())
+								: false)
+						.findAny();
+			}
+			ProductCategory productCategory;
+			if (optionalPC.isPresent()) {
+				productCategory = optionalPC.get();
+				// if not update, skip this iteration.
+				if (!productCategory.getThirdpartyUpdate()) {
+					continue;
+				}
+			} else {
+				productCategory = new ProductCategory();
+				productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
+				productCategory.setProductCategoryId(pcDto.getProductCategoryId());
+				productCategory.setDataSourceType(DataSourceType.TALLY);
+				productCategory.setCompany(company);
+			}
+			productCategory.setName(pcDto.getName());
+			productCategory.setAlias(pcDto.getAlias());
+			productCategory.setDescription(pcDto.getDescription());
+			productCategory.setActivated(pcDto.getActivated());
+			saveUpdateProductCategories.add(productCategory);
+		}
+		bulkOperationRepositoryCustom.bulkSaveProductCategory(saveUpdateProductCategories);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	@Transactional
 	public void saveUpdateProductGroups(final List<ProductGroupDTO> productGroupDTOs,
 			final SyncOperation syncOperation) {
 		long start = System.nanoTime();
@@ -250,6 +301,63 @@ public class TPProductProfileManagementService {
 			productGroup.setActivated(pgDto.getActivated());
 			saveUpdateProductGroups.add(productGroup);
 		}
+		bulkOperationRepositoryCustom.bulkSaveProductGroup(saveUpdateProductGroups);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	@Transactional
+	public void saveUpdateProductGroupsid(final List<ProductGroupDTO> productGroupDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		Set<ProductGroup> saveUpdateProductGroups = new HashSet<>();
+
+		// find all product group
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
+
+		for (ProductGroupDTO pgDto : productGroupDTOs) {
+			Optional<ProductGroup> optionalPG = null;
+			if (pgDto.getProductGroupId() == null) {
+				optionalPG = productGroups.stream().filter(p -> p.getName().equals(pgDto.getName())).findAny();
+			} else {
+				optionalPG = productGroups.stream()
+						.filter(p -> p.getProductGroupId() != null
+								? p.getProductGroupId().equals(pgDto.getProductGroupId())
+								: false)
+						.findAny();
+			}
+			// check exist by name, only one exist with a name
+
+			ProductGroup productGroup;
+			if (optionalPG.isPresent()) {
+				productGroup = optionalPG.get();
+
+
+				// if not update, skip this iteration.
+				if (!productGroup.getThirdpartyUpdate()) {
+					continue;
+				}
+			} else {
+				productGroup = new ProductGroup();
+				productGroup.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
+				productGroup.setProductGroupId(pgDto.getProductGroupId());
+				productGroup.setDataSourceType(DataSourceType.TALLY);
+				productGroup.setCompany(company);
+			}
+			productGroup.setAlias(pgDto.getAlias());
+			productGroup.setName(pgDto.getName());
+			productGroup.setDescription(pgDto.getDescription());
+			productGroup.setActivated(pgDto.getActivated());
+			saveUpdateProductGroups.add(productGroup);
+		}
+//		saveUpdateProductGroups.forEach(i -> System.out.println("save prg"+i));
 		bulkOperationRepositoryCustom.bulkSaveProductGroup(saveUpdateProductGroups);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -411,6 +519,176 @@ public class TPProductProfileManagementService {
 			}
 			saveUpdateProductProfiles.add(productProfile);
 		}
+		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+	@Transactional
+	public void saveUpdateProductProfilesId(final List<ProductProfileDTO> productProfileDTOs,
+			final SyncOperation syncOperation) {
+		log.info("Saving Product Profiles:----" + productProfileDTOs.size());
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
+
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
+
+		if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+			for (ProductProfileDTO ppDto : productProfileDTOs) {
+				String name = ppDto.getName();
+				ppDto.setName(ppDto.getAlias() != null && !ppDto.getAlias().equals("") ? ppDto.getAlias() : name);
+				ppDto.setAlias(name);
+			}
+		}
+
+		// find all exist product profiles
+		Set<String> ppNames = productProfileDTOs.stream().map(p -> p.getName()).collect(Collectors.toSet());
+		List<ProductProfile> productProfiles = productProfileRepository.findByCompanyIdAndNameIn(company.getId(),
+				ppNames);
+
+		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
+
+		List<ProductGroupProduct> productGroupProducts = new ArrayList<>();
+
+		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.PRODUCT_GROUP_TAX);
+
+		if (optProductGroupTax.isPresent() && optProductGroupTax.get().getValue().equalsIgnoreCase("true")) {
+
+			productGroupProducts = productGroupProductRepository.findByProductGroupProductActivatedAndCompanyId();
+
+		}
+
+		// All product must have a division/category, if not, set a default one
+		Division defaultDivision = divisionRepository.findFirstByCompanyId(company.getId());
+		Optional<ProductCategory> defaultCategory = productCategoryRepository
+				.findByCompanyIdAndNameIgnoreCase(company.getId(), "Not Applicable");
+		ProductCategory productCategory = new ProductCategory();
+		if (!defaultCategory.isPresent()) {
+			productCategory = new ProductCategory();
+			productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
+			productCategory.setName("Not Applicable");
+			productCategory.setDataSourceType(DataSourceType.TALLY);
+			productCategory.setCompany(company);
+			productCategory = productCategoryRepository.save(productCategory);
+		} else {
+			productCategory = defaultCategory.get();
+		}
+
+		Optional<CompanyConfiguration> optAddCompoundUnit = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ADD_COMPOUND_UNIT);
+
+		for (ProductProfileDTO ppDto : productProfileDTOs) {
+			Optional<ProductProfile> optionalPP = null;
+			// check exist by name, only one exist with a name
+			if (ppDto.getProductId() == null) {
+				optionalPP = productProfiles.stream().filter(p -> p.getName().equals(ppDto.getName())).findAny();
+			} else {
+				optionalPP = productProfiles.stream()
+						.filter(p -> p.getProductId() != null ? p.getProductId().equals(ppDto.getProductId()) : false)
+						.findAny();
+			}
+			ProductProfile productProfile;
+			if (optionalPP.isPresent()) {
+				productProfile = optionalPP.get();
+				// if not update, skip this iteration.
+				if (!productProfile.getThirdpartyUpdate()) {
+					continue;
+				}
+			} else {
+				productProfile = new ProductProfile();
+				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
+				productProfile.setCompany(company);
+				productProfile.setProductId(ppDto.getProductId());
+				productProfile.setName(ppDto.getName());
+				productProfile.setDivision(defaultDivision);
+				productProfile.setDataSourceType(DataSourceType.TALLY);
+			}
+			productProfile.setName(ppDto.getName());
+			productProfile.setAlias(ppDto.getAlias());
+			productProfile.setDescription(ppDto.getDescription());
+			productProfile.setMrp(ppDto.getMrp());
+			productProfile.setTaxRate(ppDto.getTaxRate());
+			productProfile.setSku(ppDto.getSku());
+			productProfile.setActivated(ppDto.getActivated());
+			productProfile.setTrimChar(ppDto.getTrimChar());
+			productProfile.setSize(ppDto.getSize());
+			productProfile.setHsnCode(ppDto.getHsnCode());
+			productProfile.setProductDescription(ppDto.getProductDescription());
+			productProfile.setBarcode(ppDto.getBarcode());
+			productProfile.setRemarks(ppDto.getRemarks());
+
+			if (optProductGroupTax.isPresent() && optProductGroupTax.get().getValue().equalsIgnoreCase("true")) {
+
+				if (productGroupProducts.size() > 0) {
+					Optional<ProductGroupProduct> opPgp = productGroupProducts.stream()
+							.filter(pgp -> pgp.getProduct().getName().equals(ppDto.getName())).findAny();
+
+					if (opPgp.isPresent()) {
+						double taxRate = opPgp.get().getProductGroup().getTaxRate();
+
+						if (taxRate > 0 && ppDto.getTaxRate() == 0) {
+							productProfile.setTaxRate(taxRate);
+						}
+					}
+				}
+			}
+
+			if (optAddCompoundUnit.isPresent() && optAddCompoundUnit.get().getValue().equalsIgnoreCase("true")) {
+
+				if (ppDto.getSku().contains("case of")) {
+					String numberOnly = ppDto.getSku().replaceAll("[^0-9]", "");
+					String value = numberOnly;
+					double convertionValue = Double.parseDouble(value);
+					if (convertionValue == 0) {
+						convertionValue = 1;
+					}
+					productProfile.setCompoundUnitQty(convertionValue);
+
+					Double cUnitQty = convertionValue;
+					productProfile.setPrice(ppDto.getPrice().multiply(new BigDecimal(cUnitQty)));
+					productProfile.setUnitQty(ppDto.getUnitQty() != null ? ppDto.getUnitQty() : 1d);
+					productProfile.setCompoundUnitQty(cUnitQty);
+
+				} else {
+					if (ppDto.getUnitQty() != null) {
+						productProfile.setUnitQty(ppDto.getUnitQty());
+					} else {
+						productProfile.setUnitQty(1d);
+					}
+					productProfile.setPrice(ppDto.getPrice());
+				}
+
+			} else {
+				if (ppDto.getUnitQty() != null) {
+					productProfile.setUnitQty(ppDto.getUnitQty());
+				} else {
+					productProfile.setUnitQty(1d);
+				}
+				productProfile.setPrice(ppDto.getPrice());
+			}
+
+			// update category
+			Optional<ProductCategory> optionalCategory = productCategorys.stream()
+					.filter(pl -> ppDto.getProductCategoryName().equals(pl.getName())).findAny();
+
+			if (optionalCategory.isPresent()) {
+				productProfile.setProductCategory(optionalCategory.get());
+			} else {
+				productProfile.setProductCategory(productCategory);
+			}
+			saveUpdateProductProfiles.add(productProfile);
+		}
+		saveUpdateProductProfiles
+				.forEach(obj -> System.out.println("saved product pro======" + saveUpdateProductProfiles));
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;

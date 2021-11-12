@@ -886,6 +886,12 @@ if (!this.AccountProfile) {
 		accountProfileModel.countryId = $('#dbCountrycreate').val();
 		accountProfileModel.stateId = $('#dbStatecreate').val();
 		accountProfileModel.districtId = $('#dbDistrictcreate').val();
+		
+		
+		//Modern district State Issue
+//		accountProfileModel.countryId = "101";
+//		accountProfileModel.stateId = "19";
+//		accountProfileModel.districtId = "1960";
 
 		accountProfileModel.city = $('#field_city').val();
 		accountProfileModel.location = $('#field_location').val();

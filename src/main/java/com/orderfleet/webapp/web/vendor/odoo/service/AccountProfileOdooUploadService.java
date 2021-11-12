@@ -165,6 +165,8 @@ public class AccountProfileOdooUploadService {
 
 			if (apDto.getTrn() != null && !apDto.getTrn().equals("")) {
 				accountProfile.setTinNo(apDto.getTrn());
+			}else {
+				accountProfile.setTinNo(null);
 			}
 
 			accountProfile.setDescription(String.valueOf(apDto.getId()));
