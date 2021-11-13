@@ -77,6 +77,7 @@
 						<th>Receipt Allocation Mandatory</th>
 						<th>Sales Order Mandatory</th>
 						<th>Rate With Tax</th>
+						<th>Wifi Print Enabler</th>
 						<th>Action</th>
 
 					</tr>
@@ -126,6 +127,7 @@
 							<td>${mobileConfiguration.receiptAllocationMandatory}</td>
 							<td>${mobileConfiguration.salesOrderMandatory}</td>
 							<td>${mobileConfiguration.rateWithTax}</td>
+							<td>${mobileConfiguration.wifiPrintEnabler}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -449,6 +451,14 @@
 													<label class="control-label">Rate With Tax
 														</label> <input id="rateWithTax"
 														name='rateWithTax' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Wifi Print Enabler
+														</label> <input id="wifiPrintEnabler"
+														name='wifiPrintEnabler' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

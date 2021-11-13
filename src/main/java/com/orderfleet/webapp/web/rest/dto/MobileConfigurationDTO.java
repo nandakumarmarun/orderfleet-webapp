@@ -59,7 +59,7 @@ public class MobileConfigurationDTO {
 	private boolean blockActivity;
 	private boolean salesOrderMandatory;
 	private boolean rateWithTax;
-	
+	private boolean wifiPrintEnabler;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -110,6 +110,7 @@ public class MobileConfigurationDTO {
 		this.blockActivity = mobileConfiguration.getBlockActivity();
 		this.salesOrderMandatory = mobileConfiguration.getSalesOrderMandatory();
 		this.rateWithTax = mobileConfiguration.getRateWithTax();
+		this.wifiPrintEnabler = mobileConfiguration.getWifiPrintEnabler();
 
 	}
 
@@ -456,5 +457,15 @@ public class MobileConfigurationDTO {
 	public void setRateWithTax(boolean rateWithTax) {
 		this.rateWithTax = rateWithTax;
 	}
+
+	public boolean getWifiPrintEnabler() {
+		return wifiPrintEnabler;
+	}
+
+	public void setWifiPrintEnabler(boolean wifiPrintEnabler) {
+		this.wifiPrintEnabler = wifiPrintEnabler;
+	}
+	
+	
 
 }
