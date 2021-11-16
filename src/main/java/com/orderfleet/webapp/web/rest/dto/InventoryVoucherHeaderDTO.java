@@ -44,6 +44,8 @@ public class InventoryVoucherHeaderDTO {
 
 	private String receiverAccountAlias;
 
+	private String receiverAccountCustomerId;
+
 	private String supplierAccountPid;
 
 	private String supplierAccountName;
@@ -240,6 +242,8 @@ public class InventoryVoucherHeaderDTO {
 		this.referenceInvoiceNumber = inventoryVoucherHeader.getReferenceInvoiceNumber() != null
 				? inventoryVoucherHeader.getReferenceInvoiceNumber()
 				: "";
+		this.receiverAccountCustomerId = inventoryVoucherHeader.getReceiverAccount().getCustomerId() == null ? ""
+				: inventoryVoucherHeader.getReceiverAccount().getCustomerId();
 	}
 
 	public String getDeliveryDateDocument() {
@@ -305,6 +309,14 @@ public class InventoryVoucherHeaderDTO {
 		this.userName = userName;
 		this.documentTotal = documentTotal;
 		this.documentVolume = documentVolume;
+	}
+
+	public String getReceiverAccountCustomerId() {
+		return receiverAccountCustomerId;
+	}
+
+	public void setReceiverAccountCustomerId(String receiverAccountCustomerId) {
+		this.receiverAccountCustomerId = receiverAccountCustomerId;
 	}
 
 	public String getPid() {
