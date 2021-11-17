@@ -171,6 +171,10 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	List<InventoryVoucherHeader> findAllByCompanyIdUserPidAccountPidAndDateBetweenOrderByCreatedDateDesc(String userPid,
 			String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents);
 
+	@Query("select inventoryVoucher.id,inventoryVoucher.pid,inventoryVoucher.documentDate from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.createdBy.pid = ?1 and inventoryVoucher.receiverAccount.pid = ?2 and inventoryVoucher.document.pid = ?3 Order By inventoryVoucher.createdDate desc")
+	List<Object[]> findAllByCompanyIdUserPidAccountPidAndDocumentPid(String userPid,
+			String accountPid, String documentPid);
+
 	@Query("select sum(inventoryVoucher.documentTotal) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.createdBy.login = ?#{principal.username} and inventoryVoucher.document in ?1 and inventoryVoucher.createdDate between ?2 and ?3")
 	Double getCurrentUserAchievedAmount(List<Document> documents, LocalDateTime fromDate, LocalDateTime toDate);
 

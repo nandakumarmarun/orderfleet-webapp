@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +27,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.Document;
+import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ProductNameTextSettings;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.ProductNameTextSettingsRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
@@ -39,6 +42,7 @@ import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
+import com.orderfleet.webapp.web.rest.api.dto.LastSellingDetailsDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
@@ -77,6 +81,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Inject
 	private ProductNameTextSettingsRepository productNameTextSettingsRepository;
 
+	@Inject
+	InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
+
 	/**
 	 * Save a inventoryVoucherHeader.
 	 * 
@@ -112,11 +119,11 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompany() {
 		log.debug("Request to get all InventoryVoucherHeaders");
-		String id="INV_QUERY_101";
-		String description="Selecting inventory voucher from inventoryVoucherHeader by validating company id in the class and order by create date in descending order";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_101";
+		String description = "Selecting inventory voucher from inventoryVoucherHeader by validating company id in the class and order by create date in descending order";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-				
+
 				.findAllByCompanyIdOrderByCreatedDateDesc();
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 				.collect(Collectors.toList());
@@ -133,9 +140,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public Page<InventoryVoucherHeaderDTO> findAllByCompany(Pageable pageable) {
 		log.debug("Request to get all InventoryVoucherHeaders");
-		String id="INV_QUERY_103";
-		String description="Selecting inventory voucher from inventoryVoucherHeader by validating company id in the class and order by create date in descending order and get list in pageable format";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_103";
+		String description = "Selecting inventory voucher from inventoryVoucherHeader by validating company id in the class and order by create date in descending order and get list in pageable format";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		Page<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdOrderByCreatedDateDesc(pageable);
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderList = inventoryVoucherHeaders.getContent().stream()
@@ -179,9 +186,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndDateBetween(LocalDateTime fromDate,
 			LocalDateTime toDate, List<Document> documents) {
-		String id="INV_QUERY_104";
-		String description="Selecting inventory voucher from inventory voucher header and using left join fetch fetching inventory voucher details by validating companyId and using condition create date between and document in and order by create date in descending order";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_104";
+		String description = "Selecting inventory voucher from inventory voucher header and using left join fetch fetching inventory voucher details by validating companyId and using condition create date between and document in and order by create date in descending order";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate, documents);
 		return inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new).collect(Collectors.toList());
@@ -191,9 +198,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdUserPidAndDateBetween(String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
-		String id="INV_QUERY_106";
-		String description="Selecting inventory voucher from inventoryVocherHeader and validating using company id and createBy Pid,createDate betwen,documentIn and order by createddate in desc order";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_106";
+		String description = "Selecting inventory voucher from inventoryVocherHeader and validating using company id and createBy Pid,createDate betwen,documentIn and order by createddate in desc order";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fromDate, toDate, documents);
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
@@ -205,9 +212,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdAccountPidAndDateBetween(String accountPid,
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
-		String id="INV_QUERY_107";
-		String description="Selecting inventory voucher from inventoryVocherHeader and validating using company id and receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_107";
+		String description = "Selecting inventory voucher from inventoryVocherHeader and validating using company id and receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAccountPidAndDateBetweenOrderByCreatedDateDesc(accountPid, fromDate, toDate,
 						documents);
@@ -220,9 +227,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdUserPidAccountPidAndDateBetween(String userPid,
 			String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
-		String id="INV_QUERY_108";
-		String description="Selecting inventory voucher from inventoryVocherHeader and validating using company id and createBypid,receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_108";
+		String description = "Selecting inventory voucher from inventoryVocherHeader and validating using company id and createBypid,receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdUserPidAccountPidAndDateBetweenOrderByCreatedDateDesc(userPid, accountPid, fromDate,
 						toDate, documents);
@@ -239,9 +246,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				.findAccountProfileByLocationPid(locationPid);
 		List<InventoryVoucherHeader> AllAccountsInventoryVoucherHeaders = new ArrayList<>();
 		for (AccountProfileDTO accountProfileDTO : allAccounts) {
-			String id="INV_QUERY_107";
-			String description="Selecting inventory voucher from inventoryVocherHeader and validating using company id and receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_107";
+			String description = "Selecting inventory voucher from inventoryVocherHeader and validating using company id and receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 			List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAccountPidAndDateBetweenOrderByCreatedDateDesc(accountProfileDTO.getPid(),
 							fromDate, toDate, documents);
@@ -260,9 +267,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				.findAccountProfileByLocationPid(locationPid);
 		List<InventoryVoucherHeader> AllAccountsInventoryVoucherHeaders = new ArrayList<>();
 		for (AccountProfileDTO accountProfileDTO : allAccounts) {
-			String id="INV_QUERY_108";
-			String description="Selecting inventory voucher from inventoryVocherHeader and validating using company id and createBypid,receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_108";
+			String description = "Selecting inventory voucher from inventoryVocherHeader and validating using company id and createBypid,receiveAccountPid,createDate betwen,documentIn and order by createddate in desc order";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 			List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdUserPidAccountPidAndDateBetweenOrderByCreatedDateDesc(userPid,
 							accountProfileDTO.getPid(), fromDate, toDate, documents);
@@ -296,9 +303,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	public List<InventoryVoucherHeaderDTO> findAllByExecutiveTaskExecutionPid(String executiveTaskExecutionPid) {
 		log.debug("Request to get InventoryVoucherHeader by executive task execution Pid : {}",
 				executiveTaskExecutionPid);
-		String id="INV_QUERY_121";
-		String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_121";
+		String description = "selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(executiveTaskExecutionPid);
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
@@ -308,9 +315,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 	@Override
 	public Set<Document> findDocumentsByUserIdIn(List<Long> userIds) {
-		String id="INV_QUERY_126";
-		String description="Selecting inv_voucher doc from inv voucher header where inv voucher header.createByid in=1";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_126";
+		String description = "Selecting inv_voucher doc from inv voucher header where inv voucher header.createByid in=1";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		return inventoryVoucherHeaderRepository.findDocumentsByUserIdIn(userIds);
 	}
 
@@ -319,9 +326,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 		if (status.equals("processed")) {
-			String id="INV_QUERY_136";
-			String description="Selecting inv voucher from iv_vouc_header by validating companyId ,create dateBetween,doc in,and status=4 and order by inv_Vou and ordering create date in desc ";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_136";
+			String description = "Selecting inv voucher from iv_vouc_header by validating companyId ,create dateBetween,doc in,and status=4 and order by inv_Vou and ordering create date in desc ";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAndDateBetweenAndStatusOrderByCreatedDateDesc(fromDate, toDate, documents, true);
 		} else {
@@ -339,9 +346,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			String userPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 		if (status.equals("processed")) {
-			String id="INV_QUERY_137";
-			String description="Selecting inv voucher from iv_vouc_header by validating companyId ,createBypid=1,create dateBetween,doc in,and status=5 and order by invordering create date in desc";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_137";
+			String description = "Selecting inv voucher from iv_vouc_header by validating companyId ,createBypid=1,create dateBetween,doc in,and status=5 and order by invordering create date in desc";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdUserPidAndDateBetweenAndStatusOrderByCreatedDateDesc(userPid, fromDate, toDate,
 							documents, true);
@@ -360,9 +367,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 		if (status.equals("processed")) {
-			String id="INV_QUERY_138";
-			String description="Selecting inv voucher from iv_vouc_header by validating companyId ,receiverAccount.pid ,create dateBetween,doc in,and status=5 and order by  create date in desc";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_138";
+			String description = "Selecting inv voucher from iv_vouc_header by validating companyId ,receiverAccount.pid ,create dateBetween,doc in,and status=5 and order by  create date in desc";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAccountPidAndDateBetweenAndStatusOrderByCreatedDateDesc(accountPid, fromDate,
 							toDate, documents, true);
@@ -381,9 +388,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			String userPid, String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 		if (status.equals("processed")) {
-			String id="INV_QUERY_139";
-			String description="Selecting inv voucher from iv_vouc_header by validating companyId ,createBypid=1,receiverAccount.pid ,create dateBetween,doc in,and status=5 and order by  create date in desc";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_139";
+			String description = "Selecting inv voucher from iv_vouc_header by validating companyId ,createBypid=1,receiverAccount.pid ,create dateBetween,doc in,and status=5 and order by  create date in desc";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdUserPidAccountPidAndDateBetweenAndStatusOrderByCreatedDateDesc(userPid,
 							accountPid, fromDate, toDate, documents, true);
@@ -400,9 +407,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Override
 	public List<InventoryVoucherHeaderDTO> findAllByDocumentPidAndDateBetweenOrderByCreatedDateDesc(
 			LocalDateTime fromDate, LocalDateTime toDate, String documentPid) {
-		String id="INV_QUERY_141";
-		String description="Selecting inv voucher from iv_vouc_header by validating companyId ,create dateBetween,doc pid and  order by  create date in desc";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_141";
+		String description = "Selecting inv voucher from iv_vouc_header by validating companyId ,create dateBetween,doc pid and  order by  create date in desc";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByDocumentPidAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate, documentPid);
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
@@ -413,9 +420,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Override
 	public List<InventoryVoucherHeaderDTO> findAllByDocumentPidInAndDateBetweenOrderByCreatedDateDesc(
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
-		String id="INV_QUERY_104";
-		String description="Selecting inventory voucher from inventory voucher header and using left join fetch fetching inventory voucher details by validating companyId and using condition create date between and document in and order by create date in descending order";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_104";
+		String description = "Selecting inventory voucher from inventory voucher header and using left join fetch fetching inventory voucher details by validating companyId and using condition create date between and document in and order by create date in descending order";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate, documents);
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
@@ -426,9 +433,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Override
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndInventoryPidIn(List<String> inventoryPids) {
-		String id="INV_QUERY_154";
-		String description=" Selecting invVou from invVoucherheader and validating companyid& inv_voucher Pid and ordering by Createdate in desc order";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_154";
+		String description = " Selecting invVou from invVoucherheader and validating companyid& inv_voucher Pid and ordering by Createdate in desc order";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndInventoryPidIn(inventoryPids);
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
@@ -447,12 +454,12 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 	@Override
 	public void updateInventoryVoucherHeadersStatus(List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders) {
-		
+
 		List<String> inventoryPids = inventoryVoucherHeaders.stream().map(inv -> inv.getPid())
 				.collect(Collectors.toList());
-		String id="INV_QUERY_155";
-		String description=" Updating Inv Voucher Header by setting Iv staus TRUE and validating companyId & iv.pid=1";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_155";
+		String description = " Updating Inv Voucher Header by setting Iv staus TRUE and validating companyId & iv.pid=1";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderStatusUsingPid(inventoryPids);
 	}
 
@@ -460,9 +467,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	public List<Object[]> findByCompanyIdAndInventoryPidIn(List<String> inventoryPids) {
 		List<Object[]> inventoryObjectArray = inventoryVoucherHeaderRepository
 				.findInventoryVouchersByPidIn(inventoryPids);
-		String id="INV_QUERY_176";
-		String description="Listing inventory Vouchers by PidIn";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		String id = "INV_QUERY_176";
+		String description = "Listing inventory Vouchers by PidIn";
+		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 
 		return inventoryObjectArray;
 
@@ -478,17 +485,17 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 			Set<Long> stockLocationIds = new HashSet<>();
 			stockLocationIds = stockLocations.stream().map(sl -> sl.getId()).collect(Collectors.toSet());
-			String id="INV_QUERY_179";
-			String description="Geting all stock location details by stock locationId ";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_179";
+			String description = "Geting all stock location details by stock locationId ";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetailsByStockLocations(companyId,
 					userId, fromDate, toDate, stockLocationIds);
 
 			log.info("in stocklocation based " + inventoryVoucherHeaders.size());
 		} else {
-			String id="INV_QUERY_180";
-			String description="Geting all stock location details ";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_180";
+			String description = "Geting all stock location details ";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetails(companyId, userId, fromDate,
 					toDate);
 			log.info("in user  based");
@@ -689,6 +696,75 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		inventoryVoucherHeader.setPaymentReceived(inventoryVoucherHeaderDTO.getPaymentReceived());
 
 		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
+	}
+
+	@Override
+	public List<LastSellingDetailsDTO> findHeaderByAccountPidUserPidandDocPid(String accountPid, String userPid,
+			String documentPid, String productPid) {
+
+		List<Object[]> inventoryVoucherHeader = inventoryVoucherHeaderRepository
+				.findAllByCompanyIdUserPidAccountPidAndDocumentPid(userPid, accountPid, documentPid);
+
+		Set<String> ivhpids = new HashSet<>();
+
+		for (Object[] obj : inventoryVoucherHeader) {
+			ivhpids.add(obj[1] != null ? obj[1].toString() : " ");
+		}
+		if (ivhpids.size() == 0) {
+			return null;
+		}
+
+		List<InventoryVoucherHeader> ivHeader = new ArrayList<>();
+		List<InventoryVoucherDetail> ivhDetail = inventoryVoucherDetailRepository
+				.findAllByInventoryVoucherHeaderPidIn(ivhpids);
+		if (ivhDetail.size() == 0) {
+			return null;
+		}
+
+		for (InventoryVoucherDetail voucherDetail : ivhDetail) {
+
+			if (voucherDetail.getProduct().getPid().equals(productPid)) {
+
+				ivHeader.add(voucherDetail.getInventoryVoucherHeader());
+			}
+		}
+		if (ivHeader.isEmpty()) {
+			return null;
+		}
+
+		List<InventoryVoucherHeader> sortedList = ivHeader.stream()
+				.sorted(Comparator.comparing(InventoryVoucherHeader::getDocumentDate).reversed())
+				.collect(Collectors.toList());
+		if (sortedList.size() == 0) {
+			return null;
+		}
+
+		List<InventoryVoucherHeader> lastProductInventoryVoucherHeader = new ArrayList<>();
+		int i;
+		for (i = 0; i <= 4; i++) {
+			lastProductInventoryVoucherHeader.add(sortedList.get(i));
+		}
+
+		List<InventoryVoucherDetail> ivDetails = new ArrayList<>();
+		for (InventoryVoucherHeader invHeader : lastProductInventoryVoucherHeader) {
+			ivDetails.addAll(invHeader.getInventoryVoucherDetails());
+		}
+        
+		List<LastSellingDetailsDTO> lsdDTO = new ArrayList<>();
+		for (InventoryVoucherDetail ivds : ivDetails) {
+
+			LastSellingDetailsDTO lastSellingDetailsDTO = new LastSellingDetailsDTO();
+			if (ivds.getProduct().getPid().equals(productPid)) {
+				lastSellingDetailsDTO.setQuantity(ivds.getQuantity());
+				lastSellingDetailsDTO.setSellingRate(ivds.getSellingRate());
+				lastSellingDetailsDTO.setTotalValue(ivds.getRowTotal());
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm a");
+				String DateAndTime = ivds.getInventoryVoucherHeader().getDocumentDate().format(formatter);
+				lastSellingDetailsDTO.setOrderDate(DateAndTime);
+				lsdDTO.add(lastSellingDetailsDTO);
+			}
+		}
+		return lsdDTO;
 	}
 
 }

@@ -9,5 +9,4 @@ package com.orderfleet.webapp.domain.enums;
 public enum DocumentType {
 
 	DYNAMIC_DOCUMENT, INVENTORY_VOUCHER, ACCOUNTING_VOUCHER
-
 }

@@ -336,6 +336,9 @@ public interface InventoryVoucherDetailRepository extends JpaRepository<Inventor
 	@Query(value = "select voucherDetail from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.pid in ?1")
 	List<InventoryVoucherDetail> findAllByInventoryVoucherHeaderPidIn(Set<String> inventoryVoucherHeaderPids);
 
+	@Query(value = "select voucherDetail from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.id =?1")
+	List<InventoryVoucherDetail> findAllByInventoryVoucherHeaderId(Long inventoryVoucherHeaderids);
+	
 	@Query(value = CUSTOMER_BASED_PRODUCTS , nativeQuery = true)
 	List<Object[]> getProductTotalQuantityForCustomerByDate(String userLogin,String accountProfilePid ,
 			LocalDateTime fromDate, LocalDateTime toDate );

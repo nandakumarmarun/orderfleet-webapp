@@ -896,6 +896,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setBlockActivity(false);
 		mobileConfiguration.setSalesOrderMandatory(false);
 		mobileConfiguration.setRateWithTax(false);
+		mobileConfiguration.setWifiPrintEnabler(false);
 
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}

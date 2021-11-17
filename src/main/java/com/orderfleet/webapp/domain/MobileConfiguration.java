@@ -172,6 +172,10 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "rate_with_tax", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean rateWithTax;
+	
+	@Column(name = "wifi_Print_Enabler", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean wifiPrintEnabler;
+	
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -530,6 +534,16 @@ public class MobileConfiguration implements Serializable {
 
 	public void setRateWithTax(boolean rateWithTax) {
 		this.rateWithTax = rateWithTax;
+	}
+	
+	
+
+	public boolean getWifiPrintEnabler() {
+		return wifiPrintEnabler;
+	}
+
+	public void setWifiPrintEnabler(boolean wifiPrintEnabler) {
+		this.wifiPrintEnabler = wifiPrintEnabler;
 	}
 
 	@Override

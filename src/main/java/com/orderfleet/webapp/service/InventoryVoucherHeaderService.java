@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.StockLocation;
+import com.orderfleet.webapp.web.rest.api.dto.LastSellingDetailsDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
 
@@ -27,8 +28,7 @@ public interface InventoryVoucherHeaderService {
 	/**
 	 * Save a inventoryVoucherHeader.
 	 * 
-	 * @param inventoryVoucherHeaderDTO
-	 *            the entity to save
+	 * @param inventoryVoucherHeaderDTO the entity to save
 	 * @return the persisted entity
 	 */
 	InventoryVoucherHeaderDTO save(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
@@ -36,8 +36,7 @@ public interface InventoryVoucherHeaderService {
 	/**
 	 * Get all the inventoryVoucherHeaders.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	Page<InventoryVoucherHeader> findAll(Pageable pageable);
@@ -52,8 +51,7 @@ public interface InventoryVoucherHeaderService {
 	/**
 	 * Get all the inventoryVoucherHeaders of a company.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	Page<InventoryVoucherHeaderDTO> findAllByCompany(Pageable pageable);
@@ -61,8 +59,7 @@ public interface InventoryVoucherHeaderService {
 	/**
 	 * Get the "id" inventoryVoucherHeader.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	InventoryVoucherHeaderDTO findOne(Long id);
@@ -70,8 +67,7 @@ public interface InventoryVoucherHeaderService {
 	/**
 	 * Get the inventoryVoucherHeader by "pid".
 	 * 
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	Optional<InventoryVoucherHeaderDTO> findOneByPid(String pid);
@@ -95,44 +91,44 @@ public interface InventoryVoucherHeaderService {
 			String locationPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents);
 
 	void updateInventoryVoucherHeaderStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
-	
+
 	void updateInventoryVoucherHeaderSalesManagementStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
 
 	List<InventoryVoucherHeaderDTO> findAllByExecutiveTaskExecutionPid(String executiveTaskExecutionPid);
-	
+
 	Set<Document> findDocumentsByUserIdIn(List<Long> userIds);
-	
-	//filter for status
-	
-	List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndDateBetweenAndStatus(String status,LocalDateTime fromDate, LocalDateTime toDate,
-			List<Document> documents);
-	
-	List<InventoryVoucherHeaderDTO> findAllByCompanyIdUserPidAndDateBetweenAndStatus(String status,String userPid, LocalDateTime fromDate,
+
+	// filter for status
+
+	List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndDateBetweenAndStatus(String status, LocalDateTime fromDate,
 			LocalDateTime toDate, List<Document> documents);
-	
-	List<InventoryVoucherHeaderDTO> findAllByCompanyIdAccountPidAndDateBetweenAndStatus(String status,String accountPid,
+
+	List<InventoryVoucherHeaderDTO> findAllByCompanyIdUserPidAndDateBetweenAndStatus(String status, String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents);
-	
-	List<InventoryVoucherHeaderDTO> findAllByCompanyIdUserPidAccountPidAndDateBetweenAndStatus(String status,String userPid, String accountPid,
-			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents);
-	
-	List<InventoryVoucherHeaderDTO> findAllByDocumentPidAndDateBetweenOrderByCreatedDateDesc(LocalDateTime fromDate, LocalDateTime toDate,
-			String documentPid);
-	
-	List<InventoryVoucherHeaderDTO> findAllByDocumentPidInAndDateBetweenOrderByCreatedDateDesc(LocalDateTime fromDate, LocalDateTime toDate,
-			List<Document> documents);
-	
-	void updateProcessStatus(String inventoryVoucherHeaderPid,String status);
+
+	List<InventoryVoucherHeaderDTO> findAllByCompanyIdAccountPidAndDateBetweenAndStatus(String status,
+			String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents);
+
+	List<InventoryVoucherHeaderDTO> findAllByCompanyIdUserPidAccountPidAndDateBetweenAndStatus(String status,
+			String userPid, String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents);
+
+	List<InventoryVoucherHeaderDTO> findAllByDocumentPidAndDateBetweenOrderByCreatedDateDesc(LocalDateTime fromDate,
+			LocalDateTime toDate, String documentPid);
+
+	List<InventoryVoucherHeaderDTO> findAllByDocumentPidInAndDateBetweenOrderByCreatedDateDesc(LocalDateTime fromDate,
+			LocalDateTime toDate, List<Document> documents);
+
+	void updateProcessStatus(String inventoryVoucherHeaderPid, String status);
 
 	List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndInventoryPidIn(List<String> inventoryPids);
 
 	void updateInventoryVoucherHeadersStatus(List<InventoryVoucherHeaderDTO> inventoryVoucherHeaders);
-	
 
 	List<Object[]> findByCompanyIdAndInventoryPidIn(List<String> inventoryPids);
 
-	List<StockDetailsDTO> findAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate, Set<StockLocation> stockLocation);
-	
+	List<StockDetailsDTO> findAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate,
+			Set<StockLocation> stockLocation);
+
 	InventoryVoucherHeader updateInventoryVoucherHeader(InventoryVoucherHeaderDTO inventoryVoucherHeaderDto);
 
 	void updateInventoryVoucherHeaderProcessFlowStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
@@ -140,9 +136,9 @@ public interface InventoryVoucherHeaderService {
 	void updateInventoryVoucherHeaderPaymentReceived(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
 
 	void updateInventoryVoucherHeaderBookingId(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
-	
+
 	void updateInventoryVoucherHeaderRemarks(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
-	
+
 	void updateInventoryVoucherHeaderRejectedStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
 
 	void updateInventoryVoucherHeaderDeliveryDate(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
@@ -151,4 +147,8 @@ public interface InventoryVoucherHeaderService {
 			InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
 
 	
+
+	List<LastSellingDetailsDTO> findHeaderByAccountPidUserPidandDocPid(String accountPid, String userPid, String documentPid,
+			String productPid);
+
 }

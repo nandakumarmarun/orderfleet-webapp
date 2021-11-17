@@ -87,9 +87,13 @@ import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.SalesOrderMasterSapPrave
 @Service
 public class SendSalesOrderSapService {
 
-	private static String API_URL_SALES_ORDER = "http://59.94.176.87:5002/Sales/SalesOrder_Tiscon";
+//	private static String API_URL_SALES_ORDER = "http://59.94.176.87:5002/Sales/SalesOrder_Tiscon";
+//
+//	private static String API_URL_RECIPTS = "http://59.94.176.87:5002/Receipt/Receipts";
 
-	private static String API_URL_RECIPTS = "http://59.94.176.87:5002/Receipt/Receipts";
+	private static String API_URL_SALES_ORDER = "http://115.242.172.78:5002/Sales/SalesOrder_Tiscon";
+
+	private static String API_URL_RECIPTS = "http://115.242.172.78:5002/Receipt/Receipts";
 
 	// private static String AUTHENTICATION_TOKEN =
 	// "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEzRjhFREM2QjJCNTU3OUQ0MEVGNDg1QkNBOUNFRDBBIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2MDExMDg1MzMsImV4cCI6MTYzMjY0NDUzMywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIiwiYXVkIjoiQ3VzdG9tZXJTZXJ2aWNlLkFwaSIsImNsaWVudF9pZCI6Im5hc19jbGllbnQiLCJzdWIiOiIwNWEwNzliMC1jZjBiLTQ2ZjctYThlMy1iODk4MjIwODgzMjQiLCJhdXRoX3RpbWUiOjE2MDExMDg1MzMsImlkcCI6ImxvY2FsIiwic2VydmljZS51c2VyIjoiYWRtaW4iLCJqdGkiOiIyOUU0OTRERTg1QjA0RTdBNUM1NjM3NDhCQzIyOTEyRSIsInNpZCI6IkFDOTE4QzNEMkY3MUIzRTRBMERGQzc2MDQ4QzJBMEUzIiwiaWF0IjoxNjAxMTA4NTMzLCJzY29wZSI6WyJvcGVuaWQiLCJwcm9maWxlIiwibmFzLmNsaWVudCIsIm5hcy5zZXJ2aWNlcyJdLCJhbXIiOlsicHdkIl19.x4knTyLtPEwUSnc35EnWSyxINwOLU5YTBeCD_eXDkXmMC1bWQclkdLH18Dgict07qVWyRL9EcYT66j4p7hsUGbZrZP9TLeNpQP5BT6eRSeYvkf2lmvJe1xaCvPYrHpPGvApLJJAmQxCwex7AAW74zJLpl_SdNUf3AHBkBvjr2ibEkDBgRgOTO0Z3n3f43ZxZw3LAi_x8ZRSxITY0mpevTUpDhx2pv5-ehXe7BaCbTxAJ6dBvkAavtmB-W3wp7cnJqSfr2mFpsBzE_Ek_OzAFnu_N1ALi8yE9LpuAPSDj4hVz11i98urPebHA8lEca1yBAPI6goQlKJEB4_NXI5F8CA";
@@ -165,9 +169,9 @@ public class SendSalesOrderSapService {
 		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)
 				&& inventoryVoucherHeaderDTO.getSalesManagementStatus().equals(SalesManagementStatus.APPROVE)) {
 			log.info("Downloading to sap prabhu.............");
-			String id="INV_QUERY_161";
-			String description=" Updating invVou Header by Tally download status using pid";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_161";
+			String description = " Updating invVou Header by Tally download status using pid";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 			int updated = inventoryVoucherHeaderRepository
 					.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.PROCESSING, ivhPids);
 			log.debug("updated " + updated + " to PROCESSING");
@@ -252,9 +256,9 @@ public class SendSalesOrderSapService {
 		if (authenticateResponse != null) {
 
 			if (authenticateResponse.getStatus().equals("Success")) {
-				String id="INV_QUERY_161";
-				String description=" Updating invVou Header by Tally download status using pid";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				String id = "INV_QUERY_161";
+				String description = " Updating invVou Header by Tally download status using pid";
+				log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.COMPLETED, ivhPids);
 				log.debug("updated " + updated + " to COMPLETED");
@@ -586,7 +590,10 @@ public class SendSalesOrderSapService {
 		salesOrderMasterSap.setDbKey(1);
 		salesOrderMasterSap.setLocation("");
 
-		salesOrderMasterSap.setCustomerCode(inventoryVoucherHeaderDTO.getReceiverAccountAlias());
+		salesOrderMasterSap.setCustomerCode(inventoryVoucherHeaderDTO.getReceiverAccountCustomerId() != null
+				&& !inventoryVoucherHeaderDTO.getReceiverAccountCustomerId().equals("")
+						? inventoryVoucherHeaderDTO.getReceiverAccountCustomerId()
+						: inventoryVoucherHeaderDTO.getReceiverAccountAlias());
 		salesOrderMasterSap.setCustomerName(inventoryVoucherHeaderDTO.getReceiverAccountName());
 
 		salesOrderMasterSap.setCustomerRef("");

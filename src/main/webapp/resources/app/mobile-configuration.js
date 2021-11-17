@@ -51,7 +51,8 @@ if (!this.MobileConfiguration) {
 		enableGeoFencing : false,
 		receiptAllocationMandatory : false,
 		salesOrderMandatory : false,
-		rateWithTax : false
+		rateWithTax : false,
+		wifiPrintEnabler : false
 
 	};
 
@@ -163,6 +164,8 @@ if (!this.MobileConfiguration) {
 				.is(":checked");
 		mobileConfigurationDTO.rateWithTax = $("#rateWithTax")
 		.is(":checked");
+		mobileConfigurationDTO.wifiPrintEnabler = $("#wifiPrintEnabler")
+		.is(":checked");
 
 		$.ajax({
 			url : contextPath,
@@ -268,6 +271,8 @@ if (!this.MobileConfiguration) {
 									data.salesOrderMandatory);
 							$('#rateWithTax').prop("checked",
 									data.rateWithTax);
+							$('#wifiPrintEnabler').prop("checked",
+									data.wifiPrintEnabler);
 						}
 
 					},

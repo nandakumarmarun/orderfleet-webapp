@@ -48,7 +48,10 @@ public class UploadSapResource {
 	// private static String API_URL_ACCOUNT_PROFILE =
 	// "http://59.94.176.87:81/Service1.svc/GetAllCustomersNameAndId?Scode=20&dbkey=1";
 
-	private static String API_URL_ACCOUNT_PROFILE = "http://59.94.176.87:5002/Customer/GetAllCustomers";
+	// private static String API_URL_ACCOUNT_PROFILE =
+	// "http://59.94.176.87:5002/Customer/GetAllCustomers";
+
+	private static String API_URL_ACCOUNT_PROFILE = "http://115.242.172.78:5002/Customer/GetAllCustomers";
 
 	private static String API_URL_ACCOUNT_PROFILE_OPENING_BALANCE = "http://59.94.176.87:81/Service1.svc/GetAllCustomers?dbkey=1&code=20";
 

@@ -22,6 +22,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 	Optional<Activity> findByCompanyIdAndNameIgnoreCase(Long id, String name);
 
 	Optional<Activity> findOneByPid(String pid);
+	 
 
 	@Query("select activity from Activity activity where activity.company.id = ?#{principal.companyId}")
 	List<Activity> findAllByCompanyId();
