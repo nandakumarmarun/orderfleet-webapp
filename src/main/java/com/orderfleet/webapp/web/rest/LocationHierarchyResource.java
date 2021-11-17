@@ -99,4 +99,12 @@ public class LocationHierarchyResource {
 		return new ResponseEntity<>(locationHierarchyDTOs, HttpStatus.OK);
 	}
 
+	
+	@RequestMapping(value = "/location-hierarchies-view", method = RequestMethod.GET)
+	public String getLocationHierarchyviewPage(Model model) {
+		log.debug("Web request to get LocationHierarchies");
+		model.addAttribute("locations", locationService.findAllByCompanyAndIdNotInLocationHierarchy());
+		model.addAttribute("locationsall", locationService.findAllByCompanyAndIdInLocationHierarchy());
+		return "company/location-hierarchies-view";
+	}
 }
