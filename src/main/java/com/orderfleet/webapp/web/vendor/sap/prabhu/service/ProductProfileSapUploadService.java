@@ -156,6 +156,7 @@ public class ProductProfileSapUploadService {
 			}
 
 			productProfile.setAlias(ppDto.getStr2());
+			productProfile.setProductId(ppDto.getStr1());
 			productProfile.setPrice(BigDecimal.valueOf(0));
 			productProfile.setMrp(0);
 

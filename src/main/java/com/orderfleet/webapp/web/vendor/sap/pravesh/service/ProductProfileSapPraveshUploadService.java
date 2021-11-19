@@ -145,75 +145,78 @@ public class ProductProfileSapPraveshUploadService {
 		}
 
 		for (ResponseBodySapPraveshProductProfile ppDto : resultProductProfiles) {
-			// check exist by name, only one exist with a name
-			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getName().equals(ppDto.getProductCode())).findAny();
-			ProductProfile productProfile;
-			if (optionalPP.isPresent()) {
-				productProfile = optionalPP.get();
-				// if not update, skip this iteration.
-				if (!productProfile.getThirdpartyUpdate()) {
+
+			if (ppDto.getProductGroup().equals("Tata Pravesh")) {
+				// check exist by name, only one exist with a name
+				Optional<ProductProfile> optionalPP = productProfiles.stream()
+						.filter(p -> p.getName().equals(ppDto.getProductCode())).findAny();
+				ProductProfile productProfile;
+				if (optionalPP.isPresent()) {
+					productProfile = optionalPP.get();
+					// if not update, skip this iteration.
+					if (!productProfile.getThirdpartyUpdate()) {
+						continue;
+					}
+				} else {
+					productProfile = new ProductProfile();
+					productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
+					productProfile.setCompany(company);
+					productProfile.setName(ppDto.getProductCode());
+					productProfile.setDivision(defaultDivision);
+					productProfile.setDataSourceType(DataSourceType.TALLY);
+				}
+
+				productProfile.setAlias(ppDto.getProductName());
+				productProfile.setPrice(BigDecimal.valueOf(ppDto.getProductPrice()));
+				productProfile.setMrp(0);
+
+				productProfile.setTaxRate(18);
+				productProfile.setActivated(true);
+
+				Optional<ProductProfile> opAccP = saveUpdateProductProfiles.stream()
+						.filter(so -> so.getName().equalsIgnoreCase(ppDto.getProductCode())).findAny();
+				if (opAccP.isPresent()) {
 					continue;
 				}
-			} else {
-				productProfile = new ProductProfile();
-				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
-				productProfile.setCompany(company);
-				productProfile.setName(ppDto.getProductCode());
-				productProfile.setDivision(defaultDivision);
-				productProfile.setDataSourceType(DataSourceType.TALLY);
+
+				productProfile.setSku(ppDto.getSku());
+
+				double unitQty = ppDto.getUnitQuantity();
+				if (unitQty != 0 || unitQty != 0.0) {
+					productProfile.setUnitQty(unitQty);
+				} else {
+					productProfile.setUnitQty(1.0);
+				}
+
+				productProfile.setProductCategory(defaultCategory.get());
+
+				OpeningStockDTO openingStockDto = new OpeningStockDTO();
+				openingStockDto.setProductProfileName(productProfile.getName());
+				openingStockDto.setStockLocationName(ppDto.getStockLocation());
+				openingStockDto.setQuantity(ppDto.getStockInHand());
+				openingStockDtos.add(openingStockDto);
+
+				TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
+
+				productGroupProductDTO.setGroupName(ppDto.getProductGroup());
+				productGroupProductDTO.setProductName(ppDto.getProductCode());
+
+				productGroupProductDTOs.add(productGroupProductDTO);
+
+				ProductGroupDTO productGroupDTO = new ProductGroupDTO();
+				productGroupDTO.setName(ppDto.getProductGroup());
+				productGroupDTO.setAlias(ppDto.getProductGroup());
+
+				productGroupDtos.add(productGroupDTO);
+
+				StockLocationDTO stockLocationDTO = new StockLocationDTO();
+				stockLocationDTO.setName(ppDto.getStockLocation());
+				stockLocationDTO.setAlias(ppDto.getStockLocation());
+
+				stockLocationDTOs.add(stockLocationDTO);
+
+				saveUpdateProductProfiles.add(productProfile);
 			}
-
-			productProfile.setAlias(ppDto.getProductName());
-			productProfile.setPrice(BigDecimal.valueOf(ppDto.getProductPrice()));
-			productProfile.setMrp(0);
-
-			productProfile.setTaxRate(18);
-			productProfile.setActivated(true);
-
-			Optional<ProductProfile> opAccP = saveUpdateProductProfiles.stream()
-					.filter(so -> so.getName().equalsIgnoreCase(ppDto.getProductCode())).findAny();
-			if (opAccP.isPresent()) {
-				continue;
-			}
-
-			productProfile.setSku(ppDto.getSku());
-
-			double unitQty = ppDto.getUnitQuantity();
-			if (unitQty != 0 || unitQty != 0.0) {
-				productProfile.setUnitQty(unitQty);
-			} else {
-				productProfile.setUnitQty(1.0);
-			}
-
-			productProfile.setProductCategory(defaultCategory.get());
-
-			OpeningStockDTO openingStockDto = new OpeningStockDTO();
-			openingStockDto.setProductProfileName(productProfile.getName());
-			openingStockDto.setStockLocationName(ppDto.getStockLocation());
-			openingStockDto.setQuantity(ppDto.getStockInHand());
-			openingStockDtos.add(openingStockDto);
-
-			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
-
-			productGroupProductDTO.setGroupName(ppDto.getProductGroup());
-			productGroupProductDTO.setProductName(ppDto.getProductCode());
-
-			productGroupProductDTOs.add(productGroupProductDTO);
-
-			ProductGroupDTO productGroupDTO = new ProductGroupDTO();
-			productGroupDTO.setName(ppDto.getProductGroup());
-			productGroupDTO.setAlias(ppDto.getProductGroup());
-
-			productGroupDtos.add(productGroupDTO);
-
-			StockLocationDTO stockLocationDTO = new StockLocationDTO();
-			stockLocationDTO.setName(ppDto.getStockLocation());
-			stockLocationDTO.setAlias(ppDto.getStockLocation());
-
-			stockLocationDTOs.add(stockLocationDTO);
-
-			saveUpdateProductProfiles.add(productProfile);
 
 		}
 		log.info("Saving product profiles");

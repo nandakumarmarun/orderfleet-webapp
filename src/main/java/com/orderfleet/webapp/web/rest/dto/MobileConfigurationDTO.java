@@ -1,9 +1,13 @@
 package com.orderfleet.webapp.web.rest.dto;
 
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.validation.constraints.NotNull;
 
 import com.orderfleet.webapp.domain.MobileConfiguration;
 import com.orderfleet.webapp.domain.enums.CartType;
+import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 
@@ -39,6 +43,10 @@ public class MobileConfigurationDTO {
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 	private InventoryVoucherUIType inventoryVoucherUIType;
 	private CartType cartType;
+	private DisplayName accountProfileDisplayName;
+	private DisplayName accountProfilePrintName;
+	private DisplayName productProfileDisplayName;
+	private DisplayName productProfilePrintName;
 	private boolean kfcEnabled;
 	private boolean gpsMandatory;
 	private boolean enableSecondarySales;
@@ -90,6 +98,10 @@ public class MobileConfigurationDTO {
 		this.voucherNumberGenerationType = mobileConfiguration.getVoucherNumberGenerationType();
 		this.inventoryVoucherUIType = mobileConfiguration.getInventoryVoucherUIType();
 		this.cartType = mobileConfiguration.getCartType();
+		this.accountProfileDisplayName = mobileConfiguration.getAccountProfileDisplayName();
+		this.accountProfilePrintName = mobileConfiguration.getAccountProfilePrintName();
+		this.productProfileDisplayName = mobileConfiguration.getProductProfileDisplayName();
+		this.productProfilePrintName = mobileConfiguration.getProductProfilePrintName();
 		this.kfcEnabled = mobileConfiguration.getKfcEnabled();
 		this.gpsMandatory = mobileConfiguration.getGpsMandatory();
 		this.enableSecondarySales = mobileConfiguration.getEnableSecondarySales();
@@ -465,7 +477,37 @@ public class MobileConfigurationDTO {
 	public void setWifiPrintEnabler(boolean wifiPrintEnabler) {
 		this.wifiPrintEnabler = wifiPrintEnabler;
 	}
-	
-	
+
+	public DisplayName getAccountProfileDisplayName() {
+		return accountProfileDisplayName;
+	}
+
+	public void setAccountProfileDisplayName(DisplayName accountProfileDisplayName) {
+		this.accountProfileDisplayName = accountProfileDisplayName;
+	}
+
+	public DisplayName getAccountProfilePrintName() {
+		return accountProfilePrintName;
+	}
+
+	public void setAccountProfilePrintName(DisplayName accountProfilePrintName) {
+		this.accountProfilePrintName = accountProfilePrintName;
+	}
+
+	public DisplayName getProductProfileDisplayName() {
+		return productProfileDisplayName;
+	}
+
+	public void setProductProfileDisplayName(DisplayName productProfileDisplayName) {
+		this.productProfileDisplayName = productProfileDisplayName;
+	}
+
+	public DisplayName getProductProfilePrintName() {
+		return productProfilePrintName;
+	}
+
+	public void setProductProfilePrintName(DisplayName productProfilePrintName) {
+		this.productProfilePrintName = productProfilePrintName;
+	}
 
 }

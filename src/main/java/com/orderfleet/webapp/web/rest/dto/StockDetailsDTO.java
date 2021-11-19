@@ -22,6 +22,7 @@ public class StockDetailsDTO implements Cloneable {
 
 	private double openingStock;
 	private String productName;
+	private String productPid;
 	private double saledQuantity;
 	private double closingStock;
 
@@ -68,6 +69,14 @@ public class StockDetailsDTO implements Cloneable {
 
 	public void setClosingStock(double closingStock) {
 		this.closingStock = closingStock;
+	}
+
+	public String getProductPid() {
+		return productPid;
+	}
+
+	public void setProductPid(String productPid) {
+		this.productPid = productPid;
 	}
 
 	@Override

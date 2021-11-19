@@ -18,6 +18,8 @@ public class LoadProductListDTO {
 
 	private String productName;
 
+	private String productPid;
+
 	private double productPrice;
 
 	private double productStock;
@@ -44,6 +46,14 @@ public class LoadProductListDTO {
 
 	public void setProductStock(double productStock) {
 		this.productStock = productStock;
+	}
+
+	public String getProductPid() {
+		return productPid;
+	}
+
+	public void setProductPid(String productPid) {
+		this.productPid = productPid;
 	}
 
 }

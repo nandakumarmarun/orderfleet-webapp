@@ -65,6 +65,10 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setVoucherNumberGenerationType(mobileConfigurationDTO.getVoucherNumberGenerationType());
 		configuration.setInventoryVoucherUIType(mobileConfigurationDTO.getInventoryVoucherUIType());
 		configuration.setCartType(mobileConfigurationDTO.getCartType());
+		configuration.setAccountProfileDisplayName(mobileConfigurationDTO.getAccountProfileDisplayName());
+		configuration.setAccountProfilePrintName(mobileConfigurationDTO.getAccountProfilePrintName());
+		configuration.setProductProfileDisplayName(mobileConfigurationDTO.getProductProfileDisplayName());
+		configuration.setProductProfilePrintName(mobileConfigurationDTO.getProductProfilePrintName());
 		configuration.setKfcEnabled(mobileConfigurationDTO.getKfcEnabled());
 		configuration.setGpsMandatory(mobileConfigurationDTO.getGpsMandatory());
 		configuration.setEnableSecondarySales(mobileConfigurationDTO.getEnableSecondarySales());
@@ -115,6 +119,10 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setVoucherNumberGenerationType(mobileConfigurationDTO.getVoucherNumberGenerationType());
 			configuration.setInventoryVoucherUIType(mobileConfigurationDTO.getInventoryVoucherUIType());
 			configuration.setCartType(mobileConfigurationDTO.getCartType());
+			configuration.setAccountProfileDisplayName(mobileConfigurationDTO.getAccountProfileDisplayName());
+			configuration.setAccountProfilePrintName(mobileConfigurationDTO.getAccountProfilePrintName());
+			configuration.setProductProfileDisplayName(mobileConfigurationDTO.getProductProfileDisplayName());
+			configuration.setProductProfilePrintName(mobileConfigurationDTO.getProductProfilePrintName());
 			configuration.setKfcEnabled(mobileConfigurationDTO.getKfcEnabled());
 			configuration.setGpsMandatory(mobileConfigurationDTO.getGpsMandatory());
 			configuration.setEnableSecondarySales(mobileConfigurationDTO.getEnableSecondarySales());
@@ -198,4 +206,3 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 	}
 
 }
-

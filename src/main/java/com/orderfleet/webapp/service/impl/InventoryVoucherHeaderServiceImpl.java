@@ -512,6 +512,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 			stockDetailsDTO.setProductName(obj[2] != null ? obj[2].toString() : "");
 
+			System.out.println(obj[11].toString() + "------------------------------------------------");
+			// System.out.println(obj[12].toString()+"------------------------------------------------");
+			stockDetailsDTO.setProductPid(obj[11] != null ? obj[11].toString() : "");
+
 			double opStock = 0.0;
 			double slStock = 0.0;
 			double freeQuantity = 0.0;
@@ -592,7 +596,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 						name += ")";
 					}
 					stockDetailsDTO.setProductName(productName + name);
-
+					stockDetailsDTO.setProductPid(productProfileDTO.getPid());
 				} else {
 
 					stockDetailsDTO.setProductName(productName);
@@ -749,7 +753,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		for (InventoryVoucherHeader invHeader : lastProductInventoryVoucherHeader) {
 			ivDetails.addAll(invHeader.getInventoryVoucherDetails());
 		}
-        
+
 		List<LastSellingDetailsDTO> lsdDTO = new ArrayList<>();
 		for (InventoryVoucherDetail ivds : ivDetails) {
 

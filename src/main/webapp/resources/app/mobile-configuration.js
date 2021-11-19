@@ -52,7 +52,11 @@ if (!this.MobileConfiguration) {
 		receiptAllocationMandatory : false,
 		salesOrderMandatory : false,
 		rateWithTax : false,
-		wifiPrintEnabler : false
+		wifiPrintEnabler : false,
+		accountProfileDisplayName : 'NAME',
+		accountProfilePrintName : 'NAME',
+		productProfileDisplayName : 'NAME',
+		productProfilePrintName : 'NAME'
 
 	};
 
@@ -162,10 +166,17 @@ if (!this.MobileConfiguration) {
 				":checked");
 		mobileConfigurationDTO.salesOrderMandatory = $("#salesOrderMandatory")
 				.is(":checked");
-		mobileConfigurationDTO.rateWithTax = $("#rateWithTax")
-		.is(":checked");
-		mobileConfigurationDTO.wifiPrintEnabler = $("#wifiPrintEnabler")
-		.is(":checked");
+		mobileConfigurationDTO.rateWithTax = $("#rateWithTax").is(":checked");
+		mobileConfigurationDTO.wifiPrintEnabler = $("#wifiPrintEnabler").is(
+				":checked");
+		mobileConfigurationDTO.accountProfileDisplayName = $(
+				"#accountProfileDisplayName").val();
+		mobileConfigurationDTO.accountProfilePrintName = $(
+				"#accountProfilePrintName").val();
+		mobileConfigurationDTO.productProfileDisplayName = $(
+				"#productProfileDisplayName").val();
+		mobileConfigurationDTO.productProfilePrintName = $(
+				"#productProfilePrintName").val();
 
 		$.ajax({
 			url : contextPath,
@@ -269,10 +280,17 @@ if (!this.MobileConfiguration) {
 									data.blockActivity);
 							$('#salesOrderMandatory').prop("checked",
 									data.salesOrderMandatory);
-							$('#rateWithTax').prop("checked",
-									data.rateWithTax);
+							$('#rateWithTax').prop("checked", data.rateWithTax);
 							$('#wifiPrintEnabler').prop("checked",
 									data.wifiPrintEnabler);
+							$('#accountProfileDisplayName').val(
+									data.accountProfileDisplayName);
+							$('#accountProfilePrintName').val(
+									data.accountProfilePrintName);
+							$('#productProfileDisplayName').val(
+									data.productProfileDisplayName);
+							$('#productProfilePrintName').val(
+									data.productProfilePrintName);
 						}
 
 					},

@@ -17,6 +17,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import com.orderfleet.webapp.domain.enums.CartType;
+import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 
@@ -113,6 +114,26 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "cart_type", nullable = false, columnDefinition = "character varying DEFAULT 'NORMAL'")
 	private CartType cartType;
 
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "account_profile_display_name", nullable = false, columnDefinition = "character varying DEFAULT 'NAME'")
+	private DisplayName accountProfileDisplayName;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "account_profile_print_name", nullable = false, columnDefinition = "character varying DEFAULT 'NAME'")
+	private DisplayName accountProfilePrintName;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "product_profile_display_name", nullable = false, columnDefinition = "character varying DEFAULT 'NAME'")
+	private DisplayName productProfileDisplayName;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "product_profile_print_name", nullable = false, columnDefinition = "character varying DEFAULT 'NAME'")
+	private DisplayName productProfilePrintName;
+
 	@Column(name = "kfc_enabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean kfcEnabled;
 
@@ -172,10 +193,10 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "rate_with_tax", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean rateWithTax;
-	
+
 	@Column(name = "wifi_Print_Enabler", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean wifiPrintEnabler;
-	
+
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -376,6 +397,38 @@ public class MobileConfiguration implements Serializable {
 		this.cartType = cartType;
 	}
 
+	public DisplayName getAccountProfileDisplayName() {
+		return accountProfileDisplayName;
+	}
+
+	public void setAccountProfileDisplayName(DisplayName accountProfileDisplayName) {
+		this.accountProfileDisplayName = accountProfileDisplayName;
+	}
+
+	public DisplayName getAccountProfilePrintName() {
+		return accountProfilePrintName;
+	}
+
+	public void setAccountProfilePrintName(DisplayName accountProfilePrintName) {
+		this.accountProfilePrintName = accountProfilePrintName;
+	}
+
+	public DisplayName getProductProfileDisplayName() {
+		return productProfileDisplayName;
+	}
+
+	public void setProductProfileDisplayName(DisplayName productProfileDisplayName) {
+		this.productProfileDisplayName = productProfileDisplayName;
+	}
+
+	public DisplayName getProductProfilePrintName() {
+		return productProfilePrintName;
+	}
+
+	public void setProductProfilePrintName(DisplayName productProfilePrintName) {
+		this.productProfilePrintName = productProfilePrintName;
+	}
+
 	public boolean getKfcEnabled() {
 		return kfcEnabled;
 	}
@@ -535,8 +588,6 @@ public class MobileConfiguration implements Serializable {
 	public void setRateWithTax(boolean rateWithTax) {
 		this.rateWithTax = rateWithTax;
 	}
-	
-	
 
 	public boolean getWifiPrintEnabler() {
 		return wifiPrintEnabler;

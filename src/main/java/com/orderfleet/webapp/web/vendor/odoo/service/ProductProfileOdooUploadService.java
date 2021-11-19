@@ -242,28 +242,31 @@ public class ProductProfileOdooUploadService {
 		for (OdooProductProfile ppDto : list) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> (p.getName().equals(ppDto.getName()))
-							&& (p.getProductId() != null ? p.getProductId().equals(String.valueOf(ppDto.getId()))
-									: "abcd".equals(String.valueOf(ppDto.getId()))))
+					.filter(p -> (p.getName().equals(ppDto.getName() + "-" + ppDto.getDefault_code()))
+							&& p.getProductId() != null && !p.getProductId().equals("")
+									? p.getProductId().equals(String.valueOf(ppDto.getId()))
+									: false)
 					.findAny();
 			ProductProfile productProfile;
 			if (optionalPP.isPresent()) {
 				productProfile = optionalPP.get();
 				// if not update, skip this iteration.
+				productProfile.setName(ppDto.getName() + "-" + ppDto.getDefault_code());
 				if (!productProfile.getThirdpartyUpdate()) {
 					continue;
 				}
 			} else {
-//				productProfile = new ProductProfile();
-//				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
-//				productProfile.setCompany(company);
-//				productProfile.setName(ppDto.getName());
-//				productProfile.setProductId(String.valueOf(ppDto.getId()));
-//				productProfile.setDivision(defaultDivision);
-//				productProfile.setDataSourceType(DataSourceType.TALLY);
+				productProfile = new ProductProfile();
+				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
+				productProfile.setCompany(company);
+				// productProfile.setName(ppDto.getName());
+				productProfile.setProductId(String.valueOf(ppDto.getId()));
+				productProfile.setDivision(defaultDivision);
+				productProfile.setDataSourceType(DataSourceType.TALLY);
 				continue;
 			}
 			productProfile.setActivated(true);
+			productProfile.setName(ppDto.getName() + "-" + ppDto.getDefault_code());
 			// tax
 			List<TaxMaster> taxMasters = new ArrayList<>();
 			Object taxIds = ppDto.getTax_ids();
@@ -311,7 +314,8 @@ public class ProductProfileOdooUploadService {
 //			}
 
 			Optional<ProductProfile> opAccP = saveUpdateProductProfiles.stream()
-					.filter(so -> so.getName().equalsIgnoreCase(ppDto.getName())).findAny();
+					.filter(so -> so.getName().equalsIgnoreCase(ppDto.getName() + "-" + ppDto.getDefault_code()))
+					.findAny();
 			if (opAccP.isPresent()) {
 				System.out.println(ppDto.getName());
 				i++;
@@ -329,21 +333,21 @@ public class ProductProfileOdooUploadService {
 				TPUnitOfMeasureProductDTO unitOfMeasureProductDTO = new TPUnitOfMeasureProductDTO();
 
 				unitOfMeasureProductDTO.setUnitOfMeasureId(opUom.get().getUomId());
-				unitOfMeasureProductDTO.setProductName(ppDto.getName());
+				unitOfMeasureProductDTO.setProductName(ppDto.getName() + "-" + ppDto.getDefault_code());
 
 				unitOFMeasureProductDTOs.add(unitOfMeasureProductDTO);
 
 			}
 
 			productProfile.setUnitQty(1.0);
-			productProfile.setDescription(String.valueOf(ppDto.getId()));
+			productProfile.setDescription(ppDto.getName());
 
 			productProfile.setProductCategory(defaultCategory.get());
 
 			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
 
 			productGroupProductDTO.setGroupName(ppDto.getGroup());
-			productGroupProductDTO.setProductName(ppDto.getName());
+			productGroupProductDTO.setProductName(ppDto.getName() + "-" + ppDto.getDefault_code());
 
 			productGroupProductDTOs.add(productGroupProductDTO);
 

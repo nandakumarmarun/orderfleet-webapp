@@ -65,7 +65,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	public static final String STOCK_DETAILS = "select "
 			+ "ivh.created_by_id as users,ivh.created_date,pp.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
-			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity "
+			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity,pp.pid as productPid "
 			+ "from tbl_inventory_voucher_detail ivd "
 			+ "inner join tbl_inventory_voucher_header ivh on ivd.inventory_voucher_header_id = ivh.id "
 			+ "inner join tbl_user_stock_location usl on usl.user_id = ivh.created_by_id "
@@ -77,7 +77,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	public static final String STOCK_DETAILS_STOCKLOCATION_BASED = "select "
 			+ "ivh.created_by_id as users,ivh.created_date,pp.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
-			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity "
+			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity,pp.pid as productPid "
 			+ "from tbl_inventory_voucher_detail ivd "
 			+ "inner join tbl_inventory_voucher_header ivh on ivd.inventory_voucher_header_id = ivh.id "
 			+ "inner join tbl_stock_location sl on sl.id IN ?5 "

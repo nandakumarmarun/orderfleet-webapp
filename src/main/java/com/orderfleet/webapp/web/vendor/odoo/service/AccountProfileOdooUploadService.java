@@ -110,33 +110,62 @@ public class AccountProfileOdooUploadService {
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
 		// find all exist account profiles
 		List<String> apNames = list.stream().map(apDto -> apDto.getName().toUpperCase()).collect(Collectors.toList());
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				apNames);
+//		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
+//				apNames);
+		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
 
 		List<LocationDTO> locationDtos = new ArrayList<>();
 		List<LocationAccountProfileDTO> locationAccountProfileDtos = new ArrayList<>();
 
 		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
+		int i = 0;
 
 		for (OdooAccountProfile apDto : list) {
+
+			AccountProfile accountProfile = new AccountProfile();
 			// check exist by name, only one exist with a name
+//			Optional<AccountProfile> optionalAP = accountProfiles.stream()
+//					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
 			Optional<AccountProfile> optionalAP = accountProfiles.stream()
-					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
-			AccountProfile accountProfile;
+					.filter(pc -> pc.getCustomerId() != null && !pc.getCustomerId().equals("")
+							? pc.getCustomerId().equalsIgnoreCase(String.valueOf(apDto.getId()))
+							: false)
+					.findAny();
+
+//			Optional<AccountProfile> optionalAP = null;
+//			// check exist by name, only one exist with a name
+//			if (String.valueOf(apDto.getId()) == null) {
+//				optionalAP = accountProfiles.stream()
+//						.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName() + "-" + apDto.getRef()))
+//						.findFirst();
+//			} else {
+//				optionalAP = accountProfiles.stream()
+//						.filter(pc -> pc.getCustomerId() != null
+//								? pc.getCustomerId().equalsIgnoreCase(String.valueOf(apDto.getId()))
+//								: false)
+//						.findFirst();
+//			}
+
 			if (optionalAP.isPresent()) {
 				accountProfile = optionalAP.get();
+				System.out.println(
+						accountProfile.getId() + "---------" + i++ + "=========" + accountProfile.getCustomerId());
 				// if not update, skip this iteration. Not implemented now
 				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
 			} else {
+				System.out.println("66666666666666666666666666666666666666666666666666666666666666666666666666666");
 				accountProfile = new AccountProfile();
 				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-				accountProfile.setName(apDto.getName());
+//				accountProfile.setName(apDto.getName());
+				accountProfile.setCustomerId(String.valueOf(apDto.getId()));
 				accountProfile.setUser(user);
 				accountProfile.setCompany(company);
 				accountProfile.setAccountStatus(AccountStatus.Unverified);
 				accountProfile.setDataSourceType(DataSourceType.TALLY);
 				accountProfile.setImportStatus(true);
 			}
+
+			accountProfile.setName(apDto.getName() + "-" + apDto.getRef());
 
 			// price level
 			Optional<PriceLevel> optionalPriceLevel = tempPriceLevel.stream()
@@ -151,7 +180,7 @@ public class AccountProfileOdooUploadService {
 				accountProfile.setDefaultPriceLevel(optionalPriceLevel.get());
 			}
 
-			accountProfile.setCustomerId(String.valueOf(apDto.getId()));
+//			accountProfile.setCustomerId(String.valueOf(apDto.getId()));
 
 			if (apDto.getEmail() != null && !apDto.getEmail().equals("")) {
 				if (isValidEmail(apDto.getEmail())) {
@@ -165,11 +194,11 @@ public class AccountProfileOdooUploadService {
 
 			if (apDto.getTrn() != null && !apDto.getTrn().equals("")) {
 				accountProfile.setTinNo(apDto.getTrn());
-			}else {
+			} else {
 				accountProfile.setTinNo(null);
 			}
 
-			accountProfile.setDescription(String.valueOf(apDto.getId()));
+			accountProfile.setDescription(apDto.getName());
 
 			accountProfile.setActivated(true);
 
@@ -195,7 +224,7 @@ public class AccountProfileOdooUploadService {
 				accountProfile.setPhone1("");
 			}
 
-			accountProfile.setDescription(String.valueOf(apDto.getId()));
+			// accountProfile.setDescription(String.valueOf(apDto.getId()));
 
 			// accountProfile.setClosingBalance(Double.parseDouble(apDto.getCredit()));
 
@@ -205,15 +234,16 @@ public class AccountProfileOdooUploadService {
 				accountProfile.setAccountType(defaultAccountType);
 			}
 			Optional<AccountProfile> opAccP = saveUpdateAccountProfiles.stream()
-					.filter(so -> so.getName().equalsIgnoreCase(apDto.getName())).findAny();
+					.filter(so -> so.getName().equalsIgnoreCase(apDto.getName() + "-" + apDto.getRef())).findAny();
 			if (opAccP.isPresent()) {
 				continue;
 			}
 			accountProfile.setDataSourceType(DataSourceType.TALLY);
+			System.out.println(accountProfile.getId() + "---------" + accountProfile.getCustomerId());
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
-
-		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+		accountProfileRepository.save(saveUpdateAccountProfiles);
+		// bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 
 		// saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
 

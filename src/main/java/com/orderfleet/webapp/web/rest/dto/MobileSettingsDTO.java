@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest.dto;
 import java.util.List;
 
 import com.orderfleet.webapp.domain.enums.CartType;
+import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 import com.orderfleet.webapp.web.rest.api.dto.ActivityNotificationDTO;
@@ -64,6 +65,14 @@ public class MobileSettingsDTO {
 
 	private CartType cartType;
 
+	private DisplayName accountProfileDisplayName;
+
+	private DisplayName accountProfilePrintName;
+
+	private DisplayName productProfileDisplayName;
+
+	private DisplayName productProfilePrintName;
+
 	private boolean kfcEnabled;
 
 	private boolean gpsMandatory;
@@ -101,9 +110,9 @@ public class MobileSettingsDTO {
 	private boolean blockActivity;
 
 	private boolean salesOrderMandatory;
-	
+
 	private boolean rateWithTax;
-	
+
 	private boolean wifiPrintEnabler;
 
 	public MobileSettingsDTO() {
@@ -132,6 +141,10 @@ public class MobileSettingsDTO {
 		this.voucherNumberGenerationType = mobileConfigurationDTO.getVoucherNumberGenerationType();
 		this.inventoryVoucherUIType = mobileConfigurationDTO.getInventoryVoucherUIType();
 		this.cartType = mobileConfigurationDTO.getCartType();
+		this.accountProfileDisplayName = mobileConfigurationDTO.getAccountProfileDisplayName();
+		this.accountProfilePrintName = mobileConfigurationDTO.getAccountProfilePrintName();
+		this.productProfileDisplayName = mobileConfigurationDTO.getProductProfileDisplayName();
+		this.productProfilePrintName = mobileConfigurationDTO.getProductProfilePrintName();
 		this.kfcEnabled = mobileConfigurationDTO.getKfcEnabled();
 		this.gpsMandatory = mobileConfigurationDTO.getGpsMandatory();
 		this.enableSecondarySales = mobileConfigurationDTO.getEnableSecondarySales();
@@ -151,7 +164,7 @@ public class MobileSettingsDTO {
 		this.receiptAllocationMandatory = mobileConfigurationDTO.getReceiptAllocationMandatory();
 		this.blockActivity = mobileConfigurationDTO.getBlockActivity();
 		this.salesOrderMandatory = mobileConfigurationDTO.getSalesOrderMandatory();
-		this.rateWithTax= mobileConfigurationDTO.getRateWithTax();
+		this.rateWithTax = mobileConfigurationDTO.getRateWithTax();
 		this.wifiPrintEnabler = mobileConfigurationDTO.getWifiPrintEnabler();
 	}
 
@@ -514,7 +527,37 @@ public class MobileSettingsDTO {
 	public void setWifiPrintEnabler(boolean wifiPrintEnabler) {
 		this.wifiPrintEnabler = wifiPrintEnabler;
 	}
-	
-	
+
+	public DisplayName getAccountProfileDisplayName() {
+		return accountProfileDisplayName;
+	}
+
+	public void setAccountProfileDisplayName(DisplayName accountProfileDisplayName) {
+		this.accountProfileDisplayName = accountProfileDisplayName;
+	}
+
+	public DisplayName getAccountProfilePrintName() {
+		return accountProfilePrintName;
+	}
+
+	public void setAccountProfilePrintName(DisplayName accountProfilePrintName) {
+		this.accountProfilePrintName = accountProfilePrintName;
+	}
+
+	public DisplayName getProductProfileDisplayName() {
+		return productProfileDisplayName;
+	}
+
+	public void setProductProfileDisplayName(DisplayName productProfileDisplayName) {
+		this.productProfileDisplayName = productProfileDisplayName;
+	}
+
+	public DisplayName getProductProfilePrintName() {
+		return productProfilePrintName;
+	}
+
+	public void setProductProfilePrintName(DisplayName productProfilePrintName) {
+		this.productProfilePrintName = productProfilePrintName;
+	}
 
 }

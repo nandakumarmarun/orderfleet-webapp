@@ -76,6 +76,7 @@ import com.orderfleet.webapp.domain.enums.DashboardItemConfigType;
 import com.orderfleet.webapp.domain.enums.DashboardItemType;
 import com.orderfleet.webapp.domain.enums.DashboardUIType;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.Industry;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
@@ -897,6 +898,10 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setSalesOrderMandatory(false);
 		mobileConfiguration.setRateWithTax(false);
 		mobileConfiguration.setWifiPrintEnabler(false);
+		mobileConfiguration.setAccountProfileDisplayName(DisplayName.NAME);
+		mobileConfiguration.setAccountProfilePrintName(DisplayName.NAME);
+		mobileConfiguration.setProductProfileDisplayName(DisplayName.NAME);
+		mobileConfiguration.setProductProfilePrintName(DisplayName.NAME);
 
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}

@@ -636,6 +636,7 @@ public class SendSalesOrderSapService {
 
 			salesOrderItemDetailsSap.setItemCode(inventoryVoucherDetailDTO.getProductName());
 			salesOrderItemDetailsSap.setItemName(inventoryVoucherDetailDTO.getProductAlias());
+			quantity = Math.round(quantity * 100.0) / 100.0;
 			salesOrderItemDetailsSap.setQuantity(String.valueOf(quantity));
 			salesOrderItemDetailsSap.setuPrice(String.valueOf("0.0"));
 			salesOrderItemDetailsSap.setTaxCode("");

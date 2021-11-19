@@ -78,6 +78,10 @@
 						<th>Sales Order Mandatory</th>
 						<th>Rate With Tax</th>
 						<th>Wifi Print Enabler</th>
+						<th>Account Profile Display Name</th>
+						<th>Account Profile Print Name</th>
+						<th>Product Profile Display Name</th>
+						<th>Product Profile Print Name</th>
 						<th>Action</th>
 
 					</tr>
@@ -128,6 +132,10 @@
 							<td>${mobileConfiguration.salesOrderMandatory}</td>
 							<td>${mobileConfiguration.rateWithTax}</td>
 							<td>${mobileConfiguration.wifiPrintEnabler}</td>
+							<td>${mobileConfiguration.accountProfileDisplayName}</td>
+							<td>${mobileConfiguration.accountProfilePrintName}</td>
+							<td>${mobileConfiguration.productProfileDisplayName}</td>
+							<td>${mobileConfiguration.productProfilePrintName}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -448,18 +456,16 @@
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Rate With Tax
-														</label> <input id="rateWithTax"
-														name='rateWithTax' type='checkbox'
+													<label class="control-label">Rate With Tax </label> <input
+														id="rateWithTax" name='rateWithTax' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Wifi Print Enabler
-														</label> <input id="wifiPrintEnabler"
-														name='wifiPrintEnabler' type='checkbox'
-														class="form-control" />
+													<label class="control-label">Wifi Print Enabler </label> <input
+														id="wifiPrintEnabler" name='wifiPrintEnabler'
+														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
@@ -490,6 +496,54 @@
 														id="cartType" name='cartType' class="form-control">
 														<option value="NORMAL" selected="selected">NORMAL</option>
 														<option value="GROUP_WISE">GROUP_WISE</option>
+													</select>
+												</div></td>
+										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Account Profile
+														Display Name</label> <select id="accountProfileDisplayName"
+														name='accountProfileDisplayName' class="form-control">
+														<option value="NAME" selected="selected">Name</option>
+														<option value="ALIAS">Alias</option>
+														<option value="DESCRIPTION">Description</option>
+													</select>
+												</div></td>
+										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Account Profile Print
+														Name</label> <select id="accountProfilePrintName"
+														name='accountProfilePrintName' class="form-control">
+														<option value="NAME" selected="selected">Name</option>
+														<option value="ALIAS">Alias</option>
+														<option value="DESCRIPTION">Description</option>
+													</select>
+												</div></td>
+										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Product Profile
+														Display Name</label> <select id="productProfileDisplayName"
+														name='productProfileDisplayName' class="form-control">
+														<option value="NAME" selected="selected">Name</option>
+														<option value="ALIAS">Alias</option>
+														<option value="DESCRIPTION">Description</option>
+													</select>
+												</div></td>
+										</tr>
+
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Product Profile
+														Display Name</label> <select id="productProfilePrintName"
+														name='productProfilePrintName' class="form-control">
+														<option value="NAME" selected="selected">Name</option>
+														<option value="ALIAS">Alias</option>
+														<option value="DESCRIPTION">Description</option>
 													</select>
 												</div></td>
 										</tr>
