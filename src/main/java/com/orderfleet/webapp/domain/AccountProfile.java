@@ -75,11 +75,10 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	@Column(name = "customer_id")
 	private String customerId;
-	
 
 	@Column(name = "customer_code")
 	private String customerCode;
-	
+
 	@NotNull
 	@Size(min = 1, max = 500)
 	@Column(name = "address", length = 500, nullable = false)
@@ -170,12 +169,12 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	@Column(name = "contact_person")
 	private String contactPerson;
-	
+
 	/*
 	 * @Column(name="location_radius") private double locationRadius;
 	 */
-    
-    @Column(name = "location_radius", nullable = false, columnDefinition = "double precision DEFAULT 0")
+
+	@Column(name = "location_radius", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double locationRadius;
 
 	@NotNull
@@ -226,17 +225,15 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	@ManyToOne
 	private User geoTaggedUser;
-	
+
 	@ManyToOne
 	private CountryC countryc;
-	
+
 	@ManyToOne
 	private StateC statec;
-	
+
 	@ManyToOne
 	private DistrictC districtc;
-	
-
 
 	public Long getId() {
 		return id;
@@ -565,15 +562,14 @@ public class AccountProfile implements Serializable, Cloneable {
 	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
-	
-    public String getCustomerCode() {
+
+	public String getCustomerCode() {
 		return customerCode;
 	}
 
 	public void setCustomerCode(String customerCode) {
 		this.customerCode = customerCode;
 	}
-	
 
 	public double getLocationRadius() {
 		return locationRadius;
@@ -582,11 +578,7 @@ public class AccountProfile implements Serializable, Cloneable {
 	public void setLocationRadius(double locationRadius) {
 		this.locationRadius = locationRadius;
 	}
-	
-	
 
-
-	
 	public CountryC getCountryc() {
 		return countryc;
 	}
@@ -610,7 +602,7 @@ public class AccountProfile implements Serializable, Cloneable {
 	public void setDistrictc(DistrictC districtc) {
 		this.districtc = districtc;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

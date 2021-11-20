@@ -51,18 +51,20 @@ public class StockDetailsServiceImpl implements StockDetailsService {
 	private final Logger log = LoggerFactory.getLogger(InventoryVoucherHeaderServiceImpl.class);
 
 	@Override
-	public List<StockDetailsDTO> findOtherStockItems(User user ,Set<StockLocation> stockLocations,boolean stockLocationSelected) {
+	public List<StockDetailsDTO> findOtherStockItems(User user, Set<StockLocation> stockLocations,
+			boolean stockLocationSelected) {
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
 		List<UserStockLocation> userStockLocation = new ArrayList<>();
 		userStockLocation = userStockLocationRepository.findByUserPid(user.getPid());
-		
-		if(stockLocations  != null && stockLocations.size() == 1 && stockLocationSelected){
+
+		if (stockLocations != null && stockLocations.size() == 1 && stockLocationSelected) {
 			String stockLocationPid = stockLocations.stream().findAny().get().getPid();
-			userStockLocation = userStockLocationRepository.findByUserPidAndStockLocationPid(user.getPid(), stockLocationPid);
-		}else{
+			userStockLocation = userStockLocationRepository.findByUserPidAndStockLocationPid(user.getPid(),
+					stockLocationPid);
+		} else {
 			userStockLocation = userStockLocationRepository.findByUserPid(user.getPid());
 		}
-		
+
 		if (!userStockLocation.isEmpty()) {
 			List<OpeningStock> openingStockList = openingStockRepository.findByStockLocationIn(
 					userStockLocation.stream().map(us -> us.getStockLocation()).collect(Collectors.toList()));
@@ -72,7 +74,7 @@ public class StockDetailsServiceImpl implements StockDetailsService {
 						.collect(Collectors.toList());
 				if (stockDetailsProduct.isEmpty()) {
 					StockDetailsDTO stockDetailDto = new StockDetailsDTO(op.getQuantity(),
-							op.getProductProfile().getName(), 0.0, op.getQuantity());
+							op.getProductProfile().getName(), 0.0, op.getQuantity(), op.getProductProfile().getPid());
 					stockDetails.add(stockDetailDto);
 				}
 			}
@@ -90,39 +92,39 @@ public class StockDetailsServiceImpl implements StockDetailsService {
 					.filter(ppDto -> ppDto.getName().equalsIgnoreCase(stockDetailsDTO.getProductName())).findAny();
 
 			if (opProductProfile.isPresent()) {
-				ProductProfileDTO productProfileDTO=opProductProfile.get();
+				ProductProfileDTO productProfileDTO = opProductProfile.get();
 				if (productNameTextSettings.size() > 0) {
-						String name = " (";
-						for (ProductNameTextSettings productNameText : productNameTextSettings) {
-							if (productNameText.getName().equals("DESCRIPTION")) {
-								if (productProfileDTO.getDescription() != null
-										&& !productProfileDTO.getDescription().isEmpty())
-									name += productProfileDTO.getDescription() + ",";
-							} else if (productNameText.getName().equals("MRP")) {
-								name += productProfileDTO.getMrp() + ",";
-							} else if (productNameText.getName().equals("SELLING RATE")) {
-								name += productProfileDTO.getPrice() + ",";
-							} else if (productNameText.getName().equals("STOCK")) {
-								name += stockDetailsDTO.getOpeningStock() + ",";
-							} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
-								if (productProfileDTO.getProductDescription() != null
-										&& !productProfileDTO.getProductDescription().isEmpty())
-									name += productProfileDTO.getProductDescription() + ",";
-							} else if (productNameText.getName().equals("BARCODE")) {
-								if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
-									name += productProfileDTO.getBarcode() + ",";
-							} else if (productNameText.getName().equals("REMARKS")) {
-								if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
-									name += productProfileDTO.getRemarks() + ",";
-							}
+					String name = " (";
+					for (ProductNameTextSettings productNameText : productNameTextSettings) {
+						if (productNameText.getName().equals("DESCRIPTION")) {
+							if (productProfileDTO.getDescription() != null
+									&& !productProfileDTO.getDescription().isEmpty())
+								name += productProfileDTO.getDescription() + ",";
+						} else if (productNameText.getName().equals("MRP")) {
+							name += productProfileDTO.getMrp() + ",";
+						} else if (productNameText.getName().equals("SELLING RATE")) {
+							name += productProfileDTO.getPrice() + ",";
+						} else if (productNameText.getName().equals("STOCK")) {
+							name += stockDetailsDTO.getOpeningStock() + ",";
+						} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+							if (productProfileDTO.getProductDescription() != null
+									&& !productProfileDTO.getProductDescription().isEmpty())
+								name += productProfileDTO.getProductDescription() + ",";
+						} else if (productNameText.getName().equals("BARCODE")) {
+							if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
+								name += productProfileDTO.getBarcode() + ",";
+						} else if (productNameText.getName().equals("REMARKS")) {
+							if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
+								name += productProfileDTO.getRemarks() + ",";
 						}
-						name = name.substring(0, name.length() - 1);
-						if (name.length() > 1) {
-							name += ")";
-						}
-						stockDetailsDTO.setProductName(stockDetailsDTO.getProductName() + name);
-						
-					
+					}
+					name = name.substring(0, name.length() - 1);
+					if (name.length() > 1) {
+						name += ")";
+					}
+					stockDetailsDTO.setProductPid(productProfileDTO.getPid());
+					stockDetailsDTO.setProductName(stockDetailsDTO.getProductName() + name);
+
 				} else {
 					log.info("Product Profile Size < 0");
 					stockDetailsDTO.setProductName(stockDetailsDTO.getProductName());

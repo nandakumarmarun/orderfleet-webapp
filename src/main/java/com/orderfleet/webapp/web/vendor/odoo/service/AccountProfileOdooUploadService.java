@@ -242,6 +242,8 @@ public class AccountProfileOdooUploadService {
 			System.out.println(accountProfile.getId() + "---------" + accountProfile.getCustomerId());
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
+		saveUpdateAccountProfiles.forEach(s -> System.out
+				.println(s.getId() + "----" + s.getName() + "----" + s.getCustomerId() + "----" + s.getAlias()+"---"+s));
 		accountProfileRepository.save(saveUpdateAccountProfiles);
 		// bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 

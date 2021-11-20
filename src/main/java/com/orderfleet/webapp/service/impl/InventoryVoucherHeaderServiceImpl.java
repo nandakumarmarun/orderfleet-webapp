@@ -596,11 +596,12 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 						name += ")";
 					}
 					stockDetailsDTO.setProductName(productName + name);
-					stockDetailsDTO.setProductPid(productProfileDTO.getPid());
+
 				} else {
 
 					stockDetailsDTO.setProductName(productName);
 				}
+				stockDetailsDTO.setProductPid(opProductProfile.get().getPid());
 			} else {
 				log.info("Optional Product Profile not present");
 				stockDetailsDTO.setProductName(productName);

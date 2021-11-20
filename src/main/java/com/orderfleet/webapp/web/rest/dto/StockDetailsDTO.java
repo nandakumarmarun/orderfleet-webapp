@@ -31,12 +31,14 @@ public class StockDetailsDTO implements Cloneable {
 
 	}
 
-	public StockDetailsDTO(double openingStock, String productName, double saledQuantity, double closingStock) {
+	public StockDetailsDTO(double openingStock, String productName, double saledQuantity, double closingStock,
+			String productPid) {
 		super();
 		this.openingStock = openingStock;
 		this.productName = productName;
 		this.saledQuantity = saledQuantity;
 		this.closingStock = closingStock;
+		this.productPid = productPid;
 	}
 
 	public double getOpeningStock() {
@@ -81,8 +83,8 @@ public class StockDetailsDTO implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "StockDetailsDTO [openingStock=" + openingStock + ", productName=" + productName + ", saledQuantity="
-				+ saledQuantity + ", closingStock=" + closingStock + "]";
+		return "StockDetailsDTO [openingStock=" + openingStock + ", productName=" + productName + ", productPid="
+				+ productPid + ", saledQuantity=" + saledQuantity + ", closingStock=" + closingStock + "]";
 	}
 
 }
