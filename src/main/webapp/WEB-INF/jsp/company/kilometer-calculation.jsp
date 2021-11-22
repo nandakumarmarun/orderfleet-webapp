@@ -114,6 +114,7 @@
 						<tr>
 							<th>Employee</th>
 							<th>Account</th>
+							<th>Punch Date</th>
 							<th>Punch Time</th>
 							<th>Location</th>
 							<th>Metres</th>

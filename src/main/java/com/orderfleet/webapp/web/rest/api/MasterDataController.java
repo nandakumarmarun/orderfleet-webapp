@@ -43,7 +43,9 @@ import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.VoucherNumberGenerator;
+import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
+import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.ActivityStageRepository;
 import com.orderfleet.webapp.repository.FormElementTypeRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
@@ -389,6 +391,9 @@ public class MasterDataController {
 
 	@Inject
 	private BankDetailsService bankDetailsService;
+
+	@Inject
+	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
 
 	/**
 	 * GET /account-types : get all accountTypes.
@@ -1629,13 +1634,19 @@ public class MasterDataController {
 		// document entry exist in inventory voucher entries
 		boolean documentExit = false;
 		for (VoucherNumberGenerator vng : voucherNumberGeneratorList) {
-			String id="INV_QUERY_173";
-			String description="Getting the highest Doc number without the prefix";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			String id = "INV_QUERY_173";
+			String description = "Getting the highest Doc number without the prefix";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 
-			Long lastHighestDocumentNumberwithoutPrefix = inventoryVoucherHeaderRepository
+			Long lastHighestDocumentNumberwithoutPrefix = 0L;
+			lastHighestDocumentNumberwithoutPrefix = inventoryVoucherHeaderRepository
 					.getHigestDocumentNumberwithoutPrefix(companyPid, userPid, vng.getDocument().getPid(),
 							vng.getPrefix());
+			if (vng.getDocument().getDocumentType().equals(DocumentType.ACCOUNTING_VOUCHER)) {
+				lastHighestDocumentNumberwithoutPrefix = accountingVoucherHeaderRepository
+						.getHigestDocumentNumberwithoutPrefix(companyPid, userPid, vng.getDocument().getPid(),
+								vng.getPrefix());
+			}
 
 			if (lastHighestDocumentNumberwithoutPrefix != null && lastHighestDocumentNumberwithoutPrefix != 0) {
 

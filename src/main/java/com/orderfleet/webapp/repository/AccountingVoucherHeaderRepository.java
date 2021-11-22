@@ -298,6 +298,16 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("SELECT av.documentNumberServer,av.document.pid,av.createdDate from AccountingVoucherHeader av where av.company.pid = ?1 and av.createdBy.pid = ?2 and av.document.pid IN(?3)")
 	List<Object[]> getAllDocumentNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
 
+	public static final String LAST_DOCUMENT_PID_DATE = "select max(cast(coalesce(nullif(SPLIT_PART(avh.document_number_local, ?4 , 2),''),'0') as bigint)) from tbl_accounting_voucher_header avh "
+			+ "INNER JOIN tbl_company cmp on avh.company_id = cmp.id   "
+			+ "INNER JOIN tbl_document doc on avh.document_id = doc.id  "
+			+ "INNER JOIN tbl_user u on avh.created_by_id = u.id where  "
+			+ "cmp.pid = ?1 and u.pid = ?2  and doc.pid = ?3 and "
+			+ "avh.company_id = cmp.id and avh.created_by_id = u.id and avh.document_id = doc.id";
+
+	@Query(value = LAST_DOCUMENT_PID_DATE, nativeQuery = true)
+	Long getHigestDocumentNumberwithoutPrefix(String companyPid, String userPid, String pid, String prefix);
+
 	// @Query("select
 	// avh.id,avh.pid,avh.createdDate,avh.documnetDate,avh.accountProfile.pid,avh.accountProfile.name,avh.document.pid,avh.document.name,avh.totalAmount,avh.documentNumberServer
 	// from AccountingVoucherHeader avh where avh.createdBy.login = ?1 and

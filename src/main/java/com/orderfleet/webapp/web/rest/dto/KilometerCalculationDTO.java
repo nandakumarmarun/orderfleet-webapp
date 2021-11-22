@@ -22,6 +22,7 @@ public class KilometerCalculationDTO {
 	private String UserPid;
 	private LocalDateTime createdDate;
 	private String punchingDate;
+	private String punchingTime;
 	private LocalDateTime lastModifiedDate;
 	private String employeePid;
 	private String employeeName;
@@ -52,8 +53,10 @@ public class KilometerCalculationDTO {
 				: kilometreCalculation.getExecutiveTaskExecution().getPid();
 		this.accountProfileName = kilometreCalculation.getExecutiveTaskExecution() == null ? null
 				: kilometreCalculation.getExecutiveTaskExecution().getAccountProfile().getName();
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 		this.punchingDate = dateFormatter.format(kilometreCalculation.getCreatedDate());
+		DateTimeFormatter dateFormatter1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		this.punchingTime = dateFormatter1.format(kilometreCalculation.getCreatedDate());
 		this.location = kilometreCalculation.getExecutiveTaskExecution() == null ? null
 				: kilometreCalculation.getExecutiveTaskExecution().getLocation();
 
@@ -177,6 +180,14 @@ public class KilometerCalculationDTO {
 
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	public String getPunchingTime() {
+		return punchingTime;
+	}
+
+	public void setPunchingTime(String punchingTime) {
+		this.punchingTime = punchingTime;
 	}
 
 }

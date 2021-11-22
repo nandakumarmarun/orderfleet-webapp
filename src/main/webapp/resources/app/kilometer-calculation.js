@@ -165,10 +165,9 @@ if (!this.KilometerCalculation) {
 																	+ (kilometerCalc.accountProfileName == null ? "Attendance"
 																			: kilometerCalc.accountProfileName)
 																	+ "</td><td class='tableexport-string target'>"
-																	+ (kilometerCalc.punchingDate == null ? ""
-																			: formatDate(
-																					kilometerCalc.punchingDate,
-																					'MMM DD YYYY, hh:mm:ss'))
+																	+ kilometerCalc.punchingDate
+																	+ "</td><td class='tableexport-string target'>"
+																	+ kilometerCalc.punchingTime
 																	+ "</td><td>"
 																	+ lastlocation
 																	+ "</td><td>"
@@ -205,8 +204,7 @@ if (!this.KilometerCalculation) {
 		var pid = $(obj).attr("id");
 		$(obj).html("loading...");
 		$.ajax({
-			url : kilometerCalculationPath + "/updateLocationExeTask/"
-					+ pid,
+			url : kilometerCalculationPath + "/updateLocationExeTask/" + pid,
 			method : 'GET',
 			success : function(data) {
 				$(obj).html(data.location);
