@@ -43,6 +43,7 @@ import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileLocationService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
+import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.rest.dto.KilometerCalculationDTO;
@@ -77,6 +78,9 @@ public class KilometerCalculationResource {
 
 	@Inject
 	private GeoLocationService geoLocationService;
+
+	@Inject
+	private UserService userService;
 
 	@RequestMapping(value = "/kilo-calc", method = RequestMethod.GET)
 	@Timed
@@ -144,8 +148,18 @@ public class KilometerCalculationResource {
 		List<KilometreCalculation> kilometreCalculations = new ArrayList<>();
 		if (!userPid.equals("no") && accountProfilePid.equals("no")) {
 
-			kilometreCalculations = kilometreCalculationRepository
-					.findAllByCompanyIdAndUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fDate, tDate);
+			if (!userPid.equals("all")) {
+				kilometreCalculations = kilometreCalculationRepository
+						.findAllByCompanyIdAndUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fDate, tDate);
+			} else {
+
+				List<String> userPids = userService.findAllByCompany().stream().map(a -> a.getPid())
+						.collect(Collectors.toList());
+
+				kilometreCalculations = kilometreCalculationRepository
+						.findAllByCompanyIdAndUserPidInAndDateBetweenOrderByCreatedDateDesc(userPids, fDate, tDate);
+
+			}
 //			kilometreCalculations.removeIf(u -> u.getExecutiveTaskExecution() == null);
 		}
 

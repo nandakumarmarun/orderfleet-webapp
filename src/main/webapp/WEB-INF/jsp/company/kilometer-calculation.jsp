@@ -41,6 +41,7 @@
 									<c:forEach items="${employees}" var="employee">
 										<option value="${employee.userPid}">${employee.name}</option>
 									</c:forEach>
+									<option value="all">All Employee</option>
 								</select>
 							</div>
 							<div class="col-sm-2">
