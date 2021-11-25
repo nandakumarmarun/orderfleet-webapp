@@ -242,10 +242,9 @@ public class ProductProfileOdooUploadService {
 		for (OdooProductProfile ppDto : list) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> (p.getName().equals(ppDto.getName() + "-" + ppDto.getDefault_code()))
-							&& p.getProductId() != null && !p.getProductId().equals("")
-									? p.getProductId().equals(String.valueOf(ppDto.getId()))
-									: false)
+					.filter(p -> p.getProductId() != null && !p.getProductId().equals("")
+							? p.getProductId().equals(String.valueOf(ppDto.getId()))
+							: false)
 					.findAny();
 			ProductProfile productProfile;
 			if (optionalPP.isPresent()) {

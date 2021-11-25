@@ -153,7 +153,6 @@ public class AccountProfileOdooUploadService {
 				// if not update, skip this iteration. Not implemented now
 				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
 			} else {
-				System.out.println("66666666666666666666666666666666666666666666666666666666666666666666666666666");
 				accountProfile = new AccountProfile();
 				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
 //				accountProfile.setName(apDto.getName());
@@ -239,11 +238,8 @@ public class AccountProfileOdooUploadService {
 				continue;
 			}
 			accountProfile.setDataSourceType(DataSourceType.TALLY);
-			System.out.println(accountProfile.getId() + "---------" + accountProfile.getCustomerId());
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
-		saveUpdateAccountProfiles.forEach(s -> System.out
-				.println(s.getId() + "----" + s.getName() + "----" + s.getCustomerId() + "----" + s.getAlias()+"---"+s));
 		accountProfileRepository.save(saveUpdateAccountProfiles);
 		// bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 
