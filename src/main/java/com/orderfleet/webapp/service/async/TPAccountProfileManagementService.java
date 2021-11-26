@@ -255,6 +255,11 @@ public class TPAccountProfileManagementService {
 			// accountProfile.setAccountType(defaultAccountType);
 			// }
 			accountProfile.setDataSourceType(DataSourceType.TALLY);
+			Optional<AccountProfile> opAccP = saveUpdateAccountProfiles.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(apDto.getName())).findAny();
+			if (opAccP.isPresent()) {
+				continue;
+			}
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
 		log.info("Saving...accountProfileDTOs.Account Profiles" + saveUpdateAccountProfiles.size());
@@ -291,8 +296,10 @@ public class TPAccountProfileManagementService {
 		// find all exist account profiles
 		List<String> apNames = accountProfileDTOs.stream().map(apDto -> apDto.getName().toUpperCase())
 				.collect(Collectors.toList());
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				apNames);
+//		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
+//				apNames);
+
+		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyId(companyId);
 
 		log.info("Db accounts: " + accountProfiles.size());
 		log.info("Tally  accounts: " + accountProfileDTOs.size());
@@ -306,14 +313,17 @@ public class TPAccountProfileManagementService {
 		for (AccountProfileDTO apDto : accountProfileDTOs) {
 			Optional<AccountProfile> optionalAP = null;
 			// check exist by name, only one exist with a name
-			if(apDto.getCustomerId() == null) {
+			if (apDto.getCustomerId() == null) {
+				optionalAP = accountProfiles.stream().filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName()))
+						.findFirst();
+			} else {
 				optionalAP = accountProfiles.stream()
-					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findFirst();
-			}else {
-				optionalAP = accountProfiles.stream()
-						.filter(pc -> pc.getCustomerId() !=null ? pc.getCustomerId().equalsIgnoreCase(apDto.getCustomerId()) : false).findFirst();
+						.filter(pc -> pc.getCustomerId() != null
+								? pc.getCustomerId().equalsIgnoreCase(apDto.getCustomerId())
+								: false)
+						.findFirst();
 			}
-			 
+
 			AccountProfile accountProfile;
 			if (optionalAP.isPresent()) {
 				accountProfile = optionalAP.get();
@@ -406,9 +416,7 @@ public class TPAccountProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
-	
-	
+
 	@Transactional
 	public void saveUpdateLocations(final List<LocationDTO> locationDTOs, final SyncOperation syncOperation) {
 		long start = System.nanoTime();
@@ -456,12 +464,12 @@ public class TPAccountProfileManagementService {
 		for (LocationDTO locDto : locationDTOs) {
 			Optional<Location> optionalLoc = null;
 			// check exist by name, only one exist with a name
-			if(locDto.getLocationId()== null) {
-				 optionalLoc = locations.stream().filter(p -> p.getName().equals(locDto.getName()))
-							.findAny();
-			}else {
-				 optionalLoc = locations.stream().filter(p -> p.getLocationId() != null ? p.getLocationId().equals(locDto.getLocationId()) : false)
-							.findAny();
+			if (locDto.getLocationId() == null) {
+				optionalLoc = locations.stream().filter(p -> p.getName().equals(locDto.getName())).findAny();
+			} else {
+				optionalLoc = locations.stream().filter(
+						p -> p.getLocationId() != null ? p.getLocationId().equals(locDto.getLocationId()) : false)
+						.findAny();
 			}
 			Location location;
 			if (optionalLoc.isPresent()) {
@@ -489,7 +497,6 @@ public class TPAccountProfileManagementService {
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
-	
 	@Transactional
 	public void saveUpdateLocationHierarchy(final List<LocationHierarchyDTO> locationHierarchyDTOs,
 			final SyncOperation syncOperation) {

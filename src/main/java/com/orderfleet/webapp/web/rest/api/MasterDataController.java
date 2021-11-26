@@ -37,18 +37,21 @@ import com.orderfleet.webapp.domain.DocumentAccountingVoucherColumn;
 import com.orderfleet.webapp.domain.DocumentForms;
 import com.orderfleet.webapp.domain.DocumentInventoryVoucherColumn;
 import com.orderfleet.webapp.domain.FormElementType;
+import com.orderfleet.webapp.domain.MobileConfiguration;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ReferenceDocument;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.VoucherNumberGenerator;
+import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.ActivityStageRepository;
 import com.orderfleet.webapp.repository.FormElementTypeRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.MobileConfigurationRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.ReferenceDocumentRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
@@ -395,6 +398,55 @@ public class MasterDataController {
 	@Inject
 	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
 
+	@Inject
+	private MobileConfigurationRepository mobileConfigurationRepository;
+
+	private String mobileAccountProfileDisplayName() {
+
+		String mobileDisplayName = "Name";
+
+		Optional<MobileConfiguration> opMc = mobileConfigurationRepository.findOneByCompanyId();
+
+		if (opMc.isPresent()) {
+
+			if (opMc.get().getAccountProfileDisplayName().equals(DisplayName.NAME)) {
+				mobileDisplayName = "Name";
+			}
+			if (opMc.get().getAccountProfileDisplayName().equals(DisplayName.ALIAS)) {
+				mobileDisplayName = "Alias";
+			}
+			if (opMc.get().getAccountProfileDisplayName().equals(DisplayName.DESCRIPTION)) {
+				mobileDisplayName = "Description";
+			}
+		}
+
+		return mobileDisplayName;
+
+	}
+
+	private String mobileProductProfileDisplayName() {
+
+		String mobileDisplayName = "Name";
+
+		Optional<MobileConfiguration> opMc = mobileConfigurationRepository.findOneByCompanyId();
+
+		if (opMc.isPresent()) {
+
+			if (opMc.get().getProductProfileDisplayName().equals(DisplayName.NAME)) {
+				mobileDisplayName = "Name";
+			}
+			if (opMc.get().getProductProfileDisplayName().equals(DisplayName.ALIAS)) {
+				mobileDisplayName = "Alias";
+			}
+			if (opMc.get().getProductProfileDisplayName().equals(DisplayName.DESCRIPTION)) {
+				mobileDisplayName = "Description";
+			}
+		}
+
+		return mobileDisplayName;
+
+	}
+
 	/**
 	 * GET /account-types : get all accountTypes.
 	 *
@@ -408,12 +460,14 @@ public class MasterDataController {
 	public ResponseEntity<List<AccountTypeDTO>> getAllAccountTypes(
 			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate, Pageable pageable)
 			throws URISyntaxException {
+
 		Page<AccountTypeDTO> pageDTO;
 		if (lastSyncdate == null) {
 			pageDTO = accountTypeService.findAllCompanyAndAccountTypeActivated(pageable, true);
 		} else {
 			pageDTO = accountTypeService.findByLastModifiedAndActivatedTrue(lastSyncdate, pageable);
 		}
+
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
 				.headers(PaginationUtil.generatePaginationHttpHeaders(pageDTO, "/api/account-types"))
 				.body(pageDTO.getContent());
@@ -501,6 +555,8 @@ public class MasterDataController {
 	public ResponseEntity<List<AccountProfileDTO>> getAllAccountProfilesByLocations(
 			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate,
 			@RequestParam int page, @RequestParam int size) throws URISyntaxException {
+
+		String mobileAccountPRofileDisplayName = mobileAccountProfileDisplayName();
 		Page<AccountProfileDTO> pageAccounts;
 		if (lastSyncdate == null) {
 			pageAccounts = locationAccountProfileService
@@ -509,6 +565,16 @@ public class MasterDataController {
 			pageAccounts = locationAccountProfileService
 					.findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDate(page, size, lastSyncdate);
 		}
+
+		pageAccounts.getContent().forEach(accProfile -> {
+
+			if (mobileAccountPRofileDisplayName.equals("Alias")) {
+				accProfile.setName(accProfile.getAlias());
+			}
+			if (mobileAccountPRofileDisplayName.equals("Description")) {
+				accProfile.setName(accProfile.getDescription());
+			}
+		});
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
 				.headers(PaginationUtil.generatePaginationHttpHeaders(pageAccounts, "/api/location-account-profiles"))
 				.body(pageAccounts.getContent());
@@ -736,6 +802,7 @@ public class MasterDataController {
 	public ResponseEntity<List<ProductProfileDTO>> getAllProductProfiles(@RequestParam int page, @RequestParam int size,
 			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) {
 		log.debug("REST request to get all productProfiles");
+		String mobileProductProfileDisplayName = mobileProductProfileDisplayName();
 		List<ProductProfileDTO> productProfileDTOs;
 		if (lastSyncdate == null) {
 			productProfileDTOs = productProfileService
@@ -744,6 +811,17 @@ public class MasterDataController {
 			productProfileDTOs = productProfileService.findByProductCategoryInAndActivatedTrueAndLastModifiedDate(page,
 					size, lastSyncdate);
 		}
+
+		productProfileDTOs.forEach(proProfile -> {
+
+			if (mobileProductProfileDisplayName.equals("Alias")) {
+				proProfile.setName(proProfile.getAlias());
+			}
+			if (mobileProductProfileDisplayName.equals("Description")) {
+				proProfile.setName(proProfile.getDescription());
+			}
+		});
+
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productProfileDTOs);
 	}
 
