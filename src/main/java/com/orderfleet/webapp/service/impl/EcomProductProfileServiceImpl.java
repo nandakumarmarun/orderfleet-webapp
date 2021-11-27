@@ -337,6 +337,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	}
 	
 	
+	
 	@Override
 	@Transactional(readOnly = true)
 	public List<EcomProductProfileDTO> findByCurrentUser() {
@@ -423,6 +424,32 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 				ecomProductProfileDTOs.add(ecomProductProfileDTO);
 			});
 		}
+		return ecomProductProfileDTOs;
+	}
+
+	@Override
+	public List<EcomProductProfileDTO> findByproductgrupPId(String productgroupPid) {
+		List<EcomProductProfileDTO> ecomProductProfileDTOs = new ArrayList<>();
+		
+			List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository
+					.getEcomProductByProductGroupPid(productgroupPid);
+			productGroupEcomProducts.forEach(p -> {
+				EcomProductProfileDTO ecomProductProfileDTO = new EcomProductProfileDTO(p.getEcomProduct());
+				ecomProductProfileDTO.setProductGroupPid(p.getProductGroup().getPid());
+				ecomProductProfileDTO.setProductGroupName(p.getProductGroup().getName());
+				List<ProductProfile> productProfiles = ecomProductProfileProductRepository
+						.findProductByEcomProductProfilePid(p.getEcomProduct().getPid());
+				for (ProductProfile productProfile : productProfiles) {
+					productProfile.getFiles().size();
+					ProductProfileDTO productProfileDTO = new ProductProfileDTO(productProfile);
+					productProfileDTO.setFilesPid("");
+					for (File file : productProfile.getFiles()) {
+						productProfileDTO.setFilesPid(productProfileDTO.getFilesPid() + file.getPid() + ",");
+					}
+					ecomProductProfileDTO.getProductProfiles().add(productProfileDTO);
+				}
+				ecomProductProfileDTOs.add(ecomProductProfileDTO);
+			});
 		return ecomProductProfileDTOs;
 	}
 

@@ -53,6 +53,8 @@ import com.orderfleet.webapp.repository.FormElementTypeRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.MobileConfigurationRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
+import com.orderfleet.webapp.repository.ProductGroupEcomProductsRepository;
+import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ReferenceDocumentRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserDocumentRepository;
@@ -400,6 +402,12 @@ public class MasterDataController {
 
 	@Inject
 	private MobileConfigurationRepository mobileConfigurationRepository;
+	
+	@Inject
+	private ProductGroupProductRepository productGroupProductRepository;
+	
+	@Inject 
+	private ProductGroupEcomProductsRepository  roductGroupEcomProductsRepository;
 
 	private String mobileAccountProfileDisplayName() {
 
@@ -1824,6 +1832,26 @@ public class MasterDataController {
 			producProfilePids = producProfilePids.stream().distinct().collect(Collectors.toList());
 		}
 		return new ResponseEntity<>(producProfilePids, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/product-by-productGroup",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<ProductProfileDTO>> getAllProductByProductGroup(@RequestParam (value ="productGroupPid")String productGroupPid ){
+		
+		log.debug("REST request to get products by ProductGroupPid"+productGroupPid);
+		
+		 List<ProductProfileDTO> result = productGroupProductRepository.findProductByProductGroupPid(productGroupPid).stream().map(ProductProfileDTO::new).collect(Collectors.toList());
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/ecom-product-by-productGroup",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<EcomProductProfileDTO>> getAllEcomProductByProductGroup(@RequestParam (value ="productGroupPid")String productGroupPid ){
+		
+		log.debug("REST request to get ecom products by ProductGroupPid"+productGroupPid);
+		 List<EcomProductProfileDTO> result = ecomProductProfileService.findByproductgrupPId(productGroupPid);
+		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
 
 }

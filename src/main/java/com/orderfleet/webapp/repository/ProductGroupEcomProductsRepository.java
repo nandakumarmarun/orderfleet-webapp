@@ -21,6 +21,9 @@ public interface ProductGroupEcomProductsRepository extends JpaRepository<Produc
 
 	@Query("select productGroupEcomProduct.ecomProduct from ProductGroupEcomProduct productGroupEcomProduct where productGroupEcomProduct.productGroup.pid = ?1 ")
 	List<EcomProductProfile> findEcomProductByProductGroupPid(String productGroupPid);
+	
+	@Query("select productGroupEcomProduct from ProductGroupEcomProduct productGroupEcomProduct where productGroupEcomProduct.productGroup.pid = ?1 ")
+	List<ProductGroupEcomProduct> getEcomProductByProductGroupPid(String productGroupPid);
 
 	@Query("select productGroupEcomProduct from ProductGroupEcomProduct productGroupEcomProduct where productGroupEcomProduct.company.id = ?#{principal.companyId}")
 	List<ProductGroupEcomProduct> findAllByCompanyId();
