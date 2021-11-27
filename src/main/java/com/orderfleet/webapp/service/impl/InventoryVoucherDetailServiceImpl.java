@@ -20,36 +20,35 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 
 @Service
 @Transactional
-public class InventoryVoucherDetailServiceImpl implements InventoryVoucherDetailService{
+public class InventoryVoucherDetailServiceImpl implements InventoryVoucherDetailService {
 
-	
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
-	
+
 	@Inject
 	private EmployeeProfileRepository employeeProfileRepository;
-	
+
 	@Override
 	@Transactional(readOnly = true)
-	public List<InventoryVoucherDetailDTO> findAllByCompanyIdAndDocumentPidAndDateBetween(String sort,String order,LocalDateTime fromDate,
-			LocalDateTime toDate, String documentPid,String employeePid) {
+	public List<InventoryVoucherDetailDTO> findAllByCompanyIdAndDocumentPidAndDateBetween(String sort, String order,
+			LocalDateTime fromDate, LocalDateTime toDate, String documentPid, String employeePid) {
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
 		List<String> employeePids = new ArrayList<>();
-		
-		if(employeePid != null){
-			if(employeePid.equals("Dashboard Employee") || employeePid.equals("no")){
-				//checking all employees
+
+		if (employeePid != null) {
+			if (employeePid.equals("Dashboard Employee") || employeePid.equals("no")) {
+				// checking all employees
 				employeePids.addAll(employeeProfileRepository.findEmployeePidsByCompanyId());
-			}else{
-				//checking single employee
+			} else {
+				// checking single employee
 				employeePids.add(employeePid);
 			}
 		}
-		
+
 		List<Object[]> objects = inventoryVoucherDetailRepository
 				.findAllByCompanyIdAndDocumentPidAndDateBetween(fromDate, toDate, documentPid, employeePids);
-		
-		for(Object[] object: objects){
+
+		for (Object[] object : objects) {
 			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
 			ivd.setCreatedDate((LocalDateTime) object[0]);
 			ivd.setEmployeeName((String) object[1]);
@@ -61,64 +60,59 @@ public class InventoryVoucherDetailServiceImpl implements InventoryVoucherDetail
 			ivd.setProductPid((String) object[7]);
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
-		
-		if(sort.equals("date")){
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate).reversed());
-			}else{
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate));
+
+		if (sort.equals("date")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate));
 			}
-		}
-		else if (sort.equals("item")) {
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getProductName).reversed());
-				}else{
-					inventoryVoucherDetailDTOs.sort
-					(Comparator.comparing(InventoryVoucherDetailDTO::getProductName));
-				}
-		}else if (sort.equals("quantity")) {
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity).reversed());
-				}else{
-					inventoryVoucherDetailDTOs.sort
-					(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity));
-				}
-		}else if(sort.equals("category")){
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory).reversed());
-				}else{
-					inventoryVoucherDetailDTOs.sort
-					(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory));
-				}
+		} else if (sort.equals("item")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductName).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductName));
+			}
+		} else if (sort.equals("quantity")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity));
+			}
+		} else if (sort.equals("category")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory));
+			}
 		}
 		return inventoryVoucherDetailDTOs;
 	}
 
 	@Override
-	public List<InventoryVoucherDetailDTO> findAllByCompanyIdAndDateBetweenOrderBy(String sort,String order,LocalDateTime fromDate,
-			LocalDateTime toDate, List<Document> documents, String employeePid) {
+	public List<InventoryVoucherDetailDTO> findAllByCompanyIdAndDateBetweenOrderBy(String sort, String order,
+			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents, String employeePid) {
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
 		List<String> employeePids = new ArrayList<>();
-		
-		if(employeePid != null){
-			if(employeePid.equals("Dashboard Employee") || employeePid.equals("no")){
-				//checking all employees
+
+		if (employeePid != null) {
+			if (employeePid.equals("Dashboard Employee") || employeePid.equals("no")) {
+				// checking all employees
 				employeePids.addAll(employeeProfileRepository.findEmployeePidsByCompanyId());
-			}else{
-				//checking single employee
+			} else {
+				// checking single employee
 				employeePids.add(employeePid);
 			}
 		}
-		
+
 		List<CustomInventoryVoucherDetail> customInventorys = inventoryVoucherDetailRepository
 				.findAllByCompanyIdAndDateBetween(fromDate, toDate, documents, employeePids);
-		
-		for(CustomInventoryVoucherDetail customInventory: customInventorys){
+
+		for (CustomInventoryVoucherDetail customInventory : customInventorys) {
 			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
 			ivd.setCreatedDate(customInventory.getCreatedDateTime());
 			ivd.setEmployeeName(customInventory.getEmployeeName());
@@ -130,49 +124,44 @@ public class InventoryVoucherDetailServiceImpl implements InventoryVoucherDetail
 			ivd.setProductPid(customInventory.getProductPid());
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
-		
-		if(sort.equals("date")){
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate).reversed());
-			}else{
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate));
+
+		if (sort.equals("date")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getCreatedDate));
+			}
+		} else if (sort.equals("item")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductName).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductName));
+			}
+		} else if (sort.equals("quantity")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity));
+			}
+		} else if (sort.equals("category")) {
+			if (order.equals("desc")) {
+				inventoryVoucherDetailDTOs
+						.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory).reversed());
+			} else {
+				inventoryVoucherDetailDTOs.sort(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory));
 			}
 		}
-		else if (sort.equals("item")) {
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getProductName).reversed());
-				}else{
-					inventoryVoucherDetailDTOs.sort
-					(Comparator.comparing(InventoryVoucherDetailDTO::getProductName));
-				}
-		}else if (sort.equals("quantity")) {
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity).reversed());
-				}else{
-					inventoryVoucherDetailDTOs.sort
-					(Comparator.comparing(InventoryVoucherDetailDTO::getQuantity));
-				}
-		}else if(sort.equals("category")){
-			if(order.equals("desc")){
-				inventoryVoucherDetailDTOs.sort
-				(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory).reversed());
-				}else{
-					inventoryVoucherDetailDTOs.sort
-					(Comparator.comparing(InventoryVoucherDetailDTO::getProductCategory));
-				}
-		}
-		
+
 		return inventoryVoucherDetailDTOs;
 	}
 
 	@Override
 	public InventoryVoucherDetail updateInventoryVoucherDetail(InventoryVoucherDetailDTO ivdDto) {
 		InventoryVoucherDetail ivd = new InventoryVoucherDetail();
-		ivd = inventoryVoucherDetailRepository.findOne(ivdDto.getDetailId());
+		ivd = inventoryVoucherDetailRepository.findOneById(ivdDto.getDetailId());
 		ivd.setUpdatedQuantity(ivdDto.getUpdatedQty());
 		ivd.setUpdatedRowTotal(ivdDto.getUpdatedRowTotal());
 		ivd.setUpdatedStatus(true);
@@ -180,5 +169,4 @@ public class InventoryVoucherDetailServiceImpl implements InventoryVoucherDetail
 		return ivd;
 	}
 
-	
 }
