@@ -1,7 +1,9 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -52,7 +55,7 @@ import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
 @RequestMapping("/web")
 public class LocationWiseProductGroupComparisonReportResource {
 	private final Logger log = LoggerFactory.getLogger(LocationWiseProductGroupComparisonReportResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ProductGroupRepository productGroupRepository;
 
@@ -121,12 +124,39 @@ public class LocationWiseProductGroupComparisonReportResource {
 //		List<InventoryVoucherHeader> allInventoryVoucherHeader = inventoryVoucherHeaderRepository
 //				.findAllByCompanyIdOrderByCreatedDateDesc();
 
-		String id="INV_QUERY_102";
-		String description="Selecting Inventory voucher id,receiver account id,document id and document date from invntory voucher header by validating company id and order by create date in descending order and getting result asa list of object";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		
+		String id = "INV_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all by companyId as a list of Object";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		Long start = System.nanoTime();
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> allInventoryVoucherHeaderObject = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndOrderByCreatedDateDesc();
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
 
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		List<InventoryVoucherHeaderDTO> allInventoryVoucherHeader = new ArrayList<>();
 
 		for (Object[] obj : allInventoryVoucherHeaderObject) {
@@ -219,13 +249,13 @@ public class LocationWiseProductGroupComparisonReportResource {
 						.filter(a -> a[1].toString().equals(location.getPid())).map(m -> Long.valueOf(m[2].toString()))
 						.collect(Collectors.toSet());
 
-				LocalDate start = monthDate.with(TemporalAdjusters.firstDayOfMonth());
+				LocalDate start1 = monthDate.with(TemporalAdjusters.firstDayOfMonth());
 				LocalDate end = monthDate.with(TemporalAdjusters.lastDayOfMonth());
 
 				Double achievedVolume = 0D;
 				if (!accountProfileIds.isEmpty() && !productProfileIds.isEmpty()) {
 					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream().filter(av -> {
-						if (av.getDocumentDate().isAfter(start.atTime(0, 0))
+						if (av.getDocumentDate().isAfter(start1.atTime(0, 0))
 								&& av.getDocumentDate().isBefore(end.atTime(23, 59))) {
 							return true;
 						}
@@ -294,13 +324,13 @@ public class LocationWiseProductGroupComparisonReportResource {
 						.filter(a -> a[1].toString().equals(location.getPid())).map(m -> Long.valueOf(m[2].toString()))
 						.collect(Collectors.toSet());
 
-				LocalDate start = monthDate.with(TemporalAdjusters.firstDayOfMonth());
+				LocalDate start1 = monthDate.with(TemporalAdjusters.firstDayOfMonth());
 				LocalDate end = monthDate.with(TemporalAdjusters.lastDayOfMonth());
 
 				Double achievedVolume = 0D;
 				if (!accountProfileIds.isEmpty() && !productProfileIds.isEmpty()) {
 					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream().filter(av -> {
-						if (av.getDocumentDate().isAfter(start.atTime(0, 0))
+						if (av.getDocumentDate().isAfter(start1.atTime(0, 0))
 								&& av.getDocumentDate().isBefore(end.atTime(23, 59))) {
 							return true;
 						}

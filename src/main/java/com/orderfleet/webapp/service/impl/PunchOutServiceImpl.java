@@ -71,7 +71,9 @@ public class PunchOutServiceImpl implements PunchOutService {
 
 			LocalDateTime clientFromDate = punchOutDTO.getPunchOutDate().toLocalDate().atTime(0, 0);
 			LocalDateTime clientToDate = punchOutDTO.getPunchOutDate().toLocalDate().atTime(23, 59);
-
+			String id="ATT_QUERY_121";
+			String description="get the top 1 by companyPid ,userPid and planned date between and order by create date in desc ";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			Optional<Attendance> optionalAttendence = attendanceRepository
 					.findTop1ByCompanyPidAndUserPidAndPlannedDateBetweenOrderByCreatedDateDesc(
 							user.get().getCompany().getPid(), user.get().getPid(), clientFromDate, clientToDate);

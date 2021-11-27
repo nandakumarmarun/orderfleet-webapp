@@ -1,10 +1,13 @@
 package com.orderfleet.webapp.service.impl;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -48,6 +51,7 @@ import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 public class AttendanceServiceImpl implements AttendanceService {
 
 	private final Logger log = LoggerFactory.getLogger(AttendanceServiceImpl.class);
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 
 	@Inject
 	private AttendanceRepository attendanceRepository;
@@ -223,6 +227,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 	public Attendance update(Long subgroupId) {
 		LocalDateTime fromDate = LocalDate.now().atTime(0, 0);
 		LocalDateTime toDate = LocalDate.now().atTime(23, 59);
+		String id = "ATT_QUERY_114";
+		String description = "get attendance by companyId,uerLogin and date between";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<Attendance> attendances = attendanceRepository.findByCompanyIdAndUserLoginAndDateBetweenOrderByDate(
 				SecurityUtils.getCurrentUserLogin(), fromDate, toDate);
 		AttendanceStatusSubgroup attendanceStatusSubgroup = attendanceStatusSubgroupRepository.findOne(subgroupId);
@@ -257,7 +264,10 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<AttendanceDTO> findAllByCompany() {
-		log.debug("Request to get all Attendance");
+		logger.debug("Request to get all Attendance");
+		String id = "ATT_QUERY_101";
+		String description = "get all attendance by company id";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<Attendance> attendanceList = attendanceRepository.findAllByCompanyId();
 		List<AttendanceDTO> result = attendanceList.stream().map(AttendanceDTO::new).collect(Collectors.toList());
 		return result;
@@ -272,6 +282,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Transactional(readOnly = true)
 	public List<AttendanceDTO> findByUserIsCurrentUser() {
 		log.debug("Request to get Current User Attendance");
+		String id = "ATT_QUERY_103";
+		String description = "get all attendance by checking user is current user";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<Attendance> attendanceList = attendanceRepository.findByUserIsCurrentUser();
 		List<AttendanceDTO> result = attendanceList.stream().map(AttendanceDTO::new).collect(Collectors.toList());
 		return result;
@@ -287,6 +300,10 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Transactional(readOnly = true)
 	public Page<AttendanceDTO> findAllByCompany(Pageable pageable) {
 		log.debug("Request to get all Attendance");
+		String id = "ATT_QUERY_102";
+		String description = "get all attendance by company id using page";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+
 		Page<Attendance> attendances = attendanceRepository.findAllByCompanyId(pageable);
 		List<AttendanceDTO> attendanceDTOs = attendances.getContent().stream().map(AttendanceDTO::new)
 				.collect(Collectors.toList());
@@ -341,6 +358,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<AttendanceDTO> findAllByCompanyIdAndDateBetween(LocalDateTime fromDate, LocalDateTime toDate) {
+		String id = "ATT_QUERY_104";
+		String description = "get all by companyId and date between";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		List<Attendance> attendanceList = attendanceRepository.findAllByCompanyIdAndDateBetween(fromDate, toDate);
 		List<AttendanceDTO> result = attendanceList.stream().map(AttendanceDTO::new).collect(Collectors.toList());
 		return result;
@@ -350,8 +370,40 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Transactional(readOnly = true)
 	public List<AttendanceDTO> findAllByCompanyIdUserPidAndDateBetween(String userPid, LocalDateTime fromDate,
 			LocalDateTime toDate) {
+
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		
+		String id = "ATT_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all by companyId,userPid and date between";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		Long start = System.nanoTime();
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Attendance> attendanceList = attendanceRepository.findAllByCompanyIdUserPidAndDateBetween(userPid,
 				fromDate, toDate);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		List<AttendanceDTO> result = attendanceList.stream().map(AttendanceDTO::new).collect(Collectors.toList());
 		return result;
 	}
@@ -359,6 +411,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Override
 	@Transactional(readOnly = true)
 	public Long countByCompanyIdAndDateBetween(LocalDateTime fromDate, LocalDateTime toDate) {
+		String id = "ATT_QUERY_107";
+		String description = "count attendance by companyId and date between";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		return attendanceRepository.countByCompanyIdAndDateBetween(fromDate, toDate);
 	}
 
@@ -366,6 +421,10 @@ public class AttendanceServiceImpl implements AttendanceService {
 	public List<AttendanceDTO> findAllByCompanyIdUserPidInAndDateBetween(List<Long> userIds, LocalDateTime fromDate,
 			LocalDateTime toDate) {
 		List<User> users = userRepository.findByUserIdIn(userIds);
+		String id = "ATT_QUERY_112";
+		String description = "get all attendance by companyId,userPidIn and date between";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+
 		List<Attendance> attendanceList = attendanceRepository.findAllByCompanyIdUserPidInAndDateBetween(users,
 				fromDate, toDate);
 		List<AttendanceDTO> result = attendanceList.stream().map(AttendanceDTO::new).collect(Collectors.toList());
@@ -374,6 +433,10 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 	@Override
 	public List<UserDTO> findAllUniqueUsersFromAttendance(String companypid) {
+		String id = "ATT_QUERY_115";
+		String description = "get all unique users from attendance";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+
 		List<User> users = attendanceRepository.findAllUniqueUsersFromAttendance(companypid);
 		List<UserDTO> result = users.stream().map(UserDTO::new).collect(Collectors.toList());
 		return result;
@@ -382,6 +445,10 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Override
 	public List<UserDTO> getCountUniqueUsersFromAttendanceAndCreateDateBetween(String companypid,
 			LocalDateTime startDate, LocalDateTime endDate) {
+		String id = "ATT_QUERY_116";
+		String description = "get the count of unique users from attendance and create date between";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+
 		List<User> users = attendanceRepository.getCountUniqueUsersFromAttendanceAndCreateDateBetween(companypid,
 				startDate, endDate);
 		List<UserDTO> result = users.stream().map(UserDTO::new).collect(Collectors.toList());
@@ -390,6 +457,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 	@Override
 	public Optional<AttendanceDTO> findTop1(Long companyId, String userPid) {
+		String id = "ATT_QUERY_118";
+		String description = "get the top 1 attendance by company id and user pid and order by create date ";
+		logger.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
 		Optional<AttendanceDTO> attendance = attendanceRepository
 				.findTop1ByCompanyIdAndUserPidOrderByCreatedDateDesc(companyId, userPid)
 				.map(att -> new AttendanceDTO(att));

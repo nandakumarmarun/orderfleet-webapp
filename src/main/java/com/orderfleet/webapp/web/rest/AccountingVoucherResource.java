@@ -162,11 +162,17 @@ public class AccountingVoucherResource {
 			userPid=employeeProfileDTO.getUserPid();
 		}
 		if (userPid.equals("no") && accountPid.equals("no") && documentPid.equals("no")) {
+			String id="ACC_QUERY_103";
+			String description="get all AccVoucher by companyid Between two created date";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			accountingVouchers = accountingVoucherService.findAllByCompanyIdAndDateBetween(fromDate, toDate);
 		} else if (!userPid.equals("no") && !accountPid.equals("no") && !documentPid.equals("no")) {
 			accountingVouchers = accountingVoucherService.findAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetween(
 					userPid, accountPid, documentPid, fromDate, toDate);
 		} else if (!userPid.equals("no") && !accountPid.equals("no") && documentPid.equals("no")) {
+			String id="ACC_QUERY_104";
+			String description="get all AccVoucher ByCompanyIdUserPidAccountPidAndDateBetweenOrderByCreatedDate";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			accountingVouchers = accountingVoucherService.findAllByCompanyIdUserPidAccountPidAndDateBetween(userPid,
 					accountPid, fromDate, toDate);
 		} else if (!userPid.equals("no") && accountPid.equals("no") && !documentPid.equals("no")) {
@@ -176,9 +182,15 @@ public class AccountingVoucherResource {
 			accountingVouchers = accountingVoucherService
 					.findAllByCompanyIdAccountPidDocumentPidAndDateBetween(accountPid, documentPid, fromDate, toDate);
 		} else if (!userPid.equals("no") && accountPid.equals("no") && documentPid.equals("no")) {
+			String id="ACC_QUERY_105";
+			String description="get all AccVoucher ByCompanyId,UserPid,AndDateBetweenOrderByCreatedDate";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			accountingVouchers = accountingVoucherService.findAllByCompanyIdUserPidAndDateBetween(userPid, fromDate,
 					toDate);
 		} else if (userPid.equals("no") && !accountPid.equals("no") && documentPid.equals("no")) {
+			String id="ACC_QUERY_106";
+			String description="get all AccVoucher ByCompanyId  AccountPid AndDateBetweenOrderByCreatedDateDesc";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			accountingVouchers = accountingVoucherService.findAllByCompanyIdAccountPidAndDateBetween(accountPid,
 					fromDate, toDate);
 		} else if (userPid.equals("no") && accountPid.equals("no") && !documentPid.equals("no")) {

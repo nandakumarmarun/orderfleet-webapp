@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest.api;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -86,7 +87,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 public class LoadServerItemsToMobileController {
 
 	private final Logger log = LoggerFactory.getLogger(LoadServerItemsToMobileController.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
@@ -165,6 +166,10 @@ public class LoadServerItemsToMobileController {
 
 		if (user.isPresent()) {
 			userId = user.get().getId();
+			String id="ATT_QUERY_119";
+			String description="get the top 61 by userId and order by planned date in desc ";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 			attendances = attendanceRepository.findTop61ByUserIdOrderByPlannedDateDesc(userId);
 			// getAttendanceByUserandUptoLimitDesc(userId);
 		}
@@ -230,8 +235,6 @@ public class LoadServerItemsToMobileController {
 					productListDTO.setProductName(product[1] != null ? product[1].toString() : "");
 
 					productListDTO.setProductPrice(product[2] != null ? Double.parseDouble(product[2].toString()) : 0);
-
-					productListDTO.setProductPid(product[0] != null ? product[0].toString() : "");
 
 					if (openingStocks.size() > 0) {
 
@@ -507,13 +510,38 @@ public class LoadServerItemsToMobileController {
 		List<SalesOrderAllocationDTO> salesOrderAllocationDTOs = new ArrayList<>();
 
 		if (opUser.isPresent() && opAccountProfile.isPresent()) {
-			String id = "INV_QUERY_209";
-			String description = "finding all invVoucher header by companyid and accountPid user";
-			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_209" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="finding all invVoucher header by companyid and accountPid user";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 
 			List<Object[]> objectArray = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAccountPidUserAndDateCreatedDateDesc(opAccountProfile.get().getPid(),
 							opUser.get().getPid());
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 
 			for (Object[] obj : objectArray) {
 				SalesOrderAllocationDTO salesOrderAllocationDTO = new SalesOrderAllocationDTO();
@@ -578,15 +606,40 @@ public class LoadServerItemsToMobileController {
 
 			if (mapEntry.getKey() == DocumentType.INVENTORY_VOUCHER) {
 				log.info("INVENTORY_VOUCHER");
-				String id = "INV_QUERY_196";
-				String description = "Finidng count of each inventory type document";
-				log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "INV_QUERY_196" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="getting the count of each inventoryType documents";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				List<Object[]> monthArray = inventoryVoucherHeaderRepository
 						.findCountOfEachInventoryTypeDocuments(user.getId(), mfDate, mtDate);
 				List<Object[]> weekArray = inventoryVoucherHeaderRepository
 						.findCountOfEachInventoryTypeDocuments(user.getId(), wfDate, wtDate);
 				List<Object[]> dayArray = inventoryVoucherHeaderRepository
 						.findCountOfEachInventoryTypeDocuments(user.getId(), tfDate, ttDate);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 				log.info("monthArray size :" + monthArray.size());
 				log.info("weekArray size :" + weekArray.size());
 				log.info("dayArray size :" + dayArray.size());
@@ -622,8 +675,36 @@ public class LoadServerItemsToMobileController {
 				}
 			} else if (mapEntry.getKey() == DocumentType.ACCOUNTING_VOUCHER) {
 				log.info("ACCOUNTING_VOUCHER");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ACC_QUERY_153" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="getting count of each accounting document type";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				List<Object[]> monthArray = accountingVoucherHeaderRepository
 						.findCountOfEachAccountingTypeDocuments(user.getId(), mfDate, mtDate);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 				List<Object[]> weekArray = accountingVoucherHeaderRepository
 						.findCountOfEachAccountingTypeDocuments(user.getId(), wfDate, wtDate);
 				List<Object[]> dayArray = accountingVoucherHeaderRepository
@@ -664,6 +745,11 @@ public class LoadServerItemsToMobileController {
 
 			} else if (mapEntry.getKey() == DocumentType.DYNAMIC_DOCUMENT) {
 				log.info("DYNAMIC_DOCUMENT");
+				String id="DYN_QUERY_140";
+				String description="get count of each dynamic document type";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
+
 				List<Object[]> monthArray = dynamicDocumentHeaderRepository
 						.findCountOfEachDynamicTypeDocuments(user.getId(), mfDate, mtDate);
 				List<Object[]> weekArray = dynamicDocumentHeaderRepository
@@ -882,8 +968,37 @@ public class LoadServerItemsToMobileController {
 			accountPids = accountProfileRepository.findAllPidsByCompany();
 		}
 		log.info("Account Profile Size =" + accountPids.size());
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_162" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all accVoucher by customer";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> accountingVouchersHeaders = accountingVoucherHeaderRepository
 				.getCustomerWiseAccountingVoucherHeader(userLogin, accountPids, fromDate, toDate);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
 		log.info("Accounting Voucher Size :- " + accountingVouchersHeaders.size());
 
 		for (Object[] obj : accountingVouchersHeaders) {
@@ -904,9 +1019,36 @@ public class LoadServerItemsToMobileController {
 			if (accountingVoucherHeaderDTO.getPid() != null && !accountingVoucherHeaderDTO.getPid().isEmpty()) {
 
 				// log.info((accountingVoucherHeaderDTO.getPid() + "-----accounting Pid"));
-
+				DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id1 = "ACC_QUERY_163" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description1 ="get all account detail by customer";
+				LocalDateTime startLCTime1 = LocalDateTime.now();
+				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+				String startDate1 = startLCTime1.format(DATE_FORMAT1);
+				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 				List<Object[]> accountingVouchersDetail = accountingVoucherHeaderRepository
 						.getCustomerWiseAccountingDetail(accountingVoucherHeaderDTO.getPid());
+				String flag1 = "Normal";
+				LocalDateTime endLCTime1 = LocalDateTime.now();
+				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+				String endDate1 = startLCTime1.format(DATE_FORMAT1);
+				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+				long minutes1 = duration1.toMinutes();
+				if (minutes1 <= 1 && minutes1 >= 0) {
+					flag1 = "Fast";
+				}
+				if (minutes1 > 1 && minutes1 <= 2) {
+					flag1 = "Normal";
+				}
+				if (minutes1 > 2 && minutes1 <= 10) {
+					flag1 = "Slow";
+				}
+				if (minutes1 > 10) {
+					flag1 = "Dead Slow";
+				}
+		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+						+ description1);
 
 				List<AccountingVoucherDetailDTO> accountingVoucherDetails = new ArrayList<>();
 
@@ -953,11 +1095,36 @@ public class LoadServerItemsToMobileController {
 			accountPids = accountProfileRepository.findAllPidsByCompany();
 		}
 		log.info("Account Profile Size =" + accountPids.size());
-		String id = "INV_QUERY_202";
-		String description = "Getting customer wise Inventory Header";
-		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "INV_QUERY_202" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="Getting customer wise Inventory Header";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> inventoryVouchersHeaders = inventoryVoucherHeaderRepository
 				.getCustomerWiseInventoryHeader(userLogin, accountPids, fromDate, toDate);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		log.info("Inventory Voucher Header Size =" + inventoryVouchersHeaders.size());
 
 		for (Object[] obj : inventoryVouchersHeaders) {
@@ -1000,11 +1167,36 @@ public class LoadServerItemsToMobileController {
 
 			if (inventoryVoucherHeaderDTO.getPid() != null && !inventoryVoucherHeaderDTO.getPid().isEmpty()) {
 //				System.out.println(inventoryVoucherHeaderDTO.getPid() + "-----inventory Pid");
-				String id1 = "INV_QUERY_203";
-				String description1 = "Getting customer wise Inventory Details";
-				log.info("{ Query Id:- " + id1 + " Query Description:- " + description1 + " }");
+				DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id1 = "INV_QUERY_203" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description1 ="Getting customer wise Inventory Details";
+				LocalDateTime startLCTime1 = LocalDateTime.now();
+				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+				String startDate1 = startLCTime1.format(DATE_FORMAT1);
+				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 				List<Object[]> inventoryVouchersDetail = inventoryVoucherHeaderRepository
 						.getCustomerWiseInventoryDetail(inventoryVoucherHeaderDTO.getPid());
+				String flag1 = "Normal";
+				LocalDateTime endLCTime1 = LocalDateTime.now();
+				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+				String endDate1 = startLCTime1.format(DATE_FORMAT1);
+				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+				long minutes1 = duration1.toMinutes();
+				if (minutes1 <= 1 && minutes1 >= 0) {
+					flag1 = "Fast";
+				}
+				if (minutes1 > 1 && minutes1 <= 2) {
+					flag1 = "Normal";
+				}
+				if (minutes1 > 2 && minutes1 <= 10) {
+					flag1 = "Slow";
+				}
+				if (minutes1 > 10) {
+					flag1 = "Dead Slow";
+				}
+		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+						+ description1);
 				List<InventoryVoucherDetailDTO> inventoryVoucherDetails = new ArrayList<>();
 //				System.out.println(inventoryVoucherDetails.size() + "-----------------------------------------");
 				for (Object[] obj1 : inventoryVouchersDetail) {
@@ -1112,11 +1304,36 @@ public class LoadServerItemsToMobileController {
 	private List<InventoryVoucherHeaderDTO> getDocumentInventoryItems(String exeTasKPid) {
 
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
-		String id = "INV_QUERY_188";
-		String description = "Finding invVouHeader By executiveTaskExecutionPid";
-		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_188" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get IVHeader By ExecutiveTaskExecutionPid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> inventoryVouchersObject = inventoryVoucherHeaderRepository
 				.findInventoryVoucherHeaderByExecutiveTaskExecutionPid(exeTasKPid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 
 		for (Object[] obj : inventoryVouchersObject) {
 			InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
@@ -1131,10 +1348,36 @@ public class LoadServerItemsToMobileController {
 
 	private List<AccountingVoucherHeaderDTO> getDocumentAccountingItems(String exeTasKPid) {
 		List<AccountingVoucherHeaderDTO> accountingVoucherHeaderDTOs = new ArrayList<>();
-
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_167" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get acc voucher by executive task executon pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> accountingVouchersObject = accountingVoucherHeaderRepository
 				.findAccountingVoucherHeaderByExecutiveTaskExecutionPid(exeTasKPid);
-
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		for (Object[] obj : accountingVouchersObject) {
 			AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
 			accountingVoucherHeaderDTO.setPid(obj[0] != null ? obj[0].toString() : "");
@@ -1150,13 +1393,37 @@ public class LoadServerItemsToMobileController {
 	private List<InventoryVoucherHeaderDTO> getDocumentInventoryItemsByExeIdIn(Set<Long> exeIds) {
 
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
-		String id = "INV_QUERY_190";
-		String description = "Finding invVouHeader By executiveTaskExecutionIdIn";
-		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "INV_QUERY_190" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get Iv Header by ExecutiveTaskExecutionIdIn";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 
 		List<Object[]> inventoryVouchersObject = inventoryVoucherHeaderRepository
 				.findInventoryVoucherHeaderByExecutiveTaskExecutionIdIn(exeIds);
-
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		for (Object[] obj : inventoryVouchersObject) {
 			InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO();
 			inventoryVoucherHeaderDTO.setPid(obj[0] != null ? obj[0].toString() : "");
@@ -1171,9 +1438,38 @@ public class LoadServerItemsToMobileController {
 
 	private List<AccountingVoucherHeaderDTO> getDocumentAccountingItemsByExeIdIn(Set<Long> exeIds) {
 		List<AccountingVoucherHeaderDTO> accountingVoucherHeaderDTOs = new ArrayList<>();
-
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_151" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get accVoucher by Executive task execution Id in";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> accountingVouchersObject = accountingVoucherHeaderRepository
 				.findAccountingVoucherHeaderByExecutiveTaskExecutionIdin(exeIds);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
+		
 
 		for (Object[] obj : accountingVouchersObject) {
 			AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
@@ -1190,6 +1486,9 @@ public class LoadServerItemsToMobileController {
 	private List<DynamicDocumentHeaderDTO> getDynamicDocumentsByExeIdIn(Set<Long> exeIds) {
 
 		List<DynamicDocumentHeaderDTO> dynamicDocumentHeaderDTOs = new ArrayList<>();
+		String id="DYN_QUERY_139";
+		String description="get document header by executive task execution id in";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 
 		List<Object[]> dynamicDocumentsObject = dynamicDocumentHeaderRepository
 				.findDynamicDocumentsHeaderByExecutiveTaskExecutionIdin(exeIds);
@@ -1206,6 +1505,9 @@ public class LoadServerItemsToMobileController {
 
 	private List<DynamicDocumentHeaderDTO> getDocumentDynamicItems(String exeTasKPid) {
 		List<DynamicDocumentHeaderDTO> dynamicDocumentHeaderDTOs = new ArrayList<>();
+		String id="DYN_QUERY_137";
+		String description="get document header by executive task execution pid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 
 		List<Object[]> dynamicDocumentsObject = dynamicDocumentHeaderRepository
 				.findDynamicDocumentsHeaderByExecutiveTaskExecutionPid(exeTasKPid);
@@ -1223,12 +1525,36 @@ public class LoadServerItemsToMobileController {
 
 	private List<InventoryVoucherHeaderDTO> getDocumentInventoryItemsDetails(String inventoryVoucherHeaderPid) {
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
-		String id = "INV_QUERY_189";
-		String description = "finding invVouHeader by Pid";
-		log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_189" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get Iv Header By Pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findInventoryVoucherHeaderByPid(inventoryVoucherHeaderPid);
-
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
 			inventoryVoucherHeaderDTOs.add(new InventoryVoucherHeaderDTO(inventoryVoucherHeader));
 		}
@@ -1243,10 +1569,36 @@ public class LoadServerItemsToMobileController {
 
 	private List<AccountingVoucherHeaderDTO> getDocumentAccountingItemsDetails(String accountingVoucherHeaderPid) {
 		List<AccountingVoucherHeaderDTO> accountingVoucherHeaderDTOs = new ArrayList<>();
-
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ACC_QUERY_168" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get acc voucher by pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountingVoucherHeader> inventoryVoucherHeaders = accountingVoucherHeaderRepository
 				.findAccountingVoucherHeaderByPid(accountingVoucherHeaderPid);
-
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		for (AccountingVoucherHeader accountinVoucherHeader : inventoryVoucherHeaders) {
 			accountingVoucherHeaderDTOs.add(new AccountingVoucherHeaderDTO(accountinVoucherHeader));
 		}
@@ -1260,7 +1612,9 @@ public class LoadServerItemsToMobileController {
 
 	private List<DynamicDocumentHeaderDTO> getDocumentDynamicItemsDetails(String dynamicDocumentHeaderPid) {
 		List<DynamicDocumentHeaderDTO> dynamicDocumentHeaderDTOs = new ArrayList<>();
-
+		String id="DYN_QUERY_138";
+		String description="get document header by pid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicHeaders = dynamicDocumentHeaderRepository
 				.findDynamicDocumentHeaderByPid(dynamicDocumentHeaderPid);
 

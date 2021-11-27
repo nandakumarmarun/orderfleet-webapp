@@ -54,6 +54,9 @@ public class DynamicFormDownloadController {
 	public List<DynamicExcelDTO> downloadDynamicDocumentsJson() throws URISyntaxException {
 		log.debug("REST request to download dynamic documents : {}");
 		DateTimeFormatter fmt = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+		String id="DYN_QUERY_135";
+		String description="get  document by company and status order by create date";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> documentHeaders = dynamicDocumentHeaderRepository
 				.findByCompanyAndStatusOrderByCreatedDateDesc();
 
@@ -82,6 +85,9 @@ public class DynamicFormDownloadController {
 		}
 
 		if (!dynamicExcelDtos.isEmpty()) {
+			String id1="DYN_QUERY_136";
+			String description1="Update documentHeader tally download status using Pid and company";
+			log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 			int updated = dynamicDocumentHeaderRepository
 					.updateDynamicDocumentHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PROCESSING,
 							dynamicExcelDtos.stream().map(ddh -> ddh.getDynamicDocumentPid())
@@ -100,7 +106,9 @@ public class DynamicFormDownloadController {
 			throws URISyntaxException {
 		log.debug("REST request to update Dynamic Document Header Status : {}", dynamicDocumentHeaderPids.size());
 		if (!dynamicDocumentHeaderPids.isEmpty()) {
-
+			String id="DYN_QUERY_136";
+			String description="Update documentHeader tally download status using Pid and company";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			dynamicDocumentHeaderRepository.updateDynamicDocumentHeaderTallyDownloadStatusUsingPidAndCompany(
 					TallyDownloadStatus.COMPLETED, dynamicDocumentHeaderPids);
 

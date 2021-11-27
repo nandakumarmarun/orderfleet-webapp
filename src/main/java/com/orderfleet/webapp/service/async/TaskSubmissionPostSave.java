@@ -423,7 +423,7 @@ public class TaskSubmissionPostSave {
 //				sendErrorEmail(errorMsg, lae);
 //			}
 //		} else {
-			executiveTaskExecution.setLocation("No Location");
+		executiveTaskExecution.setLocation("No Location");
 //		}
 // COMMENTING THE TOWER LOCATION API WHILE ORDER TAKING ============================================>>>
 		// tower location
@@ -527,7 +527,7 @@ public class TaskSubmissionPostSave {
 //				executiveTaskExecution.setStartLocation("No Location");
 //			}
 //		} else {
-			executiveTaskExecution.setStartLocation("No Location");
+		executiveTaskExecution.setStartLocation("No Location");
 //		}
 		// update
 		executiveTaskExecutionRepository.save(executiveTaskExecution);
@@ -1678,6 +1678,10 @@ public class TaskSubmissionPostSave {
 				&& lastExecutiveTaskExecution.get(0).getLatitude().doubleValue() != 0
 				&& executiveTaskExecution.getLongitude() != null
 				&& executiveTaskExecution.getLongitude().doubleValue() != 0) {
+			String id = "ATT_QUERY_117";
+			String description = "get the top 1 attendance by company pid and user pid and order by create date ";
+			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+
 			Optional<Attendance> attendance = attendanceRepository.findTop1ByCompanyPidAndUserPidOrderByCreatedDateDesc(
 					executiveTaskExecution.getCompany().getPid(), executiveTaskExecution.getUser().getPid());
 			String origin = executiveTaskExecution.getLatitude() + "," + executiveTaskExecution.getLongitude();

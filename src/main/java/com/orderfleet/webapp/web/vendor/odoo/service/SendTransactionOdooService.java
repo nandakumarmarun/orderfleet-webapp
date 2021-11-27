@@ -1,5 +1,7 @@
 package com.orderfleet.webapp.web.vendor.odoo.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -37,6 +40,7 @@ import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.UnitOfMeasureProductRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.odoo.dto.OdooInvoiceLine;
@@ -49,8 +53,8 @@ import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseMessageOdooInvoice;
 public class SendTransactionOdooService {
 
 	private final Logger log = LoggerFactory.getLogger(SendTransactionOdooService.class);
-	
-	private static String SEND_INVOICE_API_URL = "http://edappal.nellara.com:1214/web/api/create_invoice";	
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private static String SEND_INVOICE_API_URL = "http://edappal.nellara.com:1214/web/api/create_invoice";
 
 	public static int successCount = 0;
 	public static int failedCount = 0;
@@ -58,10 +62,10 @@ public class SendTransactionOdooService {
 
 	@Inject
 	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
-	
+
 	@Inject
 	private UserStockLocationRepository userStockLocationRepository;
-	
+
 	@Inject
 	private UnitOfMeasureProductRepository unitOfMeasureProductRepository;
 
@@ -70,20 +74,22 @@ public class SendTransactionOdooService {
 
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
-	
+
 	@Transactional
 	public void sendInvoicesToOdoo(ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper) {
 		List<InventoryVoucherHeader> inventoryVouchers = tsTransactionWrapper.getInventoryVouchers();
-		
-		if (inventoryVouchers != null && inventoryVouchers.size()>0) {
+
+		if (inventoryVouchers != null && inventoryVouchers.size() > 0) {
 			InventoryVoucherHeader ivh = inventoryVouchers.get(0);
-			
+
 			Long companyId = ivh.getCompany().getId();
 			log.info("send invoice to odoo for company id : {}", companyId);
 			List<PrimarySecondaryDocument> primarySecDocSales = new ArrayList<>();
 			List<PrimarySecondaryDocument> primarySecDocSalesReturn = new ArrayList<>();
-			primarySecDocSales = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES, companyId);
-			primarySecDocSalesReturn = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_RETURN, companyId);
+			primarySecDocSales = primarySecondaryDocumentRepository
+					.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES, companyId);
+			primarySecDocSalesReturn = primarySecondaryDocumentRepository
+					.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_RETURN, companyId);
 
 			if (primarySecDocSales.isEmpty()) {
 				log.info("........No PrimarySecondaryDocument configuration Available...........");
@@ -92,67 +98,85 @@ public class SendTransactionOdooService {
 			List<Long> documentIdListSales = primarySecDocSales.stream().map(psd -> psd.getDocument().getId())
 					.collect(Collectors.toList());
 
-			List<Long> documentIdListSalesReturn = primarySecDocSalesReturn.stream().map(psd -> psd.getDocument().getId())
-					.collect(Collectors.toList());
-			
+			List<Long> documentIdListSalesReturn = primarySecDocSalesReturn.stream()
+					.map(psd -> psd.getDocument().getId()).collect(Collectors.toList());
 
 			if (ivh != null) {
-				String id="INV_QUERY_161";
-				String description=" Updating invVou Header by Tally download status using pid";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
-
-
-
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "INV_QUERY_161" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="update InvVoucherHeader TallyDownloadStatus Using Pid";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, Arrays.asList(ivh.getPid()));
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 				log.debug("updated " + updated + " to PROCESSING");
 			}
-			
+
 			AccountProfile opRecAccPro = ivh.getReceiverAccount();
 			AccountProfile opSupAccPro = ivh.getReceiverAccount();
 			String companyPid = ivh.getCompany().getPid();
-			
+
 			List<UserStockLocation> userStockLocations = userStockLocationRepository.findAllByCompanyPid(companyPid);
 
 			List<UnitOfMeasureProduct> unitOfMeasureProducts = unitOfMeasureProductRepository.findAllByCompanyId();
 
 			Optional<UserStockLocation> opUserStockLocation = userStockLocations.stream()
 					.filter(us -> us.getUser().getPid().equals(ivh.getCreatedBy().getPid())).findAny();
-			
 
 			Set<String> ivhPids = new HashSet<>();
 			ivhPids.add(ivh.getPid());
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
 					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
-			 
+
 			ParamsOneOdooInvoice invoice = new ParamsOneOdooInvoice();
 			invoice.setCreate(true);
 			DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			invoice.setInvoice_date(ivh.getDocumentDate() != null ? ivh.getDocumentDate().format(formatter1): "");
+			invoice.setInvoice_date(ivh.getDocumentDate() != null ? ivh.getDocumentDate().format(formatter1) : "");
 			invoice.setLocation_id(Long.parseLong(opUserStockLocation.get().getStockLocation().getAlias()));
 			invoice.setRounding_amt(ivh.getRoundedOff());
-			invoice.setReference(ivh.getDocumentNumberServer());		
-			 
+			invoice.setReference(ivh.getDocumentNumberServer());
+
 			if (documentIdListSales.contains(ivh.getDocument().getId())) { // Primary Sales
 				invoice.setInvoice_type("out_invoice");
 				invoice.setJournal_type("sale");
 				invoice.setPartner_id(opRecAccPro.getCustomerId() != null && !opRecAccPro.getCustomerId().equals("")
 						? Long.parseLong(opRecAccPro.getCustomerId())
 						: 0);
-				
+
 				invoice.setOrigin(ivh.getDocumentNumberServer());
-			} else if (documentIdListSalesReturn.contains(ivh.getDocument().getId())) {  // Primary Sales Return
+			} else if (documentIdListSalesReturn.contains(ivh.getDocument().getId())) { // Primary Sales Return
 				invoice.setInvoice_type("out_refund");
 				invoice.setJournal_type("sale_refund");
-				invoice.setPartner_id(
-						opSupAccPro.getCustomerId() != null && !opSupAccPro.getCustomerId().equals("")
-								? Long.parseLong(opSupAccPro.getCustomerId())
-								: 0);
-				invoice.setOrigin(ivh.getReferenceInvoiceNumber() != null ? ivh.getReferenceInvoiceNumber(): ivh.getDocumentNumberServer());
+				invoice.setPartner_id(opSupAccPro.getCustomerId() != null && !opSupAccPro.getCustomerId().equals("")
+						? Long.parseLong(opSupAccPro.getCustomerId())
+						: 0);
+				invoice.setOrigin(ivh.getReferenceInvoiceNumber() != null ? ivh.getReferenceInvoiceNumber()
+						: ivh.getDocumentNumberServer());
 			}
-			
-			
+
 			List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 					.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(ivh.getId().toString()))
 					.collect(Collectors.toList()).stream()
@@ -188,7 +212,7 @@ public class SendTransactionOdooService {
 			}
 
 			invoice.setInvoice_lines(odooInvoiceLines);
-			
+
 			log.info("Sending Invoice to Odoo....");
 
 			RequestBodyOneOdooInvoice request = new RequestBodyOneOdooInvoice();
@@ -196,12 +220,12 @@ public class SendTransactionOdooService {
 			request.setJsonrpc("2.0");
 
 			request.setParams(invoice);
-			
+
 			HttpEntity<RequestBodyOneOdooInvoice> entity = new HttpEntity<>(request,
 					RestClientUtil.createTokenAuthHeaders());
 
 			log.info(entity.getBody().toString() + "");
-			
+
 			ObjectMapper Obj = new ObjectMapper();
 
 			// get object as a json string
@@ -213,7 +237,7 @@ public class SendTransactionOdooService {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -262,7 +286,7 @@ public class SendTransactionOdooService {
 			}
 		}
 	}
-	
+
 	private void changeServerDownloadStatus(List<ResponseMessageOdooInvoice> message) {
 		if (!message.isEmpty()) {
 
@@ -291,12 +315,37 @@ public class SendTransactionOdooService {
 			List<InventoryVoucherHeader> successdistinctElements = new ArrayList<>();
 
 			if (successReferences.size() > 0) {
-				String id="INV_QUERY_200";
-				String description="Find all headers by documnetNumberServer";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_200" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="Find all headers by documnetNumberServer";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				successInventoryHeaders = inventoryVoucherHeaderRepository
 						.findAllHeaderdByDocumentNumberServer(successReferences);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 				successdistinctElements = successInventoryHeaders.stream().distinct().collect(Collectors.toList());
 			}
 			List<InventoryVoucherHeader> failedInventoryHeaders = new ArrayList<>();

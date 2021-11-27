@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.vendor.sap.prabhu.service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -87,13 +89,9 @@ import com.orderfleet.webapp.web.vendor.sap.pravesh.dto.SalesOrderMasterSapPrave
 @Service
 public class SendSalesOrderSapService {
 
-//	private static String API_URL_SALES_ORDER = "http://59.94.176.87:5002/Sales/SalesOrder_Tiscon";
-//
-//	private static String API_URL_RECIPTS = "http://59.94.176.87:5002/Receipt/Receipts";
+	private static String API_URL_SALES_ORDER = "http://59.94.176.87:5002/Sales/SalesOrder_Tiscon";
 
-	private static String API_URL_SALES_ORDER = "http://115.242.172.78:5002/Sales/SalesOrder_Tiscon";
-
-	private static String API_URL_RECIPTS = "http://115.242.172.78:5002/Receipt/Receipts";
+	private static String API_URL_RECIPTS = "http://59.94.176.87:5002/Receipt/Receipts";
 
 	// private static String AUTHENTICATION_TOKEN =
 	// "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEzRjhFREM2QjJCNTU3OUQ0MEVGNDg1QkNBOUNFRDBBIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2MDExMDg1MzMsImV4cCI6MTYzMjY0NDUzMywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIiwiYXVkIjoiQ3VzdG9tZXJTZXJ2aWNlLkFwaSIsImNsaWVudF9pZCI6Im5hc19jbGllbnQiLCJzdWIiOiIwNWEwNzliMC1jZjBiLTQ2ZjctYThlMy1iODk4MjIwODgzMjQiLCJhdXRoX3RpbWUiOjE2MDExMDg1MzMsImlkcCI6ImxvY2FsIiwic2VydmljZS51c2VyIjoiYWRtaW4iLCJqdGkiOiIyOUU0OTRERTg1QjA0RTdBNUM1NjM3NDhCQzIyOTEyRSIsInNpZCI6IkFDOTE4QzNEMkY3MUIzRTRBMERGQzc2MDQ4QzJBMEUzIiwiaWF0IjoxNjAxMTA4NTMzLCJzY29wZSI6WyJvcGVuaWQiLCJwcm9maWxlIiwibmFzLmNsaWVudCIsIm5hcy5zZXJ2aWNlcyJdLCJhbXIiOlsicHdkIl19.x4knTyLtPEwUSnc35EnWSyxINwOLU5YTBeCD_eXDkXmMC1bWQclkdLH18Dgict07qVWyRL9EcYT66j4p7hsUGbZrZP9TLeNpQP5BT6eRSeYvkf2lmvJe1xaCvPYrHpPGvApLJJAmQxCwex7AAW74zJLpl_SdNUf3AHBkBvjr2ibEkDBgRgOTO0Z3n3f43ZxZw3LAi_x8ZRSxITY0mpevTUpDhx2pv5-ehXe7BaCbTxAJ6dBvkAavtmB-W3wp7cnJqSfr2mFpsBzE_Ek_OzAFnu_N1ALi8yE9LpuAPSDj4hVz11i98urPebHA8lEca1yBAPI6goQlKJEB4_NXI5F8CA";
@@ -104,7 +102,7 @@ public class SendSalesOrderSapService {
 	private static String AUTHENTICATION_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEzRjhFREM2QjJCNTU3OUQ0MEVGNDg1QkNBOUNFRDBBIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2MzQ4MjM4NTgsImV4cCI6MTY2NjM1OTg1OCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIiwiYXVkIjoiQ3VzdG9tZXJTZXJ2aWNlLkFwaSIsImNsaWVudF9pZCI6Im5hc19jbGllbnQiLCJzdWIiOiIwNjNhZGI5OC0yZTc0LTQxZDMtYTJhMC1hNDFiMzE3M2I1NDAiLCJhdXRoX3RpbWUiOjE2MzQ4MjM4NTcsImlkcCI6ImxvY2FsIiwic2VydmljZS51c2VyIjoiYWRtaW4iLCJqdGkiOiI5NTY1OTA3NjE1OEI3OUVDOEQ5NTdEOUNFNzE5RDU1RSIsInNpZCI6IjM0MEMzMzdFOTkxNzQ4NjlDQkY5Q0M0QzQzODIyMzM1IiwiaWF0IjoxNjM0ODIzODU4LCJzY29wZSI6WyJvcGVuaWQiLCJwcm9maWxlIiwibmFzLmNsaWVudCIsIm5hcy5zZXJ2aWNlcyJdLCJhbXIiOlsicHdkIl19.RJxvka_V9R7OSdTp329M0NWd--GjXJsw1OfomnXWB7plmxcAJUSRk6Hee1yBJ2f7TO3Mc46MdkhTgIBpUCqCmnsIPoUTD_SNdC_S_etcrTe0nYddXuub-2CxKICh6b3aVWPpp-lnHJvHXsXry6V9EuG6d--5JkCTeaXY0dY4w881XTc2q_OskH1Igmn9GWUg1ihnjqTm95U81dq6VtxzhKSW2KKHOG27HyJhK78d8lvsis1h9CJSmdbwg9FBaGUqWNexx-yzmrE7OkEWyUX8iMBpUBCXZ_hIOlHBy785NcH2uBcqdxvSvuDgMM0xKJK1XsIskQi9jzIAW2sH4JxyoQ";
 
 	private final Logger log = LoggerFactory.getLogger(SendSalesOrderSapService.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	public static int successCount = 0;
 
 	@Inject
@@ -169,11 +167,25 @@ public class SendSalesOrderSapService {
 		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)
 				&& inventoryVoucherHeaderDTO.getSalesManagementStatus().equals(SalesManagementStatus.APPROVE)) {
 			log.info("Downloading to sap prabhu.............");
-			String id = "INV_QUERY_161";
-			String description = " Updating invVou Header by Tally download status using pid";
-			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+			String id="INV_QUERY_161";
+			String description=" Updating invVou Header by Tally download status using pid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			Long start1= System.nanoTime();
 			int updated = inventoryVoucherHeaderRepository
 					.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.PROCESSING, ivhPids);
+			String flag;
+			Long end = System.nanoTime();
+			Long TimeTaken = (end - start1) / 1000000;
+			long minutes = TimeUnit.MILLISECONDS.toMinutes(TimeTaken);
+			if (minutes < 2) {
+				flag = "normal";
+			} else if (minutes > 2) {
+				flag = "slow";
+			} else {
+				flag = "deadSlow";
+			}
+			log.info("{ Query Id:- " + id + " TotalTime:- " + minutes+ "Result:-"+flag+" }");
+		
 			log.debug("updated " + updated + " to PROCESSING");
 
 			log.info("Sending  SalesOrder to SAP....");
@@ -256,11 +268,36 @@ public class SendSalesOrderSapService {
 		if (authenticateResponse != null) {
 
 			if (authenticateResponse.getStatus().equals("Success")) {
-				String id = "INV_QUERY_161";
-				String description = " Updating invVou Header by Tally download status using pid";
-				log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_161" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="update InvVoucherHeader TallyDownloadStatus Using Pid";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.COMPLETED, ivhPids);
+				 String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
 				log.debug("updated " + updated + " to COMPLETED");
 			}
 
@@ -285,8 +322,36 @@ public class SendSalesOrderSapService {
 					List<AccountingVoucherHeader> successdistinctElements = new ArrayList<>();
 
 					if (accountingHeaderPids.size() > 0) {
+						  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+							DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+							String id = "ACC_QUERY_159" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+							String description ="get all header by document number server";
+							LocalDateTime startLCTime = LocalDateTime.now();
+							String startTime = startLCTime.format(DATE_TIME_FORMAT);
+							String startDate = startLCTime.format(DATE_FORMAT);
+							logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 						successAccountingVoucherHeaders = accountingVoucherHeaderRepository
 								.findAllHeaderdByDocumentNumberServer(accountingHeaderPids);
+						 String flag = "Normal";
+							LocalDateTime endLCTime = LocalDateTime.now();
+							String endTime = endLCTime.format(DATE_TIME_FORMAT);
+							String endDate = startLCTime.format(DATE_FORMAT);
+							Duration duration = Duration.between(startLCTime, endLCTime);
+							long minutes = duration.toMinutes();
+							if (minutes <= 1 && minutes >= 0) {
+								flag = "Fast";
+							}
+							if (minutes > 1 && minutes <= 2) {
+								flag = "Normal";
+							}
+							if (minutes > 2 && minutes <= 10) {
+								flag = "Slow";
+							}
+							if (minutes > 10) {
+								flag = "Dead Slow";
+							}
+					                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+									+ description);
 						successdistinctElements = successAccountingVoucherHeaders.stream().distinct()
 								.collect(Collectors.toList());
 					}
@@ -340,11 +405,67 @@ public class SendSalesOrderSapService {
 		List<Object[]> accountingVoucherHeaders = new ArrayList<>();
 
 		if (optReceiptsManagement.isPresent() && optReceiptsManagement.get().getValue().equalsIgnoreCase("true")) {
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_156" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get by companyId and tally status and sales management status";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherHeaders = accountingVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusByCreatedDateDesc();
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 		} else {
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ACC_QUERY_155" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get by companyId and tally status";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherHeaders = accountingVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusByCreatedDateDesc();
+			   String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 		}
 
 		log.info("Accounting Voucher Header size {} ", accountingVoucherHeaders.size());
@@ -501,9 +622,38 @@ public class SendSalesOrderSapService {
 		}
 
 		if (!receiptDTOs.isEmpty()) {
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ACC_QUERY_149" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="Updating AccVoucher Tally download status using  pid and company";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			int updated = accountingVoucherHeaderRepository
 					.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PROCESSING,
 							accountingPids);
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 			log.debug("updated " + updated + " to PROCESSING");
 		}
 
@@ -590,10 +740,7 @@ public class SendSalesOrderSapService {
 		salesOrderMasterSap.setDbKey(1);
 		salesOrderMasterSap.setLocation("");
 
-		salesOrderMasterSap.setCustomerCode(inventoryVoucherHeaderDTO.getReceiverAccountCustomerId() != null
-				&& !inventoryVoucherHeaderDTO.getReceiverAccountCustomerId().equals("")
-						? inventoryVoucherHeaderDTO.getReceiverAccountCustomerId()
-						: inventoryVoucherHeaderDTO.getReceiverAccountAlias());
+		salesOrderMasterSap.setCustomerCode(inventoryVoucherHeaderDTO.getReceiverAccountAlias());
 		salesOrderMasterSap.setCustomerName(inventoryVoucherHeaderDTO.getReceiverAccountName());
 
 		salesOrderMasterSap.setCustomerRef("");
@@ -636,7 +783,6 @@ public class SendSalesOrderSapService {
 
 			salesOrderItemDetailsSap.setItemCode(inventoryVoucherDetailDTO.getProductName());
 			salesOrderItemDetailsSap.setItemName(inventoryVoucherDetailDTO.getProductAlias());
-			quantity = Math.round(quantity * 100.0) / 100.0;
 			salesOrderItemDetailsSap.setQuantity(String.valueOf(quantity));
 			salesOrderItemDetailsSap.setuPrice(String.valueOf("0.0"));
 			salesOrderItemDetailsSap.setTaxCode("");

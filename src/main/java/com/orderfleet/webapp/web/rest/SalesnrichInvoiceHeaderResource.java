@@ -118,6 +118,10 @@ public class SalesnrichInvoiceHeaderResource {
 		List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
 		List<String> executiveTaskExecutions = executiveTaskExecutionRepository
 				.findUserByCompanyPidAndUserIdInAndDateBetweenOrderByDateDesc(userIds, startDate, endDate);
+		String id="ATT_QUERY_113";
+		String description="get  attendane by companyId,userPidIn and date between";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		List<String> attentances = attendanceRepository.findByCompanyPidAndUserPidInAndDateBetween(userIds, startDate,
 				endDate);
 		Map<String, Long> executionMap = null;

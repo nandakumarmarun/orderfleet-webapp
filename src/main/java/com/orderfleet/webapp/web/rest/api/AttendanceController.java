@@ -218,6 +218,9 @@ public class AttendanceController {
 							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
 					.body(null);
 		}
+		String id="ATT_QUERY_120";
+		String description="get the one attendance by image Ref no ";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		return attendanceRepository.findOneByImageRefNo(imageRefNo).map(attendance -> {
 			try {
 				File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),

@@ -223,6 +223,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public List<DynamicDocumentHeaderDTO> findAllByCompany() {
 		log.debug("Request to get all DynamicDocumentHeaders");
+		String id="DYN_QUERY_101";
+		String description="get all document by company Id";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdOrderByCreatedDateDesc();
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
@@ -240,6 +243,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public Page<DynamicDocumentHeaderDTO> findAllByCompany(Pageable pageable) {
 		log.debug("Request to get all DynamicDocumentHeaders");
+		String id="DYN_QUERY_102";
+		String description="get all document by company Id and order by create date using page";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		Page<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdOrderByCreatedDateDesc(pageable);
 		List<DynamicDocumentHeaderDTO> dynamicDocumentHeaderList = dynamicDocumentHeaders.getContent().stream()
@@ -288,6 +294,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdAndDateBetween(LocalDateTime fromDate,
 			LocalDateTime toDate) {
+		String id="DYN_QUERY_103";
+		String description="get all document by company id and date between";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
@@ -299,6 +308,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidDocumentPidAndDateBetween(String userPid,
 			String documentPid, LocalDateTime fromDate, LocalDateTime toDate) {
+		String id="DYN_QUERY_104";
+		String description="get all document by company id, UserPid,documentPid and date between and order by created date in desc";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdUserPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(userPid, documentPid,
 						fromDate, toDate);
@@ -311,6 +323,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidAndDateBetween(String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate) {
+		String id="DYN_QUERY_105";
+		String description="get all by company id ,user pid and date between";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fromDate, toDate);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
@@ -322,6 +337,10 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdDocumentPidAndDateBetween(String documentPid,
 			LocalDateTime fromDate, LocalDateTime toDate) {
+		String id="DYN_QUERY_106";
+		String description="get all document by company id,document pid and date between";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdDocumentPidAndDateBetweenOrderByCreatedDateDesc(documentPid, fromDate, toDate);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
@@ -332,6 +351,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Override
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdAndDocumentNameStatusFalseOrderByCreatedDateDesc(
 			String documentName) {
+		String id="DYN_QUERY_113";
+		String description="get all by companyId ,doc name and status false and order by created date in desc";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdAndDocumentNameAndStatusFalseOrderByCreatedDateDesc(documentName);
 		List<DynamicDocumentHeaderDTO> result = new ArrayList<>();
@@ -355,6 +377,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Override
 	public DynamicDocumentHeaderDTO findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(
 			String executiveTaskExecutionPid, String documentName) {
+		String id="DYN_QUERY_116";
+		String description="get doc by executive task execution pid ,doc name and status false";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		DynamicDocumentHeader dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(executiveTaskExecutionPid, documentName);
 		DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO = new DynamicDocumentHeaderDTO();
@@ -376,6 +401,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 
 	@Override
 	public Set<Document> findDocumentsByUserIdIn(List<Long> userIds) {
+		String id="DYN_QUERY_125";
+		String description="get the documents by UserId in";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		return dynamicDocumentHeaderRepository.findDocumentsByUserIdIn(userIds);
 	}
 
@@ -383,6 +411,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public List<DynamicDocumentHeaderDTO> findByFilledFormsIn(List<FilledForm> filledForms) {
 		log.debug("Request to get all filledForms");
+		String id="DYN_QUERY_132";
+		String description="get documents by filled forms in";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findByFilledFormsIn(filledForms);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
@@ -393,6 +424,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Override
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidDocumentPidAndDateBetweenSetFilledForm(
 			String userPid, String documentPid, LocalDateTime fromDate, LocalDateTime toDate) {
+		String id="DYN_QUERY_104";
+		String description="get all document by company id, UserPid,documentPid and date between and order by created date in desc";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdUserPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(userPid, documentPid,
 						fromDate, toDate);
@@ -411,6 +445,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Override
 	public List<DynamicDocumentHeaderDTO> findAllDynamicDocumentByExecutiveTaskExecutionPid(String pid) {
 		Set<DynamicDocumentHeaderDTO> dynamics = new HashSet<>();
+		String id="DYN_QUERY_133";
+		String description="get all documents by executive task execution pid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> documentHeaders = dynamicDocumentHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(pid);
 		List<AccountProfileDynamicDocumentAccountprofile> acProfileDyDocumentAcprofiles = accountProfileDynamicDocumentAccountprofileRepository
@@ -433,6 +470,10 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidDocumentPidAndTallyDownloadStatusAndDateBetween(
 			String userPid, String documentPid, List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate,
 			LocalDateTime toDate) {
+		String id="DYN_QUERY_107";
+		String description="get all by document by company id, userPid,documentPid,Tally download status and date between";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdUserPidDocumentPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(userPid,
 						documentPid, tallyStatus, fromDate, toDate);
@@ -445,6 +486,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidAndTallyDownloadStatusAndDateBetween(String userPid,
 			List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate, LocalDateTime toDate) {
+		String id="DYN_QUERY_108";
+		String description="get all by document by company id, userPid,Tally download status and date between";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdUserPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(userPid,
 						tallyStatus, fromDate, toDate);
@@ -457,6 +501,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdDocumentPidAndTallyDownloadStatusAndDateBetween(
 			String documentPid, List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate, LocalDateTime toDate) {
+		String id="DYN_QUERY_109";
+		String description="get all by document by company id, documentPid,Tally download status and date between";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdDocumentPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(documentPid,
 						tallyStatus, fromDate, toDate);

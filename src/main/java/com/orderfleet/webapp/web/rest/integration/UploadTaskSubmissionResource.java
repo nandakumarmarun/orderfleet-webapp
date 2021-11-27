@@ -412,7 +412,8 @@ public class UploadTaskSubmissionResource {
 					// find referenceInventory Voucher header and detail
 					InventoryVoucherHeader referenceInventoryVoucherHeader = null;
 					InventoryVoucherDetail referenceInventoryVoucherDetail = null;
-					if (inventoryVoucherDetailDTO.getReferenceInventoryVoucherHeaderPid() != null)
+							if (inventoryVoucherDetailDTO.getReferenceInventoryVoucherHeaderPid() != null)
+						
 						referenceInventoryVoucherHeader = inventoryVoucherHeaderRepository
 								.findOneByPid(inventoryVoucherDetailDTO.getReferenceInventoryVoucherHeaderPid()).get();
 

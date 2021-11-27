@@ -120,6 +120,9 @@ public class TimeSpendReportResource {
 		List<TimeSpendReportView> timeSpendReportViews = new ArrayList<>();
 
 		if (employeeProfile != null) {
+			String id="ATT_QUERY_121";
+			String description="get the top 1 by companyPid ,userPid and planned date between and order by create date in desc ";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			Optional<Attendance> opAttendance = attendanceRepository
 					.findTop1ByCompanyPidAndUserPidAndPlannedDateBetweenOrderByCreatedDateDesc(company.getPid(),
 							employeeProfile.getUser().getPid(), fromDate, toDate);

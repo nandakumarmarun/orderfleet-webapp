@@ -17,3 +17,4 @@ public interface AccountingVoucherHeaderHistoryRepository extends JpaRepository<
 	List<AccountingVoucherHeaderHistory> findByPidOrderByIdDesc(String pid);
 
 }
+

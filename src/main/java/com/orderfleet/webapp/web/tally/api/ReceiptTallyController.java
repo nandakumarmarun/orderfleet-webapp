@@ -1,6 +1,9 @@
 package com.orderfleet.webapp.web.tally.api;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,7 @@ import com.orderfleet.webapp.domain.TallyConfiguration;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.TallyConfigurationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.tally.dto.ReceiptDTO;
 import com.orderfleet.webapp.web.tally.dto.TallyConfigurationDTO;
 
@@ -36,7 +40,7 @@ import com.orderfleet.webapp.web.tally.dto.TallyConfigurationDTO;
 public class ReceiptTallyController {
 
 	private final Logger log = LoggerFactory.getLogger(ReceiptTallyController.class);
-	
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private TallyConfigurationRepository tallyConfigRepository;
 	
@@ -59,9 +63,36 @@ public class ReceiptTallyController {
 			return receiptList;
 		}
 		tallyConfig = tallyConfiguration.get();
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ACC_QUERY_144" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get all account voucher header receipt for tally";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
 				.getAllReceiptsForTally(tallyConfig.getCompany().getId(), TallyDownloadStatus.PENDING);
-		
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
 			for (AccountingVoucherDetail accountingVoucherDetail : accountingVoucherHeader.getAccountingVoucherDetails()) {
 				ReceiptDTO receiptDTO = new ReceiptDTO(accountingVoucherDetail);
@@ -88,8 +119,36 @@ public class ReceiptTallyController {
 		
 		if(tallyConfiguration.isPresent()){
 			if (!accountingVoucherHeaderPids.isEmpty()) {
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "ACC_QUERY_147" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="updating the accVoucher tally download status using pid";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				accountingVoucherHeaderRepository
 				.updateAccountingVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.COMPLETED, tallyConfiguration.get().getCompany().getId(), accountingVoucherHeaderPids);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			}
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		}else{

@@ -226,6 +226,10 @@ public class FeedbackResource {
 	@RequestMapping(value = "/feedbacks/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FormFileDTO>> getDynamicDocumentImages(@PathVariable String pid) {
 		log.debug("Web request to get DynamicDocument images by pid : {}", pid);
+		String id="FORM_QUERY_103";
+		String description="get the form by dynamic document headerPid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		List<FilledForm> filledForms = filledFormRepository.findByDynamicDocumentHeaderPid(pid);
 		List<FormFileDTO> formFileDTOs = new ArrayList<>();
 		if (filledForms.size() > 0) {
@@ -322,10 +326,17 @@ public class FeedbackResource {
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = new ArrayList<DynamicDocumentHeader>();
 		if (userPid.equals("no")) {
+			String id="DYN_QUERY_106";
+			String description="get all document by company id,document pid and date between";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 			dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 					.findAllByCompanyIdDocumentPidAndDateBetweenOrderByCreatedDateDesc(feedbackDocumentPid, fromDate,
 							toDate);
 		} else if (!userPid.equals("no")) {
+			String id="DYN_QUERY_104";
+			String description="get all document by company id, UserPid,documentPid and date between and order by created date in desc";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 					.findAllByCompanyIdUserPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(userPid,
 							feedbackDocumentPid, fromDate, toDate);

@@ -2,9 +2,11 @@ package com.orderfleet.webapp.web.rest;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -128,6 +131,7 @@ import com.orderfleet.webapp.web.websocket.dto.DashboardAttendanceDTO;
 public class DashboardResource {
 
 	private final Logger log = LoggerFactory.getLogger(DashboardResource.class);
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 
 	@Inject
 	private DashboardUserService dashboardUserService;
@@ -318,12 +322,18 @@ public class DashboardResource {
 			Set<Long> uniqueUserIds = employeeProfileLocationRepository.findEmployeeUserIdsByLocationIdIn(locationIds);
 			List<Long> userIds = new ArrayList<>(uniqueUserIds);
 			totalUsers = dashboardUserRepository.countByUserIdIn(userIds);
+			String id="ATT_QUERY_108";
+			String description="count attendance by userId in and date between";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			attendedUsers = attendanceRepository.countByUserIdInAndDateBetween(userIds, date.atTime(0, 0),
 					date.atTime(23, 59));
 		} else {
 			if (user.getShowAllUsersData()) {
 				Set<Long> dashboardUserIds = dashboardUserRepository.findUserIdsByCompanyId();
 				totalUsers = dashboardUserIds.size();
+				String id="ATT_QUERY_109";
+				String description="count attendance by userId in and date between";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				attendedUsers = attendanceRepository.countByUserIdInAndDateBetween(dashboardUserIds, date.atTime(0, 0),
 						date.atTime(23, 59));
 			} else {
@@ -738,11 +748,37 @@ public class DashboardResource {
 
 	private void putNumberCircleOnInventoryDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary,
 			String taskExecutionPid) {
-		String id="INV_QUERY_121";
-		String description="selecting inv_voucher from inv_voucher_header and verifying companyId and select using executiveTaskExecution.pid=1 and order by created date in desc order";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		
+		String id = "INV_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all by executive task execution Pid ";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(taskExecutionPid);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		if (!inventoryVoucherHeaders.isEmpty()) {
 			for (Document document : documents) {
 				if (inventoryVoucherHeaders.stream()
@@ -755,8 +791,37 @@ public class DashboardResource {
 
 	private void putNumberCircleOnAccountingDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary,
 			String taskExecutionPid) {
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ACC_QUERY_119" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description =" get all AccVoucher By ExecutiveTask Execution Pid ";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(taskExecutionPid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		if (!accountingVoucherHeaders.isEmpty()) {
 			for (Document document : documents) {
 				if (accountingVoucherHeaders.stream()
@@ -769,6 +834,9 @@ public class DashboardResource {
 
 	private void putNumberCircleOnDynamicDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary,
 			String taskExecutionPid) {
+		String id="DYN_QUERY_133";
+		String description="get all documents by executive task execution pid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(taskExecutionPid);
 		if (!dynamicDocumentHeaders.isEmpty()) {
@@ -897,25 +965,105 @@ public class DashboardResource {
 			if (dashboardItem.getTaskPlanType().equals(TaskPlanType.BOTH)) {
 				if (userPid == null) {
 					if (!userIds.isEmpty()) {
-						String id="INV_QUERY_129";
-						String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId & inv_voucher doc=1& createDate between is 2& 3& created by id=4";
-						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+						  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+							DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+							String id = "INV_QUERY_129" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+							String description = "get count amount and volume bt doc date between and userIdIn";
+							LocalDateTime startLCTime = LocalDateTime.now();
+							String startTime = startLCTime.format(DATE_TIME_FORMAT);
+							String startDate = startLCTime.format(DATE_FORMAT);
+							logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 						obj = inventoryVoucherHeaderRepository
 								.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdIn(documents, from, to,
 										userIds);
+						 String flag = "Normal";
+							LocalDateTime endLCTime = LocalDateTime.now();
+							String endTime = endLCTime.format(DATE_TIME_FORMAT);
+							String endDate = startLCTime.format(DATE_FORMAT);
+							Duration duration = Duration.between(startLCTime, endLCTime);
+							long minutes = duration.toMinutes();
+							if (minutes <= 1 && minutes >= 0) {
+								flag = "Fast";
+							}
+							if (minutes > 1 && minutes <= 2) {
+								flag = "Normal";
+							}
+							if (minutes > 2 && minutes <= 10) {
+								flag = "Slow";
+							}
+							if (minutes > 10) {
+								flag = "Dead Slow";
+							}
+					                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+									+ description);
 					} else {
-						String id="INV_QUERY_109";
-						String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentinand createdate";
-						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+						DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						
+						String id = "INV_QUERY_109" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description = "get the amount count and volume";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						Long start = System.nanoTime();
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 						obj = inventoryVoucherHeaderRepository
 								.getCountAmountAndVolumeByDocumentsAndDateBetween(documents, from, to);
+						String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+				      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+								+ description);
 					}
 				} else {
-					String id="INV_QUERY_110";
-					String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate and createByPid";
-					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+					DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					
+					String id = "INV_QUERY_110" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description = "get amount count and volume by documents and date";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					Long start = System.nanoTime();
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					obj = inventoryVoucherHeaderRepository
 							.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUser(documents, from, to, userPid);
+
+String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 				}
 			} else if (dashboardItem.getTaskPlanType().equals(TaskPlanType.PLANNED)) {
 				obj = getPlannedInventoryCountAndAmount(documents, from, to, userIds, userPid);
@@ -931,26 +1079,103 @@ public class DashboardResource {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
-				String id="INV_QUERY_130";
-				String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId & inv_voucher doc=1& createDateBetween  is 2&3 & created by id=4 & executiveTaskExecution.executiveTaskPlan IS NOT NULL";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "INV_QUERY_130" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description = "get count amount and volume bt doc date between and userIdIn and task plan is not null";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNotNull(documents,
 								from, to, userIds);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			} else {
-				String id="INV_QUERY_113";
-				String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate,and where executivetaskexecution.executiveTaskplan=null";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				
+				String id = "INV_QUERY_113" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get amount cunt and volume by docs and date between and task plan is not null";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndTaskPlanIsNotNull(documents, from, to);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			}
 		} else {
-			String id="INV_QUERY_114";
-			String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate ,CreateByPid and where executivetaskexecution.executiveTaskplan=null";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			
+			String id = "INV_QUERY_114" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get amount cunt and volume by docs and date between User and task plan is not null";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			obj = inventoryVoucherHeaderRepository
 					.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserAndTaskPlanIsNotNull(documents, from, to,
 							userPid);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		}
 		return obj;
 	}
@@ -960,26 +1185,105 @@ public class DashboardResource {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
-				String id="INV_QUERY_131";
-				String description="Selecting count of inv_vouc, sum of doc Total,doc vol of inv_vouch and validating compnayId & inv_voucher doc=1& createDateBetween is 2&3 & created by id=4 & executiveTaskExecution.executiveTaskPlan IS NULL";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_131" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get count amount and volume bt doc date between and userIdIn and task plan is null";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNull(documents, from,
 								to, userIds);
+				  String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
 			} else {
-				String id="INV_QUERY_111";
-				String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate and where executivetaskexecution.executiveTaskplan=null";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				
+				String id = "INV_QUERY_111" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get amount cunt and volume by docs and date between and task plan is null";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				Long start = System.nanoTime();
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 				obj = inventoryVoucherHeaderRepository
 						.getCountAmountAndVolumeByDocumentsAndDateBetweenAndTaskPlanIsNull(documents, from, to);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			}
 		} else {
-			String id="INV_QUERY_112";
-			String description="Selecting count of inv_voucher sum of documentTotal,documentVolume from inv_voucher and validating companyId,documentin, createdate,createBypid and where executivetaskexecution.executiveTaskplan=null";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			
+			String id = "INV_QUERY_112" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get amount cunt and volume by docs and date between User and task plan is null";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			obj = inventoryVoucherHeaderRepository
 					.getCountAmountAndVolumeByDocumentsAndDateBetweenAndUserAndTaskPlanIsNull(documents, from, to,
 							userPid);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		}
 		return obj;
 	}
@@ -1008,15 +1312,100 @@ public class DashboardResource {
 			if (dashboardItem.getTaskPlanType().equals(TaskPlanType.BOTH)) {
 				if (userPid == null) {
 					if (!userIds.isEmpty()) {
+						DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "ACC_QUERY_128" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="get CountAndAmountof AccVoucher ByDocuments And DateBetween And UserId In wise";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 						obj = accountingVoucherHeaderRepository
 								.getCountAndAmountByDocumentsAndDateBetweenAndUserIdIn(documents, from, to, userIds);
+						 String flag = "Normal";
+							LocalDateTime endLCTime = LocalDateTime.now();
+							String endTime = endLCTime.format(DATE_TIME_FORMAT);
+							String endDate = startLCTime.format(DATE_FORMAT);
+							Duration duration = Duration.between(startLCTime, endLCTime);
+							long minutes = duration.toMinutes();
+							if (minutes <= 1 && minutes >= 0) {
+								flag = "Fast";
+							}
+							if (minutes > 1 && minutes <= 2) {
+								flag = "Normal";
+							}
+							if (minutes > 2 && minutes <= 10) {
+								flag = "Slow";
+							}
+							if (minutes > 10) {
+								flag = "Dead Slow";
+							}
+					                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+									+ description);
 					} else {
+						 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+							DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+							String id = "ACC_QUERY_108" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+							String description ="get Count AccVoucher And Amount ByDocuments And Between date";
+							LocalDateTime startLCTime = LocalDateTime.now();
+							String startTime = startLCTime.format(DATE_TIME_FORMAT);
+							String startDate = startLCTime.format(DATE_FORMAT);
+							logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 						obj = accountingVoucherHeaderRepository.getCountAndAmountByDocumentsAndDateBetween(documents,
 								from, to);
+						String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+								+ description);
 					}
 				} else {
+					 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "ACC_QUERY_109" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="getCount AccVoucher And Amount ByDocuments And  userpide";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					obj = accountingVoucherHeaderRepository.getCountAndAmountByDocumentsAndDateBetweenAndUser(documents,
 							from, to, userPid);
+					 String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+								+ description);
+
 				}
 			} else if (dashboardItem.getTaskPlanType().equals(TaskPlanType.PLANNED)) {
 				obj = getPlannedAccountingCountAndAmount(documents, from, to, userIds, userPid);
@@ -1032,17 +1421,102 @@ public class DashboardResource {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "ACC_QUERY_129" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="get count and amound of AccVoucher ByDocuments And DateBetween And UserIdIn And TaskPlanI s NotNull";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				obj = accountingVoucherHeaderRepository
 						.getCountAndAmountByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNotNull(documents, from, to,
 								userIds);
+				 String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
 			} else {
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ACC_QUERY_112" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get CountAndAmount of AccVoucher By Documents And Between  DateTaskPlan Is not Null";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				obj = accountingVoucherHeaderRepository
 						.getCountAndAmountByDocumentsAndDateBetweenAndTaskPlanIsNotNull(documents, from, to);
+				  String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
+
 			}
 		} else {
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ACC_QUERY_113" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get CountAndAmount of AccVoucher By Documents And Between  Date and user idTaskPlan Is not Nul";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			obj = accountingVoucherHeaderRepository
 					.getCountAndAmountByDocumentsAndDateBetweenAndUserAndTaskPlanIsNotNull(documents, from, to,
 							userPid);
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 		}
 		return obj;
 	}
@@ -1052,16 +1526,103 @@ public class DashboardResource {
 		Object obj = null;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ACC_QUERY_130" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get count and amound of AccVoucher ByDocuments And DateBetween And UserIdIn And TaskPlan Is null";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				obj = accountingVoucherHeaderRepository
 						.getCountAndAmountByDocumentsAndDateBetweenAndUserIdInAndTaskPlanIsNull(documents, from, to,
 								userIds);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			} else {
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ACC_QUERY_110" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="getCount AccVoucher And Amount ByDocuments And DateBetweenAndTaskPlanIsNull";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				obj = accountingVoucherHeaderRepository
 						.getCountAndAmountByDocumentsAndDateBetweenAndTaskPlanIsNull(documents, from, to);
+				 String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
+
 			}
 		} else {
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_111" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get CountAndAmount of AccVoucher By Documents And Date Between And User id And TaskPlan Is Null";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 			obj = accountingVoucherHeaderRepository
 					.getCountAndAmountByDocumentsAndDateBetweenAndUserAndTaskPlanIsNull(documents, from, to, userPid);
+			  String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 		}
 		return obj;
 	}
@@ -1087,13 +1648,22 @@ public class DashboardResource {
 				// get both document
 				if (userPid == null) {
 					if (!userIds.isEmpty()) {
+						String id="DYN_QUERY_126";
+						String description="count the documents by create date between ,documentIn and create by id in";
+						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 						count = dynamicDocumentHeaderRepository
 								.countByCreatedDateBetweenAndDocumentInAndCreatedByIdIn(from, to, documents, userIds);
 					} else {
+						String id="DYN_QUERY_118";
+						String description=" getting the count of document by create date between and docIn";
+						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 						count = dynamicDocumentHeaderRepository.countByCreatedDateBetweenAndDocumentIn(from, to,
 								documents);
 					}
 				} else {
+					String id="DYN_QUERY_119";
+					String description="  getting the count of document by create date between and docIn and created by pid";
+					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 					count = dynamicDocumentHeaderRepository.countByCreatedDateBetweenAndDocumentInAndCreatedByPid(from,
 							to, documents, userPid);
 				}
@@ -1111,15 +1681,24 @@ public class DashboardResource {
 		long count;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
+				String id="DYN_QUERY_127";
+				String description="count the documents by create date between ,documentIn and create by id in and executive task execution task plan is not null";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				count = dynamicDocumentHeaderRepository
 						.countByCreatedDateBetweenAndDocumentInAndCreatedByIdInAndExecutiveTaskExecutionExecutiveTaskPlanIsNotNull(
 								from, to, documents, userIds);
 			} else {
+				String id="DYN_QUERY_120";
+				String description=" getting the count of document by create date between and docIn and executive task execution task Plan is not null";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				count = dynamicDocumentHeaderRepository
 						.countByCreatedDateBetweenAndDocumentInAndExecutiveTaskExecutionExecutiveTaskPlanIsNotNull(from,
 								to, documents);
 			}
 		} else {
+			String id="DYN_QUERY_121";
+			String description=" getting the count of document by create date between,created by pid and docIn and executive task execution task Plan is not null";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			count = dynamicDocumentHeaderRepository
 					.countByCreatedDateBetweenAndDocumentInAndCreatedByPidAndExecutiveTaskExecutionExecutiveTaskPlanIsNotNull(
 							from, to, documents, userPid);
@@ -1132,15 +1711,24 @@ public class DashboardResource {
 		long count;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
+				String id="DYN_QUERY_128";
+				String description="count the documents by create date between ,documentIn and create by id in and executive task execution task plan is null";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				count = dynamicDocumentHeaderRepository
 						.countByCreatedDateBetweenAndDocumentInAndCreatedByIdInAndExecutiveTaskExecutionExecutiveTaskPlanIsNull(
 								from, to, documents, userIds);
 			} else {
+				String id="DYN_QUERY_122";
+				String description="getting the count of document by create date between and docIn and executive task execution task Plan is  null";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				count = dynamicDocumentHeaderRepository
 						.countByCreatedDateBetweenAndDocumentInAndExecutiveTaskExecutionExecutiveTaskPlanIsNull(from,
 								to, documents);
 			}
 		} else {
+			String id="DYN_QUERY_123";
+			String description=" getting the count of document by create date between,created by pid and docIn and executive task execution task Plan is null";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			count = dynamicDocumentHeaderRepository
 					.countByCreatedDateBetweenAndDocumentInAndCreatedByPidAndExecutiveTaskExecutionExecutiveTaskPlanIsNull(
 							from, to, documents, userPid);
@@ -1371,9 +1959,17 @@ public class DashboardResource {
 			daySummary.setDashboardItemPid(dashboardAttendance.getId() + "");
 			daySummary.setLabel(dashboardAttendance.getName());
 			if (dashboardAttendance.getAttendanceStatus() != null) {
+				String id="ATT_QUERY_110";
+				String description="count attendance by companyId,attendance status and date between";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 				daySummary.setCount(attendanceRepository.countByCompanyIdAndDateBetweenAndAttendanceStatus(from, to,
 						dashboardAttendance.getAttendanceStatus()));
 			} else if (dashboardAttendance.getAttendanceStatusSubgroup() != null) {
+				String id="ATT_QUERY_111";
+				String description="count attendance by companyId,attendance subgroup and date between";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 				daySummary.setCount(attendanceRepository.countByCompanyIdAndDateBetweenAndAttendanceSubGroup(from, to,
 						dashboardAttendance.getAttendanceStatusSubgroup()));
 			}

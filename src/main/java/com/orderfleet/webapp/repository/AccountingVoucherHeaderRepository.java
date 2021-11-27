@@ -47,7 +47,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	List<AccountingVoucherHeader> findAllByCompanyIdUserPidAndDateBetweenOrderByCreatedDateDesc(String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
-	@Query("select accVoucher from AccountingVoucherHeader accVoucher where accVoucher.company.id = ?#{principal.companyId} and accVoucher.accountProfile.pid = ?1 and accVoucher.createdDate between ?2 and ?3 Order By accVoucher.createdDate desc")
+  @Query("select accVoucher from AccountingVoucherHeader accVoucher where accVoucher.company.id = ?#{principal.companyId} and accVoucher.accountProfile.pid = ?1 and accVoucher.createdDate between ?2 and ?3 Order By accVoucher.createdDate desc")
 	List<AccountingVoucherHeader> findAllByCompanyIdAccountPidAndDateBetweenOrderByCreatedDateDesc(String accountPid,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
@@ -85,7 +85,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("select accVoucher.pid,accVoucher.document.name,accVoucher.totalAmount,accVoucher.document.documentType from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id = ?1")
 	List<Object[]> findByExecutiveTaskExecutionId(Long executiveTaskExecutionId);
 
-	List<AccountingVoucherHeader> findByExecutiveTaskExecutionPidAndDocumentPid(String executiveTaskExecutionPid,
+  	 List<AccountingVoucherHeader> findByExecutiveTaskExecutionPidAndDocumentPid(String executiveTaskExecutionPid,
 			String documentPid);
 
 	List<AccountingVoucherHeader> findByExecutiveTaskExecutionPidAndDocumentEditableTrue(
@@ -109,7 +109,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	List<AccountingVoucherHeader> findAllByCompanyIdDocumentPidAndDateBetweenOrderByCreatedDateDesc(String documentPid,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
-	@Query("select accVoucher from AccountingVoucherHeader accVoucher where accVoucher.company.id = ?#{principal.companyId} and accVoucher.createdBy.pid = ?1 and accVoucher.accountProfile.pid = ?2 and accVoucher.document.pid = ?3 and accVoucher.createdDate between ?4 and ?5 Order By accVoucher.createdDate desc")
+@Query("select accVoucher from AccountingVoucherHeader accVoucher where accVoucher.company.id = ?#{principal.companyId} and accVoucher.createdBy.pid = ?1 and accVoucher.accountProfile.pid = ?2 and accVoucher.document.pid = ?3 and accVoucher.createdDate between ?4 and ?5 Order By accVoucher.createdDate desc")
 	List<AccountingVoucherHeader> findAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(
 			String userPid, String accountPid, String documentPid, LocalDateTime fromDate, LocalDateTime toDate);
 
@@ -193,7 +193,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 
 	@Transactional
 	@Modifying(clearAutomatically = true)
-	@Query("UPDATE AccountingVoucherHeader accVoucher SET accVoucher.status = TRUE WHERE accVoucher.company.id = ?1 AND accVoucher.pid in ?2")
+	  @Query("UPDATE AccountingVoucherHeader accVoucher SET accVoucher.status = TRUE WHERE accVoucher.company.id = ?1 AND accVoucher.pid in ?2")
 	int updateAccountingVoucherHeaderStatusUsingPid(long companyId, List<String> inventoryPids);
 
 	// For tally 15-02-2019 (may modify in future for fast performance)
@@ -297,7 +297,6 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 
 	@Query("SELECT av.documentNumberServer,av.document.pid,av.createdDate from AccountingVoucherHeader av where av.company.pid = ?1 and av.createdBy.pid = ?2 and av.document.pid IN(?3)")
 	List<Object[]> getAllDocumentNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
-
 	public static final String LAST_DOCUMENT_PID_DATE = "select max(cast(coalesce(nullif(SPLIT_PART(avh.document_number_local, ?4 , 2),''),'0') as bigint)) from tbl_accounting_voucher_header avh "
 			+ "INNER JOIN tbl_company cmp on avh.company_id = cmp.id   "
 			+ "INNER JOIN tbl_document doc on avh.document_id = doc.id  "

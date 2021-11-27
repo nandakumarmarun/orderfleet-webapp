@@ -222,6 +222,9 @@ public class OtherVoucherTransactionResource {
 					+ document.get().getDocumentPrefix();
 		}
 		// find previous document number
+		String id="DYN_QUERY_115";
+		String description="getting top 1 by created Login";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		DynamicDocumentHeader dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findTop1ByCreatedByLogin(SecurityUtils.getCurrentUserLogin());
 		if (dynamicDocumentHeader != null) {
@@ -280,6 +283,9 @@ public class OtherVoucherTransactionResource {
 	@Transactional(readOnly = true)
 	@RequestMapping(value = "/other-voucher-transaction/previous-document-number", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String getPreviousDocumentNumber(@RequestParam String documentPid) {
+		String id="DYN_QUERY_124";
+		String description="get the top 1 by docPid and created by login";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		DynamicDocumentHeader dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findTop1ByDocumentPidAndCreatedByLogin(documentPid, SecurityUtils.getCurrentUserLogin());
 		if (dynamicDocumentHeader != null) {
@@ -298,6 +304,9 @@ public class OtherVoucherTransactionResource {
 		 * activityPid, accountPid, SecurityUtils.getCurrentUserLogin(),
 		 * documentPid);
 		 */
+		String id="DYN_QUERY_114";
+		String description="get document by executive task execution accountpid and doc pid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findByExecutiveTaskExecutionAccountProfilePidAndDocumentPid(accountPid, documentPid);
 		for (DynamicDocumentHeader dynamicDocumentHeader : dynamicDocumentHeaders) {
@@ -410,6 +419,9 @@ public class OtherVoucherTransactionResource {
 
 		FormFileDTO formFileDTO = new FormFileDTO();
 		if (dynamicDocumentHeader.isPresent()) {
+			String id="FORM_QUERY_106";
+			String description="get the one by dynamic document header,executive task excutionPid and form Id";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			Optional<FilledForm> filledForms = filledFormRepository
 					.findOneByDynamicDocumentHeaderExecutiveTaskExecutionPidAndFormPid(
 							dynamicDocumentHeader.get().getExecutiveTaskExecution().getPid(), formPid);
@@ -458,6 +470,9 @@ public class OtherVoucherTransactionResource {
 		Optional<DynamicDocumentHeader> dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findOneByPid(dynamicDocumentPid[0]);
 		if (dynamicDocumentHeader.isPresent()) {
+			String id="FORM_QUERY_106";
+			String description="get the one by dynamic document header,executive task excutionPid and form Id";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			filledFormRepository
 					.findOneByDynamicDocumentHeaderExecutiveTaskExecutionPidAndFormPid(
 							dynamicDocumentHeader.get().getExecutiveTaskExecution().getPid(), formPid[0])
@@ -508,6 +523,9 @@ public class OtherVoucherTransactionResource {
 		Optional<DynamicDocumentHeader> dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findOneByPid(dynamicDocumentPid);
 		if (dynamicDocumentHeader.isPresent()) {
+			String id="FORM_QUERY_106";
+			String description="get the one by dynamic document header,executive task excutionPid and form Id";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			filledFormRepository
 					.findOneByDynamicDocumentHeaderExecutiveTaskExecutionPidAndFormPid(
 							dynamicDocumentHeader.get().getExecutiveTaskExecution().getPid(), formPid)
@@ -555,6 +573,9 @@ public class OtherVoucherTransactionResource {
 		Optional<File> file = fileRepository.findOneByPid(filePid);
 		Optional<DynamicDocumentHeader> dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findOneByPid(dynamicDocumentPid);
+		String id="FORM_QUERY_106";
+		String description="get the one by dynamic document header,executive task excutionPid and form Id";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 		Optional<FilledForm> filledForms = filledFormRepository
 				.findOneByDynamicDocumentHeaderExecutiveTaskExecutionPidAndFormPid(
 						dynamicDocumentHeader.get().getExecutiveTaskExecution().getPid(), formPid);

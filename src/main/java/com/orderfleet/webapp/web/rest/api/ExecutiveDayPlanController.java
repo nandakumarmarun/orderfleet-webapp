@@ -165,6 +165,9 @@ public class ExecutiveDayPlanController {
 		if (executiveTaskPlanList.isEmpty() && fromDayPlan) {
 			// check attendance already marked with subgroup - to solve an issue
 			// in modern (Route Plan auto download)
+			String id="ATT_QUERY_106";
+			String description="get all by company id ,user login, date between and attendance status";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			List<Attendance> attendanceList = attendanceRepository
 					.findByCompanyIdUserLoginAndDateBetweenAndAttendanceStatus(login, AttendanceStatus.PRESENT,
 							currentDate.atTime(0, 0), currentDate.atTime(23, 59));

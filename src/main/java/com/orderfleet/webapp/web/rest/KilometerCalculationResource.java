@@ -43,7 +43,6 @@ import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileLocationService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
-import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.rest.dto.KilometerCalculationDTO;
@@ -78,9 +77,6 @@ public class KilometerCalculationResource {
 
 	@Inject
 	private GeoLocationService geoLocationService;
-
-	@Inject
-	private UserService userService;
 
 	@RequestMapping(value = "/kilo-calc", method = RequestMethod.GET)
 	@Timed
@@ -148,18 +144,8 @@ public class KilometerCalculationResource {
 		List<KilometreCalculation> kilometreCalculations = new ArrayList<>();
 		if (!userPid.equals("no") && accountProfilePid.equals("no")) {
 
-			if (!userPid.equals("all")) {
-				kilometreCalculations = kilometreCalculationRepository
-						.findAllByCompanyIdAndUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fDate, tDate);
-			} else {
-
-				List<String> userPids = userService.findAllByCompany().stream().map(a -> a.getPid())
-						.collect(Collectors.toList());
-
-				kilometreCalculations = kilometreCalculationRepository
-						.findAllByCompanyIdAndUserPidInAndDateBetweenOrderByCreatedDateDesc(userPids, fDate, tDate);
-
-			}
+			kilometreCalculations = kilometreCalculationRepository
+					.findAllByCompanyIdAndUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fDate, tDate);
 //			kilometreCalculations.removeIf(u -> u.getExecutiveTaskExecution() == null);
 		}
 
@@ -170,7 +156,9 @@ public class KilometerCalculationResource {
 			if (kilocalc.getLocation() == null) {
 				LocalDateTime fromDate = kilocalc.getDate().atTime(0, 0);
 				LocalDateTime toDate = kilocalc.getDate().atTime(23, 59);
-
+				String id="ATT_QUERY_105";
+				String description="get all by companyId,userPid and date between";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				List<Attendance> attendance = attendanceRepository
 						.findAllByCompanyIdUserPidAndDateBetween(kilocalc.getUserPid(), fromDate, toDate);
 				kilocalc.setLocation(attendance.get(0).getLocation());

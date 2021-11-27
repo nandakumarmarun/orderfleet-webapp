@@ -1,10 +1,13 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -42,6 +45,7 @@ import com.orderfleet.webapp.web.rest.dto.FinancialClosingReportHolder;
 public class FinancialClosingHeaderServiceImpl implements FinancialClosingHeaderService {
 	
 	private final Logger log = LoggerFactory.getLogger(FinancialClosingHeaderServiceImpl.class);
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private UserRepository userRepository;
 	
@@ -112,9 +116,39 @@ public class FinancialClosingHeaderServiceImpl implements FinancialClosingHeader
 					Optional<UserAccountProfile> userAccountProfile = userAccountProfileRepository
 							.findByCompanyIdAndUserLogin(empUser.getCompany().getId(), empUser.getLogin());
 					if (userAccountProfile.isPresent()) {
+						 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+							DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+							String id = "ACC_QUERY_134" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+							String description ="get AccVoucher ByDocumentPid AndDateBetween And AccountProfile Pid";
+							LocalDateTime startLCTime = LocalDateTime.now();
+							String startTime = startLCTime.format(DATE_TIME_FORMAT);
+							String startDate = startLCTime.format(DATE_FORMAT);
+							logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 						List<AccountingVoucherHeader> avHeaders = accountingVoucherHeaderRepository
 								.getByDocumentPidAndDateBetweenAndAccountProfilePid(fcReport.getDocumentPid(), from, currentDate,
 										userAccountProfile.get().getAccountProfile().getPid());
+						  String flag = "Normal";
+							LocalDateTime endLCTime = LocalDateTime.now();
+							String endTime = endLCTime.format(DATE_TIME_FORMAT);
+							String endDate = startLCTime.format(DATE_FORMAT);
+							Duration duration = Duration.between(startLCTime, endLCTime);
+							long minutes = duration.toMinutes();
+							if (minutes <= 1 && minutes >= 0) {
+								flag = "Fast";
+							}
+							if (minutes > 1 && minutes <= 2) {
+								flag = "Normal";
+							}
+							if (minutes > 2 && minutes <= 10) {
+								flag = "Slow";
+							}
+							if (minutes > 10) {
+								flag = "Dead Slow";
+							}
+					                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+									+ description);
+
+						
 						for (AccountingVoucherHeader avHeader : avHeaders) {
 							FinancialClosingDetailAccounting fcDetailAccounting = new FinancialClosingDetailAccounting();
 							fcDetailAccounting.setFinancialClosingHeader(fcHeader);
@@ -129,12 +163,37 @@ public class FinancialClosingHeaderServiceImpl implements FinancialClosingHeader
 					}
 
 				} else if (fcReport.getDocumentType().equals(DocumentType.INVENTORY_VOUCHER)) {
-					String id="INV_QUERY_142";
-					String description="Selecting inv voucher from iv_vouc_header by validating companyId ,create dateBetween,doc pid and  createBypid";
-					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+					 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "INV_QUERY_142" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description = "get all by DocPid and date between and uerPid";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					List<InventoryVoucherHeader> ivHeaders = inventoryVoucherHeaderRepository
 							.getByDocumentPidAndDateBetweenAndUserPid(fcReport.getDocumentPid(), from, currentDate,
 									empUser.getPid());
+					 String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+								+ description);
 					for (InventoryVoucherHeader ivHeader : ivHeaders) {
 						FinancialClosingDetailInventory fcDetailInventory = new FinancialClosingDetailInventory();
 						fcDetailInventory.setFinancialClosingHeader(fcHeader);
@@ -147,9 +206,38 @@ public class FinancialClosingHeaderServiceImpl implements FinancialClosingHeader
 						fcDetailInventories.add(fcDetailInventory);
 					}
 				} else if (fcReport.getDocumentType().equals(DocumentType.ACCOUNTING_VOUCHER)) {
+					 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "ACC_QUERY_135" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="get AccVoucher By DocumentPid And Date Between And UserPid";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					List<AccountingVoucherHeader> avHeaders = accountingVoucherHeaderRepository
 							.getByDocumentPidAndDateBetweenAndUserPid(fcReport.getDocumentPid(), from, currentDate,
 									empUser.getPid());
+					  String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+								+ description);
+
 					for (AccountingVoucherHeader avHeader : avHeaders) {
 						FinancialClosingDetailAccounting fcDetailAccounting = new FinancialClosingDetailAccounting();
 						fcDetailAccounting.setFinancialClosingHeader(fcHeader);

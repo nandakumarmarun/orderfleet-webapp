@@ -1,12 +1,16 @@
 package com.orderfleet.webapp.web.tally.api;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -35,6 +39,7 @@ import com.orderfleet.webapp.repository.GstLedgerRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.TallyConfigurationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.tally.dto.GstLedgerDTO;
 import com.orderfleet.webapp.web.tally.dto.SalesItemTally;
 import com.orderfleet.webapp.web.tally.dto.SalesOrderTally;
@@ -47,7 +52,7 @@ import com.orderfleet.webapp.web.tally.dto.TallyConfigurationDTO;
 public class SalesOrderTallyController {
 
 	private final Logger log = LoggerFactory.getLogger(SalesOrderTallyController.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
 
@@ -79,11 +84,35 @@ public class SalesOrderTallyController {
 		List<VoucherType> voucherTypes = Arrays.asList(VoucherType.PRIMARY_SALES, VoucherType.PRIMARY_SALES_ORDER);
 		List<PrimarySecondaryDocument> psDocuments = primarySecondaryDocumentRepository.findByVoucherTypesAndCompany(voucherTypes, tallyConfig.getCompany().getId());
 		Set<Long> documentIds = psDocuments.stream().map(psd -> psd.getDocument().getId()).collect(Collectors.toSet());
-		String id="INV_QUERY_169";
-		String description="Listing sales orders from tally";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_169" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get sales order for tally";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> salesOrders = inventoryVoucherHeaderRepository.getSalesOrdersForTally(tallyConfig.getCompany().getId(), documentIds);
+		  String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		List<GstLedger> gstLedgers = gstLedgerRepository.findAllByCompanyIdAndActivated(tallyConfig.getCompany().getId(), true);
 		List<GstLedgerDTO> gstLedgerDTOs = gstLedgers.stream().map(GstLedgerDTO::new).collect(Collectors.toList());
 		String previousPid = "";
@@ -152,12 +181,38 @@ public class SalesOrderTallyController {
 			List<String> inventoryHeaderPid = new ArrayList<>(inventoryVoucherHeaderPids);
 			log.info("SET SIZE : " + inventoryVoucherHeaderPids.size());
 			log.info("LIST SIZE : " + inventoryHeaderPid.size());
-			String id1="INV_QUERY_181";
-			String description1="Updating inv Vou header TallydownloadStatus using pid and Companyid";
-			log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
+			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id1 = "INV_QUERY_181" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description1 ="update Iv Header TallyDownload Status Using Pid AndCompanyId";
+			LocalDateTime startLCTime1 = LocalDateTime.now();
+			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+			String startDate1 = startLCTime1.format(DATE_FORMAT1);
+			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 			int updated = inventoryVoucherHeaderRepository.
 								updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
 										TallyDownloadStatus.PROCESSING,tallyConfig.getCompany().getId(), inventoryHeaderPid);
+			 String flag1 = "Normal";
+				LocalDateTime endLCTime1 = LocalDateTime.now();
+				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+				String endDate1 = startLCTime1.format(DATE_FORMAT1);
+				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+				long minutes1 = duration1.toMinutes();
+				if (minutes1 <= 1 && minutes1 >= 0) {
+					flag1 = "Fast";
+				}
+				if (minutes1 > 1 && minutes1 <= 2) {
+					flag1 = "Normal";
+				}
+				if (minutes1 > 2 && minutes1 <= 10) {
+					flag1 = "Slow";
+				}
+				if (minutes1 > 10) {
+					flag1 = "Dead Slow";
+				}
+		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+						+ description1);
+
 			log.debug("updated "+updated+" to PROCESSING");
 		}
 		
@@ -189,11 +244,37 @@ public class SalesOrderTallyController {
 		
 		if(tallyConfiguration.isPresent()){
 			if (!inventoryVoucherHeaderPids.isEmpty()) {
-				String id="INV_QUERY_181";
-				String description="Updating inv Vou header TallydownloadStatus using pid and Companyid";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_181" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="update Iv Header TallyDownload Status Using Pid AndCompanyId";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
 						TallyDownloadStatus.COMPLETED,tallyConfiguration.get().getCompany().getId(),inventoryVoucherHeaderPids);
+				 String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
+
 			}
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		}else{

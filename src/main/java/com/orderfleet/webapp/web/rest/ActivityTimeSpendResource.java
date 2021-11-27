@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -42,6 +44,7 @@ import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.UserActivityRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.ActivityService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
@@ -56,7 +59,7 @@ import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionView;
 public class ActivityTimeSpendResource {
 
 	private final Logger log = LoggerFactory.getLogger(ExecutiveTaskExecutionResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
@@ -237,13 +240,39 @@ public class ActivityTimeSpendResource {
 						executiveTaskExecution.getEndTime());
 				executiveTaskExecutionView.setTimeSpend(timeSpend);
 				List<ExecutiveTaskExecutionDetailView> executiveTaskExecutionDetailViews = new ArrayList<ExecutiveTaskExecutionDetailView>();
-				String id="INV_QUERY_116";
-				String description="Selecting inventory voucherPid,document name,doc Total,doc.docTypeand doc volume from inventoryvoucherHeader by applying condition executive taskexecution id =1";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			
 				List<Object[]> inventoryVouchers = new ArrayList<>();
-
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				
+				String id = "INV_QUERY_116" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get by executive task execution Id";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				inventoryVouchers = inventoryVoucherHeaderRepository
 						.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 				for (Object[] obj : inventoryVouchers) {
 					ExecutiveTaskExecutionDetailView executiveTaskExecutionDetailView = new ExecutiveTaskExecutionDetailView(
 							obj[0].toString(), obj[1].toString(), Double.valueOf(obj[2].toString()), obj[3].toString());
@@ -251,20 +280,55 @@ public class ActivityTimeSpendResource {
 					executiveTaskExecutionDetailViews.add(executiveTaskExecutionDetailView);
 				}
 
+				 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id1 = "ACC_QUERY_115" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description1 ="get AccVoucher By ExecutiveTaskExecutionId";
+					LocalDateTime startLCTime1 = LocalDateTime.now();
+					String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+					String startDate1 = startLCTime1.format(DATE_FORMAT1);
+					logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 				List<Object[]> accountingVouchers = new ArrayList<>();
 				accountingVouchers = accountingVoucherHeaderRepository
 						.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+				 String flag1 = "Normal";
+					LocalDateTime endLCTime1 = LocalDateTime.now();
+					String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+					String endDate1 = startLCTime1.format(DATE_FORMAT1);
+					Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+					long minutes1 = duration1.toMinutes();
+					if (minutes1 <= 1 && minutes1 >= 0) {
+						flag1 = "Fast";
+					}
+					if (minutes1 > 1 && minutes1 <= 2) {
+						flag1 = "Normal";
+					}
+					if (minutes1 > 2 && minutes1 <= 10) {
+						flag1 = "Slow";
+					}
+					if (minutes1 > 10) {
+						flag1 = "Dead Slow";
+					}
+			                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+							+ description1);
+
+				
 				for (Object[] obj : accountingVouchers) {
 					executiveTaskExecutionDetailViews.add(new ExecutiveTaskExecutionDetailView(obj[0].toString(),
 							obj[1].toString(), Double.valueOf(obj[2].toString()), obj[3].toString()));
 				}
-
+				String id11="DYN_QUERY_110";
+				String description11="get all documents by Task executionId";
+				log.info("{ Query Id:- "+id11+" Query Description:- "+description11+" }");
 				List<Object[]> dynamicDocuments = new ArrayList<>();
 				dynamicDocuments = dynamicDocumentHeaderRepository
 						.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
 				for (Object[] obj : dynamicDocuments) {
 					boolean imageFound = false;
 					// check image saved
+					String id111="FORM_QUERY_107";
+					String description111="get the form by checking exists by header pid";
+					log.info("{ Query Id:- "+id111+" Query Description:- "+description111+" }");
 					if (filledFormRepository.existsByHeaderPidIfFiles(obj[0].toString())) {
 						imageFound = true;
 					}

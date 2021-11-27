@@ -106,7 +106,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 	Optional<Attendance> findTop1ByCompanyPidAndUserPidAndCreatedDateBetweenOrderByCreatedDateDesc(String companyPid,
 			String userPid, LocalDateTime clientFromDate, LocalDateTime clientToDate);
 
-	Optional<Attendance> findTop1ByCompanyPidAndUserPidAndPlannedDateBetweenOrderByCreatedDateDesc(String companyPid,
+	 Optional<Attendance> findTop1ByCompanyPidAndUserPidAndPlannedDateBetweenOrderByCreatedDateDesc(String companyPid,
 			String userPid, LocalDateTime clientFromDate, LocalDateTime clientToDate);
 
 	/*

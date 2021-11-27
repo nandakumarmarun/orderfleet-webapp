@@ -3,8 +3,11 @@ package com.orderfleet.webapp.web.rest;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,7 +69,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 public class ReceiptHistoryReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(ReceiptHistoryReportResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private EmployeeProfileService employeeProfileService;
 
@@ -322,9 +325,37 @@ public class ReceiptHistoryReportResource {
 
 	private SalesTargetBlockDTO setSumOfAccountWiseAchievedBetweenDate(SalesTargetBlockDTO salesTargetBlockDTO,
 			String accountPid, List<Document> documents, LocalDate startDate, LocalDate endDate) {
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_139" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get Count and sum of account voucher by documents,date between and accountProfile";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate1 = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
 		Object sumOfAccountWiseAchieved = accountingVoucherHeaderRepository
 				.getCountAndAmountByDocumentsAndDateBetweenAndAccountProfile(documents, startDate.atTime(0, 0),
 						endDate.atTime(23, 59), accountPid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate1 = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		Object[] achievedAmountVolume = (Object[]) sumOfAccountWiseAchieved;
 		if (achievedAmountVolume[1] != null) {
 			double roundedAchievedVlm = new BigDecimal(achievedAmountVolume[1].toString())

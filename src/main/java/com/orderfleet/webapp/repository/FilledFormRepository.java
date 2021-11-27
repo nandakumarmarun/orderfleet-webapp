@@ -34,7 +34,7 @@ public interface FilledFormRepository extends JpaRepository<FilledForm, Long> {
 
 	List<FilledForm> findByDynamicDocumentHeaderPid(String dynamicDocumentPid);
 
-	List<FilledForm> findByDynamicDocumentHeaderPidIn(Set<String> dynamicDocumentPids);
+	 List<FilledForm> findByDynamicDocumentHeaderPidIn(Set<String> dynamicDocumentPids);
 
 	List<FilledForm> findByDynamicDocumentHeaderDocumentPid(String documentPid);
 

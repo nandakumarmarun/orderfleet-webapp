@@ -187,6 +187,9 @@ public class DashboardGraphViewResource {
 					Set<Long> userIds = dashboardUserRepository.findUserIdsByUserIdIn(uniqueUserIds);
 					dashboardTerritoryData.setAttendenceTotalUsers(userIds.size());
 					if(!userIds.isEmpty()) {
+						String id="ATT_QUERY_108";
+						String description="count attendance by userId in and date between";
+						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 						dashboardTerritoryData.setAttendencePresentUsers(attendanceRepository.countByUserIdInAndDateBetween(new ArrayList<>(userIds), from,
 								to));	
 					}

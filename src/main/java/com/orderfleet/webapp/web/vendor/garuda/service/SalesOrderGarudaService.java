@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.vendor.garuda.service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -45,7 +47,7 @@ import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPr
 public class SalesOrderGarudaService {
 
 	private final Logger log = LoggerFactory.getLogger(SendTransactionSapPraveshService.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private CompanyRepository companyRepository;
 
@@ -63,7 +65,7 @@ public class SalesOrderGarudaService {
 
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
-	
+
 	@Inject
 	private PriceLevelRepository priceLevelRepository;
 
@@ -98,19 +100,68 @@ public class SalesOrderGarudaService {
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
 		if (optSalesManagement.isPresent() && optSalesManagement.get().getValue().equalsIgnoreCase("true")) {
-			String id="INV_QUERY_192";
-			String description="Finding invVou by companyId,tallyDownloadStatus,salesManagementStatus and document";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_192" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get by CompanyId and TallyStatus and salesManagement status Document";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
 							documentIdList);
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 		} else {
-			String id="INV_QUERY_191";
-			String description="Finding invVou by companyId,tallyDownloadStatus and document";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_191" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get by CompanyId and TallyStatus and Document";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndDocumentOrderByCreatedDateDesc(documentIdList);
-
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 		}
 		log.debug("IVH size : {}", inventoryVoucherHeaders.size());
 
@@ -144,15 +195,36 @@ public class SalesOrderGarudaService {
 			}
 
 			if (!ivhPids.isEmpty()) {
-				String id="INV_QUERY_161";
-				String description=" Updating invVou Header by Tally download status using pid";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
-
-
-
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_161" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="update InvVoucherHeader TallyDownloadStatus Using Pid";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.PROCESSING, inventoryHeaderPids);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 				log.debug("updated " + updated + " to PROCESSING");
 			}
 
@@ -163,9 +235,8 @@ public class SalesOrderGarudaService {
 
 			List<InventoryVoucherDetail> inventoryVoucherDetails = inventoryVoucherDetailRepository
 					.findAllByInventoryVoucherHeaderPidIn(ivhPids);
-			
-			List<PriceLevel> priceLevels = priceLevelRepository
-					.findAllByCompanyIdAndIdsIn(priceLeveIds);
+
+			List<PriceLevel> priceLevels = priceLevelRepository.findAllByCompanyIdAndIdsIn(priceLeveIds);
 
 			for (Object[] obj : inventoryVoucherHeaders) {
 
@@ -174,7 +245,7 @@ public class SalesOrderGarudaService {
 
 				Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
 						.filter(emp -> emp.getId() == Long.parseLong(obj[14].toString())).findAny();
-				
+
 				Optional<PriceLevel> opPriceLevel = priceLevels.stream()
 						.filter(pl -> pl.getId() == Long.parseLong(obj[18].toString())).findAny();
 
@@ -197,9 +268,9 @@ public class SalesOrderGarudaService {
 				garudaInvoice.setEmployeeName(opEmployeeProfile.get().getName());
 				garudaInvoice.setInvoiceDate(date.format(formatter1));
 				garudaInvoice.setTotal(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
-				
+
 				garudaInvoice.setOrderType(opPriceLevel.get().getName());
-				
+
 				List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetails.stream()
 						.filter(ivd -> ivd.getInventoryVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
 						.collect(Collectors.toList()).stream()

@@ -62,6 +62,10 @@ public class FilledFormServiceServiceImpl implements FilledFormService {
 	@Transactional(readOnly = true)
 	public Optional<FilledFormDTO> findOneByPid(String pid) {
 		log.debug("Request to get FilledForm by pid : {}", pid);
+		String id="FORM_QUERY_101";
+		String description="Get the one filled form by pid ";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		return filledFormRepository.findOneByPid(pid).map(filledForm -> {
 			FilledFormDTO filledFormDTO = new FilledFormDTO(filledForm);
 			filledFormDTO.setFilledFormDetails(filledForm.getFilledFormDetails().stream().map(FilledFormDetailDTO::new)
@@ -74,6 +78,10 @@ public class FilledFormServiceServiceImpl implements FilledFormService {
 	@Transactional(readOnly = true)
 	public List<FilledFormDTO> findByDynamicDocumentHeaderDocumentPid(String documentHeaderpid) {
 		log.debug("Request to get FilledForm by documentHeaderpid : {}", documentHeaderpid);
+		String id="FORM_QUERY_105";
+		String description="get the form by dynamic document header document Pid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		List<FilledForm> filledForms = filledFormRepository.findByDynamicDocumentHeaderDocumentPid(documentHeaderpid);
 		List<FilledFormDTO> result = new ArrayList<>();
 		for (FilledForm filledForm : filledForms) {

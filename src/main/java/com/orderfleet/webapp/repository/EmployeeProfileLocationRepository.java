@@ -56,6 +56,8 @@ public interface EmployeeProfileLocationRepository extends JpaRepository<Employe
 	
 	@Query("select DISTINCT employeeProfileLocation.location.id from EmployeeProfileLocation employeeProfileLocation where employeeProfileLocation.employeeProfile.user.pid in ?1")
 	Set<Long> findLocationIdsByUserPidIn(List<String> userPids);
+//	@Query("select DISTINCT employeeProfileLocation.location.id from EmployeeProfileLocation employeeProfileLocation where employeeProfileLocation.employeeProfile.user.pid in ?1")
+//	Set<Long> findLocationIdsByUserIdIn(List<Long> userIds);
 	
 	@Query("select DISTINCT employeeProfileLocation.location.id from EmployeeProfileLocation employeeProfileLocation where employeeProfileLocation.employeeProfile.pid in ?1")
 	Set<Long> findLocationIdsByEmployeePidIn(List<String> employeePids);

@@ -306,14 +306,25 @@ public class DynamicDocumentReportResource {
 
 		List<DynamicDocumentHeader> dynamicDocuments;
 		if ("no".equals(userPid)) {
+			String id="DYN_QUERY_106";
+			String description="get all document by company id,document pid and date between";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 			dynamicDocuments = dynamicDocumentHeaderRepository
 					.findAllByCompanyIdDocumentPidAndDateBetweenOrderByCreatedDateDesc(documentPid, fromDate, toDate);
 		} else {
+			String id="DYN_QUERY_104";
+			String description="get all document by company id, UserPid,documentPid and date between and order by created date in desc";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			dynamicDocuments = dynamicDocumentHeaderRepository
 					.findAllByCompanyIdUserPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(userPid, documentPid,
 							fromDate, toDate);
 		}
 		for (DynamicDocumentHeader dynamicDocumentHeader : dynamicDocuments) {
+			String id="FORM_QUERY_103";
+			String description="get the form by dynamic document headerPid";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 			List<FilledForm> fillForms = filledFormRepository
 					.findByDynamicDocumentHeaderPid(dynamicDocumentHeader.getPid());
 			for (FilledForm filledForm : fillForms) {

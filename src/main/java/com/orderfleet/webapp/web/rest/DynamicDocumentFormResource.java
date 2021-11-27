@@ -614,9 +614,15 @@ public class DynamicDocumentFormResource {
 
 		List<Object[]> filledFormsObjArray = new ArrayList<>();
 		if (userPids.isEmpty()) {
+			String id="FORM_QUERY_111";
+			String description="get the filled form id by documents,form pid and create date between";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			filledFormsObjArray = filledFormRepository.findFilledFormsIdsByDocumentAndFormPidAndCreatedDateBetween(
 					documentPid, formPid, fromDate, toDate);
 		} else if (!userPids.isEmpty()) {
+			String id="FORM_QUERY_112";
+			String description="get the filled form id by documents,form pid,userPid and create date between";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			filledFormsObjArray = filledFormRepository
 					.findFilledFormsIdsByDocumentAndFormPidAndUserPidCreatedByAndCreatedDateBetween(documentPid,
 							formPid, userPids, fromDate, toDate);
@@ -638,6 +644,9 @@ public class DynamicDocumentFormResource {
 		Set<Long> employeeIds = new HashSet<>();
 		Set<Long> executiveTaskExecutionIds = new HashSet<>();
 		if (dynamicDocumentHeaderIds.size() > 0) {
+			String id="DYN_QUERY_141";
+			String description="get  document by filled dynamic document header id in";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			List<Object[]> dynamiDocumentObjArray = dynamicDocumentHeaderRepository
 					.findByFilledDynamicDocumentHeaderIdIn(dynamicDocumentHeaderIds);
 
@@ -667,7 +676,9 @@ public class DynamicDocumentFormResource {
 			List<Object[]> employeeArray = employeeRepository.findByEmpIdIn(employeeIds);
 
 			List<Object[]> userArray = userRepository.findByUserIdIn(userIds);
-
+			String id1="FFD_QUERY_102";
+			String description1="get all form detail by formId in";
+			log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 			List<Object[]> filedFormDetails = filledFormDetailRepository.findAllByFormIdIn(filledFormIds);
 
 			for (Object[] ffObj : filledFormsObjArray) {

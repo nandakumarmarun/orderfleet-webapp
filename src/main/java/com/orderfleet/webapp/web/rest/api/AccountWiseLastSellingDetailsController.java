@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,7 @@ import com.orderfleet.webapp.service.DocumentService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.web.rest.api.dto.LastSellingDetailsDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
+import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 @RestController
 @RequestMapping("/api")
@@ -56,9 +58,10 @@ public class AccountWiseLastSellingDetailsController {
 	@Inject
 	ActivityDocumentRepository activityDocumentRepository;
 
+	@SuppressWarnings("unchecked")
 	@Timed
 	@GetMapping("/last-selling-details")
-	public List<LastSellingDetailsDTO> accountwiseLastSellingDetails(@RequestParam("accountPid")  String accountPid,
+	public  ResponseEntity<List <LastSellingDetailsDTO>> accountwiseLastSellingDetails(@RequestParam("accountPid")  String accountPid,
 			@RequestParam("productPid")  String productPid) {
 
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
@@ -72,9 +75,16 @@ public class AccountWiseLastSellingDetailsController {
 		String name = "Sales Data Transfer";
 
 		Optional<Activity> activity = activityRepository.findByCompanyPidAndNameIgnoreCase(pid, name);
-
-		String activityPid = activity.get().getPid();
-
+		String activityPid;
+       if(activity.isPresent())
+       {
+		 activityPid = activity.get().getPid();
+          }
+       else {
+    		return ResponseEntity.badRequest().headers(
+					HeaderUtil.createFailureAlert("activity", "activityDoesn'texists","activity by name not present"))
+					.body(null);
+       }
 		String documentPid = null;
 		List<ActivityDocument> activityDocument = activityDocumentRepository.findByActivityPid(activityPid);
 		if (!activityDocument.isEmpty()) {
@@ -86,7 +96,7 @@ public class AccountWiseLastSellingDetailsController {
 		}
 List<LastSellingDetailsDTO >lastSellingDetailsDTO = inventoryVoucherHeaderService.findHeaderByAccountPidUserPidandDocPid(accountPid, userPid,documentPid,productPid);
 
-		return lastSellingDetailsDTO ;
+     return new ResponseEntity<>(lastSellingDetailsDTO,HttpStatus.CREATED); 
 
 	}
 }

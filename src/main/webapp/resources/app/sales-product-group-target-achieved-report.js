@@ -69,6 +69,7 @@ if (!this.SalesTargetAchievedReport) {
 		fromDate = new Date(fromYear, fromMonth - 1, 1);
 		toDate = new Date(toYear, toMonth, 0);
 		console.log(productGroupPids);
+		console.log(employeePid);
 		$.ajax({
 			url : salesTargetAchievedReportContextPath + "/load-data",
 			type : 'GET',

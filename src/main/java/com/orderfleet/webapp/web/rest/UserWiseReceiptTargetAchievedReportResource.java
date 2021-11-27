@@ -1,7 +1,10 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +37,7 @@ import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.UserWiseReceiptTargetRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ActivityService;
 import com.orderfleet.webapp.service.DocumentService;
 import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
@@ -52,7 +56,7 @@ import com.orderfleet.webapp.web.rest.dto.UserWiseReceiptTargetDTO;
 public class UserWiseReceiptTargetAchievedReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(UserWiseReceiptTargetAchievedReportResource.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private EmployeeProfileLocationRepository employeeProfileLocationRepository;
 
@@ -194,17 +198,70 @@ public class UserWiseReceiptTargetAchievedReportResource {
 
 		Double achievedAmount = 0D;
 		if (!accountProfileIds.isEmpty()) {
-
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ACC_QUERY_150" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get accVoucher by accountProfile, doc and activity date";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Set<Long> avHeaderIds = accountingVoucherHeaderRepository
 					.findIdByAccountProfileAndDocumentAndActivityDateBetween(accountProfileIds, documentDto.getPid(),
 							activityDto.getPid(), start.atTime(0, 0), end.atTime(23, 59));
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 
 			if (!avHeaderIds.isEmpty()) {
-
+				 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id1 = "ACC_QUERY_166" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description1 ="get total amount by accountprofile document and activity";
+					LocalDateTime startLCTime1 = LocalDateTime.now();
+					String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+					String startDate1 = startLCTime1.format(DATE_FORMAT1);
+					logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 				achievedAmount = accountingVoucherHeaderRepository
 						.totalAmountByAccountProfileAndDocumentAndActivityDateBetween(accountProfileIds,
 								documentDto.getPid(), activityDto.getPid(), start.atTime(0, 0), end.atTime(23, 59));
-
+				 String flag1 = "Normal";
+					LocalDateTime endLCTime1 = LocalDateTime.now();
+					String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+					String endDate1 = startLCTime1.format(DATE_FORMAT1);
+					Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+					long minutes1 = duration1.toMinutes();
+					if (minutes1 <= 1 && minutes1 >= 0) {
+						flag1 = "Fast";
+					}
+					if (minutes1 > 1 && minutes1 <= 2) {
+						flag1 = "Normal";
+					}
+					if (minutes1 > 2 && minutes1 <= 10) {
+						flag1 = "Slow";
+					}
+					if (minutes1 > 10) {
+						flag1 = "Dead Slow";
+					}
+			                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+							+ description1);
 			}
 		}
 		return achievedAmount == null ? 0 : achievedAmount;

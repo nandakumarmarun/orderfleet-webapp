@@ -377,20 +377,33 @@ public class LeadsTrackerResource {
 		List<Object[]> filledFormsObjArray = new ArrayList<>();
 		if (userPids.isEmpty()) {
 			if ("-1".equals(accountPid)) {
+				String id="FORM_QUERY_113";
+				String description="get the filled form id by documents,form pid and create date between filter and order by account";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				filledFormsObjArray = filledFormRepository
 						.findFilledFormsIdsByDocumentAndFormPidAndCreatedDateBetweenFilterAndOrderByAccount(documentPid,
 								formPid, fromDate, toDate);
 			} else {
+				String id="FORM_QUERY_115";
+			String description="get the filled form id by documents,form pid,account Pid in and create date between";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				filledFormsObjArray = filledFormRepository
 						.findFilledFormsIdsByDocumentAndFormPidAndAccountPidInAndCreatedDateBetween(documentPid,
 								formPid, fromDate, toDate, accountPid);
 			}
 		} else if (!userPids.isEmpty()) {
 			if ("-1".equals(accountPid)) {
+				String id="FORM_QUERY_114";
+				String description="get the filled form id by documents,form pid,userPid and create date between filter and order by account";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 				filledFormsObjArray = filledFormRepository
 						.findFilledFormsIdsByDocumentAndFormPidAndUserPidCreatedByAndCreatedDateBetweenFilterAndOrderByAccount(
 								documentPid, formPid, userPids, fromDate, toDate);
 			} else {
+				String id="FORM_QUERY_116";
+				String description="get the filled form id by documents,form pid,userPid,accountPid In and create date between";
+				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 				filledFormsObjArray = filledFormRepository
 						.findFilledFormsIdsByDocumentAndFormPidAndUserPidCreatedByAndAccountPidInAndCreatedDateBetween(
 								documentPid, formPid, userPids, fromDate, toDate, accountPid);
@@ -413,6 +426,9 @@ public class LeadsTrackerResource {
 		Set<Long> employeeIds = new HashSet<>();
 		Set<Long> executiveTaskExecutionIds = new HashSet<>();
 		if (dynamicDocumentHeaderIds.size() > 0) {
+			String id="DYN_QUERY_141";
+			String description="get  document by filled dynamic document header id in";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
 			List<Object[]> dynamiDocumentObjArray = dynamicDocumentHeaderRepository
 					.findByFilledDynamicDocumentHeaderIdIn(dynamicDocumentHeaderIds);
 
@@ -451,7 +467,9 @@ public class LeadsTrackerResource {
 			List<Object[]> employeeArray = employeeRepository.findByEmpIdIn(employeeIds);
 
 			List<Object[]> userArray = userRepository.findByUserIdIn(userIds);
-
+			String id1="FFD_QUERY_102";
+			String description1="get all form detail by formId in";
+			log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 			List<Object[]> filedFormDetails = filledFormDetailRepository.findAllByFormIdIn(filledFormIds);
 
 			for (Object[] ffObj : filledFormsObjArray) {

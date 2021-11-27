@@ -214,6 +214,10 @@ public class DynamicDocumentDownloadStatusResource {
 	@RequestMapping(value = "/dynamic-documents-download-status/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FormFileDTO>> getDynamicDocumentImages(@PathVariable String pid) {
 		log.debug("Web request to get DynamicDocument images by pid : {}", pid);
+		String id="FORM_QUERY_103";
+		String description="get the form by dynamic document headerPid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		List<FilledForm> filledForms = filledFormRepository.findByDynamicDocumentHeaderPid(pid);
 		List<FormFileDTO> formFileDTOs = new ArrayList<>();
 		if (filledForms.size() > 0) {
@@ -323,9 +327,17 @@ public class DynamicDocumentDownloadStatusResource {
 					.findAllByCompanyIdDocumentPidAndTallyDownloadStatusAndDateBetween(documentPid, tallyStatus,
 							fromDate, toDate);
 		}
+		String id="FORM_QUERY_104";
+		String description="get the form by dynamic document headerPid in";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		List<FilledForm> filledForms = filledFormRepository.findByDynamicDocumentHeaderPidIn(
 				dynamicDocuments.stream().map(d -> d.getPid()).collect(Collectors.toSet()));
 		if (!dynamicDocuments.isEmpty()) {
+			String id1="FORM_QUERY_110";
+			String description1="get the filled form pid and dynamic Document header pid by company";
+			log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
+
 			List<Object[]> filledFormPidAndDynamicDocPid = filledFormRepository
 					.findFilleFormPidAndDynamicDocumentHeaderPidByCompany(
 							dynamicDocuments.stream().map(d -> d.getPid()).collect(Collectors.toSet()));
@@ -350,6 +362,10 @@ public class DynamicDocumentDownloadStatusResource {
 	@RequestMapping(path = "/filled-forms-download-status/download/{id}", method = RequestMethod.GET)
 	public void downloadFilledFormFile(@PathVariable("id") String pid, HttpServletResponse response)
 			throws IOException {
+		String id="FORM_QUERY_101";
+		String description="Get the one filled form by pid ";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		Optional<FilledForm> savedfilledForm = filledFormRepository.findOneByPid(pid);
 		if (savedfilledForm.isPresent()) {
 			FilledForm filledForm = savedfilledForm.get();

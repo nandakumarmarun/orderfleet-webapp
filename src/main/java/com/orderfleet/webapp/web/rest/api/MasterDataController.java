@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.api;
 
 import java.lang.reflect.Array;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,24 +38,19 @@ import com.orderfleet.webapp.domain.DocumentAccountingVoucherColumn;
 import com.orderfleet.webapp.domain.DocumentForms;
 import com.orderfleet.webapp.domain.DocumentInventoryVoucherColumn;
 import com.orderfleet.webapp.domain.FormElementType;
-import com.orderfleet.webapp.domain.MobileConfiguration;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ReferenceDocument;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.VoucherNumberGenerator;
-import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.ActivityStageRepository;
 import com.orderfleet.webapp.repository.FormElementTypeRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
-import com.orderfleet.webapp.repository.MobileConfigurationRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
-import com.orderfleet.webapp.repository.ProductGroupEcomProductsRepository;
-import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ReferenceDocumentRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserDocumentRepository;
@@ -195,7 +191,7 @@ import net.bytebuddy.description.annotation.AnnotationSource.Empty;
 public class MasterDataController {
 
 	private final Logger log = LoggerFactory.getLogger(MasterDataController.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private UserActivityService userActivityService;
 
@@ -400,61 +396,6 @@ public class MasterDataController {
 	@Inject
 	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
 
-	@Inject
-	private MobileConfigurationRepository mobileConfigurationRepository;
-	
-	@Inject
-	private ProductGroupProductRepository productGroupProductRepository;
-	
-	@Inject 
-	private ProductGroupEcomProductsRepository  roductGroupEcomProductsRepository;
-
-	private String mobileAccountProfileDisplayName() {
-
-		String mobileDisplayName = "Name";
-
-		Optional<MobileConfiguration> opMc = mobileConfigurationRepository.findOneByCompanyId();
-
-		if (opMc.isPresent()) {
-
-			if (opMc.get().getAccountProfileDisplayName().equals(DisplayName.NAME)) {
-				mobileDisplayName = "Name";
-			}
-			if (opMc.get().getAccountProfileDisplayName().equals(DisplayName.ALIAS)) {
-				mobileDisplayName = "Alias";
-			}
-			if (opMc.get().getAccountProfileDisplayName().equals(DisplayName.DESCRIPTION)) {
-				mobileDisplayName = "Description";
-			}
-		}
-
-		return mobileDisplayName;
-
-	}
-
-	private String mobileProductProfileDisplayName() {
-
-		String mobileDisplayName = "Name";
-
-		Optional<MobileConfiguration> opMc = mobileConfigurationRepository.findOneByCompanyId();
-
-		if (opMc.isPresent()) {
-
-			if (opMc.get().getProductProfileDisplayName().equals(DisplayName.NAME)) {
-				mobileDisplayName = "Name";
-			}
-			if (opMc.get().getProductProfileDisplayName().equals(DisplayName.ALIAS)) {
-				mobileDisplayName = "Alias";
-			}
-			if (opMc.get().getProductProfileDisplayName().equals(DisplayName.DESCRIPTION)) {
-				mobileDisplayName = "Description";
-			}
-		}
-
-		return mobileDisplayName;
-
-	}
-
 	/**
 	 * GET /account-types : get all accountTypes.
 	 *
@@ -468,14 +409,12 @@ public class MasterDataController {
 	public ResponseEntity<List<AccountTypeDTO>> getAllAccountTypes(
 			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate, Pageable pageable)
 			throws URISyntaxException {
-
 		Page<AccountTypeDTO> pageDTO;
 		if (lastSyncdate == null) {
 			pageDTO = accountTypeService.findAllCompanyAndAccountTypeActivated(pageable, true);
 		} else {
 			pageDTO = accountTypeService.findByLastModifiedAndActivatedTrue(lastSyncdate, pageable);
 		}
-
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
 				.headers(PaginationUtil.generatePaginationHttpHeaders(pageDTO, "/api/account-types"))
 				.body(pageDTO.getContent());
@@ -563,8 +502,6 @@ public class MasterDataController {
 	public ResponseEntity<List<AccountProfileDTO>> getAllAccountProfilesByLocations(
 			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate,
 			@RequestParam int page, @RequestParam int size) throws URISyntaxException {
-
-		String mobileAccountPRofileDisplayName = mobileAccountProfileDisplayName();
 		Page<AccountProfileDTO> pageAccounts;
 		if (lastSyncdate == null) {
 			pageAccounts = locationAccountProfileService
@@ -573,16 +510,6 @@ public class MasterDataController {
 			pageAccounts = locationAccountProfileService
 					.findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDate(page, size, lastSyncdate);
 		}
-
-		pageAccounts.getContent().forEach(accProfile -> {
-
-			if (mobileAccountPRofileDisplayName.equals("Alias")) {
-				accProfile.setName(accProfile.getAlias());
-			}
-			if (mobileAccountPRofileDisplayName.equals("Description")) {
-				accProfile.setName(accProfile.getDescription());
-			}
-		});
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
 				.headers(PaginationUtil.generatePaginationHttpHeaders(pageAccounts, "/api/location-account-profiles"))
 				.body(pageAccounts.getContent());
@@ -810,7 +737,6 @@ public class MasterDataController {
 	public ResponseEntity<List<ProductProfileDTO>> getAllProductProfiles(@RequestParam int page, @RequestParam int size,
 			@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) {
 		log.debug("REST request to get all productProfiles");
-		String mobileProductProfileDisplayName = mobileProductProfileDisplayName();
 		List<ProductProfileDTO> productProfileDTOs;
 		if (lastSyncdate == null) {
 			productProfileDTOs = productProfileService
@@ -819,17 +745,6 @@ public class MasterDataController {
 			productProfileDTOs = productProfileService.findByProductCategoryInAndActivatedTrueAndLastModifiedDate(page,
 					size, lastSyncdate);
 		}
-
-		productProfileDTOs.forEach(proProfile -> {
-
-			if (mobileProductProfileDisplayName.equals("Alias")) {
-				proProfile.setName(proProfile.getAlias());
-			}
-			if (mobileProductProfileDisplayName.equals("Description")) {
-				proProfile.setName(proProfile.getDescription());
-			}
-		});
-
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productProfileDTOs);
 	}
 
@@ -1720,18 +1635,72 @@ public class MasterDataController {
 		// document entry exist in inventory voucher entries
 		boolean documentExit = false;
 		for (VoucherNumberGenerator vng : voucherNumberGeneratorList) {
-			String id = "INV_QUERY_173";
-			String description = "Getting the highest Doc number without the prefix";
-			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
-
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_173" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get highest doc No withOut prefix";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Long lastHighestDocumentNumberwithoutPrefix = 0L;
 			lastHighestDocumentNumberwithoutPrefix = inventoryVoucherHeaderRepository
 					.getHigestDocumentNumberwithoutPrefix(companyPid, userPid, vng.getDocument().getPid(),
 							vng.getPrefix());
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 			if (vng.getDocument().getDocumentType().equals(DocumentType.ACCOUNTING_VOUCHER)) {
+				 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id1 = "ACC_QUERY_169" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description1 ="get the highest doc no without prefix";
+					LocalDateTime startLCTime1 = LocalDateTime.now();
+					String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+					String startDate1 = startLCTime1.format(DATE_FORMAT1);
+					logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 				lastHighestDocumentNumberwithoutPrefix = accountingVoucherHeaderRepository
 						.getHigestDocumentNumberwithoutPrefix(companyPid, userPid, vng.getDocument().getPid(),
 								vng.getPrefix());
+				String flag1 = "Normal";
+				LocalDateTime endLCTime1 = LocalDateTime.now();
+				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+				String endDate1 = startLCTime1.format(DATE_FORMAT1);
+				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+				long minutes1 = duration1.toMinutes();
+				if (minutes1 <= 1 && minutes1 >= 0) {
+					flag1 = "Fast";
+				}
+				if (minutes1 > 1 && minutes1 <= 2) {
+					flag1 = "Normal";
+				}
+				if (minutes1 > 2 && minutes1 <= 10) {
+					flag1 = "Slow";
+				}
+				if (minutes1 > 10) {
+					flag1 = "Dead Slow";
+				}
+		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+						+ description1);
+
 			}
 
 			if (lastHighestDocumentNumberwithoutPrefix != null && lastHighestDocumentNumberwithoutPrefix != 0) {
@@ -1832,26 +1801,6 @@ public class MasterDataController {
 			producProfilePids = producProfilePids.stream().distinct().collect(Collectors.toList());
 		}
 		return new ResponseEntity<>(producProfilePids, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/product-by-productGroup",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<List<ProductProfileDTO>> getAllProductByProductGroup(@RequestParam (value ="productGroupPid")String productGroupPid ){
-		
-		log.debug("REST request to get products by ProductGroupPid"+productGroupPid);
-		
-		 List<ProductProfileDTO> result = productGroupProductRepository.findProductByProductGroupPid(productGroupPid).stream().map(ProductProfileDTO::new).collect(Collectors.toList());
-		
-		return new ResponseEntity<>(result,HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/ecom-product-by-productGroup",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<List<EcomProductProfileDTO>> getAllEcomProductByProductGroup(@RequestParam (value ="productGroupPid")String productGroupPid ){
-		
-		log.debug("REST request to get ecom products by ProductGroupPid"+productGroupPid);
-		 List<EcomProductProfileDTO> result = ecomProductProfileService.findByproductgrupPId(productGroupPid);
-		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
 
 }

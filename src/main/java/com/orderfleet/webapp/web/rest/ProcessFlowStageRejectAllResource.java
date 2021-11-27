@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -137,7 +138,7 @@ import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderResponseDataSap
 public class ProcessFlowStageRejectAllResource {
 
 	private final Logger log = LoggerFactory.getLogger(ProcessFlowStageRejectAllResource.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
 	private static final String MTD = "MTD";
@@ -374,6 +375,10 @@ public class ProcessFlowStageRejectAllResource {
 	@RequestMapping(value = "/process-flow-stage-reject-all/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FormFileDTO>> getDynamicDocumentImages(@PathVariable String pid) {
 		log.debug("Web request to get DynamicDocument images by pid : {}", pid);
+		String id="FORM_QUERY_103";
+		String description="get the form by dynamic document headerPid";
+		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 		List<FilledForm> filledForms = filledFormRepository.findByDynamicDocumentHeaderPid(pid);
 		List<FormFileDTO> formFileDTOs = new ArrayList<>();
 		if (filledForms.size() > 0) {
@@ -474,19 +479,70 @@ public class ProcessFlowStageRejectAllResource {
 
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
-			String id="INV_QUERY_197";
-			String description="Finding invVouchers by UserId and docPid";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_197" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get by UserIdIn and DocumentPidIn and ProcessFlowStatus and DateBetween";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
 							userIds, documentPids, processStatus, fromDate, toDate, true);
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 		} else {
-			String id="INV_QUERY_198";
-			String description="finding by UserIdIn ,AccountPidIn and DocumentPid";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_198" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="finding by UserIdIn ,AccountPidIn and DocumentPid";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndProcessFlowStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
 							userIds, accountPid, documentPids, processStatus, fromDate, toDate, true);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		}
 
 		if (inventoryVouchers.isEmpty()) {
@@ -558,6 +614,10 @@ public class ProcessFlowStageRejectAllResource {
 
 		List<Object[]> objeDynamicDocuments = new ArrayList<Object[]>();
 		if (executiveTaskIds.size() > 0) {
+			String id="DYN_QUERY_142";
+			String description="get all document by executive task execution id in";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 			objeDynamicDocuments = dynamicDocumentHeaderRepository
 					.findAllByExecutiveTaskExecutionIdsIn(executiveTaskIds);
 		}
@@ -1105,16 +1165,49 @@ public class ProcessFlowStageRejectAllResource {
 							"Sales Order Questions");
 
 			if (document.isPresent()) {
-				String id="INV_QUERY_210";
-				String description="Finding the Executive TaskExecutionId by Pid";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "INV_QUERY_210" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="Finding the Executive TaskExecutionId by Pid";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				long executiveTaskExectionId = inventoryVoucherHeaderRepository
 						.findExecutiveTaskExecutionIdByPId(ivhPid);
+
+                String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
+				String id1="DYN_QUERY_134";
+				String description1="get all documents by executive task execution id and doc pid";
+				log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
 				List<Object[]> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 						.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExectionId, document.get().getPid());
 
 				if (dynamicDocumentHeaders.size() > 0) {
 					Object[] obj = dynamicDocumentHeaders.get(0);
+					String id11="FORM_QUERY_103";
+					String description11="get the form by dynamic document headerPid";
+					log.info("{ Query Id:- "+id11+" Query Description:- "+description11+" }");
 
 					List<FilledForm> filledForms = filledFormRepository
 							.findByDynamicDocumentHeaderPid(obj[0].toString());
@@ -1370,11 +1463,35 @@ public class ProcessFlowStageRejectAllResource {
 
 			for (InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO : inventoryVoucherHeaderDtos)
 				if (!inventoryVoucherHeaderDTO.getPdfDownloadStatus()) {
-					String id="INV_QUERY_187";
-					String description="Updating pdf download status by pid";
-					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+					 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "INV_QUERY_187" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="Updating pdf download status by pid";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
-
+					 String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+								+ description);
 				}
 		}
 

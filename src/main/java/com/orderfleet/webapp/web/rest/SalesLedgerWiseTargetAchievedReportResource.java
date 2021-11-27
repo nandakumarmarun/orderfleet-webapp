@@ -1,8 +1,10 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -85,7 +88,7 @@ import com.orderfleet.webapp.web.rest.mapper.SalesTargetGroupUserTargetMapper;
 public class SalesLedgerWiseTargetAchievedReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesLedgerWiseTargetAchievedReportResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private SalesLedgerWiseTargetRepository salesSalesLedgerWiseTargetRepository;
 
@@ -216,12 +219,39 @@ public class SalesLedgerWiseTargetAchievedReportResource {
 //			List<InventoryVoucherHeader> allInventoryVoucherHeader = inventoryVoucherHeaderRepository
 //					.findAllByCompanyIdOrderByCreatedDateDesc();
 
-		String id="INV_QUERY_102";
-		String description="Selecting Inventory voucher id,receiver account id,document id and document date from invntory voucher header by validating company id and order by create date in descending order and getting result asa list of object";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		
+		String id = "INV_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all by companyId as a list of Object";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		Long start = System.nanoTime();
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> allInventoryVoucherHeaderObject = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndOrderByCreatedDateDesc();
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
 
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		List<InventoryVoucherHeaderDTO> allInventoryVoucherHeader = new ArrayList<>();
 
 		for (Object[] obj : allInventoryVoucherHeaderObject) {
@@ -280,12 +310,12 @@ public class SalesLedgerWiseTargetAchievedReportResource {
 
 				Tamountttt += salesSalesLedgerWiseTargetDTO.getAmount();
 
-				LocalDate start = monthDate.with(TemporalAdjusters.firstDayOfMonth()).minusDays(1);
+				LocalDate start1 = monthDate.with(TemporalAdjusters.firstDayOfMonth()).minusDays(1);
 				LocalDate end = monthDate.with(TemporalAdjusters.lastDayOfMonth()).plusDays(1);
 				Double achievedAmount = 0D;
 				if (!salesLedgerIds.isEmpty()) {
 					Set<Long> ivHeaderIds = allInventoryVoucherHeader.stream().filter(av -> {
-						if (av.getDocumentDate().isAfter(start.atTime(23, 59))
+						if (av.getDocumentDate().isAfter(start1.atTime(23, 59))
 								&& av.getDocumentDate().isBefore(end.atTime(0, 0))) {
 							return true;
 						}
@@ -296,11 +326,36 @@ public class SalesLedgerWiseTargetAchievedReportResource {
 					}).map(m -> m.getInventoryVoucherHeaderId()).collect(Collectors.toSet());
 
 					if (!ivHeaderIds.isEmpty()) {
-						String id1="INV_QUERY_211";
-						String description1="Finding sum of amount by sales ledger Id and HeaderIds";
-						log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
+						 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+							DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+							String id1 = "INV_QUERY_211" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+							String description1 ="Finding sum of amount by sales ledger Id and HeaderIds";
+							LocalDateTime startLCTime1 = LocalDateTime.now();
+							String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+							String startDate1 = startLCTime1.format(DATE_FORMAT1);
+							logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 						achievedAmount = inventoryVoucherHeaderRepository
 								.sumOfAmountByAndSalesLedgerIdAndHeaderIds(salesLedger.getId(), ivHeaderIds);
+						 String flag1 = "Normal";
+							LocalDateTime endLCTime1 = LocalDateTime.now();
+							String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+							String endDate1 = startLCTime1.format(DATE_FORMAT1);
+							Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+							long minutes1 = duration1.toMinutes();
+							if (minutes1 <= 1 && minutes1 >= 0) {
+								flag1 = "Fast";
+							}
+							if (minutes1 > 1 && minutes1 <= 2) {
+								flag1 = "Normal";
+							}
+							if (minutes1 > 2 && minutes1 <= 10) {
+								flag1 = "Slow";
+							}
+							if (minutes1 > 10) {
+								flag1 = "Dead Slow";
+							}
+					                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+									+ description1);
 					}
 				}
 
@@ -344,16 +399,37 @@ public class SalesLedgerWiseTargetAchievedReportResource {
 		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
 		Double achievedAmount = 0D;
 		if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
-			String id="INV_QUERY_166";
-			String description="Listing inv Vouchers by using AccountPid,DocPid and Doc date between and tallydownloadStaus";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
-
-
-
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_166" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get Id by UserPid and Documents and Products CreatedDateBetween";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository
 					.findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(userPid, documentIds,
 							start.atTime(0, 0), end.atTime(23, 59));
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			if (!ivHeaderIds.isEmpty()) {
 				achievedAmount = inventoryVoucherDetailRepository
 						.sumOfAmountByAndProductIdsAndHeaderIds(productProfileIds, ivHeaderIds);

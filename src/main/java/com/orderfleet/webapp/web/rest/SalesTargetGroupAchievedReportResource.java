@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -81,7 +83,7 @@ import com.orderfleet.webapp.web.rest.mapper.SalesTargetGroupUserTargetMapper;
 public class SalesTargetGroupAchievedReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesTargetGroupAchievedReportResource.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private SalesProductGroupUserTargetRepository salesProductGroupUserTargetRepository;
 
@@ -215,11 +217,37 @@ public class SalesTargetGroupAchievedReportResource {
 
 //			List<InventoryVoucherHeader> allInventoryVoucherHeader = inventoryVoucherHeaderRepository
 //					.findAllByCompanyIdOrderByCreatedDateDesc();
-		String id="INV_QUERY_204";
-		String description="Getting All invVouchers by companyid";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "INV_QUERY_204" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="Getting All invVouchers by companyid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> allInventoryVoucherHeaderObject = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndOrderByCreatedDateDescOptimised();
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
 
 		List<InventoryVoucherHeaderDTO> allInventoryVoucherHeader = new ArrayList<>();
 
@@ -361,16 +389,38 @@ public class SalesTargetGroupAchievedReportResource {
 		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
 		Double achievedAmount = 0D;
 		if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
-			String id="INV_QUERY_166";
-			String description="Listing inv Vouchers by using AccountPid,DocPid and Doc date between and tallydownloadStaus";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
-
-
-
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_166" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get Id by UserPid and Documents and Products CreatedDateBetween";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository
 					.findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(userPid, documentIds,
 							start.atTime(0, 0), end.atTime(23, 59));
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 			if (!ivHeaderIds.isEmpty()) {
 				achievedAmount = inventoryVoucherDetailRepository
 						.sumOfAmountByAndProductIdsAndHeaderIds(productProfileIds, ivHeaderIds);

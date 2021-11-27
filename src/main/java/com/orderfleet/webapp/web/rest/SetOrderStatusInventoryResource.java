@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -8,6 +9,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
@@ -41,6 +44,7 @@ import com.orderfleet.webapp.web.rest.dto.OrderStatusDTO;
 public class SetOrderStatusInventoryResource {
 
 	private final Logger log = LoggerFactory.getLogger(SetOrderStatusInventoryResource.class);
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountProfileService accountProfileService;
 
@@ -116,61 +120,268 @@ public class SetOrderStatusInventoryResource {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
-		if(employeePid.equals("no")) {
+		if (employeePid.equals("no")) {
 			if (statusId == -1 && accountPid.equals("no")) {
-				String id="INV_QUERY_145";
-				String description="Selecting inv_vou DocDate,employeename,Receiveraccountname,docTotal,OrderStatusname from invVouHeader  by validating companyId and DocdateBetween and orderby docDate in desc order";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_145" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get all by compId and date between ";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdDateBetweenOrderByDocumentDateDesc(fromDate, toDate);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+				logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			} else if (statusId != -1 && accountPid.equals("no")) {
-				String id="INV_QUERY_147";
-				String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,orderStatus id and docDtaeBetween and Order by DocDate in desc order";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_147" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get all by compId order Status and date between ";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 						.findAllByCompanyIdOrderStatusAndDateBetweenOrderByDocumentDateDesc(statusId, fromDate, toDate);
-			} else if (statusId == -1 && !accountPid.equals("no")) {
-				String id="INV_QUERY_148";
-				String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,receiver AccountPid and docDtaeBetween and Order by DocDate in desc order";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-						.findAllByCompanyIdAccountPidAndDateBetweenOrderByDocumentDateDesc(accountPid, fromDate, toDate);
-			} else if (statusId != -1 && !accountPid.equals("no")) {
-				String id="INV_QUERY_149";
-				String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,orderStatus id,receiver AccountPid and docDtaeBetween and Order by DocDate in desc order";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-						.findAllByCompanyIdOrderStatusIdAccountPidAndDateBetweenOrderByDocumentDateDesc( accountPid,statusId,
-								fromDate, toDate);
-			}
-			}else {
-				if (statusId == -1 && accountPid.equals("no")) {
-					String id="INV_QUERY_146";
-					String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId and docDtaeBetween and Order by DocDate in desc order";
-					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-					inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-							.findAllByCompanyIdEmployeePidAndDateBetweenOrderByDocumentDateDesc(employeePid,fromDate, toDate);
-				} else if (statusId != -1 && accountPid.equals("no")) {
-					String id="INV_QUERY_150";
-					String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,employee pid,orderStatus id and docDtaeBetween and Order by DocDate in desc order";
-					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-					inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-							.findAllByCompanyIdEmployeePidOrderStatusIdAndDateBetweenOrderByDocumentDateDesc(employeePid,statusId, fromDate, toDate);
-				} else if (statusId == -1 && !accountPid.equals("no")) {
-					String id="INV_QUERY_152";
-					String description=" Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,employee pid,receiver AccountPid and docDtaeBetween and Order by DocDate in desc order";
-					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-					inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-							.findAllByCompanyIdEmployeePidAccountPidAndDateBetweenOrderByDocumentDateDesc(employeePid,accountPid, fromDate, toDate);
-				} else if (statusId != -1 && !accountPid.equals("no")) {
-					String id="INV_QUERY_151";
-					String description="Selecting inv voucher DocDate,employeename,receiverAccountName,DocTotal,orderStatusname from invVouHeader by validating companyId ,employee pid,orderStatus id,receiver AccountPid and docDtaeBetween and Order by DocDate in desc order";
-					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-					inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-							.findAllByCompanyIdEmployeePidOrderStatusIdAccountPidAndDateBetweenOrderByDocumentDateDesc(employeePid,statusId, accountPid,
-									fromDate, toDate);
+
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
 				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+				logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+			} else if (statusId == -1 && !accountPid.equals("no")) {
+			       DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "INV_QUERY_148" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description = "get all by compId AccountPid and date between ";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByCompanyIdAccountPidAndDateBetweenOrderByDocumentDateDesc(accountPid, fromDate,
+								toDate);
+				 String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
+			} else if (statusId != -1 && !accountPid.equals("no")) {
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_149" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get all by compId Order sattusId AccountPid and date between ";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByCompanyIdOrderStatusIdAccountPidAndDateBetweenOrderByDocumentDateDesc(accountPid,
+								statusId, fromDate, toDate);
+
+                String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 			}
+		} else {
+			if (statusId == -1 && accountPid.equals("no")) {
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get all by compId employeePidand date between ";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByCompanyIdEmployeePidAndDateBetweenOrderByDocumentDateDesc(employeePid, fromDate,
+								toDate);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+				logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+			} else if (statusId != -1 && accountPid.equals("no")) {
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_150" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get all by compId Order sattusId EmployeePid and date between ";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByCompanyIdEmployeePidOrderStatusIdAndDateBetweenOrderByDocumentDateDesc(employeePid,
+								statusId, fromDate, toDate);
+				  String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
+			} else if (statusId == -1 && !accountPid.equals("no")) {
+			     DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "INV_QUERY_152" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description = "get all by compId EmployeePid and accountPid and date between ";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByCompanyIdEmployeePidAccountPidAndDateBetweenOrderByDocumentDateDesc(employeePid,
+								accountPid, fromDate, toDate);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
+			} else if (statusId != -1 && !accountPid.equals("no")) {
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "INV_QUERY_151" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description = "get all by compId Order sattusId EmployeePid and accountPid and date between ";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByCompanyIdEmployeePidOrderStatusIdAccountPidAndDateBetweenOrderByDocumentDateDesc(
+								employeePid, statusId, accountPid, fromDate, toDate);
+				 String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
+			}
+		}
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
 		if (!inventoryVoucherHeaders.isEmpty()) {
 			for (Object[] object : inventoryVoucherHeaders) {

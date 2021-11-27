@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -18,10 +20,12 @@ import com.orderfleet.webapp.domain.StageDetail;
 import com.orderfleet.webapp.domain.StageHeader;
 import com.orderfleet.webapp.domain.StageHeaderFile;
 import com.orderfleet.webapp.repository.FilledFormRepository;
+import com.orderfleet.webapp.web.rest.OtherVoucherTransactionResource;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StageHeaderDTO {
 
+	private final Logger log = LoggerFactory.getLogger( StageHeaderDTO.class);
 	private Long id;
 
 	private String accountProfilePid;
@@ -119,6 +123,10 @@ public class StageHeaderDTO {
 			this.stageDetailId = stageDetail.getId();
 			this.dynamicDocumentHeaderPid = stageDetail.getDynamicDocumentHeaderPid();
 			this.activityName = stageDetail.getActivity().getName();
+			String id="FORM_QUERY_109";
+			String description="get the files by dynamic document header";
+			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+
 			Set<File> dSavedFiles = filledFormRepository.findFilesByDynamicDocumentHeaderPid(this.dynamicDocumentHeaderPid);
 			for (File file : dSavedFiles) {
 				files.put(file.getPid(), file.getFileName());
