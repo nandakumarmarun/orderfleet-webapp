@@ -71,6 +71,8 @@ public interface InventoryVoucherHeaderService {
 	 * @return the entity
 	 */
 	Optional<InventoryVoucherHeaderDTO> findOneByPid(String pid);
+	
+	Optional<InventoryVoucherHeaderDTO> findByPid(String pid);
 
 	List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndDateBetween(LocalDateTime fromDate, LocalDateTime toDate,
 			List<Document> documents);

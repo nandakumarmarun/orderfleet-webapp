@@ -141,7 +141,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ " INNER JOIN tbl_account_profile ap on ivh.receiver_account_id = ap.id " + " where ivh.pid IN (?1) ";
 
 	Optional<InventoryVoucherHeader> findOneByPid(String pid);
-
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.pid = ?1")
+	Optional<InventoryVoucherHeader> findByPid(String pid);
+	
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdOrderByCreatedDateDesc();
 

@@ -198,7 +198,7 @@ public class SalesPerformanceReportResource {
 	public ResponseEntity<InventoryVoucherHeaderDTO> getInventoryVoucher(@PathVariable String pid) {
 		log.debug("Web request to get inventoryVoucherDTO by pid : {}", pid);
 		Optional<InventoryVoucherHeaderDTO> optionalInventoryVoucherHeaderDTO = inventoryVoucherService
-				.findOneByPid(pid);
+				.findByPid(pid);
 		if (optionalInventoryVoucherHeaderDTO.isPresent()) {
 			InventoryVoucherHeaderDTO inventoryVoucherDTO = optionalInventoryVoucherHeaderDTO.get();
 			Double ivTotalVolume = inventoryVoucherDTO.getInventoryVoucherDetails().stream()
