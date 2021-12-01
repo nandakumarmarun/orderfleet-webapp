@@ -1,8 +1,10 @@
 package com.orderfleet.webapp.service.impl;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +44,7 @@ import com.orderfleet.webapp.web.rest.dto.PunchOutDTO;
 public class PunchOutServiceImpl implements PunchOutService {
 
 	private final Logger log = LoggerFactory.getLogger(PunchOutServiceImpl.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private PunchOutRepository punchOutRepository;
 
@@ -71,12 +73,38 @@ public class PunchOutServiceImpl implements PunchOutService {
 
 			LocalDateTime clientFromDate = punchOutDTO.getPunchOutDate().toLocalDate().atTime(0, 0);
 			LocalDateTime clientToDate = punchOutDTO.getPunchOutDate().toLocalDate().atTime(23, 59);
-			String id="ATT_QUERY_121";
-			String description="get the top 1 by companyPid ,userPid and planned date between and order by create date in desc ";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ATT_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get the top 1 by companyPid ,userPid and planned date between";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Optional<Attendance> optionalAttendence = attendanceRepository
 					.findTop1ByCompanyPidAndUserPidAndPlannedDateBetweenOrderByCreatedDateDesc(
 							user.get().getCompany().getPid(), user.get().getPid(), clientFromDate, clientToDate);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 			if (optionalAttendence.isPresent()) {
 				log.info("Attendance exist");
 

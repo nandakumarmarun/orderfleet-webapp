@@ -2,6 +2,8 @@ package com.orderfleet.webapp.web.rest.api;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +64,7 @@ import com.orderfleet.webapp.web.websocket.dto.ActivityDTO;
 public class AttendanceController {
 
 	private final Logger log = LoggerFactory.getLogger(AttendanceController.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AttendanceService attendanceService;
 
@@ -218,10 +220,15 @@ public class AttendanceController {
 							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
 					.body(null);
 		}
-		String id="ATT_QUERY_120";
-		String description="get the one attendance by image Ref no ";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-		return attendanceRepository.findOneByImageRefNo(imageRefNo).map(attendance -> {
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ATT_QUERY_120" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get the one attendance by image Ref no";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+	ResponseEntity<Object> upload	= attendanceRepository.findOneByImageRefNo(imageRefNo).map(attendance -> {
 			try {
 				File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
 						file.getOriginalFilename(), file.getContentType());
@@ -238,6 +245,7 @@ public class AttendanceController {
 		}).orElse(ResponseEntity.badRequest()
 				.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
 				.body(null));
+	return upload;
 	}
 
 	@RequestMapping(value = "/update-attendance-status-subgroup", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

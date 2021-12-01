@@ -1,5 +1,8 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +39,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountGroupMapper;
 public class AccountGroupServiceImpl implements AccountGroupService {
 
 	private final Logger log = LoggerFactory.getLogger(AccountGroupServiceImpl.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountGroupRepository accountGroupRepository;
 
@@ -77,7 +80,15 @@ public class AccountGroupServiceImpl implements AccountGroupService {
 	@Override
 	public AccountGroupDTO update(AccountGroupDTO accountGroupDTO) {
 		log.debug("Request to Update AccountGroup : {}", accountGroupDTO);
-		return accountGroupRepository.findOneByPid(accountGroupDTO.getPid()).map(accountGroup -> {
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AG_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			 AccountGroupDTO accountgroupDTO= accountGroupRepository.findOneByPid(accountGroupDTO.getPid()).map(accountGroup -> {
 			accountGroup.setName(accountGroupDTO.getName());
 			accountGroup.setAlias(accountGroupDTO.getAlias());
 			accountGroup.setDescription(accountGroupDTO.getDescription());
@@ -85,6 +96,27 @@ public class AccountGroupServiceImpl implements AccountGroupService {
 			AccountGroupDTO result = accountGroupMapper.accountGroupToAccountGroupDTO(accountGroup);
 			return result;
 		}).orElse(null);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+					return accountgroupDTO;
 	}
 
 	/**
@@ -113,7 +145,36 @@ public class AccountGroupServiceImpl implements AccountGroupService {
 	@Transactional(readOnly = true)
 	public Page<AccountGroupDTO> findAllByCompany(Pageable pageable) {
 		log.debug("Request to get all AccountGroups");
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AG_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all by comId and order by accGroupName";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Page<AccountGroup> accountGroups = accountGroupRepository.findAllByCompanyIdOrderByAccountGroupName(pageable);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
 		Page<AccountGroupDTO> result = new PageImpl<AccountGroupDTO>(
 				accountGroupMapper.accountGroupsToAccountGroupDTOs(accountGroups.getContent()), pageable,
 				accountGroups.getTotalElements());
@@ -147,10 +208,40 @@ public class AccountGroupServiceImpl implements AccountGroupService {
 	@Transactional(readOnly = true)
 	public Optional<AccountGroupDTO> findOneByPid(String pid) {
 		log.debug("Request to get AccountGroup by pid : {}", pid);
-		return accountGroupRepository.findOneByPid(pid).map(accountGroup -> {
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AG_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			 Optional<AccountGroupDTO>AGroupDTO= accountGroupRepository.findOneByPid(pid).map(accountGroup -> {
 			AccountGroupDTO accountGroupDTO = accountGroupMapper.accountGroupToAccountGroupDTO(accountGroup);
 			return accountGroupDTO;
 		});
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+					return AGroupDTO;
+
 	}
 
 	/**
@@ -164,11 +255,41 @@ public class AccountGroupServiceImpl implements AccountGroupService {
 	@Transactional(readOnly = true)
 	public Optional<AccountGroupDTO> findByName(String name) {
 		log.debug("Request to get AccountGroup by name : {}", name);
-		return accountGroupRepository.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), name)
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AG_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get by companyId and name Ignore case";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		Optional<AccountGroupDTO>agDTO= accountGroupRepository.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), name)
 				.map(accountGroup -> {
 					AccountGroupDTO accountGroupDTO = accountGroupMapper.accountGroupToAccountGroupDTO(accountGroup);
 					return accountGroupDTO;
 				});
+
+        String flag = "Normal";
+LocalDateTime endLCTime = LocalDateTime.now();
+String endTime = endLCTime.format(DATE_TIME_FORMAT);
+String endDate = startLCTime.format(DATE_FORMAT);
+Duration duration = Duration.between(startLCTime, endLCTime);
+long minutes = duration.toMinutes();
+if (minutes <= 1 && minutes >= 0) {
+	flag = "Fast";
+}
+if (minutes > 1 && minutes <= 2) {
+	flag = "Normal";
+}
+if (minutes > 2 && minutes <= 10) {
+	flag = "Slow";
+}
+if (minutes > 10) {
+	flag = "Dead Slow";
+}
+        logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		+ description);
+		return agDTO;
 	}
 
 	/**
@@ -179,9 +300,38 @@ public class AccountGroupServiceImpl implements AccountGroupService {
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete AccountGroup : {}", pid);
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AG_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		accountGroupRepository.findOneByPid(pid).ifPresent(accountGroup -> {
 			accountGroupRepository.delete(accountGroup.getId());
 		});
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 	}
 
 	/**
@@ -199,12 +349,41 @@ public class AccountGroupServiceImpl implements AccountGroupService {
 	@Override
 	public AccountGroupDTO updateAccountGroupStatus(String pid, boolean activate) {
 		log.debug("Request to update AccountGroup status");
-		return accountGroupRepository.findOneByPid(pid).map(accountGroup -> {
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AG_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		AccountGroupDTO agDTO=	accountGroupRepository.findOneByPid(pid).map(accountGroup -> {
 			accountGroup.setActivated(activate);
 			accountGroup = accountGroupRepository.save(accountGroup);
 			AccountGroupDTO result = accountGroupMapper.accountGroupToAccountGroupDTO(accountGroup);
 			return result;
 		}).orElse(null);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+		return agDTO;
 	}
 
 	/**
@@ -222,7 +401,35 @@ public class AccountGroupServiceImpl implements AccountGroupService {
 	@Override
 	public Page<AccountGroupDTO> findAllByCompanyAndActivated(Pageable pageable, boolean active) {
 		log.debug("Request to get all active accountGroup");
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AG_QUERY_106" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all by company and active";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Page<AccountGroup> accountGroupList = accountGroupRepository.findAllByCompanyAndActive(pageable, active);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		Page<AccountGroupDTO> result = new PageImpl<AccountGroupDTO>(
 				accountGroupMapper.accountGroupsToAccountGroupDTOs(accountGroupList.getContent()), pageable,
 				accountGroupList.getTotalElements());
@@ -242,7 +449,35 @@ public class AccountGroupServiceImpl implements AccountGroupService {
 	@Override
 	public List<AccountGroupDTO> findAllByCompanyAndDeactivated(boolean deactive) {
 		log.debug("Request to get all Deactive accountGroup");
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AG_QUERY_107" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all by company and deactive";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountGroup> accountGroupList = accountGroupRepository.findAllByCompanyAndDeactive(deactive);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		List<AccountGroupDTO> result = accountGroupMapper.accountGroupsToAccountGroupDTOs(accountGroupList);
 		return result;
 	}

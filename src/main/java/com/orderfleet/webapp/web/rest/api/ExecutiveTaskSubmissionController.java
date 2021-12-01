@@ -218,103 +218,103 @@ public class ExecutiveTaskSubmissionController {
 
 //				List<Object[]> objectArray = inventoryVoucherHeaderRepository.getLastNumberForEachDocument(companyPid,
 //						userPid, documentPids);
-				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-					String id = "INV_QUERY_172" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-					String description ="get the last date with company user doc";
-					LocalDateTime startLCTime = LocalDateTime.now();
-					String startTime = startLCTime.format(DATE_TIME_FORMAT);
-					String startDate = startLCTime.format(DATE_FORMAT);
-					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid,
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_172" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get the last date with company user doc";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+				LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid,
 						userPid, documentPids);
-String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-              logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+				logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 
 				log.info("Last Date " + lastDate);
 				if (lastDate == null) {
 					lastDate = LocalDateTime.now();
 				}
-				 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-					DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-					String id1 = "INV_QUERY_171" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-					String description1 ="get  last no for each doc optimized";
-					LocalDateTime startLCTime1 = LocalDateTime.now();
-					String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-					String startDate1 = startLCTime1.format(DATE_FORMAT1);
-					logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+				DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id1 = "INV_QUERY_171" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description1 = "get  last no for each doc optimized";
+				LocalDateTime startLCTime1 = LocalDateTime.now();
+				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+				String startDate1 = startLCTime1.format(DATE_FORMAT1);
+				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 				List<Object[]> objectArray = inventoryVoucherHeaderRepository
 						.getLastNumberForEachDocumentOptimized(companyPid, userPid, documentPids, lastDate);
-				 String flag1 = "Normal";
-					LocalDateTime endLCTime1 = LocalDateTime.now();
-					String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-					String endDate1 = startLCTime1.format(DATE_FORMAT1);
-					Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-					long minutes1 = duration1.toMinutes();
-					if (minutes1 <= 1 && minutes1 >= 0) {
-						flag1 = "Fast";
-					}
-					if (minutes1 > 1 && minutes1 <= 2) {
-						flag1 = "Normal";
-					}
-					if (minutes1 > 2 && minutes1 <= 10) {
-						flag1 = "Slow";
-					}
-					if (minutes1 > 10) {
-						flag1 = "Dead Slow";
-					}
-			                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-							+ description1);
+				String flag1 = "Normal";
+				LocalDateTime endLCTime1 = LocalDateTime.now();
+				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+				String endDate1 = startLCTime1.format(DATE_FORMAT1);
+				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+				long minutes1 = duration1.toMinutes();
+				if (minutes1 <= 1 && minutes1 >= 0) {
+					flag1 = "Fast";
+				}
+				if (minutes1 > 1 && minutes1 <= 2) {
+					flag1 = "Normal";
+				}
+				if (minutes1 > 2 && minutes1 <= 10) {
+					flag1 = "Slow";
+				}
+				if (minutes1 > 10) {
+					flag1 = "Dead Slow";
+				}
+				logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
+						+ "," + description1);
 
-			                DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			        		DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			        		String id11 = "INV_QUERY_174" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			        		String description11 ="get all Doc No for Each document";
-			        		LocalDateTime startLCTime11 = LocalDateTime.now();
-			        		String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
-			        		String startDate11 = startLCTime11.format(DATE_FORMAT11);
-			        		logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
+				DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id11 = "INV_QUERY_174" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description11 = "get all Doc No for Each document";
+				LocalDateTime startLCTime11 = LocalDateTime.now();
+				String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+				String startDate11 = startLCTime11.format(DATE_FORMAT11);
+				logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 
-		List<Object[]> documentVoucherNumberListObject = inventoryVoucherHeaderRepository
+				List<Object[]> documentVoucherNumberListObject = inventoryVoucherHeaderRepository
 						.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
-		String flag11 = "Normal";
-		LocalDateTime endLCTime11 = LocalDateTime.now();
-		String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
-		String endDate11 = startLCTime11.format(DATE_FORMAT11);
-		Duration duration11 = Duration.between(startLCTime11, endLCTime11);
-		long minutes11 = duration11.toMinutes();
-		if (minutes11 <= 1 && minutes11 >= 0) {
-			flag11 = "Fast";
-		}
-		if (minutes11 > 1 && minutes11 <= 2) {
-			flag11 = "Normal";
-		}
-		if (minutes11 > 2 && minutes11 <= 10) {
-			flag11 = "Slow";
-		}
-		if (minutes11 > 10) {
-			flag11 = "Dead Slow";
-		}
-                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
-				+ description11);
+				String flag11 = "Normal";
+				LocalDateTime endLCTime11 = LocalDateTime.now();
+				String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+				String endDate11 = startLCTime11.format(DATE_FORMAT11);
+				Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+				long minutes11 = duration11.toMinutes();
+				if (minutes11 <= 1 && minutes11 >= 0) {
+					flag11 = "Fast";
+				}
+				if (minutes11 > 1 && minutes11 <= 2) {
+					flag11 = "Normal";
+				}
+				if (minutes11 > 2 && minutes11 <= 10) {
+					flag11 = "Slow";
+				}
+				if (minutes11 > 10) {
+					flag11 = "Dead Slow";
+				}
+				logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END,"
+						+ flag11 + "," + description11);
 
 				List<String> documentVoucherNumberList = new ArrayList<>();
 
@@ -438,14 +438,14 @@ String flag = "Normal";
 			List<String> documentPids = new ArrayList<String>();
 
 			documentPids.add(accountingVoucherDocument.get().getPid());
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "ACC_QUERY_164" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get all document number for each document";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_164" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all document number for each document";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			List<Object[]> documentVoucherNumberListObject = accountingVoucherHeaderRepository
 					.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
 			String flag = "Normal";
@@ -466,7 +466,7 @@ String flag = "Normal";
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 			List<String> documentVoucherNumberList = new ArrayList<>();
 
@@ -510,13 +510,36 @@ String flag = "Normal";
 			List<String> documentPids = new ArrayList<String>();
 
 			documentPids.add(dynamicVoucherDocument.get().getPid());
-			String id="DYN_QUERY_145";
-			String description="get all doc no by each doc type";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "DYN_QUERY_145" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all doc no by each doc type";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			List<Object[]> documentVoucherNumberListObject = dynamicDocumentHeaderRepository
 					.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
-
+			  String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			List<String> documentVoucherNumberList = new ArrayList<>();
 
 			if (documentVoucherNumberListObject.size() > 0) {
@@ -806,11 +829,15 @@ String flag = "Normal";
 							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
 					.body(null);
 		}
-		String id="FORM_QUERY_102";
-		String description="get the one form by dynamic document header ,executive task execution pid and image ref no";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
-		return filledFormRepository
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "FORM_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get the one form by dyn doc header executive task execution pid and image ref no";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		ResponseEntity<Object>	uploadfile= filledFormRepository
 				.findOneByDynamicDocumentHeaderExecutiveTaskExecutionPidAndImageRefNo(executiveTaskExecutionPid,
 						imageRefNo)
 				.map(filledForm -> {
@@ -821,49 +848,6 @@ String flag = "Normal";
 						filledForm.getFiles().add(uploadedFile);
 						filledFormRepository.save(filledForm);
 						log.debug("uploaded file for FilledForm: {}", filledForm);
-						return new ResponseEntity<>(HttpStatus.OK);
-					} catch (FileManagerException | IOException ex) {
-						log.debug("File upload exception : {}", ex.getMessage());
-						return ResponseEntity.badRequest()
-								.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage()))
-								.body(null);
-					}
-				})
-				.orElse(ResponseEntity.badRequest()
-						.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
-						.body(null));
-	}
-
-	@Transactional
-	@RequestMapping(value = "/upload/receiptImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> uploadReceiptImageFile(
-			@RequestParam("executiveTaskExecutionPid") String executiveTaskExecutionPid,
-			@RequestParam("imageRefNo") String imageRefNo, @RequestParam("file") MultipartFile file) {
-		log.debug("Request Receipt Image to upload a file : {}", file);
-		if (file.isEmpty()) {
-			return ResponseEntity.badRequest()
-					.headers(
-							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
-					.body(null);
-		}
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "ACC_QUERY_152" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get accVoucher by executiveTaskExecutionId and ImageRefNo";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		ResponseEntity<Object> avc = accountingVoucherHeaderRepository
-				.findOneByExecutiveTaskExecutionPidAndImageRefNo(executiveTaskExecutionPid, imageRefNo)
-					.map(accountingVoucherHeader -> {
-					try {
-						File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
-								file.getOriginalFilename(), file.getContentType());
-						// update filledForm with file
-						accountingVoucherHeader.getFiles().add(uploadedFile);
-						accountingVoucherHeaderRepository.save(accountingVoucherHeader);
-						log.debug("uploaded file for Accounting Voucher Header: {}", accountingVoucherHeader);
 						return new ResponseEntity<>(HttpStatus.OK);
 					} catch (FileManagerException | IOException ex) {
 						log.debug("File upload exception : {}", ex.getMessage());
@@ -896,8 +880,73 @@ String flag = "Normal";
 			}
 	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
+					return uploadfile;
+	}
+
+	@Transactional
+	@RequestMapping(value = "/upload/receiptImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> uploadReceiptImageFile(
+			@RequestParam("executiveTaskExecutionPid") String executiveTaskExecutionPid,
+			@RequestParam("imageRefNo") String imageRefNo, @RequestParam("file") MultipartFile file) {
+		log.debug("Request Receipt Image to upload a file : {}", file);
+		if (file.isEmpty()) {
+			return ResponseEntity.badRequest()
+					.headers(
+							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
+					.body(null);
+		}
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ACC_QUERY_152" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get accVoucher by executiveTaskExecutionId and ImageRefNo";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		ResponseEntity<Object> avc = accountingVoucherHeaderRepository
+				.findOneByExecutiveTaskExecutionPidAndImageRefNo(executiveTaskExecutionPid, imageRefNo)
+				.map(accountingVoucherHeader -> {
+					try {
+						File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
+								file.getOriginalFilename(), file.getContentType());
+						// update filledForm with file
+						accountingVoucherHeader.getFiles().add(uploadedFile);
+						accountingVoucherHeaderRepository.save(accountingVoucherHeader);
+						log.debug("uploaded file for Accounting Voucher Header: {}", accountingVoucherHeader);
+						return new ResponseEntity<>(HttpStatus.OK);
+					} catch (FileManagerException | IOException ex) {
+						log.debug("File upload exception : {}", ex.getMessage());
+						return ResponseEntity.badRequest()
+								.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage()))
+								.body(null);
+					}
+				})
+
+				.orElse(ResponseEntity.badRequest()
+						.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
+						.body(null));
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		return avc;
-		
+
 	}
 
 	/**
@@ -914,7 +963,7 @@ String flag = "Normal";
 
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			
+
 			String id = "INV_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 			String description = "get all by executive task execution Pid ";
 			LocalDateTime startLCTime = LocalDateTime.now();
@@ -941,12 +990,12 @@ String flag = "Normal";
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
-	      DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id1 = "ACC_QUERY_119" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description1 =" get all AccVoucher By ExecutiveTask Execution Pid ";
+			String description1 = " get all AccVoucher By ExecutiveTask Execution Pid ";
 			LocalDateTime startLCTime1 = LocalDateTime.now();
 			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 			String startDate1 = startLCTime1.format(DATE_FORMAT1);
@@ -971,13 +1020,38 @@ String flag = "Normal";
 			if (minutes1 > 10) {
 				flag1 = "Dead Slow";
 			}
-	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-					+ description1);
-			String id11="DYN_QUERY_133";
-			String description11="get all documents by executive task execution pid";
-			log.info("{ Query Id:- "+id11+" Query Description:- "+description11+" }");
+			logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
+					+ "," + description1);
+			DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id11 = "DYN_QUERY_133" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description11 = "get all documents by executive task execution pid";
+			LocalDateTime startLCTime11 = LocalDateTime.now();
+			String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+			String startDate11 = startLCTime11.format(DATE_FORMAT11);
+			logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 			List<DynamicDocumentHeader> oldDynamicDocumentHeaders = dynamicDocumentHeaderRepository
 					.findAllByExecutiveTaskExecutionPid(opExecutiveTaskExecution.get().getPid());
+			String flag11 = "Normal";
+			LocalDateTime endLCTime11 = LocalDateTime.now();
+			String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+			String endDate11 = startLCTime.format(DATE_FORMAT11);
+			Duration duration11 = Duration.between(startLCTime, endLCTime11);
+			long minutes11 = duration11.toMinutes();
+			if (minutes11 <= 1 && minutes11 >= 0) {
+				flag11 = "Fast";
+			}
+			if (minutes11 > 1 && minutes11 <= 2) {
+				flag11 = "Normal";
+			}
+			if (minutes11 > 2 && minutes11 <= 10) {
+				flag11 = "Slow";
+			}
+			if (minutes11 > 10) {
+				flag11 = "Dead Slow";
+			}
+			logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END,"
+					+ flag11 + "," + description11);
 
 			if (!oldInventoryVoucherHeaders.isEmpty()) {
 				inventoryVoucherHeaderRepository.delete(oldInventoryVoucherHeaders);

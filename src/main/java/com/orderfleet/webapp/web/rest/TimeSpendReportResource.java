@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -51,7 +52,7 @@ import com.orderfleet.webapp.web.rest.dto.TimeSpendReportView;
 public class TimeSpendReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(TimeSpendReportResource.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
@@ -120,13 +121,37 @@ public class TimeSpendReportResource {
 		List<TimeSpendReportView> timeSpendReportViews = new ArrayList<>();
 
 		if (employeeProfile != null) {
-			String id="ATT_QUERY_121";
-			String description="get the top 1 by companyPid ,userPid and planned date between and order by create date in desc ";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ATT_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get the top 1 by companyPid ,userPid and planned date between ";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Optional<Attendance> opAttendance = attendanceRepository
 					.findTop1ByCompanyPidAndUserPidAndPlannedDateBetweenOrderByCreatedDateDesc(company.getPid(),
 							employeeProfile.getUser().getPid(), fromDate, toDate);
-
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			if (opAttendance.isPresent()) {
 
 				TimeSpendReportView timeSpendReportView = new TimeSpendReportView();
@@ -134,7 +159,7 @@ public class TimeSpendReportResource {
 				int sortOrder = 3;
 
 				long hours = 00;
-				long minutes = 00;
+				long minutes1 = 00;
 				long seconds = 00;
 
 				List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
@@ -187,7 +212,7 @@ public class TimeSpendReportResource {
 
 					hours += Long.parseLong(timeSpendArray[0]);
 
-					minutes += Long.parseLong(timeSpendArray[1]);
+					minutes1 += Long.parseLong(timeSpendArray[1]);
 
 					seconds += Long.parseLong(timeSpendArray[2]);
 
@@ -200,7 +225,7 @@ public class TimeSpendReportResource {
 				timeSpendReportView = new TimeSpendReportView();
 
 				long hoursToSec = hours * 3600;
-				long minToSec = minutes * 60;
+				long minToSec = minutes1 * 60;
 
 				long totalSeconds = hoursToSec + minToSec + seconds;
 

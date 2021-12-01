@@ -426,11 +426,36 @@ public class TpHycountResource {
 					tourSummaryDTO.setTourDate(dynamicDocumentHeaderDTO.getDocumentDate().toLocalDate());
 					tourSummaryDTO.setDynamicDocumentPid(dynamicDocumentHeaderDTO.getPid());
 					tourSummaryDTO.setVoucherNo(dynamicDocumentHeaderDTO.getPid());
-					String id="FORM_QUERY_101";
-					String description="Get the one filled form by pid ";
-					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
+					 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "FORM_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="Get the one filled form by pid";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					Optional<FilledForm> filledForm = filledFormRepository.findOneByPid(filledFormDTO.getPid());
+					 String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+								+ description);
+
 					tourSummaryDTO.setVoucherId(filledForm.get().getId());
 					tourSummaryDTOs.add(tourSummaryDTO);
 				}
