@@ -59,7 +59,10 @@ public class UploadSapResource {
 	// private static String API_URL_PRODUCT_PROFILE =
 	// "http://59.94.176.87:81/Service1.svc/GetAllItemsNameAndId?dbkey=1";
 
-	private static String API_URL_PRODUCT_PROFILE = "http://115.242.172.78:5002/Products/GetAllProducts";
+	// private static String API_URL_PRODUCT_PROFILE =
+	// "http://115.242.172.78:5002/Products/GetAllProducts";
+
+	private static String API_URL_PRODUCT_PROFILE = "http://115.242.172.78:5002/Products/GetAllProducts_Prabhu";
 
 //	private static String AUTHENTICATION_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEzRjhFREM2QjJCNTU3OUQ0MEVGNDg1QkNBOUNFRDBBIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2MDExMDg1MzMsImV4cCI6MTYzMjY0NDUzMywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIiwiYXVkIjoiQ3VzdG9tZXJTZXJ2aWNlLkFwaSIsImNsaWVudF9pZCI6Im5hc19jbGllbnQiLCJzdWIiOiIwNWEwNzliMC1jZjBiLTQ2ZjctYThlMy1iODk4MjIwODgzMjQiLCJhdXRoX3RpbWUiOjE2MDExMDg1MzMsImlkcCI6ImxvY2FsIiwic2VydmljZS51c2VyIjoiYWRtaW4iLCJqdGkiOiIyOUU0OTRERTg1QjA0RTdBNUM1NjM3NDhCQzIyOTEyRSIsInNpZCI6IkFDOTE4QzNEMkY3MUIzRTRBMERGQzc2MDQ4QzJBMEUzIiwiaWF0IjoxNjAxMTA4NTMzLCJzY29wZSI6WyJvcGVuaWQiLCJwcm9maWxlIiwibmFzLmNsaWVudCIsIm5hcy5zZXJ2aWNlcyJdLCJhbXIiOlsicHdkIl19.x4knTyLtPEwUSnc35EnWSyxINwOLU5YTBeCD_eXDkXmMC1bWQclkdLH18Dgict07qVWyRL9EcYT66j4p7hsUGbZrZP9TLeNpQP5BT6eRSeYvkf2lmvJe1xaCvPYrHpPGvApLJJAmQxCwex7AAW74zJLpl_SdNUf3AHBkBvjr2ibEkDBgRgOTO0Z3n3f43ZxZw3LAi_x8ZRSxITY0mpevTUpDhx2pv5-ehXe7BaCbTxAJ6dBvkAavtmB-W3wp7cnJqSfr2mFpsBzE_Ek_OzAFnu_N1ALi8yE9LpuAPSDj4hVz11i98urPebHA8lEca1yBAPI6goQlKJEB4_NXI5F8CA";
 
@@ -162,13 +165,13 @@ public class UploadSapResource {
 //					API_URL_PRODUCT_PROFILE, HttpMethod.GET, null,
 //					new ParameterizedTypeReference<List<ResponseBodySapProductProfile>>() {
 //					});
-			
+
 			HttpEntity<T> entity = new HttpEntity<>(createTokenAuthHeaders());
 
-			ResponseEntity<List<ResponseBodySapProductProfile>> responseBodyProductProfiles = restTemplate
-					.exchange(API_URL_PRODUCT_PROFILE, HttpMethod.GET, entity,
-							new ParameterizedTypeReference<List<ResponseBodySapProductProfile>>() {
-							});
+			ResponseEntity<List<ResponseBodySapProductProfile>> responseBodyProductProfiles = restTemplate.exchange(
+					API_URL_PRODUCT_PROFILE, HttpMethod.GET, entity,
+					new ParameterizedTypeReference<List<ResponseBodySapProductProfile>>() {
+					});
 			log.info("Product Profile Size= " + responseBodyProductProfiles.getBody().size() + "------------");
 
 			productProfileSapUploadService.saveUpdateProductProfiles(responseBodyProductProfiles.getBody());

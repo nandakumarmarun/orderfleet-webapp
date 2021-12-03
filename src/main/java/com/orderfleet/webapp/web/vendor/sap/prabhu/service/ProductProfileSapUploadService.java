@@ -184,7 +184,7 @@ public class ProductProfileSapUploadService {
 
 			OpeningStockDTO openingStockDto = new OpeningStockDTO();
 			openingStockDto.setProductProfileName(productProfile.getName());
-			openingStockDto.setQuantity(Double.parseDouble(ppDto.getOnHand()));
+			openingStockDto.setQuantity(Double.parseDouble(ppDto.getOnHand() != null ? ppDto.getOnHand() : "0.00"));
 			openingStockDtos.add(openingStockDto);
 
 			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
