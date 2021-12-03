@@ -372,11 +372,36 @@ public class TimeUtilizationResource {
 				executiveTaskExecutionDetailViews.add(new ExecutiveTaskExecutionDetailView(obj[0].toString(),
 						obj[1].toString(), Double.valueOf(obj[2].toString()), obj[3].toString()));
 			}
-			String id11="DYN_QUERY_110";
-			String description11="get all documents by Task executionId";
-			log.info("{ Query Id:- "+id11+" Query Description:- "+description11+" }");
+			DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id11 = "DYN_QUERY_110" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description11 ="get all documents by Executive Task executionId";
+			LocalDateTime startLCTime11 = LocalDateTime.now();
+			String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+			String startDate11 = startLCTime11.format(DATE_FORMAT11);
+			logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 			List<Object[]> dynamicDocuments = dynamicDocumentHeaderRepository
 					.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+			String flag11 = "Normal";
+			LocalDateTime endLCTime11 = LocalDateTime.now();
+			String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+			String endDate11 = startLCTime11.format(DATE_FORMAT11);
+			Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+			long minutes11 = duration11.toMinutes();
+			if (minutes11 <= 1 && minutes11 >= 0) {
+				flag11 = "Fast";
+			}
+			if (minutes11 > 1 && minutes11 <= 2) {
+				flag11 = "Normal";
+			}
+			if (minutes11 > 2 && minutes11 <= 10) {
+				flag11 = "Slow";
+			}
+			if (minutes11 > 10) {
+				flag11 = "Dead Slow";
+			}
+	                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+					+ description11);
 			for (Object[] obj : dynamicDocuments) {
 				boolean imageFound = false;
 				

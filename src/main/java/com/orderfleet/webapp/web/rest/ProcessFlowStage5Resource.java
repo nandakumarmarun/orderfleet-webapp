@@ -374,11 +374,36 @@ public class ProcessFlowStage5Resource {
 	@RequestMapping(value = "/process-flow-stage-5/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FormFileDTO>> getDynamicDocumentImages(@PathVariable String pid) {
 		log.debug("Web request to get DynamicDocument images by pid : {}", pid);
-		String id="FORM_QUERY_103";
-		String description="get the form by dynamic document headerPid";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
+		  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "FORM_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get the form by dynamic document headerPid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<FilledForm> filledForms = filledFormRepository.findByDynamicDocumentHeaderPid(pid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		List<FormFileDTO> formFileDTOs = new ArrayList<>();
 		if (filledForms.size() > 0) {
 			for (FilledForm filledForm : filledForms)
@@ -557,12 +582,36 @@ public class ProcessFlowStage5Resource {
 
 		Set<Long> executiveTaskIds = inventoryVouchers.parallelStream().map(obj -> Long.valueOf(obj[30].toString()))
 				.collect(Collectors.toSet());
-		String id="DYN_QUERY_142";
-		String description="get all document by executive task execution id in";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "DYN_QUERY_142" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all document by executive task execution id in";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> objeDynamicDocuments = dynamicDocumentHeaderRepository
 				.findAllByExecutiveTaskExecutionIdsIn(executiveTaskIds);
+		  String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
 //		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
 //				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
@@ -1133,20 +1182,69 @@ public class ProcessFlowStage5Resource {
 		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 						+ description);
 
-				String id1="DYN_QUERY_134";
-				String description1="get all documents by executive task execution id and doc pid";
-				log.info("{ Query Id:- "+id1+" Query Description:- "+description1+" }");
+		                DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		        		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		        		String id1 = "DYN_QUERY_134" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		        		String description1 ="get all documents by executive task execution id and doc pid";
+		        		LocalDateTime startLCTime1 = LocalDateTime.now();
+		        		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+		        		String startDate1 = startLCTime1.format(DATE_FORMAT1);
+		        		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 				List<Object[]> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 						.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExectionId, document.get().getPid());
+				 String flag1 = "Normal";
+					LocalDateTime endLCTime1 = LocalDateTime.now();
+					String endTime1 = endLCTime1.format(DATE_TIME_FORMAT);
+					String endDate1 = startLCTime.format(DATE_FORMAT);
+					Duration duration1 = Duration.between(startLCTime, endLCTime1);
+					long minutes1 = duration1.toMinutes();
+					if (minutes1 <= 1 && minutes1 >= 0) {
+						flag1 = "Fast";
+					}
+					if (minutes1 > 1 && minutes1 <= 2) {
+						flag1 = "Normal";
+					}
+					if (minutes1 > 2 && minutes1 <= 10) {
+						flag1 = "Slow";
+					}
+					if (minutes1 > 10) {
+						flag1 = "Dead Slow";
+					}
+			                logger.info(id1 + "," + endDate1 + "," + startTime + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+							+ description1);
 
 				if (dynamicDocumentHeaders.size() > 0) {
 					Object[] obj = dynamicDocumentHeaders.get(0);
-					String id11="FORM_QUERY_103";
-					String description11="get the form by dynamic document headerPid";
-					log.info("{ Query Id:- "+id11+" Query Description:- "+description11+" }");
-
+					 DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id11 = "FORM_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description11 ="get the form by dynamic document headerPid";
+						LocalDateTime startLCTime11 = LocalDateTime.now();
+						String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+						String startDate11 = startLCTime11.format(DATE_FORMAT11);
+						logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 					List<FilledForm> filledForms = filledFormRepository
 							.findByDynamicDocumentHeaderPid(obj[0].toString());
+					 String flag11 = "Normal";
+						LocalDateTime endLCTime11 = LocalDateTime.now();
+						String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+						String endDate11 = startLCTime11.format(DATE_FORMAT11);
+						Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+						long minutes11 = duration11.toMinutes();
+						if (minutes11 <= 1 && minutes11 >= 0) {
+							flag11 = "Fast";
+						}
+						if (minutes11 > 1 && minutes11 <= 2) {
+							flag11 = "Normal";
+						}
+						if (minutes11 > 2 && minutes11 <= 10) {
+							flag11 = "Slow";
+						}
+						if (minutes11 > 10) {
+							flag11 = "Dead Slow";
+						}
+				                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+								+ description11);
 
 					for (FilledForm filledForm : filledForms) {
 

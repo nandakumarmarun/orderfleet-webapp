@@ -414,14 +414,14 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			// not required
 
 			List<Object[]> documentWiseCount = new ArrayList<Object[]>(); // count ,pid ,document_id
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "INV_QUERY_175" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get the count of InvVoucherHeader";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_175" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get the count of InvVoucherHeader";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			documentWiseCount = inventoryVoucherHeaderRepository
 					.findCountOfInventoryVoucherHeader(SecurityUtils.getCurrentUsersCompanyId());
 			String flag = "Normal";
@@ -442,7 +442,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 
 			List<OrderStatus> orderStatus = orderStatusRepository.findAllByCompanyId();
@@ -528,7 +528,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								: inventoryVoucherDTO.getBookingId());
 				DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				
+
 				String id1 = "INV_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 				String description1 = "get top1 by created by login ";
 				LocalDateTime startLCTime1 = LocalDateTime.now();
@@ -555,8 +555,8 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				if (minutes1 > 10) {
 					flag1 = "Dead Slow";
 				}
-		      logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-						+ description1);
+				logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
+						+ "," + description1);
 				if (lastInventoryVoucher != null) {
 					Date lastInventoryVoucherDate = Date
 							.from(lastInventoryVoucher.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant());
@@ -671,6 +671,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 					// find referenceInventory Voucher header and detail
 					InventoryVoucherHeader referenceInventoryVoucherHeader = null;
 					InventoryVoucherDetail referenceInventoryVoucherDetail = null;
+					
 					if (inventoryVoucherDetailDTO.getReferenceInventoryVoucherHeaderPid() != null) {
 						String ids = "INV_QUERY_212";
 						String descriptions = "get one inv Voucher by pid";
@@ -1074,7 +1075,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id = "INV_QUERY_165" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get by accountIdIn and DocumentPid TallyStatus andDocumentDateBetween";
+			String description = "get by accountIdIn and DocumentPid TallyStatus andDocumentDateBetween";
 			LocalDateTime startLCTime = LocalDateTime.now();
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate1 = startLCTime.format(DATE_FORMAT);
@@ -1083,26 +1084,26 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 					.findByAccountIdInAndDocumentPidAndTallyStatusAndDocumentDateBetweenOrderByDocumentDateDesc(
 							accountIds, refDocumentPid, tallyStatusList, startDate.atTime(0, 0),
 							endDate.atTime(23, 59));
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate1 = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate1 = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 
 			if (!inventoryVouchers.isEmpty()) {
 				Set<String> ivHeaderPids = inventoryVouchers.parallelStream().map(obj -> obj[0].toString())
@@ -1195,17 +1196,52 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			LocalDate endDate, String processStatus, Set<Long> refDocumentIds) {
 		List<Object[]> inventoryVouchers = null;
 		if (processStatus == null || processStatus.isEmpty()) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_162" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get by accountPidIn and DocumentPidIn";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate1 = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
+			inventoryVouchers = inventoryVoucherHeaderRepository
+					.findByAccountPidInAndDocumentPidInOrderByDocumentDateDesc(accountPid, refDocumentIds);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate1 = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
+		} else {
+			if ("Pending".equals(processStatus)) {
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "INV_QUERY_162" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get by accountPidIn and DocumentPidIn";
+				String id = "INV_QUERY_163" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get by accountPidIn and DocumentPidIn and TallyStatusAndDocumentDateBetween";
 				LocalDateTime startLCTime = LocalDateTime.now();
 				String startTime = startLCTime.format(DATE_TIME_FORMAT);
 				String startDate1 = startLCTime.format(DATE_FORMAT);
 				logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
-			inventoryVouchers = inventoryVoucherHeaderRepository
-					.findByAccountPidInAndDocumentPidInOrderByDocumentDateDesc(accountPid, refDocumentIds);
-			  String flag = "Normal";
+				inventoryVouchers = inventoryVoucherHeaderRepository
+						.findByAccountPidInAndDocumentPidInAndTallyStatusAndDocumentDateBetweenOrderByDocumentDateDesc(
+								accountPid, refDocumentIds, Boolean.FALSE, startDate.atTime(0, 0),
+								endDate.atTime(23, 59));
+				String flag = "Normal";
 				LocalDateTime endLCTime = LocalDateTime.now();
 				String endTime = endLCTime.format(DATE_TIME_FORMAT);
 				String endDate1 = startLCTime.format(DATE_FORMAT);
@@ -1223,77 +1259,41 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				if (minutes > 10) {
 					flag = "Dead Slow";
 				}
-		                logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 						+ description);
 
-		} else {
-			if ("Pending".equals(processStatus)) {
-				  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-					String id = "INV_QUERY_163" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-					String description ="get by accountPidIn and DocumentPidIn and TallyStatusAndDocumentDateBetween";
-					LocalDateTime startLCTime = LocalDateTime.now();
-					String startTime = startLCTime.format(DATE_TIME_FORMAT);
-					String startDate1 = startLCTime.format(DATE_FORMAT);
-					logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
-				inventoryVouchers = inventoryVoucherHeaderRepository
-						.findByAccountPidInAndDocumentPidInAndTallyStatusAndDocumentDateBetweenOrderByDocumentDateDesc(
-								accountPid, refDocumentIds, Boolean.FALSE, startDate.atTime(0, 0),
-								endDate.atTime(23, 59));
-				  String flag = "Normal";
-					LocalDateTime endLCTime = LocalDateTime.now();
-					String endTime = endLCTime.format(DATE_TIME_FORMAT);
-					String endDate1 = startLCTime.format(DATE_FORMAT);
-					Duration duration = Duration.between(startLCTime, endLCTime);
-					long minutes = duration.toMinutes();
-					if (minutes <= 1 && minutes >= 0) {
-						flag = "Fast";
-					}
-					if (minutes > 1 && minutes <= 2) {
-						flag = "Normal";
-					}
-					if (minutes > 2 && minutes <= 10) {
-						flag = "Slow";
-					}
-					if (minutes > 10) {
-						flag = "Dead Slow";
-					}
-			                logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-							+ description);
-
-
 			} else {
-				  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-					String id = "INV_QUERY_164" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-					String description ="get by accountPidIn and DocumentPidIn and DocumentDateBetween";
-					LocalDateTime startLCTime = LocalDateTime.now();
-					String startTime = startLCTime.format(DATE_TIME_FORMAT);
-					String startDate1 = startLCTime.format(DATE_FORMAT);
-					logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "INV_QUERY_164" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description = "get by accountPidIn and DocumentPidIn and DocumentDateBetween";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate1 = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
 				inventoryVouchers = inventoryVoucherHeaderRepository
 						.findByAccountPidInAndDocumentPidInAndDocumentDateBetweenOrderByDocumentDateDesc(accountPid,
 								refDocumentIds, startDate.atTime(0, 0), endDate.atTime(23, 59));
-				 String flag = "Normal";
-					LocalDateTime endLCTime = LocalDateTime.now();
-					String endTime = endLCTime.format(DATE_TIME_FORMAT);
-					String endDate1 = startLCTime.format(DATE_FORMAT);
-					Duration duration = Duration.between(startLCTime, endLCTime);
-					long minutes = duration.toMinutes();
-					if (minutes <= 1 && minutes >= 0) {
-						flag = "Fast";
-					}
-					if (minutes > 1 && minutes <= 2) {
-						flag = "Normal";
-					}
-					if (minutes > 2 && minutes <= 10) {
-						flag = "Slow";
-					}
-					if (minutes > 10) {
-						flag = "Dead Slow";
-					}
-			                logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-							+ description);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate1 = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+				logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 
 			}
 		}
@@ -1341,36 +1341,36 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	// voucher detail
 	private List<AccountingVoucherHeaderDTO> getAccountingVoucherDtos(String accountPid, Set<Long> refDocumentIds) {
 		List<Object[]> accountingVouchers = null;
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "ACC_QUERY_140" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all accVouchers by account profile and reffered documents";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ACC_QUERY_140" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all accVouchers by account profile and reffered documents";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		accountingVouchers = accountingVoucherHeaderRepository.getAllByAccountAndRefDocuments(refDocumentIds,
 				accountPid);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		Set<String> avHeaderPids = accountingVouchers.parallelStream().map(obj -> obj[0].toString())
 				.collect(Collectors.toSet());
@@ -1472,7 +1472,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		if (documentPid != null) {
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			
+
 			String id = "INV_QUERY_118" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 			String description = "get by executive task execution pid and doc Pid ";
 			LocalDateTime startLCTime = LocalDateTime.now();
@@ -1499,12 +1499,12 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 		} else {
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			
+
 			String id = "INV_QUERY_119" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 			String description = "get by executive task execution pid and doc editable true ";
 			LocalDateTime startLCTime = LocalDateTime.now();
@@ -1531,7 +1531,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 		}
 		Set<Document> documents = new HashSet<>();
@@ -1575,64 +1575,64 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id = "ACC_QUERY_116" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description =" get AccVoucher By ExecutiveTaskExecutionId and document pid";
+			String description = " get AccVoucher By ExecutiveTaskExecutionId and document pid";
 			LocalDateTime startLCTime = LocalDateTime.now();
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherHeaders = accountingVoucherHeaderRepository
 					.findByExecutiveTaskExecutionPidAndDocumentPid(executiveTaskExecutionPid, documentPid);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		} else {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "ACC_QUERY_117" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="  get AccVoucher By ExecutiveTaskExecutionId and document pid Editable isTrue";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_117" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "  get AccVoucher By ExecutiveTaskExecutionId and document pid Editable isTrue";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherHeaders = accountingVoucherHeaderRepository
 					.findByExecutiveTaskExecutionPidAndDocumentEditableTrue(executiveTaskExecutionPid);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		}
 		Set<Document> documents = new HashSet<>();
 		for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
@@ -1672,17 +1672,67 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		List<DynamicDocumentHeaderDTO> dynamicDocuments = new ArrayList<>();
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = null;
 		if (documentPid != null) {
-			String id = "DYN_QUERY_111";
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "DYN_QUERY_111" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 			String description = "get documents by executive task executionPid and Doc Pid";
-			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 					.findByExecutiveTaskExecutionPidAndDocumentPid(executiveTaskExecutionPid, documentPid);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		} else {
-			String id = "DYN_QUERY_112";
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "DYN_QUERY_112" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 			String description = "get documents by executive task executionPid and Doc editable true";
-			log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 					.findByExecutiveTaskExecutionPidAndDocumentEditableTrue(executiveTaskExecutionPid);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		}
 
 		Set<Document> documents = new HashSet<>();
@@ -1715,36 +1765,36 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	@Override
 	public TaskSubmissionResponse updateInventoryVoucher(ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO) {
 		InventoryVoucherHeaderDTO inventoryVoucherDTO = executiveTaskSubmissionDTO.getInventoryVouchers().get(0);
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "INV_QUERY_212" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get one inv Voucher by pid";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "INV_QUERY_212" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get one inv Voucher by pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
 				.findOneByPid(inventoryVoucherDTO.getPid()).get();
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		// save history
 		InventoryVoucherHeaderHistory inventoryVoucherHeaderHistory = new InventoryVoucherHeaderHistory(
@@ -1961,36 +2011,35 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = executiveTaskSubmissionDTO.getAccountingVouchers()
 				.get(0);
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "ACC_QUERY_165" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get one by pid";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ACC_QUERY_165" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get one by pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		AccountingVoucherHeader accountingVoucherHeader = accountingVoucherHeaderRepository
 				.findOneByPid(accountingVoucherHeaderDTO.getPid()).get();
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
-
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		// save history
 		AccountingVoucherHeaderHistory accountingVoucherHeaderHistory = new AccountingVoucherHeaderHistory(
@@ -2093,8 +2142,36 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	public TaskSubmissionResponse updateDynamicDocument(ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO) {
 
 		DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO = executiveTaskSubmissionDTO.getDynamicDocuments().get(0);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get one by Pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		DynamicDocumentHeader dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findOneByPid(dynamicDocumentHeaderDTO.getPid()).get();
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		// save history
 		DynamicDocumentHeaderHistory dynamicDocumentHeaderHistory = new DynamicDocumentHeaderHistory(
@@ -2140,9 +2217,37 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	 */
 	@Override
 	public TaskSubmissionResponse updateDynamicDocument(DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO) {
-
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get one by Pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		DynamicDocumentHeader dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findOneByPid(dynamicDocumentHeaderDTO.getPid()).get();
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
 		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 		dynamicDocumentHeader.setUpdatedBy(user);
 		dynamicDocumentHeader.setUpdatedDate(LocalDateTime.now());
@@ -2184,10 +2289,36 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 							Optional<FilledFormDetailDTO> optionalFFDetailDto = fFormDetailDtos.stream()
 									.filter(ffdDto -> ffdDto.getId() == filledFormDetail.getId()).findAny();
 							if (!optionalFFDetailDto.isPresent()) {
-								String id = "FFD_QUERY_101";
-								String description = "delete by filled formId";
-								log.info("{ Query Id:- " + id + " Query Description:- " + description + " }");
+								DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+								DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+								String id1 = "FFD_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+								String description1 ="delete by filled formId";
+								LocalDateTime startLCTime1 = LocalDateTime.now();
+								String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+								String startDate1 = startLCTime1.format(DATE_FORMAT1);
+								logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 								filledFormDetailRepository.deleteByFilledFormId(filledFormDetail.getId());
+								String flag1 = "Normal";
+								LocalDateTime endLCTime1 = LocalDateTime.now();
+								String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+								String endDate1 = startLCTime1.format(DATE_FORMAT1);
+								Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+								long minutes1 = duration1.toMinutes();
+								if (minutes1 <= 1 && minutes1 >= 0) {
+									flag1 = "Fast";
+								}
+								if (minutes1 > 1 && minutes1 <= 2) {
+									flag1 = "Normal";
+								}
+								if (minutes1 > 2 && minutes1 <= 10) {
+									flag1 = "Slow";
+								}
+								if (minutes1 > 10) {
+									flag1 = "Dead Slow";
+								}
+						                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+										+ description1);
+
 							}
 						}
 					} else {
@@ -2342,7 +2473,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO(), opExecutiveTaskExecution.get());
 				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				
+
 				String id = "INV_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 				String description = "get all by executive task execution Pid ";
 				LocalDateTime startLCTime = LocalDateTime.now();
@@ -2369,12 +2500,12 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				if (minutes > 10) {
 					flag = "Dead Slow";
 				}
-		      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 						+ description);
-		      DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 				String id1 = "ACC_QUERY_119" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description1 =" get all AccVoucher By ExecutiveTask Execution Pid ";
+				String description1 = " get all AccVoucher By ExecutiveTask Execution Pid ";
 				LocalDateTime startLCTime1 = LocalDateTime.now();
 				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 				String startDate1 = startLCTime1.format(DATE_FORMAT1);
@@ -2399,14 +2530,38 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				if (minutes1 > 10) {
 					flag1 = "Dead Slow";
 				}
-		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-						+ description1);
-				String id11 = "DYN_QUERY_133";
+				logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
+						+ "," + description1);
+				DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id11 = "DYN_QUERY_133" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 				String description11 = "get all documents by executive task execution pid";
-				log.info("{ Query Id:- " + id11 + " Query Description:- " + description11 + " }");
+				LocalDateTime startLCTime11 = LocalDateTime.now();
+				String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+				String startDate11 = startLCTime11.format(DATE_FORMAT11);
+				logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 				List<DynamicDocumentHeader> oldDynamicDocumentHeaders = dynamicDocumentHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(executiveTaskExecution.getPid());
-
+				String flag11 = "Normal";
+				LocalDateTime endLCTime11 = LocalDateTime.now();
+				String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+				String endDate11 = startLCTime.format(DATE_FORMAT11);
+				Duration duration11 = Duration.between(startLCTime, endLCTime11);
+				long minutes11 = duration11.toMinutes();
+				if (minutes11 <= 1 && minutes11 >= 0) {
+					flag11 = "Fast";
+				}
+				if (minutes11 > 1 && minutes11 <= 2) {
+					flag11 = "Normal";
+				}
+				if (minutes11 > 2 && minutes11 <= 10) {
+					flag11 = "Slow";
+				}
+				if (minutes11 > 10) {
+					flag11 = "Dead Slow";
+				}
+				logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END,"
+						+ flag11 + "," + description11);
 				if (!executiveTaskSubmissionDTO.getInventoryVouchers().isEmpty()) {
 					// update Inventory Vouchers
 					inventoryVouchers = updateInventoryVouchers(company, user, employeeProfile, executiveTaskExecution,

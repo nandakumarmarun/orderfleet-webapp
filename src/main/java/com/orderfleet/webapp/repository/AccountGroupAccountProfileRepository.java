@@ -53,7 +53,7 @@ public interface AccountGroupAccountProfileRepository extends JpaRepository<Acco
 	Page<AccountProfile> findAccountProfilesByUserAccountGroupsAndAccountProfileActivated(List<AccountGroup> accountGroups,
 			Pageable pageable);
 
-	Page<AccountGroupAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndAccountGroupInOrderByIdAsc(
+  Page<AccountGroupAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndAccountGroupInOrderByIdAsc(
 			List<AccountGroup> accountGroups, Pageable pageable);
 
 	List<AccountGroupAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndAccountGroupInOrderByIdAsc(
@@ -142,7 +142,7 @@ public interface AccountGroupAccountProfileRepository extends JpaRepository<Acco
 	@Query("select accountGroupAccountProfile.accountProfile from AccountGroupAccountProfile accountGroupAccountProfile where accountGroupAccountProfile.accountGroup in  ?1 and accountGroupAccountProfile.accountProfile.accountType.pid in ?2 and accountGroupAccountProfile.accountProfile.importStatus= ?3 order by accountGroupAccountProfile.accountProfile.name asc")
 	List<AccountProfile> findAccountProfilesByUserAccountGroupsAndAccountTypePidInOrderByAccountProfilesName(List<AccountGroup> accountGroups,List<String> accountTypePids,boolean status);
 	
-	@Query("select accountGroupAccountProfile.accountProfile from AccountGroupAccountProfile accountGroupAccountProfile where accountGroupAccountProfile.accountGroup in  ?1 and accountGroupAccountProfile.accountProfile.accountType.pid in ?2 order by accountGroupAccountProfile.accountProfile.name asc")
+  	@Query("select accountGroupAccountProfile.accountProfile from AccountGroupAccountProfile accountGroupAccountProfile where accountGroupAccountProfile.accountGroup in  ?1 and accountGroupAccountProfile.accountProfile.accountType.pid in ?2 order by accountGroupAccountProfile.accountProfile.name asc")
 	List<AccountProfile> findAccountByUserAccountGroupsAndAccountTypePidInOrderByAccountProfilesName(List<AccountGroup> accountGroups,List<String> accountTypePids);
 	
 	@Query("select accountGroupAccountProfile.accountProfile from AccountGroupAccountProfile accountGroupAccountProfile where accountGroupAccountProfile.accountGroup in  ?1 and accountGroupAccountProfile.accountProfile.importStatus = ?2 order by accountGroupAccountProfile.accountProfile.name asc")

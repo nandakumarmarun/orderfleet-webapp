@@ -322,20 +322,71 @@ public class DashboardResource {
 			Set<Long> uniqueUserIds = employeeProfileLocationRepository.findEmployeeUserIdsByLocationIdIn(locationIds);
 			List<Long> userIds = new ArrayList<>(uniqueUserIds);
 			totalUsers = dashboardUserRepository.countByUserIdIn(userIds);
-			String id="ATT_QUERY_108";
-			String description="count attendance by userId in and date between";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ATT_QUERY_108" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="count attendance by userId in and date between";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			attendedUsers = attendanceRepository.countByUserIdInAndDateBetween(userIds, date.atTime(0, 0),
 					date.atTime(23, 59));
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 		} else {
 			if (user.getShowAllUsersData()) {
 				Set<Long> dashboardUserIds = dashboardUserRepository.findUserIdsByCompanyId();
 				totalUsers = dashboardUserIds.size();
-				String id="ATT_QUERY_109";
-				String description="count attendance by userId in and date between";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "ATT_QUERY_109" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="count attendance by userId in and date between";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				attendedUsers = attendanceRepository.countByUserIdInAndDateBetween(dashboardUserIds, date.atTime(0, 0),
 						date.atTime(23, 59));
+				 String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
+
 			} else {
 				List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 				Set<Long> dbUserIds = dashboardUserRepository.findUserIdsByUserIdIn(userIds);
@@ -834,11 +885,36 @@ public class DashboardResource {
 
 	private void putNumberCircleOnDynamicDocItem(Set<Document> documents, DashboardSummaryDTO dashboardItemSummary,
 			String taskExecutionPid) {
-		String id="DYN_QUERY_133";
-		String description="get all documents by executive task execution pid";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+		  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "DYN_QUERY_133" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all documents by executive task execution pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(taskExecutionPid);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		if (!dynamicDocumentHeaders.isEmpty()) {
 			for (Document document : documents) {
 				if (dynamicDocumentHeaders.stream()
@@ -1648,24 +1724,102 @@ String flag = "Normal";
 				// get both document
 				if (userPid == null) {
 					if (!userIds.isEmpty()) {
-						String id="DYN_QUERY_126";
-						String description="count the documents by create date between ,documentIn and create by id in";
-						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+						DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "DYN_QUERY_126" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="count the documents by create date between documentIn and create by id in";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 						count = dynamicDocumentHeaderRepository
 								.countByCreatedDateBetweenAndDocumentInAndCreatedByIdIn(from, to, documents, userIds);
+						 String flag = "Normal";
+							LocalDateTime endLCTime = LocalDateTime.now();
+							String endTime = endLCTime.format(DATE_TIME_FORMAT);
+							String endDate = startLCTime.format(DATE_FORMAT);
+							Duration duration = Duration.between(startLCTime, endLCTime);
+							long minutes = duration.toMinutes();
+							if (minutes <= 1 && minutes >= 0) {
+								flag = "Fast";
+							}
+							if (minutes > 1 && minutes <= 2) {
+								flag = "Normal";
+							}
+							if (minutes > 2 && minutes <= 10) {
+								flag = "Slow";
+							}
+							if (minutes > 10) {
+								flag = "Dead Slow";
+							}
+					                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+									+ description);
 					} else {
-						String id="DYN_QUERY_118";
-						String description=" getting the count of document by create date between and docIn";
-						log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+						DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "DYN_QUERY_118" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="getting the count of document by create date between and docIn  ";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 						count = dynamicDocumentHeaderRepository.countByCreatedDateBetweenAndDocumentIn(from, to,
 								documents);
+						 String flag = "Normal";
+							LocalDateTime endLCTime = LocalDateTime.now();
+							String endTime = endLCTime.format(DATE_TIME_FORMAT);
+							String endDate = startLCTime.format(DATE_FORMAT);
+							Duration duration = Duration.between(startLCTime, endLCTime);
+							long minutes = duration.toMinutes();
+							if (minutes <= 1 && minutes >= 0) {
+								flag = "Fast";
+							}
+							if (minutes > 1 && minutes <= 2) {
+								flag = "Normal";
+							}
+							if (minutes > 2 && minutes <= 10) {
+								flag = "Slow";
+							}
+							if (minutes > 10) {
+								flag = "Dead Slow";
+							}
+					                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+									+ description);
+
 					}
 				} else {
-					String id="DYN_QUERY_119";
-					String description="  getting the count of document by create date between and docIn and created by pid";
-					log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+					 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "DYN_QUERY_119" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="getting the count of document by create date between and docIn and created by pid ";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					count = dynamicDocumentHeaderRepository.countByCreatedDateBetweenAndDocumentInAndCreatedByPid(from,
 							to, documents, userPid);
+					String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
+
+					
 				}
 			} else if (dashboardItem.getTaskPlanType().equals(TaskPlanType.PLANNED)) {
 				count = getPlannedDynamicDocumentCount(documents, from, to, userIds, userPid);
@@ -1681,27 +1835,103 @@ String flag = "Normal";
 		long count;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
-				String id="DYN_QUERY_127";
-				String description="count the documents by create date between ,documentIn and create by id in and executive task execution task plan is not null";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "DYN_QUERY_127" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="count the documents by documentIn and create by id in and executive task execution task plan is not null";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				count = dynamicDocumentHeaderRepository
 						.countByCreatedDateBetweenAndDocumentInAndCreatedByIdInAndExecutiveTaskExecutionExecutiveTaskPlanIsNotNull(
 								from, to, documents, userIds);
+				 String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
 			} else {
-				String id="DYN_QUERY_120";
-				String description=" getting the count of document by create date between and docIn and executive task execution task Plan is not null";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "DYN_QUERY_120" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="getting the count of document by create date between and docIn and executive task execution task Plan is not null";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				count = dynamicDocumentHeaderRepository
 						.countByCreatedDateBetweenAndDocumentInAndExecutiveTaskExecutionExecutiveTaskPlanIsNotNull(from,
 								to, documents);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 			}
 		} else {
-			String id="DYN_QUERY_121";
-			String description=" getting the count of document by create date between,created by pid and docIn and executive task execution task Plan is not null";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "DYN_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="getting the count of document docIn and executive task execution task Plan is not null";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			count = dynamicDocumentHeaderRepository
 					.countByCreatedDateBetweenAndDocumentInAndCreatedByPidAndExecutiveTaskExecutionExecutiveTaskPlanIsNotNull(
 							from, to, documents, userPid);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		}
 		return count;
 	}
@@ -1711,27 +1941,103 @@ String flag = "Normal";
 		long count;
 		if (userPid == null) {
 			if (!userIds.isEmpty()) {
-				String id="DYN_QUERY_128";
-				String description="count the documents by create date between ,documentIn and create by id in and executive task execution task plan is null";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "DYN_QUERY_128" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="count the documents by documentIn and create by id in and executive task execution task plan is null";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				count = dynamicDocumentHeaderRepository
 						.countByCreatedDateBetweenAndDocumentInAndCreatedByIdInAndExecutiveTaskExecutionExecutiveTaskPlanIsNull(
 								from, to, documents, userIds);
+				 String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+							+ description);
+
 			} else {
-				String id="DYN_QUERY_122";
-				String description="getting the count of document by create date between and docIn and executive task execution task Plan is  null";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "DYN_QUERY_122" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="getting the count of document by  docIn and executive task execution task Plan is  null";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				count = dynamicDocumentHeaderRepository
 						.countByCreatedDateBetweenAndDocumentInAndExecutiveTaskExecutionExecutiveTaskPlanIsNull(from,
 								to, documents);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			}
 		} else {
-			String id="DYN_QUERY_123";
-			String description=" getting the count of document by create date between,created by pid and docIn and executive task execution task Plan is null";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "DYN_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="getting the count of document by create date between docIn and executive task execution task Plan is null";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			count = dynamicDocumentHeaderRepository
 					.countByCreatedDateBetweenAndDocumentInAndCreatedByPidAndExecutiveTaskExecutionExecutiveTaskPlanIsNull(
 							from, to, documents, userPid);
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 		}
 		return count;
 	}
@@ -1959,19 +2265,70 @@ String flag = "Normal";
 			daySummary.setDashboardItemPid(dashboardAttendance.getId() + "");
 			daySummary.setLabel(dashboardAttendance.getName());
 			if (dashboardAttendance.getAttendanceStatus() != null) {
-				String id="ATT_QUERY_110";
-				String description="count attendance by companyId,attendance status and date between";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "ATT_QUERY_110" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="count attendance by companyId,attendance status and date between";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 
 				daySummary.setCount(attendanceRepository.countByCompanyIdAndDateBetweenAndAttendanceStatus(from, to,
 						dashboardAttendance.getAttendanceStatus()));
-			} else if (dashboardAttendance.getAttendanceStatusSubgroup() != null) {
-				String id="ATT_QUERY_111";
-				String description="count attendance by companyId,attendance subgroup and date between";
-				log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 
+			} else if (dashboardAttendance.getAttendanceStatusSubgroup() != null) {
+				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ATT_QUERY_111" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="count attendance by companyId,attendance subgroup and date between";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				daySummary.setCount(attendanceRepository.countByCompanyIdAndDateBetweenAndAttendanceSubGroup(from, to,
 						dashboardAttendance.getAttendanceStatusSubgroup()));
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 			}
 			DashboardSummaryDTO weekSummary = new DashboardSummaryDTO();
 			weekSummary.setDashboardItemPid(dashboardAttendance.getId() + "");

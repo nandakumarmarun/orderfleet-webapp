@@ -1,7 +1,9 @@
 package com.orderfleet.webapp.web.rest.api;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -62,7 +64,7 @@ import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskPlanDTO;
 public class ExecutiveDayPlanController {
 
 	private final Logger log = LoggerFactory.getLogger(ExecutiveDayPlanController.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private final ExecutiveDayPlanService executiveDayPlanService;
 
 	private final ExecutiveTaskGroupPlanRepository executiveTaskGroupPlanRepository;
@@ -165,12 +167,37 @@ public class ExecutiveDayPlanController {
 		if (executiveTaskPlanList.isEmpty() && fromDayPlan) {
 			// check attendance already marked with subgroup - to solve an issue
 			// in modern (Route Plan auto download)
-			String id="ATT_QUERY_106";
-			String description="get all by company id ,user login, date between and attendance status";
-			log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ATT_QUERY_106" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all by company id ,user login, date between and attendance status";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate1 = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
 			List<Attendance> attendanceList = attendanceRepository
 					.findByCompanyIdUserLoginAndDateBetweenAndAttendanceStatus(login, AttendanceStatus.PRESENT,
 							currentDate.atTime(0, 0), currentDate.atTime(23, 59));
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate1 = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 			if (!attendanceList.isEmpty()) {
 				Attendance attendance = attendanceList.stream().max(Comparator.comparing(Attendance::getPlannedDate))
 						.get();

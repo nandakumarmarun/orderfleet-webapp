@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,6 +46,7 @@ import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.RootPlanDetailRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AttendanceService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
@@ -62,7 +64,7 @@ import com.orderfleet.webapp.web.rest.dto.PunchOutDTO;
 public class LoginLogoutReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(AttendanceResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private AttendanceService attendanceService;
 	@Inject
@@ -138,8 +140,36 @@ public class LoginLogoutReportResource {
 	@RequestMapping(value = "/loginlogout-report/all/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FormFileDTO>> getAttendanceImages(@PathVariable String pid) {
 		log.debug("Web request to get Attendance images by pid : {}", pid);
-
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ATT_QUERY_122" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get the one by Pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<Attendance> optionalAttendanceDTO = attendanceRepository.findOneByPid(pid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		Attendance attendance = new Attendance();
 
 		List<FormFileDTO> formFileDTOs = new ArrayList<>();

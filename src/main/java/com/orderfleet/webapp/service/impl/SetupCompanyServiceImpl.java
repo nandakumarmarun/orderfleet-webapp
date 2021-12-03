@@ -1,5 +1,8 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +71,7 @@ import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.ReferenceDocumentRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountGroupService;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
@@ -98,7 +102,7 @@ import com.orderfleet.webapp.service.util.RandomUtil;
 public class SetupCompanyServiceImpl implements SetupCompanyService {
 
 	private final Logger log = LoggerFactory.getLogger(SetupCompanyServiceImpl.class);
-
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private CompanyRepository companyRepository;
 
@@ -622,7 +626,36 @@ public class SetupCompanyServiceImpl implements SetupCompanyService {
 		accountProfileRepository.save(newAccountProfiles);
 
 		// copy account group
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AG_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all by companyPid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountGroup> accountGroups = accountGroupRepository.findAllByCompanyPid(existingCompanyPid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		List<AccountGroup> newAccountGroups = new ArrayList<>();
 		for (AccountGroup accountGroup : accountGroups) {
 			try {

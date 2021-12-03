@@ -2,9 +2,11 @@ package com.orderfleet.webapp.web.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,7 @@ import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.AuthoritiesConstants;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.CompanyInvoiceConfigurationService;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.SalesnrichInvoiceHeaderService;
@@ -59,7 +62,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class SalesnrichInvoiceHeaderResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesnrichInvoiceHeaderResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
@@ -118,12 +121,36 @@ public class SalesnrichInvoiceHeaderResource {
 		List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
 		List<String> executiveTaskExecutions = executiveTaskExecutionRepository
 				.findUserByCompanyPidAndUserIdInAndDateBetweenOrderByDateDesc(userIds, startDate, endDate);
-		String id="ATT_QUERY_113";
-		String description="get  attendane by companyId,userPidIn and date between";
-		log.info("{ Query Id:- "+id+" Query Description:- "+description+" }");
-
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ATT_QUERY_113" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get  attendane by companyId userPidIn and date between";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate1 = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<String> attentances = attendanceRepository.findByCompanyPidAndUserPidInAndDateBetween(userIds, startDate,
 				endDate);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate1 = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		Map<String, Long> executionMap = null;
 		Map<String, Long> attendenceMap = null;
 		if (!executiveTaskExecutions.isEmpty()) {

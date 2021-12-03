@@ -28,7 +28,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
 	Optional<Attendance> findOneByPid(String pid);
 
-	@Query("select attendance from Attendance attendance where attendance.company.id = ?#{principal.companyId}")
+	 @Query("select attendance from Attendance attendance where attendance.company.id = ?#{principal.companyId}")
 	List<Attendance> findAllByCompanyId();
 
 	@Query("select attendance from Attendance attendance where attendance.company.id = ?#{principal.companyId}")
@@ -79,7 +79,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
 	@Query("select distinct attendance.user from Attendance attendance where attendance.company.pid = ?1")
 	List<User> findAllUniqueUsersFromAttendance(String companypid);
-
 	@Query("select distinct attendance.user from Attendance attendance where attendance.company.pid = ?1 and attendance.createdDate between ?2 and ?3")
 	List<User> getCountUniqueUsersFromAttendanceAndCreateDateBetween(String companypid, LocalDateTime startDate,
 			LocalDateTime endDate);
