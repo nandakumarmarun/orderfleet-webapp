@@ -1,5 +1,8 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -20,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.enums.LoadMobileData;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.UserActivityService;
 import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
@@ -35,7 +39,7 @@ import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
 public class InventoryResource {
 
 	private final Logger log = LoggerFactory.getLogger(InventoryResource.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private EmployeeProfileService employeeProfileService;
 
 	private UserActivityService userActivityService;
@@ -63,7 +67,35 @@ public class InventoryResource {
 	public String getInventoryCreationForm(Model model) {
 		log.debug("Web request to get a form to create inventory documents");
 		model.addAttribute("employees", employeeProfileService.findAllByCompany());
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AP_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all by compId";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		model.addAttribute("accounts", accountProfileRepository.findAllByCompanyId());
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		model.addAttribute("documents", documentRepository.findAllByCompanyId());
 		return "company/inventory";
 	}

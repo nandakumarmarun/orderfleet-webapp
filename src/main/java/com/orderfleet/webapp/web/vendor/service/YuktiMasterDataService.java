@@ -1,8 +1,10 @@
 package com.orderfleet.webapp.web.vendor.service;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,7 +82,7 @@ import com.snr.yukti.service.YuktiMasterService;
 public class YuktiMasterDataService {
 
 	private static final Logger log = LoggerFactory.getLogger(YuktiMasterDataService.class);
-	
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private EmployeeProfileRepository employeeProfileRepository;
 	
@@ -393,9 +395,65 @@ public class YuktiMasterDataService {
 		if(optionalUser.isPresent()) {
 			user = optionalUser.get();
 		} 
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AT_QUERY_109" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get first by compId";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		AccountType accountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
+		 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id1 = "AP_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description1 ="get all by compId";
+			LocalDateTime startLCTime1 = LocalDateTime.now();
+			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+			String startDate1 = startLCTime1.format(DATE_FORMAT1);
+			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 		List<AccountProfile> dbAccountProfiles = accountProfileRepository.findAllByCompanyId(company.getId());
-		
+		 String flag1 = "Normal";
+			LocalDateTime endLCTime1 = LocalDateTime.now();
+			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+			String endDate1 = startLCTime1.format(DATE_FORMAT1);
+			Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+			long minutes1 = duration1.toMinutes();
+			if (minutes1 <= 1 && minutes1 >= 0) {
+				flag1 = "Fast";
+			}
+			if (minutes1 > 1 && minutes1 <= 2) {
+				flag1 = "Normal";
+			}
+			if (minutes1 > 2 && minutes1 <= 10) {
+				flag1 = "Slow";
+			}
+			if (minutes1 > 10) {
+				flag1 = "Dead Slow";
+			}
+	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+					+ description1);
 		List<LocationAccountProfile> locationAccountProfiles = new ArrayList<>();
 		for (Branch branch : branches) {
 			// check already exist
@@ -454,8 +512,36 @@ public class YuktiMasterDataService {
 			receivablePayableRepository.deleteByCompanyId(company.getId());
 		}
 		for (Receivables receivable : receivables) {
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "AP_QUERY_113" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get by compId and alias ignorecase";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Optional<AccountProfile> optionalAccount = accountProfileRepository
 					.findByCompanyIdAndAliasIgnoreCase(company.getId(), receivable.getDebtorNo());
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			if (optionalAccount.isPresent()) {
 				ReceivablePayable toSaveReceivablePayable = new ReceivablePayable();
 				toSaveReceivablePayable.setAccountProfile(optionalAccount.get());

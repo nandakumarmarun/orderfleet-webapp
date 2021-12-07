@@ -1,6 +1,9 @@
 package com.orderfleet.webapp.web.rest.api;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -61,7 +64,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class AccountProfileController {
 
 	private final Logger log = LoggerFactory.getLogger(AccountProfileController.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private final AccountProfileRepository accountProfileRepository;
 
 	private final LocationRepository locationRepository;
@@ -116,8 +119,37 @@ public class AccountProfileController {
 	public ResponseEntity<AccountProfileDTO> createExecutiveTaskPlan(@RequestBody AccountProfileDTO accountProfileDTO,
 			@PathVariable String pid) {
 		log.debug("Rest request to save AccountProfile : {} under location with pid {}", accountProfileDTO, pid);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get by compId and name Ignore case";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<AccountProfile> exisitingAccountProfile = accountProfileRepository.findByCompanyIdAndNameIgnoreCase(
 				SecurityUtils.getCurrentUsersCompanyId(), accountProfileDTO.getName());
+		  String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		if (exisitingAccountProfile.isPresent()
 				&& (accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty())) {
 			return ResponseEntity.badRequest().headers(
@@ -145,16 +177,44 @@ public class AccountProfileController {
 			Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository.findByCompanyPidAndName(
 					companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid(),
 					CompanyConfig.NEW_CUSTOMER_ALIAS);
+			 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id1 = "AP_QUERY_129" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description1 ="get all by comp data source type and create date";
+				LocalDateTime startLCTime1 = LocalDateTime.now();
+				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+				String startDate1 = startLCTime1.format(DATE_FORMAT1);
+				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 			List<AccountProfile> listAccountProfiles = accountProfileRepository
 					.findAllByCompanyAndDataSourceTypeAndCreatedDate(DataSourceType.MOBILE);
+			String flag1 = "Normal";
+			LocalDateTime endLCTime1 = LocalDateTime.now();
+			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+			String endDate1 = startLCTime1.format(DATE_FORMAT1);
+			Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+			long minutes1 = duration1.toMinutes();
+			if (minutes1 <= 1 && minutes1 >= 0) {
+				flag1 = "Fast";
+			}
+			if (minutes1 > 1 && minutes1 <= 2) {
+				flag1 = "Normal";
+			}
+			if (minutes1 > 2 && minutes1 <= 10) {
+				flag1 = "Slow";
+			}
+			if (minutes1 > 10) {
+				flag1 = "Dead Slow";
+			}
+	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+					+ description1);
 
 			String customerId = "N" + company.getId();
 
 			if (listAccountProfiles.size() > 0) {
 				long count = 0;
-				long id = listAccountProfiles.get(0).getId();
+				long id11 = listAccountProfiles.get(0).getId();
 				count++;
-				long cId = id + count;
+				long cId = id11 + count;
 
 				customerId = String.valueOf(cId);
 			}
@@ -231,7 +291,36 @@ public class AccountProfileController {
 	public ResponseEntity<AccountProfileDTO> updateAccountProfile(@RequestBody AccountProfileDTO accountProfileDTO,
 			@PathVariable String pid) {
 		log.debug("Rest request to Update AccountProfile : {} under location with pid {}", accountProfileDTO, pid);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get one by pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<AccountProfile> exisitingAccountProfile = accountProfileRepository.findOneByPid(pid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		if (exisitingAccountProfile.isPresent()) {
 
 			log.info("Account Profile Exists");
@@ -277,7 +366,35 @@ public class AccountProfileController {
 					.body(null);
 		}
 		List<String> filePid = new ArrayList<>();
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<AccountProfile> optionalAccountProfile = accountProfileRepository.findOneByPid(accountProfilePid);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		if (optionalAccountProfile.isPresent()) {
 			try {
 				AccountProfile accountProfile = optionalAccountProfile.get();

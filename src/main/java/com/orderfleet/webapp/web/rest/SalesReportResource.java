@@ -1,8 +1,10 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,6 +54,7 @@ import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.custom.InventoryVoucherDetailCustomRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
@@ -64,7 +69,7 @@ import com.orderfleet.webapp.web.rest.report.dto.SalesReportDTO;
 @Controller
 @RequestMapping("/web")
 public class SalesReportResource {
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String TODAY = "TODAY";
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
@@ -434,7 +439,36 @@ public class SalesReportResource {
 	private List<String> getAccountPids(List<Long> userIds) {
 		List<String> accountPids = new ArrayList<>();
 		if (userIds.isEmpty()) {
+			  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "AP_QUERY_111" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get accPids by activated and company";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountPids = accountProfileRepository.findAccountPidsByActivatedAndCompany();
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		} else {
 			Set<String> pids = locationAccountProfileService.findAccountProfilePidsByUsers(userIds);
 			accountPids.addAll(pids);

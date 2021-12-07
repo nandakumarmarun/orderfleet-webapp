@@ -1023,23 +1023,16 @@ public class ExecutiveTaskExecutionResource {
 		Optional<ExecutiveTaskExecution> optionalExecutiveTaskExecution = executiveTaskExecutionRepository
 				.findOneByPid(exeTaskPid);
 		if (optionalExecutiveTaskExecution.isPresent()) {
-			Optional<AccountProfile> optionalAccountProfile = accountProfileRepository.findOneByPid(accountProfilePid);
-			if (optionalAccountProfile.isPresent()) {
-				optionalExecutiveTaskExecution.get().setAccountProfile(optionalAccountProfile.get());
-				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
-				// save InventoryVoucherHeader
-				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				
-				String id = "INV_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description = "get all by executive task execution Pid ";
+				String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get one by pid";
 				LocalDateTime startLCTime = LocalDateTime.now();
 				String startTime = startLCTime.format(DATE_TIME_FORMAT);
 				String startDate = startLCTime.format(DATE_FORMAT);
 				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
-				String flag = "Normal";
+			Optional<AccountProfile> optionalAccountProfile = accountProfileRepository.findOneByPid(accountProfilePid);
+			 String flag = "Normal";
 				LocalDateTime endLCTime = LocalDateTime.now();
 				String endTime = endLCTime.format(DATE_TIME_FORMAT);
 				String endDate = startLCTime.format(DATE_FORMAT);
@@ -1057,45 +1050,81 @@ public class ExecutiveTaskExecutionResource {
 				if (minutes > 10) {
 					flag = "Dead Slow";
 				}
-		      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 						+ description);
+
+			if (optionalAccountProfile.isPresent()) {
+				optionalExecutiveTaskExecution.get().setAccountProfile(optionalAccountProfile.get());
+				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
+				// save InventoryVoucherHeader
+				DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				
+				String id1 = "INV_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description1 = "get all by executive task execution Pid ";
+				LocalDateTime startLCTime1 = LocalDateTime.now();
+				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+				String startDate1 = startLCTime1.format(DATE_FORMAT1);
+				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
+				String flag1 = "Normal";
+				LocalDateTime endLCTime1 = LocalDateTime.now();
+				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+				String endDate1 = startLCTime1.format(DATE_FORMAT1);
+				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+				long minutes1 = duration1.toMinutes();
+				if (minutes1 <= 1 && minutes1 >= 0) {
+					flag1 = "Fast";
+				}
+				if (minutes1 > 1 && minutes1 <= 2) {
+					flag1 = "Normal";
+				}
+				if (minutes1 > 2 && minutes1 <= 10) {
+					flag1 = "Slow";
+				}
+				if (minutes1 > 10) {
+					flag1 = "Dead Slow";
+				}
+		      logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+						+ description1);
 				List<InventoryVoucherHeader> newInventoryVoucherHeaders = new ArrayList<>();
 				for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
 					inventoryVoucherHeader.setReceiverAccount(optionalAccountProfile.get());
 					newInventoryVoucherHeaders.add(inventoryVoucherHeader);
 				}
 				inventoryVoucherHeaderRepository.save(newInventoryVoucherHeaders);
-				  DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-					DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-					String id1 = "ACC_QUERY_119" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-					String description1 =" get all AccVoucher By ExecutiveTask Execution Pid ";
-					LocalDateTime startLCTime1 = LocalDateTime.now();
-					String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-					String startDate1 = startLCTime1.format(DATE_FORMAT1);
-					logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+				  DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id11 = "ACC_QUERY_119" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description11 =" get all AccVoucher By ExecutiveTask Execution Pid ";
+					LocalDateTime startLCTime11 = LocalDateTime.now();
+					String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+					String startDate11 = startLCTime11.format(DATE_FORMAT11);
+					logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 				// save AccountingVoucherHeader
 				List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
-				 String flag1 = "Normal";
-					LocalDateTime endLCTime1 = LocalDateTime.now();
-					String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-					String endDate1 = startLCTime1.format(DATE_FORMAT1);
-					Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-					long minutes1 = duration1.toMinutes();
-					if (minutes1 <= 1 && minutes1 >= 0) {
-						flag1 = "Fast";
+				 String flag11 = "Normal";
+					LocalDateTime endLCTime11 = LocalDateTime.now();
+					String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+					String endDate11 = startLCTime11.format(DATE_FORMAT11);
+					Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+					long minutes11 = duration11.toMinutes();
+					if (minutes11 <= 1 && minutes11 >= 0) {
+						flag11 = "Fast";
 					}
-					if (minutes1 > 1 && minutes1 <= 2) {
-						flag1 = "Normal";
+					if (minutes11 > 1 && minutes11 <= 2) {
+						flag11 = "Normal";
 					}
-					if (minutes1 > 2 && minutes1 <= 10) {
-						flag1 = "Slow";
+					if (minutes11 > 2 && minutes11 <= 10) {
+						flag11 = "Slow";
 					}
-					if (minutes1 > 10) {
-						flag1 = "Dead Slow";
+					if (minutes11 > 10) {
+						flag11 = "Dead Slow";
 					}
-			                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-							+ description1);
+			                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+							+ description11);
 				List<AccountingVoucherHeader> newAccountingVoucherHeaders = new ArrayList<>();
 				for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
 					accountingVoucherHeader.setAccountProfile(optionalAccountProfile.get());
@@ -1130,24 +1159,16 @@ public class ExecutiveTaskExecutionResource {
 		Optional<ExecutiveTaskExecution> optionalExecutiveTaskExecution = executiveTaskExecutionRepository
 				.findOneByPid(pid);
 		if (optionalExecutiveTaskExecution.isPresent()) {
-			Optional<AccountProfile> optionalAccountProfile = accountProfileRepository.findOneByPid(result.getPid());
-			if (optionalAccountProfile.isPresent()) {
-				optionalExecutiveTaskExecution.get().setAccountProfile(optionalAccountProfile.get());
-				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
-
-				// save InventoryVoucherHeader
-				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				
-				String id = "INV_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description = "get all by executive task execution Pid ";
+				String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get one by pid";
 				LocalDateTime startLCTime = LocalDateTime.now();
 				String startTime = startLCTime.format(DATE_TIME_FORMAT);
 				String startDate = startLCTime.format(DATE_FORMAT);
 				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
-				String flag = "Normal";
+			Optional<AccountProfile> optionalAccountProfile = accountProfileRepository.findOneByPid(result.getPid());
+			  String flag = "Normal";
 				LocalDateTime endLCTime = LocalDateTime.now();
 				String endTime = endLCTime.format(DATE_TIME_FORMAT);
 				String endDate = startLCTime.format(DATE_FORMAT);
@@ -1165,45 +1186,82 @@ public class ExecutiveTaskExecutionResource {
 				if (minutes > 10) {
 					flag = "Dead Slow";
 				}
-		      logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 						+ description);
+
+			if (optionalAccountProfile.isPresent()) {
+				optionalExecutiveTaskExecution.get().setAccountProfile(optionalAccountProfile.get());
+				executiveTaskExecutionRepository.save(optionalExecutiveTaskExecution.get());
+
+				// save InventoryVoucherHeader
+				DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				
+				String id1 = "INV_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description1 = "get all by executive task execution Pid ";
+				LocalDateTime startLCTime1 = LocalDateTime.now();
+				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+				String startDate1 = startLCTime1.format(DATE_FORMAT1);
+				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
+				String flag1 = "Normal";
+				LocalDateTime endLCTime1 = LocalDateTime.now();
+				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+				String endDate1 = startLCTime1.format(DATE_FORMAT1);
+				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+				long minutes1 = duration1.toMinutes();
+				if (minutes1 <= 1 && minutes1 >= 0) {
+					flag1 = "Fast";
+				}
+				if (minutes1 > 1 && minutes1 <= 2) {
+					flag1 = "Normal";
+				}
+				if (minutes1 > 2 && minutes1 <= 10) {
+					flag1 = "Slow";
+				}
+				if (minutes1 > 10) {
+					flag1 = "Dead Slow";
+				}
+		      logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+						+ description1);
 				List<InventoryVoucherHeader> newInventoryVoucherHeaders = new ArrayList<>();
 				for (InventoryVoucherHeader inventoryVoucherHeader : inventoryVoucherHeaders) {
 					inventoryVoucherHeader.setReceiverAccount(optionalAccountProfile.get());
 					newInventoryVoucherHeaders.add(inventoryVoucherHeader);
 				}
 				inventoryVoucherHeaderRepository.save(newInventoryVoucherHeaders);
-				 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-					DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-					String id1 = "ACC_QUERY_119" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-					String description1 =" get all AccVoucher By ExecutiveTask Execution Pid ";
-					LocalDateTime startLCTime1 = LocalDateTime.now();
-					String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-					String startDate1 = startLCTime1.format(DATE_FORMAT1);
-					logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+				 DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id11 = "ACC_QUERY_119" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description11 =" get all AccVoucher By ExecutiveTask Execution Pid ";
+					LocalDateTime startLCTime11 = LocalDateTime.now();
+					String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+					String startDate11 = startLCTime11.format(DATE_FORMAT11);
+					logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 				// save AccountingVoucherHeader
 				List<AccountingVoucherHeader> accountingVoucherHeaders = accountingVoucherHeaderRepository
 						.findAllByExecutiveTaskExecutionPid(optionalExecutiveTaskExecution.get().getPid());
-				 String flag1 = "Normal";
-					LocalDateTime endLCTime1 = LocalDateTime.now();
-					String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-					String endDate1 = startLCTime1.format(DATE_FORMAT1);
-					Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-					long minutes1 = duration1.toMinutes();
-					if (minutes1 <= 1 && minutes1 >= 0) {
-						flag1 = "Fast";
+				 String flag11 = "Normal";
+					LocalDateTime endLCTime11 = LocalDateTime.now();
+					String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+					String endDate11 = startLCTime11.format(DATE_FORMAT11);
+					Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+					long minutes11 = duration11.toMinutes();
+					if (minutes11 <= 1 && minutes11 >= 0) {
+						flag11 = "Fast";
 					}
-					if (minutes1 > 1 && minutes1 <= 2) {
-						flag1 = "Normal";
+					if (minutes11 > 1 && minutes11 <= 2) {
+						flag11 = "Normal";
 					}
-					if (minutes1 > 2 && minutes1 <= 10) {
-						flag1 = "Slow";
+					if (minutes11 > 2 && minutes11 <= 10) {
+						flag11 = "Slow";
 					}
-					if (minutes1 > 10) {
-						flag1 = "Dead Slow";
+					if (minutes11 > 10) {
+						flag11 = "Dead Slow";
 					}
-			                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-							+ description1);
+			                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+							+ description11);
 				List<AccountingVoucherHeader> newAccountingVoucherHeaders = new ArrayList<>();
 				for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
 					accountingVoucherHeader.setAccountProfile(optionalAccountProfile.get());

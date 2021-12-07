@@ -24,7 +24,7 @@ public interface AccountTypeRepository extends JpaRepository<AccountType, Long> 
 
 	Optional<AccountType> findOneByPid(String pid);
 
-	@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId}")
+@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId}")
 	List<AccountType> findAllByCompanyId();
 
 	@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId} and accountType.activated = ?1 order by accountType.name asc")

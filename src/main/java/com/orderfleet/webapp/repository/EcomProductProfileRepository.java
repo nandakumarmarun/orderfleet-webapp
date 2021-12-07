@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.orderfleet.webapp.domain.EcomProductProfile;
+import com.orderfleet.webapp.web.rest.dto.EcomProductProfileDTO;
 
 /**
  * Spring Data JPA repository for the EcomProductProfile entity.
@@ -40,6 +41,8 @@ public interface EcomProductProfileRepository extends JpaRepository<EcomProductP
 	
 	@Query("select ecomProductProfile from EcomProductProfile ecomProductProfile where ecomProductProfile.pid IN ?1")
 	List<EcomProductProfile> findAllByProductPid(List<String> pids);
+	
+   
 	
 
 }

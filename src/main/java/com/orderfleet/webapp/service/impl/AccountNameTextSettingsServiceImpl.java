@@ -1,5 +1,8 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,7 +37,7 @@ import com.orderfleet.webapp.web.rest.dto.ProductNameTextSettingsDTO;
 public class AccountNameTextSettingsServiceImpl implements AccountNameTextSettingsService {
 
 	private final Logger log = LoggerFactory.getLogger(AccountNameTextSettingsServiceImpl.class);
-
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountNameTextSettingsRepository accountNameTextSettingsRepository;
 
@@ -52,8 +55,36 @@ public class AccountNameTextSettingsServiceImpl implements AccountNameTextSettin
 	public void save(List<AccountNameTextSettingsDTO> accountNameTextSettingsDTOs) {
 		log.debug("Request to save AccountNameTextSettings : {}", accountNameTextSettingsDTOs);
 		for (AccountNameTextSettingsDTO accountNameTextSettingsDTO : accountNameTextSettingsDTOs) {
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ANTS_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get one by pid";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			AccountNameTextSettings accountNameTextSettings = accountNameTextSettingsRepository
 					.findOneByPid(accountNameTextSettingsDTO.getPid()).get();
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			accountNameTextSettings.setEnabled(accountNameTextSettingsDTO.getEnabled());
 			accountNameTextSettingsRepository.save(accountNameTextSettings);
 		}
@@ -68,9 +99,38 @@ public class AccountNameTextSettingsServiceImpl implements AccountNameTextSettin
 	@Transactional(readOnly = true)
 	public List<AccountNameTextSettingsDTO> findAllByCompany() {
 		log.debug("Request to get all AccountNameTextSettings");
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ANTS_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all by compId";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountNameTextSettings> accountNameTextSettings = accountNameTextSettingsRepository.findAllByCompanyId();
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		List<AccountNameTextSettingsDTO> result = accountNameTextSettings.stream().map(AccountNameTextSettingsDTO::new)
 				.collect(Collectors.toList());
+		
 		return result;
 	}
 
@@ -85,11 +145,40 @@ public class AccountNameTextSettingsServiceImpl implements AccountNameTextSettin
 	@Transactional(readOnly = true)
 	public Optional<AccountNameTextSettingsDTO> findOneByPid(String pid) {
 		log.debug("Request to get AccountNameTextSettings by pid : {}", pid);
-		return accountNameTextSettingsRepository.findOneByPid(pid).map(accountNameTextSettings -> {
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ANTS_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			Optional<AccountNameTextSettingsDTO>accNameTextDTO=	 accountNameTextSettingsRepository.findOneByPid(pid).map(accountNameTextSettings -> {
 			AccountNameTextSettingsDTO accountNameTextSettingsDTO = new AccountNameTextSettingsDTO(
 					accountNameTextSettings);
 			return accountNameTextSettingsDTO;
 		});
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+					return accNameTextDTO;
 	}
 
 	/**
@@ -103,13 +192,42 @@ public class AccountNameTextSettingsServiceImpl implements AccountNameTextSettin
 	@Transactional(readOnly = true)
 	public Optional<AccountNameTextSettingsDTO> findByName(String name) {
 		log.debug("Request to get AccountNameTextSettings by name : {}", name);
-		return accountNameTextSettingsRepository
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ANTS_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get all by compId and name ignore case";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		Optional<AccountNameTextSettingsDTO>accountNameDTO= accountNameTextSettingsRepository
 				.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), name)
 				.map(accountNameTextSettings -> {
 					AccountNameTextSettingsDTO accountNameTextSettingsDTO = new AccountNameTextSettingsDTO(
 							accountNameTextSettings);
 					return accountNameTextSettingsDTO;
 				});
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+					return accountNameDTO;
 	}
 
 	@Override
@@ -117,8 +235,36 @@ public class AccountNameTextSettingsServiceImpl implements AccountNameTextSettin
 		log.debug("Request to save AccountNameTextSettings : {}", accountNameTextSettingsDTOs);
 		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		for (AccountNameTextSettingsDTO accountNameTextSettingsDTO : accountNameTextSettingsDTOs) {
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ANTS_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get all by compId and name ignore case";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Optional<AccountNameTextSettings> opAccountNameTextSettings = accountNameTextSettingsRepository
 					.findByCompanyIdAndNameIgnoreCase(companyId, accountNameTextSettingsDTO.getName());
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			if (!opAccountNameTextSettings.isPresent()) {
 				AccountNameTextSettings accountNameTextSetting = new AccountNameTextSettings();
 				accountNameTextSetting.setName(accountNameTextSettingsDTO.getName());

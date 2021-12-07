@@ -1,5 +1,8 @@
 package com.orderfleet.webapp.web.rest.api;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +24,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileGeoLocationTaggingService;
 import com.orderfleet.webapp.web.rest.api.dto.AccountProfileGeoLocationTaggingDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
@@ -36,7 +40,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class AccountProfileGeoLocationTaggingController {
 
 	private final Logger log = LoggerFactory.getLogger(MasterDataController.class);
-
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
 
@@ -56,9 +60,37 @@ public class AccountProfileGeoLocationTaggingController {
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfileGeoLocationTagging",
 					"longitude is null", "longitude has no value")).body(null);
 		}
-
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<AccountProfile> existingAccountProfile = accountProfileRepository
 				.findOneByPid(accountProfileGeoLocationTaggingDTO.getAccountProfilePid());
+
+        String flag = "Normal";
+LocalDateTime endLCTime = LocalDateTime.now();
+String endTime = endLCTime.format(DATE_TIME_FORMAT);
+String endDate = startLCTime.format(DATE_FORMAT);
+Duration duration = Duration.between(startLCTime, endLCTime);
+long minutes = duration.toMinutes();
+if (minutes <= 1 && minutes >= 0) {
+	flag = "Fast";
+}
+if (minutes > 1 && minutes <= 2) {
+	flag = "Normal";
+}
+if (minutes > 2 && minutes <= 10) {
+	flag = "Slow";
+}
+if (minutes > 10) {
+	flag = "Dead Slow";
+}
+        logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		+ description);
 		if (!existingAccountProfile.isPresent()) {
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfile",
 					"Account Profile Not exists", "Account Profile not Present")).body(null);
@@ -78,10 +110,37 @@ public class AccountProfileGeoLocationTaggingController {
 	public ResponseEntity<List<AccountProfileGeoLocationTaggingDTO>> getAccountProfileGeoLocation(
 			@RequestParam String accountProfilePid) {
 		log.info("Get Account Profile Geo Tagging");
-
+		
 		List<AccountProfileGeoLocationTaggingDTO> geoLocationTaggingDTOs = new ArrayList<AccountProfileGeoLocationTaggingDTO>();
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<AccountProfile> opAccp = accountProfileRepository.findOneByPid(accountProfilePid);
-
+		  String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		if (opAccp.isPresent()) {
 			geoLocationTaggingDTOs = accountProfileGeoLocationTaggingService
 					.getAllAccountProfileGeoLocationTaggingByAccountProfile(opAccp.get().getPid());

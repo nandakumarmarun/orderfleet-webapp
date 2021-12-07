@@ -1,8 +1,10 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.custom.InventoryVoucherDetailCustomRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
@@ -49,7 +52,7 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 public class ItemSummaryEmployeeWiseResource {
 
 	private final Logger log = LoggerFactory.getLogger(ItemSummaryEmployeeWiseResource.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private PrimarySecondaryDocumentService primarySecondaryDocumentService;
 
@@ -169,8 +172,36 @@ public class ItemSummaryEmployeeWiseResource {
 		productProfilePids = profilePids != "" ? Arrays.asList(profilePids.split(",")) : productProfilePids;
 		productTerritoryPids = territoryPids != "" ? Arrays.asList(territoryPids.split(",")) : productTerritoryPids;
 		employeePidList = employeePids != "" ? Arrays.asList(employeePids.split(",")) : employeePidList;
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AP_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get all pids by company";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		accountPidList = !accountPids.equals("-1") ? Arrays.asList(accountPids)
 				: accountProfileRepository.findAllPidsByCompany();
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 
 		if (documentPid.equals("no")) {
 			List<DocumentDTO> documentDTOs = primarySecondaryDocumentService

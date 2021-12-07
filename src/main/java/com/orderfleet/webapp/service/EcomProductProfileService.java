@@ -142,5 +142,7 @@ public interface EcomProductProfileService {
 	List<EcomProductProfileDTO> findByCurrentUserAndLastModifiedDate(LocalDateTime lastModifiedDate);
 	List<EcomProductProfileDTO> findByproductgrupPId(String productgroupPid);
 	List<EcomProductProfileDTO> findByCurrentUserAndLastModifiedDateForModern(LocalDateTime lastModifiedDate);
+
+	EcomProductProfileDTO findOneByProductPid(String productPid);
 	
 }

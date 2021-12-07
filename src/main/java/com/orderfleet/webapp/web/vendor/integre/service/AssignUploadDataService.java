@@ -1,5 +1,8 @@
 package com.orderfleet.webapp.web.vendor.integre.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -48,13 +51,14 @@ import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserPriceLevelRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 
 @Service
 @Transactional
 public class AssignUploadDataService {
 	
 	private static final Logger log = LoggerFactory.getLogger(AssignUploadDataService.class);
-	
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private UserStockLocationRepository userStockLocationRepository;
 	
@@ -202,9 +206,37 @@ public class AssignUploadDataService {
 	public void locationAccountProfileAssociation(List<String> newAccountProfileAliasList,Company company) {
 		List<LocationAccountProfile> locationAccountProfiles = new ArrayList<>();
 		List<AccountProfile> newAccountProfiles = new ArrayList<>();
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AP_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get all by compId";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountProfile> existingAccountProfiles = accountProfileRepository
 				 .findAllByCompanyId(company.getId());
-		
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
 		for(String newAccountProfileAlias: newAccountProfileAliasList) {
 			Optional<AccountProfile> accountProfileExist = existingAccountProfiles.stream()
 					.filter(aProfile ->aProfile.getAlias() != null ? aProfile.getAlias().equals(newAccountProfileAlias):false)

@@ -530,43 +530,70 @@ public class LoadServerItemsToMobileController {
 		log.info("Request to customer-wise-sales-order..." + accountPid + " logged user : " + userLogin);
 
 		Optional<User> opUser = userRepository.findOneByLogin(userLogin);
-		Optional<AccountProfile> opAccountProfile = accountProfileRepository.findOneByPid(accountPid);
-
-		List<SalesOrderAllocationDTO> salesOrderAllocationDTOs = new ArrayList<>();
-
-		if (opUser.isPresent() && opAccountProfile.isPresent()) {
-			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "INV_QUERY_209" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="finding all invVoucher header by companyid and accountPid user";
+			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
 			LocalDateTime startLCTime = LocalDateTime.now();
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		Optional<AccountProfile> opAccountProfile = accountProfileRepository.findOneByPid(accountPid);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+		List<SalesOrderAllocationDTO> salesOrderAllocationDTOs = new ArrayList<>();
+
+		if (opUser.isPresent() && opAccountProfile.isPresent()) {
+			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id1 = "INV_QUERY_209" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description1 ="finding all invVoucher header by companyid and accountPid user";
+			LocalDateTime startLCTime1 = LocalDateTime.now();
+			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+			String startDate1 = startLCTime1.format(DATE_FORMAT1);
+			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 
 			List<Object[]> objectArray = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAccountPidUserAndDateCreatedDateDesc(opAccountProfile.get().getPid(),
 							opUser.get().getPid());
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
+			 String flag1 = "Normal";
+				LocalDateTime endLCTime1 = LocalDateTime.now();
+				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+				String endDate1 = startLCTime1.format(DATE_FORMAT1);
+				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+				long minutes1 = duration1.toMinutes();
+				if (minutes1 <= 1 && minutes1 >= 0) {
+					flag1 = "Fast";
 				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
+				if (minutes1 > 1 && minutes1 <= 2) {
+					flag1 = "Normal";
 				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
+				if (minutes1 > 2 && minutes1 <= 10) {
+					flag1 = "Slow";
 				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
+				if (minutes1 > 10) {
+					flag1 = "Dead Slow";
 				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+						+ description1);
 
 			for (Object[] obj : objectArray) {
 				SalesOrderAllocationDTO salesOrderAllocationDTO = new SalesOrderAllocationDTO();
@@ -1015,7 +1042,36 @@ public class LoadServerItemsToMobileController {
 		if (accountPid != null && !accountPid.equals("")) {
 			accountPids.add(accountPid);
 		} else {
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "AP_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get all pids by company";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountPids = accountProfileRepository.findAllPidsByCompany();
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 		}
 		log.info("Account Profile Size =" + accountPids.size());
 		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
@@ -1142,7 +1198,36 @@ public class LoadServerItemsToMobileController {
 		if (accountPid != null && !accountPid.equals("")) {
 			accountPids.add(accountPid);
 		} else {
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "AP_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get all pids by company";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountPids = accountProfileRepository.findAllPidsByCompany();
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 		}
 		log.info("Account Profile Size =" + accountPids.size());
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");

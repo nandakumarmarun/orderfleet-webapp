@@ -167,6 +167,12 @@ public class ProductProfileDTO {
 		this.colorImage = profile.getColorImage();
 		this.colorImageContentType = profile.getColorImageContentType();
 		this.size = profile.getSize() == null || profile.getSize().equalsIgnoreCase("") ? null : profile.getSize();
+		if (profile.getFiles() != null || !profile.getFiles().isEmpty()) {
+			String filePids = profile.getFiles().stream().map(fileDTO -> fileDTO.getPid())
+					.collect(Collectors.joining(","));
+			this.filesPid = filePids;
+		}
+	
 		this.activated = profile.getActivated();
 		this.lastModifiedDate = profile.getLastModifiedDate();
 		this.defaultLedger = profile.getDefaultLedger();
@@ -180,17 +186,14 @@ public class ProductProfileDTO {
 		this.productCode = profile.getProductCode();
 		this.productGroup = profile.getProductGroup();
 		this.purchaseCost = profile.getPurchaseCost();
+	
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
 		this.productProfileTaxMasterDTOs = profile.getTaxMastersList() == null || profile.getTaxMastersList().isEmpty()
 				|| profile.getTaxMastersList().size() <= 0 ? taxMasterDTOs
 						: profile.getTaxMastersList().stream().map(TaxMasterDTO::new).collect(Collectors.toList());
 
-		if (profile.getFiles() != null || !profile.getFiles().isEmpty()) {
-			String filePids = profile.getFiles().stream().map(fileDTO -> fileDTO.getPid())
-					.collect(Collectors.joining(","));
-			this.filesPid = filePids;
-		}
+	
 
 	}
 

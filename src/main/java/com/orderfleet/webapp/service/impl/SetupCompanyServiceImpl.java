@@ -591,50 +591,15 @@ public class SetupCompanyServiceImpl implements SetupCompanyService {
 	public void cloneAccountProfiles(String existingCompanyPid, Company company) {
 		log.info("cloning AccountProfiles.");
 		// copy account type
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AT_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get all by compPid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyPid(existingCompanyPid);
-		List<AccountType> newAccountTypes = new ArrayList<>();
-		for (AccountType accountType : accountTypes) {
-			try {
-				AccountType newAccountType = (AccountType) accountType.clone();
-				newAccountType.setId(null);
-				newAccountType.setPid(AccountTypeService.PID_PREFIX + RandomUtil.generatePid());
-				newAccountType.setCompany(company);
-				newAccountTypes.add(newAccountType);
-			} catch (CloneNotSupportedException e) {
-				e.printStackTrace();
-			}
-		}
-		accountTypeRepository.save(newAccountTypes);
-
-		// copy account profile
-		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyPid(existingCompanyPid);
-		List<AccountProfile> newAccountProfiles = new ArrayList<>();
-		for (AccountProfile accountProfile : accountProfiles) {
-			try {
-				AccountProfile newAccountProfile = (AccountProfile) accountProfile.clone();
-				newAccountProfile.setId(null);
-				newAccountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-				newAccountProfile.setCompany(company);
-				newAccountProfile.setAccountType(accountTypeRepository
-						.findByCompanyIdAndNameIgnoreCase(company.getId(), accountProfile.getAccountType().getName())
-						.get());
-				newAccountProfiles.add(newAccountProfile);
-			} catch (CloneNotSupportedException e) {
-				e.printStackTrace();
-			}
-		}
-		accountProfileRepository.save(newAccountProfiles);
-
-		// copy account group
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "AG_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all by companyPid";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<AccountGroup> accountGroups = accountGroupRepository.findAllByCompanyPid(existingCompanyPid);
 		 String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -655,6 +620,126 @@ public class SetupCompanyServiceImpl implements SetupCompanyService {
 			}
 	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
+		List<AccountType> newAccountTypes = new ArrayList<>();
+		for (AccountType accountType : accountTypes) {
+			try {
+				AccountType newAccountType = (AccountType) accountType.clone();
+				newAccountType.setId(null);
+				newAccountType.setPid(AccountTypeService.PID_PREFIX + RandomUtil.generatePid());
+				newAccountType.setCompany(company);
+				newAccountTypes.add(newAccountType);
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+			}
+		}
+		accountTypeRepository.save(newAccountTypes);
+
+		// copy account profile
+		  DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id1 = "AP_QUERY_115" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description1 ="get all by companyPid";
+			LocalDateTime startLCTime1 = LocalDateTime.now();
+			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+			String startDate1 = startLCTime1.format(DATE_FORMAT1);
+			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyPid(existingCompanyPid);
+		  String flag1 = "Normal";
+			LocalDateTime endLCTime1 = LocalDateTime.now();
+			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+			String endDate1 = startLCTime1.format(DATE_FORMAT1);
+			Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+			long minutes1 = duration1.toMinutes();
+			if (minutes1 <= 1 && minutes1 >= 0) {
+				flag1 = "Fast";
+			}
+			if (minutes1 > 1 && minutes1 <= 2) {
+				flag1 = "Normal";
+			}
+			if (minutes1 > 2 && minutes1 <= 10) {
+				flag1 = "Slow";
+			}
+			if (minutes1 > 10) {
+				flag1 = "Dead Slow";
+			}
+	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+					+ description1);
+		List<AccountProfile> newAccountProfiles = new ArrayList<>();
+		for (AccountProfile accountProfile : accountProfiles) {
+			try {
+				AccountProfile newAccountProfile = (AccountProfile) accountProfile.clone();
+				newAccountProfile.setId(null);
+				newAccountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+				newAccountProfile.setCompany(company);
+				 DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id11 = "AT_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description11 ="get by compId and name ignore case";
+					LocalDateTime startLCTime11 = LocalDateTime.now();
+					String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+					String startDate11 = startLCTime11.format(DATE_FORMAT11);
+					logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
+				newAccountProfile.setAccountType(accountTypeRepository
+						.findByCompanyIdAndNameIgnoreCase(company.getId(), accountProfile.getAccountType().getName())
+						.get());
+				 String flag11 = "Normal";
+					LocalDateTime endLCTime11 = LocalDateTime.now();
+					String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+					String endDate11 = startLCTime11.format(DATE_FORMAT11);
+					Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+					long minutes11 = duration11.toMinutes();
+					if (minutes11 <= 1 && minutes11 >= 0) {
+						flag11 = "Fast";
+					}
+					if (minutes11 > 1 && minutes11 <= 2) {
+						flag11 = "Normal";
+					}
+					if (minutes11 > 2 && minutes11 <= 10) {
+						flag11 = "Slow";
+					}
+					if (minutes11 > 10) {
+						flag11 = "Dead Slow";
+					}
+			                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+							+ description11);
+
+				newAccountProfiles.add(newAccountProfile);
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+			}
+		}
+		accountProfileRepository.save(newAccountProfiles);
+
+		// copy account group
+		 DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id11 = "AG_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description11 ="get all by companyPid";
+			LocalDateTime startLCTime11 = LocalDateTime.now();
+			String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+			String startDate11 = startLCTime11.format(DATE_FORMAT11);
+			logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
+		List<AccountGroup> accountGroups = accountGroupRepository.findAllByCompanyPid(existingCompanyPid);
+		 String flag11 = "Normal";
+			LocalDateTime endLCTime11 = LocalDateTime.now();
+			String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+			String endDate11 = startLCTime11.format(DATE_FORMAT11);
+			Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+			long minutes11 = duration11.toMinutes();
+			if (minutes11 <= 1 && minutes11 >= 0) {
+				flag11 = "Fast";
+			}
+			if (minutes11 > 1 && minutes11 <= 2) {
+				flag11 = "Normal";
+			}
+			if (minutes11 > 2 && minutes11 <= 10) {
+				flag11 = "Slow";
+			}
+			if (minutes11 > 10) {
+				flag11 = "Dead Slow";
+			}
+	                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+					+ description11);
 
 		List<AccountGroup> newAccountGroups = new ArrayList<>();
 		for (AccountGroup accountGroup : accountGroups) {

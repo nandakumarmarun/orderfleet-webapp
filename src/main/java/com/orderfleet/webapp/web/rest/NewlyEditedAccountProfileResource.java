@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest;
 
 import java.math.BigInteger;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
 import com.orderfleet.webapp.domain.NewlyEditedAccountProfile;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
@@ -50,8 +52,10 @@ import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
+import com.orderfleet.webapp.service.ExecutiveTaskPlanService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.NewlyEditedAccountProfileService;
+import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
@@ -64,7 +68,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class NewlyEditedAccountProfileResource {
 
 	private final Logger log = LoggerFactory.getLogger(NewlyEditedAccountProfileResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountProfileService accountProfileService;
 
@@ -185,9 +189,39 @@ public class NewlyEditedAccountProfileResource {
 
 			AccountProfileDTO accountProfileDTO = newlyEditedaccountProfileService
 					.newlyEditedAccountProfileToAccountProfileDTO(opNewlyEditedAccountProfile.get());
-
+			ExecutiveTaskPlan newExecutiveTaskPlan = new ExecutiveTaskPlan();
+			newExecutiveTaskPlan.setPid(ExecutiveTaskPlanService.PID_PREFIX + RandomUtil.generatePid());
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Optional<AccountProfile> exisitingAccountProfile = accountProfileRepository
 					.findOneByPid(opNewlyEditedAccountProfile.get().getAccountProfile().getPid());
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 			if (exisitingAccountProfile.isPresent()) {
 
 				AccountProfile accountProfile = accountProfileMapper

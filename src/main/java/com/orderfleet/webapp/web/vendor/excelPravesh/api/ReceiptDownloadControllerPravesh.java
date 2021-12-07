@@ -162,12 +162,67 @@ public class ReceiptDownloadControllerPravesh {
 			List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyIdAndIdsIn(employeeIds);
 			List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
 					.findAllByCompanyIdAndIdsIn(exeIds);
+			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id1 = "AP_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description1 ="get all by compId and IdsIn";
+			LocalDateTime startLCTime1 = LocalDateTime.now();
+			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+			String startDate1 = startLCTime1.format(DATE_FORMAT1);
+			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 			List<AccountProfile> accountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+			 String flag1 = "Normal";
+				LocalDateTime endLCTime1 = LocalDateTime.now();
+				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+				String endDate1 = startLCTime1.format(DATE_FORMAT1);
+				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+				long minutes1 = duration1.toMinutes();
+				if (minutes1 <= 1 && minutes1 >= 0) {
+					flag1 = "Fast";
+				}
+				if (minutes1 > 1 && minutes1 <= 2) {
+					flag1 = "Normal";
+				}
+				if (minutes1 > 2 && minutes1 <= 10) {
+					flag1 = "Slow";
+				}
+				if (minutes1 > 10) {
+					flag1 = "Dead Slow";
+				}
+		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+						+ description1);
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+			DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id11 = "AVD_QUERY_111" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description11 ="get all by accVoucherHeaderPidIn";
+			LocalDateTime startLCTime11 = LocalDateTime.now();
+			String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+			String startDate11 = startLCTime11.format(DATE_FORMAT11);
+			logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 			List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByAccountingVoucherHeaderPidIn(avhPids);
-
+			 String flag11 = "Normal";
+				LocalDateTime endLCTime11 = LocalDateTime.now();
+				String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+				String endDate11 = startLCTime11.format(DATE_FORMAT11);
+				Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+				long minutes11 = duration11.toMinutes();
+				if (minutes11 <= 1 && minutes11 >= 0) {
+					flag11 = "Fast";
+				}
+				if (minutes11 > 1 && minutes11 <= 2) {
+					flag11 = "Normal";
+				}
+				if (minutes11 > 2 && minutes11 <= 10) {
+					flag11 = "Slow";
+				}
+				if (minutes11 > 10) {
+					flag11 = "Dead Slow";
+				}
+		                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+						+ description11);
 			for (Object[] obj : accountingVoucherHeaders) {
 
 				String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";

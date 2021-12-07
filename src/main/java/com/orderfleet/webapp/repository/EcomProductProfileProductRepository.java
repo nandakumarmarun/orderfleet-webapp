@@ -42,6 +42,9 @@ public interface EcomProductProfileProductRepository extends JpaRepository<EcomP
 	List<ProductProfile> findProductByEcomProductProfilePidInAndActivatedAndStatus(Set<String> ecomProductProfilePids,
 			boolean activated, StockAvailabilityStatus status);
 	@Query("select ecomProductProfileProduct from EcomProductProfileProduct ecomProductProfileProduct where ecomProductProfileProduct.product.pid IN ?1")
-	List<EcomProductProfileProduct> findByProductProfilePids(List<String> productPids); 
+	List<EcomProductProfileProduct> findByProductProfilePids(List<String> productPids);
+	
+	@Query("select ecomProductProfileProduct.product from EcomProductProfileProduct ecomProductProfileProduct where ecomProductProfileProduct.product.pid = ?1 ")
+	ProductProfile findProductByProductProfilePid(String productPid); 
 	
 }

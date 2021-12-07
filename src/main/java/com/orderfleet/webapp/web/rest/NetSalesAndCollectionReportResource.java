@@ -259,9 +259,38 @@ public class NetSalesAndCollectionReportResource {
 			}
 	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 					+ description1);
+	                DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+	        		DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	        		String id11 = "AVD_QUERY_112" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+	        		String description11 ="get net a mount by UserId and dateBetween and PaymentMode";
+	        		LocalDateTime startLCTime11 = LocalDateTime.now();
+	        		String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+	        		String startDate11 = startLCTime11.format(DATE_FORMAT11);
+	        		logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 		Object[] netCollectionAmountCash = accountingVoucherdetailRepository
 				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentMode(userIds, fromDate, toDate,
 						PaymentMode.Cash);
+		   String flag11 = "Normal";
+			LocalDateTime endLCTime11 = LocalDateTime.now();
+			String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+			String endDate11 = startLCTime11.format(DATE_FORMAT11);
+			Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+			long minutes11 = duration11.toMinutes();
+			if (minutes11 <= 1 && minutes11 >= 0) {
+				flag11 = "Fast";
+			}
+			if (minutes11 > 1 && minutes11 <= 2) {
+				flag11 = "Normal";
+			}
+			if (minutes11 > 2 && minutes11 <= 10) {
+				flag11 = "Slow";
+			}
+			if (minutes11 > 10) {
+				flag11 = "Dead Slow";
+			}
+	                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+					+ description11);
+
 		Object[] netCollectionAmountCheque = accountingVoucherdetailRepository
 				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentMode(userIds, fromDate, toDate,
 						PaymentMode.Cheque);

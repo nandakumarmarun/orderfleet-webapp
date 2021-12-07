@@ -2,7 +2,10 @@ package com.orderfleet.webapp.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -53,7 +56,7 @@ import com.orderfleet.webapp.web.rest.mapper.SalesTargetGroupUserTargetMapper;
 public class SalesTargetGroupUserTargetServiceImpl implements SalesTargetGroupUserTargetService {
 
 	private final Logger log = LoggerFactory.getLogger(SalesTargetGroupUserTargetServiceImpl.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private SalesTargetGroupUserTargetRepository salesTargetGroupUserTargetRepository;
 
@@ -126,8 +129,37 @@ public class SalesTargetGroupUserTargetServiceImpl implements SalesTargetGroupUs
 		}
 
 		if (monthlyTargetDTO.getAccountProfilePid() != null) {
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate1 = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
 			salesTargetGroupUserTarget.setAccountProfile(
 					accountProfileRepository.findOneByPid(monthlyTargetDTO.getAccountProfilePid()).get());
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate1 = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate1 + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 			salesTargetGroupUserTarget.setAccountWiseTarget(true);
 		}
 

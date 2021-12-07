@@ -57,13 +57,13 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	@Inject
 	private EcomProductProfileMapper ecomProductProfileMapper;
 
-	//old code start
+	// old code start
 	@Inject
 	private UserProductGroupRepository userProductGroupRepository;
 
 	@Inject
 	private ProductGroupEcomProductsRepository productGroupEcomProductsRepository;
-	//old code ends
+	// old code ends
 	@Inject
 	private UserEcomProductGroupRepository userEcomProductGroupRepository;
 
@@ -76,8 +76,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	/**
 	 * Save a ecomProductProfile.
 	 *
-	 * @param ecomProductProfileDTO
-	 *            the entity to save
+	 * @param ecomProductProfileDTO the entity to save
 	 * @return the persisted entity
 	 */
 	@Override
@@ -103,8 +102,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	/**
 	 * Update a ecomProductProfile.
 	 *
-	 * @param ecomProductProfileDTO
-	 *            the entity to update
+	 * @param ecomProductProfileDTO the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -147,12 +145,10 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 		return result;
 	}
 
-	
 	/**
 	 * Get all the ecomProductProfiles.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	@Override
@@ -169,8 +165,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	/**
 	 * Get one ecomProductProfile by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -186,8 +181,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	/**
 	 * Get one ecomProductProfile by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -204,8 +198,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	/**
 	 * Get one ecomProductProfile by name.
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -224,8 +217,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	/**
 	 * Delete the ecomProductProfile by id.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete EcomProductProfile : {}", pid);
@@ -240,10 +232,8 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	 *
 	 *        Update the EcomProductProfile status by pid.
 	 *
-	 * @param pid
-	 *            the pid of the entity
-	 * @param activate
-	 *            the activate of the entity
+	 * @param pid      the pid of the entity
+	 * @param activate the activate of the entity
 	 * @return the entity
 	 */
 	@Override
@@ -267,11 +257,9 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	 *
 	 *        Get all the Activated ecomProductGroups of a company.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 *
-	 * @param active
-	 *            the active =true
+	 * @param active   the active =true
 	 *
 	 * @return the entities
 	 */
@@ -293,8 +281,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	 *
 	 *        find all deactive company
 	 *
-	 * @param deactive
-	 *            the deactive of the entity
+	 * @param deactive the deactive of the entity
 	 * @return the list
 	 */
 	@Override
@@ -306,6 +293,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 				.ecomProductProfilesToEcomProductProfileDTOs(ecomProductProfiles);
 		return ecomProductProfileDTOs;
 	}
+
 // old code start
 	@Override
 	@Transactional(readOnly = true)
@@ -335,9 +323,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 		}
 		return ecomProductProfileDTOs;
 	}
-	
-	
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<EcomProductProfileDTO> findByCurrentUser() {
@@ -367,7 +353,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 		return ecomProductProfileDTOs;
 	}
 //old code ends
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<EcomProductProfileDTO> findByCurrentUserAndLastModifiedDateForModern(LocalDateTime lastModifiedDate) {
@@ -396,8 +382,7 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 		}
 		return ecomProductProfileDTOs;
 	}
-	
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<EcomProductProfileDTO> findByCurrentUserForModern() {
@@ -430,27 +415,46 @@ public class EcomProductProfileServiceImpl implements EcomProductProfileService 
 	@Override
 	public List<EcomProductProfileDTO> findByproductgrupPId(String productgroupPid) {
 		List<EcomProductProfileDTO> ecomProductProfileDTOs = new ArrayList<>();
-		
-			List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository
-					.getEcomProductByProductGroupPid(productgroupPid);
-			productGroupEcomProducts.forEach(p -> {
-				EcomProductProfileDTO ecomProductProfileDTO = new EcomProductProfileDTO(p.getEcomProduct());
-				ecomProductProfileDTO.setProductGroupPid(p.getProductGroup().getPid());
-				ecomProductProfileDTO.setProductGroupName(p.getProductGroup().getName());
-				List<ProductProfile> productProfiles = ecomProductProfileProductRepository
-						.findProductByEcomProductProfilePid(p.getEcomProduct().getPid());
-				for (ProductProfile productProfile : productProfiles) {
-					productProfile.getFiles().size();
-					ProductProfileDTO productProfileDTO = new ProductProfileDTO(productProfile);
-					productProfileDTO.setFilesPid("");
-					for (File file : productProfile.getFiles()) {
-						productProfileDTO.setFilesPid(productProfileDTO.getFilesPid() + file.getPid() + ",");
-					}
-					ecomProductProfileDTO.getProductProfiles().add(productProfileDTO);
+
+		List<ProductGroupEcomProduct> productGroupEcomProducts = productGroupEcomProductsRepository
+				.getEcomProductByProductGroupPid(productgroupPid);
+		productGroupEcomProducts.forEach(p -> {
+			EcomProductProfileDTO ecomProductProfileDTO = new EcomProductProfileDTO(p.getEcomProduct());
+			ecomProductProfileDTO.setProductGroupPid(p.getProductGroup().getPid());
+			ecomProductProfileDTO.setProductGroupName(p.getProductGroup().getName());
+			List<ProductProfile> productProfiles = ecomProductProfileProductRepository
+					.findProductByEcomProductProfilePid(p.getEcomProduct().getPid());
+			for (ProductProfile productProfile : productProfiles) {
+				productProfile.getFiles().size();
+				ProductProfileDTO productProfileDTO = new ProductProfileDTO(productProfile);
+				productProfileDTO.setFilesPid("");
+				for (File file : productProfile.getFiles()) {
+					productProfileDTO.setFilesPid(productProfileDTO.getFilesPid() + file.getPid() + ",");
 				}
-				ecomProductProfileDTOs.add(ecomProductProfileDTO);
-			});
+				ecomProductProfileDTO.getProductProfiles().add(productProfileDTO);
+			}
+			ecomProductProfileDTOs.add(ecomProductProfileDTO);
+		});
 		return ecomProductProfileDTOs;
+	}
+
+	@Override
+	public EcomProductProfileDTO findOneByProductPid(String productPid) {
+		// TODO Auto-generated method stub
+
+		EcomProductProfileDTO ecomProductProfileDTO = new EcomProductProfileDTO();
+		ProductProfile productProfile = ecomProductProfileProductRepository
+				.findProductByProductProfilePid(productPid);
+
+		productProfile.getFiles().size();
+		ProductProfileDTO productProfileDTO = new ProductProfileDTO(productProfile);
+		productProfileDTO.setFilesPid("");
+		for (File file : productProfile.getFiles()) {
+			productProfileDTO.setFilesPid(productProfileDTO.getFilesPid() + file.getPid() + ",");
+		}
+		ecomProductProfileDTO.getProductProfiles().add(productProfileDTO);
+
+		return ecomProductProfileDTO;
 	}
 
 }

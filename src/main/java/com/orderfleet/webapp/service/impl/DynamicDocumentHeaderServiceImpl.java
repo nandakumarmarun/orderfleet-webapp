@@ -814,8 +814,36 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		}
                 logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
+                DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+        		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        		String id1 = "APDD_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+        		String description1 ="get all by company";
+        		LocalDateTime startLCTime1 = LocalDateTime.now();
+        		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+        		String startDate1 = startLCTime1.format(DATE_FORMAT1);
+        		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 		List<AccountProfileDynamicDocumentAccountprofile> acProfileDyDocumentAcprofiles = accountProfileDynamicDocumentAccountprofileRepository
 				.findAllByCompany();
+		String flag1 = "Normal";
+		LocalDateTime endLCTime1 = LocalDateTime.now();
+		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+		String endDate1 = startLCTime1.format(DATE_FORMAT1);
+		Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+		long minutes1 = duration1.toMinutes();
+		if (minutes1 <= 1 && minutes1 >= 0) {
+			flag1 = "Fast";
+		}
+		if (minutes1 > 1 && minutes1 <= 2) {
+			flag1 = "Normal";
+		}
+		if (minutes1 > 2 && minutes1 <= 10) {
+			flag1 = "Slow";
+		}
+		if (minutes1 > 10) {
+			flag1 = "Dead Slow";
+		}
+                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+				+ description1);
 		for (AccountProfileDynamicDocumentAccountprofile accountProfileDynamicDocumentAccountprofile : acProfileDyDocumentAcprofiles) {
 			for (DynamicDocumentHeader dynamicDocumentHeader : documentHeaders) {
 				if (accountProfileDynamicDocumentAccountprofile.getDocument().getPid()

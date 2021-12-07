@@ -152,7 +152,15 @@ public class EcomMasterDataController {
 		log.debug("REST request to get user EcomProductProfiles");
 		return new ResponseEntity<>(ecomProductProfileService.findByCurrentUser(), HttpStatus.OK);
 	}
-
+	
+	
+	
+	@GetMapping("/ecom-product-profile/{productPid}")
+	@Timed
+	public ResponseEntity<EcomProductProfileDTO>getOneEcomProduct(@PathVariable String productPid) {
+		log.debug("REST request to get One EcomProductProfiles");
+		return new ResponseEntity<>(ecomProductProfileService.findOneByProductPid(productPid), HttpStatus.OK);
+	}
 	/**
 	 * GET /account-profile : get the accountProfile. This will give all account
 	 * profile from user-account-profile association table (One user has only
@@ -230,6 +238,7 @@ public class EcomMasterDataController {
 					.headers(HeaderUtil.createFailureAlert("produuctProfile", "not found", "Product Profile not found"))
 					.body(null);
 		}
+		
 		result = productProfileDTO.get();
 
 		Long companyId = SecurityUtils.getCurrentUsersCompanyId();

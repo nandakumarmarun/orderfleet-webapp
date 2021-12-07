@@ -1,6 +1,9 @@
 package com.orderfleet.webapp.service.impl.integration.async;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +44,7 @@ import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.ReceivablePayableRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
@@ -78,7 +82,7 @@ import com.orderfleet.webapp.web.rest.dto.StockLocationDTO;
 public class ThirdPartySaveService {
 
 	private final Logger log = LoggerFactory.getLogger(ThirdPartySaveService.class);
-
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountTypeService accountTypeService;
 
@@ -268,8 +272,37 @@ public class ThirdPartySaveService {
 		// useed for finding not assighned from tally.............
 		for (LocationAccountProfile locationAccountProfile2 : allLocationAccountProfile) {
 			if (!locationAccountProfile2.getAccountProfile().getCity().equals("No City")) {
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="get one by pid";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				Optional<AccountProfile> accountProfile = accountProfileRepository
 						.findOneByPid(locationAccountProfile2.getAccountProfile().getPid());
+
+                String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 				Location location = locationRepository.findOneByPid(locationAccountProfile2.getLocation().getPid())
 						.get();
 				LocationAccountProfile profile = new LocationAccountProfile();
@@ -289,8 +322,36 @@ public class ThirdPartySaveService {
 			if (optionalLocationDTO.isPresent()) {
 				List<AccountProfile> newAccountProfiles = new ArrayList<>();
 				for (AccountProfileDTO accountProfileDTO : entry.getValue()) {
+					 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "AP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="get by compId and name Ignore case";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					Optional<AccountProfile> accountProfile = accountProfileRepository
 							.findByCompanyIdAndNameIgnoreCase(company.getId(), accountProfileDTO.getName());
+					 String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+								+ description);
 					if (accountProfile.isPresent()) {
 						newAccountProfiles.add(accountProfile.get());
 					}

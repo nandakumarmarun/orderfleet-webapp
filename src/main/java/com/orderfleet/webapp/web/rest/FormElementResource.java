@@ -2,6 +2,9 @@ package com.orderfleet.webapp.web.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -37,6 +40,7 @@ import com.orderfleet.webapp.repository.FormElementTypeRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.FormElementService;
 import com.orderfleet.webapp.web.rest.dto.FormElementDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
@@ -52,7 +56,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class FormElementResource {
 
 	private final Logger log = LoggerFactory.getLogger(FormElementResource.class);
-
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private FormElementService formElementService;
 
@@ -241,7 +245,35 @@ public class FormElementResource {
 		} else if (selectedMaster.equals("ProductProfile")) {
 			masters = productProfileRepository.findProductNamesByCompanyId();
 		} else if (selectedMaster.equals("AccountProfile")) {
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AP_QUERY_110" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get accNames by CompId";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			masters = accountProfileRepository.findAccountNamesByCompanyId();
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 		} else if (selectedMaster.equals("Executives")) {
 			masters = employeeProfileRepository.findEmployeeNamesByCompanyId();
 		} else if (selectedMaster.equals("OTHER")) {

@@ -1,12 +1,17 @@
 package com.orderfleet.webapp.service.impl;
 
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +31,7 @@ import com.orderfleet.webapp.web.rest.api.dto.AccountProfileGeoLocationTaggingDT
 @Service
 @Transactional
 public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfileGeoLocationTaggingService{
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
 	@Inject
@@ -39,7 +45,36 @@ public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfi
 	@Override
 	public AccountProfileGeoLocationTaggingDTO save(
 			AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO) {
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		AccountProfile accountProfile = accountProfileRepository.findOneByPid(accountProfileGeoLocationTaggingDTO.getAccountProfilePid()).get();
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		accountProfile.setLatitude(accountProfileGeoLocationTaggingDTO.getLatitude());
 		accountProfile.setLongitude(accountProfileGeoLocationTaggingDTO.getLongitude());
 		accountProfile.setLocation(accountProfileGeoLocationTaggingDTO.getLocation());
@@ -65,7 +100,36 @@ public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfi
 	@Override
 	public List<AccountProfileGeoLocationTaggingDTO> getAllAccountProfileGeoLocationTaggingByAccountProfile(
 			String pid) {
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "APGT_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all by accountProfilePid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountProfileGeoLocationTagging>accountProfileGeoLocationTaggings=accountProfileGeoLocationTaggingRepository.findAllAccountProfileGeoLocationTaggingByAccountProfilePid(pid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		List<AccountProfileGeoLocationTaggingDTO>accountProfileGeoLocationTaggingDTOs=setGeoLocationTaggingListToGeoLocationTaggingDTOList(accountProfileGeoLocationTaggings);
 		return accountProfileGeoLocationTaggingDTOs;
 	}
@@ -82,9 +146,39 @@ public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfi
 
 	@Override
 	public Optional<AccountProfileGeoLocationTaggingDTO> findOneByPid(String pid) {
-		return accountProfileGeoLocationTaggingRepository.findOneByPid(pid).map(accountProfileGeoLocationTagging -> {
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "APGT_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get one by pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		Optional<AccountProfileGeoLocationTaggingDTO>apgtDTO=	 accountProfileGeoLocationTaggingRepository.findOneByPid(pid).map(accountProfileGeoLocationTagging -> {
 			AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO = new AccountProfileGeoLocationTaggingDTO(accountProfileGeoLocationTagging);
 			return accountProfileGeoLocationTaggingDTO;
 		});
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+				return apgtDTO;
+
 	}
 }

@@ -1,5 +1,8 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -34,7 +37,7 @@ import com.orderfleet.webapp.web.rest.dto.UserAccountProfileDTO;
 public class UserAccountProfileServiceImpl implements UserAccountProfileService {
 
 	private final Logger log = LoggerFactory.getLogger(UserAccountProfileServiceImpl.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private UserAccountProfileRepository userAccountProfileRepository;
 
@@ -57,7 +60,35 @@ public class UserAccountProfileServiceImpl implements UserAccountProfileService 
 	@Override
 	public UserAccountProfileDTO saveUserAccountProfiles(String accountProfilePid, String userPid) {
 		log.debug("Request to get all saveUserAccountProfiles");
+		  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<AccountProfile> accountProfile = accountProfileRepository.findOneByPid(accountProfilePid);
+		  String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		Optional<User> user = userRepository.findOneByPid(userPid);
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		UserAccountProfile userAccountProfile = new UserAccountProfile();
@@ -92,7 +123,35 @@ public class UserAccountProfileServiceImpl implements UserAccountProfileService 
 		return userAccountProfileRepository
 				.findByCompanyIdAndUserPid(SecurityUtils.getCurrentUsersCompanyId(), userPid)
 				.map(userAccountProfile -> {
+					 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String description ="get one by pid";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					Optional<AccountProfile> accountProfile = accountProfileRepository.findOneByPid(accountProfilePid);
+					 String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+								+ description);
 					userAccountProfile.setAccountProfile(accountProfile.get());
 					userAccountProfile = userAccountProfileRepository.save(userAccountProfile);
 					UserAccountProfileDTO result = new UserAccountProfileDTO(userAccountProfile);
