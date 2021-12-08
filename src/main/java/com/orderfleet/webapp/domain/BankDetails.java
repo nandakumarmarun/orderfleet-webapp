@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -65,6 +66,14 @@ public class BankDetails implements Serializable {
 	@Size(max = 255)
 	@Column(name = "branch", length = 255)
 	private String branch;
+
+	@Size(max = 5000000)
+	@Lob
+	@Column(name = "qrImage")
+	private byte[] qrImage;
+
+	@Column(name = "qr_content_type", length = 255)
+	private String qrImageContentType;
 
 	@ManyToOne
 	@NotNull
@@ -148,6 +157,22 @@ public class BankDetails implements Serializable {
 
 	public void setBranch(String branch) {
 		this.branch = branch;
+	}
+
+	public byte[] getQrImage() {
+		return qrImage;
+	}
+
+	public void setQrImage(byte[] qrImage) {
+		this.qrImage = qrImage;
+	}
+
+	public String getQrImageContentType() {
+		return qrImageContentType;
+	}
+
+	public void setQrImageContentType(String qrImageContentType) {
+		this.qrImageContentType = qrImageContentType;
 	}
 
 }

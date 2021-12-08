@@ -138,6 +138,14 @@
 											placeholder="Phone Number" />
 									</div>
 
+									<div class="form-group">
+										<label class="control-label" for="field_qr_image">QR
+											Code </label> <input id="qrImage" type="file"
+											class="btn btn-default btn-block"> <img
+											id="previewImage" src="" style="max-height: 100px;"
+											alt="Image preview..."> <br>
+									</div>
+
 								</div>
 							</div>
 							<div class="modal-footer">

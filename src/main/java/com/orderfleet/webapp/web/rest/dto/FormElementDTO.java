@@ -34,6 +34,8 @@ public class FormElementDTO {
 
 	private String defaultValue;
 
+	private String formAccountTypePid;
+
 	private LocalDateTime lastModifiedDate;
 
 	private boolean formLoadFromMobile;
@@ -54,6 +56,7 @@ public class FormElementDTO {
 		this.formLoadFromMobile = formElement.getFormLoadFromMobile();
 		this.formLoadMobileData = formElement.getFormLoadMobileData();
 		this.activated = formElement.getActivated();
+		this.formAccountTypePid = formElement.getAccountType() != null ? formElement.getAccountType().getPid() : "all";
 	}
 
 	public FormElementDTO(String pid, String name) {
@@ -141,6 +144,14 @@ public class FormElementDTO {
 		this.formLoadMobileData = formLoadMobileData;
 	}
 
+	public String getFormAccountTypePid() {
+		return formAccountTypePid;
+	}
+
+	public void setFormAccountTypePid(String formAccountTypePid) {
+		this.formAccountTypePid = formAccountTypePid;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -167,6 +178,9 @@ public class FormElementDTO {
 	public String toString() {
 		return "FormElementDTO [pid=" + pid + ", name=" + name + ", formElementTypeId=" + formElementTypeId
 				+ ", formElementTypeName=" + formElementTypeName + ", formElementValues=" + formElementValues
-				+ ", activated=" + activated + "]";
+				+ ", activated=" + activated + ", defaultValue=" + defaultValue + ", formAccountTypePid="
+				+ formAccountTypePid + ", lastModifiedDate=" + lastModifiedDate + ", formLoadFromMobile="
+				+ formLoadFromMobile + ", formLoadMobileData=" + formLoadMobileData + "]";
 	}
+
 }

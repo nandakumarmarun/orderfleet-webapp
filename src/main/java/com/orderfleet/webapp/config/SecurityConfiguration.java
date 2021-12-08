@@ -102,7 +102,7 @@ public class SecurityConfiguration {
     	      	.antMatchers("/api/tally/**").permitAll()
     	      	.antMatchers("/api/register").permitAll()
     	      	.antMatchers("/api/validate").permitAll()
-    	      	.antMatchers("/L̥").permitAll()
+    	      	.antMatchers("/api/authenticate").permitAll()
     	      	.antMatchers("/api/onpremise-users/*").permitAll()
     	      	.antMatchers("/api/account/reset_password/init").permitAll()
     	      	.antMatchers("/api/knowledgebase/{\\d+}/download").permitAll()

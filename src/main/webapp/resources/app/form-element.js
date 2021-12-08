@@ -15,7 +15,8 @@ if (!this.FormElement) {
 		formElementTypeId : null,
 		formElementValues : [],
 		formLoadFromMobile : false,
-		formLoadMobileData : null
+		formLoadMobileData : null,
+		formAccountTypePid : "all"
 
 	};
 
@@ -88,7 +89,7 @@ if (!this.FormElement) {
 				$('#btnActivateFormElement').on('click', function() {
 					activateAssignedFormElement();
 				});
-				
+
 				$('#btnDefaultValue').on('click', function() {
 					saveDefaultValue();
 				});
@@ -101,54 +102,64 @@ if (!this.FormElement) {
 						});
 				$('#divLoadFromMobileData').hide();
 				$('#divLoadMobileData').hide();
-				
+				$('#divLoadMobileDataAccountType').hide();
+
 			});
 
-	
-	var textboxIsActive =false;
+	var textboxIsActive = false;
 	FormElement.setDefaultValue = function(pid, defaultValue) {
 		$('.alert').hide();
 		$('#divTxtDefaultValue').hide();
 		$('#divDbDefaultValue').hide();
-		
+
 		// set pid
 		formElementModel.pid = pid;
-		$.ajax({
-			url : contextPath + "/web/formElements/" + pid,
-			method : 'GET',
-			success : function(data) {
-				$('#lbl_name').text(data.name);
-				if (data.formElementTypeName == "dropdown" || data.formElementTypeName == "checkBox" || data.formElementTypeName == "radioButton") {
-					$('#dbDefaultValue').html('<option value="no">Select Default Value</option>');
-					$.each(data.formElementValues,	function(index, formElementValue) {
-						$('#dbDefaultValue').append('<option value="'+formElementValue.name+'">'+formElementValue.name+'</option>');
-					});
-					if(defaultValue != ''){
-						$('#dbDefaultValue').val(defaultValue);
+		$
+				.ajax({
+					url : contextPath + "/web/formElements/" + pid,
+					method : 'GET',
+					success : function(data) {
+						$('#lbl_name').text(data.name);
+						if (data.formElementTypeName == "dropdown"
+								|| data.formElementTypeName == "checkBox"
+								|| data.formElementTypeName == "radioButton") {
+							$('#dbDefaultValue')
+									.html(
+											'<option value="no">Select Default Value</option>');
+							$.each(data.formElementValues, function(index,
+									formElementValue) {
+								$('#dbDefaultValue').append(
+										'<option value="'
+												+ formElementValue.name + '">'
+												+ formElementValue.name
+												+ '</option>');
+							});
+							if (defaultValue != '') {
+								$('#dbDefaultValue').val(defaultValue);
+							}
+							$('#divDbDefaultValue').show();
+							textboxIsActive = false;
+						} else {
+							$('#txtDefaultValue').val(defaultValue);
+							$('#divTxtDefaultValue').show();
+							textboxIsActive = true;
+						}
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
 					}
-					$('#divDbDefaultValue').show();
-					textboxIsActive  = false ;
-				} else {
-					$('#txtDefaultValue').val(defaultValue);
-					$('#divTxtDefaultValue').show();
-					textboxIsActive  = true ;
-				}
-			},
-			error : function(xhr, error) {
-				onError(xhr, error);
-			}
-		});
+				});
 		$('#defaultValueModal').modal('show');
 	}
-	
+
 	function saveDefaultValue() {
 		var value = "";
-		if(textboxIsActive){
+		if (textboxIsActive) {
 			value = $('#txtDefaultValue').val();
-		}else{
-			value =  $('#dbDefaultValue').val();
+		} else {
+			value = $('#dbDefaultValue').val();
 		}
-		if(value == "no" || value == ""){
+		if (value == "no" || value == "") {
 			return;
 		}
 		$.ajax({
@@ -200,8 +211,10 @@ if (!this.FormElement) {
 		formElementModel.name = $('#field_name').val();
 		formElementModel.formElementTypeId = $('#field_type').val();
 		formElementModel.formElementValues = [];
-		formElementModel.formLoadFromMobile=$("#loadFromMobile").is(":checked");
-		formElementModel.formLoadMobileData= $('#loadMobileData').val();
+		formElementModel.formLoadFromMobile = $("#loadFromMobile").is(
+				":checked");
+		formElementModel.formLoadMobileData = $('#loadMobileData').val();
+		formElementModel.formAccountTypePid = $('#loadAccountTypes').val();
 		console.log(formElementModel);
 		$('#tblOptions tr td:first-child').each(function() {
 			var optionObj = {};
@@ -257,10 +270,13 @@ if (!this.FormElement) {
 			url : contextPath + "/web/formElements/" + id,
 			method : 'GET',
 			success : function(data) {
+				console.log(data)
 				$('#field_name').val(data.name);
 				$('#field_type').val(data.formElementTypeId);
-				$('#loadFromMobile').prop("checked",data.formLoadFromMobile);
+				$('#loadFromMobile').prop("checked", data.formLoadFromMobile);
 				$('#loadMobileData').val(data.formLoadMobileData);
+				$('#loadAccountTypes').val(data.formAccountTypePid);
+
 				if (data.formElementTypeName == "dropdown"
 						|| data.formElementTypeName == "checkBox") {
 					$('#divMasterTable').show();
@@ -269,16 +285,19 @@ if (!this.FormElement) {
 					$('#divMasterTable').hide();
 					$('#divLoadFromMobileData').hide();
 					$('#divLoadMobileData').hide();
+					$('#divLoadMobileDataAccountType').hide();
 				}
-				
-				if (data.formLoadFromMobile==true) {
-			    	$('#divLoadMobileData').show();
-			    	$('#divMasterTable').hide();
-			    }else{
-			    	$('#divLoadMobileData').hide();
-			    	$('#divMasterTable').show();
-			    }
-				
+
+				if (data.formLoadFromMobile == true) {
+					$('#divLoadMobileData').show();
+					$('#divLoadMobileDataAccountType').show();
+					$('#divMasterTable').hide();
+				} else {
+					$('#divLoadMobileData').hide();
+					$('#divLoadMobileDataAccountType').hide();
+					$('#divMasterTable').show();
+				}
+
 				createOptionsTableView(data.formElementValues);
 				// set pid
 				formElementModel.pid = data.pid;
@@ -367,17 +386,20 @@ if (!this.FormElement) {
 			$('#divMasterTable').hide();
 			$('#divLoadFromMobileData').hide();
 			$('#divLoadMobileData').hide();
+			$('#divLoadMobileDataAccountType').hide();
 		}
 	}
-	
-	$('#loadFromMobile').change(function () {
-	    if ($(this).prop("checked")) {
-	    	$('#divLoadMobileData').show();
-	    	$('#divMasterTable').hide();
-	    }else{
-	    	$('#divLoadMobileData').hide();
-	    	$('#divMasterTable').show();
-	    }
+
+	$('#loadFromMobile').change(function() {
+		if ($(this).prop("checked")) {
+			$('#divLoadMobileData').show();
+			$('#divLoadMobileDataAccountType').show();
+			$('#divMasterTable').hide();
+		} else {
+			$('#divLoadMobileData').hide();
+			$('#divLoadMobileDataAccountType').hide();
+			$('#divMasterTable').show();
+		}
 	});
 
 	function showSelectedMasterTableData() {
@@ -522,10 +544,11 @@ if (!this.FormElement) {
 		formElementModel.pid = null; // reset formElement model;
 		formElementModel.formElementValues = [];
 		$('#tblOptions').html("");
-		
+
 		$('#divMasterTable').hide();
 		$('#divLoadFromMobileData').hide();
 		$('#divLoadMobileData').hide();
+		$('#divLoadMobileDataAccountType').hide();
 	}
 
 	function addErrorAlert(message, key, data) {

@@ -153,14 +153,27 @@
 											</select>
 										</div>
 									</div>
-									<div id="divLoadMobileData">
-									<div class="form-group">
-										<label class="control-label" for="field_name">Options</label>
-										<br> <input type="text" class="form-control"
-											id="field_option" maxlength="400" placeholder="Option"
-											style="width: 90%; display: inline;" />
-										<button id="btnAddOption" type="button" class="btn btn-info">Add</button>
+									<div id="divLoadMobileDataAccountType">
+										<div class="form-group">
+											<label class="control-label" for="field_type">Load
+												Mobile Data Account Type</label> <select
+												id="loadAccountTypes" name="loadAccountTypes"
+												class="form-control">
+												<option value="all">All</option>
+												<c:forEach items="${accountTypes}" var="accountType">
+													<option value="${accountType.pid}">${accountType.name}</option>
+												</c:forEach>
+											</select>
+										</div>
 									</div>
+									<div id="divLoadMobileData">
+										<div class="form-group">
+											<label class="control-label" for="field_name">Options</label>
+											<br> <input type="text" class="form-control"
+												id="field_option" maxlength="400" placeholder="Option"
+												style="width: 90%; display: inline;" />
+											<button id="btnAddOption" type="button" class="btn btn-info">Add</button>
+										</div>
 									</div>
 									<table class="table  table-striped table-bordered">
 										<thead>

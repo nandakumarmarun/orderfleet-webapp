@@ -44,6 +44,10 @@ public class BankDetailsDTO {
 
 	private String branch;
 
+	private byte[] qrImage;
+
+	private String qrImageContentType;
+
 	public Long getId() {
 		return id;
 	}
@@ -122,6 +126,22 @@ public class BankDetailsDTO {
 
 	public void setBranch(String branch) {
 		this.branch = branch;
+	}
+
+	public byte[] getQrImage() {
+		return qrImage;
+	}
+
+	public void setQrImage(byte[] qrImage) {
+		this.qrImage = qrImage;
+	}
+
+	public String getQrImageContentType() {
+		return qrImageContentType;
+	}
+
+	public void setQrImageContentType(String qrImageContentType) {
+		this.qrImageContentType = qrImageContentType;
 	}
 
 }

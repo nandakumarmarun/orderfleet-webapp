@@ -51,7 +51,7 @@ public class FormElement implements Serializable, Cloneable {
 	@ManyToOne
 	private Company company;
 
-	@OneToMany(fetch = FetchType.EAGER,cascade = { CascadeType.ALL })
+	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
 	@JoinColumn(name = "form_element_id")
 	@OrderBy("id")
 	private Set<FormElementValue> formElementValues;
@@ -78,6 +78,9 @@ public class FormElement implements Serializable, Cloneable {
 	@Column(name = "last_modified_date")
 	@JsonIgnore
 	private LocalDateTime lastModifiedDate = LocalDateTime.now();
+
+	@ManyToOne
+	private AccountType accountType;;
 
 	@PreUpdate
 	public void preUpdate() {
@@ -170,6 +173,14 @@ public class FormElement implements Serializable, Cloneable {
 
 	public void setFormLoadMobileData(LoadMobileData formLoadMobileData) {
 		this.formLoadMobileData = formLoadMobileData;
+	}
+
+	public AccountType getAccountType() {
+		return accountType;
+	}
+
+	public void setAccountType(AccountType accountType) {
+		this.accountType = accountType;
 	}
 
 	@Override

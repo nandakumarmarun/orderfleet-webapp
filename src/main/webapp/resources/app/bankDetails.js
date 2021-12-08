@@ -20,7 +20,9 @@ if (!this.BankDetails) {
 		accountHolderName : null,
 		ifscCode : null,
 		swiftCode : null,
-		phoneNumber : null
+		phoneNumber : null,
+		qrImage : null,
+		qrImageContentType : null
 	};
 
 	// Specify the validation rules
@@ -136,6 +138,24 @@ if (!this.BankDetails) {
 		});
 	}
 
+	$('#qrImage').on(
+			'change',
+			function() {
+				var file = $(this)[0].files[0]; // only one file exist
+				var fileReader = new FileReader();
+				fileReader.readAsDataURL(file);
+
+				fileReader.onload = function(e) {
+					$('#previewImage').attr('src', fileReader.result);
+					var base64Data = e.target.result.substr(e.target.result
+							.indexOf('base64,')
+							+ 'base64,'.length);
+					bankDetailsModal.qrImage = base64Data;
+					bankDetailsModal.qrImageContentType = file.type;
+				};
+
+			});
+
 	function showBankDetails(id) {
 		$.ajax({
 			url : bankDetailsContextPath + "/" + id,
@@ -177,6 +197,10 @@ if (!this.BankDetails) {
 						$('#field_phone_number').val(
 								(data.phoneNumber == null ? ""
 										: data.phoneNumber));
+						if (data.qrImage != null) {
+							$('#previewImage').attr('src',
+									'data:image/png;base64,' + data.qrImage);
+						}
 
 						// set pid
 						bankDetailsModal.pid = data.pid;

@@ -81,6 +81,8 @@ public class BankDetailsServiceImpl implements BankDetailsService {
 			bankDetails.setPhoneNumber(bankDetailsDTO.getPhoneNumber());
 			bankDetails.setSwiftCode(bankDetailsDTO.getSwiftCode());
 			bankDetails.setBranch(bankDetailsDTO.getBranch());
+			bankDetails.setQrImage(bankDetailsDTO.getQrImage());
+			bankDetails.setQrImageContentType(bankDetailsDTO.getQrImageContentType());
 
 			bankDetails = bankDetailsRepository.save(bankDetails);
 			BankDetailsDTO result = bankToBankDetailsDTO(bankDetails);
@@ -203,6 +205,8 @@ public class BankDetailsServiceImpl implements BankDetailsService {
 		bankDetails.setPid(bankDetailsDTO.getPid());
 		bankDetails.setSwiftCode(bankDetailsDTO.getSwiftCode());
 		bankDetails.setBranch(bankDetailsDTO.getBranch());
+		bankDetails.setQrImage(bankDetailsDTO.getQrImage());
+		bankDetails.setQrImageContentType(bankDetailsDTO.getQrImageContentType());
 
 		return bankDetails;
 	}
@@ -218,6 +222,8 @@ public class BankDetailsServiceImpl implements BankDetailsService {
 		bankDetailsDTO.setPid(bankDetails.getPid());
 		bankDetailsDTO.setSwiftCode(bankDetails.getSwiftCode());
 		bankDetailsDTO.setBranch(bankDetails.getBranch());
+		bankDetailsDTO.setQrImage(bankDetails.getQrImage());
+		bankDetailsDTO.setQrImageContentType(bankDetails.getQrImageContentType());
 
 		return bankDetailsDTO;
 	}

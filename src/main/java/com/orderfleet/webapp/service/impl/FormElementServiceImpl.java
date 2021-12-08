@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.orderfleet.webapp.domain.FormElement;
 import com.orderfleet.webapp.domain.FormElementValue;
 import com.orderfleet.webapp.domain.UserNotApplicableElement;
+import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.FormElementRepository;
 import com.orderfleet.webapp.repository.FormElementTypeRepository;
@@ -64,6 +65,9 @@ public class FormElementServiceImpl implements FormElementService {
 	@Inject
 	private UserNotApplicableElementRepository userNotApplicableElementRepository;
 
+	@Inject
+	private AccountTypeRepository accountTypeRepository;
+
 	/**
 	 * Save a formElement.
 	 * 
@@ -77,11 +81,21 @@ public class FormElementServiceImpl implements FormElementService {
 		// set pid
 		formElementDTO.setPid(FormElementService.PID_PREFIX + RandomUtil.generatePid());
 		FormElement formElement = formElementMapper.formElementDTOToFormElement(formElementDTO);
+
 		// set company
 		System.out.println(formElement.getFormLoadFromMobile() + "+++++++++++++" + formElement.getFormLoadMobileData());
+		if (!formElementDTO.getFormAccountTypePid().equals("all")) {
+			System.out.println("--------------------------------------------------------------------------");
+			formElement
+					.setAccountType(accountTypeRepository.findOneByPid(formElementDTO.getFormAccountTypePid()).get());
+		}
 		formElement.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		formElement = formElementRepository.save(formElement);
 		FormElementDTO result = formElementMapper.formElementToFormElementDTO(formElement);
+		result.setFormAccountTypePid(
+				formElement.getAccountType() != null ? formElement.getAccountType().getPid() : "all");
+		System.out.println("--------------------------------------------------------------------------"
+				+ result.getFormAccountTypePid());
 		return result;
 	}
 
@@ -124,13 +138,23 @@ public class FormElementServiceImpl implements FormElementService {
 			formElement.setFormLoadFromMobile(formElementDTO.getFormLoadFromMobile());
 			formElement.setFormLoadMobileData(formElementDTO.getFormLoadMobileData());
 			formElement.setFormElementValues(newFormElementValues);
+			if (!formElementDTO.getFormAccountTypePid().equals("all")) {
+				System.out.println("-------------------------------------------------------");
+				formElement.setAccountType(
+						accountTypeRepository.findOneByPid(formElementDTO.getFormAccountTypePid()).get());
+			}
 			formElement = formElementRepository.save(formElement);
 			try {
 				formElementValueRepository.deleteByFormElementIdIsNull();
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Form Element Value is reffered to another table");
 			}
-			return formElementMapper.formElementToFormElementDTO(formElement);
+			FormElementDTO result = formElementMapper.formElementToFormElementDTO(formElement);
+			result.setFormAccountTypePid(
+					formElement.getAccountType() != null ? formElement.getAccountType().getPid() : "all");
+			System.out.println(result + "---------------------------------------------");
+			return result;
+			// return formElementMapper.formElementToFormElementDTO(formElement);
 		}
 		return null;
 	}
@@ -207,6 +231,8 @@ public class FormElementServiceImpl implements FormElementService {
 		log.debug("Request to get FormElement by pid : {}", pid);
 		return formElementRepository.findOneByPid(pid).map(formElement -> {
 			FormElementDTO formElementDTO = formElementMapper.formElementToFormElementDTO(formElement);
+			formElementDTO.setFormAccountTypePid(
+					formElement.getAccountType() != null ? formElement.getAccountType().getPid() : "all");
 			return formElementDTO;
 		});
 	}
@@ -224,6 +250,8 @@ public class FormElementServiceImpl implements FormElementService {
 		return formElementRepository.findByCompanyIdAndNameIgnoreCase(SecurityUtils.getCurrentUsersCompanyId(), name)
 				.map(formElement -> {
 					FormElementDTO formElementDTO = formElementMapper.formElementToFormElementDTO(formElement);
+					formElementDTO.setFormAccountTypePid(
+							formElement.getAccountType() != null ? formElement.getAccountType().getPid() : "all");
 					return formElementDTO;
 				});
 	}
@@ -250,8 +278,11 @@ public class FormElementServiceImpl implements FormElementService {
 					.map(unae -> unae.getFormElement().getId()).collect(Collectors.toList());
 			List<FormElement> formElements = formElementRepository
 					.findAllByCompanyIdAndNotFormElementIn(formElementIds);
-			
-			result = formElementMapper.formElementsToFormElementDTOs(formElements);
+
+			// result = formElementMapper.formElementsToFormElementDTOs(formElements);
+
+			result = convertFoemElementToFormElementDtos(formElements);
+
 		} else {
 			List<FormElement> formElements = formElementRepository.findAllByCompanyId();
 //			System.out.println("---*****************************");
@@ -291,9 +322,76 @@ public class FormElementServiceImpl implements FormElementService {
 //				formElementList.add(formElementDto);
 //			}
 //			result = formElementList;
-			result = formElementMapper.formElementsToFormElementDTOs(formElements);
+			// result = formElementMapper.formElementsToFormElementDTOs(formElements);
+
+			result = convertFoemElementToFormElementDtos(formElements);
 		}
 		return result;
+	}
+
+	private List<FormElementDTO> convertFoemElementToFormElementDtos(List<FormElement> formElements) {
+		
+		SecurityUtils.getCurrentUserLogin();
+
+		List<FormElementDTO> formElementDtos = new ArrayList<>();
+
+		for (FormElement formElement : formElements) {
+			if (formElement == null) {
+				return null;
+			}
+
+			FormElementDTO formElementDTO = new FormElementDTO();
+
+			formElementDTO.setFormElementTypeName(formElement.getFormElementType().getName());
+			formElementDTO.setFormElementTypeId(formElement.getFormElementType().getId());
+			formElementDTO.setPid(formElement.getPid());
+			formElementDTO.setName(formElement.getName());
+			List<FormElementValueDTO> list = formElementValueSetToFormElementValueDTOList(
+					formElement.getFormElementValues());
+			if (list != null) {
+				formElementDTO.setFormElementValues(list);
+			}
+			formElementDTO.setActivated(formElement.getActivated());
+			formElementDTO.setDefaultValue(formElement.getDefaultValue());
+			formElementDTO.setLastModifiedDate(formElement.getLastModifiedDate());
+			formElementDTO.setFormLoadFromMobile(formElement.getFormLoadFromMobile());
+			formElementDTO.setFormLoadMobileData(formElement.getFormLoadMobileData());
+
+			formElementDTO.setFormAccountTypePid(
+					formElement.getAccountType() != null ? formElement.getAccountType().getPid() : null);
+
+			formElementDtos.add(formElementDTO);
+		}
+
+		return formElementDtos;
+	}
+
+	private List<FormElementValueDTO> formElementValueSetToFormElementValueDTOList(Set<FormElementValue> set) {
+		if (set == null) {
+			return null;
+		}
+
+		List<FormElementValueDTO> list = new ArrayList<FormElementValueDTO>();
+		for (FormElementValue formElementValue : set) {
+			list.add(formElementValueToFormElementValueDTO(formElementValue));
+		}
+
+		return list;
+	}
+
+	private FormElementValueDTO formElementValueToFormElementValueDTO(FormElementValue formElementValue) {
+		if (formElementValue == null) {
+			return null;
+		}
+
+		FormElementValueDTO formElementValueDTO = new FormElementValueDTO();
+
+		if (formElementValue.getId() != null) {
+			formElementValueDTO.setId(String.valueOf(formElementValue.getId()));
+		}
+		formElementValueDTO.setName(formElementValue.getName());
+
+		return formElementValueDTO;
 	}
 
 	/**
