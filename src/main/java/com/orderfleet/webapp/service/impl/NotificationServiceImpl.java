@@ -147,4 +147,39 @@ public class NotificationServiceImpl implements NotificationService {
 			}
 		}
 	}
+
+	@Override
+	public Notification covertNotificationDTOtoNotification(NotificationDTO notificationDTO) {
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		Optional<User> optionalUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		if (!optionalUser.isPresent()) {
+			return null;
+		}
+
+		Notification notification = new Notification();
+		notification.setPid(NotificationService.PID_PREFIX + RandomUtil.generatePid());
+		notification.setTitle(notificationDTO.getTitle());
+		notification.setMessage(notificationDTO.getMessage());
+		notification.setisImportant(notificationDTO.getIsImportant());
+		notification.setResendTime(notificationDTO.getResendTime());
+		notification.setCreatedBy(optionalUser.get());
+		notification.setCompany(company);
+
+		List<NotificationDetail> notificationDetails = new ArrayList<>();
+		List<UserDevice> userDevices = userDevicesRepository
+				.findByCompanyIdAndActivatedAndUserDevicePidIn(notificationDTO.getUsers());
+		for (UserDevice userDevice : userDevices) {
+			NotificationDetail notificationDetail = new NotificationDetail();
+			notificationDetail.setNotification(notification);
+			notificationDetail.setUserDeviceId(userDevice.getId());
+			notificationDetail.setMessageStatus(MessageStatus.NONE);
+			notificationDetail.setFcmKey(userDevice.getFcmKey());
+			notificationDetail.setUserId(userDevice.getUser().getId());
+			notificationDetail.setUserPid(userDevice.getUser().getPid());
+			notificationDetail.setCompany(company);
+			notificationDetails.add(notificationDetail);
+		}
+		notification.setNotificationDetails(notificationDetails);
+		return notification;
+	}
 }

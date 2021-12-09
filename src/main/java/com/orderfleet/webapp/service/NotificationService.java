@@ -22,4 +22,6 @@ public interface NotificationService {
 
 	void updateNotificationWithFirebaseResponse(Notification notification, String[] usersFcmKeys, FirebaseResponse response);
 
+	Notification covertNotificationDTOtoNotification(NotificationDTO notificationDTO);
+
 }
