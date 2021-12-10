@@ -26,6 +26,7 @@ import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.EcomProductProfile;
 import com.orderfleet.webapp.domain.EcomProductProfileProduct;
 import com.orderfleet.webapp.domain.GSTProductGroup;
+import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PriceLevelList;
@@ -256,6 +257,11 @@ public class TPProductProfileManagementService {
 			productCategory.setAlias(pcDto.getAlias());
 			productCategory.setDescription(pcDto.getDescription());
 			productCategory.setActivated(pcDto.getActivated());
+			Optional<ProductCategory> opAccP = saveUpdateProductCategories.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(pcDto.getName())).findAny();
+			if (opAccP.isPresent()) {
+				continue;
+			}
 			saveUpdateProductCategories.add(productCategory);
 		}
 		bulkOperationRepositoryCustom.bulkSaveProductCategory(saveUpdateProductCategories);
@@ -339,7 +345,6 @@ public class TPProductProfileManagementService {
 			if (optionalPG.isPresent()) {
 				productGroup = optionalPG.get();
 
-
 				// if not update, skip this iteration.
 				if (!productGroup.getThirdpartyUpdate()) {
 					continue;
@@ -355,6 +360,11 @@ public class TPProductProfileManagementService {
 			productGroup.setName(pgDto.getName());
 			productGroup.setDescription(pgDto.getDescription());
 			productGroup.setActivated(pgDto.getActivated());
+			Optional<ProductGroup> opAccP = saveUpdateProductGroups.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(pgDto.getName())).findAny();
+			if (opAccP.isPresent()) {
+				continue;
+			}
 			saveUpdateProductGroups.add(productGroup);
 		}
 //		saveUpdateProductGroups.forEach(i -> System.out.println("save prg"+i));
@@ -684,6 +694,11 @@ public class TPProductProfileManagementService {
 				productProfile.setProductCategory(optionalCategory.get());
 			} else {
 				productProfile.setProductCategory(productCategory);
+			}
+			Optional<ProductProfile> opAccP = saveUpdateProductProfiles.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(ppDto.getName())).findAny();
+			if (opAccP.isPresent()) {
+				continue;
 			}
 			saveUpdateProductProfiles.add(productProfile);
 		}

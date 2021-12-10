@@ -44,6 +44,7 @@ import com.orderfleet.webapp.web.rest.integration.MasterDataAccountProfileResour
 import com.orderfleet.webapp.web.rest.tallypartner.DocumentUserWiseUpdateController;
 import com.orderfleet.webapp.web.tally.dto.GstLedgerDTO;
 import com.orderfleet.webapp.web.tally.service.TallyDataUploadService;
+
 @RestController
 @RequestMapping(value = "/api/tp/v1")
 public class MasterAccountProfileResource {
@@ -57,19 +58,19 @@ public class MasterAccountProfileResource {
 
 	@Inject
 	private DocumentUserWiseUpdateController documentUserWiseUpdateController;
-	
+
 	@Inject
 	private TallyConfigurationRepository tallyConfigRepository;
-	
+
 	@Inject
 	private TallyDataUploadService tallyDataUploadService;
-	
+
 	@Inject
 	PostDatedVoucherService postDatedVoucherService;
-	
+
 	@Inject
 	PostDatedVoucherRepository postDatedVoucherRepository;
-	
+
 	@Inject
 	PostDatedVoucherAllocationService postDatedVoucherAllocationService;
 
@@ -103,20 +104,20 @@ public class MasterAccountProfileResource {
 					syncOperationRepository.save(so);
 					// save/update
 
-					tpAccountProfileManagementService.  saveUpdateLocationsId(locationDTOs, so);
-					
+					tpAccountProfileManagementService.saveUpdateLocationsId(locationDTOs, so);
+
 					if (so.getUser()) {
 						documentUserWiseUpdateController.assignSaveUserLocations();
 						so.setUser(false);
 						so.setCompleted(true);
 						syncOperationRepository.save(so);
 					}
-						
+
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Locations sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
 	}
-				
+
 //	@RequestMapping(value = "/location-hierarchy.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 //	@Timed
 //	public ResponseEntity<String> createUpdateLocationHierarchy(
@@ -329,4 +330,3 @@ public class MasterAccountProfileResource {
 //		}
 //	}
 }
-
