@@ -123,16 +123,17 @@ public class ProcessFlowFunnelChartResource {
 			Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 			userIds.add(currentUserId);
 		}
-
+		
+		
 		List<String> documentPids = primarySecondaryDocumentService
 				.findAllDocumentsByCompanyIdAndVoucherTypeIn(
-						Arrays.asList(VoucherType.PRIMARY_SALES_ORDER, VoucherType.SECONDARY_SALES_ORDER))
+						Arrays.asList(VoucherType.PRIMARY_SALES_ORDER, VoucherType.SECONDARY_SALES_ORDER, VoucherType.QUOTATION))
 				.parallelStream().map(obj -> obj.getPid().toString()).collect(Collectors.toList());
 
 		List<ProcessFlowStatus> processStatus = Arrays.asList(ProcessFlowStatus.DEFAULT, ProcessFlowStatus.PO_PLACED,
 				ProcessFlowStatus.IN_STOCK, ProcessFlowStatus.PO_ACCEPTED_AT_TSL, ProcessFlowStatus.UNDER_PRODUCTION,
 				ProcessFlowStatus.READY_TO_DISPATCH_AT_TSL, ProcessFlowStatus.READY_TO_DISPATCH_AT_PS,
-				ProcessFlowStatus.NOT_DELIVERED);
+				ProcessFlowStatus.NOT_DELIVERED, ProcessFlowStatus.DELIVERED, ProcessFlowStatus.INSTALLATION_PLANNED, ProcessFlowStatus.INSTALLED);
 
 		LocalDate fDate = LocalDate.now();
 		LocalDate tDate = LocalDate.now();
@@ -150,7 +151,7 @@ public class ProcessFlowFunnelChartResource {
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-
+		
 		List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository
 				.findByUserIdInAndDocumentPidInAndProcessFlowStatusStatusAndDateBetweenAndRejectedStatusOrderByCreatedDateDesc(
 						userIds, documentPids, processStatus, fromDate, toDate, false);
@@ -185,13 +186,12 @@ public class ProcessFlowFunnelChartResource {
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
 
 				String processflowStatus = u[26].toString();
-				if (noOfDaysBetween <= 0 && !processflowStatus.equals("DELIVERED")) {
+				if (noOfDaysBetween <= 0 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 					return true;
 				}
 			}
 			return false;
 		}).collect(Collectors.toList());
-
 		List<Object[]> o = inventoryVouchers.stream().filter(u -> {
 			if (u[29] != null) {
 				LocalDate currentdate = LocalDate.now();

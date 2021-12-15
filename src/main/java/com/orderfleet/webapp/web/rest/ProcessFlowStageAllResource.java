@@ -643,7 +643,7 @@ public class ProcessFlowStageAllResource {
 								break;
 							}
 							case "delivery_by_today_or_delivery_date_crossed": {
-								if (noOfDaysBetween <= 0 && !processflowStatus.equals("DELIVERED")) {
+								if (noOfDaysBetween <= 0 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 									return true;
 								}
 								break;
@@ -653,7 +653,6 @@ public class ProcessFlowStageAllResource {
 					}
 					return false;
 				}).collect(Collectors.toList());
-
 				return createSalesPerformanceDTO(filterVouchers);
 			}
 
