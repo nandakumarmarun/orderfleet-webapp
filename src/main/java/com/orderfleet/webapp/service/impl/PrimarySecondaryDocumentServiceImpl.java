@@ -2,6 +2,7 @@ package com.orderfleet.webapp.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -117,6 +118,34 @@ public class PrimarySecondaryDocumentServiceImpl implements PrimarySecondaryDocu
 	public List<PrimarySecondaryDocument> findAllByCompanyIdAndActivedTrue() {
 		List<PrimarySecondaryDocument> primarySalesDocuments = primarySecondaryDocumentRepository.findByCompanyIdAndActivedTrue();
 		return primarySalesDocuments;
+	}
+
+	@Override
+	public List<VoucherType> findAllVoucherTypesByCompanyIdandOne() {
+		log.debug("Request to get PRIMARY_SALES_ORDER_DRAFT vouchertypes");
+		VoucherType vtsol= VoucherType.PRIMARY_SALES_ORDER_DRAFT;
+		List<VoucherType> vcherResult= new ArrayList<>();
+		List<VoucherType> result = primarySecondaryDocumentRepository.findAllVoucherTypesByCompanyId();
+		for(VoucherType vt : result) {
+			if(vt==vtsol ) {
+				vcherResult.add(vt);
+			}
+		}
+		return vcherResult;
+	}
+
+	@Override
+	public List<VoucherType> findOneSalesOrderCofirmation() {
+		log.debug("Request to get PRIMARY_SALES_ORDER_CONFIRMATION vouchertypes");
+		VoucherType vtsol1= VoucherType.PRIMARY_SALES_ORDER_CONFIRMATION;
+		List<VoucherType> vcherResult= new ArrayList<>();
+		List<VoucherType> result = primarySecondaryDocumentRepository.findAllVoucherTypesByCompanyId();
+		for(VoucherType vt : result) {
+			if(vt==vtsol1 ) {
+				vcherResult.add(vt);
+			}
+		}
+		return vcherResult;
 	}
 
 	

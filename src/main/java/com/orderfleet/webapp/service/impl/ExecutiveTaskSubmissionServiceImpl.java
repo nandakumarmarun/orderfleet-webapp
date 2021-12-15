@@ -591,8 +591,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 				String startDate1 = startLCTime1.format(DATE_FORMAT1);
 				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+				User user1 = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 				InventoryVoucherHeader lastInventoryVoucher = inventoryVoucherHeaderRepository
-						.findTop1ByCreatedByLoginOrderByCreatedDateDesc(SecurityUtils.getCurrentUserLogin());
+						.findTop1ByCreatedByLoginOrderAndDocumentPidByCreatedDateDesc(user1.getId(),document.getId());
 				String flag1 = "Normal";
 				LocalDateTime endLCTime1 = LocalDateTime.now();
 				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);

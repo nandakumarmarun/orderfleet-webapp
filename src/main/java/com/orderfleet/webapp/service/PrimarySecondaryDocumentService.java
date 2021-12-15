@@ -31,6 +31,10 @@ public interface PrimarySecondaryDocumentService {
 	
 	List<VoucherType> findAllVoucherTypesByCompanyId();
 	
+	List<VoucherType> findAllVoucherTypesByCompanyIdandOne();
+	
+	List<VoucherType> findOneSalesOrderCofirmation();
+	
 	List<PrimarySecondaryDocument> findAllByCompanyIdAndActivedTrue();
 	
 	

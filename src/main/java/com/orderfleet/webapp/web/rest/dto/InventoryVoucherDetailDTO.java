@@ -119,7 +119,8 @@ public class InventoryVoucherDetailDTO {
 	private String supplierAccountName;
 
 	private String customerLocation;
-
+	
+	private double qntyDiff;
 	public InventoryVoucherDetailDTO() {
 	}
 
@@ -619,6 +620,15 @@ public class InventoryVoucherDetailDTO {
 	public void setRatePerPiece(double ratePerPiece) {
 		this.ratePerPiece = ratePerPiece;
 	}
+	
+	
+	public double getQntyDiff() {
+		return qntyDiff;
+	}
+
+	public void setQntyDiff(double qntyDiff) {
+		this.qntyDiff = qntyDiff;
+	}
 
 	@Override
 	public int hashCode() {
@@ -665,4 +675,5 @@ public class InventoryVoucherDetailDTO {
 				+ ", employeeName=" + employeeName + "]";
 	}
 
+	
 }

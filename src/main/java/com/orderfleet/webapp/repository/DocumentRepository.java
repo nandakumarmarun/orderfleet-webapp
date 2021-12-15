@@ -21,6 +21,8 @@ import com.orderfleet.webapp.domain.enums.DocumentType;
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
 	Optional<Document> findOneByPid(String pid);
+	
+	Optional<Document>	findOneByDocumentPrefix(String documentPrefix);
 
 	Optional<Document> findByCompanyIdAndNameIgnoreCase(Long id, String name);
 
