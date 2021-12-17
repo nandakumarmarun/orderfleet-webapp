@@ -89,7 +89,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class AccountProfileResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountProfileResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private AccountProfileService accountProfileService;
 

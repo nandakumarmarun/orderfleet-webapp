@@ -84,7 +84,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 public class SalesPerformanceReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesPerformanceReportResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
 	private static final String MTD = "MTD";

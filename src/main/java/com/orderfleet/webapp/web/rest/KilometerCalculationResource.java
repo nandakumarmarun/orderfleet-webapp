@@ -58,7 +58,7 @@ import com.orderfleet.webapp.web.rest.dto.KilometerCalculationDTO;
 public class KilometerCalculationResource {
 
 	private final Logger log = LoggerFactory.getLogger(KilometerCalculationResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private EmployeeHierarchyService employeeHierarchyService;
 

@@ -48,7 +48,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 @Controller
 @RequestMapping("/web")
 public class PrintAndEmailResource {
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	private final DynamicDocumentHeaderRepository dynamicDocumentHeaderRepository;
 
 	private final MailService mailService;

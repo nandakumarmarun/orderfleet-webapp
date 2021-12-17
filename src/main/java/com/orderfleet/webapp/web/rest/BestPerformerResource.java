@@ -51,7 +51,7 @@ import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 @Controller
 @RequestMapping("/web")
 public class BestPerformerResource {
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private EmployeeProfileService employeeProfileService;
 
@@ -99,37 +99,17 @@ public class BestPerformerResource {
 
 	private BestPerformerDTO getFilterData(LocalDate fDate, LocalDate tDate) {
 		List<EmployeeProfileDTO> employeeProfileDTOs = employeeProfileService.findAllByCompany();
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "BPC_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all doc by best performance type";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Document> salesDocuments = bestPerformanceConfigurationRepository
 				.findAllDocumentsByBestPerformanceType(BestPerformanceType.SALES);
-		List<Document> receiptDocuments = bestPerformanceConfigurationRepository
-				.findAllDocumentsByBestPerformanceType(BestPerformanceType.RECEIPT);
-
-		BestPerformerDTO bestPerformerDTO = new BestPerformerDTO();
-		if (!salesDocuments.isEmpty()) {
-			Set<Long> docIds = salesDocuments.stream().map(Document::getId).collect(Collectors.toSet());
-			List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByDocumentIdInAndDateBetween(docIds,
-					fDate.atTime(0, 0), tDate.atTime(23, 59));
-			if (!ivDetails.isEmpty()) {
-				for (EmployeeProfileDTO emp : employeeProfileDTOs) {
-					bestPerformerDTO.getSalesPerformer().put(emp.getName(),
-							getSumOfAmountOrQuantity(ivDetails, emp.getPid(), fDate, tDate));
-				}
-			}
-		}
-		if (!receiptDocuments.isEmpty()) {
-			Set<Long> docIds = receiptDocuments.stream().map(Document::getId).collect(Collectors.toSet());
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "AVD_QUERY_110" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get by DocumentIdIn and DateBetween";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-			List<Object[]> avDetails = accountingVoucherDetailRepository
-					.findByDocumentIdInAndDateBetweenOrderByCreatedDateDesc(docIds, fDate.atTime(0, 0),
-							tDate.atTime(23, 59));
-			String flag = "Normal";
+		 String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
 			String endDate = startLCTime.format(DATE_FORMAT);
@@ -149,6 +129,55 @@ public class BestPerformerResource {
 			}
 	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
+
+		List<Document> receiptDocuments = bestPerformanceConfigurationRepository
+				.findAllDocumentsByBestPerformanceType(BestPerformanceType.RECEIPT);
+
+		BestPerformerDTO bestPerformerDTO = new BestPerformerDTO();
+		if (!salesDocuments.isEmpty()) {
+			Set<Long> docIds = salesDocuments.stream().map(Document::getId).collect(Collectors.toSet());
+			List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByDocumentIdInAndDateBetween(docIds,
+					fDate.atTime(0, 0), tDate.atTime(23, 59));
+			if (!ivDetails.isEmpty()) {
+				for (EmployeeProfileDTO emp : employeeProfileDTOs) {
+					bestPerformerDTO.getSalesPerformer().put(emp.getName(),
+							getSumOfAmountOrQuantity(ivDetails, emp.getPid(), fDate, tDate));
+				}
+			}
+		}
+		if (!receiptDocuments.isEmpty()) {
+			Set<Long> docIds = receiptDocuments.stream().map(Document::getId).collect(Collectors.toSet());
+			 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id1 = "AVD_QUERY_110" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description1 ="get by DocumentIdIn and DateBetween";
+				LocalDateTime startLCTime1 = LocalDateTime.now();
+				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+				String startDate1 = startLCTime1.format(DATE_FORMAT1);
+				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+			List<Object[]> avDetails = accountingVoucherDetailRepository
+					.findByDocumentIdInAndDateBetweenOrderByCreatedDateDesc(docIds, fDate.atTime(0, 0),
+							tDate.atTime(23, 59));
+			String flag1 = "Normal";
+			LocalDateTime endLCTime1 = LocalDateTime.now();
+			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+			String endDate1 = startLCTime1.format(DATE_FORMAT1);
+			Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+			long minutes1 = duration1.toMinutes();
+			if (minutes1 <= 1 && minutes1 >= 0) {
+				flag1 = "Fast";
+			}
+			if (minutes1 > 1 && minutes1 <= 2) {
+				flag1 = "Normal";
+			}
+			if (minutes1 > 2 && minutes1 <= 10) {
+				flag1 = "Slow";
+			}
+			if (minutes1 > 10) {
+				flag1 = "Dead Slow";
+			}
+	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+					+ description1);
 			if (!avDetails.isEmpty()) {
 				for (EmployeeProfileDTO emp : employeeProfileDTOs) {
 					bestPerformerDTO.getReceiptPerformer().put(emp.getName(),

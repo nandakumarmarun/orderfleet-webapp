@@ -66,7 +66,7 @@ import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 public class DashboardAccountWiseResource {
 
 	private final Logger log = LoggerFactory.getLogger(DashboardAccountWiseResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
 

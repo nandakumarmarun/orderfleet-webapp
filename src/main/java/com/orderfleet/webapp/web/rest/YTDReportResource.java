@@ -43,7 +43,7 @@ import com.orderfleet.webapp.web.rest.dto.YtdReportWeek;
 public class YTDReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(YTDReportResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 

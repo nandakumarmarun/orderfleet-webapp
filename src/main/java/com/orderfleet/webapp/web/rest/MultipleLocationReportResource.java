@@ -88,7 +88,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 public class MultipleLocationReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(MultipleLocationReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	private static final String TODAY = "TODAY";
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";

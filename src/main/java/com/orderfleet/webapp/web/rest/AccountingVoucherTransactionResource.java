@@ -86,7 +86,7 @@ import com.orderfleet.webapp.web.rest.mapper.StaticFormJSCodeMapper;
 public class AccountingVoucherTransactionResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountingVoucherTransactionResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private UserActivityService userActivityService;
 

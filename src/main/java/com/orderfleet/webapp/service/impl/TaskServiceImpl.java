@@ -105,45 +105,45 @@ public class TaskServiceImpl implements TaskService {
 		log.debug("Request to Update Task : {}", taskDTO);
 
 		return taskRepository.findOneByPid(taskDTO.getPid()).map(task -> {
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACTIVITY_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			task.setActivity(activityRepository.findOneByPid(taskDTO.getActivityPid()).get());
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "AT_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get one by pid";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
+			 DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id1 = "AT_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description1 ="get one by pid";
+				LocalDateTime startLCTime1 = LocalDateTime.now();
+				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+				String startDate1 = startLCTime1.format(DATE_FORMAT1);
+				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 			task.setAccountType(accountTypeRepository.findOneByPid(taskDTO.getAccountTypePid()).get());
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
-			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id1 = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description1 ="get one by pid";
-			LocalDateTime startLCTime1 = LocalDateTime.now();
-			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-			String startDate1 = startLCTime1.format(DATE_FORMAT1);
-			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-			task.setAccountProfile(accountProfileRepository.findOneByPid(taskDTO.getAccountProfilePid()).get());
 			 String flag1 = "Normal";
 				LocalDateTime endLCTime1 = LocalDateTime.now();
 				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
@@ -164,6 +164,35 @@ public class TaskServiceImpl implements TaskService {
 				}
 		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 						+ description1);
+			DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id11 = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description11 ="get one by pid";
+			LocalDateTime startLCTime11 = LocalDateTime.now();
+			String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+			String startDate11 = startLCTime11.format(DATE_FORMAT11);
+			logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
+			task.setAccountProfile(accountProfileRepository.findOneByPid(taskDTO.getAccountProfilePid()).get());
+			 String flag11 = "Normal";
+				LocalDateTime endLCTime11 = LocalDateTime.now();
+				String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+				String endDate11 = startLCTime11.format(DATE_FORMAT11);
+				Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+				long minutes11 = duration11.toMinutes();
+				if (minutes11 <= 1 && minutes11 >= 0) {
+					flag11 = "Fast";
+				}
+				if (minutes11 > 1 && minutes11 <= 2) {
+					flag11 = "Normal";
+				}
+				if (minutes11 > 2 && minutes11 <= 10) {
+					flag11 = "Slow";
+				}
+				if (minutes11 > 10) {
+					flag11 = "Dead Slow";
+				}
+		                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+						+ description11);
 
 			task.setRemarks(taskDTO.getRemarks());
 			task = taskRepository.save(task);

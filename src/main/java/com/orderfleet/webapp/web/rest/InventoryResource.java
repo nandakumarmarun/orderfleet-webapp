@@ -39,7 +39,7 @@ import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
 public class InventoryResource {
 
 	private final Logger log = LoggerFactory.getLogger(InventoryResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	private EmployeeProfileService employeeProfileService;
 
 	private UserActivityService userActivityService;

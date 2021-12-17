@@ -53,7 +53,7 @@ import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 public class AccountingLedgerReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountingLedgerReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private AccountingVoucherHeaderService accountingVoucherService;
 

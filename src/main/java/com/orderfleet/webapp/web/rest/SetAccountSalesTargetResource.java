@@ -43,7 +43,7 @@ import com.orderfleet.webapp.web.rest.dto.SalesTargetGroupUserTargetDTO;
 public class SetAccountSalesTargetResource {
 
 	private final Logger log = LoggerFactory.getLogger(SetAccountSalesTargetResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private SalesTargetGroupUserTargetService salesTargetGroupUserTargetService;
 

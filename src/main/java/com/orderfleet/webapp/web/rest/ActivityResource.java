@@ -2,6 +2,9 @@ package com.orderfleet.webapp.web.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +36,7 @@ import com.orderfleet.webapp.domain.ActivityStage;
 import com.orderfleet.webapp.repository.ActivityDocumentRepository;
 import com.orderfleet.webapp.repository.ActivityStageRepository;
 import com.orderfleet.webapp.security.AuthoritiesConstants;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.ActivityService;
 import com.orderfleet.webapp.service.CompanyService;
@@ -54,7 +58,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class ActivityResource {
 
 	private final Logger log = LoggerFactory.getLogger(ActivityResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private ActivityService activityService;
 
@@ -236,7 +240,36 @@ public class ActivityResource {
 	@RequestMapping(value = "/activities/documents/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<ActivityDocumentDTO>> getDocuments(@PathVariable String pid) {
 		log.debug("Web request to get get targetBlocks : {}", pid);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AD_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get by activityPid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<ActivityDocument> activityDocuments = activityDocumentRepository.findByActivityPid(pid);
+		  String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		List<ActivityDocumentDTO> result = activityDocuments.stream().map(ActivityDocumentDTO::new)
 				.collect(Collectors.toList());
 		return new ResponseEntity<>(result, HttpStatus.OK);
@@ -254,7 +287,35 @@ public class ActivityResource {
 	@Timed
 	@RequestMapping(value = "/activities/stages/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<ActivityStageDTO>> getSavedStages(@PathVariable String pid) {
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AS_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get by activityPid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<ActivityStage> activityStages = activityStageRepository.findByActivityPid(pid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		List<ActivityStageDTO> result = activityStages.stream().map(ActivityStageDTO::new)
 				.collect(Collectors.toList());
 		return new ResponseEntity<>(result, HttpStatus.OK);

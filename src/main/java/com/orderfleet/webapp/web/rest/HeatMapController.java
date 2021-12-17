@@ -46,7 +46,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 public class HeatMapController {
 
 	private final Logger log = LoggerFactory.getLogger(HeatMapController.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private ExecutiveTaskExecutionService executiveTaskExecutionService;
 

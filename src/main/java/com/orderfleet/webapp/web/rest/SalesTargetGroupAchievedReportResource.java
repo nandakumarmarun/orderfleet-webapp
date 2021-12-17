@@ -83,7 +83,7 @@ import com.orderfleet.webapp.web.rest.mapper.SalesTargetGroupUserTargetMapper;
 public class SalesTargetGroupAchievedReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesTargetGroupAchievedReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private SalesProductGroupUserTargetRepository salesProductGroupUserTargetRepository;
 

@@ -104,7 +104,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class ExecutiveTaskExecutionResource {
 
 	private final Logger log = LoggerFactory.getLogger(ExecutiveTaskExecutionResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 
 	private static final String INTERIM_SAVE = "interimSave";
 
@@ -198,9 +198,36 @@ public class ExecutiveTaskExecutionResource {
 	public String getAllExecutiveTaskExecutions(Pageable pageable, Model model,
 			@RequestParam(value = "user-key-pid", required = false) String userKeyPid,
 			@RequestParam(value = "filterBy", required = false) String filterBy) {
+		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id1 = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description1 ="get by compId and name";
+		LocalDateTime startLCTime1 = LocalDateTime.now();
+		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+		String startDate1 = startLCTime1.format(DATE_FORMAT1);
+		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 		Optional<CompanyConfiguration> opCompanyConfig = companyConfigurationRepository.findByCompanyIdAndName(
 				SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.VISIT_BASED_TRANSACTION);
-
+		String flag1 = "Normal";
+		LocalDateTime endLCTime1 = LocalDateTime.now();
+		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+		String endDate1 = startLCTime1.format(DATE_FORMAT1);
+		Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+		long minutes1 = duration1.toMinutes();
+		if (minutes1 <= 1 && minutes1 >= 0) {
+			flag1 = "Fast";
+		}
+		if (minutes1 > 1 && minutes1 <= 2) {
+			flag1 = "Normal";
+		}
+		if (minutes1 > 2 && minutes1 <= 10) {
+			flag1 = "Slow";
+		}
+		if (minutes1 > 10) {
+			flag1 = "Dead Slow";
+		}
+                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+				+ description1);
 		if (opCompanyConfig.isPresent() && opCompanyConfig.get().getValue().equals("true")) {
 			log.info("Visit Based Transactions..");
 		} else {

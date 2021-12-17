@@ -63,7 +63,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class SalesTargetGroupUserTargetResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesTargetGroupUserTargetResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private SalesTargetGroupUserTargetService salesTargetGroupUserTargetService;
 

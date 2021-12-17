@@ -52,7 +52,7 @@ import com.orderfleet.webapp.web.rest.dto.TimeSpendReportView;
 public class TimeSpendReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(TimeSpendReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 

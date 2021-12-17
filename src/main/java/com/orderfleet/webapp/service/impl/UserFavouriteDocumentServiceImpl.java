@@ -1,6 +1,8 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +22,7 @@ import com.orderfleet.webapp.repository.ActivityRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.UserFavouriteDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.UserFavouriteDocumentService;
 import com.orderfleet.webapp.web.rest.dto.UserFavouriteDocumentDTO;
 
@@ -28,7 +31,7 @@ import com.orderfleet.webapp.web.rest.dto.UserFavouriteDocumentDTO;
 public class UserFavouriteDocumentServiceImpl implements UserFavouriteDocumentService {
 
 	private final Logger log = LoggerFactory.getLogger(UserFavouriteDocumentServiceImpl.class);
-
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private UserFavouriteDocumentRepository userFavouriteDocumentRepository;
 
@@ -50,7 +53,35 @@ public class UserFavouriteDocumentServiceImpl implements UserFavouriteDocumentSe
 		List<UserFavouriteDocument> userFavouriteDocuments = new ArrayList<>();
 		for (UserFavouriteDocumentDTO userFavouriteDocumentDTO : favouriteDocumentDTOs) {
 			Document document = documentRepository.findOneByPid(userFavouriteDocumentDTO.getDocumentPid()).get();
+			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				String id = "ACTIVITY_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+				String description ="get one by pid";
+				LocalDateTime startLCTime = LocalDateTime.now();
+				String startTime = startLCTime.format(DATE_TIME_FORMAT);
+				String startDate = startLCTime.format(DATE_FORMAT);
+				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			Activity activity = activityRepository.findOneByPid(userFavouriteDocumentDTO.getActivityPid()).get();
+			 String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 			userFavouriteDocuments.add(new UserFavouriteDocument(activity, document, user, user.getCompany(),
 					userFavouriteDocumentDTO.getSortOrder()));
 		}

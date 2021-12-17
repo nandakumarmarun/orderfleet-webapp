@@ -79,7 +79,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 public class LeadsTrackerResource {
 
 	private final Logger log = LoggerFactory.getLogger(DynamicDocumentFormResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private EmployeeHierarchyService employeeHierarchyService;
 

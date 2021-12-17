@@ -1,5 +1,8 @@
 package com.orderfleet.webapp.service.impl;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +38,7 @@ import com.orderfleet.webapp.web.rest.mapper.ActivityGroupUserTargetMapper;
 public class ActivityGroupUserTargetServiceImpl implements ActivityGroupUserTargetService {
 
 	private final Logger log = LoggerFactory.getLogger(ActivityGroupUserTargetServiceImpl.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ActivityGroupUserTargetRepository activityGroupUserTargetRepository;
 
@@ -84,14 +87,50 @@ public class ActivityGroupUserTargetServiceImpl implements ActivityGroupUserTarg
 	@Override
 	public ActivityGroupUserTargetDTO update(ActivityGroupUserTargetDTO activityGroupUserTargetDTO) {
 		log.debug("Request to Update ActivityGroupUserTarget : {}", activityGroupUserTargetDTO);
-
-		return activityGroupUserTargetRepository.findOneByPid(activityGroupUserTargetDTO.getPid())
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AGUT_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get one by pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		ActivityGroupUserTargetDTO agutdto= activityGroupUserTargetRepository.findOneByPid(activityGroupUserTargetDTO.getPid())
 				.map(activityGroupUserTarget -> {
 					activityGroupUserTarget.setTargetNumber(activityGroupUserTargetDTO.getTargetNumber());
 					activityGroupUserTarget.setStartDate(activityGroupUserTargetDTO.getStartDate());
 					activityGroupUserTarget.setEndDate(activityGroupUserTargetDTO.getEndDate());
+					 DateTimeFormatter DATE_TIME_FORMATS = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMATS = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String ids = "AG_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+						String descriptions ="get one by pid";
+						LocalDateTime startLCTimes = LocalDateTime.now();
+						String startTimes = startLCTimes.format(DATE_TIME_FORMATS);
+						String startDates = startLCTimes.format(DATE_FORMATS);
+						logger.info(ids + "," + startDates + "," + startTimes + ",_ ,0 ,START,_," + descriptions);
 					activityGroupUserTarget.setActivityGroup(activityGroupRepository
 							.findOneByPid(activityGroupUserTargetDTO.getActivityGroupPid()).get());
+					 String flag = "Normal";
+						LocalDateTime endLCTimes = LocalDateTime.now();
+						String endTimes= endLCTimes.format(DATE_TIME_FORMATS);
+						String endDates = startLCTimes.format(DATE_FORMATS);
+						Duration durations = Duration.between(startLCTimes, endLCTimes);
+						long minute = durations.toMinutes();
+						if (minute <= 1 && minute >= 0) {
+							flag = "Fast";
+						}
+						if (minute > 1 && minute <= 2) {
+							flag = "Normal";
+						}
+						if (minute > 2 && minute <= 10) {
+							flag = "Slow";
+						}
+						if (minute > 10) {
+							flag = "Dead Slow";
+						}
+				                logger.info(ids + "," + endDates + "," + startTimes + "," + endTimes + "," + minute + ",END," + flag + ","
+								+ descriptions);
+
 					activityGroupUserTarget
 							.setUser(userRepository.findOneByPid(activityGroupUserTargetDTO.getUserPid()).get());
 					activityGroupUserTarget = activityGroupUserTargetRepository.save(activityGroupUserTarget);
@@ -99,6 +138,28 @@ public class ActivityGroupUserTargetServiceImpl implements ActivityGroupUserTarg
 							.activityGroupUserTargetToActivityGroupUserTargetDTO(activityGroupUserTarget);
 					return result;
 				}).orElse(null);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+					return agutdto;
+
 	}
 
 	/**
@@ -125,8 +186,36 @@ public class ActivityGroupUserTargetServiceImpl implements ActivityGroupUserTarg
 	@Transactional(readOnly = true)
 	public List<ActivityGroupUserTargetDTO> findAllByCompany() {
 		log.debug("Request to get all TaskHeaders");
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AGUT_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get all by compId";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<ActivityGroupUserTarget> activityGroupUserTargetList = activityGroupUserTargetRepository
 				.findAllByCompanyId();
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		List<ActivityGroupUserTargetDTO> result = activityGroupUserTargetMapper
 				.activityGroupUserTargetsToActivityGroupUserTargetDTOs(activityGroupUserTargetList);
 		return result;
@@ -143,7 +232,36 @@ public class ActivityGroupUserTargetServiceImpl implements ActivityGroupUserTarg
 	@Transactional(readOnly = true)
 	public Page<ActivityGroupUserTargetDTO> findAllByCompany(Pageable pageable) {
 		log.debug("Request to get all Activities");
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AGUT_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get all by compId using page";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Page<ActivityGroupUserTarget> activities = activityGroupUserTargetRepository.findAllByCompanyId(pageable);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
 		Page<ActivityGroupUserTargetDTO> result = new PageImpl<ActivityGroupUserTargetDTO>(activityGroupUserTargetMapper
 				.activityGroupUserTargetsToActivityGroupUserTargetDTOs(activities.getContent()), pageable,
 				activities.getTotalElements());
@@ -178,11 +296,41 @@ public class ActivityGroupUserTargetServiceImpl implements ActivityGroupUserTarg
 	@Transactional(readOnly = true)
 	public Optional<ActivityGroupUserTargetDTO> findOneByPid(String pid) {
 		log.debug("Request to get ActivityGroupUserTarget by pid : {}", pid);
-		return activityGroupUserTargetRepository.findOneByPid(pid).map(activityGroupUserTarget -> {
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AGUT_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get one by pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		Optional<ActivityGroupUserTargetDTO> agutDTO= activityGroupUserTargetRepository.findOneByPid(pid).map(activityGroupUserTarget -> {
 			ActivityGroupUserTargetDTO activityGroupUserTargetDTO = activityGroupUserTargetMapper
 					.activityGroupUserTargetToActivityGroupUserTargetDTO(activityGroupUserTarget);
 			return activityGroupUserTargetDTO;
 		});
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+					return agutDTO;
+
 	}
 
 	/**
@@ -193,9 +341,38 @@ public class ActivityGroupUserTargetServiceImpl implements ActivityGroupUserTarg
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete ActivityGroupUserTarget : {}", pid);
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AGUT_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get one by pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		activityGroupUserTargetRepository.findOneByPid(pid).ifPresent(activityGroupUserTarget -> {
 			activityGroupUserTargetRepository.delete(activityGroupUserTarget.getId());
 		});
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 	}
 
 }

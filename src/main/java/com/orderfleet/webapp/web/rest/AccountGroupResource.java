@@ -53,7 +53,7 @@ import javassist.expr.NewArray;
 public class AccountGroupResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountGroupResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private AccountGroupService accountGroupService;
 

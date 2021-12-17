@@ -1,6 +1,9 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +25,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.ActivityDocument;
 import com.orderfleet.webapp.domain.enums.NotificationType;
 import com.orderfleet.webapp.repository.ActivityDocumentRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ActivityNotificationService;
 import com.orderfleet.webapp.service.ActivityService;
 import com.orderfleet.webapp.service.DocumentService;
@@ -40,7 +44,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class ActivityNotificationResource {
 
 	private final Logger log = LoggerFactory.getLogger(ActivityNotificationResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	private final ActivityService activityService;
 
 	private final ActivityNotificationService activityNotificationService;
@@ -85,7 +89,36 @@ public class ActivityNotificationResource {
 	@RequestMapping(value = "/load-documents/{activityPid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody List<DocumentDTO> loadAccountProfiles(@PathVariable("activityPid") String activityPid) {
 		log.debug("Web request to  load Document by activitypid  {}", activityPid);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AD_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get by activityPid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<ActivityDocument> activityDocuments = activityDocumentRepository.findByActivityPid(activityPid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		List<DocumentDTO> documentDTOs = new ArrayList<DocumentDTO>();
 		for (ActivityDocument activityDocument : activityDocuments) {
 			DocumentDTO documentDTO = documentService.findOne(activityDocument.getDocument().getId());

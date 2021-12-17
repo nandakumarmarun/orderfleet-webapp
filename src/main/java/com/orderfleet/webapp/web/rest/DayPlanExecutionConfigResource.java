@@ -1,6 +1,9 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +49,7 @@ import com.orderfleet.webapp.web.rest.dto.DayPlanExecutionConfigDTO;
 public class DayPlanExecutionConfigResource {
 
 	private final Logger log = LoggerFactory.getLogger(DayPlanExecutionConfigResource.class);
-
+	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private DayPlanExecutionConfigService dayPlanExecutionConfigService;
 
@@ -124,8 +127,36 @@ public class DayPlanExecutionConfigResource {
 	@RequestMapping(value = "/dayPlanExecutionConfig/account-purchase-history-duration", method = RequestMethod.GET)
 	public @ResponseBody int getAccountPurchaseHistoryDuration() throws URISyntaxException {
 		log.debug("Web request to get AccountPurchaseHistoryDuration");
+		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id1 = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description1 ="get by compId and name";
+		LocalDateTime startLCTime1 = LocalDateTime.now();
+		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+		String startDate1 = startLCTime1.format(DATE_FORMAT1);
+		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 		Optional<CompanyConfiguration> optCompanyConfiguration = companyConfigurationRepository.findByCompanyIdAndName(
 				SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.ACCOUNT_PURCHASE_HISTORY_DURATION);
+		String flag1 = "Normal";
+		LocalDateTime endLCTime1 = LocalDateTime.now();
+		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+		String endDate1 = startLCTime1.format(DATE_FORMAT1);
+		Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+		long minutes1 = duration1.toMinutes();
+		if (minutes1 <= 1 && minutes1 >= 0) {
+			flag1 = "Fast";
+		}
+		if (minutes1 > 1 && minutes1 <= 2) {
+			flag1 = "Normal";
+		}
+		if (minutes1 > 2 && minutes1 <= 10) {
+			flag1 = "Slow";
+		}
+		if (minutes1 > 10) {
+			flag1 = "Dead Slow";
+		}
+                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+				+ description1);
 		if (optCompanyConfiguration.isPresent()) {
 			return Integer.valueOf(optCompanyConfiguration.get().getValue());
 		}
@@ -137,8 +168,36 @@ public class DayPlanExecutionConfigResource {
 	@RequestMapping(value = "/dayPlanExecutionConfig/account-purchase-history-duration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> saveAccountPurchaseHistoryDuration(@RequestParam String month) throws URISyntaxException {
 		log.debug("Web request to save AccountPurchaseHistoryDuration ");
+		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+        DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id1 = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description1 ="get by compId and name";
+		LocalDateTime startLCTime1 = LocalDateTime.now();
+		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+		String startDate1 = startLCTime1.format(DATE_FORMAT1);
+		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 		Optional<CompanyConfiguration> optCompanyConfiguration = companyConfigurationRepository.findByCompanyIdAndName(
 				SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.ACCOUNT_PURCHASE_HISTORY_DURATION);
+		String flag1 = "Normal";
+		LocalDateTime endLCTime1 = LocalDateTime.now();
+		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+		String endDate1 = startLCTime1.format(DATE_FORMAT1);
+		Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+		long minutes1 = duration1.toMinutes();
+		if (minutes1 <= 1 && minutes1 >= 0) {
+			flag1 = "Fast";
+		}
+		if (minutes1 > 1 && minutes1 <= 2) {
+			flag1 = "Normal";
+		}
+		if (minutes1 > 2 && minutes1 <= 10) {
+			flag1 = "Slow";
+		}
+		if (minutes1 > 10) {
+			flag1 = "Dead Slow";
+		}
+                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+				+ description1);
 		CompanyConfiguration companyConfiguration = null;
 		if (optCompanyConfiguration.isPresent()) {
 			companyConfiguration = optCompanyConfiguration.get();

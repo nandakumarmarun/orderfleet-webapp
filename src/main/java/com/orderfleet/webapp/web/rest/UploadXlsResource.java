@@ -80,7 +80,7 @@ import com.orderfleet.webapp.service.util.RandomUtil;
 public class UploadXlsResource {
 
 	private final Logger log = LoggerFactory.getLogger(UploadXlsResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	CompanyService companyService;
 

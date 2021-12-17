@@ -51,7 +51,7 @@ import com.orderfleet.webapp.web.rest.dto.TimeUtilizationView;
 @RequestMapping("/web")
 public class TimeUtilizationResource {
 	private final Logger log = LoggerFactory.getLogger(TimeUtilizationResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 

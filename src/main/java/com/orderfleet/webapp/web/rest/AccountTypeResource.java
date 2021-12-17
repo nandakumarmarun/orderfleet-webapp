@@ -62,7 +62,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class AccountTypeResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountTypeResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private AccountTypeService accountTypeService;
 

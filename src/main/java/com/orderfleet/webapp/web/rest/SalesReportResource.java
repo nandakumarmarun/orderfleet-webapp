@@ -69,7 +69,7 @@ import com.orderfleet.webapp.web.rest.report.dto.SalesReportDTO;
 @Controller
 @RequestMapping("/web")
 public class SalesReportResource {
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	private static final String TODAY = "TODAY";
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";

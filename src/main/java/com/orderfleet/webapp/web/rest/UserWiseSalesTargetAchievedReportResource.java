@@ -55,7 +55,7 @@ import com.orderfleet.webapp.web.rest.dto.UserWiseSalesTargetDTO;
 public class UserWiseSalesTargetAchievedReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(UserWiseSalesTargetAchievedReportResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
 

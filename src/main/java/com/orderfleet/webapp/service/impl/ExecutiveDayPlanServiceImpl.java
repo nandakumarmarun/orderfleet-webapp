@@ -160,10 +160,38 @@ public class ExecutiveDayPlanServiceImpl implements ExecutiveDayPlanService {
 				executiveTaskGroupPlan.setUser(user);
 				executiveTaskGroupPlan.setCompany(company);
 				executiveTaskGroupPlans.add(executiveTaskGroupPlan);
-
+				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id = "AGUT_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description ="get activity group user target";
+					LocalDateTime startLCTime = LocalDateTime.now();
+					String startTime = startLCTime.format(DATE_TIME_FORMAT);
+					String startDate = startLCTime.format(DATE_FORMAT);
+					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				ActivityGroupUserTarget activityGroupUserTarget = activityGroupUserTargetRepository
 						.findActivityGroupUserTarget(user.getId(),
 								executiveTaskGroupPlan.getTaskGroup().getActivityGroup().getId(), LocalDate.now());
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
+
 				if (activityGroupUserTarget != null) {
 					TaskGroupResponse taskGroupResponse = new TaskGroupResponse();
 					taskGroupResponse
@@ -256,9 +284,38 @@ public class ExecutiveDayPlanServiceImpl implements ExecutiveDayPlanService {
 				if (accountType.isPresent()) {
 					executiveTaskPlan.setAccountType(accountType.get());
 				}
+				 DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+					DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					String id11 = "ACTIVITY_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+					String description11 ="get one by pid";
+					LocalDateTime startLCTime11 = LocalDateTime.now();
+					String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+					String startDate11 = startLCTime11.format(DATE_FORMAT11);
+					logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 				executiveTaskPlan
 						.setActivity(activityRepository.findOneByPid(executiveTaskPlanDTO.getActivityPid()).get());
-				executiveTaskPlan.setCreatedBy(SecurityUtils.getCurrentUserLogin());
+				
+				  String flag11 = "Normal";
+					LocalDateTime endLCTime11 = LocalDateTime.now();
+					String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+					String endDate11 = startLCTime11.format(DATE_FORMAT11);
+					Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+					long minutes11 = duration11.toMinutes();
+					if (minutes11 <= 1 && minutes11 >= 0) {
+						flag11 = "Fast";
+					}
+					if (minutes11 > 1 && minutes11 <= 2) {
+						flag11 = "Normal";
+					}
+					if (minutes11 > 2 && minutes11 <= 10) {
+						flag11 = "Slow";
+					}
+					if (minutes11 > 10) {
+						flag11 = "Dead Slow";
+					}
+			                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+							+ description11);
+executiveTaskPlan.setCreatedBy(SecurityUtils.getCurrentUserLogin());
 				executiveTaskPlan.setCreatedDate(LocalDateTime.now());
 				executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.PENDING);
 				executiveTaskPlan.setPlannedDate(executiveTaskPlanDTO.getPlannedDate());

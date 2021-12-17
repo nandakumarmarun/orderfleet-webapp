@@ -58,7 +58,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 public class AccountProfileAssociationResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountProfileAssociationResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 
 	@Inject
 	private AccountProfileService accountProfileService;

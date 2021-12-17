@@ -44,7 +44,7 @@ import com.orderfleet.webapp.web.rest.dto.OrderStatusDTO;
 public class SetOrderStatusInventoryResource {
 
 	private final Logger log = LoggerFactory.getLogger(SetOrderStatusInventoryResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private AccountProfileService accountProfileService;
 

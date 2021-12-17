@@ -1,6 +1,9 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +32,7 @@ import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.web.rest.dto.CompanyConfigDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
@@ -46,7 +50,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class CompanyConfigurationResource {
 
 	private final Logger log = LoggerFactory.getLogger(CompanyConfigurationResource.class);
-
+	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
 	@Inject
 	private CompanyService companyService;
 
@@ -557,9 +561,36 @@ public class CompanyConfigurationResource {
 	public @ResponseBody CompanyConfigDTO getCompanyConfiguration(@PathVariable String companyPid)
 			throws URISyntaxException {
 		log.debug("Web request to get Company Configuration");
-
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "COMP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get by compPid and name";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DISTANCE_TRAVELED);
+		  String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 
 		Optional<CompanyConfiguration> optLocationVariance = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.LOCATION_VARIANCE);
@@ -716,9 +747,36 @@ public class CompanyConfigurationResource {
 	@RequestMapping(value = "/company-configuration/delete/{companyPid}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> deleteCompanyConfiguration(@PathVariable String companyPid) throws URISyntaxException {
 		log.debug("Web request to delete Company Configuration compantPid : {}", companyPid);
-
+		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "COMP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description ="get by compPid and name";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DISTANCE_TRAVELED);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		Optional<CompanyConfiguration> optLocationVariance = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.LOCATION_VARIANCE);
 		Optional<CompanyConfiguration> optinterimSave = companyConfigurationRepository
