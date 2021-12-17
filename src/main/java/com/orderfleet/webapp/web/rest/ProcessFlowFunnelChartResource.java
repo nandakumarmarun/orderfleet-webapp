@@ -199,7 +199,8 @@ public class ProcessFlowFunnelChartResource {
 				String date = u[29].toString();
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-				if (noOfDaysBetween > 0 && noOfDaysBetween < 15) {
+				String processflowStatus = u[26].toString();
+				if (noOfDaysBetween > 0 && noOfDaysBetween < 15 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 					return true;
 				}
 			}
@@ -213,7 +214,8 @@ public class ProcessFlowFunnelChartResource {
 				String date = u[29].toString();
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-				if (noOfDaysBetween >= 15 && noOfDaysBetween < 30) {
+				String processflowStatus = u[26].toString();
+				if (noOfDaysBetween >= 15 && noOfDaysBetween < 30 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 					return true;
 				}
 			}
@@ -227,7 +229,8 @@ public class ProcessFlowFunnelChartResource {
 				String date = u[29].toString();
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-				if (noOfDaysBetween >= 30 && noOfDaysBetween <= 45) {
+				String processflowStatus = u[26].toString();
+				if (noOfDaysBetween >= 30 && noOfDaysBetween <= 45 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 					return true;
 				}
 			}
@@ -241,7 +244,8 @@ public class ProcessFlowFunnelChartResource {
 				String date = u[29].toString();
 				LocalDate deliveryDate = LocalDate.parse(date, formatter);
 				long noOfDaysBetween = ChronoUnit.DAYS.between(currentdate, deliveryDate);
-				if (noOfDaysBetween > 45 && noOfDaysBetween <= 250) {
+				String processflowStatus = u[26].toString();
+				if (noOfDaysBetween > 45 && noOfDaysBetween <= 250 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 					return true;
 				}
 			}

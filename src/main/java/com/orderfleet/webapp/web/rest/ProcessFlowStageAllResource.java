@@ -619,25 +619,25 @@ public class ProcessFlowStageAllResource {
 						if (deliveryStage != null && !deliveryStage.isEmpty()) {
 							switch (deliveryStage) {
 							case "above_45_days_upto_250_days": {
-								if (noOfDaysBetween > 45 && noOfDaysBetween <= 250) {
+								if (noOfDaysBetween > 45 && noOfDaysBetween <= 250 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 									return true;
 								}
 								break;
 							}
 							case "31_to_45_days": {
-								if (noOfDaysBetween >= 30 && noOfDaysBetween <= 45) {
+								if (noOfDaysBetween >= 30 && noOfDaysBetween <= 45 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 									return true;
 								}
 								break;
 							}
 							case "15_to_30_days": {
-								if (noOfDaysBetween >= 15 && noOfDaysBetween < 30) {
+								if (noOfDaysBetween >= 15 && noOfDaysBetween < 30 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 									return true;
 								}
 								break;
 							}
 							case "1_to_14_days": {
-								if (noOfDaysBetween > 0 && noOfDaysBetween < 15) {
+								if (noOfDaysBetween > 0 && noOfDaysBetween < 15 && !processflowStatus.equals("DELIVERED") && !processflowStatus.equals("INSTALLED")) {
 									return true;
 								}
 								break;
