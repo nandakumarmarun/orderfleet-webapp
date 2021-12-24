@@ -77,4 +77,8 @@ public interface LocationHierarchyService {
     List<MBLocationHierarchyDTO> findByUserAndActivatedTrue();
 
 	List<LocationDTO> findChildLocationsByParentIds(List<Long> parentIds);
+	
+	 void saveCustom(List<LocationHierarchyDTO> locationHierarchyDTOs);
+	 
+	 List<LocationHierarchyDTO> findLocationHierarchyIscustomIstrue();
 }

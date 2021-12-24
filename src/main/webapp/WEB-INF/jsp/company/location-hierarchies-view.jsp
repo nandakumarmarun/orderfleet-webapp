@@ -1,4 +1,4 @@
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+ <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -137,6 +137,13 @@
 	<script type="text/javascript">
 		var rootUrl = location.protocol + '//' + location.host
 				+ '/web/location-hierarchies';
+		var customUrl = location.protocol + '//' + location.host
+				+ '/web/location-hierarchies-view';
+		var addedNodes= [];
+		var sendObj = {
+					selectednode : [],
+					addednode : [],
+				};
 		var selectednode;
 		var locationdata = [];
 		$(document).ready(function() {
@@ -315,8 +322,7 @@
 								[ selectednode.id ]);
 						$('#selected-node').val('');
 						$("#tree-container1").jstree().deselect_all(true);
-						selectednode = null;
-						updateNodeDelection();
+						updateNodeDelectionNew(selectednode.id);
 						$(".error-msg").html("Deleted Successfully");
 					} else {
 						$('#selected-node').val('');
@@ -347,6 +353,7 @@
 							var selectedVal = $('#field_location').val();
 							var selectedText = $('#field_location').find(
 									"option:selected").text();
+							
 							var node = selectednode;
 							var nodeId = selectednode.id;
 							var nodeparent = selectednode.parent;
@@ -366,6 +373,12 @@
 								alert('Please select a node type');
 								return;
 							}
+							addedNodes.push({
+								"id" : selectedVal,
+								"name" : selectedText,
+							})
+							
+							
 							$('#field_location').find("option:selected")
 									.remove(); //remove the selected option
 							$('#field_location').val("-1"); //reset drop down
@@ -388,7 +401,7 @@
 																.html(
 																		selectedText
 																				+ " Added To to Location Hierarchy View");
-														updateNode();
+														updateNode(addedNodes);
 													});
 								} else {
 									$('#tree-container1')
@@ -405,7 +418,7 @@
 																.html(
 																		selectedText
 																				+ " Added To to Location Hierarchy View");
-														updateNode();
+														updateNode(addedNodes);
 													});
 								}
 
@@ -491,28 +504,31 @@
 											  });
 										  });
 										 } 
-									updateNodeDelection()
+									updateNodeDelection(addedNodes)
 							} else {
 								window.location.reload();
 							}
 						});
 
 		//Update node
-		function updateNode() {
+		function updateNode(addednode) {
 			var jsonNodes = $('#tree-container1').jstree(true).get_json('#', {
 				flat : true
 			});
 			var flatData = convertToFlat(jsonNodes);
-			updateHierarchy(flatData);
+			sendObj.selectednode = flatData;
+			sendObj.addednode = addednode;
+			updateHierarchy(sendObj);
 		}
 
 		function updateHierarchy(newData) {
 			$.ajax({
 				method : 'POST',
-				url : rootUrl,
+				url : customUrl,
 				contentType : "application/json; charset=utf-8",
 				data : JSON.stringify(newData),
 				success : function() {
+					addedNodes = [];
 					//window.location.reload();
 				},
 				error : function(xhr, error) {
@@ -521,20 +537,41 @@
 			});
 		}
 
-		function updateNodeDelection() {
+		function updateNodeDelection(addednode) {
 			var jsonNodes = $('#tree-container1').jstree(true).get_json('#', {
 				flat : true
 			});
 			var flatData = convertToFlat(jsonNodes);
-			updateHierarchydelet(flatData);
+			sendObj.selectednode = flatData;
+			sendObj.addednode = addednode;
+			updateHierarchydelet(sendObj);
+		}
+
+		function updateNodeDelectionNew(id) {
+			
+			updateHierarchydeletedNew(id);
 		}
 
 		function updateHierarchydelet(newData) {
 			$.ajax({
 				method : 'POST',
-				url : rootUrl,
+				url : customUrl,
 				contentType : "application/json; charset=utf-8",
 				data : JSON.stringify(newData),
+				success : function() {
+					addedNodes = [];
+					window.location.reload();
+				},
+				error : function(xhr, error) {
+					console.log("Error : " + error);
+				}
+			});
+		}
+
+		function updateHierarchydeletedNew(id) {
+			$.ajax({
+				method : 'DELETE',
+				url : customUrl + "/" + id,
 				success : function() {
 					window.location.reload();
 				},

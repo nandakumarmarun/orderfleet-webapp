@@ -53,6 +53,7 @@ import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCusto
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
+import com.orderfleet.webapp.service.LocationHierarchyService;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.PriceLevelAccountProductGroupService;
 import com.orderfleet.webapp.service.PriceLevelService;
@@ -99,6 +100,8 @@ public class TPAccountProfileManagementService {
 	private final ReceivablePayableRepository receivablePayableRepository;
 
 	private final LocationAccountProfileService locationAccountProfileService;
+	
+	private final LocationHierarchyService locationHierarchyService;
 
 	private final UserRepository userRepository;
 
@@ -120,7 +123,7 @@ public class TPAccountProfileManagementService {
 			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
 			ProductGroupRepository productGroupRepository,
 			PriceLevelAccountProductGroupRepository priceLevelAccountProductGroupRepository,
-			LocationService locationService, GstLedgerRepository gstLedgerRepository) {
+			LocationService locationService, GstLedgerRepository gstLedgerRepository,LocationHierarchyService locationHierarchyService) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.syncOperationRepository = syncOperationRepository;
@@ -138,6 +141,7 @@ public class TPAccountProfileManagementService {
 		this.priceLevelAccountProductGroupRepository = priceLevelAccountProductGroupRepository;
 		this.locationService = locationService;
 		this.gstLedgerRepository = gstLedgerRepository;
+		this.locationHierarchyService = locationHierarchyService;
 	}
 
 	@Transactional
@@ -627,12 +631,23 @@ public class TPAccountProfileManagementService {
 		long start = System.nanoTime();
 		Long companyId = syncOperation.getCompany().getId();
 		Long version;
+		Set<Long> locationIds = new HashSet<>();
 		// Only one version of a company hierarchy is active at a time
 		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
 				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
+		List<LocationHierarchyDTO> locationHierarchyServiceCustomisTrue = locationHierarchyService.findLocationHierarchyIscustomIstrue();
+		locationHierarchyServiceCustomisTrue.forEach(data -> locationHierarchyDTOs.forEach(data1->{
+			if(data.getParentName().equals(data1.getLocationName()) && !data.getParentName().equals("Territory")) {
+				locationIds.add(data.getLocationId());
+			}
+		}));
+		if(!locationIds.isEmpty()) {
+			locationHierarchyRepository.updateLocationHierarchyInactivatedForListOflocationIds(ZonedDateTime.now(),locationIds);
+		}
+		
 		if (locationHierarchy.isPresent()) {
-			locationHierarchyRepository.updateLocationHierarchyInactivatedFor(ZonedDateTime.now(),
-					locationHierarchy.get().getVersion());
+			locationHierarchyRepository.updateLocationHierarchyInactivatedForTally(ZonedDateTime.now(),
+					locationHierarchy.get().getVersion(),false);
 			version = locationHierarchy.get().getVersion() + 1;
 		} else {
 			version = 1L;
@@ -650,11 +665,12 @@ public class TPAccountProfileManagementService {
 					Optional<Location> optionalParentLoc = locations.stream()
 							.filter(p -> p.getName().equals(locationDTO.getParentName())).findAny();
 					if (optionalParentLoc.isPresent()) {
-						locationHierarchyRepository.insertLocationHierarchyWithParent(version,
+						locationHierarchyRepository.insertLocationHierarchyWithParentInTally(version,
 								optionalLoc.get().getId(), optionalParentLoc.get().getId());
 					}
 				} else {
-					locationHierarchyRepository.insertLocationHierarchyWithNoParent(version, optionalLoc.get().getId());
+					
+					locationHierarchyRepository.insertLocationHierarchyWithNoParentInTally(version, optionalLoc.get().getId());
 				}
 			}
 		}

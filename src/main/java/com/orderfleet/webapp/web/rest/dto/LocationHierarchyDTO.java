@@ -18,7 +18,9 @@ public class LocationHierarchyDTO {
     private Long parentId;
 
     private String parentName;
-
+    
+    private boolean isCustom;
+    
 	public Long getLocationId() {
         return locationId;
     }
@@ -52,15 +54,24 @@ public class LocationHierarchyDTO {
     public void setParentName(String locationName) {
         this.parentName = locationName;
     }
+    
+    
 
 
-//    @Override
-//    public String toString() {
-//        return "LocationHierarchyDTO{" +
-//            "locationId=" + locationId +
-//            ", parentId=" + parentId +
-//            ", locationName='" + locationName + "'" +
-//            ", parentName='" + parentName + "'" +
-//            '}';
-//    }
+    public boolean getCustom() {
+		return isCustom;
+	}
+
+	public void setCustom(boolean isCustom) {
+		this.isCustom = isCustom;
+	}
+
+	@Override
+	public String toString() {
+		return "LocationHierarchyDTO [locationId=" + locationId + ", locationName=" + locationName + ", parentId="
+				+ parentId + ", parentName=" + parentName + ", isCustom=" + isCustom + "]";
+	}
+
+	
+    
 }

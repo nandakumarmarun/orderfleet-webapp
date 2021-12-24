@@ -3,6 +3,7 @@ package com.orderfleet.webapp.repository;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -45,17 +46,56 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version = ?2 AND lh.company.id = ?#{principal.companyId}")
 	int updateLocationHierarchyInactivatedFor(ZonedDateTime inactivatedDate, Long version);
-
+	
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version <= ?2 AND lh.company.id = ?#{principal.companyId}")
+	int updateLocationHierarchyInactivatedForLessThanVersion(ZonedDateTime inactivatedDate, Long version);
+	
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version = ?2 AND lh.company.id = ?#{principal.companyId} AND lh.isCustom = ?3")
+	int updateLocationHierarchyInactivatedForTally(ZonedDateTime inactivatedDate, Long version, boolean iscustem);
+	
+	
 	@Modifying
 	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id)"
 			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId},?2, ?3)", nativeQuery = true)
 	void insertLocationHierarchyWithParent(Long version, Long locationId, Long parentId);
+	
+	@Modifying
+	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id,is_custom)"
+			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId},?2, ?3, ?4)", nativeQuery = true)
+	void insertLocationHierarchyWithParentCustom(Long version, Long locationId, Long parentId,boolean custom);
+	
+	@Modifying
+	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id, is_custom)"
+			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId},?2, ?3,FALSE)", nativeQuery = true)
+	void insertLocationHierarchyWithParentInTally(Long version, Long locationId, Long parentId);
 
 	@Modifying
 	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id)"
 			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId}, ?2, null)", nativeQuery = true)
 	void insertLocationHierarchyWithNoParent(Long version, Long locationId);
-
+	
+	@Modifying
+	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id, is_custom)"
+			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId}, ?2, null,FALSE)", nativeQuery = true)
+	void insertLocationHierarchyWithNoParentInTally(Long version, Long locationId);
+	
+	@Modifying
+	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id, is_custom)"
+			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId}, ?2, null,?3)", nativeQuery = true)
+	void insertLocationHierarchyWithNoParentCustom(Long version, Long locationId, boolean custom );
+	
+	@Query("select lh from LocationHierarchy lh where lh.company.id = ?#{principal.companyId} and activated = true and is_custom = true")
+	List<LocationHierarchy> findLocationHierarchyActivatedTrueAndCompanyid();
+	
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.location.id = ?2 AND lh.company.id = ?#{principal.companyId}")
+	int updateLocationHierarchyInactivatedForOnlyOne(ZonedDateTime inactivatedDate, Long id);
+	
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.location.id IN ?2 AND lh.company.id = ?#{principal.companyId}")
+	int updateLocationHierarchyInactivatedForListOflocationIds(ZonedDateTime inactivatedDate, Set<Long> ids);
 	// ................. used to save asyc from tally ................//
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version = ?2 AND lh.company.id = ?3")
