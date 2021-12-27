@@ -184,7 +184,7 @@ public class ProductProfileSapUploadService {
 
 			OpeningStockDTO openingStockDto = new OpeningStockDTO();
 			openingStockDto.setProductProfileName(productProfile.getName());
-			openingStockDto.setQuantity(Double.parseDouble(ppDto.getOnHand() != null ? ppDto.getOnHand() : "0.00"));
+			openingStockDto.setQuantity((double) ppDto.getOnHand());
 			openingStockDtos.add(openingStockDto);
 
 			TPProductGroupProductDTO productGroupProductDTO = new TPProductGroupProductDTO();
@@ -230,6 +230,7 @@ public class ProductProfileSapUploadService {
 		// find all product group
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
 		for (ProductGroupDTO pgDto : productGroupDTOs) {
+
 			// check exist by name, only one exist with a name
 			Optional<ProductGroup> optionalPG = productGroups.stream().filter(p -> p.getName().equals(pgDto.getName()))
 					.findAny();
@@ -251,11 +252,11 @@ public class ProductProfileSapUploadService {
 			productGroup.setDescription(pgDto.getDescription());
 			productGroup.setActivated(true);
 
-			Optional<ProductGroup> opPgs = saveUpdateProductGroups.stream()
-					.filter(so -> so.getName().equalsIgnoreCase(pgDto.getName())).findAny();
-			if (opPgs.isPresent()) {
-				continue;
-			}
+//			Optional<ProductGroup> opPgs = saveUpdateProductGroups.stream()
+//					.filter(so -> so.getName().equalsIgnoreCase(pgDto.getName())).findAny();
+//			if (opPgs.isPresent()) {
+//				continue;
+//			}
 
 			saveUpdateProductGroups.add(productGroup);
 		}

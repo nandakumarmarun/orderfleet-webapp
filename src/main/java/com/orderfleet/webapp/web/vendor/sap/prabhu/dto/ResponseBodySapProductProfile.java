@@ -5,70 +5,82 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "ItemGroupCode", "ItemGroupName", "OnHand", "SalUnitMsr", "WeightPerPC", "str1", "str2" })
+@JsonPropertyOrder({ "id", "itemGroupCode", "itemGroupName", "onHand", "salUnitMsr", "weightPerPC", "str1", "str2" })
 public class ResponseBodySapProductProfile {
 
-	@JsonProperty("ItemGroupCode")
+	@JsonProperty("id")
+	private long id;
+	@JsonProperty("itemGroupCode")
 	private String itemGroupCode;
-	@JsonProperty("ItemGroupName")
+	@JsonProperty("itemGroupName")
 	private String itemGroupName;
-	@JsonProperty("OnHand")
-	private String onHand;
-	@JsonProperty("SalUnitMsr")
+	@JsonProperty("onHand")
+	private long onHand;
+	@JsonProperty("salUnitMsr")
 	private String salUnitMsr;
-	@JsonProperty("WeightPerPC")
+	@JsonProperty("weightPerPC")
 	private String weightPerPC;
 	@JsonProperty("str1")
 	private String str1;
 	@JsonProperty("str2")
 	private String str2;
 
-	@JsonProperty("ItemGroupCode")
+	@JsonProperty("id")
+	public long getId() {
+		return id;
+	}
+
+	@JsonProperty("id")
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	@JsonProperty("itemGroupCode")
 	public String getItemGroupCode() {
 		return itemGroupCode;
 	}
 
-	@JsonProperty("ItemGroupCode")
+	@JsonProperty("itemGroupCode")
 	public void setItemGroupCode(String itemGroupCode) {
 		this.itemGroupCode = itemGroupCode;
 	}
 
-	@JsonProperty("ItemGroupName")
+	@JsonProperty("itemGroupName")
 	public String getItemGroupName() {
 		return itemGroupName;
 	}
 
-	@JsonProperty("ItemGroupName")
+	@JsonProperty("itemGroupName")
 	public void setItemGroupName(String itemGroupName) {
 		this.itemGroupName = itemGroupName;
 	}
 
-	@JsonProperty("OnHand")
-	public String getOnHand() {
+	@JsonProperty("onHand")
+	public long getOnHand() {
 		return onHand;
 	}
 
-	@JsonProperty("OnHand")
-	public void setOnHand(String onHand) {
+	@JsonProperty("onHand")
+	public void setOnHand(long onHand) {
 		this.onHand = onHand;
 	}
 
-	@JsonProperty("SalUnitMsr")
+	@JsonProperty("salUnitMsr")
 	public String getSalUnitMsr() {
 		return salUnitMsr;
 	}
 
-	@JsonProperty("SalUnitMsr")
+	@JsonProperty("salUnitMsr")
 	public void setSalUnitMsr(String salUnitMsr) {
 		this.salUnitMsr = salUnitMsr;
 	}
 
-	@JsonProperty("WeightPerPC")
+	@JsonProperty("weightPerPC")
 	public String getWeightPerPC() {
 		return weightPerPC;
 	}
 
-	@JsonProperty("WeightPerPC")
+	@JsonProperty("weightPerPC")
 	public void setWeightPerPC(String weightPerPC) {
 		this.weightPerPC = weightPerPC;
 	}
