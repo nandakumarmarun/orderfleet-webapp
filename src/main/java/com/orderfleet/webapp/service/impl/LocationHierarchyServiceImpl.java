@@ -242,4 +242,38 @@ public class LocationHierarchyServiceImpl implements LocationHierarchyService {
 		}
 		return userLocationsHierarchies.stream().map(MBLocationHierarchyDTO::new).collect(Collectors.toList());
 	}
+
+	@Override
+	public void saveCustom(List<LocationHierarchyDTO> locationHierarchyDTOs) {
+		log.debug("Request to save LocationHierarchies : {}", locationHierarchyDTOs);
+		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Long version;
+		// Only one version of a company hierarchy is active at a time
+		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
+				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
+		if (locationHierarchy.isPresent()) {
+			System.out.println("vertion========"+locationHierarchy.get().getVersion());
+			locationHierarchyRepository.updateLocationHierarchyInactivatedForLessThanVersion(ZonedDateTime.now(),
+					locationHierarchy.get().getVersion());
+			version = locationHierarchy.get().getVersion() + 1;
+			
+		} else {
+			version = 1L;
+		}
+		// TODO:improve this code
+		for (LocationHierarchyDTO locationDTO : locationHierarchyDTOs) {
+			if (locationDTO.getParentId() != null) {
+				locationHierarchyRepository.insertLocationHierarchyWithParentCustom(version, locationDTO.getLocationId(),
+						locationDTO.getParentId(),locationDTO.getCustom());
+			} else {
+				locationHierarchyRepository.insertLocationHierarchyWithNoParentCustom(version, locationDTO.getLocationId(), locationDTO.getCustom());
+			}
+		}
+	}
+
+	@Override
+	public List<LocationHierarchyDTO> findLocationHierarchyIscustomIstrue() {
+		List<LocationHierarchy> locationHierarchys = locationHierarchyRepository.findLocationHierarchyActivatedTrueAndCompanyid();
+		return locationHierarchyMapper.locationHierarchiesToLocationHierarchyDTOs(locationHierarchys);	 
+	}
 }

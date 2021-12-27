@@ -63,7 +63,9 @@ public class LocationHierarchy implements Serializable {
 	@NotNull
 	@Column(name = "version", nullable = false)
 	private Long version;
-
+	
+	@Column(name = "isCustom", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
+	private boolean isCustom = true;
 	public LocationHierarchy() {
 		super();
 	}
@@ -130,6 +132,16 @@ public class LocationHierarchy implements Serializable {
 
 	public void setVersion(Long version) {
 		this.version = version;
+	}
+	
+	
+
+	public boolean getCustom() {
+		return isCustom;
+	}
+
+	public void setCustom(boolean isCustom) {
+		this.isCustom = isCustom;
 	}
 
 	@Override
