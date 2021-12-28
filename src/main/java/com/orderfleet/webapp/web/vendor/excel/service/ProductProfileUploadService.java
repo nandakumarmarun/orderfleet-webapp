@@ -326,24 +326,52 @@ public class ProductProfileUploadService {
 
 		for (ProductProfileDTO ppDto : productProfileDTOs) {
 			// check exist by name, only one exist with a name
-			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
-			ProductProfile productProfile;
-			if (optionalPP.isPresent()) {
-				productProfile = optionalPP.get();
-				// if not update, skip this iteration.
-				if (!productProfile.getThirdpartyUpdate()) {
-					continue;
+
+			ProductProfile productProfile = new ProductProfile();
+
+			if (ppDto.getUploadSource() != null && ppDto.getUploadSource().equalsIgnoreCase("KS")) {
+
+				Optional<ProductProfile> optionalPP = productProfiles.stream()
+						.filter(p -> p.getProductId().equals(ppDto.getProductId())).findAny();
+
+				if (optionalPP.isPresent()) {
+					productProfile = optionalPP.get();
+					// if not update, skip this iteration.
+					if (!productProfile.getThirdpartyUpdate()) {
+						continue;
+					}
+				} else {
+					productProfile = new ProductProfile();
+					productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
+					productProfile.setCompany(company);
+					productProfile.setProductId(ppDto.getProductId());
+					productProfile.setDivision(defaultDivision);
+					productProfile.setDataSourceType(DataSourceType.TALLY);
 				}
-			} else {
-				productProfile = new ProductProfile();
-				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
-				productProfile.setCompany(company);
+
 				productProfile.setName(ppDto.getName());
-				productProfile.setDivision(defaultDivision);
-				productProfile.setDataSourceType(DataSourceType.TALLY);
+
+			} else {
+
+				Optional<ProductProfile> optionalPP = productProfiles.stream()
+						.filter(p -> p.getName().equals(ppDto.getName())).findAny();
+
+				if (optionalPP.isPresent()) {
+					productProfile = optionalPP.get();
+					// if not update, skip this iteration.
+					if (!productProfile.getThirdpartyUpdate()) {
+						continue;
+					}
+				} else {
+					productProfile = new ProductProfile();
+					productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
+					productProfile.setCompany(company);
+					productProfile.setName(ppDto.getName());
+					productProfile.setDivision(defaultDivision);
+					productProfile.setDataSourceType(DataSourceType.TALLY);
+				}
 			}
-			productProfile.setProductId(ppDto.getAlias());
+			productProfile.setProductId(ppDto.getProductId());
 			productProfile.setAlias(ppDto.getAlias());
 			productProfile.setDescription(ppDto.getDescription());
 			productProfile.setPrice(ppDto.getPrice());

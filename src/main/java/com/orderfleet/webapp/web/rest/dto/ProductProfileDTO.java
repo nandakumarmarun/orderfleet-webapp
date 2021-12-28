@@ -105,6 +105,8 @@ public class ProductProfileDTO {
 
 	private double purchaseCost;
 
+	private String uploadSource;
+
 	public ProductProfileDTO() {
 		super();
 	}
@@ -172,7 +174,7 @@ public class ProductProfileDTO {
 					.collect(Collectors.joining(","));
 			this.filesPid = filePids;
 		}
-	
+
 		this.activated = profile.getActivated();
 		this.lastModifiedDate = profile.getLastModifiedDate();
 		this.defaultLedger = profile.getDefaultLedger();
@@ -186,14 +188,12 @@ public class ProductProfileDTO {
 		this.productCode = profile.getProductCode();
 		this.productGroup = profile.getProductGroup();
 		this.purchaseCost = profile.getPurchaseCost();
-	
+
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
 		this.productProfileTaxMasterDTOs = profile.getTaxMastersList() == null || profile.getTaxMastersList().isEmpty()
 				|| profile.getTaxMastersList().size() <= 0 ? taxMasterDTOs
 						: profile.getTaxMastersList().stream().map(TaxMasterDTO::new).collect(Collectors.toList());
-
-	
 
 	}
 
@@ -510,6 +510,14 @@ public class ProductProfileDTO {
 
 	public void setPurchaseCost(double purchaseCost) {
 		this.purchaseCost = purchaseCost;
+	}
+
+	public String getUploadSource() {
+		return uploadSource;
+	}
+
+	public void setUploadSource(String uploadSource) {
+		this.uploadSource = uploadSource;
 	}
 
 	@Override
