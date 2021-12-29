@@ -88,6 +88,8 @@ public class FormElementServiceImpl implements FormElementService {
 			System.out.println("--------------------------------------------------------------------------");
 			formElement
 					.setAccountType(accountTypeRepository.findOneByPid(formElementDTO.getFormAccountTypePid()).get());
+		} else {
+			formElement.setAccountType(null);
 		}
 		formElement.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		formElement = formElementRepository.save(formElement);
@@ -142,6 +144,8 @@ public class FormElementServiceImpl implements FormElementService {
 				System.out.println("-------------------------------------------------------");
 				formElement.setAccountType(
 						accountTypeRepository.findOneByPid(formElementDTO.getFormAccountTypePid()).get());
+			} else {
+				formElement.setAccountType(null);
 			}
 			formElement = formElementRepository.save(formElement);
 			try {
@@ -330,7 +334,7 @@ public class FormElementServiceImpl implements FormElementService {
 	}
 
 	private List<FormElementDTO> convertFoemElementToFormElementDtos(List<FormElement> formElements) {
-		
+
 		SecurityUtils.getCurrentUserLogin();
 
 		List<FormElementDTO> formElementDtos = new ArrayList<>();

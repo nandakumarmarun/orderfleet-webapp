@@ -100,7 +100,7 @@ public class TPAccountProfileManagementService {
 	private final ReceivablePayableRepository receivablePayableRepository;
 
 	private final LocationAccountProfileService locationAccountProfileService;
-	
+
 	private final LocationHierarchyService locationHierarchyService;
 
 	private final UserRepository userRepository;
@@ -123,7 +123,8 @@ public class TPAccountProfileManagementService {
 			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
 			ProductGroupRepository productGroupRepository,
 			PriceLevelAccountProductGroupRepository priceLevelAccountProductGroupRepository,
-			LocationService locationService, GstLedgerRepository gstLedgerRepository,LocationHierarchyService locationHierarchyService) {
+			LocationService locationService, GstLedgerRepository gstLedgerRepository,
+			LocationHierarchyService locationHierarchyService) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.syncOperationRepository = syncOperationRepository;
@@ -635,19 +636,20 @@ public class TPAccountProfileManagementService {
 		// Only one version of a company hierarchy is active at a time
 		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
 				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
-		List<LocationHierarchyDTO> locationHierarchyServiceCustomisTrue = locationHierarchyService.findLocationHierarchyIscustomIstrue();
-		locationHierarchyServiceCustomisTrue.forEach(data -> locationHierarchyDTOs.forEach(data1->{
-			if(data.getParentName().equals(data1.getLocationName()) && !data.getParentName().equals("Territory")) {
-				locationIds.add(data.getLocationId());
-			}
-		}));
-		if(!locationIds.isEmpty()) {
-			locationHierarchyRepository.updateLocationHierarchyInactivatedForListOflocationIds(ZonedDateTime.now(),locationIds);
-		}
-		
+//		List<LocationHierarchyDTO> locationHierarchyServiceCustomisTrue = locationHierarchyService.findLocationHierarchyIscustomIstrue();
+//		locationHierarchyServiceCustomisTrue.forEach(data -> locationHierarchyDTOs.forEach(data1->{
+//			if(data.getParentName().equals(data1.getLocationName()) && !data.getParentName().equals("Territory")) {
+//				locationIds.add(data.getLocationId());
+//			}
+//		}));
+//		if (!locationIds.isEmpty()) {
+//			locationHierarchyRepository.updateLocationHierarchyInactivatedForListOflocationIds(ZonedDateTime.now(),
+//					locationIds);
+//		}
+
 		if (locationHierarchy.isPresent()) {
 			locationHierarchyRepository.updateLocationHierarchyInactivatedForTally(ZonedDateTime.now(),
-					locationHierarchy.get().getVersion(),false);
+					locationHierarchy.get().getVersion(), false);
 			version = locationHierarchy.get().getVersion() + 1;
 		} else {
 			version = 1L;
@@ -669,8 +671,9 @@ public class TPAccountProfileManagementService {
 								optionalLoc.get().getId(), optionalParentLoc.get().getId());
 					}
 				} else {
-					
-					locationHierarchyRepository.insertLocationHierarchyWithNoParentInTally(version, optionalLoc.get().getId());
+
+					locationHierarchyRepository.insertLocationHierarchyWithNoParentInTally(version,
+							optionalLoc.get().getId());
 				}
 			}
 		}
