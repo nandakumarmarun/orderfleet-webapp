@@ -35,6 +35,7 @@ public class SalesOrderDTO {
 	private double docDiscountPercentage;
 	private String trimChar;
 	private String employeeAlias;
+	private String mailingName;
 
 	private AccountProfileDTO accountProfileDTO;
 	private List<SalesOrderItemDTO> salesOrderItemDTOs;
@@ -55,6 +56,10 @@ public class SalesOrderDTO {
 		this.inventoryVoucherHeaderPid = inventoryVoucherHeader.getPid();
 		this.id = inventoryVoucherHeader.getId();
 		this.ledgerName = inventoryVoucherHeader.getReceiverAccount().getName();
+		this.mailingName = inventoryVoucherHeader.getReceiverAccount().getMailingName() != null
+				&& !inventoryVoucherHeader.getReceiverAccount().getMailingName().equals("")
+						? inventoryVoucherHeader.getReceiverAccount().getMailingName()
+						: inventoryVoucherHeader.getReceiverAccount().getName();
 		this.trimChar = inventoryVoucherHeader.getReceiverAccount().getTrimChar();
 		this.ledgerAddress = inventoryVoucherHeader.getReceiverAccount().getAddress();
 		this.date = inventoryVoucherHeader.getDocumentDate();
@@ -292,6 +297,14 @@ public class SalesOrderDTO {
 
 	public void setActivityRemarks(String activityRemarks) {
 		this.activityRemarks = activityRemarks;
+	}
+
+	public String getMailingName() {
+		return mailingName;
+	}
+
+	public void setMailingName(String mailingName) {
+		this.mailingName = mailingName;
 	}
 
 }

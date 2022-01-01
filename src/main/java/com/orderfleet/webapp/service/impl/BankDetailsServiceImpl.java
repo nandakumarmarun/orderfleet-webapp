@@ -92,6 +92,8 @@ public class BankDetailsServiceImpl implements BankDetailsService {
 			bankDetails.setPhoneNumber(bankDetailsDTO.getPhoneNumber());
 			bankDetails.setSwiftCode(bankDetailsDTO.getSwiftCode());
 			bankDetails.setBranch(bankDetailsDTO.getBranch());
+			bankDetails.setQrImage(bankDetailsDTO.getQrImage());
+			bankDetails.setQrImageContentType(bankDetailsDTO.getQrImageContentType());
 
 			bankDetails = bankDetailsRepository.save(bankDetails);
 			BankDetailsDTO result = bankToBankDetailsDTO(bankDetails);

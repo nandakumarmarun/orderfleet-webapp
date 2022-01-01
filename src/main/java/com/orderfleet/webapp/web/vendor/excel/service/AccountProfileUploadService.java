@@ -445,10 +445,13 @@ public class AccountProfileUploadService {
 
 		for (LocationAccountProfileDTO locAccDto : locationAccountProfileDTOs) {
 
+			// System.out.println(locAccDto.getAccountProfileName() + "-------------------"
+			// + locAccDto.getLocationName());
+
 			LocationAccountProfile locationAccountProfile = new LocationAccountProfile();
 			// find location
 
-			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getName()))
+			Optional<Location> loc = locations.stream().filter(pl -> locAccDto.getLocationName().equals(pl.getAlias()))
 					.findFirst();
 			// find accountprofile
 			// System.out.println(loc.get()+"===Location");

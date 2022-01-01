@@ -72,7 +72,7 @@ import com.orderfleet.webapp.web.tally.service.TallyDataUploadService;
 public class LogFileServerSaveResource {
 
 	private final Logger log = LoggerFactory.getLogger(LogFileServerSaveResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private SyncOperationRepository syncOperationRepository;
 
@@ -114,36 +114,36 @@ public class LogFileServerSaveResource {
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 
 		LocalDate currentDate = LocalDate.now();
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "CLIENT_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get one by log date file name and compId";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "CLIENT_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get one by log date file name and compId";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<ClientAppLogFiles> opClientAppLogFiles = clientAppLogFilesRepository
 				.findOneByLogDateAndFileNameAndCompanyId(currentDate, file.getOriginalFilename(), company.getId());
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		ClientAppLogFiles clientAppLogFile = new ClientAppLogFiles();
 
@@ -182,9 +182,11 @@ public class LogFileServerSaveResource {
 			if (!fileDir.exists()) {
 				fileDir.mkdirs();
 			}
+			System.out.println(fileBytes.length + "");
 			FileCopyUtils.copy(fileBytes, new File(fileLocation));
 		} catch (IOException ioe) {
-			throw new FileManagerException(ioe.getMessage());
+			// throw new FileManagerException(ioe.getMessage());
+			log.info(ioe.getMessage());
 		}
 
 		// TODO Auto-generated method stub

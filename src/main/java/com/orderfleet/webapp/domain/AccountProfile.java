@@ -216,6 +216,9 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Column(name = "country_name")
 	private String countryName;
 
+	@Column(name = "mailing_name")
+	private String mailingName;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "geo_tagging_type")
 	private GeoTaggingType geoTaggingType;
@@ -601,6 +604,14 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	public void setDistrictc(DistrictC districtc) {
 		this.districtc = districtc;
+	}
+
+	public String getMailingName() {
+		return mailingName;
+	}
+
+	public void setMailingName(String mailingName) {
+		this.mailingName = mailingName;
 	}
 
 	@Override

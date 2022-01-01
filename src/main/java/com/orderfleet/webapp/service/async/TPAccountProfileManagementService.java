@@ -272,6 +272,7 @@ public class TPAccountProfileManagementService {
 			if (isValidEmail(apDto.getEmail1())) {
 				accountProfile.setEmail1(apDto.getEmail1());
 			}
+			accountProfile.setMailingName(apDto.getMailingName());
 			accountProfile.setPin(apDto.getPin());
 			accountProfile.setDescription(apDto.getDescription());
 			accountProfile.setActivated(apDto.getActivated());

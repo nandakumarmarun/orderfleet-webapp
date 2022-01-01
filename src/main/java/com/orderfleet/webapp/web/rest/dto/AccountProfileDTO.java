@@ -141,6 +141,8 @@ public class AccountProfileDTO {
 
 	private Long districtId;
 
+	private String mailingName;
+
 	public String getAitrichCode() {
 		return AitrichCode;
 	}
@@ -310,6 +312,14 @@ public class AccountProfileDTO {
 
 	public void setPhone2(String phone2) {
 		this.phone2 = phone2;
+	}
+
+	public String getMailingName() {
+		return mailingName;
+	}
+
+	public void setMailingName(String mailingName) {
+		this.mailingName = mailingName;
 	}
 
 	public String getEmail1() {
