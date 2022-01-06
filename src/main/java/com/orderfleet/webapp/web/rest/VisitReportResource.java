@@ -57,7 +57,7 @@ import com.orderfleet.webapp.web.rest.report.dto.VisitReportDTO;
 public class VisitReportResource {
 
 	private final Logger log = LoggerFactory.getLogger( VisitReportResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String TODAY = "TODAY";
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";

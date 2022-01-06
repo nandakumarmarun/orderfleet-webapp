@@ -58,7 +58,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class TaskNotificationSettingResource {
 
 	private final Logger log = LoggerFactory.getLogger(TaskNotificationSettingResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ActivityService activityService;
 	

@@ -108,7 +108,7 @@ import com.orderfleet.webapp.service.util.RandomUtil;
 public class ExcelFileUploadResource {
 
 	private final Logger log = LoggerFactory.getLogger(ExcelFileUploadResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ActivityService activityService;
 

@@ -62,7 +62,7 @@ import com.orderfleet.webapp.web.rest.dto.VisitGeoLocationView;
 public class AttachGeoLocationResource {
 
 	private final Logger log = LoggerFactory.getLogger( AttachGeoLocationResource .class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 

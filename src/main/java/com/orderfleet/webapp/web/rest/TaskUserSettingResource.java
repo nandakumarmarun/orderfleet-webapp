@@ -53,7 +53,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class TaskUserSettingResource {
 
 	private final Logger log = LoggerFactory.getLogger(TaskUserSettingResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private TaskUserSettingService taskUserSettingService;
 

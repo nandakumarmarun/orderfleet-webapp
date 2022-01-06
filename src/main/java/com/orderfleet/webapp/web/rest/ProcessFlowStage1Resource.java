@@ -143,7 +143,7 @@ import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderResponseDataSap
 public class ProcessFlowStage1Resource {
 
 	private final Logger log = LoggerFactory.getLogger(ProcessFlowStage1Resource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
 	private static final String MTD = "MTD";

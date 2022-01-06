@@ -46,7 +46,7 @@ import com.orderfleet.webapp.web.rest.dto.AttendanceStatusSubgroupDTO;
 public class AttendanceStatusSubgroupReportResource {
 	
 	private final Logger log = LoggerFactory.getLogger(AttendanceStatusSubgroupReportResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AttendanceService attendanceService;
 

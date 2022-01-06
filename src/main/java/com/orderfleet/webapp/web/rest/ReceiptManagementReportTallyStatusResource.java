@@ -90,7 +90,7 @@ import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPr
 public class ReceiptManagementReportTallyStatusResource {
 
 	private final Logger log = LoggerFactory.getLogger(ReceiptManagementReportTallyStatusResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
 	private static final String MTD = "MTD";

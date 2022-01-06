@@ -74,7 +74,7 @@ import com.orderfleet.webapp.web.rest.dto.FormDTO;
 public class DynamicDocumentFormResource {
 
 	private final Logger log = LoggerFactory.getLogger(DynamicDocumentFormResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private FilledFormRepository filledFormRepository;
 
 	private final DocumentFormsService documentFormsService;

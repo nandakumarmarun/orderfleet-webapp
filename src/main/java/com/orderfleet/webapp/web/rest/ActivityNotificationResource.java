@@ -44,7 +44,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class ActivityNotificationResource {
 
 	private final Logger log = LoggerFactory.getLogger(ActivityNotificationResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private final ActivityService activityService;
 
 	private final ActivityNotificationService activityNotificationService;

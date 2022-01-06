@@ -80,7 +80,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class ClientAppLogFilesResource {
 
 	private final Logger log = LoggerFactory.getLogger(ClientAppLogFilesResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private CompanyRepository companyRepository;
 

@@ -240,7 +240,7 @@ public class AccountProfileOdooUploadService {
 				accountProfile.setDefaultPriceLevel(optionalPriceLevel.get());
 			}
 
-//			accountProfile.setCustomerId(String.valueOf(apDto.getId()));
+			accountProfile.setCustomerId(String.valueOf(apDto.getId()));
 
 			if (apDto.getEmail() != null && !apDto.getEmail().equals("")) {
 				if (isValidEmail(apDto.getEmail())) {

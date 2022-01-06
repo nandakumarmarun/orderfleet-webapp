@@ -79,7 +79,7 @@ import com.orderfleet.webapp.web.rest.dto.FormFormElementTransactionDTO;
 public class DynamicDocumentResource {
 
 	private final Logger log = LoggerFactory.getLogger(DynamicDocumentResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private FileManagerService fileManagerService;
 

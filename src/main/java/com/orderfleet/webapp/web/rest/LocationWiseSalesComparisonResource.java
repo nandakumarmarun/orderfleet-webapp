@@ -56,7 +56,7 @@ import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
 @RequestMapping("/web")
 public class LocationWiseSalesComparisonResource {
 	private final Logger log = LoggerFactory.getLogger(LocationWiseSalesComparisonResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private LocationService locationService;
 

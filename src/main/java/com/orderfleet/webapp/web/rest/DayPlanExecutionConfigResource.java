@@ -49,7 +49,7 @@ import com.orderfleet.webapp.web.rest.dto.DayPlanExecutionConfigDTO;
 public class DayPlanExecutionConfigResource {
 
 	private final Logger log = LoggerFactory.getLogger(DayPlanExecutionConfigResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private DayPlanExecutionConfigService dayPlanExecutionConfigService;
 

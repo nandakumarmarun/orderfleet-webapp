@@ -87,7 +87,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 public class LocationHierarchyAccountResource {
 
 	private final Logger log = LoggerFactory.getLogger(LocationHierarchyAccountResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String TODAY = "TODAY";
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";

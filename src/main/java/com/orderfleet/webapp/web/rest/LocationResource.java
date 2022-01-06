@@ -54,7 +54,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class LocationResource {
 
 	private final Logger log = LoggerFactory.getLogger(LocationResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private LocationService locationService;
 

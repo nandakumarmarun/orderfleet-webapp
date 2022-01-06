@@ -5,7 +5,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +44,7 @@ import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 /**
@@ -79,9 +82,12 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	@Override
 	public void save(String locationPid, String assignedAccountProfile) {
 		log.debug("Request to save Location AccountProfile");
+		log.debug("*********************************"+locationPid,assignedAccountProfile);
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		Location location = locationRepository.findOneByPid(locationPid).get();
+		
 		String[] accountProfiles = assignedAccountProfile.split(",");
+
 		List<LocationAccountProfile> locationAccountProfile = new ArrayList<>();
 		for (String accountProfilePid : accountProfiles) {
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
@@ -115,6 +121,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 					+ description);
 			locationAccountProfile.add(new LocationAccountProfile(location, accountProfile, company));
 		}
+		
 		if (accountProfiles.length > 1) {
 			locationAccountProfileRepository.deleteByLocationPid(locationPid);
 		}
@@ -149,6 +156,11 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	public List<LocationAccountProfile> findAllByCompany() {
 		log.debug("Request to get all AccountProfile");
 		List<LocationAccountProfile> locationAccountProfile = locationAccountProfileRepository.findAllByCompanyId();
+
+		locationAccountProfile
+		.sort((LocationAccountProfile s1, LocationAccountProfile s2) -> s1.getAccountProfile().getName().compareTo(s2.getAccountProfile().getName()));
+		
+		
 		return locationAccountProfile;
 	}
 

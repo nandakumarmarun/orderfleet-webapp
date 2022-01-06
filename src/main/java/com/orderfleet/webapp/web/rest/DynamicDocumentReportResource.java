@@ -59,7 +59,7 @@ import com.orderfleet.webapp.web.rest.dto.DynamicDocumentSettingsRowColourDTO;
 public class DynamicDocumentReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(DynamicDocumentReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private DynamicDocumentHeaderRepository dynamicDocumentHeaderRepository;
 

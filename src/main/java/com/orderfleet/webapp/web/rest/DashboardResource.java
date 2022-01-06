@@ -131,7 +131,7 @@ import com.orderfleet.webapp.web.websocket.dto.DashboardAttendanceDTO;
 public class DashboardResource {
 
 	private final Logger log = LoggerFactory.getLogger(DashboardResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 
 	@Inject
 	private DashboardUserService dashboardUserService;

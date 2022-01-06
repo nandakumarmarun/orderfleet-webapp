@@ -12,7 +12,7 @@ if (!this.uploadFocus) {
 			+ location.pathname;
 			
 	var ajaxes = [
-		
+		{name: 'product_profiles', path: '/uploadProductProfiles', alias: 'Product Profiles'},
 		{name: 'account_profiles', path: '/uploadAccountProfiles', alias: 'Account Profiles'}
 		
 	];
@@ -92,6 +92,28 @@ if (!this.uploadFocus) {
 			onSaveSuccess(selectedMasters);
 		}
 	}
+//	function doAjax(selectedMasters) {
+//		if (selectedMasters.length > 0) {
+//			var m = selectedMasters.pop()
+//			$(".error-msg").html("Uploading "+m.alias+"....");
+//	        $.ajax({
+//	            url      : uploadFocusContextPath + m.path,
+//	            method : 'POST',
+//	            success  : function (serverResponse) {
+//					$(".error-msg").html("Uploading "+m.alias+" success....");                
+//	                doAjax(selectedMasters);
+//	            },
+//	            error : function(xhr, error) {
+//					$(".error-msg").html(
+//							"Error uploading "+m.alias);
+//					selectedMasters = [];
+//				}
+//	        });
+//		} else {
+//			alert("Upload Complete")
+//			onSaveSuccess(selectedMasters);
+//		}
+//	}
 
 	
 	function onSaveSuccess(result) {

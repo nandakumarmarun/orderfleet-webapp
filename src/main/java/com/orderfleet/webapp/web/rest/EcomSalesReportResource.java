@@ -78,7 +78,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 @RequestMapping("/web")
 public class EcomSalesReportResource {
 	private final Logger log = LoggerFactory.getLogger(EcomSalesReportResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 

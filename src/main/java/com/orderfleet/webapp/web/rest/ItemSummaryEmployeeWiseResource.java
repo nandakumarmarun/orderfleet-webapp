@@ -52,7 +52,7 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 public class ItemSummaryEmployeeWiseResource {
 
 	private final Logger log = LoggerFactory.getLogger(ItemSummaryEmployeeWiseResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private PrimarySecondaryDocumentService primarySecondaryDocumentService;
 

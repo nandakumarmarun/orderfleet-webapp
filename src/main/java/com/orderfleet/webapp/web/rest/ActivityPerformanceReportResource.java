@@ -54,7 +54,7 @@ import com.orderfleet.webapp.web.rest.mapper.ActivityUserTargetMapper;
 public class ActivityPerformanceReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(ActivityPerformanceReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private final UserActivityRepository userActivityRepository;
 
 	private final ActivityUserTargetRepository activityUserTargetRepository;

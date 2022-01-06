@@ -98,7 +98,7 @@ import com.orderfleet.webapp.web.rest.mapper.StaticFormJSCodeMapper;
 public class InventoryVoucherTransactionResource {
 
 	private final Logger log = LoggerFactory.getLogger(InventoryVoucherTransactionResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private UserActivityService userActivityService;
 

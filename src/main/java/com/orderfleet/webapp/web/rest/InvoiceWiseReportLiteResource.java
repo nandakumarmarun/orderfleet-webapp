@@ -100,7 +100,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class InvoiceWiseReportLiteResource {
 
 	private final Logger log = LoggerFactory.getLogger(InvoiceWiseReportLiteResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String INTERIM_SAVE = "interimSave";
 
 	private static final String DISTANCE_TRAVELLED = "distanceTarvel";

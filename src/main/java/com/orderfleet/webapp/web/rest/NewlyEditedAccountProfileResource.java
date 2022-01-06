@@ -68,7 +68,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class NewlyEditedAccountProfileResource {
 
 	private final Logger log = LoggerFactory.getLogger(NewlyEditedAccountProfileResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountProfileService accountProfileService;
 

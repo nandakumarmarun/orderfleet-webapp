@@ -64,7 +64,7 @@ import com.orderfleet.webapp.web.rest.dto.PunchOutDTO;
 public class LoginLogoutReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(AttendanceResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AttendanceService attendanceService;
 	@Inject

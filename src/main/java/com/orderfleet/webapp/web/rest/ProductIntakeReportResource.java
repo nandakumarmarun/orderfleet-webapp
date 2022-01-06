@@ -59,7 +59,7 @@ import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 public class ProductIntakeReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(ProductIntakeReportResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
 

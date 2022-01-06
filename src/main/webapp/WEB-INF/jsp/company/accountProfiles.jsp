@@ -62,7 +62,7 @@
 					</div>
 				</div>
 
-				<%-- <div class="col-sm-2">
+				<%--  <div class="col-sm-2">
 								Counrty <select id="dbCountry" name="country"
 									class="form-control">
 									<option value="no">All</option>
@@ -90,7 +90,7 @@
 										<option value="${district.id}">${district.name}</option>
 									</c:forEach>
 								</select>
-							</div> --%>
+							</div>  --%>
 
 
 

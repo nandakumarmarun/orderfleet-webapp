@@ -101,7 +101,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class OtherVoucherTransactionResource {
 
 	private final Logger log = LoggerFactory.getLogger(OtherVoucherTransactionResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private UserActivityService userActivityService;
 

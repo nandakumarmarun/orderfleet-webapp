@@ -54,7 +54,7 @@ import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
 public class LocationWiseTargetAchievedReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(LocationWiseTargetAchievedReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
 

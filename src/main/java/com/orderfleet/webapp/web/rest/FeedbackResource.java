@@ -78,7 +78,7 @@ import com.orderfleet.webapp.web.rest.dto.FormFormElementTransactionDTO;
 public class FeedbackResource {
 
 	private final Logger log = LoggerFactory.getLogger(FeedbackResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private FileManagerService fileManagerService;
 

@@ -71,7 +71,7 @@ import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 public class DashboardTerritoryWiseResource {
 
 	private final Logger log = LoggerFactory.getLogger(DashboardTerritoryWiseResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AttendanceRepository attendanceRepository;
 

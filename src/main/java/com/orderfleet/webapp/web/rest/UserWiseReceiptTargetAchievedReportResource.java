@@ -56,7 +56,7 @@ import com.orderfleet.webapp.web.rest.dto.UserWiseReceiptTargetDTO;
 public class UserWiseReceiptTargetAchievedReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(UserWiseReceiptTargetAchievedReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private EmployeeProfileLocationRepository employeeProfileLocationRepository;
 

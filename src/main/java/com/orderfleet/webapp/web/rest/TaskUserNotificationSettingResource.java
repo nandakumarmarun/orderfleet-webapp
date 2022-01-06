@@ -52,7 +52,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class TaskUserNotificationSettingResource {
 
 	private final Logger log = LoggerFactory.getLogger(TaskUserNotificationSettingResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ActivityService activityService;
 

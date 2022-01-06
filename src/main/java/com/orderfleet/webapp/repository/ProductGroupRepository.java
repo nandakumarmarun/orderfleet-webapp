@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 
@@ -55,10 +56,12 @@ public interface ProductGroupRepository extends JpaRepository<ProductGroup, Long
 	List<ProductGroup> findByCompanyIdAndNameIgnoreCaseIn(Long id, List<String> names);
 
 	ProductGroup findFirstByCompanyId(Long id);
+	ProductGroup findFirstByCompanyIdOrderByIdAsc(Long companyId);
+	
 	
 //	@Query("select productgroup from ProductGroup productgroup where productgroup.company.id = ?1 order by productgroup.id asc LIMIT 1")
 //	ProductGroup findFirstByCompanyIdAsc(Long id);
-	
+//	
 	ProductGroup findFirstByCompanyIdOrderById(Long id);
 	
 }

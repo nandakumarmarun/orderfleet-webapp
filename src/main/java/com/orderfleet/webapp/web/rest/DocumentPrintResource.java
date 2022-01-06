@@ -49,7 +49,7 @@ import com.orderfleet.webapp.web.rest.dto.DocumentPrintCheckDTO;
 public class DocumentPrintResource {
 
 	private final Logger log = LoggerFactory.getLogger(DocumentPrintResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private UserService userService;
 

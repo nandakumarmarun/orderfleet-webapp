@@ -74,7 +74,7 @@
 		<appender-ref ref="CONSOLE" />
 	</logger>
 
-	<logger name="QueryFinding" level="#logback.loglevel#"
+	<logger name="QueryFormatting" level="#logback.loglevel#"
 		additivity="false">
 		<appender-ref ref="QUERY" />
 		<appender-ref ref="CONSOLE" />

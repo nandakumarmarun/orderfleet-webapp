@@ -44,7 +44,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class BestPerformerUploadResource {
 
 	private final Logger log = LoggerFactory.getLogger(BestPerformerUploadResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private CompanyService companyService;	
 	@Inject
 	private BestPerformerRepository bestPerformerRepository;

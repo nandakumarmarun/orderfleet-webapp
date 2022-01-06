@@ -61,7 +61,7 @@ import com.orderfleet.webapp.web.rest.dto.SalesValueReportDTO;
 public class SalesValueReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesValueReportResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private EmployeeProfileService employeeProfileService;
 
@@ -189,7 +189,7 @@ public class SalesValueReportResource {
 
 			List<AccountProfileDTO> accountProfileDTOs = locationAccountProfileService
 					.findAccountProfileByLocationPidIn(locationPids);
-
+ 
 			for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
 				Map<String, List<SalesValueReportDTO>> mapSalesValueReports = purchaseHistory(accountProfileDTO,
 						company, documents, dates);

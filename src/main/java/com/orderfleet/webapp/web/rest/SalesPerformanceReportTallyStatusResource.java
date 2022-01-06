@@ -115,7 +115,7 @@ import com.orderfleet.webapp.web.vendor.odoo.service.SendInvoiceOdooService;
 public class SalesPerformanceReportTallyStatusResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesPerformanceReportTallyStatusResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
 	private static final String MTD = "MTD";

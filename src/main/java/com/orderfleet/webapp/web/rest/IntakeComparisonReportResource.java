@@ -57,7 +57,7 @@ import com.orderfleet.webapp.web.rest.dto.IntakeComparisonDTO.IntakeComparisonMo
 public class IntakeComparisonReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(IntakeComparisonReportResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
 

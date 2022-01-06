@@ -59,7 +59,7 @@ import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionView;
 public class ActivityTimeSpendResource {
 
 	private final Logger log = LoggerFactory.getLogger(ExecutiveTaskExecutionResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 

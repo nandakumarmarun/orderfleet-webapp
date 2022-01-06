@@ -62,7 +62,7 @@ import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 public class AccountingVoucherUIResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountingVoucherUIResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountingVoucherUIService accountingVoucherUIService;
 

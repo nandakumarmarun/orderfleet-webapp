@@ -69,7 +69,7 @@ import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 public class ReceiptHistoryReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(ReceiptHistoryReportResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private EmployeeProfileService employeeProfileService;
 

@@ -104,7 +104,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class ExecutiveTaskExecutionResource {
 
 	private final Logger log = LoggerFactory.getLogger(ExecutiveTaskExecutionResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 
 	private static final String INTERIM_SAVE = "interimSave";
 

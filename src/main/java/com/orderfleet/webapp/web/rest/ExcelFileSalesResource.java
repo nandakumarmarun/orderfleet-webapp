@@ -107,7 +107,7 @@ import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 public class ExcelFileSalesResource {
 
 	private final Logger log = LoggerFactory.getLogger(ExcelFileSalesResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
 	private static final String MTD = "MTD";

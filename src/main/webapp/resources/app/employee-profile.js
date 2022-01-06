@@ -246,7 +246,7 @@ if (!this.EmployeeProfile) {
 			url : employeeProfileContextPath + "/" + id,
 			method : 'GET',
 			success : function(data) {
-
+                 console.log(data);
 				$('#field_name').val(data.name);
 				$('#field_alias').val((data.alias == null ? "" : data.alias));
 				$('#field_designation').val(data.designationPid);

@@ -47,7 +47,7 @@ import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 public class TaskExecutionResource {
 
 	private final Logger log = LoggerFactory.getLogger(TaskExecutionResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ExecutiveTaskPlanService executiveTaskPlanService;
 

@@ -65,7 +65,7 @@ import com.orderfleet.webapp.service.util.RandomUtil;
 public class UploadXlsUpdateNameResource {
 
 	private final Logger log = LoggerFactory.getLogger(UploadXlsUpdateNameResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	CompanyService companyService;
 

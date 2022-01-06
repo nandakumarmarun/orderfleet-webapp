@@ -45,7 +45,7 @@ import com.orderfleet.webapp.web.rest.dto.CompanyConfigurationDTO;
 public class setThemeResource {
 
 	private final Logger log = LoggerFactory.getLogger(setThemeResource.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;

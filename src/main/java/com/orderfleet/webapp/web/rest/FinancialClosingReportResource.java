@@ -53,7 +53,7 @@ import com.orderfleet.webapp.web.rest.dto.FinancialClosingReportHolder;
 public class FinancialClosingReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(FinancialClosingReportResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 
 	private static final String VIEW = "company/financialClosingReport";
 

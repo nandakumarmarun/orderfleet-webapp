@@ -51,7 +51,7 @@ import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 @Controller
 @RequestMapping("/web")
 public class BestPerformerResource {
-	  private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private EmployeeProfileService employeeProfileService;
 

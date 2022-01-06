@@ -87,7 +87,7 @@ import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 public class SalesValueReportUploadXlsResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesValueReportUploadXlsResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private CompanyService companyService;
 

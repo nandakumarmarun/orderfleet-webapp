@@ -50,7 +50,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class CompanyConfigurationResource {
 
 	private final Logger log = LoggerFactory.getLogger(CompanyConfigurationResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private CompanyService companyService;
 

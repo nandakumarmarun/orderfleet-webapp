@@ -62,7 +62,7 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class SalesnrichInvoiceHeaderResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesnrichInvoiceHeaderResource.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
