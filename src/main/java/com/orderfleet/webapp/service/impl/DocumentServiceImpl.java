@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,7 +46,7 @@ import com.orderfleet.webapp.web.rest.mapper.DocumentMapper;
 public class DocumentServiceImpl implements DocumentService {
 
 	private final Logger log = LoggerFactory.getLogger(DocumentServiceImpl.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private DocumentRepository documentRepository;
 
@@ -74,6 +75,15 @@ public class DocumentServiceImpl implements DocumentService {
 		// set pid
 		documentDTO.setPid(DocumentService.PID_PREFIX + RandomUtil.generatePid());
 		Document document = documentMapper.documentDTOToDocument(documentDTO);
+
+		if (documentDTO.getHeaderImage() != null) {
+			document.setHeaderImage(documentDTO.getHeaderImage());
+			document.setHeaderImageContentType(documentDTO.getHeaderImageContentType());
+		}
+		if (documentDTO.getFooterImage() != null) {
+			document.setFooterImage(documentDTO.getFooterImage());
+			document.setFooterImageContentType(documentDTO.getFooterImageContentType());
+		}
 		// set company
 		document.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		document = documentRepository.save(document);
@@ -139,8 +149,15 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setTermsAndConditionsColumn(documentDTO.isTermsAndConditionsColumn());
 			document.setHasTelephonicOrder(documentDTO.getHasTelephonicOrder());
 			document.setRateWithTax(documentDTO.getRateWithTax());
+			if (documentDTO.getHeaderImage() != null) {
+				document.setHeaderImage(documentDTO.getHeaderImage());
+				document.setHeaderImageContentType(documentDTO.getHeaderImageContentType());
+			}
+			if (documentDTO.getFooterImage() != null) {
+				document.setFooterImage(documentDTO.getFooterImage());
+				document.setFooterImageContentType(documentDTO.getFooterImageContentType());
+			}
 
-			
 			document = documentRepository.save(document);
 			DocumentDTO result = documentMapper.documentToDocumentDTO(document);
 			return result;
@@ -338,35 +355,35 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Override
 	public List<DocumentDTO> findAllByActivityPid(String activityPid) {
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "AD_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get by activityPid";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AD_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get by activityPid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<ActivityDocument> activityDocuments = activityDocumentRepository.findByActivityPid(activityPid);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		List<Document> documents = new ArrayList<>();
 		for (ActivityDocument activityDocument : activityDocuments) {
@@ -405,6 +422,14 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setMode(documentDTO.getMode());
 			document.setStockFlow(documentDTO.getStockFlow());
 			document.setVoucherNumberGenerationType(documentDTO.getVoucherNumberGenerationType());
+			if (documentDTO.getHeaderImage() != null) {
+				document.setHeaderImage(documentDTO.getHeaderImage());
+				document.setHeaderImageContentType(documentDTO.getHeaderImageContentType());
+			}
+			if (documentDTO.getFooterImage() != null) {
+				document.setFooterImage(documentDTO.getFooterImage());
+				document.setFooterImageContentType(documentDTO.getFooterImageContentType());
+			}
 			document = documentRepository.save(document);
 			DocumentDTO result = documentMapper.documentToDocumentDTO(document);
 			return result;

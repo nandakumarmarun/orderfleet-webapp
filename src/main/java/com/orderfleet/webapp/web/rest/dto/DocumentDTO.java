@@ -3,6 +3,8 @@ package com.orderfleet.webapp.web.rest.dto;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Lob;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -94,6 +96,14 @@ public class DocumentDTO implements Cloneable {
 
 	private boolean rateWithTax;
 
+	private byte[] headerImage;
+
+	private String headerImageContentType;
+
+	private byte[] footerImage;
+
+	private String footerImageContentType;
+
 	public DocumentDTO() {
 
 	}
@@ -127,7 +137,10 @@ public class DocumentDTO implements Cloneable {
 		this.termsAndConditionsColumn = document.isTermsAndConditionsColumn();
 		this.hasTelephonicOrder = document.getHasTelephonicOrder();
 		this.rateWithTax = document.getRateWithTax();
-
+		this.headerImage = document.getHeaderImage();
+		this.footerImage = document.getFooterImage();
+		this.headerImageContentType = document.getHeaderImageContentType();
+		this.footerImageContentType = document.getFooterImageContentType();
 	}
 
 	public DocumentDTO(Document document, boolean activityDocRequired, int activityDocSortOrder) {
@@ -138,6 +151,10 @@ public class DocumentDTO implements Cloneable {
 		this.alias = document.getAlias();
 		this.description = document.getDescription();
 		this.termsAndConditions = document.getTermsAndConditions();
+		this.headerImage = document.getHeaderImage();
+		this.footerImage = document.getFooterImage();
+		this.headerImageContentType = document.getHeaderImageContentType();
+		this.footerImageContentType = document.getFooterImageContentType();
 		this.documentType = document.getDocumentType();
 		this.activityAccount = document.getActivityAccount();
 		this.save = document.getSave();
@@ -428,12 +445,44 @@ public class DocumentDTO implements Cloneable {
 		this.addNewCustomer = addNewCustomer;
 	}
 
+	public byte[] getHeaderImage() {
+		return headerImage;
+	}
+
+	public void setHeaderImage(byte[] headerImage) {
+		this.headerImage = headerImage;
+	}
+
+	public byte[] getFooterImage() {
+		return footerImage;
+	}
+
+	public void setFooterImage(byte[] footerImage) {
+		this.footerImage = footerImage;
+	}
+
 	public boolean getRateWithTax() {
 		return rateWithTax;
 	}
 
 	public void setRateWithTax(boolean rateWithTax) {
 		this.rateWithTax = rateWithTax;
+	}
+
+	public String getHeaderImageContentType() {
+		return headerImageContentType;
+	}
+
+	public void setHeaderImageContentType(String headerImageContentType) {
+		this.headerImageContentType = headerImageContentType;
+	}
+
+	public String getFooterImageContentType() {
+		return footerImageContentType;
+	}
+
+	public void setFooterImageContentType(String footerImageContentType) {
+		this.footerImageContentType = footerImageContentType;
 	}
 
 	@Override

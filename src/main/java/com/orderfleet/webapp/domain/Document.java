@@ -10,6 +10,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -139,6 +140,22 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "voucher_number_generation_type", nullable = false, columnDefinition = "character varying DEFAULT 'TYPE_1'")
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 
+	@Size(max = 5000000)
+	@Lob
+	@Column(name = "header_image")
+	private byte[] headerImage;
+
+	@Column(name = "header_image_content_type", length = 255)
+	private String headerImageContentType;
+
+	@Size(max = 5000000)
+	@Lob
+	@Column(name = "footer_image")
+	private byte[] footerImage;
+
+	@Column(name = "footer_image_content_type", length = 255)
+	private String footerImageContentType;
+
 	@Column(name = "rate_With_Tax", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean rateWithTax;
 
@@ -241,6 +258,22 @@ public class Document implements Serializable, Cloneable {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public String getHeaderImageContentType() {
+		return headerImageContentType;
+	}
+
+	public void setHeaderImageContentType(String headerImageContentType) {
+		this.headerImageContentType = headerImageContentType;
+	}
+
+	public String getFooterImageContentType() {
+		return footerImageContentType;
+	}
+
+	public void setFooterImageContentType(String footerImageContentType) {
+		this.footerImageContentType = footerImageContentType;
 	}
 
 	public boolean getPromptStockLocation() {
@@ -361,6 +394,22 @@ public class Document implements Serializable, Cloneable {
 
 	public void setRateWithTax(boolean rateWithTax) {
 		this.rateWithTax = rateWithTax;
+	}
+
+	public byte[] getHeaderImage() {
+		return headerImage;
+	}
+
+	public void setHeaderImage(byte[] headerImage) {
+		this.headerImage = headerImage;
+	}
+
+	public byte[] getFooterImage() {
+		return footerImage;
+	}
+
+	public void setFooterImage(byte[] footerImage) {
+		this.footerImage = footerImage;
 	}
 
 	@Override

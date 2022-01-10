@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import javax.inject.Inject;
-import javax.mail.MessagingException;
 
 import org.hibernate.service.spi.ServiceException;
 import org.json.JSONException;
@@ -25,10 +24,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.core.JsonParser;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
+
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.focus.dto.AccountProfileResponseFocus;
 import com.orderfleet.webapp.web.vendor.focus.dto.AuthenticationRequstFocus;
@@ -36,25 +35,7 @@ import com.orderfleet.webapp.web.vendor.focus.dto.AuthenticationResponseFocus;
 import com.orderfleet.webapp.web.vendor.focus.dto.ProductProfileResponseFocus;
 import com.orderfleet.webapp.web.vendor.focus.service.AccountProfileFocusUploadService;
 import com.orderfleet.webapp.web.vendor.focus.service.ProductProfileFocusUploadService;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ParamsOdoo;
-import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAuthentication;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooOutstandingInvoice;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooPriceLevel;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooProductProfile;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooStockLocation;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooTaxList;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUnitOfMeasure;
-import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooUser;
-import com.orderfleet.webapp.web.vendor.odoo.service.AccountProfileOdooUploadService;
-import com.orderfleet.webapp.web.vendor.odoo.service.OutstandingInvoiceOdooUploadService;
-import com.orderfleet.webapp.web.vendor.odoo.service.ProductProfileOdooUploadService;
-import com.orderfleet.webapp.web.vendor.odoo.service.SendInvoiceOdooService;
-import com.orderfleet.webapp.web.vendor.odoo.service.TaxListOdooUploadService;
-import com.orderfleet.webapp.web.vendor.odoo.service.UserOdooUploadService;
 
-import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 
 @Controller

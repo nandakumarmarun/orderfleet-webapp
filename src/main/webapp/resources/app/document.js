@@ -32,9 +32,13 @@ if (!this.Document) {
 		voucherNumberGenerationType : 'TYPE_1',
 		addNewCustomer : false,
 		termsAndConditionsColumn : false,
-		hasTelephonicOrder:false,
-		rateWithTax:false
-		
+		hasTelephonicOrder : false,
+		rateWithTax : false,
+		headerImage : null,
+		headerImageContentType : null,
+		footerImage : null,
+		footerImageContentType : null
+
 	};
 
 	// Specify the validation rules
@@ -181,7 +185,8 @@ if (!this.Document) {
 		documentModel.documentPrefix = $('#field_documentPrefix').val();
 		documentModel.alias = $('#field_alias').val();
 		documentModel.description = $('#field_description').val();
-		documentModel.termsAndConditions = $('#field_terms_and_conditions').val();
+		documentModel.termsAndConditions = $('#field_terms_and_conditions')
+				.val();
 		documentModel.documentType = $('#field_documentType').val();
 		documentModel.activityAccount = $('#field_activityAccount').val();
 		documentModel.save = $('#field_save').prop('checked');
@@ -205,12 +210,11 @@ if (!this.Document) {
 				"#field_voucherNumberGenerationType").val();
 		documentModel.addNewCustomer = $('#field_addNewCustomer').prop(
 				'checked');
-		documentModel.termsAndConditionsColumn = $('#field_termsAndConditionColumn').prop(
-				'checked');
+		documentModel.termsAndConditionsColumn = $(
+				'#field_termsAndConditionColumn').prop('checked');
 		documentModel.hasTelephonicOrder = $('#field_hasTelephonicOrder').prop(
-		'checked');
-		documentModel.rateWithTax = $('#field_rateWithTax').prop(
-		'checked');
+				'checked');
+		documentModel.rateWithTax = $('#field_rateWithTax').prop('checked');
 		console.log(documentModel);
 		$.ajax({
 			method : $(el).attr('method'),
@@ -227,6 +231,43 @@ if (!this.Document) {
 		});
 	}
 
+	$('#headerImage').on(
+			'change',
+			function() {
+				var file = $(this)[0].files[0]; // only one file exist
+				var fileReader = new FileReader();
+				fileReader.readAsDataURL(file);
+
+				fileReader.onload = function(e) {
+					$('#previewHeaderImage').attr('src', fileReader.result);
+					var base64Data = e.target.result.substr(e.target.result
+							.indexOf('base64,')
+							+ 'base64,'.length);
+					documentModel.headerImage = base64Data;
+					documentModel.headerImageContentType = file.type;
+				};
+
+			});
+
+	$('#footerImage').on(
+			'change',
+			function() {
+				var file = $(this)[0].files[0]; // only one file exist
+				var fileReader = new FileReader();
+				fileReader.readAsDataURL(file);
+
+				fileReader.onload = function(e) {
+					$('#previewFooterImage').attr('src', fileReader.result);
+					var base64Data = e.target.result.substr(e.target.result
+							.indexOf('base64,')
+							+ 'base64,'.length);
+					documentModel.footerImage = base64Data;
+					documentModel.footerImageContentType = file.type;
+
+				};
+
+			});
+
 	function showDocument(id) {
 		$.ajax({
 			url : documentContextPath + "/" + id,
@@ -238,7 +279,8 @@ if (!this.Document) {
 				$('#lbl_description').text(
 						(data.description == null ? "" : data.description));
 				$('#lbl_terms_and_conditions').text(
-						(data.termsAndConditions == null ? "" : data.termsAndConditions));
+						(data.termsAndConditions == null ? ""
+								: data.termsAndConditions));
 				$('#lbl_documentType').text(data.documentType);
 				$('#lbl_activityAccount').text(data.activityAccount);
 			},
@@ -249,6 +291,8 @@ if (!this.Document) {
 	}
 
 	function editDocument(id) {
+		$('#previewHeaderImage').attr('src', 'data:image/png;base64,' + null);
+		$('#previewFooterImage').attr('src', 'data:image/png;base64,' + null);
 		$
 				.ajax({
 					url : documentContextPath + "/" + id,
@@ -296,6 +340,22 @@ if (!this.Document) {
 								data.hasTelephonicOrder);
 						$("#field_rateWithTax").prop("checked",
 								data.rateWithTax);
+
+						if (data.headerImage != null) {
+							$('#previewHeaderImage')
+									.attr(
+											'src',
+											'data:image/png;base64,'
+													+ data.headerImage);
+						}
+
+						if (data.footerImage != null) {
+							$('#previewFooterImage')
+									.attr(
+											'src',
+											'data:image/png;base64,'
+													+ data.footerImage);
+						}
 
 						console.log("===========")
 						console.log(data.addNewCustomer);

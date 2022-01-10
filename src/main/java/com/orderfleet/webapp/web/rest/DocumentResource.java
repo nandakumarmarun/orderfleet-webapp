@@ -78,13 +78,11 @@ public class DocumentResource {
 	/**
 	 * POST /documents : Create a new document.
 	 *
-	 * @param documentDTO
-	 *            the documentDTO to create
-	 * @return the ResponseEntity with status 201 (Created) and with body the
-	 *         new documentDTO, or with status 400 (Bad Request) if the document
-	 *         has already an ID
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @param documentDTO the documentDTO to create
+	 * @return the ResponseEntity with status 201 (Created) and with body the new
+	 *         documentDTO, or with status 400 (Bad Request) if the document has
+	 *         already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@Secured({ AuthoritiesConstants.SITE_ADMIN, AuthoritiesConstants.MASTER_DATA_MANAGER })
 	@RequestMapping(value = "/documents", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -117,14 +115,12 @@ public class DocumentResource {
 	/**
 	 * PUT /documents : Updates an existing document.
 	 *
-	 * @param documentDTO
-	 *            the documentDTO to update
+	 * @param documentDTO the documentDTO to update
 	 * @return the ResponseEntity with status 200 (OK) and with body the updated
-	 *         documentDTO, or with status 400 (Bad Request) if the documentDTO
-	 *         is not valid, or with status 500 (Internal Server Error) if the
+	 *         documentDTO, or with status 400 (Bad Request) if the documentDTO is
+	 *         not valid, or with status 500 (Internal Server Error) if the
 	 *         documentDTO couldnt be updated
-	 * @throws URISyntaxException
-	 *             if the Location URI syntax is incorrect
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
 	@RequestMapping(value = "/documents", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -161,12 +157,11 @@ public class DocumentResource {
 	/**
 	 * GET /documents : get all the documents.
 	 *
-	 * @param pageable
-	 *            the pagination information
-	 * @return the ResponseEntity with status 200 (OK) and the list of documents
-	 *         in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @param pageable the pagination information
+	 * @return the ResponseEntity with status 200 (OK) and the list of documents in
+	 *         body
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@RequestMapping(value = "/documents", method = RequestMethod.GET)
 	@Timed
@@ -183,8 +178,7 @@ public class DocumentResource {
 	/**
 	 * GET /documents/:id : get the "id" document.
 	 *
-	 * @param id
-	 *            the id of the documentDTO to retrieve
+	 * @param id the id of the documentDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         documentDTO, or with status 404 (Not Found)
 	 */
@@ -199,8 +193,7 @@ public class DocumentResource {
 	/**
 	 * DELETE /documents/:id : delete the "id" document.
 	 *
-	 * @param id
-	 *            the id of the documentDTO to delete
+	 * @param id the id of the documentDTO to delete
 	 * @return the ResponseEntity with status 200 (OK)
 	 */
 	@RequestMapping(value = "/documents/{pid}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Sync DevSteel Masters</title>
+<title>SalesNrich | Sync Focus Masters</title>
 </head>
 <body class="page-body" data-url="">
 	<div class="page-container">

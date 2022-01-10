@@ -180,10 +180,25 @@
 											placeholder="Description"></textarea>
 									</div>
 									<div class="form-group">
-										<label class="control-label" for="field_terms_and_conditions">Terms & Conditions</label>
+										<label class="control-label" for="field_terms_and_conditions">Terms
+											& Conditions</label>
 										<textarea class="form-control" name="terms_and_conditions"
-											 id="field_terms_and_conditions"
+											id="field_terms_and_conditions"
 											placeholder="Terms & Conditions"></textarea>
+									</div>
+									<div class="form-group">
+										<label class="control-label" for="field_header_image">Header
+											Image </label> <input id="headerImage" type="file"
+											class="btn btn-default btn-block"> <img
+											id="previewHeaderImage" src="" style="max-height: 100px;"
+											alt="Image preview..."> <br>
+									</div>
+									<div class="form-group">
+										<label class="control-label" for="field_profile_image">Footer
+											Image </label> <input id="footerImage" type="file"
+											class="btn btn-default btn-block"> <img
+											id="previewFooterImage" src="" style="max-height: 100px;"
+											alt="Image preview..."> <br>
 									</div>
 									<div class="form-group">
 										<label for="save"> <input type="checkbox"
@@ -241,15 +256,17 @@
 											id="field_addNewCustomer" /> &nbsp;<span>Add New
 												Customer</span>
 										</label>
-									</div>									
+									</div>
 									<div class="form-group" id="termsAndConditionColumn">
-										<label for="termsAndConditionColumn"> <input type="checkbox"
-											id="field_termsAndConditionColumn" /> &nbsp;<span>Terms & Condition Column</span>
+										<label for="termsAndConditionColumn"> <input
+											type="checkbox" id="field_termsAndConditionColumn" /> &nbsp;<span>Terms
+												& Condition Column</span>
 										</label>
 									</div>
 									<div class="form-group" id="hasTelephonicOrder">
-										<label for="hasTelephonicOrder"> <input type="checkbox"
-											id="field_hasTelephonicOrder" /> &nbsp;<span>Has Telephonic Order</span>
+										<label for="hasTelephonicOrder"> <input
+											type="checkbox" id="field_hasTelephonicOrder" /> &nbsp;<span>Has
+												Telephonic Order</span>
 										</label>
 									</div>
 									<div class="form-group" id="rateWithTax">
