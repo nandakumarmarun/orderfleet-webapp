@@ -137,6 +137,8 @@ public class InventoryVoucherHeaderDTO {
 	private long documentId;
 	private boolean rejectedStatus;
 
+	private String imageRefNo;
+
 	private String salesLedgerName;
 
 	public InventoryVoucherHeaderDTO() {
@@ -797,6 +799,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setSalesLedgerName(String salesLedgerName) {
 		this.salesLedgerName = salesLedgerName;
+	}
+
+	public String getImageRefNo() {
+		return imageRefNo;
+	}
+
+	public void setImageRefNo(String imageRefNo) {
+		this.imageRefNo = imageRefNo;
 	}
 
 	@Override

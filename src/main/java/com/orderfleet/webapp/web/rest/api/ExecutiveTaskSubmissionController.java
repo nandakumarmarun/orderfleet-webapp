@@ -513,33 +513,33 @@ public class ExecutiveTaskSubmissionController {
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id = "DYN_QUERY_145" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all doc no by each doc type";
+			String description = "get all doc no by each doc type";
 			LocalDateTime startLCTime = LocalDateTime.now();
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			List<Object[]> documentVoucherNumberListObject = dynamicDocumentHeaderRepository
 					.getAllDocumentNumberForEachDocument(companyPid, userPid, documentPids);
-			  String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 			List<String> documentVoucherNumberList = new ArrayList<>();
 
 			if (documentVoucherNumberListObject.size() > 0) {
@@ -832,12 +832,12 @@ public class ExecutiveTaskSubmissionController {
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "FORM_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get the one form by dyn doc header executive task execution pid and image ref no";
+		String description = "get the one form by dyn doc header executive task execution pid and image ref no";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		ResponseEntity<Object>	uploadfile= filledFormRepository
+		ResponseEntity<Object> uploadfile = filledFormRepository
 				.findOneByDynamicDocumentHeaderExecutiveTaskExecutionPidAndImageRefNo(executiveTaskExecutionPid,
 						imageRefNo)
 				.map(filledForm -> {
@@ -856,31 +856,31 @@ public class ExecutiveTaskSubmissionController {
 								.body(null);
 					}
 				})
-				
+
 				.orElse(ResponseEntity.badRequest()
 						.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
 						.body(null));
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
-					return uploadfile;
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+		return uploadfile;
 	}
 
 	@Transactional
@@ -946,6 +946,45 @@ public class ExecutiveTaskSubmissionController {
 		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 		return avc;
+
+	}
+
+	@Transactional
+	@RequestMapping(value = "/upload/inventoryVoucherImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> inventoryVoucherImageeFile(
+			@RequestParam("executiveTaskExecutionPid") String executiveTaskExecutionPid,
+			@RequestParam("imageRefNo") String imageRefNo, @RequestParam("file") MultipartFile file) {
+		log.debug("Request Inventory Image to upload a file : {}", file);
+		if (file.isEmpty()) {
+			return ResponseEntity.badRequest()
+					.headers(
+							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
+					.body(null);
+		}
+
+		ResponseEntity<Object> ivc = inventoryVoucherHeaderRepository
+				.findOneByExecutiveTaskExecutionPidAndImageRefNo(executiveTaskExecutionPid, imageRefNo)
+				.map(inventoryVoucherHeader -> {
+					try {
+						File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
+								file.getOriginalFilename(), file.getContentType());
+						// update filledForm with file
+						inventoryVoucherHeader.getFiles().add(uploadedFile);
+						inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
+						log.debug("uploaded file for Inventory Voucher Header: {}", inventoryVoucherHeader);
+						return new ResponseEntity<>(HttpStatus.OK);
+					} catch (FileManagerException | IOException ex) {
+						log.debug("File upload exception : {}", ex.getMessage());
+						return ResponseEntity.badRequest()
+								.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage()))
+								.body(null);
+					}
+				})
+
+				.orElse(ResponseEntity.badRequest()
+						.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
+						.body(null));
+		return ivc;
 
 	}
 

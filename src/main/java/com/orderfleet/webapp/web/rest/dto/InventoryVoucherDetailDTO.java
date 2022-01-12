@@ -119,8 +119,13 @@ public class InventoryVoucherDetailDTO {
 	private String supplierAccountName;
 
 	private String customerLocation;
-	
+
+	private String priceLevelPid;
+
+	private String priceLevelName;
+
 	private double qntyDiff;
+
 	public InventoryVoucherDetailDTO() {
 	}
 
@@ -156,6 +161,8 @@ public class InventoryVoucherDetailDTO {
 		this.size = inventoryVoucherDetail.getSize();
 		this.color = inventoryVoucherDetail.getColor();
 		this.itemtype = inventoryVoucherDetail.getItemtype();
+		this.priceLevelName = inventoryVoucherDetail.getPriceLevel().getName();
+		this.priceLevelPid = inventoryVoucherDetail.getPriceLevel().getPid();
 
 		if (inventoryVoucherDetail.getInventoryVoucherHeader() != null) {
 			this.createdDate = inventoryVoucherDetail.getInventoryVoucherHeader().getCreatedDate();
@@ -620,14 +627,29 @@ public class InventoryVoucherDetailDTO {
 	public void setRatePerPiece(double ratePerPiece) {
 		this.ratePerPiece = ratePerPiece;
 	}
-	
-	
+
 	public double getQntyDiff() {
 		return qntyDiff;
 	}
 
 	public void setQntyDiff(double qntyDiff) {
 		this.qntyDiff = qntyDiff;
+	}
+
+	public String getPriceLevelPid() {
+		return priceLevelPid;
+	}
+
+	public void setPriceLevelPid(String priceLevelPid) {
+		this.priceLevelPid = priceLevelPid;
+	}
+
+	public String getPriceLevelName() {
+		return priceLevelName;
+	}
+
+	public void setPriceLevelName(String priceLevelName) {
+		this.priceLevelName = priceLevelName;
 	}
 
 	@Override
@@ -675,5 +697,4 @@ public class InventoryVoucherDetailDTO {
 				+ ", employeeName=" + employeeName + "]";
 	}
 
-	
 }

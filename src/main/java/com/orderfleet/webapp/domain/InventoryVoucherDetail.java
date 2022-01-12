@@ -139,6 +139,10 @@ public class InventoryVoucherDetail implements Serializable {
 	@Column(name = "volume", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double volume;
 
+	@ManyToOne
+	@JoinColumn(name = "price_level_id")
+	private PriceLevel priceLevel;
+
 	public InventoryVoucherDetail() {
 	}
 
@@ -177,6 +181,45 @@ public class InventoryVoucherDetail implements Serializable {
 		this.remarks = remarks;
 		this.inventoryVoucherBatchDetails = inventoryVoucherBatchDetails;
 		this.volume = product.getUnitQty() != null ? product.getUnitQty() * quantity : quantity * 1;
+	}
+
+	public InventoryVoucherDetail(ProductProfile product, double quantity, double freeQuantity, double sellingRate,
+			double mrp, BigDecimal purchaseRate, double taxPercentage, double discountPercentage, String batchNumber,
+			LocalDateTime batchDate, double rowTotal, double discountAmount, double taxAmount, String length,
+			String width, String thickness, String size, String color, String itemtype,
+			StockLocation sourceStockLocation, StockLocation destinationStockLocation,
+			InventoryVoucherHeader rferenceInventoryVoucherHeader,
+			InventoryVoucherDetail rferenceInventoryVoucherDetail, String remarks,
+			List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails,
+			PriceLevel inventoryVoucherDetailPriceLevel) {
+		super();
+		this.product = product;
+		this.quantity = quantity;
+		this.freeQuantity = freeQuantity;
+		this.sellingRate = sellingRate;
+		this.mrp = mrp;
+		this.purchaseRate = purchaseRate;
+		this.taxPercentage = taxPercentage;
+		this.discountPercentage = discountPercentage;
+		this.batchNumber = batchNumber;
+		this.batchDate = batchDate;
+		this.rowTotal = rowTotal;
+		this.discountAmount = discountAmount;
+		this.taxAmount = taxAmount;
+		this.length = length;
+		this.width = width;
+		this.thickness = thickness;
+		this.size = size;
+		this.color = color;
+		this.itemtype = itemtype;
+		this.sourceStockLocation = sourceStockLocation;
+		this.destinationStockLocation = destinationStockLocation;
+		this.rferenceInventoryVoucherHeader = rferenceInventoryVoucherHeader;
+		this.rferenceInventoryVoucherDetail = rferenceInventoryVoucherDetail;
+		this.remarks = remarks;
+		this.inventoryVoucherBatchDetails = inventoryVoucherBatchDetails;
+		this.volume = product.getUnitQty() != null ? product.getUnitQty() * quantity : quantity * 1;
+		this.priceLevel = inventoryVoucherDetailPriceLevel;
 	}
 
 	public Long getId() {
@@ -425,6 +468,14 @@ public class InventoryVoucherDetail implements Serializable {
 
 	public void setVolume(double volume) {
 		this.volume = volume;
+	}
+
+	public PriceLevel getPriceLevel() {
+		return priceLevel;
+	}
+
+	public void setPriceLevel(PriceLevel priceLevel) {
+		this.priceLevel = priceLevel;
 	}
 
 }

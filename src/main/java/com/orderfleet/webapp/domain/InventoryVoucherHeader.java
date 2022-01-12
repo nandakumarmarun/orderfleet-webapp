@@ -3,7 +3,9 @@ package com.orderfleet.webapp.domain;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,6 +16,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -24,6 +28,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
@@ -222,6 +227,16 @@ public class InventoryVoucherHeader implements Serializable {
 
 	@Column(name = "remarks")
 	private String remarks;
+
+	@Column(name = "imageRefNo")
+	private String imageRefNo;
+
+	@JsonIgnore
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "tbl_invetory_voucher_file", joinColumns = {
+			@JoinColumn(name = "inventory_voucher_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "file_id", referencedColumnName = "id") })
+	private Set<File> files = new HashSet<>();
 
 	public Long getId() {
 		return id;
@@ -605,6 +620,22 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setSalesLedger(SalesLedger salesLedger) {
 		this.salesLedger = salesLedger;
+	}
+
+	public String getImageRefNo() {
+		return imageRefNo;
+	}
+
+	public void setImageRefNo(String imageRefNo) {
+		this.imageRefNo = imageRefNo;
+	}
+
+	public Set<File> getFiles() {
+		return files;
+	}
+
+	public void setFiles(Set<File> files) {
+		this.files = files;
 	}
 
 }

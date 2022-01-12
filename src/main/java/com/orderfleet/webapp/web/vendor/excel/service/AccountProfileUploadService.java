@@ -330,6 +330,11 @@ public class AccountProfileUploadService {
 			// } else {
 			// accountProfile.setAccountType(defaultAccountType);
 			// }
+			Optional<AccountProfile> opAcp = saveUpdateAccountProfiles.stream()
+					.filter(acp -> acp.getName().equalsIgnoreCase(apDto.getName())).findAny();
+			if (opAcp.isPresent()) {
+				continue;
+			}
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
