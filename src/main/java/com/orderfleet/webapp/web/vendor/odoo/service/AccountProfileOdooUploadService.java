@@ -104,6 +104,10 @@ public class AccountProfileOdooUploadService {
 	public void saveUpdateAccountProfiles(final List<OdooAccountProfile> list) {
 
 		log.info("Saving Account Profiles...");
+		for(OdooAccountProfile oap:list)
+		{
+			System.out.println(oap.getName());
+		}
 		long start = System.nanoTime();
 
 		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();

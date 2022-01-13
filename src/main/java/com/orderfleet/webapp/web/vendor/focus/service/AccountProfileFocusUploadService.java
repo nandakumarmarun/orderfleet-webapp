@@ -97,7 +97,7 @@ public class AccountProfileFocusUploadService {
 	public void saveUpdateAccountProfiles(List<AccountProfileFocus> list) {
 
 		log.info("Saving Account Profiles.........");
-
+	
 		long start = System.nanoTime();
 
 		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
@@ -177,6 +177,7 @@ public class AccountProfileFocusUploadService {
 
 		for (AccountProfileFocus apDto : list) {
 			// check exist by name, only one exist with a name
+	
 			Optional<AccountProfile> optionalAP = accountProfiles.stream()
 					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
 			AccountProfile accountProfile;

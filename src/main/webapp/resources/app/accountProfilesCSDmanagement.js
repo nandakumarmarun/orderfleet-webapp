@@ -44,29 +44,27 @@ if (!this.AccountProfileCSDManagement) {
 	};
 
 	// Specify the validation error messages
-//	var validationMessages = {
-//		name : {
-//			required : "This field is required.",
-//			maxlength : "This field cannot be longer than 255 characters."
-//		},
-//
-//		address : {
-//			required : "This field is required.",
-//			maxlength : "This field cannot be longer than 250 characters."
-//		}
-//
-//	};
+	var validationMessages = {
+		name : {
+			required : "This field is required.",
+			maxlength : "This field cannot be longer than 255 characters."
+		},
+
+		address : {
+			required : "This field is required.",
+			maxlength : "This field cannot be longer than 250 characters."
+		}
+
+	};
 
 	$(document).ready(function() {
 		console.log("Entered in to js")
+       
+		loadCountrycreate();
 
-//		$("#dbCountrycreate-" +pid ).change(function() {
-//			loadStatescreate();
-//		});
+		loadStatecreate();
 
-//		$("#dbStatecreate-" + pid).change(function() {
-//			loadDistrictscreate();
-//		});
+		loadDistrictcreate();
 
 		// add the rule here
 		$.validator.addMethod("valueNotEquals", function(value, element, arg) {
@@ -74,7 +72,78 @@ if (!this.AccountProfileCSDManagement) {
 		}, "");
 
 	});
+	
+	function loadCountrycreate() {
+		console.log("entered in to countrylist");
+		$.ajax({
+			url : accountProfile_CSD_ManagementContextPath + "/loadCountries",
+			method : 'GET',
 
+			success : function(countries) {
+				$("#Countrycreate").html(
+						"<option value='-1'>  Select Country </option>")
+				$.each(countries, function(index, country) {
+
+					$("#dbCountrycreate").append(
+							"<option value='" + country.id + "'>"
+									+ country.name + "</option>");
+				});
+			},
+			error : function(xhr, error) {
+
+				onError(xhr, error);
+			}
+		});
+
+	}
+
+	function loadStatecreate() {
+		console.log("entered into stateList");
+		$.ajax({
+			url : accountProfile_CSD_ManagementContextPath + "/loadStateList",
+			method : 'GET',
+
+			success : function(states) {
+				$("#dbStatecreate").html(
+						"<option value='-1'>  Select States </option>")
+				$.each(states, function(index, state) {
+
+					$("#dbStatecreate").append(
+							"<option value='" + state.id + "'>" + state.name
+									+ "</option>");
+				});
+			},
+			error : function(xhr, error) {
+
+				onError(xhr, error);
+			}
+		});
+
+	}
+	function loadDistrictcreate() {
+        console.log("entered in to district list");
+		$.ajax({
+			url : accountProfile_CSD_ManagementContextPath
+					+ "/loadDistrictList",
+			method : 'GET',
+
+			success : function(districts) {
+				$("#dbDistrictcreate").html(
+						"<option value='-1'>  Select District  </option>")
+				$.each(districts, function(index, district) {
+
+					$("#dbDistrictcreate").append(
+							"<option value='" + district.id + "'>"
+									+ district.name + "</option>");
+				});
+			},
+			error : function(xhr, error) {
+
+				onError(xhr, error);
+			}
+		});
+
+	}
 	var $row = $('#tblAccountProfile tr');
 	$("#search").on("keyup", function() {
 		var value = $(this).val().toUpperCase();
@@ -99,174 +168,130 @@ if (!this.AccountProfileCSDManagement) {
 		});
 	});
 
-//	function loadStatescreate(id) {
-//
-//		var countryId = $("#dbCountrycreate-" +id).val();
-//        console.log(countryId);
-//		
-//		$.ajax({
-//			url : accountProfile_CSD_ManagementContextPath + "/loadStates",
-//			method : 'GET',
-//			data : {
-//				countryId : countryId
-//			},
-//			success : function(states) {
-//				$("#dbStatecreate-" + id).html(
-//						"<option value='-1'>  Select States </option>")
-//				$.each(states, function(index, state) {
-//
-//					$("#dbStatecreate-" + id).append(
-//							"<option value='" + state.id + "'>" + state.name
-//									+ "</option>");
-//				});
-//			},
-//			error : function(xhr, error) {
-//
-//				onError(xhr, error);
-//			}
-//		});
-//
-//	}
-//
-//	function loadDistrictscreate(id) {
-//
-//		var stateId = $("#dbStatecreate-" +id).val();
-//		console.log(stateId)
-//		$.ajax({
-//			url : accountProfile_CSD_ManagementContextPath + "/loadDistricts",
-//			method : 'GET',
-//			data : {
-//				stateId : stateId
-//			},
-//			success : function(districts) {
-//				$("#dbDistrictcreate-"+ id).html(
-//						"<option value='-1'>  Select District  </option>")
-//				$.each(districts, function(index, district) {
-//
-//					$("#dbDistrictcreate-"+ id).append(
-//							"<option value='" + district.id + "'>"
-//									+ district.name + "</option>");
-//				});
-//			},
-//			error : function(xhr, error) {
-//
-//				onError(xhr, error);
-//			}
-//		});
-//
-//	}
+	function loadStatescreate(id) {
 
-	function saveAccountProfiles(id)
-	{
+		var countryId = $("#dbCountrycreate" ).val();
+		console.log(countryId);
+
+		$.ajax({
+			url : accountProfile_CSD_ManagementContextPath + "/loadStates",
+			method : 'GET',
+			data : {
+				countryId : countryId
+			},
+			success : function(states) {
+				$("#dbStatecreate").html(
+						"<option value='-1'>  Select States </option>")
+				$.each(states, function(index, state) {
+
+					$("#dbStatecreate").append(
+							"<option value='" + state.id + "'>" + state.name
+									+ "</option>");
+				});
+			},
+			error : function(xhr, error) {
+
+				onError(xhr, error);
+			}
+		});
+
+	}
+
+	function loadDistrictscreate(id) {
+
+		var stateId = $("#dbStatecreate" ).val();
+		console.log(stateId)
+		$.ajax({
+			url : accountProfile_CSD_ManagementContextPath + "/loadDistricts",
+			method : 'GET',
+			data : {
+				stateId : stateId
+			},
+			success : function(districts) {
+				$("#dbDistrictcreate").html(
+						"<option value='-1'>  Select District  </option>")
+				$.each(districts, function(index, district) {
+
+					$("#dbDistrictcreate").append(
+							"<option value='" + district.id + "'>"
+									+ district.name + "</option>");
+				});
+			},
+			error : function(xhr, error) {
+
+				onError(xhr, error);
+			}
+		});
+
+	}
+
+	function saveAccountProfiles(id) {
 		console.log("updating");
 		$(".error-msg").html("");
-	
-		 if ($('#dbCountrycreate').val() == '-1') {
-		 $(".error-msg").html("Please select Country");
-		 return false;
-		 }
-		 if ($('#dbStatecreate').val() == '-1') {
-		 $(".error-msg").html("Please select State");
-		 return false;
-		 }
-		 if ($('#dbDistrictcreate').val() == '-1') {
-		 $(".error-msg").html("Please select District");
-		 return false;
-		 }
-		
-		var countryId = $("#dbCountrycreate-"+id).val();
-		var stateId =  $("#dbStatecreate-" +id).val();
-		var districtId = $("#dbDistrictcreate-"+id).val();
+
+		if ($('#dbCountrycreate').val() == '-1') {
+			$(".error-msg").html("Please select Country");
+			return false;
+		}
+		if ($('#dbStatecreate').val() == '-1') {
+			$(".error-msg").html("Please select State");
+			return false;
+		}
+		if ($('#dbDistrictcreate').val() == '-1') {
+			$(".error-msg").html("Please select District");
+			return false;
+		}
+
+		var countryId = $("#dbCountrycreate" ).val();
+		var stateId = $("#dbStatecreate").val();
+		var districtId = $("#dbDistrictcreate").val();
 		$.ajax({
-			url : accountProfile_CSD_ManagementContextPath +"/save-csd",
+			url : accountProfile_CSD_ManagementContextPath + "/save-csd",
 			type : "POST",
-			 data : {
-				 countryId:countryId,
-				 stateId : stateId,
-				 districtId :  districtId,
-				    accountPid:id
-				},
-			 success : function(status) {
-//				 console.log(Success);
-				 window.location = accountProfile_CSD_ManagementContextPath;
-				  },
+			data : {
+				countryId : countryId,
+				stateId : stateId,
+				districtId : districtId,
+				accountPid : id
+			},
+			success : function(status) {
+				// console.log(Success);
+				window.location = accountProfile_CSD_ManagementContextPath;
+			},
 			error : function(xhr, error) {
 				onError(xhr, error);
 			},
 		});
-		
+
 	}
-	// function createUpdateAccountProfile(el) {
-	//
-	// $(".error-msg").html("");
-	// if ($('#dbCountrycreate').val() == '-1') {
-	// $(".error-msg").html("Please select Country");
-	// return false;
-	// }
-	// if ($('#dbStatecreate').val() == '-1') {
-	// $(".error-msg").html("Please select State");
-	// return false;
-	// }
-	// if ($('#dbDistrictcreate').val() == '-1') {
-	// $(".error-msg").html("Please select District");
-	// return false;
-	// }
-	// accountProfileModel.name = $('#field_name').val();
-	//		
-	// accountProfileModel.countryId = $('#dbCountrycreate').val();
-	// accountProfileModel.stateId = $('#dbStatecreate').val();
-	// accountProfileModel.districtId = $('#dbDistrictcreate').val();
-	//		
-	//		
-	// accountProfileModel.address = $('#field_address').val();
-	//		
-	// $.ajax({
-	// method : $(el).attr('method'),
-	// url : $(el).attr('action'),
-	// contentType : "application/json; charset=utf-8",
-	// data : JSON.stringify(accountProfileModel),
-	// success : function(data) {
-	// onSaveSuccess(data);
-	// },
-	// error : function(xhr, error) {
-	// onError(xhr, error);
-	// }
-	// });
-	// }
-	//
-	//	
-	//	
-
-	
-
 	function onSaveSuccess(result) {
 		// reloading page to see the updated data
 		window.location = accountProfile_CSD_ManagementContextPath;
 	}
-		
+
 	AccountProfileCSDManagement.showModalPopup = function(el, id, action) {
-	 $(".error-msg").html("");
-	 resetForm();
-	 if (id) {
-	 switch (action) {
-	 case 0:
-	 saveAccountProfiles(id);
-	 break;
-	 case 1:
-		 loadStatescreate(id);
-	 break;
-	 case 2:
-		 loadDistrictscreate(id);
-	
-	 }
-	 }
-	 el.modal('show');
-	 }
+		$(".error-msg").html("");
+		resetForm();
+		if (id) {
+			switch (action) {
+			case 0:
+				saveAccountProfiles(id);
+				break;
+			case 1:
+				loadStatescreate(id);
+				break;
+			case 2:
+				loadDistrictscreate(id);
+
+			}
+		}
+		el.modal('show');
+	}
 
 	function resetForm() {
 		$('.alert').hide();
 		accountProfileCSDmanagementModel.pid = null; // reset accountProfile
-														// model;
+		// model;
 	}
 
 	function addErrorAlert(message, key, data) {

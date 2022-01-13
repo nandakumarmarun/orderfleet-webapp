@@ -34,6 +34,9 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 	@Query("select company.legalName from Company company where company.activated = true order by company.legalName asc")
 	List<String> findAllCompanyNameByActivatedTrueOrderByCreatedDate();
 
+	@Query("select company.legalName from Company company where company.activated = false order by company.legalName asc")
+	List<String> findAllCompanyNameByDeActivatedTrueOrderByCreatedDate();
+	
 	@Query("select company from Company company order by company.legalName asc")
 	List<Company> findAllCompanySortedByName();
 
@@ -59,5 +62,12 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 	List<Company> findAllByOnPremiseTrue();
 	
 	Optional<Company> findById(Long companyId);
+    @Query("select count(company) from Company company where company.activated= true")
+	Integer findcountOfActiveCompany();
+    
+    @Query("select count(company) from Company company where company.activated= false")
+    Integer findcountOfDeactiveCompany();
+   
+    
 
 }
