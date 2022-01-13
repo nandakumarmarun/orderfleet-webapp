@@ -561,7 +561,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				inventoryVoucherHeader.setReferenceInvoiceNumber(inventoryVoucherDTO.getReferenceInvoiceNumber() != null
 						? inventoryVoucherDTO.getReferenceInvoiceNumber()
 						: "");
-				
+
 				inventoryVoucherHeader.setImageRefNo(inventoryVoucherDTO.getImageRefNo());
 
 				if (inventoryVoucherDTO.getBookingDate() != null && !inventoryVoucherDTO.getBookingDate().equals("")) {
@@ -755,8 +755,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						sourceStockLocation = stockLocationRepository
 								.findOneByPid(inventoryVoucherDetailDTO.getStockLocationPid()).get();
 					}
-					PriceLevel inventoryVoucherDetailPriceLevel = new PriceLevel();
-					if (inventoryVoucherDetailDTO.getPriceLevelPid() != null) {
+					PriceLevel inventoryVoucherDetailPriceLevel = null;
+					if (inventoryVoucherDetailDTO.getPriceLevelPid() != null
+							&& !inventoryVoucherDetailDTO.getPriceLevelPid().equals("")) {
 						inventoryVoucherDetailPriceLevel = priceLevelRepository
 								.findOneByPid(inventoryVoucherDetailDTO.getPriceLevelPid()).get();
 					}
@@ -814,20 +815,38 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								});
 					}
 
-					inventoryVoucherDetails.add(new InventoryVoucherDetail(productProfile,
-							inventoryVoucherDetailDTO.getQuantity(), inventoryVoucherDetailDTO.getFreeQuantity(),
-							inventoryVoucherDetailDTO.getSellingRate(), inventoryVoucherDetailDTO.getMrp(),
-							inventoryVoucherDetailDTO.getPurchaseRate(), inventoryVoucherDetailDTO.getTaxPercentage(),
-							inventoryVoucherDetailDTO.getDiscountPercentage(),
-							inventoryVoucherDetailDTO.getBatchNumber(), inventoryVoucherDetailDTO.getBatchDate(),
-							inventoryVoucherDetailDTO.getRowTotal(), inventoryVoucherDetailDTO.getDiscountAmount(),
-							inventoryVoucherDetailDTO.getTaxAmount(), inventoryVoucherDetailDTO.getLength(),
-							inventoryVoucherDetailDTO.getWidth(), inventoryVoucherDetailDTO.getThickness(),
-							inventoryVoucherDetailDTO.getSize(), inventoryVoucherDetailDTO.getColor(),
-							inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
-							referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
-							inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails,
-							inventoryVoucherDetailPriceLevel));
+					if (inventoryVoucherDetailPriceLevel != null) {
+						inventoryVoucherDetails.add(new InventoryVoucherDetail(productProfile,
+								inventoryVoucherDetailDTO.getQuantity(), inventoryVoucherDetailDTO.getFreeQuantity(),
+								inventoryVoucherDetailDTO.getSellingRate(), inventoryVoucherDetailDTO.getMrp(),
+								inventoryVoucherDetailDTO.getPurchaseRate(),
+								inventoryVoucherDetailDTO.getTaxPercentage(),
+								inventoryVoucherDetailDTO.getDiscountPercentage(),
+								inventoryVoucherDetailDTO.getBatchNumber(), inventoryVoucherDetailDTO.getBatchDate(),
+								inventoryVoucherDetailDTO.getRowTotal(), inventoryVoucherDetailDTO.getDiscountAmount(),
+								inventoryVoucherDetailDTO.getTaxAmount(), inventoryVoucherDetailDTO.getLength(),
+								inventoryVoucherDetailDTO.getWidth(), inventoryVoucherDetailDTO.getThickness(),
+								inventoryVoucherDetailDTO.getSize(), inventoryVoucherDetailDTO.getColor(),
+								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
+								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
+								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails,
+								inventoryVoucherDetailPriceLevel));
+					} else {
+						inventoryVoucherDetails.add(new InventoryVoucherDetail(productProfile,
+								inventoryVoucherDetailDTO.getQuantity(), inventoryVoucherDetailDTO.getFreeQuantity(),
+								inventoryVoucherDetailDTO.getSellingRate(), inventoryVoucherDetailDTO.getMrp(),
+								inventoryVoucherDetailDTO.getPurchaseRate(),
+								inventoryVoucherDetailDTO.getTaxPercentage(),
+								inventoryVoucherDetailDTO.getDiscountPercentage(),
+								inventoryVoucherDetailDTO.getBatchNumber(), inventoryVoucherDetailDTO.getBatchDate(),
+								inventoryVoucherDetailDTO.getRowTotal(), inventoryVoucherDetailDTO.getDiscountAmount(),
+								inventoryVoucherDetailDTO.getTaxAmount(), inventoryVoucherDetailDTO.getLength(),
+								inventoryVoucherDetailDTO.getWidth(), inventoryVoucherDetailDTO.getThickness(),
+								inventoryVoucherDetailDTO.getSize(), inventoryVoucherDetailDTO.getColor(),
+								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
+								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
+								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails));
+					}
 				});
 				inventoryVoucherHeader.setInventoryVoucherDetails(inventoryVoucherDetails);
 

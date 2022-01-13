@@ -139,7 +139,7 @@ public class InventoryVoucherDetail implements Serializable {
 	@Column(name = "volume", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double volume;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "price_level_id")
 	private PriceLevel priceLevel;
 

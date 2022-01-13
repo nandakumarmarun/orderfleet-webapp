@@ -161,8 +161,12 @@ public class InventoryVoucherDetailDTO {
 		this.size = inventoryVoucherDetail.getSize();
 		this.color = inventoryVoucherDetail.getColor();
 		this.itemtype = inventoryVoucherDetail.getItemtype();
-		this.priceLevelName = inventoryVoucherDetail.getPriceLevel().getName();
-		this.priceLevelPid = inventoryVoucherDetail.getPriceLevel().getPid();
+		this.priceLevelName = inventoryVoucherDetail.getPriceLevel() != null
+				? inventoryVoucherDetail.getPriceLevel().getName()
+				: "";
+		this.priceLevelPid = inventoryVoucherDetail.getPriceLevel() != null
+				? inventoryVoucherDetail.getPriceLevel().getPid()
+				: "";
 
 		if (inventoryVoucherDetail.getInventoryVoucherHeader() != null) {
 			this.createdDate = inventoryVoucherDetail.getInventoryVoucherHeader().getCreatedDate();
