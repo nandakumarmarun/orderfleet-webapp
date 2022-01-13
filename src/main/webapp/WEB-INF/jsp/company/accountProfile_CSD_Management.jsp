@@ -31,7 +31,6 @@
 			<div class="col-sm-4 ">
 				<div class="input-group">
 					<span> <input type="text" id="search"
-						,
 						placeholder="Search AccountProfiles Here..." size="40"
 						width="100px"></input>
 					</span>
@@ -57,53 +56,19 @@
 						<tr class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'}">
 							<td>${accountProfiles.name}</td>
 							<td>${accountProfiles.address}</td>
-							<td width="300px"><select
-								id="dbCountrycreate-${accountProfiles.pid}"
+							<td width="300px"><select id="dbCountrycreate"
 								onchange="AccountProfileCSDManagement.showModalPopup($(),'${accountProfiles.pid}',1);"
 								name="countryid" class="form-control">
-												<option value="-1">Select Country</option> 
-									<c:forEach var="country" items="${countries}">
-										 <c:choose>
-											<c:when test="${country.id == accountProfiles.countryId}">
-												<option value="${country.id}" selected>${country.name}</option>
-											</c:when>
-											<c:otherwise>
-												<option value="${country.id}">${country.name}</option>
-											 </c:otherwise>
-										</c:choose> 
-									</c:forEach>
-							</select></td>
-							<td width="300px"><select
-								id="dbStatecreate-${accountProfiles.pid}"
+								</select></td>
+							<td width="300px"><select id="dbStatecreate"
 								onchange="AccountProfileCSDManagement.showModalPopup($(),'${accountProfiles.pid}',2);"
 								name="stateid" class="form-control">
 
-									<option value="-1">Select State</option>
-									<c:forEach var="state" items="${states}">
-										<%-- <c:choose>
-											<c:when test="${state.id == accountProfiles.stateId}">
-												<option value="${state.id}" selected>${state.name}</option>
-											</c:when>
-											 <c:otherwise>
-												<option value="${state.id}">${state.name}</option>
-										</c:otherwise>
-										</c:choose> --%>
-									</c:forEach>
+
 							</select></td>
-							<td width="300px"><select
-								id="dbDistrictcreate-${accountProfiles.pid}" name="districtid"
-								class="form-control">
-												<option value="-1">Select District</option>
-									<c:forEach var="district" items="${districts}">
-										<%-- <c:choose>
-											<c:when test="${district.id == accountProfiles.districtId}">
-												<option value="${district.id}" selected>${district.name}</option>
-											</c:when>
-											 <c:otherwise>
-												<option value="${district.id}">${district.name}</option>
-									</c:otherwise>
-										</c:choose> --%>
-									</c:forEach>
+							<td width="300px"><select id="dbDistrictcreate"
+								name="districtid" class="form-control">
+
 
 							</select></td>
 							<td>

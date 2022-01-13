@@ -3,6 +3,8 @@ package com.orderfleet.webapp.web.rest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.util.concurrent.Service.State;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.CountryC;
 import com.orderfleet.webapp.domain.DistrictC;
@@ -32,6 +35,7 @@ import com.orderfleet.webapp.repository.CounrtyCRepository;
 import com.orderfleet.webapp.repository.DistrictCRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.StateCRepository;
+import com.orderfleet.webapp.repository.StateRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
@@ -63,6 +67,7 @@ public class AccountProfile_CSD_ManagementResource {
 
 	@Inject
 	private StateCRepository stateCRepository;
+	
 
 	@RequestMapping(value = "/accountProfile_CSD_Management/loadStates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -86,6 +91,37 @@ public class AccountProfile_CSD_ManagementResource {
 
 	}
 
+	@RequestMapping(value="/accountProfile_CSD_Management/loadCountries",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<CountryCDTO>> loadCountries()
+    {    log.debug("web request to load Countries");
+		List<CountryC> countriesList = countryCRepository.findAllCountries();
+		List<CountryCDTO> countries = converttodto(countriesList);
+		
+		return new ResponseEntity<>(countries,HttpStatus.OK);
+		
+    }
+	
+	@RequestMapping(value="/accountProfile_CSD_Management/loadStateList",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<StateCDTO>> loadStates()
+    {   log.debug("Web request to load states");
+		List<StateC> statesList = stateCRepository.findAll();
+		List<StateCDTO> states = converttostatedto(statesList);
+		return new ResponseEntity<>(states, HttpStatus.OK);
+
+    }
+	
+	@RequestMapping(value = "/accountProfile_CSD_Management/loadDistrictList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<DistrictCDTO>> loadDistricts() {
+		log.debug("Web request to load districts   ");
+
+		List<DistrictC> districtsList = districtCRepository.findAll();
+		List<DistrictCDTO> districts = converttodistrictdto(districtsList);
+		return new ResponseEntity<>(districts, HttpStatus.OK);
+
+	}
 	@RequestMapping(value = "/accountProfile_CSD_Management", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -93,18 +129,35 @@ public class AccountProfile_CSD_ManagementResource {
 
 		model.addAttribute("AccountProfiles", accountProfileService.findAllByCompanyAndActivated(true));
 
-		List<CountryC> countriesList = countryCRepository.findAllCountries();
-		List<CountryCDTO> countries = converttodto(countriesList);
-		model.addAttribute("countries", countries);
+//		List<CountryC> countriesList = countryCRepository.findAllCountries();
+//		List<CountryCDTO> countries = converttodto(countriesList);
+//		model.addAttribute("countries", countries);
+//
 //		List<StateC> statesList = stateCRepository.findAllStates();
 //		List<StateCDTO> states = converttostatedto(statesList);
+//
+//		states = states.stream().filter((s) -> s.getCountry_id() == (101)).collect(Collectors.toList());
+//
 //		model.addAttribute("states", states);
+//		List<Long> statecdto = new ArrayList<>();
 //
 //		List<DistrictC> districtsList = districtCRepository.findAllDistricts();
 //		List<DistrictCDTO> districts = converttodistrictdto(districtsList);
-//		model.addAttribute("districts", districts);
+//        List<DistrictCDTO> district = new ArrayList<>();
+//		for (Long stc : statecdto) {
+//			for(DistrictCDTO dst:districts)
+//			{
+//				if(dst.getState_id()!=null && dst.getState_id().equals(stc))
+//				{
+//					district.add(dst);
+//				}
+//			}
+//			}
+//		districts= districts.stream().filter((s) -> s.getState_id() == (19)).collect(Collectors.toList());
+//	model.addAttribute("districts",districts);
 
-		return "company/accountProfile_CSD_Management";
+	return"company/accountProfile_CSD_Management";
+
 	}
 
 	private List<DistrictCDTO> converttodistrictdto(List<DistrictC> districtsList) {
@@ -147,12 +200,9 @@ public class AccountProfile_CSD_ManagementResource {
 			@RequestParam String districtId, @RequestParam String accountPid) {
 
 		log.debug("Rest request to save AccountProfiles with CSD:{}", accountPid);
-		log.info("country:" + countryId);
-		log.info("state:" + stateId);
-		log.info("district:" + districtId);
+
 		AccountProfile accountProfile = accountProfileRepository.findOneByPid(accountPid).get();
 		accountProfile.setCountryc(countryCRepository.findOne(Long.valueOf(countryId)));
-		
 
 		accountProfile.setStatec(stateCRepository.findOne(Long.valueOf(stateId)));
 

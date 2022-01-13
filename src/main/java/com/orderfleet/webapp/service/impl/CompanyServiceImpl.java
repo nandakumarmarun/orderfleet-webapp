@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.service.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ import com.orderfleet.webapp.repository.StateRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.util.RandomUtil;
+import com.orderfleet.webapp.web.rest.dto.CompanyUserCountDTO;
 import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
 import com.orderfleet.webapp.web.rest.dto.RegistrationDto;
 
@@ -327,6 +329,56 @@ public class CompanyServiceImpl implements CompanyService {
 		company = companyRepository.save(company);
 		log.debug("Automatic company created successfully with company name : {}", company.getLegalName());
 		return company;
+	}
+
+	public Integer findActiveCompanyCount() {
+		// TODO Auto-generated method stub
+		Integer activeCount=companyRepository.findcountOfActiveCompany();
+		System.out.println("*******"+activeCount);
+		CompanyUserCountDTO cs= new CompanyUserCountDTO();
+		cs.setUserCount(activeCount);
+		System.out.println("*******"+cs.getUserCount());
+		return cs.getUserCount();
+	}
+	public Integer findDeactiveCompanyCount() {
+		// TODO Auto-generated method stub
+		Integer deActiveCount=companyRepository.findcountOfDeactiveCompany();
+		CompanyUserCountDTO cs= new CompanyUserCountDTO();
+		cs.setUserCount(deActiveCount);
+		return cs.getUserCount();
+	}
+
+	@Override
+	public List<CompanyUserCountDTO> findActiveCompanyName() {
+		// TODO Auto-generated method stub
+		List<String> activeName=companyRepository.findAllCompanyNameByActivatedTrueOrderByCreatedDate();
+		List<CompanyUserCountDTO> activeNames = new ArrayList<>();
+		for(String names:activeName)
+		{
+			CompanyUserCountDTO cucDTO=new CompanyUserCountDTO();
+			cucDTO.setCompanyName(names);
+			activeNames.add(cucDTO);
+		}
+		
+		return activeNames;
+	}
+
+	@Override
+	public List<CompanyUserCountDTO> findDeactiveCompanyName() {
+		// TODO Auto-generated method stub
+		List<String> activeName=companyRepository.findAllCompanyNameByDeActivatedTrueOrderByCreatedDate();
+		List<CompanyUserCountDTO> activeNames = new ArrayList<>();
+		for(String names:activeName)
+		{
+			CompanyUserCountDTO cucDTO=new CompanyUserCountDTO();
+			cucDTO.setCompanyName(names);
+			activeNames.add(cucDTO);
+		}
+		for(CompanyUserCountDTO an:activeNames)
+		{
+			System.out.println(an.getCompanyName());
+		}
+		return activeNames;
 	}
 
 }

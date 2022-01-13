@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.orderfleet.webapp.domain.Authority;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.web.rest.dto.CompanyUserCountDTO;
 
 /**
  * Spring Data JPA repository for the User entity.
@@ -136,5 +137,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	User findByCompanyIdAndLogin(Long companyId, String userLogin);
 
 	List<User> findAllByCompanyIdAndIdIn(Long companyId, Set<Long> userIds);
-
+	
+	@Query(value = "select company.legal_name as company_name,count(u.id) as user_count from tbl_user u INNER JOIN tbl_company company on company.id=u.company_id where u.company_id = ?1 GROUP BY company.legal_name Order by company.legal_name",nativeQuery = true)
+     List<Object[]> findActivatedUserByCompanyId(Long companyId);
+    
+     @Query(value = "select company.legal_name as company_name,count(u.id) as user_count from tbl_user u INNER JOIN tbl_company company on company.id=u.company_id GROUP BY company.legal_name Order by company.legal_name",nativeQuery = true)
+	List<Object[]> findAllCompaniesActivatedUserCount();
+	
+	@Query(value = "select company.legal_name as company_name,count(u.id) as user_count from tbl_user u INNER JOIN tbl_company company on company.id=u.company_id where u.activated='FALSE' GROUP BY company.legal_name Order by company.legal_name",nativeQuery = true)
+	List<Object[]> findAllCompaniesDeactivatedUserCount();
+	@Query(value = "select company.legal_name as company_name,count(u.id) as user_count from tbl_user u INNER JOIN tbl_company company on company.id=u.company_id where u.company_id = ?1 and u.activated='FALSE' GROUP BY company.legal_name Order by company.legal_name",nativeQuery = true)
+	List<Object[]> findDeactivatedUserByCompanyId(Long companyid);
 }

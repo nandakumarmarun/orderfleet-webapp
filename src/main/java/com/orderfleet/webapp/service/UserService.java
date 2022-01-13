@@ -33,6 +33,7 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.api.dto.ManagedUserDTO;
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
+import com.orderfleet.webapp.web.rest.dto.CompanyUserCountDTO;
 import com.orderfleet.webapp.web.rest.dto.RegistrationDto;
 
 /**
@@ -536,5 +537,76 @@ public class UserService {
 		user = userRepository.save(user);
 		log.debug("Automatic admin user created with login : {}", user.getLogin());*/
 		return user;
+	}
+
+	public List<CompanyUserCountDTO>findActivatedUsercountByCompanyId(Long companyid) {
+		// TODO Auto-generated method stub
+		List<Object[]> users=userRepository.findActivatedUserByCompanyId(companyid);
+		List<CompanyUserCountDTO> compDTO= new ArrayList<>();
+		for(Object[] cu:users)
+		{
+			CompanyUserCountDTO comp= new CompanyUserCountDTO();
+			comp.setCompanyName(cu[0].toString());
+			comp.setUserCount(Integer.valueOf(cu[1].toString()));
+			compDTO.add(comp);
+		}
+		for(CompanyUserCountDTO com:compDTO)
+		{
+			System.out.println("USERCOUNT is ****************"+com.getUserCount());
+		}
+		return compDTO;
+	}
+
+	public List<CompanyUserCountDTO> findAllCompanyActivatedUsercount() {
+		// TODO Auto-generated method stub
+		List<Object[]> users=userRepository.findAllCompaniesActivatedUserCount();
+		List<CompanyUserCountDTO> compDTO= new ArrayList<>();
+		for(Object[] cu:users)
+		{
+			CompanyUserCountDTO comp= new CompanyUserCountDTO();
+			comp.setCompanyName(cu[0].toString());
+			comp.setUserCount(Integer.valueOf(cu[1].toString()));
+			compDTO.add(comp);
+		}
+		for(CompanyUserCountDTO com:compDTO)
+		{
+			System.out.println("USERCOUNT is ****************"+com.getUserCount());
+		}
+		return compDTO;
+	
+	}
+
+	public List<CompanyUserCountDTO> findAllCompanyDeActivatedUsercount() {
+		// TODO Auto-generated method stub
+		List<Object[]> users=userRepository.findAllCompaniesDeactivatedUserCount();
+		List<CompanyUserCountDTO> compDTO= new ArrayList<>();
+		for(Object[] cu:users)
+		{
+			CompanyUserCountDTO comp= new CompanyUserCountDTO();
+			comp.setCompanyName(cu[0].toString());
+			comp.setUserCount(Integer.valueOf(cu[1].toString()));
+			compDTO.add(comp);
+		}
+		
+		return compDTO;
+		
+	}
+
+	public List<CompanyUserCountDTO> findDeactivatedUsercountByCompanyId(Long companyid) {
+		// TODO Auto-generated method stub
+		List<Object[]> users=userRepository.findDeactivatedUserByCompanyId(companyid);
+		List<CompanyUserCountDTO> compDTO= new ArrayList<>();
+		for(Object[] cu:users)
+		{
+			CompanyUserCountDTO comp= new CompanyUserCountDTO();
+			comp.setCompanyName(cu[0].toString());
+			comp.setUserCount(Integer.valueOf(cu[1].toString()));
+			compDTO.add(comp);
+		}
+		for(CompanyUserCountDTO com:compDTO)
+		{
+			System.out.println("USERCOUNT is ****************"+com.getUserCount());
+		}
+		return compDTO;
 	}
 }

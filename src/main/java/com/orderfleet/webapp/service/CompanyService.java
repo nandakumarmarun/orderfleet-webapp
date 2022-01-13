@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.enums.Industry;
+import com.orderfleet.webapp.web.rest.dto.CompanyUserCountDTO;
 import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
 import com.orderfleet.webapp.web.rest.dto.RegistrationDto;
 
@@ -53,4 +54,15 @@ public interface CompanyService {
 	List<CompanyViewDTO> findAllCompanyByIndustrySortedByName(Industry industry);
 	
 	Company createCompany(RegistrationDto registrationDto);
+
+	 Integer findActiveCompanyCount();
+
+	 Integer findDeactiveCompanyCount();
+
+	List<CompanyUserCountDTO> findActiveCompanyName();
+
+	List<CompanyUserCountDTO> findDeactiveCompanyName();
+
+	  
+	  
 }
