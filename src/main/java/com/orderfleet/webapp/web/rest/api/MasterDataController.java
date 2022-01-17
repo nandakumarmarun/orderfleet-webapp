@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.ActivityStage;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.DocumentAccountType;
 import com.orderfleet.webapp.domain.DocumentAccountingVoucherColumn;
@@ -44,10 +45,12 @@ import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.VoucherNumberGenerator;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.ActivityStageRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.FormElementTypeRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
@@ -403,7 +406,9 @@ public class MasterDataController {
 		
   @Inject 
   private ProductGroupEcomProductsRepository  roductGroupEcomProductsRepository;
-
+  
+  @Inject
+  private CompanyConfigurationRepository companyConfigurationRepository;
 	/**
 	 * GET /account-types : get all accountTypes.
 	 *
@@ -447,6 +452,15 @@ public class MasterDataController {
 			locationDTOs = locationService.findAllByUserAndLocationActivated(true);
 		} else {
 			locationDTOs = locationService.findAllByUserAndLocationActivatedLastModified(true, lastSyncdate);
+		}
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent() && !locationDTOs.isEmpty()) {
+			if(Boolean.valueOf(optconfig.get().getValue())) {
+				locationDTOs.forEach(data -> {
+					String[] name = data.getName().split("~");
+					data.setName(name[0]);
+				});
+			}
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(locationDTOs);
 	}
@@ -493,6 +507,15 @@ public class MasterDataController {
 			locationDTOs = employeeProfileLocationService
 					.findLocationsByEmployeeProfileIsCurrentUserAndlastModifiedDate(lastSyncdate);
 		}
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent() && !locationDTOs.isEmpty()) {
+			if(Boolean.valueOf(optconfig.get().getValue())) {
+			locationDTOs.forEach(data -> {
+				String[] name = data.getName().split("~");
+				data.setName(name[0]);
+			});
+			}
+		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(locationDTOs);
 	}
 
@@ -517,6 +540,15 @@ public class MasterDataController {
 		} else {
 			pageAccounts = locationAccountProfileService
 					.findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDate(page, size, lastSyncdate);
+		}
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent() && !pageAccounts.getContent().isEmpty()) {
+			if(Boolean.valueOf(optconfig.get().getValue())) {
+			pageAccounts.getContent().forEach(data -> {
+				String[] name = data.getName().split("~");
+				data.setName(name[0]);
+			});
+			}
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
 				.headers(PaginationUtil.generatePaginationHttpHeaders(pageAccounts, "/api/location-account-profiles"))
@@ -546,6 +578,17 @@ public class MasterDataController {
 		} else {
 			locationAccountProfiles = locationAccountProfileService
 					.findByUserLocationsAndAccountProfileActivatedAndLastModified(limit, offset, lastSyncdate);
+		}
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent() && !locationAccountProfiles.isEmpty()) {
+			if(Boolean.valueOf(optconfig.get().getValue())) {
+			locationAccountProfiles.forEach(data -> {
+				String[] name = data.getAccountProfileName().split("~");
+				data.setAccountProfileName(name[0]);
+				String[] name1 = data.getLocationName().split("~");
+				data.setLocationName(name1[0]);
+			});
+			}
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(locationAccountProfiles);
 	}
@@ -661,6 +704,21 @@ public class MasterDataController {
 					.findProductGroupProductsByUserProductGroupIsCurrentUserAndProductGroupActivatedAndModifiedDate(
 							true, lastSyncdate);
 		}
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent() && !productGroupProductDTOs.isEmpty()) {
+			if(Boolean.valueOf(optconfig.get().getValue())) {
+				productGroupProductDTOs.forEach(data -> {
+				String[] name = data.getProductGroupDTO().getName().split("~");
+				 ProductGroupDTO pg = data.getProductGroupDTO();
+				pg.setName(name[0]);
+				data.setProductGroupDTO(pg);
+				data.getProductProfiles().forEach(data1 -> {
+					String[] name1 = data1.getName().split("~");
+					data1.setName(name1[0]);
+				});
+			});
+			}
+		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productGroupProductDTOs);
 	}
 
@@ -684,6 +742,15 @@ public class MasterDataController {
 			productGroupDTOs = userProductGroupService
 					.findProductGroupsByUserIsCurrentUserAndProductGroupActivatedAndProductGroupLastModifiedDate(true,
 							lastSyncdate);
+		}
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent() && !productGroupDTOs.isEmpty()) {
+			if(Boolean.valueOf(optconfig.get().getValue())) {
+			productGroupDTOs.forEach(data -> {
+				String[] name = data.getName().split("~");
+				data.setName(name[0]);
+			});
+			}
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productGroupDTOs);
 	}
@@ -731,6 +798,15 @@ public class MasterDataController {
 			productCategoryDTOs = userProductCategoryService
 					.findByUserIsCurrentUserAndProductCategoryActivatedAndLastModifiedDate(true, lastSyncdate);
 		}
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent() && !productCategoryDTOs.isEmpty()) {
+			if(Boolean.valueOf(optconfig.get().getValue())) {
+			productCategoryDTOs.forEach(data -> {
+				String[] name = data.getName().split("~");
+				data.setName(name[0]);
+			});
+			}
+		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productCategoryDTOs);
 	}
 
@@ -752,6 +828,15 @@ public class MasterDataController {
 		} else {
 			productProfileDTOs = productProfileService.findByProductCategoryInAndActivatedTrueAndLastModifiedDate(page,
 					size, lastSyncdate);
+		}
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent() && !productProfileDTOs.isEmpty()) {
+			if(Boolean.valueOf(optconfig.get().getValue())) {
+			productProfileDTOs.forEach(data -> {
+				String[] name = data.getName().split("~");
+				data.setName(name[0]);
+			});
+			}
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productProfileDTOs);
 	}

@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.repository;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,12 +32,14 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} order by productProfile.name asc")
 	List<ProductProfile> findAllByCompanyId();
-
+	
 	@Query("select productProfile.pid,productProfile.name,productProfile.price from ProductProfile productProfile where productProfile.pid in ?1 and productProfile.company.id = ?#{principal.companyId} order by productProfile.name asc")
 	List<Object[]> findAllNameAndPriceByCompanyIdAndPidIn(List<String> productPids);
 
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and productProfile.activated=true order by productProfile.name asc")
 	List<ProductProfile> findAllByCompanyIdActivatedTrue();
+	
+	List<ProductProfile> findByCompanyIdAndActivatedTrue(Long companyId);
 
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId}")
 	Page<ProductProfile> findAllByCompanyId(Pageable pageable);
@@ -121,4 +124,9 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	@Modifying
 	@Query("update ProductProfile productProfile set productProfile.activated = false where productProfile.company.id = ?1")
 	void deactivateAllProductProfile(Long companyId);
+	
+	@Modifying
+	@Query("update ProductProfile productProfile set productProfile.activated = false where productProfile.company.id = ?#{principal.companyId} AND productProfile.id IN ?1")
+	void deactivateProductProfileUsingInId(Set<Long> id);
+	
 }

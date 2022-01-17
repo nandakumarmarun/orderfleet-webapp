@@ -32,7 +32,7 @@ if (!this.ProductGroup) {
 			maxlength : 55
 		}
 	};
-
+	 var companyConfiguration = document.getElementById("companyConfiguration").value;
 	// Specify the validation error messages
 	var validationMessages = {
 		name : {
@@ -392,7 +392,7 @@ if (!this.ProductGroup) {
 			method : 'GET',
 			success : function(data) {
 				console.log(data.image);
-				$('#lbl_name').text(data.name);
+				$('#lbl_name').text(!companyConfiguration ?data.name :data.description == null ?data.name :data.description );
 				$('#lbl_alias').text(data.alias);
 				$('#lbl_description').text(data.description);
 				$('#div_image')

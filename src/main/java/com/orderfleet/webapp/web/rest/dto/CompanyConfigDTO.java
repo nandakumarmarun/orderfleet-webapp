@@ -36,6 +36,8 @@ public class CompanyConfigDTO {
 	private boolean sendToOdoo;
 	private boolean enableProductGroupTax;
 	private boolean aliasToName;
+	private boolean descriptionToName;
+	
 
 	public CompanyConfigDTO() {
 		super();
@@ -249,4 +251,13 @@ public class CompanyConfigDTO {
 		this.enableProductGroupTax = enableProductGroupTax;
 	}
 
+	public boolean getDescriptionToName() {
+		return descriptionToName;
+	}
+
+	public void setDescriptionToName(boolean descriptionToName) {
+		this.descriptionToName = descriptionToName;
+	}
+	
+	
 }

@@ -131,8 +131,8 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 
 	// Only for Trial Setup
 	@Modifying
-	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id)"
-			+ "VALUES (TRUE, now(), ?1, ?2, ?3, null)", nativeQuery = true)
+	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id, is_custom)"
+			+ "VALUES (TRUE, now(), ?1, ?2, ?3, null, FALSE)", nativeQuery = true)
 	void insertTrialLocationHierarchyWithNoParent(Long version, Long companyId, Long locationId);
 
 	@Transactional

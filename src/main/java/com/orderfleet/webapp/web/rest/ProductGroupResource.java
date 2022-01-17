@@ -26,6 +26,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.EcomProductProfileService;
 import com.orderfleet.webapp.service.ProductGroupEcomProductsService;
 import com.orderfleet.webapp.service.ProductGroupProductService;
@@ -67,6 +71,9 @@ public class ProductGroupResource {
 
 	@Inject
 	private TaxMasterService taxmasterService;
+	
+	@Inject
+	private	CompanyConfigurationRepository companyConfigurationRepository;
 
 	/**
 	 * POST /productGroups : Create a new productGroup.
@@ -182,6 +189,12 @@ public class ProductGroupResource {
 		model.addAttribute("ecomProducts",
 				ecomProductProfileService.findAllByCompanyAndActivatedOrDeactivatedEcomProductProfile(true));
 		model.addAttribute("taxMasters", taxmasterService.findAllByCompany());
+		//companyConfiguration based name
+		Optional<CompanyConfiguration> optLocationVariance = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optLocationVariance.isPresent()) {
+			model.addAttribute("companyConfiguration",  Boolean.valueOf(optLocationVariance.get().getValue()));		
+		}
+		
 		return "company/productGroups";
 	}
 

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -847,12 +848,23 @@ public class CompanyTrialSetUpService {
 	}
 
 	private void createTerritory(Company company) {
+		List<Location> locations = new ArrayList<>();
 		Location location = new Location();
 		location.setName("Territory");
 		location.setAlias("Territory");
 		location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
+		location.setLocationId("Territory");
 		location.setCompany(company);
-		location = locationRepository.save(location);
+		locations.add(location);
+		Location location1 = new Location();
+		location1.setName("Primary");
+		location1.setAlias("Primary");
+		location1.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
+		location1.setLocationId("Primary");
+		location1.setCompany(company);
+		locations.add(location1);
+		List<Location> locations1 = locationRepository.save(locations);
+		location = locations1.stream().filter(data -> data.getName().equals("Territory")).findAny().orElse(null);
 		locationHierarchyRepository.insertTrialLocationHierarchyWithNoParent(1L, location.getCompany().getId(),
 				location.getId());
 	}
@@ -1731,6 +1743,7 @@ public class CompanyTrialSetUpService {
 		accountProfile.setAddress("No Address");
 		accountProfile.setName(company.getLegalName());
 		accountProfile.setAlias(company.getLegalName());
+		accountProfile.setCustomerId(company.getLegalName());
 		accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
 		accountProfile.setUser(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
 		return accountProfileRepository.save(accountProfile);
@@ -1875,6 +1888,7 @@ public class CompanyTrialSetUpService {
 		productCategory.setCompany(company);
 		productCategory.setName("Not Applicable");
 		productCategory.setAlias("Not Applicable");
+		productCategory.setProductCategoryId("Not Applicable");
 		productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
 		productCategory.setThirdpartyUpdate(false);
 		productCategoryRepository.save(productCategory);

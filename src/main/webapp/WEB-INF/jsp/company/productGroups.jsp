@@ -45,6 +45,7 @@
 									<button type="button" class="btn btn-info"
 										id="btnSearchProduct" style="float: right;">Search</button>
 								</span>
+								<input id="companyConfiguration" type="hidden" value='${companyConfiguration}'/>
 							</div>
 						</div>
 					</form>
@@ -74,7 +75,7 @@
 					<c:forEach items="${pageProductGroup}" var="productGroup"
 						varStatus="loopStatus">
 						<tr class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'}">
-							<td>${productGroup.name}</td>
+							<td>${!companyConfiguration ?productGroup.name :productGroup.description == null ?productGroup.name :productGroup.description }</td>
 							<td>${productGroup.alias}</td>
 							<td>${productGroup.description}</td>
 							<td><span

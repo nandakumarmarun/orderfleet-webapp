@@ -35,7 +35,13 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} order by accountProfile.name asc")
 	List<AccountProfile> findAllByCompanyId();
-
+	
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and accountProfile.activated=true order by accountProfile.id")
+	List<AccountProfile> findAllByCompanyIdAndActivatedTrue();
+	
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} order by accountProfile.id")
+	List<AccountProfile> findAllByCompanyIdOrderbyid();
+	
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 order by accountProfile.name asc")
 	List<AccountProfile> findAllByCompanyId(Long companyId);
 
@@ -204,4 +210,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile.pid from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId}")
 	List<String> findAllPidsByCompany();
 
+	@Modifying
+	@Query("update AccountProfile accountProfile set accountProfile.activated = false where accountProfile.company.id = ?#{principal.companyId} AND accountProfile.id IN ?1")
+	void deactivateAcoundProfileUsingInId(Set<Long> id);
 }

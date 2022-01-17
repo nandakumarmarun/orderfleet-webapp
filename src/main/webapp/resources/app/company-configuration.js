@@ -63,6 +63,7 @@ if (!this.CompanyConfiguration) {
 		var sendToOdoo = $('#sendToOdoo').is(":checked");
 		var productGroupTax = $('#productGroupTax').is(":checked");
 		var aliasToName = $('#aliasToName').is(":checked");
+		var descriptionToName = $('#descriptionToName').is(":checked");
 		/* var findLocation = $('#findLocation').is(":checked"); */
 		$.ajax({
 			url : contextPath,
@@ -91,7 +92,8 @@ if (!this.CompanyConfiguration) {
 				updateStockLocation : updateStockLocation,
 				sendToOdoo : sendToOdoo,
 				productGroupTax : productGroupTax,
-				aliasToName : aliasToName
+				aliasToName : aliasToName,
+				descriptionToName : descriptionToName
 			/* findLocation : findLocation */
 			},
 			success : function(data) {
@@ -153,6 +155,8 @@ if (!this.CompanyConfiguration) {
 								data.enableProductGroupTax);
 						$("#aliasToName").prop("checked",
 								data.aliasToName);
+						$("#descriptionToName").prop("checked",
+								data.descriptionToName);
 						
 						/*
 						 * $("#findLocation").prop("checked",
