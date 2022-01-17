@@ -43,6 +43,7 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 	@Query("select coalesce(max(lh.version),0) from LocationHierarchy lh where lh.company.id = ?#{principal.companyId}")
 	Long findMaxVersionByCompanyId();
 
+	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version = ?2 AND lh.company.id = ?#{principal.companyId}")
 	int updateLocationHierarchyInactivatedFor(ZonedDateTime inactivatedDate, Long version);
@@ -55,7 +56,7 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version = ?2 AND lh.company.id = ?#{principal.companyId} AND lh.isCustom = ?3")
 	int updateLocationHierarchyInactivatedForTally(ZonedDateTime inactivatedDate, Long version, boolean iscustem);
 	
-	
+	@Transactional
 	@Modifying
 	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id)"
 			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId},?2, ?3)", nativeQuery = true)
@@ -71,6 +72,7 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId},?2, ?3,FALSE)", nativeQuery = true)
 	void insertLocationHierarchyWithParentInTally(Long version, Long locationId, Long parentId);
 
+	@Transactional
 	@Modifying
 	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id)"
 			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId}, ?2, null)", nativeQuery = true)
