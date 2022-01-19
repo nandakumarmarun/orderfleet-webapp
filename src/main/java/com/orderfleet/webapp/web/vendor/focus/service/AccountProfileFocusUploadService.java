@@ -43,7 +43,6 @@ import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
 import com.orderfleet.webapp.web.vendor.focus.dto.AccountProfileFocus;
-import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.ResponseBodySapAccountProfile;
 
 @Service
 public class AccountProfileFocusUploadService {
@@ -94,10 +93,10 @@ public class AccountProfileFocusUploadService {
 		this.locationHierarchyRepository = locationHierarchyRepository;
 	}
 
-	public void saveUpdateAccountProfiles(List<AccountProfileFocus> list) {
+	public void saveUpdateAccountProfiles(List<AccountProfileFocus> accountProfileDTos) {
 
 		log.info("Saving Account Profiles.........");
-	
+
 		long start = System.nanoTime();
 
 		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
@@ -175,108 +174,108 @@ public class AccountProfileFocusUploadService {
 		List<LocationDTO> locationDtos = new ArrayList<>();
 		List<LocationAccountProfileDTO> locationAccountProfileDtos = new ArrayList<>();
 
-		for (AccountProfileFocus apDto : list) {
-			// check exist by name, only one exist with a name
-	
-			Optional<AccountProfile> optionalAP = accountProfiles.stream()
-					.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
-			AccountProfile accountProfile;
-			if (optionalAP.isPresent()) {
-				accountProfile = optionalAP.get();
-				// if not update, skip this iteration. Not implemented now
-				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
-			} else {
-				accountProfile = new AccountProfile();
-				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-				accountProfile.setName(apDto.getName());
-				accountProfile.setAddress(apDto.getAddress());
-				accountProfile.setCustomerId(apDto.getCode());
-				accountProfile.setCreditDays(Long.valueOf(apDto.getCreditDays()));
-				accountProfile.setClosingBalance(Double.parseDouble(apDto.getClosing_Balance()));
-				accountProfile.setTinNo(apDto.getGstin());
-				accountProfile.setUser(user);
-				accountProfile.setCompany(company);
-				accountProfile.setAccountStatus(AccountStatus.Unverified);
+		if (accountProfileDTos != null) {
+			for (AccountProfileFocus apDto : accountProfileDTos) {
+				// check exist by name, only one exist with a name
+
+				Optional<AccountProfile> optionalAP = accountProfiles.stream()
+						.filter(pc -> pc.getName().equalsIgnoreCase(apDto.getName())).findAny();
+				AccountProfile accountProfile;
+				if (optionalAP.isPresent()) {
+					accountProfile = optionalAP.get();
+					// if not update, skip this iteration. Not implemented now
+					// if (!accountProfile.getThirdpartyUpdate()) { continue; }
+				} else {
+					accountProfile = new AccountProfile();
+					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+					accountProfile.setName(apDto.getName());
+					accountProfile.setAddress(apDto.getAddress());
+					accountProfile.setCustomerId(apDto.getCode());
+					accountProfile.setCreditDays(Long.valueOf(apDto.getCreditDays()));
+					accountProfile.setClosingBalance(Double.parseDouble(apDto.getClosing_Balance()));
+					accountProfile.setTinNo(apDto.getGstin());
+					accountProfile.setUser(user);
+					accountProfile.setCompany(company);
+					accountProfile.setAccountStatus(AccountStatus.Unverified);
+					accountProfile.setDataSourceType(DataSourceType.TALLY);
+					accountProfile.setImportStatus(true);
+
+				}
+				if (apDto.getCreditLimit() != null && !apDto.getCreditLimit().equals("")) {
+					Float floatnum = Float.parseFloat(apDto.getCreditLimit());
+					accountProfile.setCreditLimit((Long) floatnum.longValue());
+				}
+
+				accountProfile.setActivated(true);
+				if (apDto.getAddress() != null && !apDto.getAddress().equals("")) {
+					accountProfile.setAddress(apDto.getAddress());
+				} else {
+					accountProfile.setAddress("No Address");
+				}
+				if (apDto.getCity() != null && !apDto.getCity().equals("")) {
+					accountProfile.setCity(apDto.getCity());
+				} else {
+					accountProfile.setCity("No City");
+				}
+				if (apDto.getPhone() != null && !apDto.getPhone().equals("")) {
+					if (isValidPhone(apDto.getPhone())) {
+						accountProfile.setPhone1(apDto.getPhone());
+					}
+				} else {
+					accountProfile.setPhone1("");
+				}
+
+				// account type
+
+				if (accountProfile.getAccountType() == null) {
+					accountProfile.setAccountType(defaultAccountType);
+				}
+
+				Optional<AccountProfile> opAccP = saveUpdateAccountProfiles.stream()
+						.filter(so -> so.getName().equalsIgnoreCase(apDto.getName())).findAny();
+
+				if (opAccP.isPresent()) {
+					continue;
+				}
+
+				LocationDTO locationDTO = new LocationDTO();
+
+				LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
+
+				if (apDto.getRouteCode().equalsIgnoreCase("null") && apDto.getRouteName().equalsIgnoreCase("null")) {
+					locationDTO.setLocationId("null");
+					locationDTO.setName("No Location");
+
+					locationDtos.add(locationDTO);
+					locationAccountProfileDto.setAccountProfileName(apDto.getName());
+					locationAccountProfileDto.setLocationName("No Location");
+
+				} else {
+
+					locationDTO.setLocationId(apDto.getRouteCode());
+					locationDTO.setName(apDto.getRouteName());
+					locationDtos.add(locationDTO);
+					locationAccountProfileDto.setAccountProfileName(apDto.getName());
+					locationAccountProfileDto.setLocationName(apDto.getRouteName());
+
+				}
+
+				locationAccountProfileDtos.add(locationAccountProfileDto);
 				accountProfile.setDataSourceType(DataSourceType.TALLY);
-				accountProfile.setImportStatus(true);
-
-			}
-			if (apDto.getCreditLimit() != null && !apDto.getCreditLimit().equals("")) {
-				Float floatnum = Float.parseFloat(apDto.getCreditLimit());
-				accountProfile.setCreditLimit((Long) floatnum.longValue());
+				saveUpdateAccountProfiles.add(accountProfile);
 			}
 
-			accountProfile.setActivated(true);
-			if (apDto.getAddress() != null && !apDto.getAddress().equals("")) {
-				accountProfile.setAddress(apDto.getAddress());
-			} else {
-				accountProfile.setAddress("No Address");
-			}
-			if (apDto.getCity() != null && !apDto.getCity().equals("")) {
-				accountProfile.setCity(apDto.getCity());
-			} else {
-				accountProfile.setCity("No City");
-			}
-			if (apDto.getPhone() != null && !apDto.getPhone().equals("")) {
-				if(isValidPhone(apDto.getPhone()))
-				{
-				accountProfile.setPhone1(apDto.getPhone());}
-			} else {
-				accountProfile.setPhone1("");
+			if (locationDtos.size() > 0)
+
+			{
+				saveUpdateLocations(locationDtos);
+				saveUpdateLocationHierarchy(locationDtos);
 			}
 
-            
-			// account type
+			bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 
-			if (accountProfile.getAccountType() == null) {
-				accountProfile.setAccountType(defaultAccountType);
-			}
-
-			Optional<AccountProfile> opAccP = saveUpdateAccountProfiles.stream()
-					.filter(so -> so.getName().equalsIgnoreCase(apDto.getName())).findAny();
-
-			if (opAccP.isPresent()) {
-				continue;
-			}
-
-			LocationDTO locationDTO = new LocationDTO();
-
-			LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
-
-			if (apDto.getRouteCode().equalsIgnoreCase("null") && apDto.getRouteName().equalsIgnoreCase("null")) {
-				locationDTO.setLocationId("null");
-				locationDTO.setName("No Location");
-
-				locationDtos.add(locationDTO);
-				locationAccountProfileDto.setAccountProfileName(apDto.getName());
-				locationAccountProfileDto.setLocationName("No Location");
-
-			} else {
-
-				locationDTO.setLocationId(apDto.getRouteCode());
-				locationDTO.setName(apDto.getRouteName());
-				locationDtos.add(locationDTO);
-				locationAccountProfileDto.setAccountProfileName(apDto.getName());
-				locationAccountProfileDto.setLocationName(apDto.getRouteName());
-
-			}
-
-			locationAccountProfileDtos.add(locationAccountProfileDto);
-			accountProfile.setDataSourceType(DataSourceType.TALLY);
-			saveUpdateAccountProfiles.add(accountProfile);
+			saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
 		}
-
-		if (locationDtos.size() > 0)
-
-		{
-			saveUpdateLocations(locationDtos);
-			saveUpdateLocationHierarchy(locationDtos);
-		}
-
-		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
-
-		saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
-
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table

@@ -60,6 +60,46 @@ public class UploadFocusResource {
 	public String uploadXls(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of Upload Focus Masters");
 
+		return "company/uploadFocus";
+	}
+
+	@RequestMapping(value = "/upload-focus/uploadAccountProfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> uploadAccountProfiles() throws IOException, JSONException, ParseException {
+
+		log.debug("Web request to upload Account Profiles...");
+
+		String authToken = getAuthenticationToken();
+
+		if (authToken != null) {
+
+			RestTemplate restTemplate = new RestTemplate();
+			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+			log.info("Get Account Profile URL: " + ACCOUNT_PROFILE_API_URL);
+
+			AccountProfileResponseFocus accountProfileResponseFocus = restTemplate
+					.getForObject(ACCOUNT_PROFILE_API_URL + authToken, AccountProfileResponseFocus.class);
+
+			if (accountProfileResponseFocus.getGetCustomerDataResult().getAccountProfiles() != null) {
+
+				log.info("Saving " + accountProfileResponseFocus.getGetCustomerDataResult().getAccountProfiles().size()
+						+ " Account Profiles");
+
+				if (accountProfileResponseFocus.getGetCustomerDataResult().getAccountProfiles().size() > 0) {
+					accountProfileFocusUploadService.saveUpdateAccountProfiles(
+							accountProfileResponseFocus.getGetCustomerDataResult().getAccountProfiles());
+				}
+			}
+
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	private String getAuthenticationToken() {
+
 		AuthenticationRequstFocus authenticationRequstFocus = authenticationBody();
 
 		HttpEntity<AuthenticationRequstFocus> entity = new HttpEntity<>(authenticationRequstFocus,
@@ -98,17 +138,8 @@ public class UploadFocusResource {
 			}
 
 			if (authenticationResponseFocus.getGetloginResult().getsMessage().equals("Token Generated")) {
-				ACCOUNT_PROFILE_API_URL = ACCOUNT_PROFILE_API_URL
-						+ authenticationResponseFocus.getGetloginResult().getAuthToken();
-			} else {
-				ACCOUNT_PROFILE_API_URL = "";
-			}
 
-			if (authenticationResponseFocus.getGetloginResult().getsMessage().equals("Token Generated")) {
-				PRODUCT_PROFILE_API_URL = PRODUCT_PROFILE_API_URL
-						+ authenticationResponseFocus.getGetloginResult().getAuthToken();
-			} else {
-				PRODUCT_PROFILE_API_URL = "";
+				return authenticationResponseFocus.getGetloginResult().getAuthToken();
 			}
 
 		} catch (HttpClientErrorException exception) {
@@ -123,27 +154,7 @@ public class UploadFocusResource {
 			throw new ServiceException(exception.getMessage());
 		}
 
-		return "company/uploadFocus";
-	}
-
-	@RequestMapping(value = "/upload-focus/uploadAccountProfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<Void> uploadAccountProfiles() throws IOException, JSONException, ParseException {
-
-		log.debug("Web request to upload Account Profiles...");
-
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-
-		log.info("Get Account Profile URL: " + ACCOUNT_PROFILE_API_URL);
-
-		AccountProfileResponseFocus accountProfileResponseFocus = restTemplate.getForObject(ACCOUNT_PROFILE_API_URL,
-				AccountProfileResponseFocus.class);
-
-		accountProfileFocusUploadService
-				.saveUpdateAccountProfiles(accountProfileResponseFocus.getGetCustomerDataResult().getAccountProfiles());
-
-		return new ResponseEntity<>(HttpStatus.OK);
+		return null;
 	}
 
 	@RequestMapping(value = "/upload-focus/uploadProductProfiles", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
