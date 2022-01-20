@@ -115,6 +115,7 @@ public class AccountProfileFocusUploadService {
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
+		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyIdAndActivated(true);
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -227,7 +228,15 @@ public class AccountProfileFocusUploadService {
 
 				// account type
 
-				if (accountProfile.getAccountType() == null) {
+//				if (accountProfile.getAccountType() == null) {
+//					accountProfile.setAccountType(defaultAccountType);
+//				}
+
+				Optional<AccountType> opAccountType = accountTypes.stream()
+						.filter(acc -> acc.getName().equalsIgnoreCase(apDto.getAccountType())).findFirst();
+				if (opAccountType.isPresent()) {
+					accountProfile.setAccountType(opAccountType.get());
+				} else {
 					accountProfile.setAccountType(defaultAccountType);
 				}
 
