@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.service;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +29,7 @@ public interface AccountProfileService {
 	/**
 	 * Save a accountProfile.
 	 *
-	 * @param accountProfileDTO
-	 *            the entity to save
+	 * @param accountProfileDTO the entity to save
 	 * @return the persisted entity
 	 */
 	AccountProfileDTO save(AccountProfileDTO accountProfileDTO);
@@ -37,8 +37,7 @@ public interface AccountProfileService {
 	/**
 	 * Update a accountProfile.
 	 *
-	 * @param accountProfileDTO
-	 *            the entity to update
+	 * @param accountProfileDTO the entity to update
 	 * @return the persisted entity
 	 */
 	AccountProfileDTO update(AccountProfileDTO accountProfileDTO);
@@ -46,8 +45,7 @@ public interface AccountProfileService {
 	/**
 	 * Get all the accountProfiles.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	Page<AccountProfile> findAll(Pageable pageable);
@@ -70,8 +68,7 @@ public interface AccountProfileService {
 	/**
 	 * Get all the accountProfiles of a company.
 	 *
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	Page<AccountProfileDTO> findAllByCompany(Pageable pageable);
@@ -79,8 +76,7 @@ public interface AccountProfileService {
 	/**
 	 * Get the "id" accountProfile.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	AccountProfileDTO findOne(Long id);
@@ -88,8 +84,7 @@ public interface AccountProfileService {
 	/**
 	 * Get the accountProfile by "pid".
 	 *
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	Optional<AccountProfileDTO> findOneByPid(String pid);
@@ -97,8 +92,7 @@ public interface AccountProfileService {
 	/**
 	 * Get the accountProfileDTO by "name".
 	 *
-	 * @param name
-	 *            the name of the entity
+	 * @param name the name of the entity
 	 * @return the entity
 	 */
 	Optional<AccountProfileDTO> findByName(String name);
@@ -106,16 +100,14 @@ public interface AccountProfileService {
 	/**
 	 * Delete the "id" accountProfile.
 	 *
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 */
 	void delete(String pid);
 
 	/**
 	 * Get the accountProfileDTO by "alias".
 	 *
-	 * @param alias
-	 *            the alias of the entity
+	 * @param alias the alias of the entity
 	 * @return the entity
 	 */
 	Optional<AccountProfileDTO> findByAlias(String alias);
@@ -129,7 +121,7 @@ public interface AccountProfileService {
 	List<AccountProfileDTO> findUsersAccountProfile(String userPid);
 
 	AccountProfileDTO updateAccountProfileStatus(String pid, boolean active);
-	
+
 	AccountProfileDTO updateAccountProfileVerifiedStatus(String pid, AccountStatus verified);
 
 	List<AccountProfileDTO> findAllByCompanyAndActivated(boolean active);
@@ -142,37 +134,45 @@ public interface AccountProfileService {
 
 	List<AccountProfileDTO> findAccountProfileByAccountTypePidInAndActivated(List<String> accountTypePids);
 
-	List<AccountProfileDTO> findAccountProfileByAccountTypePidInAndActivatedAndImportStatus(List<String> accountTypePids,boolean importStatus);
+	List<AccountProfileDTO> findAccountProfileByAccountTypePidInAndActivatedAndImportStatus(
+			List<String> accountTypePids, boolean importStatus);
 
 	List<AccountProfileDTO> findAllByCompanyAndAccountImportStatusAndActivated(boolean importStatus);
 
 	Optional<AccountProfile> findOneByCompanyIdAndName(Long companyId, String name);
-	
+
 	AccountProfileDTO updateImportedStatus(String pid, boolean active);
-	
-	List<AccountProfileDTO> findByCompanyIdAndUserIdInAndImportStatusAndCreatedDateBetweenOrderByCreatedDateDesc(Long companyId,
-			List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate,boolean active);
-	
-	List<AccountProfileDTO> findByCompanyIdAndUserIdInAndDatasourceTypeMobileAndLastModifiedDateBetweenOrderByCreatedDateDesc(Long companyId,
-			List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
-	
+
+	List<AccountProfileDTO> findByCompanyIdAndUserIdInAndImportStatusAndCreatedDateBetweenOrderByCreatedDateDesc(
+			Long companyId, List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate, boolean active);
+
+	List<AccountProfileDTO> findByCompanyIdAndUserIdInAndDatasourceTypeMobileAndLastModifiedDateBetweenOrderByCreatedDateDesc(
+			Long companyId, List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
+
 	List<AccountProfileDTO> findAllByCompanyAndDatasourceType(DataSourceType dataSourceType);
-	
+
 	List<LeadManagementDTO> findAllByCompanyAndAccountTypeAccountNameType(AccountNameType accountNameType);
-	
+
 	LeadManagementDTO saveLeadManagement(LeadManagementDTO leadManagementDTO);
-	
+
 	Optional<LeadManagementDTO> findLeadManagementByPid(String pid);
-	
+
 	LeadManagementDTO updateLeadManagement(LeadManagementDTO leadManagementDTO);
-	
+
 	List<AccountProfileDTO> findByStageTypeName(StageNameType stageTypeName);
-	
+
 	List<AccountProfile> findAllAccountProfileByCompanyId(Long companyId);
 
 	List<AccountProfileDTO> findAllCustomByCompanyAndActivated(boolean active);
 
 	List<AccountProfileDTO> findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(
 			Long companyId, List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
+
+	List<AccountProfileDTO> findAllByCompanyAndActivatedLimitToCount(boolean b);
+
+	List<AccountProfileDTO> findAccountProfileByAccountTypePidInAndActivatedAndImportStatusLimitCount(
+			List<String> asList, boolean imports);
+
+	List<AccountProfileDTO> findAllByCompanyAndActivatedLimitToCountAndSearchValue(boolean b, String searchValue);
 
 }

@@ -24,7 +24,7 @@ public interface AccountTypeRepository extends JpaRepository<AccountType, Long> 
 
 	Optional<AccountType> findOneByPid(String pid);
 
-@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId}")
+	@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId}")
 	List<AccountType> findAllByCompanyId();
 
 	@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId} and accountType.activated = ?1 order by accountType.name asc")
@@ -37,20 +37,24 @@ public interface AccountTypeRepository extends JpaRepository<AccountType, Long> 
 
 	@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId} and accountType.activated = ?1 order by accountType.name asc")
 	List<AccountType> findAllByCompanyIdAndActivated(boolean activated);
-	
+
 	List<AccountType> findAllByCompanyId(Long companyId);
 
 	AccountType findFirstByCompanyIdOrderByIdAsc(Long companyId);
-	
+
 	@Query("select accountType from AccountType accountType where accountType.company.id=?#{principal.companyId} and accountType.activated = true and accountType.lastModifiedDate > ?1")
-	Page<AccountType> findAllByCompanyIdAndAccountTypeActivatedTrueAndLastModifiedDateGreater(LocalDateTime lastSyncdate, Pageable pageable);
+	Page<AccountType> findAllByCompanyIdAndAccountTypeActivatedTrueAndLastModifiedDateGreater(
+			LocalDateTime lastSyncdate, Pageable pageable);
 
 	@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId} and accountType.activated = true and accountType.pid in ?1  order by accountType.name asc")
-	List<AccountType> findAllByAccountTypePidIn(List<String>accountTypePids);
-	
+	List<AccountType> findAllByAccountTypePidIn(List<String> accountTypePids);
+
 	@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId} and accountType.name = ?1")
 	AccountType findByCompanyIdAndName(String name);
-	
+
 	@Query("select accountType from AccountType accountType where accountType.company.id = ?#{principal.companyId} and accountType.accountNameType = ?1")
 	AccountType findByCompanyIdAndAccountNameType(AccountNameType accountTypeName);
+
+	@Query("select accountType.id from AccountType accountType where accountType.company.id = ?#{principal.companyId} and accountType.activated = true and accountType.pid in ?1")
+	List<Long> findAccountTypeIdsByAccountTypePidIn(List<String> accountTypePids);
 }

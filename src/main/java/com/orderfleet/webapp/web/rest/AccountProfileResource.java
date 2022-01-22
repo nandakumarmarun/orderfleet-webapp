@@ -204,14 +204,14 @@ public class AccountProfileResource {
 	public ResponseEntity<List<AccountProfile>> updateLocationRadius(
 			@RequestParam("locationRadius") double locationRadius) {
 		log.debug("Web request to update location radius*  " + locationRadius);
-	      DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "AP_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all by compId";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AP_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all by compId";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
@@ -231,7 +231,7 @@ public class AccountProfileResource {
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 
 		for (AccountProfile accountProfileslist : accountProfiles) {
@@ -376,35 +376,35 @@ public class AccountProfileResource {
 			@RequestParam String assignedAccountProfiles) {
 		log.debug("REST request to save assigned Account Profiles : {}", locationPid);
 		String[] locationPids = locationPid.split(",");
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get one by pid";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get one by pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		AccountProfile accountProfile = accountProfileRepository.findOneByPid(assignedAccountProfiles).get();
-		  String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		locationAccountProfileRepository.deleteByAccountProfilePid(SecurityUtils.getCurrentUsersCompanyId(),
 				accountProfile.getId());
@@ -498,9 +498,14 @@ public class AccountProfileResource {
 			if (userIds.isEmpty()) {
 				// accountProfileDTOs =
 				// accountProfileService.findAllByCompanyAndActivated(true);
-				accountProfileDTOs = accountProfileService.findAllByCompanyAndActivated(true);
+				// accountProfileDTOs =
+				// accountProfileService.findAllByCompanyAndActivated(true);
+
+				accountProfileDTOs = accountProfileService.findAllByCompanyAndActivatedLimitToCount(true);
+
 			} else {
-				accountProfileDTOs = locationAccountProfileService.findAccountProfilesByCurrentUserLocations();
+				accountProfileDTOs = locationAccountProfileService
+						.findAccountProfilesByCurrentUserLocationsLimitCount();
 			}
 
 			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
@@ -512,7 +517,7 @@ public class AccountProfileResource {
 				imports = true;
 				if (userIds.isEmpty()) {
 					accountProfileDTOs.addAll(
-							accountProfileService.findAccountProfileByAccountTypePidInAndActivatedAndImportStatus(
+							accountProfileService.findAccountProfileByAccountTypePidInAndActivatedAndImportStatusLimitCount(
 									Arrays.asList(accountTypePids.split(",")), imports));
 				} else {
 					accountProfileDTOs.addAll(
@@ -523,7 +528,7 @@ public class AccountProfileResource {
 				imports = false;
 				if (userIds.isEmpty()) {
 					accountProfileDTOs.addAll(
-							accountProfileService.findAccountProfileByAccountTypePidInAndActivatedAndImportStatus(
+							accountProfileService.findAccountProfileByAccountTypePidInAndActivatedAndImportStatusLimitCount(
 									Arrays.asList(accountTypePids.split(",")), imports));
 				} else {
 					accountProfileDTOs.addAll(
@@ -605,12 +610,37 @@ public class AccountProfileResource {
 		log.debug("Web request to get get activitys : {}");
 		List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
 		if (active == true && deactivate == true) {
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+//			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+//			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(true));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(false));
 		} else if (active) {
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(true));
 		} else if (deactivate) {
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(false));
+		}
+		return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
+	}
+
+	@Timed
+	@RequestMapping(value = "/accountProfiles/get-by-search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<AccountProfileDTO>> getAccountProfilesByStatusAndSearch(@RequestParam boolean active,
+			@RequestParam boolean deactivate, @RequestParam String searchValue) {
+		log.debug("Web request to get get activitys : {}");
+		List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
+		if (active == true && deactivate == true) {
+//			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+//			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(true,searchValue));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(false,searchValue));
+		} else if (active) {
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(true,searchValue));
+		} else if (deactivate) {
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(false,searchValue));
 		}
 		return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 	}
@@ -646,12 +676,16 @@ public class AccountProfileResource {
 		}
 
 		if (active == true && deactivate == true) {
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+//			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+//			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(true));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(false));
 		} else if (active) {
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(true));
 		} else if (deactivate) {
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(false));
 		}
 
 		List<String> accountProfilePids = accountProfileDTOs.stream().map(AccountProfileDTO::getPid)

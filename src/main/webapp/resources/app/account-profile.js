@@ -554,6 +554,8 @@ if (!this.AccountProfile) {
 		} else if (statusBox == "MultipleActivate") {
 			AccountProfile.showModalPopup($('#enableAccountProfileModal'));
 		}
+		$('#tBodyAccountProfile').html(
+		"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
 		$.ajax({
 			url : accountProfileContextPath + "/get-by-status-filter",
 			type : "GET",
@@ -886,12 +888,11 @@ if (!this.AccountProfile) {
 		accountProfileModel.countryId = $('#dbCountrycreate').val();
 		accountProfileModel.stateId = $('#dbStatecreate').val();
 		accountProfileModel.districtId = $('#dbDistrictcreate').val();
-		
-		
-		//Modern district State Issue
-//		accountProfileModel.countryId = "101";
-//		accountProfileModel.stateId = "19";
-//		accountProfileModel.districtId = "1960";
+
+		// Modern district State Issue
+		// accountProfileModel.countryId = "101";
+		// accountProfileModel.stateId = "19";
+		// accountProfileModel.districtId = "1960";
 
 		accountProfileModel.city = $('#field_city').val();
 		accountProfileModel.location = $('#field_location').val();
@@ -1145,27 +1146,105 @@ if (!this.AccountProfile) {
 		});
 	}
 
+	// function searchTable(inputVal) {
+	// var table = $('#tBodyAccountProfile');
+	// table.find('tr').each(function(index, row) {
+	// var allCells = $(row).find('td');
+	// if (allCells.length > 0) {
+	// var found = false;
+	// allCells.each(function(index, td) {
+	// if (index != 7) {
+	// var regExp = new RegExp(inputVal, 'i');
+	// if (regExp.test($(td).text())) {
+	// found = true;
+	// return false;
+	// }
+	// }
+	// });
+	// if (found == true)
+	// $(row).show();
+	// else
+	// $(row).hide();
+	// }
+	// });
+	// }
+
 	function searchTable(inputVal) {
-		var table = $('#tBodyAccountProfile');
-		table.find('tr').each(function(index, row) {
-			var allCells = $(row).find('td');
-			if (allCells.length > 0) {
-				var found = false;
-				allCells.each(function(index, td) {
-					if (index != 7) {
-						var regExp = new RegExp(inputVal, 'i');
-						if (regExp.test($(td).text())) {
-							found = true;
-							return false;
-						}
-					}
-				});
-				if (found == true)
-					$(row).show();
-				else
-					$(row).hide();
+		
+		if(inputVal==""){
+			alert("Please enter search value");
+			return
+		}
+
+		var active, deactivate;
+		var statusBox = $("#slt_status").val();
+		if (statusBox == "All") {
+			active = true;
+			deactivate = true;
+		} else if (statusBox == "Active") {
+			active = true;
+			deactivate = false;
+		} else if (statusBox == "Deactive") {
+			deactivate = true;
+			active = false;
+		} else if (statusBox == "MultipleActivate") {
+			AccountProfile.showModalPopup($('#enableAccountProfileModal'));
+		}
+		$('#tBodyAccountProfile').html(
+		"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
+		$.ajax({
+			url : accountProfileContextPath + "/get-by-search",
+			type : "GET",
+			data : {
+				active : active,
+				deactivate : deactivate,
+				searchValue : inputVal
+			},
+			success : function(accountProfiles) {
+				addTableBodyvalues(accountProfiles);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
 			}
 		});
+
+		// $('#tbllocation').html("");
+		// $.ajax({
+		// url : accountProfileContextPath + "/location/" + pid,
+		// method : 'GET',
+		// success : function(response) {
+		// console.log(response);
+		// $.each(response, function(index, location) {
+		// assignedLocation += location.locationName + "<br>";
+		// });
+		// $('#tbllocation').append(
+		// '<tr><td>' + assignedLocation + '</td></tr>');
+		// },
+		// error : function(xhr, error) {
+		// onError(xhr, error);
+		// }
+		// });
+
+		// var table = $('#tBodyAccountProfile');
+		// table.find('tr').each(function(index, row) {
+		// var allCells = $(row).find('td');
+		// if (allCells.length > 0) {
+		// var found = false;
+		// allCells.each(function(index, td) {
+		// if (index != 7) {
+		// var regExp = new RegExp(inputVal, 'i');
+		// if (regExp.test($(td).text())) {
+		// found = true;
+		// return false;
+		// }
+		// }
+		// });
+		// if (found == true)
+		// $(row).show();
+		// else
+		// $(row).hide();
+		// }
+		// });
 	}
 
 	function convertDateTimeFromServer(date) {

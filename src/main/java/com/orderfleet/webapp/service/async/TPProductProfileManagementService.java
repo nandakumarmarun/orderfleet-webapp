@@ -859,6 +859,10 @@ public class TPProductProfileManagementService {
 
 		
 		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
+		productCategorys.forEach(data -> {
+			String[] name = data.getName().split("~");
+			data.setName(name[0]);
+		});
 
 		List<ProductGroupProduct> productGroupProducts = new ArrayList<>();
 		Set<Long> dectivatedpp = new HashSet<>();
@@ -1013,7 +1017,15 @@ public class TPProductProfileManagementService {
 			 
 		}
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
-		
+		//update name
+		List<ProductCategory> productCategorycopy = productCategoryRepository.findByCompanyId(company.getId());
+		if(!productCategorycopy.isEmpty()) {
+			productCategorycopy.forEach(data -> {
+				if(!data.getName().contains("~")) {
+				data.setName(data.getName() + "~" + data.getProductCategoryId());
+				}
+			});}
+		productCategoryRepository.save(productCategorycopy);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table

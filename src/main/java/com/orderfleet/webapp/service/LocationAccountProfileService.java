@@ -78,4 +78,6 @@ public interface LocationAccountProfileService {
 	List<LocationAccountProfile> findAllLocationAccountProfiles(Long companyId);
 
 	List<LocationDTO> findAllLocationByAccountProfilePid(String accountProfilePid);
+
+	List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsLimitCount();
 }

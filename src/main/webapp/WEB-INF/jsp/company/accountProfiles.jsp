@@ -97,9 +97,9 @@
 
 				<div class="col-sm-4 ">
 					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Search...."
-							id="search" style="height: 35px" /> <span
-							class="input-group-addon btn btn-default" title="Search"
+						<input type="text" class="form-control"
+							placeholder="Search By Name..." id="search" style="height: 35px" />
+						<span class="input-group-addon btn btn-default" title="Search"
 							id="btnSearch"> <i class=" entypo-search"
 							style="font-size: 20px"> </i>
 						</span>
@@ -240,39 +240,39 @@
 										</c:forEach>
 									</select>
 								</div>
-								
-								<!-- Modern district state issue -->
-								
-								<!-- 								<div class="form-group"> -->
-<!-- 									<label class="control-label" for="dbCountrycreate">Counrty -->
-<!-- 									</label> <select id="dbCountrycreate" name="countryid" -->
-<!-- 										class="form-control"><option value="-1">Select -->
-<!-- 											Country</option> -->
-<%-- 										<c:forEach items="${countries}" var="country"> --%>
-<%-- 											<option value="${country.id}">${country.name}</option> --%>
-<%-- 										</c:forEach> --%>
-<!-- 									</select> -->
-<!-- 								</div> -->
-<!-- 								<div class="form-group"> -->
-<!-- 									<label class="control-label" for="dbStatecreate">State -->
-<!-- 									</label> <select id="dbStatecreate" name="stateid" class="form-control"><option -->
-<!-- 											value="-1">Select State</option> -->
-<%-- 										<c:forEach items="${states}" var="state"> --%>
-<%-- 											<option value="${state.id}">${state.name}</option> --%>
-<%-- 										</c:forEach> --%>
-<!-- 									</select> -->
-<!-- 								</div> -->
 
-<!-- 								<div class="form-group"> -->
-<!-- 									<label class="control-label" for="dbDistrictcreate">District -->
-<!-- 									</label> <select id="dbDistrictcreate" name="districtid" -->
-<!-- 										class="form-control"><option value="-1">Select -->
-<!-- 											District</option> -->
-<%-- 										<c:forEach items="${districts}" var="district"> --%>
-<%-- 											<option value="${district.id}">${district.name}</option> --%>
-<%-- 										</c:forEach> --%>
-<!-- 									</select> -->
-<!-- 								</div> -->
+								<!-- Modern district state issue -->
+
+								<!-- 								<div class="form-group"> -->
+								<!-- 									<label class="control-label" for="dbCountrycreate">Counrty -->
+								<!-- 									</label> <select id="dbCountrycreate" name="countryid" -->
+								<!-- 										class="form-control"><option value="-1">Select -->
+								<!-- 											Country</option> -->
+								<%-- 										<c:forEach items="${countries}" var="country"> --%>
+								<%-- 											<option value="${country.id}">${country.name}</option> --%>
+								<%-- 										</c:forEach> --%>
+								<!-- 									</select> -->
+								<!-- 								</div> -->
+								<!-- 								<div class="form-group"> -->
+								<!-- 									<label class="control-label" for="dbStatecreate">State -->
+								<!-- 									</label> <select id="dbStatecreate" name="stateid" class="form-control"><option -->
+								<!-- 											value="-1">Select State</option> -->
+								<%-- 										<c:forEach items="${states}" var="state"> --%>
+								<%-- 											<option value="${state.id}">${state.name}</option> --%>
+								<%-- 										</c:forEach> --%>
+								<!-- 									</select> -->
+								<!-- 								</div> -->
+
+								<!-- 								<div class="form-group"> -->
+								<!-- 									<label class="control-label" for="dbDistrictcreate">District -->
+								<!-- 									</label> <select id="dbDistrictcreate" name="districtid" -->
+								<!-- 										class="form-control"><option value="-1">Select -->
+								<!-- 											District</option> -->
+								<%-- 										<c:forEach items="${districts}" var="district"> --%>
+								<%-- 											<option value="${district.id}">${district.name}</option> --%>
+								<%-- 										</c:forEach> --%>
+								<!-- 									</select> -->
+								<!-- 								</div> -->
 								<div class="form-group">
 									<label class="control-label" for="field_city">City</label> <input
 										type="text" class="form-control" name="city" id="field_city"
