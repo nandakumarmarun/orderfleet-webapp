@@ -104,6 +104,10 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.accountType.pid in ?1 and accountProfile.activated =?2 order by accountProfile.name asc")
 	List<AccountProfile> findByCompanyIdAndAccountTypesInAndActivated(List<String> accountTypes, boolean active);
 
+	@Query(value = "select * from tbl_account_profile where company_id = ?#{principal.companyId} and  account_type_id in ?1 and activated =?2 order by name asc LIMIT 1000", nativeQuery = true)
+	List<AccountProfile> findByCompanyIdAndAccountTypesInAndActivatedLimitCount(List<Long> accountTypeIds,
+			boolean active);
+
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.accountType.pid in ?1 and accountProfile.activated = ?2 and accountProfile.importStatus = ?3 order by accountProfile.name asc")
 	List<AccountProfile> findByCompanyIdAndAccountTypesInAndActivatedAndAccountImportStatus(List<String> accountTypes,
 			boolean active, boolean importStatus);
@@ -114,6 +118,10 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.importStatus = ?1 and accountProfile.activated = ?2 order by accountProfile.name asc")
 	List<AccountProfile> findAllByCompanyAndAccountImportStatusAndActivated(boolean importStatus, boolean active);
+
+	@Query(value = "select * from tbl_account_profile where company_id = ?#{principal.companyId} and  import_status = ?1 and activated = ?2 order by name asc LIMIT 1000", nativeQuery = true)
+	List<AccountProfile> findAllByCompanyAndAccountImportStatusAndActivatedLimitCount(boolean importStatus,
+			boolean active);
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and UPPER(accountProfile.name) in ?2")
 	List<AccountProfile> findByCompanyIdAndNameIgnoreCaseIn(Long companyId, List<String> names);
@@ -198,6 +206,9 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and  accountProfile.pid in ?1")
 	List<AccountProfile> findAllByAccountProfilePids(List<String> associatedAccountProfilePids);
+
+	@Query(value = "select * from tbl_account_profile where company_id = ?#{principal.companyId} and pid in ?1 order by name LIMIT 1000", nativeQuery = true)
+	List<AccountProfile> findAllByAccountProfilePidsLimitCount(List<String> accountProfilePids);
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.user.id in ?2 and accountProfile.lastModifiedDate between ?3 and ?4  and accountProfile.activated = true order by accountProfile.lastModifiedDate desc")
 	List<AccountProfile> findByCompanyIdAndUserIdInAndLastModifedDateBetweenOrderByLastModifedDateDesc(Long companyId,

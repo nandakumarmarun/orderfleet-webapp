@@ -650,6 +650,26 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	}
 
 	@Override
+	public List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsAndAccountTypePidInLimitCount(
+			List<String> accountTypePids, boolean importStatus) {
+		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+
+		// get accounts in employee locations
+		List<AccountProfile> result = new ArrayList<>();
+		if (locations.size() > 0) {
+			List<String> accountProfilePids = locationAccountProfileRepository
+					.findAccountProfilePidsByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(locations,
+							accountTypePids, importStatus);
+
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByAccountProfilePidsLimitCount(accountProfilePids);
+			// remove duplicates
+			result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+		}
+		return accountProfileMapper.accountProfilesToAccountProfileDTOs(result);
+	}
+
+	@Override
 	public List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAccountTypePidIn(List<String> accountTypePids) {
 		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
 
@@ -659,6 +679,28 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 			List<AccountProfile> accountProfiles = locationAccountProfileRepository
 					.findAccountByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(locations,
 							accountTypePids);
+			// remove duplicates
+			result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+		}
+		return accountProfileMapper.accountProfilesToAccountProfileDTOs(result);
+	}
+
+	@Override
+	public List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAccountTypePidInLimitCount(
+			List<String> accountTypePids) {
+		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+
+		// get accounts in employee locations
+		List<AccountProfile> result = new ArrayList<>();
+		if (locations.size() > 0) {
+
+			List<String> accountProfilePids = locationAccountProfileRepository
+					.findAccountPidByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(locations,
+							accountTypePids);
+
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByAccountProfilePidsLimitCount(accountProfilePids);
+
 			// remove duplicates
 			result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
 		}
@@ -681,6 +723,25 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	}
 
 	@Override
+	public List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsAndImpotedStatusLimitCount(
+			boolean importStatus) {
+		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+
+		// get accounts in employee locations
+		List<AccountProfile> result = new ArrayList<>();
+		if (locations.size() > 0) {
+
+			List<String> accountProfilePids = locationAccountProfileRepository
+					.findAccountPidByUserLocationsAndImportedStatusOrderByAccountProfilesName(locations, importStatus);
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByAccountProfilePidsLimitCount(accountProfilePids);
+			// remove duplicates
+			result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+		}
+		return accountProfileMapper.accountProfilesToAccountProfileDTOs(result);
+	}
+
+	@Override
 	public List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAllImpotedStatus() {
 		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
 
@@ -689,6 +750,24 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		if (locations.size() > 0) {
 			List<AccountProfile> accountProfiles = locationAccountProfileRepository
 					.findAccountByUserLocationsAndAllImportedStatusOrderByAccountProfilesName(locations);
+			// remove duplicates
+			result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+		}
+		return accountProfileMapper.accountProfilesToAccountProfileDTOs(result);
+	}
+
+	@Override
+	public List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAllImpotedStatusLimitCount() {
+		List<Location> locations = employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
+
+		// get accounts in employee locations
+		List<AccountProfile> result = new ArrayList<>();
+		if (locations.size() > 0) {
+
+			List<String> accountProfilePids = locationAccountProfileRepository
+					.findAccountPidByUserLocationsAndAllImportedStatusOrderByAccountProfilesName(locations);
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByAccountProfilePidsLimitCount(accountProfilePids);
 			// remove duplicates
 			result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
 		}

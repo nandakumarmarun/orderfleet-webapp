@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.service;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -54,30 +55,41 @@ public interface LocationAccountProfileService {
 			LocalDateTime lastModified);
 
 	List<AccountProfileDTO> findAccountProfileByLocationPidInAndActivated(List<String> locationPids, boolean activated);
-	
+
 	List<LocationAccountProfileDTO> findLocationByAccountProfilePid(String accountProfilePid);
-	
-	List<AccountProfileDTO> findAllAccountProfileByLocationPidInAndActivated(List<String> locationPids, boolean activated);
-	
+
+	List<AccountProfileDTO> findAllAccountProfileByLocationPidInAndActivated(List<String> locationPids,
+			boolean activated);
+
 	List<AccountProfileDTO> findAccountProfileByLocationPidAndActivated(String locationPid, boolean activated);
-	
-	List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsAndAccountTypePidIn(List<String>accountTypePids ,boolean importStatus);
-	
-	List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAccountTypePidIn(List<String>accountTypePids);
-	
+
+	List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsAndAccountTypePidIn(List<String> accountTypePids,
+			boolean importStatus);
+
+	List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAccountTypePidIn(List<String> accountTypePids);
+
 	List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsAndImpotedStatus(boolean importStatus);
-	
+
 	List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAllImpotedStatus();
 
 	void saveLocationAccountProfileSingle(String locationPid, String accountProfilePid);
-	
+
 	List<AccountProfileDTO> findAccountProfilesByUsers(List<Long> userIds);
-	
+
 	Set<String> findAccountProfilePidsByUsers(List<Long> userIds);
-	
+
 	List<LocationAccountProfile> findAllLocationAccountProfiles(Long companyId);
 
 	List<LocationDTO> findAllLocationByAccountProfilePid(String accountProfilePid);
 
 	List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsLimitCount();
+
+	List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsAndAccountTypePidInLimitCount(List<String> asList,
+			boolean imports);
+
+	List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAccountTypePidInLimitCount(List<String> asList);
+
+	List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsAndImpotedStatusLimitCount(boolean imports);
+
+	List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAllImpotedStatusLimitCount();
 }

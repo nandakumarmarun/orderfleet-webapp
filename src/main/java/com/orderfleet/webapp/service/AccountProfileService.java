@@ -175,4 +175,8 @@ public interface AccountProfileService {
 
 	List<AccountProfileDTO> findAllByCompanyAndActivatedLimitToCountAndSearchValue(boolean b, String searchValue);
 
+	List<AccountProfileDTO> findAccountProfileByAccountTypePidInAndActivatedLimitCount(List<String> asList);
+
+	List<AccountProfileDTO> findAllByCompanyAndAccountImportStatusAndActivatedLimitCount(boolean imports);
+
 }

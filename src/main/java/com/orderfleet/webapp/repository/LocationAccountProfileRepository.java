@@ -198,17 +198,32 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	List<AccountProfile> findAccountProfilesByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(
 			List<Location> locations, List<String> accountTypePids, boolean status);
 
+	@Query("select locationAccountProfile.accountProfile.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 and locationAccountProfile.accountProfile.accountType.pid in ?2 and locationAccountProfile.accountProfile.importStatus= ?3 order by locationAccountProfile.accountProfile.name asc")
+	List<String> findAccountProfilePidsByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(
+			List<Location> locations, List<String> accountTypePids, boolean status);
+
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 and locationAccountProfile.accountProfile.accountType.pid in ?2 order by locationAccountProfile.accountProfile.name asc")
 	List<AccountProfile> findAccountByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(
 			List<Location> locations, List<String> accountTypePids);
+
+	@Query("select locationAccountProfile.accountProfile.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 and locationAccountProfile.accountProfile.accountType.pid in ?2 order by locationAccountProfile.accountProfile.name asc")
+	List<String> findAccountPidByUserLocationsAndAccountTypePidInOrderByAccountProfilesName(List<Location> locations,
+			List<String> accountTypePids);
 
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 and locationAccountProfile.accountProfile.importStatus = ?2 order by locationAccountProfile.accountProfile.name asc")
 	List<AccountProfile> findAccountByUserLocationsAndImportedStatusOrderByAccountProfilesName(List<Location> locations,
 			boolean status);
 
+	@Query("select locationAccountProfile.accountProfile.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 and locationAccountProfile.accountProfile.importStatus = ?2 order by locationAccountProfile.accountProfile.name asc")
+	List<String> findAccountPidByUserLocationsAndImportedStatusOrderByAccountProfilesName(List<Location> locations,
+			boolean status);
+
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 order by locationAccountProfile.accountProfile.name asc")
 	List<AccountProfile> findAccountByUserLocationsAndAllImportedStatusOrderByAccountProfilesName(
 			List<Location> locations);
+
+	@Query("select locationAccountProfile.accountProfile.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 order by locationAccountProfile.accountProfile.name asc")
+	List<String> findAccountPidByUserLocationsAndAllImportedStatusOrderByAccountProfilesName(List<Location> locations);
 
 	LocationAccountProfile findByAccountProfile(AccountProfile accountProfile);
 

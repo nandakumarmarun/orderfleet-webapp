@@ -516,32 +516,33 @@ public class AccountProfileResource {
 			if (importedStatus.equals("true")) {
 				imports = true;
 				if (userIds.isEmpty()) {
-					accountProfileDTOs.addAll(
-							accountProfileService.findAccountProfileByAccountTypePidInAndActivatedAndImportStatusLimitCount(
+					accountProfileDTOs.addAll(accountProfileService
+							.findAccountProfileByAccountTypePidInAndActivatedAndImportStatusLimitCount(
 									Arrays.asList(accountTypePids.split(",")), imports));
 				} else {
-					accountProfileDTOs.addAll(
-							locationAccountProfileService.findAccountProfilesByCurrentUserLocationsAndAccountTypePidIn(
+					accountProfileDTOs.addAll(locationAccountProfileService
+							.findAccountProfilesByCurrentUserLocationsAndAccountTypePidInLimitCount(
 									Arrays.asList(accountTypePids.split(",")), imports));
 				}
 			} else if (importedStatus.equals("false")) {
 				imports = false;
 				if (userIds.isEmpty()) {
-					accountProfileDTOs.addAll(
-							accountProfileService.findAccountProfileByAccountTypePidInAndActivatedAndImportStatusLimitCount(
+					accountProfileDTOs.addAll(accountProfileService
+							.findAccountProfileByAccountTypePidInAndActivatedAndImportStatusLimitCount(
 									Arrays.asList(accountTypePids.split(",")), imports));
 				} else {
-					accountProfileDTOs.addAll(
-							locationAccountProfileService.findAccountProfilesByCurrentUserLocationsAndAccountTypePidIn(
+					accountProfileDTOs.addAll(locationAccountProfileService
+							.findAccountProfilesByCurrentUserLocationsAndAccountTypePidInLimitCount(
 									Arrays.asList(accountTypePids.split(",")), imports));
 				}
 			} else {
 				if (userIds.isEmpty()) {
-					accountProfileDTOs.addAll(accountProfileService.findAccountProfileByAccountTypePidInAndActivated(
-							Arrays.asList(accountTypePids.split(","))));
-				} else {
 					accountProfileDTOs
-							.addAll(locationAccountProfileService.findAccountByCurrentUserLocationsAndAccountTypePidIn(
+							.addAll(accountProfileService.findAccountProfileByAccountTypePidInAndActivatedLimitCount(
+									Arrays.asList(accountTypePids.split(","))));
+				} else {
+					accountProfileDTOs.addAll(locationAccountProfileService
+							.findAccountByCurrentUserLocationsAndAccountTypePidInLimitCount(
 									Arrays.asList(accountTypePids.split(","))));
 				}
 			}
@@ -554,27 +555,27 @@ public class AccountProfileResource {
 			if (importedStatus.equals("true")) {
 				imports = true;
 				if (userIds.isEmpty()) {
-					accountProfileDTOs
-							.addAll(accountProfileService.findAllByCompanyAndAccountImportStatusAndActivated(imports));
+					accountProfileDTOs.addAll(accountProfileService
+							.findAllByCompanyAndAccountImportStatusAndActivatedLimitCount(imports));
 				} else {
 					accountProfileDTOs.addAll(locationAccountProfileService
-							.findAccountProfilesByCurrentUserLocationsAndImpotedStatus(imports));
+							.findAccountProfilesByCurrentUserLocationsAndImpotedStatusLimitCount(imports));
 				}
 			} else if (importedStatus.equals("false")) {
 				imports = false;
 				if (userIds.isEmpty()) {
-					accountProfileDTOs
-							.addAll(accountProfileService.findAllByCompanyAndAccountImportStatusAndActivated(imports));
+					accountProfileDTOs.addAll(accountProfileService
+							.findAllByCompanyAndAccountImportStatusAndActivatedLimitCount(imports));
 				} else {
 					accountProfileDTOs.addAll(locationAccountProfileService
-							.findAccountProfilesByCurrentUserLocationsAndImpotedStatus(imports));
+							.findAccountProfilesByCurrentUserLocationsAndImpotedStatusLimitCount(imports));
 				}
 			} else {
 				if (userIds.isEmpty()) {
-					accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+					accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(true));
 				} else {
-					accountProfileDTOs.addAll(
-							locationAccountProfileService.findAccountByCurrentUserLocationsAndAllImpotedStatus());
+					accountProfileDTOs.addAll(locationAccountProfileService
+							.findAccountByCurrentUserLocationsAndAllImpotedStatusLimitCount());
 				}
 			}
 
@@ -633,14 +634,18 @@ public class AccountProfileResource {
 		if (active == true && deactivate == true) {
 //			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
 //			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(true,searchValue));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(false,searchValue));
+			accountProfileDTOs.addAll(
+					accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(true, searchValue));
+			accountProfileDTOs.addAll(
+					accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(false, searchValue));
 		} else if (active) {
 			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(true,searchValue));
+			accountProfileDTOs.addAll(
+					accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(true, searchValue));
 		} else if (deactivate) {
 			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(false,searchValue));
+			accountProfileDTOs.addAll(
+					accountProfileService.findAllByCompanyAndActivatedLimitToCountAndSearchValue(false, searchValue));
 		}
 		return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 	}
