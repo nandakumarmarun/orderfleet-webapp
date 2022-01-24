@@ -167,37 +167,37 @@ public class SendSalesOrderSapService {
 		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)
 				&& inventoryVoucherHeaderDTO.getSalesManagementStatus().equals(SalesManagementStatus.APPROVE)) {
 			log.info("Downloading to sap prabhu.............");
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "INV_QUERY_161" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="Updating invVou Header by Tally download status using pid";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-			
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_161" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "Updating invVou Header by Tally download status using pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 			int updated = inventoryVoucherHeaderRepository
 					.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.PROCESSING, ivhPids);
-			  String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 			log.debug("updated " + updated + " to PROCESSING");
 
 			log.info("Sending  SalesOrder to SAP....");
@@ -283,33 +283,33 @@ public class SendSalesOrderSapService {
 				DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 				String id = "INV_QUERY_161" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="update InvVoucherHeader TallyDownloadStatus Using Pid";
+				String description = "update InvVoucherHeader TallyDownloadStatus Using Pid";
 				LocalDateTime startLCTime = LocalDateTime.now();
 				String startTime = startLCTime.format(DATE_TIME_FORMAT);
 				String startDate = startLCTime.format(DATE_FORMAT);
 				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
 						TallyDownloadStatus.COMPLETED, ivhPids);
-				 String flag = "Normal";
-					LocalDateTime endLCTime = LocalDateTime.now();
-					String endTime = endLCTime.format(DATE_TIME_FORMAT);
-					String endDate = startLCTime.format(DATE_FORMAT);
-					Duration duration = Duration.between(startLCTime, endLCTime);
-					long minutes = duration.toMinutes();
-					if (minutes <= 1 && minutes >= 0) {
-						flag = "Fast";
-					}
-					if (minutes > 1 && minutes <= 2) {
-						flag = "Normal";
-					}
-					if (minutes > 2 && minutes <= 10) {
-						flag = "Slow";
-					}
-					if (minutes > 10) {
-						flag = "Dead Slow";
-					}
-			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-							+ description);
+				String flag = "Normal";
+				LocalDateTime endLCTime = LocalDateTime.now();
+				String endTime = endLCTime.format(DATE_TIME_FORMAT);
+				String endDate = startLCTime.format(DATE_FORMAT);
+				Duration duration = Duration.between(startLCTime, endLCTime);
+				long minutes = duration.toMinutes();
+				if (minutes <= 1 && minutes >= 0) {
+					flag = "Fast";
+				}
+				if (minutes > 1 && minutes <= 2) {
+					flag = "Normal";
+				}
+				if (minutes > 2 && minutes <= 10) {
+					flag = "Slow";
+				}
+				if (minutes > 10) {
+					flag = "Dead Slow";
+				}
+				logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+						+ description);
 				log.debug("updated " + updated + " to COMPLETED");
 			}
 
@@ -334,36 +334,37 @@ public class SendSalesOrderSapService {
 					List<AccountingVoucherHeader> successdistinctElements = new ArrayList<>();
 
 					if (accountingHeaderPids.size() > 0) {
-						  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-							DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-							String id = "ACC_QUERY_159" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-							String description ="get all header by document number server";
-							LocalDateTime startLCTime = LocalDateTime.now();
-							String startTime = startLCTime.format(DATE_TIME_FORMAT);
-							String startDate = startLCTime.format(DATE_FORMAT);
-							logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+						DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+						DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String id = "ACC_QUERY_159" + "_" + SecurityUtils.getCurrentUserLogin() + "_"
+								+ LocalDateTime.now();
+						String description = "get all header by document number server";
+						LocalDateTime startLCTime = LocalDateTime.now();
+						String startTime = startLCTime.format(DATE_TIME_FORMAT);
+						String startDate = startLCTime.format(DATE_FORMAT);
+						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 						successAccountingVoucherHeaders = accountingVoucherHeaderRepository
 								.findAllHeaderdByDocumentNumberServer(accountingHeaderPids);
-						 String flag = "Normal";
-							LocalDateTime endLCTime = LocalDateTime.now();
-							String endTime = endLCTime.format(DATE_TIME_FORMAT);
-							String endDate = startLCTime.format(DATE_FORMAT);
-							Duration duration = Duration.between(startLCTime, endLCTime);
-							long minutes = duration.toMinutes();
-							if (minutes <= 1 && minutes >= 0) {
-								flag = "Fast";
-							}
-							if (minutes > 1 && minutes <= 2) {
-								flag = "Normal";
-							}
-							if (minutes > 2 && minutes <= 10) {
-								flag = "Slow";
-							}
-							if (minutes > 10) {
-								flag = "Dead Slow";
-							}
-					                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-									+ description);
+						String flag = "Normal";
+						LocalDateTime endLCTime = LocalDateTime.now();
+						String endTime = endLCTime.format(DATE_TIME_FORMAT);
+						String endDate = startLCTime.format(DATE_FORMAT);
+						Duration duration = Duration.between(startLCTime, endLCTime);
+						long minutes = duration.toMinutes();
+						if (minutes <= 1 && minutes >= 0) {
+							flag = "Fast";
+						}
+						if (minutes > 1 && minutes <= 2) {
+							flag = "Normal";
+						}
+						if (minutes > 2 && minutes <= 10) {
+							flag = "Slow";
+						}
+						if (minutes > 10) {
+							flag = "Dead Slow";
+						}
+						logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END,"
+								+ flag + "," + description);
 						successdistinctElements = successAccountingVoucherHeaders.stream().distinct()
 								.collect(Collectors.toList());
 					}
@@ -420,64 +421,64 @@ public class SendSalesOrderSapService {
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id = "ACC_QUERY_156" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get by companyId and tally status and sales management status";
+			String description = "get by companyId and tally status and sales management status";
 			LocalDateTime startLCTime = LocalDateTime.now();
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherHeaders = accountingVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusAndSalesManagementStatusByCreatedDateDesc();
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		} else {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "ACC_QUERY_155" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get by companyId and tally status";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_155" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get by companyId and tally status";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherHeaders = accountingVoucherHeaderRepository
 					.findByCompanyIdAndTallyStatusByCreatedDateDesc();
-			   String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		}
 
 		log.info("Accounting Voucher Header size {} ", accountingVoucherHeaders.size());
@@ -513,7 +514,7 @@ public class SendSalesOrderSapService {
 			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id1 = "AP_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description1 ="get all by compId and IdsIn";
+			String description1 = "get all by compId and IdsIn";
 			LocalDateTime startLCTime1 = LocalDateTime.now();
 			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 			String startDate1 = startLCTime1.format(DATE_FORMAT1);
@@ -538,41 +539,41 @@ public class SendSalesOrderSapService {
 			if (minutes1 > 10) {
 				flag1 = "Dead Slow";
 			}
-	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-					+ description1);
+			logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
+					+ "," + description1);
 			List<AccountProfile> supplierAccountProfiles = new ArrayList<>();
 
 			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
 			DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id11 = "AVD_QUERY_111" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description11 ="get all by accVoucherHeaderPidIn";
+			String description11 = "get all by accVoucherHeaderPidIn";
 			LocalDateTime startLCTime11 = LocalDateTime.now();
 			String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
 			String startDate11 = startLCTime11.format(DATE_FORMAT11);
 			logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
 			List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByAccountingVoucherHeaderPidIn(avhPids);
-			 String flag11 = "Normal";
-				LocalDateTime endLCTime11 = LocalDateTime.now();
-				String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
-				String endDate11 = startLCTime11.format(DATE_FORMAT11);
-				Duration duration11 = Duration.between(startLCTime11, endLCTime11);
-				long minutes11 = duration11.toMinutes();
-				if (minutes11 <= 1 && minutes11 >= 0) {
-					flag11 = "Fast";
-				}
-				if (minutes11 > 1 && minutes11 <= 2) {
-					flag11 = "Normal";
-				}
-				if (minutes11 > 2 && minutes11 <= 10) {
-					flag11 = "Slow";
-				}
-				if (minutes11 > 10) {
-					flag11 = "Dead Slow";
-				}
-		                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
-						+ description11);
+			String flag11 = "Normal";
+			LocalDateTime endLCTime11 = LocalDateTime.now();
+			String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+			String endDate11 = startLCTime11.format(DATE_FORMAT11);
+			Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+			long minutes11 = duration11.toMinutes();
+			if (minutes11 <= 1 && minutes11 >= 0) {
+				flag11 = "Fast";
+			}
+			if (minutes11 > 1 && minutes11 <= 2) {
+				flag11 = "Normal";
+			}
+			if (minutes11 > 2 && minutes11 <= 10) {
+				flag11 = "Slow";
+			}
+			if (minutes11 > 10) {
+				flag11 = "Dead Slow";
+			}
+			logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END,"
+					+ flag11 + "," + description11);
 			int i = 1;
 			for (Object[] obj : accountingVoucherHeaders) {
 
@@ -689,37 +690,37 @@ public class SendSalesOrderSapService {
 		}
 
 		if (!receiptDTOs.isEmpty()) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "ACC_QUERY_149" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="Updating AccVoucher Tally download status using  pid and company";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_149" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "Updating AccVoucher Tally download status using  pid and company";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			int updated = accountingVoucherHeaderRepository
 					.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PROCESSING,
 							accountingPids);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 
 			log.debug("updated " + updated + " to PROCESSING");
 		}
@@ -807,7 +808,7 @@ public class SendSalesOrderSapService {
 		salesOrderMasterSap.setDbKey(1);
 		salesOrderMasterSap.setLocation("");
 
-		salesOrderMasterSap.setCustomerCode(inventoryVoucherHeaderDTO.getReceiverAccountAlias());
+		salesOrderMasterSap.setCustomerCode(inventoryVoucherHeaderDTO.getReceiverAccountCustomerId());
 		salesOrderMasterSap.setCustomerName(inventoryVoucherHeaderDTO.getReceiverAccountName());
 
 		salesOrderMasterSap.setCustomerRef("");
