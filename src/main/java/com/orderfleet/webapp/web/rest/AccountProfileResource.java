@@ -681,16 +681,16 @@ public class AccountProfileResource {
 		}
 
 		if (active == true && deactivate == true) {
-//			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
-//			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(true));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(false));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(true));
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(false));
 		} else if (active) {
-			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(true));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(true));
 		} else if (deactivate) {
-			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
-			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(false));
+			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(false));
+			// accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivatedLimitToCount(false));
 		}
 
 		List<String> accountProfilePids = accountProfileDTOs.stream().map(AccountProfileDTO::getPid)

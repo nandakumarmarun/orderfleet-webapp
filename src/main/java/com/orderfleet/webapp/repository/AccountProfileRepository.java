@@ -86,7 +86,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query(value = "select * from tbl_account_profile where company_id = ?#{principal.companyId} and activated =?1 order by name asc LIMIT 1000", nativeQuery = true)
 	List<AccountProfile> findAllByCompanyAndActivateOrDeactivateAccountProfileOrderByNameLimitByCount(boolean active);
 
-	@Query(value = "select * from tbl_account_profile where company_id = ?#{principal.companyId} and activated =?1 and name LIKE '%' || ?2 || '%' order by name LIMIT 1000", nativeQuery = true)
+	@Query(value = "select * from tbl_account_profile where company_id = ?#{principal.companyId} and activated =?1 and lower(name) LIKE '%' || lower(?2) || '%' order by name LIMIT 1000", nativeQuery = true)
 	List<AccountProfile> findAllByCompanyAndActivateOrDeactivateAccountProfileOrderByNameLimitByCountAndSearchValue(
 			boolean active, String searchValue);
 

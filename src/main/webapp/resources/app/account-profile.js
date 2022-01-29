@@ -869,18 +869,18 @@ if (!this.AccountProfile) {
 	function createUpdateAccountProfile(el) {
 
 		$(".error-msg").html("");
-		if ($('#dbCountrycreate').val() == '-1') {
-			$(".error-msg").html("Please select Country");
-			return false;
-		}
-		if ($('#dbStatecreate').val() == '-1') {
-			$(".error-msg").html("Please select State");
-			return false;
-		}
-		if ($('#dbDistrictcreate').val() == '-1') {
-			$(".error-msg").html("Please select District");
-			return false;
-		}
+//		if ($('#dbCountrycreate').val() == '-1') {
+//			$(".error-msg").html("Please select Country");
+//			return false;
+//		}
+//		if ($('#dbStatecreate').val() == '-1') {
+//			$(".error-msg").html("Please select State");
+//			return false;
+//		}
+//		if ($('#dbDistrictcreate').val() == '-1') {
+//			$(".error-msg").html("Please select District");
+//			return false;
+//		}
 		accountProfileModel.name = $('#field_name').val();
 		accountProfileModel.alias = $('#field_alias').val();
 		accountProfileModel.accountTypePid = $('#field_accountType').val();
