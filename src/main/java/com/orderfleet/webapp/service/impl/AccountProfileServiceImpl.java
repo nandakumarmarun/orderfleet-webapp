@@ -208,10 +208,15 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 					logger.info(ids + "," + endDates + "," + startTimes + "," + endTimes + "," + minute + ",END,"
 							+ flags + "," + descriptions);
 
-					accountProfile.setCountryc(countrycrepository.findOne(accountProfileDTO.getCountryId()));
-					accountProfile.setStatec(statecrepository.findOne(Long.valueOf(accountProfileDTO.getStateId())));
-					accountProfile
-							.setDistrictc(districtcrepository.findOne(Long.valueOf(accountProfileDTO.getDistrictId())));
+					if (accountProfileDTO.getCountryId() != null && accountProfileDTO.getStateId() != null
+							&& accountProfileDTO.getDistrictId() != null && accountProfileDTO.getCountryId() != 0
+							&& accountProfileDTO.getStateId() != 0 && accountProfileDTO.getDistrictId() != 0) {
+						accountProfile.setCountryc(countrycrepository.findOne(accountProfileDTO.getCountryId()));
+						accountProfile
+								.setStatec(statecrepository.findOne(Long.valueOf(accountProfileDTO.getStateId())));
+						accountProfile.setDistrictc(
+								districtcrepository.findOne(Long.valueOf(accountProfileDTO.getDistrictId())));
+					}
 
 					accountProfile.setAddress(accountProfileDTO.getAddress());
 					accountProfile.setCity(accountProfileDTO.getCity());

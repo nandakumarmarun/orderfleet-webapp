@@ -402,8 +402,11 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 			List<ProductProfile> productProfiles = productGroupProductRepository
 					.findProductByProductGroupPidAndActivated(productGroup.getPid(), true);
 
-			List<ProductProfileDTO> productProfileDTOs = productProfiles.stream().map(ProductProfileDTO::new)
-					.collect(Collectors.toList());
+			List<ProductProfileDTO> productProfileDTOs = productMapper
+					.productProfilesToProductProfileDTOs(productProfiles);
+
+//			List<ProductProfileDTO> productProfileDTOs = productProfiles.stream().map(ProductProfileDTO::new)
+//					.collect(Collectors.toList());
 
 			// set description to productProfile
 			List<ProductNameTextSettings> productNameTextSettings = productNameTextSettingsRepository
