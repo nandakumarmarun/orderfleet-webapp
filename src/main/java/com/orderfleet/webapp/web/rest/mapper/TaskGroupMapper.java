@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -11,10 +12,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.orderfleet.webapp.domain.ActivityGroup;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.TaskGroup;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.repository.ActivityGroupRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.TaskGroupDTO;
 
@@ -24,9 +29,13 @@ import com.orderfleet.webapp.web.rest.dto.TaskGroupDTO;
  * @author Muhammed Riyas T
  * @since June 04, 2016
  */
-@Mapper(componentModel = "spring", uses = { TaskMapper.class, })
+@Component
 public abstract class TaskGroupMapper {
 	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	 
+	 @Inject
+		private CompanyConfigurationRepository companyConfigurationRepository;
+	 
 	@Inject
 	private ActivityGroupRepository activityGroupRepository;
 
@@ -79,5 +88,13 @@ public abstract class TaskGroupMapper {
 					return aGroup;
 
 	}
-
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }

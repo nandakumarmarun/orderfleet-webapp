@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -11,14 +12,18 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Activity;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Task;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.ActivityRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.TaskDTO;
 
@@ -28,7 +33,7 @@ import com.orderfleet.webapp.web.rest.dto.TaskDTO;
  * @author Myhammed Riyas T
  * @since June 04, 2016
  */
-@Mapper(componentModel = "spring", uses = {})
+@Component
 public abstract class TaskMapper {
 	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
@@ -40,22 +45,25 @@ public abstract class TaskMapper {
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
 
-	@Mapping(target = "accountPids", ignore = true)
-	@Mapping(source = "activity.pid", target = "activityPid")
-	@Mapping(source = "activity.name", target = "activityName")
-	@Mapping(source = "accountType.pid", target = "accountTypePid")
-	@Mapping(source = "accountType.name", target = "accountTypeName")
-	@Mapping(source = "accountProfile.pid", target = "accountProfilePid")
-	@Mapping(source = "accountProfile.name", target = "accountProfileName")
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
+	
+//	@Mapping(target = "accountPids", ignore = true)
+//	@Mapping(source = "activity.pid", target = "activityPid")
+//	@Mapping(source = "activity.name", target = "activityName")
+//	@Mapping(source = "accountType.pid", target = "accountTypePid")
+//	@Mapping(source = "accountType.name", target = "accountTypeName")
+//	@Mapping(source = "accountProfile.pid", target = "accountProfilePid")
+//	@Mapping(source = "accountProfile.name", target = "accountProfileName")
 	public abstract TaskDTO taskToTaskDTO(Task task);
 
 	public abstract List<TaskDTO> tasksToTaskDTOs(List<Task> tasks);
 
-	@Mapping(source = "activityPid", target = "activity")
-	@Mapping(source = "accountTypePid", target = "accountType")
-	@Mapping(source = "accountProfilePid", target = "accountProfile")
-	@Mapping(target = "company", ignore = true)
-	@Mapping(target = "id", ignore = true)
+//	@Mapping(source = "activityPid", target = "activity")
+//	@Mapping(source = "accountTypePid", target = "accountType")
+//	@Mapping(source = "accountProfilePid", target = "accountProfile")
+//	@Mapping(target = "company", ignore = true)
+//	@Mapping(target = "id", ignore = true)
 	public abstract Task taskDTOToTask(TaskDTO taskDTO);
 
 	public abstract List<Task> taskDTOsToTasks(List<TaskDTO> taskDTOs);
@@ -168,4 +176,13 @@ public abstract class TaskMapper {
 
 		return ap;
 	}
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }

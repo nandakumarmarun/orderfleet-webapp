@@ -1,17 +1,23 @@
 package com.orderfleet.webapp.web.rest.mapper;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Form;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserForm;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.FormRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.UserFormDTO;
 
 /**
@@ -20,9 +26,12 @@ import com.orderfleet.webapp.web.rest.dto.UserFormDTO;
  * @author Sarath
  * @since Apr 19, 2017
  */
-@Mapper(componentModel = "spring", uses = { TaskMapper.class, })
+@Component
 public abstract class UserFormMapper {
 
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
+	
 	@Inject
 	private UserRepository userRepository;
 
@@ -58,4 +67,14 @@ public abstract class UserFormMapper {
 		}
 		return userRepository.findOneByPid(pid).map(user -> user).orElse(null);
 	}
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
+
 }

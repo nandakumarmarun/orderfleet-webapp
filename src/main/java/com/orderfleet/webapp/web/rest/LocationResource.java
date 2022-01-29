@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -41,6 +42,7 @@ import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
@@ -72,6 +74,9 @@ public class LocationResource {
 	
 	@Inject
 	private EmployeeProfileLocationService employeeProfileLocationService;
+	
+	@Inject
+	private AccountProfileMapper accountProfileMapper;
 
 	/**
 	 * POST /locations : Create a new location.
@@ -187,8 +192,10 @@ public class LocationResource {
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<Object[]> accountProfiles = accountProfileRepository.findAccountProfileAndCreatedByAndActivated(true);
-		 String flag = "Normal";
+//		List<Object[]> accountProfiles = accountProfileRepository.findAccountProfileAndCreatedByAndActivated(true);
+		List<AccountProfile> accountProfileList = accountProfileRepository
+				.findAllByCompanyAndActivateOrDeactivateAccountProfileOrderByName(true);
+		String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
 			String endDate = startLCTime.format(DATE_FORMAT);
@@ -209,17 +216,20 @@ public class LocationResource {
 	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 
-		if(!accountProfiles.isEmpty()) {
-			List<AccountProfileDTO> accountProfileDtos = accountProfiles.parallelStream().map(obj -> {
-				AccountProfileDTO accDto = new AccountProfileDTO();
-				accDto.setPid(obj[0].toString());
-				accDto.setAlias(obj[1] == null ? "" : obj[1].toString());
-				accDto.setName(obj[2].toString());
-				accDto.setDescription(obj[3] == null ? "" : obj[3].toString());
-				accDto.setAddress(obj[4] == null ? "" : obj[4].toString());
-				accDto.setUserName(obj[5] == null ? "" : obj[5].toString());
-				return accDto;
-			}).collect(Collectors.toList());
+		if(!accountProfileList.isEmpty()) {
+			List<AccountProfileDTO> accountProfileDtos =accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfileList);
+//			= accountProfiles.parallelStream().map(obj -> {
+//				AccountProfileDTO accDto = new AccountProfileDTO();
+//				accDto.setPid(obj[0].toString());
+//				accDto.setAlias(obj[1] == null ? "" : obj[1].toString());
+//				accDto.setName(obj[2].toString());
+//				accDto.setDescription(obj[3] == null ? "" : obj[3].toString());
+//				accDto.setAddress(obj[4] == null ? "" : obj[4].toString());
+//				accDto.setUserName(obj[5] == null ? "" : obj[5].toString());
+//				return accDto;
+//			}).collect(Collectors.toList());
+	               
+	                
 			model.addAttribute("accountProfiles", accountProfileDtos);
 		}
 		return "company/locations";

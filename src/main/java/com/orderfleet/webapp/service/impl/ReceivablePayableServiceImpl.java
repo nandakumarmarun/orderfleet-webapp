@@ -32,6 +32,7 @@ import com.orderfleet.webapp.service.ReceivablePayableService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
+import com.orderfleet.webapp.web.rest.mapper.ReceivablePayableMapper;
 
 /**
  * Service Implementation for managing ReceivablePayable.
@@ -54,8 +55,8 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	@Inject
 	private LocationAccountProfileService locationAccountProfileService;
 
-	// @Inject
-	// private ReceivablePayableMapper receivablePayableMapper;
+	 @Inject
+	 private ReceivablePayableMapper receivablePayableMapper;
 
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
@@ -520,23 +521,25 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	public List<ReceivablePayableDTO> findAllByCompanyAndDateBetween(LocalDate fromDate, LocalDate toDate) {
 		log.debug("Request to get all receivablePayables");
 		List<ReceivablePayable> receivablePayables = receivablePayableRepository.findAllByCompanyIdAndDateBetween(fromDate,toDate);
-		List<ReceivablePayableDTO> result = new ArrayList<>();
-		for (ReceivablePayable receivablePayable : receivablePayables) {
-			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
-			result.add(payableDTO);
-		}
-		return result;
+//		List<ReceivablePayableDTO> result = new ArrayList<>();
+//		for (ReceivablePayable receivablePayable : receivablePayables) {
+//			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
+//			result.add(payableDTO);
+//		}
+		List<ReceivablePayableDTO> receivablePayableDTO = receivablePayableMapper.receivablePayablesToReceivablePayableDTOs(receivablePayables);
+		return receivablePayableDTO;
 	}
 
 	@Override
 	public List<ReceivablePayableDTO> findAllByAccountProfilePidAndDateBetween(String accountPid, LocalDate fromDate,
 			LocalDate toDate) {
 		List<ReceivablePayable> receivablePayables = receivablePayableRepository.findAllByAccountProfilePidAndDateBetween(accountPid,fromDate,toDate);
-		List<ReceivablePayableDTO> result = new ArrayList<>();
-		for (ReceivablePayable receivablePayable : receivablePayables) {
-			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
-			result.add(payableDTO);
-		}
-		return result;
+//		List<ReceivablePayableDTO> result = new ArrayList<>();
+//		for (ReceivablePayable receivablePayable : receivablePayables) {
+//			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
+//			result.add(payableDTO);
+//		}
+		List<ReceivablePayableDTO> receivablePayableDTO = receivablePayableMapper.receivablePayablesToReceivablePayableDTOs(receivablePayables);
+		return receivablePayableDTO;
 	}
 }

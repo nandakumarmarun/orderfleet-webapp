@@ -1,14 +1,22 @@
 package com.orderfleet.webapp.web.rest.mapper;
 
 import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
 import com.orderfleet.webapp.domain.DocumentPrint;
 import com.orderfleet.webapp.domain.Activity;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.DocumentPrintDTO;
 
 /**
@@ -18,28 +26,31 @@ import com.orderfleet.webapp.web.rest.dto.DocumentPrintDTO;
  * @since Aug 12, 2017
  *
  */
-@Mapper(componentModel = "spring", uses = {})
-public interface DocumentPrintMapper {
+@Component
+public abstract class DocumentPrintMapper {
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
-	@Mapping(source = "user.login", target = "userLoginName")
-	@Mapping(source = "user.firstName", target = "userFirstName")
-	@Mapping(source = "user.lastName", target = "userLastName")
-	@Mapping(source = "user.pid", target = "userPid")
-	@Mapping(source = "document.pid", target = "documentPid")
-	@Mapping(source = "document.name", target = "documentName")
-	@Mapping(source = "activity.pid", target = "activityPid")
-	@Mapping(source = "activity.name", target = "activityName")
-	DocumentPrintDTO documentPrintToDocumentPrintDTO(DocumentPrint documentPrint);
+//	@Mapping(source = "user.login", target = "userLoginName")
+//	@Mapping(source = "user.firstName", target = "userFirstName")
+//	@Mapping(source = "user.lastName", target = "userLastName")
+//	@Mapping(source = "user.pid", target = "userPid")
+//	@Mapping(source = "document.pid", target = "documentPid")
+//	@Mapping(source = "document.name", target = "documentName")
+//	@Mapping(source = "activity.pid", target = "activityPid")
+//	@Mapping(source = "activity.name", target = "activityName")
+	public abstract DocumentPrintDTO documentPrintToDocumentPrintDTO(DocumentPrint documentPrint);
 
-	List<DocumentPrintDTO> documentPrintsToDocumentPrintDTOs(List<DocumentPrint> documentPrints);
+	public abstract List<DocumentPrintDTO> documentPrintsToDocumentPrintDTOs(List<DocumentPrint> documentPrints);
 
-	@Mapping(target = "company", ignore = true)
-	@Mapping(target = "id", ignore = true)
-	DocumentPrint documentPrintDTOToDocumentPrint(DocumentPrintDTO documentPrintDTO);
+//	@Mapping(target = "company", ignore = true)
+//	@Mapping(target = "id", ignore = true)
+	public abstract DocumentPrint documentPrintDTOToDocumentPrint(DocumentPrintDTO documentPrintDTO);
 
-	List<DocumentPrint> documentPrintDTOsToDocumentPrints(List<DocumentPrintDTO> documentPrintDTOs);
+	public abstract List<DocumentPrint> documentPrintDTOsToDocumentPrints(List<DocumentPrintDTO> documentPrintDTOs);
 
-	default User userFromId(Long id) {
+	public  User userFromId(Long id) {
 		if (id == null) {
 			return null;
 		}
@@ -48,7 +59,7 @@ public interface DocumentPrintMapper {
 		return employee;
 	}
 
-	default Document documentFromId(Long id) {
+	public Document documentFromId(Long id) {
 		if (id == null) {
 			return null;
 		}
@@ -57,7 +68,7 @@ public interface DocumentPrintMapper {
 		return employee;
 	}
 
-	default Activity activityFromId(Long id) {
+	public Activity activityFromId(Long id) {
 		if (id == null) {
 			return null;
 		}
@@ -65,4 +76,13 @@ public interface DocumentPrintMapper {
 		employee.setId(id);
 		return employee;
 	}
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }

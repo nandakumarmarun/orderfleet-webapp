@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -11,11 +12,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.orderfleet.webapp.domain.AccountProfile;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.LedgerReportTP;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.LedgerReportTPDTO;
@@ -26,7 +31,7 @@ import com.orderfleet.webapp.web.rest.dto.LedgerReportTPDTO;
  * @author Sarath
  * @since Nov 2, 2016
  */
-@Mapper(componentModel = "spring", uses = {})
+@Component
 public abstract class LedgerReportTPMapper {
 	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
@@ -34,19 +39,22 @@ public abstract class LedgerReportTPMapper {
 
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
-	@Mapping(source = "division.pid", target = "divisionPid")
-	@Mapping(source = "division.name", target = "divisionName")
-	@Mapping(source = "division.alias", target = "divisionAlias")
-	@Mapping(source = "accountProfile.pid", target = "accountProfilePid")
-	@Mapping(source = "accountProfile.name", target = "accountProfileName")
+//	@Mapping(source = "division.pid", target = "divisionPid")
+//	@Mapping(source = "division.name", target = "divisionName")
+//	@Mapping(source = "division.alias", target = "divisionAlias")
+//	@Mapping(source = "accountProfile.pid", target = "accountProfilePid")
+//	@Mapping(source = "accountProfile.name", target = "accountProfileName")
 	public abstract LedgerReportTPDTO ledgerReportTPToLedgerReportTPDTO(LedgerReportTP ledgerReportTP);
 
 	public abstract List<LedgerReportTPDTO> ledgerReportTPsToLedgerReportTPDTOs(List<LedgerReportTP> ledgerReportTPs);
 
-	@Mapping(source = "divisionPid", target = "division")
-	@Mapping(source = "accountProfilePid", target = "accountProfile")
-	@Mapping(target = "company", ignore = true)
+//	@Mapping(source = "divisionPid", target = "division")
+//	@Mapping(source = "accountProfilePid", target = "accountProfile")
+//	@Mapping(target = "company", ignore = true)
 	public abstract LedgerReportTP ledgerReportTPDTOToLedgerReportTP(LedgerReportTPDTO ledgerReportTPDTO);
 
 	public abstract List<LedgerReportTP> ledgerReportTPDTOsToLedgerReportTPs(List<LedgerReportTPDTO> ledgerReportTPDTOs);
@@ -95,4 +103,13 @@ public abstract class LedgerReportTPMapper {
 
 		return ap;
 	}
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }

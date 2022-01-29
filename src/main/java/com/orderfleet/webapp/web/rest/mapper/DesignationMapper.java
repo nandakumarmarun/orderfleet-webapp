@@ -1,11 +1,19 @@
 package com.orderfleet.webapp.web.rest.mapper;
 
 import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Designation;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.DesignationDTO;
 
 /**
@@ -14,17 +22,29 @@ import com.orderfleet.webapp.web.rest.dto.DesignationDTO;
  * @author Muhammed Riyas T
  * @since May 24, 2016
  */
-@Mapper(componentModel = "spring", uses = {})
-public interface DesignationMapper {
+@Component
+public abstract class DesignationMapper {
 
-	DesignationDTO designationToDesignationDTO(Designation designation);
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
+	
+	public abstract DesignationDTO designationToDesignationDTO(Designation designation);
 
-	List<DesignationDTO> designationsToDesignationDTOs(List<Designation> designations);
+	public abstract List<DesignationDTO> designationsToDesignationDTOs(List<Designation> designations);
 
-	@Mapping(target = "company", ignore = true)
-	@Mapping(target = "id", ignore = true)
-	Designation designationDTOToDesignation(DesignationDTO designationDTO);
+//	@Mapping(target = "company", ignore = true)
+//	@Mapping(target = "id", ignore = true)
+	public abstract Designation designationDTOToDesignation(DesignationDTO designationDTO);
 
-	List<Designation> designationDTOsToDesignations(List<DesignationDTO> designationDTOs);
+	public abstract List<Designation> designationDTOsToDesignations(List<DesignationDTO> designationDTOs);
 
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }

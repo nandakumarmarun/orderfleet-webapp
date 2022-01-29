@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -11,11 +12,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.Activity;
 import com.orderfleet.webapp.domain.ActivityUserTarget;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.repository.ActivityRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.ActivityUserTargetDTO;
@@ -26,30 +31,33 @@ import com.orderfleet.webapp.web.rest.dto.ActivityUserTargetDTO;
  * @author Shaheer
  * @since May 17, 2016
  */
-@Mapper(componentModel = "spring", uses = {})
+@Component
 public abstract class ActivityUserTargetMapper {
 	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private ActivityRepository activityRepository;
 
 	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
+	
+	@Inject
 	private UserRepository userRepository;
 
-	@Mapping(source = "activity.pid", target = "activityPid")
-	@Mapping(source = "activity.name", target = "activityName")
-	@Mapping(source = "user.pid", target = "userPid")
-	@Mapping(source = "user.firstName", target = "userName")
-	@Mapping(target = "achivedNumber", ignore = true)
+//	@Mapping(source = "activity.pid", target = "activityPid")
+//	@Mapping(source = "activity.name", target = "activityName")
+//	@Mapping(source = "user.pid", target = "userPid")
+//	@Mapping(source = "user.firstName", target = "userName")
+//	@Mapping(target = "achivedNumber", ignore = true)
 	public abstract ActivityUserTargetDTO activityUserTargetToActivityUserTargetDTO(
 			ActivityUserTarget activityUserTarget);
 
 	public abstract List<ActivityUserTargetDTO> activityUserTargetsToActivityUserTargetDTOs(
 			List<ActivityUserTarget> activityUserTargets);
 
-	@Mapping(source = "activityPid", target = "activity")
-	@Mapping(source = "userPid", target = "user")
-	@Mapping(target = "company", ignore = true)
-	@Mapping(target = "id", ignore = true)
+//	@Mapping(source = "activityPid", target = "activity")
+//	@Mapping(source = "userPid", target = "user")
+//	@Mapping(target = "company", ignore = true)
+//	@Mapping(target = "id", ignore = true)
 	public abstract ActivityUserTarget activityUserTargetDTOToActivityUserTarget(
 			ActivityUserTargetDTO activityUserTargetDTO);
 
@@ -98,4 +106,13 @@ public abstract class ActivityUserTargetMapper {
 		}
 		return userRepository.findOneByPid(pid).map(user -> user).orElse(null);
 	}
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }
