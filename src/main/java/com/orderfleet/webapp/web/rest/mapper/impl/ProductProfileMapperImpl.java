@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-
 import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductProfile;
@@ -15,233 +14,292 @@ import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.mapper.ProductProfileMapper;
 
 @Component
-public class ProductProfileMapperImpl extends ProductProfileMapper{
-	
-	 @Override
-	    public ProductProfileDTO productProfileToProductProfileDTO(ProductProfile productProfile) {
-	        if ( productProfile == null ) {
-	            return null;
-	        }
+public class ProductProfileMapperImpl extends ProductProfileMapper {
 
-	        ProductProfileDTO productProfileDTO = new ProductProfileDTO();
+	@Override
+	public ProductProfileDTO productProfileToProductProfileDTO(ProductProfile productProfile) {
+		if (productProfile == null) {
+			return null;
+		}
 
-	        productProfileDTO.setProductCategoryName( productProfileProductCategoryName( productProfile ) );
-	        productProfileDTO.setUnitsPid( productProfileUnitsPid( productProfile ) );
-	        productProfileDTO.setDivisionName( productProfileDivisionName( productProfile ) );
-	        productProfileDTO.setProductCategoryPid( productProfileProductCategoryPid( productProfile ) );
-	        productProfileDTO.setDivisionPid( productProfileDivisionPid( productProfile ) );
-	        productProfileDTO.setUnitsName( productProfileUnitsName( productProfile ) );
-	        productProfileDTO.setActivated( productProfile.getActivated() );
-	        productProfileDTO.setAlias( productProfile.getAlias() );
-	        productProfileDTO.setBarcode( productProfile.getBarcode() );
-	        if ( productProfile.getColorImage() != null ) {
-	            byte[] colorImage = productProfile.getColorImage();
-	            productProfileDTO.setColorImage( Arrays.copyOf( colorImage, colorImage.length ) );
-	        }
-	        productProfileDTO.setColorImageContentType( productProfile.getColorImageContentType() );
-	        productProfileDTO.setCompoundUnitQty( productProfile.getCompoundUnitQty() );
-	        productProfileDTO.setCreatedDate( productProfile.getCreatedDate() );
-	        productProfileDTO.setDefaultLedger( productProfile.getDefaultLedger() );
-	        productProfileDTO.setDescription( productProfile.getDescription() );
-	        productProfileDTO.setHsnCode( productProfile.getHsnCode() );
-	        productProfileDTO.setLastModifiedDate( productProfile.getLastModifiedDate() );
-	        productProfileDTO.setMrp( productProfile.getMrp() );
-	        productProfileDTO.setName( productProfileName(productProfile) );
-	        productProfileDTO.setPid( productProfile.getPid() );
-	        productProfileDTO.setPrice( productProfile.getPrice() );
-	        productProfileDTO.setProductCode( productProfile.getProductCode() );
-	        productProfileDTO.setProductDescription( productProfile.getProductDescription() );
-	        productProfileDTO.setProductGroup( productProfile.getProductGroup() );
-	        productProfileDTO.setProductId( productProfile.getProductId() );
-	        productProfileDTO.setPurchaseCost( productProfile.getPurchaseCost() );
-	        productProfileDTO.setRemarks( productProfile.getRemarks() );
-	        productProfileDTO.setSize( productProfile.getSize() );
-	        productProfileDTO.setSku( productProfile.getSku() );
-	        productProfileDTO.setStockAvailabilityStatus( productProfile.getStockAvailabilityStatus() );
-	        productProfileDTO.setTaxRate( productProfile.getTaxRate() );
-	        productProfileDTO.setTrimChar( productProfile.getTrimChar() );
-	        productProfileDTO.setUnitQty( productProfile.getUnitQty() );
+		ProductProfileDTO productProfileDTO = new ProductProfileDTO();
 
-	        return productProfileDTO;
-	    }
+		productProfileDTO.setProductCategoryName(productProfileProductCategoryName(productProfile));
+		productProfileDTO.setUnitsPid(productProfileUnitsPid(productProfile));
+		productProfileDTO.setDivisionName(productProfileDivisionName(productProfile));
+		productProfileDTO.setProductCategoryPid(productProfileProductCategoryPid(productProfile));
+		productProfileDTO.setDivisionPid(productProfileDivisionPid(productProfile));
+		productProfileDTO.setUnitsName(productProfileUnitsName(productProfile));
+		productProfileDTO.setActivated(productProfile.getActivated());
+		productProfileDTO.setAlias(productProfile.getAlias());
+		productProfileDTO.setBarcode(productProfile.getBarcode());
+		if (productProfile.getColorImage() != null) {
+			byte[] colorImage = productProfile.getColorImage();
+			productProfileDTO.setColorImage(Arrays.copyOf(colorImage, colorImage.length));
+		}
+		productProfileDTO.setColorImageContentType(productProfile.getColorImageContentType());
+		productProfileDTO.setCompoundUnitQty(productProfile.getCompoundUnitQty());
+		productProfileDTO.setCreatedDate(productProfile.getCreatedDate());
+		productProfileDTO.setDefaultLedger(productProfile.getDefaultLedger());
+		productProfileDTO.setDescription(productProfile.getDescription());
+		productProfileDTO.setHsnCode(productProfile.getHsnCode());
+		productProfileDTO.setLastModifiedDate(productProfile.getLastModifiedDate());
+		productProfileDTO.setMrp(productProfile.getMrp());
+		productProfileDTO.setName(productProfile.getName());
+		productProfileDTO.setPid(productProfile.getPid());
+		productProfileDTO.setPrice(productProfile.getPrice());
+		productProfileDTO.setProductCode(productProfile.getProductCode());
+		productProfileDTO.setProductDescription(productProfile.getProductDescription());
+		productProfileDTO.setProductGroup(productProfile.getProductGroup());
+		productProfileDTO.setProductId(productProfile.getProductId());
+		productProfileDTO.setPurchaseCost(productProfile.getPurchaseCost());
+		productProfileDTO.setRemarks(productProfile.getRemarks());
+		productProfileDTO.setSize(productProfile.getSize());
+		productProfileDTO.setSku(productProfile.getSku());
+		productProfileDTO.setStockAvailabilityStatus(productProfile.getStockAvailabilityStatus());
+		productProfileDTO.setTaxRate(productProfile.getTaxRate());
+		productProfileDTO.setTrimChar(productProfile.getTrimChar());
+		productProfileDTO.setUnitQty(productProfile.getUnitQty());
 
-	    @Override
-	    public List<ProductProfileDTO> productProfilesToProductProfileDTOs(List<ProductProfile> productProfiles) {
-	        if ( productProfiles == null ) {
-	            return null;
-	        }
+		return productProfileDTO;
+	}
 
-	        List<ProductProfileDTO> list = new ArrayList<ProductProfileDTO>();
-	        for ( ProductProfile productProfile : productProfiles ) {
-	            list.add( productProfileToProductProfileDTO( productProfile ) );
-	        }
+	public ProductProfileDTO productProfileToProductProfileDTODescription(ProductProfile productProfile) {
+		if (productProfile == null) {
+			return null;
+		}
 
-	        return list;
-	    }
+		ProductProfileDTO productProfileDTO = new ProductProfileDTO();
 
-	    @Override
-	    public ProductProfile productProfileDTOToProductProfile(ProductProfileDTO productProfileDTO) {
-	        if ( productProfileDTO == null ) {
-	            return null;
-	        }
+		productProfileDTO.setProductCategoryName(productProfileProductCategoryName(productProfile));
+		productProfileDTO.setUnitsPid(productProfileUnitsPid(productProfile));
+		productProfileDTO.setDivisionName(productProfileDivisionName(productProfile));
+		productProfileDTO.setProductCategoryPid(productProfileProductCategoryPid(productProfile));
+		productProfileDTO.setDivisionPid(productProfileDivisionPid(productProfile));
+		productProfileDTO.setUnitsName(productProfileUnitsName(productProfile));
+		productProfileDTO.setActivated(productProfile.getActivated());
+		productProfileDTO.setAlias(productProfile.getAlias());
+		productProfileDTO.setBarcode(productProfile.getBarcode());
+		if (productProfile.getColorImage() != null) {
+			byte[] colorImage = productProfile.getColorImage();
+			productProfileDTO.setColorImage(Arrays.copyOf(colorImage, colorImage.length));
+		}
+		productProfileDTO.setColorImageContentType(productProfile.getColorImageContentType());
+		productProfileDTO.setCompoundUnitQty(productProfile.getCompoundUnitQty());
+		productProfileDTO.setCreatedDate(productProfile.getCreatedDate());
+		productProfileDTO.setDefaultLedger(productProfile.getDefaultLedger());
+		productProfileDTO.setDescription(productProfile.getDescription());
+		productProfileDTO.setHsnCode(productProfile.getHsnCode());
+		productProfileDTO.setLastModifiedDate(productProfile.getLastModifiedDate());
+		productProfileDTO.setMrp(productProfile.getMrp());
+		productProfileDTO.setName(
+				productProfile.getDescription() != null && !productProfile.getDescription().equalsIgnoreCase("common")
+						? productProfile.getDescription()
+						: productProfile.getName());
+		productProfileDTO.setPid(productProfile.getPid());
+		productProfileDTO.setPrice(productProfile.getPrice());
+		productProfileDTO.setProductCode(productProfile.getProductCode());
+		productProfileDTO.setProductDescription(productProfile.getProductDescription());
+		productProfileDTO.setProductGroup(productProfile.getProductGroup());
+		productProfileDTO.setProductId(productProfile.getProductId());
+		productProfileDTO.setPurchaseCost(productProfile.getPurchaseCost());
+		productProfileDTO.setRemarks(productProfile.getRemarks());
+		productProfileDTO.setSize(productProfile.getSize());
+		productProfileDTO.setSku(productProfile.getSku());
+		productProfileDTO.setStockAvailabilityStatus(productProfile.getStockAvailabilityStatus());
+		productProfileDTO.setTaxRate(productProfile.getTaxRate());
+		productProfileDTO.setTrimChar(productProfile.getTrimChar());
+		productProfileDTO.setUnitQty(productProfile.getUnitQty());
 
-	        ProductProfile productProfile = new ProductProfile();
+		return productProfileDTO;
+	}
 
-	        productProfile.setDivision( divisionFromPid( productProfileDTO.getDivisionPid() ) );
-	        productProfile.setProductCategory( productCategoryFromPid( productProfileDTO.getProductCategoryPid() ) );
-	        productProfile.setActivated( productProfileDTO.getActivated() );
-	        productProfile.setAlias( productProfileDTO.getAlias() );
-	        productProfile.setBarcode( productProfileDTO.getBarcode() );
-	        if ( productProfileDTO.getColorImage() != null ) {
-	            byte[] colorImage = productProfileDTO.getColorImage();
-	            productProfile.setColorImage( Arrays.copyOf( colorImage, colorImage.length ) );
-	        }
-	        productProfile.setColorImageContentType( productProfileDTO.getColorImageContentType() );
-	        productProfile.setCompoundUnitQty( productProfileDTO.getCompoundUnitQty() );
-	        productProfile.setDefaultLedger( productProfileDTO.getDefaultLedger() );
-	        productProfile.setDescription( productProfileDTO.getDescription() );
-	        productProfile.setHsnCode( productProfileDTO.getHsnCode() );
-	        productProfile.setLastModifiedDate( productProfileDTO.getLastModifiedDate() );
-	        productProfile.setMrp( productProfileDTO.getMrp() );
-	        productProfile.setName( productProfileDTO.getName() );
-	        productProfile.setPid( productProfileDTO.getPid() );
-	        productProfile.setPrice( productProfileDTO.getPrice() );
-	        productProfile.setProductCode( productProfileDTO.getProductCode() );
-	        productProfile.setProductDescription( productProfileDTO.getProductDescription() );
-	        productProfile.setProductGroup( productProfileDTO.getProductGroup() );
-	        productProfile.setProductId( productProfileDTO.getProductId() );
-	        productProfile.setPurchaseCost( productProfileDTO.getPurchaseCost() );
-	        productProfile.setRemarks( productProfileDTO.getRemarks() );
-	        productProfile.setSize( productProfileDTO.getSize() );
-	        productProfile.setSku( productProfileDTO.getSku() );
-	        productProfile.setStockAvailabilityStatus( productProfileDTO.getStockAvailabilityStatus() );
-	        productProfile.setTaxRate( productProfileDTO.getTaxRate() );
-	        productProfile.setTrimChar( productProfileDTO.getTrimChar() );
-	        productProfile.setUnitQty( productProfileDTO.getUnitQty() );
+	@Override
+	public List<ProductProfileDTO> productProfilesToProductProfileDTOs(List<ProductProfile> productProfiles) {
+		if (productProfiles == null) {
+			return null;
+		}
 
-	        return productProfile;
-	    }
+		List<ProductProfileDTO> list = new ArrayList<ProductProfileDTO>();
 
-	    @Override
-	    public List<ProductProfile> productProfileDTOsToProductProfiles(List<ProductProfileDTO> productProfileDTOs) {
-	        if ( productProfileDTOs == null ) {
-	            return null;
-	        }
+		if (getCompanyCofig()) {
+			for (ProductProfile productProfile : productProfiles) {
+				list.add(productProfileToProductProfileDTODescription(productProfile));
+			}
+		} else {
+			for (ProductProfile productProfile : productProfiles) {
+				list.add(productProfileToProductProfileDTO(productProfile));
+			}
+		}
 
-	        List<ProductProfile> list = new ArrayList<ProductProfile>();
-	        for ( ProductProfileDTO productProfileDTO : productProfileDTOs ) {
-	            list.add( productProfileDTOToProductProfile( productProfileDTO ) );
-	        }
+		return list;
+	}
 
-	        return list;
-	    }
+	@Override
+	public ProductProfile productProfileDTOToProductProfile(ProductProfileDTO productProfileDTO) {
+		if (productProfileDTO == null) {
+			return null;
+		}
 
-	    private String productProfileProductCategoryName(ProductProfile productProfile) {
+		ProductProfile productProfile = new ProductProfile();
 
-	        if ( productProfile == null ) {
-	            return null;
-	        }
-	        ProductCategory productCategory = productProfile.getProductCategory();
-	        if ( productCategory == null ) {
-	            return null;
-	        }
-	        String name = productCategory.getName();
-	        if(name==null)
-	        {
-	        	return null;
-	        }
-	        if (productCategory.getDescription()!=null && getCompanyCofig() && !productCategory.getDescription().equals("common") ) {
-	          
-	        	return productCategory.getDescription();
-	        }
-	        return name;
-	    }
+		productProfile.setDivision(divisionFromPid(productProfileDTO.getDivisionPid()));
+		productProfile.setProductCategory(productCategoryFromPid(productProfileDTO.getProductCategoryPid()));
+		productProfile.setActivated(productProfileDTO.getActivated());
+		productProfile.setAlias(productProfileDTO.getAlias());
+		productProfile.setBarcode(productProfileDTO.getBarcode());
+		if (productProfileDTO.getColorImage() != null) {
+			byte[] colorImage = productProfileDTO.getColorImage();
+			productProfile.setColorImage(Arrays.copyOf(colorImage, colorImage.length));
+		}
+		productProfile.setColorImageContentType(productProfileDTO.getColorImageContentType());
+		productProfile.setCompoundUnitQty(productProfileDTO.getCompoundUnitQty());
+		productProfile.setDefaultLedger(productProfileDTO.getDefaultLedger());
+		productProfile.setDescription(productProfileDTO.getDescription());
+		productProfile.setHsnCode(productProfileDTO.getHsnCode());
+		productProfile.setLastModifiedDate(productProfileDTO.getLastModifiedDate());
+		productProfile.setMrp(productProfileDTO.getMrp());
+		productProfile.setName(productProfileDTO.getName());
+		productProfile.setPid(productProfileDTO.getPid());
+		productProfile.setPrice(productProfileDTO.getPrice());
+		productProfile.setProductCode(productProfileDTO.getProductCode());
+		productProfile.setProductDescription(productProfileDTO.getProductDescription());
+		productProfile.setProductGroup(productProfileDTO.getProductGroup());
+		productProfile.setProductId(productProfileDTO.getProductId());
+		productProfile.setPurchaseCost(productProfileDTO.getPurchaseCost());
+		productProfile.setRemarks(productProfileDTO.getRemarks());
+		productProfile.setSize(productProfileDTO.getSize());
+		productProfile.setSku(productProfileDTO.getSku());
+		productProfile.setStockAvailabilityStatus(productProfileDTO.getStockAvailabilityStatus());
+		productProfile.setTaxRate(productProfileDTO.getTaxRate());
+		productProfile.setTrimChar(productProfileDTO.getTrimChar());
+		productProfile.setUnitQty(productProfileDTO.getUnitQty());
 
-	    private String productProfileUnitsPid(ProductProfile productProfile) {
+		return productProfile;
+	}
 
-	        if ( productProfile == null ) {
-	            return null;
-	        }
-	        Units units = productProfile.getUnits();
-	        if ( units == null ) {
-	            return null;
-	        }
-	        String pid = units.getPid();
-	        if ( pid == null ) {
-	            return null;
-	        }
-	        return pid;
-	    }
+	@Override
+	public List<ProductProfile> productProfileDTOsToProductProfiles(List<ProductProfileDTO> productProfileDTOs) {
+		if (productProfileDTOs == null) {
+			return null;
+		}
 
-	    private String productProfileDivisionName(ProductProfile productProfile) {
+		List<ProductProfile> list = new ArrayList<ProductProfile>();
+		for (ProductProfileDTO productProfileDTO : productProfileDTOs) {
+			list.add(productProfileDTOToProductProfile(productProfileDTO));
+		}
 
-	        if ( productProfile == null ) {
-	            return null;
-	        }
-	        Division division = productProfile.getDivision();
-	        if ( division == null ) {
-	            return null;
-	        }
-	        String name = division.getName();
-	        if ( name == null ) {
-	            return null;
-	        }
-	        return name;
-	    }
+		return list;
+	}
 
-	    private String productProfileProductCategoryPid(ProductProfile productProfile) {
+	private String productProfileProductCategoryName(ProductProfile productProfile) {
 
-	        if ( productProfile == null ) {
-	            return null;
-	        }
-	        ProductCategory productCategory = productProfile.getProductCategory();
-	        if ( productCategory == null ) {
-	            return null;
-	        }
-	        String pid = productCategory.getPid();
-	        if ( pid == null ) {
-	            return null;
-	        }
-	        return pid;
-	    }
+		if (productProfile == null) {
+			return null;
+		}
+		ProductCategory productCategory = productProfile.getProductCategory();
+		if (productCategory == null) {
+			return null;
+		}
+		String name = productCategory.getName();
+		if (name == null) {
+			return null;
+		}
+		if (productCategory.getDescription() != null && getCompanyCofig()
+				&& !productCategory.getDescription().equals("common")) {
 
-	    private String productProfileDivisionPid(ProductProfile productProfile) {
+			return productCategory.getDescription();
+		}
+		return name;
+	}
 
-	        if ( productProfile == null ) {
-	            return null;
-	        }
-	        Division division = productProfile.getDivision();
-	        if ( division == null ) {
-	            return null;
-	        }
-	        String pid = division.getPid();
-	        if ( pid == null ) {
-	            return null;
-	        }
-	        return pid;
-	    }
+	private String productProfileUnitsPid(ProductProfile productProfile) {
 
-	    private String productProfileUnitsName(ProductProfile productProfile) {
+		if (productProfile == null) {
+			return null;
+		}
+		Units units = productProfile.getUnits();
+		if (units == null) {
+			return null;
+		}
+		String pid = units.getPid();
+		if (pid == null) {
+			return null;
+		}
+		return pid;
+	}
 
-	        if ( productProfile == null ) {
-	            return null;
-	        }
-	        Units units = productProfile.getUnits();
-	        if ( units == null ) {
-	            return null;
-	        }
-	        String name = units.getName();
-	        if ( name == null ) {
-	            return null;
-	        }
-	        return name;
-	    }
-	    private String productProfileName(ProductProfile productProfile) {
-	        if(productProfile.getProductDescription()!=null && getCompanyCofig() && !productProfile.getProductDescription().equals("common")) {
-	        return productProfile.getProductDescription();
-	        }
-	       
-	    return productProfile.getName();
-	    }
+	private String productProfileDivisionName(ProductProfile productProfile) {
+
+		if (productProfile == null) {
+			return null;
+		}
+		Division division = productProfile.getDivision();
+		if (division == null) {
+			return null;
+		}
+		String name = division.getName();
+		if (name == null) {
+			return null;
+		}
+		return name;
+	}
+
+	private String productProfileProductCategoryPid(ProductProfile productProfile) {
+
+		if (productProfile == null) {
+			return null;
+		}
+		ProductCategory productCategory = productProfile.getProductCategory();
+		if (productCategory == null) {
+			return null;
+		}
+		String pid = productCategory.getPid();
+		if (pid == null) {
+			return null;
+		}
+		return pid;
+	}
+
+	private String productProfileDivisionPid(ProductProfile productProfile) {
+
+		if (productProfile == null) {
+			return null;
+		}
+		Division division = productProfile.getDivision();
+		if (division == null) {
+			return null;
+		}
+		String pid = division.getPid();
+		if (pid == null) {
+			return null;
+		}
+		return pid;
+	}
+
+	private String productProfileUnitsName(ProductProfile productProfile) {
+
+		if (productProfile == null) {
+			return null;
+		}
+		Units units = productProfile.getUnits();
+		if (units == null) {
+			return null;
+		}
+		String name = units.getName();
+		if (name == null) {
+			return null;
+		}
+		return name;
+	}
+
+	private String productProfileName(ProductProfile productProfile) {
+		if (productProfile.getProductDescription() != null && getCompanyCofig()
+				&& !productProfile.getProductDescription().equals("common")) {
+			return productProfile.getProductDescription();
+		}
+
+		return productProfile.getName();
+	}
 
 }

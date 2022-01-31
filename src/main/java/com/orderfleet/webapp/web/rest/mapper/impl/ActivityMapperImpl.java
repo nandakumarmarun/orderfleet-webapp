@@ -14,127 +14,166 @@ import com.orderfleet.webapp.web.rest.dto.AccountTypeDTO;
 import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountTypeMapper;
 import com.orderfleet.webapp.web.rest.mapper.ActivityMapper;
+
 @Component
 public class ActivityMapperImpl extends ActivityMapper {
 
-	 @Autowired
-	    private AccountTypeMapper accountTypeMapper;
+	@Autowired
+	private AccountTypeMapper accountTypeMapper;
 
-	    @Override
-	    public ActivityDTO activityToActivityDTO(Activity activity) {
-	        if ( activity == null ) {
-	            return null;
-	        }
+	@Override
+	public ActivityDTO activityToActivityDTO(Activity activity) {
+		if (activity == null) {
+			return null;
+		}
 
-	        ActivityDTO activityDTO = new ActivityDTO();
+		ActivityDTO activityDTO = new ActivityDTO();
 
-	        activityDTO.setActivated( activity.getActivated() );
-	        Set<AccountTypeDTO> set = accountTypeSetToAccountTypeDTOSet( activity.getActivityAccountTypes() );
-	        if ( set != null ) {
-	            activityDTO.setActivityAccountTypes( set );
-	        }
-	        activityDTO.setAlias( activity.getAlias() );
-	        activityDTO.setCompletePlans( activity.getCompletePlans() );
-	        activityDTO.setContactManagement( activity.getContactManagement() );
-	        activityDTO.setDescription( activity.getDescription() );
-	        activityDTO.setGeoFencing( activity.getGeoFencing() );
-	        activityDTO.setHasDefaultAccount( activity.getHasDefaultAccount() );
-	        activityDTO.setHasSecondarySales( activity.getHasSecondarySales() );
-	        activityDTO.setHasTelephonicOrder( activity.getHasTelephonicOrder() );
-	        activityDTO.setLastModifiedDate( activity.getLastModifiedDate() );
-	        activityDTO.setName( activityName(activity) );
-	        activityDTO.setPid( activity.getPid() );
-	        activityDTO.setTargetDisplayOnDayplan( activity.getTargetDisplayOnDayplan() );
+		activityDTO.setActivated(activity.getActivated());
+		Set<AccountTypeDTO> set = accountTypeSetToAccountTypeDTOSet(activity.getActivityAccountTypes());
+		if (set != null) {
+			activityDTO.setActivityAccountTypes(set);
+		}
+		activityDTO.setAlias(activity.getAlias());
+		activityDTO.setCompletePlans(activity.getCompletePlans());
+		activityDTO.setContactManagement(activity.getContactManagement());
+		activityDTO.setDescription(activity.getDescription());
+		activityDTO.setGeoFencing(activity.getGeoFencing());
+		activityDTO.setHasDefaultAccount(activity.getHasDefaultAccount());
+		activityDTO.setHasSecondarySales(activity.getHasSecondarySales());
+		activityDTO.setHasTelephonicOrder(activity.getHasTelephonicOrder());
+		activityDTO.setLastModifiedDate(activity.getLastModifiedDate());
+		activityDTO.setName(activity.getName());
+		activityDTO.setPid(activity.getPid());
+		activityDTO.setTargetDisplayOnDayplan(activity.getTargetDisplayOnDayplan());
 
-	        return activityDTO;
-	    }
+		return activityDTO;
+	}
 
-	    @Override
-	    public List<ActivityDTO> activitiesToActivityDTOs(List<Activity> activities) {
-	        if ( activities == null ) {
-	            return null;
-	        }
+	public ActivityDTO activityToActivityDTODescription(Activity activity) {
+		if (activity == null) {
+			return null;
+		}
 
-	        List<ActivityDTO> list = new ArrayList<ActivityDTO>();
-	        for ( Activity activity : activities ) {
-	            list.add( activityToActivityDTO( activity ) );
-	        }
+		ActivityDTO activityDTO = new ActivityDTO();
 
-	        return list;
-	    }
+		activityDTO.setActivated(activity.getActivated());
+		Set<AccountTypeDTO> set = accountTypeSetToAccountTypeDTOSet(activity.getActivityAccountTypes());
+		if (set != null) {
+			activityDTO.setActivityAccountTypes(set);
+		}
+		activityDTO.setAlias(activity.getAlias());
+		activityDTO.setCompletePlans(activity.getCompletePlans());
+		activityDTO.setContactManagement(activity.getContactManagement());
+		activityDTO.setDescription(activity.getDescription());
+		activityDTO.setGeoFencing(activity.getGeoFencing());
+		activityDTO.setHasDefaultAccount(activity.getHasDefaultAccount());
+		activityDTO.setHasSecondarySales(activity.getHasSecondarySales());
+		activityDTO.setHasTelephonicOrder(activity.getHasTelephonicOrder());
+		activityDTO.setLastModifiedDate(activity.getLastModifiedDate());
+		activityDTO.setName(activity.getDescription() != null && !activity.getDescription().equalsIgnoreCase("common")
+				? activity.getDescription()
+				: activity.getName());
+		activityDTO.setPid(activity.getPid());
+		activityDTO.setTargetDisplayOnDayplan(activity.getTargetDisplayOnDayplan());
 
-	    @Override
-	    public Activity activityDTOToActivity(ActivityDTO activityDTO) {
-	        if ( activityDTO == null ) {
-	            return null;
-	        }
+		return activityDTO;
+	}
 
-	        Activity activity = new Activity();
+	@Override
+	public List<ActivityDTO> activitiesToActivityDTOs(List<Activity> activities) {
+		if (activities == null) {
+			return null;
+		}
 
-	        activity.setActivated( activityDTO.getActivated() );
-	        Set<AccountType> set = accountTypeDTOSetToAccountTypeSet( activityDTO.getActivityAccountTypes() );
-	        if ( set != null ) {
-	            activity.setActivityAccountTypes( set );
-	        }
-	        activity.setAlias( activityDTO.getAlias() );
-	        activity.setCompletePlans( activityDTO.getCompletePlans() );
-	        activity.setContactManagement( activityDTO.getContactManagement() );
-	        activity.setDescription( activityDTO.getDescription() );
-	        activity.setGeoFencing( activityDTO.getGeoFencing() );
-	        activity.setHasDefaultAccount( activityDTO.getHasDefaultAccount() );
-	        activity.setHasSecondarySales( activityDTO.getHasSecondarySales() );
-	        activity.setHasTelephonicOrder( activityDTO.getHasTelephonicOrder() );
-	        activity.setName( activityDTO.getName() );
-	        activity.setPid( activityDTO.getPid() );
-	        activity.setTargetDisplayOnDayplan( activityDTO.getTargetDisplayOnDayplan() );
+		List<ActivityDTO> list = new ArrayList<ActivityDTO>();
 
-	        return activity;
-	    }
+		if (getCompanyCofig()) {
+			for (Activity activity : activities) {
+				list.add(activityToActivityDTODescription(activity));
+			}
+		} else {
+			for (Activity activity : activities) {
+				list.add(activityToActivityDTO(activity));
+			}
+		}
 
-	    @Override
-	    public List<Activity> activityDTOsToActivities(List<ActivityDTO> activityDTOs) {
-	        if ( activityDTOs == null ) {
-	            return null;
-	        }
+		return list;
+	}
 
-	        List<Activity> list = new ArrayList<Activity>();
-	        for ( ActivityDTO activityDTO : activityDTOs ) {
-	            list.add( activityDTOToActivity( activityDTO ) );
-	        }
+	@Override
+	public Activity activityDTOToActivity(ActivityDTO activityDTO) {
+		if (activityDTO == null) {
+			return null;
+		}
 
-	        return list;
-	    }
+		Activity activity = new Activity();
 
-	    protected Set<AccountTypeDTO> accountTypeSetToAccountTypeDTOSet(Set<AccountType> set) {
-	        if ( set == null ) {
-	            return null;
-	        }
+		activity.setActivated(activityDTO.getActivated());
+		Set<AccountType> set = accountTypeDTOSetToAccountTypeSet(activityDTO.getActivityAccountTypes());
+		if (set != null) {
+			activity.setActivityAccountTypes(set);
+		}
+		activity.setAlias(activityDTO.getAlias());
+		activity.setCompletePlans(activityDTO.getCompletePlans());
+		activity.setContactManagement(activityDTO.getContactManagement());
+		activity.setDescription(activityDTO.getDescription());
+		activity.setGeoFencing(activityDTO.getGeoFencing());
+		activity.setHasDefaultAccount(activityDTO.getHasDefaultAccount());
+		activity.setHasSecondarySales(activityDTO.getHasSecondarySales());
+		activity.setHasTelephonicOrder(activityDTO.getHasTelephonicOrder());
+		activity.setName(activityDTO.getName());
+		activity.setPid(activityDTO.getPid());
+		activity.setTargetDisplayOnDayplan(activityDTO.getTargetDisplayOnDayplan());
 
-	        Set<AccountTypeDTO> set_ = new HashSet<AccountTypeDTO>();
-	        for ( AccountType accountType : set ) {
-	            set_.add( accountTypeMapper.accountTypeToAccountTypeDTO( accountType ) );
-	        }
+		return activity;
+	}
 
-	        return set_;
-	    }
+	@Override
+	public List<Activity> activityDTOsToActivities(List<ActivityDTO> activityDTOs) {
+		if (activityDTOs == null) {
+			return null;
+		}
 
-	    protected Set<AccountType> accountTypeDTOSetToAccountTypeSet(Set<AccountTypeDTO> set) {
-	        if ( set == null ) {
-	            return null;
-	        }
+		List<Activity> list = new ArrayList<Activity>();
+		for (ActivityDTO activityDTO : activityDTOs) {
+			list.add(activityDTOToActivity(activityDTO));
+		}
 
-	        Set<AccountType> set_ = new HashSet<AccountType>();
-	        for ( AccountTypeDTO accountTypeDTO : set ) {
-	            set_.add( accountTypeMapper.accountTypeDTOToAccountType( accountTypeDTO ) );
-	        }
+		return list;
+	}
 
-	        return set_;
-	    }
-	    private String activityName(Activity activity) {
-	        if(activity.getDescription()!=null && getCompanyCofig() && !activity.getDescription().equals("common")) {
-	        return activity.getDescription();
-	        }
-	       
-	    return activity.getName();
-	    }
+	protected Set<AccountTypeDTO> accountTypeSetToAccountTypeDTOSet(Set<AccountType> set) {
+		if (set == null) {
+			return null;
+		}
+
+		Set<AccountTypeDTO> set_ = new HashSet<AccountTypeDTO>();
+		for (AccountType accountType : set) {
+			set_.add(accountTypeMapper.accountTypeToAccountTypeDTO(accountType));
+		}
+
+		return set_;
+	}
+
+	protected Set<AccountType> accountTypeDTOSetToAccountTypeSet(Set<AccountTypeDTO> set) {
+		if (set == null) {
+			return null;
+		}
+
+		Set<AccountType> set_ = new HashSet<AccountType>();
+		for (AccountTypeDTO accountTypeDTO : set) {
+			set_.add(accountTypeMapper.accountTypeDTOToAccountType(accountTypeDTO));
+		}
+
+		return set_;
+	}
+
+	private String activityName(Activity activity) {
+		if (activity.getDescription() != null && getCompanyCofig() && !activity.getDescription().equals("common")) {
+			return activity.getDescription();
+		}
+
+		return activity.getName();
+	}
 }
