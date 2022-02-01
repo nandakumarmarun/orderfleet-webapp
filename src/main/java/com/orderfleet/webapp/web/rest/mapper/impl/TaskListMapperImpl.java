@@ -13,111 +13,140 @@ import com.orderfleet.webapp.web.rest.dto.TaskDTO;
 import com.orderfleet.webapp.web.rest.dto.TaskListDTO;
 import com.orderfleet.webapp.web.rest.mapper.TaskListMapper;
 import com.orderfleet.webapp.web.rest.mapper.TaskMapper;
+
 @Component
-public class TaskListMapperImpl extends TaskListMapper{
+public class TaskListMapperImpl extends TaskListMapper {
 
- @Autowired
-    private TaskMapper taskMapper;
+	@Autowired
+	private TaskMapper taskMapper;
 
-    @Override
-    public TaskListDTO taskListToTaskListDTO(TaskList taskList) {
-        if ( taskList == null ) {
-            return null;
-        }
+	@Override
+	public TaskListDTO taskListToTaskListDTO(TaskList taskList) {
+		if (taskList == null) {
+			return null;
+		}
 
-        TaskListDTO taskListDTO = new TaskListDTO();
+		TaskListDTO taskListDTO = new TaskListDTO();
 
-        taskListDTO.setPid( taskList.getPid() );
-        taskListDTO.setName( taskListName(taskList) );
-        taskListDTO.setAlias( taskList.getAlias() );
-        taskListDTO.setDescription( taskList.getDescription() );
-        Set<TaskDTO> set = taskSetToTaskDTOSet( taskList.getTasks() );
-        if ( set != null ) {
-            taskListDTO.setTasks( set );
-        }
+		taskListDTO.setPid(taskList.getPid());
+		taskListDTO.setName(taskList.getName());
+		taskListDTO.setAlias(taskList.getAlias());
+		taskListDTO.setDescription(taskList.getDescription());
+		Set<TaskDTO> set = taskSetToTaskDTOSet(taskList.getTasks());
+		if (set != null) {
+			taskListDTO.setTasks(set);
+		}
 
-        return taskListDTO;
-    }
+		return taskListDTO;
+	}
 
-    @Override
-    public List<TaskListDTO> taskListsToTaskListDTOs(List<TaskList> taskLists) {
-        if ( taskLists == null ) {
-            return null;
-        }
+	public TaskListDTO taskListToTaskListDTODescription(TaskList taskList) {
+		if (taskList == null) {
+			return null;
+		}
 
-        List<TaskListDTO> list = new ArrayList<TaskListDTO>();
-        for ( TaskList taskList : taskLists ) {
-            list.add( taskListToTaskListDTO( taskList ) );
-        }
+		TaskListDTO taskListDTO = new TaskListDTO();
 
-        return list;
-    }
+		taskListDTO.setPid(taskList.getPid());
+		taskListDTO.setName(taskList.getDescription() != null && !taskList.getDescription().equalsIgnoreCase("common")
+				? taskList.getDescription()
+				: taskList.getName());
+		taskListDTO.setAlias(taskList.getAlias());
+		taskListDTO.setDescription(taskList.getDescription());
+		Set<TaskDTO> set = taskSetToTaskDTOSet(taskList.getTasks());
+		if (set != null) {
+			taskListDTO.setTasks(set);
+		}
 
-    @Override
-    public TaskList taskListDTOToTaskList(TaskListDTO taskListDTO) {
-        if ( taskListDTO == null ) {
-            return null;
-        }
+		return taskListDTO;
+	}
 
-        TaskList taskList = new TaskList();
+	@Override
+	public List<TaskListDTO> taskListsToTaskListDTOs(List<TaskList> taskLists) {
+		if (taskLists == null) {
+			return null;
+		}
 
-        taskList.setPid( taskListDTO.getPid() );
-        taskList.setName( taskListDTO.getName() );
-        taskList.setAlias( taskListDTO.getAlias() );
-        taskList.setDescription( taskListDTO.getDescription() );
-        Set<Task> set = taskDTOSetToTaskSet( taskListDTO.getTasks() );
-        if ( set != null ) {
-            taskList.setTasks( set );
-        }
+		List<TaskListDTO> list = new ArrayList<TaskListDTO>();
+		if (getCompanyCofig()) {
+			for (TaskList taskList : taskLists) {
+				list.add(taskListToTaskListDTODescription(taskList));
+			}
+		} else {
+			for (TaskList taskList : taskLists) {
+				list.add(taskListToTaskListDTO(taskList));
+			}
+		}
 
-        return taskList;
-    }
+		return list;
+	}
 
-    @Override
-    public List<TaskList> taskListDTOsToTaskLists(List<TaskListDTO> taskListDTOs) {
-        if ( taskListDTOs == null ) {
-            return null;
-        }
+	@Override
+	public TaskList taskListDTOToTaskList(TaskListDTO taskListDTO) {
+		if (taskListDTO == null) {
+			return null;
+		}
 
-        List<TaskList> list = new ArrayList<TaskList>();
-        for ( TaskListDTO taskListDTO : taskListDTOs ) {
-            list.add( taskListDTOToTaskList( taskListDTO ) );
-        }
+		TaskList taskList = new TaskList();
 
-        return list;
-    }
+		taskList.setPid(taskListDTO.getPid());
+		taskList.setName(taskListDTO.getName());
+		taskList.setAlias(taskListDTO.getAlias());
+		taskList.setDescription(taskListDTO.getDescription());
+		Set<Task> set = taskDTOSetToTaskSet(taskListDTO.getTasks());
+		if (set != null) {
+			taskList.setTasks(set);
+		}
 
-    protected Set<TaskDTO> taskSetToTaskDTOSet(Set<Task> set) {
-        if ( set == null ) {
-            return null;
-        }
+		return taskList;
+	}
 
-        Set<TaskDTO> set_ = new HashSet<TaskDTO>();
-        for ( Task task : set ) {
-            set_.add( taskMapper.taskToTaskDTO( task ) );
-        }
+	@Override
+	public List<TaskList> taskListDTOsToTaskLists(List<TaskListDTO> taskListDTOs) {
+		if (taskListDTOs == null) {
+			return null;
+		}
 
-        return set_;
-    }
+		List<TaskList> list = new ArrayList<TaskList>();
+		for (TaskListDTO taskListDTO : taskListDTOs) {
+			list.add(taskListDTOToTaskList(taskListDTO));
+		}
 
-    protected Set<Task> taskDTOSetToTaskSet(Set<TaskDTO> set) {
-        if ( set == null ) {
-            return null;
-        }
+		return list;
+	}
 
-        Set<Task> set_ = new HashSet<Task>();
-        for ( TaskDTO taskDTO : set ) {
-            set_.add( taskMapper.taskDTOToTask( taskDTO ) );
-        }
+	protected Set<TaskDTO> taskSetToTaskDTOSet(Set<Task> set) {
+		if (set == null) {
+			return null;
+		}
 
-        return set_;
-    }
-    private String  taskListName(TaskList taskList) {
-        if(taskList.getDescription()!=null && getCompanyCofig() && !taskList.getDescription().equals("common")) {
-        return taskList.getDescription();
-        }
-       
-    return taskList.getName();
-    }
+		Set<TaskDTO> set_ = new HashSet<TaskDTO>();
+		for (Task task : set) {
+			set_.add(taskMapper.taskToTaskDTO(task));
+		}
+
+		return set_;
+	}
+
+	protected Set<Task> taskDTOSetToTaskSet(Set<TaskDTO> set) {
+		if (set == null) {
+			return null;
+		}
+
+		Set<Task> set_ = new HashSet<Task>();
+		for (TaskDTO taskDTO : set) {
+			set_.add(taskMapper.taskDTOToTask(taskDTO));
+		}
+
+		return set_;
+	}
+
+	private String taskListName(TaskList taskList) {
+		if (taskList.getDescription() != null && getCompanyCofig() && !taskList.getDescription().equals("common")) {
+			return taskList.getDescription();
+		}
+
+		return taskList.getName();
+	}
 
 }

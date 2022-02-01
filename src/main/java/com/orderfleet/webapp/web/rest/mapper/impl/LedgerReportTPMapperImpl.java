@@ -36,6 +36,28 @@ public class LedgerReportTPMapperImpl extends LedgerReportTPMapper {
 
         return ledgerReportTPDTO;
     }
+   public LedgerReportTPDTO ledgerReportTPToLedgerReportTPDTODescription(LedgerReportTP ledgerReportTP) {
+       if ( ledgerReportTP == null ) {
+           return null;
+       }
+
+       LedgerReportTPDTO ledgerReportTPDTO = new LedgerReportTPDTO();
+
+       ledgerReportTPDTO.setDivisionName( ledgerReportTPDivisionDescription( ledgerReportTP ) );
+       ledgerReportTPDTO.setDivisionPid( ledgerReportTPDivisionPid( ledgerReportTP ) );
+       ledgerReportTPDTO.setAccountProfilePid( ledgerReportTPAccountProfilePid( ledgerReportTP ) );
+       ledgerReportTPDTO.setAccountProfileName( ledgerReportTPAccountProfileDescription( ledgerReportTP ) );
+       ledgerReportTPDTO.setDivisionAlias( ledgerReportTPDivisionAlias( ledgerReportTP ) );
+       ledgerReportTPDTO.setId( ledgerReportTP.getId() );
+       ledgerReportTPDTO.setVoucheNo( ledgerReportTP.getVoucheNo() );
+       ledgerReportTPDTO.setVoucherDate( ledgerReportTP.getVoucherDate() );
+       ledgerReportTPDTO.setNarration( ledgerReportTP.getNarration() );
+       ledgerReportTPDTO.setAmount( ledgerReportTP.getAmount() );
+       ledgerReportTPDTO.setType( ledgerReportTP.getType() );
+       ledgerReportTPDTO.setDebitCredit( ledgerReportTP.getDebitCredit() );
+
+       return ledgerReportTPDTO;
+   }
 
     @Override
     public List<LedgerReportTPDTO> ledgerReportTPsToLedgerReportTPDTOs(List<LedgerReportTP> ledgerReportTPs) {
@@ -44,10 +66,18 @@ public class LedgerReportTPMapperImpl extends LedgerReportTPMapper {
         }
 
         List<LedgerReportTPDTO> list = new ArrayList<LedgerReportTPDTO>();
+        if(getCompanyCofig())
+        {
         for ( LedgerReportTP ledgerReportTP : ledgerReportTPs ) {
-            list.add( ledgerReportTPToLedgerReportTPDTO( ledgerReportTP ) );
+            list.add( ledgerReportTPToLedgerReportTPDTODescription( ledgerReportTP ) );
         }
-
+        }
+        else
+        {
+        	for ( LedgerReportTP ledgerReportTP : ledgerReportTPs ) {
+                list.add( ledgerReportTPToLedgerReportTPDTO( ledgerReportTP ) );
+            }
+        }
         return list;
     }
 
@@ -99,10 +129,28 @@ public class LedgerReportTPMapperImpl extends LedgerReportTPMapper {
         if ( name == null ) {
             return null;
         }
-        if(division.getDescription()!=null && getCompanyCofig() && !division.getDescription().equals("common")) {
+//        if(division.getDescription()!=null && getCompanyCofig() && !division.getDescription().equals("common")) {
+//	        return division.getDescription();
+//	        }
+//	       
+        return name;
+    }
+    private String ledgerReportTPDivisionDescription(LedgerReportTP ledgerReportTP) {
+
+        if ( ledgerReportTP == null ) {
+            return null;
+        }
+        Division division = ledgerReportTP.getDivision();
+        if ( division == null ) {
+            return null;
+        }
+        String name = division.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(division.getDescription()!=null && !division.getDescription().equals("common")) {
 	        return division.getDescription();
-	        }
-	       
+	        }	       
         return name;
     }
 
@@ -151,12 +199,32 @@ public class LedgerReportTPMapperImpl extends LedgerReportTPMapper {
         if ( name == null ) {
             return null;
         }
-        if(accountProfile.getDescription()!=null && getCompanyCofig() && !accountProfile.getDescription().equals("common")) {
+//        if(accountProfile.getDescription()!=null && getCompanyCofig() && !accountProfile.getDescription().equals("common")) {
+//	        return accountProfile.getDescription();
+//	        }
+	       
+        return name;
+    }
+    private String ledgerReportTPAccountProfileDescription(LedgerReportTP ledgerReportTP) {
+
+        if ( ledgerReportTP == null ) {
+            return null;
+        }
+        AccountProfile accountProfile = ledgerReportTP.getAccountProfile();
+        if ( accountProfile == null ) {
+            return null;
+        }
+        String name = accountProfile.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(accountProfile.getDescription()!=null && !accountProfile.getDescription().equals("common")) {
 	        return accountProfile.getDescription();
 	        }
 	       
         return name;
     }
+
 
     private String ledgerReportTPDivisionAlias(LedgerReportTP ledgerReportTP) {
 

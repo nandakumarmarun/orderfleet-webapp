@@ -29,7 +29,21 @@ public class LocationHierarchyMapperImpl extends LocationHierarchyMapper{
 
 	        return locationHierarchyDTO;
 	    }
+	  public LocationHierarchyDTO locationHierarchyToLocationHierarchyDTODescription(LocationHierarchy locationHierarchy) {
+	        if ( locationHierarchy == null ) {
+	            return null;
+	        }
 
+	        LocationHierarchyDTO locationHierarchyDTO = new LocationHierarchyDTO();
+
+	        locationHierarchyDTO.setParentName( locationHierarchyParentName( locationHierarchy ) );
+	        locationHierarchyDTO.setLocationName( locationHierarchyLocationDescription( locationHierarchy ) );
+	        locationHierarchyDTO.setLocationId( locationHierarchyLocationId( locationHierarchy ) );
+	        locationHierarchyDTO.setParentId( locationHierarchyParentId( locationHierarchy ) );
+	        locationHierarchyDTO.setCustom( locationHierarchy.getCustom() );
+
+	        return locationHierarchyDTO;
+	    }
 	    @Override
 	    public List<LocationHierarchyDTO> locationHierarchiesToLocationHierarchyDTOs(List<LocationHierarchy> locationHierarchies) {
 	        if ( locationHierarchies == null ) {
@@ -37,10 +51,19 @@ public class LocationHierarchyMapperImpl extends LocationHierarchyMapper{
 	        }
 
 	        List<LocationHierarchyDTO> list = new ArrayList<LocationHierarchyDTO>();
+	        if(getCompanyCofig())
+	        {
 	        for ( LocationHierarchy locationHierarchy : locationHierarchies ) {
-	            list.add( locationHierarchyToLocationHierarchyDTO( locationHierarchy ) );
+	            list.add( locationHierarchyToLocationHierarchyDTODescription( locationHierarchy ) );
 	        }
-
+	        }
+	        else
+	        {
+	        	 for ( LocationHierarchy locationHierarchy : locationHierarchies ) {
+	 	            list.add( locationHierarchyToLocationHierarchyDTO( locationHierarchy ) );
+	 	        }
+	        	
+	        }
 	        return list;
 	    }
 
@@ -103,7 +126,28 @@ public class LocationHierarchyMapperImpl extends LocationHierarchyMapper{
 	            return null;
 	        }
 	        
-		        if(location.getDescription()!=null && getCompanyCofig() && !location.getDescription().equals("common")) {
+//		        if(location.getDescription()!=null && getCompanyCofig() && !location.getDescription().equals("common")) {
+//		        return location.getDescription();
+//		        }
+		       
+		    
+	        return name;
+	    }
+	    private String locationHierarchyLocationDescription(LocationHierarchy locationHierarchy) {
+
+	        if ( locationHierarchy == null ) {
+	            return null;
+	        }
+	        Location location = locationHierarchy.getLocation();
+	        if ( location == null ) {
+	            return null;
+	        }
+	        String name = location.getName();
+	        if ( name == null ) {
+	            return null;
+	        }
+	        
+		        if(location.getDescription()!=null && !location.getDescription().equals("common")) {
 		        return location.getDescription();
 		        }
 		       
@@ -142,11 +186,5 @@ public class LocationHierarchyMapperImpl extends LocationHierarchyMapper{
 	        }
 	        return id;
 	    }
-	    private String accountProfileName(AccountProfile accountProfile) {
-	        if(accountProfile.getDescription()!=null && getCompanyCofig() && !accountProfile.getDescription().equals("common")) {
-	        return accountProfile.getDescription();
-	        }
-	       
-	    return accountProfile.getName();
-	    }
+	    
 }

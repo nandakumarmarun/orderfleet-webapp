@@ -93,8 +93,8 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfileDTO.setLastModifiedDate(productProfile.getLastModifiedDate());
 		productProfileDTO.setMrp(productProfile.getMrp());
 		productProfileDTO.setName(
-				productProfile.getDescription() != null && !productProfile.getDescription().equalsIgnoreCase("common")
-						? productProfile.getDescription()
+				productProfile.getProductDescription() != null && !productProfile.getProductDescription().equalsIgnoreCase("common")
+						? productProfile.getProductDescription()
 						: productProfile.getName());
 		productProfileDTO.setPid(productProfile.getPid());
 		productProfileDTO.setPrice(productProfile.getPrice());

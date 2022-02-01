@@ -22,7 +22,7 @@ public class CompetitorProfileMapperImpl extends CompetitorProfileMapper {
 
 	        competitorProfileDTO.setActivated( competitorProfile.getActivated() );
 	        competitorProfileDTO.setPid( competitorProfile.getPid() );
-	        competitorProfileDTO.setName(competitorProfileName( competitorProfile ));
+	        competitorProfileDTO.setName(competitorProfile.getName());
 	        competitorProfileDTO.setAlias( competitorProfile.getAlias() );
 	        competitorProfileDTO.setDescription( competitorProfile.getDescription() );
 	        competitorProfileDTO.setLastModifiedDate( competitorProfile.getLastModifiedDate() );
@@ -31,6 +31,25 @@ public class CompetitorProfileMapperImpl extends CompetitorProfileMapper {
 	        return competitorProfileDTO;
 	    }
 
+	  public CompetitorProfileDTO competitorProfileToCompetitorProfileDTODescription(CompetitorProfile competitorProfile) {
+	        if ( competitorProfile == null ) {
+	            return null;
+	        }
+
+	        CompetitorProfileDTO competitorProfileDTO = new CompetitorProfileDTO();
+
+	        competitorProfileDTO.setActivated( competitorProfile.getActivated() );
+	        competitorProfileDTO.setPid( competitorProfile.getPid() );
+	        competitorProfileDTO.setName(competitorProfile.getDescription() != null && !competitorProfile.getDescription().equalsIgnoreCase("common")
+					? competitorProfile.getDescription()
+					: competitorProfile.getName());
+	        competitorProfileDTO.setAlias( competitorProfile.getAlias() );
+	        competitorProfileDTO.setDescription( competitorProfile.getDescription() );
+	        competitorProfileDTO.setLastModifiedDate( competitorProfile.getLastModifiedDate() );
+	        competitorProfileDTO.setChartColor( competitorProfile.getChartColor() );
+
+	        return competitorProfileDTO;
+	    }
 	    @Override
 	    public List<CompetitorProfileDTO> competitorProfilesToCompetitorProfileDTOs(List<CompetitorProfile> competitorProfiles) {
 	        if ( competitorProfiles == null ) {
@@ -38,10 +57,17 @@ public class CompetitorProfileMapperImpl extends CompetitorProfileMapper {
 	        }
 
 	        List<CompetitorProfileDTO> list = new ArrayList<CompetitorProfileDTO>();
+	        if(getCompanyCofig()) {
 	        for ( CompetitorProfile competitorProfile : competitorProfiles ) {
-	            list.add( competitorProfileToCompetitorProfileDTO( competitorProfile ) );
+	            list.add( competitorProfileToCompetitorProfileDTODescription( competitorProfile ) );
 	        }
-
+	        }
+	        else
+	        {
+	        	for ( CompetitorProfile competitorProfile : competitorProfiles ) {
+		            list.add( competitorProfileToCompetitorProfileDTO( competitorProfile ) );
+		        }
+	        }
 	        return list;
 	    }
 

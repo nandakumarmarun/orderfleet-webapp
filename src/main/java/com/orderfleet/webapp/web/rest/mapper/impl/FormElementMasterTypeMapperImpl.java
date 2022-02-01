@@ -22,13 +22,29 @@ public class FormElementMasterTypeMapperImpl extends FormElementMasterTypeMapper
 
         formElementMasterTypeDTO.setActivated( formElementMaster.getActivated() );
         formElementMasterTypeDTO.setPid( formElementMaster.getPid() );
-        formElementMasterTypeDTO.setName( formElementMasterName(formElementMaster ));
+        formElementMasterTypeDTO.setName( formElementMaster.getName());
         formElementMasterTypeDTO.setAlias( formElementMaster.getAlias() );
         formElementMasterTypeDTO.setDescription( formElementMaster.getDescription() );
 
         return formElementMasterTypeDTO;
     }
+    public FormElementMasterTypeDTO formElementMasterToFormElementMasterTypeDTODescription(FormElementMasterType formElementMaster) {
+        if ( formElementMaster == null ) {
+            return null;
+        }
 
+        FormElementMasterTypeDTO formElementMasterTypeDTO = new FormElementMasterTypeDTO();
+
+        formElementMasterTypeDTO.setActivated( formElementMaster.getActivated() );
+        formElementMasterTypeDTO.setPid( formElementMaster.getPid() );
+        formElementMasterTypeDTO.setName(formElementMaster.getDescription() != null && !formElementMaster.getDescription().equalsIgnoreCase("common")
+				? formElementMaster.getDescription()
+				: formElementMaster.getName());
+        formElementMasterTypeDTO.setAlias( formElementMaster.getAlias() );
+        formElementMasterTypeDTO.setDescription( formElementMaster.getDescription() );
+
+        return formElementMasterTypeDTO;
+    }
     @Override
     public List<FormElementMasterTypeDTO> formElementMastersToFormElementMasterTypeDTOs(List<FormElementMasterType> formElementMasters) {
         if ( formElementMasters == null ) {
@@ -36,10 +52,17 @@ public class FormElementMasterTypeMapperImpl extends FormElementMasterTypeMapper
         }
 
         List<FormElementMasterTypeDTO> list = new ArrayList<FormElementMasterTypeDTO>();
+      if(getCompanyCofig()) {
         for ( FormElementMasterType formElementMasterType : formElementMasters ) {
-            list.add( formElementMasterToFormElementMasterTypeDTO( formElementMasterType ) );
+            list.add( formElementMasterToFormElementMasterTypeDTODescription( formElementMasterType ) );
         }
-
+      }
+      else
+      { for ( FormElementMasterType formElementMasterType : formElementMasters ) {
+          list.add( formElementMasterToFormElementMasterTypeDTO( formElementMasterType ) );
+      }
+    	  
+      }
         return list;
     }
 

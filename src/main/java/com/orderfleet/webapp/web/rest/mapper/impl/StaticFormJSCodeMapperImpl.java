@@ -29,6 +29,21 @@ public class StaticFormJSCodeMapperImpl extends StaticFormJSCodeMapper{
         return staticFormJSCodeDTO;
     }
 
+ public StaticFormJSCodeDTO staticFormJSCodeToStaticFormJSCodeDTODescription(StaticFormJSCode staticFormJSCode) {
+     if ( staticFormJSCode == null ) {
+         return null;
+     }
+
+     StaticFormJSCodeDTO staticFormJSCodeDTO = new StaticFormJSCodeDTO();
+
+     staticFormJSCodeDTO.setDocumentPid( staticFormJSCodeDocumentPid( staticFormJSCode ) );
+     staticFormJSCodeDTO.setDocumentName( staticFormJSCodeDocumentDescription( staticFormJSCode ) );
+     staticFormJSCodeDTO.setId( staticFormJSCode.getId() );
+     staticFormJSCodeDTO.setJsCode( staticFormJSCode.getJsCode() );
+     staticFormJSCodeDTO.setJsCodeName( staticFormJSCode.getJsCodeName() );
+
+     return staticFormJSCodeDTO;
+ }
     @Override
     public List<StaticFormJSCodeDTO> staticFormJSCodesToStaticFormJSCodeDTOs(List<StaticFormJSCode> staticFormJSCodes) {
         if ( staticFormJSCodes == null ) {
@@ -36,10 +51,17 @@ public class StaticFormJSCodeMapperImpl extends StaticFormJSCodeMapper{
         }
 
         List<StaticFormJSCodeDTO> list = new ArrayList<StaticFormJSCodeDTO>();
+        if(getCompanyCofig()) {
         for ( StaticFormJSCode staticFormJSCode : staticFormJSCodes ) {
-            list.add( staticFormJSCodeToStaticFormJSCodeDTO( staticFormJSCode ) );
+            list.add( staticFormJSCodeToStaticFormJSCodeDTODescription( staticFormJSCode ) );
         }
-
+        }
+        else
+        {
+        	for ( StaticFormJSCode staticFormJSCode : staticFormJSCodes ) {
+                list.add( staticFormJSCodeToStaticFormJSCodeDTO( staticFormJSCode ) );
+            }
+        }
         return list;
     }
 
@@ -101,10 +123,27 @@ public class StaticFormJSCodeMapperImpl extends StaticFormJSCodeMapper{
         if ( name == null ) {
             return null;
         }
-        if(document.getDescription()!=null && getCompanyCofig() && !document.getDescription().equals("common")) {
+//        if(document.getDescription()!=null && getCompanyCofig() && !document.getDescription().equals("common")) {
+//	        return document.getDescription();
+//	        }
+        return name;
+    }
+    private String staticFormJSCodeDocumentDescription(StaticFormJSCode staticFormJSCode) {
+
+        if ( staticFormJSCode == null ) {
+            return null;
+        }
+        Document document = staticFormJSCode.getDocument();
+        if ( document == null ) {
+            return null;
+        }
+        String name = document.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(document.getDescription()!=null &&!document.getDescription().equals("common")) {
 	        return document.getDescription();
 	        }
         return name;
     }
-
 }

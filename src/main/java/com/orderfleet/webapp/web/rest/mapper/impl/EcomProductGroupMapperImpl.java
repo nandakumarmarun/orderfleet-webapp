@@ -22,7 +22,7 @@ public class EcomProductGroupMapperImpl extends EcomProductGroupMapper {
         EcomProductGroupDTO ecomProductGroupDTO = new EcomProductGroupDTO();
 
         ecomProductGroupDTO.setPid( ecomProductGroup.getPid() );
-        ecomProductGroupDTO.setName( ecomProductGroupName(ecomProductGroup) );
+        ecomProductGroupDTO.setName( ecomProductGroup.getName() );
         ecomProductGroupDTO.setAlias( ecomProductGroup.getAlias() );
         ecomProductGroupDTO.setDescription( ecomProductGroup.getDescription() );
         ecomProductGroupDTO.setImageContentType( ecomProductGroup.getImageContentType() );
@@ -33,6 +33,27 @@ public class EcomProductGroupMapperImpl extends EcomProductGroupMapper {
         return ecomProductGroupDTO;
     }
 
+	  public EcomProductGroupDTO productGroupToProductGroupDTODescription(EcomProductGroup ecomProductGroup) {
+	        if ( ecomProductGroup == null ) {
+	            return null;
+	        }
+
+	        EcomProductGroupDTO ecomProductGroupDTO = new EcomProductGroupDTO();
+
+	        ecomProductGroupDTO.setPid( ecomProductGroup.getPid() );
+	        ecomProductGroupDTO.setName( ecomProductGroup.getDescription() != null && !ecomProductGroup.getDescription().equalsIgnoreCase("common")
+					? ecomProductGroup.getDescription()
+					: ecomProductGroup.getName()); 
+	        ecomProductGroupDTO.setAlias( ecomProductGroup.getAlias() );
+	        ecomProductGroupDTO.setDescription( ecomProductGroup.getDescription() );
+	        ecomProductGroupDTO.setImageContentType( ecomProductGroup.getImageContentType() );
+	        ecomProductGroupDTO.setLastModifiedDate( ecomProductGroup.getLastModifiedDate() );
+	        ecomProductGroupDTO.setActivated( ecomProductGroup.getActivated() );
+	        ecomProductGroupDTO.setThirdpartyUpdate( ecomProductGroup.getThirdpartyUpdate() );
+
+	        return ecomProductGroupDTO;
+	    }
+
     @Override
     public List<EcomProductGroupDTO> productGroupsToProductGroupDTOs(List<EcomProductGroup> ecomProductGroups) {
         if ( ecomProductGroups == null ) {
@@ -40,8 +61,15 @@ public class EcomProductGroupMapperImpl extends EcomProductGroupMapper {
         }
 
         List<EcomProductGroupDTO> list = new ArrayList<EcomProductGroupDTO>();
+        if(getCompanyCofig()) {
         for ( EcomProductGroup ecomProductGroup : ecomProductGroups ) {
+            list.add( productGroupToProductGroupDTODescription( ecomProductGroup ) );
+        }
+        }else
+        { for ( EcomProductGroup ecomProductGroup : ecomProductGroups ) {
             list.add( productGroupToProductGroupDTO( ecomProductGroup ) );
+        }
+        	
         }
 
         return list;

@@ -347,11 +347,10 @@ public class LocationServiceImpl implements LocationService {
 
 		List<Location> locationList = locationRepository.findAllLocationsByCompanyAndActivatedLocations(true);
 
-		List<LocationDTO> result = new ArrayList<>();
-
-		for (Location location : locationList) {
-			result.add(new LocationDTO(location));
-		}
+		List<LocationDTO> result = locationMapper.locationsToLocationDTOs(locationList);
+//		for (Location location : locationList) {
+//			result.add(new LocationDTO(location));
+//		}
 		return result;
 
 	}

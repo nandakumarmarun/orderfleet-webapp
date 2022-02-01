@@ -22,7 +22,7 @@ public class StockLocationMapperImpl extends StockLocationMapper{
 
         stockLocationDTO.setActivated( stockLocation.getActivated() );
         stockLocationDTO.setPid( stockLocation.getPid() );
-        stockLocationDTO.setName( stockLocationName(stockLocation));
+        stockLocationDTO.setName( stockLocation.getName());
         stockLocationDTO.setAlias( stockLocation.getAlias() );
         stockLocationDTO.setDescription( stockLocation.getDescription() );
         stockLocationDTO.setStockLocationType( stockLocation.getStockLocationType() );
@@ -30,7 +30,25 @@ public class StockLocationMapperImpl extends StockLocationMapper{
 
         return stockLocationDTO;
     }
+    public StockLocationDTO stockLocationToStockLocationDTODescription(StockLocation stockLocation) {
+        if ( stockLocation == null ) {
+            return null;
+        }
 
+        StockLocationDTO stockLocationDTO = new StockLocationDTO();
+
+        stockLocationDTO.setActivated( stockLocation.getActivated() );
+        stockLocationDTO.setPid( stockLocation.getPid() );
+        stockLocationDTO.setName( stockLocation.getDescription() != null && !stockLocation.getDescription().equalsIgnoreCase("common")
+				? stockLocation.getDescription()
+				: stockLocation.getName());
+        stockLocationDTO.setAlias( stockLocation.getAlias() );
+        stockLocationDTO.setDescription( stockLocation.getDescription() );
+        stockLocationDTO.setStockLocationType( stockLocation.getStockLocationType() );
+        stockLocationDTO.setLastModifiedDate( stockLocation.getLastModifiedDate() );
+
+        return stockLocationDTO;
+    }
     @Override
     public List<StockLocationDTO> stockLocationsToStockLocationDTOs(List<StockLocation> stockLocations) {
         if ( stockLocations == null ) {
@@ -38,8 +56,17 @@ public class StockLocationMapperImpl extends StockLocationMapper{
         }
 
         List<StockLocationDTO> list = new ArrayList<StockLocationDTO>();
+        if(getCompanyCofig())
+        {
         for ( StockLocation stockLocation : stockLocations ) {
-            list.add( stockLocationToStockLocationDTO( stockLocation ) );
+            list.add( stockLocationToStockLocationDTODescription( stockLocation ) );
+        }
+        }
+        else
+        {
+        	 for ( StockLocation stockLocation : stockLocations ) {
+                 list.add( stockLocationToStockLocationDTO( stockLocation ) );
+             }
         }
 
         return list;

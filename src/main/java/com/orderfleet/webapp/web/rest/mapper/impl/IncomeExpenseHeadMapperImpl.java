@@ -21,13 +21,31 @@ public class IncomeExpenseHeadMapperImpl extends IncomeExpenseHeadMapper {
 
         incomeExpenseHeadDTO.setActivated( incomeExpenseHead.getActivated() );
         incomeExpenseHeadDTO.setPid( incomeExpenseHead.getPid() );
-        incomeExpenseHeadDTO.setName( incomeExpenseHeadName(incomeExpenseHead) );
+        incomeExpenseHeadDTO.setName( incomeExpenseHead.getName() );
         incomeExpenseHeadDTO.setAlias( incomeExpenseHead.getAlias() );
         incomeExpenseHeadDTO.setDescription( incomeExpenseHead.getDescription() );
         incomeExpenseHeadDTO.setLastModifiedDate( incomeExpenseHead.getLastModifiedDate() );
 
         return incomeExpenseHeadDTO;
     }
+  public IncomeExpenseHeadDTO incomeExpenseHeadToIncomeExpenseHeadDTODescription(IncomeExpenseHead incomeExpenseHead) {
+      if ( incomeExpenseHead == null ) {
+          return null;
+      }
+
+      IncomeExpenseHeadDTO incomeExpenseHeadDTO = new IncomeExpenseHeadDTO();
+
+      incomeExpenseHeadDTO.setActivated( incomeExpenseHead.getActivated() );
+      incomeExpenseHeadDTO.setPid( incomeExpenseHead.getPid() );
+      incomeExpenseHeadDTO.setName( incomeExpenseHead.getDescription() != null && !incomeExpenseHead.getDescription().equalsIgnoreCase("common")
+				? incomeExpenseHead.getDescription()
+				: incomeExpenseHead.getName()); 
+      incomeExpenseHeadDTO.setAlias( incomeExpenseHead.getAlias() );
+      incomeExpenseHeadDTO.setDescription( incomeExpenseHead.getDescription() );
+      incomeExpenseHeadDTO.setLastModifiedDate( incomeExpenseHead.getLastModifiedDate() );
+
+      return incomeExpenseHeadDTO;
+  }
 
     @Override
     public List<IncomeExpenseHeadDTO> incomeExpenseHeadsToIncomeExpenseHeadDTOs(List<IncomeExpenseHead> incomeExpenseHeads) {
@@ -36,10 +54,16 @@ public class IncomeExpenseHeadMapperImpl extends IncomeExpenseHeadMapper {
         }
 
         List<IncomeExpenseHeadDTO> list = new ArrayList<IncomeExpenseHeadDTO>();
+        if(getCompanyCofig()) {
         for ( IncomeExpenseHead incomeExpenseHead : incomeExpenseHeads ) {
-            list.add( incomeExpenseHeadToIncomeExpenseHeadDTO( incomeExpenseHead ) );
+            list.add( incomeExpenseHeadToIncomeExpenseHeadDTODescription( incomeExpenseHead ) );
         }
-
+        }else
+        {
+        	 for ( IncomeExpenseHead incomeExpenseHead : incomeExpenseHeads ) {
+                 list.add( incomeExpenseHeadToIncomeExpenseHeadDTO( incomeExpenseHead ) );
+             }
+        }
         return list;
     }
 

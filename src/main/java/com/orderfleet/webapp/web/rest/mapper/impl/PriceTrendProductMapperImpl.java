@@ -22,13 +22,31 @@ public class PriceTrendProductMapperImpl extends PriceTrendProductMapper {
 
         priceTrendProductDTO.setActivated( priceTrendProduct.getActivated() );
         priceTrendProductDTO.setPid( priceTrendProduct.getPid() );
-        priceTrendProductDTO.setName( priceTrendProductName(priceTrendProduct));
+        priceTrendProductDTO.setName( priceTrendProduct.getName());
         priceTrendProductDTO.setAlias( priceTrendProduct.getAlias() );
         priceTrendProductDTO.setDescription( priceTrendProduct.getDescription() );
         priceTrendProductDTO.setLastModifiedDate( priceTrendProduct.getLastModifiedDate() );
 
         return priceTrendProductDTO;
     }
+  public PriceTrendProductDTO priceTrendProductToPriceTrendProductDTODescription(PriceTrendProduct priceTrendProduct) {
+      if ( priceTrendProduct == null ) {
+          return null;
+      }
+
+      PriceTrendProductDTO priceTrendProductDTO = new PriceTrendProductDTO();
+
+      priceTrendProductDTO.setActivated( priceTrendProduct.getActivated() );
+      priceTrendProductDTO.setPid( priceTrendProduct.getPid() );
+      priceTrendProductDTO.setName(priceTrendProduct.getDescription() != null && !priceTrendProduct.getDescription().equalsIgnoreCase("common")
+				? priceTrendProduct.getDescription()
+				: priceTrendProduct.getName());
+      priceTrendProductDTO.setAlias( priceTrendProduct.getAlias() );
+      priceTrendProductDTO.setDescription( priceTrendProduct.getDescription() );
+      priceTrendProductDTO.setLastModifiedDate( priceTrendProduct.getLastModifiedDate() );
+
+      return priceTrendProductDTO;
+  }
 
     @Override
     public List<PriceTrendProductDTO> priceTrendProductsToPriceTrendProductDTOs(List<PriceTrendProduct> priceTrendProducts) {
@@ -37,10 +55,18 @@ public class PriceTrendProductMapperImpl extends PriceTrendProductMapper {
         }
 
         List<PriceTrendProductDTO> list = new ArrayList<PriceTrendProductDTO>();
+        if(getCompanyCofig())
+        {
         for ( PriceTrendProduct priceTrendProduct : priceTrendProducts ) {
-            list.add( priceTrendProductToPriceTrendProductDTO( priceTrendProduct ) );
+            list.add( priceTrendProductToPriceTrendProductDTODescription( priceTrendProduct ) );
         }
-
+        }
+        else
+        {
+        	 for ( PriceTrendProduct priceTrendProduct : priceTrendProducts ) {
+                 list.add( priceTrendProductToPriceTrendProductDTO( priceTrendProduct ) );
+             }
+        }
         return list;
     }
 

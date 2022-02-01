@@ -21,7 +21,7 @@ public class SalesTargetGroupMapperImpl extends SalesTargetGroupMapper {
         SalesTargetGroupDTO salesTargetGroupDTO = new SalesTargetGroupDTO();
 
         salesTargetGroupDTO.setPid( salesTargetGroup.getPid() );
-        salesTargetGroupDTO.setName( salesTargetGroupName(salesTargetGroup) );
+        salesTargetGroupDTO.setName( salesTargetGroup.getName() );
         salesTargetGroupDTO.setAlias( salesTargetGroup.getAlias() );
         salesTargetGroupDTO.setDescription( salesTargetGroup.getDescription() );
         salesTargetGroupDTO.setTargetUnit( salesTargetGroup.getTargetUnit() );
@@ -29,7 +29,24 @@ public class SalesTargetGroupMapperImpl extends SalesTargetGroupMapper {
 
         return salesTargetGroupDTO;
     }
+  public SalesTargetGroupDTO salesTargetGroupToSalesTargetGroupDTODescription(SalesTargetGroup salesTargetGroup) {
+      if ( salesTargetGroup == null ) {
+          return null;
+      }
 
+      SalesTargetGroupDTO salesTargetGroupDTO = new SalesTargetGroupDTO();
+
+      salesTargetGroupDTO.setPid( salesTargetGroup.getPid() );
+      salesTargetGroupDTO.setName(salesTargetGroup.getDescription() != null && !salesTargetGroup.getDescription().equalsIgnoreCase("common")
+				? salesTargetGroup.getDescription()
+				: salesTargetGroup.getName());
+      salesTargetGroupDTO.setAlias( salesTargetGroup.getAlias() );
+      salesTargetGroupDTO.setDescription( salesTargetGroup.getDescription() );
+      salesTargetGroupDTO.setTargetUnit( salesTargetGroup.getTargetUnit() );
+      salesTargetGroupDTO.setTargetSettingType( salesTargetGroup.getTargetSettingType() );
+
+      return salesTargetGroupDTO;
+  }
     @Override
     public List<SalesTargetGroupDTO> salesTargetGroupsToSalesTargetGroupDTOs(List<SalesTargetGroup> salesTargetGroups) {
         if ( salesTargetGroups == null ) {
@@ -37,10 +54,17 @@ public class SalesTargetGroupMapperImpl extends SalesTargetGroupMapper {
         }
 
         List<SalesTargetGroupDTO> list = new ArrayList<SalesTargetGroupDTO>();
+        if(getCompanyCofig()) {
         for ( SalesTargetGroup salesTargetGroup : salesTargetGroups ) {
-            list.add( salesTargetGroupToSalesTargetGroupDTO( salesTargetGroup ) );
+            list.add( salesTargetGroupToSalesTargetGroupDTODescription( salesTargetGroup ) );
         }
-
+        }
+        else
+        {
+        	 for ( SalesTargetGroup salesTargetGroup : salesTargetGroups ) {
+                 list.add( salesTargetGroupToSalesTargetGroupDTO( salesTargetGroup ) );
+             }
+        }
         return list;
     }
 

@@ -29,7 +29,29 @@ public class PriceTrendProductGroupMapperImpl extends PriceTrendProductGroupMapp
 
         priceTrendProductGroupDTO.setActivated( priceTrendProductGroup.getActivated() );
         priceTrendProductGroupDTO.setPid( priceTrendProductGroup.getPid() );
-        priceTrendProductGroupDTO.setName( priceTrendProductGroupName(priceTrendProductGroup));
+        priceTrendProductGroupDTO.setName( priceTrendProductGroup.getName());
+        priceTrendProductGroupDTO.setAlias( priceTrendProductGroup.getAlias() );
+        priceTrendProductGroupDTO.setDescription( priceTrendProductGroup.getDescription() );
+        List<PriceTrendProductDTO> list = priceTrendProductMapper.priceTrendProductsToPriceTrendProductDTOs( priceTrendProductGroup.getPriceTrendProducts() );
+        if ( list != null ) {
+            priceTrendProductGroupDTO.setPriceTrendProducts( list );
+        }
+        priceTrendProductGroupDTO.setLastModifiedDate( priceTrendProductGroup.getLastModifiedDate() );
+
+        return priceTrendProductGroupDTO;
+    }
+    public PriceTrendProductGroupDTO priceTrendProductGroupToPriceTrendProductGroupDTODescription(PriceTrendProductGroup priceTrendProductGroup) {
+        if ( priceTrendProductGroup == null ) {
+            return null;
+        }
+
+        PriceTrendProductGroupDTO priceTrendProductGroupDTO = new PriceTrendProductGroupDTO();
+
+        priceTrendProductGroupDTO.setActivated( priceTrendProductGroup.getActivated() );
+        priceTrendProductGroupDTO.setPid( priceTrendProductGroup.getPid() );
+        priceTrendProductGroupDTO.setName(priceTrendProductGroup.getDescription() != null && !priceTrendProductGroup.getDescription().equalsIgnoreCase("common")
+				? priceTrendProductGroup.getDescription()
+				: priceTrendProductGroup.getName());
         priceTrendProductGroupDTO.setAlias( priceTrendProductGroup.getAlias() );
         priceTrendProductGroupDTO.setDescription( priceTrendProductGroup.getDescription() );
         List<PriceTrendProductDTO> list = priceTrendProductMapper.priceTrendProductsToPriceTrendProductDTOs( priceTrendProductGroup.getPriceTrendProducts() );
@@ -48,10 +70,18 @@ public class PriceTrendProductGroupMapperImpl extends PriceTrendProductGroupMapp
         }
 
         List<PriceTrendProductGroupDTO> list = new ArrayList<PriceTrendProductGroupDTO>();
+        if(getCompanyCofig()) {
         for ( PriceTrendProductGroup priceTrendProductGroup : priceTrendProductGroups ) {
+            list.add( priceTrendProductGroupToPriceTrendProductGroupDTODescription( priceTrendProductGroup ) );
+        }
+        }
+        else
+        {
+        	for ( PriceTrendProductGroup priceTrendProductGroup : priceTrendProductGroups ) {
             list.add( priceTrendProductGroupToPriceTrendProductGroupDTO( priceTrendProductGroup ) );
         }
-
+        	
+        }
         return list;
     }
 

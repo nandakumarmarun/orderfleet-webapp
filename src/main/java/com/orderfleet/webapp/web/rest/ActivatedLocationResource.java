@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
+import com.orderfleet.webapp.web.rest.mapper.LocationMapper;
 
 /**
  * Web controller for managing SalesTargetGroup.
@@ -39,13 +41,17 @@ public class ActivatedLocationResource {
 
 	@Inject
 	private LocationRepository locationRepository;
+	@Inject
+	private LocationMapper locationMapper;
 
 	@RequestMapping(value = "/activatedLocations", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
 	public String getAllSalesTargetGroups(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of Activated Locations");
-		model.addAttribute("locations", locationRepository.findAllByCompanyIdAndLocationActivatedOrDeactivated(true));
+	List<Location>locationlist=locationRepository.findAllByCompanyIdAndLocationActivatedOrDeactivated(true);
+	List<LocationDTO> locationdto= locationMapper.locationsToLocationDTOs(locationlist);
+	model.addAttribute("locations",locationdto);
 		return "company/activatedLocations";
 	}
 

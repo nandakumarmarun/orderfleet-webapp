@@ -5,79 +5,102 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-
 import com.orderfleet.webapp.domain.Bank;
 import com.orderfleet.webapp.web.rest.dto.BankDTO;
 import com.orderfleet.webapp.web.rest.mapper.BankMapper;
+
 @Component
-public class BankMapperImpl extends BankMapper{
+public class BankMapperImpl extends BankMapper {
 
-	 @Override
-	    public BankDTO bankToBankDTO(Bank bank) {
-	        if ( bank == null ) {
-	            return null;
-	        }
+	@Override
+	public BankDTO bankToBankDTO(Bank bank) {
+		if (bank == null) {
+			return null;
+		}
 
-	        BankDTO bankDTO = new BankDTO();
+		BankDTO bankDTO = new BankDTO();
 
-	        bankDTO.setActivated( bank.getActivated() );
-	        bankDTO.setPid( bank.getPid() );
-	        bankDTO.setName( bankName(bank) );
-	        bankDTO.setAlias( bank.getAlias() );
-	        bankDTO.setDescription( bank.getDescription() );
+		bankDTO.setActivated(bank.getActivated());
+		bankDTO.setPid(bank.getPid());
+		bankDTO.setName(bank.getName());
+		bankDTO.setAlias(bank.getAlias());
+		bankDTO.setDescription(bank.getDescription());
 
-	        return bankDTO;
-	    }
+		return bankDTO;
+	}
 
-	    @Override
-	    public List<BankDTO> banksToBankDTOs(List<Bank> banks) {
-	        if ( banks == null ) {
-	            return null;
-	        }
+	public BankDTO bankToBankDTODescription(Bank bank) {
+		if (bank == null) {
+			return null;
+		}
 
-	        List<BankDTO> list = new ArrayList<BankDTO>();
-	        for ( Bank bank : banks ) {
-	            list.add( bankToBankDTO( bank ) );
-	        }
+		BankDTO bankDTO = new BankDTO();
 
-	        return list;
-	    }
+		bankDTO.setActivated(bank.getActivated());
+		bankDTO.setPid(bank.getPid());
+		bankDTO.setName(bank.getDescription() != null && !bank.getDescription().equalsIgnoreCase("common")
+				? bank.getDescription()
+				: bank.getName());
+		bankDTO.setAlias(bank.getAlias());
+		bankDTO.setDescription(bank.getDescription());
 
-	    @Override
-	    public Bank bankDTOToBank(BankDTO bankDTO) {
-	        if ( bankDTO == null ) {
-	            return null;
-	        }
+		return bankDTO;
+	}
 
-	        Bank bank = new Bank();
+	@Override
+	public List<BankDTO> banksToBankDTOs(List<Bank> banks) {
+		if (banks == null) {
+			return null;
+		}
+		List<BankDTO> list = new ArrayList<BankDTO>();
+		if (getCompanyCofig()) {
+			for (Bank bank : banks) {
+				list.add(bankToBankDTODescription(bank));
+			}
+		} else {
+			for (Bank bank : banks) {
+				list.add(bankToBankDTO(bank));
+			}
+		}
+		return list;
+	}
 
-	        bank.setActivated( bankDTO.getActivated() );
-	        bank.setPid( bankDTO.getPid() );
-	        bank.setName( bankDTO.getName() );
-	        bank.setAlias( bankDTO.getAlias() );
-	        bank.setDescription( bankDTO.getDescription() );
+	@Override
+	public Bank bankDTOToBank(BankDTO bankDTO) {
+		if (bankDTO == null) {
+			return null;
+		}
 
-	        return bank;
-	    }
+		Bank bank = new Bank();
 
-	    @Override
-	    public List<Bank> bankDTOsToBanks(List<BankDTO> bankDTOs) {
-	        if ( bankDTOs == null ) {
-	            return null;
-	        }
+		bank.setActivated(bankDTO.getActivated());
+		bank.setPid(bankDTO.getPid());
+		bank.setName(bankDTO.getName());
+		bank.setAlias(bankDTO.getAlias());
+		bank.setDescription(bankDTO.getDescription());
 
-	        List<Bank> list = new ArrayList<Bank>();
-	        for ( BankDTO bankDTO : bankDTOs ) {
-	            list.add( bankDTOToBank( bankDTO ) );
-	        }
+		return bank;
+	}
 
-	        return list;
-	    }
-	    private String bankName(Bank bank) {
-	        if(bank.getDescription()!=null && getCompanyCofig() && !bank.getDescription().equals("common")) {
-	        return bank.getDescription();
-	        }
-	       
-	    return bank.getName();
-	    }
+	@Override
+	public List<Bank> bankDTOsToBanks(List<BankDTO> bankDTOs) {
+		if (bankDTOs == null) {
+			return null;
+		}
+
+		List<Bank> list = new ArrayList<Bank>();
+		for (BankDTO bankDTO : bankDTOs) {
+			list.add(bankDTOToBank(bankDTO));
+		}
+
+		return list;
+	}
+
+	private String bankName(Bank bank) {
+		if (bank.getDescription() != null && getCompanyCofig() && !bank.getDescription().equals("common")) {
+			return bank.getDescription();
+		}
+
+		return bank.getName();
+	}
 }

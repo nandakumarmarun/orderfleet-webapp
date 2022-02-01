@@ -30,6 +30,22 @@ public class ExecutiveTaskGroupPlanMapperImpl extends ExecutiveTaskGroupPlanMapp
 
         return executiveTaskGroupPlanDTO;
     }
+    public ExecutiveTaskGroupPlanDTO executiveTaskGroupPlanToExecutiveTaskGroupPlanDTODescription(ExecutiveTaskGroupPlan executiveTaskGroupPlan) {
+        if ( executiveTaskGroupPlan == null ) {
+            return null;
+        }
+
+        ExecutiveTaskGroupPlanDTO executiveTaskGroupPlanDTO = new ExecutiveTaskGroupPlanDTO();
+
+        executiveTaskGroupPlanDTO.setTaskGroupName( executiveTaskGroupPlanTaskGroupDescription( executiveTaskGroupPlan ) );
+        executiveTaskGroupPlanDTO.setTaskGroupPid( executiveTaskGroupPlanTaskGroupPid( executiveTaskGroupPlan ) );
+        executiveTaskGroupPlanDTO.setPid( executiveTaskGroupPlan.getPid() );
+        executiveTaskGroupPlanDTO.setRemarks( executiveTaskGroupPlan.getRemarks() );
+        executiveTaskGroupPlanDTO.setCreatedDate( executiveTaskGroupPlan.getCreatedDate() );
+        executiveTaskGroupPlanDTO.setPlannedDate( executiveTaskGroupPlan.getPlannedDate() );
+
+        return executiveTaskGroupPlanDTO;
+    }
 
     @Override
     public List<ExecutiveTaskGroupPlanDTO> executiveTaskGroupPlansToExecutiveTaskGroupPlanDTOs(List<ExecutiveTaskGroupPlan> executiveTaskGroupPlans) {
@@ -38,10 +54,16 @@ public class ExecutiveTaskGroupPlanMapperImpl extends ExecutiveTaskGroupPlanMapp
         }
 
         List<ExecutiveTaskGroupPlanDTO> list = new ArrayList<ExecutiveTaskGroupPlanDTO>();
+        if(getCompanyCofig()) {
         for ( ExecutiveTaskGroupPlan executiveTaskGroupPlan : executiveTaskGroupPlans ) {
-            list.add( executiveTaskGroupPlanToExecutiveTaskGroupPlanDTO( executiveTaskGroupPlan ) );
+            list.add( executiveTaskGroupPlanToExecutiveTaskGroupPlanDTODescription( executiveTaskGroupPlan ) );
         }
-
+        }else
+        {
+        	 for ( ExecutiveTaskGroupPlan executiveTaskGroupPlan : executiveTaskGroupPlans ) {
+                 list.add( executiveTaskGroupPlanToExecutiveTaskGroupPlanDTO( executiveTaskGroupPlan ) );
+             }
+        }
         return list;
     }
 
@@ -89,12 +111,30 @@ public class ExecutiveTaskGroupPlanMapperImpl extends ExecutiveTaskGroupPlanMapp
         if ( name == null ) {
             return null;
         }
-        if(taskGroup.getDescription()!=null && getCompanyCofig() && !taskGroup.getDescription().equals("common")) {
+//        if(taskGroup.getDescription()!=null && getCompanyCofig() && !taskGroup.getDescription().equals("common")) {
+//	        return taskGroup.getDescription();
+//	        }
+        return name;
+    }
+
+    private String executiveTaskGroupPlanTaskGroupDescription(ExecutiveTaskGroupPlan executiveTaskGroupPlan) {
+
+        if ( executiveTaskGroupPlan == null ) {
+            return null;
+        }
+        TaskGroup taskGroup = executiveTaskGroupPlan.getTaskGroup();
+        if ( taskGroup == null ) {
+            return null;
+        }
+        String name = taskGroup.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(taskGroup.getDescription()!=null && !taskGroup.getDescription().equals("common")) {
 	        return taskGroup.getDescription();
 	        }
         return name;
     }
-
     private String executiveTaskGroupPlanTaskGroupPid(ExecutiveTaskGroupPlan executiveTaskGroupPlan) {
 
         if ( executiveTaskGroupPlan == null ) {

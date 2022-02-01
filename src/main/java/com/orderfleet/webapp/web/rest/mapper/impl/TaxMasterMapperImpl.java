@@ -21,7 +21,7 @@ public class TaxMasterMapperImpl extends TaxMasterMapper {
         TaxMasterDTO taxMasterDTO = new TaxMasterDTO();
 
         taxMasterDTO.setPid( taxMaster.getPid() );
-        taxMasterDTO.setVatName( taxMasterName(taxMaster) );
+        taxMasterDTO.setVatName( taxMaster.getVatName() );
         taxMasterDTO.setDescription( taxMaster.getDescription() );
         taxMasterDTO.setVatPercentage( taxMaster.getVatPercentage() );
         taxMasterDTO.setVatClass( taxMaster.getVatClass() );
@@ -30,7 +30,25 @@ public class TaxMasterMapperImpl extends TaxMasterMapper {
 
         return taxMasterDTO;
     }
+  public TaxMasterDTO taxMasterToTaxMasterDTODescription(TaxMaster taxMaster) {
+      if ( taxMaster == null ) {
+          return null;
+      }
 
+      TaxMasterDTO taxMasterDTO = new TaxMasterDTO();
+
+      taxMasterDTO.setPid( taxMaster.getPid() );
+      taxMasterDTO.setVatName(taxMaster.getDescription() != null && !taxMaster.getDescription().equalsIgnoreCase("common")
+				? taxMaster.getDescription()
+				: taxMaster.getVatName());
+      taxMasterDTO.setDescription( taxMaster.getDescription() );
+      taxMasterDTO.setVatPercentage( taxMaster.getVatPercentage() );
+      taxMasterDTO.setVatClass( taxMaster.getVatClass() );
+      taxMasterDTO.setTaxId( taxMaster.getTaxId() );
+      taxMasterDTO.setTaxCode( taxMaster.getTaxCode() );
+
+      return taxMasterDTO;
+  }
     @Override
     public List<TaxMasterDTO> taxMastersToTaxMasterDTOs(List<TaxMaster> taxMasters) {
         if ( taxMasters == null ) {
@@ -38,8 +56,16 @@ public class TaxMasterMapperImpl extends TaxMasterMapper {
         }
 
         List<TaxMasterDTO> list = new ArrayList<TaxMasterDTO>();
+        if(getCompanyCofig())
+        {
         for ( TaxMaster taxMaster : taxMasters ) {
-            list.add( taxMasterToTaxMasterDTO( taxMaster ) );
+            list.add( taxMasterToTaxMasterDTODescription( taxMaster ) );
+        }}
+        else
+        {
+        	for ( TaxMaster taxMaster : taxMasters ) {
+                list.add( taxMasterToTaxMasterDTO( taxMaster ) );
+            }
         }
 
         return list;

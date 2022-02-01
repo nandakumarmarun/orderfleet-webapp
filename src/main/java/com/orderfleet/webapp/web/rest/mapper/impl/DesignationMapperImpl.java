@@ -20,7 +20,24 @@ public class DesignationMapperImpl extends DesignationMapper{
 
 	        designationDTO.setActivated( designation.getActivated() );
 	        designationDTO.setPid( designation.getPid() );
-	        designationDTO.setName( designationName(designation));
+	        designationDTO.setName( designation.getName());
+	        designationDTO.setAlias( designation.getAlias() );
+	        designationDTO.setDescription( designation.getDescription() );
+
+	        return designationDTO;
+	    }
+	 public DesignationDTO designationToDesignationDTODescription(Designation designation) {
+	        if ( designation == null ) {
+	            return null;
+	        }
+
+	        DesignationDTO designationDTO = new DesignationDTO();
+
+	        designationDTO.setActivated( designation.getActivated() );
+	        designationDTO.setPid( designation.getPid() );
+	        designationDTO.setName(designation.getDescription() != null && !designation.getDescription().equalsIgnoreCase("common")
+					? designation.getDescription()
+					: designation.getName());
 	        designationDTO.setAlias( designation.getAlias() );
 	        designationDTO.setDescription( designation.getDescription() );
 
@@ -34,10 +51,17 @@ public class DesignationMapperImpl extends DesignationMapper{
 	        }
 
 	        List<DesignationDTO> list = new ArrayList<DesignationDTO>();
+	        if(getCompanyCofig())
+	        {
 	        for ( Designation designation : designations ) {
-	            list.add( designationToDesignationDTO( designation ) );
+	            list.add( designationToDesignationDTODescription( designation ) );
 	        }
-
+	        }else
+	        {
+	        	for ( Designation designation : designations ) {
+		            list.add( designationToDesignationDTO( designation ) );
+		        }
+	        }
 	        return list;
 	    }
 

@@ -288,22 +288,23 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 	public List<ReceivablePayableDTO> findAllByCompany() {
 		log.debug("Request to get all receivablePayables");
 		List<ReceivablePayable> receivablePayables = receivablePayableRepository.findAllByCompanyId();
-		List<ReceivablePayableDTO> result = new ArrayList<>();
-		for (ReceivablePayable receivablePayable : receivablePayables) {
-			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
-			result.add(payableDTO);
-		}
+//		List<ReceivablePayableDTO> result = new ArrayList<>();
+//		for (ReceivablePayable receivablePayable : receivablePayables) {
+//			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
+//			result.add(payableDTO);
+//		}
+		List<ReceivablePayableDTO> result= receivablePayableMapper.receivablePayablesToReceivablePayableDTOs(receivablePayables);
 		return result;
 	}
 
 	@Override
 	public List<ReceivablePayableDTO> findAllByAccountProfilePid(String accountPid) {
 		List<ReceivablePayable> receivablePayables = receivablePayableRepository.findAllByAccountProfilePid(accountPid);
-		List<ReceivablePayableDTO> result = new ArrayList<>();
-		for (ReceivablePayable receivablePayable : receivablePayables) {
-			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
-			result.add(payableDTO);
-		}
+		List<ReceivablePayableDTO> result = receivablePayableMapper.receivablePayablesToReceivablePayableDTOs(receivablePayables);
+//		for (ReceivablePayable receivablePayable : receivablePayables) {
+//			ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
+//			result.add(payableDTO);
+//		}
 		return result;
 	}
 

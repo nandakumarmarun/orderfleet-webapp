@@ -40,6 +40,31 @@ public class SalesTargetGroupUserTargetMapperImpl extends SalesTargetGroupUserTa
         return salesTargetGroupUserTargetDTO;
     }
 
+   public SalesTargetGroupUserTargetDTO salesTargetGroupUserTargetToSalesTargetGroupUserTargetDTODescription(SalesTargetGroupUserTarget salesTargetGroupUserTarget) {
+       if ( salesTargetGroupUserTarget == null ) {
+           return null;
+       }
+
+       SalesTargetGroupUserTargetDTO salesTargetGroupUserTargetDTO = new SalesTargetGroupUserTargetDTO();
+
+       salesTargetGroupUserTargetDTO.setAccountProfilePid( salesTargetGroupUserTargetAccountProfilePid( salesTargetGroupUserTarget ) );
+       salesTargetGroupUserTargetDTO.setTargetUnit( salesTargetGroupUserTargetSalesTargetGroupTargetUnit( salesTargetGroupUserTarget ) );
+       salesTargetGroupUserTargetDTO.setUserPid( salesTargetGroupUserTargetUserPid( salesTargetGroupUserTarget ) );
+       salesTargetGroupUserTargetDTO.setUserName( salesTargetGroupUserTargetUserFirstName( salesTargetGroupUserTarget ) );
+       salesTargetGroupUserTargetDTO.setAccountProfileName( salesTargetGroupUserTargetAccountProfileDescription( salesTargetGroupUserTarget ) );
+       salesTargetGroupUserTargetDTO.setSalesTargetGroupName( salesTargetGroupUserTargetSalesTargetGroupDescription( salesTargetGroupUserTarget ) );
+       salesTargetGroupUserTargetDTO.setSalesTargetGroupPid( salesTargetGroupUserTargetSalesTargetGroupPid( salesTargetGroupUserTarget ) );
+       salesTargetGroupUserTargetDTO.setPid( salesTargetGroupUserTarget.getPid() );
+       salesTargetGroupUserTargetDTO.setFromDate( salesTargetGroupUserTarget.getFromDate() );
+       salesTargetGroupUserTargetDTO.setToDate( salesTargetGroupUserTarget.getToDate() );
+       salesTargetGroupUserTargetDTO.setVolume( salesTargetGroupUserTarget.getVolume() );
+       salesTargetGroupUserTargetDTO.setAmount( salesTargetGroupUserTarget.getAmount() );
+       salesTargetGroupUserTargetDTO.setAccountWiseTarget( salesTargetGroupUserTarget.getAccountWiseTarget() );
+       salesTargetGroupUserTargetDTO.setLastModifiedDate( salesTargetGroupUserTarget.getLastModifiedDate() );
+
+       return salesTargetGroupUserTargetDTO;
+   }
+
     @Override
     public List<SalesTargetGroupUserTargetDTO> salesTargetGroupUserTargetsToSalesTargetGroupUserTargetDTOs(List<SalesTargetGroupUserTarget> salesTargetGroupUserTargets) {
         if ( salesTargetGroupUserTargets == null ) {
@@ -47,9 +72,17 @@ public class SalesTargetGroupUserTargetMapperImpl extends SalesTargetGroupUserTa
         }
 
         List<SalesTargetGroupUserTargetDTO> list = new ArrayList<SalesTargetGroupUserTargetDTO>();
+       if(getCompanyCofig())
+       {
         for ( SalesTargetGroupUserTarget salesTargetGroupUserTarget : salesTargetGroupUserTargets ) {
-            list.add( salesTargetGroupUserTargetToSalesTargetGroupUserTargetDTO( salesTargetGroupUserTarget ) );
-        }
+            list.add( salesTargetGroupUserTargetToSalesTargetGroupUserTargetDTODescription( salesTargetGroupUserTarget ) );
+        }}
+       else
+       {
+    	   for ( SalesTargetGroupUserTarget salesTargetGroupUserTarget : salesTargetGroupUserTargets ) {
+               list.add( salesTargetGroupUserTargetToSalesTargetGroupUserTargetDTO( salesTargetGroupUserTarget ) );
+           }
+       }
 
         return list;
     }
@@ -165,7 +198,25 @@ public class SalesTargetGroupUserTargetMapperImpl extends SalesTargetGroupUserTa
         if ( name == null ) {
             return null;
         }
-        if(accountProfile.getDescription()!=null && getCompanyCofig() && !accountProfile.getDescription().equals("common")) {
+//        if(accountProfile.getDescription()!=null && getCompanyCofig() && !accountProfile.getDescription().equals("common")) {
+//	        return accountProfile.getDescription();
+//	        }
+        return name;
+    }
+    private String salesTargetGroupUserTargetAccountProfileDescription(SalesTargetGroupUserTarget salesTargetGroupUserTarget) {
+
+        if ( salesTargetGroupUserTarget == null ) {
+            return null;
+        }
+        AccountProfile accountProfile = salesTargetGroupUserTarget.getAccountProfile();
+        if ( accountProfile == null ) {
+            return null;
+        }
+        String name = accountProfile.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(accountProfile.getDescription()!=null && !accountProfile.getDescription().equals("common")) {
 	        return accountProfile.getDescription();
 	        }
         return name;
@@ -184,7 +235,25 @@ public class SalesTargetGroupUserTargetMapperImpl extends SalesTargetGroupUserTa
         if ( name == null ) {
             return null;
         }
-        if(salesTargetGroup.getDescription()!=null && getCompanyCofig() && !salesTargetGroup.getDescription().equals("common")) {
+//        if(salesTargetGroup.getDescription()!=null && getCompanyCofig() && !salesTargetGroup.getDescription().equals("common")) {
+//	        return salesTargetGroup.getDescription();
+//	        }
+        return name;
+    }
+    private String salesTargetGroupUserTargetSalesTargetGroupDescription(SalesTargetGroupUserTarget salesTargetGroupUserTarget) {
+
+        if ( salesTargetGroupUserTarget == null ) {
+            return null;
+        }
+        SalesTargetGroup salesTargetGroup = salesTargetGroupUserTarget.getSalesTargetGroup();
+        if ( salesTargetGroup == null ) {
+            return null;
+        }
+        String name = salesTargetGroup.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(salesTargetGroup.getDescription()!=null  && !salesTargetGroup.getDescription().equals("common")) {
 	        return salesTargetGroup.getDescription();
 	        }
         return name;

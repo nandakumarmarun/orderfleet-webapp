@@ -37,6 +37,27 @@ public class ActivityGroupUserTargetMapperImpl extends ActivityGroupUserTargetMa
 
 		return activityGroupUserTargetDTO;
 	}
+	public ActivityGroupUserTargetDTO activityGroupUserTargetToActivityGroupUserTargetDTODescription(
+			ActivityGroupUserTarget activityGroupUserTarget) {
+		if (activityGroupUserTarget == null) {
+			return null;
+		}
+
+		ActivityGroupUserTargetDTO activityGroupUserTargetDTO = new ActivityGroupUserTargetDTO();
+
+		activityGroupUserTargetDTO.setUserPid(activityGroupUserTargetUserPid(activityGroupUserTarget));
+		activityGroupUserTargetDTO.setUserName(activityGroupUserTargetUserFirstName(activityGroupUserTarget));
+		activityGroupUserTargetDTO
+				.setActivityGroupName(activityGroupUserTargetActivityGroupDescription(activityGroupUserTarget));
+		activityGroupUserTargetDTO
+				.setActivityGroupPid(activityGroupUserTargetActivityGroupPid(activityGroupUserTarget));
+		activityGroupUserTargetDTO.setPid(activityGroupUserTarget.getPid());
+		activityGroupUserTargetDTO.setStartDate(activityGroupUserTarget.getStartDate());
+		activityGroupUserTargetDTO.setEndDate(activityGroupUserTarget.getEndDate());
+		activityGroupUserTargetDTO.setTargetNumber(activityGroupUserTarget.getTargetNumber());
+
+		return activityGroupUserTargetDTO;
+	}
 
 	@Override
 	public List<ActivityGroupUserTargetDTO> activityGroupUserTargetsToActivityGroupUserTargetDTOs(
@@ -44,12 +65,17 @@ public class ActivityGroupUserTargetMapperImpl extends ActivityGroupUserTargetMa
 		if (activityGroupUserTargets == null) {
 			return null;
 		}
-
 		List<ActivityGroupUserTargetDTO> list = new ArrayList<ActivityGroupUserTargetDTO>();
+		if (getCompanyCofig()) {
 		for (ActivityGroupUserTarget activityGroupUserTarget : activityGroupUserTargets) {
-			list.add(activityGroupUserTargetToActivityGroupUserTargetDTO(activityGroupUserTarget));
+			list.add(activityGroupUserTargetToActivityGroupUserTargetDTODescription(activityGroupUserTarget));
 		}
-
+		}
+		else {
+			for (ActivityGroupUserTarget activityGroupUserTarget : activityGroupUserTargets) {
+				list.add(activityGroupUserTargetToActivityGroupUserTargetDTO(activityGroupUserTarget));
+		}
+		}
 		return list;
 	}
 
@@ -134,7 +160,28 @@ public class ActivityGroupUserTargetMapperImpl extends ActivityGroupUserTargetMa
 			return null;
 		}
 
-		if (activityGroup.getDescription() != null && getCompanyCofig()
+//		if (activityGroup.getDescription() != null && getCompanyCofig()
+//				&& !activityGroup.getDescription().equals("common")) {
+//			return activityGroup.getDescription();
+//		}
+		return name;
+	}
+
+	private String activityGroupUserTargetActivityGroupDescription(ActivityGroupUserTarget activityGroupUserTarget) {
+
+		if (activityGroupUserTarget == null) {
+			return null;
+		}
+		ActivityGroup activityGroup = activityGroupUserTarget.getActivityGroup();
+		if (activityGroup == null) {
+			return null;
+		}
+		String name = activityGroup.getName();
+		if (name == null) {
+			return null;
+		}
+
+		if (activityGroup.getDescription() != null
 				&& !activityGroup.getDescription().equals("common")) {
 			return activityGroup.getDescription();
 		}

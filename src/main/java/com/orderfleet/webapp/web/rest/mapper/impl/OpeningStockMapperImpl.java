@@ -38,6 +38,28 @@ public class OpeningStockMapperImpl extends OpeningStockMapper{
 
         return openingStockDTO;
     }
+    public OpeningStockDTO openingStockToOpeningStockDTODescription(OpeningStock openingStock) {
+        if ( openingStock == null ) {
+            return null;
+        }
+
+        OpeningStockDTO openingStockDTO = new OpeningStockDTO();
+
+        openingStockDTO.setProductProfilePid( openingStockProductProfilePid( openingStock ) );
+        openingStockDTO.setStockLocationName( openingStockStockLocationDescription( openingStock ) );
+        openingStockDTO.setStockLocationPid( openingStockStockLocationPid( openingStock ) );
+        openingStockDTO.setProductProfileName( openingStockProductProfileDescription( openingStock ) );
+        openingStockDTO.setActivated( openingStock.getActivated() );
+        openingStockDTO.setReservedStock( openingStock.getReservedStock() );
+        openingStockDTO.setPid( openingStock.getPid() );
+        openingStockDTO.setBatchNumber( openingStock.getBatchNumber() );
+        openingStockDTO.setQuantity( openingStock.getQuantity() );
+        openingStockDTO.setCreatedDate( openingStock.getCreatedDate() );
+        openingStockDTO.setOpeningStockDate( openingStock.getOpeningStockDate() );
+        openingStockDTO.setLastModifiedDate( openingStock.getLastModifiedDate() );
+
+        return openingStockDTO;
+    }
 
     @Override
     public List<OpeningStockDTO> openingStocksToOpeningStockDTOs(List<OpeningStock> openingStocks) {
@@ -46,10 +68,18 @@ public class OpeningStockMapperImpl extends OpeningStockMapper{
         }
 
         List<OpeningStockDTO> list = new ArrayList<OpeningStockDTO>();
+        if(getCompanyCofig())
+        {
         for ( OpeningStock openingStock : openingStocks ) {
-            list.add( openingStockToOpeningStockDTO( openingStock ) );
+            list.add( openingStockToOpeningStockDTODescription( openingStock ) );
         }
-
+        }
+        else
+        {
+        	 for ( OpeningStock openingStock : openingStocks ) {
+                 list.add( openingStockToOpeningStockDTO( openingStock ) );
+             }
+        }
         return list;
     }
 
@@ -117,13 +147,31 @@ public class OpeningStockMapperImpl extends OpeningStockMapper{
         if ( name == null ) {
             return null;
         }
-        if(stockLocation.getDescription()!=null && getCompanyCofig() && !stockLocation.getDescription().equals("common")) {
+//        if(stockLocation.getDescription()!=null && getCompanyCofig() && !stockLocation.getDescription().equals("common")) {
+//	        return stockLocation.getDescription();
+//	        }
+	       
+        return name;
+    }
+    private String openingStockStockLocationDescription(OpeningStock openingStock) {
+
+        if ( openingStock == null ) {
+            return null;
+        }
+        StockLocation stockLocation = openingStock.getStockLocation();
+        if ( stockLocation == null ) {
+            return null;
+        }
+        String name = stockLocation.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(stockLocation.getDescription()!=null && !stockLocation.getDescription().equals("common")) {
 	        return stockLocation.getDescription();
 	        }
 	       
         return name;
     }
-
     private String openingStockStockLocationPid(OpeningStock openingStock) {
 
         if ( openingStock == null ) {
@@ -153,7 +201,26 @@ public class OpeningStockMapperImpl extends OpeningStockMapper{
         if ( name == null ) {
             return null;
         }
-        if(productProfile.getProductDescription()!=null && getCompanyCofig() && !productProfile.getProductDescription().equals("common")) {
+//        if(productProfile.getProductDescription()!=null && getCompanyCofig() && !productProfile.getProductDescription().equals("common")) {
+//	        return productProfile.getProductDescription();
+//	        }
+	       
+        return name;
+    }
+    private String openingStockProductProfileDescription(OpeningStock openingStock) {
+
+        if ( openingStock == null ) {
+            return null;
+        }
+        ProductProfile productProfile = openingStock.getProductProfile();
+        if ( productProfile == null ) {
+            return null;
+        }
+        String name = productProfile.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(productProfile.getProductDescription()!=null && !productProfile.getProductDescription().equals("common")) {
 	        return productProfile.getProductDescription();
 	        }
 	       

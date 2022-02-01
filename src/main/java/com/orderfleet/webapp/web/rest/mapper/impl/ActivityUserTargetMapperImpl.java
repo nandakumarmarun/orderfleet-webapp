@@ -35,18 +35,42 @@ public class ActivityUserTargetMapperImpl extends ActivityUserTargetMapper {
 		return activityUserTargetDTO;
 	}
 
+	public ActivityUserTargetDTO activityUserTargetToActivityUserTargetDTODescription(ActivityUserTarget activityUserTarget) {
+		if (activityUserTarget == null) {
+			return null;
+		}
+
+		ActivityUserTargetDTO activityUserTargetDTO = new ActivityUserTargetDTO();
+
+		activityUserTargetDTO.setActivityName(activityUserTargetActivityDescription(activityUserTarget));
+		activityUserTargetDTO.setUserPid(activityUserTargetUserPid(activityUserTarget));
+		activityUserTargetDTO.setUserName(activityUserTargetUserFirstName(activityUserTarget));
+		activityUserTargetDTO.setActivityPid(activityUserTargetActivityPid(activityUserTarget));
+		activityUserTargetDTO.setPid(activityUserTarget.getPid());
+		activityUserTargetDTO.setStartDate(activityUserTarget.getStartDate());
+		activityUserTargetDTO.setEndDate(activityUserTarget.getEndDate());
+		activityUserTargetDTO.setTargetNumber(activityUserTarget.getTargetNumber());
+
+		return activityUserTargetDTO;
+	}
+
 	@Override
 	public List<ActivityUserTargetDTO> activityUserTargetsToActivityUserTargetDTOs(
 			List<ActivityUserTarget> activityUserTargets) {
 		if (activityUserTargets == null) {
 			return null;
 		}
-
 		List<ActivityUserTargetDTO> list = new ArrayList<ActivityUserTargetDTO>();
+ if(getCompanyCofig()) {
 		for (ActivityUserTarget activityUserTarget : activityUserTargets) {
+			list.add(activityUserTargetToActivityUserTargetDTODescription(activityUserTarget));
+		}
+ }else
+ {
+	 for (ActivityUserTarget activityUserTarget : activityUserTargets) {
 			list.add(activityUserTargetToActivityUserTargetDTO(activityUserTarget));
 		}
-
+ }
 		return list;
 	}
 
@@ -97,13 +121,33 @@ public class ActivityUserTargetMapperImpl extends ActivityUserTargetMapper {
 			return null;
 		}
 
-		if (activity.getDescription() != null && getCompanyCofig() && !activity.getDescription().equals("common")) {
+//		if (activity.getDescription() != null && getCompanyCofig() && !activity.getDescription().equals("common")) {
+//			return activity.getDescription();
+//
+//		}
+		return name;
+	}
+
+	private String activityUserTargetActivityDescription(ActivityUserTarget activityUserTarget) {
+
+		if (activityUserTarget == null) {
+			return null;
+		}
+		Activity activity = activityUserTarget.getActivity();
+		if (activity == null) {
+			return null;
+		}
+		String name = activity.getName();
+		if (name == null) {
+			return null;
+		}
+
+		if (activity.getDescription() != null &&  !activity.getDescription().equals("common")) {
 			return activity.getDescription();
 
 		}
 		return name;
 	}
-
 	private String activityUserTargetUserPid(ActivityUserTarget activityUserTarget) {
 
 		if (activityUserTarget == null) {

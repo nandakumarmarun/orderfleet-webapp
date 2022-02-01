@@ -48,7 +48,37 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
 
         return employeeProfileDTO;
     }
+  public EmployeeProfileDTO employeeProfileToEmployeeProfileDTODescription(EmployeeProfile employeeProfile) {
+      if ( employeeProfile == null ) {
+          return null;
+      }
 
+      EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
+
+      employeeProfileDTO.setDesignationPid( employeeProfileDesignationPid( employeeProfile ) );
+      employeeProfileDTO.setDesignationName( employeeProfileDesignationDescription( employeeProfile ) );
+      employeeProfileDTO.setDepartmentName( employeeProfileDepartmentDescription( employeeProfile ) );
+      employeeProfileDTO.setDepartmentPid( employeeProfileDepartmentPid( employeeProfile ) );
+      employeeProfileDTO.setUserLastName( employeeProfileUserLastName( employeeProfile ) );
+      employeeProfileDTO.setUserPid( employeeProfileUserPid( employeeProfile ) );
+      employeeProfileDTO.setUserFirstName( employeeProfileUserFirstName( employeeProfile ) );
+      employeeProfileDTO.setActivated( employeeProfile.getActivated() );
+      employeeProfileDTO.setPid( employeeProfile.getPid() );
+      employeeProfileDTO.setOrgEmpId( employeeProfile.getOrgEmpId() );
+      employeeProfileDTO.setName( employeeProfile.getName());
+      employeeProfileDTO.setAlias( employeeProfile.getAlias() );
+      employeeProfileDTO.setReferenceId( employeeProfile.getReferenceId() );
+      employeeProfileDTO.setAddress( employeeProfile.getAddress() );
+      employeeProfileDTO.setPhone( employeeProfile.getPhone() );
+      employeeProfileDTO.setEmail( employeeProfile.getEmail() );
+      if ( employeeProfile.getProfileImage() != null ) {
+          byte[] profileImage = employeeProfile.getProfileImage();
+          employeeProfileDTO.setProfileImage( Arrays.copyOf( profileImage, profileImage.length ) );
+      }
+      employeeProfileDTO.setProfileImageContentType( employeeProfile.getProfileImageContentType() );
+
+      return employeeProfileDTO;
+  }
     @Override
     public List<EmployeeProfileDTO> employeeProfilesToEmployeeProfileDTOs(List<EmployeeProfile> employeeProfiles) {
         if ( employeeProfiles == null ) {
@@ -56,8 +86,17 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
         }
 
         List<EmployeeProfileDTO> list = new ArrayList<EmployeeProfileDTO>();
+        if(getCompanyCofig())
+        {
         for ( EmployeeProfile employeeProfile : employeeProfiles ) {
-            list.add( employeeProfileToEmployeeProfileDTO( employeeProfile ) );
+            list.add( employeeProfileToEmployeeProfileDTODescription( employeeProfile ) );
+        }
+        }
+        else
+        {
+        	 for ( EmployeeProfile employeeProfile : employeeProfiles ) {
+                 list.add( employeeProfileToEmployeeProfileDTO( employeeProfile ) );
+             }
         }
 
         return list;
@@ -134,10 +173,29 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
         if ( name == null ) {
             return null;
         }
-        if(designation.getDescription()!=null && getCompanyCofig() && !designation.getDescription().equals("common")) {
+//        if(designation.getDescription()!=null && getCompanyCofig() && !designation.getDescription().equals("common")) {
+//	        return designation.getDescription();
+//	        }
+//	       
+        return name;
+    }
+    private String employeeProfileDesignationDescription(EmployeeProfile employeeProfile) {
+
+        if ( employeeProfile == null ) {
+            return null;
+        }
+        Designation designation = employeeProfile.getDesignation();
+        if ( designation == null ) {
+            return null;
+        }
+        String name = designation.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(designation.getDescription()!=null && !designation.getDescription().equals("common")) {
 	        return designation.getDescription();
 	        }
-	       
+//	       
         return name;
     }
 
@@ -154,7 +212,26 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
         if ( name == null ) {
             return null;
         }
-        if(department.getDescription()!=null && getCompanyCofig() && !department.getDescription().equals("common")) {
+//        if(department.getDescription()!=null && getCompanyCofig() && !department.getDescription().equals("common")) {
+//	        return department.getDescription();
+//	        }
+	       
+        return name;
+    }
+    private String employeeProfileDepartmentDescription(EmployeeProfile employeeProfile) {
+
+        if ( employeeProfile == null ) {
+            return null;
+        }
+        Department department = employeeProfile.getDepartment();
+        if ( department == null ) {
+            return null;
+        }
+        String name = department.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(department.getDescription()!=null && !department.getDescription().equals("common")) {
 	        return department.getDescription();
 	        }
 	       

@@ -31,7 +31,7 @@ public class ActivityGroupMapperImpl extends ActivityGroupMapper{
 	        ActivityGroupDTO activityGroupDTO = new ActivityGroupDTO();
 
 	        activityGroupDTO.setPid( activityGroup.getPid() );
-	        activityGroupDTO.setName( activityGroupName(activityGroup));
+	        activityGroupDTO.setName( activityGroup.getName());
 	        activityGroupDTO.setAlias( activityGroup.getAlias() );
 	        activityGroupDTO.setDescription( activityGroup.getDescription() );
 	        Set<ActivityDTO> set = activitySetToActivityDTOSet( activityGroup.getActivities() );
@@ -44,17 +44,46 @@ public class ActivityGroupMapperImpl extends ActivityGroupMapper{
 	        return activityGroupDTO;
 	    }
 
+	
+	    public ActivityGroupDTO activityGroupToActivityGroupDTODescription(ActivityGroup activityGroup) {
+	        if ( activityGroup == null ) {
+	            return null;
+	        }
+
+	        ActivityGroupDTO activityGroupDTO = new ActivityGroupDTO();
+
+	        activityGroupDTO.setPid( activityGroup.getPid() );
+	        activityGroupDTO.setName(activityGroup.getDescription() != null && !activityGroup.getDescription().equalsIgnoreCase("common")
+					? activityGroup.getDescription()
+					: activityGroup.getName());
+	        activityGroupDTO.setAlias( activityGroup.getAlias() );
+	        activityGroupDTO.setDescription( activityGroup.getDescription() );
+	        Set<ActivityDTO> set = activitySetToActivityDTOSet( activityGroup.getActivities() );
+	        if ( set != null ) {
+	            activityGroupDTO.setActivities( set );
+	        }
+	        activityGroupDTO.setActivated( activityGroup.getActivated() );
+	        activityGroupDTO.setLastModifiedDate( activityGroup.getLastModifiedDate() );
+
+	        return activityGroupDTO;
+	    }
 	    @Override
 	    public List<ActivityGroupDTO> activityGroupsToActivityGroupDTOs(List<ActivityGroup> activityGroups) {
 	        if ( activityGroups == null ) {
 	            return null;
 	        }
-
 	        List<ActivityGroupDTO> list = new ArrayList<ActivityGroupDTO>();
+	        if (getCompanyCofig()) {
+	        
 	        for ( ActivityGroup activityGroup : activityGroups ) {
-	            list.add( activityGroupToActivityGroupDTO( activityGroup ) );
+	            list.add( activityGroupToActivityGroupDTODescription( activityGroup ) );
 	        }
-
+	        }else
+	        {
+	        	for ( ActivityGroup activityGroup : activityGroups ) {
+		            list.add( activityGroupToActivityGroupDTO( activityGroup ) );
+	        }
+	        }
 	        return list;
 	    }
 

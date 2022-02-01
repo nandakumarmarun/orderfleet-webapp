@@ -35,7 +35,25 @@ public class TaskMapperImpl extends TaskMapper {
 
 		return taskDTO;
 	}
+	public TaskDTO taskToTaskDTODescription(Task task) {
+		if (task == null) {
+			return null;
+		}
 
+		TaskDTO taskDTO = new TaskDTO();
+
+		taskDTO.setAccountProfilePid(taskAccountProfilePid(task));
+		taskDTO.setAccountTypePid(taskAccountTypePid(task));
+		taskDTO.setActivityName(taskActivityDescription(task));
+		taskDTO.setAccountTypeName(taskAccountTypeDescription(task));
+		taskDTO.setAccountProfileName(taskAccountProfileDescription(task));
+		taskDTO.setActivityPid(taskActivityPid(task));
+		taskDTO.setPid(task.getPid());
+		taskDTO.setRemarks(task.getRemarks());
+		taskDTO.setActivated(task.getActivated());
+
+		return taskDTO;
+	}
 	@Override
 	public List<TaskDTO> tasksToTaskDTOs(List<Task> tasks) {
 		if (tasks == null) {
@@ -43,8 +61,15 @@ public class TaskMapperImpl extends TaskMapper {
 		}
 
 		List<TaskDTO> list = new ArrayList<TaskDTO>();
+		if(getCompanyCofig()) {
 		for (Task task : tasks) {
-			list.add(taskToTaskDTO(task));
+			list.add(taskToTaskDTODescription(task));
+		}}
+		else
+		{
+			for (Task task : tasks) {
+				list.add(taskToTaskDTO(task));
+			}
 		}
 
 		return list;
@@ -127,13 +152,31 @@ public class TaskMapperImpl extends TaskMapper {
 		if (name == null) {
 			return null;
 		}
-		if (activity.getDescription() != null && getCompanyCofig()
+//		if (activity.getDescription() != null && getCompanyCofig()
+//				&& !activity.getDescription().equals("common")) {
+//			return activity.getDescription();
+//		}
+		return name;
+	}
+	private String taskActivityDescription(Task task) {
+
+		if (task == null) {
+			return null;
+		}
+		Activity activity = task.getActivity();
+		if (activity == null) {
+			return null;
+		}
+		String name = activity.getName();
+		if (name == null) {
+			return null;
+		}
+		if (activity.getDescription() != null 
 				&& !activity.getDescription().equals("common")) {
 			return activity.getDescription();
 		}
 		return name;
 	}
-
 	private String taskAccountTypeName(Task task) {
 
 		if (task == null) {
@@ -147,13 +190,31 @@ public class TaskMapperImpl extends TaskMapper {
 		if (name == null) {
 			return null;
 		}
-		if (accountType.getDescription() != null && getCompanyCofig()
+//		if (accountType.getDescription() != null && getCompanyCofig()
+//				&& !accountType.getDescription().equals("common")) {
+//			return accountType.getDescription();
+//		}
+		return name;
+	}
+	private String taskAccountTypeDescription(Task task) {
+
+		if (task == null) {
+			return null;
+		}
+		AccountType accountType = task.getAccountType();
+		if (accountType == null) {
+			return null;
+		}
+		String name = accountType.getName();
+		if (name == null) {
+			return null;
+		}
+		if (accountType.getDescription() != null
 				&& !accountType.getDescription().equals("common")) {
 			return accountType.getDescription();
 		}
 		return name;
 	}
-
 	private String taskAccountProfileName(Task task) {
 
 		if (task == null) {
@@ -168,14 +229,35 @@ public class TaskMapperImpl extends TaskMapper {
 			return null;
 		}
 
-		if (accountProfile.getDescription() != null && getCompanyCofig()
+//		if (accountProfile.getDescription() != null && getCompanyCofig()
+//				&& !accountProfile.getDescription().equals("common")) {
+//			return accountProfile.getDescription();
+//
+//		}
+		return name;
+	}
+
+	private String taskAccountProfileDescription(Task task) {
+
+		if (task == null) {
+			return null;
+		}
+		AccountProfile accountProfile = task.getAccountProfile();
+		if (accountProfile == null) {
+			return null;
+		}
+		String name = accountProfile.getName();
+		if (name == null) {
+			return null;
+		}
+
+		if (accountProfile.getDescription() != null 
 				&& !accountProfile.getDescription().equals("common")) {
 			return accountProfile.getDescription();
 
 		}
 		return name;
 	}
-
 	private String taskActivityPid(Task task) {
 
 		if (task == null) {

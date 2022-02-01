@@ -34,6 +34,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
+import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupLocationTarget;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
@@ -48,8 +49,10 @@ import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationWiseProductGroupPerformanceDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationPerformaceDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupLocationTargetDTO;
+import com.orderfleet.webapp.web.rest.mapper.ProductGroupMapper;
 
 @Controller
 @RequestMapping("/web")
@@ -80,11 +83,16 @@ public class LocationWiseProductGroupComparisonReportResource {
 	@Inject
 	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
 
+	@Inject
+	private ProductGroupMapper productGroupMapper;
+	
 	@Timed
 	@RequestMapping(value = "/location-wise-product-group-comparison-report", method = RequestMethod.GET)
 	public String getLocationWiseTargetAchievedReport(Model model) {
 		log.debug("Web request to get a page of Location Wise Product Group Comparison Report");
-		model.addAttribute("products", productGroupRepository.findAllByCompanyIdAndDeactivatedProductGroup(true));
+		List<ProductGroup>productgroupList =productGroupRepository.findAllByCompanyIdAndDeactivatedProductGroup(true);
+		List<ProductGroupDTO>productgroupdto =productGroupMapper.productGroupsToProductGroupDTOs(productgroupList);
+		model.addAttribute("products",productgroupdto );
 		return "company/locationWiseProductGroupComparisonReport";
 	}
 

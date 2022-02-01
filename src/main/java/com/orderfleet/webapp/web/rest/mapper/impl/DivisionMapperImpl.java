@@ -20,7 +20,24 @@ public class DivisionMapperImpl extends DivisionMapper{
 
 	        divisionDTO.setActivated( division.getActivated() );
 	        divisionDTO.setPid( division.getPid() );
-	        divisionDTO.setName( divisionName(division));
+	        divisionDTO.setName(division.getName());
+	        divisionDTO.setAlias( division.getAlias() );
+	        divisionDTO.setDescription( division.getDescription() );
+
+	        return divisionDTO;
+	    }
+	 public DivisionDTO divisionToDivisionDTODescription(Division division) {
+	        if ( division == null ) {
+	            return null;
+	        }
+
+	        DivisionDTO divisionDTO = new DivisionDTO();
+
+	        divisionDTO.setActivated( division.getActivated() );
+	        divisionDTO.setPid( division.getPid() );
+	        divisionDTO.setName(division.getDescription() != null && !division.getDescription().equalsIgnoreCase("common")
+					? division.getDescription()
+					: division.getName());
 	        divisionDTO.setAlias( division.getAlias() );
 	        divisionDTO.setDescription( division.getDescription() );
 
@@ -34,10 +51,18 @@ public class DivisionMapperImpl extends DivisionMapper{
 	        }
 
 	        List<DivisionDTO> list = new ArrayList<DivisionDTO>();
+	        if(getCompanyCofig())
+	        {
 	        for ( Division division : divisions ) {
-	            list.add( divisionToDivisionDTO( division ) );
+	            list.add( divisionToDivisionDTODescription( division ) );
 	        }
-
+	        }
+	        else
+	        {
+	        	 for ( Division division : divisions ) {
+	 	            list.add( divisionToDivisionDTO( division ) );
+	 	        }
+	        }
 	        return list;
 	    }
 

@@ -35,6 +35,26 @@ public class DocumentPrintMapperImpl extends DocumentPrintMapper{
 
 	        return documentPrintDTO;
 	    }
+	 public DocumentPrintDTO documentPrintToDocumentPrintDTODescription(DocumentPrint documentPrint) {
+	        if ( documentPrint == null ) {
+	            return null;
+	        }
+
+	        DocumentPrintDTO documentPrintDTO = new DocumentPrintDTO();
+
+	        documentPrintDTO.setDocumentPid( documentPrintDocumentPid( documentPrint ) );
+	        documentPrintDTO.setUserLastName( documentPrintUserLastName( documentPrint ) );
+	        documentPrintDTO.setActivityName( documentPrintActivityDescription( documentPrint ) );
+	        documentPrintDTO.setUserLoginName( documentPrintUserLogin( documentPrint ) );
+	        documentPrintDTO.setUserPid( documentPrintUserPid( documentPrint ) );
+	        documentPrintDTO.setUserFirstName( documentPrintUserFirstName( documentPrint ) );
+	        documentPrintDTO.setDocumentName( documentPrintDocumentDescription( documentPrint ) );
+	        documentPrintDTO.setActivityPid( documentPrintActivityPid( documentPrint ) );
+	        documentPrintDTO.setPid( documentPrint.getPid() );
+	        documentPrintDTO.setPrintStatus( documentPrint.isPrintStatus() );
+
+	        return documentPrintDTO;
+	    }
 
 	    @Override
 	    public List<DocumentPrintDTO> documentPrintsToDocumentPrintDTOs(List<DocumentPrint> documentPrints) {
@@ -43,10 +63,17 @@ public class DocumentPrintMapperImpl extends DocumentPrintMapper{
 	        }
 
 	        List<DocumentPrintDTO> list = new ArrayList<DocumentPrintDTO>();
+	        if(getCompanyCofig())
+	        {
 	        for ( DocumentPrint documentPrint : documentPrints ) {
-	            list.add( documentPrintToDocumentPrintDTO( documentPrint ) );
+	            list.add( documentPrintToDocumentPrintDTODescription( documentPrint ) );
 	        }
-
+	        }else
+	        {
+	        	for ( DocumentPrint documentPrint : documentPrints ) {
+		            list.add( documentPrintToDocumentPrintDTO( documentPrint ) );
+		        }
+	        }
 	        return list;
 	    }
 
@@ -123,7 +150,26 @@ public class DocumentPrintMapperImpl extends DocumentPrintMapper{
 	        if ( name == null ) {
 	            return null;
 	        }
-	        if(activity.getDescription()!=null && getCompanyCofig() && !activity.getDescription().equals("common")) {
+//	        if(activity.getDescription()!=null && getCompanyCofig() && !activity.getDescription().equals("common")) {
+//		        return activity.getDescription();
+//		        }
+	        return name;
+	    }
+
+	    private String documentPrintActivityDescription(DocumentPrint documentPrint) {
+
+	        if ( documentPrint == null ) {
+	            return null;
+	        }
+	        Activity activity = documentPrint.getActivity();
+	        if ( activity == null ) {
+	            return null;
+	        }
+	        String name = activity.getName();
+	        if ( name == null ) {
+	            return null;
+	        }
+	        if(activity.getDescription()!=null && !activity.getDescription().equals("common")) {
 		        return activity.getDescription();
 		        }
 	        return name;
@@ -190,7 +236,25 @@ public class DocumentPrintMapperImpl extends DocumentPrintMapper{
 	        if ( name == null ) {
 	            return null;
 	        }
-	        if(document.getDescription()!=null && getCompanyCofig() && !document.getDescription().equals("common")) {
+//	        if(document.getDescription()!=null && getCompanyCofig() && !document.getDescription().equals("common")) {
+//		        return document.getDescription();
+//		        }
+	        return name;
+	    }
+	    private String documentPrintDocumentDescription(DocumentPrint documentPrint) {
+
+	        if ( documentPrint == null ) {
+	            return null;
+	        }
+	        Document document = documentPrint.getDocument();
+	        if ( document == null ) {
+	            return null;
+	        }
+	        String name = document.getName();
+	        if ( name == null ) {
+	            return null;
+	        }
+	        if(document.getDescription()!=null && !document.getDescription().equals("common")) {
 		        return document.getDescription();
 		        }
 	        return name;

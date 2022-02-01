@@ -24,14 +24,33 @@ public class KnowledgebaseMapperImpl extends KnowledgebaseMapper{
         knowledgebaseDTO.setProductGroupName( knowledgebaseProductGroupName( knowledgebase ) );
         knowledgebaseDTO.setActivated( knowledgebase.getActivated() );
         knowledgebaseDTO.setPid( knowledgebase.getPid() );
-        knowledgebaseDTO.setName( knowledgebaseName(knowledgebase) );
+        knowledgebaseDTO.setName( knowledgebase.getName() );
         knowledgebaseDTO.setAlias( knowledgebase.getAlias() );
         knowledgebaseDTO.setDescription( knowledgebase.getDescription() );
         knowledgebaseDTO.setLastModifiedDate( knowledgebase.getLastModifiedDate() );
 
         return knowledgebaseDTO;
     }
+    public KnowledgebaseDTO knowledgebaseToKnowledgebaseDTODescription(Knowledgebase knowledgebase) {
+        if ( knowledgebase == null ) {
+            return null;
+        }
 
+        KnowledgebaseDTO knowledgebaseDTO = new KnowledgebaseDTO();
+
+        knowledgebaseDTO.setProductGroupPid( knowledgebaseProductGroupPid( knowledgebase ) );
+        knowledgebaseDTO.setProductGroupName( knowledgebaseProductGroupDescription( knowledgebase ) );
+        knowledgebaseDTO.setActivated( knowledgebase.getActivated() );
+        knowledgebaseDTO.setPid( knowledgebase.getPid() );
+        knowledgebaseDTO.setName( knowledgebase.getDescription() != null && !knowledgebase.getDescription().equalsIgnoreCase("common")
+				? knowledgebase.getDescription()
+				: knowledgebase.getName());
+        knowledgebaseDTO.setAlias( knowledgebase.getAlias() );
+        knowledgebaseDTO.setDescription( knowledgebase.getDescription() );
+        knowledgebaseDTO.setLastModifiedDate( knowledgebase.getLastModifiedDate() );
+
+        return knowledgebaseDTO;
+    }
     @Override
     public List<KnowledgebaseDTO> knowledgebasesToKnowledgebaseDTOs(List<Knowledgebase> knowledgebases) {
         if ( knowledgebases == null ) {
@@ -39,8 +58,15 @@ public class KnowledgebaseMapperImpl extends KnowledgebaseMapper{
         }
 
         List<KnowledgebaseDTO> list = new ArrayList<KnowledgebaseDTO>();
+        if(getCompanyCofig()) {
         for ( Knowledgebase knowledgebase : knowledgebases ) {
-            list.add( knowledgebaseToKnowledgebaseDTO( knowledgebase ) );
+            list.add( knowledgebaseToKnowledgebaseDTODescription( knowledgebase ) );
+        }}
+        else
+        {
+        	 for ( Knowledgebase knowledgebase : knowledgebases ) {
+                 list.add( knowledgebaseToKnowledgebaseDTO( knowledgebase ) );
+             }
         }
 
         return list;
@@ -107,7 +133,25 @@ public class KnowledgebaseMapperImpl extends KnowledgebaseMapper{
         if ( name == null ) {
             return null;
         }
-        if(productGroup.getDescription()!=null && getCompanyCofig() && !productGroup.getDescription().equals("common")) {
+//        if(productGroup.getDescription()!=null && getCompanyCofig() && !productGroup.getDescription().equals("common")) {
+//            return productGroup.getDescription();
+//            }
+        return name;
+    }
+    private String knowledgebaseProductGroupDescription(Knowledgebase knowledgebase) {
+
+        if ( knowledgebase == null ) {
+            return null;
+        }
+        ProductGroup productGroup = knowledgebase.getProductGroup();
+        if ( productGroup == null ) {
+            return null;
+        }
+        String name = productGroup.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(productGroup.getDescription()!=null && !productGroup.getDescription().equals("common")) {
             return productGroup.getDescription();
             }
         return name;

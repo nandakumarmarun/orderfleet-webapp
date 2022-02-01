@@ -21,13 +21,29 @@ public class DepartmentMapperImpl extends DepartmentMapper {
 
 	        departmentDTO.setActivated( department.getActivated() );
 	        departmentDTO.setPid( department.getPid() );
-	        departmentDTO.setName( departmentName(department));
+	        departmentDTO.setName( department.getName());
 	        departmentDTO.setAlias( department.getAlias() );
 	        departmentDTO.setDescription( department.getDescription() );
 
 	        return departmentDTO;
 	    }
+	 public DepartmentDTO departmentToDepartmentDTODescription(Department department) {
+	        if ( department == null ) {
+	            return null;
+	        }
 
+	        DepartmentDTO departmentDTO = new DepartmentDTO();
+
+	        departmentDTO.setActivated( department.getActivated() );
+	        departmentDTO.setPid( department.getPid() );
+	        departmentDTO.setName( department.getDescription() != null && !department.getDescription().equalsIgnoreCase("common")
+					? department.getDescription()
+					: department.getName());
+	        departmentDTO.setAlias( department.getAlias() );
+	        departmentDTO.setDescription( department.getDescription() );
+
+	        return departmentDTO;
+	    }
 	    @Override
 	    public List<DepartmentDTO> departmentsToDepartmentDTOs(List<Department> departments) {
 	        if ( departments == null ) {
@@ -35,10 +51,18 @@ public class DepartmentMapperImpl extends DepartmentMapper {
 	        }
 
 	        List<DepartmentDTO> list = new ArrayList<DepartmentDTO>();
+	        if(getCompanyCofig())
+	        {
 	        for ( Department department : departments ) {
+	            list.add( departmentToDepartmentDTODescription( department ) );
+	        }
+	        }
+	        else
+	        {for ( Department department : departments ) {
 	            list.add( departmentToDepartmentDTO( department ) );
 	        }
-
+	        	
+	        }
 	        return list;
 	    }
 

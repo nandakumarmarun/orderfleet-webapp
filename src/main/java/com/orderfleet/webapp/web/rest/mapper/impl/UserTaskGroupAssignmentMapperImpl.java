@@ -34,6 +34,26 @@ public class UserTaskGroupAssignmentMapperImpl extends UserTaskGroupAssignmentMa
 
         return userTaskGroupAssignmentDTO;
     }
+   public UserTaskGroupAssignmentDTO userTaskGroupAssignmentToUserTaskGroupAssignmentDTODescription(UserTaskGroupAssignment userTaskGroupAssignment) {
+       if ( userTaskGroupAssignment == null ) {
+           return null;
+       }
+
+       UserTaskGroupAssignmentDTO userTaskGroupAssignmentDTO = new UserTaskGroupAssignmentDTO();
+
+       userTaskGroupAssignmentDTO.setExecutiveUserPid( userTaskGroupAssignmentExecutiveUserPid( userTaskGroupAssignment ) );
+       userTaskGroupAssignmentDTO.setTaskGroupName( userTaskGroupAssignmentTaskGroupDescription( userTaskGroupAssignment ) );
+       userTaskGroupAssignmentDTO.setExecutiveUserName( userTaskGroupAssignmentExecutiveUserFirstName( userTaskGroupAssignment ) );
+       userTaskGroupAssignmentDTO.setTaskGroupPid( userTaskGroupAssignmentTaskGroupPid( userTaskGroupAssignment ) );
+       userTaskGroupAssignmentDTO.setUserPid( userTaskGroupAssignmentUserPid( userTaskGroupAssignment ) );
+       userTaskGroupAssignmentDTO.setUserName( userTaskGroupAssignmentUserFirstName( userTaskGroupAssignment ) );
+       userTaskGroupAssignmentDTO.setPid( userTaskGroupAssignment.getPid() );
+       userTaskGroupAssignmentDTO.setPriorityStatus( userTaskGroupAssignment.getPriorityStatus() );
+       userTaskGroupAssignmentDTO.setStartDate( userTaskGroupAssignment.getStartDate() );
+       userTaskGroupAssignmentDTO.setRemarks( userTaskGroupAssignment.getRemarks() );
+
+       return userTaskGroupAssignmentDTO;
+   }
 
     @Override
     public List<UserTaskGroupAssignmentDTO> userTaskGroupAssignmentsToUserTaskGroupAssignmentDTOs(List<UserTaskGroupAssignment> userTaskGroupAssignments) {
@@ -42,8 +62,15 @@ public class UserTaskGroupAssignmentMapperImpl extends UserTaskGroupAssignmentMa
         }
 
         List<UserTaskGroupAssignmentDTO> list = new ArrayList<UserTaskGroupAssignmentDTO>();
+        if(getCompanyCofig()) {
         for ( UserTaskGroupAssignment userTaskGroupAssignment : userTaskGroupAssignments ) {
-            list.add( userTaskGroupAssignmentToUserTaskGroupAssignmentDTO( userTaskGroupAssignment ) );
+            list.add( userTaskGroupAssignmentToUserTaskGroupAssignmentDTODescription( userTaskGroupAssignment ) );
+        }}
+        else
+        {
+        	for ( UserTaskGroupAssignment userTaskGroupAssignment : userTaskGroupAssignments ) {
+                list.add( userTaskGroupAssignmentToUserTaskGroupAssignmentDTO( userTaskGroupAssignment ) );
+            }
         }
 
         return list;
@@ -110,12 +137,29 @@ public class UserTaskGroupAssignmentMapperImpl extends UserTaskGroupAssignmentMa
         if ( name == null ) {
             return null;
         }
-        if(taskGroup.getDescription()!=null && getCompanyCofig() && !taskGroup.getDescription().equals("common")) {
+//        if(taskGroup.getDescription()!=null && getCompanyCofig() && !taskGroup.getDescription().equals("common")) {
+//	        return taskGroup.getDescription();
+//	        }
+        return name;
+    }
+    private String userTaskGroupAssignmentTaskGroupDescription(UserTaskGroupAssignment userTaskGroupAssignment) {
+
+        if ( userTaskGroupAssignment == null ) {
+            return null;
+        }
+        TaskGroup taskGroup = userTaskGroupAssignment.getTaskGroup();
+        if ( taskGroup == null ) {
+            return null;
+        }
+        String name = taskGroup.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(taskGroup.getDescription()!=null && !taskGroup.getDescription().equals("common")) {
 	        return taskGroup.getDescription();
 	        }
         return name;
     }
-
     private String userTaskGroupAssignmentExecutiveUserFirstName(UserTaskGroupAssignment userTaskGroupAssignment) {
 
         if ( userTaskGroupAssignment == null ) {

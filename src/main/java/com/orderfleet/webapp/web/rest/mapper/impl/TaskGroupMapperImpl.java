@@ -35,7 +35,7 @@ public class TaskGroupMapperImpl extends TaskGroupMapper{
         taskGroupDTO.setActivityGroupName( taskGroupActivityGroupName( taskGroup ) );
         taskGroupDTO.setActivityGroupPid( taskGroupActivityGroupPid( taskGroup ) );
         taskGroupDTO.setPid( taskGroup.getPid() );
-        taskGroupDTO.setName( taskGroupName(taskGroup));
+        taskGroupDTO.setName( taskGroup.getName());
         taskGroupDTO.setAlias( taskGroup.getAlias() );
         taskGroupDTO.setDescription( taskGroup.getDescription() );
         Set<TaskDTO> set = taskSetToTaskDTOSet( taskGroup.getTasks() );
@@ -46,6 +46,28 @@ public class TaskGroupMapperImpl extends TaskGroupMapper{
         return taskGroupDTO;
     }
 
+    public TaskGroupDTO taskGroupToTaskGroupDTODescription(TaskGroup taskGroup) {
+        if ( taskGroup == null ) {
+            return null;
+        }
+
+        TaskGroupDTO taskGroupDTO = new TaskGroupDTO();
+
+        taskGroupDTO.setActivityGroupName( taskGroupActivityGroupDescription( taskGroup ) );
+        taskGroupDTO.setActivityGroupPid( taskGroupActivityGroupPid( taskGroup ) );
+        taskGroupDTO.setPid( taskGroup.getPid() );
+        taskGroupDTO.setName(taskGroup.getDescription() != null && !taskGroup.getDescription().equalsIgnoreCase("common")
+				? taskGroup.getDescription()
+				: taskGroup.getName());
+        taskGroupDTO.setAlias( taskGroup.getAlias() );
+        taskGroupDTO.setDescription( taskGroup.getDescription() );
+        Set<TaskDTO> set = taskSetToTaskDTOSet( taskGroup.getTasks() );
+        if ( set != null ) {
+            taskGroupDTO.setTasks( set );
+        }
+
+        return taskGroupDTO;
+    }
     @Override
     public List<TaskGroupDTO> taskGroupsToTaskGroupDTOs(List<TaskGroup> taskGroups) {
         if ( taskGroups == null ) {
@@ -53,8 +75,16 @@ public class TaskGroupMapperImpl extends TaskGroupMapper{
         }
 
         List<TaskGroupDTO> list = new ArrayList<TaskGroupDTO>();
+        if(getCompanyCofig())
+        {
         for ( TaskGroup taskGroup : taskGroups ) {
-            list.add( taskGroupToTaskGroupDTO( taskGroup ) );
+            list.add( taskGroupToTaskGroupDTODescription( taskGroup ) );
+        }}
+        else
+        {
+        	for ( TaskGroup taskGroup : taskGroups ) {
+                list.add( taskGroupToTaskGroupDTO( taskGroup ) );
+            }
         }
 
         return list;
@@ -108,12 +138,29 @@ public class TaskGroupMapperImpl extends TaskGroupMapper{
         if ( name == null ) {
             return null;
         }
-        if(activityGroup.getDescription()!=null && getCompanyCofig() && !activityGroup.getDescription().equals("common")) {
+//        if(activityGroup.getDescription()!=null && getCompanyCofig() && !activityGroup.getDescription().equals("common")) {
+//            return activityGroup.getDescription();
+//            }
+        return name;
+    }
+    private String taskGroupActivityGroupDescription(TaskGroup taskGroup) {
+
+        if ( taskGroup == null ) {
+            return null;
+        }
+        ActivityGroup activityGroup = taskGroup.getActivityGroup();
+        if ( activityGroup == null ) {
+            return null;
+        }
+        String name = activityGroup.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(activityGroup.getDescription()!=null && !activityGroup.getDescription().equals("common")) {
             return activityGroup.getDescription();
             }
         return name;
     }
-
     private String taskGroupActivityGroupPid(TaskGroup taskGroup) {
 
         if ( taskGroup == null ) {

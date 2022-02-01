@@ -35,6 +35,27 @@ public class UserTaskListAssignmentMapperImpl extends UserTaskListAssignmentMapp
         return userTaskListAssignmentDTO;
     }
 
+   public UserTaskListAssignmentDTO userTaskListAssignmentToUserTaskListAssignmentDTODescription(UserTaskListAssignment userTaskListAssignment) {
+       if ( userTaskListAssignment == null ) {
+           return null;
+       }
+
+       UserTaskListAssignmentDTO userTaskListAssignmentDTO = new UserTaskListAssignmentDTO();
+
+       userTaskListAssignmentDTO.setExecutiveUserPid( userTaskListAssignmentExecutiveUserPid( userTaskListAssignment ) );
+       userTaskListAssignmentDTO.setTaskListName( userTaskListAssignmentTaskListDescription( userTaskListAssignment ) );
+       userTaskListAssignmentDTO.setExecutiveUserName( userTaskListAssignmentExecutiveUserFirstName( userTaskListAssignment ) );
+       userTaskListAssignmentDTO.setTaskListPid( userTaskListAssignmentTaskListPid( userTaskListAssignment ) );
+       userTaskListAssignmentDTO.setUserPid( userTaskListAssignmentUserPid( userTaskListAssignment ) );
+       userTaskListAssignmentDTO.setUserName( userTaskListAssignmentUserFirstName( userTaskListAssignment ) );
+       userTaskListAssignmentDTO.setPid( userTaskListAssignment.getPid() );
+       userTaskListAssignmentDTO.setPriorityStatus( userTaskListAssignment.getPriorityStatus() );
+       userTaskListAssignmentDTO.setStartDate( userTaskListAssignment.getStartDate() );
+       userTaskListAssignmentDTO.setRemarks( userTaskListAssignment.getRemarks() );
+
+       return userTaskListAssignmentDTO;
+   }
+
     @Override
     public List<UserTaskListAssignmentDTO> userTaskListAssignmentsToUserTaskListAssignmentDTOs(List<UserTaskListAssignment> userTaskListAssignments) {
         if ( userTaskListAssignments == null ) {
@@ -42,8 +63,15 @@ public class UserTaskListAssignmentMapperImpl extends UserTaskListAssignmentMapp
         }
 
         List<UserTaskListAssignmentDTO> list = new ArrayList<UserTaskListAssignmentDTO>();
+        if(getCompanyCofig())
+        {
         for ( UserTaskListAssignment userTaskListAssignment : userTaskListAssignments ) {
-            list.add( userTaskListAssignmentToUserTaskListAssignmentDTO( userTaskListAssignment ) );
+            list.add( userTaskListAssignmentToUserTaskListAssignmentDTODescription( userTaskListAssignment ) );
+        }}
+        {
+        	for ( UserTaskListAssignment userTaskListAssignment : userTaskListAssignments ) {
+                list.add( userTaskListAssignmentToUserTaskListAssignmentDTO( userTaskListAssignment ) );
+            }
         }
 
         return list;
@@ -110,7 +138,25 @@ public class UserTaskListAssignmentMapperImpl extends UserTaskListAssignmentMapp
         if ( name == null ) {
             return null;
         }
-        if(taskList.getDescription()!=null && getCompanyCofig() && !taskList.getDescription().equals("common")) {
+//        if(taskList.getDescription()!=null && getCompanyCofig() && !taskList.getDescription().equals("common")) {
+//	        return taskList.getDescription();
+//	        }
+        return name;
+    }
+    private String userTaskListAssignmentTaskListDescription(UserTaskListAssignment userTaskListAssignment) {
+
+        if ( userTaskListAssignment == null ) {
+            return null;
+        }
+        TaskList taskList = userTaskListAssignment.getTaskList();
+        if ( taskList == null ) {
+            return null;
+        }
+        String name = taskList.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(taskList.getDescription()!=null && !taskList.getDescription().equals("common")) {
 	        return taskList.getDescription();
 	        }
         return name;

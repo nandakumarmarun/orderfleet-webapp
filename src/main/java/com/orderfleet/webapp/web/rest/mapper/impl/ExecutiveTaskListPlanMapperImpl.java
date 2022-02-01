@@ -32,7 +32,22 @@ public class ExecutiveTaskListPlanMapperImpl extends ExecutiveTaskListPlanMapper
 
         return executiveTaskListPlanDTO;
     }
+    public ExecutiveTaskListPlanDTO executiveTaskListPlanToExecutiveTaskListPlanDTODescription(ExecutiveTaskListPlan executiveTaskListPlan) {
+        if ( executiveTaskListPlan == null ) {
+            return null;
+        }
 
+        ExecutiveTaskListPlanDTO executiveTaskListPlanDTO = new ExecutiveTaskListPlanDTO();
+
+        executiveTaskListPlanDTO.setTaskListName( executiveTaskListPlanTaskListDescription( executiveTaskListPlan ) );
+        executiveTaskListPlanDTO.setTaskListPid( executiveTaskListPlanTaskListPid( executiveTaskListPlan ) );
+        executiveTaskListPlanDTO.setPid( executiveTaskListPlan.getPid() );
+        executiveTaskListPlanDTO.setCreatedDate( executiveTaskListPlan.getCreatedDate() );
+        executiveTaskListPlanDTO.setRemarks( executiveTaskListPlan.getRemarks() );
+        executiveTaskListPlanDTO.setPlannedDate( executiveTaskListPlan.getPlannedDate() );
+
+        return executiveTaskListPlanDTO;
+    }
     @Override
     public List<ExecutiveTaskListPlanDTO> executiveTaskListPlansToExecutiveTaskListPlanDTOs(List<ExecutiveTaskListPlan> executiveTaskListPlans) {
         if ( executiveTaskListPlans == null ) {
@@ -40,8 +55,16 @@ public class ExecutiveTaskListPlanMapperImpl extends ExecutiveTaskListPlanMapper
         }
 
         List<ExecutiveTaskListPlanDTO> list = new ArrayList<ExecutiveTaskListPlanDTO>();
+        if(getCompanyCofig())
+        {
         for ( ExecutiveTaskListPlan executiveTaskListPlan : executiveTaskListPlans ) {
-            list.add( executiveTaskListPlanToExecutiveTaskListPlanDTO( executiveTaskListPlan ) );
+            list.add( executiveTaskListPlanToExecutiveTaskListPlanDTODescription( executiveTaskListPlan ) );
+        }}
+        else
+        {
+        	for ( ExecutiveTaskListPlan executiveTaskListPlan : executiveTaskListPlans ) {
+                list.add( executiveTaskListPlanToExecutiveTaskListPlanDTO( executiveTaskListPlan ) );
+            }
         }
 
         return list;
@@ -91,12 +114,29 @@ public class ExecutiveTaskListPlanMapperImpl extends ExecutiveTaskListPlanMapper
         if ( name == null ) {
             return null;
         }
-        if(taskList.getDescription()!=null && getCompanyCofig() && !taskList.getDescription().equals("common")) {
+//        if(taskList.getDescription()!=null && getCompanyCofig() && !taskList.getDescription().equals("common")) {
+//	        return taskList.getDescription();
+//	        }
+        return name;
+    }
+    private String executiveTaskListPlanTaskListDescription(ExecutiveTaskListPlan executiveTaskListPlan) {
+
+        if ( executiveTaskListPlan == null ) {
+            return null;
+        }
+        TaskList taskList = executiveTaskListPlan.getTaskList();
+        if ( taskList == null ) {
+            return null;
+        }
+        String name = taskList.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(taskList.getDescription()!=null && !taskList.getDescription().equals("common")) {
 	        return taskList.getDescription();
 	        }
         return name;
     }
-
     private String executiveTaskListPlanTaskListPid(ExecutiveTaskListPlan executiveTaskListPlan) {
 
         if ( executiveTaskListPlan == null ) {

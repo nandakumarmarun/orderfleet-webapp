@@ -41,6 +41,29 @@ public class UserTaskAssignmentMapperImpl extends UserTaskAssignmentMapper {
         return userTaskAssignmentDTO;
     }
 
+    public UserTaskAssignmentDTO userTaskAssignmentToUserTaskAssignmentDTODescription(UserTaskAssignment userTaskAssignment) {
+        if ( userTaskAssignment == null ) {
+            return null;
+        }
+
+        UserTaskAssignmentDTO userTaskAssignmentDTO = new UserTaskAssignmentDTO();
+
+        userTaskAssignmentDTO.setExecutiveUserPid( userTaskAssignmentExecutiveUserPid( userTaskAssignment ) );
+        userTaskAssignmentDTO.setTaskActivityName( userTaskAssignmentTaskActivityDescription( userTaskAssignment ) );
+        userTaskAssignmentDTO.setExecutiveUserName( userTaskAssignmentExecutiveUserFirstName( userTaskAssignment ) );
+        userTaskAssignmentDTO.setTaskPid( userTaskAssignmentTaskPid( userTaskAssignment ) );
+        userTaskAssignmentDTO.setUserPid( userTaskAssignmentUserPid( userTaskAssignment ) );
+        userTaskAssignmentDTO.setTaskAccountName( userTaskAssignmentTaskAccountProfileDescription( userTaskAssignment ) );
+        userTaskAssignmentDTO.setUserName( userTaskAssignmentUserFirstName( userTaskAssignment ) );
+        userTaskAssignmentDTO.setPid( userTaskAssignment.getPid() );
+        userTaskAssignmentDTO.setPriorityStatus( userTaskAssignment.getPriorityStatus() );
+        userTaskAssignmentDTO.setStartDate( userTaskAssignment.getStartDate() );
+        userTaskAssignmentDTO.setRemarks( userTaskAssignment.getRemarks() );
+        userTaskAssignmentDTO.setTaskStatus( userTaskAssignment.getTaskStatus() );
+
+        return userTaskAssignmentDTO;
+    }
+
     @Override
     public List<UserTaskAssignmentDTO> userTaskAssignmentsToUserTaskAssignmentDTOs(List<UserTaskAssignment> userTaskAssignments) {
         if ( userTaskAssignments == null ) {
@@ -48,10 +71,18 @@ public class UserTaskAssignmentMapperImpl extends UserTaskAssignmentMapper {
         }
 
         List<UserTaskAssignmentDTO> list = new ArrayList<UserTaskAssignmentDTO>();
+        if(getCompanyCofig())
+        {
         for ( UserTaskAssignment userTaskAssignment : userTaskAssignments ) {
-            list.add( userTaskAssignmentToUserTaskAssignmentDTO( userTaskAssignment ) );
+            list.add( userTaskAssignmentToUserTaskAssignmentDTODescription( userTaskAssignment ) );
         }
-
+        }
+        else
+        {
+        	 for ( UserTaskAssignment userTaskAssignment : userTaskAssignments ) {
+                 list.add( userTaskAssignmentToUserTaskAssignmentDTO( userTaskAssignment ) );
+             }
+        }
         return list;
     }
 
@@ -121,12 +152,33 @@ public class UserTaskAssignmentMapperImpl extends UserTaskAssignmentMapper {
         if ( name == null ) {
             return null;
         }
-        if(activity.getDescription()!=null && getCompanyCofig() && !activity.getDescription().equals("common")) {
+//        if(activity.getDescription()!=null && getCompanyCofig() && !activity.getDescription().equals("common")) {
+//	        return activity.getDescription();
+//	        }
+        return name;
+    }
+    private String userTaskAssignmentTaskActivityDescription(UserTaskAssignment userTaskAssignment) {
+
+        if ( userTaskAssignment == null ) {
+            return null;
+        }
+        Task task = userTaskAssignment.getTask();
+        if ( task == null ) {
+            return null;
+        }
+        Activity activity = task.getActivity();
+        if ( activity == null ) {
+            return null;
+        }
+        String name = activity.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(activity.getDescription()!=null &&  !activity.getDescription().equals("common")) {
 	        return activity.getDescription();
 	        }
         return name;
     }
-
     private String userTaskAssignmentExecutiveUserFirstName(UserTaskAssignment userTaskAssignment) {
 
         if ( userTaskAssignment == null ) {
@@ -192,12 +244,33 @@ public class UserTaskAssignmentMapperImpl extends UserTaskAssignmentMapper {
         if ( name == null ) {
             return null;
         }
-        if(accountProfile.getDescription()!=null && getCompanyCofig() && !accountProfile.getDescription().equals("common")) {
+//        if(accountProfile.getDescription()!=null && getCompanyCofig() && !accountProfile.getDescription().equals("common")) {
+//	        return accountProfile.getDescription();
+//	        }
+        return name;
+    }
+    private String userTaskAssignmentTaskAccountProfileDescription(UserTaskAssignment userTaskAssignment) {
+
+        if ( userTaskAssignment == null ) {
+            return null;
+        }
+        Task task = userTaskAssignment.getTask();
+        if ( task == null ) {
+            return null;
+        }
+        AccountProfile accountProfile = task.getAccountProfile();
+        if ( accountProfile == null ) {
+            return null;
+        }
+        String name = accountProfile.getName();
+        if ( name == null ) {
+            return null;
+        }
+        if(accountProfile.getDescription()!=null &&!accountProfile.getDescription().equals("common")) {
 	        return accountProfile.getDescription();
 	        }
         return name;
     }
-
     private String userTaskAssignmentUserFirstName(UserTaskAssignment userTaskAssignment) {
 
         if ( userTaskAssignment == null ) {

@@ -23,11 +23,30 @@ public class FormMapperImpl extends FormMapper{
         formDTO.setJsCode( form.getJsCode() );
         formDTO.setLastModifiedDate( form.getLastModifiedDate() );
         formDTO.setMultipleRecord( form.getMultipleRecord() );
-        formDTO.setName( formName(form));
+        formDTO.setName(form.getName());
         formDTO.setPid( form.getPid() );
 
         return formDTO;
     }
+  public FormDTO formToFormDTODescription(Form form) {
+      if ( form == null ) {
+          return null;
+      }
+
+      FormDTO formDTO = new FormDTO();
+
+      formDTO.setActivated( form.getActivated() );
+      formDTO.setDescription( form.getDescription() );
+      formDTO.setJsCode( form.getJsCode() );
+      formDTO.setLastModifiedDate( form.getLastModifiedDate() );
+      formDTO.setMultipleRecord( form.getMultipleRecord() );
+      formDTO.setName(form.getDescription() != null && !form.getDescription().equalsIgnoreCase("common")
+				? form.getDescription()
+				: form.getName());
+      formDTO.setPid( form.getPid() );
+
+      return formDTO;
+  }
 
     @Override
     public List<FormDTO> formsToFormDTOs(List<Form> forms) {
@@ -36,10 +55,17 @@ public class FormMapperImpl extends FormMapper{
         }
 
         List<FormDTO> list = new ArrayList<FormDTO>();
+        if(getCompanyCofig()) {
         for ( Form form : forms ) {
+            list.add( formToFormDTODescription( form ) );
+        }
+        }
+        else
+        {for ( Form form : forms ) {
             list.add( formToFormDTO( form ) );
         }
-
+        	
+        }
         return list;
     }
 
