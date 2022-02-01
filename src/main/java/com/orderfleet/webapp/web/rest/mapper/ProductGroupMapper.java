@@ -30,20 +30,24 @@ public abstract class ProductGroupMapper {
 //	@Mapping(target = "image", ignore = true)
 	public abstract ProductGroupDTO productGroupToProductGroupDTO(ProductGroup productGroup);
 
-	public abstract	List<ProductGroupDTO> productGroupsToProductGroupDTOs(List<ProductGroup> productGroups);
+	public abstract ProductGroupDTO productGroupToProductGroupDTODescription(ProductGroup productGroup);
+
+	public abstract List<ProductGroupDTO> productGroupsToProductGroupDTOs(List<ProductGroup> productGroups);
 
 //	@Mapping(target = "company", ignore = true)
 //	@Mapping(target = "id", ignore = true)
 	public abstract ProductGroup productGroupDTOToProductGroup(ProductGroupDTO productGroupDTO);
 
-	public abstract	List<ProductGroup> productGroupDTOsToProductGroups(List<ProductGroupDTO> productGroupDTOs);
-	public boolean getCompanyCofig(){
-		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
-		if(optconfig.isPresent()) {
-		if(Boolean.valueOf(optconfig.get().getValue())) {
-		return true;
-		}
+	public abstract List<ProductGroup> productGroupDTOsToProductGroups(List<ProductGroupDTO> productGroupDTOs);
+
+	public boolean getCompanyCofig() {
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if (optconfig.isPresent()) {
+			if (Boolean.valueOf(optconfig.get().getValue())) {
+				return true;
+			}
 		}
 		return false;
-		}
+	}
 }

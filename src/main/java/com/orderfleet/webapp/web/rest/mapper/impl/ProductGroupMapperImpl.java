@@ -35,6 +35,7 @@ public class ProductGroupMapperImpl extends ProductGroupMapper {
 		return productGroupDTO;
 	}
 
+	@Override
 	public ProductGroupDTO productGroupToProductGroupDTODescription(ProductGroup productGroup) {
 		if (productGroup == null) {
 			return null;

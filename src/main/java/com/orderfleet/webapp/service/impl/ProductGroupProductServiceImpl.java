@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,13 +17,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.EcomProductProfile;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductNameTextSettings;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.StockAvailabilityStatus;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentStockLocationSourceRepository;
 import com.orderfleet.webapp.repository.EcomProductProfileProductRepository;
@@ -53,6 +57,9 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 
 	@Inject
 	private ProductGroupRepository productGroupRepository;
+
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	@Inject
 	private ProductGroupProductRepository productGroupProductRepository;
@@ -387,6 +394,17 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 	// return productGroupProducts;
 	// }
 
+	public boolean getCompanyCofig() {
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if (optconfig.isPresent()) {
+			if (Boolean.valueOf(optconfig.get().getValue())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProductGroupProductDTO> findProductGroupProductsByUserProductGroupIsCurrentUserAndProductGroupActivated(
@@ -395,9 +413,19 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 		// get user productGroups
 		List<ProductGroup> productGroups = userProductGroupRepository
 				.findProductGroupsByUserIsCurrentUserAndProductGroupsActivated(activted);
+
+		boolean companyconfig = getCompanyCofig();
+
 		for (ProductGroup productGroup : productGroups) {
 			ProductGroupProductDTO productGroupProductDTO = new ProductGroupProductDTO();
-			productGroupProductDTO.setProductGroupDTO(productGroupMapper.productGroupToProductGroupDTO(productGroup));
+
+			if (companyconfig) {
+				productGroupProductDTO
+						.setProductGroupDTO(productGroupMapper.productGroupToProductGroupDTODescription(productGroup));
+			} else {
+				productGroupProductDTO
+						.setProductGroupDTO(productGroupMapper.productGroupToProductGroupDTO(productGroup));
+			}
 			// get Products by productGroup
 			List<ProductProfile> productProfiles = productGroupProductRepository
 					.findProductByProductGroupPidAndActivated(productGroup.getPid(), true);
@@ -520,6 +548,7 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 		List<ProductGroupProduct> allProductGroupProducts = productGroupProductRepository
 				.findByProductGroupPidInAndActivatedAndLastModifiedDateAndProductGroupLastModified(groupPids, true,
 						lastModifiedDate);
+		boolean companyconfig = getCompanyCofig();
 		Map<String, List<ProductGroupProduct>> productGroupProductMap = allProductGroupProducts.parallelStream()
 				.collect(Collectors.groupingBy(pl -> pl.getProductGroup().getName()));
 		for (Map.Entry<String, List<ProductGroupProduct>> entry : productGroupProductMap.entrySet()) {
@@ -528,8 +557,14 @@ public class ProductGroupProductServiceImpl implements ProductGroupProductServic
 				productProfiles.add(productGroupProduct.getProduct());
 			}
 			ProductGroupProductDTO productGroupProductDTO = new ProductGroupProductDTO();
-			productGroupProductDTO.setProductGroupDTO(
-					productGroupMapper.productGroupToProductGroupDTO(entry.getValue().get(0).getProductGroup()));
+			if (companyconfig) {
+				productGroupProductDTO.setProductGroupDTO(productGroupMapper
+						.productGroupToProductGroupDTODescription(entry.getValue().get(0).getProductGroup()));
+			} else {
+				productGroupProductDTO.setProductGroupDTO(
+						productGroupMapper.productGroupToProductGroupDTO(entry.getValue().get(0).getProductGroup()));
+			}
+
 			// get Products by productGroup
 			List<ProductProfileDTO> productProfileDTOs = productProfileMapper
 					.productProfilesToProductProfileDTOs(new ArrayList<>(productProfiles));
