@@ -631,26 +631,26 @@ public class TPAccountProfileManagementService {
 		log.info("Tally  accounts: " + accountProfileDTOs.size());
 		// all pricelevels
 		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
-		Set<Long> dectivatedac = new HashSet<>();
+//		Set<Long> dectivatedac = new HashSet<>();
 		// account type
 		// List<AccountType> accountTypes =
 		// accountTypeRepository.findAllByCompanyId(company.getId());
-		if(!accountProfiles.isEmpty() && accountProfiles.size() > 1 && !accountProfileDTOs.isEmpty()) {
-			accountProfiles.remove(0);
-			for(AccountProfile ac :accountProfiles) {
-			flagac = false;
-			 accountProfileDTOs.forEach(data ->{
-				if(ac.getCustomerId().equals(data.getCustomerId())) {
-					flagac = true;
-				}
-			});
-			if(!flagac) {
-				dectivatedac.add(ac.getId());
-			}
-		}}
-			if(!dectivatedac.isEmpty()) {
-				accountProfileRepository.deactivateAcoundProfileUsingInId(dectivatedac);
-			}
+//		if(!accountProfiles.isEmpty() && accountProfiles.size() > 1 && !accountProfileDTOs.isEmpty()) {
+//			accountProfiles.remove(0);
+//			for(AccountProfile ac :accountProfiles) {
+//			flagac = false;
+//			 accountProfileDTOs.forEach(data ->{
+//				if(ac.getCustomerId().equals(data.getCustomerId())) {
+//					flagac = true;
+//				}
+//			});
+//			if(!flagac) {
+//				dectivatedac.add(ac.getId());
+//			}
+//		}}
+//			if(!dectivatedac.isEmpty()) {
+//				accountProfileRepository.deactivateAcoundProfileUsingInId(dectivatedac);
+//			}
 		for (AccountProfileDTO apDto : accountProfileDTOs) {
 			Optional<AccountProfile> optionalAP = null;
 			// check exist by name, only one exist with a name
@@ -758,7 +758,7 @@ public class TPAccountProfileManagementService {
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
-		dectivatedac.forEach(data -> log.info("deactivated id " + dectivatedac.size() +" +"+ data));
+//		dectivatedac.forEach(data -> log.info("deactivated id " + dectivatedac.size() +" +"+ data));
 	}
 
 	@Transactional

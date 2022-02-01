@@ -854,6 +854,7 @@ public class CompanyTrialSetUpService {
 		location.setAlias("Territory");
 		location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
 		location.setLocationId("Territory");
+		location.setDescription("Territory");
 		location.setCompany(company);
 		locations.add(location);
 		Location location1 = new Location();
@@ -861,6 +862,7 @@ public class CompanyTrialSetUpService {
 		location1.setAlias("Primary");
 		location1.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
 		location1.setLocationId("Primary");
+		location1.setDescription("Primary");
 		location1.setCompany(company);
 		locations.add(location1);
 		List<Location> locations1 = locationRepository.save(locations);
@@ -1877,6 +1879,8 @@ public class CompanyTrialSetUpService {
 		productGroup.setCompany(company);
 		productGroup.setName("General");
 		productGroup.setAlias("General");
+		productGroup.setDescription("General");
+		productGroup.setProductGroupId("General");
 		productGroup.setThirdpartyUpdate(false);
 		productGroup.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
 		productGroupRepository.save(productGroup);
@@ -1889,6 +1893,7 @@ public class CompanyTrialSetUpService {
 		productCategory.setName("Not Applicable");
 		productCategory.setAlias("Not Applicable");
 		productCategory.setProductCategoryId("Not Applicable");
+		productCategory.setDescription("Not Applicable");
 		productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
 		productCategory.setThirdpartyUpdate(false);
 		productCategoryRepository.save(productCategory);
