@@ -22,6 +22,8 @@ if (!this.ProductProfile) {
 		unitsPid : null,
 		sku : null,
 		unitQty : null,
+		productDescription : null,
+		discountPercentage : null,
 		taxRate : null,
 		price : null,
 		mrp : null,
@@ -505,6 +507,7 @@ if (!this.ProductProfile) {
 	function createUpdateProductProfile(el) {
 		productProfileModel.name = $('#field_name').val();
 		productProfileModel.alias = $('#field_alias').val();
+		productProfileModel.productDescription = $('#field_Pdescription').val();
 		productProfileModel.productCategoryPid = $('#field_category').val();
 		productProfileModel.divisionPid = $('#field_division').val();
 		productProfileModel.unitsPid = $('#field_units').val();
@@ -514,6 +517,7 @@ if (!this.ProductProfile) {
 		productProfileModel.mrp = $('#field_mrp').val();
 		productProfileModel.description = $('#field_description').val();
 		productProfileModel.taxRate = $('#field_taxRate').val();
+		productProfileModel.discountPercentage = $('#field_discountPercentage').val();
 		productProfileModel.size = $('#field_size').val();
 		productProfileModel.hsnCode = $('#field_hsnCode').val();
 		productProfileModel.productId = $('#field_productId').val();
@@ -545,11 +549,13 @@ if (!this.ProductProfile) {
 				$('#lbl_name').text(data.name);
 				$('#lbl_alias').text(data.alias);
 				$('#lbl_category').text(data.productCategoryName);
+				$('#lbl_productdescription').text(data.productDescription);
 				$('#lbl_division').text(data.divisionName);
 				$('#lbl_units').text(data.unitsName);
 				$('#lbl_unitQty').text(data.unitQty);
 				$('#lbl_sku').text(data.sku);
 				$('#lbl_price').text(data.price);
+				$('#lbl_discountPercentage').text(data.discountPercentage);
 				$('#lbl_mrp').text(data.mrp);
 				$('#lbl_taxRate').text(data.taxRate);
 				$('#lbl_size').text(data.size);
@@ -574,6 +580,7 @@ if (!this.ProductProfile) {
 					success : function(data) {
 						$('#field_name').val(data.name);
 						$('#field_alias').val(data.alias);
+						$('#field_Pdescription').val(data.productDescription);
 						$('#field_category').val(data.productCategoryPid);
 						$('#field_division').val(data.divisionPid);
 						$('#field_units').val(data.unitsPid);
@@ -583,6 +590,7 @@ if (!this.ProductProfile) {
 						$('#field_mrp').val(data.mrp);
 						$('#field_description').val(data.description);
 						$('#field_taxRate').val(data.taxRate);
+						$('#field_discountPercentage').val(data.discountPercentage);
 						$('#field_size').val(data.size);
 						$('#field_hsnCode').val(data.hsnCode);
 						$('#field_productId').val(data.productId);

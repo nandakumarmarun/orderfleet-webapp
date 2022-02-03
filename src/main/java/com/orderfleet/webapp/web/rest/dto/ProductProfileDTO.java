@@ -48,6 +48,8 @@ public class ProductProfileDTO {
 	private Double compoundUnitQty;
 
 	private double taxRate;
+	
+	private double discountPercentage;
 
 	private String productCategoryPid;
 
@@ -133,6 +135,14 @@ public class ProductProfileDTO {
 
 	public String getStockLocationName() {
 		return stockLocationName;
+	}
+	
+	public double getDiscountPercentage() {
+		return discountPercentage;
+	}
+
+	public void setDiscountPercentage(double discountPercentage) {
+		this.discountPercentage = discountPercentage;
 	}
 
 	public void setStockLocationName(String stockLocationName) {

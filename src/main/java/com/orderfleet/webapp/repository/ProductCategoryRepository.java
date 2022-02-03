@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.orderfleet.webapp.domain.ProductCategory;
+import com.orderfleet.webapp.domain.ProductProfile;
 
 /**
  * Spring Data JPA repository for the ProductCategory entity.
@@ -59,4 +60,5 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
 	
 	@Query("select productCategory from ProductCategory productCategory where productCategory.company.pid = ?1 and productCategory.pid in ?2 order By productCategory.id asc")
 	List<ProductCategory> findAllByCompanyPidOrderByProductId(String companyPid,List<String>categoryPids);
+	
 }

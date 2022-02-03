@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.web.rest.dto.ProductCategoryDTO;
+import com.orderfleet.webapp.web.rest.dto.SetDiscountPercentage;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
@@ -232,5 +233,12 @@ public class ProductCategoryResource {
 		ProductCategoryDTO result = productCategoryService.updateProductCategoryThirdpartyUpdateStatus(
 				productCategoryDTO.getPid(), productCategoryDTO.getThirdpartyUpdate());
 		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/productCategories/assign-discount-Percentage",method = RequestMethod.POST)
+	public ResponseEntity<Void> assignDiscountPercentage(@RequestBody SetDiscountPercentage setDiscountPercentage){
+		log.debug("REST request to save Discount Percentage : {}",setDiscountPercentage);
+		productCategoryService.saveDicountPercentage(setDiscountPercentage);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

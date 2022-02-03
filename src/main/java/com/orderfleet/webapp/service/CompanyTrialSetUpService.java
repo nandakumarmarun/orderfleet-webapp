@@ -984,6 +984,7 @@ public class CompanyTrialSetUpService {
 		document.setActivityAccount(AccountTypeColumn.Receiver);
 		document.setCompany(company);
 		document.setDocumentType(DocumentType.INVENTORY_VOUCHER);
+		document.setDescription("Sales Order");
 		document.setDocumentPrefix("SO");
 		document.setPid(DocumentService.PID_PREFIX + RandomUtil.generatePid());
 		document.setSave(true);
@@ -995,6 +996,7 @@ public class CompanyTrialSetUpService {
 		document1.setActivityAccount(AccountTypeColumn.By);
 		document1.setCompany(company);
 		document1.setDocumentType(DocumentType.ACCOUNTING_VOUCHER);
+		document1.setDescription("Receipt");
 		document1.setDocumentPrefix("RE");
 		document1.setPid(DocumentService.PID_PREFIX + RandomUtil.generatePid());
 		document1.setSave(true);
@@ -1005,6 +1007,7 @@ public class CompanyTrialSetUpService {
 		document2.setName("No Order");
 		document2.setCompany(company);
 		document2.setDocumentType(DocumentType.DYNAMIC_DOCUMENT);
+		document2.setDescription("No Order");
 		document2.setDocumentPrefix("NO");
 		document2.setPid(DocumentService.PID_PREFIX + RandomUtil.generatePid());
 		document2.setSave(true);
@@ -1061,6 +1064,7 @@ public class CompanyTrialSetUpService {
 		form.setActivated(true);
 		form.setCompany(company);
 		form.setName("No Order");
+		form.setDescription("No Order");
 		form.setMultipleRecord(false);
 		form.setPid(FormService.PID_PREFIX + RandomUtil.generatePid());
 		form = formRepository.save(form);

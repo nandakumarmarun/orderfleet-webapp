@@ -39,6 +39,7 @@ import com.orderfleet.webapp.service.TaxMasterService;
 import com.orderfleet.webapp.web.rest.dto.EcomProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.SetDiscountPercentage;
 import com.orderfleet.webapp.web.rest.dto.SetTaxRate;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
@@ -163,7 +164,14 @@ public class ProductGroupResource {
 		productGroupService.saveUnitQuantity(setUnitQty);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
+	
+	@RequestMapping(value = "/productGroups/assign-discount-Percentage",method = RequestMethod.POST)
+	public ResponseEntity<Void> assignDiscountPercentage(@RequestBody SetDiscountPercentage setDiscountPercentage){
+		log.debug("REST request to save Discount Percentage : {}",setDiscountPercentage);
+		System.out.println("discount===================" + setDiscountPercentage);
+		productGroupService.saveDicountPercentage(setDiscountPercentage);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 	/**
 	 * GET /productGroups : get all the productGroups.
 	 *

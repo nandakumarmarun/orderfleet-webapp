@@ -82,6 +82,10 @@ if (!this.ProductGroup) {
 					$(".error-msg").html('');
 					saveAssignedUnitQty();
 				});
+				$('#btnsavediscountPercentage').on('click', function() {
+					$(".error-msg").html('');
+					savediscountPercentage();
+				});
 				
 				// validate image
 				$('#field_image').bind(
@@ -585,6 +589,38 @@ if (!this.ProductGroup) {
 			url : productGroupContextPath + "/assign-unit-quantity",
 			type : "POST",
 			data : JSON.stringify(setUnitQty),
+			contentType : "application/json; charset=utf-8",
+			success : function(status) {
+				$("#assignTaxModal").modal("hide");
+				onSaveSuccess(status);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			},
+		});
+	}
+	
+	function savediscountPercentage() {
+		let prodGrpPidnews = $("#dbDPProductGroups").val();
+		let discountPercentagevalue = $("#txtdiscountPercentage").val();
+		
+		if (prodGrpPidnews == null) {
+			$(".error-msg").html("Please select product groups");
+			return;
+		}
+		if (discountPercentagevalue < 0) {
+			$(".error-msg").html("Enter discount Percentage");
+			return;
+		}
+		$(".error-msg").html("Please wait...");
+		var setDiscountPercentage = {
+			productGroups : prodGrpPidnews,
+			discountPercentage : discountPercentagevalue
+		};
+		$.ajax({
+			url : productGroupContextPath + "/assign-discount-Percentage",
+			type : "POST",
+			data : JSON.stringify(setDiscountPercentage),
 			contentType : "application/json; charset=utf-8",
 			success : function(status) {
 				$("#assignTaxModal").modal("hide");

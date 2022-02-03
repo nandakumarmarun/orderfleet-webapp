@@ -58,6 +58,7 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfileDTO.setSku(productProfile.getSku());
 		productProfileDTO.setStockAvailabilityStatus(productProfile.getStockAvailabilityStatus());
 		productProfileDTO.setTaxRate(productProfile.getTaxRate());
+		productProfileDTO.setDiscountPercentage(productProfile.getDiscountPercentage());
 		productProfileDTO.setTrimChar(productProfile.getTrimChar());
 		productProfileDTO.setUnitQty(productProfile.getUnitQty());
 
@@ -110,6 +111,7 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfileDTO.setTaxRate(productProfile.getTaxRate());
 		productProfileDTO.setTrimChar(productProfile.getTrimChar());
 		productProfileDTO.setUnitQty(productProfile.getUnitQty());
+		productProfileDTO.setDiscountPercentage(productProfile.getDiscountPercentage());
 
 		return productProfileDTO;
 	}
@@ -174,6 +176,7 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfile.setTaxRate(productProfileDTO.getTaxRate());
 		productProfile.setTrimChar(productProfileDTO.getTrimChar());
 		productProfile.setUnitQty(productProfileDTO.getUnitQty());
+		productProfile.setDiscountPercentage(productProfileDTO.getDiscountPercentage());
 
 		return productProfile;
 	}

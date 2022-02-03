@@ -28,6 +28,7 @@ import com.orderfleet.webapp.service.ProductGroupService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
+import com.orderfleet.webapp.web.rest.dto.SetDiscountPercentage;
 import com.orderfleet.webapp.web.rest.dto.SetTaxRate;
 import com.orderfleet.webapp.web.rest.mapper.ProductGroupMapper;
 
@@ -389,6 +390,15 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 				groupPids);
 		List<ProductGroupDTO> productGroupDTOs = productGroupMapper.productGroupsToProductGroupDTOs(productGroups);
 		return productGroupDTOs;
+	}
+
+	@Override
+	public void saveDicountPercentage(SetDiscountPercentage setDiscountPercentage) {
+		List<ProductProfile> productProfiles = productGroupProductRepository
+				.findProductsByProductGroupPids(setDiscountPercentage.getProductGroups());
+		if (!productProfiles.isEmpty()) {
+			productProfileRepository.updateDiscoundPercentage(setDiscountPercentage.getDiscountPercentage(), productProfiles);
+		}
 	}
 
 }

@@ -15,12 +15,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.ProductCategory;
+import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
+import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ProductCategoryService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.ProductCategoryDTO;
+import com.orderfleet.webapp.web.rest.dto.SetDiscountPercentage;
 import com.orderfleet.webapp.web.rest.mapper.ProductCategoryMapper;
 
 /**
@@ -43,6 +46,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
 	@Inject
 	private ProductCategoryMapper productCategoryMapper;
+	
+	@Inject
+	private ProductProfileRepository productProfileRepository;
 
 	/**
 	 * Save a productCategory.
@@ -321,6 +327,16 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 		List<ProductCategoryDTO> productCategoryDTOs = productCategoryMapper
 				.productCategoriesToProductCategoryDTOs(productCategories);
 		return productCategoryDTOs;
+	}
+
+	@Override
+	public void saveDicountPercentage(SetDiscountPercentage setDiscountPercentage) {
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findByProductCategoryPidIn(setDiscountPercentage.getProductGroups());
+		if (!productProfiles.isEmpty()) {
+			productProfileRepository.updateDiscoundPercentage(setDiscountPercentage.getDiscountPercentage(), productProfiles);
+		}
+		
 	}
 
 }

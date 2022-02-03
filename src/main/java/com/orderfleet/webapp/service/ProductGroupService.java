@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
+import com.orderfleet.webapp.web.rest.dto.SetDiscountPercentage;
 import com.orderfleet.webapp.web.rest.dto.SetTaxRate;
 
 /**
@@ -101,6 +102,8 @@ public interface ProductGroupService {
 	void saveTaxRate(SetTaxRate setTaxRate);
 	
 	void saveUnitQuantity(SetTaxRate setUnitQty);
+	
+	void saveDicountPercentage(SetDiscountPercentage setDiscountPercentage);
 
 	/**
 	 * Update the productGroup status by pid.
@@ -155,4 +158,6 @@ public interface ProductGroupService {
 	List<ProductGroupDTO> findAllProductGroupByCompanyPid(String companyPid);
 	
 	List<ProductGroupDTO> findAllProductGroupByCompanyPidAndGroupPid(String companyPid,List<String>groupPids);
+
+	
 }

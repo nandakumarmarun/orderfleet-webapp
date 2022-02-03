@@ -95,6 +95,9 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "tax_rate", columnDefinition = "double precision DEFAULT 0")
 	private double taxRate;
+	
+	@Column(name = "discount_percentage", columnDefinition = "double precision DEFAULT 0")
+	private double discountPercentage ;
 
 	@ManyToOne
 	@NotNull
@@ -474,6 +477,15 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public void setProductGroup(String productGroup) {
 		this.productGroup = productGroup;
+	}
+	
+
+	public double getDiscountPercentage() {
+		return discountPercentage;
+	}
+
+	public void setDiscountPercentage(double discountPercentage) {
+		this.discountPercentage = discountPercentage;
 	}
 
 	@Override

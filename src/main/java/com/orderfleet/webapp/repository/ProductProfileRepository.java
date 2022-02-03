@@ -66,6 +66,10 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	@Modifying
 	@Query("update ProductProfile productProfile set productProfile.unitQty = ?1 where productProfile in ?2")
 	void updateUnitQuantity(double unitQty, List<ProductProfile> productProfiles);
+	
+	@Modifying
+	@Query("update ProductProfile productProfile set productProfile.discountPercentage = ?1 where productProfile in ?2")
+	void updateDiscoundPercentage(double unitQty, List<ProductProfile> productProfiles);
 
 	List<ProductProfile> findAllByCompanyPid(String companyPid);
 

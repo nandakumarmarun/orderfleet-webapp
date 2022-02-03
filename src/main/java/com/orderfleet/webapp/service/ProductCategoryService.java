@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.web.rest.dto.ProductCategoryDTO;
+import com.orderfleet.webapp.web.rest.dto.SetDiscountPercentage;
 
 /**
  * Service Interface for managing ProductCategory.
@@ -134,6 +135,8 @@ public interface ProductCategoryService {
 	 * @return the list
 	 */
 	List<ProductCategoryDTO> findAllByCompanyAndDeactivated(boolean deactive);
+	
+	void saveDicountPercentage(SetDiscountPercentage setDiscountPercentage);
 
 	Optional<ProductCategoryDTO> findByNameAndCompanyId(Long companyId, String name);
 

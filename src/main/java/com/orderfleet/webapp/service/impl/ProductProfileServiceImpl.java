@@ -153,7 +153,11 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 			productProfile.setProductCategory(
 					productCategoryRepository.findOneByPid(productProfileDTO.getProductCategoryPid()).get());
 			productProfile.setDivision(divisionRepository.findOneByPid(productProfileDTO.getDivisionPid()).get());
-			productProfile.setUnits(unitsRepository.findOneByPid(productProfileDTO.getUnitsPid()).get());
+			if(productProfileDTO.getUnitsPid()!=null) {
+				productProfile.setUnits(unitsRepository.findOneByPid(productProfileDTO.getUnitsPid()).get());
+			}
+			productProfile.setDiscountPercentage(productProfileDTO.getDiscountPercentage());
+			productProfile.setProductDescription(productProfileDTO.getProductDescription());
 			productProfile.setSku(productProfileDTO.getSku());
 			productProfile.setUnitQty(productProfileDTO.getUnitQty());
 			productProfile.setPrice(productProfileDTO.getPrice());

@@ -27,6 +27,9 @@
 					<button type="button" class="btn btn-success"
 						onclick="ProductGroup.showModalPopup($('#assignUnitQtyModal'));">Assign
 						Unit Qty</button>
+						<button type="button" class="btn btn-success"
+						onclick="ProductGroup.showModalPopup($('#assignDiscountPercentage'));">Assign
+						Discount Percentage</button>
 					<button type="button" class="btn btn-success"
 						onclick="ProductGroup.showModalPopup($('#myModal'));">Create
 						new Product Group</button>
@@ -552,7 +555,56 @@
 				</div>
 				<!-- /.modal-dialog -->
 			</div>
+				
+				<div class="modal fade container" id="assignDiscountPercentage">
+				<!-- model Dialog -->
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title">Assign Discount Percentage</h4>
+						</div>
+						<div class="modal-body">
+							<section class="search-results-env">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="search-results-panes">
+											<div class="search-results-pane" style="display: block;">
+												<div class="form-group">
+													<label class="control-label" for="field_alias">Product
+														Groups</label> <select multiple="multiple" id="dbDPProductGroups"
+														class="form-control" style="height: 200px;">
+														<c:forEach items="${productGroups}" var="productGroup">
+															<option value="${productGroup.pid}">${productGroup.name}</option>
+														</c:forEach>
+													</select>
+												</div>
+												<div class="form-group">
+													<label class="control-label" for="txtdiscountPercentage">Discount Percentage</label> 
+													<input type="number" id="txtdiscountPercentage" class="form-control" />
+												</div>
+												<label class="error-msg" style="color: red;"></label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</section>
 
+						</div>
+						<div class="modal-footer">
+							<input class="btn btn-success" type="button" id="btnsavediscountPercentage"
+								value="Save" />
+							<button class="btn" data-dismiss="modal">Cancel</button>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+				
 			<div class="modal fade container" id="enableProductGroupModal">
 				<!-- model Dialog -->
 				<div class="modal-dialog">

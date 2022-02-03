@@ -205,6 +205,11 @@
 										id="field_productId" maxlength="55" placeholder="Product Id" />
 								</div>
 								<div class="form-group">
+									<label class="control-label" for="field_Pdescription">Product Description</label> <input
+										type="text" class="form-control" name="Pdescription" id="field_Pdescription"
+										 placeholder="Product description" />
+								</div>
+								<div class="form-group">
 									<label class="control-label" for="field_category">Category</label>
 									<select id="field_category" name="productCategoryPid"
 										class="form-control">
@@ -262,6 +267,12 @@
 										Rate</label> <input type="number" class="form-control" name="taxRate"
 										id="field_taxRate" maxlength="4" max="10000"
 										placeholder="Tax Rate" />
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="field_discountPercentage">discountPercentage
+										</label> <input type="number" class="form-control" name="discountPercentage"
+										id="field_discountPercentage"  max="10000"
+										placeholder="discountPercentage" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="field_size">Size</label> <input
@@ -333,6 +344,10 @@
 											<td id="lbl_alias"></td>
 										</tr>
 										<tr>
+											<td>Product Description</td>
+											<td id="lbl_productdescription"></td>
+										</tr>
+										<tr>
 											<td>Product Id</td>
 											<td id="lbl_productId"></td>
 										</tr>
@@ -347,6 +362,10 @@
 										<tr>
 											<td>units</td>
 											<td id="lbl_units"></td>
+										</tr>
+										<tr>
+											<td>discount Percentage</td>
+											<td id="lbl_discountPercentage"></td>
 										</tr>
 										<tr>
 											<td>Unit Quantity</td>
