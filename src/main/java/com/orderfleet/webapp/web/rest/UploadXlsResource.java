@@ -447,6 +447,10 @@ public class UploadXlsResource {
 			System.out.println("Duplicate Accounts(LocationAccountProfile) Size: " + duplicateCount + "...");
 			accountNames.removeAll(accountNames);
 			log.info("Saving LocationAccountProfile Size " + newLocationAccountProfiles.size() + "....");
+			List<String> accountProfilePids = newLocationAccountProfiles.stream()
+					.map(lap -> lap.getAccountProfile().getPid()).collect(Collectors.toList());
+			locationAccountProfileRepository.deleteByCompanyIdAndAccountProfilePidIn(
+					SecurityUtils.getCurrentUsersCompanyId(), accountProfilePids);
 			locationAccountProfileRepository.save(newLocationAccountProfiles);
 			log.info("Saving LocationAccountProfile Success......");
 		} catch (Exception e) {
