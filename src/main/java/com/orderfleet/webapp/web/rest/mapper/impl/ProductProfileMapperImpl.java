@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest.mapper.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -61,7 +62,11 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfileDTO.setDiscountPercentage(productProfile.getDiscountPercentage());
 		productProfileDTO.setTrimChar(productProfile.getTrimChar());
 		productProfileDTO.setUnitQty(productProfile.getUnitQty());
-
+		if (productProfile.getFiles() != null || !productProfile.getFiles().isEmpty()) {
+			String filePids = productProfile.getFiles().stream().map(fileDTO -> fileDTO.getPid())
+					.collect(Collectors.joining(","));
+			productProfileDTO.setFilesPid(filePids);
+		}
 		return productProfileDTO;
 	}
 

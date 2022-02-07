@@ -332,6 +332,62 @@ public class TPProductProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
+	
+	@Transactional
+	public void saveUpdateProductCategoriesUpdateIdNew(final List<ProductCategoryDTO> productCategoryDTOs,
+			final SyncOperation syncOperation) {
+		
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		Set<ProductCategory> saveUpdateProductCategories = new HashSet<>();
+		// find all product category
+		List<ProductCategory> productCategories = productCategoryRepository.findAllByCompanyId();
+		for (ProductCategoryDTO pcDto : productCategoryDTOs) {
+			Optional<ProductCategory> optionalPC = null;
+			// check exist by name, only one exist with a name
+			
+				optionalPC = productCategories.stream()
+						.filter(p -> p.getProductCategoryId() != null && !p.getProductCategoryId().equals("")
+						? p.getProductCategoryId().equals(pcDto.getProductCategoryId())
+						: false)
+				.findAny();
+			ProductCategory productCategory;
+			if (optionalPC.isPresent()) {
+				productCategory = optionalPC.get();
+				// if not update, skip this iteration.
+				if (!productCategory.getThirdpartyUpdate()) {
+					continue;
+				}
+			} else {
+				productCategory = new ProductCategory();
+				productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
+				productCategory.setProductCategoryId(pcDto.getProductCategoryId());
+				productCategory.setDataSourceType(DataSourceType.TALLY);
+				productCategory.setDescription(pcDto.getName());
+				productCategory.setCompany(company);
+			}
+//			productCategory.setName(pcDto.getName() + "~" +pcDto.getProductCategoryId());
+			productCategory.setName(pcDto.getName());
+			productCategory.setAlias(pcDto.getAlias());
+			productCategory.setDescription(pcDto.getName());
+			productCategory.setActivated(pcDto.getActivated());
+			Optional<ProductCategory> opAccP = saveUpdateProductCategories.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(pcDto.getName())).findAny();
+			if (opAccP.isPresent()) {
+				continue;
+			}
+			saveUpdateProductCategories.add(productCategory);
+		}
+		bulkOperationRepositoryCustom.bulkSaveProductCategory(saveUpdateProductCategories);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
 
 	@Transactional
 	public void saveUpdateProductGroups(final List<ProductGroupDTO> productGroupDTOs,
@@ -476,6 +532,67 @@ public class TPProductProfileManagementService {
 			}
 			productGroup.setAlias(pgDto.getAlias());
 			productGroup.setName(pgDto.getName() + "~" +pgDto.getProductGroupId());
+			productGroup.setDescription(pgDto.getName());
+			productGroup.setActivated(pgDto.getActivated());
+			Optional<ProductGroup> opAccP = saveUpdateProductGroups.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(pgDto.getName())).findAny();
+			if (opAccP.isPresent()) {
+				continue;
+			}
+			saveUpdateProductGroups.add(productGroup);
+		}
+//		saveUpdateProductGroups.forEach(i -> System.out.println("save prg"+i));
+		bulkOperationRepositoryCustom.bulkSaveProductGroup(saveUpdateProductGroups);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+	
+	@Transactional
+	public void saveUpdateProductGroupsUpdateIdNew(final List<ProductGroupDTO> productGroupDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		Set<ProductGroup> saveUpdateProductGroups = new HashSet<>();
+
+		// find all product group
+		List<ProductGroup> productGroups = productGroupRepository.findAllByCompanyId();
+
+		for (ProductGroupDTO pgDto : productGroupDTOs) {
+			Optional<ProductGroup> optionalPG = null;
+				optionalPG = productGroups.stream()
+						.filter(p -> p.getProductGroupId() != null && !p.getProductGroupId().equals("")
+						? p.getProductGroupId().equals(pgDto.getProductGroupId())
+						: false)
+				.findAny();
+			
+				
+			// check exist by name, only one exist with a name
+
+			ProductGroup productGroup;
+			if (optionalPG.isPresent()) {
+				productGroup = optionalPG.get();
+
+				// if not update, skip this iteration.
+				if (!productGroup.getThirdpartyUpdate()) {
+					continue;
+				}
+			} else {
+				productGroup = new ProductGroup();
+				productGroup.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
+				productGroup.setProductGroupId(pgDto.getProductGroupId());
+				productGroup.setDataSourceType(DataSourceType.TALLY);
+				productGroup.setDescription(pgDto.getName());
+				productGroup.setCompany(company);
+			}
+			productGroup.setAlias(pgDto.getAlias());
+//			productGroup.setName(pgDto.getName() + "~" +pgDto.getProductGroupId());\
+			productGroup.setName(pgDto.getName());
 			productGroup.setDescription(pgDto.getName());
 			productGroup.setActivated(pgDto.getActivated());
 			Optional<ProductGroup> opAccP = saveUpdateProductGroups.stream()
@@ -1038,6 +1155,214 @@ public class TPProductProfileManagementService {
 		dectivatedpp.forEach(data -> log.info("deactivated id " + dectivatedpp.size() + data));
 		
 	}
+	
+	@Transactional
+	public void saveUpdateProductProfilesUpdateIdNew(final List<ProductProfileDTO> productProfileDTOs,
+			final SyncOperation syncOperation) {
+		
+		log.info("Saving Product Profiles:----" + productProfileDTOs.size());
+		long start = System.nanoTime();
+		
+		final Company company = syncOperation.getCompany();
+		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
+
+		if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+			for (ProductProfileDTO ppDto : productProfileDTOs) {
+				String name = ppDto.getName();
+				ppDto.setName(ppDto.getAlias() != null && !ppDto.getAlias().equals("") ? ppDto.getAlias() : name);
+				ppDto.setAlias(name);
+			}
+		}
+
+		// find all exist product profiles
+		Set<String> ppNames = productProfileDTOs.stream().map(p -> p.getName()).collect(Collectors.toSet());
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
+
+		
+		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
+//		productCategorys.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});
+
+		List<ProductGroupProduct> productGroupProducts = new ArrayList<>();
+		Set<Long> dectivatedpp = new HashSet<>();
+
+		Optional<CompanyConfiguration> optProductGroupTax = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.PRODUCT_GROUP_TAX);
+
+		if (optProductGroupTax.isPresent() && optProductGroupTax.get().getValue().equalsIgnoreCase("true")) {
+
+			productGroupProducts = productGroupProductRepository.findByProductGroupProductActivatedAndCompanyId();
+
+		}
+		//find pp is not tally
+		for(ProductProfile pp :productProfiles) {
+			 flag = false;
+			productProfileDTOs.forEach(data ->{
+				if(pp.getProductId().equals(data.getProductId())) {
+					flag = true;
+				}
+			});
+			if(!flag) {
+				dectivatedpp.add(pp.getId());
+			}
+		}
+			if(!dectivatedpp.isEmpty()) {
+				productProfileRepository.deactivateProductProfileUsingInId(dectivatedpp);
+			}
+		// All product must have a division/category, if not, set a default one
+		Division defaultDivision = divisionRepository.findFirstByCompanyId(company.getId());
+		Optional<ProductCategory> defaultCategory = productCategoryRepository
+				.findByCompanyIdAndNameIgnoreCase(company.getId(), "Not Applicable");
+		ProductCategory productCategory = new ProductCategory();
+		if (!defaultCategory.isPresent()) {
+			productCategory = new ProductCategory();
+			productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
+			productCategory.setName("Not Applicable");
+			productCategory.setDataSourceType(DataSourceType.TALLY);
+			productCategory.setCompany(company);
+			productCategory = productCategoryRepository.save(productCategory);
+		} else {
+			productCategory = defaultCategory.get();
+		}
+
+		Optional<CompanyConfiguration> optAddCompoundUnit = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ADD_COMPOUND_UNIT);
+
+		for (ProductProfileDTO ppDto : productProfileDTOs) {
+			Optional<ProductProfile> optionalPP = null;
+			// check exist by name, only one exist with a name
+		
+				optionalPP = productProfiles.stream()
+						.filter(p -> p.getProductId() != null && !p.getProductId().equals("")
+						? p.getProductId().equals(ppDto.getProductId())
+								: false)
+						.findAny();
+			ProductProfile productProfile;
+			if (optionalPP.isPresent()) {
+				productProfile = optionalPP.get();
+//				productProfile.setName(ppDto.getName() + "~" + ppDto.getProductId());
+				productProfile.setName(ppDto.getName());
+				// if not update, skip this iteration.
+				if (!productProfile.getThirdpartyUpdate()) {
+					continue;
+				}
+			} else {
+				productProfile = new ProductProfile();
+				productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
+				productProfile.setCompany(company);
+				productProfile.setProductId(ppDto.getProductId());
+				productProfile.setDivision(defaultDivision);
+				productProfile.setProductDescription(ppDto.getName());
+				productProfile.setDataSourceType(DataSourceType.TALLY);
+			}
+			productProfile.setName(ppDto.getName());
+			productProfile.setAlias(ppDto.getAlias());
+			productProfile.setMrp(ppDto.getMrp());
+			productProfile.setTaxRate(ppDto.getTaxRate());
+			productProfile.setSku(ppDto.getSku());
+			productProfile.setActivated(ppDto.getActivated());
+			productProfile.setTrimChar(ppDto.getTrimChar());
+			productProfile.setSize(ppDto.getSize());
+			productProfile.setHsnCode(ppDto.getHsnCode());
+			productProfile.setProductDescription(ppDto.getName());
+			productProfile.setBarcode(ppDto.getBarcode());
+			productProfile.setRemarks(ppDto.getRemarks());
+
+			if (optProductGroupTax.isPresent() && optProductGroupTax.get().getValue().equalsIgnoreCase("true")) {
+
+				if (productGroupProducts.size() > 0) {
+					Optional<ProductGroupProduct> opPgp = productGroupProducts.stream()
+							.filter(pgp -> pgp.getProduct().getName().equals(ppDto.getName())).findAny();
+
+					if (opPgp.isPresent()) {
+						double taxRate = opPgp.get().getProductGroup().getTaxRate();
+
+						if (taxRate > 0 && ppDto.getTaxRate() == 0) {
+							productProfile.setTaxRate(taxRate);
+						}
+					}
+				}
+			}
+
+			if (optAddCompoundUnit.isPresent() && optAddCompoundUnit.get().getValue().equalsIgnoreCase("true")) {
+
+				if (ppDto.getSku().contains("case of")) {
+					String numberOnly = ppDto.getSku().replaceAll("[^0-9]", "");
+					String value = numberOnly;
+					double convertionValue = Double.parseDouble(value);
+					if (convertionValue == 0) {
+						convertionValue = 1;
+					}
+					productProfile.setCompoundUnitQty(convertionValue);
+
+					Double cUnitQty = convertionValue;
+					productProfile.setPrice(ppDto.getPrice().multiply(new BigDecimal(cUnitQty)));
+					productProfile.setUnitQty(ppDto.getUnitQty() != null ? ppDto.getUnitQty() : 1d);
+					productProfile.setCompoundUnitQty(cUnitQty);
+
+				} else {
+					if (ppDto.getUnitQty() != null) {
+						productProfile.setUnitQty(ppDto.getUnitQty());
+					} else {
+						productProfile.setUnitQty(1d);
+					}
+					productProfile.setPrice(ppDto.getPrice());
+				}
+
+			} else {
+				if (ppDto.getUnitQty() != null) {
+					productProfile.setUnitQty(ppDto.getUnitQty());
+				} else {
+					productProfile.setUnitQty(1d);
+				}
+				productProfile.setPrice(ppDto.getPrice());
+			}
+
+			// update category
+			Optional<ProductCategory> optionalCategory = productCategorys.stream()
+					.filter(pl -> ppDto.getProductCategoryName().equals(pl.getName())).findAny();
+
+			if (optionalCategory.isPresent()) {
+				productProfile.setProductCategory(optionalCategory.get());
+			} else {
+				productProfile.setProductCategory(productCategory);
+			}
+			Optional<ProductProfile> opAccP = saveUpdateProductProfiles.stream()
+					.filter(so -> so.getName().equalsIgnoreCase(ppDto.getName())).findAny();
+			if (opAccP.isPresent()) {
+				continue;
+			}
+			
+			saveUpdateProductProfiles.add(productProfile);
+			 
+		}
+		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
+		//update name
+//		List<ProductCategory> productCategorycopy = productCategoryRepository.findByCompanyId(company.getId());
+//		if(!productCategorycopy.isEmpty()) {
+//			productCategorycopy.forEach(data -> {
+//				if(!data.getName().contains("~")) {
+//				data.setName(data.getName() + "~" + data.getProductCategoryId());
+//				}
+//			});}
+//		productCategoryRepository.save(productCategorycopy);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		
+		log.info("Sync completed in {} ms", elapsedTime);
+		dectivatedpp.forEach(data -> log.info("deactivated id " + dectivatedpp.size() + data));
+		
+	}
+
 
 	@Transactional
 	public void saveUpdateProductProfiles(final TPProductProfileCustomDTO productProfileCustomDTO,
@@ -1274,6 +1599,91 @@ public class TPProductProfileManagementService {
 	
 	@Transactional
 	@Async
+	public void saveUpdateProductGroupProductUpdateIdNew(final List<TPProductGroupProductDTO> productGroupProductDTOs,
+			final SyncOperation syncOperation) {
+		
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		final Long companyId = syncOperation.getCompany().getId();
+		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
+		if (syncOperation.getReset()) {
+			productGroupProductRepository.updateProductGroupProductInactivate(companyId);
+		}
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+//		productGroups.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});
+//		productProfiles.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
+
+		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
+			// check exist by names,
+			Optional<ProductGroupProduct> optionalPGP = productGroupProductRepository
+					.findByCompanyIdAndProductGroupNameIgnoreCaseAndProductNameIgnoreCase(companyId,
+							pgpDto.getGroupName(), pgpDto.getProductName());
+			// if not exist save
+			if (!optionalPGP.isPresent()) {
+				Optional<ProductGroup> optionalGroup = productGroups.stream()
+						.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findAny();
+				Optional<ProductProfile> optionalpp = productProfiles.stream()
+						.filter(pl -> pgpDto.getProductName().equals(pl.getName())).findAny();
+
+				if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+
+					optionalpp = productProfiles.stream()
+							.filter(pl -> pl.getAlias() != null && !pl.getAlias().equals("")
+									? pgpDto.getProductName().equals(pl.getAlias())
+									: pgpDto.getProductName().equals(pl.getName()))
+							.findAny();
+
+				}
+
+				if (optionalpp.isPresent() && optionalGroup.isPresent()) {
+					ProductGroupProduct pgp = new ProductGroupProduct();
+					pgp.setProductGroup(optionalGroup.get());
+					pgp.setProduct(optionalpp.get());
+					pgp.setCompany(company);
+					pgp.setActivated(true);
+					saveUpdateProductGroupProducts.add(pgp);
+				}
+			} else {
+				optionalPGP.get().setActivated(true);
+				saveUpdateProductGroupProducts.add(optionalPGP.get());
+			}
+		}
+//		saveUpdateProductGroupProducts.forEach(data -> {
+//			if(!data.getProductGroup().getName().contains("~")) {
+//				data.getProductGroup().setName(data.getProductGroup().getName() + "~" + data.getProductGroup().getProductGroupId());
+//			}
+//		});
+		bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		//update name
+//				List<ProductProfile> productProfilesCopy = productProfileRepository
+//						.findByCompanyIdAndActivatedTrue(companyId);
+//				if(!productProfilesCopy.isEmpty()) {
+//					productProfilesCopy.forEach(data -> {
+//						if(!data.getName().contains("~")) {
+//						data.setName(data.getName() + "~" + data.getProductId());
+//						}
+//					});}
+//				productProfileRepository.save(productProfilesCopy);
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+	
+	@Transactional
+	@Async
 	public void saveDeleteProductGroupProduct(final List<TPProductGroupProductDTO> productGroupProductDTOs,
 			final SyncOperation syncOperation) {
 		long start = System.nanoTime();
@@ -1384,6 +1794,78 @@ public class TPProductProfileManagementService {
 				}
 			});}
 		productProfileRepository.save(productProfilesCopy);
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+	
+	@Transactional
+	@Async
+	public void saveDeleteProductGroupProductUpdateIdNew(final List<TPProductGroupProductDTO> productGroupProductDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		final Long companyId = syncOperation.getCompany().getId();
+		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+//		productGroups.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});
+//		productProfiles.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
+
+		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
+			Optional<ProductGroup> optionalGroup = productGroups.stream()
+					.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findAny();
+			Optional<ProductProfile> optionalpp = productProfiles.stream()
+					.filter(pl -> pgpDto.getProductName().equals(pl.getName())).findAny();
+
+			if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+				optionalpp = productProfiles.stream()
+						.filter(pl -> pl.getAlias() != null && !pl.getAlias().equals("")
+								? pgpDto.getProductName().equals(pl.getAlias())
+								: pgpDto.getProductName().equals(pl.getName()))
+						.findAny();
+
+			}
+
+			if (optionalpp.isPresent() && optionalGroup.isPresent()) {
+				ProductGroupProduct pgp = new ProductGroupProduct();
+				pgp.setProductGroup(optionalGroup.get());
+				pgp.setProduct(optionalpp.get());
+				pgp.setCompany(company);
+				pgp.setActivated(true);
+				saveUpdateProductGroupProducts.add(pgp);
+			}
+		}
+		
+//		saveUpdateProductGroupProducts.forEach(data -> {
+//			if(!data.getProductGroup().getName().contains("~")) {
+//				data.getProductGroup().setName(data.getProductGroup().getName() + "~" + data.getProductGroup().getProductGroupId());
+//			}
+//		});
+		productGroupProductRepository.save(saveUpdateProductGroupProducts);
+//		bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+//		List<ProductProfile> productProfilesCopy = productProfileRepository
+//				.findByCompanyIdAndActivatedTrue(companyId);
+//		if(!productProfilesCopy.isEmpty()) {
+//			productProfilesCopy.forEach(data -> {
+//				if(!data.getName().contains("~")) {
+//				data.setName(data.getName() + "~" + data.getProductId());
+//				}
+//			});}
+//		productProfileRepository.save(productProfilesCopy);
 		// update sync table
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
@@ -1605,6 +2087,103 @@ public class TPProductProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
+	
+	@Transactional
+	@Async
+	public void saveUpdateOpeningStockUpadetIdNew(final List<OpeningStockDTO> openingStockDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		final Long companyId = company.getId();
+		Set<OpeningStock> saveOpeningStocks = new HashSet<>();
+		// All opening-stock must have a stock-location, if not, set a default
+		// one
+		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(company.getId());
+		// find all exist product profiles
+		Set<String> ppNames = openingStockDTOs.stream().map(os -> os.getProductProfileName())
+				.collect(Collectors.toSet());
+
+		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
+
+		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
+
+//		List<ProductProfile> productProfiles = productProfileRepository
+//				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
+
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+//		productProfiles.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});
+		// delete all opening stock
+		openingStockRepository.deleteByCompanyId(company.getId());
+		for (OpeningStockDTO osDto : openingStockDTOs) {
+
+			Optional<ProductProfile> optionalpp = productProfiles.stream()
+					.filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny();
+			if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+
+				optionalpp = productProfiles.stream()
+						.filter(pl -> pl.getAlias() != null && !pl.getAlias().equals("")
+								? osDto.getProductProfileName().equals(pl.getAlias())
+								: osDto.getProductProfileName().equals(pl.getName()))
+						.findAny();
+
+			}
+
+			// only save if account profile exist
+//			productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
+//					.ifPresent(pp -> {
+
+			if (optionalpp.isPresent()) {
+				OpeningStock openingStock = new OpeningStock();
+				openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
+				openingStock.setOpeningStockDate(LocalDateTime.now());
+				openingStock.setCreatedDate(LocalDateTime.now());
+				openingStock.setCompany(company);
+				openingStock.setProductProfile(optionalpp.get());
+
+				if (osDto.getStockLocationName() == null) {
+					openingStock.setStockLocation(defaultStockLocation);
+				} else {
+					// stock location
+					Optional<StockLocation> optionalStockLocation = StockLocations.stream()
+							.filter(pl -> osDto.getStockLocationName().equals(pl.getName())).findAny();
+					if (optionalStockLocation.isPresent()) {
+						openingStock.setStockLocation(optionalStockLocation.get());
+					} else {
+						openingStock.setStockLocation(defaultStockLocation);
+					}
+				}
+				
+				openingStock.setBatchNumber(osDto.getBatchNumber());
+				openingStock.setQuantity(osDto.getQuantity());
+				saveOpeningStocks.add(openingStock);
+			}
+		}
+		
+		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		//update name
+//		List<ProductProfile> productProfilesCopy = productProfileRepository
+//				.findByCompanyIdAndActivatedTrue(companyId);
+//		if(!productProfilesCopy.isEmpty()) {
+//			productProfilesCopy.forEach(data -> {
+//				if(!data.getName().contains("~")) {
+//				data.setName(data.getName() + "~" + data.getProductId());
+//				}
+//			});}
+//		productProfileRepository.save(productProfilesCopy);
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+	
 	@Transactional
 	@Async
 	public void saveUpdateTemporaryOpeningStockUpdatedId(final List<OpeningStockDTO> openingStockDTOs,
@@ -1678,6 +2257,81 @@ public class TPProductProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
+	
+	@Transactional
+	@Async
+	public void saveUpdateTemporaryOpeningStockUpdatedIdNew(final List<OpeningStockDTO> openingStockDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		final Long companyId = company.getId();
+		Set<TemporaryOpeningStock> saveOpeningStocks = new HashSet<>();
+		// All opening-stock must have a stock-location, if not, set a default
+		// one
+		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(company.getId());
+		// find all exist product profiles
+		Set<String> ppNames = openingStockDTOs.stream().map(os -> os.getProductProfileName())
+				.collect(Collectors.toSet());
+
+		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
+
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findAllByCompanyIdActivatedTrue();
+//		productProfiles.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});
+		// delete all opening stock
+		temporaryOpeningStockRepository.deleteByCompanyId(company.getId());
+		for (OpeningStockDTO osDto : openingStockDTOs) {
+			// only save if account profile exist
+			productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
+					.ifPresent(pp -> {
+						TemporaryOpeningStock openingStock = new TemporaryOpeningStock();
+						openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
+						openingStock.setOpeningStockDate(LocalDateTime.now());
+						openingStock.setCreatedDate(LocalDateTime.now());
+						openingStock.setCompany(company);
+						openingStock.setProductProfile(pp);
+
+						if (osDto.getStockLocationName() == null) {
+							openingStock.setStockLocation(defaultStockLocation);
+						} else {
+							// stock location
+							Optional<StockLocation> optionalStockLocation = StockLocations.stream()
+									.filter(pl -> osDto.getStockLocationName().equals(pl.getName())).findAny();
+							if (optionalStockLocation.isPresent()) {
+								openingStock.setStockLocation(optionalStockLocation.get());
+							} else {
+								openingStock.setStockLocation(defaultStockLocation);
+							}
+						}
+						openingStock.setBatchNumber(osDto.getBatchNumber());
+						openingStock.setQuantity(osDto.getQuantity());
+						saveOpeningStocks.add(openingStock);
+					});
+		}
+		bulkOperationRepositoryCustom.bulkSaveTemporaryOpeningStocks(saveOpeningStocks);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		//update name
+//				List<ProductProfile> productProfilesCopy = productProfileRepository
+//						.findByCompanyIdAndActivatedTrue(companyId);
+//				if(!productProfilesCopy.isEmpty()) {
+//					productProfilesCopy.forEach(data -> {
+//						if(!data.getName().contains("~")) {
+//						data.setName(data.getName() + "~" + data.getProductId());
+//						}
+//					});}
+//				productProfileRepository.save(productProfilesCopy);
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+	
 	@Transactional
 	@Async
 	public void saveUpdateTemporaryOpeningStock(final List<OpeningStockDTO> openingStockDTOs,
@@ -1935,6 +2589,93 @@ public class TPProductProfileManagementService {
 	
 	@Transactional
 	@Async
+	public void saveUpdatePriceLevelListUpdatedIdNew(final List<PriceLevelListDTO> priceLevelListDTOs,
+			final SyncOperation syncOperation) {
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		final Long companyId = company.getId();
+		Set<PriceLevelList> saveUpdatePriceLevelLists = new HashSet<>();
+		// find all exist priceLevels
+		Set<String> plNames = priceLevelListDTOs.stream().map(pll -> pll.getPriceLevelName())
+				.collect(Collectors.toSet());
+
+//		Set<String> ppNames = priceLevelListDTOs.stream().map(pll -> pll.getProductProfileName())
+//				.collect(Collectors.toSet());
+
+		List<PriceLevelList> priceLevelLists = priceLevelListRepository
+				.findByCompanyIdAndPriceLevelNameIgnoreCaseIn(company.getId(), plNames);
+		// temporary variables for storing db data for product profile and price
+		// level
+		Map<String, ProductProfile> tempProductProfile = new HashMap<>();
+		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
+
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+//		productProfiles.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});
+
+		for (PriceLevelListDTO pllDto : priceLevelListDTOs) {
+			// check exist by price-level name and product-profile name, only
+			// one exist with a both same for a company
+			Optional<PriceLevelList> optionalPll = priceLevelLists.stream()
+					.filter(pll -> pll.getPriceLevel().getName().equals(pllDto.getPriceLevelName())
+							&& pll.getProductProfile().getName().equals(pllDto.getProductProfileName()))
+					.findAny();
+			PriceLevelList priceLevelList;
+			if (optionalPll.isPresent()) {
+				priceLevelList = optionalPll.get();
+				// if not update, skip this iteration.
+				// if (!priceLevel.getThirdpartyUpdate()) {continue;}
+			} else {
+				priceLevelList = new PriceLevelList();
+				priceLevelList.setPid(PriceLevelListService.PID_PREFIX + RandomUtil.generatePid());
+				priceLevelList.setCompany(company);
+			}
+			// set product profile and price level, if present
+			Optional<ProductProfile> optionalPP;
+			if (tempProductProfile.containsKey(pllDto.getProductProfileName())) {
+				optionalPP = Optional.of(tempProductProfile.get(pllDto.getProductProfileName()));
+			} else {
+				optionalPP = productProfiles.stream().filter(pl -> pllDto.getProductProfileName().equals(pl.getName()))
+						.findAny();
+			}
+			Optional<PriceLevel> optionalPL = tempPriceLevel.stream()
+					.filter(pl -> pllDto.getPriceLevelName().equals(pl.getName())).findAny();
+			if (optionalPP.isPresent() && optionalPL.isPresent()) {
+				priceLevelList.setProductProfile(optionalPP.get());
+				// put it in map for later access
+				tempProductProfile.put(pllDto.getProductProfileName(), optionalPP.get());
+				priceLevelList.setPriceLevel(optionalPL.get());
+				priceLevelList.setPrice(pllDto.getPrice());
+				priceLevelList.setRangeFrom(pllDto.getRangeFrom());
+				priceLevelList.setRangeTo(pllDto.getRangeTo());
+				saveUpdatePriceLevelLists.add(priceLevelList);
+			}
+		}
+		bulkOperationRepositoryCustom.bulkSaveUpdatePriceLevelLists(saveUpdatePriceLevelLists);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		//setName
+//		List<ProductProfile> productProfilesCopy = productProfileRepository
+//				.findByCompanyIdAndActivatedTrue(companyId);
+//		if(!productProfilesCopy.isEmpty()) {
+//			productProfilesCopy.forEach(data -> {
+//				if(!data.getName().contains("~")) {
+//				data.setName(data.getName() + "~" + data.getProductId());
+//				}
+//			});}
+//		productProfileRepository.save(productProfilesCopy);
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+	
+	@Transactional
+	@Async
 	public void saveUpdateProductWiseDefaultLedger(List<ProductProfileDTO> ppDTOs, SyncOperation syncOperation) {
 
 		long start = System.nanoTime();
@@ -2083,6 +2824,75 @@ public class TPProductProfileManagementService {
 		log.info("Sync completed in {} ms", elapsedTime);
 
 	}
+	
+	@Transactional
+	@Async
+	public void saveUpdateGSTProductGroupUpdatedIdNew(List<GSTProductGroupDTO> gstpgDTOs, SyncOperation syncOperation) {
+
+		long start = System.nanoTime();
+		final Company company = syncOperation.getCompany();
+		Set<GSTProductGroup> saveUpdategstpg = new HashSet<>();
+		List<ProductGroup> productGroup = productGroupRepository.findAllByCompanyId(true);
+//		productGroup.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});
+		for (GSTProductGroupDTO ppDto : gstpgDTOs) {
+			// check exist by name, only one exist with a name
+//			Optional<ProductGroup> pg = productGroupRepository.findByCompanyIdAndNameIgnoreCase(company.getId(),
+//					ppDto.getProductGroupName());
+			Optional<ProductGroup> pg = productGroup.stream().filter(pgdata -> pgdata.getName().equals(ppDto.getProductGroupName())).findAny();
+			if (pg.isPresent()) {
+				GSTProductGroup gstpg = new GSTProductGroup();
+
+				gstpg.setProductGroup(pg.get());
+				gstpg.setHsnsacCode(ppDto.getHsnsacCode());
+				gstpg.setApplyDate(ppDto.getApplyDate());
+				gstpg.setCentralTax(ppDto.getCentralTax());
+				gstpg.setStateTax(ppDto.getStateTax());
+				gstpg.setIntegratedTax(ppDto.getIntegratedTax());
+				gstpg.setAditionalCess(ppDto.getAditionalCess());
+				gstpg.setTaxType(ppDto.getTaxType());
+				gstpg.setCompany(company);
+				saveUpdategstpg.add(gstpg);
+			}
+		}
+		bulkOperationRepositoryCustom.bulkSaveGSTProductGroup(saveUpdategstpg);
+
+		// updateing tax rate to productprofile
+		for (GSTProductGroup gstpg : saveUpdategstpg) {
+			List<String> productGroups = new ArrayList<>();
+			productGroups.add(gstpg.getProductGroup().getPid());
+			List<ProductProfile> productProfiles = productGroupProductRepository
+					.findProductsByProductGroupPids(productGroups);
+			if (productProfiles.size() > 0) {
+				double vat = 0;
+				if (gstpg.getIntegratedTax() != null && (!gstpg.getIntegratedTax().equalsIgnoreCase(""))) {
+					vat = Double.valueOf(gstpg.getIntegratedTax().replace("%", ""));
+				}
+				productProfileRepository.updateTaxRate(vat, productProfiles);
+			}
+		}
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		//update name
+//		List<ProductGroup> productGroupcopy = productGroupRepository.findAllByCompanyId(true);
+//		if(!productGroupcopy.isEmpty()) {
+//			productGroupcopy.forEach(data -> {
+//				if(!data.getName().contains("~")) {
+//				data.setName(data.getName() + "~" + data.getProductGroupId());
+//				}
+//			});}
+//		productGroupRepository.save(productGroupcopy);
+		// update sync table
+		syncOperation.setCompleted(true);
+		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+		syncOperation.setLastSyncTime(elapsedTime);
+		syncOperationRepository.save(syncOperation);
+		log.info("Sync completed in {} ms", elapsedTime);
+
+	}
+	
 	@Transactional
 	public void saveUpdateTaxMasters(List<TaxMasterDTO> taxMasterDTOs, SyncOperation syncOperation) {
 		long start = System.nanoTime();
