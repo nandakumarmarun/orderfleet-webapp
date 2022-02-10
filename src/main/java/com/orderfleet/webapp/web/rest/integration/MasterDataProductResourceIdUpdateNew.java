@@ -141,6 +141,7 @@ public class MasterDataProductResourceIdUpdateNew {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
+					
 					tpProductProfileManagementService.saveUpdateProductProfilesUpdateIdNew(productProfileDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Product-profile sync operation not registered for this company",
