@@ -95,6 +95,8 @@ public class DocumentDTO implements Cloneable {
 	private VoucherNumberGenerationType voucherNumberGenerationType;
 
 	private boolean rateWithTax;
+	
+	private boolean discountScaleBar;
 
 	private byte[] headerImage;
 
@@ -137,6 +139,7 @@ public class DocumentDTO implements Cloneable {
 		this.termsAndConditionsColumn = document.isTermsAndConditionsColumn();
 		this.hasTelephonicOrder = document.getHasTelephonicOrder();
 		this.rateWithTax = document.getRateWithTax();
+		this.discountScaleBar =document.getDiscountScaleBar();
 		this.headerImage = document.getHeaderImage();
 		this.footerImage = document.getFooterImage();
 		this.headerImageContentType = document.getHeaderImageContentType();
@@ -178,7 +181,7 @@ public class DocumentDTO implements Cloneable {
 		this.termsAndConditionsColumn = document.isTermsAndConditionsColumn();
 		this.hasTelephonicOrder = document.getHasTelephonicOrder();
 		this.rateWithTax = document.getRateWithTax();
-
+		this.discountScaleBar =document.getDiscountScaleBar();
 	}
 
 	public String getTermsAndConditions() {
@@ -467,6 +470,15 @@ public class DocumentDTO implements Cloneable {
 
 	public void setRateWithTax(boolean rateWithTax) {
 		this.rateWithTax = rateWithTax;
+	}
+
+	
+	public boolean getDiscountScaleBar() {
+		return discountScaleBar;
+	}
+
+	public void setDiscountScaleBar(boolean discountScaleBar) {
+		this.discountScaleBar = discountScaleBar;
 	}
 
 	public String getHeaderImageContentType() {

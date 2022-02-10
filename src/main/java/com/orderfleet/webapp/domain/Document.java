@@ -158,6 +158,9 @@ public class Document implements Serializable, Cloneable {
 
 	@Column(name = "rate_With_Tax", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean rateWithTax;
+	
+	@Column(name = "discount_Scale_Bar", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean discountScaleBar;
 
 	@PreUpdate
 	public void preUpdate() {
@@ -394,6 +397,16 @@ public class Document implements Serializable, Cloneable {
 
 	public void setRateWithTax(boolean rateWithTax) {
 		this.rateWithTax = rateWithTax;
+	}
+
+	
+	
+	public boolean getDiscountScaleBar() {
+		return discountScaleBar;
+	}
+
+	public void setDiscountScaleBar(boolean discountScaleBar) {
+		this.discountScaleBar = discountScaleBar;
 	}
 
 	public byte[] getHeaderImage() {

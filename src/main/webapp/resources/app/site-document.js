@@ -38,6 +38,7 @@ if (!this.Document) {
 		termsAndConditionsColumn : false,
 		hasTelephonicOrder : false,
 		rateWithTax : false,
+		discountScaleBar : false,
 		headerImage : null,
 		headerImageContentType : null,
 		footerImage : null,
@@ -328,6 +329,7 @@ if (!this.Document) {
 		documentModel.hasTelephonicOrder = $('#field_hasTelephonicOrder').prop(
 				'checked');
 		documentModel.rateWithTax = $('#field_rateWithTax').prop('checked');
+		documentModel.discountScaleBar = $('#field_discountScaleBar').prop('checked');
 
 		$.ajax({
 			method : $(el).attr('method'),
@@ -417,6 +419,8 @@ if (!this.Document) {
 								data.hasTelephonicOrder);
 						$("#field_rateWithTax").prop("checked",
 								data.rateWithTax);
+						$("#field_discountScaleBar").prop("checked",
+								data.discountScaleBar);
 						if (data.headerImage != null) {
 							$('#previewHeaderImage')
 									.attr(

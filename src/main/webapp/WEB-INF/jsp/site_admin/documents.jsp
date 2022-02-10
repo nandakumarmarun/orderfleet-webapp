@@ -270,6 +270,11 @@
 											id="field_rateWithTax" /> &nbsp;<span>Rate With Tax</span>
 										</label>
 									</div>
+									<div class="form-group" id="discountScaleBar">
+										<label for="discountScaleBar"> <input type="checkbox"
+											id="field_discountScaleBar" /> &nbsp;<span>Discount Scale Bar</span>
+										</label>
+									</div>
 								</div>
 							</div>
 							<div class="modal-footer">

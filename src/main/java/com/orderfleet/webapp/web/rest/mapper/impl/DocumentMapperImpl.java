@@ -53,6 +53,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 			documentDTO.setFooterImage(Arrays.copyOf(footerImage, footerImage.length));
 		}
 		documentDTO.setRateWithTax(document.getRateWithTax());
+		documentDTO.setDiscountScaleBar(document.getDiscountScaleBar());
 		documentDTO.setHeaderImageContentType(document.getHeaderImageContentType());
 		documentDTO.setFooterImageContentType(document.getFooterImageContentType());
 
@@ -101,6 +102,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 			documentDTO.setFooterImage(Arrays.copyOf(footerImage, footerImage.length));
 		}
 		documentDTO.setRateWithTax(document.getRateWithTax());
+		documentDTO.setDiscountScaleBar(document.getDiscountScaleBar());
 		documentDTO.setHeaderImageContentType(document.getHeaderImageContentType());
 		documentDTO.setFooterImageContentType(document.getFooterImageContentType());
 
@@ -161,6 +163,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		document.setTermsAndConditionsColumn(documentDTO.isTermsAndConditionsColumn());
 		document.setHasTelephonicOrder(documentDTO.getHasTelephonicOrder());
 		document.setRateWithTax(documentDTO.getRateWithTax());
+		document.setDiscountScaleBar(documentDTO.getDiscountScaleBar());
 		if (documentDTO.getHeaderImage() != null) {
 			byte[] headerImage = documentDTO.getHeaderImage();
 			document.setHeaderImage(Arrays.copyOf(headerImage, headerImage.length));

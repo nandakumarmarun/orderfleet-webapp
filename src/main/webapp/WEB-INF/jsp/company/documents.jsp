@@ -274,6 +274,11 @@
 											id="field_rateWithTax" /> &nbsp;<span>Rate With Tax</span>
 										</label>
 									</div>
+									<div class="form-group" id="discountScaleBar">
+										<label for="discountScaleBar"> <input type="checkbox"
+											id="field_discountScaleBar" /> &nbsp;<span>Discount Scale Bar</span>
+										</label>
+									</div>
 
 								</div>
 							</div>
@@ -377,6 +382,13 @@
 										</dt>
 										<dd>
 											<span id="lbl_rate_With_Tax"></span>
+										</dd>
+										<hr />
+										<dt>
+											<span>Discount Scale Bar</span>
+										</dt>
+										<dd>
+											<span id="lbl_discount_Scale_Bar"></span>
 										</dd>
 									</dl>
 								</div>
