@@ -83,6 +83,8 @@ public class InvoiceWiseReportView {
 	private boolean mockLocationStatus;
 
 	private boolean withCustomer;
+	
+	private String description;
 
 	public InvoiceWiseReportView() {
 		super();
@@ -98,7 +100,7 @@ public class InvoiceWiseReportView {
 			List<InvoiceWiseReportDetailView> invoiceWiseReportDetailViews, BigDecimal latitude, BigDecimal longitude,
 			BigDecimal towerLatitude, BigDecimal towerLongitude, String employeeName, String towerLocation,
 			double totalRecieptAmount, double totalSalesOrderAmount, LocalDateTime punchInDate,
-			boolean mockLocationStatus, boolean withCustomer) {
+			boolean mockLocationStatus, boolean withCustomer,String description) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -137,6 +139,7 @@ public class InvoiceWiseReportView {
 		this.punchInDate = punchInDate;
 		this.mockLocationStatus = mockLocationStatus;
 		this.withCustomer = withCustomer;
+		this.setDescription(description);
 	}
 
 	public InvoiceWiseReportView(ExecutiveTaskExecution executiveTaskExecution) {
@@ -174,6 +177,7 @@ public class InvoiceWiseReportView {
 		this.punchInDate = executiveTaskExecution.getPunchInDate();
 		this.mockLocationStatus = executiveTaskExecution.getMockLocationStatus();
 		this.withCustomer = executiveTaskExecution.getWithCustomer();
+		this.setDescription(executiveTaskExecution.getAccountProfile().getDescription());
 	}
 
 	public String getPid() {
@@ -479,7 +483,13 @@ public class InvoiceWiseReportView {
 	public void setWithCustomer(boolean withCustomer) {
 		this.withCustomer = withCustomer;
 	}
+	public String getDescription() {
+		return description;
+	}
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	@Override
 	public String toString() {
 		return "ExecutiveTaskExecutionView [pid=" + pid + ", createdDate=" + createdDate + ", plannedDate="
@@ -493,5 +503,7 @@ public class InvoiceWiseReportView {
 				+ ", activityStatus=" + activityStatus + ", rejectReasonRemark=" + rejectReasonRemark
 				+ ", invoiceWiseReportDetailViews=" + invoiceWiseReportDetailViews + "]";
 	}
+
+	
 
 }

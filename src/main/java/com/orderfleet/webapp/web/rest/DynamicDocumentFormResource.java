@@ -34,14 +34,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.FilledFormDetail;
 import com.orderfleet.webapp.domain.Form;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
@@ -118,6 +121,9 @@ public class DynamicDocumentFormResource {
 
 	@Inject
 	private EmployeeProfileService employeeProfileService;
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	public DynamicDocumentFormResource(FilledFormRepository filledFormRepository,
 			DocumentFormsService documentFormsService, FormFormElementRepository formFormElementRepository,
@@ -762,7 +768,11 @@ public class DynamicDocumentFormResource {
 				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 				String startDate1 = startLCTime1.format(DATE_FORMAT1);
 				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-			List<Object[]> filedFormDetails = filledFormDetailRepository.findAllByFormIdIn(filledFormIds);
+			
+				
+				List<Object[]> filedFormDetails = filledFormDetailRepository.findAllByFormIdIn(filledFormIds);
+			
+			
 			String flag1 = "Normal";
 			LocalDateTime endLCTime1 = LocalDateTime.now();
 			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
@@ -784,6 +794,8 @@ public class DynamicDocumentFormResource {
 	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 					+ description1);
 
+	                boolean compConf= getCompanyCofig();
+	                
 			for (Object[] ffObj : filledFormsObjArray) {
 
 				DynamicDocumentFilledFormDTO dynamicDocumentFilledFormDTO = new DynamicDocumentFilledFormDTO();
@@ -810,9 +822,18 @@ public class DynamicDocumentFormResource {
 						dynamicDocumentFilledFormDTO.setDynamicDocumentHeaderTaskExecutionLocation(
 								opExecutiveTaskExecution.get()[1] != null ? opExecutiveTaskExecution.get()[1].toString()
 										: "");
+						if(compConf)
+						{
 						dynamicDocumentFilledFormDTO.setDynamicDocumentHeaderAccountProfileName(
-								opExecutiveTaskExecution.get()[2] != null ? opExecutiveTaskExecution.get()[2].toString()
+								opExecutiveTaskExecution.get()[8] != null ? opExecutiveTaskExecution.get()[8].toString()
 										: "");
+						}
+						else
+						{
+							dynamicDocumentFilledFormDTO.setDynamicDocumentHeaderAccountProfileName(
+									opExecutiveTaskExecution.get()[2] != null ? opExecutiveTaskExecution.get()[2].toString()
+											: "");
+						}
 						dynamicDocumentFilledFormDTO.setDynamicDocumentHeaderAccountProfilePhone1(
 								opExecutiveTaskExecution.get()[3] != null ? opExecutiveTaskExecution.get()[3].toString()
 										: "");
@@ -884,5 +905,13 @@ public class DynamicDocumentFormResource {
 		log.info("Sync completed in {} ms", elapsedTime);
 		return dynamicDocumentFilledFormDTOs;
 	}
-
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }

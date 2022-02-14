@@ -10,6 +10,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -30,8 +31,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.repository.AccountingVoucherDetailRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountingVoucherHeaderService;
@@ -53,7 +57,7 @@ import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 public class AccountingLedgerReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountingLedgerReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountingVoucherHeaderService accountingVoucherService;
 
@@ -65,22 +69,24 @@ public class AccountingLedgerReportResource {
 
 	@Inject
 	private DocumentService documentService;
-	
+
 	@Inject
 	private EmployeeHierarchyService employeeHierarchyService;
-	
+
 	@Inject
 	private EmployeeProfileService employeeProfileService;
+
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	/**
 	 * GET /accounting-ledger-report : get all the accounting vouchers.
 	 *
-	 * @param pageable
-	 *            the pagination information
-	 * @return the ResponseEntity with status 200 (OK) and the list of
-	 *         accounting vouchers in body
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @param pageable the pagination information
+	 * @return the ResponseEntity with status 200 (OK) and the list of accounting
+	 *         vouchers in body
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@Timed
 	@RequestMapping(value = "/accounting-ledger-report", method = RequestMethod.GET)
@@ -100,8 +106,7 @@ public class AccountingLedgerReportResource {
 	/**
 	 * GET /accounting-ledger-report/:id : get the "id" AccountingVoucher.
 	 *
-	 * @param id
-	 *            the id of the AccountingVoucherDTO to retrieve
+	 * @param id the id of the AccountingVoucherDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         AccountingVoucherDTO, or with status 404 (Not Found)
 	 */
@@ -122,7 +127,7 @@ public class AccountingLedgerReportResource {
 			@RequestParam("documentPid") String documentPid, @RequestParam("filterBy") String filterBy,
 			@RequestParam String fromDate, @RequestParam String toDate) {
 		log.debug("Web request to filter accounting vouchers");
-		
+
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
 		if (!employeePid.equals("no")) {
 			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
@@ -131,7 +136,7 @@ public class AccountingLedgerReportResource {
 		if (employeeProfileDTO.getPid() != null) {
 			userPid = employeeProfileDTO.getUserPid();
 		}
-		
+
 		List<AccountingLedgerReportDTO> accountingVouchers = new ArrayList<>();
 		if (filterBy.equals("TODAY")) {
 			accountingVouchers = getFilterData(userPid, accountPid, documentPid, LocalDate.now(), LocalDate.now());
@@ -146,12 +151,24 @@ public class AccountingLedgerReportResource {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
 			accountingVouchers = getFilterData(userPid, accountPid, documentPid, monthStartDate, LocalDate.now());
 		} else if (filterBy.equals("CUSTOM")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); 
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toDateTime = LocalDate.parse(toDate, formatter);
 			accountingVouchers = getFilterData(userPid, accountPid, documentPid, fromDateTime, toDateTime);
 		}
+
 		return new ResponseEntity<>(accountingVouchers, HttpStatus.OK);
+	}
+
+	public boolean getCompanyCofig() {
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if (optconfig.isPresent()) {
+			if (Boolean.valueOf(optconfig.get().getValue())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private List<AccountingLedgerReportDTO> getFilterData(String userPid, String accountPid, String documentPid,
@@ -160,14 +177,14 @@ public class AccountingLedgerReportResource {
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<AccountingVoucherDetail> accountingVoucherDetails = new ArrayList<>();
 		if (userPid.equals("no") && accountPid.equals("no") && documentPid.equals("no")) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "AVD_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get all by companyId and date between";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AVD_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all by companyId and date between";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByCompanyIdAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate);
 			String flag = "Normal";
@@ -188,18 +205,18 @@ public class AccountingLedgerReportResource {
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 
 		} else if (!userPid.equals("no") && !accountPid.equals("no") && !documentPid.equals("no")) {
-			  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "AVD_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get all by companyId userPid accPid docPid and date between";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AVD_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all by companyId userPid accPid docPid and date between";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(userPid,
 							accountPid, documentPid, fromDate, toDate);
@@ -221,17 +238,17 @@ public class AccountingLedgerReportResource {
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 		} else if (!userPid.equals("no") && !accountPid.equals("no") && documentPid.equals("no")) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "AVD_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get all by companyId userPid accPid and date between";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AVD_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all by companyId userPid accPid and date between";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByCompanyIdUserPidAccountPidAndDateBetweenOrderByCreatedDateDesc(userPid, accountPid,
 							fromDate, toDate);
@@ -253,14 +270,14 @@ public class AccountingLedgerReportResource {
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 
 		} else if (!userPid.equals("no") && accountPid.equals("no") && !documentPid.equals("no")) {
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id = "AVD_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all by companyId userPid docPid  and date between";
+			String description = "get all by companyId userPid docPid  and date between";
 			LocalDateTime startLCTime = LocalDateTime.now();
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
@@ -268,35 +285,35 @@ public class AccountingLedgerReportResource {
 			accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByCompanyIdUserPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(userPid, documentPid,
 							fromDate, toDate);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		} else if (userPid.equals("no") && !accountPid.equals("no") && !documentPid.equals("no")) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "AVD_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get all by companyId accPid docPid and date between";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AVD_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all by companyId accPid docPid and date between";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByCompanyIdAccountPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(accountPid,
 							documentPid, fromDate, toDate);
@@ -318,17 +335,17 @@ public class AccountingLedgerReportResource {
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 		} else if (!userPid.equals("no") && accountPid.equals("no") && documentPid.equals("no")) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "AVD_QUERY_106" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get all by companyId  userPid and date between";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AVD_QUERY_106" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all by companyId  userPid and date between";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByCompanyIdUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fromDate, toDate);
 			String flag = "Normal";
@@ -349,74 +366,84 @@ public class AccountingLedgerReportResource {
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 
 		} else if (userPid.equals("no") && !accountPid.equals("no") && documentPid.equals("no")) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "AVD_QUERY_107" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get all by companyId accPid and date between";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "AVD_QUERY_107" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all by companyId accPid and date between";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByCompanyIdAccountPidAndDateBetweenOrderByCreatedDateDesc(accountPid, fromDate, toDate);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		} else if (userPid.equals("no") && accountPid.equals("no") && !documentPid.equals("no")) {
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id = "AVD_QUERY_108" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all by companyId docPid and date between";
+			String description = "get all by companyId docPid and date between";
 			LocalDateTime startLCTime = LocalDateTime.now();
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			accountingVoucherDetails = accountingVoucherDetailRepository
 					.findAllByCompanyIdDocumentPidAndDateBetweenOrderByCreatedDateDesc(documentPid, fromDate, toDate);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		}
-		return accountingVoucherDetails.stream().map(AccountingLedgerReportDTO::new)
+		boolean compConfig = getCompanyCofig();
+		List<AccountingLedgerReportDTO> result = accountingVoucherDetails.stream().map(AccountingLedgerReportDTO::new)
 				.collect(Collectors.toList());
+
+		result.stream().forEach(alt -> {
+			if (compConfig) {
+				alt.setByAccountName(alt.getDescription());
+			} else {
+				alt.setByAccountName(alt.getByAccountName());
+			}
+		});
+		return result;
 	}
 
 }

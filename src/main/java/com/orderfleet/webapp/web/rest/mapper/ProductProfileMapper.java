@@ -95,4 +95,9 @@ public abstract class ProductProfileMapper {
 		}
 		return false;
 		}
+
+	public abstract ProductProfileDTO productProfileToProductProfileDTODescription(ProductProfile productProfile) ;
+		// TODO Auto-generated method stub
+	
+	
 }

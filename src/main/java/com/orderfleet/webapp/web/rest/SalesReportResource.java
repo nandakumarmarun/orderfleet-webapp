@@ -38,13 +38,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
@@ -122,6 +125,9 @@ public class SalesReportResource {
 	private ProductProfileService productProfileService;
 	@Inject
 	private StockLocationRepository stockLocationRepository;
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	@RequestMapping(value = "/sales-report", method = RequestMethod.GET)
 	@Timed
@@ -266,14 +272,31 @@ public class SalesReportResource {
 		}
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid,
 				accountPid, fromDate, toDate, inclSubordinate, voucherType);
+		boolean compConfig = getCompanyCofig();
 		List<String> productNames;
 		if ("no".equals(pGroupPid)) {
+			if(compConfig)
+			{
 			productNames = productProfileRepository
-					.findProductNamesByCompanyIdAndActivatedTrueAndCreatedLessThan(toDate.atTime(23, 59));
+					.findProductDescriptionByCompanyIdAndActivatedTrueAndCreatedLessThan(toDate.atTime(23, 59));
+			}
+			else
+			{
+				productNames = productProfileRepository
+						.findProductNamesByCompanyIdAndActivatedTrueAndCreatedLessThan(toDate.atTime(23, 59));
+			}
 		} else {
+			if(compConfig)
+			{
 			productNames = productGroupProductRepository
-					.findProductNameByProductGroupPidAndActivatedTrueAndCreatedLessThan(pGroupPid,
+					.findProductDescriptionByProductGroupPidAndActivatedTrueAndCreatedLessThan(pGroupPid,
 							toDate.atTime(23, 59));
+			}else
+			{
+				productNames = productGroupProductRepository
+						.findProductNameByProductGroupPidAndActivatedTrueAndCreatedLessThan(pGroupPid,
+								toDate.atTime(23, 59));
+			}
 		}
 		Set<String> ivList = inventoryVoucherDetailDtos.stream().map(InventoryVoucherDetailDTO::getProductName)
 				.collect(Collectors.toSet());
@@ -329,20 +352,22 @@ public class SalesReportResource {
 		List<Long> documentIds = documents.stream().map(Document::getId).collect(Collectors.toList());
 
 		List<Object[]> ivDetailDtos = inventoryVoucherDetailRepository
-				.findByAccountPidInAndEmployeeIdInAndDocumentIdInDateBetween(accountProfilePids, userIds, documentIds,
+				.findByAccountPidInAndEmployeeIdInAndDocumentIdInDateBetweenProduct(accountProfilePids, userIds, documentIds,
 						fromDate, toDate);
+		
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
 		if (!ivDetailDtos.isEmpty()) {
 			for (Object[] object : ivDetailDtos) {
 				InventoryVoucherDetailDTO ivDetailDto = new InventoryVoucherDetailDTO();
 				ivDetailDto.setEmployeeName(object[0].toString());
 				ivDetailDto.setProductPid(object[1].toString());
-				ivDetailDto.setProductName(object[2].toString());
+	            ivDetailDto.setProductName(object[2].toString());
 				ivDetailDto.setProductUnitQty(object[3] == null ? 1d : (Double) object[3]);
 				ivDetailDto.setQuantity((Double) object[4]);
 				ivDetailDto.setAccountName(object[5].toString());
 				ivDetailDto.setCreatedDate((LocalDateTime) object[6]);
 				ivDetailDto.setVisitRemarks(object[7] == null ? null : object[7].toString());
+				ivDetailDto.setProductDescription(object[8].toString());
 				inventoryVoucherDetailDTOs.add(ivDetailDto);
 			}
 		}
@@ -350,6 +375,15 @@ public class SalesReportResource {
 
 	}
 
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 	private List<String> filterNotOrderedProduct(Set<String> orderedProductNames, List<String> productNames) {
 		if (orderedProductNames.isEmpty()) {
 			return productNames;

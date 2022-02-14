@@ -150,6 +150,9 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 	@Query("select productGroupProduct.product.name from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid = ?1 and productGroupProduct.product.activated=true and productGroupProduct.product.createdDate <= ?2")
 	List<String> findProductNameByProductGroupPidAndActivatedTrueAndCreatedLessThan(String productGroupPid,
 			LocalDateTime toDate);
+	@Query("select productGroupProduct.product.productDescription from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid = ?1 and productGroupProduct.product.activated=true and productGroupProduct.product.createdDate <= ?2")
+	List<String> findProductDescriptionByProductGroupPidAndActivatedTrueAndCreatedLessThan(String productGroupPid,
+			LocalDateTime toDate);
 
 	@Query("select productGroupProduct.product.pid from ProductGroupProduct productGroupProduct where productGroupProduct.product.pid in ?1 and productGroupProduct.productGroup.pid in ?2 and productGroupProduct.product.productCategory.pid in ?3 and productGroupProduct.product.activated = ?4 Order By productGroupProduct.product.name asc")
 	List<String> findProductByProductPidInAndProductGroupPidInAndProductProductCategoryPidInAndActivated(

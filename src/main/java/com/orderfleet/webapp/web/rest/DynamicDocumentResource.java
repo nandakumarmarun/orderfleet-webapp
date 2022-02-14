@@ -42,11 +42,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.io.Files;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.Form;
 import com.orderfleet.webapp.domain.FormElement;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DocumentFormsRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
 import com.orderfleet.webapp.repository.UserNotApplicableElementRepository;
@@ -113,6 +116,8 @@ public class DynamicDocumentResource {
 	@Inject
 	private UserMenuItemService userMenuItemService;
 
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 	/**
 	 * GET /dynamic-documents : get all the filled forms.
 	 *
@@ -320,6 +325,7 @@ public class DynamicDocumentResource {
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
+		System.out.println(documentPid);
 		List<DynamicDocumentHeaderDTO> dynamicDocuments = new ArrayList<DynamicDocumentHeaderDTO>();
 		if (userPid.equals("no") && documentPid.equals("no")) {
 			dynamicDocuments = dynamicDocumentHeaderService.findAllByCompanyIdAndDateBetween(fromDate, toDate);
@@ -341,10 +347,15 @@ public class DynamicDocumentResource {
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<FilledForm> filledForms = filledFormRepository
+		
+			
+			
+			List<FilledForm> filledForms = filledFormRepository
 				.findByDynamicDocumentHeaderPidIn(
 						dynamicDocuments.stream().map(d -> d.getPid()).collect(Collectors.toSet()));
-		 String flag = "Normal";
+			
+		
+		String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
 			String endDate = startLCTime.format(DATE_FORMAT);
@@ -365,6 +376,7 @@ public class DynamicDocumentResource {
 	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
 		if(!dynamicDocuments.isEmpty()) {
+
 			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id1 = "FORM_QUERY_110" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
@@ -373,8 +385,14 @@ public class DynamicDocumentResource {
 			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 			String startDate1 = startLCTime1.format(DATE_FORMAT1);
 			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+			
+		
+		
+			Set<String> dynamicDocs = dynamicDocuments.stream().map(d -> d.getPid()).collect(Collectors.toSet());
 			List<Object[]> filledFormPidAndDynamicDocPid = 
-					filledFormRepository.findFilleFormPidAndDynamicDocumentHeaderPidByCompany(dynamicDocuments.stream().map(d -> d.getPid()).collect(Collectors.toSet()));
+					filledFormRepository.findFilleFormPidAndDynamicDocumentHeaderPidByCompany(dynamicDocs);
+			
+			
 			String flag1 = "Normal";
 			LocalDateTime endLCTime1 = LocalDateTime.now();
 			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
@@ -407,6 +425,8 @@ public class DynamicDocumentResource {
 						}
 					}
 				}
+				
+				
 			}
 		}
 		

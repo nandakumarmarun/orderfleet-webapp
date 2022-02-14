@@ -3,18 +3,24 @@ package com.orderfleet.webapp.web.rest.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.AccountingVoucherHeaderHistory;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 
 /**
  * A DTO for the AccountingVoucherHeader entity.
@@ -24,6 +30,9 @@ import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
  */
 public class AccountingVoucherHeaderDTO {
 
+	@Inject
+	CompanyConfigurationRepository companyConfigurationRepository;
+	
 	private long id;
 
 	private String pid;
@@ -93,13 +102,16 @@ public class AccountingVoucherHeaderDTO {
 	private String orderReferenceNumber;
 
 	private boolean sendToOdoo;
+	private String description;
 
 	public AccountingVoucherHeaderDTO() {
 		super();
 	}
 
 	public AccountingVoucherHeaderDTO(AccountingVoucherHeader accountingVoucherHeader) {
+		
 		super();
+	
 		this.pid = accountingVoucherHeader.getPid();
 		if (accountingVoucherHeader.getDocument() != null) {
 			this.documentPid = accountingVoucherHeader.getDocument().getPid();
@@ -114,9 +126,12 @@ public class AccountingVoucherHeaderDTO {
 		}
 		if (accountingVoucherHeader.getAccountProfile() != null) {
 			this.accountProfilePid = accountingVoucherHeader.getAccountProfile().getPid();
-			this.accountProfileName = accountingVoucherHeader.getAccountProfile().getName();
+			
+				this.accountProfileName = accountingVoucherHeader.getAccountProfile().getName();	
+			this.description =accountingVoucherHeader.getAccountProfile().getDescription();
 			this.phone = accountingVoucherHeader.getAccountProfile().getPhone1();
 		}
+		
 		this.createdDate = accountingVoucherHeader.getCreatedDate();
 		this.documentDate = accountingVoucherHeader.getDocumentDate();
 		if (accountingVoucherHeader.getEmployee() != null) {
@@ -177,6 +192,7 @@ public class AccountingVoucherHeaderDTO {
 		this.remarks = accountingVoucherHeader.getRemarks();
 		this.documentNumberLocal = accountingVoucherHeader.getDocumentNumberLocal();
 		this.documentNumberServer = accountingVoucherHeader.getDocumentNumberServer();
+		this.description=accountingVoucherHeader.getAccountProfile().getDescription();
 	}
 
 	public long getDocumentId() {
@@ -450,7 +466,12 @@ public class AccountingVoucherHeaderDTO {
 	public void setSendToOdoo(boolean sendToOdoo) {
 		this.sendToOdoo = sendToOdoo;
 	}
-
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -472,5 +493,6 @@ public class AccountingVoucherHeaderDTO {
 	public int hashCode() {
 		return Objects.hashCode(pid);
 	}
+	
 
 }

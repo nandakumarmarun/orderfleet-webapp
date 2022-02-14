@@ -197,6 +197,7 @@ public class AccountingVoucherResource {
 			accountingVouchers = accountingVoucherService.findAllByCompanyIdDocumentPidAndDateBetween(documentPid,
 					fromDate, toDate);
 		}
+		
 		return accountingVouchers;
 	}
 

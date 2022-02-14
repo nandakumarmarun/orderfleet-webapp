@@ -31,6 +31,8 @@ import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileGroupDTO;
+import com.orderfleet.webapp.web.rest.mapper.ProductGroupMapper;
+import com.orderfleet.webapp.web.rest.mapper.ProductProfileMapper;
 
 /**
  * Resource for ProductProfileGroup
@@ -55,6 +57,12 @@ public class ProductProfileGroupResource {
 
 	@Inject
 	private ProductProfileService productProfileService;
+	
+	@Inject
+	private ProductGroupMapper productGroupMapper;
+	
+	@Inject
+	private ProductProfileMapper productProfileMapper;
 
 	@RequestMapping(value = "/productProfileGroups", method = RequestMethod.GET)
 	@Timed
@@ -127,12 +135,15 @@ public class ProductProfileGroupResource {
 		for (Map.Entry<String, List<ProductGroupProduct>> entry : productGroupProductMap.entrySet()) {
 
 			ProductProfileGroupDTO productProfileGroupDTO = new ProductProfileGroupDTO();
-			productProfileGroupDTO.setProductProfileDTO(new ProductProfileDTO(entry.getValue().get(0).getProduct()));
+			ProductProfileDTO productProfileDTO =productProfileMapper.productProfileToProductProfileDTODescription(entry.getValue().get(0).getProduct());
+			productProfileGroupDTO.setProductProfileDTO(productProfileDTO);
 			List<ProductGroupDTO> productGroupDTOs = new ArrayList<>();
 			for (ProductGroupProduct productGroupProduct : entry.getValue()) {
-				ProductGroupDTO groupDTO = new ProductGroupDTO(productGroupProduct.getProductGroup());
+//				ProductGroupDTO groupDTO = new ProductGroupDTO(productGroupProduct.getProductGroup());
+				ProductGroupDTO groupDTO =productGroupMapper.productGroupToProductGroupDTODescription(productGroupProduct.getProductGroup());
 				productGroupDTOs.add(groupDTO);
 			}
+			
 			productProfileGroupDTO.setProductGroupDTOs(productGroupDTOs);
 			productProfileGroupDTOs.add(productProfileGroupDTO);
 		}

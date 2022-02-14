@@ -64,6 +64,8 @@ public class DynamicDocumentHeaderDTO {
 	private boolean imageButtonVisible = false;// for displaying image button if images exist
 
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
+	
+	private String description;
 
 	public DynamicDocumentHeaderDTO() {
 		super();
@@ -95,6 +97,7 @@ public class DynamicDocumentHeaderDTO {
 			this.accountAddress = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getAddress();
 			this.accountPhone = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getPhone1();
 			this.accountEmail = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getEmail1();
+			this.description   = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getDescription();
 		}
 		if (dynamicDocumentHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = dynamicDocumentHeader.getTallyDownloadStatus();
@@ -124,6 +127,7 @@ public class DynamicDocumentHeaderDTO {
 		this.accountAddress = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getAddress();
 		this.accountPhone = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getPhone1();
 		this.accountEmail = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getEmail1();
+		this.description = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getDescription();
 
 	}
 
@@ -310,6 +314,13 @@ public class DynamicDocumentHeaderDTO {
 	public void setTallyDownloadStatus(TallyDownloadStatus tallyDownloadStatus) {
 		this.tallyDownloadStatus = tallyDownloadStatus;
 	}
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -330,4 +341,5 @@ public class DynamicDocumentHeaderDTO {
 		return Objects.hashCode(pid);
 	}
 
+	
 }

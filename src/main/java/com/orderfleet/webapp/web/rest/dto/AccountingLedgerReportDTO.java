@@ -1,10 +1,17 @@
 package com.orderfleet.webapp.web.rest.dto;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 
 /**
  * A DTO for the AccountingLedgerReportDTO entity.
@@ -13,6 +20,9 @@ import com.orderfleet.webapp.domain.enums.PaymentMode;
  * @since Mar 14, 2016
  */
 public class AccountingLedgerReportDTO {
+
+	@Inject
+	private static CompanyConfigurationRepository companyConfigurationRepository;
 
 	private String userName;
 
@@ -30,10 +40,11 @@ public class AccountingLedgerReportDTO {
 	private double byAmount;
 
 	private double toAmount;
-	
+
 	private String incomeExpenseHead;
-	
+
 	private String employeeName;
+	private String description;
 
 	public AccountingLedgerReportDTO() {
 	}
@@ -43,7 +54,10 @@ public class AccountingLedgerReportDTO {
 		this.userName = accountingVoucherDetail.getAccountingVoucherHeader().getCreatedBy().getFirstName();
 		this.documentName = accountingVoucherDetail.getAccountingVoucherHeader().getDocument().getName();
 		this.mode = accountingVoucherDetail.getMode();
+
+		
 		this.byAccountName = accountingVoucherDetail.getBy().getName();
+		
 		this.toAccountName = accountingVoucherDetail.getTo().getName();
 		this.createdDate = accountingVoucherDetail.getAccountingVoucherHeader().getCreatedDate();
 		if (accountingVoucherDetail.getAccountingVoucherHeader().getDocument().getActivityAccount()
@@ -53,12 +67,13 @@ public class AccountingLedgerReportDTO {
 				.equals(AccountTypeColumn.To)) {
 			this.toAmount = accountingVoucherDetail.getAmount();
 		}
-		if(accountingVoucherDetail.getIncomeExpenseHead()!=null) {
-		this.incomeExpenseHead=accountingVoucherDetail.getIncomeExpenseHead().getName();
+		if (accountingVoucherDetail.getIncomeExpenseHead() != null) {
+			this.incomeExpenseHead = accountingVoucherDetail.getIncomeExpenseHead().getName();
 		}
-		if(accountingVoucherDetail.getAccountingVoucherHeader()!=null) {
-			this.employeeName=accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
+		if (accountingVoucherDetail.getAccountingVoucherHeader() != null) {
+			this.employeeName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
 		}
+		this.description=accountingVoucherDetail.getBy().getDescription();
 	}
 
 	public String getUserName() {
@@ -140,6 +155,15 @@ public class AccountingLedgerReportDTO {
 	public void setEmployeeName(String employeeName) {
 		this.employeeName = employeeName;
 	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	
-	
+
 }

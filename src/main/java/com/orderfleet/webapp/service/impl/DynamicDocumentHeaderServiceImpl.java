@@ -20,16 +20,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountProfileDynamicDocumentAccountprofile;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.DynamicDocumentHeaderHistory;
+import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.FilledFormDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountProfileDynamicDocumentAccountprofileRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderHistoryRepository;
@@ -57,7 +62,7 @@ import com.orderfleet.webapp.web.rest.dto.FilledFormDetailDTO;
 public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderService {
 
 	private final Logger log = LoggerFactory.getLogger(DynamicDocumentHeaderServiceImpl.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private DynamicDocumentHeaderRepository dynamicDocumentHeaderRepository;
 
@@ -84,6 +89,9 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 
 	@Inject
 	private AccountProfileDynamicDocumentAccountprofileRepository accountProfileDynamicDocumentAccountprofileRepository;
+
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	/**
 	 * Save a dynamicDocumentHeader.
@@ -141,36 +149,36 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Override
 	public void update(DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO) {
 		log.debug("Request to save update feedback documents");
-		  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "DYN_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get one by Pid";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get one by Pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		DynamicDocumentHeader dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findOneByPid(dynamicDocumentHeaderDTO.getPid()).get();
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 		dynamicDocumentHeader.setUpdatedBy(user);
@@ -257,33 +265,33 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all document by company Id";
+		String description = "get all document by company Id";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdOrderByCreatedDateDesc();
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
 				.collect(Collectors.toList());
 		return result;
@@ -302,33 +310,33 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all document by company Id and order by create date using page";
+		String description = "get all document by company Id and order by create date using page";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Page<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdOrderByCreatedDateDesc(pageable);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		List<DynamicDocumentHeaderDTO> dynamicDocumentHeaderList = dynamicDocumentHeaders.getContent().stream()
 				.map(DynamicDocumentHeaderDTO::new).collect(Collectors.toList());
 		Page<DynamicDocumentHeaderDTO> result = new PageImpl<DynamicDocumentHeaderDTO>(dynamicDocumentHeaderList,
@@ -363,81 +371,104 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Transactional(readOnly = true)
 	public Optional<DynamicDocumentHeaderDTO> findOneByPid(String pid) {
 		log.debug("Request to get DynamicDocumentHeader by pid : {}", pid);
-		  DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "DYN_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get one by Pid";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		Optional<DynamicDocumentHeaderDTO> ddhDTO=dynamicDocumentHeaderRepository.findOneByPid(pid).map(dynamicDocumentHeader -> {
-			DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO = new DynamicDocumentHeaderDTO(dynamicDocumentHeader);
-			dynamicDocumentHeaderDTO.setFilledForms(dynamicDocumentHeader.getFilledForms().stream()
-					.map(FilledFormDTO::new).collect(Collectors.toList()));
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get one by Pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		Optional<DynamicDocumentHeaderDTO> ddhDTO = dynamicDocumentHeaderRepository.findOneByPid(pid)
+				.map(dynamicDocumentHeader -> {
+					DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO = new DynamicDocumentHeaderDTO(
+							dynamicDocumentHeader);
+					dynamicDocumentHeaderDTO.setFilledForms(dynamicDocumentHeader.getFilledForms().stream()
+							.map(FilledFormDTO::new).collect(Collectors.toList()));
+					String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+					logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag
+							+ "," + description);
 
-			return dynamicDocumentHeaderDTO;
-		});
-		return  ddhDTO;
+					return dynamicDocumentHeaderDTO;
+				});
+		return ddhDTO;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdAndDateBetween(LocalDateTime fromDate,
 			LocalDateTime toDate) {
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "DYN_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all document by company id and date between";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all document by company id and date between";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
 				.collect(Collectors.toList());
+
+		boolean comp = getCompanyCofig();
+
+		result.stream().forEach(ddh -> {
+			if (comp) {
+				ddh.setAccountName(ddh.getDescription());
+			} else {
+				ddh.setAccountName(ddh.getAccountName());
+			}
+		});
 		return result;
+	}
+
+	public boolean getCompanyCofig() {
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if (optconfig.isPresent()) {
+			if (Boolean.valueOf(optconfig.get().getValue())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -447,7 +478,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all document by company id UserPid documentPid and date between";
+		String description = "get all document by company id UserPid documentPid and date between";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
@@ -473,11 +504,21 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
-		
+
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
 				.collect(Collectors.toList());
+		boolean comp = getCompanyCofig();
+
+		result.stream().forEach(ddh -> {
+			if (comp) {
+				ddh.setAccountName(ddh.getDescription());
+			} else {
+				ddh.setAccountName(ddh.getAccountName());
+			}
+		});
+
 		return result;
 	}
 
@@ -488,7 +529,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_105" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all by company id  user pid and date between";
+		String description = "get all by company id  user pid and date between";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
@@ -513,10 +554,19 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
 				.collect(Collectors.toList());
+		boolean comp = getCompanyCofig();
+
+		result.stream().forEach(ddh -> {
+			if (comp) {
+				ddh.setAccountName(ddh.getDescription());
+			} else {
+				ddh.setAccountName(ddh.getAccountName());
+			}
+		});
 		return result;
 	}
 
@@ -527,7 +577,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_106" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all document by company id document pid and date between";
+		String description = "get all document by company id document pid and date between";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
@@ -535,6 +585,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdDocumentPidAndDateBetweenOrderByCreatedDateDesc(documentPid, fromDate, toDate);
+
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -553,10 +604,19 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
 				.collect(Collectors.toList());
+		boolean comp = getCompanyCofig();
+
+		result.stream().forEach(ddh -> {
+			if (comp) {
+				ddh.setAccountName(ddh.getDescription());
+			} else {
+				ddh.setAccountName(ddh.getAccountName());
+			}
+		});
 		return result;
 	}
 
@@ -566,13 +626,15 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_113" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all by companyId doc name and status false";
+		String description = "get all by companyId doc name and status false";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdAndDocumentNameAndStatusFalseOrderByCreatedDateDesc(documentName);
+
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -591,7 +653,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 
 		List<DynamicDocumentHeaderDTO> result = new ArrayList<>();
@@ -618,33 +680,35 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_116" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get doc by executive task execution pid doc name ";
+		String description = "get doc by executive task execution pid doc name ";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 		DynamicDocumentHeader dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findByExecutiveTaskExecutionPidAndDocumentNameAndStatusFalse(executiveTaskExecutionPid, documentName);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		DynamicDocumentHeaderDTO dynamicDocumentHeaderDTO = new DynamicDocumentHeaderDTO();
 		if (dynamicDocumentHeader != null) {
 			dynamicDocumentHeaderDTO = new DynamicDocumentHeaderDTO(dynamicDocumentHeader);
@@ -667,88 +731,14 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_125" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get the documents by UserId in";
+		String description = "get the documents by UserId in";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		Set<Document>documents= dynamicDocumentHeaderRepository.findDocumentsByUserIdIn(userIds);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
-					return documents;
-	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<DynamicDocumentHeaderDTO> findByFilledFormsIn(List<FilledForm> filledForms) {
-		log.debug("Request to get all filledForms");
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "DYN_QUERY_132" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get documents by filled forms in";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
-				.findByFilledFormsIn(filledForms);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
-		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
-				.collect(Collectors.toList());
-		return result;
-	}
+		Set<Document> documents = dynamicDocumentHeaderRepository.findDocumentsByUserIdIn(userIds);
 
-	@Override
-	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidDocumentPidAndDateBetweenSetFilledForm(
-			String userPid, String documentPid, LocalDateTime fromDate, LocalDateTime toDate) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "DYN_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all document by company id UserPid documentPid and date between";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
-				.findAllByCompanyIdUserPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(userPid, documentPid,
-						fromDate, toDate);
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -767,7 +757,87 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+		return documents;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<DynamicDocumentHeaderDTO> findByFilledFormsIn(List<FilledForm> filledForms) {
+		log.debug("Request to get all filledForms");
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_132" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get documents by filled forms in";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
+		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
+				.findByFilledFormsIn(filledForms);
+
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
+				.collect(Collectors.toList());
+		return result;
+	}
+
+	@Override
+	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidDocumentPidAndDateBetweenSetFilledForm(
+			String userPid, String documentPid, LocalDateTime fromDate, LocalDateTime toDate) {
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all document by company id UserPid documentPid and date between";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
+		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
+				.findAllByCompanyIdUserPidDocumentPidAndDateBetweenOrderByCreatedDateDesc(userPid, documentPid,
+						fromDate, toDate);
+
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 		List<DynamicDocumentHeaderDTO> result = new ArrayList<>();
 		if (!dynamicDocumentHeaders.isEmpty()) {
@@ -784,14 +854,14 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	@Override
 	public List<DynamicDocumentHeaderDTO> findAllDynamicDocumentByExecutiveTaskExecutionPid(String pid) {
 		Set<DynamicDocumentHeaderDTO> dynamics = new HashSet<>();
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "DYN_QUERY_133" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all documents by executive task execution pid";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_133" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all documents by executive task execution pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<DynamicDocumentHeader> documentHeaders = dynamicDocumentHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(pid);
 		String flag = "Normal";
@@ -812,16 +882,16 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
-                DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-        		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        		String id1 = "APDD_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-        		String description1 ="get all by company";
-        		LocalDateTime startLCTime1 = LocalDateTime.now();
-        		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-        		String startDate1 = startLCTime1.format(DATE_FORMAT1);
-        		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id1 = "APDD_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description1 = "get all by company";
+		LocalDateTime startLCTime1 = LocalDateTime.now();
+		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+		String startDate1 = startLCTime1.format(DATE_FORMAT1);
+		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 		List<AccountProfileDynamicDocumentAccountprofile> acProfileDyDocumentAcprofiles = accountProfileDynamicDocumentAccountprofileRepository
 				.findAllByCompany();
 		String flag1 = "Normal";
@@ -842,7 +912,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		if (minutes1 > 10) {
 			flag1 = "Dead Slow";
 		}
-                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+		logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 				+ description1);
 		for (AccountProfileDynamicDocumentAccountprofile accountProfileDynamicDocumentAccountprofile : acProfileDyDocumentAcprofiles) {
 			for (DynamicDocumentHeader dynamicDocumentHeader : documentHeaders) {
@@ -862,14 +932,14 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 	public List<DynamicDocumentHeaderDTO> findAllByCompanyIdUserPidDocumentPidAndTallyDownloadStatusAndDateBetween(
 			String userPid, String documentPid, List<TallyDownloadStatus> tallyStatus, LocalDateTime fromDate,
 			LocalDateTime toDate) {
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "DYN_QUERY_107" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all by document by companyid userPid documentPid Tally download status";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_107" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all by document by companyid userPid documentPid Tally download status";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdUserPidDocumentPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(userPid,
 						documentPid, tallyStatus, fromDate, toDate);
@@ -891,7 +961,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
 				.collect(Collectors.toList());
@@ -905,7 +975,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_108" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all by document by company id userPid Tally download status";
+		String description = "get all by document by company id userPid Tally download status";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
@@ -931,7 +1001,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
 				.collect(Collectors.toList());
@@ -945,7 +1015,7 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "DYN_QUERY_109" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all by document by company id documentPid and Tally download status";
+		String description = "get all by document by company id documentPid and Tally download status";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
@@ -953,26 +1023,26 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 		List<DynamicDocumentHeader> dynamicDocumentHeaders = dynamicDocumentHeaderRepository
 				.findAllByCompanyIdDocumentPidAndTallyDownloadStatusAndDateBetweenOrderByCreatedDateDesc(documentPid,
 						tallyStatus, fromDate, toDate);
-		  String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		List<DynamicDocumentHeaderDTO> result = dynamicDocumentHeaders.stream().map(DynamicDocumentHeaderDTO::new)
 				.collect(Collectors.toList());
 		return result;
@@ -980,36 +1050,36 @@ public class DynamicDocumentHeaderServiceImpl implements DynamicDocumentHeaderSe
 
 	@Override
 	public void updateDynamicDocumentHeaderStatus(DynamicDocumentHeaderDTO dynamicDocumentDTO) {
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "DYN_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get one by Pid";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "DYN_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get one by Pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		DynamicDocumentHeader dynamicDocumentHeader = dynamicDocumentHeaderRepository
 				.findOneByPid(dynamicDocumentDTO.getPid()).get();
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		dynamicDocumentHeader.setStatus(true);
 		dynamicDocumentHeader.setTallyDownloadStatus(dynamicDocumentDTO.getTallyDownloadStatus());

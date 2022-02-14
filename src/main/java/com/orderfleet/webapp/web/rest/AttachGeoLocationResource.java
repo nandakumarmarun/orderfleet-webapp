@@ -31,12 +31,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 import com.orderfleet.webapp.repository.AccountProfileGeoLocationTaggingRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
@@ -98,6 +101,9 @@ public class AttachGeoLocationResource {
 	
 	@Inject
 	private AccountProfileGeoLocationTaggingService accountProfileGeoLocationTaggingService;
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	@RequestMapping(value = "/attach-geo-location", method = RequestMethod.GET)
 	@Timed
@@ -236,6 +242,7 @@ public class AttachGeoLocationResource {
 			apGeoLocationTag = apGeoLocationTag.stream().filter(apglt -> accountPid.equals(apglt[4].toString()))
 					.collect(Collectors.toList());
 		}
+		boolean compCon=getCompanyCofig();
 		List<MobileGeoLocationView> mobileGeoLocationViews = new ArrayList<>();
 		for (Object[] object : apGeoLocationTag) {
 			MobileGeoLocationView mobileGeoLocationView = new MobileGeoLocationView();
@@ -243,7 +250,14 @@ public class AttachGeoLocationResource {
 			mobileGeoLocationView.setSendDate((LocalDateTime)object[1]);
 			mobileGeoLocationView.setUserName(object[3].toString());
 			mobileGeoLocationView.setAccountPid(object[4].toString());
-			mobileGeoLocationView.setAccountProfileName(object[5].toString());
+			if(compCon)
+			{
+			mobileGeoLocationView.setAccountProfileName(object[9].toString());
+			}
+			else
+			{
+				mobileGeoLocationView.setAccountProfileName(object[5].toString());
+			}
 			mobileGeoLocationView.setLatitude((BigDecimal)object[6]);
 			mobileGeoLocationView.setLongitude((BigDecimal)object[7]);
 			mobileGeoLocationView.setLocation(object[8] == null ? "" : object[8].toString());
@@ -251,7 +265,15 @@ public class AttachGeoLocationResource {
 		}
 		return mobileGeoLocationViews;
 	}
-
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 	private List<VisitGeoLocationView> getVisitGeoLocationFilteredData(String userPid, String activityPid,
 			String accountPid, LocalDate fDate, LocalDate tDate) {
 		List<Long> userIds;
@@ -325,8 +347,16 @@ public class AttachGeoLocationResource {
 	private List<VisitGeoLocationView> createGeoLocationView(List<ExecutiveTaskExecution> executiveTaskExecutions) {
 		List<VisitGeoLocationView> visitGeoLocationViews = new ArrayList<>();
 		List<EmployeeProfileDTO> employeeList = employeeProfileService.findAllByCompany();
+		boolean compCon= getCompanyCofig();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			VisitGeoLocationView visitGeoLocationView = new VisitGeoLocationView(executiveTaskExecution);
+			if(compCon) {
+			visitGeoLocationView.setAccountProfileName(visitGeoLocationView.getDescription());
+			}
+			else
+			{
+				visitGeoLocationView.setAccountProfileName(visitGeoLocationView.getAccountProfileName());
+			}
 			List<ExecutiveTaskExecutionDetailView> executiveTaskExecutionDetailViews = new ArrayList<>();
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");

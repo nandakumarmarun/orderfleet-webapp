@@ -645,7 +645,7 @@ public class SalesPerformanceManagementResource {
 				sendSalesOrderSapButtonStatus = false;
 			}
 		}
-
+boolean compconfig= getCompanyCofig();
 		DecimalFormat df = new DecimalFormat("0.00");
 		int size = inventoryVouchers.size();
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
@@ -660,7 +660,14 @@ public class SalesPerformanceManagementResource {
 			salesPerformanceDTO.setCreatedDate((LocalDateTime) ivData[5]);
 			salesPerformanceDTO.setDocumentDate((LocalDateTime) ivData[6]);
 			salesPerformanceDTO.setReceiverAccountPid(ivData[7].toString());
-			salesPerformanceDTO.setReceiverAccountName(ivData[8].toString());
+			if(compconfig)
+			{
+			salesPerformanceDTO.setReceiverAccountName(ivData[27].toString());
+			}
+			else
+			{
+				salesPerformanceDTO.setReceiverAccountName(ivData[8].toString());
+			}
 			salesPerformanceDTO.setSupplierAccountPid(ivData[9].toString());
 			salesPerformanceDTO.setSupplierAccountName(ivData[10].toString());
 			salesPerformanceDTO.setEmployeePid(ivData[11].toString());
@@ -693,7 +700,15 @@ public class SalesPerformanceManagementResource {
 		}
 		return salesPerformanceDTOs;
 	}
-
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 	@RequestMapping(value = "/sales-performance-management/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed

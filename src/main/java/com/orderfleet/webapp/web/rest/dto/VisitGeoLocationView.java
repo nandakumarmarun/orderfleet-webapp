@@ -41,12 +41,13 @@ public class VisitGeoLocationView {
 	private BigDecimal startLatitude;
 	
 	private String startLocation;
+	private String description;
 	
 	private List<ExecutiveTaskExecutionDetailView> executiveTaskExecutionDetailViews;
 
 	public VisitGeoLocationView(String pid, LocalDateTime createdDate,LocalDateTime plannedDate,  String userName,
 			String activityName, String accountTypeName,String accountProfilePid, String accountProfileName, LocationType locationType,
-			String location, BigDecimal longitude,BigDecimal latitude,BigDecimal startLongitude,BigDecimal startLatitude,LocationType startLocationType, String startLocation) {
+			String location, BigDecimal longitude,BigDecimal latitude,BigDecimal startLongitude,BigDecimal startLatitude,LocationType startLocationType, String startLocation,String description) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -64,6 +65,7 @@ public class VisitGeoLocationView {
 		this.startLatitude=startLatitude;
 		this.startLocationType=startLocationType;
 		this.startLocation=startLocation;
+		this.description=description;
 	}
 
 	public VisitGeoLocationView(ExecutiveTaskExecution executiveTaskExecution) {
@@ -84,6 +86,7 @@ public class VisitGeoLocationView {
 		this.startLatitude=executiveTaskExecution.getStartLatitude();
 		this.startLocationType=executiveTaskExecution.getStartLocationType();
 		this.startLocation=executiveTaskExecution.getStartLocation();
+		this.description=executiveTaskExecution.getAccountProfile().getDescription();
 	}
 
 	public String getPid() {
@@ -223,6 +226,13 @@ public class VisitGeoLocationView {
 	public void setStartLatitude(BigDecimal startLatitude) {
 		this.startLatitude = startLatitude;
 	}
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	
 	public List<ExecutiveTaskExecutionDetailView> getExecutiveTaskExecutionDetailViews() {
 		return executiveTaskExecutionDetailViews;
@@ -243,6 +253,7 @@ public class VisitGeoLocationView {
 				+ startLongitude + ", startLatitude=" + startLatitude + ", startLocation=" + startLocation
 				+ ", executiveTaskExecutionDetailViews=" + executiveTaskExecutionDetailViews + "]";
 	}
+
 	
 	
 

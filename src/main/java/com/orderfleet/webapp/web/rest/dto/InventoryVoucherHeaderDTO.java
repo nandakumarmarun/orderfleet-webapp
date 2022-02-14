@@ -140,6 +140,8 @@ public class InventoryVoucherHeaderDTO {
 	private String imageRefNo;
 
 	private String salesLedgerName;
+	
+	private String description;
 
 	public InventoryVoucherHeaderDTO() {
 		super();
@@ -163,6 +165,7 @@ public class InventoryVoucherHeaderDTO {
 					: inventoryVoucherHeader.getReceiverAccount().getAlias();
 			this.receiverAccountLocation = inventoryVoucherHeader.getReceiverAccount().getLocation() == null ? ""
 					: inventoryVoucherHeader.getReceiverAccount().getLocation();
+			this.setDescription(inventoryVoucherHeader.getReceiverAccount().getDescription());
 		}
 		this.processStatus = inventoryVoucherHeader.getProcessStatus();
 		if (!inventoryVoucherHeader.getInventoryVoucherDetails().isEmpty()) {
@@ -293,7 +296,7 @@ public class InventoryVoucherHeaderDTO {
 			String documentPid, String documentName, LocalDateTime createdDate, LocalDateTime documentDate,
 			String receiverAccountPid, String receiverAccountName, String supplierAccountPid,
 			String supplierAccountName, String employeePid, String employeeName, String userName, double documentTotal,
-			double documentVolume) {
+			double documentVolume,String description) {
 		super();
 		this.pid = pid;
 		this.documentNumberLocal = documentNumberLocal;
@@ -311,6 +314,7 @@ public class InventoryVoucherHeaderDTO {
 		this.userName = userName;
 		this.documentTotal = documentTotal;
 		this.documentVolume = documentVolume;
+		this.description = description;
 	}
 
 	public String getReceiverAccountCustomerId() {
@@ -808,7 +812,13 @@ public class InventoryVoucherHeaderDTO {
 	public void setImageRefNo(String imageRefNo) {
 		this.imageRefNo = imageRefNo;
 	}
+	public String getDescription() {
+		return description;
+	}
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -830,5 +840,7 @@ public class InventoryVoucherHeaderDTO {
 	public int hashCode() {
 		return Objects.hashCode(pid);
 	}
+
+	
 
 }

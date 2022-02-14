@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -28,8 +29,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
@@ -71,11 +76,14 @@ public class StockTrackingResource {
 	@Inject
 	private LocationAccountProfileService locationAccountProfileService;
 
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
+
 	/**
 	 * GET /stock-tracking-report : get StockTrackingReport.
 	 *
-	 * @throws URISyntaxException
-	 *             if there is an error to generate the pagination HTTP headers
+	 * @throws URISyntaxException if there is an error to generate the pagination
+	 *                            HTTP headers
 	 */
 	@GetMapping(value = "/stock-tracking-report")
 	@Timed
@@ -187,6 +195,31 @@ public class StockTrackingResource {
 		}
 		List<InventoryVoucherDetailDTO> voucherDetailDTOs = inventoryVouchers.stream()
 				.map(InventoryVoucherDetailDTO::new).collect(Collectors.toList());
+		boolean comp = getCompanyCofig();
+
+		voucherDetailDTOs.stream().forEach(ivd -> {
+			if (comp) {
+
+				ivd.setAccountName(ivd.getDescription());
+				ivd.setProductName(ivd.getProductDescription());
+
+			} else {
+				ivd.setAccountName(ivd.getAccountName());
+				ivd.setProductName(ivd.getProductName());
+			}
+		});
+
 		return voucherDetailDTOs;
+	}
+
+	public boolean getCompanyCofig() {
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if (optconfig.isPresent()) {
+			if (Boolean.valueOf(optconfig.get().getValue())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

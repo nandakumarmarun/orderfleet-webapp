@@ -39,6 +39,8 @@ public class DynamicDocumentFilledFormDTO {
 	private String dynamicDocumentHeaderTaskExecutionLocation;
 
 	private List<DynamicDocumentFilledFormDetailsDTO> filledFormDetails;
+	
+	private String dynamicDocumentHeaderDescription;
 
 	public String getDynamicDocumentHeaderAccountProfileName() {
 		return dynamicDocumentHeaderAccountProfileName;
@@ -126,6 +128,14 @@ public class DynamicDocumentFilledFormDTO {
 
 	public void setDynamicDocumentHeaderAccountProfileAddress(String dynamicDocumentHeaderAccountProfileAddress) {
 		this.dynamicDocumentHeaderAccountProfileAddress = dynamicDocumentHeaderAccountProfileAddress;
+	}
+
+	public String getDynamicDocumentHeaderDescription() {
+		return dynamicDocumentHeaderDescription;
+	}
+
+	public void setDynamicDocumentHeaderDescription(String dynamicDocumentHeaderDescription) {
+		this.dynamicDocumentHeaderDescription = dynamicDocumentHeaderDescription;
 	}
 
 }

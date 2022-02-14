@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -33,8 +34,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.custom.InventoryVoucherDetailCustomRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -79,6 +83,9 @@ public class ItemSummaryEmployeeWiseResource {
 
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	@RequestMapping(value = "/item-summary-employee-wise", method = RequestMethod.GET)
 	@Timed
@@ -262,7 +269,7 @@ public class ItemSummaryEmployeeWiseResource {
 
 		Set<InventoryVoucherDetailDTO> ivdSet = new HashSet<>();
 		List<InventoryVoucherDetailDTO> ivdDTOs = new ArrayList<>();
-
+    boolean companyConfig=getCompanyCofig();
 		inventoryVoucherDetailDTOs.forEach(ivd -> ivdSet.add(ivd));
 
 		ivdSet.forEach(ivdset -> {
@@ -270,11 +277,28 @@ public class ItemSummaryEmployeeWiseResource {
 					.filter(ivd -> ivd.getProductName().equals(ivdset.getProductName()))
 					.mapToDouble(InventoryVoucherDetailDTO::getQuantity).sum();
 			InventoryVoucherDetailDTO ivdDTO = new InventoryVoucherDetailDTO();
-			ivdDTO.setProductName(ivdset.getProductName());
+			if(companyConfig)
+			{
+			ivdDTO.setProductName(ivdset.getProductDescription());
+			}
+			else
+			{
+				ivdDTO.setProductName(ivdset.getProductName());
+			}
+			
 			ivdDTO.setQuantity(cumulative);
 			ivdDTOs.add(ivdDTO);
 		});
 
 		return ivdDTOs;
 	}
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }

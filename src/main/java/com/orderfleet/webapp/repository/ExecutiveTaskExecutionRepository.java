@@ -243,7 +243,7 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	@Query("select distinct(ete.accountProfile) from ExecutiveTaskExecution ete where ete.user.id = ?1 and ete.company.id = ?#{principal.companyId}")
 	List<AccountProfile> getAllOrderBasedAndUserBasedCustomer(long userId);
 
-	@Query("select exeTaskExecution.id,exeTaskExecution.location,exeTaskExecution.accountProfile.name,exeTaskExecution.accountProfile.phone1,exeTaskExecution.accountProfile.city,exeTaskExecution.accountProfile.location,exeTaskExecution.accountProfile.address,exeTaskExecution.accountProfile.accountType.name"
+	@Query("select exeTaskExecution.id,exeTaskExecution.location,exeTaskExecution.accountProfile.name,exeTaskExecution.accountProfile.phone1,exeTaskExecution.accountProfile.city,exeTaskExecution.accountProfile.location,exeTaskExecution.accountProfile.address,exeTaskExecution.accountProfile.accountType.name,exeTaskExecution.accountProfile.description"
 			+ " from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.id IN ?1")
 	List<Object[]> findByExeIdIn(Set<Long> executiveTaskExecutionIds);
 

@@ -9,6 +9,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -27,9 +28,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ActivityService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
@@ -48,6 +53,8 @@ import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 public class VerificationResource {
 
 	private final Logger log = LoggerFactory.getLogger(VerificationResource.class);
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
@@ -137,6 +144,7 @@ public class VerificationResource {
 
 	private List<ExecutiveTaskExecutionDTO> getFilterData(String employeePid, String activityPid, LocalDate fDate,
 			LocalDate tDate) {
+		 boolean companyconfig = getCompanyCofig();
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<ExecutiveTaskExecution>();
@@ -163,7 +171,7 @@ public class VerificationResource {
 			executiveTaskExecutions = executiveTaskExecutionRepository
 					.findAllByCompanyIdActivityPidAndDateBetweenOrderByDateDesc(activityPid, fromDate, toDate);
 		}
-
+		
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			EmployeeProfileDTO employeeProfileDTO2 = employeeProfileService
 					.findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
@@ -171,11 +179,29 @@ public class VerificationResource {
 				ExecutiveTaskExecutionDTO executiveTaskExecutionDTO = new ExecutiveTaskExecutionDTO(
 						executiveTaskExecution);
 				executiveTaskExecutionDTO.setEmployeeName(employeeProfileDTO2.getName());
+				if(companyconfig)
+				{
+				executiveTaskExecutionDTO.setAccountProfileName(executiveTaskExecutionDTO.getDescription());
+				}
+				else
+				{
+					executiveTaskExecutionDTO.setAccountProfileName(executiveTaskExecutionDTO.getAccountProfileName());
+				}
 				executiveTaskExecutionDTOs.add(executiveTaskExecutionDTO);
 			}
 		}
 
 		return executiveTaskExecutionDTOs;
 	}
+	
 
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }

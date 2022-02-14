@@ -699,12 +699,23 @@ public class InvoiceWiseReportResource {
 
 		log.info("executive task execution looping started :" + executiveTaskExecutions.size());
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
+		boolean compConfig= getCompanyCofig();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			double totalSalesOrderAmount = 0.0;
 			double totalRecieptAmount = 0.0;
 			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView(executiveTaskExecution);
 			EmployeeProfile employeeProfile = employeeProfileRepository
 					.findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
+		
+			if(compConfig)
+			{
+				invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getDescription());
+			}
+			else
+			{
+				invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getAccountProfileName());
+
+			}
 			if (employeeProfile != null) {
 				invoiceWiseReportView.setEmployeeName(employeeProfile.getName());
 				String timeSpend = findTimeSpend(executiveTaskExecution.getPunchInDate(),
@@ -1456,5 +1467,13 @@ public class InvoiceWiseReportResource {
 		}
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }

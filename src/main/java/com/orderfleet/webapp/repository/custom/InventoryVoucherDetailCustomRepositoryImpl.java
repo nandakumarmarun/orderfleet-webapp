@@ -37,7 +37,7 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 				+ "ivd.product.name," + "ivd.quantity," + "ivd.sellingRate," + "ivd.rowTotal," + "ivd.product.pid,"
 				+ "ivd.product.unitQty," + "ivd.volume," + "ivd.inventoryVoucherHeader.receiverAccount.location,"
 				+ "ivd.inventoryVoucherHeader.supplierAccount.location,"
-				+ "ivd.inventoryVoucherHeader.document.activityAccount");
+				+ "ivd.inventoryVoucherHeader.document.activityAccount,"+"ivd.product.productDescription");
 		if (!stockLocationPids.isEmpty()) {
 			subQueryString.append(",ivd.sourceStockLocation.name," + "ivd.destinationStockLocation.name ");
 		}
@@ -127,6 +127,7 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			if (AccountTypeColumn.valueOf(object[14].toString()).equals(AccountTypeColumn.Supplier)) {
 				ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
 			}
+			ivd.setProductDescription((String) object[15]);
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
 

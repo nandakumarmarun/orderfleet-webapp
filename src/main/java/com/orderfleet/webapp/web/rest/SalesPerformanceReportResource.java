@@ -51,8 +51,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountProfile;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
@@ -90,6 +93,8 @@ public class SalesPerformanceReportResource {
 	private static final String MTD = "MTD";
 	private static final String CUSTOM = "CUSTOM";
 
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 	@Inject
 	private InventoryVoucherHeaderService inventoryVoucherService;
 
@@ -366,6 +371,7 @@ public class SalesPerformanceReportResource {
 
 	private List<SalesPerformanceDTO> createSalesPerformanceDTO(List<Object[]> inventoryVouchers) {
 		// fetch voucher details
+		boolean comp= getCompanyCofig();
 		Set<String> ivHeaderPids = inventoryVouchers.parallelStream().map(obj -> obj[0].toString())
 				.collect(Collectors.toSet());
 		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
@@ -384,7 +390,14 @@ public class SalesPerformanceReportResource {
 			salesPerformanceDTO.setCreatedDate((LocalDateTime) ivData[5]);
 			salesPerformanceDTO.setDocumentDate((LocalDateTime) ivData[6]);
 			salesPerformanceDTO.setReceiverAccountPid(ivData[7].toString());
-			salesPerformanceDTO.setReceiverAccountName(ivData[8].toString());
+			if(comp)
+			{
+			salesPerformanceDTO.setReceiverAccountName(ivData[17].toString());
+			}
+			else
+			{
+				salesPerformanceDTO.setReceiverAccountName(ivData[8].toString());
+			}
 			salesPerformanceDTO.setSupplierAccountPid(ivData[9].toString());
 			salesPerformanceDTO.setSupplierAccountName(ivData[10].toString());
 			salesPerformanceDTO.setEmployeePid(ivData[11].toString());
@@ -400,7 +413,15 @@ public class SalesPerformanceReportResource {
 		}
 		return salesPerformanceDTOs;
 	}
-
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 	@RequestMapping(value = "/primary-sales-performance/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed

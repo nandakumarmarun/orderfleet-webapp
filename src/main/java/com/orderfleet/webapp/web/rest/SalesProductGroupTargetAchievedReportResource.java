@@ -64,10 +64,12 @@ import com.orderfleet.webapp.repository.SalesTargetGroupUserTargetRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ProductGroupSalesTargetGroupService;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformaceAchivementDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformaceDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesProductGroupUserTargetDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesTargetGroupUserTargetDTO;
+import com.orderfleet.webapp.web.rest.mapper.ProductGroupMapper;
 import com.orderfleet.webapp.web.rest.mapper.SalesTargetGroupUserTargetMapper;
 
 /**
@@ -136,6 +138,9 @@ public class SalesProductGroupTargetAchievedReportResource {
 
 	@Inject
 	private ProductGroupProductRepository productGroupProductRepository;
+	
+	@Inject
+	private ProductGroupMapper productGroupMapper;
 
 	/**
 	 * GET /sales-product-group-target-vs-achieved-report
@@ -148,7 +153,9 @@ public class SalesProductGroupTargetAchievedReportResource {
 	@RequestMapping(value = "/sales-product-group-target-vs-achieved-report", method = RequestMethod.GET)
 	public String getSalesTargetAchievedReport(Model model) {
 		log.debug("Web request to get a page of Marketing Activity Performance");
-		model.addAttribute("products", productGroupRepository.findAllByCompanyId(true));
+		List<ProductGroup> productGroup=productGroupRepository.findAllByCompanyId(true);
+		List<ProductGroupDTO> productGroupDTOs =productGroupMapper.productGroupsToProductGroupDTOs(productGroup);
+		model.addAttribute("products",productGroupDTOs);
 		return "company/salesProductGroupTargetAchievedReport";
 	}
 

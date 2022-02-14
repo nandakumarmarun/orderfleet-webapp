@@ -337,10 +337,12 @@ public class ReceiptManagementReportTallyStatusResource {
 		if ("-1".equals(accountPid)) {
 			accountVouchers = accountingVoucherHeaderService.getAllByCompanyIdUserPidDocumentPidAndDateBetween(userPids,
 					documentPids, tallyStatus, fromDate, toDate);
+			
 		} else {
 			accountVouchers = accountingVoucherHeaderService
 					.getAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetween(userPids, accountPid, documentPids,
 							tallyStatus, fromDate, toDate);
+			
 		}
 		if (accountVouchers.isEmpty()) {
 			return Collections.emptyList();

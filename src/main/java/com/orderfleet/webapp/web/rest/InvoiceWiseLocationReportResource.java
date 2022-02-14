@@ -441,12 +441,22 @@ public class InvoiceWiseLocationReportResource {
 								userIds, accountProfilePids);
 			}
 		}
-
+boolean cmp=getCompanyCofig();
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			double totalSalesOrderAmount = 0.0;
 			double totalRecieptAmount = 0.0;
 			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView(executiveTaskExecution);
+			if(cmp)
+			{
+				invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getDescription());
+			}
+			
+			else
+			{
+				invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getAccountProfileName());
+			}
+			
 			EmployeeProfile employeeProfile = employeeProfileRepository
 					.findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
 			if (employeeProfile != null) {
@@ -719,6 +729,15 @@ public class InvoiceWiseLocationReportResource {
 		return invoiceWiseReportViews;
 
 	}
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 
 	private List<String> getAccountPids(List<Long> userIds) {
 		List<AccountProfileDTO> allAccountDtos;

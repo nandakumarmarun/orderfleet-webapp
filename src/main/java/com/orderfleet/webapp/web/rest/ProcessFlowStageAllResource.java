@@ -755,7 +755,7 @@ public class ProcessFlowStageAllResource {
 				sendSalesOrderSapButtonStatus = false;
 			}
 		}
-
+boolean compCon =getCompanyCofig();
 		DecimalFormat df = new DecimalFormat("0.00");
 		int size = inventoryVouchers.size();
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
@@ -770,7 +770,14 @@ public class ProcessFlowStageAllResource {
 			salesPerformanceDTO.setCreatedDate((LocalDateTime) ivData[5]);
 			salesPerformanceDTO.setDocumentDate((LocalDateTime) ivData[6]);
 			salesPerformanceDTO.setReceiverAccountPid(ivData[7].toString());
-			salesPerformanceDTO.setReceiverAccountName(ivData[8].toString());
+			if(compCon)
+			{
+			salesPerformanceDTO.setReceiverAccountName(ivData[33].toString());
+			}
+			else
+			{
+				salesPerformanceDTO.setReceiverAccountName(ivData[8].toString());
+			}
 			salesPerformanceDTO.setSupplierAccountPid(ivData[9].toString());
 			salesPerformanceDTO.setSupplierAccountName(ivData[10].toString());
 			salesPerformanceDTO.setEmployeePid(ivData[11].toString());
@@ -823,9 +830,9 @@ public class ProcessFlowStageAllResource {
 				salesPerformanceDTO.setRemarks("");
 			}
 
-			if (ivData[33] != null) {
+			if (ivData[34] != null) {
 				salesPerformanceDTO
-						.setReceiverAccountPhone(ivData[33].toString().equals("") ? "" : ivData[33].toString());
+						.setReceiverAccountPhone(ivData[34].toString().equals("") ? "" : ivData[34].toString());
 			} else {
 				salesPerformanceDTO.setReceiverAccountPhone("");
 			}
@@ -841,11 +848,20 @@ public class ProcessFlowStageAllResource {
 			} else {
 				salesPerformanceDTO.setImageButtonVisible(false);
 			}
+			
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
 	}
-
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 	@RequestMapping(value = "/process-flow-stage-all/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed

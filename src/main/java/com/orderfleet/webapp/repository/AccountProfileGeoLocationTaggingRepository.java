@@ -22,7 +22,7 @@ public interface AccountProfileGeoLocationTaggingRepository extends JpaRepositor
 	@Query("select apGeoLocationTagging from AccountProfileGeoLocationTagging apGeoLocationTagging where apGeoLocationTagging.company.id = ?#{principal.companyId} and apGeoLocationTagging.user.id in ?1 and apGeoLocationTagging.accountProfile.pid in ?2 and apGeoLocationTagging.sendDate between ?3 and ?4 order by apGeoLocationTagging.sendDate DESC")
 	List<AccountProfileGeoLocationTagging> findGeoLocationTaggingByUserIdInAccountProfilePidInAndDateBetweenOrdeByDateDesc(List<Long> userIds, List<String> accountPids, LocalDateTime fromDate, LocalDateTime toDate);
 
-	@Query("select distinct apglt.pid, apglt.sendDate, apglt.user.id, apglt.user.firstName, ap.pid, ap.name, ap.latitude, ap.longitude, ap.location from AccountProfileGeoLocationTagging apglt JOIN AccountProfile ap ON apglt.accountProfile.id=ap.id where ap.activated = true and apglt.company.id = ?#{principal.companyId} and apglt.sendDate between ?1 and ?2 order by apglt.sendDate desc")
+	@Query("select distinct apglt.pid, apglt.sendDate, apglt.user.id, apglt.user.firstName, ap.pid, ap.name, ap.latitude, ap.longitude, ap.location,ap.description from AccountProfileGeoLocationTagging apglt JOIN AccountProfile ap ON apglt.accountProfile.id=ap.id where ap.activated = true and apglt.company.id = ?#{principal.companyId} and apglt.sendDate between ?1 and ?2 order by apglt.sendDate desc")
 	List<Object[]> findByActivatedAndCompanyWithAccountProfileAndSentDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
 	
 }
