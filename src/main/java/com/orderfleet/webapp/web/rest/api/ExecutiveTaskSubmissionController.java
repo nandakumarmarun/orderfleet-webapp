@@ -226,8 +226,10 @@ public class ExecutiveTaskSubmissionController {
 				String startTime = startLCTime.format(DATE_TIME_FORMAT);
 				String startDate = startLCTime.format(DATE_FORMAT);
 				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 				LocalDateTime lastDate = inventoryVoucherHeaderRepository.lastDateWithCompanyUserDocument(companyPid,
 						userPid, documentPids);
+
 				String flag = "Normal";
 				LocalDateTime endLCTime = LocalDateTime.now();
 				String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -261,8 +263,10 @@ public class ExecutiveTaskSubmissionController {
 				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 				String startDate1 = startLCTime1.format(DATE_FORMAT1);
 				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+
 				List<Object[]> objectArray = inventoryVoucherHeaderRepository
 						.getLastNumberForEachDocumentOptimized(companyPid, userPid, documentPids, lastDate);
+
 				String flag1 = "Normal";
 				LocalDateTime endLCTime1 = LocalDateTime.now();
 				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
@@ -629,7 +633,8 @@ public class ExecutiveTaskSubmissionController {
 	public ResponseEntity<TaskSubmissionResponse> updateExecutiveTaskSubmission(
 			@Valid @RequestBody ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO) {
 		log.debug("Web request to save ExecutiveTaskExecution start");
-		TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
+		
+				TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 		try {
 			ExecutiveTaskSubmissionTransactionWrapper transactionWrapper = executiveTaskSubmissionService
 					.updationExecutiveTaskExecution(executiveTaskSubmissionDTO);

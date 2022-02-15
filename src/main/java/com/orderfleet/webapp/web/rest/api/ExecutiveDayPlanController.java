@@ -175,9 +175,11 @@ public class ExecutiveDayPlanController {
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate1 = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate1 + "," + startTime + ",_ ,0 ,START,_," + description);
+		
 			List<Attendance> attendanceList = attendanceRepository
 					.findByCompanyIdUserLoginAndDateBetweenAndAttendanceStatus(login, AttendanceStatus.PRESENT,
 							currentDate.atTime(0, 0), currentDate.atTime(23, 59));
+			
 			String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);

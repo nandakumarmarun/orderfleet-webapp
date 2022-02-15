@@ -162,6 +162,9 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "discount_Scale_Bar", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean discountScaleBar;
 
+	@Column(name = "discount_percentage", columnDefinition = "double precision DEFAULT 0")
+	private double discountPercentage ;
+
 	@PreUpdate
 	public void preUpdate() {
 		this.lastModifiedDate = LocalDateTime.now();
@@ -423,6 +426,15 @@ public class Document implements Serializable, Cloneable {
 
 	public void setFooterImage(byte[] footerImage) {
 		this.footerImage = footerImage;
+	}
+
+	
+	public double getDiscountPercentage() {
+		return discountPercentage;
+	}
+
+	public void setDiscountPercentage(double discountPercentage) {
+		this.discountPercentage = discountPercentage;
 	}
 
 	@Override

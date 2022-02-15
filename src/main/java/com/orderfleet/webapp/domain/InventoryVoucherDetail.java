@@ -143,7 +143,14 @@ public class InventoryVoucherDetail implements Serializable {
 	@JoinColumn(name = "price_level_id")
 	private PriceLevel priceLevel;
 
+	@Column(name = "additional_discount ", columnDefinition = "double precision DEFAULT 0")
+	private double additionalDiscount;
+	
+	
+
 	public InventoryVoucherDetail() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 	public InventoryVoucherDetail(ProductProfile product, double quantity, double freeQuantity, double sellingRate,
@@ -153,7 +160,7 @@ public class InventoryVoucherDetail implements Serializable {
 			StockLocation sourceStockLocation, StockLocation destinationStockLocation,
 			InventoryVoucherHeader rferenceInventoryVoucherHeader,
 			InventoryVoucherDetail rferenceInventoryVoucherDetail, String remarks,
-			List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails) {
+			List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails,double additionalDiscount) {
 		super();
 		this.product = product;
 		this.quantity = quantity;
@@ -181,6 +188,7 @@ public class InventoryVoucherDetail implements Serializable {
 		this.remarks = remarks;
 		this.inventoryVoucherBatchDetails = inventoryVoucherBatchDetails;
 		this.volume = product.getUnitQty() != null ? product.getUnitQty() * quantity : quantity * 1;
+		this.additionalDiscount=additionalDiscount;
 	}
 
 	public InventoryVoucherDetail(ProductProfile product, double quantity, double freeQuantity, double sellingRate,
@@ -191,7 +199,7 @@ public class InventoryVoucherDetail implements Serializable {
 			InventoryVoucherHeader rferenceInventoryVoucherHeader,
 			InventoryVoucherDetail rferenceInventoryVoucherDetail, String remarks,
 			List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails,
-			PriceLevel inventoryVoucherDetailPriceLevel) {
+			PriceLevel inventoryVoucherDetailPriceLevel,double additionalDiscount ) {
 		super();
 		this.product = product;
 		this.quantity = quantity;
@@ -220,6 +228,7 @@ public class InventoryVoucherDetail implements Serializable {
 		this.inventoryVoucherBatchDetails = inventoryVoucherBatchDetails;
 		this.volume = product.getUnitQty() != null ? product.getUnitQty() * quantity : quantity * 1;
 		this.priceLevel = inventoryVoucherDetailPriceLevel;
+		this.additionalDiscount=additionalDiscount;
 	}
 
 	public Long getId() {
@@ -476,6 +485,14 @@ public class InventoryVoucherDetail implements Serializable {
 
 	public void setPriceLevel(PriceLevel priceLevel) {
 		this.priceLevel = priceLevel;
+	}
+
+	public Double getAdditionalDiscount() {
+		return additionalDiscount;
+	}
+
+	public void setAdditionalDiscount(Double additionalDiscount) {
+		this.additionalDiscount = additionalDiscount;
 	}
 
 }

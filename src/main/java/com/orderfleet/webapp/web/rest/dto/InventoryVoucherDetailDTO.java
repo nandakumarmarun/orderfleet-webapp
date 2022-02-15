@@ -125,9 +125,12 @@ public class InventoryVoucherDetailDTO {
 	private String priceLevelName;
 
 	private double qntyDiff;
-	
+
 	private String productDescription;
+
 	private String description;
+
+	private double additionalDiscount;
 
 	public InventoryVoucherDetailDTO() {
 	}
@@ -138,7 +141,7 @@ public class InventoryVoucherDetailDTO {
 		if (inventoryVoucherDetail.getProduct() != null) {
 			this.productPid = inventoryVoucherDetail.getProduct().getPid();
 			this.productName = inventoryVoucherDetail.getProduct().getName();
-			this.productDescription =inventoryVoucherDetail.getProduct().getProductDescription();
+			this.productDescription = inventoryVoucherDetail.getProduct().getProductDescription();
 			this.productCategory = inventoryVoucherDetail.getProduct().getProductCategory().getName();
 			this.productSKU = inventoryVoucherDetail.getProduct().getSku();
 			this.productUnitQty = inventoryVoucherDetail.getProduct().getUnitQty();
@@ -171,13 +174,17 @@ public class InventoryVoucherDetailDTO {
 		this.priceLevelPid = inventoryVoucherDetail.getPriceLevel() != null
 				? inventoryVoucherDetail.getPriceLevel().getPid()
 				: "";
+		this.additionalDiscount = inventoryVoucherDetail.getAdditionalDiscount() != null
+				? inventoryVoucherDetail.getAdditionalDiscount()
+				: 0;
 
 		if (inventoryVoucherDetail.getInventoryVoucherHeader() != null) {
 			this.createdDate = inventoryVoucherDetail.getInventoryVoucherHeader().getCreatedDate();
 			// Used in Item Wise Sales
 			this.accountPid = inventoryVoucherDetail.getInventoryVoucherHeader().getReceiverAccount().getPid();
 			this.accountName = inventoryVoucherDetail.getInventoryVoucherHeader().getReceiverAccount().getName();
-			this.setDescription(inventoryVoucherDetail.getInventoryVoucherHeader().getReceiverAccount().getDescription());
+			this.setDescription(
+					inventoryVoucherDetail.getInventoryVoucherHeader().getReceiverAccount().getDescription());
 			if (inventoryVoucherDetail.getInventoryVoucherHeader().getEmployee() != null) {
 				this.employeeName = inventoryVoucherDetail.getInventoryVoucherHeader().getEmployee().getName();
 			}
@@ -217,7 +224,6 @@ public class InventoryVoucherDetailDTO {
 				.map(InventoryVoucherBatchDetailDTO::new).collect(Collectors.toList());
 	}
 
-	
 	public Long getDetailId() {
 		return detailId;
 	}
@@ -661,6 +667,7 @@ public class InventoryVoucherDetailDTO {
 	public void setPriceLevelName(String priceLevelName) {
 		this.priceLevelName = priceLevelName;
 	}
+
 	public String getProductDescription() {
 		return productDescription;
 	}
@@ -668,12 +675,21 @@ public class InventoryVoucherDetailDTO {
 	public void setProductDescription(String productDescription) {
 		this.productDescription = productDescription;
 	}
+
 	public String getDescription() {
 		return description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Double getAdditionalDiscount() {
+		return additionalDiscount;
+	}
+
+	public void setAdditionalDiscount(Double additionalDiscount) {
+		this.additionalDiscount = additionalDiscount;
 	}
 
 	@Override
@@ -720,8 +736,5 @@ public class InventoryVoucherDetailDTO {
 				+ ", createdDate=" + createdDate + ", accountPid=" + accountPid + ", accountName=" + accountName
 				+ ", employeeName=" + employeeName + "]";
 	}
-
-	
-	
 
 }

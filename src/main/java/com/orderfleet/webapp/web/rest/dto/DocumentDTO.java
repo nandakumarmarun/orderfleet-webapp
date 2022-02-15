@@ -40,6 +40,8 @@ public class DocumentDTO implements Cloneable {
 
 	private String termsAndConditions;
 
+	private double discountPercentage;
+	
 	private DocumentType documentType;
 
 	private AccountTypeColumn activityAccount;
@@ -105,6 +107,8 @@ public class DocumentDTO implements Cloneable {
 	private byte[] footerImage;
 
 	private String footerImageContentType;
+	
+	
 
 	public DocumentDTO() {
 
@@ -118,6 +122,7 @@ public class DocumentDTO implements Cloneable {
 		this.alias = document.getAlias();
 		this.description = document.getDescription();
 		this.termsAndConditions = document.getTermsAndConditions();
+		this.discountPercentage =document.getDiscountPercentage();
 		this.documentType = document.getDocumentType();
 		this.activityAccount = document.getActivityAccount();
 		this.save = document.getSave();
@@ -144,6 +149,7 @@ public class DocumentDTO implements Cloneable {
 		this.footerImage = document.getFooterImage();
 		this.headerImageContentType = document.getHeaderImageContentType();
 		this.footerImageContentType = document.getFooterImageContentType();
+		this.discountPercentage =document.getDiscountPercentage();
 	}
 
 	public DocumentDTO(Document document, boolean activityDocRequired, int activityDocSortOrder) {
@@ -154,6 +160,7 @@ public class DocumentDTO implements Cloneable {
 		this.alias = document.getAlias();
 		this.description = document.getDescription();
 		this.termsAndConditions = document.getTermsAndConditions();
+		this.discountPercentage =document.getDiscountPercentage();
 		this.headerImage = document.getHeaderImage();
 		this.footerImage = document.getFooterImage();
 		this.headerImageContentType = document.getHeaderImageContentType();
@@ -182,6 +189,7 @@ public class DocumentDTO implements Cloneable {
 		this.hasTelephonicOrder = document.getHasTelephonicOrder();
 		this.rateWithTax = document.getRateWithTax();
 		this.discountScaleBar =document.getDiscountScaleBar();
+		this.discountPercentage =document.getDiscountPercentage();
 	}
 
 	public String getTermsAndConditions() {
@@ -495,6 +503,15 @@ public class DocumentDTO implements Cloneable {
 
 	public void setFooterImageContentType(String footerImageContentType) {
 		this.footerImageContentType = footerImageContentType;
+	}
+
+	
+	public double getDiscountPercentage() {
+		return discountPercentage;
+	}
+
+	public void setDiscountPercentage(double discountPercentage) {
+		this.discountPercentage = discountPercentage;
 	}
 
 	@Override

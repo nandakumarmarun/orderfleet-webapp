@@ -21,6 +21,7 @@ if (!this.Document) {
 		activityAccount : null,
 		description : null,
 		termsAndConditions : null,
+		discountPercentage : null,
 		save : true,
 		editable : true,
 		batchEnabled : false,
@@ -39,6 +40,7 @@ if (!this.Document) {
 		headerImageContentType : null,
 		footerImage : null,
 		footerImageContentType : null
+	
 
 	};
 
@@ -188,6 +190,7 @@ if (!this.Document) {
 		documentModel.description = $('#field_description').val();
 		documentModel.termsAndConditions = $('#field_terms_and_conditions')
 				.val();
+		documentModel.discountPercentage =$('#field_discountPercent').val();
 		documentModel.documentType = $('#field_documentType').val();
 		documentModel.activityAccount = $('#field_activityAccount').val();
 		documentModel.save = $('#field_save').prop('checked');
@@ -283,6 +286,10 @@ if (!this.Document) {
 				$('#lbl_terms_and_conditions').text(
 						(data.termsAndConditions == null ? ""
 								: data.termsAndConditions));
+				$('#lbl_discountPercent').text(
+						(data.discountPercentage == null ? ""
+								: data.discountPercentage));
+				
 				$('#lbl_documentType').text(data.documentType);
 				$('#lbl_activityAccount').text(data.activityAccount);
 			},
@@ -311,6 +318,10 @@ if (!this.Document) {
 						$('#field_terms_and_conditions').val(
 								(data.termsAndConditions == null ? ""
 										: data.termsAndConditions));
+						$('#field_discountPercent').val(
+								(data.discountPercentage == null ? ""
+										: data.discountPercentage));
+						
 						$('#field_documentType').val(data.documentType);
 						Document.onChangeDocumentType();
 						if (data.activityAccount != null)

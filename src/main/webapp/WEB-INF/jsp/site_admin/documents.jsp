@@ -189,6 +189,12 @@
 											placeholder="Terms & Conditions"></textarea>
 									</div>
 									<div class="form-group">
+									<label class="control-label" for="field_discount_Percentage">Discount Percentage
+										</label> <input type="number" class="form-control" name="discountPercentage"
+										id="field_discount_Percentage"  max="10000"
+										placeholder="Discount Percentage" />
+								</div>
+									<div class="form-group">
 										<label class="control-label" for="field_header_image">Header
 											Image </label> <input id="headerImage" type="file"
 											class="btn btn-default btn-block"> <img
@@ -372,6 +378,13 @@
 											<span id="lbl_terms_and_conditions"></span>
 										</dd>
 										<hr />
+										<dt>
+											<span>discount Percentage</span>
+											</dt>
+											<dd>
+											<span id="lbl_discount_Percentage"></span>
+										</dd>
+										<hr/>	
 									</dl>
 								</div>
 							</div>

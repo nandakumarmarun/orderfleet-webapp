@@ -830,7 +830,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
 								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
 								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails,
-								inventoryVoucherDetailPriceLevel));
+								inventoryVoucherDetailPriceLevel,inventoryVoucherDetailDTO.getAdditionalDiscount()));
 					} else {
 						inventoryVoucherDetails.add(new InventoryVoucherDetail(productProfile,
 								inventoryVoucherDetailDTO.getQuantity(), inventoryVoucherDetailDTO.getFreeQuantity(),
@@ -845,7 +845,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								inventoryVoucherDetailDTO.getSize(), inventoryVoucherDetailDTO.getColor(),
 								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
 								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
-								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails));
+								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails,inventoryVoucherDetailDTO.getAdditionalDiscount()));
 					}
 				});
 				inventoryVoucherHeader.setInventoryVoucherDetails(inventoryVoucherDetails);
@@ -2166,7 +2166,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						inventoryVoucherDetailDTO.getColor(), inventoryVoucherDetailDTO.getItemtype(),
 						sourceStockLocation, destinationStockLocation, referenceInventoryVoucherHeader,
 						referenceInventoryVoucherDetail, inventoryVoucherDetailDTO.getRemarks(),
-						inventoryVoucherBatchDetails));
+						inventoryVoucherBatchDetails,inventoryVoucherDetailDTO.getAdditionalDiscount()));
 			}
 		}
 		return newInventoryVoucherDetails;
@@ -2977,7 +2977,8 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								inventoryVoucherDetailDTO.getSize(), inventoryVoucherDetailDTO.getColor(),
 								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
 								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
-								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails));
+								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails,
+								inventoryVoucherDetailDTO.getAdditionalDiscount()));
 					}
 				});
 

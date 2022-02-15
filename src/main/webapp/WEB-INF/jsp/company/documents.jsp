@@ -117,7 +117,7 @@
 									aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
-								<h4 class="modal-title" id="myModalLabel">Create or edit a
+								<h4 class="modal-title" id="myModalLabel">Create
 									Document</h4>
 							</div>
 							<div class="modal-body">
@@ -186,6 +186,12 @@
 											id="field_terms_and_conditions"
 											placeholder="Terms & Conditions"></textarea>
 									</div>
+									<div class="form-group">
+									<label class="control-label" for="field_discountPercent">Discount Percentage
+										</label> <input type="number" class="form-control" name="discountPercentage"
+										id="field_discountPercent"  max="10000"
+										placeholder="Discount Percentage" />
+								</div>
 									<div class="form-group">
 										<label class="control-label" for="field_header_image">Header
 											Image </label> <input id="headerImage" type="file"
@@ -370,6 +376,13 @@
 											<span id="lbl_terms_and_conditions"></span>
 										</dd>
 										<hr />
+										<dt>
+											<span>Discount Percentage</span>
+											</dt>
+											<dd>
+											<span id="lbl_discountPercent"></span>
+										</dd>
+										<hr/>	
 										<dt>
 											<span>Has Telephonic Order</span>
 										</dt>

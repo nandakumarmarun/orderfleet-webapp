@@ -144,6 +144,7 @@ public class DocumentResource {
 					HeaderUtil.createFailureAlert("document", "documentPrefixexists", "Document Prefix already in use"))
 					.body(null);
 		}
+		
 		DocumentDTO result = documentService.update(documentDTO);
 		if (result == null) {
 			return ResponseEntity.badRequest()
