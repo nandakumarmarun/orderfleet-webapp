@@ -66,9 +66,9 @@ public class FileManagerServiceImpl implements FileManagerService {
 			return processImageUpload(fileBytes, originalFileName, mimeType);
 		}
 		final String md5 = getMD5(fileBytes) + Instant.now().toEpochMilli();
-//		String fileLocation = getFileSaveDirectory() + "/" + LocalDate.now().getMonthValue() + "-"
-//				+ LocalDate.now().getYear() + "/" + md5 + "_" + originalFileName;
-		
+//		String fileLocation = getFileSaveDirectory() + "/" + String.valueOf(LocalDate.now().getYear()) + "-"
+//				+ String.valueOf(LocalDate.now().getMonth().name()) + "/" + md5 + "_" + originalFileName;
+
 		String fileLocation = getFileSaveDirectory() + "/" + md5 + "_" + originalFileName;
 		// write to disk
 		writeToDisk(fileBytes, fileLocation);
@@ -171,7 +171,8 @@ public class FileManagerServiceImpl implements FileManagerService {
 	}
 
 	private String getFileSaveDirectory() {
-		return FILE_SAVE_DIRECTORY + SecurityUtils.getCurrentUsersCompanyId();
+		return FILE_SAVE_DIRECTORY + SecurityUtils.getCurrentUsersCompanyId() + "/"
+				+ String.valueOf(LocalDate.now().getYear()) + "-" + String.valueOf(LocalDate.now().getMonth().name());
 	}
 
 	@Override
