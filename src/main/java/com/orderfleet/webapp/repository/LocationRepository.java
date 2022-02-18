@@ -3,10 +3,12 @@ package com.orderfleet.webapp.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.orderfleet.webapp.domain.Location;
@@ -79,5 +81,9 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	
 	@Query("select location.id, location.name,location.alias from Location location where location.company.id = ?1")
 	List<Object[]> findAllLocationByCompanyId(Long companyId);
+	
+	@Modifying
+	@Query("update Location location set location.name = CONCAT(location.name, '_old'),location.activated = false where location.company.id = ?#{principal.companyId} AND location.id IN ?1")
+	void deactivatelocationId(Set<Long> id);
 
 }

@@ -30,6 +30,7 @@ import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.PriceLevelAccountProductGroup;
 import com.orderfleet.webapp.domain.ProductGroup;
+import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.User;
@@ -114,6 +115,7 @@ public class TPAccountProfileManagementService {
 	private final GstLedgerRepository gstLedgerRepository;
 	
 	boolean flagac = false;
+	 boolean flag = false;
 
 	public TPAccountProfileManagementService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			SyncOperationRepository syncOperationRepository, PriceLevelRepository priceLevelRepository,
@@ -878,7 +880,7 @@ public class TPAccountProfileManagementService {
 							: false)
 					.findAny();
 
-			AccountProfile accountProfile;
+			AccountProfile accountProfile = new AccountProfile();
 			if (optionalAP.isPresent()) {
 				accountProfile = optionalAP.get();
 //				accountProfile.setName(apDto.getName() + "~" + apDto.getCustomerId());
@@ -886,15 +888,26 @@ public class TPAccountProfileManagementService {
 				// if not update, skip this iteration. Not implemented now
 				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
 			} else {
-				accountProfile = new AccountProfile();
-				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-				accountProfile.setCustomerId(apDto.getCustomerId());
-				accountProfile.setUser(user);
-				accountProfile.setCompany(company);
-				accountProfile.setAccountStatus(AccountStatus.Unverified);
-				accountProfile.setDataSourceType(DataSourceType.TALLY);
-				accountProfile.setDescription(apDto.getName());
-				accountProfile.setImportStatus(true);
+				
+				Optional<AccountProfile> optionalAPName = accountProfiles.stream()
+						.filter(p -> p.getName() != null && !p.getName().equals("")
+								? p.getName().equals(apDto.getName())
+								: false)
+						.findAny();
+				if(!optionalAPName.isPresent()) {
+					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+					accountProfile.setCustomerId(apDto.getCustomerId());
+					accountProfile.setUser(user);
+					accountProfile.setCompany(company);
+					accountProfile.setAccountStatus(AccountStatus.Unverified);
+					accountProfile.setDataSourceType(DataSourceType.TALLY);
+					accountProfile.setDescription(apDto.getName());
+					accountProfile.setImportStatus(true);
+				}else {
+					accountProfile = optionalAPName.get();
+					accountProfile.setCustomerId(apDto.getCustomerId());
+				}
+				
 			}
 //			accountProfile.setName(apDto.getName() + "~" + apDto.getCustomerId());
 			accountProfile.setName(apDto.getName());
@@ -1121,10 +1134,31 @@ public class TPAccountProfileManagementService {
 	public void saveUpdateLocationsUpdationIdNew(List<LocationDTO> locationDTOs, final SyncOperation syncOperation) {
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
+		
 		Set<Location> saveUpdateLocations = new HashSet<>();
 		locationDTOs=locationDTOs.stream().filter(data -> !data.getName().equals("Territory")).collect(Collectors.toList());
 		// find all locations
 		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
+		Set<Long> dectivatedloc = new HashSet<>();
+		for(Location pp :locations) {
+			
+			if(!pp.getName().equals("Primary") && !pp.getName().equals("Territory") && pp.getActivated()){
+				  flag = false;
+					 locationDTOs.forEach(data ->{
+						if(pp.getLocationId().equals(data.getLocationId())) {
+							flag = true;
+						}
+					});
+					if(!flag) {
+						dectivatedloc.add(pp.getId());
+					}
+			}
+			
+		}
+			if(!dectivatedloc.isEmpty()) {
+				locationRepository.deactivatelocationId(dectivatedloc);
+			}
+		//locations.forEach(data -> System.out.println("====name==="+ data.getName()));
 		for (LocationDTO locDto : locationDTOs) {
 			Optional<Location> optionalLoc = null;
 			// check exist by name, only one exist with a name
@@ -1134,17 +1168,34 @@ public class TPAccountProfileManagementService {
 							? p.getLocationId().equals(locDto.getLocationId())
 							: false)
 					.findAny();
-			Location location;
+			Location location = new Location();
 			if (optionalLoc.isPresent()) {
 				location = optionalLoc.get();
 				// if not update, skip this iteration.
 				// if (!location.getThirdpartyUpdate()) {continue;}
 			} else {
-				location = new Location();
-				location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
-				location.setLocationId(locDto.getLocationId());
-				location.setDescription(locDto.getName());
-				location.setCompany(company);
+				// check exist by name,
+				/* System.out.println("create neww"); */
+				
+				
+				Optional<Location> optionalLocName = locations.stream()
+						.filter(p -> p.getName() != null && !p.getName().equals("")
+								? p.getName().equals(locDto.getName())
+								: false)
+						.findAny();
+				
+				if(!optionalLocName.isPresent()) {
+//					System.out.println("create neww no name exist"+ locDto.getName() +"====gui===="+locDto.getLocationId());
+					location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
+					location.setLocationId(locDto.getLocationId());
+					location.setDescription(locDto.getName());
+					location.setCompany(company);
+				}else {
+//					System.out.println("create replce guid exist"+ locDto.getName() +"====gui===="+locDto.getLocationId());
+					location = optionalLocName.get();
+					location.setLocationId(locDto.getLocationId());
+				}
+				
 			}
 			location.setActivated(locDto.getActivated());
 			location.setDescription(locDto.getName());
@@ -1157,7 +1208,24 @@ public class TPAccountProfileManagementService {
 			}
 			saveUpdateLocations.add(location);
 		}
-		bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
+		
+		
+		List<Location> UpdateLocations = saveUpdateLocations.stream().filter(data -> data.getId() != null).collect(Collectors.toList());
+		List<Location> saveLocations = saveUpdateLocations.stream().filter(data ->  data.getId() == null).collect(Collectors.toList());
+//		UpdateLocations.forEach(data -> System.out.println("id === "+data.getId() + "name===== "+data.getName()));
+//		System.out.println("===========================================================================================");
+//		saveLocations.forEach(data -> System.out.println("id === "+data.getId() + "name===== "+data.getName()));
+		//updation Location
+		locationRepository.flush();
+//		System.out.println("updated===="+UpdateLocations.size());
+		locationRepository.save(UpdateLocations);
+		//Save Location
+		
+		if(!saveLocations.isEmpty()) {
+			locationRepository.flush();
+//			System.out.println("Save===="+saveLocations.size());
+			locationRepository.save(saveLocations);
+		}
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -1166,6 +1234,7 @@ public class TPAccountProfileManagementService {
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
+		dectivatedloc.forEach(data -> log.info("deactivated id " + dectivatedloc.size() + data));
 	}
 	
 	
