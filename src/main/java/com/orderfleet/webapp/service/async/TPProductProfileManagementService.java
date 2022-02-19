@@ -351,7 +351,7 @@ public class TPProductProfileManagementService {
 						? p.getProductCategoryId().equals(pcDto.getProductCategoryId())
 						: false)
 				.findAny();
-			ProductCategory productCategory;
+			ProductCategory productCategory = new ProductCategory();;
 			if (optionalPC.isPresent()) {
 				productCategory = optionalPC.get();
 				// if not update, skip this iteration.
@@ -359,12 +359,21 @@ public class TPProductProfileManagementService {
 					continue;
 				}
 			} else {
-				productCategory = new ProductCategory();
-				productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
-				productCategory.setProductCategoryId(pcDto.getProductCategoryId());
-				productCategory.setDataSourceType(DataSourceType.TALLY);
-				productCategory.setDescription(pcDto.getName());
-				productCategory.setCompany(company);
+				Optional<ProductCategory> optionalPCName = productCategories.stream()
+						.filter(p -> p.getName() != null && !p.getName().equals("")
+						? p.getName().equals(pcDto.getName())
+						: false)
+				.findAny();
+				if(!optionalPCName.isPresent()) {
+					productCategory.setPid(ProductCategoryService.PID_PREFIX + RandomUtil.generatePid());
+					productCategory.setProductCategoryId(pcDto.getProductCategoryId());
+					productCategory.setDataSourceType(DataSourceType.TALLY);
+					productCategory.setDescription(pcDto.getName());
+					productCategory.setCompany(company);
+				}else {
+					productCategory = optionalPCName.get();
+					productCategory.setProductCategoryId(pcDto.getProductCategoryId());
+				}
 			}
 //			productCategory.setName(pcDto.getName() + "~" +pcDto.getProductCategoryId());
 			productCategory.setName(pcDto.getName());
@@ -574,7 +583,7 @@ public class TPProductProfileManagementService {
 				
 			// check exist by name, only one exist with a name
 
-			ProductGroup productGroup;
+			ProductGroup productGroup =new ProductGroup();;
 			if (optionalPG.isPresent()) {
 				productGroup = optionalPG.get();
 
@@ -583,12 +592,21 @@ public class TPProductProfileManagementService {
 					continue;
 				}
 			} else {
-				productGroup = new ProductGroup();
-				productGroup.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
-				productGroup.setProductGroupId(pgDto.getProductGroupId());
-				productGroup.setDataSourceType(DataSourceType.TALLY);
-				productGroup.setDescription(pgDto.getName());
-				productGroup.setCompany(company);
+				Optional<ProductGroup> optionalPGname = productGroups.stream()
+						.filter(p -> p.getName() != null && !p.getName().equals("")
+						? p.getName().equals(pgDto.getName())
+						: false)
+				.findAny();
+				if(!optionalPGname.isPresent()) {
+					productGroup.setPid(ProductGroupService.PID_PREFIX + RandomUtil.generatePid());
+					productGroup.setProductGroupId(pgDto.getProductGroupId());
+					productGroup.setDataSourceType(DataSourceType.TALLY);
+					productGroup.setDescription(pgDto.getName());
+					productGroup.setCompany(company);
+				}else {
+					productGroup= optionalPGname.get();
+					productGroup.setProductGroupId(pgDto.getProductGroupId());
+				}				
 			}
 			productGroup.setAlias(pgDto.getAlias());
 //			productGroup.setName(pgDto.getName() + "~" +pgDto.getProductGroupId());\
