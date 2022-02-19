@@ -351,7 +351,7 @@ public class TPProductProfileManagementService {
 						? p.getProductCategoryId().equals(pcDto.getProductCategoryId())
 						: false)
 				.findAny();
-			ProductCategory productCategory = new ProductCategory();;
+			ProductCategory productCategory = new ProductCategory();
 			if (optionalPC.isPresent()) {
 				productCategory = optionalPC.get();
 				// if not update, skip this iteration.
@@ -583,7 +583,7 @@ public class TPProductProfileManagementService {
 				
 			// check exist by name, only one exist with a name
 
-			ProductGroup productGroup =new ProductGroup();;
+			ProductGroup productGroup =new ProductGroup();
 			if (optionalPG.isPresent()) {
 				productGroup = optionalPG.get();
 
