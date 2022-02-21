@@ -59,6 +59,8 @@ if (!this.DayPlanExecutionReport) {
 																	+ dayPlanExecution.taskPlanStatus
 																	+ "</td><td>"
 																	+ dayPlanExecution.userRemarks
+																	+ "</td><td class='janvary'>"
+																	+  moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm')
 																	+ "</td></tr>");
 										});
 					},

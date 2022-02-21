@@ -62,6 +62,7 @@
 						<th>Execution Order</th>
 						<th>Execution Status</th>
 						<th>Remarks</th>
+						<th>Assign Date</th>
 					</tr>
 				</thead>
 				<tbody id="tBodyDayPlans">

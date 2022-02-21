@@ -106,6 +106,7 @@ if (!this.DayPlanExecutionSummery) {
 							    		+ '<td>'+ executionOrder +'</td>'
 							    		+ '<td>'+ dayPlanExecution.taskPlanStatus +'</td>'
 							    		+ '<td>'+ dayPlanExecution.userRemarks +'</td>'
+							    		+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm') + '</td>'
 							    		+ '</tr>');
 		    				}else{
 		    				$("#tblBody").append('<tr data-id="'+ dayPlanExecution.date +'" data-parent="' + innerIndex + '">'
@@ -113,6 +114,7 @@ if (!this.DayPlanExecutionSummery) {
 						    		+ '<td>'+ executionOrder +'</td>'
 						    		+ '<td>'+ dayPlanExecution.taskPlanStatus +'</td>'
 						    		+ '<td>'+ dayPlanExecution.userRemarks +'</td>'
+						    		+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm') + '</td>'
 						    		+ '</tr>');
 		    				}
 						});

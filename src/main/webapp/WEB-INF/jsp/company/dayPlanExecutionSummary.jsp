@@ -49,6 +49,7 @@
 						<th>Scheduled</th>
 						<th>Achieved</th>
 						<th>Percentage(%)</th>
+						<th>Assign Date</th>
 					</tr>
 				</thead>
 				<tbody id="tblBody">
