@@ -45,11 +45,11 @@
 					<tr
 						style="font-weight: bold;"
 						class="td-color">
+						<th>Created Date</th>
 						<th>Date</th>
 						<th>Scheduled</th>
 						<th>Achieved</th>
 						<th>Percentage(%)</th>
-						<th>Assign Date</th>
 					</tr>
 				</thead>
 				<tbody id="tblBody">

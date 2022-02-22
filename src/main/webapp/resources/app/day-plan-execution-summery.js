@@ -63,6 +63,7 @@ if (!this.DayPlanExecutionSummery) {
 					 var dpeSummary = JSON.parse(key);
 					 index += 1;
 					 $("#tblBody").append('<tr style="background: beige;" data-id="' + index + '" data-parent="">'
+						+ '<td>'+""+'</td>'	 
 					 	+ '<td class="janvary">' + moment(dpeSummary.date).format('DD MMM YYYY') + '</td>'
 						+ '<td>'+ dpeSummary.scheduled +'</td>'
 						+ '<td>'+ dpeSummary.achieved +'</td>'
@@ -76,6 +77,7 @@ if (!this.DayPlanExecutionSummery) {
 						 $("#tblBody").append(
 								'<tr style="background: rgba(255, 228, 196, 0.43);" data-id="'
 								+ innerIndex + '" data-parent="' + index + '">'
+								+ '<td>'+""+'</td>'
 								+ '<td class="janvary">'+ dayPlanExecution.date +'</td>'
 					    		+ '<td>'+ dayPlanExecution.scheduled +'</td>'
 					    		+ '<td>'+ dayPlanExecution.achieved +'</td>'
@@ -86,6 +88,7 @@ if (!this.DayPlanExecutionSummery) {
 							 $("#tblBody").append(
 										'<tr style="background: rgba(255, 228, 196, 0.43);" data-id="'
 										+ innerIndex + '" data-parent="' + index + '">'
+										+ '<td>'+""+'</td>'
 										+ '<td class="janvary">'+ dayPlanExecution.date +' - '+dayPlanExecution.alias+'</td>'
 							    		+ '<td>'+ dayPlanExecution.scheduled +'</td>'
 							    		+ '<td>'+ dayPlanExecution.achieved +'</td>'
@@ -102,19 +105,19 @@ if (!this.DayPlanExecutionSummery) {
 		    				}
 		    				if(dayPlanExecution.taskListAlias==null || dayPlanExecution.taskListAlias==""){
 		    					$("#tblBody").append('<tr data-id="'+ dayPlanExecution.date +'" data-parent="' + innerIndex + '">'
+		    							+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm') + '</td>'
 			    						+ '<td class="janvary">'+ dayPlanExecution.activityName +' - '+ dayPlanExecution.accountProfileName +'</td>'
 							    		+ '<td>'+ executionOrder +'</td>'
 							    		+ '<td>'+ dayPlanExecution.taskPlanStatus +'</td>'
 							    		+ '<td>'+ dayPlanExecution.userRemarks +'</td>'
-							    		+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm') + '</td>'
 							    		+ '</tr>');
 		    				}else{
 		    				$("#tblBody").append('<tr data-id="'+ dayPlanExecution.date +'" data-parent="' + innerIndex + '">'
+		    						+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm') + '</td>'
 		    						+ '<td class="janvary">'+ dayPlanExecution.activityName +' - '+ dayPlanExecution.accountProfileName +' - '+dayPlanExecution.taskListAlias+'</td>'
 						    		+ '<td>'+ executionOrder +'</td>'
 						    		+ '<td>'+ dayPlanExecution.taskPlanStatus +'</td>'
 						    		+ '<td>'+ dayPlanExecution.userRemarks +'</td>'
-						    		+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm') + '</td>'
 						    		+ '</tr>');
 		    				}
 						});

@@ -49,7 +49,10 @@ if (!this.DayPlanExecutionReport) {
 											}
 											$('#tBodyDayPlans')
 													.append(
-															"<tr><td>"
+															        "<tr>"
+																	+ "<td class='janvary'>"
+																	+  moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm')
+																	+ "</td><td>"
 																	+ dayPlanExecution.activityName
 																	+ " - "
 																	+ dayPlanExecution.accountProfileName
@@ -59,8 +62,7 @@ if (!this.DayPlanExecutionReport) {
 																	+ dayPlanExecution.taskPlanStatus
 																	+ "</td><td>"
 																	+ dayPlanExecution.userRemarks
-																	+ "</td><td class='janvary'>"
-																	+  moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm')
+																	
 																	+ "</td></tr>");
 										});
 					},
