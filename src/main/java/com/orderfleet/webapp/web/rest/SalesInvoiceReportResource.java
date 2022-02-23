@@ -213,7 +213,7 @@ public class SalesInvoiceReportResource {
 			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id1 = "AP_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description1 ="get all by compId and IdsIn";
+			String description1 = "get all by compId and IdsIn";
 			LocalDateTime startLCTime1 = LocalDateTime.now();
 			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 			String startDate1 = startLCTime1.format(DATE_FORMAT1);
@@ -238,8 +238,8 @@ public class SalesInvoiceReportResource {
 			if (minutes1 > 10) {
 				flag1 = "Dead Slow";
 			}
-	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-					+ description1);
+			logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
+					+ "," + description1);
 			// remove duplicates
 			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
 
@@ -255,14 +255,14 @@ public class SalesInvoiceReportResource {
 		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id1 = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description1 ="get by compId and name";
+		String description1 = "get by compId and name";
 		LocalDateTime startLCTime1 = LocalDateTime.now();
 		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 		String startDate1 = startLCTime1.format(DATE_FORMAT1);
 		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 		Optional<CompanyConfiguration> opCompanyConfiguration = companyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_SALES_ORDER_EMAIL);
-	
+
 		String flag1 = "Normal";
 		LocalDateTime endLCTime1 = LocalDateTime.now();
 		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
@@ -281,9 +281,9 @@ public class SalesInvoiceReportResource {
 		if (minutes1 > 10) {
 			flag1 = "Dead Slow";
 		}
-                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+		logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 				+ description1);
-                if (opCompanyConfiguration.isPresent()) {
+		if (opCompanyConfiguration.isPresent()) {
 
 			if (opCompanyConfiguration.get().getValue().equals("true")) {
 				sendSalesOrderEmailStatus = true;
@@ -318,6 +318,9 @@ public class SalesInvoiceReportResource {
 			@RequestParam("documentPids") List<String> documentPids, @RequestParam String fromDate,
 			@RequestParam String toDate) {
 		log.debug("Web request to filter accounting vouchers");
+
+		
+
 		if (documentPids.isEmpty()) {
 			return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
 		}
@@ -345,6 +348,7 @@ public class SalesInvoiceReportResource {
 			String tallyDownloadStatus, String accountPid, LocalDate fDate, LocalDate tDate) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
+		
 		List<Long> userIds = employeeProfileRepository.findUserIdByEmployeePidIn(employeePids);
 		Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 		userIds.add(currentUserId);
@@ -372,71 +376,71 @@ public class SalesInvoiceReportResource {
 
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "INV_QUERY_157" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description = "get all ByUserIdIn And DocumentPidIn AndTallyDownloadStatusDateBetween";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_157" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all ByUserIdIn And DocumentPidIn AndTallyDownloadStatusDateBetween";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(userIds,
 							documentPids, tallyStatus, fromDate, toDate);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
-		
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		} else {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "INV_QUERY_160" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get all By UserIdIn and AccountPidIn and DocumentPidIn and TallyDownloadStatusDateBetween";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_160" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all By UserIdIn and AccountPidIn and DocumentPidIn and TallyDownloadStatusDateBetween";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
 							userIds, accountPid, documentPids, tallyStatus, fromDate, toDate);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
-		
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
 		}
 		if (inventoryVouchers.isEmpty()) {
 			return Collections.emptyList();
@@ -447,24 +451,45 @@ public class SalesInvoiceReportResource {
 
 	private List<SalesPerformanceDTO> createSalesPerformanceDTO(List<Object[]> inventoryVouchers) {
 		// fetch voucher details
-		boolean compConfig= getCompanyCofig();
+		boolean compConfig = getCompanyCofig();
 		Set<String> ivHeaderPids = inventoryVouchers.parallelStream().map(obj -> obj[0].toString())
 				.collect(Collectors.toSet());
+		
+
 		List<Object[]> ivDetails = inventoryVoucherDetailRepository.findByInventoryVoucherHeaderPidIn(ivHeaderPids);
+		
+
+		Map<String, Double> ivTotalQty = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
+				Collectors.summingDouble(obj -> ((Double) (obj[4] == null ? 1.0d : obj[4])))));
+
 		Map<String, Double> ivTotalVolume = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
 				Collectors.summingDouble(obj -> ((Double) (obj[3] == null ? 1.0d : obj[3]) * (Double) obj[4]))));
 
-		Map<String, Double> ivTotalWithoutTax = ivDetails.stream()
+		Map<String, Double> ivDiscAmount = ivDetails.stream()
 				.collect(Collectors.groupingBy(obj -> obj[0].toString(),
-						Collectors.summingDouble(obj -> ((Double) (obj[4] == null ? 1.0d : obj[4])
-								* ((Double) obj[8] * ((100 - (Double) obj[10]) / 100))))));
+						Collectors.summingDouble(obj -> (((Double) obj[8] * ((Double) obj[10] / 100))
+								* (Double) (obj[4] == null ? 1.0d : obj[4])))));
 
-		Map<String, Double> ivTotalTax = ivDetails.stream()
-				.collect(
-						Collectors.groupingBy(obj -> obj[0].toString(),
-								Collectors.summingDouble(obj -> ((Double) (obj[4] == null ? 1.0d : obj[4])
-										* ((Double) obj[8] * ((100 - (Double) obj[10]) / 100)))
-										* ((Double) obj[7] / 100))));
+		Map<String, Double> ivAddtnlDiscAmount = ivDetails.stream()
+				.collect(Collectors.groupingBy(obj -> obj[0].toString(),
+						Collectors.summingDouble(
+								obj -> (((((Double) obj[8] - ((Double) obj[8] * ((Double) obj[10] / 100)))
+										* (Double) obj[11] / 100)) * (Double) (obj[4] == null ? 1.0d : obj[4])))));
+
+		Map<String, Double> ivTotalWithoutTax = ivDetails.stream().collect(Collectors.groupingBy(
+				obj -> obj[0].toString(),
+				Collectors.summingDouble(obj -> (((((Double) obj[8] - ((Double) obj[8] * ((Double) obj[10] / 100))))
+						- (((((Double) obj[8] - ((Double) obj[8] * ((Double) obj[10] / 100))) * (Double) obj[11]
+								/ 100))))
+						* (Double) (obj[4] == null ? 1.0d : obj[4])))));
+
+		
+
+		Map<String, Double> ivTotalTax = ivDetails.stream().collect(Collectors.groupingBy(obj -> obj[0].toString(),
+				Collectors.summingDouble(obj -> (((((Double) obj[8] - ((Double) obj[8] * ((Double) obj[10] / 100))))
+						- (((((Double) obj[8] - ((Double) obj[8] * ((Double) obj[10] / 100))) * (Double) obj[11]
+								/ 100))))
+						* (Double) (obj[4] == null ? 1.0d : obj[4])) * ((Double) obj[7] / 100))));
 
 		int size = inventoryVouchers.size();
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
@@ -472,6 +497,7 @@ public class SalesInvoiceReportResource {
 		for (int i = 0; i < size; i++) {
 			SalesPerformanceDTO salesPerformanceDTO = new SalesPerformanceDTO();
 			Object[] ivData = inventoryVouchers.get(i);
+
 			salesPerformanceDTO.setPid(ivData[0].toString());
 			salesPerformanceDTO.setDocumentNumberLocal(ivData[1].toString());
 			salesPerformanceDTO.setDocumentNumberServer(ivData[2].toString());
@@ -480,12 +506,9 @@ public class SalesInvoiceReportResource {
 			salesPerformanceDTO.setCreatedDate((LocalDateTime) ivData[5]);
 			salesPerformanceDTO.setDocumentDate((LocalDateTime) ivData[6]);
 			salesPerformanceDTO.setReceiverAccountPid(ivData[7].toString());
-			if(compConfig)
-			{
-			salesPerformanceDTO.setReceiverAccountName(ivData[27].toString());
-			}
-			else
-			{
+			if (compConfig) {
+				salesPerformanceDTO.setReceiverAccountName(ivData[27].toString());
+			} else {
 				salesPerformanceDTO.setReceiverAccountName(ivData[8].toString());
 			}
 			salesPerformanceDTO.setSupplierAccountPid(ivData[9].toString());
@@ -513,19 +536,34 @@ public class SalesInvoiceReportResource {
 
 			salesPerformanceDTO.setSendSalesOrderEmailStatus(SendSalesOrderEmailStatus.valueOf(ivData[24].toString()));
 			salesPerformanceDTO.setClientDate((LocalDateTime) ivData[25]);
+			salesPerformanceDTO.setQuantity(ivTotalQty.get(salesPerformanceDTO.getPid()));
+			ivDetails.forEach(data -> {
+				if (ivData[0].equals(data[0])) {
+					salesPerformanceDTO.setDiscountPercentage((double) data[10]);
+					salesPerformanceDTO.setAdditonalDiscount((double) data[11]);
+				}
+
+			});
+			salesPerformanceDTO
+					.setDiscountAmount(Double.parseDouble(df.format(ivDiscAmount.get(salesPerformanceDTO.getPid()))));
+			salesPerformanceDTO.setAdditionalDiscountAmount(
+					Double.parseDouble(df.format(ivAddtnlDiscAmount.get(salesPerformanceDTO.getPid()))));
 			salesPerformanceDTOs.add(salesPerformanceDTO);
 		}
 		return salesPerformanceDTOs;
 	}
-	public boolean getCompanyCofig(){
-		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
-		if(optconfig.isPresent()) {
-		if(Boolean.valueOf(optconfig.get().getValue())) {
-		return true;
-		}
+
+	public boolean getCompanyCofig() {
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if (optconfig.isPresent()) {
+			if (Boolean.valueOf(optconfig.get().getValue())) {
+				return true;
+			}
 		}
 		return false;
-		}
+	}
+
 	@RequestMapping(value = "/sales-invoice-report/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed
@@ -538,37 +576,37 @@ public class SalesInvoiceReportResource {
 	public void downloadInventoryXls(@RequestParam("inventoryVoucherHeaderPids") String[] inventoryVoucherHeaderPids,
 			HttpServletResponse response) {
 		log.debug("start downloading....");
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "INV_QUERY_159" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all By Pids";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "INV_QUERY_159" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get all By Pids";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<Object[]> inventoryVouchers = inventoryVoucherHeaderRepository
 				.findByPidsOrderByCreatedDateDesc(Arrays.asList(inventoryVoucherHeaderPids));
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
-	
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+
 		log.debug("inventoryvoucherheaders foudn.....");
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>();
 
@@ -584,8 +622,9 @@ public class SalesInvoiceReportResource {
 		log.debug("Downloading Excel report");
 		String excelFileName = "InvoiceDetails" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = { "Invoice Number", "Invoice Date", "Customer", "Amt(without tax)", "Tax Total",
-				"Total Amount", "Activity Date", "Client Date" };
+		String[] headerColumns = { "Invoice Number", "Invoice Date", "Customer", "Total Qty", "Total KG", "Dis%",
+				"Dis.Amt", "Add'l Dis%", "Add'l Dis.Amt", "Amt(without tax)", "Tax Total", "Total Amount",
+				"Activity Date", "Client Date" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -624,15 +663,21 @@ public class SalesInvoiceReportResource {
 			docDateCell.setCellValue(salesPerform.getDocumentDate().toString());
 			docDateCell.setCellStyle(dateCellStyle);
 			row.createCell(2).setCellValue(salesPerform.getReceiverAccountName());
-			row.createCell(3).setCellValue(salesPerform.getTotalWithoutTax());
-			row.createCell(4).setCellValue(salesPerform.getTaxTotal());
-			row.createCell(5).setCellValue(salesPerform.getDocumentTotal());
+			row.createCell(3).setCellValue(salesPerform.getQuantity());
+			row.createCell(4).setCellValue(salesPerform.getTotalVolume());
+			row.createCell(5).setCellValue(salesPerform.getDiscountPercentage());
+			row.createCell(6).setCellValue(salesPerform.getDiscountAmount());
+			row.createCell(7).setCellValue(salesPerform.getAdditonalDiscount());
+			row.createCell(8).setCellValue(salesPerform.getAdditionalDiscountAmount());
+			row.createCell(9).setCellValue(salesPerform.getTotalWithoutTax());
+			row.createCell(10).setCellValue(salesPerform.getTaxTotal());
+			row.createCell(11).setCellValue(salesPerform.getDocumentTotal());
 
-			HSSFCell serverDateCell = row.createCell(6);
+			HSSFCell serverDateCell = row.createCell(12);
 			serverDateCell.setCellValue(salesPerform.getCreatedDate().toString());
 			serverDateCell.setCellStyle(dateCellStyle);
 
-			HSSFCell clientDateCell = row.createCell(7);
+			HSSFCell clientDateCell = row.createCell(13);
 			clientDateCell.setCellValue(salesPerform.getClientDate().toString());
 			clientDateCell.setCellStyle(dateCellStyle);
 

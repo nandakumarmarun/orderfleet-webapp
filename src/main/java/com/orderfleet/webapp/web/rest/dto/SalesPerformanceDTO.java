@@ -100,6 +100,16 @@ public class SalesPerformanceDTO {
 	private boolean imageButtonVisible;
 
 	private String dynamicDocumentPid;
+	
+	private double discountAmount;
+	
+	private double additonalDiscount;
+	
+	private double AdditionalDiscountAmount;
+	
+	private double quantity;
+	
+	private double discountPercentage;
 
 	public String getPid() {
 		return pid;
@@ -453,4 +463,45 @@ public class SalesPerformanceDTO {
 		this.receiverAccountLocation = receiverAccountLocation;
 	}
 
+	public double getDiscountAmount() {
+		return discountAmount;
+	}
+
+	public void setDiscountAmount(double discountAmount) {
+		this.discountAmount = discountAmount;
+	}
+
+	public double getAdditonalDiscount() {
+		return additonalDiscount;
+	}
+
+	public void setAdditonalDiscount(double additonalDiscount) {
+		this.additonalDiscount = additonalDiscount;
+	}
+
+	public double getAdditionalDiscountAmount() {
+		return AdditionalDiscountAmount;
+	}
+
+	public void setAdditionalDiscountAmount(double additionalDiscountAmount) {
+		AdditionalDiscountAmount = additionalDiscountAmount;
+	}
+
+	public double getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(double quantity) {
+		this.quantity = quantity;
+	}
+
+	public double getDiscountPercentage() {
+		return discountPercentage;
+	}
+
+	public void setDiscountPercentage(double discountPercentage) {
+		this.discountPercentage = discountPercentage;
+	}
+
+	
 }

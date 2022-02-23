@@ -51,7 +51,7 @@ import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 public class AttendanceServiceImpl implements AttendanceService {
 
 	private final Logger log = LoggerFactory.getLogger(AttendanceServiceImpl.class);
-	private final Logger logger = LoggerFactory.getLogger("QueryFinding");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 
 	@Inject
 	private AttendanceRepository attendanceRepository;

@@ -130,6 +130,7 @@ if (!this.InventoryVoucher) {
 						voucherType : $("#dbDocumentType").val(),
 						documentPids : docPids,
 					},
+				
 					success : function(inventoryVouchers) {
 						$("#lblCounts").text("0");
 						$('#tBodyInventoryVoucher').html("");
@@ -139,6 +140,7 @@ if (!this.InventoryVoucher) {
 											"<tr><td colspan='10' align='center'>No data available</td></tr>");
 							return;
 						}
+						
 						var counts = 0;
 						let totAmount = 0;
 						let totTax = 0;
@@ -173,8 +175,21 @@ if (!this.InventoryVoucher) {
 																	+ "</td><td>"
 																	+ inventoryVoucher.receiverAccountName
 																	+ "</td><td>"
+																	+ inventoryVoucher.quantity
+																	+ "</td><td>"
+																	+ inventoryVoucher.totalVolume
+																	+ "</td><td>"
+																	+ inventoryVoucher.discountPercentage
+																	+ "</td><td>"
+																	+ inventoryVoucher.discountAmount
+																	+ "</td><td>"
+																	+ inventoryVoucher.additonalDiscount
+																	+ "</td><td>"
+																	+ inventoryVoucher.additionalDiscountAmount
+																	+ "</td><td>"
 																	+ inventoryVoucher.totalWithoutTax
 																	+ "</td><td>"
+																	
 																	+ inventoryVoucher.taxTotal
 																	+ "</td><td>"
 																	+ inventoryVoucher.documentTotal

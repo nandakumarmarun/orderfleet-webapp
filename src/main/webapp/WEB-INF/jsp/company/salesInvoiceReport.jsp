@@ -189,6 +189,12 @@ rotate
 							<th>Invoice No.</th>
 							<th>Invoice date</th>
 							<th>Customer</th>
+							 <th>Total Qty</th>
+							<th>Total KG</th>
+							<th> Dis%</th>
+							<th>Dis.Amt</th>
+							<th>Add'l Dis%</th>
+							<th>Add'l Dis Amount</th>
 							<th>Amount (without Tax)
 								<p id="totalAmount" style="float: right;"></p>
 							</th>
