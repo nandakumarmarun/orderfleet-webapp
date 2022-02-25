@@ -334,7 +334,7 @@ public interface InventoryVoucherDetailRepository extends JpaRepository<Inventor
 
 	// Dash board End
 
-	@Query(value = "select voucherDetail.inventoryVoucherHeader.pid, voucherDetail.product.pid, voucherDetail.product.name, voucherDetail.product.unitQty, voucherDetail.quantity ,voucherDetail.updatedQuantity ,voucherDetail.updatedStatus ,voucherDetail.taxPercentage , voucherDetail.sellingRate , voucherDetail.rowTotal ,voucherDetail.discountPercentage from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.pid in ?1")
+	@Query(value = "select voucherDetail.inventoryVoucherHeader.pid, voucherDetail.product.pid, voucherDetail.product.name, voucherDetail.product.unitQty, voucherDetail.quantity ,voucherDetail.updatedQuantity ,voucherDetail.updatedStatus ,voucherDetail.taxPercentage , voucherDetail.sellingRate , voucherDetail.rowTotal ,voucherDetail.discountPercentage,voucherDetail.additionalDiscount from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.pid in ?1")
 	List<Object[]> findByInventoryVoucherHeaderPidIn(Set<String> inventoryVoucherHeaderPids);
 
 	@Query(value = "select voucherDetail from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.pid in ?1")
