@@ -137,9 +137,7 @@ public class ProductProfileFocusUploadService {
 						productProfile.setHsnCode(ppDto.getHsnCode());
 					}
 					
-					if (ppDto.getSalesUnit() != null && !ppDto.getSalesUnit().equals("")) {
-						productProfile.setSku(ppDto.getSalesUnit());
-					}
+					productProfile.setSku(ppDto.getBaseUnits());
 					
 //					if (ppDto.getSellingRate() != null && !ppDto.getSellingRate().equals("")) {
 //						productProfile.setPrice(BigDecimal.valueOf(Double.valueOf(ppDto.getStandard_price())));
