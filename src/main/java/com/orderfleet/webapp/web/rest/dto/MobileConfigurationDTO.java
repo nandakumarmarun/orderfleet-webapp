@@ -68,6 +68,7 @@ public class MobileConfigurationDTO {
 	private boolean salesOrderMandatory;
 	private boolean rateWithTax;
 	private boolean wifiPrintEnabler;
+	private boolean blockCustomerByCredits;
 
 	public MobileConfigurationDTO() {
 		super();
@@ -123,6 +124,7 @@ public class MobileConfigurationDTO {
 		this.salesOrderMandatory = mobileConfiguration.getSalesOrderMandatory();
 		this.rateWithTax = mobileConfiguration.getRateWithTax();
 		this.wifiPrintEnabler = mobileConfiguration.getWifiPrintEnabler();
+		this.blockCustomerByCredits = mobileConfiguration.isBlockCustomerByCredits();
 
 	}
 
@@ -476,6 +478,14 @@ public class MobileConfigurationDTO {
 
 	public void setWifiPrintEnabler(boolean wifiPrintEnabler) {
 		this.wifiPrintEnabler = wifiPrintEnabler;
+	}
+
+	public boolean isBlockCustomerByCredits() {
+		return blockCustomerByCredits;
+	}
+
+	public void setBlockCustomerByCredits(boolean blockCustomerByCredits) {
+		this.blockCustomerByCredits = blockCustomerByCredits;
 	}
 
 	public DisplayName getAccountProfileDisplayName() {

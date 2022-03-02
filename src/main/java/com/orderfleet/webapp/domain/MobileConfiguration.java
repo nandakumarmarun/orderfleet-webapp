@@ -197,6 +197,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "wifi_Print_Enabler", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean wifiPrintEnabler;
 
+	@Column(name = "block_Customer_By_Credits", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean blockCustomerByCredits;
+	
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -595,6 +598,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setWifiPrintEnabler(boolean wifiPrintEnabler) {
 		this.wifiPrintEnabler = wifiPrintEnabler;
+	}
+	
+	public boolean isBlockCustomerByCredits() {
+		return blockCustomerByCredits;
+	}
+
+	public void setBlockCustomerByCredits(boolean blockCustomerByCredits) {
+		this.blockCustomerByCredits = blockCustomerByCredits;
 	}
 
 	@Override

@@ -78,6 +78,7 @@
 						<th>Sales Order Mandatory</th>
 						<th>Rate With Tax</th>
 						<th>Wifi Print Enabler</th>
+						<th>Block Customer By Credits</th>
 						<th>Account Profile Display Name</th>
 						<th>Account Profile Print Name</th>
 						<th>Product Profile Display Name</th>
@@ -132,6 +133,7 @@
 							<td>${mobileConfiguration.salesOrderMandatory}</td>
 							<td>${mobileConfiguration.rateWithTax}</td>
 							<td>${mobileConfiguration.wifiPrintEnabler}</td>
+							<td>${mobileConfiguration.blockCustomerByCredits}</td>
 							<td>${mobileConfiguration.accountProfileDisplayName}</td>
 							<td>${mobileConfiguration.accountProfilePrintName}</td>
 							<td>${mobileConfiguration.productProfileDisplayName}</td>
@@ -458,6 +460,13 @@
 											<td><div class="form-group">
 													<label class="control-label">Rate With Tax </label> <input
 														id="rateWithTax" name='rateWithTax' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Block Customer By Credits</label> <input
+														id="blockCustomerByCredits" name='blockCustomerByCredits' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

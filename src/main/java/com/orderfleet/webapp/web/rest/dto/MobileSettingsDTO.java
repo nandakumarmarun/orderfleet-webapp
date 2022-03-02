@@ -114,6 +114,8 @@ public class MobileSettingsDTO {
 	private boolean rateWithTax;
 
 	private boolean wifiPrintEnabler;
+	
+	private boolean blockCustomerByCredits;
 
 	public MobileSettingsDTO() {
 		super();
@@ -166,6 +168,8 @@ public class MobileSettingsDTO {
 		this.salesOrderMandatory = mobileConfigurationDTO.getSalesOrderMandatory();
 		this.rateWithTax = mobileConfigurationDTO.getRateWithTax();
 		this.wifiPrintEnabler = mobileConfigurationDTO.getWifiPrintEnabler();
+		this.blockCustomerByCredits=mobileConfigurationDTO.isBlockCustomerByCredits();
+		
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -526,6 +530,14 @@ public class MobileSettingsDTO {
 
 	public void setWifiPrintEnabler(boolean wifiPrintEnabler) {
 		this.wifiPrintEnabler = wifiPrintEnabler;
+	}
+	
+	public boolean isBlockCustomerByCredits() {
+		return blockCustomerByCredits;
+	}
+
+	public void setBlockCustomerByCredits(boolean blockCustomerByCredits) {
+		this.blockCustomerByCredits = blockCustomerByCredits;
 	}
 
 	public DisplayName getAccountProfileDisplayName() {

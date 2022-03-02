@@ -90,6 +90,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setSalesOrderMandatory(mobileConfigurationDTO.getSalesOrderMandatory());
 		configuration.setRateWithTax(mobileConfigurationDTO.getRateWithTax());
 		configuration.setWifiPrintEnabler(mobileConfigurationDTO.getWifiPrintEnabler());
+		configuration.setBlockCustomerByCredits(mobileConfigurationDTO.isBlockCustomerByCredits());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -144,7 +145,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setSalesOrderMandatory(mobileConfigurationDTO.getSalesOrderMandatory());
 			configuration.setRateWithTax(mobileConfigurationDTO.getRateWithTax());
 			configuration.setWifiPrintEnabler(mobileConfigurationDTO.getWifiPrintEnabler());
-
+			configuration.setBlockCustomerByCredits(mobileConfigurationDTO.isBlockCustomerByCredits());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

@@ -53,6 +53,7 @@ if (!this.MobileConfiguration) {
 		salesOrderMandatory : false,
 		rateWithTax : false,
 		wifiPrintEnabler : false,
+		blockCustomerByCredits: false,
 		accountProfileDisplayName : 'NAME',
 		accountProfilePrintName : 'NAME',
 		productProfileDisplayName : 'NAME',
@@ -169,6 +170,7 @@ if (!this.MobileConfiguration) {
 		mobileConfigurationDTO.rateWithTax = $("#rateWithTax").is(":checked");
 		mobileConfigurationDTO.wifiPrintEnabler = $("#wifiPrintEnabler").is(
 				":checked");
+		mobileConfigurationDTO.blockCustomerByCredits=$("#blockCustomerByCredits").is(":checked");
 		mobileConfigurationDTO.accountProfileDisplayName = $(
 				"#accountProfileDisplayName").val();
 		mobileConfigurationDTO.accountProfilePrintName = $(
@@ -283,6 +285,8 @@ if (!this.MobileConfiguration) {
 							$('#rateWithTax').prop("checked", data.rateWithTax);
 							$('#wifiPrintEnabler').prop("checked",
 									data.wifiPrintEnabler);
+							$('#blockCustomerByCredits').prop("checked",
+									data.blockCustomerByCredits);
 							$('#accountProfileDisplayName').val(
 									data.accountProfileDisplayName);
 							$('#accountProfilePrintName').val(
