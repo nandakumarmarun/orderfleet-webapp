@@ -50,11 +50,11 @@
 							</tr>
 						</thead>
 						<tbody>
-							<!-- <tr>
+							 <tr>
 								<td><input class="check-one" name='uploadMasters' type="checkbox" value="product_profiles"></input></td>
 								<td>Product Profiles</td>
 							</tr>
-							 -->
+							
 							<tr>
 								<td><input class="check-one" name='uploadMasters' type="checkbox" value="account_profiles"></input></td>
 								<td>Account Profiles</td>

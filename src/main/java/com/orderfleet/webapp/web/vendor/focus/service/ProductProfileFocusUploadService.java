@@ -34,6 +34,7 @@ import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
 import com.orderfleet.webapp.web.vendor.focus.dto.ProductProfileFocus;
+import com.orderfleet.webapp.web.vendor.focus.dto.ProductProfileNewFocus;
 
 @Service
 public class ProductProfileFocusUploadService {
@@ -68,7 +69,7 @@ public class ProductProfileFocusUploadService {
 		this.companyRepository = companyRepository;
 	}
 
-	public void saveUpdateProductProfiles(List<ProductProfileFocus> list) {
+	public void saveUpdateProductProfiles(List<ProductProfileNewFocus> list) {
 		
 		log.info("Saving Product Profiles.........");
 		
@@ -78,7 +79,7 @@ public class ProductProfileFocusUploadService {
 		
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
 		
-		Set<String> ppNames = list.stream().map(p -> p.getMaster_Name()).collect(Collectors.toSet());
+		Set<String> ppNames = list.stream().map(p -> p.getItemName()).collect(Collectors.toSet());
 		
 		List<ProductProfile> productProfiles = productProfileRepository
 				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
@@ -105,10 +106,10 @@ public class ProductProfileFocusUploadService {
 				} else {
 					productCategory = defaultCategory.get();
 				}
-				for (ProductProfileFocus ppDto :list) {
+				for (ProductProfileNewFocus ppDto :list) {
 					// check exist by name, only one exist with a name
 					Optional<ProductProfile> optionalPP = productProfiles.stream()
-							.filter(p -> p.getName().equals(ppDto.getMaster_Name())).findAny();
+							.filter(p -> p.getName().equals(ppDto.getItemName())).findAny();
 					ProductProfile productProfile;
 					if (optionalPP.isPresent()) {
 						productProfile = optionalPP.get();
@@ -120,19 +121,34 @@ public class ProductProfileFocusUploadService {
 						productProfile = new ProductProfile();
 						productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
 						productProfile.setCompany(company);
-						productProfile.setName(ppDto.getMaster_Name());
+						productProfile.setName(ppDto.getItemName());
 						productProfile.setDivision(defaultDivision);
 						productProfile.setDataSourceType(DataSourceType.TALLY);
 					}
 
 	
-					productProfile.setProductId(ppDto.getMaster_Code());
-					productProfile.setPrice(BigDecimal.valueOf(0));
+					productProfile.setProductId(ppDto.getItemCode());
+					productProfile.setPrice(BigDecimal.valueOf(ppDto.getSellingRate()));
+					productProfile.setTaxRate(ppDto.getGstPer());
 					productProfile.setMrp(0);
 					productProfile.setActivated(true);
+					
+					if (ppDto.getHsnCode() != null && !ppDto.getHsnCode().equals("")) {
+						productProfile.setHsnCode(ppDto.getHsnCode());
+					}
+					
+					if (ppDto.getSalesUnit() != null && !ppDto.getSalesUnit().equals("")) {
+						productProfile.setSku(ppDto.getSalesUnit());
+					}
+					
+//					if (ppDto.getSellingRate() != null && !ppDto.getSellingRate().equals("")) {
+//						productProfile.setPrice(BigDecimal.valueOf(Double.valueOf(ppDto.getStandard_price())));
+//					} else {
+//						productProfile.setPrice(BigDecimal.valueOf(0));
+//					}
 
 					Optional<ProductProfile> opAccP = saveUpdateProductProfiles.stream()
-							.filter(so -> so.getName().equalsIgnoreCase(ppDto.getMaster_Name())).findAny();
+							.filter(so -> so.getName().equalsIgnoreCase(ppDto.getItemName())).findAny();
 					if (opAccP.isPresent()) {
 						continue;
 					}
@@ -145,16 +161,15 @@ public class ProductProfileFocusUploadService {
 //					Optional<ProductGroup> defaultProductGroup =productGroupRepository. findByCompanyIdAndNameIgnoreCase(company.getId(),"General");
                    ProductGroup defaultpg =productGroupRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
 //					System.out.println("************"+defaultpg);
-                   productGroupProductDTO.setGroupName(defaultpg.getName());
+                   productGroupProductDTO.setGroupName(ppDto.getItemType() != null ? ppDto.getItemType() :defaultpg.getName());
 					
-					productGroupProductDTO.setProductName(ppDto.getMaster_Name());
+					productGroupProductDTO.setProductName(ppDto.getItemName());
 
 					productGroupProductDTOs.add(productGroupProductDTO);
 
 					ProductGroupDTO productGroupDTO = new ProductGroupDTO();
-					productGroupDTO.setName(defaultpg.getName());
-			
-
+					productGroupDTO.setName(ppDto.getItemType());
+					productGroupDTO.setAlias(ppDto.getItemType());
 					productGroupDtos.add(productGroupDTO);
 
 					saveUpdateProductProfiles.add(productProfile);

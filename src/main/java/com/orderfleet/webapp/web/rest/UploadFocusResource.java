@@ -32,6 +32,7 @@ import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.focus.dto.AccountProfileResponseFocus;
 import com.orderfleet.webapp.web.vendor.focus.dto.AuthenticationRequstFocus;
 import com.orderfleet.webapp.web.vendor.focus.dto.AuthenticationResponseFocus;
+import com.orderfleet.webapp.web.vendor.focus.dto.ProductProfileNewResponceFocus;
 import com.orderfleet.webapp.web.vendor.focus.dto.ProductProfileResponseFocus;
 import com.orderfleet.webapp.web.vendor.focus.service.AccountProfileFocusUploadService;
 import com.orderfleet.webapp.web.vendor.focus.service.ProductProfileFocusUploadService;
@@ -46,7 +47,7 @@ public class UploadFocusResource {
 
 	private static String ACCOUNT_PROFILE_API_URL = "http://23.111.12.87/DevaSteelsIntegration/FocusService.svc/GetCustomerData?Auth_Token=";
 
-	private static String PRODUCT_PROFILE_API_URL = "http://23.111.12.87/DevaSteelsIntegration/FocusService.svc/GetMasterData?Auth_Token=";
+	private static String PRODUCT_PROFILE_API_URL = "http://23.111.12.87/DevaSteelsIntegration/FocusService.svc/GETProductsWithPrice?Auth_Token=";
 	@Inject
 	private AccountProfileFocusUploadService accountProfileFocusUploadService;
 
@@ -98,6 +99,46 @@ public class UploadFocusResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/upload-focus/uploadProductProfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> uploadProductProfiles() throws IOException, JSONException, ParseException {
+
+		log.debug("Web request to upload Product Profiles...");
+
+		String authToken = getAuthenticationToken();
+
+		if (authToken != null) {
+
+			RestTemplate restTemplate = new RestTemplate();
+			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+			log.info("Get Product Profile URL: " + PRODUCT_PROFILE_API_URL);
+
+			ProductProfileNewResponceFocus  productProfileNewResponceFocus = restTemplate
+					.getForObject(PRODUCT_PROFILE_API_URL + authToken, ProductProfileNewResponceFocus.class);
+
+			if (productProfileNewResponceFocus.getGetProductsWithPriceResult().getProduct() != null) {
+
+			log.info("Saving " + productProfileNewResponceFocus.getGetProductsWithPriceResult().getProduct().size()
+						+ " product Profiles");
+				
+				
+				
+
+				if (productProfileNewResponceFocus.getGetProductsWithPriceResult().getProduct().size() > 0) {
+					productProfileFocusUploadService
+					.saveUpdateProductProfiles(
+							productProfileNewResponceFocus.getGetProductsWithPriceResult().getProduct());
+				}
+			}
+
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	
 	private String getAuthenticationToken() {
 
 		AuthenticationRequstFocus authenticationRequstFocus = authenticationBody();
@@ -157,27 +198,27 @@ public class UploadFocusResource {
 		return null;
 	}
 
-	@RequestMapping(value = "/upload-focus/uploadProductProfiles", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<Void> uploadProductProfiles() throws IOException, JSONException, ParseException {
-
-		log.debug("web request to upload productProfiles");
-
-		String jsonstring = productRequestBody();
-		HttpEntity<String> entity = new HttpEntity<>(jsonstring, RestClientUtil.createTokenAuthHeaders());
-
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-
-		log.info("Product profile URL:" + PRODUCT_PROFILE_API_URL);
-
-		ProductProfileResponseFocus productProfileResponseFocus = restTemplate.postForObject(PRODUCT_PROFILE_API_URL,
-				entity, ProductProfileResponseFocus.class);
-
-		productProfileFocusUploadService
-				.saveUpdateProductProfiles(productProfileResponseFocus.getGetMasterDataResult().getProductProfiles());
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
+//	@RequestMapping(value = "/upload-focus/uploadProductProfiles", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//	@Timed
+//	public ResponseEntity<Void> uploadProductProfiles() throws IOException, JSONException, ParseException {
+//
+//		log.debug("web request to upload productProfiles");
+//
+//		String jsonstring = productRequestBody();
+//		HttpEntity<String> entity = new HttpEntity<>(jsonstring, RestClientUtil.createTokenAuthHeaders());
+//
+//		RestTemplate restTemplate = new RestTemplate();
+//		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+//
+//		log.info("Product profile URL:" + PRODUCT_PROFILE_API_URL);
+//
+//		ProductProfileResponseFocus productProfileResponseFocus = restTemplate.postForObject(PRODUCT_PROFILE_API_URL,
+//				entity, ProductProfileResponseFocus.class);
+//
+//		productProfileFocusUploadService
+//				.saveUpdateProductProfiles(productProfileResponseFocus.getGetMasterDataResult().getProductProfiles());
+//		return new ResponseEntity<>(HttpStatus.OK);
+//	}
 
 	private String productRequestBody() throws JSONException {
 
