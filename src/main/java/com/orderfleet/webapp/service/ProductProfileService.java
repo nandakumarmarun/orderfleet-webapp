@@ -119,6 +119,8 @@ public interface ProductProfileService {
 	List<ProductProfileDTO> findProductsByUserProductCategoriesIsCurrentUserAndActivated(int page, int count);
 
 	List<ProductProfileDTO> findProductsAssignedInProductGroup();
+	
+	List<ProductProfileDTO> searchByName(String name);
 
 	/**
 	 * Update the ProductProfile status by pid.

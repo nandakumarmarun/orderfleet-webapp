@@ -106,11 +106,11 @@ if (!this.ProductProfile) {
 			.ready(
 					function() {
 						// filter by
-						$('#btnSearch').click(
-								function() {
-									searchTable($("#search").val(),
-											$('#tBodyProductProfile'));
-								});
+//						$('#btnSearch').click(
+//								function() {
+//									searchTable($("#search").val(),
+//											$('#tBodyProductProfile'));
+//								});
 
 						// validate color image
 						$('#field_colorImage')
@@ -419,6 +419,25 @@ if (!this.ProductProfile) {
 			error : function(xhr, error) {
 				onError(xhr, error);
 			},
+		});
+	}
+	
+	ProductProfile.searchByName = function(inputvalue){
+		var input = "";
+		console.log($("#search").val());
+		$.ajax({
+			url : productProfileContextPath + "/searchByName",
+			method : 'GET',
+			data : {
+				input :inputvalue
+			},
+
+			success : function(ProdctProfiles) {
+				addTableBodyvalues(ProdctProfiles);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
 		});
 	}
 

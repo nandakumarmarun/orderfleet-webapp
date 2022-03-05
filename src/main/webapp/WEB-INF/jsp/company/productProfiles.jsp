@@ -119,12 +119,10 @@
 
 				<div class="col-sm-4">
 					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Search" /> <span
+						<input type="text" class="form-control" placeholder="Search" id="search"/> <span
 							class="input-group-btn">
-							<button
-								onclick="Orderfleet.searchTable($(this).parent().prev('input').val());"
-								class="btn btn-default entypo-search" type="button"
-								style="font-size: 18px"></button>
+							<button class="btn btn-default entypo-search" id="btnSearch"
+								type="button" style="font-size: 18px" onclick="ProductProfile.searchByName($('#search').val());"></button>
 						</span>
 					</div>
 				</div>

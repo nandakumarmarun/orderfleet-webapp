@@ -309,6 +309,13 @@ public class ProductProfileResource {
 		return new ResponseEntity<>(res, HttpStatus.OK);
 
 	}
+	
+	@RequestMapping(value = "/productProfiles/searchByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<ProductProfileDTO>>searchByName(@RequestParam String input) {
+		log.debug("Web request to get searchbyname : {}");
+		List<ProductProfileDTO> productProfileDTOs = productProfileService.searchByName(input);
+		return new ResponseEntity<>(productProfileDTOs, HttpStatus.OK);
+	}
 
 	/**
 	 * @author Fahad

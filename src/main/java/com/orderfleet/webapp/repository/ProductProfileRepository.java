@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.ProductCategory;
@@ -95,6 +96,9 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and productProfile.activated = ?1 Order By productProfile.name asc")
 	List<ProductProfile> findAllByCompanyIdAndActivatedOrDeactivatedProductProfileOrderByName(boolean active);
 
+	@Query(value ="select * from tbl_product_profile  where company_Id = ?#{principal.companyId} and activated = ?1 Order By name asc Limit 2000", nativeQuery = true)
+	List<ProductProfile> findAllByCompanyIdAndActivatedOrDeactivatedProductProfileOrderByNameCountByLimit(boolean active);
+	
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and productProfile.productCategory.pid in ?1 and  productProfile.activated = ?2 Order by productProfile.name asc")
 	List<ProductProfile> findByProductCategoryPidInAndActivated(List<String> productCategoyPids, boolean active);
 
@@ -138,4 +142,6 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	@Query("select productProfile.productDescription from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and activated=true and productProfile.createdDate <= ?1 Order By productProfile.productDescription asc")
 	List<String> findProductDescriptionByCompanyIdAndActivatedTrueAndCreatedLessThan(LocalDateTime atTime);
 	
+	@Query("Select productProfile from ProductProfile  productProfile where productProfile.company.id = ?#{principal.companyId} and lower(productProfile.name) like lower(concat('%', :name,'%'))")
+	public List<ProductProfile> searchByName(@Param("name") String name);
 }

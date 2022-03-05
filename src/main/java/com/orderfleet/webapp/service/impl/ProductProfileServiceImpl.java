@@ -102,8 +102,9 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	@Inject
 	private DocumentStockLocationSourceRepository documentStockLocationSourceRepository;
 
-	@Inject 
+	@Inject
 	private UnitsRepository unitsRepository;
+
 	/**
 	 * Save a productProfile.
 	 *
@@ -113,8 +114,8 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	@Override
 	public ProductProfileDTO save(ProductProfileDTO productProfileDTO) {
 		log.debug("Request to save ProductProfile : {}", productProfileDTO);
-		log.debug("serviseunitypid",  productProfileDTO.getUnitsPid());
-		System.out.println("uspid"+ productProfileDTO.getUnitsPid());
+		log.debug("serviseunitypid", productProfileDTO.getUnitsPid());
+		System.out.println("uspid" + productProfileDTO.getUnitsPid());
 		productProfileDTO.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid()); // set
 		ProductProfile productProfile = productProfileMapper.productProfileDTOToProductProfile(productProfileDTO);
 		productProfile.setUnits(unitsRepository.findOneByPid(productProfileDTO.getUnitsPid()).get());
@@ -153,7 +154,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 			productProfile.setProductCategory(
 					productCategoryRepository.findOneByPid(productProfileDTO.getProductCategoryPid()).get());
 			productProfile.setDivision(divisionRepository.findOneByPid(productProfileDTO.getDivisionPid()).get());
-			if(productProfileDTO.getUnitsPid()!=null) {
+			if (productProfileDTO.getUnitsPid() != null) {
 				productProfile.setUnits(unitsRepository.findOneByPid(productProfileDTO.getUnitsPid()).get());
 			}
 			productProfile.setDiscountPercentage(productProfileDTO.getDiscountPercentage());
@@ -519,7 +520,8 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	public List<ProductProfileDTO> findAllByCompanyAndActivatedProductProfileOrderByName(boolean active) {
 		log.debug("Request to get Activated ProductProfile");
 		List<ProductProfile> productProfiles = productProfileRepository
-				.findAllByCompanyIdAndActivatedOrDeactivatedProductProfileOrderByName(active);
+				.findAllByCompanyIdAndActivatedOrDeactivatedProductProfileOrderByNameCountByLimit(active);
+		System.out.println("productProfileList" + productProfiles.size());
 		List<ProductProfileDTO> productProfileDTOs = productProfileMapper
 				.productProfilesToProductProfileDTOs(productProfiles);
 		List<String> productNameTextSettings = productNameTextSettingsRepository
@@ -825,5 +827,11 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 		List<ProductProfile> productProfileList = productProfileRepository.findByPidInAndActivated(profilePids, true);
 		List<ProductProfileDTO> result = productProfileMapper.productProfilesToProductProfileDTOs(productProfileList);
 		return result;
+	}
+	
+	@Override
+	public List<ProductProfileDTO> searchByName(String name) {
+		List<ProductProfile> productProfiles = productProfileRepository.searchByName(name);
+		return productProfileMapper.productProfilesToProductProfileDTOs(productProfiles);
 	}
 }
