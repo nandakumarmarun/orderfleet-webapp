@@ -32,9 +32,11 @@ import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.web.vendor.focus.dto.AccountProfileResponseFocus;
 import com.orderfleet.webapp.web.vendor.focus.dto.AuthenticationRequstFocus;
 import com.orderfleet.webapp.web.vendor.focus.dto.AuthenticationResponseFocus;
+import com.orderfleet.webapp.web.vendor.focus.dto.OutStandingResponseFocus;
 import com.orderfleet.webapp.web.vendor.focus.dto.ProductProfileNewResponceFocus;
 import com.orderfleet.webapp.web.vendor.focus.dto.ProductProfileResponseFocus;
 import com.orderfleet.webapp.web.vendor.focus.service.AccountProfileFocusUploadService;
+import com.orderfleet.webapp.web.vendor.focus.service.OutStandingFocusUploadService;
 import com.orderfleet.webapp.web.vendor.focus.service.ProductProfileFocusUploadService;
 
 import net.minidev.json.parser.ParseException;
@@ -48,8 +50,15 @@ public class UploadFocusResource {
 	private static String ACCOUNT_PROFILE_API_URL = "http://23.111.12.87/DevaSteelsIntegration/FocusService.svc/GetCustomerData?Auth_Token=";
 
 	private static String PRODUCT_PROFILE_API_URL = "http://23.111.12.87/DevaSteelsIntegration/FocusService.svc/GETProductsWithPrice?Auth_Token=";
+	
+	private static String RECEIVABLE_PAYABLE_API_URL ="http://23.111.12.87/DevaSteelsIntegration/FocusService.svc/OutStandingReportALL?Auth_Token=";
+	
 	@Inject
 	private AccountProfileFocusUploadService accountProfileFocusUploadService;
+	
+	@Inject
+	private OutStandingFocusUploadService outStandingFocusUploadService;
+
 
 	@Inject
 	private ProductProfileFocusUploadService productProfileFocusUploadService;
@@ -138,6 +147,41 @@ public class UploadFocusResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/upload-focus/uploadReceivablePayable", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> uploadReceivablePayable() throws IOException, JSONException, ParseException {
+
+		log.debug("Web request to upload ReceivablePayable...");
+
+		String authToken = getAuthenticationToken();
+
+		if (authToken != null) {
+
+			RestTemplate restTemplate = new RestTemplate();
+			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+			log.info("Get Account Profile URL: " + RECEIVABLE_PAYABLE_API_URL);
+
+			OutStandingResponseFocus OutStandingResponseFocus = restTemplate
+					.getForObject(RECEIVABLE_PAYABLE_API_URL + authToken, OutStandingResponseFocus.class);
+
+			if (OutStandingResponseFocus.getOutStandingReportALLResult().getOutStandingFocus() != null) {
+
+				log.info("Saving " + OutStandingResponseFocus.getOutStandingReportALLResult().getOutStandingFocus().size()
+						+ " Receivable payable ");
+
+
+				if (OutStandingResponseFocus.getOutStandingReportALLResult().getOutStandingFocus().size() > 0) {
+					
+					outStandingFocusUploadService.saveUpdateReceivablePayable(OutStandingResponseFocus.getOutStandingReportALLResult().getOutStandingFocus());
+				}
+			}
+
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 	
 	private String getAuthenticationToken() {
 

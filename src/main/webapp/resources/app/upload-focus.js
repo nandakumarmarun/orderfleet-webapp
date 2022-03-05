@@ -13,7 +13,8 @@ if (!this.uploadFocus) {
 			
 	var ajaxes = [
 		{name: 'product_profiles', path: '/uploadProductProfiles', alias: 'Product Profiles'},
-		{name: 'account_profiles', path: '/uploadAccountProfiles', alias: 'Account Profiles'}
+		{name: 'account_profiles', path: '/uploadAccountProfiles', alias: 'Account Profiles'},
+		{name: 'receivable_payable', path: '/uploadReceivablePayable',alias: 'receivable payable'}
 		
 	];
 	

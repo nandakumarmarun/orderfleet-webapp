@@ -60,6 +60,10 @@
 								<td>Account Profiles</td>
 							</tr>
 							
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="receivable_payable"></input></td>
+								<td>Receivable Payable</td>
+							</tr>
 							
 						</tbody>
 					</table>
