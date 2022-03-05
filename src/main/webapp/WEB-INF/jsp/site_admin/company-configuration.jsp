@@ -61,6 +61,7 @@
 						<th>Product Group Tax</th>
 						<th>Alias To Name</th>
 						<th>Description TO Name</th>
+						<th>Stock api</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -94,6 +95,7 @@
 							<th>${companyConfiguration.enableProductGroupTax}</th>
 							<th>${companyConfiguration.aliasToName}</th>
 							<th>${companyConfiguration.descriptionToName}</th>
+							<th>${companyConfiguration.stockApi}</th>
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
@@ -325,6 +327,14 @@
 											<td><div class="form-group">
 													<label class="control-label">Description TO Name</label> <input
 														id="descriptionToName" name='checksdescriptionToName' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Stock Api</label> <input
+														id="stockApi" name='checksstockApi' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

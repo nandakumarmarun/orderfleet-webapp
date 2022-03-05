@@ -22,18 +22,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.DocumentStockCalculation;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.StockLocationType;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DocumentStockCalculationRepository;
 import com.orderfleet.webapp.repository.DocumentStockLocationSourceRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.api.dto.LiveStockDTO;
 import com.orderfleet.webapp.web.rest.api.dto.StockLocationWiseStockDTO;
+import com.orderfleet.webapp.web.vendor.focus.service.StockFocusService;
 
 /**
  * REST controller for managing StockCalculation.
@@ -54,18 +59,25 @@ public class StockCalculationController {
 	private final DocumentStockCalculationRepository documentStockCalculationRepository;
 	
 	private final UserStockLocationRepository userStockLocationRepository;
+	
+	private final StockFocusService stockFocusService;
+	
+	private CompanyConfigurationRepository companyConfigurationrepo;
 
 	public StockCalculationController(DocumentStockLocationSourceRepository documentStockLocationSourceRepository,
 			OpeningStockRepository openingStockRepository,
 			InventoryVoucherDetailRepository inventoryVoucherDetailRepository,
 			DocumentStockCalculationRepository documentStockCalculationRepository,
-			UserStockLocationRepository userStockLocationRepository) {
+			UserStockLocationRepository userStockLocationRepository,
+			StockFocusService stockFocusService,CompanyConfigurationRepository companyConfigurationrepo) {
 		super();
 		this.documentStockLocationSourceRepository = documentStockLocationSourceRepository;
 		this.openingStockRepository = openingStockRepository;
 		this.inventoryVoucherDetailRepository = inventoryVoucherDetailRepository;
 		this.documentStockCalculationRepository = documentStockCalculationRepository;
 		this.userStockLocationRepository = userStockLocationRepository;
+		this.stockFocusService = stockFocusService;
+		this.companyConfigurationrepo = companyConfigurationrepo;
 	}
 
 	/**
@@ -79,25 +91,31 @@ public class StockCalculationController {
 	@RequestMapping(value = "/stock", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Double> getStock(@RequestParam String documentPid, @RequestParam String productPid) {
-		//user stock location
-		List<StockLocation> userStockLocations = userStockLocationRepository.findStockLocationsByUserIsCurrentUser();
-		if (userStockLocations.isEmpty()) {
-			return ResponseEntity.ok().body(0.0);
-		}
-		List<StockLocation> stockLocations = documentStockLocationSourceRepository
-				.findStockLocationByDocumentPidAndStockLocationIn(documentPid, userStockLocations);
-		if (stockLocations.isEmpty()) {
-			return ResponseEntity.ok().body(0.0);
-		}
-		// Group actual and logical stock locations
-		Map<StockLocationType, List<StockLocation>> groupByLocationTypeMap = stockLocations.stream().parallel()
-				.collect(Collectors.groupingBy(StockLocation::getStockLocationType));
-		List<StockLocation> actualStockLocations = groupByLocationTypeMap.get(StockLocationType.ACTUAL);
-		List<StockLocation> logicalStockLocations = groupByLocationTypeMap.get(StockLocationType.LOGICAL);
-		// calculate stock
-		Double stock = calculateStock(documentPid, productPid, stockLocations, actualStockLocations,
-				logicalStockLocations);
-		return ResponseEntity.ok().body(stock);
+		Optional<CompanyConfiguration> optStockThirdPartyApi = companyConfigurationrepo.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.STOCK_API);
+		if(optStockThirdPartyApi.isPresent() && Boolean.valueOf(optStockThirdPartyApi.get().getValue())) {
+			double result = stockFocusService.getStockFocus(productPid);
+			return ResponseEntity.ok().body(result);
+		}else {
+		 		//user stock location
+				List<StockLocation> userStockLocations = userStockLocationRepository.findStockLocationsByUserIsCurrentUser();
+				if (userStockLocations.isEmpty()) {
+					return ResponseEntity.ok().body(0.0);
+				}
+				List<StockLocation> stockLocations = documentStockLocationSourceRepository
+						.findStockLocationByDocumentPidAndStockLocationIn(documentPid, userStockLocations);
+				if (stockLocations.isEmpty()) {
+					return ResponseEntity.ok().body(0.0);
+				}
+				// Group actual and logical stock locations
+				Map<StockLocationType, List<StockLocation>> groupByLocationTypeMap = stockLocations.stream().parallel()
+						.collect(Collectors.groupingBy(StockLocation::getStockLocationType));
+				List<StockLocation> actualStockLocations = groupByLocationTypeMap.get(StockLocationType.ACTUAL);
+				List<StockLocation> logicalStockLocations = groupByLocationTypeMap.get(StockLocationType.LOGICAL);
+				// calculate stock
+				Double stock = calculateStock(documentPid, productPid, stockLocations, actualStockLocations,
+						logicalStockLocations);
+				return ResponseEntity.ok().body(stock);
+		 	}	
 	}
 	
 	/**

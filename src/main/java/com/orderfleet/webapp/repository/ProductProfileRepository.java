@@ -33,6 +33,9 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} order by productProfile.name asc")
 	List<ProductProfile> findAllByCompanyId();
 	
+	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and productProfile.pid = ?1")
+	Optional<ProductProfile> findOneByCompanyIdandPid(String pid);
+	
 	@Query("select productProfile.pid,productProfile.name,productProfile.price from ProductProfile productProfile where productProfile.pid in ?1 and productProfile.company.id = ?#{principal.companyId} order by productProfile.name asc")
 	List<Object[]> findAllNameAndPriceByCompanyIdAndPidIn(List<String> productPids);
 

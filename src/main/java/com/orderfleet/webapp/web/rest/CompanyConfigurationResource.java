@@ -178,6 +178,10 @@ public class CompanyConfigurationResource {
 					mcDto.setDescriptionToName(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.STOCK_API)) {
+					mcDto.setStockApi(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
@@ -207,7 +211,8 @@ public class CompanyConfigurationResource {
 			@RequestParam String sendSalesOrderSap, @RequestParam String piecesToQuantity,
 			@RequestParam String sendSalesOrderOdoo, @RequestParam String sendTransactionsSapPravesh,
 			@RequestParam String addCompoundUnit, @RequestParam String updateStockLocation,
-			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName, @RequestParam String descriptionToName)
+			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName, @RequestParam String descriptionToName,
+			@RequestParam String stockApi)
 			throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
@@ -266,6 +271,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
 		Optional<CompanyConfiguration> optdescriptionToName = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DESCRIPTION_TO_NAME);
+		Optional<CompanyConfiguration> optStockApi = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -296,6 +303,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration productGroupTaxCompany = null;
 		CompanyConfiguration aliasToNameCompany = null;
 		CompanyConfiguration descriptionToNameCompany = null;
+		CompanyConfiguration stockApiCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -561,6 +569,17 @@ public class CompanyConfigurationResource {
 			descriptionToNameCompany.setValue(descriptionToName);
 		}
 		companyConfigurationRepository.save(descriptionToNameCompany);
+		
+		if (optStockApi.isPresent()) {
+			stockApiCompany= optStockApi.get();
+			stockApiCompany.setValue(stockApi);
+		} else {
+			stockApiCompany = new CompanyConfiguration();
+			stockApiCompany.setCompany(company);
+			stockApiCompany.setName(CompanyConfig.STOCK_API);
+			stockApiCompany.setValue(stockApi);
+		}
+		companyConfigurationRepository.save(stockApiCompany);
 
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
@@ -676,7 +695,8 @@ public class CompanyConfigurationResource {
 		Optional<CompanyConfiguration> optdescriptionToName = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DESCRIPTION_TO_NAME);
 
-
+		Optional<CompanyConfiguration> optstoApi = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
 
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
@@ -760,6 +780,10 @@ public class CompanyConfigurationResource {
 		}
 		if (optdescriptionToName.isPresent()) {
 			companyConfigurationDTO.setDescriptionToName(Boolean.valueOf(optdescriptionToName.get().getValue()));
+		}
+		
+		if (optstoApi.isPresent()) {
+			companyConfigurationDTO.setStockApi(Boolean.valueOf(optstoApi.get().getValue()));
 		}
 
 		/*
@@ -862,6 +886,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
 		Optional<CompanyConfiguration> optdescriptionToName = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DESCRIPTION_TO_NAME);
+		Optional<CompanyConfiguration> optstockApi = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -972,6 +998,11 @@ public class CompanyConfigurationResource {
 		if (optdescriptionToName.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optdescriptionToName.get().getCompany().getId(),
 					CompanyConfig.DESCRIPTION_TO_NAME);
+		}
+		
+		if (optstockApi.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optstockApi.get().getCompany().getId(),
+					CompanyConfig.STOCK_API);
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {

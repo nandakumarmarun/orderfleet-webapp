@@ -37,6 +37,7 @@ public class CompanyConfigDTO {
 	private boolean enableProductGroupTax;
 	private boolean aliasToName;
 	private boolean descriptionToName;
+	private boolean stockApi;
 	
 
 	public CompanyConfigDTO() {
@@ -257,6 +258,14 @@ public class CompanyConfigDTO {
 
 	public void setDescriptionToName(boolean descriptionToName) {
 		this.descriptionToName = descriptionToName;
+	}
+
+	public boolean getStockApi() {
+		return stockApi;
+	}
+
+	public void setStockApi(boolean stockApi) {
+		this.stockApi = stockApi;
 	}
 	
 	
