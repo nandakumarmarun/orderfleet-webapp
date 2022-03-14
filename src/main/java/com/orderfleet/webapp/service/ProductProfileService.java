@@ -144,6 +144,8 @@ public interface ProductProfileService {
 	 * @return the list.
 	 */
 	List<ProductProfileDTO> findAllByCompanyAndActivatedProductProfileOrderByName(boolean active);
+	
+	List<ProductProfileDTO> findAllByCompanyAndActivatedProductProfileOrderByNameLiits(boolean active);
 
 	/**
 	 * @author Fahad
@@ -174,4 +176,6 @@ public interface ProductProfileService {
 			boolean active, StockAvailabilityStatus status);
 	
 	List<ProductProfileDTO> findAllProductProfilePidByProductProfilePidAndActivated(List<String> profilePids);
+	
+	
 }

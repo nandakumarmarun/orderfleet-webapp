@@ -520,7 +520,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	public List<ProductProfileDTO> findAllByCompanyAndActivatedProductProfileOrderByName(boolean active) {
 		log.debug("Request to get Activated ProductProfile");
 		List<ProductProfile> productProfiles = productProfileRepository
-				.findAllByCompanyIdAndActivatedOrDeactivatedProductProfileOrderByNameCountByLimit(active);
+				.findAllByCompanyIdAndActivatedOrDeactivatedProductProfileOrderByName(active);
 		System.out.println("productProfileList" + productProfiles.size());
 		List<ProductProfileDTO> productProfileDTOs = productProfileMapper
 				.productProfilesToProductProfileDTOs(productProfiles);
@@ -833,5 +833,101 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 	public List<ProductProfileDTO> searchByName(String name) {
 		List<ProductProfile> productProfiles = productProfileRepository.searchByName(name);
 		return productProfileMapper.productProfilesToProductProfileDTOs(productProfiles);
+	}
+
+	@Override
+	public List<ProductProfileDTO> findAllByCompanyAndActivatedProductProfileOrderByNameLiits(boolean active) {
+		log.debug("Request to get Activated ProductProfile");
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findAllByCompanyIdAndActivatedOrDeactivatedProductProfileOrderByNameCountByLimit(active);
+		System.out.println("productProfileList" + productProfiles.size());
+		List<ProductProfileDTO> productProfileDTOs = productProfileMapper
+				.productProfilesToProductProfileDTOs(productProfiles);
+		List<String> productNameTextSettings = productNameTextSettingsRepository
+				.findNameByCompanyIdAndEnabledTrue(SecurityUtils.getCurrentUsersCompanyId());
+		Set<Long> sLocationIds = documentStockLocationSourceRepository.findStockLocationIdsByCompanyId();
+
+		if (!productNameTextSettings.isEmpty()) {
+			Boolean descriptionExist = Boolean.FALSE;
+			Boolean mrpExist = Boolean.FALSE;
+			Boolean sellingRateExist = Boolean.FALSE;
+			Boolean stockExist = Boolean.FALSE;
+			Boolean productDescriptionExist = Boolean.FALSE;
+			Boolean barcodeExist = Boolean.FALSE;
+			Boolean remarkExist = Boolean.FALSE;
+			for (String productNameText : productNameTextSettings) {
+				switch (productNameText) {
+				case "DESCRIPTION":
+					descriptionExist = Boolean.TRUE;
+					break;
+				case "MRP":
+					mrpExist = Boolean.TRUE;
+					break;
+				case "SELLING RATE":
+					sellingRateExist = Boolean.TRUE;
+					break;
+				case "STOCK":
+					stockExist = Boolean.TRUE;
+					break;
+				case "PRODUCT DESCRIPTION":
+					productDescriptionExist = Boolean.TRUE;
+					break;
+				case "BARCODE":
+					barcodeExist = Boolean.TRUE;
+					break;
+				case "REMARKS":
+					remarkExist = Boolean.TRUE;
+					break;
+				default:
+					break;
+				}
+			}
+			for (ProductProfileDTO productProfileDTO : productProfileDTOs) {
+				StringBuilder name = new StringBuilder(" (");
+				if (descriptionExist && productProfileDTO.getDescription() != null
+						&& !productProfileDTO.getDescription().isEmpty()) {
+					name.append(productProfileDTO.getDescription());
+				}
+				if (mrpExist) {
+					name.append(",").append(productProfileDTO.getMrp());
+				}
+				if (sellingRateExist) {
+					name.append(",").append(productProfileDTO.getPrice());
+				}
+				if (stockExist) {
+					if (sLocationIds.isEmpty()) {
+						OpeningStock openingStock = openingStockRepository
+								.findTop1ByProductProfilePidOrderByCreatedDateDesc(productProfileDTO.getPid());
+						if (openingStock != null) {
+							name.append(",").append(openingStock.getQuantity());
+						}
+					} else {
+						Double sum = openingStockRepository.findSumOpeningStockByProductPidAndStockLocationIdIn(
+								productProfileDTO.getPid(), sLocationIds);
+						name.append(",").append(sum);
+					}
+				}
+				if (productDescriptionExist && productProfileDTO.getProductDescription() != null
+						&& !productProfileDTO.getProductDescription().isEmpty()) {
+					name.append(",").append(productProfileDTO.getProductDescription());
+				}
+				if (barcodeExist && productProfileDTO.getBarcode() != null
+						&& !productProfileDTO.getBarcode().isEmpty()) {
+					name.append(",").append(productProfileDTO.getBarcode());
+				}
+				if (remarkExist && productProfileDTO.getRemarks() != null
+						&& !productProfileDTO.getRemarks().isEmpty()) {
+					name.append(",").append(productProfileDTO.getRemarks());
+				}
+				name.append(")");
+				if (name.length() > 3) {
+					productProfileDTO.setName(productProfileDTO.getName() + name.toString());
+				} else {
+					productProfileDTO.setName(productProfileDTO.getName());
+				}
+			}
+		}
+		return productProfileDTOs;
+		
 	}
 }

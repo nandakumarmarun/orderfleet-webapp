@@ -191,11 +191,11 @@ public class ProductProfileResource {
 		model.addAttribute("divisions", divisionService.findAllByCompany());
 		model.addAttribute("productGroups", productGroupService.findAllByCompany());
 		model.addAttribute("productProfiles",
-				productProfileService.findAllByCompanyAndActivatedProductProfileOrderByName(true));
+				productProfileService.findAllByCompanyAndActivatedProductProfileOrderByNameLiits(true));
 		model.addAttribute("taxMasters", taxmasterService.findAllByCompany());
 		model.addAttribute("unitlist", unitservise.findAll());
 		model.addAttribute("deactivatedProductProfiles",
-				productProfileService.findAllByCompanyAndActivatedProductProfileOrderByName(false));
+				productProfileService.findAllByCompanyAndActivatedProductProfileOrderByNameLiits(false));
 		return "company/productProfiles";
 	}
 
@@ -240,7 +240,7 @@ public class ProductProfileResource {
 		List<ProductProfileDTO> productProfiles = new ArrayList<>();
 		// none selected
 		if (categoryPids.isEmpty() && groupPids.isEmpty()) {
-			productProfiles.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByName(true));
+			productProfiles.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByNameLiits(true));
 			return new ResponseEntity<>(productProfiles, HttpStatus.OK);
 		}
 		// both selected
@@ -428,15 +428,15 @@ public class ProductProfileResource {
 		List<ProductProfileDTO> productProfileDTOs = new ArrayList<>();
 		if (active == true && deactivate == true) {
 			productProfileDTOs
-					.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByName(true));
+					.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByNameLiits(true));
 			productProfileDTOs
-					.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByName(false));
+					.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByNameLiits(false));
 		} else if (active) {
 			productProfileDTOs
-					.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByName(true));
+					.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByNameLiits(true));
 		} else if (deactivate) {
 			productProfileDTOs
-					.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByName(false));
+					.addAll(productProfileService.findAllByCompanyAndActivatedProductProfileOrderByNameLiits(false));
 		}
 		return new ResponseEntity<>(productProfileDTOs, HttpStatus.OK);
 	}
