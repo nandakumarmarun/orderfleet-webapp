@@ -36,9 +36,46 @@ if (!this.AttachGeoLocation) {
 		$("#btnSaveNewGeoLocation").click(function() {
 			saveNewGeoLocation();
 		});
+		
 
+		$('#btnDownload')
+				.on(
+						'click',
+						function() {
+							var tblAttachGeoLocation = $("#tblAttachGeoLocation tbody");
+							console.log(tblAttachGeoLocation.children().length);
+							console.log(tblAttachGeoLocation[0].textContent.trim());
+							if (tblAttachGeoLocation.children().length == 0) {
+								alert("no values available");
+								return;
+							}
+							if (tblAttachGeoLocation[0].textContent.trim() == "No data available") {
+								alert("no values available");
+								return;
+							}
+							downloadXls();
+							$("#tblAttachGeoLocation th:last-child, #tblAttachGeoLocation td:last-child").show();
+						});
 	});
 
+	
+	
+	function downloadXls() {
+		var activity = "no";
+		 var employeePid = $("#dbEmployee").val();
+		  var activityPid = activity;
+		  var accountPid = $("#dbAccount").val();
+		   var filterBy = $("#dbDateSearch").val();
+		  var fromDate = $("#txtFromDate").val();
+		  var toDate = $("#txtToDate").val();
+		  var rName = $("#dbReportFrom").val();
+		 var status = $('#slt_status').val();
+		console.log(status);
+		window.location.href = attachGeoLocationContextPath
+				+ "/download-attach-geo-Location-xls?employeePid=" + employeePid + '&activityPid='+activityPid + '&accountPid='+accountPid + '&filterBy='+filterBy + '&fromDate='+fromDate + '&rName='+rName +'&toDate='+toDate;	
+	}
+	
+	
 	function attachAccountProfile() {
 		$.ajax({
 			url : attachGeoLocationContextPath + "/attachAccountProfile",
@@ -67,6 +104,8 @@ if (!this.AttachGeoLocation) {
 	}
 
 	AttachGeoLocation.filter = function() {
+	
+		
 		if ($('#dbDateSearch').val() == "SINGLE") {
 			if ($("#txtFromDate").val() == "") {
 				return;
@@ -85,7 +124,7 @@ if (!this.AttachGeoLocation) {
 					url : attachGeoLocationContextPath + "/filter",
 					type : 'GET',
 					data : {
-//						userPid : $("#dbUser").val(),
+// userPid : $("#dbUser").val(),
 						employeePid : $("#dbEmployee").val(),
 						activityPid : activity,
 						accountPid : $("#dbAccount").val(),

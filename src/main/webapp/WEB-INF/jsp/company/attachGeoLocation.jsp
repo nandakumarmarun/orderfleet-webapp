@@ -60,6 +60,7 @@
 			<div class="row col-xs-12"></div>
 			<div class="clearfix"></div>
 			<hr />
+
 			<div class="row">
 				<!-- Profile Info and Notifications -->
 				<div class="col-md-12 col-sm-12 clearfix">
@@ -74,7 +75,8 @@
 						</div>
 						<div class="form-group">
 							<div class="col-sm-2">
-								Employee<select id="dbEmployee" name="employeePid" class="form-control">
+								Employee<select id="dbEmployee" name="employeePid"
+									class="form-control">
 									<option value="no">All Employees</option>
 									<c:forEach items="${employees}" var="employee">
 										<option value="${employee.pid}">${employee.name}</option>
@@ -129,6 +131,13 @@
 								<button type="button" class="btn btn-info"
 									onclick="AttachGeoLocation.filter()">Apply</button>
 							</div>
+							<div class="col-sm-1">
+								<br />
+								<button type="button" class="btn btn-orange" id="btnDownload"
+									title="download xlsx">
+									<i class="entypo-download"></i> download
+								</button>
+							</div>
 						</div>
 					</form>
 				</div>
@@ -164,7 +173,8 @@
 								aria-label="Close">
 								<span aria-hidden="true">&times;</span>
 							</button>
-							<h4 class="modal-title" id="viewModalLabel">Update Location In Account Profile</h4>
+							<h4 class="modal-title" id="viewModalLabel">Update Location
+								In Account Profile</h4>
 						</div>
 						<div class="modal-body">
 							<!-- error message -->
@@ -201,7 +211,7 @@
 				</div>
 				<!-- /.modal-dialog -->
 			</div>
-			
+
 			<!-- Model Container for Mobile Geo location -->
 			<div class="modal fade container" id="viewModalMobile">
 				<!-- model Dialog -->
@@ -262,7 +272,7 @@
 			</div>
 			<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
-			
+
 		</div>
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
