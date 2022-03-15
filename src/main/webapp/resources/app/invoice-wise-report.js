@@ -52,29 +52,23 @@ if (!this.InvoiceWiseReport) {
 		$('.selectpicker').selectpicker();
 	});
 
-//	InvoiceWiseReport.downloadXls = function() {
-//		var excelName = "acvts_txns_"
-//				+ new Date().toISOString().replace(/[\-\:\.]/g, "");
-//		var instance = $('#tblInvoiceWiseReport').tableExport({
-//			formats : [ 'xlsx' ],
-//			filename : excelName,
-//			exportButtons : false
-//		});
-//		var exportData = instance.getExportData()['tblInvoiceWiseReport']['xlsx'];
-//		instance.export2file(exportData.data, exportData.mimeType,
-//				exportData.filename, exportData.fileExtension);
-//	}
+
 	
 	InvoiceWiseReport.downloadXls = function() {
-		// Avoid last column in each row
-		// $("#tblInvoiceWiseReport th:last-child, #tblAccountProfile
-		// td:last-child").hide();
+	   
+		        	var	employeePid = $('#dbEmployee').val();
+					var	documentPid = $("#dbDocument").val();
+					var	activityPid = $("#dbActivity").val();
+					var	accountPid = $("#dbAccount").val();
+					var filterBy = $("#dbDateSearch").val();
+					var	fromDate = $("#txtFromDate").val();
+					var	toDate = $("#txtToDate").val();
+					var	inclSubordinate = $('#inclSubOrdinates').is(":checked");
+					
+	     window.location.href = invoiceWiseReportContextPath+"/downloadxls?&employeePid="+employeePid+'&documentPid='+documentPid+'&activityPid='+activityPid+
+	     '&accountPid='+accountPid+'&filterBy='+filterBy+'&fromDate='+fromDate+'&toDate='+toDate+'&inclSubordinate='+inclSubordinate;
+	     console.log("Success.....");
 		
-		var excelName = "acvts_txns_"+ new Date().toISOString().replace(/[\-\:\.]/g, "");
-		 var table2excel = new Table2Excel();
-		     table2excel.export(document.getElementById('tblInvoiceWiseReport'),excelName);
-		 // $("#tblAccountProfile th:last-child, #tblAccountProfile
-			// td:last-child").show();
 	}
 
 	InvoiceWiseReport.filter = function() {
@@ -259,10 +253,10 @@ if (!this.InvoiceWiseReport) {
 																	+ invoiceWiseReport.accountProfileName
 																	+ "</td><td>"
 																	+ invoiceWiseReport.activityName
-																	+ "</td><td class='tableexport-string target'>"
+																	+ "</td><td class=tableexport-string target'>"
 																	+ formatDate(
 																			invoiceWiseReport.punchInDate,
-																			'MMM DD YYYY, h:mm:ss a')
+																			'MMM DD YYYY,h:mm:ss a')
 																	+ "</td><td class='tableexport-string target'>"
 																	+ formatDate(
 																			invoiceWiseReport.sendDate,
