@@ -138,7 +138,7 @@ public class InventoryOrderStatusController {
 	public ResponseEntity<List<InventoryVoucherHeaderDTO>> findInventoryVoucherHeaders(
 			@RequestParam(required = false, value = "fromDate") String fromDate,
 			@RequestParam(required = false, value = "toDate") String toDate) {
-		log.debug("request for get inventory-order-status ");
+		log.debug("request for get inventory-order-status tert ");
 		Set<String> ivhpid = new HashSet<>();
 		List<InventoryVoucherDetail> ivhdlist = new ArrayList<>();
 		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
@@ -160,7 +160,24 @@ public class InventoryOrderStatusController {
 				String startDate = startLCTime.format(DATE_FORMAT);
 				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 				List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-						.findAllByCompanyIdUserIdAndDateBetweenOrderByDocumentDateDesc(user.getId(), fromdate1, todate1);
+						.findAllByCompanyIdUserPidAndDateBetweenOrderByDocumentDateDesc(user.getId(), fromdate1, todate1);
+				 inventoryVoucherHeaders.forEach(data -> ivhpid.add(data.getPid()));
+				 
+				 if (!ivhpid.isEmpty()) {
+						ivhdlist=inventoryVoucherDetailRepository.findAllByInventoryVoucherHeaderPidIn(ivhpid);
+						
+					}
+				 
+				  for(InventoryVoucherHeader ivh1 : inventoryVoucherHeaders) {
+	            	   List<InventoryVoucherDetail> ivhdetails = new ArrayList<>();
+	            	   for(InventoryVoucherDetail ivhd : ivhdlist) {
+	            		   if(ivh1.getId().equals(ivhd.getInventoryVoucherHeader().getId())) {
+	            			  ivhdetails.add(ivhd);
+	            			  ivh1.setInventoryVoucherDetails(ivhdetails);
+	            		   }
+	            	   }
+	                	
+	                }
 				String flag = "Normal";
 				LocalDateTime endLCTime = LocalDateTime.now();
 				String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -185,6 +202,7 @@ public class InventoryOrderStatusController {
 				inventoryVoucherHeaderDTOs = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 						.collect(Collectors.toList());
 			} else {
+				System.out.println("entrerrr date nulll");
 				 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 					String id = "INV_QUERY_144" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
@@ -234,7 +252,7 @@ public class InventoryOrderStatusController {
 		            	   }
 		                	
 		                }
-		               
+		              
 		                List<InventoryVoucherHeader> ivhfilter = inventoryVoucherHeaders.stream().filter(data -> {
 		                	DateTimeFormatter DATE_FORMATnew = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 							String dataDate = data.getCreatedDate().format(DATE_FORMATnew);

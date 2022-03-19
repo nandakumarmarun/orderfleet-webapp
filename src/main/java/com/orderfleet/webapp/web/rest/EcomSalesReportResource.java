@@ -390,6 +390,11 @@ public class EcomSalesReportResource {
 						ivh.getPid(), ivh.getDocument().getName(), documentTotal,
 						ivh.getDocument().getDocumentType().toString());
 				executiveTaskExecutionDetailView.setDocumentVolume(documentTotal);
+				 Optional<ExecutiveTaskExecutionDetailView> ivdetails = executiveTaskExecutionDetailViews.stream()
+						.filter(ivd -> ivd.getDocumentName().equalsIgnoreCase(ivd.getDocumentName())).findAny();
+				if (ivdetails.isPresent()) {
+					continue;
+				}
 				executiveTaskExecutionDetailViews.add(executiveTaskExecutionDetailView);
 			}
 			executiveTaskExecutionView.setExecutiveTaskExecutionDetailViews(executiveTaskExecutionDetailViews);
