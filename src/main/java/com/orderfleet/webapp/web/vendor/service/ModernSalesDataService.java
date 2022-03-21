@@ -220,6 +220,7 @@ public class ModernSalesDataService {
 					log.info("-------------------");
 					log.info(xmlString);
 					log.info("-------------------");
+					System.out.println("Urls"+apiUrl);
 					HttpHeaders headers = new HttpHeaders();
 					headers.setContentType(MediaType.APPLICATION_XML);
 					HttpEntity<String> request = new HttpEntity<>(xmlString, headers);
@@ -253,7 +254,7 @@ public class ModernSalesDataService {
 		xmlRequest.append(inventoryVoucher.getDocumentDate()==null?" ":DateUtil.convertLocalDateTimeToString(inventoryVoucher.getDocumentDate(), "dd-MMM-yyyy"));
 		xmlRequest.append("</VOUCHERDATE>");
 		xmlRequest.append("<CUSTOMER>");
-		xmlRequest.append(inventoryVoucher.getReceiverAccount().getName()==null?" ":inventoryVoucher.getReceiverAccount().getName());
+		xmlRequest.append(inventoryVoucher.getReceiverAccount().getName()==null?" ":inventoryVoucher.getReceiverAccount().getName().replaceAll("&", "&amp;"));
 		xmlRequest.append("</CUSTOMER>");
 		xmlRequest.append("<ORDERBRANCH>");
 		
@@ -325,13 +326,13 @@ public class ModernSalesDataService {
 					.filter(pgEcom -> pgEcom.getEcomProduct().getPid().equals(ecomproduct.get().getEcomProductProfile().getPid())).findFirst();
 			if(productGroup.isPresent()) {
 //..................ProductGroup Name to be used instead of Alias
-				xmlRequest.append(productGroup.get().getEcomProductGroup().getAlias());
+				xmlRequest.append(productGroup.get().getEcomProductGroup().getAlias().replaceAll("&", "&amp;"));
 			}
 			
 			xmlRequest.append("</GROUP>");
 			xmlRequest.append("<ITEMNAME>");
 //..................Item name  to be used instead of Alias
-			xmlRequest.append(ivd.getProduct().getName()==null?" ":ivd.getProduct().getName());
+			xmlRequest.append(ivd.getProduct().getName()==null?" ":ivd.getProduct().getName().replaceAll("&", "&amp;"));
 			xmlRequest.append("</ITEMNAME>");
 			xmlRequest.append("<QTY>");
 			xmlRequest.append(ivd.getQuantity());
