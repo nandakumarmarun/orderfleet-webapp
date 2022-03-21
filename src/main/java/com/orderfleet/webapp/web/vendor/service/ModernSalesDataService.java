@@ -223,10 +223,10 @@ public class ModernSalesDataService {
 					HttpHeaders headers = new HttpHeaders();
 					headers.setContentType(MediaType.APPLICATION_XML);
 					HttpEntity<String> request = new HttpEntity<>(xmlString, headers);
-//					final ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
-//					if (response.getStatusCode().equals(HttpStatus.OK)) {
-//						log.info("order successfully uploaded to **:modern ");
-//					}
+					final ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
+					if (response.getStatusCode().equals(HttpStatus.OK)) {
+						log.info("order successfully uploaded to **:modern ");
+					}
 			}	
 		}
 		
