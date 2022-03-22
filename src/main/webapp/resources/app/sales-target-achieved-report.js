@@ -99,39 +99,55 @@ if (!this.SalesTargetAchievedReport) {
 		$("#tblSalesTargetAchievedReport tbody").html("");
 		
 		var count = targetData.monthList.length;
+     
 		$("#th_target").removeAttr("colspan");
 		$("#th_target").attr("colspan", count);
 		$("#th_achived").removeAttr("colspan");
 		$("#th_achived").attr("colspan", count);
 		
 		var newRowContent = "";
+		var totalRow = "";
 		$.each(targetData.monthList,function(index, month) {
 			newRowContent += "<td style='color: white; background-color: #35aa47; text-align: center; vertical-align: middle;'>"+ month + "</td>";
-		});
+		
+		     });
+		
+		
 		newRowContent += newRowContent;
 		$("#txtRowHeader").html(newRowContent);
 		
+		
 		var performanceRow = "";
+         var totalRow = "";
+         var targetsumRow="";
+       var achivedsumRow="";
+       var achievedtotalRow ="";
+		var sumTarget=0;
+		var sumAchieved=0;
 		$.each(targetData.salesTargetGroupUserTargets, function(salesTargetGroupName, targets) {
-			
+		
 			var targetRow = "";
 			var achivedRow = "";
 			var targetTotal = 0;
 			var achivedTotal = 0;
+
 			for(var i = 0, size = targets.length; i < size ; i++) {
-				
+
 				var tVolume = targets[i].volume;
 				var tAmount = targets[i].amount;
+
 				if(tAmount != 0){
 					targetTotal += tAmount;
 					 var tAmount1 = (tAmount).toFixed(2);
+					 
 					targetRow += "<td>"+ tAmount1 +"</td>";
 					
 				}else{
 					targetTotal += tVolume;
 					 var tVolume1 = (tVolume).toFixed(2);
-					targetRow += "<td>"+ tVolume1 +"</td>";
 					
+					targetRow += "<td>"+ tVolume1 +"</td>";
+
 				}
 				
 				var aAmount = targets[i].achievedAmount;
@@ -140,6 +156,7 @@ if (!this.SalesTargetAchievedReport) {
 				achivedRow += "<td>"+ aAmount1 +"</td>";
 					
 			}
+
 			var targetTotal1 = (targetTotal).toFixed(2);
 			var achivedTotal1 = (achivedTotal).toFixed(2);
 			if(targetTotal!=0 || achivedTotal!=0){
@@ -148,6 +165,11 @@ if (!this.SalesTargetAchievedReport) {
 			achivedRow += "<td>"+ achivedTotal1 +"</td>";
 			
 			performanceRow += targetRow += achivedRow;
+		
+			sumTarget +=targetTotal;	
+		   sumAchieved +=achivedTotal;
+			
+			
 			var achivedPercentage = (achivedTotal / targetTotal) * 100;
 			achivedPercentage =	Math.round(achivedPercentage);
 			if(achivedPercentage>=100){
@@ -167,9 +189,50 @@ if (!this.SalesTargetAchievedReport) {
 			performanceRow += "</tr>"
 			}
 		});
-		$("#tblBody").html(performanceRow);
-	}
+    var abc=0;
+    var itemRow="";
+    targetData.totalList.forEach(myfunction)
+    	
+    	function myfunction(item)
+       {
+    		abc = item;
+    		itemRow +="<td>"+(abc).toFixed(2) +"</td>";
+    	}
+    	var cba=0;
+    	targetData.achievedList.forEach(sumFunction)
+    	function sumFunction(item)
+    	{
+    		cba =item;
+    		achivedsumRow += "<td>"+ (cba).toFixed(2)+"</td>";
+    	}
+ 
+		totalRow += "<tr> <td style ='text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; font-size:24px'>"+"Total"+"</td>";
+		targetsumRow += "<td>"+(sumTarget).toFixed(2) +"</td>";
+		achievedtotalRow+="<td>"+ (sumAchieved).toFixed(2) +"</td>";
+		
+		var percentageRow ="";
+		var achivedPercentages = (sumAchieved / sumTarget) * 100;
+		achivedPercentages =	Math.round(achivedPercentages);
+		if(achivedPercentages>=100){
+			achivedPercentages=100;
+		}else if(achivedPercentages<100){
+			achivedPercentages=achivedPercentages;
+		}else{
+			achivedPercentages=0;
+		}
+		if(achivedPercentages==100){
+			percentageRow += "<td style='color: white;background-color: green;'>"+ achivedPercentages+"%" +"</td>";
+		}else if(achivedPercentages>=80 && achivedPercentages<100){
+			percentageRow += "<td style='color: black;background-color: yellow;'>"+ achivedPercentages+"%" +"</td>";
+		}else{
+			percentageRow += "<td style='color: white;background-color: red;'>"+ achivedPercentages+"%" +"</td>";
+		}
+		percentageRow += "</tr>"
+		
+		performanceRow+= totalRow +=itemRow+= targetsumRow += achivedsumRow +=achievedtotalRow +=percentageRow;
 	
+			$("#tblBody").html(performanceRow);
+	}
 
 	function convertLocalDateToServer (date) {
 		if (date) {

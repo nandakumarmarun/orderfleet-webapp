@@ -6,12 +6,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +67,7 @@ import com.orderfleet.webapp.web.rest.mapper.SalesTargetGroupUserTargetMapper;
 public class SalesTargetAchievedReportResource {
 
 	private final Logger log = LoggerFactory.getLogger(SalesTargetAchievedReportResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private SalesTargetGroupUserTargetRepository salesTargetGroupUserTargetRepository;
 
@@ -141,21 +143,27 @@ public class SalesTargetAchievedReportResource {
 		// filter based on product group
 		List<SalesTargetGroup> salesTargetGroups = productGroupSalesTargetGrouprepository
 				.findSalesTargetGroupByProductGroupPidIn(productGroupPids);
+
 		List<String> salesTargetGroupPids = salesTargetGroups.stream().map(a -> a.getPid())
 				.collect(Collectors.toList());
 		List<SalesTargetGroupUserTarget> salesTargetGroupUserTargets = salesTargetGroupUserTargetRepository
 				.findBySalesTargetGroupPidInAndUserPidAndFromDateGreaterThanEqualAndToDateLessThanEqualAndAccountWiseTargetFalse(
 						salesTargetGroupPids, userPid, fromDate, toDate);
+
 		if (!salesTargetGroupUserTargets.isEmpty()) {
 			SalesPerformaceDTO salesPerformaceDTO = new SalesPerformaceDTO();
 			// Get months date between the date
 			List<LocalDate> monthsBetweenDates = monthsDateBetweenDates(fromDate, toDate);
+
 			List<SalesTargetGroupUserTargetDTO> salesTargetGroupUserTargetDTOs = salesTargetGroupUserTargetMapper
 					.salesTargetGroupUserTargetsToSalesTargetGroupUserTargetDTOs(salesTargetGroupUserTargets);
 			// group by SalesTargetGroupName
 			Map<String, List<SalesTargetGroupUserTargetDTO>> salesTargetGroupUserTargetBySalesTargetGroupName = salesTargetGroupUserTargetDTOs
 					.parallelStream()
 					.collect(Collectors.groupingBy(SalesTargetGroupUserTargetDTO::getSalesTargetGroupName));
+
+			Map<LocalDate, List<SalesTargetGroupUserTargetDTO>> salesTargetGroupUserTargetByMonths = salesTargetGroupUserTargetDTOs
+					.parallelStream().collect(Collectors.groupingBy(SalesTargetGroupUserTargetDTO::getFromDate));
 
 			CompanySetting companySetting = companySettingRepository.findOneByCompanyId();
 			Optional<CompanyConfiguration> optLocWiseCompanyConfig = Optional.empty();
@@ -166,56 +174,40 @@ public class SalesTargetAchievedReportResource {
 						.findDocumentIdWithSalesTargetGroupNameBySalesTargetGroupPid(salesTargetGroupPids);
 				pProfileIdWithSTGroupNames = salesTargetGroupProductRepository
 						.findProductIdWithSalesTargetGroupNameBySalesTargetGroupPid(salesTargetGroupPids);
-				DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		        DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id1 = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description1 ="get by compId and name";
-				LocalDateTime startLCTime1 = LocalDateTime.now();
-				String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-				String startDate1 = startLCTime1.format(DATE_FORMAT1);
-				logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+
 				optLocWiseCompanyConfig = companyConfigurationRepository
 						.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.LOCATION_WISE);
-				String flag1 = "Normal";
-				LocalDateTime endLCTime1 = LocalDateTime.now();
-				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-				String endDate1 = startLCTime1.format(DATE_FORMAT1);
-				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-				long minutes1 = duration1.toMinutes();
-				if (minutes1 <= 1 && minutes1 >= 0) {
-					flag1 = "Fast";
-				}
-				if (minutes1 > 1 && minutes1 <= 2) {
-					flag1 = "Normal";
-				}
-				if (minutes1 > 2 && minutes1 <= 10) {
-					flag1 = "Slow";
-				}
-				if (minutes1 > 10) {
-					flag1 = "Dead Slow";
-				}
-		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-						+ description1);	}
+			}
 			// actual sales user target
 			Map<String, List<SalesTargetGroupUserTargetDTO>> salesTargetGroupUserTargetMap = new HashMap<>();
+			List<Double> targetTotal = new ArrayList<>();
+			List<Double> achievedTotal = new ArrayList<>();
+
 			for (SalesTargetGroup salesTargetGroup : salesTargetGroups) {
 				String groupName = salesTargetGroup.getName();
+
 				List<SalesTargetGroupUserTargetDTO> salesTargetGroupUserTargetList = new ArrayList<>();
 				for (LocalDate monthDate : monthsBetweenDates) {
 					String month = monthDate.getMonth().toString();
+
 					// group by month, one month has only one
 					// user-target
 					Map<String, List<SalesTargetGroupUserTargetDTO>> salesTargetGroupUserTargetByMonth = null;
 					List<SalesTargetGroupUserTargetDTO> userTarget = salesTargetGroupUserTargetBySalesTargetGroupName
 							.get(groupName);
+
 					SalesTargetGroupUserTargetDTO salesTargetGroupUserTargetDTO = null;
 					if (userTarget != null) {
+
 						salesTargetGroupUserTargetByMonth = userTarget.stream()
 								.collect(Collectors.groupingBy(a -> a.getFromDate().getMonth().toString()));
+
 						if (salesTargetGroupUserTargetByMonth != null
 								&& salesTargetGroupUserTargetByMonth.get(month) != null) {
 							salesTargetGroupUserTargetDTO = salesTargetGroupUserTargetByMonth.get(month).get(0);
+
 						}
+
 					}
 					// no target saved, add a default one
 					if (salesTargetGroupUserTargetDTO == null) {
@@ -229,6 +221,7 @@ public class SalesTargetAchievedReportResource {
 							&& companySetting.getSalesConfiguration().getAchievementSummaryTableEnabled()) {
 						salesTargetGroupUserTargetDTO.setAchievedAmount(
 								getAchievedAmountFromSummary(userPid, salesTargetGroupUserTargetDTO, monthDate));
+
 					} else {
 						Set<Long> documentIds = new HashSet<>();
 						Set<Long> productProfileIds = new HashSet<>();
@@ -255,11 +248,43 @@ public class SalesTargetAchievedReportResource {
 					salesTargetGroupUserTargetList.add(salesTargetGroupUserTargetDTO);
 				}
 				salesTargetGroupUserTargetMap.put(groupName, salesTargetGroupUserTargetList);
+
+			}
+			for (LocalDate monthDate : monthsBetweenDates) {
+				List<SalesTargetGroupUserTargetDTO> userTargetByMonth = salesTargetGroupUserTargetByMonths
+						.get(monthDate);
+				if (userTargetByMonth != null) {
+					Map<Object, List<SalesTargetGroupUserTargetDTO>> saleTargetGroups = userTargetByMonth.stream()
+							.collect(Collectors.groupingBy(a -> a.getFromDate()));
+
+					for (Map.Entry map : saleTargetGroups.entrySet()) {
+						System.out.println("key :" + map.getKey());
+						List<SalesTargetGroupUserTargetDTO> values = (List<SalesTargetGroupUserTargetDTO>) map
+								.getValue();
+						double total = 0;
+						double achieved_total = 0;
+						for (SalesTargetGroupUserTargetDTO stgt : values) {
+							if (stgt.getAmount() != 0) {
+								total += stgt.getAmount();
+
+							} else {
+
+								total += stgt.getVolume();
+							}
+							achieved_total += stgt.getAchievedAmount();
+						}
+
+						targetTotal.add(total);
+						achievedTotal.add(achieved_total);
+					}
+				}
 			}
 			List<String> monthList = new ArrayList<>();
 			for (LocalDate monthDate : monthsBetweenDates) {
 				monthList.add(monthDate.getMonth().toString());
 			}
+			salesPerformaceDTO.setAchievedList(achievedTotal);
+			salesPerformaceDTO.setTotalList(targetTotal);
 			salesPerformaceDTO.setMonthList(monthList);
 			salesPerformaceDTO.setSalesTargetGroupUserTargets(salesTargetGroupUserTargetMap);
 			return salesPerformaceDTO;
@@ -273,37 +298,11 @@ public class SalesTargetAchievedReportResource {
 		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
 		Double achievedAmount = 0D;
 		if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "INV_QUERY_166" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get Id by UserPid and Documents and Products CreatedDateBetween";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository
 					.findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(userPid, documentIds,
 							start.atTime(0, 0), end.atTime(23, 59));
-			String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+
 			if (!ivHeaderIds.isEmpty()) {
 				achievedAmount = inventoryVoucherDetailRepository
 						.sumOfAmountByAndProductIdsAndHeaderIds(productProfileIds, ivHeaderIds);
