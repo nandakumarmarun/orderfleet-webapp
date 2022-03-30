@@ -267,11 +267,11 @@ public class UploadXlsResource {
 						accProfile.setName(accountProofileName);
 					}
 
-					if (addressNumber == -1) {
+					if (addressNumber == -1 || row.getCell(addressNumber) == null) {
 						accProfile.setAddress("No Address");
 					} else {
 						String address = "";
-
+						
 						// celltype=0==>Numeric && celltype=1==>String
 						if (row.getCell(addressNumber).getCellType() == 0) {
 							address = String.valueOf(row.getCell(addressNumber).getNumericCellValue());
@@ -287,7 +287,7 @@ public class UploadXlsResource {
 							accProfile.setAddress(address);
 						}
 					}
-					if (cityNumber == -1) {
+					if (cityNumber == -1 || row.getCell(cityNumber) == null) {
 						accProfile.setCity("No city");
 					} else {
 
