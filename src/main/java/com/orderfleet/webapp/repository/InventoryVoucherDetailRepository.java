@@ -41,6 +41,10 @@ public interface InventoryVoucherDetailRepository extends JpaRepository<Inventor
 	@Query("select coalesce(sum(voucherDetail.quantity),0) from InventoryVoucherDetail voucherDetail where voucherDetail.product.pid = ?1 and voucherDetail.sourceStockLocation in ?2 and voucherDetail.inventoryVoucherHeader.createdDate between ?3 and ?4")
 	Double getClosingStockBySourceStockLocationAndCreatedDateBetween(String productPid,
 			List<StockLocation> stockLocations, LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Query("select coalesce(sum((voucherDetail.quantity + voucherDetail.freeQuantity)),0) from InventoryVoucherDetail voucherDetail where voucherDetail.product.pid = ?1 and voucherDetail.sourceStockLocation in ?2 and voucherDetail.inventoryVoucherHeader.createdDate between ?3 and ?4")
+	Double getClosingStockBySourceStockLocationAndFreeQntyandCreatedDateBetween(String productPid,
+			List<StockLocation> stockLocations, LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Query("select coalesce(sum(voucherDetail.quantity),0) from InventoryVoucherDetail voucherDetail where voucherDetail.product.pid = ?1 and voucherDetail.destinationStockLocation in ?2 and voucherDetail.inventoryVoucherHeader.createdDate between ?3 and ?4")
 	Double getClosingStockByDestinationStockLocationAndCreatedDateBetween(String productPid,

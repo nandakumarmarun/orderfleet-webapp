@@ -285,6 +285,11 @@
 											id="field_discountScaleBar" /> &nbsp;<span>Discount Scale Bar</span>
 										</label>
 									</div>
+									<div class="form-group" id="enableHeaderPrintOut">
+										<label for="enableHeaderPrintOut"> <input type="checkbox"
+											id="field_enableHeaderPrintOut" /> &nbsp;<span>Enable Header PrintOut</span>
+										</label>
+									</div>
 
 								</div>
 							</div>
@@ -402,6 +407,13 @@
 										</dt>
 										<dd>
 											<span id="lbl_discount_Scale_Bar"></span>
+										</dd>
+										<hr />
+										<dt>
+											<span>Enable Header PrintOut</span>
+										</dt>
+										<dd>
+											<span id="lbl_enableHeaderPrintOut"></span>
 										</dd>
 									</dl>
 								</div>

@@ -300,7 +300,7 @@ public class StockCalculationController {
 
 	
 	private Double calculateClosingStock(Double openingStock, String productPid, List<StockLocation> stockLocations, LocalDateTime from, LocalDateTime to) {
-		Double stockLocationSourceSum = inventoryVoucherDetailRepository.getClosingStockBySourceStockLocationAndCreatedDateBetween(productPid,
+		Double stockLocationSourceSum = inventoryVoucherDetailRepository.getClosingStockBySourceStockLocationAndFreeQntyandCreatedDateBetween(productPid,
 				stockLocations,from,to);
 		Double stockLocationDestinationSum = inventoryVoucherDetailRepository
 				.getClosingStockByDestinationStockLocationAndCreatedDateBetween(productPid, stockLocations,from, to);
@@ -309,7 +309,7 @@ public class StockCalculationController {
 
 	private Double calculateClosingStockLogical(Double openingStock, String productPid,
 			List<StockLocation> logicalStockLocations, LocalDateTime from, LocalDateTime to) {
-		Double slSourceLogicalSum = inventoryVoucherDetailRepository.getClosingStockBySourceStockLocationAndCreatedDateBetween(productPid,
+		Double slSourceLogicalSum = inventoryVoucherDetailRepository.getClosingStockBySourceStockLocationAndFreeQntyandCreatedDateBetween(productPid,
 				logicalStockLocations,from, to);
 		Double slDestinationLogicalSum = inventoryVoucherDetailRepository
 				.getClosingStockByDestinationStockLocationAndCreatedDateBetween(productPid, logicalStockLocations,from , to);

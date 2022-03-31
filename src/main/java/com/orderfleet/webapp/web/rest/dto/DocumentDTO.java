@@ -108,6 +108,8 @@ public class DocumentDTO implements Cloneable {
 
 	private String footerImageContentType;
 	
+	private boolean enableHeaderPrintOut;
+	
 	
 
 	public DocumentDTO() {
@@ -150,6 +152,7 @@ public class DocumentDTO implements Cloneable {
 		this.headerImageContentType = document.getHeaderImageContentType();
 		this.footerImageContentType = document.getFooterImageContentType();
 		this.discountPercentage =document.getDiscountPercentage();
+		this.enableHeaderPrintOut = document.getEnableHeaderPrintOut();
 	}
 
 	public DocumentDTO(Document document, boolean activityDocRequired, int activityDocSortOrder) {
@@ -190,6 +193,7 @@ public class DocumentDTO implements Cloneable {
 		this.rateWithTax = document.getRateWithTax();
 		this.discountScaleBar =document.getDiscountScaleBar();
 		this.discountPercentage =document.getDiscountPercentage();
+		this.enableHeaderPrintOut = document.getEnableHeaderPrintOut();
 	}
 
 	public String getTermsAndConditions() {
@@ -512,6 +516,16 @@ public class DocumentDTO implements Cloneable {
 
 	public void setDiscountPercentage(double discountPercentage) {
 		this.discountPercentage = discountPercentage;
+	}
+	
+	
+
+	public boolean getEnableHeaderPrintOut() {
+		return enableHeaderPrintOut;
+	}
+
+	public void setEnableHeaderPrintOut(boolean enableHeaderPrintOut) {
+		this.enableHeaderPrintOut = enableHeaderPrintOut;
 	}
 
 	@Override

@@ -161,9 +161,12 @@ public class Document implements Serializable, Cloneable {
 	
 	@Column(name = "discount_Scale_Bar", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean discountScaleBar;
-
+	
 	@Column(name = "discount_percentage", columnDefinition = "double precision DEFAULT 0")
 	private double discountPercentage ;
+	
+	@Column(name = "enable_header_printOut", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enableHeaderPrintOut;
 
 	@PreUpdate
 	public void preUpdate() {
@@ -435,6 +438,16 @@ public class Document implements Serializable, Cloneable {
 
 	public void setDiscountPercentage(double discountPercentage) {
 		this.discountPercentage = discountPercentage;
+	}
+	
+	
+
+	public boolean getEnableHeaderPrintOut() {
+		return enableHeaderPrintOut;
+	}
+
+	public void setEnableHeaderPrintOut(boolean enableHeaderPrintOut) {
+		this.enableHeaderPrintOut = enableHeaderPrintOut;
 	}
 
 	@Override

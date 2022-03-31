@@ -57,6 +57,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		documentDTO.setHeaderImageContentType(document.getHeaderImageContentType());
 		documentDTO.setFooterImageContentType(document.getFooterImageContentType());
         documentDTO.setDiscountPercentage(document.getDiscountPercentage());
+        documentDTO.setEnableHeaderPrintOut(document.getEnableHeaderPrintOut());
 		return documentDTO;
 	}
 
@@ -106,6 +107,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		documentDTO.setHeaderImageContentType(document.getHeaderImageContentType());
 		documentDTO.setFooterImageContentType(document.getFooterImageContentType());
         documentDTO.setDiscountPercentage(document.getDiscountPercentage());
+        documentDTO.setEnableHeaderPrintOut(document.getEnableHeaderPrintOut());
 		return documentDTO;
 	}
 
@@ -164,6 +166,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		document.setHasTelephonicOrder(documentDTO.getHasTelephonicOrder());
 		document.setRateWithTax(documentDTO.getRateWithTax());
 		document.setDiscountScaleBar(documentDTO.getDiscountScaleBar());
+		document.setEnableHeaderPrintOut(documentDTO.getEnableHeaderPrintOut());
 		document.setDiscountPercentage(documentDTO.getDiscountPercentage());
 		if (documentDTO.getHeaderImage() != null) {
 			byte[] headerImage = documentDTO.getHeaderImage();
