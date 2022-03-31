@@ -737,7 +737,14 @@ public class InvoiceWiseReportResource {
 						executiveTaskExecution.getSendDate());
 				invoiceWiseReportView.setTimeSpend(timeSpend);
 				List<InvoiceWiseReportDetailView> executiveTaskExecutionDetailViews = new ArrayList<>();
-
+//				List<Object[]> inventoryVouchers;
+//				if (documentPid.equals("no")) {
+//					inventoryVouchers = inventoryVoucherHeaderRepository
+//							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+//				} else {
+//					inventoryVouchers = inventoryVoucherHeaderRepository
+//							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
+//				}
 
 				for (Object[] obj : inventoryVouchers) {
 
@@ -754,7 +761,14 @@ public class InvoiceWiseReportResource {
 					}
 				}
 
-
+//				List<Object[]> accountingVouchers = new ArrayList<>();
+//				if (documentPid.equals("no")) {
+//					accountingVouchers = accountingVoucherHeaderRepository
+//							.findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+//				} else {
+//					accountingVouchers = accountingVoucherHeaderRepository
+//							.findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(), documentPid);
+//				}
 				for (Object[] obj : accountingVouchers) {
 
 					if (obj[4].toString().equalsIgnoreCase(executiveTaskExecution.getPid())) {
@@ -814,148 +828,6 @@ public class InvoiceWiseReportResource {
 
 	}
 
-	@RequestMapping(value = "/invoice-wise-reports/downloadxls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void downloadXls(@RequestParam("documentPid") String documentPid, @RequestParam("employeePid") String employeePid,
-			@RequestParam("activityPid") String activityPid, @RequestParam("accountPid") String accountPid,
-			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
-			@RequestParam boolean inclSubordinate,HttpServletResponse response)
-	{
-		log.debug("downloading......");
-		List<InvoiceWiseReportView> executiveTaskExecutions = new ArrayList<>();
-		if (filterBy.equals("TODAY")) {
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, LocalDate.now(),
-					LocalDate.now(), inclSubordinate);
-		} else if (filterBy.equals("YESTERDAY")) {
-			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, yeasterday,
-					yeasterday, inclSubordinate);
-		} else if (filterBy.equals("WTD")) {
-			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
-			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, weekStartDate,
-					LocalDate.now(), inclSubordinate);
-		} else if (filterBy.equals("MTD")) {
-			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, monthStartDate,
-					LocalDate.now(), inclSubordinate);
-		} else if (filterBy.equals("CUSTOM")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, fromDateTime,
-					toFateTime, inclSubordinate);
-		} else if (filterBy.equals("SINGLE")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, fromDateTime,
-					fromDateTime, inclSubordinate);
-		}
-		buildExcelDocument(executiveTaskExecutions, response);
-	}
-	private void buildExcelDocument(List<InvoiceWiseReportView> executiveTaskExecutions, HttpServletResponse response) {
-		
-		// TODO Auto-generated method stub
-		log.debug("Downloading Excel report");
-		String excelFileName = "ActivityTransactn" + ".xls";
-		String sheetName = "Sheet1";
-
-		String[] headerColumns = { "Employee", "AccountProfile", "Activity", "Punch In", "Client Date", "Time Spend (hh:mm:ss)",
-				"ServerDate", "GPSLocation", "TowerLocation","Visit Type", "Sales/ Sales OrderAmount Total", "Receipt Amount Total",
-				"Remarks" };
-		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
-			HSSFSheet worksheet = workbook.createSheet(sheetName);
-			createHeaderRow(worksheet, headerColumns);
-			createReportRows(worksheet, executiveTaskExecutions);
-			// Resize all columns to fit the content size
-			for (int i = 0; i < headerColumns.length; i++) {
-				worksheet.autoSizeColumn(i);
-			}
-			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
-			response.setContentType("application/vnd.ms-excel");
-			// Writes the report to the output stream
-			ServletOutputStream outputStream = response.getOutputStream();
-			worksheet.getWorkbook().write(outputStream);
-			outputStream.flush();
-		} catch (IOException ex) {
-			log.error("IOException on downloading Sales Order {}", ex.getMessage());
-		}
-		
-	}
-	private void createReportRows(HSSFSheet worksheet, List<InvoiceWiseReportView> executiveTaskExecutions) {
-		// TODO Auto-generated method stub
-		/*
-		 * CreationHelper helps us create instances of various things like DataFormat,
-		 * Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way
-		 */
-		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
-		// Create Cell Style for formatting Date
-		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
-		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM/DD/YYYY, h:mm:ss "));
-		// Create Other rows and cells with Sales data
-		int rowNum = 1;
-		for (InvoiceWiseReportView executivetask : executiveTaskExecutions) {
-			HSSFRow row = worksheet.createRow(rowNum++);
-			LocalDateTime localDateTime = executivetask.getPunchInDate();
-			Instant i=localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-			Date date =Date.from(i);
-			LocalDateTime localDate = executivetask.getSendDate();
-			Instant it=localDate.atZone(ZoneId.systemDefault()).toInstant();
-			Date dates =Date.from(it);
-			LocalDateTime localtime = executivetask.getCreatedDate();
-			Instant itn=localtime.atZone(ZoneId.systemDefault()).toInstant();
-			Date data =Date.from(itn);
-			
-			row.createCell(0).setCellValue(executivetask.getEmployeeName());
-
-			
-			row.createCell(1).setCellValue(executivetask.getAccountProfileName());
-			row.createCell(2).setCellValue(executivetask.getActivityName());
-			HSSFCell punchInDateCell = row.createCell(3);
-			punchInDateCell.setCellValue(date);
-			punchInDateCell.setCellStyle(dateCellStyle);
-			HSSFCell clientDateCell = row.createCell(4);
-			clientDateCell.setCellValue(dates);
-			clientDateCell.setCellStyle(dateCellStyle);
-			row.createCell(5).setCellValue(executivetask.getTimeSpend().toString());
-			HSSFCell serverDateCell = row.createCell(6);
-			serverDateCell.setCellValue(data);
-			serverDateCell.setCellStyle(dateCellStyle);
-			row.createCell(7).setCellValue(executivetask.getLocation());
-			row.createCell(8).setCellValue(executivetask.getTowerLocation());
-			if(executivetask.getWithCustomer()== true)
-			{
-			row.createCell(9).setCellValue("Counter visit");
-			}
-			else
-			{
-				row.createCell(9).setCellValue("Remote visit");
-			}
-			row.createCell(10).setCellValue(executivetask.getTotalSalesOrderAmount());
-			row.createCell(11).setCellValue(executivetask.getTotalRecieptAmount());
-			row.createCell(12).setCellValue(executivetask.getRemarks());
-			
-		}
-	}
-
-	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
-		// Create a Font for styling header cells
-		Font headerFont = worksheet.getWorkbook().createFont();
-		headerFont.setFontName("Arial");
-		headerFont.setBold(true);
-		headerFont.setFontHeightInPoints((short) 14);
-		headerFont.setColor(IndexedColors.RED.getIndex());
-		// Create a CellStyle with the font
-		HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
-		headerCellStyle.setFont(headerFont);
-		// Create a Row
-		HSSFRow headerRow = worksheet.createRow(0);
-		// Create cells
-		for (int i = 0; i < headerColumns.length; i++) {
-			HSSFCell cell = headerRow.createCell(i);
-			cell.setCellValue(headerColumns[i]);
-			cell.setCellStyle(headerCellStyle);
-		}
-	}
 	private List<String> getAccountPids(List<Long> userIds) {
 		List<AccountProfileDTO> allAccountDtos;
 		if (userIds.isEmpty()) {
@@ -1008,7 +880,187 @@ public class InvoiceWiseReportResource {
 
 	}
 
-
+	// private List<InvoiceWiseReportView> getFilterData1(String
+	// employeePid,
+	// String documentPid, String activityPid,
+	// String accountPid, LocalDate fDate, LocalDate tDate) {
+	//
+	// String userPid = "no";
+	// if (!employeePid.equals("no") && !employeePid.equals("Dashboard
+	// Employee")) {
+	// Optional<EmployeeProfileDTO> opEmployee =
+	// employeeProfileService.findOneByPid(employeePid);
+	// if (opEmployee.isPresent()) {
+	// userPid = opEmployee.get().getUserPid();
+	// }
+	// }
+	//
+	// List<Long> userIds = getUserIdsUnderCurrentUser(employeePid);
+	//
+	// LocalDateTime fromDate = fDate.atTime(0, 0);
+	// LocalDateTime toDate = tDate.atTime(23, 59);
+	// List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
+	// if (userPid.equals("no") && activityPid.equals("no") &&
+	// accountPid.equals("no")) {
+	//
+	// // user under current user
+	// if (userIds.isEmpty()) {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByCompanyIdAndDateBetweenOrderByDateDesc(fromDate, toDate);
+	// } else {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByUserIdInAndDateBetweenOrderByDateDesc(userIds, fromDate,
+	// toDate);
+	// }
+	// } else if (!userPid.equals("no") && !activityPid.equals("no") &&
+	// !accountPid.equals("no")) {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByCompanyIdUserPidActivityPidAccountPidAndDateBetweenOrderByDateDesc(userPid,
+	// activityPid,
+	// accountPid, fromDate, toDate);
+	// } else if (!userPid.equals("no") && activityPid.equals("no") &&
+	// accountPid.equals("no")) {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByCompanyIdUserPidAndDateBetweenOrderByDateDesc(userPid,
+	// fromDate,
+	// toDate);
+	//
+	// } else if (!activityPid.equals("no") && userPid.equals("no") &&
+	// accountPid.equals("no")) {
+	// // user under current user
+	// if (userIds.isEmpty()) {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByCompanyIdActivityPidAndDateBetweenOrderByDateDesc(activityPid,
+	// fromDate, toDate);
+	// } else {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByUserIdInActivityPidAndDateBetweenOrderByDateDesc(userIds,
+	// activityPid, fromDate,
+	// toDate);
+	// }
+	// } else if (!accountPid.equals("no") && userPid.equals("no") &&
+	// activityPid.equals("no")) {
+	// // user under current user
+	// if (userIds.isEmpty()) {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByCompanyIdAccountPidAndDateBetweenOrderByDateDesc(accountPid,
+	// fromDate, toDate);
+	// } else {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByUserIdInAccountPidAndDateBetweenOrderByDateDesc(userIds,
+	// accountPid, fromDate,
+	// toDate);
+	// }
+	// } else if (!userPid.equals("no") && !activityPid.equals("no") &&
+	// accountPid.equals("no")) {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByCompanyIdUserPidActivityPidAndDateBetweenOrderByDateDesc(userPid,
+	// activityPid, fromDate,
+	// toDate);
+	// } else if (!userPid.equals("no") && !accountPid.equals("no") &&
+	// activityPid.equals("no")) {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByCompanyIdUserPidAccountPidAndDateBetweenOrderByDateDesc(userPid,
+	// accountPid, fromDate,
+	// toDate);
+	// } else if (!accountPid.equals("no") && !activityPid.equals("no") &&
+	// userPid.equals("no")) {
+	// // user under current user
+	// if (userIds.isEmpty()) {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByCompanyIdActivityPidAccountPidAndDateBetweenOrderByDateDesc(activityPid,
+	// accountPid,
+	// fromDate, toDate);
+	// } else {
+	// executiveTaskExecutions = executiveTaskExecutionRepository
+	// .findAllByUserIdInActivityPidAccountPidAndDateBetweenOrderByDateDesc(userIds,
+	// activityPid,
+	// accountPid, fromDate, toDate);
+	// }
+	// }
+	// List<InvoiceWiseReportView> invoiceWiseReportViews = new
+	// ArrayList<>();
+	// for (ExecutiveTaskExecution executiveTaskExecution :
+	// executiveTaskExecutions)
+	// {
+	// InvoiceWiseReportView invoiceWiseReportView = new
+	// InvoiceWiseReportView(
+	// executiveTaskExecution);
+	// EmployeeProfileDTO employeeProfileDTO = employeeProfileService
+	// .findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
+	// if (employeeProfileDTO != null) {
+	// invoiceWiseReportView.setEmployeeName(employeeProfileDTO.getName());
+	// String timeSpend = findTimeSpend(executiveTaskExecution.getStartTime(),
+	// executiveTaskExecution.getEndTime());
+	// invoiceWiseReportView.setTimeSpend(timeSpend);
+	// List<InvoiceWiseReportDetailView> executiveTaskExecutionDetailViews
+	// =
+	// new ArrayList<InvoiceWiseReportDetailView>();
+	// List<Object[]> inventoryVouchers = new ArrayList<>();
+	// if (documentPid.equals("no")) {
+	// inventoryVouchers = inventoryVoucherHeaderRepository
+	// .findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+	// } else {
+	// inventoryVouchers = inventoryVoucherHeaderRepository
+	// .findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(),
+	// documentPid);
+	// }
+	// for (Object[] obj : inventoryVouchers) {
+	// InvoiceWiseReportDetailView executiveTaskExecutionDetailView = new
+	// InvoiceWiseReportDetailView(
+	// obj[0].toString(), obj[1].toString(), Double.valueOf(obj[2].toString()),
+	// obj[3].toString());
+	// executiveTaskExecutionDetailView.setDocumentVolume(Double.valueOf(obj[4].toString()));
+	// executiveTaskExecutionDetailViews.add(executiveTaskExecutionDetailView);
+	// }
+	//
+	// List<Object[]> accountingVouchers = new ArrayList<>();
+	// if (documentPid.equals("no")) {
+	// accountingVouchers = accountingVoucherHeaderRepository
+	// .findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+	// } else {
+	// accountingVouchers = accountingVoucherHeaderRepository
+	// .findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(),
+	// documentPid);
+	// }
+	// for (Object[] obj : accountingVouchers) {
+	// executiveTaskExecutionDetailViews.add(new
+	// InvoiceWiseReportDetailView(obj[0].toString(),
+	// obj[1].toString(), Double.valueOf(obj[2].toString()),
+	// obj[3].toString()));
+	// }
+	//
+	// List<Object[]> dynamicDocuments = new ArrayList<>();
+	// if (documentPid.equals("no")) {
+	// dynamicDocuments = dynamicDocumentHeaderRepository
+	// .findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
+	// } else {
+	// dynamicDocuments = dynamicDocumentHeaderRepository
+	// .findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(),
+	// documentPid);
+	// }
+	// for (Object[] obj : dynamicDocuments) {
+	// boolean imageFound = false;
+	// // check image saved
+	// if (filledFormRepository.existsByHeaderPidIfFiles(obj[0].toString())) {
+	// imageFound = true;
+	// }
+	// executiveTaskExecutionDetailViews.add(new
+	// InvoiceWiseReportDetailView(obj[0].toString(),
+	// obj[1].toString(), obj[2].toString(), imageFound));
+	// }
+	// // if condition for document wise filter
+	// if (!documentPid.equals("no") &&
+	// executiveTaskExecutionDetailViews.isEmpty())
+	// {
+	// } else {
+	// invoiceWiseReportView.setInvoiceWiseReportDetailViews(executiveTaskExecutionDetailViews);
+	// invoiceWiseReportViews.add(invoiceWiseReportView);
+	// }
+	// }
+	// }
+	// return invoiceWiseReportViews;
+	// }
 
 	private List<Long> getUserIdsUnderCurrentUser(String employeePid, boolean inclSubordinate) {
 		List<Long> userIds = Collections.emptyList();
