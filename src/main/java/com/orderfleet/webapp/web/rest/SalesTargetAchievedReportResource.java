@@ -278,6 +278,11 @@ public class SalesTargetAchievedReportResource {
 						achievedTotal.add(achieved_total);
 					}
 				}
+				else {
+					double total = 0;
+					targetTotal.add(total);
+					achievedTotal.add(total);
+				}
 			}
 			List<String> monthList = new ArrayList<>();
 			for (LocalDate monthDate : monthsBetweenDates) {
