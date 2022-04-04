@@ -232,15 +232,15 @@ public class SalesPerformanceReportResource {
 				.findByPid(pid);
 		if (optionalInventoryVoucherHeaderDTO.isPresent()) {
 			InventoryVoucherHeaderDTO inventoryVoucherDTO = optionalInventoryVoucherHeaderDTO.get();
-			Double ivTotalVolume = inventoryVoucherDTO.getInventoryVoucherDetails().stream()
-					.collect(Collectors.summingDouble(ivd -> {
-						if (ivd.getProductUnitQty() != null) {
-							return (ivd.getProductUnitQty() * ivd.getQuantity());
-						} else {
-							return 0;
-						}
-					}));
-			inventoryVoucherDTO.setDocumentVolume(ivTotalVolume);
+////			Double ivTotalVolume = inventoryVoucherDTO.getInventoryVoucherDetails().stream()
+////					.collect(Collectors.summingDouble(ivd -> {
+////						if (ivd.getProductUnitQty() != null) {
+////							return (ivd.getProductUnitQty() * ivd.getQuantity());
+////						} else {
+////							return 0;
+////						}
+////					}));
+//			inventoryVoucherDTO.setDocumentVolume(ivTotalVolume);
 			return new ResponseEntity<>(inventoryVoucherDTO, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

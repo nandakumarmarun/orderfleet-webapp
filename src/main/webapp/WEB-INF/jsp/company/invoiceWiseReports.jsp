@@ -606,6 +606,10 @@
 									<td id="lbl_documentTotalIc"></td>
 								</tr>
 								<tr>
+									<td>Document Volume</td>
+									<td id="lbl_documentVolumIc"></td>
+								</tr>
+								<tr>
 									<td>Document Discount Amount</td>
 									<td id="lbl_documentDiscountAmountIc"></td>
 								</tr>

@@ -2516,6 +2516,7 @@ public class TransactionResource {
 							.setDocumentNumberServer(inventoryVoucherHeaderDTO.getDocumentNumberServer());
 					inventoryVoucherHeaderDTO.setDocumentPid(documentDto.getPid());
 					inventoryVoucherHeaderDTO.setDocumentName(documentDto.getName());
+					inventoryVoucherHeaderDTO.setDocumentVolume(inventoryVoucherHeaderDTO.getDocumentVolume());
 					inventoryVoucherHeaderDTO.setStatus(true);
 
 					if (inventoryVoucherHeaderDTO.getInventoryVoucherDetails() == null) {

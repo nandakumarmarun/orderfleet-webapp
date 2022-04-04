@@ -988,6 +988,9 @@ if (!this.InvoiceWiseReport) {
 						$('#lbl_documentTotalIc').text(
 								(data.documentTotal == null ? ""
 										: data.documentTotal));
+						$('#lbl_documentVolumIc').text(
+								(data.documentVolume == null ? ""
+										: data.documentVolume));
 						$('#lbl_documentDiscountAmountIc').text(
 								(data.docDiscountAmount == null ? ""
 										: data.docDiscountAmount));
