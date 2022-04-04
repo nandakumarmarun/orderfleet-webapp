@@ -966,7 +966,7 @@ if (!this.InvoiceWiseReport) {
 	function showInventoryVoucher(pid) {
 		$
 				.ajax({
-					url : contextPath + "/web/primary-sales-performance/" + pid,
+					url : contextPath + "/web/primary-sales-performance-invoice/" + pid,
 					method : 'GET',
 					success : function(data) {
 						$('#lbl_documentNumberIc').text(

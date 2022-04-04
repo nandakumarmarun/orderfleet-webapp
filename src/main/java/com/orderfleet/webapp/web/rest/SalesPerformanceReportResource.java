@@ -232,6 +232,29 @@ public class SalesPerformanceReportResource {
 				.findByPid(pid);
 		if (optionalInventoryVoucherHeaderDTO.isPresent()) {
 			InventoryVoucherHeaderDTO inventoryVoucherDTO = optionalInventoryVoucherHeaderDTO.get();
+			Double ivTotalVolume = inventoryVoucherDTO.getInventoryVoucherDetails().stream()
+					.collect(Collectors.summingDouble(ivd -> {
+						if (ivd.getProductUnitQty() != null) {
+							return (ivd.getProductUnitQty() * ivd.getQuantity());
+						} else {
+							return 0;
+						}
+					}));
+			inventoryVoucherDTO.setDocumentVolume(ivTotalVolume);
+			return new ResponseEntity<>(inventoryVoucherDTO, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@RequestMapping(value = "/primary-sales-performance-invoice/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> getInventoryVoucherInvoice(@PathVariable String pid) {
+		log.debug("Web request to get inventoryVoucherDTO by pid : {}", pid);
+		Optional<InventoryVoucherHeaderDTO> optionalInventoryVoucherHeaderDTO = inventoryVoucherService
+				.findByPid(pid);
+		if (optionalInventoryVoucherHeaderDTO.isPresent()) {
+			InventoryVoucherHeaderDTO inventoryVoucherDTO = optionalInventoryVoucherHeaderDTO.get();
 ////			Double ivTotalVolume = inventoryVoucherDTO.getInventoryVoucherDetails().stream()
 ////					.collect(Collectors.summingDouble(ivd -> {
 ////						if (ivd.getProductUnitQty() != null) {
@@ -246,7 +269,7 @@ public class SalesPerformanceReportResource {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-
+	
 	@RequestMapping(value = "/primary-sales-performance/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<SalesPerformanceDTO>> filterInventoryVouchers(
