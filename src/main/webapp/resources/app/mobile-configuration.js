@@ -57,8 +57,8 @@ if (!this.MobileConfiguration) {
 		accountProfileDisplayName : 'NAME',
 		accountProfilePrintName : 'NAME',
 		productProfileDisplayName : 'NAME',
-		productProfilePrintName : 'NAME'
-
+		productProfilePrintName : 'NAME',
+			maxCartNos:false
 	};
 
 	$(document).ready(function() {
@@ -179,6 +179,7 @@ if (!this.MobileConfiguration) {
 				"#productProfileDisplayName").val();
 		mobileConfigurationDTO.productProfilePrintName = $(
 				"#productProfilePrintName").val();
+		mobileConfigurationDTO.maxCartNos = $("#maxCartNos").is(":checked");
 
 		$.ajax({
 			url : contextPath,
@@ -295,6 +296,7 @@ if (!this.MobileConfiguration) {
 									data.productProfileDisplayName);
 							$('#productProfilePrintName').val(
 									data.productProfilePrintName);
+							$('#maxCartNos').prop("checked", data.maxCartNos);
 						}
 
 					},

@@ -69,7 +69,8 @@ public class MobileConfigurationDTO {
 	private boolean rateWithTax;
 	private boolean wifiPrintEnabler;
 	private boolean blockCustomerByCredits;
-
+	private boolean maxCartNos;
+ 
 	public MobileConfigurationDTO() {
 		super();
 	}
@@ -125,7 +126,7 @@ public class MobileConfigurationDTO {
 		this.rateWithTax = mobileConfiguration.getRateWithTax();
 		this.wifiPrintEnabler = mobileConfiguration.getWifiPrintEnabler();
 		this.blockCustomerByCredits = mobileConfiguration.isBlockCustomerByCredits();
-
+        this.maxCartNos =mobileConfiguration.getMaxCartNos();
 	}
 
 	public String getPid() {
@@ -518,6 +519,14 @@ public class MobileConfigurationDTO {
 
 	public void setProductProfilePrintName(DisplayName productProfilePrintName) {
 		this.productProfilePrintName = productProfilePrintName;
+	}
+
+	public boolean isMaxCartNos() {
+		return maxCartNos;
+	}
+
+	public void setMaxCartNos(boolean maxCartNos) {
+		this.maxCartNos = maxCartNos;
 	}
 
 }

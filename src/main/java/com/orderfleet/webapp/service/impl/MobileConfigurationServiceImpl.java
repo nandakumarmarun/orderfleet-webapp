@@ -91,6 +91,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setRateWithTax(mobileConfigurationDTO.getRateWithTax());
 		configuration.setWifiPrintEnabler(mobileConfigurationDTO.getWifiPrintEnabler());
 		configuration.setBlockCustomerByCredits(mobileConfigurationDTO.isBlockCustomerByCredits());
+		configuration.setMaxCartNos(mobileConfigurationDTO.isMaxCartNos());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -146,6 +147,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setRateWithTax(mobileConfigurationDTO.getRateWithTax());
 			configuration.setWifiPrintEnabler(mobileConfigurationDTO.getWifiPrintEnabler());
 			configuration.setBlockCustomerByCredits(mobileConfigurationDTO.isBlockCustomerByCredits());
+			configuration.setMaxCartNos(mobileConfigurationDTO.isMaxCartNos());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

@@ -83,6 +83,7 @@
 						<th>Account Profile Print Name</th>
 						<th>Product Profile Display Name</th>
 						<th>Product Profile Print Name</th>
+						<th>MAX CART NOS </th>
 						<th>Action</th>
 
 					</tr>
@@ -138,6 +139,7 @@
 							<td>${mobileConfiguration.accountProfilePrintName}</td>
 							<td>${mobileConfiguration.productProfileDisplayName}</td>
 							<td>${mobileConfiguration.productProfilePrintName}</td>
+							<td>${mobileConfiguration.maxCartNos}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -556,7 +558,13 @@
 													</select>
 												</div></td>
 										</tr>
-
+                                    <tr>
+											<td><div class="form-group">
+													<label class="control-label">MAX CART NOS  </label> <input
+														id="maxCartNos" name='maxCartNos' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
 
 									</table>
 								</div>

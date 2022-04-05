@@ -116,6 +116,7 @@ public class MobileSettingsDTO {
 	private boolean wifiPrintEnabler;
 	
 	private boolean blockCustomerByCredits;
+	private boolean maxCartNos;
 
 	public MobileSettingsDTO() {
 		super();
@@ -169,7 +170,7 @@ public class MobileSettingsDTO {
 		this.rateWithTax = mobileConfigurationDTO.getRateWithTax();
 		this.wifiPrintEnabler = mobileConfigurationDTO.getWifiPrintEnabler();
 		this.blockCustomerByCredits=mobileConfigurationDTO.isBlockCustomerByCredits();
-		
+		this.maxCartNos=mobileConfigurationDTO.isMaxCartNos();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -570,6 +571,14 @@ public class MobileSettingsDTO {
 
 	public void setProductProfilePrintName(DisplayName productProfilePrintName) {
 		this.productProfilePrintName = productProfilePrintName;
+	}
+
+	public boolean isMaxCartNos() {
+		return maxCartNos;
+	}
+
+	public void setMaxCartNos(boolean maxCartNos) {
+		this.maxCartNos = maxCartNos;
 	}
 
 }

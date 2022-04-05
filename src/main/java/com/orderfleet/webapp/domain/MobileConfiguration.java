@@ -200,6 +200,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "block_Customer_By_Credits", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean blockCustomerByCredits;
 	
+	@Column(name = "max_Cart_Nos", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean maxCartNos ;
+	
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -606,6 +609,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setBlockCustomerByCredits(boolean blockCustomerByCredits) {
 		this.blockCustomerByCredits = blockCustomerByCredits;
+	}
+
+	public boolean getMaxCartNos() {
+		return maxCartNos;
+	}
+
+	public void setMaxCartNos(boolean maxCartNos) {
+		this.maxCartNos = maxCartNos;
 	}
 
 	@Override
