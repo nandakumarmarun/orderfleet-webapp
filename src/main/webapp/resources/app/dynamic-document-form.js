@@ -259,9 +259,20 @@ if (!this.DynamicDocumentForm) {
 				var cssClass = index % 2 === 0 ? "odd" : "even";
 				var row = $('<tr class="' + cssClass + '">');
 				$("#tblBody").append(row);
-				for (var i = 0; i < length; i++) {	
-					var value = formDetail[i] == undefined
-							|| formDetail[i] == null ? "" : formDetail[i];
+				for (var i = 0; i < length; i++) {
+					console.log(formDetail[0].replace(/[0-9]/g, ''));
+					var value;
+				
+					if(i == 0){
+						// remove numbers in AccountProfileName
+						value = formDetail[i] == undefined
+						|| formDetail[i] == null ? "" : formDetail[i].replace(/[^A-Za-z]+/g, '');
+					}else{
+						value = formDetail[i] == undefined
+						|| formDetail[i] == null ? "" : formDetail[i];
+					}
+					
+					
 					row.append('<td>' + value + '</td>');
 				}
 				$("#tblBody").append('</tr>');

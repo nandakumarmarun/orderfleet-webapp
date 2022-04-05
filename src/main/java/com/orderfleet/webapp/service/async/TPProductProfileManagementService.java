@@ -2406,7 +2406,7 @@ public class TPProductProfileManagementService {
 						}
 						openingStock.setBatchNumber(osDto.getBatchNumber());
 						openingStock.setQuantity(osDto.getQuantity());
-						if(osDto.getQuantity() > 0) {
+						if(osDto.getQuantity() != 0) {
 							saveOpeningStocks.add(openingStock);
 						}
 					});
