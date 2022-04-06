@@ -108,6 +108,11 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 	 Optional<Attendance> findTop1ByCompanyPidAndUserPidAndPlannedDateBetweenOrderByCreatedDateDesc(String companyPid,
 			String userPid, LocalDateTime clientFromDate, LocalDateTime clientToDate);
 
+	
+		@Query("select attendance.remarks,attendance.createdDate,ep.name from Attendance attendance inner join EmployeeProfile ep on attendance.user.id=ep.user.id where attendance.user.id in ?1 and attendance.createdDate between ?2 and ?3")
+	  List<Object[]> findByUserIdInAndDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
+	 
+	
 	/*
 	 * @Query("select planned_date,attendance_status,remarks from tbl_attendance WHERE company_id = ?#{principal.companyId} and  user_id = ?1 ORDER BY  DESC top 61"
 	 * ) List<Object[]> getAttendanceByUserandUptoLimitDesc(Long userId);

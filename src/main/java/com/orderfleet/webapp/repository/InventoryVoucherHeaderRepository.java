@@ -773,4 +773,14 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	Optional<InventoryVoucherHeader> findOneByExecutiveTaskExecutionPidAndImageRefNo(String executiveTaskExecutionPid,
 			String imageRefNo);
+	
+	
+	
+	@Query("select count(inventoryVoucher),sum(inventoryVoucher.documentTotal),MIN(inventoryVoucher.createdDate),MAX(inventoryVoucher.createdDate) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.document in ?1 and inventoryVoucher.executiveTaskExecution.id in ?2")
+	List<Object[]> findByDocumentsAndExecutiveTaskIdIn(List<Document> documents, List<Long> eteIds);
+
+	
+   
+	@Query("select inventoryVoucher.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.document in ?1 and inventoryVoucher.executiveTaskExecution.id in ?2")
+	List<Object[]> findByDocumentsAndExecutiveIdIn(List<Document> documents, Set<Long> exeIds);
 }

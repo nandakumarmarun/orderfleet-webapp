@@ -101,6 +101,7 @@ public class VisitReportResource {
 	public ResponseEntity<VisitReportDTO> filterInventoryVouchers(@RequestParam("employeePid") String employeePid,
 			@RequestParam("filterBy") String filterBy, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate,
 			@RequestParam boolean inclSubordinate) {
+		System.out.println("employeePid:"+employeePid);
 		List<Document> documents = primarySecondaryDocumentRepository.findAllDocumentsByCompanyId();
 		if (documents.isEmpty()) {
 			return null;

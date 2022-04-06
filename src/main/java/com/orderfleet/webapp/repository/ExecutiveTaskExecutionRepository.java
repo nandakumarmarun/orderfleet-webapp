@@ -247,4 +247,14 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 			+ " from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.id IN ?1")
 	List<Object[]> findByExeIdIn(Set<Long> executiveTaskExecutionIds);
 
+	//	 hardcoreReport/30-03-2022/Resmi
+	
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where  exeTaskExecution.date between ?1 and ?2 and exeTaskExecution.user.id in ?3  Order By exeTaskExecution.createdDate desc")
+	List<ExecutiveTaskExecution> findByDateAndUserIdIn(LocalDateTime fromDate,LocalDateTime toDate, List<Long> userIds);
+
+	@Query("select count(exeTaskExecution),MIN(exeTaskExecution.date),MAX(exeTaskExecution.date),ep.name"
+			+ " from ExecutiveTaskExecution exeTaskExecution inner join EmployeeProfile ep on exeTaskExecution.user.id = ep.user.id where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.id IN ?1 group by ep.name")
+	List<Object[]> findByExeTaskIdIn(List<Long> eteIds);
+
+	
 }

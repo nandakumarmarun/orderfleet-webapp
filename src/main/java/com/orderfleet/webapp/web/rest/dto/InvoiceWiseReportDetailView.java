@@ -31,6 +31,8 @@ public class InvoiceWiseReportDetailView {
 		this.imageSaved = imageSaved;
 	}
 
+	
+
 	public String getPid() {
 		return pid;
 	}

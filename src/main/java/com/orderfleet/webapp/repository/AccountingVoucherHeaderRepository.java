@@ -316,4 +316,9 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 //	List<Object[]> getCustomerWiseAccountingVoucherHeader(String userLogin, String accountPid, LocalDateTime fromDate,
 //			LocalDateTime toDate);
 
+	@Query("select sum(accVoucher.totalAmount) from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1")
+	List<Object[]> findByExecutiveTaskIdIn(List<Long> eteIds);
+
+	@Query("select accVoucher.totalAmount,accVoucher.employee.name from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1 and accVoucher.document in ?2 ")
+	List<Object[]> findByExecutiveTaskExecutionIdInAndDocument(List<Long> eteIds,List<Document>documents);
 }
