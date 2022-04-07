@@ -239,7 +239,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("update AccountProfile accountProfile set accountProfile.activated = false where accountProfile.company.id = ?#{principal.companyId} AND accountProfile.id IN ?1")
 	void deactivateAcoundProfileUsingInId(Set<Long> id);
 
-	@Query("select accountProfile.pid,ep.name from AccountProfile accountProfile  inner join EmployeeProfile ep on accountProfile.user.id=ep.user.id where accountProfile.company.id = ?#{principal.companyId} and accountProfile.user.id in ?1 and accountProfile.createdDate between ?2 and ?3")
+	@Query("select count(accountProfile),ep.name from AccountProfile accountProfile  inner join EmployeeProfile ep on accountProfile.user.id=ep.user.id where accountProfile.company.id = ?#{principal.companyId} and accountProfile.user.id in ?1 and accountProfile.createdDate between ?2 and ?3 Group By ep.name")
 	List<Object[]> findByUserIdInAndDateBetween(List<Long> userIds, LocalDateTime fromDate,LocalDateTime toDate);
 
 }

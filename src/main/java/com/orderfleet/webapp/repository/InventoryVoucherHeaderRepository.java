@@ -776,7 +776,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	
 	
 	
-	@Query("select count(inventoryVoucher),sum(inventoryVoucher.documentTotal),MIN(inventoryVoucher.createdDate),MAX(inventoryVoucher.createdDate) from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.document in ?1 and inventoryVoucher.executiveTaskExecution.id in ?2")
+	@Query("select count(inventoryVoucher),sum(inventoryVoucher.documentTotal),MIN(inventoryVoucher.createdDate),MAX(inventoryVoucher.createdDate),inventoryVoucher.employee.name from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.document in ?1 and inventoryVoucher.executiveTaskExecution.id in ?2 Group By inventoryVoucher.employee.name ")
 	List<Object[]> findByDocumentsAndExecutiveTaskIdIn(List<Document> documents, List<Long> eteIds);
 
 	

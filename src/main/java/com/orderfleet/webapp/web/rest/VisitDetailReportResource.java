@@ -247,9 +247,10 @@ public class VisitDetailReportResource {
 		}
 
 		log.info("Finding  Inventory Vouchers...");
-		List<Object[]> ivhDtos = inventoryVoucherHeaderRepository
-				.findByDocumentsAndExecutiveTaskExecutionIdIn(documents, eteIds);
-
+		List<Object[]> ivhDtos = new ArrayList<>();
+		if (eteIds.size() > 0) {
+			ivhDtos = inventoryVoucherHeaderRepository.findByDocumentsAndExecutiveTaskExecutionIdIn(documents, eteIds);
+		}
 		Set<String> ivhPids = new HashSet<>();
 
 		for (Object[] ivh : ivhDtos) {
@@ -304,28 +305,23 @@ public class VisitDetailReportResource {
 					LocalDateTime lastVisitTime = LocalDateTime.parse(obj[2].toString());
 
 					executiveView.setTotalVisit(obj[0].toString());
+
 					executiveView.setFirstVisitTime(firstVisittime);
 					executiveView.setLastVisitTime(lastVisitTime);
 
 				}
 			}
 
-			for (Object[] obj : inventoryVouchers) {
-				for (Object[] obj1 : ivhDtos) {
-					if (obj1[0].toString().equals(employeeName)) {
+			    for (Object[] obj : inventoryVouchers) {
+            if(obj[4].toString().equals(employeeName)) {
+				LocalDateTime firstSoTime = LocalDateTime.parse(obj[2].toString());
+				LocalDateTime LastSoTime = LocalDateTime.parse(obj[3].toString());
 
-						LocalDateTime firstSoTime = LocalDateTime.parse(obj[2].toString());
-						LocalDateTime LastSoTime = LocalDateTime.parse(obj[3].toString());
-
-						executiveView.setFirstSoTime(firstSoTime);
-						executiveView.setLastSoTime(LastSoTime);
-						executiveView.setTotalSo(obj[0].toString());
-
-						executiveView.setTotalSaleOrderAmount(Double.valueOf(obj[1].toString()));
-
-					}
-				}
-			}
+				executiveView.setFirstSoTime(firstSoTime);
+				executiveView.setLastSoTime(LastSoTime);
+				executiveView.setTotalSo(obj[0].toString());
+				executiveView.setTotalSaleOrderAmount(Double.valueOf(obj[1].toString()));
+			}}
 			double receiptAmount = 0.0;
 			for (Object[] obj : accountingVouchers) {
 				if (obj[1].toString().equals(employeeName)) {
@@ -336,7 +332,7 @@ public class VisitDetailReportResource {
 			}
 			for (Object[] obj : accountProfile) {
 				if (obj[1].toString().equals(employeeName)) {
-					executiveView.setLedgerCount(accountProfile.size());
+					executiveView.setLedgerCount(Integer.parseInt(obj[0].toString()));
 
 				}
 
