@@ -83,7 +83,8 @@
 						<th>Account Profile Print Name</th>
 						<th>Product Profile Display Name</th>
 						<th>Product Profile Print Name</th>
-						<th>MAX CART NOS </th>
+						<th>MAX CART NOS</th>
+						<th>Max Cart Size</th>
 						<th>Action</th>
 
 					</tr>
@@ -140,6 +141,8 @@
 							<td>${mobileConfiguration.productProfileDisplayName}</td>
 							<td>${mobileConfiguration.productProfilePrintName}</td>
 							<td>${mobileConfiguration.maxCartNos}</td>
+							<td>${mobileConfiguration. cartMaxSize}</td>
+							
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -467,8 +470,9 @@
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Block Customer By Credits</label> <input
-														id="blockCustomerByCredits" name='blockCustomerByCredits' type='checkbox'
+													<label class="control-label">Block Customer By
+														Credits</label> <input id="blockCustomerByCredits"
+														name='blockCustomerByCredits' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
@@ -558,11 +562,19 @@
 													</select>
 												</div></td>
 										</tr>
-                                    <tr>
+										<tr>
 											<td><div class="form-group">
-													<label class="control-label">MAX CART NOS  </label> <input
-														id="maxCartNos" name='maxCartNos' type='checkbox'
-														class="form-control" />
+													<label class="control-label">Max Cart Nos </label> <input
+														id="maxCartNos" name='maxCartNos'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label" for="field_cartMaxSize">MAX
+														CART SIZE </label> <input type="number" step="0.01"
+														class="form-control" name="cartMaxSize"
+														id="field_cartMaxSize" maxlength="8" />
 												</div></td>
 										</tr>
 

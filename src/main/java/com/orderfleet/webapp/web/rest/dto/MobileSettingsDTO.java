@@ -116,8 +116,10 @@ public class MobileSettingsDTO {
 	private boolean wifiPrintEnabler;
 	
 	private boolean blockCustomerByCredits;
-	private boolean maxCartNos;
 
+	private boolean maxCartNos;
+	
+     private double  cartMaxSize;
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -171,6 +173,7 @@ public class MobileSettingsDTO {
 		this.wifiPrintEnabler = mobileConfigurationDTO.getWifiPrintEnabler();
 		this.blockCustomerByCredits=mobileConfigurationDTO.isBlockCustomerByCredits();
 		this.maxCartNos=mobileConfigurationDTO.isMaxCartNos();
+		this.cartMaxSize=mobileConfigurationDTO.getCartMaxSize();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -580,5 +583,17 @@ public class MobileSettingsDTO {
 	public void setMaxCartNos(boolean maxCartNos) {
 		this.maxCartNos = maxCartNos;
 	}
+
+	public double getCartMaxSize() {
+		return cartMaxSize;
+	}
+
+	public void setCartMaxSize(double cartMaxSize) {
+		this.cartMaxSize = cartMaxSize;
+	}
+
+
+
+	
 
 }

@@ -203,6 +203,8 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "max_Cart_Nos", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean maxCartNos ;
 	
+	@Column(name = "cart_Max_Size", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double cartMaxSize;
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -617,6 +619,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setMaxCartNos(boolean maxCartNos) {
 		this.maxCartNos = maxCartNos;
+	}
+
+	public double getCartMaxSize() {
+		return cartMaxSize;
+	}
+
+	public void setCartMaxSize(double cartMaxSize) {
+		this.cartMaxSize = cartMaxSize;
 	}
 
 	@Override
