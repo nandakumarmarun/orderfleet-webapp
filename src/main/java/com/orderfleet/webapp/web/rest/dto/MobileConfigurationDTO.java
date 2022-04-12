@@ -71,6 +71,7 @@ public class MobileConfigurationDTO {
 	private boolean blockCustomerByCredits;
 	private boolean maxCartNos;
 	private double  cartMaxSize;
+	private boolean roundOffAutomation;
  
 	public MobileConfigurationDTO() {
 		super();
@@ -129,6 +130,7 @@ public class MobileConfigurationDTO {
 		this.blockCustomerByCredits = mobileConfiguration.isBlockCustomerByCredits();
         this.maxCartNos =mobileConfiguration.getMaxCartNos();
         this.cartMaxSize=mobileConfiguration.getCartMaxSize();
+        this.roundOffAutomation=mobileConfiguration.isRoundOffAutomation();
 	}
 
 	public String getPid() {
@@ -537,6 +539,14 @@ public class MobileConfigurationDTO {
 
 	public void setCartMaxSize(double cartMaxSize) {
 		this.cartMaxSize = cartMaxSize;
+	}
+
+	public boolean isRoundOffAutomation() {
+		return roundOffAutomation;
+	}
+
+	public void setRoundOffAutomation(boolean roundOffAutomation) {
+		this.roundOffAutomation = roundOffAutomation;
 	}
 
 }

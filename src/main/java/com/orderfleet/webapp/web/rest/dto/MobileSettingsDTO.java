@@ -120,6 +120,9 @@ public class MobileSettingsDTO {
 	private boolean maxCartNos;
 	
      private double  cartMaxSize;
+     
+     private boolean roundOffAutomation;
+     
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -174,6 +177,7 @@ public class MobileSettingsDTO {
 		this.blockCustomerByCredits=mobileConfigurationDTO.isBlockCustomerByCredits();
 		this.maxCartNos=mobileConfigurationDTO.isMaxCartNos();
 		this.cartMaxSize=mobileConfigurationDTO.getCartMaxSize();
+		this.roundOffAutomation=mobileConfigurationDTO.isRoundOffAutomation();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -590,6 +594,14 @@ public class MobileSettingsDTO {
 
 	public void setCartMaxSize(double cartMaxSize) {
 		this.cartMaxSize = cartMaxSize;
+	}
+
+	public boolean isRoundOffAutomation() {
+		return roundOffAutomation;
+	}
+
+	public void setRoundOffAutomation(boolean roundOffAutomation) {
+		this.roundOffAutomation = roundOffAutomation;
 	}
 
 

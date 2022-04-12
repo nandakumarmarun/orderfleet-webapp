@@ -93,6 +93,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setBlockCustomerByCredits(mobileConfigurationDTO.isBlockCustomerByCredits());
 		configuration.setMaxCartNos(mobileConfigurationDTO.isMaxCartNos());
 		configuration.setCartMaxSize(mobileConfigurationDTO.getCartMaxSize());
+		configuration.setRoundOffAutomation(mobileConfigurationDTO.isRoundOffAutomation());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -150,6 +151,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setBlockCustomerByCredits(mobileConfigurationDTO.isBlockCustomerByCredits());
 			configuration.setMaxCartNos(mobileConfigurationDTO.isMaxCartNos());
 			configuration.setCartMaxSize(mobileConfigurationDTO.getCartMaxSize());
+			configuration.setRoundOffAutomation(mobileConfigurationDTO.isRoundOffAutomation());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

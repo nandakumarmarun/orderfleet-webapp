@@ -205,6 +205,10 @@ public class MobileConfiguration implements Serializable {
 	
 	@Column(name = "cart_Max_Size", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double cartMaxSize;
+	
+	@Column(name = "round_Off_Automation", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean roundOffAutomation ;
+	
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -627,6 +631,15 @@ public class MobileConfiguration implements Serializable {
 
 	public void setCartMaxSize(double cartMaxSize) {
 		this.cartMaxSize = cartMaxSize;
+	}
+
+	
+	public boolean isRoundOffAutomation() {
+		return roundOffAutomation;
+	}
+
+	public void setRoundOffAutomation(boolean roundOffAutomation) {
+		this.roundOffAutomation = roundOffAutomation;
 	}
 
 	@Override

@@ -85,6 +85,7 @@
 						<th>Product Profile Print Name</th>
 						<th>MAX CART NOS</th>
 						<th>Max Cart Size</th>
+						<th>Round Off Automation</th>
 						<th>Action</th>
 
 					</tr>
@@ -142,6 +143,7 @@
 							<td>${mobileConfiguration.productProfilePrintName}</td>
 							<td>${mobileConfiguration.maxCartNos}</td>
 							<td>${mobileConfiguration. cartMaxSize}</td>
+							<td>${mobileConfiguration. roundOffAutomation}</td>
 							
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
@@ -577,7 +579,13 @@
 														id="field_cartMaxSize" maxlength="8" />
 												</div></td>
 										</tr>
-
+<tr>
+											<td><div class="form-group">
+													<label class="control-label">Round Off Automation </label> <input
+														id="roundOffAutomation" name='roundOffAutomation'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
 									</table>
 								</div>
 							</div>
