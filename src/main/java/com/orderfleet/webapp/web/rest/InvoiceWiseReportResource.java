@@ -426,12 +426,12 @@ public class InvoiceWiseReportResource {
 			// accountProfilePids = getAccountPids(userIds);
 			// if all accounts selected avoid account wise query
 			executiveTaskExecutions = executiveTaskExecutionRepository
-					.getByDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
+					.getByCreatedDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
 		} else {
 			// if a specific account is selected load data based on that particular account
 			accountProfilePids = Arrays.asList(accountPid);
 			executiveTaskExecutions = executiveTaskExecutionRepository
-					.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
+					.getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
 							accountProfilePids);
 		}
 

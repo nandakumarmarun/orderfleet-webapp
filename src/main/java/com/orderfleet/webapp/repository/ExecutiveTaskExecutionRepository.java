@@ -256,5 +256,48 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 			+ " from ExecutiveTaskExecution exeTaskExecution inner join EmployeeProfile ep on exeTaskExecution.user.id = ep.user.id where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.id IN ?1 group by ep.name")
 	List<Object[]> findByExeTaskIdIn(List<Long> eteIds);
 
+	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity in ?3 and exeTaskExecution.user.id in ?4")
+	Long countByCreatedDateBetweenAndActivitiesAndUserIdIn(LocalDateTime fromDate, LocalDateTime toDate,
+			List<Activity> activities, List<Long> userIds);
 	
+	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity in ?3 ")
+	Long countByCreatedDateBetweenAndActivities(LocalDateTime fromDate, LocalDateTime toDate, List<Activity> activities);
+
+	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity in ?3 and exeTaskExecution.user.pid = ?4 ")
+	Long countByCreatedDateBetweenAndActivities(LocalDateTime fromDate, LocalDateTime toDate, List<Activity> activities,
+			String userPid);
+	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity in ?3 and exeTaskExecution.user.id in ?4 and exeTaskExecution.executiveTaskPlan IS NOT NULL ")
+	Long countByCreatedDateBetweenAndActivitiesAndUserIdInAndTaskPlanIsNotNull(LocalDateTime fromDate, LocalDateTime toDate,
+			List<Activity> activities, List<Long> userIds);
+	
+	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity in ?3 and exeTaskExecution.executiveTaskPlan IS NOT NULL ")
+	Long countByCreatedDateBetweenAndActivitiesAndTaskPlanIsNotNull(LocalDateTime fromDate, LocalDateTime toDate,
+			List<Activity> activities);
+	
+	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity in ?3 and exeTaskExecution.user.pid = ?4 and exeTaskExecution.executiveTaskPlan IS NOT NULL ")
+	Long countByCreatedDateBetweenAndActivitiesAndUserAndTaskPlanIsNotNull(LocalDateTime fromDate, LocalDateTime toDate,
+			List<Activity> activities, String userPid);
+	
+	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity in ?3 and exeTaskExecution.user.id in ?4 and exeTaskExecution.executiveTaskPlan IS NULL ")
+	Long countByCreatedDateBetweenAndActivitiesAndUserIdInAndTaskPlanIsNull(LocalDateTime fromDate, LocalDateTime toDate,
+			List<Activity> activities, List<Long> userIds);
+	
+	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity in ?3 and exeTaskExecution.executiveTaskPlan IS NULL ")
+	Long countByCreatedDateBetweenAndActivitiesAndTaskPlanIsNull(LocalDateTime fromDate, LocalDateTime toDate,
+			List<Activity> activities);
+	
+	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity in ?3 and exeTaskExecution.user.pid = ?4 and exeTaskExecution.executiveTaskPlan IS NULL ")
+	Long countByCreatedDateBetweenAndActivitiesAndUserAndTaskPlanIsNull(LocalDateTime fromDate, LocalDateTime toDate,
+			List<Activity> activities, String userPid);
+	
+	ExecutiveTaskExecution findTop1ByUserPidAndCreatedDateBetweenOrderByCreatedDateDesc(String userPid, LocalDateTime fromDate,
+			LocalDateTime toDate);
+
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity.pid in ?3 and exeTaskExecution.user.id in ?4  Order By exeTaskExecution.createdDate desc")
+	List<ExecutiveTaskExecution> getByCreatedDateBetweenAndActivityPidInAndUserIdIn(LocalDateTime fromDate,
+			LocalDateTime toDate, List<String> activityPids, List<Long> userIds);
+
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity.pid in ?3 and exeTaskExecution.user.id in ?4 and exeTaskExecution.accountProfile.pid in ?5 Order By exeTaskExecution.createdDate desc")
+	List<ExecutiveTaskExecution> getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(LocalDateTime fromDate,
+			LocalDateTime toDate, List<String> activityPids, List<Long> userIds, List<String> accountPids);
 }
