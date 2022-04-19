@@ -209,6 +209,10 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "round_Off_Automation", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean roundOffAutomation ;
 	
+	@Column(name = "pTen_Quotation_Layout", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean ptenQuotationLayout ;
+	
+	
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -640,6 +644,16 @@ public class MobileConfiguration implements Serializable {
 
 	public void setRoundOffAutomation(boolean roundOffAutomation) {
 		this.roundOffAutomation = roundOffAutomation;
+	}
+
+	
+
+	public boolean isPtenQuotationLayout() {
+		return ptenQuotationLayout;
+	}
+
+	public void setPtenQuotationLayout(boolean ptenQuotationLayout) {
+		this.ptenQuotationLayout = ptenQuotationLayout;
 	}
 
 	@Override

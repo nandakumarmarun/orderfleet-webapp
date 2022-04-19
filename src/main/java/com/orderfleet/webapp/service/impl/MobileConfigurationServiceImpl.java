@@ -94,6 +94,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setMaxCartNos(mobileConfigurationDTO.isMaxCartNos());
 		configuration.setCartMaxSize(mobileConfigurationDTO.getCartMaxSize());
 		configuration.setRoundOffAutomation(mobileConfigurationDTO.isRoundOffAutomation());
+		configuration.setPtenQuotationLayout(mobileConfigurationDTO.isPtenQuotationLayout());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -152,6 +153,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setMaxCartNos(mobileConfigurationDTO.isMaxCartNos());
 			configuration.setCartMaxSize(mobileConfigurationDTO.getCartMaxSize());
 			configuration.setRoundOffAutomation(mobileConfigurationDTO.isRoundOffAutomation());
+			configuration.setPtenQuotationLayout(mobileConfigurationDTO.isPtenQuotationLayout());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

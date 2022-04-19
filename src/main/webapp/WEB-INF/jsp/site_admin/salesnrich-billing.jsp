@@ -57,15 +57,16 @@ text-center {
 				<div class="row">
 					<form>
 						<div class="row">
-							<div class="col-sm-3">
-								<label>Company</label> <select id="sbCompany" name="companyCode"
-									class="form-control"><option value="-1">Select
-										Company</option>
-									<c:forEach items="${companies}" var="company">
-										<option value="${company.pid}">${company.legalName}</option>
-									</c:forEach>
-								</select>
-							</div>
+						 <div class="col-sm-3">
+						Company<select id="sbCompany" name="companyCode"
+							class="form-control selectpicker" data-live-search="true">
+							<option value="no">Select Company</option>
+							<c:forEach items="${companies}" var="company">
+								<option value="${company.pid}">${company.legalName}</option>
+							</c:forEach>
+						</select>
+					</div> 
+							 
 							<div class="col-sm-2">
 								<br /> <select class="form-control" id="dbDateSearch"
 									onchange="showDatePicker()">
@@ -74,7 +75,8 @@ text-center {
 									<option value="CUSTOM">CUSTOM</option>
 								</select>
 							</div>
-							<div class="col-sm-2 hide custom_date1">
+							
+								<div class="col-sm-2 hide custom_date1">
 								<br />
 								<div class="input-group">
 									<input type="text" class="form-control" id="txtFromDate"
@@ -101,6 +103,8 @@ text-center {
 								<button type="button" class="btn btn-info entypo-search"
 									style="font-size: 18px" id="btnApply" title="Apply"></button>
 							</div>
+							
+							
 						</div>
 					</form>
 				</div>
@@ -206,7 +210,7 @@ text-center {
 								<th style="width: 10%"></th>
 							</tr>
 						</thead>
-						<tbody></tbody>
+						<tbody id= tableBillDetails></tbody>
 						<tfoot>
 							<tr>
 								<td></td>
@@ -402,7 +406,9 @@ text-center {
 					$('#btnApply').on('click', function() {
 						loadTransactionDetails();
 					});
-					
+					$('#btnSearch').click(function() {
+						searchTable($("#search").val(), $('#tableBillDetails'));
+					});
 					salesNrichDatePickers();
 
 					//updateSelectedUserCountOnDiv
@@ -673,7 +679,30 @@ text-center {
 				dateFormat : "dd-mm-yy"
 			}).datepicker("setDate", date);
 		}
-		
+
+		function searchTable(inputVal, table) {
+			table.find('tr').each(function(index, row) {
+				var allCells = $(row).find('td');
+				if (allCells.length > 0) {
+					var found = false;
+					allCells.each(function(index, td) {
+						if (index != 7) {
+							var regExp = new RegExp(inputVal, 'i');
+							if (regExp.test($(td).text())) {
+								found = true;
+								return false;
+							}
+						}
+					});
+					if (found == true)
+						$(row).show();
+					else
+						$(row).hide();
+				}
+			});
+		}
+
+			
 		function onSaveSuccess(result) {
 			// reloading page to see the updated data
 			window.location = salesNrichBillingContextPath;

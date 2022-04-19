@@ -86,6 +86,7 @@
 						<th>MAX CART NOS</th>
 						<th>Max Cart Size</th>
 						<th>Round Off Automation</th>
+						<th>P-Ten Quotation Layout
 						<th>Action</th>
 
 					</tr>
@@ -144,7 +145,8 @@
 							<td>${mobileConfiguration.maxCartNos}</td>
 							<td>${mobileConfiguration. cartMaxSize}</td>
 							<td>${mobileConfiguration. roundOffAutomation}</td>
-							
+							<td>${mobileConfiguration.ptenQuotationLayout}</td>
+
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -487,6 +489,28 @@
 										</tr>
 										<tr>
 											<td><div class="form-group">
+													<label class="control-label">Max Cart Nos </label> <input
+														id="maxCartNos" name='maxCartNos' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Round Off Automation </label>
+													<input id="roundOffAutomation" name='roundOffAutomation'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">P-Ten Quotation Layout
+													</label> <input id="ptenQuotationLayout" name='ptenQuotationLayout'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
 													<label class="control-label">Vchr.No Generation
 														type</label> <select id="voucherNumberGenerationType"
 														name='voucherNumberGenerationType' class="form-control">
@@ -564,13 +588,7 @@
 													</select>
 												</div></td>
 										</tr>
-										<tr>
-											<td><div class="form-group">
-													<label class="control-label">Max Cart Nos </label> <input
-														id="maxCartNos" name='maxCartNos'
-														type='checkbox' class="form-control" />
-												</div></td>
-										</tr>
+
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label" for="field_cartMaxSize">MAX
@@ -579,13 +597,7 @@
 														id="field_cartMaxSize" maxlength="8" />
 												</div></td>
 										</tr>
-<tr>
-											<td><div class="form-group">
-													<label class="control-label">Round Off Automation </label> <input
-														id="roundOffAutomation" name='roundOffAutomation'
-														type='checkbox' class="form-control" />
-												</div></td>
-										</tr>
+
 									</table>
 								</div>
 							</div>

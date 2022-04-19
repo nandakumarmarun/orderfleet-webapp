@@ -72,6 +72,7 @@ public class MobileConfigurationDTO {
 	private boolean maxCartNos;
 	private double  cartMaxSize;
 	private boolean roundOffAutomation;
+	private boolean ptenQuotationLayout;
  
 	public MobileConfigurationDTO() {
 		super();
@@ -131,6 +132,7 @@ public class MobileConfigurationDTO {
         this.maxCartNos =mobileConfiguration.getMaxCartNos();
         this.cartMaxSize=mobileConfiguration.getCartMaxSize();
         this.roundOffAutomation=mobileConfiguration.isRoundOffAutomation();
+        this.ptenQuotationLayout =mobileConfiguration.isPtenQuotationLayout();
 	}
 
 	public String getPid() {
@@ -549,4 +551,15 @@ public class MobileConfigurationDTO {
 		this.roundOffAutomation = roundOffAutomation;
 	}
 
+	public boolean isPtenQuotationLayout() {
+		return ptenQuotationLayout;
+	}
+
+	public void setPtenQuotationLayout(boolean ptenQuotationLayout) {
+		this.ptenQuotationLayout = ptenQuotationLayout;
+	}
+
+
+
+	
 }
