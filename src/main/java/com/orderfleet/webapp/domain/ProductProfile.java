@@ -194,7 +194,10 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "purchase_cost", columnDefinition = "double precision DEFAULT 0")
 	private double purchaseCost;
-
+	
+	@Column(name = "cess_TaxRate", columnDefinition="double precision DEFAULT 0")
+	private double cessTaxRate;
+	
 	public Units getUnits() {
 		return units;
 	}
@@ -486,6 +489,16 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public void setDiscountPercentage(double discountPercentage) {
 		this.discountPercentage = discountPercentage;
+	}
+	
+	
+
+	public double getCessTaxRate() {
+		return cessTaxRate;
+	}
+
+	public void setCessTaxRate(double cessTaxRate) {
+		this.cessTaxRate = cessTaxRate;
 	}
 
 	@Override

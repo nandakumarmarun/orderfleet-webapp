@@ -120,17 +120,17 @@
 						<tr>
 							<th rowspan="2"
 								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">ACTIVITY</th>
-							<th colspan="3" id="th_target"
-								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">TARGET</th>
 							<th rowspan="2"
-								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">TOTAL</th>
-							<th colspan="3" id="th_achived"
-								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">ACHIEVED</th>
-							<th rowspan="2"
-								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">TOTAL</th>
+								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">TARGET TOTAL</th>
+								<th rowspan="2"
+								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">ACHIVED TOTAL</th>
 							<th rowspan="2"
 								style="text-align: center; color: white; font-weight: bold; background-color: rgb(48, 54, 65); vertical-align: middle;">ACHIEVED%
-							</th>
+							</th>	
+							<th colspan="3" id="th_target"
+								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">TARGET</th>
+							<th colspan="3" id="th_achived"
+								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">ACHIEVED</th>
 						</tr>
 						<tr id="txtRowHeader">
 							<td

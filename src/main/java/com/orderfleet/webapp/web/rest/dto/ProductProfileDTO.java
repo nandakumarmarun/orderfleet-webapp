@@ -108,6 +108,8 @@ public class ProductProfileDTO {
 	private double purchaseCost;
 
 	private String uploadSource;
+	
+	private double cessTaxRate;
 
 	public ProductProfileDTO() {
 		super();
@@ -528,6 +530,16 @@ public class ProductProfileDTO {
 
 	public void setUploadSource(String uploadSource) {
 		this.uploadSource = uploadSource;
+	}
+	
+	
+
+	public double getCessTaxRate() {
+		return cessTaxRate;
+	}
+
+	public void setCessTaxRate(double cessTaxRate) {
+		this.cessTaxRate = cessTaxRate;
 	}
 
 	@Override

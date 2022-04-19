@@ -99,7 +99,7 @@ if (!this.SalesTargetAchievedReport) {
 		$("#tblSalesTargetAchievedReport tbody").html("");
 		
 		var count = targetData.monthList.length;
-     
+		console.log(targetData.monthList) 
 		$("#th_target").removeAttr("colspan");
 		$("#th_target").attr("colspan", count);
 		$("#th_achived").removeAttr("colspan");
@@ -124,16 +124,21 @@ if (!this.SalesTargetAchievedReport) {
        var achievedtotalRow ="";
 		var sumTarget=0;
 		var sumAchieved=0;
+		
 		$.each(targetData.salesTargetGroupUserTargets, function(salesTargetGroupName, targets) {
 		
 			var targetRow = "";
 			var achivedRow = "";
 			var targetTotal = 0;
 			var achivedTotal = 0;
+			var cloumtotal = 0;
+			var cloumn = 0 ;
+			
 
 			for(var i = 0, size = targets.length; i < size ; i++) {
-
+              
 				var tVolume = targets[i].volume;
+				console.log(targets[i].volume);
 				var tAmount = targets[i].amount;
 
 				if(tAmount != 0){
@@ -158,18 +163,14 @@ if (!this.SalesTargetAchievedReport) {
 			}
 
 			var targetTotal1 = (targetTotal).toFixed(2);
+			console.log((targetTotal).toFixed(2))
 			var achivedTotal1 = (achivedTotal).toFixed(2);
 			if(targetTotal!=0 || achivedTotal!=0){
 			performanceRow += "<tr><td>" + salesTargetGroupName + "</td>";
-			targetRow += "<td>"+targetTotal1 +"</td>";
-			achivedRow += "<td>"+ achivedTotal1 +"</td>";
+			performanceRow += "<td>"+targetTotal1 +"</td>";
+			performanceRow += "<td>"+ achivedTotal1 +"</td>";
 			
-			performanceRow += targetRow += achivedRow;
 		
-			sumTarget +=targetTotal;	
-		   sumAchieved +=achivedTotal;
-			
-			
 			var achivedPercentage = (achivedTotal / targetTotal) * 100;
 			achivedPercentage =	Math.round(achivedPercentage);
 			if(achivedPercentage>=100){
@@ -186,6 +187,9 @@ if (!this.SalesTargetAchievedReport) {
 			}else{
 			performanceRow += "<td style='color: white;background-color: red;'>"+ achivedPercentage+"%" +"</td>";
 			}
+			performanceRow += targetRow += achivedRow;
+			sumTarget +=targetTotal;	
+			sumAchieved +=achivedTotal;
 			performanceRow += "</tr>"
 			}
 		});
@@ -196,6 +200,7 @@ if (!this.SalesTargetAchievedReport) {
     	function myfunction(item)
        {
     		abc = item;
+    		
     		itemRow +="<td>"+(abc).toFixed(2) +"</td>";
     	}
     	var cba=0;
@@ -206,7 +211,8 @@ if (!this.SalesTargetAchievedReport) {
     		achivedsumRow += "<td>"+ (cba).toFixed(2)+"</td>";
     	}
  
-		totalRow += "<tr> <td style ='text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; font-size:24px'>"+"Total"+"</td>";
+    	totalRow += "<br>"
+		totalRow +="<tr> <td style ='text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; font-size:24px'>"+"Total"+"</td>";
 		targetsumRow += "<td>"+(sumTarget).toFixed(2) +"</td>";
 		achievedtotalRow+="<td>"+ (sumAchieved).toFixed(2) +"</td>";
 		
@@ -227,13 +233,13 @@ if (!this.SalesTargetAchievedReport) {
 		}else{
 			percentageRow += "<td style='color: white;background-color: red;'>"+ achivedPercentages+"%" +"</td>";
 		}
-		percentageRow += "</tr>"
-		
-		performanceRow+= totalRow +=itemRow+= targetsumRow += achivedsumRow +=achievedtotalRow +=percentageRow;
+		achivedsumRow += "</tr>" 	
+		performanceRow += totalRow +=targetsumRow += achievedtotalRow += percentageRow +=itemRow += achivedsumRow;
 	
 			$("#tblBody").html(performanceRow);
 	}
-
+	
+	
 	function convertLocalDateToServer (date) {
 		if (date) {
 			return moment(date).format('YYYY-MM-DD');
@@ -241,7 +247,6 @@ if (!this.SalesTargetAchievedReport) {
 			return "";
 		}
 	}
-
 
 	function onError(httpResponse, exception) {
 		var i;

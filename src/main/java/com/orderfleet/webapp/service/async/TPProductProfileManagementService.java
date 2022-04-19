@@ -3,6 +3,7 @@ package com.orderfleet.webapp.service.async;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -142,6 +143,8 @@ public class TPProductProfileManagementService {
 
 	@Autowired
 	private StockLocationService stockLocationService;
+
+	private Collection<ProductCategoryDTO> productGroups;
 
 	public TPProductProfileManagementService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			SyncOperationRepository syncOperationRepository, DivisionRepository divisionRepository,
@@ -712,6 +715,7 @@ public class TPProductProfileManagementService {
 			productProfile.setDescription(ppDto.getDescription());
 			productProfile.setMrp(ppDto.getMrp());
 			productProfile.setTaxRate(ppDto.getTaxRate());
+			productProfile.setCessTaxRate(ppDto.getCessTaxRate());
 			productProfile.setSku(ppDto.getSku());
 			productProfile.setActivated(ppDto.getActivated());
 			productProfile.setTrimChar(ppDto.getTrimChar());
@@ -2707,21 +2711,31 @@ public class TPProductProfileManagementService {
 	@Transactional
 	@Async
 	public void saveUpdateProductWiseDefaultLedger(List<ProductProfileDTO> ppDTOs, SyncOperation syncOperation) {
-
+		log.info("Requst to save Update Product Wise DefaultLedger------"+ppDTOs.size());
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
+
+		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(company.getId());
+		
 		for (ProductProfileDTO ppDto : ppDTOs) {
 			// check exist by name, only one exist with a name
-			Optional<ProductProfile> productProfile = productProfileRepository
-					.findByCompanyIdAndNameIgnoreCase(company.getId(), ppDto.getName());
-			if (productProfile.isPresent()) {
-				ProductProfile pp = productProfile.get();
-				pp.setTaxRate(ppDto.getTaxRate());
-				pp.setDefaultLedger(ppDto.getDefaultLedger());
-				saveUpdateProductProfiles.add(pp);
+			
+			Optional<ProductProfile> optionalProductProfile = productProfiles.stream()
+					.filter(pp -> pp.getProductId() != null && !pp.getProductId().equals("")
+					? pp.getProductId().equals(ppDto.getProductId())
+					: false)
+			.findAny();
+			ProductProfile productProfile;
+			if (optionalProductProfile.isPresent()) {
+				
+				productProfile = optionalProductProfile.get();
+//				pp.setTaxRate(ppDto.getTaxRate());
+				productProfile.setDefaultLedger(ppDto.getDefaultLedger());
+				saveUpdateProductProfiles.add(productProfile);
 			}
 		}
+		
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;

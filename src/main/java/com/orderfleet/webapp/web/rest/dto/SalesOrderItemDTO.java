@@ -21,6 +21,7 @@ public class SalesOrderItemDTO {
 	private String unit;
 	private double itemDiscount;
 	private double rateOfVat;
+	private double cessRateOfVat;
 	private BigDecimal itemRate;
 	private double itemStock;
 	private double quantity;
@@ -74,6 +75,7 @@ public class SalesOrderItemDTO {
 		this.unit = inventoryVoucherDetail.getProduct().getSku();
 		this.itemDiscount = inventoryVoucherDetail.getDiscountPercentage();
 		this.rateOfVat = inventoryVoucherDetail.getProduct().getTaxRate();
+		this.cessRateOfVat = inventoryVoucherDetail.getProduct().getCessTaxRate();
 		this.itemRate = inventoryVoucherDetail.getProduct().getPrice();
 		// this.itemStock = inventoryVoucherDetail.getProduct().getitemStock;
 		this.quantity = inventoryVoucherDetail.getQuantity();
@@ -492,6 +494,16 @@ public class SalesOrderItemDTO {
 
 	public void setUpdateStatus(boolean updateStatus) {
 		this.updateStatus = updateStatus;
+	}
+	
+	
+
+	public double getCessRateOfVat() {
+		return cessRateOfVat;
+	}
+
+	public void setCessRateOfVat(double cessRateOfVat) {
+		this.cessRateOfVat = cessRateOfVat;
 	}
 
 	@Override

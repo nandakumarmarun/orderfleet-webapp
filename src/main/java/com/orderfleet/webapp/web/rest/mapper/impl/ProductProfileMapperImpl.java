@@ -59,6 +59,7 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfileDTO.setSku(productProfile.getSku());
 		productProfileDTO.setStockAvailabilityStatus(productProfile.getStockAvailabilityStatus());
 		productProfileDTO.setTaxRate(productProfile.getTaxRate());
+		productProfileDTO.setCessTaxRate(productProfile.getCessTaxRate());
 		productProfileDTO.setDiscountPercentage(productProfile.getDiscountPercentage());
 		productProfileDTO.setTrimChar(productProfile.getTrimChar());
 		productProfileDTO.setUnitQty(productProfile.getUnitQty());
@@ -114,6 +115,7 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfileDTO.setSku(productProfile.getSku());
 		productProfileDTO.setStockAvailabilityStatus(productProfile.getStockAvailabilityStatus());
 		productProfileDTO.setTaxRate(productProfile.getTaxRate());
+		productProfileDTO.setCessTaxRate(productProfile.getCessTaxRate());
 		productProfileDTO.setTrimChar(productProfile.getTrimChar());
 		productProfileDTO.setUnitQty(productProfile.getUnitQty());
 		productProfileDTO.setDiscountPercentage(productProfile.getDiscountPercentage());
@@ -179,6 +181,7 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfile.setSku(productProfileDTO.getSku());
 		productProfile.setStockAvailabilityStatus(productProfileDTO.getStockAvailabilityStatus());
 		productProfile.setTaxRate(productProfileDTO.getTaxRate());
+		productProfile.setCessTaxRate(productProfileDTO.getCessTaxRate());
 		productProfile.setTrimChar(productProfileDTO.getTrimChar());
 		productProfile.setUnitQty(productProfileDTO.getUnitQty());
 		productProfile.setDiscountPercentage(productProfileDTO.getDiscountPercentage());

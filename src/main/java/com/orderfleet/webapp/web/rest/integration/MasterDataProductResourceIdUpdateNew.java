@@ -348,4 +348,29 @@ public class MasterDataProductResourceIdUpdateNew {
 				}).orElse(new ResponseEntity<>("gst_product_group sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
 	}
+	
+	@RequestMapping(value = "/product-wise-default-ledgerIdNem.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> bulkSaveProductWiseDefaultLedger(@Valid @RequestBody List<ProductProfileDTO> ppDTOs) {
+		log.debug("REST request to save product-wise-default-ledger : {}", ppDTOs.size());
+		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+				SyncOperationType.PRODUCT_WISE_DEFAULT_LEDGER).map(so -> {
+					Optional<SyncOperation> opSyncPP = syncOperationRepository.findOneByCompanyIdAndOperationType(
+							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.PRODUCTPROFILE);
+					if (!opSyncPP.get().getCompleted()) {
+						return new ResponseEntity<>("product-profile save processing try after some time.",
+								HttpStatus.BAD_REQUEST);
+					}
+					// update sync status
+					so.setCompleted(false);
+					so.setLastSyncStartedDate(LocalDateTime.now());
+					syncOperationRepository.save(so);
+					// save/update
+					tpProductProfileManagementService.saveUpdateProductWiseDefaultLedger(ppDTOs, so);
+					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+				})
+				.orElse(new ResponseEntity<>(
+						"product-wise-default-ledger sync operation not registered for this company",
+						HttpStatus.BAD_REQUEST));
+	}
 }
