@@ -104,7 +104,7 @@
 
 							<div class="col-sm-2">
 								Account <select id="dbAccount" name="accountPid"
-									class="form-control">
+									class="form-control selectpicker" data-live-search="true">
 									<option value="no">All Account</option>
 									<c:forEach items="${accounts}" var="account">
 										<option value="${account.pid}">${account.name}</option>

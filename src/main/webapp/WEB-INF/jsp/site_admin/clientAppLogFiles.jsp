@@ -27,16 +27,16 @@
 				<div class="col-md-12  clearfix">
 					<form role="form" class="form-horizontal">
 						<div class="form-group">
-							<div class="col-sm-2">
-								Company <select id="dbCompanies" name="dbComapanies"
-									class="form-control"><option value="-1"
-										data-live-search="true">Select Company</option>
-									<c:forEach items="${companies}" var="company">
-										<option value="${company.pid}">${company.legalName}</option>
-									</c:forEach>
-								</select>
-							</div>
-
+						<div class="col-sm-2">
+						<select id="dbCompanies" name="dbComapanies"
+							class="form-control selectpicker" data-live-search="true">
+							<option value="no">Select Company</option>
+							<c:forEach items="${companies}" var="company">
+								<option value="${company.pid}">${company.legalName}</option>
+							</c:forEach>
+						</select>
+					</div>
+						
 							<div class="col-sm-2">
 								<br /> <select class="form-control" id="dbDateSearch"
 									onchange="ClientAppLogFilesReport.showDatePicker()">

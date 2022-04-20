@@ -35,7 +35,7 @@
 						<div class="form-group">
 							<div class="col-sm-3">
 								Contacts <select id="dbAccount" name="accountPid"
-									class="form-control">
+									class="form-control selectpicker" data-live-search="true">
 									<option value="-1">All Contacts</option>
 									<c:forEach items="${accountProfiles}" var="accountProfile">
 										<option value="${accountProfile.pid}">${accountProfile.name}</option>
