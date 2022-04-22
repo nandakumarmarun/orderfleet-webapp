@@ -700,6 +700,7 @@ if (!this.InventoryVoucher) {
 
 	function downloadXls() {
 		// var inventoryVoucherHeaderPids = [];
+		console.log("excel download started");
 		var inventoryVoucherHeaderPids = "";
 		$("input[type='checkbox']:checked").each(function() {
 			var inventoryVoucherPid = $(this).val();
@@ -714,7 +715,7 @@ if (!this.InventoryVoucher) {
 			window.location.href = inventoryVoucherContextPath
 					+ "/download-inventory-xls?inventoryVoucherHeaderPids="
 					+ inventoryVoucherHeaderPids;
-			console.log("sucess.......");
+		console.log("sucess.......");
 		}
 	}
 

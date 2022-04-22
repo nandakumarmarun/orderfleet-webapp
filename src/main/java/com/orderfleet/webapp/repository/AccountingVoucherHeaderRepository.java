@@ -319,6 +319,6 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	@Query("select sum(accVoucher.totalAmount) from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1")
 	List<Object[]> findByExecutiveTaskIdIn(List<Long> eteIds);
 
-	@Query("select accVoucher.totalAmount,accVoucher.employee.name from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1 and accVoucher.document in ?2 ")
-	List<Object[]> findByExecutiveTaskExecutionIdInAndDocument(List<Long> eteIds,List<Document>documents);
+	@Query("select accVoucher.totalAmount,accVoucher.employee.name from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1 ")
+	List<Object[]> findByExecutiveTaskExecutionsIdIn(List<Long> eteIds);
 }

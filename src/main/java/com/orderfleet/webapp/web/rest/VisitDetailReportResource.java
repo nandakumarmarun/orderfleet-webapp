@@ -265,8 +265,7 @@ public class VisitDetailReportResource {
 		log.info("Finding executive Task execution Accounting Vouchers...");
 		List<Object[]> accountingVouchers = new ArrayList<>();
 		if (eteIds.size() > 0) {
-			accountingVouchers = accountingVoucherHeaderRepository.findByExecutiveTaskExecutionIdInAndDocument(eteIds,
-					documents);
+			accountingVouchers = accountingVoucherHeaderRepository.findByExecutiveTaskExecutionsIdIn(eteIds);
 
 		}
 

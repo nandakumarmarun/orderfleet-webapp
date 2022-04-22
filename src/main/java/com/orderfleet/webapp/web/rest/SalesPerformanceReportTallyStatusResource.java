@@ -309,18 +309,18 @@ public class SalesPerformanceReportTallyStatusResource {
 		}
 		model.addAttribute("sendSalesOrderOdooStatus", sendSalesOrderOdoo);
 
-		boolean pdfDownloadStatus = false;
-		Optional<CompanyConfiguration> opCompanyConfigurationPdf = companyConfigurationRepository
-				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
-		if (opCompanyConfigurationPdf.isPresent()) {
-
-			if (opCompanyConfigurationPdf.get().getValue().equals("true")) {
-				pdfDownloadStatus = true;
-			} else {
-				pdfDownloadStatus = false;
-			}
-		}
-		model.addAttribute("pdfDownloadStatus", pdfDownloadStatus);
+//		boolean pdfDownloadStatus = false;
+//		Optional<CompanyConfiguration> opCompanyConfigurationPdf = companyConfigurationRepository
+//				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
+//		if (opCompanyConfigurationPdf.isPresent()) {
+//
+//			if (opCompanyConfigurationPdf.get().getValue().equals("true")) {
+//				pdfDownloadStatus = true;
+//			} else {
+//				pdfDownloadStatus = false;
+//			}
+//		}
+//		model.addAttribute("pdfDownloadStatus", pdfDownloadStatus);
 
 		return "company/primarySalesPerformanceTallyStatusReport";
 	}
@@ -647,8 +647,7 @@ public class SalesPerformanceReportTallyStatusResource {
 		String excelFileName = "SalesOrder" + ".xls";
 		String sheetName = "Sheet1";
 		String[] headerColumns = { "Order No", "Salesman", "Order Date", "Customer", "Customer Location", "Supplier",
-				"Product Name", "Quantity", "Unit Quantity", "Total Quantity", "Free Quantity", "Selling Rate",
-				"Discount Amount", "Discount Percentage", "Tax Amount", "Row Total" };
+				"Product Name","Price", "Quantity", "Discount Percentage", "Tax Amount", "Row Total" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -688,19 +687,15 @@ public class SalesPerformanceReportTallyStatusResource {
 				docDateCell.setCellValue(ivh.getDocumentDate().toString());
 				docDateCell.setCellStyle(dateCellStyle);
 				row.createCell(3).setCellValue(ivh.getReceiverAccountName());
-				row.createCell(4).setCellValue(ivh.getReceiverAccountLocation());
+				row.createCell(4).setCellValue(ivh.getCustomeraddress());
 				row.createCell(5).setCellValue(ivh.getSupplierAccountName());
 
 				row.createCell(6).setCellValue(ivd.getProductName());
-				row.createCell(7).setCellValue(ivd.getQuantity());
-				row.createCell(8).setCellValue(ivd.getProductUnitQty());
-				row.createCell(9).setCellValue((ivd.getQuantity() * ivd.getProductUnitQty()));
-				row.createCell(10).setCellValue(ivd.getFreeQuantity());
-				row.createCell(11).setCellValue(ivd.getSellingRate());
-				row.createCell(12).setCellValue(ivd.getDiscountAmount());
-				row.createCell(13).setCellValue(ivd.getDiscountPercentage());
-				row.createCell(14).setCellValue(ivd.getTaxAmount());
-				row.createCell(15).setCellValue(ivd.getRowTotal());
+				row.createCell(7).setCellValue(ivd.getSellingRate());
+				row.createCell(8).setCellValue(ivd.getQuantity());
+				row.createCell(9).setCellValue(ivd.getDiscountPercentage());
+				row.createCell(10).setCellValue(ivd.getTaxAmount());
+				row.createCell(11).setCellValue(ivd.getRowTotal());
 			}
 		}
 	}

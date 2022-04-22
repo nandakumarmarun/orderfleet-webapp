@@ -119,7 +119,10 @@
 								<button type="button" class="btn btn-info"
 									onclick="InventoryVoucher.filter()">Apply</button>
 							</div>
-
+							<div class="col-sm-1">
+								<br>
+								<button type="button" class="btn btn-success" id="downloadXls">Download xls</button>
+							</div>
 
 							<c:if test="${sendSalesOrderEmailStatus=='true'}">
 								<div class="col-sm-1">
@@ -155,6 +158,7 @@
 								</div>
 
 							</c:if>
+
 						</div>
 					</form>
 				</div>
