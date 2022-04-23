@@ -92,7 +92,10 @@ public class Activity implements Serializable {
 	@NotNull
 	@Column(name = "has_telephonic_order", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean hasTelephonicOrder;
-
+	
+	@NotNull
+	@Column(name = "email_to_complaint", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean emailTocomplaint;
 
 
 	@NotNull
@@ -244,6 +247,16 @@ public class Activity implements Serializable {
 
 	public void setHasTelephonicOrder(boolean hasTelephonicOrder) {
 		this.hasTelephonicOrder = hasTelephonicOrder;
+	}
+	
+	
+
+	public boolean getEmailTocomplaint() {
+		return emailTocomplaint;
+	}
+
+	public void setEmailTocomplaint(boolean emailTocomplaint) {
+		this.emailTocomplaint = emailTocomplaint;
 	}
 
 	@Override

@@ -24,7 +24,8 @@ if (!this.Activity) {
 		companyPid : null,
 		contactManagement : null,
 		geoFencing : null,
-		hasTelephonicOrder : null
+		hasTelephonicOrder : null,
+		emailTocomplaint : null
 	};
 
 	// Specify the validation rules
@@ -239,6 +240,8 @@ if (!this.Activity) {
 		"checked");
 		activityModel.hasTelephonicOrder = $('#hasTelephonicOrder').prop(
 		"checked");
+		activityModel.emailTocomplaint = $('#emailTocomplaint').prop(
+		"checked");
 		activityModel.completePlans = $('#completePlans').prop("checked");
 		activityModel.targetDisplayOnDayplan = $('#targetDisplayOnDayplan')
 				.prop("checked");
@@ -327,6 +330,8 @@ if (!this.Activity) {
 								data.geoFencing);
 						$("#hasTelephonicOrder").prop("checked",
 								data.hasTelephonicOrder);
+						$("#emailTocomplaint").prop("checked",
+								data.emailTocomplaint);
 						$("#completePlans").prop("checked", data.completePlans);
 						$("#targetDisplayOnDayplan").prop("checked",
 								data.targetDisplayOnDayplan);

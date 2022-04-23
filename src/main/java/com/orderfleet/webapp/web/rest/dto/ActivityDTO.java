@@ -50,6 +50,8 @@ public class ActivityDTO {
 	private boolean saveActivityDuration;
 
 	private boolean targetDisplayOnDayplan;
+	
+	private boolean emailTocomplaint;
 
 	private int sortOrder;
 
@@ -86,6 +88,7 @@ public class ActivityDTO {
 		this.hasSecondarySales = activity.getHasSecondarySales();
 		this.geoFencing = activity.getGeoFencing();
 		this.hasTelephonicOrder = activity.getHasTelephonicOrder();
+		this.emailTocomplaint = activity.getEmailTocomplaint();
 
 
 		// eagerly load the association
@@ -301,6 +304,16 @@ public class ActivityDTO {
 
 	public void setHasTelephonicOrder(boolean hasTelephonicOrder) {
 		this.hasTelephonicOrder = hasTelephonicOrder;
+	}
+	
+	
+
+	public boolean getEmailTocomplaint() {
+		return emailTocomplaint;
+	}
+
+	public void setEmailTocomplaint(boolean emailTocomplaint) {
+		this.emailTocomplaint = emailTocomplaint;
 	}
 
 	@Override

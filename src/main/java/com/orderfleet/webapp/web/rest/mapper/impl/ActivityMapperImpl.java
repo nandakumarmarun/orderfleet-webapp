@@ -46,7 +46,7 @@ public class ActivityMapperImpl extends ActivityMapper {
 		activityDTO.setName(activity.getName());
 		activityDTO.setPid(activity.getPid());
 		activityDTO.setTargetDisplayOnDayplan(activity.getTargetDisplayOnDayplan());
-
+		activityDTO.setEmailTocomplaint(activity.getEmailTocomplaint());
 		return activityDTO;
 	}
 
@@ -76,6 +76,7 @@ public class ActivityMapperImpl extends ActivityMapper {
 				: activity.getName());
 		activityDTO.setPid(activity.getPid());
 		activityDTO.setTargetDisplayOnDayplan(activity.getTargetDisplayOnDayplan());
+		activityDTO.setEmailTocomplaint(activity.getEmailTocomplaint());
 
 		return activityDTO;
 	}
@@ -125,6 +126,7 @@ public class ActivityMapperImpl extends ActivityMapper {
 		activity.setName(activityDTO.getName());
 		activity.setPid(activityDTO.getPid());
 		activity.setTargetDisplayOnDayplan(activityDTO.getTargetDisplayOnDayplan());
+		activity.setEmailTocomplaint(activityDTO.getEmailTocomplaint());
 
 		return activity;
 	}

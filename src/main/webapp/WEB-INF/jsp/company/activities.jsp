@@ -165,6 +165,12 @@
 										name="hasTelephonicOrder" id="hasTelephonicOrder" 
 										style="width: 4%;" />
 								</div>
+								<div class="form-group">
+									<label class="control-label" for="emailTocomplaint">Email To Complaint
+										 </label> <input type="checkbox" class="form-control"
+										name="emailTocomplaint" id="emailTocomplaint" 
+										style="width: 4%;" />
+								</div>
 								
 								<div class="form-group">
 									<label class="control-label" for="field_description">Description</label>

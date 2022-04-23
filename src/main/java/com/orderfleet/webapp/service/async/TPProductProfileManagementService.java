@@ -1295,6 +1295,7 @@ public class TPProductProfileManagementService {
 			productProfile.setAlias(ppDto.getAlias());
 			productProfile.setMrp(ppDto.getMrp());
 			productProfile.setTaxRate(ppDto.getTaxRate());
+			productProfile.setCessTaxRate(ppDto.getCessTaxRate());
 			productProfile.setSku(ppDto.getSku());
 			productProfile.setActivated(ppDto.getActivated());
 			productProfile.setTrimChar(ppDto.getTrimChar());

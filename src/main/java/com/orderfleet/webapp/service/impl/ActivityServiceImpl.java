@@ -427,6 +427,7 @@ public class ActivityServiceImpl implements ActivityService {
 			activity.setHasSecondarySales(activityDTO.getHasSecondarySales());
 			activity.setGeoFencing(activityDTO.getGeoFencing());
 			activity.setHasTelephonicOrder(activityDTO.getHasTelephonicOrder());
+			activity.setEmailTocomplaint(activityDTO.getEmailTocomplaint());
 
 			activity = activityRepository.save(activity);
 			ActivityDTO result = activityMapper.activityToActivityDTO(activity);

@@ -23,7 +23,8 @@ if (!this.Activity) {
 		targetDisplayOnDayplan : null,
 		contactManagement : null,
 		geoFencing : null,
-		hasTelephonicOrder : null
+		hasTelephonicOrder : null,
+		emailTocomplaint : null
 	};
 
 	// Specify the validation rules
@@ -165,6 +166,8 @@ if (!this.Activity) {
 		activityModel.completePlans = $('#completePlans').prop("checked");
 		activityModel.targetDisplayOnDayplan = $('#targetDisplayOnDayplan')
 				.prop("checked");
+		activityModel.emailTocomplaint = $('#emailTocomplaint')
+		.prop("checked");
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -253,7 +256,8 @@ if (!this.Activity) {
 						$("#completePlans").prop("checked", data.completePlans);
 						$("#targetDisplayOnDayplan").prop("checked",
 								data.targetDisplayOnDayplan);
-
+						$("#emailTocomplaint").prop("checked",
+								data.emailTocomplaint);
 						// set pid
 						activityModel.pid = data.pid;
 					},
