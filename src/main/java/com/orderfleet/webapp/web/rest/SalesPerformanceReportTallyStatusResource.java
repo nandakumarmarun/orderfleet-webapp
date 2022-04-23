@@ -309,18 +309,17 @@ public class SalesPerformanceReportTallyStatusResource {
 		}
 		model.addAttribute("sendSalesOrderOdooStatus", sendSalesOrderOdoo);
 
-//		boolean pdfDownloadStatus = false;
-//		Optional<CompanyConfiguration> opCompanyConfigurationPdf = companyConfigurationRepository
-//				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
-//		if (opCompanyConfigurationPdf.isPresent()) {
-//
-//			if (opCompanyConfigurationPdf.get().getValue().equals("true")) {
-//				pdfDownloadStatus = true;
-//			} else {
-//				pdfDownloadStatus = false;
-//			}
-//		}
-//		model.addAttribute("pdfDownloadStatus", pdfDownloadStatus);
+		boolean pdfDownloadStatus = false;
+		Optional<CompanyConfiguration> opCompanyConfigurationPdf = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_PDF_DOWNLOAD);
+		if (opCompanyConfigurationPdf.isPresent()) {
+
+			if (opCompanyConfigurationPdf.get().getValue().equals("true")) {
+				pdfDownloadStatus = true;
+			} else {
+				pdfDownloadStatus = false;			}
+		}
+		model.addAttribute("pdfDownloadStatus", pdfDownloadStatus);
 
 		return "company/primarySalesPerformanceTallyStatusReport";
 	}
