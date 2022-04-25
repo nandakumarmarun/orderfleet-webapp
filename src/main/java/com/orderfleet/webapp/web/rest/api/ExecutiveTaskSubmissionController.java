@@ -10,19 +10,26 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.embedded.MimeMappings;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,6 +65,7 @@ import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.CustomerTimeSpentRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
@@ -161,6 +169,10 @@ public class ExecutiveTaskSubmissionController {
 
 	@Inject
 	private DocumentRepository documentRepository;
+	
+	@Inject
+	
+	private EmployeeProfileRepository employeeProfileRepository;
 
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
@@ -603,9 +615,16 @@ public class ExecutiveTaskSubmissionController {
 
 			// send sales orders to third party ERP
 			sendSalesOrderToThirdPartyErp(tsTransactionWrapper);
-
+			
+			
+			//send EmailToComplaint Modern
+//			if(tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getEmailTocomplaint()) {
+//				System.out.println("========================================================================email=============================================================================");
+//				sendEmailToComplaint(executiveTaskSubmissionDTO);
+//			}
 			taskSubmissionResponse.setStatus("Success");
 			taskSubmissionResponse.setMessage("Activity submitted successfully...");
+			
 		} catch (DataIntegrityViolationException dive) {
 			taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Duplicate Key");
 			taskSubmissionResponse.setMessage(LocalDateTime.now() + " " + dive.getMessage());
@@ -1175,5 +1194,55 @@ public class ExecutiveTaskSubmissionController {
 				modernSalesDataService.saveTransactions(tsTransactionWrapper, companyId, apiBaseUrl);
 			}
 		}
+	}
+	
+	private void sendEmailToComplaint(ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO)  {
+		log.info("Sending Email To Complaint");
+		String toMassage = "rameeskr77@gmail.com";
+		String fromMassage = "salesnrich.info@gmail.com";
+		
+		if(!executiveTaskSubmissionDTO.getDynamicDocuments().isEmpty()) {
+			User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+			Company company = user.getCompany();
+			EmployeeProfile employeeProfile = employeeProfileRepository.findEmployeeProfileByUser(user);
+			String emString = employeeProfile.getName() != null ? employeeProfile.getName() : "";
+	
+	for(DynamicDocumentHeaderDTO dynamicDTO : executiveTaskSubmissionDTO.getDynamicDocuments())	{
+		JavaMailSender mailSender = getJavaMailSender();
+		MimeMessage massage = mailSender.createMimeMessage();
+	
+			MimeMessageHelper helper;
+			try {
+				helper = new MimeMessageHelper(massage, true);
+				helper.setSubject("Complaint From " + emString);
+				helper.setText("ACC : " + dynamicDTO+ " user : "+ user);
+				helper.setTo(toMassage);
+				helper.setFrom(fromMassage);
+				//XlFILE AttacCHing.........
+				mailSender.send(massage);				
+				log.debug("Sent email successfully");
+			} catch (MessagingException e) {
+				// TODO Auto-generated catch block
+				 log.warn("Email could not be sent to user '{}'", e);
+			}
+			
+		}	
+		}
+	}
+	
+	public JavaMailSender getJavaMailSender() {
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost("smtp.gmail.com");
+		mailSender.setPort(587);
+		mailSender.setUsername("salesnrich.info@gmail.com");
+		mailSender.setPassword("fohcijtqujnqyqcn");
+
+		Properties props = mailSender.getJavaMailProperties();
+		props.put("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.debug", "false");
+
+		return mailSender;
 	}
 }
