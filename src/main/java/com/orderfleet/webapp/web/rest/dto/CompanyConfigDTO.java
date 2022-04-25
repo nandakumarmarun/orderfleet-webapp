@@ -38,6 +38,7 @@ public class CompanyConfigDTO {
 	private boolean aliasToName;
 	private boolean descriptionToName;
 	private boolean stockApi;
+	private boolean employeeCreateBtn;
 	
 
 	public CompanyConfigDTO() {
@@ -266,6 +267,14 @@ public class CompanyConfigDTO {
 
 	public void setStockApi(boolean stockApi) {
 		this.stockApi = stockApi;
+	}
+
+	public boolean getEmployeeCreateBtn() {
+		return employeeCreateBtn;
+	}
+
+	public void setEmployeeCreateBtn(boolean employeeCreateBtn) {
+		this.employeeCreateBtn = employeeCreateBtn;
 	}
 	
 	

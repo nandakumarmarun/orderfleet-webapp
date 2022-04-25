@@ -25,7 +25,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.DepartmentService;
 import com.orderfleet.webapp.service.DesignationService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
@@ -61,6 +65,9 @@ public class EmployeeProfileResource {
 	
 	@Inject
 	private UserService userService;
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	/**
 	 * POST /employee-profiles : Create a new employeeProfile.
@@ -174,6 +181,10 @@ public class EmployeeProfileResource {
 		model.addAttribute("deactivatedEmployeeProfiles", deactivatedEmployeeProfiles);
 		model.addAttribute("designations", designationService.findAllByCompany());
 		model.addAttribute("departments", departmentService.findAllByCompany());
+		Optional<CompanyConfiguration> optCreateEmployeeBtn = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.EMPLOYEE_CREATE_BTN);
+		if(optCreateEmployeeBtn.isPresent()) {
+			model.addAttribute("CreateEmployeeBtn",Boolean.valueOf(optCreateEmployeeBtn.get().getValue()));
+		}
 		return "company/employee-profiles";
 	}
 

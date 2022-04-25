@@ -182,6 +182,10 @@ public class CompanyConfigurationResource {
 					mcDto.setStockApi(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if(cc.getName().equals(CompanyConfig.EMPLOYEE_CREATE_BTN)) {
+					mcDto.setEmployeeCreateBtn(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
@@ -212,7 +216,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String sendSalesOrderOdoo, @RequestParam String sendTransactionsSapPravesh,
 			@RequestParam String addCompoundUnit, @RequestParam String updateStockLocation,
 			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName, @RequestParam String descriptionToName,
-			@RequestParam String stockApi)
+			@RequestParam String stockApi,@RequestParam String employeeCreateBtn)
 			throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
@@ -273,6 +277,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DESCRIPTION_TO_NAME);
 		Optional<CompanyConfiguration> optStockApi = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
+		Optional<CompanyConfiguration> optemployeeCreateBtn = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -304,6 +310,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration aliasToNameCompany = null;
 		CompanyConfiguration descriptionToNameCompany = null;
 		CompanyConfiguration stockApiCompany = null;
+		CompanyConfiguration employeeCreateBtnCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -580,7 +587,17 @@ public class CompanyConfigurationResource {
 			stockApiCompany.setValue(stockApi);
 		}
 		companyConfigurationRepository.save(stockApiCompany);
-
+		
+		if (optemployeeCreateBtn.isPresent()) {
+			employeeCreateBtnCompany= optemployeeCreateBtn.get();
+			employeeCreateBtnCompany.setValue(employeeCreateBtn);
+		} else {
+			employeeCreateBtnCompany = new CompanyConfiguration();
+			employeeCreateBtnCompany.setCompany(company);
+			employeeCreateBtnCompany.setName(CompanyConfig.EMPLOYEE_CREATE_BTN);
+			employeeCreateBtnCompany.setValue(employeeCreateBtn);
+		}
+		companyConfigurationRepository.save(employeeCreateBtnCompany);
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -697,7 +714,8 @@ public class CompanyConfigurationResource {
 
 		Optional<CompanyConfiguration> optstoApi = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
-
+		Optional<CompanyConfiguration> optemployeeCreateBtn = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -785,7 +803,10 @@ public class CompanyConfigurationResource {
 		if (optstoApi.isPresent()) {
 			companyConfigurationDTO.setStockApi(Boolean.valueOf(optstoApi.get().getValue()));
 		}
-
+		
+		if (optemployeeCreateBtn.isPresent()) {
+			companyConfigurationDTO.setEmployeeCreateBtn(Boolean.valueOf(optemployeeCreateBtn.get().getValue()));
+		}
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
@@ -888,6 +909,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DESCRIPTION_TO_NAME);
 		Optional<CompanyConfiguration> optstockApi = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
+		Optional<CompanyConfiguration> optemployeeCreateBtn = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1004,6 +1027,11 @@ public class CompanyConfigurationResource {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optstockApi.get().getCompany().getId(),
 					CompanyConfig.STOCK_API);
 		}
+		if (optemployeeCreateBtn.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optemployeeCreateBtn.get().getCompany().getId(),
+					CompanyConfig.EMPLOYEE_CREATE_BTN);
+		}
+		
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationRepository.deleteByCompanyIdAndName(optFindLocation.get()

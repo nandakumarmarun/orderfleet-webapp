@@ -62,6 +62,7 @@
 						<th>Alias To Name</th>
 						<th>Description TO Name</th>
 						<th>Stock api</th>
+						<th>Employee Create Btn</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -96,6 +97,7 @@
 							<th>${companyConfiguration.aliasToName}</th>
 							<th>${companyConfiguration.descriptionToName}</th>
 							<th>${companyConfiguration.stockApi}</th>
+							<th>${companyConfiguration.employeeCreateBtn}</th>
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
@@ -339,7 +341,13 @@
 												</div></td>
 										</tr>
 
-
+											<tr>
+											<td><div class="form-group">
+													<label class="control-label">Employee Create Btn</label> <input
+														id="employeeCreateBtn" name='checksemployeeCreateBtn' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
 
 										<!-- <tr>
 											<td><div class="form-group">

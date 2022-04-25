@@ -24,9 +24,11 @@
 			<h2>Employee Profiles</h2>
 			<div class="row col-xs-12">
 				<div class="pull-right">
+				<c:if test="${CreateEmployeeBtn == true}">
 					<button type="button" class="btn btn-success"
 						onclick="EmployeeProfile.showModalPopup($('#myModal'));">Create
 						new Employee Profile</button>
+				</c:if>
 				</div>
 			</div>
 			<br> <br>
