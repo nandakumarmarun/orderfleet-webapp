@@ -69,8 +69,7 @@
 												Employees</a>
 										</div> -->
 									</div>
-									<select id="dbEmployee" name="employeePid"
-										class="form-control">
+									<select id="dbEmployee" name="employeePid" class="form-control">
 										<option value="no">Select Dashboard Employee</option>
 									</select>
 								</div>
@@ -106,6 +105,12 @@
 							</div>
 							<div class="col-sm-1">
 								<button id="applyBtn" type="button" class="btn btn-info">Apply</button>
+								
+							</div>
+                    <div class="col-sm-2">
+								<br>
+								<button type="button" class="btn btn-success"
+									onclick="window.print()">Print</button>
 							</div>
 						</div>
 					</form>
@@ -121,12 +126,14 @@
 							<th rowspan="2"
 								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">ACTIVITY</th>
 							<th rowspan="2"
-								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">TARGET TOTAL</th>
-								<th rowspan="2"
-								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">ACHIVED TOTAL</th>
+								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">TARGET
+								TOTAL</th>
+							<th rowspan="2"
+								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">ACHIVED
+								TOTAL</th>
 							<th rowspan="2"
 								style="text-align: center; color: white; font-weight: bold; background-color: rgb(48, 54, 65); vertical-align: middle;">ACHIEVED%
-							</th>	
+							</th>
 							<th colspan="3" id="th_target"
 								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">TARGET</th>
 							<th colspan="3" id="th_achived"
@@ -162,8 +169,8 @@
 
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
 
-	<%-- 	<spring:url value="/resources/assets/js/jquery-ui.js" var="jqueryUI"></spring:url>
-	<script type="text/javascript" src="${jqueryUI}"></script> --%>
+	
+
 
 	<spring:url value="/resources/assets/js/MonthPicker.js"
 		var="monthPicker"></spring:url>
@@ -176,10 +183,11 @@
 		var="reportcommonjsfileJS"></spring:url>
 	<script type="text/javascript" src="${reportcommonjsfileJS}"></script>
 
+   ?
 	<spring:url value="/resources/app/sales-target-achieved-report.js"
 		var="salesTargetAchievedReportJs"></spring:url>
-	<script type="text/javascript" src="${salesTargetAchievedReportJs}"></script>
 
+	<script type="text/javascript" src="${salesTargetAchievedReportJs}"></script>
 
 </body>
 </html>

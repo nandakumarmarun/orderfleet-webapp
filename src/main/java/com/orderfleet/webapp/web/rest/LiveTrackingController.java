@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -26,6 +27,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
+import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AttendanceService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
@@ -66,6 +68,9 @@ public class LiveTrackingController {
 
 	@Inject
 	private GeoLocationService geoLocationService;
+	
+	@Inject
+	private UserRepository userRepository;
 
 	@RequestMapping("/live-tracking")
 	public String executives(Model model) {
@@ -104,13 +109,16 @@ public class LiveTrackingController {
 			@RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 		// get user under current users
 		List<EmployeeProfileDTO> dashboardEmployees;
-		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-		log.info("No: subordinate users :" + userIds);
-		if (userIds.isEmpty()) {
+//		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		List<Long> dashBoarduserId = userRepository.FindAllUserByDashboardUserIdInAndCompanyId(companyId).stream().map(data ->  data.getId()).collect(Collectors.toList());
+		log.info("No: subordinate users :" + dashBoarduserId);
+		if (dashBoarduserId.isEmpty()) {
 			dashboardEmployees = employeeProfileService.findAllByCompany();
 		} else {
-			dashboardEmployees = employeeProfileService.findAllEmployeeByUserIdsIn(userIds);
+			dashboardEmployees = employeeProfileService.findAllEmployeeByUserIdsIn(dashBoarduserId);
 		}
+		
 		List<LiveTrackingDTO> liveTrackingDTOs = new ArrayList<>();
 		dashboardEmployees.forEach(employee -> {
 			LiveTrackingDTO liveTrackingDTO = new LiveTrackingDTO();
