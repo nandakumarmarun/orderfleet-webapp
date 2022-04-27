@@ -39,6 +39,7 @@ public class CompanyConfigDTO {
 	private boolean descriptionToName;
 	private boolean stockApi;
 	private boolean employeeCreateBtn;
+	private boolean modernSpecialConfig;
 	
 
 	public CompanyConfigDTO() {
@@ -275,6 +276,14 @@ public class CompanyConfigDTO {
 
 	public void setEmployeeCreateBtn(boolean employeeCreateBtn) {
 		this.employeeCreateBtn = employeeCreateBtn;
+	}
+
+	public boolean isModernSpecialConfig() {
+		return modernSpecialConfig;
+	}
+
+	public void setModernSpecialConfig(boolean modernSpecialConfig) {
+		this.modernSpecialConfig = modernSpecialConfig;
 	}
 	
 	

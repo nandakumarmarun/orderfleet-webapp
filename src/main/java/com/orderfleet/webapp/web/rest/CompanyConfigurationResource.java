@@ -186,6 +186,10 @@ public class CompanyConfigurationResource {
 					mcDto.setEmployeeCreateBtn(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if(cc.getName().equals(CompanyConfig.MODERN_SPECIAL_CONFIG)) {
+					mcDto.setModernSpecialConfig(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
@@ -216,7 +220,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String sendSalesOrderOdoo, @RequestParam String sendTransactionsSapPravesh,
 			@RequestParam String addCompoundUnit, @RequestParam String updateStockLocation,
 			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName, @RequestParam String descriptionToName,
-			@RequestParam String stockApi,@RequestParam String employeeCreateBtn)
+			@RequestParam String stockApi,@RequestParam String employeeCreateBtn,@RequestParam String modernSpecialConfig)
 			throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
@@ -279,6 +283,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
 		Optional<CompanyConfiguration> optemployeeCreateBtn = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
+		Optional<CompanyConfiguration> optmodernSpecialConfig = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.MODERN_SPECIAL_CONFIG);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -311,6 +317,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration descriptionToNameCompany = null;
 		CompanyConfiguration stockApiCompany = null;
 		CompanyConfiguration employeeCreateBtnCompany = null;
+		CompanyConfiguration modernSpecialConfigCompany =null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -598,6 +605,16 @@ public class CompanyConfigurationResource {
 			employeeCreateBtnCompany.setValue(employeeCreateBtn);
 		}
 		companyConfigurationRepository.save(employeeCreateBtnCompany);
+		if (optmodernSpecialConfig.isPresent()) {
+			modernSpecialConfigCompany= optmodernSpecialConfig.get();
+			modernSpecialConfigCompany.setValue(modernSpecialConfig);
+		} else {
+			modernSpecialConfigCompany = new CompanyConfiguration();
+			modernSpecialConfigCompany.setCompany(company);
+			modernSpecialConfigCompany.setName(CompanyConfig.MODERN_SPECIAL_CONFIG);
+			modernSpecialConfigCompany.setValue(modernSpecialConfig);
+		}
+		companyConfigurationRepository.save(modernSpecialConfigCompany);
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -716,6 +733,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
 		Optional<CompanyConfiguration> optemployeeCreateBtn = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
+		Optional<CompanyConfiguration> optmodernSpecialConfig = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.MODERN_SPECIAL_CONFIG);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -806,6 +825,9 @@ public class CompanyConfigurationResource {
 		
 		if (optemployeeCreateBtn.isPresent()) {
 			companyConfigurationDTO.setEmployeeCreateBtn(Boolean.valueOf(optemployeeCreateBtn.get().getValue()));
+		}
+		if (optmodernSpecialConfig.isPresent()) {
+			companyConfigurationDTO.setModernSpecialConfig(Boolean.valueOf(optmodernSpecialConfig.get().getValue()));
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {
@@ -911,6 +933,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
 		Optional<CompanyConfiguration> optemployeeCreateBtn = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
+		Optional<CompanyConfiguration> optmodernSpecialConfig = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.MODERN_SPECIAL_CONFIG);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1030,6 +1054,10 @@ public class CompanyConfigurationResource {
 		if (optemployeeCreateBtn.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optemployeeCreateBtn.get().getCompany().getId(),
 					CompanyConfig.EMPLOYEE_CREATE_BTN);
+		}
+		if (optmodernSpecialConfig.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optmodernSpecialConfig.get().getCompany().getId(),
+					CompanyConfig.MODERN_SPECIAL_CONFIG);
 		}
 		
 		/*
