@@ -87,6 +87,8 @@ import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
 import com.orderfleet.webapp.web.rest.dto.DashboardWebSocketDataDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
+import com.orderfleet.webapp.web.rest.dto.FilledFormDTO;
+import com.orderfleet.webapp.web.rest.dto.FilledFormDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.MobileConfigurationDTO;
@@ -619,7 +621,6 @@ public class ExecutiveTaskSubmissionController {
 			
 			//send EmailToComplaint Modern
 //			if(tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getEmailTocomplaint()) {
-//				System.out.println("========================================================================email=============================================================================");
 //				sendEmailToComplaint(executiveTaskSubmissionDTO);
 //			}
 			taskSubmissionResponse.setStatus("Success");
@@ -1206,16 +1207,18 @@ public class ExecutiveTaskSubmissionController {
 			Company company = user.getCompany();
 			EmployeeProfile employeeProfile = employeeProfileRepository.findEmployeeProfileByUser(user);
 			String emString = employeeProfile.getName() != null ? employeeProfile.getName() : "";
+			LocalDateTime issueDate = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO().getSendDate();
+			String acName = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO().getAccountProfileName();
 	
 	for(DynamicDocumentHeaderDTO dynamicDTO : executiveTaskSubmissionDTO.getDynamicDocuments())	{
+		String compliantSlip = createComplaintSlip(dynamicDTO);
 		JavaMailSender mailSender = getJavaMailSender();
 		MimeMessage massage = mailSender.createMimeMessage();
-	
 			MimeMessageHelper helper;
 			try {
 				helper = new MimeMessageHelper(massage, true);
-				helper.setSubject("Complaint From " + emString);
-				helper.setText("ACC : " + dynamicDTO+ " user : "+ user);
+				helper.setSubject("Complaint From " + acName);
+				helper.setText("EMPLOYEE NAME : "+emString +"\n" + "ISSUE DATE  : "+issueDate +"\n"+"CUSTOMER NAME : "+acName +"\n"+compliantSlip);
 				helper.setTo(toMassage);
 				helper.setFrom(fromMassage);
 				//XlFILE AttacCHing.........
@@ -1230,6 +1233,23 @@ public class ExecutiveTaskSubmissionController {
 		}
 	}
 	
+	private String createComplaintSlip(DynamicDocumentHeaderDTO dynamicDTO) {
+		StringBuilder builder = null;
+		for(FilledFormDTO ff: dynamicDTO.getFilledForms()) {
+		      builder =  new StringBuilder();
+		      builder.append("                 Complaint Details                 "+"\n");
+		      builder.append("               ---------------------                 "+"\n");
+			for (FilledFormDetailDTO ffDetails:ff.getFilledFormDetails()) {
+				builder.append("Qus: "+ffDetails.getFormElementName());
+				builder.append("\n");
+				builder.append("Ans: "+ffDetails.getValue()+"\n");
+				builder.append("\n");
+			}
+		     builder.append("----------------------------------------------"); 
+		}
+		return builder.toString();
+	}
+
 	public JavaMailSender getJavaMailSender() {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 		mailSender.setHost("smtp.gmail.com");
