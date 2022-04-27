@@ -27,7 +27,17 @@
 									</c:forEach>
 								</select>
 				</div>
-				<div class="col-md-6 col-xs-12">
+				<!-- <div class="col-sm-3">
+					<div class="form-group col-xs-5">
+						<select id="slt_status" class=" form-control  " title="filter">
+							<option value="All">All</option>
+							<option value="Completed">COMPLETED</option>
+							<option value="Pending">PENDING</option>
+							<option value="Skipped">SKIPPED</option>
+						</select>
+					</div>
+				</div> -->
+				<div class="col-md-3 col-xs-12">
 					<div id="daterangePicker" class="pull-right"
 						style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc;">
 						<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
@@ -36,6 +46,9 @@
 				</div>
 				<div class="col-sm-3 col-xs-12">
 					<button id="btnApply" type="button" class="btn btn-info">Apply</button>
+				</div>
+				<div class="col-sm-3 col-xs-12">
+					<button id="btnDownloadxls" type="button" class="btn btn-info">Download Xls</button>
 				</div>
 			</div>
 			<br />

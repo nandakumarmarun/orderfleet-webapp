@@ -34,8 +34,26 @@ if (!this.DayPlanExecutionSummery) {
 		$('#btnApply').on('click', function() {
 			loadPlanExecutionSummaryBetween($('#daterangePicker').data('daterangepicker').startDate.format('YYYY-MM-DD'), $('#daterangePicker').data('daterangepicker').endDate.format('YYYY-MM-DD'));
 		});
+		$('#btnDownloadxls').on('click', function() {
+			downloadXls();
+		});
 		
 	});
+	
+	function downloadXls()
+	{
+		var employeePid = $("#dbEmployee").val();
+	    var startDate = $('#daterangePicker').data('daterangepicker').startDate.format('YYYY-MM-DD');
+	    var endDate =$('#daterangePicker').data('daterangepicker').endDate.format('YYYY-MM-DD');
+		
+	  window.location.href = dayPlanExecutionSummeryContextPath+"/downloadxls?&employeePid="+employeePid+'&startDate='+startDate+'&endDate='+endDate;
+		
+	  console.log("Success.....");
+		
+	}
+	
+	
+	
 	
 	function loadPlanExecutionSummaryBetween(startDate, endDate) {
 		$('#tblBody').html("<tr><td colspan='4' align='center'>Loading...</td></tr>");

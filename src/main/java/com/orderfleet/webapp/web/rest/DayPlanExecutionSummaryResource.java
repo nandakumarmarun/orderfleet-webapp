@@ -1,9 +1,14 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,10 +18,21 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +56,8 @@ import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.DayPlanExecutionSummaryDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskPlanDTO;
+import com.orderfleet.webapp.web.rest.dto.SalesTargetGroupUserTargetDTO;
+import com.orderfleet.webapp.web.rest.dto.VisitReportView;
 
 /**
  * Web controller for managing DayPlanExecutionSummery.
@@ -140,24 +158,9 @@ public class DayPlanExecutionSummaryResource {
 
 		actualEcutiveTaskPlans = executiveTaskPlanRepository.findByUserPidInAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(
 				userPids, startDate.atTime(0, 0), endDate.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
-//		String userPid = "-1";
-//		if (employeeProfileDTO.getPid() != null) {
-//			userPid = employeeProfileDTO.getUserPid();
-//		}
 
-		// filter by user and date between
-//		if (userPid != null && !"-1".equals(userPid)) {
-//			actualEcutiveTaskPlans = executiveTaskPlanRepository
-//					.findByUserPidAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(userPid, startDate.atTime(0, 0),
-//							endDate.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
-//		}
-//		// filter by date between
-//		if (userPid == null || "-1".equals(userPid)) {
-//			actualEcutiveTaskPlans = executiveTaskPlanRepository.findByPlannedDateBetweenAndCompanyIdOrderByIdAsc(
-//					startDate.atTime(0, 0), endDate.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
-//		}
 		Map<LocalDate, Map<String, List<ExecutiveTaskPlan>>> plansGroupedByDateThenByUser = null;
-		// map for UI
+		   // map for UI
 		Map<DayPlanExecutionSummaryDTO, Map<DayPlanExecutionSummaryDTO, List<ExecutiveTaskPlanDTO>>> resultMap = new TreeMap<>();
 		if (actualEcutiveTaskPlans.size() > 0) {
 			// group by plan date, then by user
@@ -256,10 +259,244 @@ public class DayPlanExecutionSummaryResource {
 				String formatedTotal = decimalFormat.format(percentage);
 				dpesDateDTO.setPercentage(Double.parseDouble(formatedTotal));
 				resultMap.put(dpesDateDTO, resultChildMap);
+				
+							
+//				for(Map.Entry  dpe :resultChildMap.entrySet()) {
+//					
+//				 
+//					List<ExecutiveTaskPlanDTO> values = (List<ExecutiveTaskPlanDTO>) dpe.getValue();
+//					
+//					
+//					
+//					
+//					for(ExecutiveTaskPlanDTO  atp:values)
+//				{
+//					System.out.println(" company Name :"+atp.getAccountProfileName());
+//					System.out.println("created date :"+ atp.getCreatedDate());
+//					System.out.println("status :"+ atp.getTaskPlanStatus());
+//					System.out.println("Scheduled :"+atp.getSortOrder());
+//				}
+//					
+//				}
+//				
+				
 			}
 		}
 		return new ResponseEntity<>(resultMap, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/day-plans-execution-summary/downloadxls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public void downloadXls(@RequestParam("employeePid") String employeePid,
+			@RequestParam(required = true, name = "startDate") LocalDate startDate,
+			@RequestParam(required = true, name = "endDate") LocalDate endDate,
+			HttpServletResponse response) {
+
+		List<ExecutiveTaskPlan> actualEcutiveTaskPlans = null;
+
+		List<String> userPids = new ArrayList<>();
+		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
+		if (!employeePid.equals("no")) {
+			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
+			if (employeeProfileDTO.getPid() != null) {
+				userPids.add(employeeProfileDTO.getUserPid());
+			}
+		} else {
+			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+			if (userIds.size() > 0) {
+				List<UserDTO> users = userService.findByUserIdIn(userIds);
+				for(UserDTO user:users) {
+					userPids.add(user.getPid());
+				}
+			}
+		}
+		
+		actualEcutiveTaskPlans = executiveTaskPlanRepository.findByUserPidInAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(
+				userPids, startDate.atTime(0, 0), endDate.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
+
+		Map<LocalDate, Map<String, List<ExecutiveTaskPlan>>> plansGroupedByDateThenByUser = null;
+		   // map for UI
+		Map<DayPlanExecutionSummaryDTO, Map<DayPlanExecutionSummaryDTO, List<ExecutiveTaskPlanDTO>>> resultMap = new TreeMap<>();
+		Map<DayPlanExecutionSummaryDTO, List<ExecutiveTaskPlanDTO>> resultChildMap = new LinkedHashMap<>();
+		if (actualEcutiveTaskPlans.size() > 0) {
+			// group by plan date, then by user
+			plansGroupedByDateThenByUser = actualEcutiveTaskPlans.stream().collect(Collectors.groupingBy(
+					etp -> etp.getPlannedDate().toLocalDate(), Collectors.groupingBy(etp -> etp.getUser().getLogin())));
+			for (Map.Entry<LocalDate, Map<String, List<ExecutiveTaskPlan>>> entry : plansGroupedByDateThenByUser
+					.entrySet()) {
+
+				// parent
+				DayPlanExecutionSummaryDTO dpesDateDTO = new DayPlanExecutionSummaryDTO();
+				Long dgAchieved = 0L;
+				int dgScheduled = 0;
+				LocalDate today = LocalDate.now();
+				if (today.isAfter(entry.getKey())) {
+					for (Map.Entry<String, List<ExecutiveTaskPlan>> entry2 : entry.getValue().entrySet()) {
+						List<ExecutiveTaskPlan> childValue = entry2.getValue();
+						for (ExecutiveTaskPlan executiveTaskPlan : childValue) {
+							if (executiveTaskPlan.getTaskPlanStatus().equals(TaskPlanStatus.PENDING)) {
+								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
+								executiveTaskPlan.setUserRemarks("Unattended");
+							} else if (executiveTaskPlan.getTaskPlanStatus().equals(TaskPlanStatus.CREATED)) {
+								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
+								executiveTaskPlan.setUserRemarks("Unattended");
+							}
+						}
+						List<ExecutiveTaskPlan> savedExecutedPlan = executiveTaskExecutionRepository
+								.findExecutiveTaskPlanByExecutiveTaskPlanIn(childValue);
+						Long achieved = childValue.stream()
+								.filter(etp -> TaskPlanStatus.COMPLETED == etp.getTaskPlanStatus()).count();
+						dgAchieved += achieved;
+						int scheduled = childValue.size();
+						dgScheduled += scheduled;
+						List<ExecutiveTaskPlan> convertedTaskPlans = childValue.stream().map(etp -> {
+							int index = savedExecutedPlan.indexOf(etp);
+							if (index != -1) {
+								etp.setSortOrder(index + 1);
+							}
+							return etp;
+						}).collect(Collectors.toList());
+						DayPlanExecutionSummaryDTO dpesUserDTO = new DayPlanExecutionSummaryDTO();
+						dpesUserDTO.setDate(entry2.getKey()); // set user name
+						dpesUserDTO.setScheduled(Long.valueOf(scheduled));
+						dpesUserDTO.setAchieved(achieved);
+						double total = (Double.valueOf(achieved) / Double.valueOf(scheduled));
+						double percentage = total * 100;
+						DecimalFormat decimalFormat = new DecimalFormat("#.##");
+						String formatedTotal = decimalFormat.format(percentage);
+						dpesUserDTO.setPercentage(Double.parseDouble(formatedTotal));
+						if (entry2.getValue().get(0).getTaskList() != null) {
+							dpesUserDTO.setAlias(entry2.getValue().get(0).getTaskList().getAlias());
+						}
+						resultChildMap.put(dpesUserDTO, convertedTaskPlans.stream().map(ExecutiveTaskPlanDTO::new)
+								.collect(Collectors.toList()));
+					}
+				} else {
+					for (Map.Entry<String, List<ExecutiveTaskPlan>> entry2 : entry.getValue().entrySet()) {
+						List<ExecutiveTaskPlan> childValue = entry2.getValue();
+						List<ExecutiveTaskPlan> savedExecutedPlan = executiveTaskExecutionRepository
+								.findExecutiveTaskPlanByExecutiveTaskPlanIn(childValue);
+						Long achieved = childValue.stream()
+								.filter(etp -> TaskPlanStatus.COMPLETED == etp.getTaskPlanStatus()).count();
+						dgAchieved += achieved;
+						int scheduled = childValue.size();
+						dgScheduled += scheduled;
+						List<ExecutiveTaskPlan> convertedTaskPlans = childValue.stream().map(etp -> {
+							int index = savedExecutedPlan.indexOf(etp);
+							if (index != -1) {
+								etp.setSortOrder(index + 1);
+							}
+							return etp;
+						}).collect(Collectors.toList());
+						DayPlanExecutionSummaryDTO dpesUserDTO = new DayPlanExecutionSummaryDTO();
+						dpesUserDTO.setDate(entry2.getKey()); // set user name
+						dpesUserDTO.setScheduled(Long.valueOf(scheduled));
+						if (entry2.getValue().get(0).getTaskList() != null) {
+							dpesUserDTO.setAlias(entry2.getValue().get(0).getTaskList().getAlias());
+						}
+						dpesUserDTO.setAchieved(achieved);
+						double total = (Double.valueOf(achieved) / Double.valueOf(scheduled));
+						double percentage = total * 100;
+						DecimalFormat decimalFormat = new DecimalFormat("#.##");
+						String formatedTotal = decimalFormat.format(percentage);
+						dpesUserDTO.setPercentage(Double.parseDouble(formatedTotal));
+						resultChildMap.put(dpesUserDTO, convertedTaskPlans.stream().map(ExecutiveTaskPlanDTO::new)
+								.collect(Collectors.toList()));
+					}
+				}
+		
+		
+			}
+			buildExcelDocument(resultChildMap, response);
+		}
+		
+	}
+	private void buildExcelDocument(Map<DayPlanExecutionSummaryDTO, List<ExecutiveTaskPlanDTO>> resultChildMap,
+			HttpServletResponse response) {
+		
+		log.debug("Downloading Excel report");
+		String excelFileName = "DayPlanExecutionSummary" + ".xls";
+		String sheetName = "Sheet1";
+
+		String[] headerColumns = { "Date", "Activity", "AccountProfile", "Sort Order", "Status",
+				"Remarks",  };
+		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
+			HSSFSheet worksheet = workbook.createSheet(sheetName);
+			createHeaderRow(worksheet, headerColumns);
+			createReportRows(worksheet, resultChildMap);
+			// Resize all columns to fit the content size
+			for (int i = 0; i < headerColumns.length; i++) {
+				worksheet.autoSizeColumn(i);
+			}
+			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
+			response.setContentType("application/vnd.ms-excel");
+			// Writes the report to the output stream
+			ServletOutputStream outputStream = response.getOutputStream();
+			worksheet.getWorkbook().write(outputStream);
+			outputStream.flush();
+		} catch (IOException ex) {
+			log.error("IOException on downloading Visit Details {}", ex.getMessage());
+		}
+
+	}
+		
+		
+		
+	private void createReportRows(HSSFSheet worksheet,
+			Map<DayPlanExecutionSummaryDTO, List<ExecutiveTaskPlanDTO>> resultChildMap) {
+		// TODO Auto-generated method stub
+		
+		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
+		// Create Cell Style for formatting Date
+		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
+		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM/DD/YYYY, h:mm:ss "));
+		// Create Other rows and cells with Sales data
+		int rowNum = 1;
+		for(Map.Entry  dpe :resultChildMap.entrySet()) {
+			
+		 List<ExecutiveTaskPlanDTO> values = (List<ExecutiveTaskPlanDTO>) dpe.getValue();
+			
+			for(ExecutiveTaskPlanDTO  executivetask:values)
+		   {
+			HSSFRow row = worksheet.createRow(rowNum++);
+
+			LocalDateTime localDateTime = executivetask.getCreatedDate();
+			Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+			Date date = Date.from(i);
+			HSSFCell DateCell = row.createCell(0);
+			DateCell.setCellValue(date);
+			DateCell.setCellStyle(dateCellStyle);
+			row.createCell(1).setCellValue(executivetask.getActivityName());
+
+			row.createCell(2).setCellValue(executivetask.getAccountProfileName());
+			row.createCell(3).setCellValue(executivetask.getSortOrder());
+			row.createCell(4).setCellValue(executivetask.getTaskPlanStatus().toString());
+			row.createCell(5).setCellValue(executivetask.getUserRemarks());
+			
+		  }
+	}
+	}
+
+	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
+		// TODO Auto-generated method stub
+		// Create a Font for styling header cells
+				Font headerFont = worksheet.getWorkbook().createFont();
+				headerFont.setFontName("Arial");
+				headerFont.setBold(true);
+				headerFont.setFontHeightInPoints((short) 14);
+				headerFont.setColor(IndexedColors.RED.getIndex());
+				// Create a CellStyle with the font
+				HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
+				headerCellStyle.setFont(headerFont);
+				// Create a Row
+				HSSFRow headerRow = worksheet.createRow(0);
+				// Create cells
+				for (int i = 0; i < headerColumns.length; i++) {
+					HSSFCell cell = headerRow.createCell(i);
+					cell.setCellValue(headerColumns[i]);
+					cell.setCellStyle(headerCellStyle);
+				}
+	}
+
 
 	@Timed
 	@Transactional(readOnly = true)
