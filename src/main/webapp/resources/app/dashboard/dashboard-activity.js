@@ -34,14 +34,17 @@ function getUserPanelHtml(grpId, groupName, divUserPnl) {
 
 // checking every order time for change tile color
 if (enableWebsocket == "true") {
+	
 	setInterval(function() {
 		$.each(userDataList, function(index, userData) {
-			var tileColor = getTileColor(userData.lastTime);
+			var tileColor = getTileColor(userData,userData.lastTime);
 			// change tile color class
-			$("#divUser" + userData.userPid).removeClass("tile-yellow");
-			$("#divUser" + userData.userPid).removeClass("tile-red");
-			$("#divUser" + userData.userPid).removeClass("tile-green");
-			$("#divUser" + userData.userPid).addClass(tileColor);
+			
+				$("#divUser" + userData.userPid).removeClass("tile-yellow");
+				$("#divUser" + userData.userPid).removeClass("tile-red");
+				$("#divUser" + userData.userPid).removeClass("tile-green");
+				$("#divUser" + userData.userPid).addClass(tileColor);
+				
 		});
 	}, 20000);
 }

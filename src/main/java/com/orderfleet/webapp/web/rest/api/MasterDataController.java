@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.ActivityStage;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.DistanceFare;
 import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.DocumentAccountType;
 import com.orderfleet.webapp.domain.DocumentAccountingVoucherColumn;
@@ -68,6 +70,7 @@ import com.orderfleet.webapp.service.ActivityGroupService;
 import com.orderfleet.webapp.service.AttendanceStatusSubgroupService;
 import com.orderfleet.webapp.service.BankDetailsService;
 import com.orderfleet.webapp.service.CompetitorProfileService;
+import com.orderfleet.webapp.service.DistanceFareService;
 import com.orderfleet.webapp.service.DocumentAccountTypeService;
 import com.orderfleet.webapp.service.DocumentAccountingVoucherColumnService;
 import com.orderfleet.webapp.service.DocumentEcomProductGroupService;
@@ -138,6 +141,7 @@ import com.orderfleet.webapp.web.rest.dto.ActivityStageDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceStatusSubgroupDTO;
 import com.orderfleet.webapp.web.rest.dto.BankDetailsDTO;
 import com.orderfleet.webapp.web.rest.dto.CompetitorProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.DistanceFareDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentAccountTypeDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentEcomProductGroupDTO;
@@ -409,6 +413,9 @@ public class MasterDataController {
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
+	
+	@Inject
+	private DistanceFareService distanceFareService;
 
 	/**
 	 * GET /account-types : get all accountTypes.
@@ -1894,4 +1901,12 @@ public class MasterDataController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/distanceFare", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<List<DistanceFareDTO>> getAllDistanceFare() {
+		long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		 List<DistanceFareDTO> result = distanceFareService.findAllByCompany(); 
+		 return new ResponseEntity<>(result, HttpStatus.OK);	 
+	}
+	
 }

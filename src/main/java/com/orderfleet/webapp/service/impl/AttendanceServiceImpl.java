@@ -25,17 +25,20 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.AttendanceStatusSubgroup;
+import com.orderfleet.webapp.domain.DistanceFare;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.geolocation.api.GeoLocationServiceException;
 import com.orderfleet.webapp.geolocation.model.TowerLocation;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.DistanceFareRepository;
 import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.AttendanceStatusSubgroupRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AttendanceService;
+import com.orderfleet.webapp.service.DistanceFareService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
@@ -67,6 +70,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 	@Inject
 	private GeoLocationService geoLocationService;
+	
+	@Inject
+	private DistanceFareRepository distanceFareRepository;
 
 	/**
 	 * Save a attendance.
@@ -80,7 +86,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 		log.info("******/" + attendanceDTO.getAttendanceSubGroupId() + attendanceDTO.getAttendanceSubGroupName());
 		// find user and company
 		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).get();
-
+		Optional<DistanceFare> distanceFare = distanceFareRepository.findOneByPid(attendanceDTO.getDistanceFarePid());
 		Attendance attendance = new Attendance();
 		attendance.setPid(AttendanceService.PID_PREFIX + RandomUtil.generatePid());
 		attendance.setClientTransactionKey(attendanceDTO.getClientTransactionKey());
@@ -99,7 +105,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 			attendance.setAttendanceStatusSubgroup(
 					attendanceStatusSubgroupRepository.findOne(attendanceDTO.getAttendanceSubGroupId()));
 		}
-
+		//set oodoMeter
+		attendance.setOodoMeter(attendanceDTO.getOodoMeter());
+		
+		//set DistaceFare
+		if(distanceFare.isPresent()) {
+			attendance.setDistanceFare(distanceFare.get());
+		}
 		// set location
 		LocationType locationType = attendanceDTO.getLocationType();
 		BigDecimal lat = attendanceDTO.getLatitude();

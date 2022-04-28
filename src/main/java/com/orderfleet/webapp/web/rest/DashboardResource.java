@@ -105,6 +105,7 @@ import com.orderfleet.webapp.service.DynamicDocumentHeaderService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.LocationHierarchyService;
+import com.orderfleet.webapp.service.PunchOutService;
 import com.orderfleet.webapp.service.UserActivityService;
 import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
@@ -254,6 +255,9 @@ public class DashboardResource {
 
 	@Inject
 	private GeoLocationService geoLocationService;
+	
+	@Inject
+	private	PunchOutService punchOutService; 
 
 	/**
 	 * GET /web/dashboard : get dashboard page.
@@ -664,7 +668,7 @@ public class DashboardResource {
 	private DashboardUserDataDTO<DashboardSummaryDTO> makeDashboardUserDataDTO(LocalDate date, UserDTO user,
 			List<DashboardItem> dashboardItems) {
 		DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData = new DashboardUserDataDTO<>(attendanceService,
-				employeeProfileRepository, customerTimeSpentRepository);
+				employeeProfileRepository, customerTimeSpentRepository, punchOutService);
 		dashboardUserData.setUserPid(user.getPid());
 		dashboardUserData.setEmployeeData(dashboardUserData, user.getPid());
 		dashboardUserData.setAttendanceStatus(dashboardUserData, user.getPid(), date);
@@ -675,10 +679,17 @@ public class DashboardResource {
 		// set user dash board item wise summary
 		dashboardUserData.setUserSummaryData(createSingleUserSummaryData(dashboardItems, date.atTime(0, 0),
 				date.atTime(23, 59), user.getPid(), executiveTaskExecution));
+		
 		Long count = dashboardNotificationRepository.countByCreatedByAndReadFalseAndCreatedDateBetween(user.getLogin(),
 				date.atTime(0, 0), date.atTime(23, 59));
 		dashboardUserData.setNotificationCount(count == null ? 0 : count.intValue());
-
+		Optional<CompanyConfiguration> optModernSpecialConfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.MODERN_SPECIAL_CONFIG);
+		if(optModernSpecialConfig.isPresent() && Boolean.valueOf(optModernSpecialConfig.get().getValue())) {
+			dashboardUserData.setPunchOutStatus(dashboardUserData, user.getPid(), date);
+			dashboardUserData.setAttendaceBaseColorTile(true);
+		}else {
+			dashboardUserData.setAttendaceBaseColorTile(false);
+		}
 		return dashboardUserData;
 	}
 

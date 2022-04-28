@@ -77,7 +77,7 @@ function makeUserTileHeaderHtml(userData) {
 			.substring(0, 13) : "";
 
 	let html = "<div class='tile-menu'><div id='divUser" + userData.userPid
-			+ "' class='tile-block " + getTileColor(userData.lastTime)
+			+ "' class='tile-block " + getTileColor(userData,userData.lastTime)
 			+ " height_tiles'>";
 	html += "<div class='tile-header'><i id='attSubgroup" + userData.userPid
 			+ "'>" + attendanceSubGroup + "</i>";
@@ -157,9 +157,21 @@ function getLocation(obj) {
 	});
 }
 
-function getTileColor(lastOrderTime) {
+function getTileColor(userwiseData,lastOrderTime) {
+	
 	let tileColor = "tile-red";
-	if (lastOrderTime != null) {
+	if(userwiseData.attendaceBaseColorTile != null && userwiseData.attendaceBaseColorTile == true){
+		if(userwiseData.attendanceMarked == true && userwiseData.punchOutStatus == false){
+			
+			tileColor = "tile-yellow";
+		}
+		if(userwiseData.attendanceMarked == true && userwiseData.punchOutStatus == true){
+			
+			tileColor = "tile-green";
+		}
+		
+	}
+	if (lastOrderTime != null && userwiseData.attendaceBaseColorTile == false) {
 		let delayTime = $('#txtDelayTime').val();
 		let orderDate = new Date(formatDate(lastOrderTime,
 				'MMM DD YYYY, h:mm:ss a'));
@@ -176,6 +188,8 @@ function getTileColor(lastOrderTime) {
 	}
 	return tileColor;
 }
+
+
 
 function getAttendanceThumbsHtml(userData) {
 	let attendance, attendanceTitle;

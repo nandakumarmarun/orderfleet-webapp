@@ -915,6 +915,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setSalesOrderMandatory(false);
 		mobileConfiguration.setRateWithTax(false);
 		mobileConfiguration.setWifiPrintEnabler(false);
+		mobileConfiguration.setShowDistanceFare(false);
 		mobileConfiguration.setAccountProfileDisplayName(DisplayName.NAME);
 		mobileConfiguration.setAccountProfilePrintName(DisplayName.NAME);
 		mobileConfiguration.setProductProfileDisplayName(DisplayName.NAME);

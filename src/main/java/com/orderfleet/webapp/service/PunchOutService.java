@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,9 +21,10 @@ public interface PunchOutService {
 
 	List<PunchOutDTO> findAllByCompanyIdAndPunchDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
 
-	List<PunchOutDTO> findAllByCompanyIdUserPidInAndPunchDateBetween(List<Long> userIds, LocalDateTime fromDate,
-			LocalDateTime toDate);
-
+	List<PunchOutDTO> findAllByCompanyIdUserPidInAndPunchDateBetween(List<Long> userIds, LocalDateTime fromDate,LocalDateTime toDate);
+	
+	List<PunchOutDTO> findAllByCompanyIdUserPidAndPunchDate(String userPId,LocalDateTime fromDate,LocalDateTime toDate);
+	
 	List<PunchOutDTO> findAllByCompanyIdUserPidAndPunchDateBetween(String userPid, LocalDateTime fromDate,
 			LocalDateTime toDate);
 

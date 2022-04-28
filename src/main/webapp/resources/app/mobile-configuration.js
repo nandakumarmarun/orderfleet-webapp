@@ -53,6 +53,7 @@ if (!this.MobileConfiguration) {
 		salesOrderMandatory : false,
 		rateWithTax : false,
 		wifiPrintEnabler : false,
+		showDistanceFare : false,
 		blockCustomerByCredits: false,
 		accountProfileDisplayName : 'NAME',
 		accountProfilePrintName : 'NAME',
@@ -190,7 +191,9 @@ if (!this.MobileConfiguration) {
 		":checked");
 		mobileConfigurationDTO.ptenQuotationLayout = $("#ptenQuotationLayout").is(
 		":checked");
-
+		mobileConfigurationDTO.showDistanceFare = $("#showDistanceFare").is(
+		":checked");
+		
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -313,6 +316,9 @@ if (!this.MobileConfiguration) {
 									data.roundOffAutomation);
 							$('#ptenQuotationLayout').prop("checked",
 									data.ptenQuotationLayout);
+							$('#showDistanceFare').prop("checked",
+									data.showDistanceFare);
+							
 						}
 
 					},

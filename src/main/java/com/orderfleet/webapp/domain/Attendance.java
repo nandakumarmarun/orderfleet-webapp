@@ -121,6 +121,12 @@ public class Attendance implements Serializable {
 
 	@Column(name = "imageRefNo")
 	private String imageRefNo;
+	
+	@Column(name = "oodoMeter", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double oodoMeter;
+	
+	@ManyToOne
+	private DistanceFare distanceFare;
 
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -355,6 +361,24 @@ public class Attendance implements Serializable {
 
 	public void setFiles(Set<File> files) {
 		this.files = files;
+	}
+	
+	
+
+	public DistanceFare getDistanceFare() {
+		return distanceFare;
+	}
+
+	public void setDistanceFare(DistanceFare distanceFare) {
+		this.distanceFare = distanceFare;
+	}
+
+	public double getOodoMeter() {
+		return oodoMeter;
+	}
+
+	public void setOodoMeter(double oodoMeter) {
+		this.oodoMeter = oodoMeter;
 	}
 
 	@Override

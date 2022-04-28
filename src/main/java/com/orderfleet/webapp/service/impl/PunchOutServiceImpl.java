@@ -13,11 +13,13 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.orderfleet.webapp.domain.Attendance;
+import com.orderfleet.webapp.domain.DistanceFare;
 import com.orderfleet.webapp.domain.PunchOut;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.LocationType;
@@ -25,6 +27,7 @@ import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.geolocation.api.GeoLocationServiceException;
 import com.orderfleet.webapp.geolocation.model.TowerLocation;
 import com.orderfleet.webapp.repository.AttendanceRepository;
+import com.orderfleet.webapp.repository.DistanceFareRepository;
 import com.orderfleet.webapp.repository.PunchOutRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -56,6 +59,8 @@ public class PunchOutServiceImpl implements PunchOutService {
 
 	@Inject
 	private GeoLocationService geoLocationService;
+	
+
 
 	/**
 	 * Save a punchout.
@@ -110,6 +115,7 @@ public class PunchOutServiceImpl implements PunchOutService {
 
 				Optional<PunchOut> optionalPunchOut = punchOutRepository
 						.findIsAttendancePresent(optionalAttendence.get().getPid());
+			
 				if (!optionalPunchOut.isPresent()) {
 					log.info("Attendance pid not present on punchout");
 					PunchOut punchOut = new PunchOut();
@@ -122,6 +128,7 @@ public class PunchOutServiceImpl implements PunchOutService {
 					punchOut.setUser(user.get());
 					punchOut.setCompany(user.get().getCompany());
 					punchOut.setAttendance(optionalAttendence.get());
+					
 
 					// set location
 					LocationType locationType = punchOutDTO.getLocationType();
@@ -299,4 +306,18 @@ public class PunchOutServiceImpl implements PunchOutService {
 		List<PunchOutDTO> result = punchOutList.stream().map(PunchOutDTO::new).collect(Collectors.toList());
 		return result;
 	}
+
+	@Override
+	public List<PunchOutDTO> findAllByCompanyIdUserPidAndPunchDate(String userPId, LocalDateTime fromDate,
+			LocalDateTime toDate) {
+		Optional<User> user = userRepository.findOneByPid(userPId);
+		List<PunchOutDTO> result = null;
+		if(user.isPresent()) {
+			  List<PunchOut> punchOuts = punchOutRepository.findAllByCompanyIdUserAndCreatedDate(user.get(),fromDate,toDate);
+			   result = punchOuts.stream().map(PunchOutDTO::new).collect(Collectors.toList());
+		}
+		
+		return result;
+	}
+	
 }

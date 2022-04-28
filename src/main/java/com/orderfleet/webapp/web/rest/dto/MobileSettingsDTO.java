@@ -125,6 +125,8 @@ public class MobileSettingsDTO {
      
      private boolean ptenQuotationLayout;
      
+     private boolean showDistanceFare;
+     
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -181,6 +183,7 @@ public class MobileSettingsDTO {
 		this.cartMaxSize=mobileConfigurationDTO.getCartMaxSize();
 		this.roundOffAutomation=mobileConfigurationDTO.isRoundOffAutomation();
 		this.ptenQuotationLayout=mobileConfigurationDTO.isPtenQuotationLayout();
+		this.showDistanceFare = mobileConfigurationDTO.getShowDistanceFare();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -613,6 +616,14 @@ public class MobileSettingsDTO {
 
 	public void setPtenQuotationLayout(boolean ptenQuotationLayout) {
 		this.ptenQuotationLayout = ptenQuotationLayout;
+	}
+
+	public boolean getShowDistanceFare() {
+		return showDistanceFare;
+	}
+
+	public void setShowDistanceFare(boolean showDistanceFare) {
+		this.showDistanceFare = showDistanceFare;
 	}
 
 	

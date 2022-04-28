@@ -73,6 +73,7 @@ public class MobileConfigurationDTO {
 	private double  cartMaxSize;
 	private boolean roundOffAutomation;
 	private boolean ptenQuotationLayout;
+	private boolean showDistanceFare;
  
 	public MobileConfigurationDTO() {
 		super();
@@ -133,6 +134,7 @@ public class MobileConfigurationDTO {
         this.cartMaxSize=mobileConfiguration.getCartMaxSize();
         this.roundOffAutomation=mobileConfiguration.isRoundOffAutomation();
         this.ptenQuotationLayout =mobileConfiguration.isPtenQuotationLayout();
+        this.showDistanceFare = mobileConfiguration.getShowDistanceFare();
 	}
 
 	public String getPid() {
@@ -559,7 +561,15 @@ public class MobileConfigurationDTO {
 		this.ptenQuotationLayout = ptenQuotationLayout;
 	}
 
+	public boolean getShowDistanceFare() {
+		return showDistanceFare;
+	}
 
+	public void setShowDistanceFare(boolean showDistanceFare) {
+		this.showDistanceFare = showDistanceFare;
+	}
+
+	
 
 	
 }

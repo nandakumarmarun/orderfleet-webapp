@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -211,6 +212,10 @@ public class MobileConfiguration implements Serializable {
 	
 	@Column(name = "pTen_Quotation_Layout", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean ptenQuotationLayout ;
+	
+	@Column(name = "show_Distance_Fare",nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+    private boolean showDistanceFare;
+	
 	
 	
 	@NotNull
@@ -654,6 +659,16 @@ public class MobileConfiguration implements Serializable {
 
 	public void setPtenQuotationLayout(boolean ptenQuotationLayout) {
 		this.ptenQuotationLayout = ptenQuotationLayout;
+	}
+	
+	
+
+	public boolean getShowDistanceFare() {
+		return showDistanceFare;
+	}
+
+	public void setShowDistanceFare(boolean showDistanceFare) {
+		this.showDistanceFare = showDistanceFare;
 	}
 
 	@Override

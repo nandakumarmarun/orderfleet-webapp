@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,9 @@ public interface PunchOutRepository extends JpaRepository<PunchOut, Long> {
 	List<PunchOut> findAllByCompanyIdUserPidInAndCreatedDateBetween(List<User> user, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
+	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.user = ?1 and pncout.createdDate between ?2 and ?3 Order By pncout.createdDate asc")
+	List<PunchOut> findAllByCompanyIdUserAndCreatedDate(User user,LocalDateTime fromDate ,LocalDateTime toDate);
+	
 	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.user.pid = ?1 and pncout.createdDate between ?2 and ?3 Order By pncout.createdDate asc")
 	List<PunchOut> findAllByCompanyIdUserPidAndCreatedDateBetween(String userPid, LocalDateTime fromDate,
 			LocalDateTime toDate);

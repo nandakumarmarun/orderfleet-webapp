@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.orderfleet.webapp.domain.CustomerTimeSpent;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.enums.AttendanceStatus;
 import com.orderfleet.webapp.domain.enums.LocationType;
@@ -16,6 +17,7 @@ import com.orderfleet.webapp.repository.CustomerTimeSpentRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AttendanceService;
+import com.orderfleet.webapp.service.PunchOutService;
 
 /**
  * A DTO for the DashboardUserData.
@@ -63,6 +65,8 @@ public class DashboardUserDataDTO<T> {
 	private String attendanceSubGroupCode;
 	private String taskExecutionPid;
 	private BigDecimal latitude;
+	private boolean attendaceBaseColorTile;
+	private boolean punchOutStatus;
 
 	// Set Customer Time Spent for Dashboard
 	private Long customerTimeSpentTime;
@@ -75,16 +79,19 @@ public class DashboardUserDataDTO<T> {
 	private EmployeeProfileRepository employeeProfileRepository;
 	@JsonIgnore
 	private CustomerTimeSpentRepository customerTimeSpentRepository;
-
+	@JsonIgnore
+	private PunchOutService punchOutService;
+	
 	public DashboardUserDataDTO() {
 	}
 
 	public DashboardUserDataDTO(AttendanceService attendanceService,
 			EmployeeProfileRepository employeeProfileRepository,
-			CustomerTimeSpentRepository customerTimeSpentRepository) {
+			CustomerTimeSpentRepository customerTimeSpentRepository,PunchOutService punchOutService) {
 		this.attendanceService = attendanceService;
 		this.employeeProfileRepository = employeeProfileRepository;
 		this.customerTimeSpentRepository = customerTimeSpentRepository;
+		this.punchOutService = punchOutService;
 	}
 
 	public String getUserPid() {
@@ -278,7 +285,49 @@ public class DashboardUserDataDTO<T> {
 	public void setLatitude(BigDecimal latitude) {
 		this.latitude = latitude;
 	}
+	
+	
 
+	public boolean getAttendaceBaseColorTile() {
+		return attendaceBaseColorTile;
+	}
+
+	public void setAttendaceBaseColorTile(boolean attendaceBaseColorTile) {
+		this.attendaceBaseColorTile = attendaceBaseColorTile;
+	}
+	
+	
+	
+
+	public boolean getPunchOutStatus() {
+		return punchOutStatus;
+	}
+
+	public void setPunchOutStatus(boolean punchOutStatus) {
+		this.punchOutStatus = punchOutStatus;
+	}
+
+	public void setPunchOutStatus(DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData, String userPid,
+			LocalDate date) {
+		 Optional<EmployeeProfile> employeeProfiles = employeeProfileRepository.findByUserPid(userPid);
+		 
+		  List<PunchOutDTO> punchoutList = punchOutService.findAllByCompanyIdUserPidAndPunchDate(userPid, date.atTime(0,0), date.atTime(23, 59));
+		  if(employeeProfiles.isPresent()) {
+			  Optional<PunchOutDTO> punchExists = punchoutList.stream()
+						.filter(a -> a.getLogin().equals(employeeProfiles.get().getUser().getLogin())
+								&& date.equals(a.getPunchOutDate().toLocalDate()))
+						.findAny();
+			  if(punchExists.isPresent()) {
+				  dashboardUserData.setPunchOutStatus(true);
+			  }else {
+				  dashboardUserData.setPunchOutStatus(false);
+			}
+		  }
+		
+		
+	}
+
+	
 	public void setEmployeeData(DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData, String userPid) {
 		// set employee profile name and image
 		employeeProfileRepository.findByUserPid(userPid).ifPresent(employeeProfile -> {
@@ -329,6 +378,8 @@ public class DashboardUserDataDTO<T> {
 			dashboardUserData.setCustomerTimeSpentBoolean(false);
 		}
 	}
+	
+	
 
 	public void setLastExecutionDetails(DashboardUserDataDTO<DashboardSummaryDTO> dashboardUserData,
 			ExecutiveTaskExecution executiveTaskExecution) {

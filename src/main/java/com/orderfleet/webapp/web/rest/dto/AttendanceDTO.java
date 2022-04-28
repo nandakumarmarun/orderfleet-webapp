@@ -41,6 +41,8 @@ public class AttendanceDTO {
 	private String towerLocation;
 	private BigDecimal towerLatitude;
 	private BigDecimal towerLongitude;
+	private double oodoMeter;
+	private String distanceFarePid;
 	private String imageRefNo;
 	private Boolean imageButtonVisible = Boolean.FALSE;;
 
@@ -100,6 +102,10 @@ public class AttendanceDTO {
 		this.towerLatitude = attendance.getTowerLatitude();
 		this.towerLongitude = attendance.getTowerLongitude();
 		this.imageRefNo = attendance.getImageRefNo();
+		this.oodoMeter = attendance.getOodoMeter();
+		if(attendance.getDistanceFare() != null) {
+			this.distanceFarePid = attendance.getDistanceFare().getPid();
+		}
 		if (attendance.getAttendanceStatusSubgroup() != null) {
 			this.attendanceSubGroupId = attendance.getAttendanceStatusSubgroup().getId();
 			this.attendanceSubGroupName = attendance.getAttendanceStatusSubgroup().getName();
@@ -341,6 +347,24 @@ public class AttendanceDTO {
 
 	public void setImageButtonVisible(Boolean imageButtonVisible) {
 		this.imageButtonVisible = imageButtonVisible;
+	}
+	
+	
+
+	public double getOodoMeter() {
+		return oodoMeter;
+	}
+
+	public void setOodoMeter(double oodoMeter) {
+		this.oodoMeter = oodoMeter;
+	}
+
+	public String getDistanceFarePid() {
+		return distanceFarePid;
+	}
+
+	public void setDistanceFarePid(String distanceFarePid) {
+		this.distanceFarePid = distanceFarePid;
 	}
 
 	@Override

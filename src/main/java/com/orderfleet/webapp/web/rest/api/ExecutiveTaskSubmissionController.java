@@ -46,6 +46,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.orderfleet.webapp.config.Constants;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.CompanyIntegrationModule;
 import com.orderfleet.webapp.domain.CustomerTimeSpent;
 import com.orderfleet.webapp.domain.Document;
@@ -57,9 +58,11 @@ import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.VoucherNumberGenerator;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.CustomerTimeSpentType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyIntegrationModuleRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.CustomerTimeSpentRepository;
@@ -173,8 +176,10 @@ public class ExecutiveTaskSubmissionController {
 	private DocumentRepository documentRepository;
 	
 	@Inject
-	
 	private EmployeeProfileRepository employeeProfileRepository;
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
@@ -620,9 +625,12 @@ public class ExecutiveTaskSubmissionController {
 			
 			
 			//send EmailToComplaint Modern
-//			if(tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getEmailTocomplaint()) {
-//				sendEmailToComplaint(executiveTaskSubmissionDTO);
-//			}
+			
+				if(tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getEmailTocomplaint()) {
+					sendEmailToComplaint(executiveTaskSubmissionDTO);
+				}
+			
+			
 			taskSubmissionResponse.setStatus("Success");
 			taskSubmissionResponse.setMessage("Activity submitted successfully...");
 			
@@ -1199,7 +1207,7 @@ public class ExecutiveTaskSubmissionController {
 	
 	private void sendEmailToComplaint(ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO)  {
 		log.info("Sending Email To Complaint");
-		String toMassage = "rameeskr77@gmail.com";
+		String toMassage = "santhosh.admin@moderndistropolis.com";
 		String fromMassage = "salesnrich.info@gmail.com";
 		
 		if(!executiveTaskSubmissionDTO.getDynamicDocuments().isEmpty()) {

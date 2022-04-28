@@ -86,7 +86,8 @@
 						<th>MAX CART NOS</th>
 						<th>Max Cart Size</th>
 						<th>Round Off Automation</th>
-						<th>P-Ten Quotation Layout
+						<th>P-Ten Quotation Layout</th>
+						<th>Show Distance Fare</th>
 						<th>Action</th>
 
 					</tr>
@@ -146,7 +147,7 @@
 							<td>${mobileConfiguration. cartMaxSize}</td>
 							<td>${mobileConfiguration. roundOffAutomation}</td>
 							<td>${mobileConfiguration.ptenQuotationLayout}</td>
-
+       			            <td>${mobileConfiguration.showDistanceFare}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -509,6 +510,14 @@
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Show Distance Fare
+													</label> <input id="showDistanceFare" name='showDistanceFare'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Vchr.No Generation
