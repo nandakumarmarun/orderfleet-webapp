@@ -65,6 +65,10 @@ if (!this.StockDetails) {
 																	+ "</td><td>"
 																	+ stockDetail.openingStock
 																	+ "</td><td>"
+																	+ stockDetail.saleStock
+																	+ "</td><td>"
+																	+ stockDetail.freeQnty
+																	+ "</td><td>"
 																	+ stockDetail.saledQuantity
 																	+ "</td><td>"
 																	+ stockDetail.closingStock

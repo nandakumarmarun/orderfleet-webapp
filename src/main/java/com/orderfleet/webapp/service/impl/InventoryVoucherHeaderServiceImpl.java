@@ -1215,13 +1215,13 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			}
 
 			double saledQuantity = slStock + freeQuantity;
-
+			stockDetailsDTO.setSaleStock(slStock);
+			stockDetailsDTO.setFreeQnty(freeQuantity);
 			stockDetailsDTO.setOpeningStock(opStock);
 			stockDetailsDTO.setSaledQuantity(saledQuantity);
 
 			stockDetailsDTOs.add(stockDetailsDTO);
 		}
-
 		Map<String, List<StockDetailsDTO>> groupedList = stockDetailsDTOs.stream()
 				.collect(Collectors.groupingBy(StockDetailsDTO::getProductName));
 
@@ -1230,7 +1230,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		List<StockDetailsDTO> proccessedStockDetailsDTOs = new ArrayList<>();
 
 		log.info("Key set size = " + keySet.size() + "*******");
-
+ 
 		for (String productName : keySet) {
 
 			Optional<ProductProfileDTO> opProductProfile = productProfileDtos.stream()
@@ -1243,7 +1243,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			double openingStock = valuesList.get(0).getOpeningStock();
 			double saledQuantity = valuesList.stream()
 					.collect(Collectors.summingDouble((StockDetailsDTO::getSaledQuantity)));
-
+			double saleStock = valuesList.stream()
+					.collect(Collectors.summingDouble((StockDetailsDTO::getSaleStock)));
+			double freeQnty = valuesList.stream()
+					.collect(Collectors.summingDouble((StockDetailsDTO::getFreeQnty)));
 			double closingStock = openingStock - saledQuantity;
 
 			if (opProductProfile.isPresent()) {
@@ -1287,14 +1290,14 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				log.info("Optional Product Profile not present");
 				stockDetailsDTO.setProductName(productName);
 			}
+			stockDetailsDTO.setSaleStock(saleStock);
+			stockDetailsDTO.setFreeQnty(freeQnty);
 			stockDetailsDTO.setOpeningStock(openingStock);
 			stockDetailsDTO.setSaledQuantity(saledQuantity);
 			stockDetailsDTO.setClosingStock(closingStock);
 
 			proccessedStockDetailsDTOs.add(stockDetailsDTO);
-
 		}
-
 		return proccessedStockDetailsDTOs;
 	}
 

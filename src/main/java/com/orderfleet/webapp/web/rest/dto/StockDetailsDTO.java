@@ -23,6 +23,8 @@ public class StockDetailsDTO implements Cloneable {
 	private double openingStock;
 	private String productName;
 	private String productPid;
+	private double saleStock;
+	private double freeQnty;
 	private double saledQuantity;
 	private double closingStock;
 
@@ -39,6 +41,18 @@ public class StockDetailsDTO implements Cloneable {
 		this.saledQuantity = saledQuantity;
 		this.closingStock = closingStock;
 		this.productPid = productPid;
+	}
+	
+	public StockDetailsDTO(double openingStock, String productName,double saleStock,double freeQnty, double saledQuantity, double closingStock,
+			String productPid) {
+		super();
+		this.openingStock = openingStock;
+		this.productName = productName;
+		this.saledQuantity = saledQuantity;
+		this.closingStock = closingStock;
+		this.productPid = productPid;
+		this.saleStock = saleStock;
+		this.freeQnty = freeQnty;
 	}
 
 	public double getOpeningStock() {
@@ -81,10 +95,28 @@ public class StockDetailsDTO implements Cloneable {
 		this.productPid = productPid;
 	}
 
+	public double getSaleStock() {
+		return saleStock;
+	}
+
+	public void setSaleStock(double saleStock) {
+		this.saleStock = saleStock;
+	}
+
+	public double getFreeQnty() {
+		return freeQnty;
+	}
+
+	public void setFreeQnty(double freeQnty) {
+		this.freeQnty = freeQnty;
+	}
+
 	@Override
 	public String toString() {
 		return "StockDetailsDTO [openingStock=" + openingStock + ", productName=" + productName + ", productPid="
-				+ productPid + ", saledQuantity=" + saledQuantity + ", closingStock=" + closingStock + "]";
+				+ productPid + ", saleStock=" + saleStock + ", freeQnty=" + freeQnty + ", saledQuantity="
+				+ saledQuantity + ", closingStock=" + closingStock + "]";
 	}
+	
 
 }
