@@ -190,6 +190,11 @@ public class CompanyConfigurationResource {
 					mcDto.setModernSpecialConfig(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				
+				if (cc.getName().equals(CompanyConfig.SALES_ORDER_STATUS)) {
+					mcDto.setSalesOrderStatus(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
@@ -220,7 +225,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String sendSalesOrderOdoo, @RequestParam String sendTransactionsSapPravesh,
 			@RequestParam String addCompoundUnit, @RequestParam String updateStockLocation,
 			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName, @RequestParam String descriptionToName,
-			@RequestParam String stockApi,@RequestParam String employeeCreateBtn,@RequestParam String modernSpecialConfig)
+			@RequestParam String stockApi,@RequestParam String employeeCreateBtn,@RequestParam String modernSpecialConfig,@RequestParam String salesorderstatus)
 			throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
@@ -285,6 +290,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
 		Optional<CompanyConfiguration> optmodernSpecialConfig = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.MODERN_SPECIAL_CONFIG);
+		Optional<CompanyConfiguration> optsalesOrderStatus = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_ORDER_STATUS);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -318,6 +325,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration stockApiCompany = null;
 		CompanyConfiguration employeeCreateBtnCompany = null;
 		CompanyConfiguration modernSpecialConfigCompany =null;
+		CompanyConfiguration salesorderstatusCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -615,6 +623,18 @@ public class CompanyConfigurationResource {
 			modernSpecialConfigCompany.setValue(modernSpecialConfig);
 		}
 		companyConfigurationRepository.save(modernSpecialConfigCompany);
+
+		if (optsalesOrderStatus.isPresent()) {
+				salesorderstatusCompany = optsalesOrderStatus.get();
+				salesorderstatusCompany.setValue(salesorderstatus);
+			} else {
+				salesorderstatusCompany = new CompanyConfiguration();
+				salesorderstatusCompany.setCompany(company);
+				salesorderstatusCompany.setName(CompanyConfig.SALES_ORDER_STATUS);
+				salesorderstatusCompany.setValue(salesorderstatus);
+			}
+			companyConfigurationRepository.save(salesorderstatusCompany);
+		
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -735,6 +755,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
 		Optional<CompanyConfiguration> optmodernSpecialConfig = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.MODERN_SPECIAL_CONFIG);
+		Optional<CompanyConfiguration> optSalesOrderStatus = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_ORDER_STATUS);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -828,6 +850,10 @@ public class CompanyConfigurationResource {
 		}
 		if (optmodernSpecialConfig.isPresent()) {
 			companyConfigurationDTO.setModernSpecialConfig(Boolean.valueOf(optmodernSpecialConfig.get().getValue()));
+		}
+		
+		if (optSalesOrderStatus.isPresent()) {
+			companyConfigurationDTO.setSalesOrderStatus(Boolean.valueOf(optSalesOrderStatus.get().getValue()));
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {
@@ -935,6 +961,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
 		Optional<CompanyConfiguration> optmodernSpecialConfig = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.MODERN_SPECIAL_CONFIG);
+		Optional<CompanyConfiguration> optSalesOrderStatus = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_ORDER_STATUS);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1059,7 +1087,10 @@ public class CompanyConfigurationResource {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optmodernSpecialConfig.get().getCompany().getId(),
 					CompanyConfig.MODERN_SPECIAL_CONFIG);
 		}
-		
+		if (optSalesOrderStatus.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName( optSalesOrderStatus.get().getCompany().getId(),
+					CompanyConfig.SALES_ORDER_STATUS);
+		}
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationRepository.deleteByCompanyIdAndName(optFindLocation.get()

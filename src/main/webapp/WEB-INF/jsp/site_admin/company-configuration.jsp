@@ -64,6 +64,7 @@
 						<th>Stock api</th>
 						<th>Employee Create Btn</th>
 						<th>Modern Special Config</th>
+						<th>Sales Order Status</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -100,6 +101,7 @@
 							<th>${companyConfiguration.stockApi}</th>
 							<th>${companyConfiguration.employeeCreateBtn}</th>
 							<th>${companyConfiguration.modernSpecialConfig}</th>
+							<th>${companyConfiguration.salesOrderStatus}</th>
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
@@ -354,6 +356,13 @@
 											<td><div class="form-group">
 													<label class="control-label">Modern Special Config</label> <input
 														id="modernSpecialConfig" name='checksmodernSpecialConfig' type='checkbox'
+														class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Sale Order status</label> <input
+														id="salesOrderStatus" name='checksmodernSpecialConfig' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>

@@ -134,12 +134,13 @@
 								</div>
 
 							</c:if>
-							
+
 							<c:if test="${sendTransactionsSapPravesh=='true'}">
 								<div class="col-sm-1">
 									<br>
 									<button type="button" class="btn btn-primary"
-										id="sendTransactionsSapPravesh">Send Sales Order To SAP</button>
+										id="sendTransactionsSapPravesh">Send Sales Order To
+										SAP</button>
 									<!-- 									<div class="loader hide"></div> -->
 
 								</div>
@@ -148,7 +149,7 @@
 						</div>
 					</form>
 				</div>
-				
+
 				<div class="col-md-12 col-sm-12 clearfix"
 					style="font-size: 14px; color: black;">
 					<div class="col-sm-2">
@@ -168,7 +169,7 @@
 
 
 				<table class="table  table-striped table-bordered">
-					<thead>
+					<thead id="theadInventoryVoucher">
 						<tr>
 							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
 								All</th>
@@ -187,6 +188,7 @@
 							<th>Management Status</th>
 							<th>Status</th>
 							<th>Action</th>
+							<th>SalesOrderStatus</th>
 							<th>VisitRemarks</th>
 						</tr>
 					</thead>
@@ -266,23 +268,8 @@
 								<td id="lbl_documentDiscountPercentage"></td>
 							</tr>
 						</table>
-						<table class="collaptable table table-striped table-bordered">
-							<thead>
-								<tr>
-									<th>Product</th>
-									<th>Quantity</th>
-									<th>Unit Qty</th>
-									<th>Total Qty</th>
-									<th>Free Qty</th>
-									<th>Selling Rate</th>
-									<th>Tax%</th>
-									<th>Discount%</th>
-									<th>Total</th>
-								</tr>
-							</thead>
-							<tbody id="tblVoucherDetails">
-
-							</tbody>
+						<table class="collaptable table table-striped table-bordered" id="tblVoucherDetailshead">
+							
 						</table>
 					</div>
 					<div class="modal-footer">
@@ -293,7 +280,63 @@
 			</div>
 			<!-- /.modal-dialog -->
 		</div>
+
+		<div class="modal fade container" id="productModel">
+			<!-- model Dialog -->
+			<div class="modal-dialog" style="width:500px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="viewModalLabel">ProductProfiles</h4>
+					</div>
+					<div class="modal-body">
+						<!-- error message -->
+						<div class="alert alert-danger alert-dismissible" role="alert"
+							style="display: none;">
+							<button type="button" class="close" onclick="$('.alert').hide();"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<p></p>
+						</div>
+
+						<div class="col-sm-6" style="margin-bottom: 20px;">
+							<div class="input-group">
+								<input type="text" class="form-control" placeholder="Search"
+									id="search" /> <span class="input-group-btn">
+									<button class="btn btn-default entypo-search" id="btnSearch"
+										type="button" style="font-size: 18px"
+										onclick="InventoryVoucher.searchByName($('#search').val());"></button>
+								</span>
+							</div>
+						</div>
+
+						<table class="collaptable table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th><input type="checkbox" class="allcheckbox">All</th>
+									<th>Product</th>
+								</tr>
+							</thead>
+							<tbody id="tblProductDetails">
+
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default " data-dismiss="modal" onclick="InventoryVoucher.closeModalPopup($('#productModel'))">Cancel</button>
+						<button type="button" class="btn btn-default" id="btnSaveProducts">Add</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
 	</div>
+
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
 
 	<spring:url value="/resources/app/sales-performance-management.js"

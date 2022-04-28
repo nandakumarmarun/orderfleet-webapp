@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.CountryC;
+import com.orderfleet.webapp.domain.District;
 import com.orderfleet.webapp.domain.DistrictC;
 import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.StateC;
@@ -54,6 +55,7 @@ public class AccountProfileMapperImpl extends AccountProfileMapper {
 		accountProfileDTO.setDataSourceType(accountProfile.getDataSourceType());
 		accountProfileDTO.setDefaultDiscountPercentage(accountProfile.getDefaultDiscountPercentage());
 		accountProfileDTO.setDescription(accountProfile.getDescription());
+		accountProfileDTO.setDistrictName(accountProfileDistrictName(accountProfile));
 		accountProfileDTO.setEmail1(accountProfile.getEmail1());
 		accountProfileDTO.setEmail2(accountProfile.getEmail2());
 		accountProfileDTO.setGeoTaggedTime(accountProfile.getGeoTaggedTime());
@@ -106,6 +108,7 @@ public class AccountProfileMapperImpl extends AccountProfileMapper {
 		accountProfileDTO.setAddress(accountProfile.getAddress());
 		accountProfileDTO.setAlias(accountProfile.getAlias());
 		accountProfileDTO.setCity(accountProfile.getCity());
+		accountProfileDTO.setDistrictName(accountProfileDistrictName(accountProfile));
 		accountProfileDTO.setClosingBalance(accountProfile.getClosingBalance());
 		accountProfileDTO.setContactPerson(accountProfile.getContactPerson());
 		accountProfileDTO.setCountryName(accountProfile.getCountryName());
@@ -317,6 +320,22 @@ public class AccountProfileMapperImpl extends AccountProfileMapper {
 			return null;
 		}
 		return firstName;
+	}
+	
+	private String accountProfileDistrictName(AccountProfile accountProfile) {
+
+		if (accountProfile == null) {
+			return null;
+		}
+		DistrictC district = accountProfile.getDistrictc();
+		if (district == null) {
+			return null;
+		}
+		String districtName = district.getName();
+		if (districtName == null) {
+			return null;
+		}
+		return districtName;
 	}
 
 	private Long accountProfileCountrycId(AccountProfile accountProfile) {

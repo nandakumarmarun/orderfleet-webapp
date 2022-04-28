@@ -19,6 +19,7 @@ import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
+import com.orderfleet.webapp.domain.enums.SalesOrderStatus;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
@@ -428,11 +429,20 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
 			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
-			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks ,iv.orderNumber , iv.pdfDownloadStatus ,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate,iv.receiverAccount.location,iv.receiverAccount.description from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks ,iv.orderNumber , iv.pdfDownloadStatus ,iv.salesManagementStatus,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate,iv.receiverAccount.location,iv.receiverAccount.description,iv.salesOrderStatus,iv.executiveTaskExecution.location,iv.executiveTaskExecution.pid,iv.executiveTaskExecution.latitude,iv.deliveryDate from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
 			+ "iv.document.pid in ?2 and iv.tallyDownloadStatus in ?3 and iv.createdDate between ?4 and ?5 Order By iv.createdDate desc")
 	List<Object[]> findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
 			List<Long> userIds, List<String> documentPids, List<TallyDownloadStatus> tallyDownloadStatus,
 			LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
+			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
+			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
+			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks ,iv.orderNumber , iv.pdfDownloadStatus ,iv.salesManagementStatus,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate,iv.receiverAccount.location,iv.receiverAccount.description,iv.salesOrderStatus,iv.executiveTaskExecution.location,iv.executiveTaskExecution.pid,iv.executiveTaskExecution.latitude,iv.deliveryDate from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+			+ "iv.document.pid in ?2 and iv.tallyDownloadStatus in ?3 and iv.createdDate between ?4 and ?5 and iv.salesOrderStatus in ?6 Order By iv.createdDate desc")
+	List<Object[]> findByUserIdInAndDocumentPidInAndTallyDownloadStatusandsaleOrderstausDateBetweenOrderByCreatedDateDesc(
+			List<Long> userIds, List<String> documentPids, List<TallyDownloadStatus> tallyDownloadStatus,
+			LocalDateTime fromDate, LocalDateTime toDate ,List<SalesOrderStatus> salesOrderStatus);
 
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
@@ -454,11 +464,21 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
 			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
-			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks , iv.orderNumber , iv.pdfDownloadStatus,iv.salesManagementStatus ,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate,iv.receiverAccount.location,iv.receiverAccount.description from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks , iv.orderNumber , iv.pdfDownloadStatus,iv.salesManagementStatus,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate,iv.receiverAccount.location,iv.receiverAccount.description,iv.salesOrderStatus from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
 			+ "iv.receiverAccount.pid = ?2 and iv.document.pid in ?3 and iv.tallyDownloadStatus in ?4 and iv.createdDate between ?5 and ?6 Order By iv.createdDate desc")
 	List<Object[]> findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
 			List<Long> userIds, String accountPids, List<String> documentPids,
 			List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
+			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
+			+ "iv.supplierAccount.name, iv.employee.pid, iv.employee.name, iv.createdBy.firstName,iv.documentTotal, "
+			+ "iv.documentVolume, iv.tallyDownloadStatus, iv.executiveTaskExecution.remarks , iv.orderNumber , iv.pdfDownloadStatus,iv.salesManagementStatus,iv.documentTotalUpdated ,iv.documentVolumeUpdated ,iv.updatedStatus ,iv.sendSalesOrderEmailStatus ,iv.executiveTaskExecution.sendDate,iv.receiverAccount.location,iv.receiverAccount.description,iv.salesOrderStatus,iv.executiveTaskExecution.location,iv.executiveTaskExecution.pid,iv.executiveTaskExecution.latitude,iv.deliveryDate from InventoryVoucherHeader iv where iv.company.id = ?#{principal.companyId} and iv.createdBy.id in ?1 and "
+			+ "iv.receiverAccount.pid = ?2 and iv.document.pid in ?3 and iv.tallyDownloadStatus in ?4 and iv.createdDate between ?5 and ?6 and  iv.salesOrderStatus in ?7 Order By iv.createdDate desc")
+	List<Object[]> findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusaStatusdDateBetweenOrderByCreatedDateDesc(
+			List<Long> userIds, String accountPids, List<String> documentPids,
+			List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate,List<SalesOrderStatus> salesOrderStatus);
+	
 
 	@Modifying(clearAutomatically = true)
 	@Transactional
@@ -637,6 +657,11 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status , reference_invoice_number , rounded_off "
 			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and sales_management_status = 'APPROVE' and document_id IN(?1) and company_id = ?#{principal.companyId} order by created_date desc";
 
+	public static final String DOCUMENT_BASED_SALE_ORDER_DOWNLOAD_TALLY = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
+			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
+			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status , reference_invoice_number , rounded_off "
+			+ "FROM tbl_inventory_voucher_header where tally_download_status ='PENDING' and sales_management_status = 'APPROVE' and sales_order_status = 'CONFIRM'  and document_id IN(?1) and company_id = ?#{principal.companyId} order by created_date desc";
+	
 	public static final String DOCUMENT_BASED_ORDER_MANAGEMENT_DOWNLOAD_TALLY_LIMIT = "SELECT id, created_date, doc_discount_amount, doc_discount_percentage, document_date, document_number_local, document_number_server, document_total, document_volume, pid, status, company_id, created_by_id, "
 			+ "document_id, employee_id, executive_task_execution_id, receiver_account_id, supplier_account_id, price_level_id, reference_document_number, reference_document_type, source_module, process_status, order_status_id, updated_date, "
 			+ "updated_by_id, tally_download_status, order_number, pdf_download_status, sales_management_status, document_total_updated, document_volume_updated, updated_status , reference_invoice_number , rounded_off "
@@ -665,6 +690,10 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query(value = DOCUMENT_BASED_ORDER_MANAGEMENT_DOWNLOAD_TALLY, nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
+			List<Long> documentIds);
+	
+	@Query(value = DOCUMENT_BASED_SALE_ORDER_DOWNLOAD_TALLY, nativeQuery = true)
+	List<Object[]> findByCompanyIdAndTallyStatusAndSalesOrderStatusAndDocumentOrderByCreatedDateDesc(
 			List<Long> documentIds);
 
 	@Query(value = EMPLOYEE_SALES_ORDER__MANAGEMENT_TALLY, nativeQuery = true)

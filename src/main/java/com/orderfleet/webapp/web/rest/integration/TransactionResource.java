@@ -394,9 +394,13 @@ public class TransactionResource {
 
 		Optional<CompanyConfiguration> optSalesManagement = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_MANAGEMENT);
+	
 
 		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
+		
+		Optional<CompanyConfiguration> optSalesOrder = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_ORDER_STATUS);
 
 		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
@@ -411,9 +415,15 @@ public class TransactionResource {
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
-					.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
-							documentIdList);
+			if(optSalesOrder.isPresent() && optSalesOrder.get().getValue().equalsIgnoreCase("true")) {
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findByCompanyIdAndTallyStatusAndSalesOrderStatusAndDocumentOrderByCreatedDateDesc(
+								documentIdList);
+			}else {
+				inventoryVoucherHeaders = inventoryVoucherHeaderRepository
+						.findByCompanyIdAndTallyStatusAndSalesManagementStatusAndDocumentOrderByCreatedDateDesc(
+								documentIdList);
+			}
 			String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);

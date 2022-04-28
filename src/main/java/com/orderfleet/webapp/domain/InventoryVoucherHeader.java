@@ -31,6 +31,7 @@ import org.hibernate.annotations.Parameter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
+import com.orderfleet.webapp.domain.enums.SalesOrderStatus;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.SourceModule;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
@@ -124,8 +125,8 @@ public class InventoryVoucherHeader implements Serializable {
 	@NotNull
 	private Company company;
 
-	// @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	 @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "inventory_voucher_header_id")
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<InventoryVoucherDetail> inventoryVoucherDetails;
@@ -188,6 +189,11 @@ public class InventoryVoucherHeader implements Serializable {
 	@Column(name = "sales_management_status", nullable = false, columnDefinition = "character varying DEFAULT 'DEFAULT'")
 	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.DEFAULT;
 
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "sales_order_status", nullable = false, columnDefinition = "character varying DEFAULT 'CREATED'")
+	private SalesOrderStatus  salesOrderStatus = SalesOrderStatus.CREATED;
+	
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "process_flow_status", nullable = false, columnDefinition = "character varying DEFAULT 'DEFAULT'")
@@ -636,6 +642,14 @@ public class InventoryVoucherHeader implements Serializable {
 
 	public void setFiles(Set<File> files) {
 		this.files = files;
+	}
+
+	public SalesOrderStatus getSalesOrderStatus() {
+		return salesOrderStatus;
+	}
+
+	public void setSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
+		this.salesOrderStatus = salesOrderStatus;
 	}
 
 }

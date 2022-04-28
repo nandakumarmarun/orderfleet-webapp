@@ -39,6 +39,8 @@ public class InventoryVoucherDetailDTO {
 	private double freeQuantity;
 
 	private double sellingRate;
+	
+	private double updatedsellingRate;
 
 	private double mrp;
 
@@ -150,6 +152,7 @@ public class InventoryVoucherDetailDTO {
 		}
 		this.quantity = inventoryVoucherDetail.getQuantity();
 		this.updatedQty = inventoryVoucherDetail.getUpdatedQuantity();
+		this.updatedsellingRate = inventoryVoucherDetail.getUpdatedsellingRate();
 		this.freeQuantity = inventoryVoucherDetail.getFreeQuantity();
 		this.sellingRate = inventoryVoucherDetail.getSellingRate();
 		this.taxPercentage = inventoryVoucherDetail.getTaxPercentage();
@@ -692,6 +695,14 @@ public class InventoryVoucherDetailDTO {
 		this.additionalDiscount = additionalDiscount;
 	}
 
+	public double getUpdatedsellingRate() {
+		return updatedsellingRate;
+	}
+
+	public void setUpdatedsellingRate(double updatedsellingRate) {
+		this.updatedsellingRate = updatedsellingRate;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -734,7 +745,7 @@ public class InventoryVoucherDetailDTO {
 				+ ", referenceInventoryVoucherDetailId=" + referenceInventoryVoucherDetailId + ", remarks=" + remarks
 				+ ", visitRemarks=" + visitRemarks + ", inventoryVoucherBatchDetails=" + inventoryVoucherBatchDetails
 				+ ", createdDate=" + createdDate + ", accountPid=" + accountPid + ", accountName=" + accountName
-				+ ", employeeName=" + employeeName + "]";
+				+ ", employeeName=" + employeeName + ",updatedsellingRate=" + updatedsellingRate +"]";
 	}
 
 }

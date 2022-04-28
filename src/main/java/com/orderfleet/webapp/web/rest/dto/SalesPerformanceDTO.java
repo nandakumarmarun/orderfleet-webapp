@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
+import com.orderfleet.webapp.domain.enums.SalesOrderStatus;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
@@ -74,6 +75,8 @@ public class SalesPerformanceDTO {
 	private SalesManagementStatus salesManagementStatus;
 
 	private SendSalesOrderEmailStatus sendSalesOrderEmailStatus;
+	
+	private SalesOrderStatus salesOrderStatus;
 
 	private ProcessFlowStatus processFlowStatus;
 
@@ -501,6 +504,14 @@ public class SalesPerformanceDTO {
 
 	public void setDiscountPercentage(double discountPercentage) {
 		this.discountPercentage = discountPercentage;
+	}
+
+	public SalesOrderStatus getSalesOrderStatus() {
+		return salesOrderStatus;
+	}
+
+	public void setSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
+		this.salesOrderStatus = salesOrderStatus;
 	}
 
 	

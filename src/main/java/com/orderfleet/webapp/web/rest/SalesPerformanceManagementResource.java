@@ -77,10 +77,19 @@ import com.itextpdf.text.pdf.codec.Base64.OutputStream;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
+import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
+import com.orderfleet.webapp.domain.InventoryVoucherUpdateHistory;
+import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.ProductGroup;
+import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.UnitOfMeasureProduct;
+import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
+import com.orderfleet.webapp.domain.enums.SalesOrderStatus;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
@@ -90,8 +99,11 @@ import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.InventoryVoucherUpdateHistoryRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
+import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
+import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -101,12 +113,15 @@ import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.InventoryVoucherDetailService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.PrimarySecondaryDocumentService;
+import com.orderfleet.webapp.service.ProductProfileService;
+import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherXlsDownloadDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.util.RestClientUtil;
@@ -137,10 +152,16 @@ public class SalesPerformanceManagementResource {
 
 	@Inject
 	private InventoryVoucherHeaderService inventoryVoucherService;
+	
+	@Inject
+	private ProductProfileService productProfileService;
 
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
 
+	@Inject
+	private InventoryVoucherUpdateHistoryRepository inventoryVoucherUpdateHistoryRepository;
+	
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
 
@@ -188,7 +209,12 @@ public class SalesPerformanceManagementResource {
 
 	@Inject
 	private AccountProfileMapper accountProfileMapper;
-
+	
+	@Inject
+	private ProductProfileRepository productRepository;
+	
+	@Inject
+	private PriceLevelRepository priceLevelRepository;
 	@Inject
 	private SendTransactionSapPraveshService sendTransactionSapPraveshService;
 
@@ -381,6 +407,7 @@ public class SalesPerformanceManagementResource {
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> getInventoryVoucher(@PathVariable String pid) {
 		log.debug("Web request to get inventoryVoucherDTO by pid : {}", pid);
+		System.out.println("enterd");
 		Optional<InventoryVoucherHeaderDTO> optionalInventoryVoucherHeaderDTO = inventoryVoucherService
 				.findOneByPid(pid);
 		Optional<CompanyConfiguration> opCompanyConfigurationSendSalesOrderSap = companyConfigurationRepository
@@ -648,6 +675,7 @@ public class SalesPerformanceManagementResource {
 boolean compconfig= getCompanyCofig();
 		DecimalFormat df = new DecimalFormat("0.00");
 		int size = inventoryVouchers.size();
+		
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
 			SalesPerformanceDTO salesPerformanceDTO = new SalesPerformanceDTO();
@@ -694,6 +722,7 @@ boolean compconfig= getCompanyCofig();
 					.setDocumentVolumeUpdated(ivData[22] != null ? Double.parseDouble(ivData[22].toString()) : 0.0);
 			salesPerformanceDTO.setUpdatedStatus(ivData[23] != null ? Boolean.valueOf(ivData[23].toString()) : false);
 			salesPerformanceDTO.setReceiverAccountLocation(ivData[26] != null ? ivData[26].toString() : "");
+			salesPerformanceDTO.setSalesOrderStatus(SalesOrderStatus.valueOf(ivData[28].toString()));
 			salesPerformanceDTO.setEditOrder(orderEdit);
 			salesPerformanceDTO.setSendSalesOrderSapButtonStatus(sendSalesOrderSapButtonStatus);
 			salesPerformanceDTOs.add(salesPerformanceDTO);
@@ -916,43 +945,71 @@ boolean compconfig= getCompanyCofig();
 	@RequestMapping(value = "/sales-performance-management/updateInventory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<InventoryVoucherHeaderDTO> updateInventoryDetail(@RequestParam long id,
-			@RequestParam long quantity, @RequestParam String ivhPid) {
+			@RequestParam long quantity, @RequestParam String ivhPid, @RequestParam String sellingrate) {
 		System.out.println("------------------------------------------------------------------------");
-		System.out.println("quantity : " + quantity + "\n Id :" + id + " \n IVHPid : " + ivhPid);
+		System.out.println("quantity : " + quantity + "\n Id :" + id + " \n IVHPid : " + ivhPid + "sellingrate" + sellingrate);
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
 		List<InventoryVoucherDetailDTO> ivdList = inventoryVoucherHeaderDTO.getInventoryVoucherDetails();
 		Optional<InventoryVoucherDetailDTO> opIvDetail = ivdList.stream().filter(ivd -> ivd.getDetailId() == id)
 				.findAny();
-
+		
+		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository.findOneByPid(ivhPid).get(); 
+		List<InventoryVoucherUpdateHistory> inventoryVoucherUpdateHistoryList = inventoryVoucherUpdateHistoryRepository.findAllByInventoryVoucherHeaderId(inventoryVoucherHeader.getId()); 
+		inventoryVoucherUpdateHistoryList.forEach(c->System.out.println(c.getInventoryVoucherHeader().getId()));
+		
+		long numMatches = inventoryVoucherUpdateHistoryList.stream()
+                .filter(c -> c.isUpdated() == true)
+                .count();
+		
+		System.out.println(numMatches);
+		if(numMatches == 0) {
+			InventoryVoucherUpdateHistory inventoryVoucherUpdateHistory = new  InventoryVoucherUpdateHistory();
+			inventoryVoucherUpdateHistory.setPid(inventoryVoucherService.PID_PREFIX + RandomUtil.generatePid());
+			inventoryVoucherUpdateHistory.setQuantity(opIvDetail.get().getQuantity());
+			inventoryVoucherUpdateHistory.setUpdated(false);
+			User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+			inventoryVoucherUpdateHistory.setUpdateBy(user);
+			inventoryVoucherUpdateHistory.setUpdatedDate(LocalDateTime.now());
+			inventoryVoucherUpdateHistory.setInventoryVoucherHeader(inventoryVoucherHeader);
+			inventoryVoucherUpdateHistoryRepository.save(inventoryVoucherUpdateHistory);
+		}
+		
+		
+		
 		if (opIvDetail.isPresent()) {
 			InventoryVoucherDetailDTO ivdDto = opIvDetail.get();
 			// ivdDto.setUpdatedQty(quantity);
 			double discAmt = ivdDto.getDiscountAmount();
 			double discPer = ivdDto.getDiscountPercentage();
+			
+			ivdDto.setSellingRate(Double.parseDouble(sellingrate));
 			double sellingRate = ivdDto.getSellingRate();
+			
 			double taxPer = ivdDto.getTaxPercentage();
 			sellingRate = sellingRate - discAmt;
+			
 			sellingRate = sellingRate - (sellingRate * (discPer * 0.01));
+			
 			double rowTotal = sellingRate * quantity;
+			
 			double totalTax = rowTotal * (taxPer * 0.01);
 			double updatedRowTotal = totalTax + rowTotal;
+			
 
 			double rowTotalDiff = 0.0;
 			double quantityDiff = 0.0;
 			if (ivdDto.getUpdatedStatus()) {
+				
 				rowTotalDiff = Math.abs(ivdDto.getUpdatedRowTotal() - updatedRowTotal);
-
+				
 				quantityDiff = Math.abs(ivdDto.getUpdatedQty() - quantity);
-
-				System.out.println("updated : " + ivdDto.getUpdatedStatus());
-				System.out.println("rowTotatlDiff : " + rowTotalDiff + "\n quantityDiff : " + quantityDiff);
+				
 			} else {
 				rowTotalDiff = Math.abs(ivdDto.getRowTotal() - updatedRowTotal);
 
 				quantityDiff = Math.abs(ivdDto.getQuantity() - quantity);
 
-				System.out.println("updated : " + ivdDto.getUpdatedStatus());
-				System.out.println("rowTotatlDiff : " + rowTotalDiff + "\n quantityDiff : " + quantityDiff);
+
 			}
 
 			double updatedDocTotal = 0.0;
@@ -960,20 +1017,30 @@ boolean compconfig= getCompanyCofig();
 			if (inventoryVoucherHeaderDTO.getUpdatedStatus()) {
 				if (ivdDto.getUpdatedStatus()) {
 					if (ivdDto.getUpdatedQty() <= quantity) {
+					
 						updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
+					
 					} else {
+				
 						updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
+					
 					}
 
 					if (ivdDto.getUpdatedRowTotal() <= updatedRowTotal) {
+						
 						updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotalUpdated() + rowTotalDiff;
+					
 					} else {
+					
 						updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotalUpdated());
+						
 					}
 				} else {
 					if (ivdDto.getQuantity() <= quantity) {
+						System.out.println("3DocumentVolumeUpdatedless"+inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
 						updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
 					} else {
+						System.out.println("3DocumentVolumeUpdatedmore"+inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
 						updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
 					}
 
@@ -1006,16 +1073,30 @@ boolean compconfig= getCompanyCofig();
 
 			ivdDto.setUpdatedStatus(true);
 			ivdDto.setUpdatedRowTotal(updatedRowTotal);
+			System.out.println(updatedRowTotal);
 			ivdDto.setUpdatedQty(quantity);
+			ivdDto.setUpdatedsellingRate(Double.parseDouble(sellingrate));
 
 			inventoryVoucherHeaderDTO.setDocumentTotalUpdated(updatedDocTotal);
+			System.out.println(updatedDocTotal);
 			inventoryVoucherHeaderDTO.setDocumentVolumeUpdated(updatedDocVol);
+			System.out.println(updatedDocVol);
 			inventoryVoucherHeaderDTO.setUpdatedStatus(true);
 			System.out.println("IVH : Volume : " + inventoryVoucherHeaderDTO.getDocumentVolume() + "\n");
 			System.out.println("IVH : Volume Updated : " + inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + "\n");
 			System.out.println("------------------------------------------------------------------------");
 			inventoryVoucherDetailService.updateInventoryVoucherDetail(ivdDto);
 			inventoryVoucherService.updateInventoryVoucherHeader(inventoryVoucherHeaderDTO);
+			
+			InventoryVoucherUpdateHistory inventoryVoucherUpdateHistory = new  InventoryVoucherUpdateHistory();
+			inventoryVoucherUpdateHistory.setPid(inventoryVoucherService.PID_PREFIX + RandomUtil.generatePid());
+			inventoryVoucherUpdateHistory.setQuantity(quantity);
+			inventoryVoucherUpdateHistory.setUpdated(true);
+			User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+			inventoryVoucherUpdateHistory.setUpdateBy(user);
+			inventoryVoucherUpdateHistory.setUpdatedDate(LocalDateTime.now());
+			inventoryVoucherUpdateHistory.setInventoryVoucherHeader(inventoryVoucherHeader);
+			inventoryVoucherUpdateHistoryRepository.save(inventoryVoucherUpdateHistory);
 
 		}
 
@@ -1023,6 +1104,23 @@ boolean compconfig= getCompanyCofig();
 		return new ResponseEntity<>(inventoryVoucherHeaderDTO, HttpStatus.OK);
 
 	}
+	
+	@RequestMapping(value = "/sales-performance-management/changeSalesOrderStatus", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> changeSalesOrderStatus(@RequestParam String pid,
+			@RequestParam SalesOrderStatus salesOrderStatus) {
+		log.info("Sales Sales Management Status " + salesOrderStatus);
+		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(pid).get();
+		if (inventoryVoucherHeaderDTO.getTallyDownloadStatus() != TallyDownloadStatus.COMPLETED) {
+			inventoryVoucherHeaderDTO.setSalesOrderStatus(salesOrderStatus);
+			inventoryVoucherService.updateInventoryVoucherHeaderSalesOrderStatus(inventoryVoucherHeaderDTO);
+			return new ResponseEntity<>("success", HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>("failed", HttpStatus.OK);
+
+	}
+	
 
 	@RequestMapping(value = "/sales-performance-management/changeSalesManagementStatus", method = RequestMethod.GET)
 	@Timed
@@ -1226,6 +1324,42 @@ boolean compconfig= getCompanyCofig();
 
 		return salesOrderMasterSap;
 	}
+	
+	@RequestMapping(value = "/sales-performance-management/addNewProduct", method = RequestMethod.POST)
+	@Timed
+	public ResponseEntity<Void> saveAssignedProducts(@RequestParam String inventoryHeaderPid , @RequestParam String assignedproducts) {
+		log.debug("REST request to save assigned account type : {}",inventoryHeaderPid);
+		System.out.println(assignedproducts);
+		String selectdproducts =  assignedproducts;
+		String[] products = selectdproducts.split(",");
+		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository.findOneByPid(inventoryHeaderPid).get(); 
+		InventoryVoucherDetail InventoryVoucherDetail = new InventoryVoucherDetail();
+		List<InventoryVoucherDetail> inventoryVoucherDetailList = inventoryVoucherHeader.getInventoryVoucherDetails();
+		
+		for (String productPid : products) {
+			ProductProfile product = productRepository.findOneByPid(productPid).get();
+			InventoryVoucherDetail.setProduct(product);
+			InventoryVoucherDetail.setSellingRate(Double.parseDouble(product.getPrice().toString()));
+			InventoryVoucherDetail.setTaxPercentage(product.getTaxRate());
+			InventoryVoucherDetail.setDiscountPercentage(product.getDiscountPercentage());
+			Optional<InventoryVoucherDetail> opIvDetail = inventoryVoucherDetailList.stream().filter(ivd -> ivd.getProduct().equals(product))
+					.findAny();
+			if(!opIvDetail.isPresent()){
+				inventoryVoucherDetailList.add(InventoryVoucherDetail);
+			}
+		}
+		inventoryVoucherHeader.setInventoryVoucherDetails(inventoryVoucherDetailList);
+		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/sales-performance-management/searchByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<ProductProfileDTO>>searchByName(@RequestParam String input) {
+		log.debug("Web request to get searchbyname : {}");
+		List<ProductProfileDTO> productProfileDTOs = productProfileService.searchByName(input);
+		return new ResponseEntity<>(productProfileDTOs, HttpStatus.OK);
+	}
+	
 
 	@RequestMapping(value = "/sales-performance-management/downloadPdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed

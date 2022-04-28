@@ -12,6 +12,7 @@ import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
 import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
 import com.orderfleet.webapp.domain.enums.SalesManagementStatus;
+import com.orderfleet.webapp.domain.enums.SalesOrderStatus;
 import com.orderfleet.webapp.domain.enums.SendSalesOrderEmailStatus;
 import com.orderfleet.webapp.domain.enums.SourceModule;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
@@ -104,6 +105,8 @@ public class InventoryVoucherHeaderDTO {
 	private TallyDownloadStatus tallyDownloadStatus = TallyDownloadStatus.PENDING;
 
 	private SalesManagementStatus salesManagementStatus = SalesManagementStatus.DEFAULT;
+	
+	private SalesOrderStatus salesOrderStatus = SalesOrderStatus.CREATED;
 
 	private SendSalesOrderEmailStatus sendSalesOrderEmailStatus = SendSalesOrderEmailStatus.NOT_SENT;
 
@@ -228,6 +231,10 @@ public class InventoryVoucherHeaderDTO {
 
 		if (inventoryVoucherHeader.getSalesManagementStatus() != null) {
 			this.salesManagementStatus = inventoryVoucherHeader.getSalesManagementStatus();
+		}
+		
+		if (inventoryVoucherHeader.getSalesOrderStatus() != null) {
+			this.salesOrderStatus = inventoryVoucherHeader.getSalesOrderStatus();
 		}
 
 		if (inventoryVoucherHeader.getSendSalesOrderEmailStatus() != null) {
@@ -819,6 +826,16 @@ public class InventoryVoucherHeaderDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	
+	public SalesOrderStatus getSalesOrderStatus() {
+		return salesOrderStatus;
+	}
+
+	public void setSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
+		this.salesOrderStatus = salesOrderStatus;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

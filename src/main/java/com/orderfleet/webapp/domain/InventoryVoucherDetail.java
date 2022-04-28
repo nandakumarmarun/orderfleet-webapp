@@ -59,6 +59,9 @@ public class InventoryVoucherDetail implements Serializable {
 
 	@Column(name = "selling_rate")
 	private double sellingRate;
+	
+	@Column(name = "updated_selling_rate", columnDefinition = "double precision DEFAULT 0" )
+	private double updatedsellingRate;
 
 	@Column(name = "mrp")
 	private double mrp;
@@ -495,4 +498,12 @@ public class InventoryVoucherDetail implements Serializable {
 		this.additionalDiscount = additionalDiscount;
 	}
 
+	public double getUpdatedsellingRate() {
+		return updatedsellingRate;
+	}
+
+	public void setUpdatedsellingRate(double updatedsellingRate) {
+		this.updatedsellingRate = updatedsellingRate;
+	}
+	
 }

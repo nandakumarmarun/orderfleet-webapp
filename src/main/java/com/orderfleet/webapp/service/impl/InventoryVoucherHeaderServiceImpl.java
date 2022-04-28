@@ -613,6 +613,16 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
 	}
 
+
+	@Override
+	public void updateInventoryVoucherHeaderSalesOrderStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
+		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
+				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();
+		inventoryVoucherHeader.setSalesOrderStatus(inventoryVoucherHeaderDTO.getSalesOrderStatus());
+		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
+		System.out.println("saved status");
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByExecutiveTaskExecutionPid(String executiveTaskExecutionPid) {

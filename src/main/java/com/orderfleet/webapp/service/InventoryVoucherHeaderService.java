@@ -96,6 +96,8 @@ public interface InventoryVoucherHeaderService {
 
 	void updateInventoryVoucherHeaderSalesManagementStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
 
+	void updateInventoryVoucherHeaderSalesOrderStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO);
+	
 	List<InventoryVoucherHeaderDTO> findAllByExecutiveTaskExecutionPid(String executiveTaskExecutionPid);
 
 	Set<Document> findDocumentsByUserIdIn(List<Long> userIds);

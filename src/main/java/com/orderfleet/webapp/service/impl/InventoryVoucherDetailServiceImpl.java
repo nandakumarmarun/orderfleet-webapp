@@ -165,8 +165,11 @@ public class InventoryVoucherDetailServiceImpl implements InventoryVoucherDetail
 		ivd.setUpdatedQuantity(ivdDto.getUpdatedQty());
 		ivd.setUpdatedRowTotal(ivdDto.getUpdatedRowTotal());
 		ivd.setUpdatedStatus(true);
+		ivd.setUpdatedsellingRate(ivdDto.getUpdatedsellingRate());
 		ivd = inventoryVoucherDetailRepository.save(ivd);
+		System.out.println("updatesellingrate"+ivd.getUpdatedsellingRate());
 		return ivd;
+		
 	}
 
 }

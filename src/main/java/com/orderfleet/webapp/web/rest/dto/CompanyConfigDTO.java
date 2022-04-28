@@ -40,6 +40,8 @@ public class CompanyConfigDTO {
 	private boolean stockApi;
 	private boolean employeeCreateBtn;
 	private boolean modernSpecialConfig;
+	private boolean salesOrderStatus;
+
 	
 
 	public CompanyConfigDTO() {
@@ -284,6 +286,14 @@ public class CompanyConfigDTO {
 
 	public void setModernSpecialConfig(boolean modernSpecialConfig) {
 		this.modernSpecialConfig = modernSpecialConfig;
+	}
+
+	public boolean isSalesOrderStatus() {
+		return salesOrderStatus;
+	}
+
+	public void setSalesOrderStatus(boolean salesOrderStatus) {
+		this.salesOrderStatus = salesOrderStatus;
 	}
 	
 	
