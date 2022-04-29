@@ -22,7 +22,7 @@ public interface SalesTargetGroupRepository extends JpaRepository<SalesTargetGro
 
 	Optional<SalesTargetGroup> findOneByPid(String pid);
 
-	@Query("select salesTargetGroup from SalesTargetGroup salesTargetGroup where salesTargetGroup.company.id = ?#{principal.companyId}")
+	@Query("select salesTargetGroup from SalesTargetGroup salesTargetGroup where salesTargetGroup.company.id = ?#{principal.companyId} and salesTargetGroup.activated=true")
 	List<SalesTargetGroup> findAllByCompanyId();
 
 	@Query("select salesTargetGroup.pid,salesTargetGroup.name  from SalesTargetGroup salesTargetGroup where salesTargetGroup.company.id = ?#{principal.companyId}")

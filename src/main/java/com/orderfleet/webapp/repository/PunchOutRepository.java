@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.PunchOut;
 import com.orderfleet.webapp.domain.User;
 
@@ -19,6 +20,8 @@ import com.orderfleet.webapp.domain.User;
  */
 
 public interface PunchOutRepository extends JpaRepository<PunchOut, Long> {
+	
+	Optional<PunchOut> findOneByImageRefNo(String imageRefNo);
 
 	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.attendance.pid = ?1")
 	Optional<PunchOut> findIsAttendancePresent(String attendancepid);

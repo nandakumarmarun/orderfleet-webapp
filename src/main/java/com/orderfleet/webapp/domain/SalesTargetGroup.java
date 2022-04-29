@@ -41,6 +41,9 @@ public class SalesTargetGroup implements Serializable {
 	@Column(name = "pid", unique = true, nullable = false, updatable = false)
 	private String pid;
 
+	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
+	private boolean activated = true;
+	
 	@NotNull
 	@Size(min = 1, max = 255)
 	@Column(name = "name", length = 255, nullable = false)

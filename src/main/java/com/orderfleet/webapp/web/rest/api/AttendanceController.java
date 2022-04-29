@@ -41,6 +41,7 @@ import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.AttendanceSubgroupApprovalRequestRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DashboardAttendanceUserRepository;
+import com.orderfleet.webapp.repository.PunchOutRepository;
 import com.orderfleet.webapp.repository.RootPlanSubgroupApproveRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AttendanceService;
@@ -95,6 +96,9 @@ public class AttendanceController {
 
 	@Inject
 	private FileManagerService fileManagerService;
+	
+	@Inject
+	private PunchOutRepository punchOutRepository;
 
 	/**
 	 * POST /attendance : mark attendance.
@@ -347,6 +351,45 @@ public class AttendanceController {
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
 
+	}
+	
+	@Transactional
+	@RequestMapping(value = "/upload/punchOutImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> uploadpunchOutImageFile(@RequestParam("imageRefNo") String imageRefNo,
+			@RequestParam("file") MultipartFile file) {
+		log.debug("Request PunchOut Image to upload a file : {}", file);
+		if (file.isEmpty()) {
+			return ResponseEntity.badRequest()
+					.headers(
+							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
+					.body(null);
+		}
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ATT_QUERY_120" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get the one PunchOut by image Ref no";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+	ResponseEntity<Object> upload	= punchOutRepository.findOneByImageRefNo(imageRefNo).map(punchout -> {
+			try {
+				File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
+						file.getOriginalFilename(), file.getContentType());
+				// update filledForm with file
+				punchout.getFiles().add(uploadedFile);
+				punchOutRepository.save(punchout);
+				log.debug("uploaded file for PunchOut {}", punchout);
+				return new ResponseEntity<>(HttpStatus.OK);
+			} catch (FileManagerException | IOException ex) {
+				log.debug("File upload exception : {}", ex.getMessage());
+				return ResponseEntity.badRequest()
+						.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage())).body(null);
+			}
+		}).orElse(ResponseEntity.badRequest()
+				.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
+				.body(null));
+	return upload;
 	}
 
 	private void saveKilometreDifference(Attendance attendance) {

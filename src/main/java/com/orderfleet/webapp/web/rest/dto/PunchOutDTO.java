@@ -34,6 +34,8 @@ public class PunchOutDTO {
 	private LocalDateTime punchOutDate;
 	private LocalDateTime createdDate;
 	private String employeeName;
+	private double oodoMeter;
+	private String imageRefNo;
 
 	public PunchOutDTO() {
 		super();
@@ -58,6 +60,8 @@ public class PunchOutDTO {
 		this.attendancePid = punchOut.getAttendance().getPid();
 		this.punchOutDate = punchOut.getPunchOutDate();
 		this.createdDate = punchOut.getCreatedDate();
+		this.oodoMeter = punchOut.getOodoMeter();
+		this.imageRefNo = punchOut.getImageRefNo();
 
 	}
 
@@ -203,6 +207,24 @@ public class PunchOutDTO {
 
 	public void setCreatedDate(LocalDateTime createdDate) {
 		this.createdDate = createdDate;
+	}
+	
+	
+
+	public double getOodoMeter() {
+		return oodoMeter;
+	}
+
+	public void setOodoMeter(double oodoMeter) {
+		this.oodoMeter = oodoMeter;
+	}
+
+	public String getImageRefNo() {
+		return imageRefNo;
+	}
+
+	public void setImageRefNo(String imageRefNo) {
+		this.imageRefNo = imageRefNo;
 	}
 
 	@Override

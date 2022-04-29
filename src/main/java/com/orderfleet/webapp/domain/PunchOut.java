@@ -3,13 +3,20 @@ package com.orderfleet.webapp.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -94,6 +101,20 @@ public class PunchOut implements Serializable {
 	@NotNull
 	@Column(name = "punch_out_date", nullable = false)
 	private LocalDateTime punchOutDate;
+	
+	@Column(name = "imageRefNo")
+	private String imageRefNo;
+	
+	@Column(name = "oodoMeter", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double oodoMeter;
+	
+	
+	@JsonIgnore
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "tbl_punchout_file", joinColumns = {
+			@JoinColumn(name = "punchout_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "file_id", referencedColumnName = "id") })
+	private Set<File> files = new HashSet<>();
 
 	public PunchOut() {
 		super();
@@ -236,4 +257,29 @@ public class PunchOut implements Serializable {
 		this.punchOutDate = punchOutDate;
 	}
 
+	public double getOodoMeter() {
+		return oodoMeter;
+	}
+
+	public void setOodoMeter(double oodoMeter) {
+		this.oodoMeter = oodoMeter;
+	}
+
+	public Set<File> getFiles() {
+		return files;
+	}
+
+	public void setFiles(Set<File> files) {
+		this.files = files;
+	}
+
+	public String getImageRefNo() {
+		return imageRefNo;
+	}
+
+	public void setImageRefNo(String imageRefNo) {
+		this.imageRefNo = imageRefNo;
+	}
+ 
+	
 }

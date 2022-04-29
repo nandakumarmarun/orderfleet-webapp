@@ -128,7 +128,8 @@ public class PunchOutServiceImpl implements PunchOutService {
 					punchOut.setUser(user.get());
 					punchOut.setCompany(user.get().getCompany());
 					punchOut.setAttendance(optionalAttendence.get());
-					
+					punchOut.setOodoMeter(punchOutDTO.getOodoMeter());
+					punchOut.setImageRefNo(punchOutDTO.getImageRefNo());
 
 					// set location
 					LocationType locationType = punchOutDTO.getLocationType();

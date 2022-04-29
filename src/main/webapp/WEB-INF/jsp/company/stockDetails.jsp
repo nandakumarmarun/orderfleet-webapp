@@ -66,9 +66,9 @@
 					<tr>
 						<th>Product</th>
 						<th>Op Stk</th>
+					<!--  <th>Sales(QTY)</th>
+						<th>Damage/Replacement(QTY)</th>-->	
 						<th>Sales(QTY)</th>
-						<th>Damage/Replacement(QTY)</th>
-						<th>TotalSales(QTY)</th>
 						<th>Closing Stock</th>
 					</tr>
 				</thead>
@@ -78,8 +78,8 @@
 						<tr class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'}">
 							<td>${stockDetail.productName}</td>
 							<td>${stockDetail.openingStock}</td>
-							<td>${stockDetail.saleStock}</td>
-							<td>${stockDetail.freeQnty}</td>
+							<!--<td>${stockDetail.saleStock}</td>
+							<td>${stockDetail.freeQnty}</td>-->	
 							<td>${stockDetail.saledQuantity}</td>
 							<td>${stockDetail.closingStock}</td>
 						</tr>
