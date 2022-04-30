@@ -127,6 +127,9 @@ if (!this.InventoryVoucher) {
 				},
 				success : function(status) {
 					$("#productModel").modal("hide");
+					$("#tblProductDetails").html("");
+					$("#tblProductDetails").append("");
+					$('#search').val('');
 					// onSaveSuccess(status);
 				},
 				error : function(xhr, error) {
@@ -528,7 +531,7 @@ if (!this.InventoryVoucher) {
 																	+ ""
 																	+ "<button type='button' class='btn btn-blue' style='margin-top: 10px;' onclick='InventoryVoucher.showModalPopup($(\"#productModel\"),\""
 																	+ inventoryVoucher.pid
-																	+ "\",1);'>addProducts</button>"
+																	+ "\",1);'>Add Products</button>"
 																	+ button
 																	+ ""
 																	+ sendSalesOrderSapButton
