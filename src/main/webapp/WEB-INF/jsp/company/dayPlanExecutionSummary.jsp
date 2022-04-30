@@ -20,23 +20,24 @@
 			<hr />
 			<div class="row">
 				<div class="col-sm-3 col-xs-12">
-					<select id="dbEmployee" name="employeePid" class="form-control" >
-									<option value="no">All Employee</option>
-									<c:forEach items="${employees}" var="employee">
-										<option value="${employee.pid}">${employee.name}</option>
-									</c:forEach>
-								</select>
+					<select id="dbEmployee" name="employeePid" class="form-control">
+						<option value="no">All Employee</option>
+						<c:forEach items="${employees}" var="employee">
+							<option value="${employee.pid}">${employee.name}</option>
+						</c:forEach>
+					</select>
 				</div>
-				<!-- <div class="col-sm-3">
+				<div class="col-sm-3">
 					<div class="form-group col-xs-5">
 						<select id="slt_status" class=" form-control  " title="filter">
-							<option value="All">All</option>
-							<option value="Completed">COMPLETED</option>
-							<option value="Pending">PENDING</option>
-							<option value="Skipped">SKIPPED</option>
+							<option value="ALL">All</option>
+							<option value="CREATED">CREATED</option>
+							<option value="PENDING">PENDING</option>
+							<option value="SKIPPED">SKIPPED</option>
+							<option value="COMPLETED">COMPLETED</option>
 						</select>
 					</div>
-				</div> -->
+				</div>
 				<div class="col-md-3 col-xs-12">
 					<div id="daterangePicker" class="pull-right"
 						style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc;">
@@ -48,16 +49,15 @@
 					<button id="btnApply" type="button" class="btn btn-info">Apply</button>
 				</div>
 				<div class="col-sm-3 col-xs-12">
-					<button id="btnDownloadxls" type="button" class="btn btn-info">Download Xls</button>
+					<button id="btnDownloadxls" type="button" class="btn btn-info">Download
+						Xls</button>
 				</div>
 			</div>
 			<br />
 			<table class="collaptable table table-striped table-responsive"
 				style="border: 2px solid #EBEBEB;">
 				<thead>
-					<tr
-						style="font-weight: bold;"
-						class="td-color">
+					<tr style="font-weight: bold;" class="td-color">
 						<th>Created Date</th>
 						<th>Date</th>
 						<th>Scheduled</th>

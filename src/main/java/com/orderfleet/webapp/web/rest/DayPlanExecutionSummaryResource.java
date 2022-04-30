@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.domain.enums.TaskPlanStatus;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
@@ -135,7 +137,8 @@ public class DayPlanExecutionSummaryResource {
 	public ResponseEntity<Map<DayPlanExecutionSummaryDTO, Map<DayPlanExecutionSummaryDTO, List<ExecutiveTaskPlanDTO>>>> getTaskPlanByUserAndPlanDateBetween(
 			@RequestParam("employeePid") String employeePid,
 			@RequestParam(required = true, name = "startDate") LocalDate startDate,
-			@RequestParam(required = true, name = "endDate") LocalDate endDate) {
+			@RequestParam(required = true, name = "endDate") LocalDate endDate,
+			@RequestParam String fillterBy) {
 		log.debug("Web request to get Executive Task Plan");
 		List<ExecutiveTaskPlan> actualEcutiveTaskPlans = null;
 
@@ -201,6 +204,14 @@ public class DayPlanExecutionSummaryResource {
 							}
 							return etp;
 						}).collect(Collectors.toList());
+						
+						List<ExecutiveTaskPlan> taskPlans = new ArrayList<>();
+						
+						if(!fillterBy.trim().equalsIgnoreCase("ALL")) {
+							System.out.println("hi");
+							taskPlans = fillterBytaskPlan(fillterBy,convertedTaskPlans);
+						}
+						
 						DayPlanExecutionSummaryDTO dpesUserDTO = new DayPlanExecutionSummaryDTO();
 						dpesUserDTO.setDate(entry2.getKey()); // set user name
 						dpesUserDTO.setScheduled(Long.valueOf(scheduled));
@@ -213,8 +224,13 @@ public class DayPlanExecutionSummaryResource {
 						if (entry2.getValue().get(0).getTaskList() != null) {
 							dpesUserDTO.setAlias(entry2.getValue().get(0).getTaskList().getAlias());
 						}
-						resultChildMap.put(dpesUserDTO, convertedTaskPlans.stream().map(ExecutiveTaskPlanDTO::new)
-								.collect(Collectors.toList()));
+						if(fillterBy.trim().equalsIgnoreCase("ALL")) {
+							resultChildMap.put(dpesUserDTO, convertedTaskPlans.stream().map(ExecutiveTaskPlanDTO::new)
+									.collect(Collectors.toList()));
+						}else {
+							resultChildMap.put(dpesUserDTO, taskPlans.stream().map(ExecutiveTaskPlanDTO::new)
+									.collect(Collectors.toList()));
+						}
 					}
 				} else {
 					for (Map.Entry<String, List<ExecutiveTaskPlan>> entry2 : entry.getValue().entrySet()) {
@@ -233,6 +249,16 @@ public class DayPlanExecutionSummaryResource {
 							}
 							return etp;
 						}).collect(Collectors.toList());
+						
+						List<ExecutiveTaskPlan> taskPlans = new ArrayList<>();
+						
+						if(!fillterBy.trim().equalsIgnoreCase("ALL")) {
+						
+							taskPlans = fillterBytaskPlan(fillterBy,convertedTaskPlans);
+						}
+						
+						
+						System.out.println(taskPlans);
 						DayPlanExecutionSummaryDTO dpesUserDTO = new DayPlanExecutionSummaryDTO();
 						dpesUserDTO.setDate(entry2.getKey()); // set user name
 						dpesUserDTO.setScheduled(Long.valueOf(scheduled));
@@ -245,8 +271,14 @@ public class DayPlanExecutionSummaryResource {
 						DecimalFormat decimalFormat = new DecimalFormat("#.##");
 						String formatedTotal = decimalFormat.format(percentage);
 						dpesUserDTO.setPercentage(Double.parseDouble(formatedTotal));
-						resultChildMap.put(dpesUserDTO, convertedTaskPlans.stream().map(ExecutiveTaskPlanDTO::new)
-								.collect(Collectors.toList()));
+						if(fillterBy.trim().equalsIgnoreCase("ALL")) {
+							resultChildMap.put(dpesUserDTO, convertedTaskPlans.stream().map(ExecutiveTaskPlanDTO::new)
+									.collect(Collectors.toList()));
+						}else {
+							resultChildMap.put(dpesUserDTO, taskPlans.stream().map(ExecutiveTaskPlanDTO::new)
+									.collect(Collectors.toList()));
+						}
+						
 					}
 				}
 				// set date.
@@ -258,33 +290,39 @@ public class DayPlanExecutionSummaryResource {
 				DecimalFormat decimalFormat = new DecimalFormat("#.##");
 				String formatedTotal = decimalFormat.format(percentage);
 				dpesDateDTO.setPercentage(Double.parseDouble(formatedTotal));
-				resultMap.put(dpesDateDTO, resultChildMap);
+				for(Map.Entry  dpe :resultChildMap.entrySet()) {
+				List<ExecutiveTaskPlanDTO> values = (List<ExecutiveTaskPlanDTO>) dpe.getValue();
+					if(!values.isEmpty()) {
+						resultMap.put(dpesDateDTO, resultChildMap);	
+					}
+				}
 				
-							
-//				for(Map.Entry  dpe :resultChildMap.entrySet()) {
-//					
-//				 
-//					List<ExecutiveTaskPlanDTO> values = (List<ExecutiveTaskPlanDTO>) dpe.getValue();
-//					
-//					
-//					
-//					
-//					for(ExecutiveTaskPlanDTO  atp:values)
-//				{
-//					System.out.println(" company Name :"+atp.getAccountProfileName());
-//					System.out.println("created date :"+ atp.getCreatedDate());
-//					System.out.println("status :"+ atp.getTaskPlanStatus());
-//					System.out.println("Scheduled :"+atp.getSortOrder());
-//				}
-//					
-//				}
-//				
 				
 			}
 		}
 		return new ResponseEntity<>(resultMap, HttpStatus.OK);
 	}
 
+	
+	
+	public List<ExecutiveTaskPlan> fillterBytaskPlan(String TaskPlanStatus,List<ExecutiveTaskPlan> convertedTaskPlans) {
+		List<ExecutiveTaskPlan> TaskPlans = new ArrayList<>();
+		System.out.println("enterd"+TaskPlanStatus);
+		if(TaskPlanStatus.trim().equalsIgnoreCase("CREATED")) {
+			TaskPlans = convertedTaskPlans.stream().filter(a->a.getTaskPlanStatus().toString().equals("CREATED")).collect(Collectors.toList());
+		} 
+		if(TaskPlanStatus.trim().equalsIgnoreCase("COMPLETED")) {
+			TaskPlans = convertedTaskPlans.stream().filter(a->a.getTaskPlanStatus().toString().equals("COMPLETED")).collect(Collectors.toList());
+		}
+		if(TaskPlanStatus.trim().equalsIgnoreCase("PENDING")) {
+			TaskPlans = convertedTaskPlans.stream().filter(a->a.getTaskPlanStatus().toString().equals("PENDING")).collect(Collectors.toList());
+		}
+		if(TaskPlanStatus.trim().equalsIgnoreCase("SKIPPED")) {
+			TaskPlans = convertedTaskPlans.stream().filter(a->a.getTaskPlanStatus().toString().equals("SKIPPED")).collect(Collectors.toList());
+		}
+		return TaskPlans;
+	}
+	
 	@RequestMapping(value = "/day-plans-execution-summary/downloadxls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public void downloadXls(@RequestParam("employeePid") String employeePid,
 			@RequestParam(required = true, name = "startDate") LocalDate startDate,

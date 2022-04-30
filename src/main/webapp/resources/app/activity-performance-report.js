@@ -116,11 +116,10 @@ if (!this.ActivityPerformanceReport) {
 				targetTotal += targets[i].targetNumber;
 				achivedTotal += targets[i].achivedNumber;
 			}
-			targetRow += "<td>"+targetTotal +"</td>";
-			achivedRow += "<td>"+ achivedTotal +"</td>";
+			performanceRow += "<td>"+targetTotal +"</td>";
+			performanceRow += "<td>"+ achivedTotal +"</td>";
 			
-			performanceRow += targetRow += achivedRow;
-			
+	
 			var achivedPercentage = Math.round((achivedTotal / targetTotal) * 100);
 			achivedPercentage =	achivedPercentage > 0 ? achivedPercentage : 0;
 			achivedPercentage =	achivedPercentage < 100 ? achivedPercentage :100;
@@ -131,6 +130,7 @@ if (!this.ActivityPerformanceReport) {
 			}else{
 			performanceRow += "<td style='color: white;background-color: red;'>"+ achivedPercentage+"%" +"</td>";
 			}
+			performanceRow += targetRow += achivedRow;
 			performanceRow += "</tr>"
 		});
 		$("#tblBody").html(performanceRow);

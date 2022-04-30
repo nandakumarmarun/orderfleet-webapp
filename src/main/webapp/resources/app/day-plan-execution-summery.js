@@ -62,6 +62,7 @@ if (!this.DayPlanExecutionSummery) {
 			method : 'GET',
 			data : {
 				employeePid : $("#dbEmployee").val(),
+				fillterBy : $("#slt_status").val(),
 				startDate : startDate,
 				endDate : endDate
 			},
