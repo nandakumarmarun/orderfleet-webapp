@@ -22,6 +22,8 @@ import com.orderfleet.webapp.domain.User;
 public interface PunchOutRepository extends JpaRepository<PunchOut, Long> {
 	
 	Optional<PunchOut> findOneByImageRefNo(String imageRefNo);
+	
+	Optional<PunchOut> findOneByPid(String pid);
 
 	@Query("select pncout from PunchOut pncout where pncout.company.id = ?#{principal.companyId} and pncout.attendance.pid = ?1")
 	Optional<PunchOut> findIsAttendancePresent(String attendancepid);

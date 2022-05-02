@@ -38,7 +38,13 @@ public class LoginLogoutDTO {
 	private LocalDate attendanceDay;
 	private String punchoutRemarks;
 	private String punchoutStatus;
-
+	private double attendaceOdooMeter;
+	private double punchoutOdoMeter;
+	private String vehicleType;
+	private double totalOdoMeter;
+	private String attendancePid;
+	private String punchoutPid;
+	
 	public LoginLogoutDTO() {
 		super();
 	}
@@ -86,7 +92,15 @@ public class LoginLogoutDTO {
 		this.imageRefNo = attendance.getImageRefNo();
 		this.punchoutServerDate = punchout.getCreatedDate();
 		this.punchoutClientDate = punchout.getPunchOutDate();
-
+		this.punchoutOdoMeter = punchout.getOodoMeter();
+		this.attendaceOdooMeter = attendance.getOodoMeter();
+		this.attendancePid = attendance.getPid();
+		this.punchoutPid = punchout.getPid();
+				
+		if(attendance.getDistanceFare() != null) {
+			this.vehicleType = attendance.getDistanceFare().getVehicleType();
+		}
+		
 		if (attendance.getFiles().size() > 0) {
 			this.imageButtonVisible = true;
 		}
@@ -267,6 +281,60 @@ public class LoginLogoutDTO {
 
 	public void setPunchoutStatus(String punchoutStatus) {
 		this.punchoutStatus = punchoutStatus;
+	}
+	
+	
+
+	public double getAttendaceOdooMeter() {
+		return attendaceOdooMeter;
+	}
+
+	public void setAttendaceOdooMeter(double attendaceOdooMeter) {
+		this.attendaceOdooMeter = attendaceOdooMeter;
+	}
+
+	public double getPunchoutOdoMeter() {
+		return punchoutOdoMeter;
+	}
+
+	public void setPunchoutOdoMeter(double punchoutOdoMeter) {
+		this.punchoutOdoMeter = punchoutOdoMeter;
+	}
+	
+	
+
+	public double getTotalOdoMeter() {
+		return totalOdoMeter;
+	}
+
+	public void setTotalOdoMeter(double totalOdoMeter) {
+		this.totalOdoMeter = totalOdoMeter;
+	}
+
+	public String getVehicleType() {
+		return vehicleType;
+	}
+
+	public void setVehicleType(String vehicleType) {
+		this.vehicleType = vehicleType;
+	}
+	
+	
+
+	public String getAttendancePid() {
+		return attendancePid;
+	}
+
+	public void setAttendancePid(String attendancePid) {
+		this.attendancePid = attendancePid;
+	}
+
+	public String getPunchoutPid() {
+		return punchoutPid;
+	}
+
+	public void setPunchoutPid(String punchoutPid) {
+		this.punchoutPid = punchoutPid;
 	}
 
 	@Override

@@ -148,12 +148,17 @@
 						<th>Attendance Status</th>
 						<th>Attendance Client Date</th>
 						<th>Attendance Server Date</th>
+						<th>Attendance OdoMeter Reading</th>
 						<th>Attendance Remarks</th>
+						<th>Vehicle Type</th>
 						<th>Punch Out Status</th>
 						<th>Punch Out Client Date</th>
 						<th>Punch Out Server Date</th>
+						<th>Punch Out OdoMeter Reading</th>
 						<th>Punch Out Remarks</th>
-						
+						<th>Total OdoMeter Reading</th>
+						<th>View Attendance Image</th>
+						<th>View PunchOut Image</th>
 					</tr>
 				</thead>
 				<tbody id="tBodyLoginLogOut">
@@ -172,7 +177,7 @@
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal"
 							aria-label="Close">
-							<span aria-hidden="true">&times;</span>
+								 
 						</button>
 						<h4 class="modal-title" id="viewModalLabel">Attendance Images</h4>
 					</div>

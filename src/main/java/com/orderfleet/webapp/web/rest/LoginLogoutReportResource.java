@@ -39,11 +39,13 @@ import com.google.common.io.Files;
 import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.File;
+import com.orderfleet.webapp.domain.PunchOut;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AttendanceStatus;
 import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
+import com.orderfleet.webapp.repository.PunchOutRepository;
 import com.orderfleet.webapp.repository.RootPlanDetailRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -90,6 +92,9 @@ public class LoginLogoutReportResource {
 
 	@Inject
 	private FileManagerService fileManagerService;
+	
+	@Inject 
+    private	PunchOutRepository punchOutRepository;
 
 	/**
 	 * GET /attendance-report : get attendance list.
@@ -206,6 +211,77 @@ public class LoginLogoutReportResource {
 		return new ResponseEntity<>(formFileDTOs, HttpStatus.OK);
 
 	}
+	
+	@Timed
+	@RequestMapping(value = "/loginlogout-report/all/PunchOutImages/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<FormFileDTO>> getPunchOutImages(@PathVariable String pid) {
+		log.debug("Web request to get Attendance images by pid : {}", pid);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "ATT_QUERY_122" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get the one by Pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		Optional<PunchOut> optPunchOut = punchOutRepository.findOneByPid(pid);
+		 String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
+		PunchOut punchOut = new PunchOut();
+
+		List<FormFileDTO> formFileDTOs = new ArrayList<>();
+		if (optPunchOut.isPresent()) {
+			punchOut = optPunchOut.get();
+		}
+		if (punchOut.getFiles().size() > 0) {
+			FormFileDTO formFileDTO = new FormFileDTO();
+			String formName = punchOut.getUser().getFirstName();
+			Optional<EmployeeProfile> opEmployee = employeeProfileRepository
+					.findByUserPid(punchOut.getUser().getPid());
+			if (opEmployee.isPresent()) {
+				formName = formName + " " + opEmployee.get().getName();
+			}
+			formFileDTO.setFormName(formName);
+			formFileDTO.setFiles(new ArrayList<>());
+			Set<File> files = punchOut.getFiles();
+			for (File file : files) {
+				FileDTO fileDTO = new FileDTO();
+				fileDTO.setFileName(file.getFileName());
+				fileDTO.setMimeType(file.getMimeType());
+				java.io.File physicalFile = this.fileManagerService.getPhysicalFileByFile(file);
+				if (physicalFile.exists()) {
+					try {
+						fileDTO.setContent(Files.toByteArray(physicalFile));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				formFileDTO.getFiles().add(fileDTO);
+			}
+			formFileDTOs.add(formFileDTO);
+		}
+		return new ResponseEntity<>(formFileDTOs, HttpStatus.OK);
+
+	}
 
 	private List<LoginLogoutDTO> getFilterData(String employeePid, String attStatus, LocalDate fDate, LocalDate tDate,
 			boolean inclSubordinate) {
@@ -241,12 +317,15 @@ public class LoginLogoutReportResource {
 
 					AttendanceDTO attDto = attendanceExists.get();
 
+					loginlogoutDTO.setAttendancePid(attDto.getPid());
 					loginlogoutDTO.setEmployeeName(employee.getName());
 					loginlogoutDTO.setAttendanceStatus(attDto.getAttendanceStatus().toString());
 					loginlogoutDTO.setPlannedDate(attDto.getPlannedDate());
 					loginlogoutDTO.setCreatedDate(attDto.getCreatedDate());
+					loginlogoutDTO.setAttendaceOdooMeter(attDto.getOodoMeter());
+					loginlogoutDTO.setVehicleType(attDto.getVehicleType());					
 					loginlogoutDTO.setRemarks(attDto.getRemarks());
-
+					loginlogoutDTO.setImageButtonVisible(true);
 				} else {
 					loginlogoutDTO.setEmployeeName(employee.getName());
 					loginlogoutDTO.setAttendanceStatus("NOT MARKED");
@@ -256,15 +335,22 @@ public class LoginLogoutReportResource {
 
 				if (punchExists.isPresent()) {
 					PunchOutDTO pnchDto = punchExists.get();
-
+					loginlogoutDTO.setPunchoutPid(pnchDto.getPid());
 					loginlogoutDTO.setPunchoutClientDate(pnchDto.getCreatedDate());
 					loginlogoutDTO.setPunchoutServerDate(pnchDto.getPunchOutDate());
 					loginlogoutDTO.setPunchoutRemarks(pnchDto.getPunchOutRemarks());
+					loginlogoutDTO.setPunchoutOdoMeter(pnchDto.getOodoMeter());
+					if(attendanceExists.isPresent()) {
+					loginlogoutDTO.setTotalOdoMeter(attendanceExists.get().getOodoMeter() + pnchDto.getOodoMeter());
+					}
+					
 					loginlogoutDTO.setPunchoutStatus("MARKED");
 				} else {
 					loginlogoutDTO.setPunchoutStatus("NOT MARKED");
 					loginlogoutDTO.setPunchoutRemarks("");
 				}
+				
+				
 
 				loginlogoutDtos.add(loginlogoutDTO);
 			}

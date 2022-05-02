@@ -114,8 +114,25 @@ if (!this.LoginLogOut) {
 						.each(
 							loginLogOutList,
 							function(index, loginLogOut) {
+								
+								var content = "";
+								var pcontent = "";
 
-
+								if (loginLogOut.imageButtonVisible) {
+									content = "<td><button type='button' class='btn btn-info' onclick='LoginLogOut.showModalPopup($(\"#imagesModal\"),\""
+											+ loginLogOut.attendancePid
+											+ "\",0);'>Attendance Images</button></td>";
+								} else {
+									content = "<td></td>";
+								}
+								
+								if (loginLogOut.imageButtonVisible) {
+									pcontent = "<td><button type='button' class='btn btn-info' onclick='LoginLogOut.showModalPopupPunchOut($(\"#imagesModal\"),\""
+											+ loginLogOut.punchoutPid
+											+ "\",0);'>Punchout Images</button></td>";
+								} else {
+									pcontent = "<td></td>";
+								}
 								$('#tBodyLoginLogOut')
 									.append(
 										"<tr><td>"
@@ -135,8 +152,13 @@ if (!this.LoginLogOut) {
 											loginLogOut.createdDate,
 											'MMM DD YYYY, h:mm:ss a')
 										+ "</td><td>"
+										+ loginLogOut.attendaceOdooMeter
+										+ "</td><td>"
 										+ (loginLogOut.remarks == null ? ""
 											: loginLogOut.remarks)
+										+ "</td><td>"
+										+ (loginLogOut.vehicleType == null ? ""
+											: loginLogOut.vehicleType)	
 										+ "</td><td>"
 										+ loginLogOut.punchoutStatus
 										+ "</td><td>"
@@ -148,9 +170,16 @@ if (!this.LoginLogOut) {
 											loginLogOut.punchoutServerDate,
 											'MMM DD YYYY, h:mm:ss a')
 										+ "</td><td>"
+										+ loginLogOut.punchoutOdoMeter
+										+ "</td><td>"
 										+ (loginLogOut.punchoutRemarks == null ? ""
 											: loginLogOut.punchoutRemarks)
-										+ "</td></tr>");
+										+ "</td><td>"
+										+ loginLogOut.totalOdoMeter
+										+ "</td>"
+										+ content
+										+ pcontent
+										+ "</tr>");
 							});
 				}
 			});
@@ -188,7 +217,7 @@ if (!this.LoginLogOut) {
 	function showAttendanceImage(pid) {
 		$
 			.ajax({
-				url: attendanceReportContextPath + "/images/" + pid,
+				url: loginlogoutReportContextPath + "/images/" + pid,
 				method: 'GET',
 				success: function(filledFormFiles) {
 
@@ -223,6 +252,54 @@ if (!this.LoginLogOut) {
 			});
 	}
 
+	LoginLogOut.showModalPopupPunchOut = function(el, pid, action) {
+		if (pid) {
+			switch (action) {
+				case 0:
+					showPunchOutImage(pid);
+					break;
+			}
+		}
+		el.modal('show');
+	}
+
+	function showPunchOutImage(pid) {
+		$
+			.ajax({
+				url: loginlogoutReportContextPath + "/PunchOutImages/" + pid,
+				method: 'GET',
+				success: function(filledFormFiles) {
+
+					$('#divAttendanceImages').html("");
+					$
+						.each(
+							filledFormFiles,
+							function(index, filledFormFile) {
+								var table = '<table class="table  table-striped table-bordered"><tr><td style="font-weight: bold;">'
+									+ filledFormFile.formName
+									+ '</td></tr>';
+								$
+									.each(
+										filledFormFile.files,
+										function(index,
+											file) {
+											table += '<tr><th>'
+												+ file.fileName
+												+ '</th></tr>';
+											table += '<tr><td><img width="100%" src="data:image/png;base64,'
+												+ file.content
+												+ '"/></td></tr>';
+										});
+								table += '</table>';
+								$('#divAttendanceImages')
+									.append(table);
+							});
+				},
+				error: function(xhr, error) {
+					onError(xhr, error);
+				}
+			});
+	}
 
 	function searchTable(inputVal) {
 		var table = $('#tBodyAttendanceReport');

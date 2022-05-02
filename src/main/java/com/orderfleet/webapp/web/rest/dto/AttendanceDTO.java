@@ -44,6 +44,7 @@ public class AttendanceDTO {
 	private double oodoMeter;
 	private String distanceFarePid;
 	private String imageRefNo;
+	private String vehicleType;
 	private Boolean imageButtonVisible = Boolean.FALSE;;
 
 	public AttendanceDTO() {
@@ -106,6 +107,10 @@ public class AttendanceDTO {
 		if(attendance.getDistanceFare() != null) {
 			this.distanceFarePid = attendance.getDistanceFare().getPid();
 		}
+		if(attendance.getDistanceFare() != null) {
+			this.vehicleType = attendance.getDistanceFare().getVehicleType();
+		}
+		
 		if (attendance.getAttendanceStatusSubgroup() != null) {
 			this.attendanceSubGroupId = attendance.getAttendanceStatusSubgroup().getId();
 			this.attendanceSubGroupName = attendance.getAttendanceStatusSubgroup().getName();
@@ -365,6 +370,15 @@ public class AttendanceDTO {
 
 	public void setDistanceFarePid(String distanceFarePid) {
 		this.distanceFarePid = distanceFarePid;
+	}
+
+	
+	public String getVehicleType() {
+		return vehicleType;
+	}
+
+	public void setVehicleType(String vehicleType) {
+		this.vehicleType = vehicleType;
 	}
 
 	@Override
