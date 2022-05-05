@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -24,8 +25,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.EmployeeProfileHistory;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
+import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
+import com.orderfleet.webapp.repository.EmployeeHierarchyRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -68,9 +74,15 @@ public class LiveTrackingController {
 
 	@Inject
 	private GeoLocationService geoLocationService;
-	
+
 	@Inject
 	private UserRepository userRepository;
+
+	@Inject
+	private EmployeeProfileRepository employeeRepository;
+
+	@Inject
+	private EmployeeHierarchyRepository employeeHierarchyRepository;
 
 	@RequestMapping("/live-tracking")
 	public String executives(Model model) {
@@ -108,19 +120,14 @@ public class LiveTrackingController {
 	public @ResponseBody List<LiveTrackingDTO> getUsersDetails(
 			@RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 		// get user under current users
-		List<EmployeeProfileDTO> dashboardEmployees;
-//		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
-		List<Long> dashBoarduserId = userRepository.FindAllUserByDashboardUserIdInAndCompanyId(companyId).stream().map(data ->  data.getId()).collect(Collectors.toList());
-		log.info("No: subordinate users :" + dashBoarduserId);
-		if (dashBoarduserId.isEmpty()) {
-			dashboardEmployees = employeeProfileService.findAllByCompany();
-		} else {
-			dashboardEmployees = employeeProfileService.findAllEmployeeByUserIdsIn(dashBoarduserId);
-		}
-		
+
+		List<EmployeeProfileDTO> employees;
+		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+
+		employees = employeeProfileService.findAllEmployeeByUserIdsIn(userIds);
+
 		List<LiveTrackingDTO> liveTrackingDTOs = new ArrayList<>();
-		dashboardEmployees.forEach(employee -> {
+		employees.forEach(employee -> {
 			LiveTrackingDTO liveTrackingDTO = new LiveTrackingDTO();
 			liveTrackingDTO.setEmployeeName(employee.getName());
 			liveTrackingDTO.setUserPid(employee.getUserPid());

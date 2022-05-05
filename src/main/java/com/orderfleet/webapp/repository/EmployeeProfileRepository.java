@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 
 /**
  * Spring Data JPA repository for the EmployeeProfile entity.
@@ -113,5 +114,13 @@ public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile
 	List<Long> findAllUserIdsByActivatedAndCompanyId(boolean activated);
 
 	@Query("select employeeProfile.id,employeeProfile.name from EmployeeProfile employeeProfile where employeeProfile.company.id = ?#{principal.companyId} and employeeProfile.id IN ?1")
-	List<Object[]> findByEmpIdIn(Set<Long> ids);
+	List<Object[]> findByEmpIdIn(Set<Long> employeeIds);
+	
+	@Query("select employeeProfile.id from EmployeeProfile employeeProfile where employeeProfile.user.id in ?1 and employeeProfile.company.id = ?2")
+     Set<Long> getAllByUserIdInAndCompanyId(List<Long> id, Long companyId);
+	
+	
+	
+	
+
 }
