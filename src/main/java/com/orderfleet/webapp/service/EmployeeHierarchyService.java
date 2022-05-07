@@ -99,4 +99,6 @@ public interface EmployeeHierarchyService {
 	
 	
 	List<Long> getEmployeeSubordinateEmployeeIds(String employeePid);
+
+	List<Long> getCurrentUsersSubordinateIdsForLiveTracking();
 }

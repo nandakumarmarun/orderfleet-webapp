@@ -1,6 +1,7 @@
+
 package com.orderfleet.webapp.web.rest;
 
-import java.math.BigDecimal;
+ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +123,7 @@ public class LiveTrackingController {
 		// get user under current users
 
 		List<EmployeeProfileDTO> employees;
-		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIdsForLiveTracking();
 
 		employees = employeeProfileService.findAllEmployeeByUserIdsIn(userIds);
 
