@@ -341,7 +341,7 @@ public class LoginLogoutReportResource {
 					loginlogoutDTO.setPunchoutRemarks(pnchDto.getPunchOutRemarks());
 					loginlogoutDTO.setPunchoutOdoMeter(pnchDto.getOodoMeter());
 					if(attendanceExists.isPresent()) {
-					loginlogoutDTO.setTotalOdoMeter(attendanceExists.get().getOodoMeter() + pnchDto.getOodoMeter());
+					loginlogoutDTO.setTotalOdoMeter(pnchDto.getOodoMeter() - attendanceExists.get().getOodoMeter());
 					}
 					
 					loginlogoutDTO.setPunchoutStatus("MARKED");

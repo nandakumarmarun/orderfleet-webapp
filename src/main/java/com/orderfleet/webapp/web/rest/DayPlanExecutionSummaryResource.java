@@ -208,7 +208,6 @@ public class DayPlanExecutionSummaryResource {
 						List<ExecutiveTaskPlan> taskPlans = new ArrayList<>();
 						
 						if(!fillterBy.trim().equalsIgnoreCase("ALL")) {
-							System.out.println("hi");
 							taskPlans = fillterBytaskPlan(fillterBy,convertedTaskPlans);
 						}
 						
@@ -307,7 +306,6 @@ public class DayPlanExecutionSummaryResource {
 	
 	public List<ExecutiveTaskPlan> fillterBytaskPlan(String TaskPlanStatus,List<ExecutiveTaskPlan> convertedTaskPlans) {
 		List<ExecutiveTaskPlan> TaskPlans = new ArrayList<>();
-		System.out.println("enterd"+TaskPlanStatus);
 		if(TaskPlanStatus.trim().equalsIgnoreCase("CREATED")) {
 			TaskPlans = convertedTaskPlans.stream().filter(a->a.getTaskPlanStatus().toString().equals("CREATED")).collect(Collectors.toList());
 		} 

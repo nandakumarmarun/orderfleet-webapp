@@ -156,7 +156,7 @@
 						<th>Punch Out Server Date</th>
 						<th>Punch Out OdoMeter Reading</th>
 						<th>Punch Out Remarks</th>
-						<th>Total OdoMeter Reading</th>
+						<th>Total Kilometer Reading</th>
 						<th>View Attendance Image</th>
 						<th>View PunchOut Image</th>
 					</tr>
