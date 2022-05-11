@@ -38,9 +38,11 @@ import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.ProductNameTextSettingsRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.UserRepository;
@@ -91,6 +93,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
 
 	/**
 	 * Save a inventoryVoucherHeader.
@@ -242,36 +247,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public Optional<InventoryVoucherHeaderDTO> findOneByPid(String pid) {
 		log.debug("Request to get InventoryVoucherHeader by pid : {}", pid);
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "INV_QUERY_212" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get one inv Voucher by pid";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 		Optional<InventoryVoucherHeaderDTO> ivDTO = inventoryVoucherHeaderRepository.findOneByPid(pid)
 				.map(InventoryVoucherHeaderDTO::new);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
 		return ivDTO;
 	}
 
@@ -279,39 +258,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndDateBetween(LocalDateTime fromDate,
 			LocalDateTime toDate, List<Document> documents) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-		String id = "INV_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get all by companyId and date between";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		Long start = System.nanoTime();
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate, documents);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
 
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
 		return inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new).collect(Collectors.toList());
 	}
 
@@ -319,38 +269,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdUserPidAndDateBetween(String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-		String id = "INV_QUERY_106" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get all by companyIdUserPid and date between";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		Long start = System.nanoTime();
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fromDate, toDate, documents);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 				.collect(Collectors.toList());
 		return result;
@@ -360,39 +282,11 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdAccountPidAndDateBetween(String accountPid,
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-		String id = "INV_QUERY_107" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get all by compIdAccountPid and Date Between";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		Long start = System.nanoTime();
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAccountPidAndDateBetweenOrderByCreatedDateDesc(accountPid, fromDate, toDate,
 						documents);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 				.collect(Collectors.toList());
 		return result;
@@ -402,39 +296,11 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdUserPidAccountPidAndDateBetween(String userPid,
 			String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-		String id = "INV_QUERY_108" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get all by compId UserPidAccountPid and date between";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		Long start = System.nanoTime();
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdUserPidAccountPidAndDateBetweenOrderByCreatedDateDesc(userPid, accountPid, fromDate,
 						toDate, documents);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 				.collect(Collectors.toList());
 		return result;
@@ -448,39 +314,11 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				.findAccountProfileByLocationPid(locationPid);
 		List<InventoryVoucherHeader> AllAccountsInventoryVoucherHeaders = new ArrayList<>();
 		for (AccountProfileDTO accountProfileDTO : allAccounts) {
-			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-			String id = "INV_QUERY_107" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description = "get all by compIdAccountPid and Date Between";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			Long start = System.nanoTime();
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAccountPidAndDateBetweenOrderByCreatedDateDesc(accountProfileDTO.getPid(),
 							fromDate, toDate, documents);
-			String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+
 			AllAccountsInventoryVoucherHeaders.addAll(inventoryVoucherHeaders);
 		}
 		List<InventoryVoucherHeaderDTO> result = AllAccountsInventoryVoucherHeaders.stream()
@@ -496,39 +334,11 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				.findAccountProfileByLocationPid(locationPid);
 		List<InventoryVoucherHeader> AllAccountsInventoryVoucherHeaders = new ArrayList<>();
 		for (AccountProfileDTO accountProfileDTO : allAccounts) {
-			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-			String id = "INV_QUERY_108" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description = "get all by compId UserPidAccountPid and date between";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			Long start = System.nanoTime();
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdUserPidAccountPidAndDateBetweenOrderByCreatedDateDesc(userPid,
 							accountProfileDTO.getPid(), fromDate, toDate, documents);
-			String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+
 			AllAccountsInventoryVoucherHeaders.addAll(inventoryVoucherHeaders);
 		}
 		List<InventoryVoucherHeaderDTO> result = AllAccountsInventoryVoucherHeaders.stream()
@@ -538,37 +348,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 	@Override
 	public void updateInventoryVoucherHeaderStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "INV_QUERY_212" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get one inv Voucher by pid";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 
 		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
 				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
 
 		inventoryVoucherHeader.setStatus(true);
 		inventoryVoucherHeader.setTallyDownloadStatus(inventoryVoucherHeaderDTO.getTallyDownloadStatus());
@@ -578,41 +360,13 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 	@Override
 	public void updateInventoryVoucherHeaderSalesManagementStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "INV_QUERY_212" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get one inv Voucher by pid";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
 				.findOneByPid(inventoryVoucherHeaderDTO.getPid()).get();
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
 
 		inventoryVoucherHeader.setSalesManagementStatus(inventoryVoucherHeaderDTO.getSalesManagementStatus());
 		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
 	}
-
 
 	@Override
 	public void updateInventoryVoucherHeaderSalesOrderStatus(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
@@ -628,37 +382,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	public List<InventoryVoucherHeaderDTO> findAllByExecutiveTaskExecutionPid(String executiveTaskExecutionPid) {
 		log.debug("Request to get InventoryVoucherHeader by executive task execution Pid : {}",
 				executiveTaskExecutionPid);
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-		String id = "INV_QUERY_121" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get all by executive task execution Pid ";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByExecutiveTaskExecutionPid(executiveTaskExecutionPid);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 				.collect(Collectors.toList());
 		return result;
@@ -666,35 +393,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 	@Override
 	public Set<Document> findDocumentsByUserIdIn(List<Long> userIds) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "INV_QUERY_126" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get doc by UserIdIn";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 		Set<Document> documents = inventoryVoucherHeaderRepository.findDocumentsByUserIdIn(userIds);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
 		return documents;
 	}
 
@@ -703,36 +404,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 		if (status.equals("processed")) {
-			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "INV_QUERY_136" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description = "get all by compId dateBetween and status";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAndDateBetweenAndStatusOrderByCreatedDateDesc(fromDate, toDate, documents, true);
-			String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
 
 		} else {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
@@ -749,37 +423,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			String userPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 		if (status.equals("processed")) {
-			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "INV_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description = "get all by compId UserPid dateBetween and status";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdUserPidAndDateBetweenAndStatusOrderByCreatedDateDesc(userPid, fromDate, toDate,
 							documents, true);
-			String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
 
 		} else {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
@@ -796,37 +443,11 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 		if (status.equals("processed")) {
-			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "INV_QUERY_138" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description = "get all by compIdAccPid dateBetween and status";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAccountPidAndDateBetweenAndStatusOrderByCreatedDateDesc(accountPid, fromDate,
 							toDate, documents, true);
-			String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+
 		} else {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdAccountPidAndDateBetweenAndStatusOrderByCreatedDateDesc(accountPid, fromDate,
@@ -842,37 +463,11 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			String userPid, String accountPid, LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
 		if (status.equals("processed")) {
-			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "INV_QUERY_139" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description = "get all by compIdAccPid UserPid dateBetween and status";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdUserPidAccountPidAndDateBetweenAndStatusOrderByCreatedDateDesc(userPid,
 							accountPid, fromDate, toDate, documents, true);
-			String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+
 		} else {
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 					.findAllByCompanyIdUserPidAccountPidAndDateBetweenAndStatusOrderByCreatedDateDesc(userPid,
@@ -886,36 +481,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Override
 	public List<InventoryVoucherHeaderDTO> findAllByDocumentPidAndDateBetweenOrderByCreatedDateDesc(
 			LocalDateTime fromDate, LocalDateTime toDate, String documentPid) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "INV_QUERY_141" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get all by DocPid and date between order";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByDocumentPidAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate, documentPid);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 				.collect(Collectors.toList());
 		boolean compConfig = getCompanyCofig();
@@ -932,38 +501,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Override
 	public List<InventoryVoucherHeaderDTO> findAllByDocumentPidInAndDateBetweenOrderByCreatedDateDesc(
 			LocalDateTime fromDate, LocalDateTime toDate, List<Document> documents) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-		String id = "INV_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get all by companyId and date between";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		Long start = System.nanoTime();
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndDateBetweenOrderByCreatedDateDesc(fromDate, toDate, documents);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 				.collect(Collectors.toList());
 		boolean compConfig = getCompanyCofig();
@@ -992,36 +533,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	@Override
 	@Transactional(readOnly = true)
 	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndInventoryPidIn(List<String> inventoryPids) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "INV_QUERY_154" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get by CompId and InventoryPidIn";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 		List<InventoryVoucherHeader> inventoryVoucherHeaders = inventoryVoucherHeaderRepository
 				.findAllByCompanyIdAndInventoryPidIn(inventoryPids);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
 
 		List<InventoryVoucherHeaderDTO> result = inventoryVoucherHeaders.stream().map(InventoryVoucherHeaderDTO::new)
 				.collect(Collectors.toList());
@@ -1042,70 +556,17 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 		List<String> inventoryPids = inventoryVoucherHeaders.stream().map(inv -> inv.getPid())
 				.collect(Collectors.toList());
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "INV_QUERY_155" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "Updating the inv Voucher header status using pid";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 		inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderStatusUsingPid(inventoryPids);
 
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
 	}
 
 	@Override
 	public List<Object[]> findByCompanyIdAndInventoryPidIn(List<String> inventoryPids) {
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "INV_QUERY_176" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get Iv header by PidIn";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 		List<Object[]> inventoryObjectArray = inventoryVoucherHeaderRepository
 				.findInventoryVouchersByPidIn(inventoryPids);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
 		return inventoryObjectArray;
 
 	}
@@ -1120,69 +581,15 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 			Set<Long> stockLocationIds = new HashSet<>();
 			stockLocationIds = stockLocations.stream().map(sl -> sl.getId()).collect(Collectors.toSet());
-			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "INV_QUERY_179" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description = "Getting all stock details by stockLocations";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetailsByStockLocations(companyId,
 					userId, fromDate, toDate, stockLocationIds);
-			String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
 
 			log.info("in stocklocation based " + inventoryVoucherHeaders.size());
 		} else {
-			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "INV_QUERY_180" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description = "Get all stock details";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllStockDetails(companyId, userId, fromDate,
 					toDate);
-			String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
 
 			log.info("in user  based");
 		}
@@ -1193,33 +600,57 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				.findAllByCompanyIdAndEnabledTrue(companyId);
 
 		List<StockDetailsDTO> stockDetailsDTOs = new ArrayList<>();
+		List<Long> DocumentIds = new ArrayList<>();
+		for (Object[] obj : inventoryVoucherHeaders) {
+
+			Long docIds = Long.parseLong(obj[2].toString());
+
+			DocumentIds.add(docIds);
+		}
+
+		List<Document> documents = primarySecondaryDocumentRepository.findDocumentsByDocIdInAndVoucherType(DocumentIds,
+				VoucherType.DAMAGE);
+
 		for (Object[] obj : inventoryVoucherHeaders) {
 			StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
 
-			stockDetailsDTO.setProductName(obj[2] != null ? obj[2].toString() : "");
+			stockDetailsDTO.setProductName(obj[3] != null ? obj[3].toString() : "");
 
 			double opStock = 0.0;
 			double slStock = 0.0;
 			double freeQuantity = 0.0;
+			if (obj[6] != null) {
+				opStock = Double.parseDouble(obj[6].toString());
+
+			}
+
 			if (obj[5] != null) {
-				opStock = Double.parseDouble(obj[5].toString());
-//				log.info(obj[3] + " opStock : " + opStock);
+				slStock = Double.parseDouble(obj[5].toString());
 			}
 
-			if (obj[4] != null) {
-				slStock = Double.parseDouble(obj[4].toString());
-			}
-
-			if (obj[10] != null) {
-				freeQuantity = Double.parseDouble(obj[10].toString());
+			if (obj[11] != null) {
+				freeQuantity = Double.parseDouble(obj[11].toString());
 			}
 
 			double saledQuantity = slStock + freeQuantity;
 			stockDetailsDTO.setSaleStock(slStock);
 			stockDetailsDTO.setFreeQnty(freeQuantity);
 			stockDetailsDTO.setOpeningStock(opStock);
-			stockDetailsDTO.setSaledQuantity(saledQuantity);
+			if (documents.size() > 0) {
+				for (Document doc : documents) {
 
+					if (Long.parseLong(obj[2].toString()) == doc.getId()) {
+
+						stockDetailsDTO.setDamageQty(saledQuantity);
+
+					} else {
+
+						stockDetailsDTO.setSaledQuantity(saledQuantity);
+					}
+				}
+			} else {
+				stockDetailsDTO.setSaledQuantity(saledQuantity);
+			}
 			stockDetailsDTOs.add(stockDetailsDTO);
 		}
 		Map<String, List<StockDetailsDTO>> groupedList = stockDetailsDTOs.stream()
@@ -1230,7 +661,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		List<StockDetailsDTO> proccessedStockDetailsDTOs = new ArrayList<>();
 
 		log.info("Key set size = " + keySet.size() + "*******");
- 
+
 		for (String productName : keySet) {
 
 			Optional<ProductProfileDTO> opProductProfile = productProfileDtos.stream()
@@ -1243,11 +674,11 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			double openingStock = valuesList.get(0).getOpeningStock();
 			double saledQuantity = valuesList.stream()
 					.collect(Collectors.summingDouble((StockDetailsDTO::getSaledQuantity)));
-			double saleStock = valuesList.stream()
-					.collect(Collectors.summingDouble((StockDetailsDTO::getSaleStock)));
-			double freeQnty = valuesList.stream()
-					.collect(Collectors.summingDouble((StockDetailsDTO::getFreeQnty)));
-			double closingStock = openingStock - saledQuantity;
+			double saleStock = valuesList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getSaleStock)));
+			double freeQnty = valuesList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getFreeQnty)));
+			double damageQty = valuesList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getDamageQty)));
+
+			double closingStock = openingStock - (saledQuantity + damageQty);
 
 			if (opProductProfile.isPresent()) {
 				if (productNameTextSettings.size() > 0) {
@@ -1294,6 +725,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			stockDetailsDTO.setFreeQnty(freeQnty);
 			stockDetailsDTO.setOpeningStock(openingStock);
 			stockDetailsDTO.setSaledQuantity(saledQuantity);
+			stockDetailsDTO.setDamageQty(damageQty);
 			stockDetailsDTO.setClosingStock(closingStock);
 
 			proccessedStockDetailsDTOs.add(stockDetailsDTO);

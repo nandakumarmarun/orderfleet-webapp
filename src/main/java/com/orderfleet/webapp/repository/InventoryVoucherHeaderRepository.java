@@ -67,7 +67,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "INNER JOIN tbl_account_profile sap on sap.id = ivh.supplier_account_id where ivh.company_id = ?1  and ivh.send_sales_order_status = 'NOT_SENT' order by ivh.created_date desc";
 
 	public static final String STOCK_DETAILS = "select "
-			+ "ivh.created_by_id as users,ivh.created_date,pp.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
+			+ "ivh.created_by_id as users,ivh.created_date,ivh.document_id,pp.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
 			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity,pp.pid as productPid "
 			+ "from tbl_inventory_voucher_detail ivd "
 			+ "inner join tbl_inventory_voucher_header ivh on ivd.inventory_voucher_header_id = ivh.id "
@@ -78,8 +78,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "ivh.created_by_id in (?2) and ivh.created_date BETWEEN ?3 AND ?4 and "
 			+ "ivd.product_id = op.product_profile_id order by ivd.product_id";
 
+
 	public static final String STOCK_DETAILS_STOCKLOCATION_BASED = "select "
-			+ "ivh.created_by_id as users,ivh.created_date,pp.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
+			+ "ivh.created_by_id as users,ivh.created_date,̥ivh.document_id,PP.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
 			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity,pp.pid as productPid "
 			+ "from tbl_inventory_voucher_detail ivd "
 			+ "inner join tbl_inventory_voucher_header ivh on ivd.inventory_voucher_header_id = ivh.id "
@@ -88,6 +89,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "inner join tbl_product_profile pp on pp.id = ivd.product_id where ivh.company_id = ?1 and "
 			+ "ivh.created_by_id in (?2) and ivh.created_date BETWEEN ?3 AND ?4 and "
 			+ "ivd.product_id = op.product_profile_id order by ivd.product_id";
+	
 
 //	public static final String DOCUMENT_NUMBER = "SELECT iv.document_number_local,doc.pid,iv.created_date from tbl_inventory_voucher_header iv "
 //			+ "INNER JOIN tbl_company cmp on iv.company_id = cmp.id "

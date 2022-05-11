@@ -58,5 +58,8 @@ public interface PrimarySecondaryDocumentRepository extends JpaRepository<Primar
 	
 	@Query("select psd from PrimarySecondaryDocument psd where psd.voucherType in ?1 and psd.company.id = ?2")
 	List<PrimarySecondaryDocument> findByVoucherTypesAndCompany(List<VoucherType> voucherTypes, Long companyId);
+	
+	@Query("select psd.document from PrimarySecondaryDocument psd where psd.document.id in ?1 and psd.voucherType = ?2 ")
+	List<Document> findDocumentsByDocIdInAndVoucherType( List<Long> documentIds,VoucherType voucherType);
 
 }

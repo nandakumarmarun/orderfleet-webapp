@@ -26,6 +26,7 @@ public class StockDetailsDTO implements Cloneable {
 	private double saleStock;
 	private double freeQnty;
 	private double saledQuantity;
+	private double damageQty;
 	private double closingStock;
 
 	public StockDetailsDTO() {
@@ -109,6 +110,14 @@ public class StockDetailsDTO implements Cloneable {
 
 	public void setFreeQnty(double freeQnty) {
 		this.freeQnty = freeQnty;
+	}
+
+	public double getDamageQty() {
+		return damageQty;
+	}
+
+	public void setDamageQty(double damageQty) {
+		this.damageQty = damageQty;
 	}
 
 	@Override
