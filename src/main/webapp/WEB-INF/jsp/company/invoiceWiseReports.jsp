@@ -216,7 +216,7 @@
 							<th>Activity</th>
 							<th>Punch In</th>
 							<th>Client Date</th>
-							<th>Time Spend (hh:mm:ss)</th>
+							<th>Time Spend (hh:mm:ss:mmm)</th>
 							<th>Server Date</th>
 							<th>GPS Location</th>
 							<th>Enable/ Disable</th>

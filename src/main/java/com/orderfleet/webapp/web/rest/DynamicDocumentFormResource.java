@@ -382,6 +382,8 @@ public class DynamicDocumentFormResource {
 			@RequestParam("includeHeader") boolean isHeaderIncluded,
 			@RequestParam("includeAccount") boolean includeAccount) {
 		log.debug("filter dynamic document forms by documentPid : {} and formPid : {}", documentPid, formPid);
+		
+		log.debug("**********Employee Pid*************** :"+employeePid);
 
 		DateTimeFormatter fmt = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 		DateTimeFormatter date = DateTimeFormatter.ofPattern("MMM dd,yyyy");
@@ -610,7 +612,7 @@ public class DynamicDocumentFormResource {
 		if (employeeProfileDTO.getPid() != null) {
 			userPids.add(employeeProfileDTO.getUserPid());
 		} else {
-			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIdsForLiveTracking();
 			System.out.println("UserIds" + userIds.toString());
 			List<UserDTO> userDtoList = userService.findByUserIdIn(userIds);
 			userPids = userDtoList.stream().map(UserDTO::getPid).collect(Collectors.toList());

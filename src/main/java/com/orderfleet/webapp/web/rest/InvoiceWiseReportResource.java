@@ -1121,9 +1121,11 @@ public class InvoiceWiseReportResource {
 	}
 
 	public String findTimeSpend(LocalDateTime startTime, LocalDateTime endTime) {
+		System.out.println("Start date :"+startTime +" end time : "+endTime);
 		long hours = 00;
 		long minutes = 00;
 		long seconds = 00;
+		long milliseconds=00;
 		if (startTime != null && endTime != null) {
 			long years = startTime.until(endTime, ChronoUnit.YEARS);
 			startTime = startTime.plusYears(years);
@@ -1140,8 +1142,12 @@ public class InvoiceWiseReportResource {
 			startTime = startTime.plusMinutes(minutes);
 
 			seconds = startTime.until(endTime, ChronoUnit.SECONDS);
+			startTime = startTime.plusSeconds(seconds);
+			
+			milliseconds =startTime.until(endTime, ChronoUnit.MILLIS);
 		}
-		return hours + " : " + minutes + " : " + seconds;
+		System.out.println("Time spend :"+hours + " : " + minutes + " : " + seconds+":"+milliseconds);
+		return hours + " : " + minutes + " : " + seconds + ":"+milliseconds;
 
 	}
 
