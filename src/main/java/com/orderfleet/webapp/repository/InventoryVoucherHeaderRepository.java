@@ -80,7 +80,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 
 	public static final String STOCK_DETAILS_STOCKLOCATION_BASED = "select "
-			+ "ivh.created_by_id as users,ivh.created_date,̥ivh.document_id,PP.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
+			+ "ivh.created_by_id as users,ivh.created_date,ivh.document_id,PP.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
 			+ "op.quantity  as op_qty,sl.id,sl.name,ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity,pp.pid as productPid "
 			+ "from tbl_inventory_voucher_detail ivd "
 			+ "inner join tbl_inventory_voucher_header ivh on ivd.inventory_voucher_header_id = ivh.id "

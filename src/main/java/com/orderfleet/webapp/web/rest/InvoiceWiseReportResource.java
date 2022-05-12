@@ -828,6 +828,7 @@ public class InvoiceWiseReportResource {
 
 	}
 
+	
 	private List<String> getAccountPids(List<Long> userIds) {
 		List<AccountProfileDTO> allAccountDtos;
 		if (userIds.isEmpty()) {
@@ -1121,7 +1122,7 @@ public class InvoiceWiseReportResource {
 	}
 
 	public String findTimeSpend(LocalDateTime startTime, LocalDateTime endTime) {
-		System.out.println("Start date :"+startTime +" end time : "+endTime);
+		
 		long hours = 00;
 		long minutes = 00;
 		long seconds = 00;
@@ -1146,7 +1147,7 @@ public class InvoiceWiseReportResource {
 			
 			milliseconds =startTime.until(endTime, ChronoUnit.MILLIS);
 		}
-		System.out.println("Time spend :"+hours + " : " + minutes + " : " + seconds+":"+milliseconds);
+		
 		return hours + " : " + minutes + " : " + seconds + ":"+milliseconds;
 
 	}

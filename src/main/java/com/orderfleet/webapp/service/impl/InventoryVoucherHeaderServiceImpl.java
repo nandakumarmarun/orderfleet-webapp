@@ -607,10 +607,15 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 			DocumentIds.add(docIds);
 		}
-
-		List<Document> documents = primarySecondaryDocumentRepository.findDocumentsByDocIdInAndVoucherType(DocumentIds,
+              System.out.println("Doc Id :"+DocumentIds);
+              List<Document> documents=new ArrayList<>();
+              if(DocumentIds.size()!=0)
+              {
+		      documents = primarySecondaryDocumentRepository.findDocumentsByDocIdInAndVoucherType(DocumentIds,
 				VoucherType.DAMAGE);
-
+		
+              }
+              
 		for (Object[] obj : inventoryVoucherHeaders) {
 			StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
 
