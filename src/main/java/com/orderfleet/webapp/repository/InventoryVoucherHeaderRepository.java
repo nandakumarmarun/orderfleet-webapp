@@ -563,6 +563,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query(value = LAST_DOCUMENT_DATE, nativeQuery = true)
 	LocalDateTime lastDateWithCompanyUserDocument(String companyPid, String userPid, List<String> documentPids);
 
+	
 //	@Query(value = LAST_DOCUMENT_PID_DATE, nativeQuery = true)
 //	List<Object[]> lastDatesWithCompanyUserDocuments(String companyPid, String userPid, List<String> documentPids);
 
