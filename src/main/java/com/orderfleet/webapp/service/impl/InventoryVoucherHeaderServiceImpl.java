@@ -607,7 +607,6 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 			DocumentIds.add(docIds);
 		}
-              System.out.println("Doc Id :"+DocumentIds);
               List<Document> documents=new ArrayList<>();
               if(DocumentIds.size()!=0)
               {

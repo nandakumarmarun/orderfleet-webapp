@@ -612,8 +612,8 @@ public class DynamicDocumentFormResource {
 		if (employeeProfileDTO.getPid() != null) {
 			userPids.add(employeeProfileDTO.getUserPid());
 		} else {
-			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIdsForLiveTracking();
-			System.out.println("UserIds" + userIds.toString());
+			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+			System.out.println("UserIds=====" + userIds.size());
 			List<UserDTO> userDtoList = userService.findByUserIdIn(userIds);
 			userPids = userDtoList.stream().map(UserDTO::getPid).collect(Collectors.toList());
 		}
