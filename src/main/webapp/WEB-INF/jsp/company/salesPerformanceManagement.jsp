@@ -305,7 +305,7 @@
 
 						<div class="col-sm-6" style="margin-bottom: 20px;">
 							<div class="input-group">
-								<input type="text" class="form-control" placeholder="Search"
+								<input type="text" class="form-control" name="productSearch" placeholder="Search"
 									id="search" /> <span class="input-group-btn">
 									<button class="btn btn-default entypo-search" id="btnSearch"
 										type="button" style="font-size: 18px"

@@ -1073,8 +1073,10 @@ boolean compconfig= getCompanyCofig();
 
 			ivdDto.setUpdatedStatus(true);
 			ivdDto.setUpdatedRowTotal(updatedRowTotal);
+			ivdDto.setRowTotal(updatedRowTotal);
 			System.out.println(updatedRowTotal);
 			ivdDto.setUpdatedQty(quantity);
+			ivdDto.setQuantity(quantity);
 			ivdDto.setUpdatedsellingRate(Double.parseDouble(sellingrate));
 
 			inventoryVoucherHeaderDTO.setDocumentTotalUpdated(updatedDocTotal);
@@ -1087,7 +1089,7 @@ boolean compconfig= getCompanyCofig();
 			System.out.println("------------------------------------------------------------------------");
 			inventoryVoucherDetailService.updateInventoryVoucherDetail(ivdDto);
 			inventoryVoucherService.updateInventoryVoucherHeader(inventoryVoucherHeaderDTO);
-			
+
 			InventoryVoucherUpdateHistory inventoryVoucherUpdateHistory = new  InventoryVoucherUpdateHistory();
 			inventoryVoucherUpdateHistory.setPid(inventoryVoucherService.PID_PREFIX + RandomUtil.generatePid());
 			inventoryVoucherUpdateHistory.setQuantity(quantity);

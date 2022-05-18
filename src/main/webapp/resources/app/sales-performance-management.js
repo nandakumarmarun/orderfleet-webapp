@@ -1069,7 +1069,7 @@ if (!this.InventoryVoucher) {
 
 	InventoryVoucher.closeModalPopup = function(el) {
 		el.modal('hide');
-		$('#search').find("input[type=text], textarea").val("");
+		  $('#search').val('');
 	}
 
 	function addErrorAlert(message, key, data) {
