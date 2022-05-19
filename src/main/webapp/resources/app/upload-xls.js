@@ -10,7 +10,8 @@ if (!this.xlsFileUploader) {
 
 	var uploadXlsContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
-
+	
+	
 	$(document).ready(function() {
 
 		$('.selectpicker').selectpicker();
@@ -21,11 +22,18 @@ if (!this.xlsFileUploader) {
 		$('#uploadAccount').on('click', function() {
 			saveAccountXls();
 		});
+		
 		$('#assignProductColumnNumbers').on('click', function() {
 			assignProductColumnNumbers()
 		});
 		$('#uploadProduct').on('click', function() {
 			saveProductXls();
+		});
+		$('#assignInvoiceColumnNumbers').on('click', function() {
+			assignInvoiceColumnNumbers();
+		});
+		$('#uploadInvoice').on('click', function() {
+			saveInvoiceXls();
 		});
 	});
 
@@ -39,14 +47,26 @@ if (!this.xlsFileUploader) {
 		var cityNumber = $('#cityColumnNumber').val();
 		var locationNumber = $('#locationColumnNumber').val();
 		var pinNumber = $('#pinColumnNumber').val();
-		var phoneNumber = $('#phoneColumnNumber').val();
-		var eMailNumber = $('#eMailColumnNumber').val();
+		var phone1Number = $('#phoneColumnNumber').val();
+
+		var eMail1Number = $('#eMailColumnNumber').val();
+
 		var descriptionNumber = $('#descriptionColumnNumber').val();
 		var contactPersonNumber = $('#contactPersonColumnNumber').val();
-		var accountTypeColumnNumber = $('#accountTypeColumnNumber').val();
-		var territoryColumnNumber = $('#territoryColumnNumber').val();
-		var aliasColumnNumber = $("#aliasColumnNumber").val();
-		var closingBalanceColumnNumber = $("#closingBalanceColumnNumber").val();
+		var accountTypeNumber = $('#accountTypeColumnNumber').val();
+		var territoryNumber = $('#territoryColumnNumber').val();
+		var aliasNumber = $("#aliasColumnNumber").val();
+		var closingBalanceNumber = $("#closingBalanceColumnNumber").val();
+		var creditDaysNumber = $("#creditDaysColumnNumber").val();
+		var creditLimitNumber = $("#creditLimitColumnNumber").val();
+		var priceLevelNumber = $("#priceLevelColumnNumber").val();
+		var tinNoNumber = $("#tinNoColumnNumber").val();
+
+		var customerIdNumber = $("#customerIdColumnNumber").val();
+		var customerCodeNumber = $("#customerCodeColumnNumber").val();
+		var countryNumber = $("#countryColumnNumber").val();
+		var stateNumber = $("#stateColumnNumber").val();
+		var districtNumber = $("#districtColumnNumber").val();
 
 		if (nameNumber == '') {
 			$('#alertMessage').html("please assign name column number");
@@ -65,36 +85,74 @@ if (!this.xlsFileUploader) {
 		if (pinNumber == '') {
 			pinNumber = -1;
 		}
-		if (phoneNumber == '') {
-			phoneNumber = -1;
+		if (phone1Number == '') {
+			phone1Number = -1;
 		}
-		if (eMailNumber == '') {
-			eMailNumber = -1;
+
+		if (eMail1Number == '') {
+			eMail1Number = -1;
 		}
+
 		if (descriptionNumber == '') {
 			descriptionNumber = -1;
 		}
 		if (contactPersonNumber == '') {
 			contactPersonNumber = -1;
 		}
-		if (accountTypeColumnNumber == '') {
-			accountTypeColumnNumber = -1;
+		if (accountTypeNumber == '') {
+			accountTypeNumber = -1;
 		}
-		if (territoryColumnNumber == '') {
-			territoryColumnNumber = -1;
+		if (territoryNumber == '') {
+			territoryNumber = -1;
 		}
-		if (aliasColumnNumber == '') {
-			aliasColumnNumber = -1;
+		if (aliasNumber == '') {
+			aliasNumber = -1;
 		}
-		if (closingBalanceColumnNumber == '') {
-			closingBalanceColumnNumber = -1;
+		if (closingBalanceNumber == '') {
+			closingBalanceNumber = -1;
+		}
+		if (creditDaysNumber == '') {
+			creditDaysNumber = -1;
+		}
+		if (creditLimitNumber == '') {
+			creditLimitNumber = -1;
+		}
+		if (priceLevelNumber == '') {
+			priceLevelNumber = -1;
+		}
+		if (closingBalanceNumber == '') {
+			closingBalanceNumber = -1;
+		}
+		if (tinNoNumber == '') {
+			tinNoNumber = -1;
+		}
+		if (customerIdNumber == '') {
+			customerIdNumber = -1;
+		}
+		if (customerCodeNumber == '') {
+			customerCodeNumber = -1;
+		}
+		if (countryNumber == '') {
+			countryNumber = -1;
+		}
+		if (stateNumber == '') {
+			stateNumber = -1;
+		}
+		if (districtNumber == '') {
+			districtNumber = -1;
 		}
 		accountNumbers = nameNumber + "," + addressNumber + "," + cityNumber
-				+ "," + locationNumber + "," + pinNumber + "," + phoneNumber
-				+ "," + eMailNumber + "," + descriptionNumber + ","
-				+ contactPersonNumber + "," + accountTypeColumnNumber + ","
-				+ territoryColumnNumber + "," + aliasColumnNumber + ","
-				+ closingBalanceColumnNumber;
+				+ "," + locationNumber + "," + pinNumber + "," + phone1Number
+				+ "," + eMail1Number + "," + descriptionNumber + ","
+				+ contactPersonNumber + "," + accountTypeNumber + ","
+				+ territoryNumber + "," + aliasNumber + ","
+				+ closingBalanceNumber + "," + creditDaysNumber + ","
+				+ creditLimitNumber + "," + priceLevelNumber + ","
+				+ tinNoNumber + "," + customerIdNumber + ","
+				+ customerCodeNumber + "," + countryNumber + "," + stateNumber
+				+ "," + districtNumber;
+
+		console.log("Column numbers " + accountNumbers);
 		if (accountNumbers == '') {
 			$('#alertMessage').html("please assign column numbers");
 			$('#alertBox').modal("show");
@@ -141,8 +199,15 @@ if (!this.xlsFileUploader) {
 		var unitQuantityNumber = $('#productUnitQuantityColumnNumber').val();
 		var TaxRateNumber = $('#productTaxRateColumnNumber').val();
 		var sizeNumber = $('#productSizeColumnNumber').val();
-		var openingStockNumber = $('#productOpeningStockColumnNumber').val();
+	    var openingStockNumber = $('#openingStockColumnNumber').val();
 		var productGroupNumber = $('#productGroupColumnNumber').val();
+		var mrpNumber = $('#mrpColumnNumber').val();
+		var productCategoryNumber = $('#productCategoryColumnNumber').val();
+		var hsnCodeNumber = $('#hsnColumnNumber').val();
+		var productIdNumber = $('#productIdColumnNumber').val();
+		var compoundUnitNumber = $('#compoundUnitColumnNumber').val();
+		var productCodeNumber = $('#productCodeColumnNumber').val();
+		var unitsNumber =$('#unitsColumnNumber').val();
 
 		if (nameNumber == '') {
 			$('#alertMessage').html("please assign product name column number");
@@ -176,11 +241,35 @@ if (!this.xlsFileUploader) {
 		if (productGroupNumber == '') {
 			productGroupNumber = -1;
 		}
+		if (mrpNumber == '') {
+			mrpNumber = -1;
+		}
+		if (productCategoryNumber == '') {
+			productCategoryNumber = -1;
+		}
+		if (hsnCodeNumber == '') {
+			hsnCodeNumber = -1;
+		}
+		if (productIdNumber == '') {
+			productIdNumber = -1;
+		}
+		if (compoundUnitNumber == '') {
+			compoundUnitNumber = -1;
+		}
+		if (productCodeNumber == '') {
+			productCodeNumber = -1;
+		}
+		if (unitsNumber == '') {
+			unitsNumber = -1;
+		}
 
 		productNumbers = nameNumber + "," + alias + "," + descriptionNumber
 				+ "," + priceNumber + "," + skuNumber + ","
-				+ unitQuantityNumber + "," + TaxRateNumber + "," + sizeNumber
-				+ "," + openingStockNumber + "," + productGroupNumber;
+				+ unitQuantityNumber + "," + TaxRateNumber + "," + sizeNumber+ "," + openingStockNumber
+				 + "," + productGroupNumber + ","
+				+ mrpNumber + "," + productCategoryNumber + "," + hsnCodeNumber
+				+ "," + productIdNumber + "," + compoundUnitNumber + ","
+				+ productCodeNumber+","+unitsNumber;
 		if (productNumbers == '') {
 			$('#alertMessage').html("please assign column numbers");
 			$('#alertBox').modal("show");
@@ -213,6 +302,79 @@ if (!this.xlsFileUploader) {
 
 	}
 
+
+	
+	function saveInvoiceXls() {
+
+		$(".error-msg").html("Saving....");
+
+		var invoiceNumbers = "";
+		var nameNumber = $('#customerNameColumnNumber').val();
+		var customerIdNumber = 1;
+		var docNoNumber = $('#documentNoColumnNumber').val();
+		var docDateNumber = $('#documentDateColumnNumber').val();
+		var docAmountNumber = $('#documentAmountColumnNumber').val();
+		var balanceAmountNumber = $('#balanceAmountColumnNumber').val();
+
+		
+		if (nameNumber == '') {
+			$('#alertMessage').html("please assign name column number");
+			$('#alertBox').modal("show");
+			return false;
+		}
+		if (customerIdNumber == '') {
+			customerIdNumber = -1;
+		}
+		if (docNoNumber == '') {
+			docNoNumber = -1;
+		}
+		if (docDateNumber == '') {
+			docDateNumber = -1;
+		}
+		if (docAmountNumber == '') {
+			docAmountNumber = -1;
+		}
+		if (balanceAmountNumber == '') {
+			balanceAmountNumber = -1;
+		}
+
+		invoiceNumbers = nameNumber + "," + customerIdNumber + "," + docNoNumber
+				+ "," + docDateNumber + "," + docAmountNumber + "," + balanceAmountNumber;
+				
+
+		console.log("Column numbers " + invoiceNumbers);
+		if (invoiceNumbers == '') {
+			$('#alertMessage').html("please assign column numbers");
+			$('#alertBox').modal("show");
+			return false;
+		}
+
+		var invoiceXls = new FormData();
+
+		invoiceXls.append("file", $('#txtInvoiceDetails')[0].files[0]);
+		invoiceXls.append('companyId', $('#field_company').val());
+		invoiceXls.append('invoiceNumbers', invoiceNumbers);
+		$
+				.ajax({
+					type : 'POST',
+					url : uploadXlsContextPath + "/saveInvoiceXls",
+					data : invoiceXls,
+					cache : false,
+					contentType : false,
+					processData : false,
+
+					success : function(data) {
+						onSaveSuccess(data);
+						$(".error-msg").html("");
+					},
+					error : function(xhr, error) {
+						console.log("Error uploading excel .................");
+						$(".error-msg").html(
+								"Error uploading excel .................");
+					}
+				});
+
+	}
 	function assignAccountColumnNumbers() {
 		$(".error-msg").html("");
 		if ($('#field_company').val() == -1) {
@@ -265,6 +427,32 @@ if (!this.xlsFileUploader) {
 		}
 
 		$('#productColumnNumbers').modal('show');
+	}
+	function assignInvoiceColumnNumbers() {
+		$(".error-msg").html("");
+		if ($('#field_company').val() == -1) {
+			$('#alertMessage').html("please select company");
+			$('#alertBox').modal("show");
+			return false;
+		}
+		if ($('#txtInvoiceDetails').val() == '') {
+			$('#alertMessage').html("please select file");
+			$('#alertBox').modal("show");
+			return false;
+		}
+
+		var validExts = new Array(".xlsx", ".xls");
+		var fileExt = $('#txtInvoiceDetails').val();
+		fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+		if (validExts.indexOf(fileExt) < 0) {
+			$('#alertMessage').html(
+					"Invalid file selected, valid files are  "
+							+ validExts.toString() + " types.");
+			$('#alertBox').modal("show");
+			return false;
+		}
+
+		$('#ReceivablePayableColumnNumbers').modal('show');
 	}
 
 	function onSaveSuccess(result) {

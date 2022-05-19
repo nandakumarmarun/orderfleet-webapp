@@ -1,11 +1,16 @@
 package com.orderfleet.webapp.web.rest;
 
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
+
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -36,29 +41,42 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CountryC;
+import com.orderfleet.webapp.domain.DistrictC;
 import com.orderfleet.webapp.domain.Division;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.OpeningStock;
+import com.orderfleet.webapp.domain.PriceLevel;
 import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.ReceivablePayable;
+import com.orderfleet.webapp.domain.StateC;
 import com.orderfleet.webapp.domain.StockLocation;
+import com.orderfleet.webapp.domain.Units;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
+import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.CounrtyCRepository;
+import com.orderfleet.webapp.repository.DistrictCRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.OpeningStockRepository;
+import com.orderfleet.webapp.repository.PriceLevelRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
+import com.orderfleet.webapp.repository.ReceivablePayableRepository;
+import com.orderfleet.webapp.repository.StateCRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
+import com.orderfleet.webapp.repository.UnitsRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -66,7 +84,10 @@ import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.OpeningStockService;
 import com.orderfleet.webapp.service.ProductProfileService;
+import com.orderfleet.webapp.service.ReceivablePayableService;
 import com.orderfleet.webapp.service.util.RandomUtil;
+import com.orderfleet.webapp.web.rest.dto.AccountProfileUploadDTO;
+import com.orderfleet.webapp.web.rest.dto.ProductProfileUploadDTO;
 
 /**
  * used to upload xls
@@ -125,6 +146,24 @@ public class UploadXlsResource {
 
 	@Inject
 	private OpeningStockRepository openingStockRepository;
+
+	@Inject
+	private PriceLevelRepository priceLevelRepository;
+
+	@Inject
+	private CounrtyCRepository countryCRepository;
+
+	@Inject
+	private StateCRepository stateCRepository;
+
+	@Inject
+	private DistrictCRepository districtCRepository;
+
+	@Inject
+	private UnitsRepository unitsRepository;
+
+	@Inject
+	private ReceivablePayableRepository receivablePayableRepository;
 
 	@RequestMapping(value = "/upload-xls", method = RequestMethod.GET)
 	@Timed
@@ -185,7 +224,10 @@ public class UploadXlsResource {
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
 
 		User user = userRepository.findTop1ByCompanyId(company.getId());
-
+		List<PriceLevel> priceLevelDTOs = priceLevelRepository.findByCompanyId(company.getId());
+		List<CountryC> countrycDTOS = countryCRepository.findAllCountries();
+		List<StateC> statecDTOs = stateCRepository.findAllStates();
+		List<DistrictC> districtcDTOs = districtCRepository.findAllDistricts();
 		List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileRepository
 				.findAllByCompanyId(company.getId());
 		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
@@ -223,18 +265,31 @@ public class UploadXlsResource {
 			MultipartFile multipartFile = request.getFile(itrator.next());
 			System.out.println(allAccountNumbers.toString());
 			int NameNumber = Integer.parseInt(allAccountNumbers[0]);
+
 			int addressNumber = Integer.parseInt(allAccountNumbers[1]);
 			int cityNumber = Integer.parseInt(allAccountNumbers[2]);
 			int locationNumber = Integer.parseInt(allAccountNumbers[3]);
 			int pinNumber = Integer.parseInt(allAccountNumbers[4]);
-			int phoneNumber = Integer.parseInt(allAccountNumbers[5]);
-			int eMailNumber = Integer.parseInt(allAccountNumbers[6]);
+			int phone1Number = Integer.parseInt(allAccountNumbers[5]);
+
+			int eMail1Number = Integer.parseInt(allAccountNumbers[6]);
+
 			int descriptionNumber = Integer.parseInt(allAccountNumbers[7]);
 			int contactPersonNumber = Integer.parseInt(allAccountNumbers[8]);
 			int accountTypeNumber = Integer.parseInt(allAccountNumbers[9]);
 			int territoryNumber = Integer.parseInt(allAccountNumbers[10]);
 			int aliasNumber = Integer.parseInt(allAccountNumbers[11]);
 			int closingBalanceNumber = Integer.parseInt(allAccountNumbers[12]);
+			int creditDaysNumber = Integer.parseInt(allAccountNumbers[13]);
+			int creditLimitNumber = Integer.parseInt(allAccountNumbers[14]);
+			int priceLevelNumber = Integer.parseInt(allAccountNumbers[15]);
+			int tinNoNumber = Integer.parseInt(allAccountNumbers[16]);
+
+			int customerIdNumber = Integer.parseInt(allAccountNumbers[17]);
+			int customerCodeNumber = Integer.parseInt(allAccountNumbers[18]);
+			int countryNumber = Integer.parseInt(allAccountNumbers[19]);
+			int stateNumber = Integer.parseInt(allAccountNumbers[20]);
+			int districtNumber = Integer.parseInt(allAccountNumbers[21]);
 
 			int rowNumber = 0;
 			Workbook workbook = WorkbookFactory.create(multipartFile.getInputStream());
@@ -262,16 +317,16 @@ public class UploadXlsResource {
 						accProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
 						accProfile.setCompany(company);
 						accProfile.setAccountStatus(AccountStatus.Unverified);
-						accProfile.setAccountType(deafultAccountType);
+//						accProfile.setAccountType(deafultAccountType);
 						accProfile.setUser(user);
 						accProfile.setName(accountProofileName);
 					}
 
-					if (addressNumber == -1 || row.getCell(addressNumber) == null) {
+					if (addressNumber == -1) {
 						accProfile.setAddress("No Address");
 					} else {
 						String address = "";
-						
+
 						// celltype=0==>Numeric && celltype=1==>String
 						if (row.getCell(addressNumber).getCellType() == 0) {
 							address = String.valueOf(row.getCell(addressNumber).getNumericCellValue());
@@ -281,13 +336,13 @@ public class UploadXlsResource {
 							address = String.valueOf(row.getCell(addressNumber).getStringCellValue());
 						}
 
-						if (address == null || address.isEmpty()) {
+						if (address.equals(null) || address.isEmpty()) {
 							accProfile.setAddress("No Address");
 						} else {
 							accProfile.setAddress(address);
 						}
 					}
-					if (cityNumber == -1 || row.getCell(cityNumber) == null) {
+					if (cityNumber == -1) {
 						accProfile.setCity("No city");
 					} else {
 
@@ -316,17 +371,19 @@ public class UploadXlsResource {
 						String pin = formatter.formatCellValue(row.getCell(pinNumber));
 						accProfile.setPin(pin);
 					}
-					if (phoneNumber != -1) {
-						String phones = formatter.formatCellValue(row.getCell(phoneNumber));
+					if (phone1Number != -1) {
+						String phones = formatter.formatCellValue(row.getCell(phone1Number));
 						String[] phoneNums = phones.split("\n|\\/|\\,");
 						accProfile.setPhone1(phoneNums[0]);
 						if (phoneNums.length > 1) {
 							accProfile.setPhone2(phoneNums[1]);
 						}
 					}
-					if (eMailNumber != -1) {
-						accProfile.setEmail1(row.getCell(eMailNumber).getStringCellValue());
+
+					if (eMail1Number != -1) {
+						accProfile.setEmail1(row.getCell(eMail1Number).getStringCellValue());
 					}
+
 					if (descriptionNumber != -1) {
 						accProfile.setDescription(row.getCell(descriptionNumber).getStringCellValue());
 					}
@@ -339,6 +396,8 @@ public class UploadXlsResource {
 								.filter(at -> at.getName().equals(accTypeName)).findAny();
 						if (opAccountType.isPresent()) {
 							accProfile.setAccountType(opAccountType.get());
+						} else {
+							accProfile.setAccountType(deafultAccountType);
 						}
 					}
 					if (aliasNumber != -1) {
@@ -354,6 +413,7 @@ public class UploadXlsResource {
 						}
 
 						accProfile.setAlias(alias);
+
 					}
 					if (closingBalanceNumber != -1) {
 
@@ -371,7 +431,101 @@ public class UploadXlsResource {
 
 						accProfile.setClosingBalance(closingBalance);
 					}
+					if (creditDaysNumber != -1) {
 
+						Long creditdays = null;
+						// celltype=0==>Numeric && celltype=1==>String
+						if (row.getCell(creditDaysNumber).getCellType() == 0) {
+							creditdays = (long) row.getCell(creditDaysNumber).getNumericCellValue();
+						}
+
+						if (row.getCell(creditDaysNumber).getCellType() == 1) {
+							creditdays = Long.valueOf(row.getCell(creditDaysNumber).getStringCellValue());
+						}
+
+						Long creditDays = creditdays;
+						accProfile.setCreditDays(creditDays);
+					}
+					if (creditLimitNumber != -1) {
+
+						Long creditlimit = null;
+						// celltype=0==>Numeric && celltype=1==>String
+						if (row.getCell(creditLimitNumber).getCellType() == 0) {
+							creditlimit = (long) row.getCell(creditLimitNumber).getNumericCellValue();
+						}
+
+						if (row.getCell(creditLimitNumber).getCellType() == 1) {
+							creditlimit = Long.valueOf(row.getCell(creditLimitNumber).getStringCellValue());
+						}
+
+						Long creditLimit = creditlimit;
+						accProfile.setCreditLimit(creditLimit);
+					}
+					if (tinNoNumber != -1) {
+						String tin = row.getCell(tinNoNumber).getStringCellValue();
+						if (tin.isEmpty() || tin == null) {
+							accProfile.setTinNo(" ");
+						} else {
+							accProfile.setTinNo(tin);
+
+						}
+					}
+
+					if (customerIdNumber == -1) {
+						accProfile.setCustomerId("No value");
+					} else {
+
+						String customersid = "";
+//						 celltype=0==>Numeric && celltype=1==>String
+						if (row.getCell(customerIdNumber).getCellType() == 0) {
+							customersid = String.valueOf(row.getCell(customerIdNumber).getNumericCellValue());
+						}
+
+						if (row.getCell(customerIdNumber).getCellType() == 1) {
+							customersid = String.valueOf(row.getCell(customerIdNumber).getStringCellValue());
+						}
+						if (customersid == null || customersid.isEmpty()) {
+							accProfile.setCustomerId(" ");
+						}
+						  String s1 = customersid.substring(0,customersid.indexOf("."));
+					        s1.trim();
+						accProfile.setCustomerId(s1);
+					}
+					if (customerCodeNumber != -1) {
+						accProfile.setCustomerCode(row.getCell(customerCodeNumber).getStringCellValue());
+					}
+					if (priceLevelNumber != -1) {
+						String priceLevelName = row.getCell(priceLevelNumber).getStringCellValue();
+						Optional<PriceLevel> opPriceLevel = priceLevelDTOs.stream()
+								.filter(pl -> pl.getName().equals(priceLevelName)).findAny();
+						if (opPriceLevel.isPresent()) {
+							accProfile.setDefaultPriceLevel(opPriceLevel.get());
+						}
+					}
+					if (countryNumber != -1) {
+						String countryName = row.getCell(countryNumber).getStringCellValue();
+						Optional<CountryC> opCountry = countrycDTOS.stream()
+								.filter(ps -> ps.getName().equals(countryName)).findAny();
+						if (opCountry.isPresent()) {
+							accProfile.setCountryc(opCountry.get());
+						}
+					}
+					if (stateNumber != -1) {
+						String stateName = row.getCell(stateNumber).getStringCellValue();
+						Optional<StateC> opState = statecDTOs.stream().filter(st -> st.getName().equals(stateName))
+								.findAny();
+						if (opState.isPresent()) {
+							accProfile.setStatec(opState.get());
+						}
+					}
+					if (districtNumber != -1) {
+						String districtName = row.getCell(districtNumber).getStringCellValue();
+						Optional<DistrictC> opDistrict = districtcDTOs.stream()
+								.filter(dt -> dt.getName().equals(districtName)).findAny();
+						if (opDistrict.isPresent()) {
+							accProfile.setDistrictc(opDistrict.get());
+						}
+					}
 					if (saveUpdateAccountProfiles.stream().filter(acp -> acp.getName().equals(accountProofileName))
 							.findAny().isPresent()) {
 						duplicateCount++;
@@ -463,6 +617,8 @@ public class UploadXlsResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+
+
 	@SuppressWarnings("deprecation")
 	@RequestMapping(value = "/upload-xls/saveProductXls", method = RequestMethod.POST)
 	@Timed
@@ -476,7 +632,7 @@ public class UploadXlsResource {
 		List<ProductCategory> productCategories = productCategoryRepository.findAllByCompanyPid(companyPid[0]);
 		List<Division> divisions = divisionRepository.findAllByCompanyPid(companyPid[0]);
 		Company company = companyRepository.findOneByPid(companyPid[0]).get();
-
+		List<Units> units = unitsRepository.findAllUnits();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
 
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
@@ -498,6 +654,13 @@ public class UploadXlsResource {
 			int sizeNumber = Integer.parseInt(allProductNumbers[7]);
 			int openingStockNumber = Integer.parseInt(allProductNumbers[8]);
 			int productGroupNumber = Integer.parseInt(allProductNumbers[9]);
+			int mrpNumber = Integer.parseInt(allProductNumbers[10]);
+			int productCategoryNumber = Integer.parseInt(allProductNumbers[11]);
+			int hsnNumber = Integer.parseInt(allProductNumbers[12]);
+			int productIdNumber = Integer.parseInt(allProductNumbers[13]);
+			int compoundUnitNumber = Integer.parseInt(allProductNumbers[14]);
+			int productCodeNumber = Integer.parseInt(allProductNumbers[15]);
+			int unitsNumber = Integer.parseInt(allProductNumbers[16]);
 
 			int rowNumber = 0;
 			Workbook workbook = WorkbookFactory.create(multipartFile.getInputStream());
@@ -507,7 +670,7 @@ public class UploadXlsResource {
 				rowNumber = row.getRowNum();
 
 				if (rowNumber > 0) {
-					System.out.println(rowNumber + "--------------");
+
 					rowNumber++;
 					String productProfileName = "";
 
@@ -519,6 +682,7 @@ public class UploadXlsResource {
 
 					if (row.getCell(NameNumber).getCellType() == 1) {
 						productProfileName = String.valueOf(row.getCell(NameNumber).getStringCellValue());
+
 					}
 
 					if (productProfileName == null || productProfileName.isEmpty()) {
@@ -538,9 +702,9 @@ public class UploadXlsResource {
 					} else {
 						productProfile = new ProductProfile();
 						productProfile.setName(productProfileName);
-						productProfile.setProductCategory(productCategories.get(0));
 						productProfile.setDivision(divisions.get(0));
 						productProfile.setPid(ProductProfileService.PID_PREFIX + RandomUtil.generatePid());
+						productProfile.setProductCategory(productCategories.get(0));
 						productProfile.setCompany(company);
 					}
 
@@ -560,6 +724,7 @@ public class UploadXlsResource {
 					}
 					if (descriptionNumber != -1) {
 						String description = "";
+
 						// celltype=0==>Numeric && celltype=1==>String
 						if (row.getCell(descriptionNumber).getCellType() == 0) {
 							description = String.valueOf(row.getCell(descriptionNumber).getNumericCellValue());
@@ -568,7 +733,10 @@ public class UploadXlsResource {
 						if (row.getCell(descriptionNumber).getCellType() == 1) {
 							description = String.valueOf(row.getCell(descriptionNumber).getStringCellValue());
 						}
+						if (description.equals(null) || description.isEmpty()) {
+							productProfile.setDescription("null");
 
+						}
 						productProfile.setDescription(description);
 					}
 					if (priceNumber == -1) {
@@ -603,6 +771,89 @@ public class UploadXlsResource {
 					}
 					if (sizeNumber != -1) {
 						productProfile.setSize(String.valueOf(row.getCell(sizeNumber).getNumericCellValue()));
+					}
+
+					if (mrpNumber != -1) {
+
+						String mrp = "";
+						// celltype=0==>Numeric && celltype=1==>String
+						if (row.getCell(mrpNumber).getCellType() == 0) {
+							mrp = String.valueOf(row.getCell(mrpNumber).getNumericCellValue());
+						}
+
+						if (row.getCell(mrpNumber).getCellType() == 1) {
+							mrp = String.valueOf(row.getCell(mrpNumber).getStringCellValue());
+						}
+						Double mRP = Double.parseDouble(mrp);
+						productProfile.setMrp(mRP);
+					}
+					if (productCategoryNumber != -1) {
+						String productCategoryName = row.getCell(productCategoryNumber).getStringCellValue();
+						Optional<ProductCategory> opProductCategory = productCategories.stream()
+								.filter(pc -> pc.getName().equals(productCategoryName)).findAny();
+						if (opProductCategory.isPresent()) {
+							productProfile.setProductCategory(opProductCategory.get());
+						}
+					}
+					if (hsnNumber != -1) {
+
+						String HsnCode = "";
+						// celltype=0==>Numeric && celltype=1==>String
+						if (row.getCell(hsnNumber).getCellType() == 0) {
+							HsnCode = String.valueOf(row.getCell(hsnNumber).getNumericCellValue());
+						}
+
+						if (row.getCell(hsnNumber).getCellType() == 1) {
+							HsnCode = String.valueOf(row.getCell(hsnNumber).getStringCellValue());
+						}
+						if (HsnCode == null || HsnCode.isEmpty()) {
+							productProfile.setHsnCode(" ");
+						} else {
+							productProfile.setHsnCode(HsnCode);
+						}
+					}
+					if (productIdNumber != -1) {
+						String proId = String.valueOf(row.getCell(productIdNumber).getNumericCellValue());
+						
+						 String s1 = proId.substring(0,proId.indexOf("."));
+					        s1.trim();
+					        productProfile.setProductId(s1);
+					}
+					if (productCodeNumber != -1) {
+						productProfile
+								.setProductCode(String.valueOf(row.getCell(productCodeNumber).getNumericCellValue()));
+					}
+					if (compoundUnitNumber != -1) {
+
+						String compoundUnit = "";
+						// celltype=0==>Numeric && celltype=1==>String
+						if (row.getCell(compoundUnitNumber).getCellType() == 0) {
+							compoundUnit = String.valueOf(row.getCell(compoundUnitNumber).getNumericCellValue());
+						}
+
+						if (row.getCell(compoundUnitNumber).getCellType() == 1) {
+							compoundUnit = String.valueOf(row.getCell(compoundUnitNumber).getStringCellValue());
+						}
+						Double cUNIT = Double.parseDouble(compoundUnit);
+						productProfile.setCompoundUnitQty(cUNIT);
+					}
+					if (unitsNumber == -1) {
+						productProfile.setUnits(null);
+					} else {
+
+						String unitsName = row.getCell(unitsNumber).getStringCellValue();
+						Units unit = new Units();
+//						if (unitsName == null || unitsName.isEmpty()) {
+//							unit.setName("Null");
+//							productProfile.setUnits(unit);
+//						}
+						Optional<Units> unitname = units.stream().filter(st -> st.getName().equals(unitsName))
+								.findAny();
+						if (unitname.isPresent()) {
+							unit.setName(unitsName);
+							productProfile.setUnits(unitname.get());
+							;
+						}
 					}
 
 					if (saveUpdateProductProfiles.stream().filter(pp -> pp.getName().equals(ppName)).findAny()
@@ -655,8 +906,10 @@ public class UploadXlsResource {
 
 					if (productGroupNumber != -1) {
 						String productGroupName = row.getCell(productGroupNumber).getStringCellValue();
+
 						Optional<ProductGroup> opProductGroup = productGroups.stream()
 								.filter(pg -> pg.getName().equals(productGroupName)).findAny();
+
 						if (opProductGroup.isPresent()) {
 
 							if (productNames.stream().filter(pn -> pn.equals(ppName)).findAny().isPresent()) {
@@ -688,6 +941,7 @@ public class UploadXlsResource {
 							}
 
 						}
+
 					}
 
 				}
@@ -797,4 +1051,119 @@ public class UploadXlsResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+
+	@RequestMapping(value = "/upload-xls/saveInvoiceXls", method = RequestMethod.POST)
+	@Timed
+	public ResponseEntity<Void> saveAssignedInvoiceDetails(MultipartHttpServletRequest request) {
+		log.info("Request to Upload excel invoice Details..................");
+
+		String[] companyPid = request.getParameterValues("companyId");
+		String[] invoiceNumbers = request.getParameterValues("invoiceNumbers");
+		String[] allInvoiceNumbers = invoiceNumbers[0].split(",");
+
+		Company company = companyRepository.findOneByPid(companyPid[0]).get();
+
+		try {
+			Iterator<String> itrator = request.getFileNames();
+			MultipartFile multipartFile = request.getFile(itrator.next());
+
+			int NameNumber = Integer.parseInt(allInvoiceNumbers[0]);
+			int idNumber = Integer.parseInt(allInvoiceNumbers[1]);
+			
+			int docNoNumber = Integer.parseInt(allInvoiceNumbers[2]);
+			int docDateNumber = Integer.parseInt(allInvoiceNumbers[3]);
+			int docAmountNumber = Integer.parseInt(allInvoiceNumbers[4]);
+			int balanceAmountNumber = Integer.parseInt(allInvoiceNumbers[5]);
+
+			int rowNumber = 0;
+			Workbook workbook = WorkbookFactory.create(multipartFile.getInputStream());
+			Sheet sheet = workbook.getSheetAt(0);
+			List<String> cuIds = new ArrayList<>();
+
+			for (Row row : sheet) {
+
+				rowNumber = row.getRowNum();
+				String customerId = null;
+				String s1= null;
+				if (rowNumber > 0) {
+					rowNumber++;
+
+					if (idNumber != -1) {
+            
+						customerId = String.valueOf(row.getCell(idNumber).getNumericCellValue());
+						  s1 = customerId.substring(0,customerId.indexOf("."));
+					        s1.trim();
+					        
+					}
+				}
+				cuIds.add(s1);
+			}
+			
+			receivablePayableRepository.deleteByCompanyId(company.getId());
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAccountProfilesByCompanyIdAndCustomerIdIn(company.getId(), cuIds);
+			Set<ReceivablePayable> saveReceivablePayable = new HashSet<>();
+			for (Row row : sheet) {
+
+				rowNumber = row.getRowNum();
+
+				if (rowNumber > 0) {
+
+					rowNumber++;
+					String accountProfileName = row.getCell(NameNumber).getStringCellValue();
+
+					Optional<AccountProfile> accProfile = accountProfiles.stream()
+							.filter(a -> a.getName().equalsIgnoreCase(accountProfileName)).findAny();
+
+					if (accProfile.isPresent()) {
+						
+						ReceivablePayable receivablePayable = new ReceivablePayable();
+						receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
+						receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
+						receivablePayable.setCompany(company);
+						receivablePayable.setAccountProfile(accProfile.get());
+
+						if (docNoNumber != -1) {
+
+							String docNumber = row.getCell(docNoNumber).getStringCellValue();
+							receivablePayable.setReferenceDocumentNumber(docNumber);
+						}
+
+						if (docDateNumber != -1) {
+							Date documentDate = row.getCell(docDateNumber).getDateCellValue();
+							LocalDate docDate = documentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+							receivablePayable.setReferenceDocumentDate(docDate);
+						}
+						if (docAmountNumber != -1) {
+							String docAmount = "";
+
+							docAmount = String.valueOf(row.getCell(docAmountNumber).getNumericCellValue());
+							Double docamt = Double.parseDouble(docAmount);
+							receivablePayable.setReferenceDocumentAmount(docamt);
+						}
+						if (balanceAmountNumber != -1) {
+							String balAmount = "";
+
+							balAmount = String.valueOf(row.getCell(balanceAmountNumber).getNumericCellValue());
+							Double balamt = Double.parseDouble(balAmount);
+							receivablePayable.setReferenceDocumentBalanceAmount(balamt);
+						}
+						saveReceivablePayable.add(receivablePayable);
+
+					}
+
+				}
+
+			}
+			log.info("Successfully saved Invoice Details");
+
+			bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+			e.printStackTrace();
+		}
+		log.info("Excel Invoice Details Uploaded successfully..................");
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }

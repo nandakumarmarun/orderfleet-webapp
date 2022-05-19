@@ -241,5 +241,8 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select count(accountProfile),ep.name from AccountProfile accountProfile  inner join EmployeeProfile ep on accountProfile.user.id=ep.user.id where accountProfile.company.id = ?#{principal.companyId} and accountProfile.user.id in ?1 and accountProfile.createdDate between ?2 and ?3 Group By ep.name")
 	List<Object[]> findByUserIdInAndDateBetween(List<Long> userIds, LocalDateTime fromDate,LocalDateTime toDate);
+	
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.customerId in ?2")
+    List<AccountProfile> findAccountProfilesByCompanyIdAndCustomerIdIn(Long id, List<String> cuIds);
 
 }
