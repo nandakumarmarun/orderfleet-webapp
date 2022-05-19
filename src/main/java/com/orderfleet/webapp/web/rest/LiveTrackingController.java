@@ -127,7 +127,7 @@ public class LiveTrackingController {
 		// get user under current users
 
 		List<EmployeeProfileDTO> dashboardEmployees;
-		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIdsForLiveTracking();
+		List<Long> userIds = employeeHierarchyService. getCurrentUsersSubordinateIds();
 
 
 		List<Long> dashBoarduserId = dashboardUserRepository.findDashBoardUserIdsByUserIdInAndCompanyId(userIds);
