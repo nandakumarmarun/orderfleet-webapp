@@ -52,5 +52,9 @@ public interface DashboardUserRepository extends JpaRepository<DashboardUser, Lo
 
 	@Query("select dashboardUser from DashboardUser dashboardUser where dashboardUser.company.id = ?#{principal.companyId}")
 	List<DashboardUser> findDashboardUsersByCompanyIdAndSordOrder();
+	
+	
+	@Query("select dashboardUser.user.id from DashboardUser dashboardUser where  dashboardUser.user.id in ?1 and dashboardUser.company.id = ?#{principal.companyId}")
+	List<Long> findDashBoardUserIdsByUserIdInAndCompanyId(List<Long> userIds);
 
 }
