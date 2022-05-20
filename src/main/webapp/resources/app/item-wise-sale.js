@@ -93,10 +93,14 @@ if (!this.ItemWiseSale) {
 		var value = "";
 		var empPids = $('#dbEmployee').val();
 		var accountPids = $('#dbAccount').val();
+		var productGroupPids = $('#dbproductGroup').val();
+		var territtoryPids = $('#dbTerittory').val();
+
 		$('#lblTotal').text("0");
 		if ($("#includeStockLocationDetails").is(':checked')) {
 			value = $('#includeStockLocationDetails').val();
 		}
+
 		if ($('#dbDateSearch').val() == "CUSTOM") {
 			if ($("#txtFromDate").val() == "" || $("#txtToDate").val() == "") {
 				return;
@@ -114,23 +118,36 @@ if (!this.ItemWiseSale) {
 			}).get().join(',');
 		}
 
+		if ("-1" == productGroupPids) {
+			productGroupPids = $('#dbproductGroup option').map(function() {
+				return $(this).val();
+			}).get().join(',');
+		}
+
+		if ("-1" == territtoryPids) {
+			territtoryPids = $('#dbTerittory option').map(function() {
+				return $(this).val();
+			}).get().join(',');
+		}
+
 		if ($("#dbDocumentType").val() == "no") {
 			alert("Please Select Document Type")
 			return;
 		}
+
 		var rows = "";
 		$('#tHeadItemWiseSale').html("");
 		if (value == "no") {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>Quantity</th><th>Amount</th></tr>");
+							"<tr><th>Date</th><th>OderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>Quantity</th><th>Amount</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='8' align='center'>Please wait...</td></tr>");
 		} else {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Category</th><th>Item</th><th>Quantity</th><th>Unit Quantity</th><th>Voulume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
+							"<tr><th>Date</th><th>OderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>Quantity</th><th>Unit Quantity</th><th>Voulume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='7' align='center'>Please wait...</td></tr>");
@@ -143,7 +160,8 @@ if (!this.ItemWiseSale) {
 						sort : $('input[name=sorting]:checked').val(),
 						order : $('input[name=order]:checked').val(),
 						categoryPids : "",
-						groupPids : "",
+						groupPids : productGroupPids,
+						terittoryPids : territtoryPids,
 						voucherType : $("#dbDocumentType").val(),
 						documentPid : $("#dbDocument").val(),
 						filterBy : $("#dbDateSearch").val(),
@@ -177,8 +195,14 @@ if (!this.ItemWiseSale) {
 										.each(
 												itemWiseSales,
 												function(key, itemWiseSale) {
+													console
+															.log(itemWiseSale.productGroup);
+													console
+															.log(itemWiseSale.territory);
 													rows += "<tr><td>"
 															+ convertDateTimeFromServer(itemWiseSale.createdDate)
+															+ "</td><td>"
+															+ itemWiseSale.oderID
 															+ "</td><td>"
 															+ itemWiseSale.employeeName
 															+ "</td><td>"
@@ -198,6 +222,10 @@ if (!this.ItemWiseSale) {
 															+ "</td><td>"
 															+ itemWiseSale.productName
 															+ "</td><td>"
+															+ itemWiseSale.productGroup
+															+ "</td><td>"
+															+ itemWiseSales.territory
+															+ "</td><td>"
 															+ itemWiseSale.quantity
 															+ "</td><td>"
 															+ itemWiseSale.productUnitQty
@@ -212,9 +240,15 @@ if (!this.ItemWiseSale) {
 										.each(
 												itemWiseSales,
 												function(key, itemWiseSale) {
+													console
+															.log(itemWiseSale.productGroup);
+													console
+															.log(itemWiseSale.territory);
 													total += itemWiseSale.rowTotal;
 													rows += "<tr><td>"
 															+ convertDateTimeFromServer(itemWiseSale.createdDate)
+															+ "</td><td>"
+															+ itemWiseSale.oderID
 															+ "</td><td>"
 															+ itemWiseSale.employeeName
 															+ "</td><td>"
@@ -227,6 +261,10 @@ if (!this.ItemWiseSale) {
 															+ itemWiseSale.productCategory
 															+ "</td><td>"
 															+ itemWiseSale.productName
+															+ "</td><td>"
+															+ itemWiseSale.productGroup
+															+ "</td><td>"
+															+ itemWiseSale.territory
 															+ "</td><td>"
 															+ itemWiseSale.quantity
 															+ "</td><td>"
@@ -395,6 +433,16 @@ if (!this.ItemWiseSale) {
 			$('#divDatePickers').css('display', 'none');
 		} else {
 			$('#divDatePickers').css('display', 'initial');
+		}
+	}
+	
+	ItemWiseSale.showdeliverdateDatePicker = function() {
+		$("#txtFromDeliveryDate").val("");
+		$("#toFromDeliveryDate").val("");
+		if ($('#dbdeliverdateDateSearch').val() != "CUSTOM") {
+			$('#divdeliveryDatePickers').css('display', 'none');
+		} else {
+			$('#divdeliveryDatePickers').css('display', 'initial');
 		}
 	}
 

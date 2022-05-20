@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -31,10 +33,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.LocationAccountProfile;
+import com.orderfleet.webapp.domain.ProductGroupProduct;
+import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
+import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
+import com.orderfleet.webapp.repository.LocationRepository;
+import com.orderfleet.webapp.repository.ProductGroupProductRepository;
+import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.custom.InventoryVoucherDetailCustomRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -82,6 +91,18 @@ public class ItemWiseSaleResource {
 
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
+	
+	@Inject
+	private ProductProfileRepository productProfileRepository;
+	
+	@Inject
+	ProductGroupProductRepository productGroupProductRepository;
+	
+	@Inject
+	private LocationAccountProfileRepository locationAccountProfileRepository;
+	
+	@Inject
+	private LocationRepository locationRepository;
 
 	@RequestMapping(value = "/item-wise-sale", method = RequestMethod.GET)
 	@Timed
@@ -93,6 +114,7 @@ public class ItemWiseSaleResource {
 		model.addAttribute("productGroups", productGroupService.findAllByCompany());
 		model.addAttribute("productProfiles", productProfileService.findAllByCompany());
 		model.addAttribute("accounts", accountProfileService.findAllByCompany());
+		model.addAttribute("territories",locationRepository.findAllByCompanyId());
 		List<StockLocation> companyStockLocations = stockLocationRepository.findAllByCompanyId();
 		model.addAttribute("stockLocations", companyStockLocations);
 		// model.addAttribute("employees",)
@@ -117,48 +139,55 @@ public class ItemWiseSaleResource {
 			@RequestParam("filterBy") String filterBy,
 			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 			@RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+			@RequestParam(value = "fromdeliveryDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDeliveryDate,
+			@RequestParam(value = "	toDeliveryDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDeliveryDate,
 			@RequestParam String stockLocations, @RequestParam String profilePids,
 			@RequestParam("employeePid") String employeePids, @RequestParam boolean inclSubordinate,
-			@RequestParam String accountPids) {
+			@RequestParam String accountPids, @RequestParam String terittoryPids) {
 
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
 
 		if (filterBy.equals("TODAY")) {
 			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
 					LocalDate.now(), LocalDate.now(), stockLocations, profilePids, employeePids, inclSubordinate,
-					accountPids);
+					accountPids,terittoryPids);
 		} else if (filterBy.equals("YESTERDAY")) {
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
 			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
-					yeasterday, yeasterday, stockLocations, profilePids, employeePids, inclSubordinate, accountPids);
+					yeasterday, yeasterday, stockLocations, profilePids, employeePids, inclSubordinate, accountPids,terittoryPids);
 		} else if (filterBy.equals("WTD")) {
 			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
 			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
 			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
 					weekStartDate, LocalDate.now(), stockLocations, profilePids, employeePids, inclSubordinate,
-					accountPids);
+					accountPids,terittoryPids);
 		} else if (filterBy.equals("MTD")) {
 			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
 			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
 					monthStartDate, LocalDate.now(), stockLocations, profilePids, employeePids, inclSubordinate,
-					accountPids);
+					accountPids,terittoryPids);
 		} else if (filterBy.equals("CUSTOM")) {
 			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
-					fromDate, toDate, stockLocations, profilePids, employeePids, inclSubordinate, accountPids);
+					fromDate, toDate, stockLocations, profilePids, employeePids, inclSubordinate, accountPids,terittoryPids);
 		}
 		return new ResponseEntity<>(inventoryVoucherDetailDTOs, HttpStatus.OK);
 
 	}
 
+	
 	private List<InventoryVoucherDetailDTO> getFilterData(String sort, String order, String categoryPids,
 			String groupPids, VoucherType voucherType, String documentPid, LocalDate fDate, LocalDate tDate,
 			String stockLocations, String profilePids, String employeePids, boolean inclSubordinate,
-			String accountPids) {
+			String accountPids, String terittoryPids) {
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
+		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOList = new ArrayList<>();
+		List<ProductGroupProduct> productProfilesProductGroup = productGroupProductRepository.findAllByCompanyId();
+		List<LocationAccountProfile> LocationAccountProfile = locationAccountProfileRepository.findAllByCompanyId();
+		System.out.println(productProfilesProductGroup.size());
 
 		List<String> stockLocationPids = new ArrayList<>();
 		List<String> productCategoryPids = new ArrayList<>();
@@ -175,6 +204,7 @@ public class ItemWiseSaleResource {
 		productCategoryPids = categoryPids != "" ? Arrays.asList(categoryPids.split(",")) : productCategoryPids;
 		productGroupPids = groupPids != "" ? Arrays.asList(groupPids.split(",")) : productGroupPids;
 		productProfilePids = profilePids != "" ? Arrays.asList(profilePids.split(",")) : productProfilePids;
+		productTerritoryPids = terittoryPids != "" ? Arrays.asList(terittoryPids.split(",")) : productTerritoryPids;
 		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id = "AP_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
@@ -185,6 +215,7 @@ public class ItemWiseSaleResource {
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		accountPidList = !accountPids.equals("-1") ? Arrays.asList(accountPids)
 				: accountProfileRepository.findAllPidsByCompany();
+
 		 String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -225,8 +256,39 @@ public class ItemWiseSaleResource {
 		inventoryVoucherDetailDTOs = inventoryVoucherDetailCustomRepository.getInventoryDetailListBy(
 				productCategoryPids, productGroupPids, productProfilePids, stockLocationPids, fromDate, toDate,
 				documentPids, productTerritoryPids, employeePidList, status, accountPidList);
+		
+		for(InventoryVoucherDetailDTO inventoryVoucherDTO : inventoryVoucherDetailDTOs) {
+			List<String> productGroups = new ArrayList();
+			List<ProductGroupProduct> optProductGroupProductList = productProfilesProductGroup.stream().filter(p -> p.getProduct().getPid().equals(inventoryVoucherDTO.getProductPid())).collect(Collectors.toList());
+			
+			Optional<LocationAccountProfile> LocationAccountProfileOp = LocationAccountProfile.stream().
+				    filter(a->a.getAccountProfile().getPid().equals(inventoryVoucherDTO.getAccountPid())).findAny();
+		
+			if(LocationAccountProfileOp.isPresent()) {
+			
+				LocationAccountProfile locationAccountProfile = LocationAccountProfileOp.get();
+				inventoryVoucherDTO.setTerritory(locationAccountProfile.getLocation().getName());
+			}
+			
+			
+			Optional<ProductGroupProduct> optProductGroupProduct = productProfilesProductGroup.stream().filter(p -> p.getProduct().getPid().equals(inventoryVoucherDTO.getProductPid())).findAny();
+	         
+			if(!optProductGroupProductList.isEmpty()) {
+				for(ProductGroupProduct productGroupProduct : optProductGroupProductList) {
+					productGroups.add(productGroupProduct.getProductGroup().getName());
+				}
+				inventoryVoucherDTO.setProductGroups(productGroups);	
+			}
+			
+			if(optProductGroupProduct.isPresent()) {
+				
+				ProductGroupProduct productGroupProduct = optProductGroupProduct.get();
+				inventoryVoucherDTO.setProductGroup(productGroupProduct.getProductGroup().getName());
+			}
+			inventoryVoucherDetailDTOList.add(inventoryVoucherDTO);
+		}
 
-		return filterBySortAndOrder(sort, order, inventoryVoucherDetailDTOs);
+		return filterBySortAndOrder(sort, order, inventoryVoucherDetailDTOList);
 	}
 
 	private List<InventoryVoucherDetailDTO> filterBySortAndOrder(String sort, String order,
@@ -262,7 +324,6 @@ public class ItemWiseSaleResource {
 			}
 		}
 		return inventoryVoucherDetailDTOs;
-
 	}
 
 }

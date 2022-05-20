@@ -19,6 +19,8 @@ public class InventoryVoucherDetailDTO {
 	private Long detailId;
 
 	private String productPid;
+	
+	private String oderID;
 
 	private String productName;
 
@@ -27,6 +29,8 @@ public class InventoryVoucherDetailDTO {
 	private String productCategory;
 
 	private List<String> productGroups;
+	
+	private String productGroup;
 
 	private String productSKU;
 
@@ -133,6 +137,10 @@ public class InventoryVoucherDetailDTO {
 	private String description;
 
 	private double additionalDiscount;
+	
+	private String territory;
+	
+	private LocalDateTime deliveryDate;
 
 	public InventoryVoucherDetailDTO() {
 	}
@@ -241,6 +249,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setProductPid(String productPid) {
 		this.productPid = productPid;
+	}
+
+	public String getOderID() {
+		return oderID;
+	}
+
+	public void setOderID(String oderID) {
+		this.oderID = oderID;
 	}
 
 	public String getProductName() {
@@ -663,6 +679,14 @@ public class InventoryVoucherDetailDTO {
 		this.priceLevelPid = priceLevelPid;
 	}
 
+	public String getProductGroup() {
+		return productGroup;
+	}
+
+	public void setProductGroup(String productGroup) {
+		this.productGroup = productGroup;
+	}
+
 	public String getPriceLevelName() {
 		return priceLevelName;
 	}
@@ -701,6 +725,22 @@ public class InventoryVoucherDetailDTO {
 
 	public void setUpdatedsellingRate(double updatedsellingRate) {
 		this.updatedsellingRate = updatedsellingRate;
+	}
+
+	public String getTerritory() {
+		return territory;
+	}
+
+	public void setTerritory(String territory) {
+		this.territory = territory;
+	}
+
+	public LocalDateTime getDeliveryDate() {
+		return deliveryDate;
+	}
+
+	public void setDeliveryDate(LocalDateTime deliveryDate) {
+		this.deliveryDate = deliveryDate;
 	}
 
 	@Override

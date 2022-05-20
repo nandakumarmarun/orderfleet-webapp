@@ -104,6 +104,27 @@
 									</c:forEach>
 								</select>
 							</div>
+							
+							<div class="col-sm-2">
+								Account <select id="dbproductGroup" name="productGroup"
+									class="form-control selectpicker" data-live-search="true">
+									<option value="-1">All Product Groups</option>
+									<c:forEach items="${productGroups}" var="productGroup">
+										<option value="${productGroup.pid}">${productGroup.name}</option>
+									</c:forEach>
+								</select>
+							</div>
+							
+							<div class="col-sm-2">
+								Account <select id="dbTerittory" name="terittory"
+									class="form-control selectpicker" data-live-search="true">
+									<option value="-1">All Terittories</option>
+									<c:forEach items="${territories}" var="locationAccountProfile">
+										<option value="${locationAccountProfile.pid}">${locationAccountProfile.name}</option>
+									</c:forEach>
+								</select>
+							</div>
+							
 							<div class="col-sm-2">
 								Document Type <select id="dbDocumentType" name="documentType"
 									class="form-control">
@@ -144,6 +165,8 @@
 										style="background-color: #fff; width: 139px;" />
 								</div>
 							</div>
+							
+							
 							<div class="col-sm-1">
 								<br>
 								<button type="button" class="btn btn-info"

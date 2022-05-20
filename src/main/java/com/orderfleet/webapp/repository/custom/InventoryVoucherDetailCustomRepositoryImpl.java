@@ -1,18 +1,25 @@
 package com.orderfleet.webapp.repository.custom;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Component;
 
+import com.orderfleet.webapp.domain.ProductGroup;
+import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
+import com.orderfleet.webapp.repository.ProductGroupRepository;
+import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 
@@ -21,6 +28,12 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	
+	@Inject
+	private ProductGroupRepository productGroupRepository;
+	
+
+
 
 	@Override
 	public List<InventoryVoucherDetailDTO> getInventoryDetailListBy(List<String> productCategoryPids,
@@ -31,13 +44,17 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 		Map<String, List<String>> queryParameters = new HashMap<>();
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
 
+//		
+//		System.out.println("productProfiel"+productProfiles.size());
+		
 		StringBuilder subQueryString = new StringBuilder("select " + "ivd.inventoryVoucherHeader.createdDate,"
-				+ "ivd.inventoryVoucherHeader.employee.name," + "ivd.inventoryVoucherHeader.receiverAccount.name,"
+				+ "ivd.inventoryVoucherHeader.employee.name," + "ivd.inventoryVoucherHeader.documentNumberServer,"
+				+ "ivd.inventoryVoucherHeader.receiverAccount.name,"
 				+ "ivd.inventoryVoucherHeader.supplierAccount.name," + "ivd.product.productCategory.name,"
 				+ "ivd.product.name," + "ivd.quantity," + "ivd.sellingRate," + "ivd.rowTotal," + "ivd.product.pid,"
 				+ "ivd.product.unitQty," + "ivd.volume," + "ivd.inventoryVoucherHeader.receiverAccount.location,"
 				+ "ivd.inventoryVoucherHeader.supplierAccount.location,"
-				+ "ivd.inventoryVoucherHeader.document.activityAccount,"+"ivd.product.productDescription");
+				+ "ivd.inventoryVoucherHeader.document.activityAccount," + "ivd.product.productDescription,"+"ivd.inventoryVoucherHeader.receiverAccount.pid,"+"ivd.inventoryVoucherHeader.deliveryDate");
 		if (!stockLocationPids.isEmpty()) {
 			subQueryString.append(",ivd.sourceStockLocation.name," + "ivd.destinationStockLocation.name ");
 		}
@@ -109,29 +126,39 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
 			ivd.setCreatedDate((LocalDateTime) object[0]);
 			ivd.setEmployeeName((String) object[1]);
-			ivd.setAccountName((String) object[2]);
-			ivd.setSupplierAccountName((String) object[3]);
-			ivd.setProductCategory((String) object[4]);
-			ivd.setProductName((String) object[5]);
-			ivd.setQuantity((double) object[6]);
-			ivd.setSellingRate((double) object[7]);
-			ivd.setRowTotal((double) object[8]);
-			ivd.setProductPid((String) object[9]);
+			ivd.setOderID((String) object[2]);
+			ivd.setAccountName((String) object[3]);
+			ivd.setSupplierAccountName((String) object[4]);
+			ivd.setProductCategory((String) object[5]);
+			ivd.setProductName((String) object[6]);
+			ivd.setQuantity((double) object[7]);
+			ivd.setSellingRate((double) object[8]);
+			ivd.setRowTotal((double) object[9]);
+	
+			ivd.setProductPid((String) object[10]);
 			if (!stockLocationPids.isEmpty()) {
-				ivd.setSourceStockLocationName((String) object[12]);
-				ivd.setDestinationStockLocationName((String) object[13]);
+				ivd.setSourceStockLocationName((String) object[13]);
+				ivd.setDestinationStockLocationName((String) object[14]);
 			}
-			ivd.setProductUnitQty(object[10] != null ? Double.valueOf(object[10].toString()) : 1);
-			ivd.setVolume(Double.valueOf(object[11].toString()));
-			ivd.setCustomerLocation(object[12] != null ? object[12].toString() : "");
-			if (AccountTypeColumn.valueOf(object[14].toString()).equals(AccountTypeColumn.Supplier)) {
-				ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
+						
+			ivd.setProductUnitQty(object[11] != null ? Double.valueOf(object[11].toString()) : 1);
+			ivd.setVolume(Double.valueOf(object[12].toString()));
+			ivd.setCustomerLocation(object[13] != null ? object[12].toString() : "");
+			
+			if (AccountTypeColumn.valueOf(object[15].toString()).equals(AccountTypeColumn.Supplier)) {
+				ivd.setCustomerLocation(object[14] != null ? object[14].toString() : "");
 			}
-			ivd.setProductDescription((String) object[15]);
+			ivd.setProductDescription((String) object[16]);
+			ivd.setAccountPid((String) object[17]);
+			
+			if(object[18] != null){
+				LocalDate deliveryDateLocal = (LocalDate) object[18];
+				LocalDateTime deliveryDate = deliveryDateLocal.atTime(0, 0);
+				ivd.setDeliveryDate(deliveryDate);
+			}
+		
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
-
 		return inventoryVoucherDetailDTOs;
 	}
-
 }
