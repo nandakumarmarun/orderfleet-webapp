@@ -1336,7 +1336,7 @@ boolean compconfig= getCompanyCofig();
 		String[] products = selectdproducts.split(",");
 		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository.findOneByPid(inventoryHeaderPid).get(); 
 		InventoryVoucherDetail InventoryVoucherDetail = new InventoryVoucherDetail();
-		List<InventoryVoucherDetail> inventoryVoucherDetailList = inventoryVoucherHeader.getInventoryVoucherDetails();
+		List<InventoryVoucherDetail> inventoryVoucherDetailList = inventoryVoucherDetailRepository.findAllByInventoryVoucherHeaderId(inventoryVoucherHeader.getId());
 		
 		for (String productPid : products) {
 			ProductProfile product = productRepository.findOneByPid(productPid).get();
