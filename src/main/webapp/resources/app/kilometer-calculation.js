@@ -93,18 +93,28 @@ if (!this.KilometerCalculation) {
 	KilometerCalculation.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");
-		if ($('#dbDateSearch').val() != "CUSTOM") {
-			$(".custom_date1").addClass('hide');
-			$(".custom_date1").removeClass('show');
-			$(".custom_date2").addClass('hide');
-			$(".custom_date2").removeClass('show');
-			$('#divDatePickers').css('display', 'none');
-		} else {
+		if ($('#dbDateSearch').val() == "CUSTOM") {
 			$(".custom_date1").addClass('show');
 			$(".custom_date2").addClass('show');
 			$(".custom_date1").removeClass('hide');
 			$(".custom_date2").removeClass('hide');
 			$('#divDatePickers').css('display', 'initial');
+		} else if ($('#dbDateSearch').val() == "SINGLE") {
+			$(".custom_date1").addClass('show');
+			$(".custom_date1").removeClass('hide');
+			$(".custom_date2").addClass('hide');
+			$(".custom_date2").removeClass('show');
+			$("#txtFromDate").datepicker({
+				dateFormat : "dd-mm-yy"
+			});
+			$("#txtFromDate").datepicker('show');
+			$('#divDatePickers').css('display', 'initial');
+		} else {
+			$(".custom_date1").addClass('hide');
+			$(".custom_date1").removeClass('show');
+			$(".custom_date2").addClass('hide');
+			$(".custom_date2").removeClass('show');
+			$('#divDatePickers').css('display', 'none');
 		}
 	}
 
@@ -166,6 +176,8 @@ if (!this.KilometerCalculation) {
 																			: kilometerCalc.accountProfileName)
 																	+ "</td><td class='tableexport-string target'>"
 																	+ kilometerCalc.punchingDate
+																	+ "</td><td class='tableexport-string target'>"
+																	+ kilometerCalc.date
 																	+ "</td><td class='tableexport-string target'>"
 																	+ kilometerCalc.punchingTime
 																	+ "</td><td>"

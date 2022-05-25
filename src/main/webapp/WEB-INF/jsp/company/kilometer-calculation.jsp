@@ -45,36 +45,43 @@
 								</select>
 							</div>
 							<div class="col-sm-2">
-								<br />  <select id="dbFareType" name="fareTypePid"
+								<br /> <select id="dbFareType" name="fareTypePid"
 									class="form-control">
 									<option value="no">Select Vehicle Fare</option>
 									<c:forEach items="${distanceFare}" var="distanceFare">
 										<option value="${distanceFare.fare}">${distanceFare.vehicleType}</option>
 									</c:forEach>
-								</select> 
+								</select>
 							</div>
 							<div class="col-sm-2">
 								<br /> <select class="form-control" id="dbDateSearch"
 									onchange="KilometerCalculation.showDatePicker()">
 									<option value="TODAY">Today</option>
 									<option value="YESTERDAY">Yesterday</option>
-									<option value="WTD">WTD</option>
-									<option value="MTD">MTD</option>
+									<option value="SINGLE">Single Date</option>
 									<option value="CUSTOM">CUSTOM</option>
 								</select>
 							</div>
-							<div id="divDatePickers" style="display: none;">
-								<div class="col-sm-2">
-									<div class="input-group">
-										From Date<input type="text" class="form-control"
-											id="txtFromDate" placeholder="Select From Date"
-											style="background-color: #fff;" />
+							<div class="col-sm-2 hide custom_date1">
+								<br />
+								<div class="input-group">
+									<input type="text" class="form-control" id="txtFromDate"
+										placeholder="Select From Date" style="background-color: #fff;"
+										readonly="readonly" />
+
+									<div class="input-group-addon">
+										<a href="#"><i class="entypo-calendar"></i></a>
 									</div>
 								</div>
-								<div class="col-sm-2">
-									<div class="input-group">
-										To Date<input type="text" class="form-control" id="txtToDate"
-											placeholder="Select To Date" style="background-color: #fff;" />
+							</div>
+							<div class="col-sm-2 hide custom_date2">
+								<br />
+								<div class="input-group">
+									<input type="text" class="form-control" id="txtToDate"
+										placeholder="Select To Date" style="background-color: #fff;"
+										readonly="readonly" />
+									<div class="input-group-addon">
+										<a href="#"><i class="entypo-calendar"></i></a>
 									</div>
 								</div>
 							</div>
@@ -88,23 +95,25 @@
 								<button id="btnDownload" type="button" class="btn btn-success">Download
 									Xls</button>
 							</div>
-							
+
 						</div>
 					</form>
 				</div>
 			</div>
-							<div class="col-md-12 col-sm-12 clearfix" style="font-size: 14px; color: black;">
-								<div class="col-sm-3">
-									<label>Transactions : </label> <label id="lblSub">0</label>
-								</div>
-								<div class="col-sm-3">
-									<label>Total distance : </label> <label id="lblTotalKilo">0 Km</label>
-								</div>
-								<div class="col-sm-3">
-									<label>Total Fare : Rs </label> <label id="lblTotalFare">0</label>
-								</div>
-								<div class="col-sm-3"></div>
-							</div>
+			<div class="col-md-12 col-sm-12 clearfix"
+				style="font-size: 14px; color: black;">
+				<div class="col-sm-3">
+					<label>Transactions : </label> <label id="lblSub">0</label>
+				</div>
+				<div class="col-sm-3">
+					<label>Total distance : </label> <label id="lblTotalKilo">0
+						Km</label>
+				</div>
+				<div class="col-sm-3">
+					<label>Total Fare : Rs </label> <label id="lblTotalFare">0</label>
+				</div>
+				<div class="col-sm-3"></div>
+			</div>
 			<div class="clearfix"></div>
 			<hr />
 
@@ -115,7 +124,8 @@
 						<tr>
 							<th>Employee</th>
 							<th>Account</th>
-							<th>Punch Date</th>
+							<th>Server Date</th>
+							<th>Client Date</th>
 							<th>Punch Time</th>
 							<th>Location</th>
 							<th>Metres</th>
@@ -138,7 +148,7 @@
 	<%-- <spring:url value="/resources/assets/js/table2excel.js"
 		var="table2excel"></spring:url>
 	<script type="text/javascript" src="${table2excel}"></script> --%>
-	
+
 	<!-- tableExport.jquery.plugin -->
 	<spring:url value="/resources/assets/js/tableexport/xlsx.core.min.js"
 		var="jsXlsx"></spring:url>

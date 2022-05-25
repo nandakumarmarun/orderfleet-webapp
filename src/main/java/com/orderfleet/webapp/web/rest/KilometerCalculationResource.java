@@ -121,14 +121,11 @@ public class KilometerCalculationResource {
 		} else if (filterBy.equals("YESTERDAY")) {
 			LocalDate yeasterday = LocalDate.now().minusDays(1);
 			kilometreCalculationDTO = getFilterData(userPid, accountProfilePid, yeasterday, yeasterday);
-		} else if (filterBy.equals("WTD")) {
-			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
-			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			kilometreCalculationDTO = getFilterData(userPid, accountProfilePid, weekStartDate, LocalDate.now());
-		} else if (filterBy.equals("MTD")) {
-			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			kilometreCalculationDTO = getFilterData(userPid, accountProfilePid, monthStartDate, LocalDate.now());
-		} else if (filterBy.equals("CUSTOM")) {
+		} else if (filterBy.equals("SINGLE")) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
+			kilometreCalculationDTO = getFilterData(userPid, accountProfilePid, fromDateTime, fromDateTime);
+		}  else if (filterBy.equals("CUSTOM")) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
