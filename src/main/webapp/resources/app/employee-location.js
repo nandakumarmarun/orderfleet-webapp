@@ -96,7 +96,9 @@ if (!this.EmployeeProfileLocation) {
 														.append(
 																"<tr><td>"
 																		+ employeeProfile.name
-																		+ "</td><td><button type='button' class='btn btn-info' onclick='EmployeeProfileLocation.showModalPopup($(\"#locationsModal\"),\""
+																		+ "</td><td>"
+																		+employeeProfile.userFirstName
+																		+"</td><td><button type='button' class='btn btn-info' onclick='EmployeeProfileLocation.showModalPopup($(\"#locationsModal\"),\""
 																		+ employeeProfile.pid
 																		+ "\",0);'>Assign Locations</button></td></tr>");
 
