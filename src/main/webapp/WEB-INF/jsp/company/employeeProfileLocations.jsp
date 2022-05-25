@@ -84,7 +84,7 @@
 				<thead>
 					<tr>
 						<th>Name</th>
-						<th> User Name</th>
+						<th>User Name</th>
 						<th>Actions</th>
 					</tr>
 				</thead>
