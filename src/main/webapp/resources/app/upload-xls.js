@@ -310,8 +310,8 @@ if (!this.xlsFileUploader) {
 
 		var invoiceNumbers = "";
 		var nameNumber = $('#customerNameColumnNumber').val();
-		var customerIdNumber = 1;
-		var docNoNumber = $('#documentNoColumnNumber').val();
+		var customerIdNumber = $('#documentNoColumnNumber').val();
+		var docNoNumber = $('#documentNumberColumnNumber').val();
 		var docDateNumber = $('#documentDateColumnNumber').val();
 		var docAmountNumber = $('#documentAmountColumnNumber').val();
 		var balanceAmountNumber = $('#balanceAmountColumnNumber').val();
@@ -322,9 +322,9 @@ if (!this.xlsFileUploader) {
 			$('#alertBox').modal("show");
 			return false;
 		}
-		if (customerIdNumber == '') {
-			customerIdNumber = -1;
-		}
+//		if (customerIdNumber == '') {
+//			customerIdNumber = -1;
+//		}
 		if (docNoNumber == '') {
 			docNoNumber = -1;
 		}
@@ -338,7 +338,7 @@ if (!this.xlsFileUploader) {
 			balanceAmountNumber = -1;
 		}
 
-		invoiceNumbers = nameNumber + "," + customerIdNumber + "," + docNoNumber
+		invoiceNumbers = nameNumber + "," + customerIdNumber  +","+ docNoNumber
 				+ "," + docDateNumber + "," + docAmountNumber + "," + balanceAmountNumber;
 				
 
@@ -452,7 +452,7 @@ if (!this.xlsFileUploader) {
 			return false;
 		}
 
-		$('#ReceivablePayableColumnNumbers').modal('show');
+		$('#receivablePayableColumnNumbers').modal('show');
 	}
 
 	function onSaveSuccess(result) {

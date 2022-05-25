@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -87,7 +88,6 @@ import com.orderfleet.webapp.service.OpeningStockService;
 import com.orderfleet.webapp.service.ProductProfileService;
 import com.orderfleet.webapp.service.ReceivablePayableService;
 import com.orderfleet.webapp.service.util.RandomUtil;
-
 
 /**
  * used to upload xls
@@ -325,156 +325,212 @@ public class UploadXlsResource {
 					if (addressNumber == -1) {
 						accProfile.setAddress("No Address");
 					} else {
-						String address = "";
 
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(addressNumber).getCellType() == 0) {
-							address = String.valueOf(row.getCell(addressNumber).getNumericCellValue());
-						}
+						Cell cell = row.getCell(addressNumber);
 
-						if (row.getCell(addressNumber).getCellType() == 1) {
-							address = String.valueOf(row.getCell(addressNumber).getStringCellValue());
-						}
-
-						if (address.equals(null) || address.isEmpty()) {
+						if (cell == null) {
 							accProfile.setAddress("No Address");
 						} else {
+							String address = "";
+
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(addressNumber).getCellType() == 0) {
+								address = String.valueOf(row.getCell(addressNumber).getNumericCellValue());
+							}
+
+							if (row.getCell(addressNumber).getCellType() == 1) {
+								address = String.valueOf(row.getCell(addressNumber).getStringCellValue());
+							}
+
 							accProfile.setAddress(address);
 						}
 					}
 					if (cityNumber == -1) {
 						accProfile.setCity("No city");
 					} else {
+						Cell cell = row.getCell(cityNumber);
 
-						String city = "";
-
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(cityNumber).getCellType() == 0) {
-							city = String.valueOf(row.getCell(cityNumber).getNumericCellValue());
-						}
-
-						if (row.getCell(cityNumber).getCellType() == 1) {
-							city = String.valueOf(row.getCell(cityNumber).getStringCellValue());
-						}
-
-						if (city == null || city.isEmpty()) {
+						if (cell == null) {
 							accProfile.setCity("No city");
 						} else {
+							String city = "";
+
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(cityNumber).getCellType() == 0) {
+								city = String.valueOf(row.getCell(cityNumber).getNumericCellValue());
+							}
+
+							if (row.getCell(cityNumber).getCellType() == 1) {
+								city = String.valueOf(row.getCell(cityNumber).getStringCellValue());
+							}
 							accProfile.setCity(city);
 						}
-
 					}
 					if (locationNumber != -1) {
-						accProfile.setLocation(row.getCell(locationNumber).getStringCellValue());
+						Cell cell = row.getCell(locationNumber);
+						if (cell == null) {
+							accProfile.setLocation(" ");
+						} else {
+							accProfile.setLocation(row.getCell(locationNumber).getStringCellValue());
+						}
 					}
 					if (pinNumber != -1) {
-						String pin = formatter.formatCellValue(row.getCell(pinNumber));
-						accProfile.setPin(pin);
+						Cell cell = row.getCell(pinNumber);
+						if (cell == null) {
+							accProfile.setPin(" ");
+						} else {
+							String pin = formatter.formatCellValue(row.getCell(pinNumber));
+							accProfile.setPin(pin);
+						}
 					}
 					if (phone1Number != -1) {
-						String phones = formatter.formatCellValue(row.getCell(phone1Number));
-						String[] phoneNums = phones.split("\n|\\/|\\,");
-						accProfile.setPhone1(phoneNums[0]);
-						if (phoneNums.length > 1) {
-							accProfile.setPhone2(phoneNums[1]);
+						Cell cell = row.getCell(phone1Number);
+						if (cell == null) {
+							accProfile.setPhone2(" ");
+						} else {
+							String phones = formatter.formatCellValue(row.getCell(phone1Number));
+							String[] phoneNums = phones.split("\n|\\/|\\,");
+							accProfile.setPhone1(phoneNums[0]);
+							if (phoneNums.length > 1) {
+								accProfile.setPhone2(phoneNums[1]);
+							}
 						}
 					}
 
 					if (eMail1Number != -1) {
-						accProfile.setEmail1(row.getCell(eMail1Number).getStringCellValue());
+						Cell cell = row.getCell(eMail1Number);
+						if (cell == null) {
+							accProfile.setEmail1(" ");
+						} else {
+							accProfile.setEmail1(row.getCell(eMail1Number).getStringCellValue());
+						}
 					}
 
 					if (descriptionNumber != -1) {
-						accProfile.setDescription(row.getCell(descriptionNumber).getStringCellValue());
+						Cell cell = row.getCell(descriptionNumber);
+						if (cell == null) {
+							accProfile.setDescription(" ");
+						} else {
+							accProfile.setDescription(row.getCell(descriptionNumber).getStringCellValue());
+						}
 					}
 					if (contactPersonNumber != -1) {
-						accProfile.setContactPerson(row.getCell(contactPersonNumber).getStringCellValue());
+						Cell cell = row.getCell(contactPersonNumber);
+						if (cell == null) {
+							accProfile.setContactPerson(" ");
+						} else {
+							accProfile.setContactPerson(row.getCell(contactPersonNumber).getStringCellValue());
+						}
 					}
 					if (accountTypeNumber != -1) {
-						String accTypeName = row.getCell(accountTypeNumber).getStringCellValue();
-						Optional<AccountType> opAccountType = accountTypeDTOs.stream()
-								.filter(at -> at.getName().equals(accTypeName)).findAny();
-						if (opAccountType.isPresent()) {
-							accProfile.setAccountType(opAccountType.get());
-						} else {
+						Cell cell = row.getCell(accountTypeNumber);
+						if (cell == null) {
 							accProfile.setAccountType(deafultAccountType);
+						} else {
+							String accTypeName = row.getCell(accountTypeNumber).getStringCellValue();
+							Optional<AccountType> opAccountType = accountTypeDTOs.stream()
+									.filter(at -> at.getName().equals(accTypeName)).findAny();
+							if (opAccountType.isPresent()) {
+								accProfile.setAccountType(opAccountType.get());
+							} else {
+								accProfile.setAccountType(deafultAccountType);
+							}
 						}
 					}
 					if (aliasNumber != -1) {
+						Cell cell = row.getCell(aliasNumber);
+						if (cell == null) {
+							accProfile.setAlias(" ");
+						} else {
+							String alias = "";
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(aliasNumber).getCellType() == 0) {
+								alias = String.valueOf(row.getCell(aliasNumber).getNumericCellValue());
+							}
 
-						String alias = "";
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(aliasNumber).getCellType() == 0) {
-							alias = String.valueOf(row.getCell(aliasNumber).getNumericCellValue());
+							if (row.getCell(aliasNumber).getCellType() == 1) {
+								alias = String.valueOf(row.getCell(aliasNumber).getStringCellValue());
+							}
+
+							accProfile.setAlias(alias);
 						}
-
-						if (row.getCell(aliasNumber).getCellType() == 1) {
-							alias = String.valueOf(row.getCell(aliasNumber).getStringCellValue());
-						}
-
-						accProfile.setAlias(alias);
-
 					}
 					if (closingBalanceNumber != -1) {
+						Cell cell = row.getCell(closingBalanceNumber);
+						if (cell == null) {
+							accProfile.setClosingBalance(0);
+						} else {
+							String closeBal = "";
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(closingBalanceNumber).getCellType() == 0) {
+								closeBal = String.valueOf(row.getCell(closingBalanceNumber).getNumericCellValue());
+							}
 
-						String closeBal = "";
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(closingBalanceNumber).getCellType() == 0) {
-							closeBal = String.valueOf(row.getCell(closingBalanceNumber).getNumericCellValue());
+							if (row.getCell(closingBalanceNumber).getCellType() == 1) {
+								closeBal = String.valueOf(row.getCell(closingBalanceNumber).getStringCellValue());
+							}
+
+							double closingBalance = Double.valueOf(closeBal);
+
+							accProfile.setClosingBalance(closingBalance);
 						}
-
-						if (row.getCell(closingBalanceNumber).getCellType() == 1) {
-							closeBal = String.valueOf(row.getCell(closingBalanceNumber).getStringCellValue());
-						}
-
-						double closingBalance = Double.valueOf(closeBal);
-
-						accProfile.setClosingBalance(closingBalance);
 					}
 					if (creditDaysNumber != -1) {
+						Cell cell = row.getCell(creditDaysNumber);
+						if (cell == null) {
+							accProfile.setCreditDays(0L);
+						} else {
+							Long creditdays = null;
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(creditDaysNumber).getCellType() == 0) {
+								creditdays = (long) row.getCell(creditDaysNumber).getNumericCellValue();
+							}
 
-						Long creditdays = null;
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(creditDaysNumber).getCellType() == 0) {
-							creditdays = (long) row.getCell(creditDaysNumber).getNumericCellValue();
+							if (row.getCell(creditDaysNumber).getCellType() == 1) {
+								creditdays = Long.valueOf(row.getCell(creditDaysNumber).getStringCellValue());
+							}
+
+							Long creditDays = creditdays;
+							accProfile.setCreditDays(creditDays);
 						}
-
-						if (row.getCell(creditDaysNumber).getCellType() == 1) {
-							creditdays = Long.valueOf(row.getCell(creditDaysNumber).getStringCellValue());
-						}
-
-						Long creditDays = creditdays;
-						accProfile.setCreditDays(creditDays);
 					}
 					if (creditLimitNumber != -1) {
+						Cell cell = row.getCell(creditLimitNumber);
+						if (cell == null) {
+							accProfile.setCreditLimit(0L);
+						} else {
+							Long creditlimit = null;
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(creditLimitNumber).getCellType() == 0) {
+								creditlimit = (long) row.getCell(creditLimitNumber).getNumericCellValue();
+							}
 
-						Long creditlimit = null;
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(creditLimitNumber).getCellType() == 0) {
-							creditlimit = (long) row.getCell(creditLimitNumber).getNumericCellValue();
+							if (row.getCell(creditLimitNumber).getCellType() == 1) {
+								creditlimit = Long.valueOf(row.getCell(creditLimitNumber).getStringCellValue());
+							}
+
+							Long creditLimit = creditlimit;
+							accProfile.setCreditLimit(creditLimit);
 						}
-
-						if (row.getCell(creditLimitNumber).getCellType() == 1) {
-							creditlimit = Long.valueOf(row.getCell(creditLimitNumber).getStringCellValue());
-						}
-
-						Long creditLimit = creditlimit;
-						accProfile.setCreditLimit(creditLimit);
 					}
 					if (tinNoNumber != -1) {
-						String tin = row.getCell(tinNoNumber).getStringCellValue();
-						if (tin.isEmpty() || tin == null) {
+						Cell cell = row.getCell(tinNoNumber);
+						if (cell == null) {
 							accProfile.setTinNo(" ");
 						} else {
-							accProfile.setTinNo(tin);
+							String tin = row.getCell(tinNoNumber).getStringCellValue();
 
+							accProfile.setTinNo(tin);
 						}
 					}
 
 					if (customerIdNumber == -1) {
 						accProfile.setCustomerId("No value");
 					} else {
-
+						Cell cell = row.getCell(customerIdNumber);
+						if (cell == null) {
+							accProfile.setCustomerId(" ");
+						}
 						String customersid = "";
 //						 celltype=0==>Numeric && celltype=1==>String
 						if (row.getCell(customerIdNumber).getCellType() == 0) {
@@ -484,46 +540,69 @@ public class UploadXlsResource {
 						if (row.getCell(customerIdNumber).getCellType() == 1) {
 							customersid = String.valueOf(row.getCell(customerIdNumber).getStringCellValue());
 						}
-						if (customersid == null || customersid.isEmpty()) {
-							accProfile.setCustomerId(" ");
-						}
-						  String s1 = customersid.substring(0,customersid.indexOf("."));
-					        s1.trim();
+
+						String s1 = customersid.substring(0, customersid.indexOf("."));
+						s1.trim();
 						accProfile.setCustomerId(s1);
 					}
 					if (customerCodeNumber != -1) {
-						accProfile.setCustomerCode(row.getCell(customerCodeNumber).getStringCellValue());
+						Cell cell = row.getCell(customerCodeNumber);
+						if (cell == null) {
+							accProfile.setCustomerCode(" ");
+						} else {
+							accProfile.setCustomerCode(row.getCell(customerCodeNumber).getStringCellValue());
+						}
 					}
 					if (priceLevelNumber != -1) {
-						String priceLevelName = row.getCell(priceLevelNumber).getStringCellValue();
-						Optional<PriceLevel> opPriceLevel = priceLevelDTOs.stream()
-								.filter(pl -> pl.getName().equals(priceLevelName)).findAny();
-						if (opPriceLevel.isPresent()) {
-							accProfile.setDefaultPriceLevel(opPriceLevel.get());
+						Cell cell = row.getCell(priceLevelNumber);
+						if (cell == null) {
+							accProfile.setDefaultPriceLevel(null);
+						} else {
+							String priceLevelName = row.getCell(priceLevelNumber).getStringCellValue();
+							Optional<PriceLevel> opPriceLevel = priceLevelDTOs.stream()
+									.filter(pl -> pl.getName().equals(priceLevelName)).findAny();
+							if (opPriceLevel.isPresent()) {
+								accProfile.setDefaultPriceLevel(opPriceLevel.get());
+							}
 						}
 					}
 					if (countryNumber != -1) {
-						String countryName = row.getCell(countryNumber).getStringCellValue();
-						Optional<CountryC> opCountry = countrycDTOS.stream()
-								.filter(ps -> ps.getName().equals(countryName)).findAny();
-						if (opCountry.isPresent()) {
-							accProfile.setCountryc(opCountry.get());
+						Cell cell = row.getCell(countryNumber);
+						if (cell == null) {
+							accProfile.setCountryc(null);
+						} else {
+							String countryName = row.getCell(countryNumber).getStringCellValue();
+							Optional<CountryC> opCountry = countrycDTOS.stream()
+									.filter(ps -> ps.getName().equals(countryName)).findAny();
+							if (opCountry.isPresent()) {
+								accProfile.setCountryc(opCountry.get());
+							}
 						}
 					}
 					if (stateNumber != -1) {
-						String stateName = row.getCell(stateNumber).getStringCellValue();
-						Optional<StateC> opState = statecDTOs.stream().filter(st -> st.getName().equals(stateName))
-								.findAny();
-						if (opState.isPresent()) {
-							accProfile.setStatec(opState.get());
+						Cell cell = row.getCell(stateNumber);
+						if (cell == null) {
+							accProfile.setStatec(null);
+						} else {
+							String stateName = row.getCell(stateNumber).getStringCellValue();
+							Optional<StateC> opState = statecDTOs.stream().filter(st -> st.getName().equals(stateName))
+									.findAny();
+							if (opState.isPresent()) {
+								accProfile.setStatec(opState.get());
+							}
 						}
 					}
 					if (districtNumber != -1) {
-						String districtName = row.getCell(districtNumber).getStringCellValue();
-						Optional<DistrictC> opDistrict = districtcDTOs.stream()
-								.filter(dt -> dt.getName().equals(districtName)).findAny();
-						if (opDistrict.isPresent()) {
-							accProfile.setDistrictc(opDistrict.get());
+						Cell cell = row.getCell(districtNumber);
+						if (cell == null) {
+							accProfile.setDistrictc(null);
+						} else {
+							String districtName = row.getCell(districtNumber).getStringCellValue();
+							Optional<DistrictC> opDistrict = districtcDTOs.stream()
+									.filter(dt -> dt.getName().equals(districtName)).findAny();
+							if (opDistrict.isPresent()) {
+								accProfile.setDistrictc(opDistrict.get());
+							}
 						}
 					}
 					if (saveUpdateAccountProfiles.stream().filter(acp -> acp.getName().equals(accountProofileName))
@@ -560,6 +639,7 @@ public class UploadXlsResource {
 					}
 
 					if (territoryNumber != -1) {
+
 						String territoryName = row.getCell(territoryNumber).getStringCellValue();
 						Optional<Location> oplocation = locations.stream()
 								.filter(l -> l.getName().equals(territoryName)).findAny();
@@ -616,8 +696,6 @@ public class UploadXlsResource {
 		log.info("Excel Account Profile Uploaded successfully..................");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
-
 
 	@SuppressWarnings("deprecation")
 	@RequestMapping(value = "/upload-xls/saveProductXls", method = RequestMethod.POST)
@@ -709,150 +787,201 @@ public class UploadXlsResource {
 					}
 
 					if (aliasNumber != -1) {
+						Cell cell = row.getCell(aliasNumber);
+						if (cell == null) {
+							productProfile.setAlias(" ");
+						} else {
+							String alias = "";
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(aliasNumber).getCellType() == 0) {
+								alias = String.valueOf(row.getCell(aliasNumber).getNumericCellValue());
+							}
 
-						String alias = "";
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(aliasNumber).getCellType() == 0) {
-							alias = String.valueOf(row.getCell(aliasNumber).getNumericCellValue());
+							if (row.getCell(aliasNumber).getCellType() == 1) {
+								alias = String.valueOf(row.getCell(aliasNumber).getStringCellValue());
+							}
+
+							productProfile.setAlias(alias);
 						}
-
-						if (row.getCell(aliasNumber).getCellType() == 1) {
-							alias = String.valueOf(row.getCell(aliasNumber).getStringCellValue());
-						}
-
-						productProfile.setAlias(alias);
 					}
 					if (descriptionNumber != -1) {
-						String description = "";
+						Cell cell = row.getCell(descriptionNumber);
+						if (cell == null) {
+							productProfile.setDescription(" ");
+						} else {
+							String description = "";
 
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(descriptionNumber).getCellType() == 0) {
-							description = String.valueOf(row.getCell(descriptionNumber).getNumericCellValue());
-						}
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(descriptionNumber).getCellType() == 0) {
+								description = String.valueOf(row.getCell(descriptionNumber).getNumericCellValue());
+							}
 
-						if (row.getCell(descriptionNumber).getCellType() == 1) {
-							description = String.valueOf(row.getCell(descriptionNumber).getStringCellValue());
-						}
-						if (description.equals(null) || description.isEmpty()) {
-							productProfile.setDescription("null");
+							if (row.getCell(descriptionNumber).getCellType() == 1) {
+								description = String.valueOf(row.getCell(descriptionNumber).getStringCellValue());
+							}
 
+							productProfile.setDescription(description);
 						}
-						productProfile.setDescription(description);
 					}
-					if (priceNumber == -1) {
-						productProfile.setPrice(BigDecimal.valueOf(0));
-					} else {
-						productProfile.setPrice(BigDecimal.valueOf(row.getCell(priceNumber).getNumericCellValue()));
+					if (priceNumber != -1) {
+						Cell cell = row.getCell(priceNumber);
+						if (cell == null) {
+							productProfile.setPrice(BigDecimal.valueOf(0));
+						}
+
+						else {
+							productProfile.setPrice(BigDecimal.valueOf(row.getCell(priceNumber).getNumericCellValue()));
+						}
 					}
 					if (skuNumber != -1) {
-						productProfile.setSku(row.getCell(skuNumber).getStringCellValue());
+						Cell cell = row.getCell(skuNumber);
+						if (cell == null) {
+							productProfile.setSku(" ");
+						} else {
+							productProfile.setSku(row.getCell(skuNumber).getStringCellValue());
+						}
 					}
 					if (unitQuantityNumber != -1) {
-
-						String unitQty = "";
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(unitQuantityNumber).getCellType() == 0) {
-							unitQty = String.valueOf(row.getCell(unitQuantityNumber).getNumericCellValue());
-						}
-
-						if (row.getCell(unitQuantityNumber).getCellType() == 1) {
-							unitQty = String.valueOf(row.getCell(unitQuantityNumber).getStringCellValue());
-						}
-						double unitQuantity = 0.0;
-						if (unitQty == null || unitQty.isEmpty()) {
-							unitQuantity = 0.0;
+						Cell cell = row.getCell(unitQuantityNumber);
+						if (cell == null) {
+							productProfile.setUnitQty(0.0);
 						} else {
+							String unitQty = "";
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(unitQuantityNumber).getCellType() == 0) {
+								unitQty = String.valueOf(row.getCell(unitQuantityNumber).getNumericCellValue());
+							}
+
+							if (row.getCell(unitQuantityNumber).getCellType() == 1) {
+								unitQty = String.valueOf(row.getCell(unitQuantityNumber).getStringCellValue());
+							}
+							double unitQuantity = 0.0;
+
 							unitQuantity = Double.parseDouble(unitQty);
+
+							productProfile.setUnitQty(unitQuantity);
 						}
-						productProfile.setUnitQty(unitQuantity);
 					}
 					if (TaxRateNumber != -1) {
-						productProfile.setTaxRate(row.getCell(TaxRateNumber).getNumericCellValue());
+						Cell cell = row.getCell(TaxRateNumber);
+						if (cell == null) {
+							productProfile.setTaxRate(0.0);
+						} else {
+							productProfile.setTaxRate(row.getCell(TaxRateNumber).getNumericCellValue());
+						}
 					}
 					if (sizeNumber != -1) {
-						productProfile.setSize(String.valueOf(row.getCell(sizeNumber).getNumericCellValue()));
+						Cell cell = row.getCell(sizeNumber);
+						if (cell == null) {
+							productProfile.setSize(" ");
+						} else {
+							productProfile.setSize(String.valueOf(row.getCell(sizeNumber).getNumericCellValue()));
+						}
 					}
 
 					if (mrpNumber != -1) {
+						Cell cell = row.getCell(mrpNumber);
+						if (cell == null) {
+							productProfile.setMrp(0.0);
+						} else {
+							String mrp = "";
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(mrpNumber).getCellType() == 0) {
+								mrp = String.valueOf(row.getCell(mrpNumber).getNumericCellValue());
+							}
 
-						String mrp = "";
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(mrpNumber).getCellType() == 0) {
-							mrp = String.valueOf(row.getCell(mrpNumber).getNumericCellValue());
+							if (row.getCell(mrpNumber).getCellType() == 1) {
+								mrp = String.valueOf(row.getCell(mrpNumber).getStringCellValue());
+							}
+							Double mRP = Double.parseDouble(mrp);
+							productProfile.setMrp(mRP);
 						}
-
-						if (row.getCell(mrpNumber).getCellType() == 1) {
-							mrp = String.valueOf(row.getCell(mrpNumber).getStringCellValue());
-						}
-						Double mRP = Double.parseDouble(mrp);
-						productProfile.setMrp(mRP);
 					}
 					if (productCategoryNumber != -1) {
-						String productCategoryName = row.getCell(productCategoryNumber).getStringCellValue();
-						Optional<ProductCategory> opProductCategory = productCategories.stream()
-								.filter(pc -> pc.getName().equals(productCategoryName)).findAny();
-						if (opProductCategory.isPresent()) {
-							productProfile.setProductCategory(opProductCategory.get());
+						Cell cell = row.getCell(productCategoryNumber);
+						if (cell == null) {
+							productProfile.setProductCategory(null);
+						} else {
+							String productCategoryName = row.getCell(productCategoryNumber).getStringCellValue();
+							Optional<ProductCategory> opProductCategory = productCategories.stream()
+									.filter(pc -> pc.getName().equals(productCategoryName)).findAny();
+							if (opProductCategory.isPresent()) {
+								productProfile.setProductCategory(opProductCategory.get());
+							}
 						}
 					}
 					if (hsnNumber != -1) {
-
-						String HsnCode = "";
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(hsnNumber).getCellType() == 0) {
-							HsnCode = String.valueOf(row.getCell(hsnNumber).getNumericCellValue());
-						}
-
-						if (row.getCell(hsnNumber).getCellType() == 1) {
-							HsnCode = String.valueOf(row.getCell(hsnNumber).getStringCellValue());
-						}
-						if (HsnCode == null || HsnCode.isEmpty()) {
+						Cell cell = row.getCell(hsnNumber);
+						if (cell == null) {
 							productProfile.setHsnCode(" ");
 						} else {
+							String HsnCode = "";
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(hsnNumber).getCellType() == 0) {
+								HsnCode = String.valueOf(row.getCell(hsnNumber).getNumericCellValue());
+							}
+
+							if (row.getCell(hsnNumber).getCellType() == 1) {
+								HsnCode = String.valueOf(row.getCell(hsnNumber).getStringCellValue());
+							}
+
 							productProfile.setHsnCode(HsnCode);
 						}
 					}
 					if (productIdNumber != -1) {
-						String proId = String.valueOf(row.getCell(productIdNumber).getNumericCellValue());
-						
-						 String s1 = proId.substring(0,proId.indexOf("."));
-					        s1.trim();
-					        productProfile.setProductId(s1);
+						Cell cell = row.getCell(productIdNumber);
+						if (cell == null) {
+							productProfile.setProductId(" ");
+						} else {
+							String proId = String.valueOf(row.getCell(productIdNumber).getNumericCellValue());
+
+							String s1 = proId.substring(0, proId.indexOf("."));
+							s1.trim();
+							productProfile.setProductId(s1);
+						}
 					}
 					if (productCodeNumber != -1) {
-						productProfile
-								.setProductCode(String.valueOf(row.getCell(productCodeNumber).getNumericCellValue()));
+						Cell cell = row.getCell(productCodeNumber);
+						if (cell == null) {
+							productProfile.setProductCode(" ");
+						} else {
+							productProfile.setProductCode(
+									String.valueOf(row.getCell(productCodeNumber).getNumericCellValue()));
+						}
 					}
 					if (compoundUnitNumber != -1) {
+						Cell cell = row.getCell(compoundUnitNumber);
+						if (cell == null) {
+							productProfile.setCompoundUnitQty(0.0);
+						} else {
+							String compoundUnit = "";
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(compoundUnitNumber).getCellType() == 0) {
+								compoundUnit = String.valueOf(row.getCell(compoundUnitNumber).getNumericCellValue());
+							}
 
-						String compoundUnit = "";
-						// celltype=0==>Numeric && celltype=1==>String
-						if (row.getCell(compoundUnitNumber).getCellType() == 0) {
-							compoundUnit = String.valueOf(row.getCell(compoundUnitNumber).getNumericCellValue());
+							if (row.getCell(compoundUnitNumber).getCellType() == 1) {
+								compoundUnit = String.valueOf(row.getCell(compoundUnitNumber).getStringCellValue());
+							}
+							Double cUNIT = Double.parseDouble(compoundUnit);
+							productProfile.setCompoundUnitQty(cUNIT);
 						}
-
-						if (row.getCell(compoundUnitNumber).getCellType() == 1) {
-							compoundUnit = String.valueOf(row.getCell(compoundUnitNumber).getStringCellValue());
-						}
-						Double cUNIT = Double.parseDouble(compoundUnit);
-						productProfile.setCompoundUnitQty(cUNIT);
 					}
-					if (unitsNumber == -1) {
-						productProfile.setUnits(null);
-					} else {
+					if (unitsNumber != -1) {
+						Cell cell = row.getCell(unitsNumber);
+						if (cell == null) {
+							productProfile.setUnits(null);
+						} else {
 
-						String unitsName = row.getCell(unitsNumber).getStringCellValue();
-						Units unit = new Units();
-//						if (unitsName == null || unitsName.isEmpty()) {
-//							unit.setName("Null");
-//							productProfile.setUnits(unit);
-//						}
-						Optional<Units> unitname = units.stream().filter(st -> st.getName().equals(unitsName))
-								.findAny();
-						if (unitname.isPresent()) {
-							unit.setName(unitsName);
-							productProfile.setUnits(unitname.get());
-							;
+							String unitsName = row.getCell(unitsNumber).getStringCellValue();
+							Units unit = new Units();
+							Optional<Units> unitname = units.stream().filter(st -> st.getName().equals(unitsName))
+									.findAny();
+							if (unitname.isPresent()) {
+								unit.setName(unitsName);
+								productProfile.setUnits(unitname.get());
+
+							}
 						}
 					}
 
@@ -905,6 +1034,7 @@ public class UploadXlsResource {
 					String ppName = productProfileName;
 
 					if (productGroupNumber != -1) {
+						
 						String productGroupName = row.getCell(productGroupNumber).getStringCellValue();
 
 						Optional<ProductGroup> opProductGroup = productGroups.stream()
@@ -921,7 +1051,7 @@ public class UploadXlsResource {
 							productNames.add(productProfileName);
 
 							for (ProductProfile productProfile : newProductProfiles) {
-
+ 
 								if (productProfile.getName().equalsIgnoreCase(productProfileName)) {
 									List<ProductGroupProduct> pgpProfiles = productGroupProducts.stream().filter(
 											pgp -> pgp.getProduct().getPid().equals(productProfile.getPid()) && pgp
@@ -1051,7 +1181,6 @@ public class UploadXlsResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-
 	@RequestMapping(value = "/upload-xls/saveInvoiceXls", method = RequestMethod.POST)
 	@Timed
 	public ResponseEntity<Void> saveAssignedInvoiceDetails(MultipartHttpServletRequest request) {
@@ -1069,7 +1198,7 @@ public class UploadXlsResource {
 
 			int NameNumber = Integer.parseInt(allInvoiceNumbers[0]);
 			int idNumber = Integer.parseInt(allInvoiceNumbers[1]);
-			
+
 			int docNoNumber = Integer.parseInt(allInvoiceNumbers[2]);
 			int docDateNumber = Integer.parseInt(allInvoiceNumbers[3]);
 			int docAmountNumber = Integer.parseInt(allInvoiceNumbers[4]);
@@ -1084,21 +1213,21 @@ public class UploadXlsResource {
 
 				rowNumber = row.getRowNum();
 				String customerId = null;
-				String s1= null;
+				String s1 = null;
 				if (rowNumber > 0) {
 					rowNumber++;
 
 					if (idNumber != -1) {
-            
+
 						customerId = String.valueOf(row.getCell(idNumber).getNumericCellValue());
-						  s1 = customerId.substring(0,customerId.indexOf("."));
-					        s1.trim();
-					        
+						s1 = customerId.substring(0, customerId.indexOf("."));
+						s1.trim();
+
 					}
 				}
 				cuIds.add(s1);
 			}
-			
+
 			receivablePayableRepository.deleteByCompanyId(company.getId());
 			List<AccountProfile> accountProfiles = accountProfileRepository
 					.findAccountProfilesByCompanyIdAndCustomerIdIn(company.getId(), cuIds);
@@ -1116,38 +1245,59 @@ public class UploadXlsResource {
 							.filter(a -> a.getName().equalsIgnoreCase(accountProfileName)).findAny();
 
 					if (accProfile.isPresent()) {
-						
+
 						ReceivablePayable receivablePayable = new ReceivablePayable();
 						receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
 						receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
 						receivablePayable.setCompany(company);
+						receivablePayable.setBillOverDue(null);
 						receivablePayable.setAccountProfile(accProfile.get());
 
 						if (docNoNumber != -1) {
-
-							String docNumber = row.getCell(docNoNumber).getStringCellValue();
-							receivablePayable.setReferenceDocumentNumber(docNumber);
+							Cell cell = row.getCell(docNoNumber);
+							if (cell == null) {
+								receivablePayable.setReferenceDocumentNumber(" ");
+							} else {
+								String docNumber = row.getCell(docNoNumber).getStringCellValue();
+								receivablePayable.setReferenceDocumentNumber(docNumber);
+							}
 						}
 
 						if (docDateNumber != -1) {
-							Date documentDate = row.getCell(docDateNumber).getDateCellValue();
-							LocalDate docDate = documentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+							Cell cell = row.getCell(docDateNumber);
+							if (cell == null) {
+								receivablePayable.setReferenceDocumentDate(null);
+							} else {
+								Date documentDate = row.getCell(docDateNumber).getDateCellValue();
+								LocalDate docDate = documentDate.toInstant().atZone(ZoneId.systemDefault())
+										.toLocalDate();
 
-							receivablePayable.setReferenceDocumentDate(docDate);
+								receivablePayable.setReferenceDocumentDate(docDate);
+							}
 						}
 						if (docAmountNumber != -1) {
-							String docAmount = "";
+							Cell cell = row.getCell(docAmountNumber);
+							if (cell == null) {
+								receivablePayable.setReferenceDocumentAmount(0.0);
+							} else {
+								String docAmount = "";
 
-							docAmount = String.valueOf(row.getCell(docAmountNumber).getNumericCellValue());
-							Double docamt = Double.parseDouble(docAmount);
-							receivablePayable.setReferenceDocumentAmount(docamt);
+								docAmount = String.valueOf(row.getCell(docAmountNumber).getNumericCellValue());
+								Double docamt = Double.parseDouble(docAmount);
+								receivablePayable.setReferenceDocumentAmount(docamt);
+							}
 						}
 						if (balanceAmountNumber != -1) {
-							String balAmount = "";
+							Cell cell = row.getCell(balanceAmountNumber);
+							if (cell == null) {
+								receivablePayable.setReferenceDocumentBalanceAmount(0.0);
+							} else {
+								String balAmount = "";
 
-							balAmount = String.valueOf(row.getCell(balanceAmountNumber).getNumericCellValue());
-							Double balamt = Double.parseDouble(balAmount);
-							receivablePayable.setReferenceDocumentBalanceAmount(balamt);
+								balAmount = String.valueOf(row.getCell(balanceAmountNumber).getNumericCellValue());
+								Double balamt = Double.parseDouble(balAmount);
+								receivablePayable.setReferenceDocumentBalanceAmount(balamt);
+							}
 						}
 						saveReceivablePayable.add(receivablePayable);
 
