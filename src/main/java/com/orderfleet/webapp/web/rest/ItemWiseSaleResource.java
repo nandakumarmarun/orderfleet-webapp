@@ -205,6 +205,7 @@ public class ItemWiseSaleResource {
 		productGroupPids = groupPids != "" ? Arrays.asList(groupPids.split(",")) : productGroupPids;
 		productProfilePids = profilePids != "" ? Arrays.asList(profilePids.split(",")) : productProfilePids;
 		productTerritoryPids = terittoryPids != "" ? Arrays.asList(terittoryPids.split(",")) : productTerritoryPids;
+		System.out.println(	productTerritoryPids);
 		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id = "AP_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();

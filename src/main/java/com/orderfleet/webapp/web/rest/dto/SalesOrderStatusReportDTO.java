@@ -42,6 +42,8 @@ public class SalesOrderStatusReportDTO {
 	
 	private String territory;
 	
+	private String territoryPid;
+	
 	private double documentTotal;
 	
 	private SalesOrderStatus salesOrderStatus;
@@ -134,6 +136,14 @@ public class SalesOrderStatusReportDTO {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getTerritoryPid() {
+		return territoryPid;
+	}
+
+	public void setTerritoryPid(String territoryPid) {
+		this.territoryPid = territoryPid;
 	}
 
 	public double getDocumentTotal() {

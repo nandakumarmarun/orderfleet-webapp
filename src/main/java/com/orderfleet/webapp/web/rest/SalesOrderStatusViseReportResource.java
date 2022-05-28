@@ -63,6 +63,7 @@ import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
+import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -136,6 +137,9 @@ public class SalesOrderStatusViseReportResource {
 	@Inject
 	private LocationAccountProfileRepository locationAccountProfileRepository;
 	
+	@Inject
+	private LocationRepository locationRepository;
+	
 	
 	@RequestMapping(value = "/sales-order-statusvise-report", method = RequestMethod.GET)
 	@Timed
@@ -148,9 +152,10 @@ public class SalesOrderStatusViseReportResource {
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 		model.addAttribute("documents", documentDTOs);
 		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
+		model.addAttribute("territories",locationRepository.findAllByCompanyId());
 		return "company/salesOrderStatusReport";
 	}
-	
+
 	@RequestMapping(value = "/sales-order-statusvise-report/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed
@@ -166,15 +171,18 @@ public class SalesOrderStatusViseReportResource {
 			@RequestParam("accountPid") String accountPid, @RequestParam("filterBy") String filterBy,
 			@RequestParam("documentPids") List<String> documentPids, @RequestParam String fromDate,
 			@RequestParam String toDate,
-			@RequestParam String salesOrderStatus) {
+			@RequestParam String salesOrderStatus,
+			@RequestParam String terittoryPids) {
 		log.debug("Web request to filter accounting vouchers");
+		LocalDate fDate = LocalDate.now();
+		LocalDate tDate = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 		if (documentPids.isEmpty()) {
 			return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
 		}
-		LocalDate fDate = LocalDate.now();
-		LocalDate tDate = LocalDate.now();
+	
+		
 		if (filterBy.equals(SalesOrderStatusViseReportResource.CUSTOM)) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			fDate = LocalDate.parse(fromDate, formatter);
 			tDate = LocalDate.parse(toDate, formatter);
 		} else if (filterBy.equals(SalesOrderStatusViseReportResource.YESTERDAY)) {
@@ -186,18 +194,22 @@ public class SalesOrderStatusViseReportResource {
 		} else if (filterBy.equals(SalesOrderStatusViseReportResource.MTD)) {
 			fDate = LocalDate.now().withDayOfMonth(1);
 		}
+		
+		
 		List<SalesOrderStatusReportDTO> salesOrderStatusReportDTOs = getFilterData(employeePids, documentPids, tallyDownloadStatus,
-				salesOrderStatus,accountPid, fDate, tDate);
+				salesOrderStatus,accountPid, fDate, tDate,terittoryPids);
+	
 		return new ResponseEntity<>(salesOrderStatusReportDTOs, HttpStatus.OK);
 	}
 
 	private List<SalesOrderStatusReportDTO> getFilterData(List<String> employeePids, List<String> documentPids,
-			String tallyDownloadStatus,String salesOrderStatus, String accountPid, LocalDate fDate, LocalDate tDate) {
+			String tallyDownloadStatus,String salesOrderStatus, String accountPid, LocalDate fDate, LocalDate tDate,String terittoryPids) {
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 		List<Long> userIds = employeeProfileRepository.findUserIdByEmployeePidIn(employeePids);
 		Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 		userIds.add(currentUserId);
+		 System.out.println("CompanyID"+SecurityUtils.getCurrentUsersCompanyId());
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -242,8 +254,9 @@ public class SalesOrderStatusViseReportResource {
 		}
 		
 		List<String> accountProfilePids;
+		List<String> productTerritoryPids = new ArrayList<>();
 		accountProfilePids = Arrays.asList(accountPid);
-	
+		productTerritoryPids = terittoryPids != "" ? Arrays.asList(terittoryPids.split(",")) : productTerritoryPids;
 		
 
 		
@@ -257,11 +270,26 @@ public class SalesOrderStatusViseReportResource {
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusaStatusdDateBetweenOrderByCreatedDateDesc(
 							userIds, accountPid, documentPids, tallyStatus, fromDate, toDate,salesStatus);		 
 		}
+		
 		if (inventoryVouchers.isEmpty()) {
 			System.out.println("List is empty");
 			return Collections.emptyList();
 		} else {
-			return createSalesOrderStatusReportDTO(inventoryVouchers);
+			List<SalesOrderStatusReportDTO> salesOrderStatusReportDTOs  = new ArrayList<>(); 
+			List<SalesOrderStatusReportDTO> fillterdsalesOrderStatusReportDTOs = createSalesOrderStatusReportDTO(inventoryVouchers);
+			if(!productTerritoryPids.isEmpty()) {
+				for(String productTerritoryPid : productTerritoryPids) {
+					List<SalesOrderStatusReportDTO> optSalesOrderStatusReportDTO = fillterdsalesOrderStatusReportDTOs.stream().filter(p -> p.getTerritoryPid().equals(productTerritoryPid)).collect(Collectors.toList());
+					if(!optSalesOrderStatusReportDTO.isEmpty()) {
+						salesOrderStatusReportDTOs.addAll(optSalesOrderStatusReportDTO);
+					}
+				}
+				return salesOrderStatusReportDTOs;
+			}
+			else {
+				return createSalesOrderStatusReportDTO(inventoryVouchers);
+			}
+		
 		}
 	}
 
@@ -281,7 +309,6 @@ public class SalesOrderStatusViseReportResource {
 			SalesOrderStatusReportDTO salesOrderStatusReportDTO = new SalesOrderStatusReportDTO();
 			Object[] ivData = inventoryVouchers.get(i);
 			salesOrderStatusReportDTO.setPid(ivData[0].toString());
-			System.out.println(ivData[0].toString());
 			salesOrderStatusReportDTO.setDocumentNumberLocal(ivData[1].toString());
 			salesOrderStatusReportDTO.setDocumentNumberServer(ivData[2].toString());
 			salesOrderStatusReportDTO.setServerDate((LocalDateTime) ivData[5]);
@@ -299,6 +326,7 @@ public class SalesOrderStatusViseReportResource {
 				
 				LocationAccountProfile locationAccountProfile = LocationAccountProfileOp.get();
 				salesOrderStatusReportDTO.setTerritory(locationAccountProfile.getLocation().getName());
+				salesOrderStatusReportDTO.setTerritoryPid(locationAccountProfile.getLocation().getPid());
 			}
 			
 			if(matchingObject.isPresent()) {

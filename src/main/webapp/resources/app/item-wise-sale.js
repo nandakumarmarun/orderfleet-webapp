@@ -140,14 +140,14 @@ if (!this.ItemWiseSale) {
 		if (value == "no") {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>OderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>Quantity</th><th>Amount</th></tr>");
+							"<tr><th>Date</th><th>OderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>DeliveryDate</th><th>Quantity</th><th>Amount</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='8' align='center'>Please wait...</td></tr>");
 		} else {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>OderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>Quantity</th><th>Unit Quantity</th><th>Voulume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
+							"<tr><th>Date</th><th>OderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>DeliveryDate</th><th>Quantity</th><th>Unit Quantity</th><th>Voulume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='7' align='center'>Please wait...</td></tr>");
@@ -226,6 +226,8 @@ if (!this.ItemWiseSale) {
 															+ "</td><td>"
 															+ itemWiseSales.territory
 															+ "</td><td>"
+															+ convertDateTimeFromServer(itemWiseSale.deliveryDate)
+															+ "</td><td>"
 															+ itemWiseSale.quantity
 															+ "</td><td>"
 															+ itemWiseSale.productUnitQty
@@ -265,6 +267,8 @@ if (!this.ItemWiseSale) {
 															+ itemWiseSale.productGroup
 															+ "</td><td>"
 															+ itemWiseSale.territory
+															+ "</td><td>"
+															+ convertDateTimeFromServer(itemWiseSale.deliveryDate)
 															+ "</td><td>"
 															+ itemWiseSale.quantity
 															+ "</td><td>"

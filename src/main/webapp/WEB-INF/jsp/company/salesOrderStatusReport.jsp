@@ -24,7 +24,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Sale Order StatusVise Report</h2>
+			<h2>Sale Order Status Wise Report</h2>
 			<div class="row col-xs-12"></div>
 			<div class="clearfix"></div>
 			<hr />
@@ -72,6 +72,7 @@
 									<option value="no">All</option>
 								</select>
 							</div>
+
 							<div class="col-sm-2">
 								Day <select class="form-control" id="dbDateSearch"
 									onchange="InventoryVoucher.showDatePicker()">
@@ -82,6 +83,7 @@
 									<option value="CUSTOM">CUSTOM</option>
 								</select>
 							</div>
+
 							<div class="col-sm-2 hide custom_date1">
 								<br />
 								<div class="input-group">
@@ -94,6 +96,7 @@
 									</div>
 								</div>
 							</div>
+
 							<div class="col-sm-2 hide custom_date2">
 								<br />
 								<div class="input-group">
@@ -105,6 +108,9 @@
 									</div>
 								</div>
 							</div>
+
+
+
 							<div class="col-sm-2">
 								Status <select id="dbStatus" name="tallyDownloadStatus"
 									class="form-control">
@@ -124,7 +130,17 @@
 									<option value="CONFIRM">CONFIRM</option>
 								</select>
 							</div>
-							
+
+							<div class="col-sm-2">
+								Account <select id="dbTerittory" name="terittory"
+									class="form-control selectpicker" data-live-search="true">
+									<option value="-1">All Terittories</option>
+									<c:forEach items="${territories}" var="locationAccountProfile">
+										<option value="${locationAccountProfile.pid}">${locationAccountProfile.name}</option>
+									</c:forEach>
+								</select>
+							</div>
+
 							<div class="col-sm-1">
 								<br>
 								<button type="button" class="btn btn-info"
@@ -132,7 +148,8 @@
 							</div>
 							<div class="col-sm-1 " id="downloadXls">
 								<br>
-								<button type="button" class="btn btn-success" id="downloadXlsbutton">Download</button>
+								<button type="button" class="btn btn-success"
+									id="downloadXlsbutton">Download</button>
 							</div>
 
 						</div>
@@ -157,7 +174,8 @@
 			<div class="table-responsive">
 
 
-				<table class="table  table-striped table-bordered " id="inventoryVoucherTable">
+				<table class="table  table-striped table-bordered "
+					id="inventoryVoucherTable">
 					<thead id="theadInventoryVoucher">
 						<tr>
 							<th>OrderId</th>
@@ -184,33 +202,33 @@
 		</div>
 
 
-	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
+		<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
 
-	<spring:url value="/resources/app/sales-order-status-report.js"
-		var="inventoryVoucherJs"></spring:url>
-	<script type="text/javascript" src="${inventoryVoucherJs}"></script>
-	
-	<spring:url value="/resources/assets/js/table2excel.js"
-		var="table2excel"></spring:url>
-	<script type="text/javascript" src="${table2excel}"></script>
-	
-	<!-- tableExport.jquery.plugin -->
-	<spring:url value="/resources/assets/js/tableexport/xlsx.core.min.js"
-		var="jsXlsx"></spring:url>
-	<spring:url value="/resources/assets/js/tableexport/FileSaver.min.js"
-		var="fileSaver"></spring:url>
-<%-- 	<spring:url value="/resources/assets/js/tableexport/tableexport.min.js" --%>
-<%-- 		var="tableExport"></spring:url> --%>
-	<script type="text/javascript" src="${jsXlsx}"></script>
-	<script type="text/javascript" src="${fileSaver}"></script>
-<%-- 	<script type="text/javascript" src="${tableExport}"></script> --%>
+		<spring:url value="/resources/app/sales-order-status-report.js"
+			var="inventoryVoucherJs"></spring:url>
+		<script type="text/javascript" src="${inventoryVoucherJs}"></script>
 
-	<spring:url value="/resources/assets/js/moment.js" var="momentJs"></spring:url>
-	<script type="text/javascript" src="${momentJs}"></script>
+		<spring:url value="/resources/assets/js/table2excel.js"
+			var="table2excel"></spring:url>
+		<script type="text/javascript" src="${table2excel}"></script>
 
-	<spring:url value="/resources/assets/js/custom/jquery.aCollapTable.js"
-		var="aCollapTable"></spring:url>
-	<script type="text/javascript" src="${aCollapTable}"></script>
+		<!-- tableExport.jquery.plugin -->
+		<spring:url value="/resources/assets/js/tableexport/xlsx.core.min.js"
+			var="jsXlsx"></spring:url>
+		<spring:url value="/resources/assets/js/tableexport/FileSaver.min.js"
+			var="fileSaver"></spring:url>
+		<spring:url
+			value="/resources/assets/js/tableexport/tableexport.min.js"
+			var="tableexport"></spring:url>
+		<script type="text/javascript" src="${jsXlsx}"></script>
+		<script type="text/javascript" src="${fileSaver}"></script>
+		<%-- 	<script type="text/javascript" src="${tableExport}"></script> --%>
 
+		<spring:url value="/resources/assets/js/moment.js" var="momentJs"></spring:url>
+		<script type="text/javascript" src="${momentJs}"></script>
+
+		<spring:url value="/resources/assets/js/custom/jquery.aCollapTable.js"
+			var="aCollapTable"></spring:url>
+		<script type="text/javascript" src="${aCollapTable}"></script>
 </body>
 </html>

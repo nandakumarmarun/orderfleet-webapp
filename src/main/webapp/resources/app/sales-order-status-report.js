@@ -177,6 +177,7 @@ if (!this.InventoryVoucher) {
 
 		let docPids = $('#dbDocument').val();
 		let empPids = $('#dbEmployee').val();
+		var territtoryPids = $('#dbTerittory').val();
 		if ("no" == docPids) {
 			docPids = $('#dbDocument option').map(function() {
 				return $(this).val();
@@ -187,6 +188,13 @@ if (!this.InventoryVoucher) {
 				return $(this).val();
 			}).get().join(',');
 		}
+		
+		if ("-1" == territtoryPids) {
+			territtoryPids = $('#dbTerittory option').map(function() {
+				return $(this).val();
+			}).get().join(',');
+		}
+		
 		$('#tBodyInventoryVoucher').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
 		/*
@@ -203,6 +211,7 @@ if (!this.InventoryVoucher) {
 						tallyDownloadStatus : $("#dbStatus").val(),
 						salesOrderStatus : $("#salesStatus").val(),
 						employeePids : empPids,
+						terittoryPids : territtoryPids,
 						accountPid : $("#dbAccount").val(),
 						filterBy : $("#dbDateSearch").val(),
 						fromDate : $("#txtFromDate").val(),
@@ -244,7 +253,7 @@ if (!this.InventoryVoucher) {
 													.append(
 															"<tr><td>"
 																	+ inventoryVoucher.documentNumberLocal
-																	+ "</td><td>"
+																	+ "</td><td class='tableexport-string target'>"
 																	+ convertDateTimeFromServer(inventoryVoucher.serverDate)
 																	+ "</td><td>"
 																	+ inventoryVoucher.employeeName
@@ -256,8 +265,8 @@ if (!this.InventoryVoucher) {
 																	+ inventoryVoucher.receiverAccountLocation
 																	+ "</td><td>"																	
 																	+inventoryVoucher.territory
-																	+ "</td><td>"
-																	+deliveryDate
+																	+ "</td><td class='tableexport-string target'>"
+																	+(inventoryVoucher.deliveryDate == null ? "" : inventoryVoucher.deliveryDate)
 																	+ "</td><td>"
 																	+locationName
 																	+ "</td><td>"
@@ -575,6 +584,18 @@ if (!this.InventoryVoucher) {
 			$('#divDatePickers').css('display', 'initial');
 		}
 	}
+	
+	InventoryVoucher.showdeliverdateDatePicker = function() {
+		$("#txtFromDeliveryDate").val("");
+		$("#toDeliveryDate").val("");
+		console.log($('#dbDeliveryDateSearch').val())
+		if ($('#dbDeliveryDateSearch').val() != "CUSTOM") {
+			$('#divdeliveryDatePickers').css('display', 'none');
+		} else {
+			$('#divdeliveryDatePickers').css('display', 'initial');
+		}
+	}
+
 
 	function selectAllInventoryVoucher(checkbox) {
 		$('.check-one').prop('checked', checkbox.checked);
