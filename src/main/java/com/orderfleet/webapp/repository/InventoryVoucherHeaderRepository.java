@@ -815,4 +815,7 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
    
 	@Query("select inventoryVoucher.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.document in ?1 and inventoryVoucher.executiveTaskExecution.id in ?2")
 	List<Object[]> findByDocumentsAndExecutiveIdIn(List<Document> documents, Set<Long> exeIds);
+	
+	@Query("select inventoryVoucher.documentNumberServer,inventoryVoucher.executiveTaskExecution.pid,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType  from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1 and inventoryVoucher.company.id = ?#{principal.companyId}")
+     List<Object[]> findByExecutiveTaskExecutionsIdIn(Set<Long> exeIds);
 }

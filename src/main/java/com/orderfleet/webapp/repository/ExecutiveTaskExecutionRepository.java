@@ -300,4 +300,8 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity.pid in ?3 and exeTaskExecution.user.id in ?4 and exeTaskExecution.accountProfile.pid in ?5 Order By exeTaskExecution.createdDate desc")
 	List<ExecutiveTaskExecution> getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(LocalDateTime fromDate,
 			LocalDateTime toDate, List<String> activityPids, List<Long> userIds, List<String> accountPids);
+	
+	
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.accountProfile.id in ?1 Order By exeTaskExecution.date desc")
+   List<ExecutiveTaskExecution> getByAccountIdIn(List<Long> Id);
 }
