@@ -41,7 +41,7 @@
 							<td>
 								<button type="button" class="btn btn-info"
 									onclick="userVehicle.showModalPopup($('#VehicleModal'),'${employee.pid}',0);">Assign
-									Product Groups</button>
+									Vehicle</button>
 							</td>
 						</tr>
 					</c:forEach>
