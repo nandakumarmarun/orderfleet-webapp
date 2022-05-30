@@ -40,6 +40,8 @@ public class UserVehicleAssociation {
 	@ManyToOne
 	@NotNull
 	private Company company;
+	
+
 
 	public UserVehicleAssociation() {
 		super();
@@ -53,7 +55,6 @@ public class UserVehicleAssociation {
 		this.employeeProfile = employeeProfile;
 		this.vehicle = vehicle;
 		this.company = company;
-		this.createdDate = createdDate;
 	}
 
 	public Long getId() {
@@ -96,18 +97,10 @@ public class UserVehicleAssociation {
 		this.company = company;
 	}
 
-	public LocalDateTime getCreatedDate() {
-		return createdDate;
-	}
-
-	public void setCreatedDate(LocalDateTime createdDate) {
-		this.createdDate = createdDate;
-	}
-
 	@Override
 	public String toString() {
 		return "UserVehicleAssociation [id=" + id + ", pid=" + pid + ", employeeProfile=" + employeeProfile
-				+ ", vehicle=" + vehicle + ", company=" + company + ", createdDate=" + createdDate + "]";
+				+ ", vehicle=" + vehicle + ", company=" + company + "]";
 	}
 
 }

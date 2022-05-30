@@ -85,61 +85,13 @@ public class InvoiceWiseReportView {
 	private boolean withCustomer;
 	
 	private String description;
+	
+	private String vehicleRegistrationNumber;
+	 
+	private String vehiclename;
 
 	public InvoiceWiseReportView() {
 		super();
-	}
-
-	public InvoiceWiseReportView(String pid, LocalDateTime createdDate, LocalDateTime plannedDate,
-			LocalDateTime sendDate, LocalDateTime startTime, LocalDateTime endTime, String timeSpend, String remarks,
-			String userName, String activityName, String accountTypeName, String accountProfileName,
-			String accountProfileLocation, BigDecimal accountProfileLatitude, BigDecimal accountProfileLongitude,
-			LocationType locationType, boolean isGpsOff, boolean isMobileDataOff, String location,
-			LocationType startLocationType, boolean startIsGpsOff, boolean startIsMobileDataOff, String startLocation,
-			ActivityStatus activityStatus, String rejectReasonRemark,
-			List<InvoiceWiseReportDetailView> invoiceWiseReportDetailViews, BigDecimal latitude, BigDecimal longitude,
-			BigDecimal towerLatitude, BigDecimal towerLongitude, String employeeName, String towerLocation,
-			double totalRecieptAmount, double totalSalesOrderAmount, LocalDateTime punchInDate,
-			boolean mockLocationStatus, boolean withCustomer,String description) {
-		super();
-		this.pid = pid;
-		this.createdDate = createdDate;
-		this.plannedDate = plannedDate;
-		this.sendDate = sendDate;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.timeSpend = timeSpend;
-		this.remarks = remarks;
-		this.userName = userName;
-		this.activityName = activityName;
-		this.accountTypeName = accountTypeName;
-		this.accountProfileName = accountProfileName;
-		this.accountProfileLocation = accountProfileLocation;
-		this.accountProfileLatitude = accountProfileLatitude;
-		this.accountProfileLongitude = accountProfileLongitude;
-		this.locationType = locationType;
-		this.isGpsOff = isGpsOff;
-		this.isMobileDataOff = isMobileDataOff;
-		this.location = location;
-		this.startLocationType = startLocationType;
-		this.startIsGpsOff = startIsGpsOff;
-		this.startIsMobileDataOff = startIsMobileDataOff;
-		this.startLocation = startLocation;
-		this.activityStatus = activityStatus;
-		this.rejectReasonRemark = rejectReasonRemark;
-		this.invoiceWiseReportDetailViews = invoiceWiseReportDetailViews;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.towerLatitude = towerLatitude;
-		this.towerLongitude = towerLongitude;
-		this.employeeName = employeeName;
-		this.towerLocation = towerLocation;
-		this.totalRecieptAmount = totalRecieptAmount;
-		this.totalSalesOrderAmount = totalSalesOrderAmount;
-		this.punchInDate = punchInDate;
-		this.mockLocationStatus = mockLocationStatus;
-		this.withCustomer = withCustomer;
-		this.setDescription(description);
 	}
 
 	public InvoiceWiseReportView(ExecutiveTaskExecution executiveTaskExecution) {
@@ -178,6 +130,77 @@ public class InvoiceWiseReportView {
 		this.mockLocationStatus = executiveTaskExecution.getMockLocationStatus();
 		this.withCustomer = executiveTaskExecution.getWithCustomer();
 		this.setDescription(executiveTaskExecution.getAccountProfile().getDescription());
+	}
+
+	public InvoiceWiseReportView(String pid, LocalDateTime createdDate, LocalDateTime plannedDate,
+			LocalDateTime sendDate, LocalDateTime startTime, LocalDateTime endTime, String timeSpend, String remarks,
+			String userName, String activityName, String accountTypeName, String accountProfileName,
+			String accountProfileLocation, BigDecimal accountProfileLatitude, BigDecimal accountProfileLongitude,
+			LocationType locationType, boolean isGpsOff, boolean isMobileDataOff, String location,
+			LocationType startLocationType, boolean startIsGpsOff, boolean startIsMobileDataOff, String startLocation,
+			ActivityStatus activityStatus, String rejectReasonRemark,
+			List<InvoiceWiseReportDetailView> invoiceWiseReportDetailViews, BigDecimal latitude, BigDecimal longitude,
+			BigDecimal towerLatitude, BigDecimal towerLongitude, String employeeName, String towerLocation,
+			double totalRecieptAmount, double totalSalesOrderAmount, LocalDateTime punchInDate,
+			boolean mockLocationStatus, boolean withCustomer, String description, String vehicleRegistrationNumber,
+			String vehiclename) {
+		super();
+		this.pid = pid;
+		this.createdDate = createdDate;
+		this.plannedDate = plannedDate;
+		this.sendDate = sendDate;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.timeSpend = timeSpend;
+		this.remarks = remarks;
+		this.userName = userName;
+		this.activityName = activityName;
+		this.accountTypeName = accountTypeName;
+		this.accountProfileName = accountProfileName;
+		this.accountProfileLocation = accountProfileLocation;
+		this.accountProfileLatitude = accountProfileLatitude;
+		this.accountProfileLongitude = accountProfileLongitude;
+		this.locationType = locationType;
+		this.isGpsOff = isGpsOff;
+		this.isMobileDataOff = isMobileDataOff;
+		this.location = location;
+		this.startLocationType = startLocationType;
+		this.startIsGpsOff = startIsGpsOff;
+		this.startIsMobileDataOff = startIsMobileDataOff;
+		this.startLocation = startLocation;
+		this.activityStatus = activityStatus;
+		this.rejectReasonRemark = rejectReasonRemark;
+		this.invoiceWiseReportDetailViews = invoiceWiseReportDetailViews;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.towerLatitude = towerLatitude;
+		this.towerLongitude = towerLongitude;
+		this.employeeName = employeeName;
+		this.towerLocation = towerLocation;
+		this.totalRecieptAmount = totalRecieptAmount;
+		this.totalSalesOrderAmount = totalSalesOrderAmount;
+		this.punchInDate = punchInDate;
+		this.mockLocationStatus = mockLocationStatus;
+		this.withCustomer = withCustomer;
+		this.description = description;
+		this.vehicleRegistrationNumber = vehicleRegistrationNumber;
+		this.vehiclename = vehiclename;
+	}
+
+	public String getVehicleRegistrationNumber() {
+		return vehicleRegistrationNumber;
+	}
+
+	public void setVehicleRegistrationNumber(String vehicleRegistrationNumber) {
+		this.vehicleRegistrationNumber = vehicleRegistrationNumber;
+	}
+
+	public String getVehiclename() {
+		return vehiclename;
+	}
+
+	public void setVehiclename(String vehiclename) {
+		this.vehiclename = vehiclename;
 	}
 
 	public String getPid() {

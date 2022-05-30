@@ -185,6 +185,9 @@ public class ExecutiveTaskExecution implements Serializable {
 
 	@Column(name = "with_customer", columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean withCustomer;
+	
+	@Column(name = "vehicle_Number")
+	private String vehicleNumber;
 
 	public Long getId() {
 		return id;
@@ -196,6 +199,14 @@ public class ExecutiveTaskExecution implements Serializable {
 
 	public String getPid() {
 		return pid;
+	}
+	
+	public String getVehicleNumber() {
+		return vehicleNumber;
+	}
+
+	public void setVehicleNumber(String vehicleNumber) {
+		this.vehicleNumber = vehicleNumber;
 	}
 
 	public void setPid(String pid) {

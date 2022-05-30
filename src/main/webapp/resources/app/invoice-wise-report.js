@@ -295,6 +295,9 @@ if (!this.InvoiceWiseReport) {
 																	+ "<td>"
 																	+ invoiceWiseReport.totalRecieptAmount
 																	+ "</td><td>"
+																	+ (invoiceWiseReport.vehicleRegistrationNumber == null ? ""
+																			: invoiceWiseReport.vehicleRegistrationNumber)
+																	+ "</td><td>"
 																	+ (invoiceWiseReport.remarks == null ? ""
 																			: invoiceWiseReport.remarks)
 																	+ "</td></tr>");

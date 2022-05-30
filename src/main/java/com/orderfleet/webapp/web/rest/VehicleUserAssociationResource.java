@@ -47,7 +47,7 @@ public class VehicleUserAssociationResource {
 	
 	private final Logger log = LoggerFactory.getLogger(UserProductGroupResource.class);
 	
-	@RequestMapping(value = "/user-vehicle-association", method = RequestMethod.GET)
+	@RequestMapping(value = "/employee-vehicle-association", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
 	public String getUserProductGroups(Model model) throws URISyntaxException {
@@ -64,7 +64,7 @@ public class VehicleUserAssociationResource {
 		return "company/userVehicleAssociation";
 	}
  
-	@RequestMapping(value = "/user-vehicle-association/save", method = RequestMethod.POST)
+	@RequestMapping(value = "/employee-vehicle-association/save", method = RequestMethod.POST)
 	@Timed
 	public ResponseEntity<Void> save(@RequestParam String employeePid, @RequestParam String assignedProductGroups) {
 		log.debug("REST request to save assigned assigned productGroups", employeePid);
@@ -74,7 +74,7 @@ public class VehicleUserAssociationResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/user-vehicle-association/{userPid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/employee-vehicle-association/{userPid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<VehicleDTO> getUserProductGroups(@PathVariable String userPid) {
 		log.debug("Web request to get get ProductGroups by user pid : {}", userPid);

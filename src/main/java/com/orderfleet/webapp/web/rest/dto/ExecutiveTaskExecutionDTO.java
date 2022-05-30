@@ -113,8 +113,10 @@ public class ExecutiveTaskExecutionDTO {
 	private boolean mockLocationStatus;
 
 	private boolean withCustomer;
-	
+
 	private String description;
+
+	private String VehicleRegistrationNumber;
 
 	public ExecutiveTaskExecutionDTO() {
 		super();
@@ -144,7 +146,8 @@ public class ExecutiveTaskExecutionDTO {
 				executiveTaskExecution.getStartTime(), executiveTaskExecution.getEndTime(),
 				executiveTaskExecution.getRejectReasonRemark(), executiveTaskExecution.getPunchInDate(),
 				executiveTaskExecution.getMockLocationStatus(), executiveTaskExecution.getWithCustomer(),
-                executiveTaskExecution.getAccountProfile().getDescription());
+				executiveTaskExecution.getAccountProfile().getDescription());
+
 	}
 
 	public ExecutiveTaskExecutionDTO(String pid, String clientTransactionKey, BigDecimal latitude, BigDecimal longitude,
@@ -156,7 +159,7 @@ public class ExecutiveTaskExecutionDTO {
 			String executiveTaskPlanPid, boolean startIsGpsOff, boolean startIsMobileDataOff,
 			LocationType startLocationType, String startLocation, BigDecimal startLatitude, BigDecimal startLongitude,
 			LocalDateTime startTime, LocalDateTime endTime, String rejectReasonRemark, LocalDateTime punchInDate,
-			boolean mockLocationStatus, boolean withCustomer,String description) {
+			boolean mockLocationStatus, boolean withCustomer, String description) {
 		super();
 		this.pid = pid;
 		this.clientTransactionKey = clientTransactionKey;
@@ -598,6 +601,7 @@ public class ExecutiveTaskExecutionDTO {
 	public void setWithCustomer(boolean withCustomer) {
 		this.withCustomer = withCustomer;
 	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -605,6 +609,15 @@ public class ExecutiveTaskExecutionDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	public String getVehicleRegistrationNumber() {
+		return VehicleRegistrationNumber;
+	}
+
+	public void setVehicleRegistrationNumber(String vehicleRegistrationNumber) {
+		VehicleRegistrationNumber = vehicleRegistrationNumber;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -648,7 +661,5 @@ public class ExecutiveTaskExecutionDTO {
 				+ ", interimSave=" + interimSave + ", punchInDate=" + punchInDate + ", mockLocationStatus="
 				+ mockLocationStatus + ", withCustomer=" + withCustomer + "]";
 	}
-
-
 
 }

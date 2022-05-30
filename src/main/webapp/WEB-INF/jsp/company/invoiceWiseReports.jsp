@@ -224,6 +224,7 @@
 							<th>Visit Type</th>
 							<th>Sales/ Sales Order Amount Total</th>
 							<th>Receipt Amount Total</th>
+							<th>Vehicle Registration Number</th>
 							<th>Remarks</th>
 						</tr>
 					</thead>

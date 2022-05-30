@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +17,8 @@ public interface UserVehicleAssociationRepository extends JpaRepository<UserVehi
 	Vehicle findVehicleByUserPid(String employeePid);
 	
 	void deleteByemployeeProfilePid(String employeePid);
+	
+	@Query("select userVehicleAssociation from UserVehicleAssociation userVehicleAssociation where userVehicleAssociation.employeeProfile.pid = ?1 ")
+	Optional<UserVehicleAssociation> findByVehicleAndUserPid(String employeePid);
+	
 }

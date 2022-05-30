@@ -64,6 +64,7 @@ import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.SalesLedger;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.UserVehicleAssociation;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
@@ -103,6 +104,7 @@ import com.orderfleet.webapp.repository.ReferenceDocumentRepository;
 import com.orderfleet.webapp.repository.SalesLedgerRepository;
 import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.repository.UserVehicleAssociationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountingVoucherHeaderService;
 import com.orderfleet.webapp.service.DynamicDocumentHeaderService;
@@ -239,6 +241,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 
 	@Inject
 	private SalesLedgerRepository salesLedgerRepository;
+	
+	@Inject
+	private UserVehicleAssociationRepository userVehicleAssociationRepository;
 
 	@Override
 	public ExecutiveTaskSubmissionTransactionWrapper executiveTaskSubmission(
@@ -249,8 +254,18 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		Company company = user.getCompany();
 		EmployeeProfile employeeProfile = employeeProfileRepository.findEmployeeProfileByUser(user);
 		ExecutiveTaskExecutionDTO executionDTO = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO();
+		Optional<UserVehicleAssociation> userVehicleAssociationOpt =  userVehicleAssociationRepository.findByVehicleAndUserPid(employeeProfile.getPid());
+		if(userVehicleAssociationOpt.isPresent()) {
+			UserVehicleAssociation userVehicleAssociation = userVehicleAssociationOpt.get();
+			executionDTO.setVehicleRegistrationNumber(userVehicleAssociation.getVehicle().getRegistrationNumber());
+		}
+	
 		// save Executive Task Execution
 		ExecutiveTaskExecution executiveTaskExecution = saveExecutiveTaskExecution(company, user, executionDTO);
+		
+		
+	
+		
 		// save Inventory Vouchers
 		List<InventoryVoucherHeader> inventoryVouchers = saveInventoryVouchers(company, user, employeeProfile,
 				executiveTaskExecution, executiveTaskSubmissionDTO.getInventoryVouchers());
@@ -306,7 +321,9 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		ExecutiveTaskExecution executiveTaskExecution = new ExecutiveTaskExecution();
 
 		log.info("----Saving Executive task Execution Started----- " + user.getLogin());
-
+		
+		
+		
 		// set pid
 		executiveTaskExecution.setPid(ExecutiveTaskExecutionService.PID_PREFIX + RandomUtil.generatePid());
 		executiveTaskExecution.setClientTransactionKey(executiveTaskExecutionDTO.getClientTransactionKey());
@@ -439,8 +456,10 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		executiveTaskExecution.setWithCustomer(executiveTaskExecutionDTO.getWithCustomer());
 		// set company
 		executiveTaskExecution.setCompany(company);
+		executiveTaskExecution.setVehicleNumber(executiveTaskExecutionDTO.getVehicleRegistrationNumber() == null ? "No Vehicle " : executiveTaskExecutionDTO.getVehicleRegistrationNumber());
 		executiveTaskExecution = executiveTaskExecutionRepository.save(executiveTaskExecution);
-
+		
+	
 		log.info("----Saving Executive task Execution Completed----- " + user.getLogin());
 		return executiveTaskExecution;
 	}

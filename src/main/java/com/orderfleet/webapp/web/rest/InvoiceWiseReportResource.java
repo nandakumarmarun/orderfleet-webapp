@@ -60,6 +60,7 @@ import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Activity;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.EmployeeVehicleAssosiationHistory;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
@@ -77,6 +78,7 @@ import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
+import com.orderfleet.webapp.repository.EmployeeVehicleAssosiationHistoryRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
@@ -194,6 +196,8 @@ public class InvoiceWiseReportResource {
 
 	@Inject
 	private UserRepository userRepository;
+	
+
 
 	/**
 	 * GET /invoice-wise-reports : get all the executive task executions.
@@ -290,6 +294,7 @@ public class InvoiceWiseReportResource {
 	@Timed
 	public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
 		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
+		
 		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
 		if (opExecutiveeExecution.isPresent()) {
 			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
@@ -367,6 +372,7 @@ public class InvoiceWiseReportResource {
 			@RequestParam("activityPid") String activityPid, @RequestParam("accountPid") String accountPid,
 			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
 			@RequestParam boolean inclSubordinate) {
+		
 		List<InvoiceWiseReportView> executiveTaskExecutions = new ArrayList<>();
 		if (filterBy.equals("TODAY")) {
 			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, LocalDate.now(),
@@ -409,6 +415,11 @@ public class InvoiceWiseReportResource {
 		List<String> accountProfilePids;
 
 		List<Long> userIds = getUserIdsUnderCurrentUser(employeePid, inclSubordinate);
+		
+//		List<EmployeeVehicleAssosiationHistory> employeeVehicleAssosiationHistory = employeeVehicleAssociationRepository.findAll();
+		
+		
+		
 		log.info("User Ids :" + userIds);
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
@@ -420,6 +431,9 @@ public class InvoiceWiseReportResource {
 			activityPids = Arrays.asList(activityPid);
 		}
 
+		
+		
+		
 		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
 		log.info("Finding executive Task execution");
 		if (accountPid.equalsIgnoreCase("no")) {
@@ -721,7 +735,13 @@ public class InvoiceWiseReportResource {
 			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView(executiveTaskExecution);
 			EmployeeProfile employeeProfile = employeeProfileRepository
 					.findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
-		
+			
+
+			
+
+		invoiceWiseReportView.setVehicleRegistrationNumber(executiveTaskExecution.getVehicleNumber() == null ? "no vehicle" : executiveTaskExecution.getVehicleNumber());
+
+			
 			if(compConfig)
 			{
 				invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getDescription());
