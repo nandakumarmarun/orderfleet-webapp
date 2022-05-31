@@ -91,7 +91,7 @@
 											<c:forEach items="${vehicle}" var="vehicle">
 												<tr>
 													<td><input name='vehicle' type='radio'
-														value="${vehicle.pid}" /><span style="margin-left: 5px;">${vehicle.name}</span>n</td>
+														value="${vehicle.pid}" /><span style="margin-left: 5px;">${vehicle.name}</span></td>
 												</tr>
 											</c:forEach>
 										</tbody>
