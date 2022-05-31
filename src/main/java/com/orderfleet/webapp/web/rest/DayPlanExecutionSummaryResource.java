@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
@@ -181,7 +182,9 @@ public class DayPlanExecutionSummaryResource {
 				if (today.isAfter(entry.getKey())) {
 					for (Map.Entry<String, List<ExecutiveTaskPlan>> entry2 : entry.getValue().entrySet()) {
 						List<ExecutiveTaskPlan> childValue = entry2.getValue();
+						
 						for (ExecutiveTaskPlan executiveTaskPlan : childValue) {
+							
 							if (executiveTaskPlan.getTaskPlanStatus().equals(TaskPlanStatus.PENDING)) {
 								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
 								executiveTaskPlan.setUserRemarks("Unattended");
@@ -189,7 +192,9 @@ public class DayPlanExecutionSummaryResource {
 								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
 								executiveTaskPlan.setUserRemarks("Unattended");
 							}
+							
 						}
+						
 						List<ExecutiveTaskPlan> savedExecutedPlan = executiveTaskExecutionRepository
 								.findExecutiveTaskPlanByExecutiveTaskPlanIn(childValue);
 						Long achieved = childValue.stream()
@@ -202,7 +207,7 @@ public class DayPlanExecutionSummaryResource {
 							if (index != -1) {
 								etp.setSortOrder(index + 1);
 							}
-							return etp;
+									return etp;
 						}).collect(Collectors.toList());
 						
 						List<ExecutiveTaskPlan> taskPlans = new ArrayList<>();
@@ -234,8 +239,12 @@ public class DayPlanExecutionSummaryResource {
 				} else {
 					for (Map.Entry<String, List<ExecutiveTaskPlan>> entry2 : entry.getValue().entrySet()) {
 						List<ExecutiveTaskPlan> childValue = entry2.getValue();
+						
+						
 						List<ExecutiveTaskPlan> savedExecutedPlan = executiveTaskExecutionRepository
 								.findExecutiveTaskPlanByExecutiveTaskPlanIn(childValue);
+						
+						
 						Long achieved = childValue.stream()
 								.filter(etp -> TaskPlanStatus.COMPLETED == etp.getTaskPlanStatus()).count();
 						dgAchieved += achieved;
@@ -368,7 +377,13 @@ public class DayPlanExecutionSummaryResource {
 				if (today.isAfter(entry.getKey())) {
 					for (Map.Entry<String, List<ExecutiveTaskPlan>> entry2 : entry.getValue().entrySet()) {
 						List<ExecutiveTaskPlan> childValue = entry2.getValue();
+						List<Long> exId = childValue.stream().map(ext->ext.getId()).collect(Collectors.toList());
+						
+						String name = entry2.getKey();
+						
+						List<ExecutiveTaskExecution> extDateTime =executiveTaskExecutionRepository.findExecutiveTaskExecutionByExecutiveTaskPlanIdIn(exId);
 						for (ExecutiveTaskPlan executiveTaskPlan : childValue) {
+						
 							if (executiveTaskPlan.getTaskPlanStatus().equals(TaskPlanStatus.PENDING)) {
 								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
 								executiveTaskPlan.setUserRemarks("Unattended");
@@ -376,7 +391,14 @@ public class DayPlanExecutionSummaryResource {
 								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
 								executiveTaskPlan.setUserRemarks("Unattended");
 							}
-						}
+							for(ExecutiveTaskExecution abcd:extDateTime)
+							{
+								if(abcd.getExecutiveTaskPlan().getId().equals(executiveTaskPlan.getId()))
+								{
+								executiveTaskPlan.setPlannedDate(abcd.getSendDate());
+							}
+						}}
+						
 						List<ExecutiveTaskPlan> savedExecutedPlan = executiveTaskExecutionRepository
 								.findExecutiveTaskPlanByExecutiveTaskPlanIn(childValue);
 						Long achieved = childValue.stream()
@@ -454,7 +476,7 @@ public class DayPlanExecutionSummaryResource {
 		String sheetName = "Sheet1";
 
 		String[] headerColumns = { "Date", "Activity", "AccountProfile", "Sort Order", "Status",
-				"Remarks",  };
+				"Remarks","EmployeeName","Submission Date","Submission Time"  };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -485,6 +507,11 @@ public class DayPlanExecutionSummaryResource {
 		// Create Cell Style for formatting Date
 		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
 		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM/DD/YYYY, h:mm:ss "));
+		HSSFCellStyle datCellStyle = worksheet.getWorkbook().createCellStyle();
+		datCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM/DD/YYYY"));
+		HSSFCellStyle timeCellStyle = worksheet.getWorkbook().createCellStyle();
+		timeCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("h:mm:ss"));
+		
 		// Create Other rows and cells with Sales data
 		int rowNum = 1;
 		for(Map.Entry  dpe :resultChildMap.entrySet()) {
@@ -502,11 +529,23 @@ public class DayPlanExecutionSummaryResource {
 			DateCell.setCellValue(date);
 			DateCell.setCellStyle(dateCellStyle);
 			row.createCell(1).setCellValue(executivetask.getActivityName());
-
-			row.createCell(2).setCellValue(executivetask.getAccountProfileName());
+        	row.createCell(2).setCellValue(executivetask.getAccountProfileName());
 			row.createCell(3).setCellValue(executivetask.getSortOrder());
 			row.createCell(4).setCellValue(executivetask.getTaskPlanStatus().toString());
 			row.createCell(5).setCellValue(executivetask.getUserRemarks());
+			row.createCell(6).setCellValue(executivetask.getCreatedBy());
+			LocalDateTime localDate = executivetask.getPlannedDate();
+			Instant it = localDate.atZone(ZoneId.systemDefault()).toInstant();
+			Date dates = Date.from(it);
+			HSSFCell DateCells = row.createCell(7);
+			DateCells.setCellValue(dates);
+			DateCells.setCellStyle(datCellStyle);
+			LocalDateTime localDates = executivetask.getPlannedDate();
+			Instant its = localDates.atZone(ZoneId.systemDefault()).toInstant();
+			Date time = Date.from(its);
+			HSSFCell timeCells = row.createCell(8);
+			timeCells.setCellValue(time);
+			timeCells.setCellStyle(timeCellStyle);
 			
 		  }
 	}

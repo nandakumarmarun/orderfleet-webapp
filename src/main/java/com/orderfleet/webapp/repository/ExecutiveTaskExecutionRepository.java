@@ -304,4 +304,7 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.accountProfile.id in ?1 Order By exeTaskExecution.date desc")
    List<ExecutiveTaskExecution> getByAccountIdIn(List<Long> Id);
+
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.executiveTaskPlan.id in ?1 ")
+     List<ExecutiveTaskExecution> findExecutiveTaskExecutionByExecutiveTaskPlanIdIn(List<Long> childValue);
 }
