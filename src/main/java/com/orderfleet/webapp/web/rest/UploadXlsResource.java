@@ -371,8 +371,19 @@ public class UploadXlsResource {
 						if (cell == null) {
 							accProfile.setLocation(" ");
 						} else {
-							accProfile.setLocation(row.getCell(locationNumber).getStringCellValue());
+							String location = "";
+
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(locationNumber).getCellType() == 0) {
+								location = String.valueOf(row.getCell(locationNumber).getNumericCellValue());
+							}
+
+							if (row.getCell(locationNumber).getCellType() == 1) {
+								location = String.valueOf(row.getCell(locationNumber).getStringCellValue());
+							}
+							accProfile.setLocation(location);
 						}
+						
 					}
 					if (pinNumber != -1) {
 						Cell cell = row.getCell(pinNumber);
@@ -411,7 +422,17 @@ public class UploadXlsResource {
 						if (cell == null) {
 							accProfile.setDescription(" ");
 						} else {
-							accProfile.setDescription(row.getCell(descriptionNumber).getStringCellValue());
+							String descriptions= "";
+
+							// celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(descriptionNumber).getCellType() == 0) {
+								descriptions = String.valueOf(row.getCell(descriptionNumber).getNumericCellValue());
+							}
+
+							if (row.getCell(descriptionNumber).getCellType() == 1) {
+								descriptions = String.valueOf(row.getCell(descriptionNumber).getStringCellValue());
+							}
+							accProfile.setDescription(descriptions);
 						}
 					}
 					if (contactPersonNumber != -1) {
@@ -419,7 +440,17 @@ public class UploadXlsResource {
 						if (cell == null) {
 							accProfile.setContactPerson(" ");
 						} else {
-							accProfile.setContactPerson(row.getCell(contactPersonNumber).getStringCellValue());
+							String contactPerson = "";
+
+						// celltype=0==>Numeric && celltype=1==>String
+						if (row.getCell(contactPersonNumber).getCellType() == 0) {
+							contactPerson = String.valueOf(row.getCell(contactPersonNumber).getNumericCellValue());
+						}
+
+						if (row.getCell(contactPersonNumber).getCellType() == 1) {
+							contactPerson = String.valueOf(row.getCell(contactPersonNumber).getStringCellValue());
+						}
+							accProfile.setContactPerson(contactPerson);
 						}
 					}
 					if (accountTypeNumber != -1) {
@@ -550,7 +581,15 @@ public class UploadXlsResource {
 						if (cell == null) {
 							accProfile.setCustomerCode(" ");
 						} else {
-							accProfile.setCustomerCode(row.getCell(customerCodeNumber).getStringCellValue());
+							String customerscode = "";
+//							 celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(customerCodeNumber).getCellType() == 0) {
+								customerscode = String.valueOf(row.getCell(customerCodeNumber).getNumericCellValue());
+							}
+							if (row.getCell(customerCodeNumber).getCellType() == 1) {
+								customerscode = row.getCell(customerCodeNumber).getStringCellValue();
+							}
+							accProfile.setCustomerCode(customerscode);
 						}
 					}
 					if (priceLevelNumber != -1) {
