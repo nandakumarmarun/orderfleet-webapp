@@ -92,7 +92,7 @@ if (!this.InvoiceWiseReport) {
 																	+ "' data-parent=\"\"><td class='tableexport-string target'>"
 																	+ invoiceWiseReport.employeeName
 																	+ "</td><td>"
-																	+ invoiceWiseReport.route
+																	+ (invoiceWiseReport.route== null ? " " :invoiceWiseReport.route)
 																	+ "</td><td class=tableexport-string target'>"
 																	+ formatDate(
 																			invoiceWiseReport.attndncTime,
@@ -130,9 +130,12 @@ if (!this.InvoiceWiseReport) {
 																	+(executionDetail.totalSaleOrderAmount).toFixed(2)
 																	+"</div><div class='col-md-4'><label>Total Collection Value :</label>"
 																	+(executionDetail.totalReceiptAmount).toFixed(2)
-																
-																			
-																	
+																	+"</div><br><br><div class='col-md-4'><label>Total Cash Amount :</label>"
+																	+(executionDetail.totalCash).toFixed(2)
+																	+"</div><div class='col-md-4'><label>Total Cheque Amount :</label>"
+																	+(executionDetail.totalCheque).toFixed(2)
+																	+"</div><div class='col-md-4'><label>Total Rtgs Amount :</label>"
+																	+(executionDetail.totalRtgs).toFixed(2)
 																	+ " </div></td></tr>");
 													});
 											

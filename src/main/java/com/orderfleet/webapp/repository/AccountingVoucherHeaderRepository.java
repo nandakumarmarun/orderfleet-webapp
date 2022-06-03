@@ -321,4 +321,7 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 
 	@Query("select accVoucher.totalAmount,accVoucher.employee.name from AccountingVoucherHeader accVoucher where accVoucher.executiveTaskExecution.id IN ?1 ")
 	List<Object[]> findByExecutiveTaskExecutionsIdIn(List<Long> eteIds);
+	
+	@Query("select accVoucher from AccountingVoucherHeader accVoucher  where accVoucher.executiveTaskExecution.id IN ?1 ")
+    List<AccountingVoucherHeader> findByExecutiveTaskExecutionIdIn(List<Long> eteIds);
 }

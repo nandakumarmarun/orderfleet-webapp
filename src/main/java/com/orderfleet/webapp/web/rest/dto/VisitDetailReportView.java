@@ -3,36 +3,40 @@ package com.orderfleet.webapp.web.rest.dto;
 import java.time.LocalDateTime;
 
 public class VisitDetailReportView {
-	
-     private String pid;
-	
+
+	private String pid;
+
 	private LocalDateTime firstVisitTime;
-	
+
 	private LocalDateTime lastVisitTime;
-	
+
 	private String totalVisit;
-	
+
 	private LocalDateTime firstSoTime;
-	
+
 	private LocalDateTime lastSoTime;
-	
+
 	private String totalSo;
-	
+
 	private Integer ledgerCount;
-	
+
 	private double totalKG;
-	
+
 	private double totalReceiptAmount;
-	
+
 	private double totalSaleOrderAmount;
+
+	private double totalCash;
+
+	private double totalCheque;
+
+	private double totalRtgs;
 
 	public VisitDetailReportView() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	
-	
 	public VisitDetailReportView(String pid, LocalDateTime firstVisitTime, LocalDateTime lastVisitTime,
 			String totalVisit) {
 		super();
@@ -41,8 +45,6 @@ public class VisitDetailReportView {
 		this.lastVisitTime = lastVisitTime;
 		this.totalVisit = totalVisit;
 	}
-
-
 
 	public VisitDetailReportView(String pid, LocalDateTime firstSoTime, LocalDateTime lastSoTime, String totalSo,
 			double totalSaleOrderAmount) {
@@ -54,18 +56,11 @@ public class VisitDetailReportView {
 		this.totalSaleOrderAmount = totalSaleOrderAmount;
 	}
 
-
-
-	
-
-
-	public VisitDetailReportView( double totalReceiptAmount) {
+	public VisitDetailReportView(double totalReceiptAmount) {
 		super();
-	
+
 		this.totalReceiptAmount = totalReceiptAmount;
 	}
-
-
 
 	public LocalDateTime getFirstVisitTime() {
 		return firstVisitTime;
@@ -146,5 +141,29 @@ public class VisitDetailReportView {
 	public void setTotalSaleOrderAmount(double totalSaleOrderAmount) {
 		this.totalSaleOrderAmount = totalSaleOrderAmount;
 	}
-	
+
+	public double getTotalCash() {
+		return totalCash;
+	}
+
+	public void setTotalCash(double totalCash) {
+		this.totalCash = totalCash;
+	}
+
+	public double getTotalCheque() {
+		return totalCheque;
+	}
+
+	public void setTotalCheque(double totalCheque) {
+		this.totalCheque = totalCheque;
+	}
+
+	public double getTotalRtgs() {
+		return totalRtgs;
+	}
+
+	public void setTotalRtgs(double totalRtgs) {
+		this.totalRtgs = totalRtgs;
+	}
+
 }

@@ -619,8 +619,13 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
 
 			stockDetailsDTO.setProductName(obj[3] != null ? obj[3].toString() : "");
-
-			double opStock = 0.0;
+            Long id = Long.parseLong(obj[0].toString());
+		
+            Optional<User> user = userRepository.findOneById(id);
+            String name = user.get().getFirstName();
+            System.out.println("Name:"+name);
+            stockDetailsDTO.setEmployeeName(name);
+           double opStock = 0.0;
 			double slStock = 0.0;
 			double freeQuantity = 0.0;
 			if (obj[6] != null) {
@@ -636,7 +641,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				freeQuantity = Double.parseDouble(obj[11].toString());
 			}
 
-			double saledQuantity = slStock + freeQuantity;
+			double saledQuantity = slStock + freeQuantity;			
 			stockDetailsDTO.setSaleStock(slStock);
 			stockDetailsDTO.setFreeQnty(freeQuantity);
 			stockDetailsDTO.setOpeningStock(opStock);
@@ -681,9 +686,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			double saleStock = valuesList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getSaleStock)));
 			double freeQnty = valuesList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getFreeQnty)));
 			double damageQty = valuesList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getDamageQty)));
-
+      
 			double closingStock = openingStock - (saledQuantity + damageQty);
-
+             String empName =valuesList.get(0).getEmployeeName();
 			if (opProductProfile.isPresent()) {
 				if (productNameTextSettings.size() > 0) {
 					ProductProfileDTO productProfileDTO = opProductProfile.get();
@@ -731,6 +736,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			stockDetailsDTO.setSaledQuantity(saledQuantity);
 			stockDetailsDTO.setDamageQty(damageQty);
 			stockDetailsDTO.setClosingStock(closingStock);
+			stockDetailsDTO.setEmployeeName(empName);
 
 			proccessedStockDetailsDTOs.add(stockDetailsDTO);
 		}

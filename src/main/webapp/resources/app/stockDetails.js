@@ -33,7 +33,9 @@ if (!this.StockDetails) {
 					
 				});
 				
-				
+				$('#downloadXls').on('click', function() {
+					downloadXls();
+				});
 			});
 	
 	StockDetails.filter = function() {
@@ -76,6 +78,18 @@ if (!this.StockDetails) {
 					}
 				});
 	}
+	
+	function downloadXls()
+	{
+		var employeePid = $("#dbEmployee").val();
+	   
+		
+	  window.location.href = stockDetailsContextPath+"/downloadxls?&employeePid="+employeePid;
+		
+	  console.log("Success.....");
+		
+	}
+	
 	
 	StockDetails.printStock = function() {
 		

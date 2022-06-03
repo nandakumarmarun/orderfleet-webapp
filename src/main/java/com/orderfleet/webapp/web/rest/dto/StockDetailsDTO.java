@@ -28,6 +28,8 @@ public class StockDetailsDTO implements Cloneable {
 	private double saledQuantity;
 	private double damageQty;
 	private double closingStock;
+	private LocalDateTime reportingTime;
+	private String employeeName;
 
 	public StockDetailsDTO() {
 		super();
@@ -42,6 +44,7 @@ public class StockDetailsDTO implements Cloneable {
 		this.saledQuantity = saledQuantity;
 		this.closingStock = closingStock;
 		this.productPid = productPid;
+		
 	}
 	
 	public StockDetailsDTO(double openingStock, String productName,double saleStock,double freeQnty, double saledQuantity, double closingStock,
@@ -118,6 +121,22 @@ public class StockDetailsDTO implements Cloneable {
 
 	public void setDamageQty(double damageQty) {
 		this.damageQty = damageQty;
+	}
+
+	public LocalDateTime getReportingTime() {
+		return reportingTime;
+	}
+
+	public void setReportingTime(LocalDateTime reportingTime) {
+		this.reportingTime = reportingTime;
+	}
+
+	public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
 	}
 
 	@Override

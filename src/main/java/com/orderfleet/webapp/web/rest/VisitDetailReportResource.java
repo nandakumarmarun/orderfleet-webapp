@@ -73,9 +73,11 @@ import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.LocationType;
+import com.orderfleet.webapp.domain.enums.PaymentMode;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.geolocation.model.TowerLocation;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.AccountingVoucherDetailRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.AttendanceRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
@@ -159,6 +161,9 @@ public class VisitDetailReportResource {
 
 	@Inject
 	private AttendanceRepository attendanceRepository;
+	
+	@Inject
+	private AccountingVoucherDetailRepository accountingVoucherDetailRepository;
 
 	/**
 	 * GET /invoice-wise-reports : get all the executive task executions.
@@ -268,7 +273,23 @@ public class VisitDetailReportResource {
 			accountingVouchers = accountingVoucherHeaderRepository.findByExecutiveTaskExecutionsIdIn(eteIds);
 
 		}
-
+		List<AccountingVoucherHeader> accountingHeader = accountingVoucherHeaderRepository
+				.findByExecutiveTaskExecutionIdIn(eteIds);
+		List<Long> accId = accountingHeader.stream().map(acc -> acc.getId()).collect(Collectors.toList());
+		
+		log.info("Finding executive Task execution Accounting Vouchers Details...");
+		List<Object[]> netCollectionAmountCash = accountingVoucherDetailRepository
+				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCash(accId,
+						PaymentMode.Cash);
+		List<Object[]> netCollectionAmountCheque = accountingVoucherDetailRepository
+				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCheque(accId,
+						PaymentMode.Cheque);
+		
+		List<Object[]> netCollectionAmountRtgs = accountingVoucherDetailRepository
+				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeRtgs(accId,
+						PaymentMode.RTGS);
+		
+		
 		List<Object[]> accountProfile = new ArrayList<>();
 		accountProfile = accountProfileRepository.findByUserIdInAndDateBetween(userIds, fromDate, toDate);
 
@@ -294,7 +315,7 @@ public class VisitDetailReportResource {
 
 					LocalDateTime attTime = LocalDateTime.parse(obj[1].toString());
 					visitreport.setRoute(obj[0].toString());
-					visitreport.setAttndncTime(attTime);
+				    visitreport.setAttndncTime(attTime);
 				}
 			}
 
@@ -311,16 +332,17 @@ public class VisitDetailReportResource {
 				}
 			}
 
-			    for (Object[] obj : inventoryVouchers) {
-            if(obj[4].toString().equals(employeeName)) {
-				LocalDateTime firstSoTime = LocalDateTime.parse(obj[2].toString());
-				LocalDateTime LastSoTime = LocalDateTime.parse(obj[3].toString());
+			for (Object[] obj : inventoryVouchers) {
+				if (obj[4].toString().equals(employeeName)) {
+					LocalDateTime firstSoTime = LocalDateTime.parse(obj[2].toString());
+					LocalDateTime LastSoTime = LocalDateTime.parse(obj[3].toString());
 
-				executiveView.setFirstSoTime(firstSoTime);
-				executiveView.setLastSoTime(LastSoTime);
-				executiveView.setTotalSo(obj[0].toString());
-				executiveView.setTotalSaleOrderAmount(Double.valueOf(obj[1].toString()));
-			}}
+					executiveView.setFirstSoTime(firstSoTime);
+					executiveView.setLastSoTime(LastSoTime);
+					executiveView.setTotalSo(obj[0].toString());
+					executiveView.setTotalSaleOrderAmount(Double.valueOf(obj[1].toString()));
+				}
+			}
 			double receiptAmount = 0.0;
 			for (Object[] obj : accountingVouchers) {
 				if (obj[1].toString().equals(employeeName)) {
@@ -337,6 +359,27 @@ public class VisitDetailReportResource {
 
 			}
 
+			for(Object[] obj:netCollectionAmountCash)
+			{
+				if(obj[1].toString().equals(employeeName))
+				{
+					executiveView.setTotalCash(Double.valueOf(obj[0].toString()));
+				}
+			}
+			for(Object[] obj:netCollectionAmountCheque)
+			{
+				if(obj[1].toString().equals(employeeName))
+				{
+					executiveView.setTotalCash(Double.valueOf(obj[0].toString()));
+				}
+			}
+			for(Object[] obj:netCollectionAmountRtgs)
+			{
+				if(obj[1].toString().equals(employeeName))
+				{
+					executiveView.setTotalCash(Double.valueOf(obj[0].toString()));
+				}
+			}
 			double totalVolume = ivDetails.stream()
 					.filter(ivd -> ivd.getInventoryVoucherHeader().getEmployee().getName().equals(employeeName))
 					.mapToDouble(InventoryVoucherDetail::getVolume).sum();
@@ -388,7 +431,7 @@ public class VisitDetailReportResource {
 
 		String[] headerColumns = { "Employee", "Route", "Atendance MarkedTime", "First Visit Time", "Last Visit Time",
 				"Total Visit", "First SO Time", "Last SO Time", "Total SO", "New Ledger Created", "Total KG",
-				"Total Value", "Total Collection value" };
+				"Total Value", "Total Collection value","Total Cash","Total Cheque","Total RtgsAmount" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -427,12 +470,15 @@ public class VisitDetailReportResource {
 			row.createCell(0).setCellValue(executivetask.getEmployeeName());
 
 			row.createCell(1).setCellValue(executivetask.getRoute());
+			if(executivetask.getAttndncTime()!=null)
+			{
 			LocalDateTime localDateTime = executivetask.getAttndncTime();
 			Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
 			Date date = Date.from(i);
 			HSSFCell attndncDateCell = row.createCell(2);
 			attndncDateCell.setCellValue(date);
 			attndncDateCell.setCellStyle(dateCellStyle);
+			}
 			for (VisitDetailReportView vdrv : executivetask.getVisitDetailReportView()) {
 				if (vdrv.getFirstVisitTime() != null) {
 					LocalDateTime abc = vdrv.getFirstVisitTime();
@@ -482,6 +528,10 @@ public class VisitDetailReportResource {
 				row.createCell(10).setCellValue(vdrv.getTotalKG());
 				row.createCell(11).setCellValue(vdrv.getTotalSaleOrderAmount());
 				row.createCell(12).setCellValue(vdrv.getTotalReceiptAmount());
+				row.createCell(13).setCellValue(vdrv.getTotalCash());
+				row.createCell(14).setCellValue(vdrv.getTotalCheque());
+				row.createCell(15).setCellValue(vdrv.getTotalRtgs());
+				
 
 			}
 		}

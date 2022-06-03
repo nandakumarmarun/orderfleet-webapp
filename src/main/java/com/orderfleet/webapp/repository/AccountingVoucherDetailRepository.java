@@ -67,5 +67,17 @@ public interface AccountingVoucherDetailRepository extends JpaRepository<Account
 	@Query("select sum(voucherDetail.amount) from AccountingVoucherDetail voucherDetail where voucherDetail.accountingVoucherHeader.company.id = ?#{principal.companyId} and voucherDetail.accountingVoucherHeader.createdBy.id in ?1 and voucherDetail.accountingVoucherHeader.documentDate between ?2 and ?3 and voucherDetail.mode = ?4")
 	Object[] findnetCollectionAmountByUserIdandDateBetweenAndPaymentMode(List<Long> userIds, LocalDateTime fromDate,
 			LocalDateTime toDate, PaymentMode paymentMode);
+	
+	@Query("select sum(voucherDetail.amount),voucherDetail.accountingVoucherHeader.employee.name from AccountingVoucherDetail voucherDetail where voucherDetail.accountingVoucherHeader.company.id = ?#{principal.companyId} and voucherDetail.accountingVoucherHeader.id in ?1 and voucherDetail.mode = ?2  group by voucherDetail.accountingVoucherHeader.employee.name")
+	List<Object[]> findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCash(List<Long> accountIds,PaymentMode paymentMode);
 
+	@Query("select sum(voucherDetail.amount),voucherDetail.accountingVoucherHeader.employee.name from AccountingVoucherDetail voucherDetail where voucherDetail.accountingVoucherHeader.company.id = ?#{principal.companyId} and voucherDetail.accountingVoucherHeader.id in ?1 and voucherDetail.mode = ?2  group by voucherDetail.accountingVoucherHeader.employee.name")
+    List<Object[]> findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCheque(List<Long> accId,
+			PaymentMode cheque);
+	
+    @Query("select sum(voucherDetail.amount),voucherDetail.accountingVoucherHeader.employee.name from AccountingVoucherDetail voucherDetail where voucherDetail.accountingVoucherHeader.company.id = ?#{principal.companyId} and voucherDetail.accountingVoucherHeader.id in ?1 and voucherDetail.mode = ?2  group by voucherDetail.accountingVoucherHeader.employee.name") 
+    List<Object[]> findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeRtgs(List<Long> accId, PaymentMode rtgs);
+
+	
+	
 }

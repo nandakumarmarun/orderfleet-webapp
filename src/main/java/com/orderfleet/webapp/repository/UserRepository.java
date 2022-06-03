@@ -47,6 +47,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findOneWithAuthoritiesByLogin(String login);
 
 	Optional<User> findOneByPid(String pid);
+	
+	Optional<User> findOneById(Long Id);
 
 	List<User> findByPidIn(List<String> pids);
 
