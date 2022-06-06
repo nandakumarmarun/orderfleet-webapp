@@ -241,7 +241,7 @@ public class StockDetailsResource {
 	private void buildExcelDocument(List<StockDetailsDTO> stockDetails, HttpServletResponse response) {
 		// TODO Auto-generated method stub
 		log.debug("Downloading Excel report");
-		String excelFileName = "DayPlanExecutionSummary" + ".xls";
+		String excelFileName = "Stock Details" + ".xls";
 		String sheetName = "Sheet1";
 
 		String[] headerColumns = { "Reporting Time", "EmployeeName", "ProductName", "OpeningStock", "Sales Qty",

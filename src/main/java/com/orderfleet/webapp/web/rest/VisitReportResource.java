@@ -183,9 +183,12 @@ public class VisitReportResource {
 		for (Object[] ivh : ivhDtos) {
 			ivhPids.add(ivh[4].toString());
 		}
-		List<InventoryVoucherDetail> ivDetails = inventoryVoucherDetailRepository
+		List<InventoryVoucherDetail> ivDetails = new ArrayList<>();
+		if(!ivhPids.isEmpty())
+		{
+		 ivDetails = inventoryVoucherDetailRepository
 				.findAllByInventoryVoucherHeaderPidIn(ivhPids);
-
+		}
 		List<List<String>> reportValues = new ArrayList<>();
 		for (Map.Entry<String, List<Long>> entry : employeeWiseGrouped.entrySet()) {
 			List<String> values = new ArrayList<>();

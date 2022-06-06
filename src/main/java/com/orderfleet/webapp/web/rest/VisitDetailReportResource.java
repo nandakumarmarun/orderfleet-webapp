@@ -192,6 +192,7 @@ public class VisitDetailReportResource {
 			@RequestParam String fromDate, @RequestParam String toDate, @RequestParam boolean inclSubordinate) {
 
 		List<Document> documents = primarySecondaryDocumentRepository.findAllDocumentsByCompanyId();
+		System.out.println("Documents :"+documents.isEmpty());
 		if (documents.isEmpty()) {
 			return null;
 		}
@@ -214,7 +215,7 @@ public class VisitDetailReportResource {
 
 	private List<VisitReportView> getFilterData(String employeePid, LocalDate fDate, LocalDate tDate,
 			List<Document> documents, boolean inclSubordinate) {
-		log.info("Get Fileter Data");
+		log.info("Get Filter Data");
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 
@@ -231,12 +232,12 @@ public class VisitDetailReportResource {
 		if (etExtecutions.isEmpty()) {
 			return null;
 		}
-
+     
 		Map<String, List<Long>> employeeWiseGrouped = etExtecutions.stream().collect(Collectors.groupingBy(
 				obj -> (String) obj[1], TreeMap::new, Collectors.mapping(ete -> (Long) ete[0], Collectors.toList())));
 
 		List<Long> eteIds = employeeWiseGrouped.values().stream().flatMap(List::stream).collect(Collectors.toList());
-
+ 
 		log.info("Finding Visit Details");
 		List<Object[]> visitDetails = new ArrayList<>();
 		if (eteIds.size() > 0) {
@@ -250,7 +251,7 @@ public class VisitDetailReportResource {
 			inventoryVouchers = inventoryVoucherHeaderRepository.findByDocumentsAndExecutiveTaskIdIn(documents, eteIds);
 
 		}
-
+		
 		log.info("Finding  Inventory Vouchers...");
 		List<Object[]> ivhDtos = new ArrayList<>();
 		if (eteIds.size() > 0) {
@@ -266,29 +267,35 @@ public class VisitDetailReportResource {
 		if (ivhPids.size() > 0) {
 			ivDetails = inventoryVoucherDetailRepository.findAllByInventoryVoucherHeaderPidIn(ivhPids);
 		}
-
+		
 		log.info("Finding executive Task execution Accounting Vouchers...");
 		List<Object[]> accountingVouchers = new ArrayList<>();
 		if (eteIds.size() > 0) {
 			accountingVouchers = accountingVoucherHeaderRepository.findByExecutiveTaskExecutionsIdIn(eteIds);
 
 		}
+		
 		List<AccountingVoucherHeader> accountingHeader = accountingVoucherHeaderRepository
 				.findByExecutiveTaskExecutionIdIn(eteIds);
 		List<Long> accId = accountingHeader.stream().map(acc -> acc.getId()).collect(Collectors.toList());
+		List<Object[]> netCollectionAmountCash= new ArrayList<>();
+		List<Object[]> netCollectionAmountCheque=new ArrayList<>();
+		List<Object[]> netCollectionAmountRtgs = new ArrayList<>();
 		
+		if(!accId.isEmpty())
+		{
 		log.info("Finding executive Task execution Accounting Vouchers Details...");
-		List<Object[]> netCollectionAmountCash = accountingVoucherDetailRepository
+		netCollectionAmountCash = accountingVoucherDetailRepository
 				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCash(accId,
 						PaymentMode.Cash);
-		List<Object[]> netCollectionAmountCheque = accountingVoucherDetailRepository
+		netCollectionAmountCheque = accountingVoucherDetailRepository
 				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCheque(accId,
 						PaymentMode.Cheque);
 		
-		List<Object[]> netCollectionAmountRtgs = accountingVoucherDetailRepository
+		 netCollectionAmountRtgs = accountingVoucherDetailRepository
 				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeRtgs(accId,
 						PaymentMode.RTGS);
-		
+		}
 		
 		List<Object[]> accountProfile = new ArrayList<>();
 		accountProfile = accountProfileRepository.findByUserIdInAndDateBetween(userIds, fromDate, toDate);
@@ -296,7 +303,7 @@ public class VisitDetailReportResource {
 		log.info("Finding Attendance details.......");
 		List<Object[]> attendance = new ArrayList<>();
 		attendance = attendanceRepository.findByUserIdInAndDateBetween(userIds, fromDate, toDate);
-
+		
 		log.info("executive task execution looping started :");
 		List<VisitReportView> visitReportView = new ArrayList<>();
 
@@ -309,7 +316,7 @@ public class VisitDetailReportResource {
 
 			String employeeName = entry.getKey();
 			visitreport.setEmployeeName(employeeName);
-			System.out.println("Name:" + employeeName);
+			
 			for (Object[] obj : attendance) {
 				if (obj[2].toString().equals(employeeName)) {
 
