@@ -782,10 +782,10 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query(value = OPTIMISED_INVENTORY_QUERY, nativeQuery = true)
 	List<Object[]> findAllByCompanyIdAndOrderByCreatedDateDescOptimised();
 
-	@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1")
+	@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid,inventoryVoucher.documentNumberServer,inventoryVoucher.createdDate from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1")
 	List<Object[]> findByExecutiveTaskExecutionIdIn(Set<Long> exeIds);
 
-	@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1 and inventoryVoucher.document.pid = ?2")
+	@Query("select inventoryVoucher.pid,inventoryVoucher.document.name,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.documentVolume,inventoryVoucher.executiveTaskExecution.pid,inventoryVoucher.documentNumberServer,inventoryVoucher.createdDate from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1 and inventoryVoucher.document.pid = ?2")
 	List<Object[]> findByExecutiveTaskExecutionIdInAndDocumentPid(Set<Long> exeIds, String documentPid);
 
 	@Query(value = DOCUMENT_BASED_ORDER_MANAGEMENT_DOWNLOAD_TALLY_LIMIT, nativeQuery = true)
