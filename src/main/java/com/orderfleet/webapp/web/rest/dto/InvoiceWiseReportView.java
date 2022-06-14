@@ -89,6 +89,8 @@ public class InvoiceWiseReportView {
 	private String vehicleRegistrationNumber;
 	 
 	private String vehiclename;
+	
+	private String invoiceNo;
 
 	public InvoiceWiseReportView() {
 		super();
@@ -513,6 +515,15 @@ public class InvoiceWiseReportView {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
+
 	@Override
 	public String toString() {
 		return "ExecutiveTaskExecutionView [pid=" + pid + ", createdDate=" + createdDate + ", plannedDate="
