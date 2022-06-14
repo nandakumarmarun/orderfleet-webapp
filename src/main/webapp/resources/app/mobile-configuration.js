@@ -59,6 +59,7 @@ if (!this.MobileConfiguration) {
 		accountProfilePrintName : 'NAME',
 		productProfileDisplayName : 'NAME',
 		productProfilePrintName : 'NAME',
+		bluetoothPaperType :'SMALL',
 			maxCartNos : false,
 			cartMaxSize : null,
 			roundOffAutomation : false,
@@ -184,6 +185,8 @@ if (!this.MobileConfiguration) {
 				"#productProfileDisplayName").val();
 		mobileConfigurationDTO.productProfilePrintName = $(
 				"#productProfilePrintName").val();
+		mobileConfigurationDTO.bluetoothPaperType = $(
+		"#bluetoothPeperType").val();
 		mobileConfigurationDTO.maxCartNos = $("#maxCartNos").is(
 		":checked");
 		mobileConfigurationDTO.cartMaxSize = $('#field_cartMaxSize').val();
@@ -318,6 +321,8 @@ if (!this.MobileConfiguration) {
 									data.ptenQuotationLayout);
 							$('#showDistanceFare').prop("checked",
 									data.showDistanceFare);
+							$('#bluetoothPeperType').val(
+									data.bluetoothPaperType);
 							
 						}
 

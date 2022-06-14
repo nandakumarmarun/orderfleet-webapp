@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.dto;
 
 import java.util.List;
 
+import com.orderfleet.webapp.domain.enums.BluetoothPaperType;
 import com.orderfleet.webapp.domain.enums.CartType;
 import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
@@ -72,6 +73,8 @@ public class MobileSettingsDTO {
 	private DisplayName productProfileDisplayName;
 
 	private DisplayName productProfilePrintName;
+	
+	private BluetoothPaperType bluetoothPaperType;
 
 	private boolean kfcEnabled;
 
@@ -184,6 +187,7 @@ public class MobileSettingsDTO {
 		this.roundOffAutomation=mobileConfigurationDTO.isRoundOffAutomation();
 		this.ptenQuotationLayout=mobileConfigurationDTO.isPtenQuotationLayout();
 		this.showDistanceFare = mobileConfigurationDTO.getShowDistanceFare();
+		this.bluetoothPaperType = mobileConfigurationDTO.getBluetoothPaperType();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -626,10 +630,12 @@ public class MobileSettingsDTO {
 		this.showDistanceFare = showDistanceFare;
 	}
 
-	
+	public BluetoothPaperType getBluetoothPaperType() {
+		return bluetoothPaperType;
+	}
 
-
-
-	
+	public void setBluetoothPaperType(BluetoothPaperType bluetoothPaperType) {
+		this.bluetoothPaperType = bluetoothPaperType;
+	}
 
 }

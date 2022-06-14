@@ -96,6 +96,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setRoundOffAutomation(mobileConfigurationDTO.isRoundOffAutomation());
 		configuration.setPtenQuotationLayout(mobileConfigurationDTO.isPtenQuotationLayout());
 		configuration.setShowDistanceFare(mobileConfigurationDTO.getShowDistanceFare());
+		configuration.setBluetoothPaperType(mobileConfigurationDTO.getBluetoothPaperType());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -156,6 +157,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setRoundOffAutomation(mobileConfigurationDTO.isRoundOffAutomation());
 			configuration.setPtenQuotationLayout(mobileConfigurationDTO.isPtenQuotationLayout());
 			configuration.setShowDistanceFare(mobileConfigurationDTO.getShowDistanceFare());
+			configuration.setBluetoothPaperType(mobileConfigurationDTO.getBluetoothPaperType());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

@@ -83,6 +83,7 @@
 						<th>Account Profile Print Name</th>
 						<th>Product Profile Display Name</th>
 						<th>Product Profile Print Name</th>
+						<th>Bluetooth Paper Type</th>
 						<th>MAX CART NOS</th>
 						<th>Max Cart Size</th>
 						<th>Round Off Automation</th>
@@ -148,6 +149,7 @@
 							<td>${mobileConfiguration. roundOffAutomation}</td>
 							<td>${mobileConfiguration.ptenQuotationLayout}</td>
        			            <td>${mobileConfiguration.showDistanceFare}</td>
+       			            <td>${mobileConfiguration.bluetoothPaperType}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -594,6 +596,18 @@
 														<option value="NAME" selected="selected">Name</option>
 														<option value="ALIAS">Alias</option>
 														<option value="DESCRIPTION">Description</option>
+													</select>
+												</div></td>
+										</tr>
+										
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Bluetooth Paper Type
+													</label> <select id="bluetoothPeperType"
+														name='bluetoothPeperType' class="form-control">
+														<option value="SMALL" selected="selected">Small</option>
+														<option value="MEDIUM">Medium</option>
+														<option value="LARGE">Large</option>
 													</select>
 												</div></td>
 										</tr>

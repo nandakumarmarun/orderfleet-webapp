@@ -6,6 +6,7 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 
 import com.orderfleet.webapp.domain.MobileConfiguration;
+import com.orderfleet.webapp.domain.enums.BluetoothPaperType;
 import com.orderfleet.webapp.domain.enums.CartType;
 import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
@@ -47,6 +48,7 @@ public class MobileConfigurationDTO {
 	private DisplayName accountProfilePrintName;
 	private DisplayName productProfileDisplayName;
 	private DisplayName productProfilePrintName;
+	private BluetoothPaperType bluetoothPaperType;
 	private boolean kfcEnabled;
 	private boolean gpsMandatory;
 	private boolean enableSecondarySales;
@@ -135,6 +137,7 @@ public class MobileConfigurationDTO {
         this.roundOffAutomation=mobileConfiguration.isRoundOffAutomation();
         this.ptenQuotationLayout =mobileConfiguration.isPtenQuotationLayout();
         this.showDistanceFare = mobileConfiguration.getShowDistanceFare();
+        this.bluetoothPaperType = mobileConfiguration.getBluetoothPaperType();
 	}
 
 	public String getPid() {
@@ -569,7 +572,13 @@ public class MobileConfigurationDTO {
 		this.showDistanceFare = showDistanceFare;
 	}
 
-	
+	public BluetoothPaperType getBluetoothPaperType() {
+		return bluetoothPaperType;
+	}
+
+	public void setBluetoothPaperType(BluetoothPaperType bluetoothPaperType) {
+		this.bluetoothPaperType = bluetoothPaperType;
+	}
 
 	
 }

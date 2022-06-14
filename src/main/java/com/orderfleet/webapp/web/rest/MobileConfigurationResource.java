@@ -71,7 +71,7 @@ public class MobileConfigurationResource {
 		Optional<Company> optionalCompany = companyRepository.findOneByPid(companyPid);
 		if (optionalCompany.isPresent()) {
 			return mobileConfigurationService.findByCompanyId(optionalCompany.get().getId());
-		}
+		} 
 		return null;
 	}
 
@@ -89,6 +89,8 @@ public class MobileConfigurationResource {
 		Optional<MobileConfigurationDTO> opConfigurationDTO = mobileConfigurationService
 				.findOneByCompanyId(optionalCompany.get().getId());
 
+		
+		
 		if (opConfigurationDTO.isPresent()) {
 			mobileConfigurationDTO.setPid(opConfigurationDTO.get().getPid());
 			mobileConfigurationService.updateMobileConfiguration(mobileConfigurationDTO);

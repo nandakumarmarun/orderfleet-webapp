@@ -17,6 +17,7 @@ import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.orderfleet.webapp.domain.enums.BluetoothPaperType;
 import com.orderfleet.webapp.domain.enums.CartType;
 import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
@@ -200,24 +201,27 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "block_Customer_By_Credits", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean blockCustomerByCredits;
-	
+
 	@Column(name = "max_Cart_Nos", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
-	private boolean maxCartNos ;
-	
+	private boolean maxCartNos;
+
 	@Column(name = "cart_Max_Size", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double cartMaxSize;
-	
+
 	@Column(name = "round_Off_Automation", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
-	private boolean roundOffAutomation ;
-	
+	private boolean roundOffAutomation;
+
 	@Column(name = "pTen_Quotation_Layout", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
-	private boolean ptenQuotationLayout ;
-	
-	@Column(name = "show_Distance_Fare",nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
-    private boolean showDistanceFare;
-	
-	
-	
+	private boolean ptenQuotationLayout;
+
+	@Column(name = "show_Distance_Fare", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean showDistanceFare;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "bluetooth_peper_type", nullable = false, columnDefinition = "character varying DEFAULT 'SMALL'")
+	private BluetoothPaperType bluetoothPaperType;
+
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -617,7 +621,7 @@ public class MobileConfiguration implements Serializable {
 	public void setWifiPrintEnabler(boolean wifiPrintEnabler) {
 		this.wifiPrintEnabler = wifiPrintEnabler;
 	}
-	
+
 	public boolean isBlockCustomerByCredits() {
 		return blockCustomerByCredits;
 	}
@@ -642,7 +646,6 @@ public class MobileConfiguration implements Serializable {
 		this.cartMaxSize = cartMaxSize;
 	}
 
-	
 	public boolean isRoundOffAutomation() {
 		return roundOffAutomation;
 	}
@@ -651,8 +654,6 @@ public class MobileConfiguration implements Serializable {
 		this.roundOffAutomation = roundOffAutomation;
 	}
 
-	
-
 	public boolean isPtenQuotationLayout() {
 		return ptenQuotationLayout;
 	}
@@ -660,8 +661,6 @@ public class MobileConfiguration implements Serializable {
 	public void setPtenQuotationLayout(boolean ptenQuotationLayout) {
 		this.ptenQuotationLayout = ptenQuotationLayout;
 	}
-	
-	
 
 	public boolean getShowDistanceFare() {
 		return showDistanceFare;
@@ -669,6 +668,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setShowDistanceFare(boolean showDistanceFare) {
 		this.showDistanceFare = showDistanceFare;
+	}
+	
+	public BluetoothPaperType getBluetoothPaperType() {
+		return bluetoothPaperType;
+	}
+
+	public void setBluetoothPaperType(BluetoothPaperType bluetoothPaperType) {
+		this.bluetoothPaperType = bluetoothPaperType;
 	}
 
 	@Override
