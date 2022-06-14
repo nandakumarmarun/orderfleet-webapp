@@ -97,7 +97,7 @@ if (!this.EmployeeProfileLocation) {
 																"<tr><td>"
 																		+ employeeProfile.name
 																		+ "</td><td>"
-																		+employeeProfile.userFirstName
+																		+employeeProfile.userLogin
 																		+"</td><td><button type='button' class='btn btn-info' onclick='EmployeeProfileLocation.showModalPopup($(\"#locationsModal\"),\""
 																		+ employeeProfile.pid
 																		+ "\",0);'>Assign Locations</button></td></tr>");

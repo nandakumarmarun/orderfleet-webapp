@@ -31,6 +31,7 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
         employeeProfileDTO.setUserLastName( employeeProfileUserLastName( employeeProfile ) );
         employeeProfileDTO.setUserPid( employeeProfileUserPid( employeeProfile ) );
         employeeProfileDTO.setUserFirstName( employeeProfileUserFirstName( employeeProfile ) );
+        employeeProfileDTO.setUserLogin(employeeProfileUserLoginName(employeeProfile));
         employeeProfileDTO.setActivated( employeeProfile.getActivated() );
         employeeProfileDTO.setPid( employeeProfile.getPid() );
         employeeProfileDTO.setOrgEmpId( employeeProfile.getOrgEmpId() );
@@ -53,6 +54,7 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
           return null;
       }
 
+      
       EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
 
       employeeProfileDTO.setDesignationPid( employeeProfileDesignationPid( employeeProfile ) );
@@ -62,6 +64,7 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
       employeeProfileDTO.setUserLastName( employeeProfileUserLastName( employeeProfile ) );
       employeeProfileDTO.setUserPid( employeeProfileUserPid( employeeProfile ) );
       employeeProfileDTO.setUserFirstName( employeeProfileUserFirstName( employeeProfile ) );
+      employeeProfileDTO.setUserLogin(employeeProfileUserLoginName(employeeProfile));
       employeeProfileDTO.setActivated( employeeProfile.getActivated() );
       employeeProfileDTO.setPid( employeeProfile.getPid() );
       employeeProfileDTO.setOrgEmpId( employeeProfile.getOrgEmpId() );
@@ -302,4 +305,19 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
         return firstName;
     }
    
+    private String employeeProfileUserLoginName(EmployeeProfile employeeProfile) {
+
+        if ( employeeProfile == null ) {
+            return null;
+        }
+        User user = employeeProfile.getUser();
+        if ( user == null ) {
+            return null;
+        }
+        String userLogin = user.getLogin();
+        if ( userLogin == null ) {
+            return null;
+        }
+        return userLogin;
+    }
 }

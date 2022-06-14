@@ -104,10 +104,10 @@ public class AccountProfileOdooUploadService {
 	public void saveUpdateAccountProfiles(final List<OdooAccountProfile> list) {
 
 		log.info("Saving Account Profiles...");
-		for(OdooAccountProfile oap:list)
-		{
-			System.out.println(oap.getName());
-		}
+//		for(OdooAccountProfile oap:list)
+//		{
+//			System.out.println(oap.getName());
+//		}
 		long start = System.nanoTime();
 
 		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
@@ -213,8 +213,8 @@ public class AccountProfileOdooUploadService {
 
 			if (optionalAP.isPresent()) {
 				accountProfile = optionalAP.get();
-				System.out.println(
-						accountProfile.getId() + "---------" + i++ + "=========" + accountProfile.getCustomerId());
+//				System.out.println(
+//						accountProfile.getId() + "---------" + i++ + "=========" + accountProfile.getCustomerId());
 				// if not update, skip this iteration. Not implemented now
 				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
 			} else {

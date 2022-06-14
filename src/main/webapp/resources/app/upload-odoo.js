@@ -95,26 +95,28 @@ if (!this.uploadOdoo) {
 	}
 	
 	function doAjax(selectedMasters) {
-		if (selectedMasters.length > 0) {
-			var m = selectedMasters.pop()
-			$(".error-msg").html("Uploading "+m.alias+"....");
-	        $.ajax({
-	            url      : uploadOdooContextPath + m.path,
-	            method : 'GET',
-	            success  : function (serverResponse) {
-					$(".error-msg").html("Uploading "+m.alias+" success....");                
-	                doAjax(selectedMasters);
-	            },
-	            error : function(xhr, error) {
-					$(".error-msg").html(
-							"Error uploading "+m.alias);
-					selectedMasters = [];
-				}
-	        });
-		} else {
-			alert("Upload Complete")
-			onSaveSuccess(selectedMasters);
-		}
+		setTimeout(() => {
+			if (selectedMasters.length > 0) {
+				var m = selectedMasters.pop()
+				$(".error-msg").html("Uploading "+m.alias+"....");
+				$.ajax({
+					url      : uploadOdooContextPath + m.path,
+					method : 'GET',
+					success  : function (serverResponse) {
+						$(".error-msg").html("Uploading "+m.alias+" success....");                
+						doAjax(selectedMasters);
+					},
+					error : function(xhr, error) {
+						$(".error-msg").html(
+								"Error uploading "+m.alias);
+						selectedMasters = [];
+					}
+				});
+			} else {
+				alert("Upload Complete")
+				onSaveSuccess(selectedMasters);
+			}	
+		}, 3000);
 	}
 
 	

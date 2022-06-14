@@ -62,6 +62,8 @@ public class EmployeeProfileDTO {
 	private boolean activated;
 	
 	private String orgEmpId;
+	
+	private String userLogin;
 
 	public boolean getActivated() {
 		return activated;
@@ -214,6 +216,16 @@ public class EmployeeProfileDTO {
 
 	public void setUserPid(String userPid) {
 		this.userPid = userPid;
+	}
+	
+	
+
+	public String getUserLogin() {
+		return userLogin;
+	}
+
+	public void setUserLogin(String userLogin) {
+		this.userLogin = userLogin;
 	}
 
 	@Override
