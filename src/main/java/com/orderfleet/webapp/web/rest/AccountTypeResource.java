@@ -111,6 +111,7 @@ public class AccountTypeResource {
 					.headers(HeaderUtil.createFailureAlert("accountType", "nameexists", "Account type already in use"))
 					.body(null);
 		}
+		
 		accountTypeDTO.setActivated(true);
 		AccountTypeDTO result = accountTypeService.save(accountTypeDTO);
 		return ResponseEntity.created(new URI("/web/accountTypes/" + result.getPid()))
