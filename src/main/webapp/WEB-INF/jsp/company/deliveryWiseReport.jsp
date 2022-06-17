@@ -69,15 +69,7 @@
 									</select>
 								</div>
 							</div>
-							<div class="col-sm-2">
-								Document <select id="dbDocument" name="documentPid"
-									class="form-control">
-									<option value="no">All Document</option>
-									<c:forEach items="${documents}" var="document">
-										<option value="${document.pid}">${document.name}</option>
-									</c:forEach>
-								</select>
-							</div>
+							
 							<div class="col-sm-2">
 								Account <select id="dbAccount" name="accountPid"
 									class="form-control">
@@ -192,6 +184,7 @@
 							<th>Invoice Date</th>
 							<th>Vehicle Number</th>
 							<th>Submission Date</th>
+							<th>Action</th>
 							
 						</tr>
 					</thead>
@@ -201,6 +194,38 @@
 				</table>
 			</div>
 
+<!-- Model Container-->
+		<div class="modal fade container " id="imagesModal">
+			<!-- model Dialog -->
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="viewModalLabel">Delivery Images</h4>
+					</div>
+					<div class="modal-body zoom">
+						<!-- error message -->
+						<div class="alert alert-danger alert-dismissible" role="alert"
+							style="display: none;">
+							<button type="button" class="close" onclick="$('.alert').hide();"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<p></p>
+						</div>
+						<div id="divAttendanceImages" style="overflow: auto; height: 500px;"></div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
 
 			<hr />
 

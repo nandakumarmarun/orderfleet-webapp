@@ -59,7 +59,6 @@ if (!this.DeliveryWiseReport) {
 					type : 'GET',
 					data : {
 						employeePid : $('#dbEmployee').val(),
-						documentPid : $("#dbDocument").val(),
 						activityPid : $("#dbActivity").val(),
 						accountPid : $("#dbAccount").val(),
 						filterBy : $("#dbDateSearch").val(),
@@ -82,7 +81,16 @@ if (!this.DeliveryWiseReport) {
 								.each(
 										deliveryWiseReports,
 										function(index, invoiceWiseReport) {
+											var content = "";
 											
+											if (invoiceWiseReport.imageButtonVisible) {
+												content = "<td><button type='button' class='btn btn-info' onclick='DeliveryWiseReport.showModalPopup($(\"#imagesModal\"),\""
+														+ invoiceWiseReport.pid
+														+ "\",0);'>View Images</button></td>";
+											} else {
+												content = "<td></td>";
+											}
+
 
 											
 											$('#tBodyDeliveryWiseReport')
@@ -146,8 +154,54 @@ if (!this.DeliveryWiseReport) {
 	}
 
 	
-	
+	DeliveryWiseReport.showModalPopup = function(el, pid, action) {
+		if (pid) {
+			switch (action) {
+			case 0:
+				showDeliveryImage(pid);
+				break;
+			}
+		}
+		el.modal('show');
+	}
 
+	function showDeliveryImage(pid) {
+		$
+				.ajax({
+					url : deliveryWiseReportContextPath + "/images/" + pid,
+					method : 'GET',
+					success : function(filledFormFiles) {
+
+						$('#divAttendanceImages').html("");
+						$
+								.each(
+										filledFormFiles,
+										function(index, filledFormFile) {
+											var table = '<table class="table  table-striped table-bordered"><tr><td style="font-weight: bold;">'
+													+ filledFormFile.formName
+													+ '</td></tr>';
+											$
+													.each(
+															filledFormFile.files,
+															function(index,
+																	file) {
+																table += '<tr><th>'
+																		+ file.fileName
+																		+ '</th></tr>';
+																table += '<tr><td><img width="100%" src="data:image/png;base64,'
+																		+ file.content
+																		+ '"/></td></tr>';
+															});
+											table += '</table>';
+											$('#divAttendanceImages')
+													.append(table);
+										});
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
+	}
 	DeliveryWiseReport.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");

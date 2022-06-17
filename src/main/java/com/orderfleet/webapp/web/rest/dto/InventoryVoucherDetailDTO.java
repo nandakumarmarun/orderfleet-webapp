@@ -141,6 +141,8 @@ public class InventoryVoucherDetailDTO {
 	private String territory;
 	
 	private LocalDateTime deliveryDate;
+	
+	private String referenceInvoiceNo;
 
 	public InventoryVoucherDetailDTO() {
 	}
@@ -233,7 +235,10 @@ public class InventoryVoucherDetailDTO {
 		this.updatedStatus = inventoryVoucherDetail.getUpdatedStatus();
 		this.inventoryVoucherBatchDetails = inventoryVoucherDetail.getInventoryVoucherBatchDetails().stream()
 				.map(InventoryVoucherBatchDetailDTO::new).collect(Collectors.toList());
+		
+		this.referenceInvoiceNo =inventoryVoucherDetail.getReferenceInvoiceNo();
 	}
+	
 
 	public Long getDetailId() {
 		return detailId;
@@ -741,6 +746,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setDeliveryDate(LocalDateTime deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public String getReferenceInvoiceNo() {
+		return referenceInvoiceNo;
+	}
+
+	public void setReferenceInvoiceNo(String referenceInvoiceNo) {
+		this.referenceInvoiceNo = referenceInvoiceNo;
 	}
 
 	@Override

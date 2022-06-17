@@ -36,12 +36,15 @@ import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.File;
+import com.orderfleet.webapp.domain.InventoryVoucherDetail;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
+import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -79,7 +82,9 @@ public class InventoryVoucherBatchDetailController {
 
 	@Inject
 	private FileManagerService fileManagerService;
-	
+
+	@Inject
+	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
 
 	private final Logger log = LoggerFactory.getLogger(InventoryVoucherBatchDetailController.class);
 
@@ -106,6 +111,7 @@ public class InventoryVoucherBatchDetailController {
 		log.debug("API request to fetch Customers Invoice Details (sales)");
 
 		String docPid = "DOC-KKcTOuI90C1522998462406";
+		String documentPid = "DOC-nx6mcvKb9G1653966130937";
 		List<InvoiceDTO> invoiceDto = new ArrayList<>();
 
 		List<String> accountPids = new ArrayList<>();
@@ -116,34 +122,47 @@ public class InventoryVoucherBatchDetailController {
 
 			accountPids = accountProfileRepository.findAllPidsByCompany();
 		}
-		log.info("Account Profile Size =" + accountPids.size());
 
 		List<AccountProfile> accountprofile = accountProfileRepository.findByPidIn(accountPids);
 
 		List<Long> Ids = accountprofile.stream().map(acc -> acc.getId()).collect(Collectors.toList());
 
 		List<ExecutiveTaskExecution> executiveTaskExecutionsObject = new ArrayList<>();
-		executiveTaskExecutionsObject = executiveTaskExecutionRepository.getByAccountIdIn(Ids);
 
-//		List<ExecutiveTaskExecution> executiveTask = executiveTaskExecutionsObject.stream().limit(5)
-//				.collect(Collectors.toList());
+		executiveTaskExecutionsObject = executiveTaskExecutionRepository.getByAccountIdIn(Ids);
 
 		Set<Long> exeIds = executiveTaskExecutionsObject.stream().map(ext -> ext.getId()).collect(Collectors.toSet());
 
 		List<Object[]> inventoryVouchers = new ArrayList<>();
+		List<InventoryVoucherHeader> deliveryVoucher = new ArrayList<>();
 		if (exeIds.size() > 0) {
 
-			inventoryVouchers = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionsIdInAndDocumentPid(exeIds,docPid);
+			inventoryVouchers = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionsIdInAndDocumentPid(exeIds,
+					docPid);
+			deliveryVoucher = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionIdInAndDocumentsPid(exeIds,
+					documentPid);
 		}
-         System.out.println("Inv size :"+inventoryVouchers.size());
+
+		List<Long> ivId = deliveryVoucher.stream().map(dv -> dv.getId()).collect(Collectors.toList());
+		List<InventoryVoucherDetail> invDetail = new ArrayList<>();
+		if (ivId.size() > 0) {
+			invDetail = inventoryVoucherDetailRepository.findByInventoryHeaderIdIn(ivId);
+		}
+		for (InventoryVoucherDetail obj1 : invDetail) {
+			Object[] ivh = inventoryVouchers.stream()
+					.filter(abc -> abc[0].toString().equals(obj1.getReferenceInvoiceNo())).findAny().get();
+			inventoryVouchers.remove(ivh);
+		}
+
 		List<Object[]> inventory = inventoryVouchers.stream().limit(5).collect(Collectors.toList());
 		for (ExecutiveTaskExecution executive : executiveTaskExecutionsObject) {
-			System.out.println("enterd in to loop");
+
 			double totalSalesOrderAmount = 0.0;
 			InvoiceDTO invoicedto = new InvoiceDTO();
 			invoicedto.setInvoiceDate(executive.getDate());
 			for (Object[] obj : inventory) {
 				if (obj[1].toString().equalsIgnoreCase(executive.getPid())) {
+
 					invoicedto.setInvoiceNo(obj[0].toString());
 					if (obj[3].toString().equalsIgnoreCase("INVENTORY_VOUCHER")) {
 
@@ -152,15 +171,13 @@ public class InventoryVoucherBatchDetailController {
 						invoiceDto.add(invoicedto);
 					}
 				}
-//				invoicedto.setDocumentTotal(totalSalesOrderAmount);
-//				invoiceDto.add(invoicedto);
 
 			}
 		}
 		return new ResponseEntity<>(invoiceDto, HttpStatus.OK);
 
 	}
-	
+
 	@Transactional
 	@RequestMapping(value = "/upload/invoiceimage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> uploadAttendanceImageFile(@RequestParam("imageRefNo") String imageRefNo,
@@ -172,26 +189,27 @@ public class InventoryVoucherBatchDetailController {
 							HeaderUtil.createFailureAlert("fileUpload", "Nocontent", "Invalid file upload: No content"))
 					.body(null);
 		}
-		
-		
-		
-	ResponseEntity<Object> upload	= inventoryVoucherHeaderRepository.findOneByImageRefNo(imageRefNo).map(invoice -> {
-			try {
-				File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
-						file.getOriginalFilename(), file.getContentType());
-				// update filledForm with file
-				invoice.getFiles().add(uploadedFile);
-				inventoryVoucherHeaderRepository.save(invoice);
-				log.debug("uploaded file for : {}", invoice);
-				return new ResponseEntity<>(HttpStatus.OK);
-			} catch (FileManagerException | IOException ex) {
-				log.debug("File upload exception : {}", ex.getMessage());
-				return ResponseEntity.badRequest()
-						.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage())).body(null);
-			}
-		}).orElse(ResponseEntity.badRequest()
-				.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
-				.body(null));
-	return upload;
+
+		ResponseEntity<Object> upload = inventoryVoucherHeaderRepository.findOneByImageRefNo(imageRefNo)
+				.map(invoice -> {
+					try {
+						File uploadedFile = this.fileManagerService.processFileUpload(file.getBytes(),
+								file.getOriginalFilename(), file.getContentType());
+						// update filledForm with file
+						invoice.getFiles().add(uploadedFile);
+						inventoryVoucherHeaderRepository.save(invoice);
+						log.debug("uploaded file for : {}", invoice);
+						return new ResponseEntity<>(HttpStatus.OK);
+					} catch (FileManagerException | IOException ex) {
+						log.debug("File upload exception : {}", ex.getMessage());
+						return ResponseEntity.badRequest()
+								.headers(HeaderUtil.createFailureAlert("fileUpload", "exception", ex.getMessage()))
+								.body(null);
+					}
+				})
+				.orElse(ResponseEntity.badRequest()
+						.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "image not found"))
+						.body(null));
+		return upload;
 	}
 }

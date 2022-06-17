@@ -1,5 +1,7 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,15 +28,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.io.Files;
 import com.orderfleet.webapp.domain.Activity;
+import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
+import com.orderfleet.webapp.domain.File;
+import com.orderfleet.webapp.domain.InventoryVoucherDetail;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.UserActivity;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
@@ -46,9 +54,11 @@ import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
+import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.UserActivityRepository;
 import com.orderfleet.webapp.repository.UserRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.DocumentFormsService;
@@ -56,6 +66,7 @@ import com.orderfleet.webapp.service.DocumentService;
 import com.orderfleet.webapp.service.DynamicDocumentHeaderService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.ExecutiveTaskExecutionService;
+import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.PriceLevelService;
@@ -63,6 +74,8 @@ import com.orderfleet.webapp.service.UserActivityService;
 import com.orderfleet.webapp.service.UserDocumentService;
 import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
+import com.orderfleet.webapp.web.rest.dto.FileDTO;
+import com.orderfleet.webapp.web.rest.dto.FormFileDTO;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportDetailView;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
@@ -101,49 +114,22 @@ public class DeliveryReportResource {
 	private EmployeeProfileRepository employeeProfileRepository;
 
 	@Inject
-	private FilledFormRepository filledFormRepository;
-
-	@Inject
 	private DashboardUserRepository dashboardUserRepository;
 
 	@Inject
-	private AccountProfileRepository accountProfileRepository;
-
-	@Inject
-	private AccountTypeService accountTypeService;
-
-	@Inject
-	private PriceLevelService priceLevelService;
-
-	@Inject
-	private DocumentService documentService;
-
-	@Inject
-	private DocumentFormsService documentFormsService;
-
-	@Inject
-	private ExecutiveTaskExecutionService executiveTaskExecutionService;
-
-	@Inject
-	private CompanyConfigurationRepository companyConfigurationRepository;
-
-	@Inject
-	private DynamicDocumentHeaderService dynamicDocumentHeaderService;
-
-	@Inject
 	private UserDocumentService userDocumentService;
-
-	@Inject
-	private LocationService locationService;
-
-	@Inject
-	private GeoLocationService geoLocationService;
 
 	@Inject
 	private UserActivityService userActivityService;
 
 	@Inject
 	private UserRepository userRepository;
+
+	@Inject
+	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
+
+	@Inject
+	private FileManagerService fileManagerService;
 
 	@RequestMapping(value = "/delivery-wise-reports", method = RequestMethod.GET)
 	@Timed
@@ -175,9 +161,11 @@ public class DeliveryReportResource {
 	@Timed
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<InvoiceWiseReportView>> filterDeliveryExecutiveTaskExecutions(
-			@RequestParam("documentPid") String documentPid, @RequestParam("employeePid") String employeePid,
-			@RequestParam("activityPid") String activityPid, @RequestParam("accountPid") String accountPid,
-			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate) {
+			@RequestParam("employeePid") String employeePid, @RequestParam("activityPid") String activityPid,
+			@RequestParam("accountPid") String accountPid, @RequestParam("filterBy") String filterBy,
+			@RequestParam String fromDate, @RequestParam String toDate) {
+
+		String documentPid = "DOC-nx6mcvKb9G1653966130937";
 
 		List<InvoiceWiseReportView> executiveTaskExecutions = new ArrayList<>();
 		if (filterBy.equals("TODAY")) {
@@ -222,7 +210,7 @@ public class DeliveryReportResource {
 
 		List<Long> userIds = getUserIdsUnderCurrentUser(employeePid);
 
-		log.info("User Ids :" + userIds);
+		
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -236,8 +224,7 @@ public class DeliveryReportResource {
 		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
 		log.info("Finding executive Task execution");
 		if (accountPid.equalsIgnoreCase("no")) {
-			// accountProfilePids = getAccountPids(userIds);
-			// if all accounts selected avoid account wise query
+			
 			executiveTaskExecutions = executiveTaskExecutionRepository
 					.getByCreatedDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
 		} else {
@@ -253,55 +240,72 @@ public class DeliveryReportResource {
 			exeIds.add(executiveTaskExecution.getId());
 		}
 
+		System.out.println("Execution ids:" + exeIds);
 		log.info("Finding executive Task execution Inventory Vouchers...");
-		log.info("Documents :"+documentPid);
+		
 		List<Object[]> inventoryVouchers = new ArrayList<>();
+		List<InventoryVoucherHeader> deliveryVoucher = new ArrayList<>();
 		if (exeIds.size() > 0) {
 			if (documentPid.equals("no")) {
 				inventoryVouchers = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionIdIn(exeIds);
 
 			} else {
-				inventoryVouchers = inventoryVoucherHeaderRepository
-						.findByExecutiveTaskExecutionIdInAndDocumentPid(exeIds, documentPid);
+				deliveryVoucher = inventoryVoucherHeaderRepository
+						.findByExecutiveTaskExecutionIdInAndDocumentsPid(exeIds, documentPid);
 
 			}
 		}
 
-		log.info("executive task execution looping started :" + executiveTaskExecutions.size());
+		List<Long> ivId = deliveryVoucher.stream().map(dv -> dv.getId()).collect(Collectors.toList());
+		List<InventoryVoucherDetail> invDetail = new ArrayList<>();
+		if (ivId.size() > 0) {
+			invDetail = inventoryVoucherDetailRepository.findByInventoryHeaderIdIn(ivId);
+		}
+		List<String> invoiceNo = invDetail.stream().map(inv -> inv.getReferenceInvoiceNo())
+				.collect(Collectors.toList());
+
+		if (invoiceNo.size() > 0) {
+			inventoryVouchers = inventoryVoucherHeaderRepository.findByDocumentNumberlocalIn(invoiceNo);
+		}
+		List<Long> exetId = new ArrayList();
+
+		inventoryVouchers.forEach(data -> {
+			exetId.add(Long.parseLong(data[1].toString()));
+		});
+
+		List<Object[]> executive = new ArrayList<>();
+		if (exetId.size() > 0) {
+			executive = executiveTaskExecutionRepository.findByExecutiveTaskExecutionIdIn(exetId);
+		}
+		log.info("executive task execution looping started :");
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
-		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
+
+		for (Object[] obj : inventoryVouchers) {
+			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView();
+
 			double totalSalesOrderAmount = 0.0;
+			for (Object[] object : executive) {
 
-			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView(executiveTaskExecution);
-			EmployeeProfile employeeProfile = employeeProfileRepository
-					.findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
+				if (obj[1].toString().equals(object[3].toString())) {
 
-			invoiceWiseReportView
-					.setVehicleRegistrationNumber(executiveTaskExecution.getVehicleNumber() == null ? "no vehicle"
-							: executiveTaskExecution.getVehicleNumber());
-			invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getAccountProfileName());
-			invoiceWiseReportView.setSendDate(executiveTaskExecution.getDate());
-			if (employeeProfile != null) {
-				invoiceWiseReportView.setEmployeeName(employeeProfile.getName());
+					invoiceWiseReportView.setPid(obj[5].toString());
+					invoiceWiseReportView.setEmployeeName(obj[6].toString());
+					invoiceWiseReportView.setAccountProfileName(object[1].toString());
+					invoiceWiseReportView
+							.setVehicleRegistrationNumber(object[2] == null ? "No vehicle" : object[2].toString());
+					invoiceWiseReportView.setCreatedDate(LocalDateTime.parse(object[0].toString()));
+					invoiceWiseReportView.setInvoiceNo(obj[0].toString());
+					invoiceWiseReportView.setSendDate(LocalDateTime.parse(obj[4].toString()));
 
-				for (Object[] obj : inventoryVouchers) {
-
-					if (obj[5].toString().equalsIgnoreCase(executiveTaskExecution.getPid())) {
-
-						invoiceWiseReportView.setInvoiceNo(obj[6].toString());
-						invoiceWiseReportView.setCreatedDate(LocalDateTime.parse(obj[7].toString()));
-						if (obj[3].toString().equalsIgnoreCase("INVENTORY_VOUCHER")) {
-							totalSalesOrderAmount += Double.valueOf(obj[2].toString());
-							invoiceWiseReportView.setTotalSalesOrderAmount(totalSalesOrderAmount);
-
-							invoiceWiseReportViews.add(invoiceWiseReportView);
-						}
-
-					}
+					totalSalesOrderAmount += Double.valueOf(obj[2].toString());
+					invoiceWiseReportView.setTotalSalesOrderAmount(totalSalesOrderAmount);
+					invoiceWiseReportViews.add(invoiceWiseReportView);
 				}
 			}
 		}
-		log.info("executive task execution looping ended :" + executiveTaskExecutions.size());
+
+		log.info("executive task execution looping ended :");
+		invoiceWiseReportViews.forEach(data -> System.out.println(data.getInvoiceNo()));
 		return invoiceWiseReportViews;
 	}
 
@@ -388,4 +392,44 @@ public class DeliveryReportResource {
 
 		return userIds;
 	}
+
+	@Timed
+	@RequestMapping(value = "/delivery-wise-reports/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<FormFileDTO>> getAttendanceImages(@PathVariable String pid) {
+		log.debug("Web request to get Attendance images by pid : {}", pid);
+
+		Optional<InventoryVoucherHeader> invDTO = inventoryVoucherHeaderRepository.findOneByPid(pid);
+
+		InventoryVoucherHeader invHeader = new InventoryVoucherHeader();
+
+		List<FormFileDTO> formFileDTOs = new ArrayList<>();
+		if (invDTO.isPresent()) {
+			invHeader = invDTO.get();
+		}
+		if (invHeader.getFiles().size() > 0) {
+			FormFileDTO formFileDTO = new FormFileDTO();
+			String formName = invHeader.getEmployee().getName();
+			formFileDTO.setFormName(formName);
+			formFileDTO.setFiles(new ArrayList<>());
+			Set<File> files = invHeader.getFiles();
+			for (File file : files) {
+				FileDTO fileDTO = new FileDTO();
+				fileDTO.setFileName(file.getFileName());
+				fileDTO.setMimeType(file.getMimeType());
+				java.io.File physicalFile = this.fileManagerService.getPhysicalFileByFile(file);
+				if (physicalFile.exists()) {
+					try {
+						fileDTO.setContent(Files.toByteArray(physicalFile));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				formFileDTO.getFiles().add(fileDTO);
+			}
+			formFileDTOs.add(formFileDTO);
+		}
+		return new ResponseEntity<>(formFileDTOs, HttpStatus.OK);
+
+	}
+
 }

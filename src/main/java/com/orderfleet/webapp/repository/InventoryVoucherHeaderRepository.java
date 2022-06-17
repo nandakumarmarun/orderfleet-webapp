@@ -819,6 +819,14 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	
 	@Query("select inventoryVoucher.documentNumberServer,inventoryVoucher.executiveTaskExecution.pid,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.createdDate  from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1 and inventoryVoucher.document.pid =?2 and inventoryVoucher.company.id = ?#{principal.companyId} order by inventoryVoucher.createdDate desc")
      List<Object[]> findByExecutiveTaskExecutionsIdInAndDocumentPid(Set<Long> exeIds,String DocPid);
+     
+     @Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.executiveTaskExecution.id IN ?1 and inventoryVoucher.document.pid =?2 and inventoryVoucher.company.id = ?#{principal.companyId} order by inventoryVoucher.createdDate desc")
+     List<InventoryVoucherHeader> findByExecutiveTaskExecutionIdInAndDocumentsPid(Set<Long> exeIds,String DocPid);
+     
+    
 
 	Optional<InventoryVoucherHeader> findOneByImageRefNo(String imageRefNo);
+
+	  @Query("select inventoryVoucher.documentNumberServer,inventoryVoucher.executiveTaskExecution.id,inventoryVoucher.documentTotal,inventoryVoucher.document.documentType,inventoryVoucher.createdDate,inventoryVoucher.pid,inventoryVoucher.employee.name from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.documentNumberLocal IN ?1 and inventoryVoucher.company.id = ?#{principal.companyId} order by inventoryVoucher.createdDate desc")
+      List<Object[]> findByDocumentNumberlocalIn(List<String> invoiceNo);
 }

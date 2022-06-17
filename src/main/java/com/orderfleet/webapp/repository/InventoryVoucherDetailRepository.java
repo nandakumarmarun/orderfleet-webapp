@@ -354,4 +354,7 @@ public interface InventoryVoucherDetailRepository extends JpaRepository<Inventor
 	List<InventoryVoucherDetail> findAllById(Long referenceInventoryVoucherDetailId);
 
 	InventoryVoucherDetail findOneById(Long detailId);
+
+	@Query("select voucherDetail from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.id in ?1")
+     List<InventoryVoucherDetail> findByInventoryHeaderIdIn(List<Long> ivId);
 }

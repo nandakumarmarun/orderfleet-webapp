@@ -43,6 +43,12 @@ public class InvoiceDTO {
 	public void setDocumentTotal(Double documentTotal) {
 		this.documentTotal = documentTotal;
 	}
+
+	@Override
+	public String toString() {
+		return "InvoiceDTO [invoiceNo=" + invoiceNo + ", invoiceDate=" + invoiceDate + ", documentTotal="
+				+ documentTotal + "]";
+	}
 	
 	
 

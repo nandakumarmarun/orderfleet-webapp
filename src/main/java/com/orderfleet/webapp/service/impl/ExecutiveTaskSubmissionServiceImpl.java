@@ -763,6 +763,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 					log.info("S StockLocation name : " + inventoryVoucherDetailDTO.getSourceStockLocationName());
 					log.info("StockLocation Pid : " + inventoryVoucherDetailDTO.getStockLocationPid());
 					log.info("StockLocation Name : " + inventoryVoucherDetailDTO.getStockLocationName());
+					log.info("Reference invoice no : " + inventoryVoucherDetailDTO.getReferenceInvoiceNo());
 					if (inventoryVoucherDetailDTO.getSourceStockLocationPid() != null)
 						sourceStockLocation = stockLocationRepository
 								.findOneByPid(inventoryVoucherDetailDTO.getSourceStockLocationPid()).get();
@@ -849,7 +850,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
 								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
 								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails,
-								inventoryVoucherDetailPriceLevel,inventoryVoucherDetailDTO.getAdditionalDiscount()));
+								inventoryVoucherDetailPriceLevel,inventoryVoucherDetailDTO.getAdditionalDiscount(),inventoryVoucherDetailDTO.getReferenceInvoiceNo()));
 					} else {
 						inventoryVoucherDetails.add(new InventoryVoucherDetail(productProfile,
 								inventoryVoucherDetailDTO.getQuantity(), inventoryVoucherDetailDTO.getFreeQuantity(),
@@ -864,7 +865,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								inventoryVoucherDetailDTO.getSize(), inventoryVoucherDetailDTO.getColor(),
 								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
 								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
-								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails,inventoryVoucherDetailDTO.getAdditionalDiscount()));
+								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails,inventoryVoucherDetailDTO.getAdditionalDiscount(),inventoryVoucherDetailDTO.getReferenceInvoiceNo()));
 					}
 				});
 				inventoryVoucherHeader.setInventoryVoucherDetails(inventoryVoucherDetails);
@@ -2185,7 +2186,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 						inventoryVoucherDetailDTO.getColor(), inventoryVoucherDetailDTO.getItemtype(),
 						sourceStockLocation, destinationStockLocation, referenceInventoryVoucherHeader,
 						referenceInventoryVoucherDetail, inventoryVoucherDetailDTO.getRemarks(),
-						inventoryVoucherBatchDetails,inventoryVoucherDetailDTO.getAdditionalDiscount()));
+						inventoryVoucherBatchDetails,inventoryVoucherDetailDTO.getAdditionalDiscount(),inventoryVoucherDetailDTO.getReferenceInvoiceNo()));
 			}
 		}
 		return newInventoryVoucherDetails;
@@ -2997,7 +2998,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 								inventoryVoucherDetailDTO.getItemtype(), sourceStockLocation, destinationStockLocation,
 								referenceInventoryVoucherHeader, referenceInventoryVoucherDetail,
 								inventoryVoucherDetailDTO.getRemarks(), inventoryVoucherBatchDetails,
-								inventoryVoucherDetailDTO.getAdditionalDiscount()));
+								inventoryVoucherDetailDTO.getAdditionalDiscount(),inventoryVoucherDetailDTO.getReferenceInvoiceNo()));
 					}
 				});
 

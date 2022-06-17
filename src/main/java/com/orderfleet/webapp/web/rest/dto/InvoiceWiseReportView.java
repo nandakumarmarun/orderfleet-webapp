@@ -91,6 +91,8 @@ public class InvoiceWiseReportView {
 	private String vehiclename;
 	
 	private String invoiceNo;
+	
+	private Boolean imageButtonVisible = Boolean.FALSE;
 
 	public InvoiceWiseReportView() {
 		super();
@@ -132,6 +134,7 @@ public class InvoiceWiseReportView {
 		this.mockLocationStatus = executiveTaskExecution.getMockLocationStatus();
 		this.withCustomer = executiveTaskExecution.getWithCustomer();
 		this.setDescription(executiveTaskExecution.getAccountProfile().getDescription());
+		
 	}
 
 	public InvoiceWiseReportView(String pid, LocalDateTime createdDate, LocalDateTime plannedDate,
