@@ -11,6 +11,8 @@ public interface UnitsService {
 	
 	UnitsDTO save(UnitsDTO unitsDTO);
 	
+	UnitsDTO saveorUpdate(List<UnitsDTO> unitsDTO);
+	
 	UnitsDTO update(UnitsDTO unitsDTO);
 	
 	List<UnitsDTO> findAll();

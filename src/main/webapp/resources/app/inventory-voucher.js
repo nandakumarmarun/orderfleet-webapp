@@ -10,6 +10,8 @@ if (!this.InventoryVoucher) {
 
 	var inventoryVoucherContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
+	
+	 var companyConfiguration = document.getElementById("companyConfiguration").value;
 
 	$(document).ready(function() {
 		$("#txtToDate").datepicker({ dateFormat: "dd-mm-yy" });
@@ -72,6 +74,12 @@ if (!this.InventoryVoucher) {
 						$('#lbl_document').text(data.documentName);
 						$('#lbl_documentDate').text(
 								convertDateTimeFromServer(data.createdDate));
+						if(companyConfiguration == "true"){
+							$('#lbl_receiver').text(data.description);
+						}
+						else{
+							$('#lbl_receiver').text(data.receiverAccountName);
+						}
 						$('#lbl_receiver').text(data.receiverAccountName);
 						$('#lbl_supplier').text(data.supplierAccountName);
 						$('#lbl_documentTotal').text(data.documentTotal);
@@ -96,7 +104,7 @@ if (!this.InventoryVoucher) {
 															"<tr data-id='"
 																	+ index
 																	+ "'><td>"
-																	+ voucherDetail.productName
+																	+ (companyConfiguration == "true" ? voucherDetail.productDescription : voucherDetail.productName)
 																	+ "</td><td>"
 																	+ voucherDetail.quantity
 																	+ "</td><td>"

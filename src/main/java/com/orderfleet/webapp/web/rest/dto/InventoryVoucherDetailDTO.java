@@ -143,6 +143,14 @@ public class InventoryVoucherDetailDTO {
 	private LocalDateTime deliveryDate;
 	
 	private String referenceInvoiceNo;
+	
+	private String lengthType;
+	
+	private double lengthInInch;
+	
+	private double lengthInMeter;
+	
+	private double lengthInFeet;
 
 	public InventoryVoucherDetailDTO() {
 	}
@@ -762,6 +770,38 @@ public class InventoryVoucherDetailDTO {
 		int result = 1;
 		result = prime * result + ((productName == null) ? 0 : productName.hashCode());
 		return result;
+	}
+	
+	public String getLengthType() {
+		return lengthType;
+	}
+
+	public void setLengthType(String lengthType) {
+		this.lengthType = lengthType;
+	}
+
+	public double getLengthInInch() {
+		return lengthInInch;
+	}
+
+	public void setLengthInInch(double lengthInInch) {
+		this.lengthInInch = lengthInInch;
+	}
+
+	public double getLengthInMeter() {
+		return lengthInMeter;
+	}
+
+	public void setLengthInMeter(double lengthInMeter) {
+		this.lengthInMeter = lengthInMeter;
+	}
+
+	public double getLengthInFeet() {
+		return lengthInFeet;
+	}
+
+	public void setLengthInFeet(double lengthInFeet) {
+		this.lengthInFeet = lengthInFeet;
 	}
 
 	@Override

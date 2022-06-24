@@ -152,7 +152,17 @@ public class InventoryVoucherDetail implements Serializable {
 	@Column(name = "reference_invoice_no")
 	private String referenceInvoiceNo;
 	
+	@Column(name = "length_type")
+	private String lengthType;
 	
+	@Column(name = "length_In_Inch", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double lengthInInch;
+	
+	@Column(name = "length_In_Meter", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double lengthInMeter;
+	
+	@Column(name = "length_In_Feet", nullable = false, columnDefinition = "double precision DEFAULT 0")
+	private double lengthInFeet;
 	
 	
 
@@ -168,7 +178,7 @@ public class InventoryVoucherDetail implements Serializable {
 			StockLocation sourceStockLocation, StockLocation destinationStockLocation,
 			InventoryVoucherHeader rferenceInventoryVoucherHeader,
 			InventoryVoucherDetail rferenceInventoryVoucherDetail, String remarks,
-			List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails,double additionalDiscount,String referenceInvoiceNo ) {
+			List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails,double additionalDiscount,String referenceInvoiceNo,String lengthType,double lengthInInch ,double lengthInMeter,double lengthInFeet ) {
 		super();
 		this.product = product;
 		this.quantity = quantity;
@@ -198,6 +208,10 @@ public class InventoryVoucherDetail implements Serializable {
 		this.volume = product.getUnitQty() != null ? product.getUnitQty() * quantity : quantity * 1;
 		this.additionalDiscount=additionalDiscount;
 		this.referenceInvoiceNo=referenceInvoiceNo;
+		this.lengthType=lengthType;
+		this.lengthInInch=lengthInInch;
+		this.lengthInFeet=lengthInFeet;
+		this.lengthInMeter=lengthInMeter;
 	}
 
 	public InventoryVoucherDetail(ProductProfile product, double quantity, double freeQuantity, double sellingRate,
@@ -208,7 +222,7 @@ public class InventoryVoucherDetail implements Serializable {
 			InventoryVoucherHeader rferenceInventoryVoucherHeader,
 			InventoryVoucherDetail rferenceInventoryVoucherDetail, String remarks,
 			List<InventoryVoucherBatchDetail> inventoryVoucherBatchDetails,
-			PriceLevel inventoryVoucherDetailPriceLevel,double additionalDiscount,String referenceInvoiceNo ) {
+			PriceLevel inventoryVoucherDetailPriceLevel,double additionalDiscount,String referenceInvoiceNo,String lengthType,double lengthInInch ,double lengthInMeter,double lengthInFeet) {
 		super();
 		this.product = product;
 		this.quantity = quantity;
@@ -239,6 +253,10 @@ public class InventoryVoucherDetail implements Serializable {
 		this.priceLevel = inventoryVoucherDetailPriceLevel;
 		this.additionalDiscount=additionalDiscount;
 		this.referenceInvoiceNo = referenceInvoiceNo;
+		this.lengthType=lengthType;
+		this.lengthInInch=lengthInInch;
+		this.lengthInFeet=lengthInFeet;
+		this.lengthInMeter=lengthInMeter;
 	}
 
 	public Long getId() {
@@ -521,7 +539,35 @@ public class InventoryVoucherDetail implements Serializable {
 		this.referenceInvoiceNo = referenceInvoiceNo;
 	}
 
+	public String getLengthType() {
+		return lengthType;
+	}
 
+	public void setLengthType(String lengthType) {
+		this.lengthType = lengthType;
+	}
 
-	
+	public double getLengthInInch() {
+		return lengthInInch;
+	}
+
+	public void setLengthInInch(double lengthInInch) {
+		this.lengthInInch = lengthInInch;
+	}
+
+	public double getLengthInMeter() {
+		return lengthInMeter;
+	}
+
+	public void setLengthInMeter(double lengthInMeter) {
+		this.lengthInMeter = lengthInMeter;
+	}
+
+	public double getLengthInFeet() {
+		return lengthInFeet;
+	}
+
+	public void setLengthInFeet(double lengthInFeet) {
+		this.lengthInFeet = lengthInFeet;
+	}
 }

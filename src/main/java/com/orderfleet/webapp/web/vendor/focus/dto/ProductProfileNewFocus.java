@@ -43,6 +43,8 @@ public class ProductProfileNewFocus {
 	@JsonProperty("Selling_Rate")
 	private double sellingRate;
 	
+	@JsonProperty("Item_Width")
+	public String itemwidth;
 	
 	@JsonProperty("Base_Unit")
 	public String getBaseUnits() {

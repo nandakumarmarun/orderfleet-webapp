@@ -13,11 +13,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Units;
+import com.orderfleet.webapp.domain.enums.AccountNameType;
+import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 import com.orderfleet.webapp.repository.UnitsRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.UnitsService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.UnitsDTO;
+import com.orderfleet.webapp.web.rest.dto.AccountTypeDTO;
 import com.orderfleet.webapp.web.rest.dto.BankDTO;
 
 @Service
@@ -110,6 +116,46 @@ public class UnitsServiceImpl implements UnitsService {
 			unitsRepo.delete(unit.getId());
 		});
 		
+	}
+
+	@Override
+	public UnitsDTO saveorUpdate(List<UnitsDTO> unitsDTOs) {
+		log.info("Saving units...");
+		long start = System.nanoTime();
+		Optional<Units> unitsOp = null;
+		List<Units> unitslist = unitsRepo.findAll();
+		List<Units> units=  new ArrayList();
+		for(UnitsDTO unitsDTO: unitsDTOs) {
+			unitsOp =  unitslist.stream().filter(pc -> pc.getShortName().equalsIgnoreCase(unitsDTO.getShortName())).findAny();
+			AccountType accountType = new AccountType();
+			Units unit = new Units();
+			if(unitsOp.isPresent()){
+				
+			    Units unitsoptional = unitsOp.get();
+			    unit.setId(unitsoptional.getId());
+				unit.setPid(unitsoptional.getPid());
+				unit.setName(unitsDTO.getName());
+				unit.setShortName(unitsDTO.getShortName());
+				unit.setAlias(unitsDTO.getAlias());
+				unit.setUnitId(unitsDTO.getUnitId());
+				unit.setUnitCode(unitsDTO.getUnitCode());	
+				
+			}else {
+				unit.setPid(UnitsService.PID_PREFIX + RandomUtil.generatePid());
+				unit.setName(unitsDTO.getName());
+				unit.setShortName(unitsDTO.getShortName());
+				unit.setAlias(unitsDTO.getAlias());
+				unit.setUnitId(unitsDTO.getUnitId());
+				unit.setUnitCode(unitsDTO.getUnitCode());	
+			}
+			units.add(unit);
+		}
+		unitsRepo.save(units);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		log.info("Sync completed in {} ms", elapsedTime);
+		return null;
 	}
 
 	

@@ -214,9 +214,15 @@ public class SalesPerformanceReportResource {
 			model.addAttribute("accounts", accountProfileDTOs);
 		}
 		model.addAttribute("voucherTypes", primarySecondaryDocumentService.findAllVoucherTypesByCompanyId());
+		
+		Optional<CompanyConfiguration> optDescToName = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optDescToName.isPresent()) {
+			model.addAttribute("companyConfiguration",  Boolean.valueOf(optDescToName.get().getValue()));		
+		}
+		
 		return "company/primarySalesPerformanceReport";
 	}
-
+	
 	/**
 	 * GET /primary-sales-performance/:id : get the "id" InventoryVoucher.
 	 *

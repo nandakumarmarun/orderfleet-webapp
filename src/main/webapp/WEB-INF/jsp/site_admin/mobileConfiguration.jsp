@@ -83,12 +83,13 @@
 						<th>Account Profile Print Name</th>
 						<th>Product Profile Display Name</th>
 						<th>Product Profile Print Name</th>
-						<th>Bluetooth Paper Type</th>
 						<th>MAX CART NOS</th>
 						<th>Max Cart Size</th>
 						<th>Round Off Automation</th>
 						<th>P-Ten Quotation Layout</th>
 						<th>Show Distance Fare</th>
+						<th>Bluetooth Paper Type</th>
+						<th>MultipleProduct</th>
 						<th>Action</th>
 
 					</tr>
@@ -150,6 +151,7 @@
 							<td>${mobileConfiguration.ptenQuotationLayout}</td>
        			            <td>${mobileConfiguration.showDistanceFare}</td>
        			            <td>${mobileConfiguration.bluetoothPaperType}</td>
+       			            <td>${mobileConfiguration.multipleProduct}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -618,6 +620,13 @@
 														CART SIZE </label> <input type="number" step="0.01"
 														class="form-control" name="cartMaxSize"
 														id="field_cartMaxSize" maxlength="8" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">multipleProduct
+													</label> <input id="multipleProduct" name='multipleProduct'
+														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
 

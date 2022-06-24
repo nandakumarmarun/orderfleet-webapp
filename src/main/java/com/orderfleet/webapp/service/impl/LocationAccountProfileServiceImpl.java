@@ -353,7 +353,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 			Page<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
 					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdOrderByIdAsc(
 							locationIds, companyId, new PageRequest(page, count));
-
+	
 			result = accountProfiles.getContent().stream().map(la -> la.getAccountProfile())
 					.collect(Collectors.toList());
 

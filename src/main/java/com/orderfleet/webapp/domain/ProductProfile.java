@@ -95,9 +95,9 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "tax_rate", columnDefinition = "double precision DEFAULT 0")
 	private double taxRate;
-	
+
 	@Column(name = "discount_percentage", columnDefinition = "double precision DEFAULT 0")
-	private double discountPercentage ;
+	private double discountPercentage;
 
 	@ManyToOne
 	@NotNull
@@ -194,10 +194,20 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "purchase_cost", columnDefinition = "double precision DEFAULT 0")
 	private double purchaseCost;
-	
-	@Column(name = "cess_TaxRate", columnDefinition="double precision DEFAULT 0")
+
+	@Column(name = "cess_TaxRate", columnDefinition = "double precision DEFAULT 0")
 	private double cessTaxRate;
-	
+
+	@Column(name = "width", columnDefinition = "double precision DEFAULT 0")
+	private double width;
+
+	@Column(name = "selling_rate" ,columnDefinition = "double precision DEFAULT 0")
+	private double sellingRate;
+
+	@Column(name = "Base_Unit")
+	private String baseUnits;
+
+
 	public Units getUnits() {
 		return units;
 	}
@@ -381,6 +391,39 @@ public class ProductProfile implements Serializable, Cloneable {
 	public void setThirdpartyUpdate(boolean thirdpartyUpdate) {
 		this.thirdpartyUpdate = thirdpartyUpdate;
 	}
+	
+	public double getWidth() {
+		return width;
+	}
+
+	public void setWidth(double width) {
+		this.width = width;
+	}
+
+
+	public void setCreatedDate(LocalDateTime createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public double getSellingRate() {
+		return sellingRate;
+	}
+
+	public void setSellingRate(double sellingRate) {
+		this.sellingRate = sellingRate;
+	}
+
+	public String getBaseUnits() {
+		return baseUnits;
+	}
+
+	public void setBaseUnits(String baseUnits) {
+		this.baseUnits = baseUnits;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 
 	public LocalDateTime getCreatedDate() {
 		return createdDate;
@@ -481,7 +524,6 @@ public class ProductProfile implements Serializable, Cloneable {
 	public void setProductGroup(String productGroup) {
 		this.productGroup = productGroup;
 	}
-	
 
 	public double getDiscountPercentage() {
 		return discountPercentage;
@@ -490,8 +532,6 @@ public class ProductProfile implements Serializable, Cloneable {
 	public void setDiscountPercentage(double discountPercentage) {
 		this.discountPercentage = discountPercentage;
 	}
-	
-	
 
 	public double getCessTaxRate() {
 		return cessTaxRate;

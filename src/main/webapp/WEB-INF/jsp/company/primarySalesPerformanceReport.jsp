@@ -78,6 +78,8 @@
 									<option value="CUSTOM">CUSTOM</option>
 								</select>
 							</div>
+							
+							<input id="companyConfiguration" type="hidden" value='${companyConfiguration}'/>
 							<div class="col-sm-2 hide custom_date1">
 							<br/>
 							<div class="input-group">

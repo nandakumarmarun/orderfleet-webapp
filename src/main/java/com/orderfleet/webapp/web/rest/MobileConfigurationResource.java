@@ -88,8 +88,6 @@ public class MobileConfigurationResource {
 		}
 		Optional<MobileConfigurationDTO> opConfigurationDTO = mobileConfigurationService
 				.findOneByCompanyId(optionalCompany.get().getId());
-
-		
 		
 		if (opConfigurationDTO.isPresent()) {
 			mobileConfigurationDTO.setPid(opConfigurationDTO.get().getPid());

@@ -439,6 +439,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 		// get productProfiles by user productCategories
 		Page<ProductProfile> productProfiles = productProfileRepository
 				.findByProductCategoryInAndActivatedTrue(productCategories, new PageRequest(page, count));
+		System.out.println(productProfiles);
 		List<ProductProfileDTO> result = productProfiles.getContent().stream().map(ProductProfileDTO::new)
 				.collect(Collectors.toList());
 		List<ProductNameTextSettings> productNameTextSettings = productNameTextSettingsRepository

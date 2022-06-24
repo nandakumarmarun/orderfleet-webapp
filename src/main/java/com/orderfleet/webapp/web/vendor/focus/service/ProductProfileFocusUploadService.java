@@ -124,6 +124,7 @@ public class ProductProfileFocusUploadService {
 						productProfile.setName(ppDto.getItemName());
 						productProfile.setDivision(defaultDivision);
 						productProfile.setDataSourceType(DataSourceType.TALLY);
+						productProfile.setWidth(Double.parseDouble(ppDto.itemwidth));
 					}
 
 	
@@ -132,6 +133,7 @@ public class ProductProfileFocusUploadService {
 					productProfile.setTaxRate(ppDto.getGstPer());
 					productProfile.setMrp(0);
 					productProfile.setActivated(true);
+					productProfile.setWidth(Double.parseDouble(ppDto.itemwidth));
 					
 					if (ppDto.getHsnCode() != null && !ppDto.getHsnCode().equals("")) {
 						productProfile.setHsnCode(ppDto.getHsnCode());

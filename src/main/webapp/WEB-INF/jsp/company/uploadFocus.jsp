@@ -65,11 +65,55 @@
 								<td>Receivable Payable</td>
 							</tr>
 							
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="brand_deva"></input></td>
+								<td>branddeva</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="district"></input></td>
+								<td>District</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="city"></input></td>
+								<td>City</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="state"></input></td>
+								<td>state</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="bussinessunit"></input></td>
+								<td>BussinessUnit</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="routecode"></input></td>
+								<td>RouteCode</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="lengthType"></input></td>
+								<td>LengthType</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="contry"></input></td>
+								<td>Country</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="customertype"></input></td>
+								<td>CustomerType</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="unitmaster"></input></td>
+								<td>UnitMaster</td>
+							</tr>
+							<tr>
+								<td><input class="check-one" name='uploadMasters' type="checkbox" value="fiscalyear"></input></td>
+								<td>FiscalYear</td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
 				
-			<hr />
+			<hr/>
 
 			<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>

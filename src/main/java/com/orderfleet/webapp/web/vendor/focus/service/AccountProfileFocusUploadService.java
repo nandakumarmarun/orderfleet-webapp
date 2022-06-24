@@ -23,6 +23,7 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.LocationHierarchy;
+import com.orderfleet.webapp.domain.RouteCode;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
@@ -32,6 +33,7 @@ import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationHierarchyRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
+import com.orderfleet.webapp.repository.RouteCodeRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -206,7 +208,7 @@ public class AccountProfileFocusUploadService {
 					Float floatnum = Float.parseFloat(apDto.getCreditLimit());
 					accountProfile.setCreditLimit((Long) floatnum.longValue());
 				}
-
+				
 				accountProfile.setActivated(true);
 				if (apDto.getAddress() != null && !apDto.getAddress().equals("")) {
 					accountProfile.setAddress(apDto.getAddress());
@@ -225,7 +227,7 @@ public class AccountProfileFocusUploadService {
 				} else {
 					accountProfile.setPhone1("");
 				}
-
+				
 				// account type
 
 //				if (accountProfile.getAccountType() == null) {

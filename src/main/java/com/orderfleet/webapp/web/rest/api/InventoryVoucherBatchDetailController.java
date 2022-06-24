@@ -148,10 +148,14 @@ public class InventoryVoucherBatchDetailController {
 		if (ivId.size() > 0) {
 			invDetail = inventoryVoucherDetailRepository.findByInventoryHeaderIdIn(ivId);
 		}
+		
 		for (InventoryVoucherDetail obj1 : invDetail) {
-			Object[] ivh = inventoryVouchers.stream()
-					.filter(abc -> abc[0].toString().equals(obj1.getReferenceInvoiceNo())).findAny().get();
-			inventoryVouchers.remove(ivh);
+			if(obj1.getReferenceInvoiceNo() != null) {
+				Object[] ivh = inventoryVouchers.stream()
+						.filter(abc -> abc[0].toString().equals(obj1.getReferenceInvoiceNo())).findAny().get();
+				inventoryVouchers.remove(ivh);
+			}
+   
 		}
 
 		List<Object[]> inventory = inventoryVouchers.stream().limit(5).collect(Collectors.toList());

@@ -130,6 +130,8 @@ public class MobileSettingsDTO {
      
      private boolean showDistanceFare;
      
+     private boolean multipleProduct;
+     
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -188,6 +190,7 @@ public class MobileSettingsDTO {
 		this.ptenQuotationLayout=mobileConfigurationDTO.isPtenQuotationLayout();
 		this.showDistanceFare = mobileConfigurationDTO.getShowDistanceFare();
 		this.bluetoothPaperType = mobileConfigurationDTO.getBluetoothPaperType();
+		this.multipleProduct = mobileConfigurationDTO.getMultipleProduct();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -638,4 +641,11 @@ public class MobileSettingsDTO {
 		this.bluetoothPaperType = bluetoothPaperType;
 	}
 
+	public boolean getMultipleProduct() {
+		return multipleProduct;
+	}
+
+	public void setMultipleProduct(boolean multipleProduct) {
+		this.multipleProduct = multipleProduct;
+	}
 }

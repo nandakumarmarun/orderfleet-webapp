@@ -92,6 +92,7 @@ import com.orderfleet.webapp.service.FormService;
 import com.orderfleet.webapp.service.IncomeExpenseHeadService;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.KnowledgebaseService;
+import com.orderfleet.webapp.service.LengthTypeService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationHierarchyService;
 import com.orderfleet.webapp.service.LocationService;
@@ -159,6 +160,7 @@ import com.orderfleet.webapp.web.rest.dto.FormDTO;
 import com.orderfleet.webapp.web.rest.dto.FormElementDTO;
 import com.orderfleet.webapp.web.rest.dto.IncomeExpenseHeadDTO;
 import com.orderfleet.webapp.web.rest.dto.KnowledgebaseDTO;
+import com.orderfleet.webapp.web.rest.dto.LengthTypeDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.MobileMenuItemDTO;
@@ -201,6 +203,7 @@ public class MasterDataController {
 
 	private final Logger log = LoggerFactory.getLogger(MasterDataController.class);
 	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	
 	@Inject
 	private UserActivityService userActivityService;
 
@@ -236,6 +239,9 @@ public class MasterDataController {
 
 	@Inject
 	private FormService formsService;
+	
+	@Inject
+	private LengthTypeService lengthTypeService;
 
 	@Inject
 	private DocumentInventoryVoucherColumnService documentInventoryVoucherColumnService;
@@ -535,6 +541,24 @@ public class MasterDataController {
 				.headers(PaginationUtil.generatePaginationHttpHeaders(pageAccounts, "/api/location-account-profiles"))
 				.body(pageAccounts.getContent());
 	}
+	
+	
+	/**
+	 * GET /lengthTypes:get all length Types.
+	 * This will give all length types of  from focus
+	 */
+	
+	/**  it will retrun length types from focus**/ 
+	
+	@RequestMapping(value = "/length-types-focus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<LengthTypeDTO>> getAlllengthTypesFocus(){
+		log.debug("REST request to get all StockLocations assigned to user");
+		List<LengthTypeDTO> lengthTypeDTOs = lengthTypeService.findAllLengthTypes();
+		System.out.println("DTOs"+lengthTypeDTOs);
+	return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(lengthTypeDTOs);
+		
+	}
 
 	/**
 	 * GET /location-account-profile-association :get location wise accountProfiles.
@@ -781,6 +805,7 @@ public class MasterDataController {
 			productProfileDTOs = productProfileService.findByProductCategoryInAndActivatedTrueAndLastModifiedDate(page,
 					size, lastSyncdate);
 		}
+		
 //		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository
 //				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
 //		if (optconfig.isPresent() && !productProfileDTOs.isEmpty()) {

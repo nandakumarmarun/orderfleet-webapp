@@ -277,6 +277,7 @@ public class DeliveryReportResource {
 		if (exetId.size() > 0) {
 			executive = executiveTaskExecutionRepository.findByExecutiveTaskExecutionIdIn(exetId);
 		}
+		EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByPid(employeePid);
 		log.info("executive task execution looping started :");
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
 
@@ -289,7 +290,7 @@ public class DeliveryReportResource {
 				if (obj[1].toString().equals(object[3].toString())) {
 
 					invoiceWiseReportView.setPid(obj[5].toString());
-					invoiceWiseReportView.setEmployeeName(obj[6].toString());
+					invoiceWiseReportView.setEmployeeName(employee.getName());
 					invoiceWiseReportView.setAccountProfileName(object[1].toString());
 					invoiceWiseReportView
 							.setVehicleRegistrationNumber(object[2] == null ? "No vehicle" : object[2].toString());

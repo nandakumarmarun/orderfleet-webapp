@@ -28,6 +28,8 @@ public interface AccountTypeService {
 	 * @return the persisted entity
 	 */
 	AccountTypeDTO save(AccountTypeDTO accountTypeDTO);
+	
+	AccountTypeDTO saveOrUpdate(List<AccountTypeDTO> accountTypeDTOs);
 
 	/**
 	 * Update a accountType.

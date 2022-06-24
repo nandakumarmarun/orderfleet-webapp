@@ -110,6 +110,14 @@ public class ProductProfileDTO {
 	private String uploadSource;
 	
 	private double cessTaxRate;
+	
+	private double itemWidth;
+
+	private double sellingRate;
+	
+	private String baseUnits;
+	
+	private double igst;
 
 	public ProductProfileDTO() {
 		super();
@@ -200,7 +208,9 @@ public class ProductProfileDTO {
 		this.productCode = profile.getProductCode();
 		this.productGroup = profile.getProductGroup();
 		this.purchaseCost = profile.getPurchaseCost();
-
+		this.itemWidth=profile.getWidth();
+		this.sellingRate=profile.getSellingRate();
+		this.baseUnits =profile.getBaseUnits();
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
 		this.productProfileTaxMasterDTOs = profile.getTaxMastersList() == null || profile.getTaxMastersList().isEmpty()
@@ -540,6 +550,38 @@ public class ProductProfileDTO {
 
 	public void setCessTaxRate(double cessTaxRate) {
 		this.cessTaxRate = cessTaxRate;
+	}
+	
+	public double getItemWidth() {
+		return itemWidth;
+	}
+
+	public void setItemWidth(double itemWidth) {
+		this.itemWidth = itemWidth;
+	}
+
+	public double getSellingRate() {
+		return sellingRate;
+	}
+
+	public void setSellingRate(double sellingRate) {
+		this.sellingRate = sellingRate;
+	}
+
+	public String getBaseUnits() {
+		return baseUnits;
+	}
+
+	public void setBaseUnits(String baseUnits) {
+		this.baseUnits = baseUnits;
+	}
+
+	public double getIgst() {
+		return igst;
+	}
+
+	public void setIgst(double igst) {
+		this.igst = igst;
 	}
 
 	@Override

@@ -76,6 +76,7 @@ public class MobileConfigurationDTO {
 	private boolean roundOffAutomation;
 	private boolean ptenQuotationLayout;
 	private boolean showDistanceFare;
+	private boolean multipleProduct;
  
 	public MobileConfigurationDTO() {
 		super();
@@ -138,6 +139,7 @@ public class MobileConfigurationDTO {
         this.ptenQuotationLayout =mobileConfiguration.isPtenQuotationLayout();
         this.showDistanceFare = mobileConfiguration.getShowDistanceFare();
         this.bluetoothPaperType = mobileConfiguration.getBluetoothPaperType();
+        this.multipleProduct = mobileConfiguration.getMultipleProduct();
 	}
 
 	public String getPid() {
@@ -580,5 +582,11 @@ public class MobileConfigurationDTO {
 		this.bluetoothPaperType = bluetoothPaperType;
 	}
 
-	
+	public boolean getMultipleProduct() {
+		return multipleProduct;
+	}
+
+	public void setMultipleProduct(boolean multipleProduct) {
+		this.multipleProduct = multipleProduct;
+	}
 }

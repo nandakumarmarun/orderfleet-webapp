@@ -73,6 +73,7 @@ import com.orderfleet.webapp.domain.UserStockLocation;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
+import com.orderfleet.webapp.domain.enums.BluetoothPaperType;
 import com.orderfleet.webapp.domain.enums.CartType;
 import com.orderfleet.webapp.domain.enums.CompanyType;
 import com.orderfleet.webapp.domain.enums.ContactManagement;
@@ -920,6 +921,8 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setAccountProfilePrintName(DisplayName.NAME);
 		mobileConfiguration.setProductProfileDisplayName(DisplayName.NAME);
 		mobileConfiguration.setProductProfilePrintName(DisplayName.NAME);
+		mobileConfiguration.setBluetoothPaperType(BluetoothPaperType.SMALL);
+		mobileConfiguration.setMultipleProduct(false);
 
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}

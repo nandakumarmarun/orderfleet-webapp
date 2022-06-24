@@ -14,7 +14,18 @@ if (!this.uploadFocus) {
 	var ajaxes = [
 		{name: 'product_profiles', path: '/uploadProductProfiles', alias: 'Product Profiles'},
 		{name: 'account_profiles', path: '/uploadAccountProfiles', alias: 'Account Profiles'},
-		{name: 'receivable_payable', path: '/uploadReceivablePayable',alias: 'receivable payable'}
+		{name: 'receivable_payable', path: '/uploadReceivablePayable',alias: 'receivable payable'},
+		{name: 'brand_deva', path: '/branddeva',alias: 'brand deva'},
+		{name: 'district', path: '/district',alias: 'district'},
+		{name: 'state', path: '/state',alias: 'state'},
+		{name: 'city', path: '/city',alias: 'city'},
+		{name: 'routecode', path: '/routecode',alias: 'route code'},
+		{name: 'bussinessunit', path: '/businessunit',alias: 'bussinessunit'},
+		{name: 'lengthType', path: '/lengthType',alias: 'lengthType'},
+		{name: 'contry', path:'/contry',alias:'contry'},
+		{name: 'customertype', path: '/customertype',alias:'customertype'},
+		{name: 'fiscalyear', path: '/fiscalyear',alias: 'fiscalyear'},
+		{name: 'unitmaster', path: '/unitmaster',alias: 'unitmaster'}
 		
 	];
 	

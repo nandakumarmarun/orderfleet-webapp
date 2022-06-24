@@ -11,6 +11,7 @@ import com.orderfleet.webapp.domain.CountryC;
 import com.orderfleet.webapp.domain.District;
 import com.orderfleet.webapp.domain.DistrictC;
 import com.orderfleet.webapp.domain.PriceLevel;
+import com.orderfleet.webapp.domain.RouteCode;
 import com.orderfleet.webapp.domain.StateC;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
@@ -147,7 +148,6 @@ public class AccountProfileMapperImpl extends AccountProfileMapper {
 		accountProfileDTO.setTinNo(accountProfile.getTinNo());
 		accountProfileDTO.setTrimChar(accountProfile.getTrimChar());
 		accountProfileDTO.setWhatsAppNo(accountProfile.getWhatsAppNo());
-
 		return accountProfileDTO;
 	}
 

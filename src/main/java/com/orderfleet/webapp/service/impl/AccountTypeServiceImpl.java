@@ -3,6 +3,7 @@ package com.orderfleet.webapp.service.impl;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,12 +18,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.AccountType;
+import com.orderfleet.webapp.domain.StateFocus;
+import com.orderfleet.webapp.domain.enums.AccountNameType;
+import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountTypeService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.AccountTypeDTO;
+import com.orderfleet.webapp.web.rest.dto.StateFocusDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountTypeMapper;
 
 /**
@@ -741,4 +746,51 @@ if (minutes > 10) {
 		List<AccountTypeDTO> result = accountTypeMapper.accountTypesToAccountTypeDTOs(accountTypeList);
 		return result;
 	}
+
+	@Override
+	public AccountTypeDTO saveOrUpdate(List<AccountTypeDTO> accountTypeDTOs) {
+		log.info("Saving Account Type...");
+		long start = System.nanoTime();
+		Optional<AccountType> accounttypeop = null;
+		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyId();
+		List<AccountType> accountTypeList =  new ArrayList();
+		for(AccountTypeDTO accountTypeDTO: accountTypeDTOs) {
+			accounttypeop =  accountTypes.stream().filter(pc -> pc.getAlias().equals( accountTypeDTO.getAlias())).findAny();
+			AccountType accountType = new AccountType();
+			if(accounttypeop.isPresent()){
+				
+				AccountType cityoptional = accounttypeop.get();
+				// set pid
+				accountType.setId(cityoptional.getId());
+				accountType.setPid(cityoptional.getPid());
+				accountType.setName(accountTypeDTO.getName());
+				accountType.setAlias(accountTypeDTO.getAlias());
+				accountType.setAccountNameType(AccountNameType.GENERAL);
+				accountType.setReceiverSupplierType(ReceiverSupplierType.Receiver);
+				// set company
+				accountType.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
+				
+				
+			}else {
+		
+				accountType.setPid(AccountTypeService.PID_PREFIX + RandomUtil.generatePid());
+				accountType.setName(accountTypeDTO.getName());
+				accountType.setAlias(accountTypeDTO.getAlias());
+				accountType.setAccountNameType(AccountNameType.GENERAL);
+				accountType.setReceiverSupplierType(ReceiverSupplierType.Receiver);
+				// set company
+				accountType.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
+			}
+			accountTypeList.add(accountType);
+		}
+		accountTypeRepository.save(accountTypeList);
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		// update sync table
+		log.info("Sync completed in {} ms", elapsedTime);
+		return null;
+	}
+
+
+
 }

@@ -237,7 +237,7 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	@ManyToOne
 	private DistrictC districtc;
-
+	
 	public Long getId() {
 		return id;
 	}

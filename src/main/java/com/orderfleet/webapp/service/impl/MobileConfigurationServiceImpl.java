@@ -97,6 +97,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setPtenQuotationLayout(mobileConfigurationDTO.isPtenQuotationLayout());
 		configuration.setShowDistanceFare(mobileConfigurationDTO.getShowDistanceFare());
 		configuration.setBluetoothPaperType(mobileConfigurationDTO.getBluetoothPaperType());
+		configuration.setMultipleProduct(mobileConfigurationDTO.getMultipleProduct());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -158,6 +159,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setPtenQuotationLayout(mobileConfigurationDTO.isPtenQuotationLayout());
 			configuration.setShowDistanceFare(mobileConfigurationDTO.getShowDistanceFare());
 			configuration.setBluetoothPaperType(mobileConfigurationDTO.getBluetoothPaperType());
+			configuration.setMultipleProduct(mobileConfigurationDTO.getMultipleProduct());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

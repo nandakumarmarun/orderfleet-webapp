@@ -221,6 +221,9 @@ public class MobileConfiguration implements Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "bluetooth_peper_type", nullable = false, columnDefinition = "character varying DEFAULT 'SMALL'")
 	private BluetoothPaperType bluetoothPaperType;
+	
+	@Column(name = "multiple_Product", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean multipleProduct;
 
 	@NotNull
 	@ManyToOne
@@ -676,6 +679,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setBluetoothPaperType(BluetoothPaperType bluetoothPaperType) {
 		this.bluetoothPaperType = bluetoothPaperType;
+	}
+	
+	public boolean getMultipleProduct() {
+		return multipleProduct;
+	}
+
+	public void setMultipleProduct(boolean multipleProduct) {
+		this.multipleProduct = multipleProduct;
 	}
 
 	@Override

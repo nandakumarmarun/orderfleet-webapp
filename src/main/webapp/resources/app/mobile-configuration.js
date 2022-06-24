@@ -63,7 +63,8 @@ if (!this.MobileConfiguration) {
 			maxCartNos : false,
 			cartMaxSize : null,
 			roundOffAutomation : false,
-			ptenQuotationLayout:false
+			ptenQuotationLayout:false,
+			multipleProduct:false
 			
 	};
 
@@ -196,6 +197,8 @@ if (!this.MobileConfiguration) {
 		":checked");
 		mobileConfigurationDTO.showDistanceFare = $("#showDistanceFare").is(
 		":checked");
+		mobileConfigurationDTO.multipleProduct = $("#multipleProduct").is(
+		":checked");
 		
 		$.ajax({
 			url : contextPath,
@@ -323,7 +326,8 @@ if (!this.MobileConfiguration) {
 									data.showDistanceFare);
 							$('#bluetoothPeperType').val(
 									data.bluetoothPaperType);
-							
+							$('#multipleProduct').prop("checked",
+									data.multipleProduct);
 						}
 
 					},
