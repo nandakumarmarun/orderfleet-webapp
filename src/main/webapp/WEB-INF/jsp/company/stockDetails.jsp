@@ -56,10 +56,24 @@
 								<button type="button" class="btn btn-success"
 									onclick = "window.print()">Print</button>
 							</div>
-							<div class="col-sm-1">
+						<!-- 	<div class="col-sm-1">
 								<br>
 								<button type="button" class="btn btn-success" id="downloadXls">Download</button>
-							</div>
+							</div> -->
+						
+						<c:if test="${pdfDownloadStatus=='true'}">
+								
+								<div class="col-sm-1">
+									<br>
+									<button type="button"
+										class="btn btn-success"
+										id="packingSlipByCustomer">Download Pdf</button>
+									
+
+								</div>
+
+							</c:if>
+						
 						</div>
 					</form>
 				</div>

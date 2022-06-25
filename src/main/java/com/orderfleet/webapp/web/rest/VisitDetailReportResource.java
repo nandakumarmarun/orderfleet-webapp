@@ -377,14 +377,14 @@ public class VisitDetailReportResource {
 			{
 				if(obj[1].toString().equals(employeeName))
 				{
-					executiveView.setTotalCash(Double.valueOf(obj[0].toString()));
+					executiveView.setTotalCheque(Double.valueOf(obj[0].toString()));
 				}
 			}
 			for(Object[] obj:netCollectionAmountRtgs)
 			{
 				if(obj[1].toString().equals(employeeName))
 				{
-					executiveView.setTotalCash(Double.valueOf(obj[0].toString()));
+					executiveView.setTotalRtgs(Double.valueOf(obj[0].toString()));
 				}
 			}
 			double totalVolume = ivDetails.stream()

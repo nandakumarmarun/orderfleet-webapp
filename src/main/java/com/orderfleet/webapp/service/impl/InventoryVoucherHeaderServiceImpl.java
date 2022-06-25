@@ -623,7 +623,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 		
             Optional<User> user = userRepository.findOneById(id);
             String name = user.get().getFirstName();
-            System.out.println("Name:"+name);
+       
             stockDetailsDTO.setEmployeeName(name);
            double opStock = 0.0;
 			double slStock = 0.0;

@@ -36,6 +36,9 @@ if (!this.StockDetails) {
 				$('#downloadXls').on('click', function() {
 					downloadXls();
 				});
+				$('#packingSlipByCustomer').on('click', function() {
+					downloadPdf();
+				});
 			});
 	
 	StockDetails.filter = function() {
@@ -89,7 +92,24 @@ if (!this.StockDetails) {
 	  console.log("Success.....");
 		
 	}
-	
+	function downloadPdf() {
+		$(".loader").addClass('show');
+
+		if (confirm("Are you sure?")) {
+
+			$(".loader").removeClass('show');
+
+			var employeePid = $("#dbEmployee").val();
+
+			window.open(stockDetailsContextPath+"/downloadpdf?&employeePid="+employeePid);
+
+		}
+
+		setTimeout(function() {
+			InventoryVoucher.filter();
+		}, 1000);
+
+	}
 	
 	StockDetails.printStock = function() {
 		
@@ -103,12 +123,6 @@ if (!this.StockDetails) {
 		   newWin.close();
 	
 		
-//		var printContents = document.getElementById(tableStock);
-//    w=window.open();
-//    w.document.write(printContents);
-//    w.print();
-//    w.close();
-//	
 	}
 	
 

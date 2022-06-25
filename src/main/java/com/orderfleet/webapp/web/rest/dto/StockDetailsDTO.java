@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
@@ -31,10 +32,31 @@ public class StockDetailsDTO implements Cloneable {
 	private LocalDateTime reportingTime;
 	private String employeeName;
 
+	private List<StockDetailsTotalDTO> stocktotal;
+
 	public StockDetailsDTO() {
 		super();
 
 	}
+
+	
+	public StockDetailsDTO(double openingStock, String productName, String productPid, double saleStock,
+			double freeQnty, double saledQuantity, double damageQty, double closingStock, LocalDateTime reportingTime,
+			String employeeName, List<StockDetailsTotalDTO> stocktotal) {
+		super();
+		this.openingStock = openingStock;
+		this.productName = productName;
+		this.productPid = productPid;
+		this.saleStock = saleStock;
+		this.freeQnty = freeQnty;
+		this.saledQuantity = saledQuantity;
+		this.damageQty = damageQty;
+		this.closingStock = closingStock;
+		this.reportingTime = reportingTime;
+		this.employeeName = employeeName;
+		this.stocktotal = stocktotal;
+	}
+
 
 	public StockDetailsDTO(double openingStock, String productName, double saledQuantity, double closingStock,
 			String productPid) {
@@ -44,11 +66,11 @@ public class StockDetailsDTO implements Cloneable {
 		this.saledQuantity = saledQuantity;
 		this.closingStock = closingStock;
 		this.productPid = productPid;
-		
+
 	}
-	
-	public StockDetailsDTO(double openingStock, String productName,double saleStock,double freeQnty, double saledQuantity, double closingStock,
-			String productPid) {
+
+	public StockDetailsDTO(double openingStock, String productName, double saleStock, double freeQnty,
+			double saledQuantity, double closingStock, String productPid) {
 		super();
 		this.openingStock = openingStock;
 		this.productName = productName;
@@ -139,12 +161,19 @@ public class StockDetailsDTO implements Cloneable {
 		this.employeeName = employeeName;
 	}
 
+	public List<StockDetailsTotalDTO> getStocktotal() {
+		return stocktotal;
+	}
+
+	public void setStocktotal(List<StockDetailsTotalDTO> stocktotal) {
+		this.stocktotal = stocktotal;
+	}
+
 	@Override
 	public String toString() {
 		return "StockDetailsDTO [openingStock=" + openingStock + ", productName=" + productName + ", productPid="
 				+ productPid + ", saleStock=" + saleStock + ", freeQnty=" + freeQnty + ", saledQuantity="
 				+ saledQuantity + ", closingStock=" + closingStock + "]";
 	}
-	
 
 }

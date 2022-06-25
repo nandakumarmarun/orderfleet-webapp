@@ -2,6 +2,7 @@ package com.orderfleet.webapp.repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -314,4 +315,7 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
     @Query("select ete.id, ep.name from ExecutiveTaskExecution ete inner join EmployeeProfile ep on ete.user.id=ep.user.id where ete.user.id in ?1 and ete.date between ?2 and ?3 and ete.activity.pid = ?4 Order By ep.name ASC")
     List<Object[]> findByUserIdInDateBetweenAndActivityPid(List<Long> userIds, LocalDateTime fromDate,
 			LocalDateTime toDate, String activityPid);
+	
+    @Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.user.id in ?1 and exeTaskExecution.createdDate between ?2 and ?3 ")
+     List<ExecutiveTaskExecution> findAllByUserIdAndDateBetween(Long userId, LocalDateTime fromDate, LocalDateTime toDate);
 }
