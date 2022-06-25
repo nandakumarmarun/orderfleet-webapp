@@ -52,29 +52,30 @@ if (!this.InvoiceWiseReport) {
 		$('.selectpicker').selectpicker();
 	});
 
-//	InvoiceWiseReport.downloadXls = function() {
-//		var excelName = "acvts_txns_"
-//				+ new Date().toISOString().replace(/[\-\:\.]/g, "");
-//		var instance = $('#tblInvoiceWiseReport').tableExport({
-//			formats : [ 'xlsx' ],
-//			filename : excelName,
-//			exportButtons : false
-//		});
-//		var exportData = instance.getExportData()['tblInvoiceWiseReport']['xlsx'];
-//		instance.export2file(exportData.data, exportData.mimeType,
-//				exportData.filename, exportData.fileExtension);
-//	}
 	
 	InvoiceWiseReport.downloadXls = function() {
-		// Avoid last column in each row
-		// $("#tblInvoiceWiseReport th:last-child, #tblAccountProfile
-		// td:last-child").hide();
 		
-		var excelName = "acvts_txns_"+ new Date().toISOString().replace(/[\-\:\.]/g, "");
-		 var table2excel = new Table2Excel();
-		     table2excel.export(document.getElementById('tblInvoiceWiseReport'),excelName);
-		 // $("#tblAccountProfile th:last-child, #tblAccountProfile
-			// td:last-child").show();
+		
+//		var excelName = "acvts_txns_"+ new Date().toISOString().replace(/[\-\:\.]/g, "");
+//		 var table2excel = new Table2Excel();
+//		     table2excel.export(document.getElementById('tblInvoiceWiseReport'),excelName);
+		
+	
+		            var	employeePid = $('#dbEmployee').val();
+		            var	documentPid = $("#dbDocument").val();
+		            var	activityPid = $("#dbActivity").val();
+		            var accountPid = $("#dbAccount").val();
+		            var	filterBy = $("#dbDateSearch").val();
+		            var	fromDate = $("#txtFromDate").val();
+		            var	toDate = $("#txtToDate").val();
+		            var	inclSubordinate = $('#inclSubOrdinates').is(":checked");
+	
+	  window.location.href =  invoiceWiseReportContextPath+"/downloadxls?&employeePid="+employeePid+'&documentPid='+documentPid+'&activityPid='+activityPid+'&accountPid='+accountPid+'&filterBy='+filterBy+'&fromDate='+fromDate+'&toDate='+toDate+'&inclSubordinate='+inclSubordinate;
+	     console.log("Success.....");
+					
+		
+		
+		
 	}
 
 	InvoiceWiseReport.filter = function() {

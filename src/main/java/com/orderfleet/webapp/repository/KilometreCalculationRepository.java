@@ -2,6 +2,7 @@
 package com.orderfleet.webapp.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,4 +48,7 @@ public interface KilometreCalculationRepository extends JpaRepository<KilometreC
 	@Query("select kilometreCalculation from KilometreCalculation kilometreCalculation where kilometreCalculation.company.id = ?#{principal.companyId} and kilometreCalculation.user.pid in ?1 and kilometreCalculation.date =?2 Order By kilometreCalculation.createdDate desc")
 	List<KilometreCalculation> findAllByCompanyIdAndUserPidInAndDateOrderByCreatedDateDesc(List<String> userPid,
 			LocalDate fromDate);
+
+	@Query("select sum(kilometreCalculation.kilometre),kilometreCalculation.employee.name from KilometreCalculation kilometreCalculation where kilometreCalculation.company.id = ?#{principal.companyId} and kilometreCalculation.user.id in ?1 and kilometreCalculation.createdDate between ?2 and ?3 Group By kilometreCalculation.employee.name")
+    List<Object[]> findByUserIdsAndDateBetwewn(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
 }
