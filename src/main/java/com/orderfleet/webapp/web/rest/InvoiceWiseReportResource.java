@@ -1,14 +1,11 @@
 package com.orderfleet.webapp.web.rest;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
@@ -16,7 +13,6 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -27,17 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -60,7 +46,6 @@ import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Activity;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.EmployeeProfile;
-import com.orderfleet.webapp.domain.EmployeeVehicleAssosiationHistory;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
@@ -78,7 +63,6 @@ import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
-import com.orderfleet.webapp.repository.EmployeeVehicleAssosiationHistoryRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
@@ -105,7 +89,6 @@ import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportDetailView;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
@@ -196,8 +179,6 @@ public class InvoiceWiseReportResource {
 
 	@Inject
 	private UserRepository userRepository;
-	
-
 
 	/**
 	 * GET /invoice-wise-reports : get all the executive task executions.
@@ -294,7 +275,6 @@ public class InvoiceWiseReportResource {
 	@Timed
 	public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
 		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
-		
 		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
 		if (opExecutiveeExecution.isPresent()) {
 			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
@@ -372,7 +352,6 @@ public class InvoiceWiseReportResource {
 			@RequestParam("activityPid") String activityPid, @RequestParam("accountPid") String accountPid,
 			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
 			@RequestParam boolean inclSubordinate) {
-		
 		List<InvoiceWiseReportView> executiveTaskExecutions = new ArrayList<>();
 		if (filterBy.equals("TODAY")) {
 			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, LocalDate.now(),
@@ -415,11 +394,6 @@ public class InvoiceWiseReportResource {
 		List<String> accountProfilePids;
 
 		List<Long> userIds = getUserIdsUnderCurrentUser(employeePid, inclSubordinate);
-		
-//		List<EmployeeVehicleAssosiationHistory> employeeVehicleAssosiationHistory = employeeVehicleAssociationRepository.findAll();
-		
-		
-		
 		log.info("User Ids :" + userIds);
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
@@ -431,21 +405,18 @@ public class InvoiceWiseReportResource {
 			activityPids = Arrays.asList(activityPid);
 		}
 
-		
-		
-		
 		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
 		log.info("Finding executive Task execution");
 		if (accountPid.equalsIgnoreCase("no")) {
 			// accountProfilePids = getAccountPids(userIds);
 			// if all accounts selected avoid account wise query
 			executiveTaskExecutions = executiveTaskExecutionRepository
-					.getByCreatedDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
+					.getByDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
 		} else {
 			// if a specific account is selected load data based on that particular account
 			accountProfilePids = Arrays.asList(accountPid);
 			executiveTaskExecutions = executiveTaskExecutionRepository
-					.getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
+					.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
 							accountProfilePids);
 		}
 
@@ -728,29 +699,12 @@ public class InvoiceWiseReportResource {
 
 		log.info("executive task execution looping started :" + executiveTaskExecutions.size());
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
-		boolean compConfig= getCompanyCofig();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			double totalSalesOrderAmount = 0.0;
 			double totalRecieptAmount = 0.0;
 			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView(executiveTaskExecution);
 			EmployeeProfile employeeProfile = employeeProfileRepository
 					.findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
-			
-
-			
-
-		invoiceWiseReportView.setVehicleRegistrationNumber(executiveTaskExecution.getVehicleNumber() == null ? "no vehicle" : executiveTaskExecution.getVehicleNumber());
-
-			
-			if(compConfig)
-			{
-				invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getDescription());
-			}
-			else
-			{
-				invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getAccountProfileName());
-
-			}
 			if (employeeProfile != null) {
 				invoiceWiseReportView.setEmployeeName(employeeProfile.getName());
 				String timeSpend = findTimeSpend(executiveTaskExecution.getPunchInDate(),
@@ -848,7 +802,6 @@ public class InvoiceWiseReportResource {
 
 	}
 
-	
 	private List<String> getAccountPids(List<Long> userIds) {
 		List<AccountProfileDTO> allAccountDtos;
 		if (userIds.isEmpty()) {
@@ -1142,11 +1095,10 @@ public class InvoiceWiseReportResource {
 	}
 
 	public String findTimeSpend(LocalDateTime startTime, LocalDateTime endTime) {
-		
 		long hours = 00;
 		long minutes = 00;
 		long seconds = 00;
-		long milliseconds=00;
+		long milliseconds = 00;
 		if (startTime != null && endTime != null) {
 			long years = startTime.until(endTime, ChronoUnit.YEARS);
 			startTime = startTime.plusYears(years);
@@ -1163,12 +1115,12 @@ public class InvoiceWiseReportResource {
 			startTime = startTime.plusMinutes(minutes);
 
 			seconds = startTime.until(endTime, ChronoUnit.SECONDS);
-			startTime = startTime.plusSeconds(seconds);
 			
-			milliseconds =startTime.until(endTime, ChronoUnit.MILLIS);
+			milliseconds = startTime.until(endTime, ChronoUnit.MILLIS);
+			
+			
 		}
-		
-		return hours + " : " + minutes + " : " + seconds + ":"+milliseconds;
+		return hours + " : " + minutes + " : " + seconds+ " : "+ milliseconds;
 
 	}
 
@@ -1509,199 +1461,5 @@ public class InvoiceWiseReportResource {
 		}
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value = "/invoice-wise-reports/downloadxls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void downloadXLs(@RequestParam("documentPid") String documentPid, @RequestParam("employeePid") String employeePid,
-			@RequestParam("activityPid") String activityPid, @RequestParam("accountPid") String accountPid,
-			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
-			@RequestParam boolean inclSubordinate,HttpServletResponse response) {
-	
-		log.debug("downloading......");
-		
-		List<InvoiceWiseReportView> executiveTaskExecutions = new ArrayList<>();
-		if (filterBy.equals("TODAY")) {
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, LocalDate.now(),
-					LocalDate.now(), inclSubordinate);
-		} else if (filterBy.equals("YESTERDAY")) {
-			LocalDate yeasterday = LocalDate.now().minusDays(1);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, yeasterday,
-					yeasterday, inclSubordinate);
-		} else if (filterBy.equals("WTD")) {
-			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
-			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, weekStartDate,
-					LocalDate.now(), inclSubordinate);
-		} else if (filterBy.equals("MTD")) {
-			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, monthStartDate,
-					LocalDate.now(), inclSubordinate);
-		} else if (filterBy.equals("CUSTOM")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, fromDateTime,
-					toFateTime, inclSubordinate);
-		} else if (filterBy.equals("SINGLE")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, fromDateTime,
-					fromDateTime, inclSubordinate);
-		}
-			buildExcelDocument(executiveTaskExecutions, response);
-	}
-	
-	
-	
-	
-	private void buildExcelDocument(List<InvoiceWiseReportView> executiveTaskExecutions, HttpServletResponse response) {
-		// TODO Auto-generated method stub
-		log.debug("Downloading Excel report");
-		String excelFileName = "InvoiceWiseReports" + ".xls";
-		String sheetName = "Sheet1";
 
-		String[] headerColumns = { "Employee","Account Profile","Activity","PunchIn Date","PunchIn Time","Client Date","Client Time","Time Spend (hh:mm:ss:mmm)",
-				"Server Date","Server Time","GPS Location","Enable/ Disable","Tower Location","Visit Type","Sales/ Sales Order AmountTotal",
-				"Receipt Amount Total",	"Vehicle Registration Number","Remarks" };
-		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
-			HSSFSheet worksheet = workbook.createSheet(sheetName);
-			createHeaderRow(worksheet, headerColumns);
-			createReportRows(worksheet, executiveTaskExecutions);
-			// Resize all columns to fit the content size
-			for (int i = 0; i < headerColumns.length; i++) {
-				worksheet.autoSizeColumn(i);
-			}
-			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
-			response.setContentType("application/vnd.ms-excel");
-			// Writes the report to the output stream
-			ServletOutputStream outputStream = response.getOutputStream();
-			worksheet.getWorkbook().write(outputStream);
-			outputStream.flush();
-		} catch (IOException ex) {
-			log.error("IOException on downloading Visit Details {}", ex.getMessage());
-		}
-	}
-
-	private void createReportRows(HSSFSheet worksheet, List<InvoiceWiseReportView> executiveTaskExecutions) {
-		// TODO Auto-generated method stub
-		
-		
-		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
-		// Create Cell Style for formatting Date
-		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
-		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM/DD/YYYY"));
-		
-		HSSFCellStyle timeCellStyle = worksheet.getWorkbook().createCellStyle();
-		timeCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("h:mm:ss"));
-		// Create Other rows and cells with Sales data
-		int rowNum = 1;
-		
-		for(InvoiceWiseReportView invoice:executiveTaskExecutions)
-		{
-			HSSFRow row = worksheet.createRow(rowNum++);
-			
-			row.createCell(0).setCellValue(invoice.getEmployeeName());
-			row.createCell(1).setCellValue(invoice.getAccountProfileName());
-			row.createCell(2).setCellValue(invoice.getActivityName());
-			
-			if(invoice.getPunchInDate()!=null)
-			{
-			LocalDateTime localDateTime = invoice.getPunchInDate();
-			Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-			Date date = Date.from(i);
-			HSSFCell punchDateCell = row.createCell(3);
-			punchDateCell.setCellValue(date);
-			punchDateCell.setCellStyle(dateCellStyle);
-			}
-			
-			if(invoice.getPunchInDate()!=null)
-			{
-			LocalDateTime localDateTime = invoice.getPunchInDate();
-			Instant it = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-			Date date = Date.from(it);
-			HSSFCell punchTimeCell = row.createCell(4);
-			punchTimeCell.setCellValue(date);
-			punchTimeCell.setCellStyle(timeCellStyle);
-			}
-			if(invoice.getSendDate()!=null)
-			{
-			LocalDateTime localDateTime = invoice.getSendDate();
-			Instant ins = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-			Date date = Date.from(ins);
-			HSSFCell clientDateCell = row.createCell(5);
-			clientDateCell.setCellValue(date);
-			clientDateCell.setCellStyle(dateCellStyle);
-			}
-			if(invoice.getSendDate()!=null)
-			{
-			LocalDateTime localDateTime = invoice.getSendDate();
-			Instant ins = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-			Date date = Date.from(ins);
-			HSSFCell clientTimeCell = row.createCell(6);
-			clientTimeCell.setCellValue(date);
-			clientTimeCell.setCellStyle(timeCellStyle);
-			}
-			row.createCell(7).setCellValue(invoice.getTimeSpend());
-		
-			if(invoice.getCreatedDate()!=null)
-			{
-			LocalDateTime localDateTime = invoice.getCreatedDate();
-			Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-			Date date = Date.from(i);
-			HSSFCell createDateCell = row.createCell(8);
-			createDateCell.setCellValue(date);
-			createDateCell.setCellStyle(dateCellStyle);
-			}
-			if(invoice.getCreatedDate()!=null)
-			{
-			LocalDateTime localDateTime = invoice.getCreatedDate();
-			Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-			Date date = Date.from(i);
-			HSSFCell createTimeCell = row.createCell(9);
-			createTimeCell.setCellValue(date);
-			createTimeCell.setCellStyle(timeCellStyle);
-			}
-			row.createCell(10).setCellValue(invoice.getAccountProfileLocation());
-			row.createCell(11).setCellValue(invoice.getMockLocationStatus());
-			row.createCell(12).setCellValue(invoice.getTowerLocation());
-			row.createCell(13).setCellValue(invoice.getWithCustomer());
-			row.createCell(14).setCellValue(invoice.getTotalSalesOrderAmount());
-			row.createCell(15).setCellValue(invoice.getTotalRecieptAmount());
-			row.createCell(16).setCellValue(invoice.getVehicleRegistrationNumber());
-			row.createCell(17).setCellValue(invoice.getRemarks());
-			
-		}
-	}
-
-	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
-		
-		// Create a Font for styling header cells
-				Font headerFont = worksheet.getWorkbook().createFont();
-				headerFont.setFontName("Arial");
-				headerFont.setBold(true);
-				headerFont.setFontHeightInPoints((short) 14);
-				headerFont.setColor(IndexedColors.RED.getIndex());
-				// Create a CellStyle with the font
-				HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
-				headerCellStyle.setFont(headerFont);
-				// Create a Row
-				HSSFRow headerRow = worksheet.createRow(0);
-				// Create cells
-				for (int i = 0; i < headerColumns.length; i++) {
-					HSSFCell cell = headerRow.createCell(i);
-					cell.setCellValue(headerColumns[i]);
-					cell.setCellStyle(headerCellStyle);
-				}
-	}
-
-	public boolean getCompanyCofig(){
-		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
-		if(optconfig.isPresent()) {
-		if(Boolean.valueOf(optconfig.get().getValue())) {
-		return true;
-		}
-		}
-		return false;
-		}
-	
-	
 }

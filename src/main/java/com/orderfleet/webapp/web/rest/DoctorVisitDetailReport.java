@@ -65,7 +65,6 @@ import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.DoctorVisitDTO;
-import com.orderfleet.webapp.web.rest.dto.ExpenseDTO;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.rest.dto.KilometerCalculationDTO;
 import com.orderfleet.webapp.web.rest.dto.VisitReportView;
