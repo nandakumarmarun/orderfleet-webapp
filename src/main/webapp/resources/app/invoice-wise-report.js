@@ -295,6 +295,9 @@ if (!this.InvoiceWiseReport) {
 																	+ "<td>"
 																	+ invoiceWiseReport.totalRecieptAmount
 																	+ "</td><td>"
+																	+ (invoiceWiseReport.vehicleRegistrationNumber == null ? ""
+																			: invoiceWiseReport.vehicleRegistrationNumber)
+																	+ "</td><td>"
 																	+ (invoiceWiseReport.remarks == null ? ""
 																			: invoiceWiseReport.remarks)
 																	+ "</td></tr>");
@@ -966,7 +969,7 @@ if (!this.InvoiceWiseReport) {
 	function showInventoryVoucher(pid) {
 		$
 				.ajax({
-					url : contextPath + "/web/primary-sales-performance/" + pid,
+					url : contextPath + "/web/primary-sales-performance-invoice/" + pid,
 					method : 'GET',
 					success : function(data) {
 						$('#lbl_documentNumberIc').text(
@@ -988,6 +991,9 @@ if (!this.InvoiceWiseReport) {
 						$('#lbl_documentTotalIc').text(
 								(data.documentTotal == null ? ""
 										: data.documentTotal));
+						$('#lbl_documentVolumIc').text(
+								(data.documentVolume == null ? ""
+										: data.documentVolume));
 						$('#lbl_documentDiscountAmountIc').text(
 								(data.docDiscountAmount == null ? ""
 										: data.docDiscountAmount));

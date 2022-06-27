@@ -1,11 +1,14 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
@@ -13,6 +16,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -23,7 +27,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +60,7 @@ import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Activity;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.EmployeeProfile;
+import com.orderfleet.webapp.domain.EmployeeVehicleAssosiationHistory;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
@@ -63,6 +78,7 @@ import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
+import com.orderfleet.webapp.repository.EmployeeVehicleAssosiationHistoryRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
@@ -89,6 +105,7 @@ import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportDetailView;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
+import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
@@ -179,6 +196,8 @@ public class InvoiceWiseReportResource {
 
 	@Inject
 	private UserRepository userRepository;
+	
+
 
 	/**
 	 * GET /invoice-wise-reports : get all the executive task executions.
@@ -275,6 +294,7 @@ public class InvoiceWiseReportResource {
 	@Timed
 	public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
 		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
+		
 		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
 		if (opExecutiveeExecution.isPresent()) {
 			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
@@ -352,6 +372,7 @@ public class InvoiceWiseReportResource {
 			@RequestParam("activityPid") String activityPid, @RequestParam("accountPid") String accountPid,
 			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
 			@RequestParam boolean inclSubordinate) {
+		
 		List<InvoiceWiseReportView> executiveTaskExecutions = new ArrayList<>();
 		if (filterBy.equals("TODAY")) {
 			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, LocalDate.now(),
@@ -394,6 +415,11 @@ public class InvoiceWiseReportResource {
 		List<String> accountProfilePids;
 
 		List<Long> userIds = getUserIdsUnderCurrentUser(employeePid, inclSubordinate);
+		
+//		List<EmployeeVehicleAssosiationHistory> employeeVehicleAssosiationHistory = employeeVehicleAssociationRepository.findAll();
+		
+		
+		
 		log.info("User Ids :" + userIds);
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
@@ -405,18 +431,21 @@ public class InvoiceWiseReportResource {
 			activityPids = Arrays.asList(activityPid);
 		}
 
+		
+		
+		
 		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
 		log.info("Finding executive Task execution");
 		if (accountPid.equalsIgnoreCase("no")) {
 			// accountProfilePids = getAccountPids(userIds);
 			// if all accounts selected avoid account wise query
 			executiveTaskExecutions = executiveTaskExecutionRepository
-					.getByDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
+					.getByCreatedDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
 		} else {
 			// if a specific account is selected load data based on that particular account
 			accountProfilePids = Arrays.asList(accountPid);
 			executiveTaskExecutions = executiveTaskExecutionRepository
-					.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
+					.getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
 							accountProfilePids);
 		}
 
@@ -699,12 +728,29 @@ public class InvoiceWiseReportResource {
 
 		log.info("executive task execution looping started :" + executiveTaskExecutions.size());
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
+		boolean compConfig= getCompanyCofig();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			double totalSalesOrderAmount = 0.0;
 			double totalRecieptAmount = 0.0;
 			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView(executiveTaskExecution);
 			EmployeeProfile employeeProfile = employeeProfileRepository
 					.findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
+			
+
+			
+
+		invoiceWiseReportView.setVehicleRegistrationNumber(executiveTaskExecution.getVehicleNumber() == null ? "no vehicle" : executiveTaskExecution.getVehicleNumber());
+
+			
+			if(compConfig)
+			{
+				invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getDescription());
+			}
+			else
+			{
+				invoiceWiseReportView.setAccountProfileName(invoiceWiseReportView.getAccountProfileName());
+
+			}
 			if (employeeProfile != null) {
 				invoiceWiseReportView.setEmployeeName(employeeProfile.getName());
 				String timeSpend = findTimeSpend(executiveTaskExecution.getPunchInDate(),
@@ -802,6 +848,7 @@ public class InvoiceWiseReportResource {
 
 	}
 
+	
 	private List<String> getAccountPids(List<Long> userIds) {
 		List<AccountProfileDTO> allAccountDtos;
 		if (userIds.isEmpty()) {
@@ -1095,10 +1142,11 @@ public class InvoiceWiseReportResource {
 	}
 
 	public String findTimeSpend(LocalDateTime startTime, LocalDateTime endTime) {
+		
 		long hours = 00;
 		long minutes = 00;
 		long seconds = 00;
-		long milliseconds = 00;
+		long milliseconds=00;
 		if (startTime != null && endTime != null) {
 			long years = startTime.until(endTime, ChronoUnit.YEARS);
 			startTime = startTime.plusYears(years);
@@ -1115,12 +1163,12 @@ public class InvoiceWiseReportResource {
 			startTime = startTime.plusMinutes(minutes);
 
 			seconds = startTime.until(endTime, ChronoUnit.SECONDS);
+			startTime = startTime.plusSeconds(seconds);
 			
-			milliseconds = startTime.until(endTime, ChronoUnit.MILLIS);
-			
-			
+			milliseconds =startTime.until(endTime, ChronoUnit.MILLIS);
 		}
-		return hours + " : " + minutes + " : " + seconds+ " : "+ milliseconds;
+		
+		return hours + " : " + minutes + " : " + seconds + ":"+milliseconds;
 
 	}
 
@@ -1461,5 +1509,13 @@ public class InvoiceWiseReportResource {
 		}
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-
+	public boolean getCompanyCofig(){
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+		return true;
+		}
+		}
+		return false;
+		}
 }
