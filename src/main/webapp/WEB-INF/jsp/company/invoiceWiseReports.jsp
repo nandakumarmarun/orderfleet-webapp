@@ -181,6 +181,11 @@
 									<button id="btnDownload" type="button" style="font-size: 18px"
 										class="btn btn-orange entypo-download" title="Download Xls"></button>
 								</div>
+								<div class="col-sm-3">
+									<br />
+									<button id="btnTestdownload" type="button" 
+										class="btn btn-success" >  Download Xls</button>
+								</div>
 							</div>
 						</div>
 					</form>
@@ -986,6 +991,22 @@
 												}
 												InvoiceWiseReport.downloadXls();
 											});
+							$('#btnTestdownload')
+							.on(
+									'click',
+									function() {
+										var tblInvoiceWiseReport = $("#tblInvoiceWiseReport tbody");
+										if (tblInvoiceWiseReport
+												.children().length == 0) {
+											alert("no values available");
+											return;
+										}
+										if (tblInvoiceWiseReport[0].textContent == "No data available") {
+											alert("no values available");
+											return;
+										}
+										InvoiceWiseReport.testdownloadXls();
+									});
 
 							InvoiceWiseReport.filter();
 							//if(documentType == null){

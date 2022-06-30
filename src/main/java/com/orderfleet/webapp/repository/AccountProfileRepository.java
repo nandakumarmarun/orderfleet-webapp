@@ -244,5 +244,9 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.customerId in ?2")
     List<AccountProfile> findAccountProfilesByCompanyIdAndCustomerIdIn(Long id, List<String> cuIds);
+	
+
+	@Query(value="SELECT * FROM tbl_account_profile where company_id = ?#{principal.companyId}  and id not in (SELECT a.id FROM tbl_account_profile a JOIN tbl_location_account_profile b On b.account_profile_id = a.id and  a.company_id = ?#{principal.companyId} )",nativeQuery = true)
+	List<AccountProfile> findAllAccountProfilesWithoutLocation();
 
 }

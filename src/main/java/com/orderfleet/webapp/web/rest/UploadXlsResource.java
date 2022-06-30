@@ -566,15 +566,16 @@ public class UploadXlsResource {
 //						 celltype=0==>Numeric && celltype=1==>String
 						if (row.getCell(customerIdNumber).getCellType() == 0) {
 							customersid = String.valueOf(row.getCell(customerIdNumber).getNumericCellValue());
+							accProfile.setCustomerId(customersid);
 						}
 
 						if (row.getCell(customerIdNumber).getCellType() == 1) {
 							customersid = String.valueOf(row.getCell(customerIdNumber).getStringCellValue());
+//							String s1 = customersid.substring(0, customersid.indexOf("."));
+//							s1.trim();
+//							accProfile.setCustomerId(s1);
 						}
-
-						String s1 = customersid.substring(0, customersid.indexOf("."));
-						s1.trim();
-						accProfile.setCustomerId(s1);
+						accProfile.setCustomerId(customersid);
 					}
 					if (customerCodeNumber != -1) {
 						Cell cell = row.getCell(customerCodeNumber);

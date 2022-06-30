@@ -237,6 +237,7 @@ public class StockDetailsResource {
 		List<UserStockLocation> userStockLocations = userStockLocationRepository.findByUserPid(user.get().getPid());
 		Set<StockLocation> usersStockLocations = userStockLocations.stream().map(usl -> usl.getStockLocation())
 				.collect(Collectors.toSet());
+		System.out.println("stockLocation:"+usersStockLocations);
 		List<OpeningStock> openingStockUserBased = openingStockRepository
 				.findByStockLocationInOrderByCreatedDateAsc(new ArrayList<>(usersStockLocations));
 		List<StockDetailsDTO> stockDetails = new ArrayList<StockDetailsDTO>();
@@ -381,6 +382,7 @@ public class StockDetailsResource {
 
 		long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Optional<EmployeeProfileDTO> employeeProfileDTO = employeeProfileService.findOneByPid(employeePid);
+		System.out.println("NAme: "+employeeProfileDTO.get().getName());
 		String userPid = employeeProfileDTO.get().getUserPid();
 		Optional<User> user = userRepository.findOneByPid(userPid);
 		Long userId = user.get().getId();
@@ -398,7 +400,7 @@ public class StockDetailsResource {
 			stockDetails = inventoryVoucherHeaderService.findAllStockDetails(companyId, userId, fromDate, toDate, null);
 			List<StockDetailsDTO> unSaled = stockDetailsService.findOtherStockItems(user.get(), usersStockLocations,
 					false);
-			String employeeName = null;
+			String employeeName = null ;
 			for (StockDetailsDTO dto : stockDetails) {
 				unSaled.removeIf(unSale -> unSale.getProductName().equals(dto.getProductName()));
 				dto.setReportingTime(dateTime);
@@ -427,9 +429,11 @@ public class StockDetailsResource {
 
 			}
 			System.out.println("size :" + accountingVouchers.size());
-
-			List<AccountingVoucherHeader> accountingHeader = accountingVoucherHeaderRepository
+			List<AccountingVoucherHeader> accountingHeader =new ArrayList<>();
+			if (eteIds.size() > 0) {
+			 accountingHeader = accountingVoucherHeaderRepository
 					.findByExecutiveTaskExecutionIdIn(eteIds);
+			}
 
 			List<Long> accId = accountingHeader.stream().map(acc -> acc.getId()).collect(Collectors.toList());
 			List<Object[]> netCollectionAmountCash = new ArrayList<>();
@@ -478,11 +482,11 @@ public class StockDetailsResource {
 			
 		}
 
-		buildpdf(stockDetails, stockTotal, response);
+		buildpdf(stockDetails, stockTotal,employeePid, response);
 	}
 
 	private void buildpdf(List<StockDetailsDTO> stockDetails, List<StockDetailsTotalDTO> stockTotal,
-			HttpServletResponse response) throws IOException {
+			String employeePid, HttpServletResponse response) throws IOException {
 		// TODO Auto-generated method stub
 
 		response.setContentType("application/pdf");
@@ -505,7 +509,16 @@ public class StockDetailsResource {
 			 * com.itextpdf.text.Font fontSize_16 = FontFactory.getFont(FontFactory.TIMES,
 			 * 16f, com.itextpdf.text.Font.BOLD);
 			 */
-
+			String strDate = null;
+			if (dateTime != null) {
+			Instant i = dateTime.atZone(ZoneId.systemDefault()).toInstant();
+			Date dates = Date.from(i);
+			
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss a");
+			 strDate = dateFormat.format(dates);
+			}
+			Optional<EmployeeProfileDTO> employeeProfileDTO = employeeProfileService.findOneByPid(employeePid);
+			  String Employeename =employeeProfileDTO.get().getName();
 			Paragraph companyName = new Paragraph();
 			Paragraph line = new Paragraph();
 			companyName.setAlignment(Element.ALIGN_CENTER);
@@ -515,6 +528,10 @@ public class StockDetailsResource {
 			line.add(new Paragraph("_______________________________________________________"));
 			document.add(companyName);
 			document.add(line);
+			document.add(new Paragraph("\n"));
+			document.add(new Paragraph("Employee Name : "+ Employeename));
+			document.add(new Paragraph("Applying Date&Time : " +strDate ));
+			document.add(new Paragraph("\n"));
 			PdfPTable table = createPdfTable(stockDetails);
 			table.setWidthPercentage(100);
 			document.add(table);
@@ -542,7 +559,7 @@ public class StockDetailsResource {
 	private PdfPTable createPdfTable(List<StockDetailsDTO> stockDetails) {
 		com.itextpdf.text.Font fontWeight = FontFactory.getFont(FontFactory.TIMES, 12f, com.itextpdf.text.Font.BOLD);
 
-		PdfPTable table = new PdfPTable(new float[] { 75f, 50f, 100f, 50f, 50f, 50f, 50f });
+		PdfPTable table = new PdfPTable(new float[] {100f, 50f, 50f, 50f, 50f });
 		table.setTotalWidth(350f);
 
 		PdfPCell blank = new PdfPCell(new Paragraph("\n"));
@@ -554,80 +571,59 @@ public class StockDetailsResource {
 		table.addCell(blank);
 		table.addCell(blank);
 		table.addCell(blank);
-		table.addCell(blank);
-		table.addCell(blank);
+		
 
-		PdfPCell cell1 = new PdfPCell(new Paragraph("Applying Time", fontWeight));
+
+		PdfPCell cell1 = new PdfPCell(new Paragraph("ProductName", fontWeight));
 		cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-		PdfPCell cell2 = new PdfPCell(new Paragraph("Employee Name", fontWeight));
+		PdfPCell cell2 = new PdfPCell(new Paragraph("Opening Stock", fontWeight));
 		cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-		PdfPCell cell3 = new PdfPCell(new Paragraph("ProductName", fontWeight));
+		PdfPCell cell3 = new PdfPCell(new Paragraph("Sales Quantity", fontWeight));
 		cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-		PdfPCell cell4 = new PdfPCell(new Paragraph("Opening Stock", fontWeight));
+		PdfPCell cell4 = new PdfPCell(new Paragraph("Damage Qty", fontWeight));
 		cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-		PdfPCell cell5 = new PdfPCell(new Paragraph("Sales Quantity", fontWeight));
+		PdfPCell cell5 = new PdfPCell(new Paragraph("Closing Stock", fontWeight));
 		cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-		PdfPCell cell6 = new PdfPCell(new Paragraph("Damage Qty", fontWeight));
-		cell6.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-		PdfPCell cell7 = new PdfPCell(new Paragraph("Closing Stock", fontWeight));
-		cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
 
 		table.addCell(cell1);
 		table.addCell(cell2);
 		table.addCell(cell3);
 		table.addCell(cell4);
 		table.addCell(cell5);
-		table.addCell(cell6);
-		table.addCell(cell7);
+		
 
+		
 	
 		for (StockDetailsDTO stockdto : stockDetails) {
 
-			fontWeight = FontFactory.getFont(FontFactory.TIMES, 10f, com.itextpdf.text.Font.NORMAL);
+			fontWeight = FontFactory.getFont(FontFactory.TIMES, 11f, com.itextpdf.text.Font.NORMAL);
 
-			PdfPCell col1 = new PdfPCell();
-			if (stockdto.getReportingTime() != null) {
-				LocalDateTime date = stockdto.getReportingTime();
+			
+			PdfPCell col1 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getProductName()), fontWeight));
+			col1.setHorizontalAlignment(Element.ALIGN_LEFT);
 
-				Instant i = date.atZone(ZoneId.systemDefault()).toInstant();
-				Date dates = Date.from(i);
-
-				DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss a");
-				String strDate = dateFormat.format(dates);
-
-				col1 = new PdfPCell(new Paragraph(strDate, fontWeight));
-			}
-			PdfPCell col2 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getEmployeeName()), fontWeight));
+			PdfPCell col2 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getOpeningStock()), fontWeight));
 			col2.setHorizontalAlignment(Element.ALIGN_LEFT);
 
-			PdfPCell col3 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getProductName()), fontWeight));
+			PdfPCell col3 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getSaledQuantity()), fontWeight));
 			col3.setHorizontalAlignment(Element.ALIGN_LEFT);
 
-			PdfPCell col4 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getOpeningStock()), fontWeight));
+			PdfPCell col4 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getDamageQty()), fontWeight));
 			col4.setHorizontalAlignment(Element.ALIGN_LEFT);
 
-			PdfPCell col5 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getSaledQuantity()), fontWeight));
+			PdfPCell col5 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getClosingStock()), fontWeight));
 			col5.setHorizontalAlignment(Element.ALIGN_LEFT);
-
-			PdfPCell col6 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getDamageQty()), fontWeight));
-			col6.setHorizontalAlignment(Element.ALIGN_LEFT);
-
-			PdfPCell col7 = new PdfPCell(new Paragraph(String.valueOf(stockdto.getClosingStock()), fontWeight));
-			col7.setHorizontalAlignment(Element.ALIGN_LEFT);
 
 			table.addCell(col1);
 			table.addCell(col2);
 			table.addCell(col3);
 			table.addCell(col4);
 			table.addCell(col5);
-			table.addCell(col6);
-			table.addCell(col7);
+			
 		}
 
 		return table;

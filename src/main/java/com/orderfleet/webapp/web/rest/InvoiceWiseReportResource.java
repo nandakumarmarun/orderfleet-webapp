@@ -901,187 +901,7 @@ public class InvoiceWiseReportResource {
 
 	}
 
-	// private List<InvoiceWiseReportView> getFilterData1(String
-	// employeePid,
-	// String documentPid, String activityPid,
-	// String accountPid, LocalDate fDate, LocalDate tDate) {
-	//
-	// String userPid = "no";
-	// if (!employeePid.equals("no") && !employeePid.equals("Dashboard
-	// Employee")) {
-	// Optional<EmployeeProfileDTO> opEmployee =
-	// employeeProfileService.findOneByPid(employeePid);
-	// if (opEmployee.isPresent()) {
-	// userPid = opEmployee.get().getUserPid();
-	// }
-	// }
-	//
-	// List<Long> userIds = getUserIdsUnderCurrentUser(employeePid);
-	//
-	// LocalDateTime fromDate = fDate.atTime(0, 0);
-	// LocalDateTime toDate = tDate.atTime(23, 59);
-	// List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
-	// if (userPid.equals("no") && activityPid.equals("no") &&
-	// accountPid.equals("no")) {
-	//
-	// // user under current user
-	// if (userIds.isEmpty()) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdAndDateBetweenOrderByDateDesc(fromDate, toDate);
-	// } else {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByUserIdInAndDateBetweenOrderByDateDesc(userIds, fromDate,
-	// toDate);
-	// }
-	// } else if (!userPid.equals("no") && !activityPid.equals("no") &&
-	// !accountPid.equals("no")) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdUserPidActivityPidAccountPidAndDateBetweenOrderByDateDesc(userPid,
-	// activityPid,
-	// accountPid, fromDate, toDate);
-	// } else if (!userPid.equals("no") && activityPid.equals("no") &&
-	// accountPid.equals("no")) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdUserPidAndDateBetweenOrderByDateDesc(userPid,
-	// fromDate,
-	// toDate);
-	//
-	// } else if (!activityPid.equals("no") && userPid.equals("no") &&
-	// accountPid.equals("no")) {
-	// // user under current user
-	// if (userIds.isEmpty()) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdActivityPidAndDateBetweenOrderByDateDesc(activityPid,
-	// fromDate, toDate);
-	// } else {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByUserIdInActivityPidAndDateBetweenOrderByDateDesc(userIds,
-	// activityPid, fromDate,
-	// toDate);
-	// }
-	// } else if (!accountPid.equals("no") && userPid.equals("no") &&
-	// activityPid.equals("no")) {
-	// // user under current user
-	// if (userIds.isEmpty()) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdAccountPidAndDateBetweenOrderByDateDesc(accountPid,
-	// fromDate, toDate);
-	// } else {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByUserIdInAccountPidAndDateBetweenOrderByDateDesc(userIds,
-	// accountPid, fromDate,
-	// toDate);
-	// }
-	// } else if (!userPid.equals("no") && !activityPid.equals("no") &&
-	// accountPid.equals("no")) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdUserPidActivityPidAndDateBetweenOrderByDateDesc(userPid,
-	// activityPid, fromDate,
-	// toDate);
-	// } else if (!userPid.equals("no") && !accountPid.equals("no") &&
-	// activityPid.equals("no")) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdUserPidAccountPidAndDateBetweenOrderByDateDesc(userPid,
-	// accountPid, fromDate,
-	// toDate);
-	// } else if (!accountPid.equals("no") && !activityPid.equals("no") &&
-	// userPid.equals("no")) {
-	// // user under current user
-	// if (userIds.isEmpty()) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdActivityPidAccountPidAndDateBetweenOrderByDateDesc(activityPid,
-	// accountPid,
-	// fromDate, toDate);
-	// } else {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByUserIdInActivityPidAccountPidAndDateBetweenOrderByDateDesc(userIds,
-	// activityPid,
-	// accountPid, fromDate, toDate);
-	// }
-	// }
-	// List<InvoiceWiseReportView> invoiceWiseReportViews = new
-	// ArrayList<>();
-	// for (ExecutiveTaskExecution executiveTaskExecution :
-	// executiveTaskExecutions)
-	// {
-	// InvoiceWiseReportView invoiceWiseReportView = new
-	// InvoiceWiseReportView(
-	// executiveTaskExecution);
-	// EmployeeProfileDTO employeeProfileDTO = employeeProfileService
-	// .findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
-	// if (employeeProfileDTO != null) {
-	// invoiceWiseReportView.setEmployeeName(employeeProfileDTO.getName());
-	// String timeSpend = findTimeSpend(executiveTaskExecution.getStartTime(),
-	// executiveTaskExecution.getEndTime());
-	// invoiceWiseReportView.setTimeSpend(timeSpend);
-	// List<InvoiceWiseReportDetailView> executiveTaskExecutionDetailViews
-	// =
-	// new ArrayList<InvoiceWiseReportDetailView>();
-	// List<Object[]> inventoryVouchers = new ArrayList<>();
-	// if (documentPid.equals("no")) {
-	// inventoryVouchers = inventoryVoucherHeaderRepository
-	// .findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
-	// } else {
-	// inventoryVouchers = inventoryVoucherHeaderRepository
-	// .findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(),
-	// documentPid);
-	// }
-	// for (Object[] obj : inventoryVouchers) {
-	// InvoiceWiseReportDetailView executiveTaskExecutionDetailView = new
-	// InvoiceWiseReportDetailView(
-	// obj[0].toString(), obj[1].toString(), Double.valueOf(obj[2].toString()),
-	// obj[3].toString());
-	// executiveTaskExecutionDetailView.setDocumentVolume(Double.valueOf(obj[4].toString()));
-	// executiveTaskExecutionDetailViews.add(executiveTaskExecutionDetailView);
-	// }
-	//
-	// List<Object[]> accountingVouchers = new ArrayList<>();
-	// if (documentPid.equals("no")) {
-	// accountingVouchers = accountingVoucherHeaderRepository
-	// .findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
-	// } else {
-	// accountingVouchers = accountingVoucherHeaderRepository
-	// .findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(),
-	// documentPid);
-	// }
-	// for (Object[] obj : accountingVouchers) {
-	// executiveTaskExecutionDetailViews.add(new
-	// InvoiceWiseReportDetailView(obj[0].toString(),
-	// obj[1].toString(), Double.valueOf(obj[2].toString()),
-	// obj[3].toString()));
-	// }
-	//
-	// List<Object[]> dynamicDocuments = new ArrayList<>();
-	// if (documentPid.equals("no")) {
-	// dynamicDocuments = dynamicDocumentHeaderRepository
-	// .findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
-	// } else {
-	// dynamicDocuments = dynamicDocumentHeaderRepository
-	// .findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(),
-	// documentPid);
-	// }
-	// for (Object[] obj : dynamicDocuments) {
-	// boolean imageFound = false;
-	// // check image saved
-	// if (filledFormRepository.existsByHeaderPidIfFiles(obj[0].toString())) {
-	// imageFound = true;
-	// }
-	// executiveTaskExecutionDetailViews.add(new
-	// InvoiceWiseReportDetailView(obj[0].toString(),
-	// obj[1].toString(), obj[2].toString(), imageFound));
-	// }
-	// // if condition for document wise filter
-	// if (!documentPid.equals("no") &&
-	// executiveTaskExecutionDetailViews.isEmpty())
-	// {
-	// } else {
-	// invoiceWiseReportView.setInvoiceWiseReportDetailViews(executiveTaskExecutionDetailViews);
-	// invoiceWiseReportViews.add(invoiceWiseReportView);
-	// }
-	// }
-	// }
-	// return invoiceWiseReportViews;
-	// }
+	
 
 	private List<Long> getUserIdsUnderCurrentUser(String employeePid, boolean inclSubordinate) {
 		List<Long> userIds = Collections.emptyList();
@@ -1156,6 +976,7 @@ public class InvoiceWiseReportResource {
 
 			long days = startTime.until(endTime, ChronoUnit.DAYS);
 			startTime = startTime.plusDays(days);
+			
 			hours = startTime.until(endTime, ChronoUnit.HOURS);
 			startTime = startTime.plusHours(hours);
 
@@ -1509,6 +1330,192 @@ public class InvoiceWiseReportResource {
 		}
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/invoice-wise-reports/downloadxls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Transactional(readOnly = true)
+	@Timed
+	public void downloadXLs(@RequestParam("documentPid") String documentPid, @RequestParam("employeePid") String employeePid,
+			@RequestParam("activityPid") String activityPid, @RequestParam("accountPid") String accountPid,
+			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
+			@RequestParam boolean inclSubordinate,HttpServletResponse response) {
+	
+		log.debug("downloading......");
+		
+		List<InvoiceWiseReportView> executiveTaskExecutions = new ArrayList<>();
+		if (filterBy.equals("TODAY")) {
+			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, LocalDate.now(),
+					LocalDate.now(), inclSubordinate);
+		} else if (filterBy.equals("YESTERDAY")) {
+			LocalDate yeasterday = LocalDate.now().minusDays(1);
+			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, yeasterday,
+					yeasterday, inclSubordinate);
+		} else if (filterBy.equals("WTD")) {
+			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
+			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, weekStartDate,
+					LocalDate.now(), inclSubordinate);
+		} else if (filterBy.equals("MTD")) {
+			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
+			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, monthStartDate,
+					LocalDate.now(), inclSubordinate);
+		} else if (filterBy.equals("CUSTOM")) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
+			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
+			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, fromDateTime,
+					toFateTime, inclSubordinate);
+		} else if (filterBy.equals("SINGLE")) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
+			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, accountPid, fromDateTime,
+					fromDateTime, inclSubordinate);
+		}
+			buildExcelDocument(executiveTaskExecutions, response);
+	}
+	
+	
+	
+	
+	private void buildExcelDocument(List<InvoiceWiseReportView> executiveTaskExecutions, HttpServletResponse response) {
+		// TODO Auto-generated method stub
+		log.debug("Downloading Excel report");
+		String excelFileName = "actvtz_txnz" + ".xlsx";
+		String sheetName = "Sheet1";
+
+		String[] headerColumns = { "Employee","Account Profile","Activity","PunchIn Date","PunchIn Time","Client Date","Client Time","Time Spend (hh:mm:ss:mmm)",
+				"Server Date","Server Time","GPS Location","Enable/ Disable","Tower Location","Visit Type","Sales/ Sales Order AmountTotal",
+				"Receipt Amount Total",	"Vehicle Registration Number","Remarks" };
+		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
+			HSSFSheet worksheet = workbook.createSheet(sheetName);
+			createHeaderRow(worksheet, headerColumns);
+			createReportRows(worksheet, executiveTaskExecutions);
+			// Resize all columns to fit the content size
+			for (int i = 0; i < headerColumns.length; i++) {
+				worksheet.autoSizeColumn(i);
+			}
+			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
+			response.setContentType("application/vnd.ms-excel");
+			// Writes the report to the output stream
+			ServletOutputStream outputStream = response.getOutputStream();
+			worksheet.getWorkbook().write(outputStream);
+			outputStream.flush();
+		} catch (IOException ex) {
+			log.error("IOException on downloading Visit Details {}", ex.getMessage());
+		}
+	}
+
+	private void createReportRows(HSSFSheet worksheet, List<InvoiceWiseReportView> executiveTaskExecutions) {
+		// TODO Auto-generated method stub
+		
+		
+		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
+		// Create Cell Style for formatting Date
+		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
+		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM/DD/YYYY"));
+		
+		HSSFCellStyle timeCellStyle = worksheet.getWorkbook().createCellStyle();
+		timeCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("h:mm:ss"));
+		// Create Other rows and cells with Sales data
+		int rowNum = 1;
+		
+		for(InvoiceWiseReportView invoice:executiveTaskExecutions)
+		{
+			HSSFRow row = worksheet.createRow(rowNum++);
+			
+			row.createCell(0).setCellValue(invoice.getEmployeeName());
+			row.createCell(1).setCellValue(invoice.getAccountProfileName());
+			row.createCell(2).setCellValue(invoice.getActivityName());
+			
+			if(invoice.getPunchInDate()!=null)
+			{
+			LocalDateTime localDateTime = invoice.getPunchInDate();
+			Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+			Date date = Date.from(i);
+			HSSFCell punchDateCell = row.createCell(3);
+			punchDateCell.setCellValue(date);
+			punchDateCell.setCellStyle(dateCellStyle);
+			}
+			
+			if(invoice.getPunchInDate()!=null)
+			{
+			LocalDateTime localDateTime = invoice.getPunchInDate();
+			Instant it = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+			Date date = Date.from(it);
+			HSSFCell punchTimeCell = row.createCell(4);
+			punchTimeCell.setCellValue(date);
+			punchTimeCell.setCellStyle(timeCellStyle);
+			}
+			if(invoice.getSendDate()!=null)
+			{
+			LocalDateTime localDateTime = invoice.getSendDate();
+			Instant ins = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+			Date date = Date.from(ins);
+			HSSFCell clientDateCell = row.createCell(5);
+			clientDateCell.setCellValue(date);
+			clientDateCell.setCellStyle(dateCellStyle);
+			}
+			if(invoice.getSendDate()!=null)
+			{
+			LocalDateTime localDateTime = invoice.getSendDate();
+			Instant ins = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+			Date date = Date.from(ins);
+			HSSFCell clientTimeCell = row.createCell(6);
+			clientTimeCell.setCellValue(date);
+			clientTimeCell.setCellStyle(timeCellStyle);
+			}
+			row.createCell(7).setCellValue(invoice.getTimeSpend());
+		
+			if(invoice.getCreatedDate()!=null)
+			{
+			LocalDateTime localDateTime = invoice.getCreatedDate();
+			Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+			Date date = Date.from(i);
+			HSSFCell createDateCell = row.createCell(8);
+			createDateCell.setCellValue(date);
+			createDateCell.setCellStyle(dateCellStyle);
+			}
+			if(invoice.getCreatedDate()!=null)
+			{
+			LocalDateTime localDateTime = invoice.getCreatedDate();
+			Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+			Date date = Date.from(i);
+			HSSFCell createTimeCell = row.createCell(9);
+			createTimeCell.setCellValue(date);
+			createTimeCell.setCellStyle(timeCellStyle);
+			}
+			row.createCell(10).setCellValue(invoice.getAccountProfileLocation());
+			row.createCell(11).setCellValue(invoice.getMockLocationStatus());
+			row.createCell(12).setCellValue(invoice.getTowerLocation());
+			row.createCell(13).setCellValue(invoice.getWithCustomer());
+			row.createCell(14).setCellValue(invoice.getTotalSalesOrderAmount());
+			row.createCell(15).setCellValue(invoice.getTotalRecieptAmount());
+			row.createCell(16).setCellValue(invoice.getVehicleRegistrationNumber());
+			row.createCell(17).setCellValue(invoice.getRemarks());
+			
+		}
+	}
+
+	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
+		
+		// Create a Font for styling header cells
+				Font headerFont = worksheet.getWorkbook().createFont();
+				headerFont.setFontName("Arial");
+				headerFont.setBold(true);
+				headerFont.setFontHeightInPoints((short) 14);
+				headerFont.setColor(IndexedColors.RED.getIndex());
+				// Create a CellStyle with the font
+				HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
+				headerCellStyle.setFont(headerFont);
+				// Create a Row
+				HSSFRow headerRow = worksheet.createRow(0);
+				// Create cells
+				for (int i = 0; i < headerColumns.length; i++) {
+					HSSFCell cell = headerRow.createCell(i);
+					cell.setCellValue(headerColumns[i]);
+					cell.setCellStyle(headerCellStyle);
+				}
+	}
+
 	public boolean getCompanyCofig(){
 		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
 		if(optconfig.isPresent()) {
