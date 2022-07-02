@@ -168,6 +168,10 @@ public class InventoryVoucherDetailDTO {
 			this.productAlias = inventoryVoucherDetail.getProduct().getAlias() == null ? ""
 					: inventoryVoucherDetail.getProduct().getAlias();
 		}
+		this.lengthType=inventoryVoucherDetail.getLengthType();
+		this.lengthInInch=inventoryVoucherDetail.getLengthInInch();
+		this.lengthInFeet =inventoryVoucherDetail.getLengthInFeet();
+		this.lengthInMeter = inventoryVoucherDetail.getLengthInMeter();
 		this.quantity = inventoryVoucherDetail.getQuantity();
 		this.updatedQty = inventoryVoucherDetail.getUpdatedQuantity();
 		this.updatedsellingRate = inventoryVoucherDetail.getUpdatedsellingRate();
