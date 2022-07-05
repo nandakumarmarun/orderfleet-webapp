@@ -132,6 +132,8 @@ public class MobileSettingsDTO {
      
      private boolean multipleProduct;
      
+     private boolean showAccountBalanceInReceiptAmount;
+     
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -191,6 +193,7 @@ public class MobileSettingsDTO {
 		this.showDistanceFare = mobileConfigurationDTO.getShowDistanceFare();
 		this.bluetoothPaperType = mobileConfigurationDTO.getBluetoothPaperType();
 		this.multipleProduct = mobileConfigurationDTO.getMultipleProduct();
+		this.showAccountBalanceInReceiptAmount =mobileConfigurationDTO.getShowAccountBalanceInReceiptAmount();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -648,4 +651,14 @@ public class MobileSettingsDTO {
 	public void setMultipleProduct(boolean multipleProduct) {
 		this.multipleProduct = multipleProduct;
 	}
+
+	public boolean getShowAccountBalanceInReceiptAmount() {
+		return showAccountBalanceInReceiptAmount;
+	}
+
+	public void setShowAccountBalanceInReceiptAmount(boolean showAccountBalanceInReceiptAmount) {
+		this.showAccountBalanceInReceiptAmount = showAccountBalanceInReceiptAmount;
+	}
+	
+	
 }

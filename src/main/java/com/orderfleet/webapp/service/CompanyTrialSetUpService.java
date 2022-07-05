@@ -923,6 +923,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setProductProfilePrintName(DisplayName.NAME);
 		mobileConfiguration.setBluetoothPaperType(BluetoothPaperType.SMALL);
 		mobileConfiguration.setMultipleProduct(false);
+		mobileConfiguration.setShowAccountBalanceInReceiptAmount(false);
 
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}

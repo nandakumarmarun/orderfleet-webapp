@@ -77,6 +77,7 @@ public class MobileConfigurationDTO {
 	private boolean ptenQuotationLayout;
 	private boolean showDistanceFare;
 	private boolean multipleProduct;
+	private boolean showAccountBalanceInReceiptAmount;
  
 	public MobileConfigurationDTO() {
 		super();
@@ -140,6 +141,7 @@ public class MobileConfigurationDTO {
         this.showDistanceFare = mobileConfiguration.getShowDistanceFare();
         this.bluetoothPaperType = mobileConfiguration.getBluetoothPaperType();
         this.multipleProduct = mobileConfiguration.getMultipleProduct();
+        this.showAccountBalanceInReceiptAmount=mobileConfiguration.getShowAccountBalanceInReceiptAmount();
 	}
 
 	public String getPid() {
@@ -589,4 +591,14 @@ public class MobileConfigurationDTO {
 	public void setMultipleProduct(boolean multipleProduct) {
 		this.multipleProduct = multipleProduct;
 	}
+
+	public boolean getShowAccountBalanceInReceiptAmount() {
+		return showAccountBalanceInReceiptAmount;
+	}
+
+	public void setShowAccountBalanceInReceiptAmount(boolean showAccountBalanceInReceiptAmount) {
+		this.showAccountBalanceInReceiptAmount = showAccountBalanceInReceiptAmount;
+	}
+	
+	
 }

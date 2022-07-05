@@ -1379,7 +1379,7 @@ public class InvoiceWiseReportResource {
 	private void buildExcelDocument(List<InvoiceWiseReportView> executiveTaskExecutions, HttpServletResponse response) {
 		// TODO Auto-generated method stub
 		log.debug("Downloading Excel report");
-		String excelFileName = "actvtz_txnz" + ".xlsx";
+		String excelFileName = "actvtz_txnz" + ".xls";
 		String sheetName = "Sheet1";
 
 		String[] headerColumns = { "Employee","Account Profile","Activity","PunchIn Date","PunchIn Time","Client Date","Client Time","Time Spend (hh:mm:ss:mmm)",

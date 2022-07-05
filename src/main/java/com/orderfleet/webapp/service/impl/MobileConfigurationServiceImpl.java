@@ -98,6 +98,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setShowDistanceFare(mobileConfigurationDTO.getShowDistanceFare());
 		configuration.setBluetoothPaperType(mobileConfigurationDTO.getBluetoothPaperType());
 		configuration.setMultipleProduct(mobileConfigurationDTO.getMultipleProduct());
+		configuration.setShowAccountBalanceInReceiptAmount(mobileConfigurationDTO.getShowAccountBalanceInReceiptAmount());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -160,6 +161,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setShowDistanceFare(mobileConfigurationDTO.getShowDistanceFare());
 			configuration.setBluetoothPaperType(mobileConfigurationDTO.getBluetoothPaperType());
 			configuration.setMultipleProduct(mobileConfigurationDTO.getMultipleProduct());
+			configuration.setShowAccountBalanceInReceiptAmount(mobileConfigurationDTO.getShowAccountBalanceInReceiptAmount());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

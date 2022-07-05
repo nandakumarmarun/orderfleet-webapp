@@ -64,7 +64,8 @@ if (!this.MobileConfiguration) {
 			cartMaxSize : null,
 			roundOffAutomation : false,
 			ptenQuotationLayout:false,
-			multipleProduct:false
+			multipleProduct:false,
+			showAccountBalanceInReceiptAmount:false
 			
 	};
 
@@ -199,6 +200,8 @@ if (!this.MobileConfiguration) {
 		":checked");
 		mobileConfigurationDTO.multipleProduct = $("#multipleProduct").is(
 		":checked");
+		mobileConfigurationDTO.showAccountBalanceInReceiptAmount = $("#accountBalance").is(
+		":checked");
 		
 		$.ajax({
 			url : contextPath,
@@ -328,6 +331,8 @@ if (!this.MobileConfiguration) {
 									data.bluetoothPaperType);
 							$('#multipleProduct').prop("checked",
 									data.multipleProduct);
+							$('#accountBalance').prop("checked",
+									data.showAccountBalanceInReceiptAmount);
 						}
 
 					},

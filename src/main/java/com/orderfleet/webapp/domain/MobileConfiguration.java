@@ -224,6 +224,9 @@ public class MobileConfiguration implements Serializable {
 	
 	@Column(name = "multiple_Product", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean multipleProduct;
+	
+	@Column(name = "show_AccountBalanceIn_ReceiptAmount", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean showAccountBalanceInReceiptAmount;
 
 	@NotNull
 	@ManyToOne
@@ -687,6 +690,15 @@ public class MobileConfiguration implements Serializable {
 
 	public void setMultipleProduct(boolean multipleProduct) {
 		this.multipleProduct = multipleProduct;
+	}
+
+	
+	public boolean getShowAccountBalanceInReceiptAmount() {
+		return showAccountBalanceInReceiptAmount;
+	}
+
+	public void setShowAccountBalanceInReceiptAmount(boolean showAccountBalanceInReceiptAmount) {
+		this.showAccountBalanceInReceiptAmount = showAccountBalanceInReceiptAmount;
 	}
 
 	@Override
