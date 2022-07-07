@@ -15,6 +15,7 @@ public class TaxMasterDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private Long alterId;
 	private String pid;
 	private String vatName;
 	private String description;
@@ -40,6 +41,14 @@ public class TaxMasterDTO implements Serializable {
 		this.vatClass = taxMaster.getVatClass();
 		this.taxCode = taxMaster.getTaxCode();
 		this.taxId = taxMaster.getTaxId();
+	}
+
+	public Long getAlterId() {
+		return alterId;
+	}
+
+	public void setAlterId(Long alterId) {
+		this.alterId = alterId;
 	}
 
 	public String getPid() {

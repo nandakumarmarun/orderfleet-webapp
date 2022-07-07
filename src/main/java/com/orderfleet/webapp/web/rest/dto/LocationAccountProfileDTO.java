@@ -6,6 +6,7 @@ import com.orderfleet.webapp.domain.LocationAccountProfile;
 
 public class LocationAccountProfileDTO {
 
+	private Long alterId;
 	private String accountProfilePid;
 	private String accountProfileName;
 	private String locationPid;
@@ -15,7 +16,7 @@ public class LocationAccountProfileDTO {
 	public LocationAccountProfileDTO() {
 		super();
 	}
-	
+
 	public LocationAccountProfileDTO(String accountProfilePid, String accountProfileName, String locationPid,
 			String locationName, LocalDateTime lastModifiedDate) {
 		super();
@@ -26,14 +27,20 @@ public class LocationAccountProfileDTO {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
-
-
 	public LocationAccountProfileDTO(LocationAccountProfile locationAccountProfile) {
 		this.accountProfilePid = locationAccountProfile.getAccountProfile().getPid();
 		this.accountProfileName = locationAccountProfile.getAccountProfile().getName();
 		this.locationPid = locationAccountProfile.getLocation().getPid();
 		this.locationName = locationAccountProfile.getLocation().getName();
 		this.lastModifiedDate = locationAccountProfile.getLastModifiedDate();
+	}
+
+	public Long getAlterId() {
+		return alterId;
+	}
+
+	public void setAlterId(Long alterid) {
+		this.alterId = alterid;
 	}
 
 	public String getAccountProfilePid() {

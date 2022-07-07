@@ -19,6 +19,8 @@ import com.orderfleet.webapp.repository.projections.CustomAccountProfiles;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccountProfileDTO {
 
+	private Long alterId;
+
 	private String pid;
 
 	@NotNull
@@ -192,6 +194,14 @@ public class AccountProfileDTO {
 //		this.promptStockLocationInventory = promptStockLocationInventory;
 		this.dataSourceType = customAccount.getDataSourceType();
 		this.locationRadius = customAccount.getlocationRadius();
+	}
+
+	public Long getAlterId() {
+		return alterId;
+	}
+
+	public void setAlterId(Long alterId) {
+		this.alterId = alterId;
 	}
 
 	public String getPid() {

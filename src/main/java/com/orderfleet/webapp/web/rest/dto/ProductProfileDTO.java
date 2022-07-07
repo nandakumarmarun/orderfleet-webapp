@@ -27,6 +27,8 @@ public class ProductProfileDTO {
 
 	private String pid;
 
+	private Long alterId;
+	
 	@NotNull
 	@Size(max = 255)
 	private String name;
@@ -582,6 +584,14 @@ public class ProductProfileDTO {
 
 	public void setIgst(double igst) {
 		this.igst = igst;
+	}
+
+	public Long getAlterId() {
+		return alterId;
+	}
+
+	public void setAlterId(Long alterId) {
+		this.alterId = alterId;
 	}
 
 	@Override

@@ -18,6 +18,8 @@ public class ProductCategoryDTO {
 
 	private String pid;
 
+	private Long alterId;
+
 	@NotNull
 	@Size(min = 1, max = 255)
 	private String name;
@@ -60,6 +62,14 @@ public class ProductCategoryDTO {
 
 	public void setPid(String pid) {
 		this.pid = pid;
+	}
+
+	public Long getAlterId() {
+		return alterId;
+	}
+
+	public void setAlterId(Long alterId) {
+		this.alterId = alterId;
 	}
 
 	public String getName() {

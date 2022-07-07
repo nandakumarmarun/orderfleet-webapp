@@ -21,6 +21,8 @@ public class LocationDTO {
 
 	private String pid;
 
+	private Long alterId;
+
 	@NotNull
 	@Size(min = 1, max = 255)
 	private String name;
@@ -58,6 +60,14 @@ public class LocationDTO {
 		this.activated = location.getActivated();
 		this.lastModifiedDate = location.getLastModifiedDate();
 		this.locationId = location.getLocationId();
+	}
+
+	public Long getAlterId() {
+		return alterId;
+	}
+
+	public void setAlterId(Long alterId) {
+		this.alterId = alterId;
 	}
 
 	public boolean getActivated() {

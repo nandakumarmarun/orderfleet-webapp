@@ -21,6 +21,8 @@ import com.orderfleet.webapp.domain.ProductGroup;
 public class ProductGroupDTO {
 
 	private String pid;
+	
+	private Long alterId;
 
 	@NotNull
 	@Size(min = 1, max = 255)
@@ -95,6 +97,16 @@ public class ProductGroupDTO {
 		this.thirdpartyUpdate = thirdpartyUpdate;
 		this.lastModifiedDate = lastModifiedDate;
 
+	}
+
+	
+	
+	public Long getAlterId() {
+		return alterId;
+	}
+
+	public void setAlterId(Long alterId) {
+		this.alterId = alterId;
 	}
 
 	public String getPid() {
