@@ -78,6 +78,16 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 			+ "inner join tbl_product_profile pp on pp.id = ivd.product_id where ivh.company_id = ?1 and "
 			+ "ivh.created_by_id in (?2) and ivh.created_date BETWEEN ?3 AND ?4 and "
 			+ "ivd.product_id = op.product_profile_id order by ivd.product_id";
+	
+	public static final String SALES_DETAILS = "select "
+			+ "ivh.created_by_id as users,ivh.created_date,ivh.document_id,pp.name as productName,ivd.product_id,ivd.quantity as sales_qty,"
+			+ "ivh.id as ivh,ivd.id as ivd,ivd.free_quantity as free_quantity,pp.pid as productPid,ep.name as empName "
+			+ "from tbl_inventory_voucher_detail ivd "
+			+ "inner join tbl_inventory_voucher_header ivh on ivd.inventory_voucher_header_id = ivh.id "
+			+ "inner join tbl_employee_profile ep on ep.id =ivh.employee_id "
+			+ "inner join tbl_product_profile pp on pp.id = ivd.product_id where ivh.company_id = ?1 and "
+			+ "ivh.created_by_id in (?2) and ivh.created_date BETWEEN ?3 AND ?4 "
+			+ "order by ivd.product_id";
 
 
 	public static final String STOCK_DETAILS_STOCKLOCATION_BASED = "select "
@@ -593,6 +603,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 
 	@Query(value = STOCK_DETAILS, nativeQuery = true)
 	List<Object[]> getAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate, LocalDateTime toDate);
+	
+	@Query(value = SALES_DETAILS, nativeQuery = true)
+	List<Object[]> getAllSalesDetails(Long companyId, List<Long> userId, LocalDateTime fromDate, LocalDateTime toDate);
 
 	@Transactional
 	@Modifying(clearAutomatically = true)

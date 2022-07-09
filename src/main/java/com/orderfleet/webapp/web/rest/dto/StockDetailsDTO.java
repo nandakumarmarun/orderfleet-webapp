@@ -31,6 +31,7 @@ public class StockDetailsDTO implements Cloneable {
 	private double closingStock;
 	private LocalDateTime reportingTime;
 	private String employeeName;
+	private List<String> productList;
 
 	private List<StockDetailsTotalDTO> stocktotal;
 
@@ -42,7 +43,7 @@ public class StockDetailsDTO implements Cloneable {
 	
 	public StockDetailsDTO(double openingStock, String productName, String productPid, double saleStock,
 			double freeQnty, double saledQuantity, double damageQty, double closingStock, LocalDateTime reportingTime,
-			String employeeName, List<StockDetailsTotalDTO> stocktotal) {
+			String employeeName, List<StockDetailsTotalDTO> stocktotal,List<String> productList) {
 		super();
 		this.openingStock = openingStock;
 		this.productName = productName;
@@ -55,6 +56,7 @@ public class StockDetailsDTO implements Cloneable {
 		this.reportingTime = reportingTime;
 		this.employeeName = employeeName;
 		this.stocktotal = stocktotal;
+		this.productList = productList;
 	}
 
 
@@ -169,11 +171,23 @@ public class StockDetailsDTO implements Cloneable {
 		this.stocktotal = stocktotal;
 	}
 
+	public List<String> getProductList() {
+		return productList;
+	}
+
+
+	public void setProductList(List<String> productList) {
+		this.productList = productList;
+	}
+
+
 	@Override
 	public String toString() {
-		return "StockDetailsDTO [openingStock=" + openingStock + ", productName=" + productName + ", productPid="
-				+ productPid + ", saleStock=" + saleStock + ", freeQnty=" + freeQnty + ", saledQuantity="
-				+ saledQuantity + ", closingStock=" + closingStock + "]";
+		return "StockDetailsDTO [productName=" + productName + ", saledQuantity=" + saledQuantity + ", damageQty="
+				+ damageQty + ", employeeName=" + employeeName + ", productList=" + productList + "]";
 	}
+
+
+	
 
 }

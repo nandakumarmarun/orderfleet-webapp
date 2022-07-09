@@ -2,6 +2,7 @@ package com.orderfleet.webapp.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -154,5 +155,11 @@ public interface InventoryVoucherHeaderService {
 
 	List<LastSellingDetailsDTO> findHeaderByAccountPidUserPidandDocPid(String accountPid, String userPid, String documentPid,
 			String productPid);
+
+	
+	Map<String, List<StockDetailsDTO>> findAllSalesDetails(Long companyId, List<Long> userId, LocalDateTime fromDate,
+			LocalDateTime toDate);
+
+	
 
 }
