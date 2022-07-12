@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
+import com.orderfleet.webapp.domain.enums.SalesOrderStatus;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -54,7 +55,7 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 				+ "ivd.product.name," + "ivd.quantity," + "ivd.sellingRate," + "ivd.rowTotal," + "ivd.product.pid,"
 				+ "ivd.product.unitQty," + "ivd.volume," + "ivd.inventoryVoucherHeader.receiverAccount.location,"
 				+ "ivd.inventoryVoucherHeader.supplierAccount.location,"
-				+ "ivd.inventoryVoucherHeader.document.activityAccount," + "ivd.product.productDescription,"+"ivd.inventoryVoucherHeader.receiverAccount.pid,"+"ivd.inventoryVoucherHeader.deliveryDate");
+				+ "ivd.inventoryVoucherHeader.document.activityAccount," + "ivd.product.productDescription,"+"ivd.inventoryVoucherHeader.receiverAccount.pid,"+"ivd.inventoryVoucherHeader.deliveryDate,"+"ivd.inventoryVoucherHeader.salesOrderStatus");
 		if (!stockLocationPids.isEmpty()) {
 			subQueryString.append(",ivd.sourceStockLocation.name," + "ivd.destinationStockLocation.name ");
 		}
@@ -122,7 +123,8 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 		typedQuery.setParameter("fromDate", fromDate);
 		typedQuery.setParameter("toDate", toDate);
 		List<Object[]> objectArray = typedQuery.getResultList();
-		for (Object[] object : objectArray) {
+		System.out.println("querycompleted"+objectArray.size());
+		for (Object[] object : objectArray) { 
 			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
 			ivd.setCreatedDate((LocalDateTime) object[0]);
 			ivd.setEmployeeName((String) object[1]);
@@ -156,7 +158,7 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 				LocalDateTime deliveryDate = deliveryDateLocal.atTime(0, 0);
 				ivd.setDeliveryDate(deliveryDate);
 			}
-		
+			ivd.setSalesOrderStatus(SalesOrderStatus.valueOf(object[19].toString()));
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
 		return inventoryVoucherDetailDTOs;

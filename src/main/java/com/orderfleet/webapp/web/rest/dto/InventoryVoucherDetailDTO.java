@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
+import com.orderfleet.webapp.domain.enums.SalesOrderStatus;
 
 /**
  * A DTO for the InventoryVoucherDetailDTO entity.
@@ -151,6 +152,8 @@ public class InventoryVoucherDetailDTO {
 	private double lengthInMeter;
 	
 	private double lengthInFeet;
+	
+	private SalesOrderStatus  salesOrderStatus = SalesOrderStatus.CREATED;
 
 	public InventoryVoucherDetailDTO() {
 	}
@@ -806,6 +809,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setLengthInFeet(double lengthInFeet) {
 		this.lengthInFeet = lengthInFeet;
+	}
+
+	public SalesOrderStatus getSalesOrderStatus() {
+		return salesOrderStatus;
+	}
+
+	public void setSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
+		this.salesOrderStatus = salesOrderStatus;
 	}
 
 	@Override
