@@ -1384,7 +1384,7 @@ public class InvoiceWiseReportResource {
 
 		String[] headerColumns = { "Employee","Account Profile","Activity","PunchIn Date","PunchIn Time","Client Date","Client Time","Time Spend (hh:mm:ss:mmm)",
 				"Server Date","Server Time","GPS Location","Enable/ Disable","Tower Location","Visit Type","Sales/ Sales Order AmountTotal",
-				"Receipt Amount Total",	"Vehicle Registration Number","Remarks" };
+				"Receipt Amount Total",	"Vehicle Registration Number","Remarks","DocumentName","Document Total"};
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -1483,7 +1483,7 @@ public class InvoiceWiseReportResource {
 			createTimeCell.setCellValue(date);
 			createTimeCell.setCellStyle(timeCellStyle);
 			}
-			row.createCell(10).setCellValue(invoice.getAccountProfileLocation());
+			row.createCell(10).setCellValue(invoice.getLocation()+",  Customer Location "+invoice.getAccountProfileLocation());
 			row.createCell(11).setCellValue(invoice.getMockLocationStatus());
 			row.createCell(12).setCellValue(invoice.getTowerLocation());
 			row.createCell(13).setCellValue(invoice.getWithCustomer());
@@ -1491,6 +1491,12 @@ public class InvoiceWiseReportResource {
 			row.createCell(15).setCellValue(invoice.getTotalRecieptAmount());
 			row.createCell(16).setCellValue(invoice.getVehicleRegistrationNumber());
 			row.createCell(17).setCellValue(invoice.getRemarks());
+			for(InvoiceWiseReportDetailView invoiceDetail : invoice.getInvoiceWiseReportDetailViews())
+			{
+				row.createCell(18).setCellValue(invoiceDetail.getDocumentName());
+				row.createCell(19).setCellValue(invoiceDetail.getDocumentTotal());
+				
+			}
 			
 		}
 	}

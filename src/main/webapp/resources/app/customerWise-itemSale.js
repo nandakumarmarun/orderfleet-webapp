@@ -67,13 +67,14 @@ CustomerWiseItemSale.downloadXls = function() {
 						inclSubordinate : $('#inclSubOrdinates').is(":checked")
 					},
 					success : function(invoiceWiseReports) {
-
+						
 						$('#tBodyInvoiceWiseReport').html("");
 
-						if (invoiceWiseReports.length == 0) {
+						if (Object.keys(invoiceWiseReports).length === 0) {
+							
 							$('#tBodyInvoiceWiseReport')
 									.html(
-											"<tr><td colspan='11' align='center'>No data available</td></tr>");
+											"<tr><td colspan='8' align='center'>No data available</td></tr>");
 							return;
 						} else {
 							fillTargetData(invoiceWiseReports)

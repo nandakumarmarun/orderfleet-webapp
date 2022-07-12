@@ -76,22 +76,7 @@ public class CustomerWiseItemSalesReportResource {
 	@Transactional(readOnly = true)
 	public String getAllDocuments(Model model) throws URISyntaxException {
 		log.debug("Web request to get a page of stockDetails");
-//		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-//
-//		if (userIds.isEmpty()) {
-//			String user = SecurityUtils.getCurrentUserLogin();
-//			System.out.println("if.." + userIds.size());
-//			long userId = userRepository.getIdByLogin(user);
-//			userIds = new ArrayList<>();
-//			userIds.add(userId);
-//			model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
-//		} else {
-//			System.out.println("else .." + userIds.size());
-//			model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
-//		}
 
-		
-		
 		model.addAttribute("products", productProfileRepository.findAllByCompanyIdActivatedTrue());
 		return "company/customerWiseItemSale";
 
@@ -117,7 +102,7 @@ public class CustomerWiseItemSalesReportResource {
 			salesDetails = getFilterData(employeePid, fromDateTime, fromDateTime, inclSubordinate);
 		}
 		
-
+       
 		return new ResponseEntity<>(salesDetails, HttpStatus.OK);
 
 	}
@@ -135,16 +120,6 @@ public class CustomerWiseItemSalesReportResource {
 		Map<String, List<StockDetailsDTO>> stockDetails = new HashMap<>();
 		stockDetails = inventoryVoucherHeaderService.findAllSalesDetails(companyId, userIds, fromDate, toDate);
 
-//		List<String> pnames = productProfileRepository.findProductNamesByCompanyId();
-//
-//		StockDetailsDTO stockDTO = new StockDetailsDTO();
-//		stockDTO.setProductList(pnames);
-//		stockDetails.add(stockDTO);
-		
-		
-		
-      
-
 		return stockDetails;
 
 	}
@@ -154,8 +129,7 @@ public class CustomerWiseItemSalesReportResource {
 		if (employeePid.equals("Dashboard Employee") || employeePid.equals("no")) {
 			userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
 			if (employeePid.equals("Dashboard Employee")) {
-//				List<User> dashboardUsers = dashboardUserRepository.findUsersByCompanyId();
-//				List<Long> dashboardUserIds = dashboardUsers.stream().map(User::getId).collect(Collectors.toList());
+
 				Set<Long> dashboardUserIds = dashboardUserRepository.findUserIdsByCompanyId();
 				Set<Long> uniqueIds = new HashSet<>();
 				log.info("dashboard user ids empty: " + dashboardUserIds.isEmpty());
@@ -179,8 +153,7 @@ public class CustomerWiseItemSalesReportResource {
 				}
 			} else {
 				if (userIds.isEmpty()) {
-					// List<User> users = userRepository.findAllByCompanyId();
-					// userIds = users.stream().map(User::getId).collect(Collectors.toList());
+					
 					userIds = userRepository.findAllUserIdsByCompanyId();
 				}
 			}

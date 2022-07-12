@@ -573,183 +573,174 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	}
 
 	@Override
-	public Map<String, List<StockDetailsDTO>> findAllSalesDetails(Long companyId, List<Long> userId, LocalDateTime fromDate,
-			LocalDateTime toDate) {{
+	public Map<String, List<StockDetailsDTO>> findAllSalesDetails(Long companyId, List<Long> userId,
+			LocalDateTime fromDate, LocalDateTime toDate) {
+		{
 
-		List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
-
-		
+			List<Object[]> inventoryVoucherHeaders = new ArrayList<>();
 
 			inventoryVoucherHeaders = inventoryVoucherHeaderRepository.getAllSalesDetails(companyId, userId, fromDate,
 					toDate);
-			
-           System.out.println("iv size :"+inventoryVoucherHeaders.size());
-           
-		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyIdActivatedTrue();
-		List<ProductProfileDTO> productProfileDtos = productProfileMapper
-				.productProfilesToProductProfileDTOs(productProfiles);
-		List<ProductNameTextSettings> productNameTextSettings = productNameTextSettingsRepository
-				.findAllByCompanyIdAndEnabledTrue(companyId);
 
-		List<StockDetailsDTO> stockDetailsDTOs = new ArrayList<>();
-		List<Long> DocumentIds = new ArrayList<>();
-		if(inventoryVoucherHeaders.size()!=0) {
-		for (Object[] obj : inventoryVoucherHeaders) {
+			System.out.println("iv size :" + inventoryVoucherHeaders.size());
 
-			Long docIds = Long.parseLong(obj[2].toString());
+			List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyIdActivatedTrue();
+			List<ProductProfileDTO> productProfileDtos = productProfileMapper
+					.productProfilesToProductProfileDTOs(productProfiles);
+			List<ProductNameTextSettings> productNameTextSettings = productNameTextSettingsRepository
+					.findAllByCompanyIdAndEnabledTrue(companyId);
 
-			DocumentIds.add(docIds);
-		}}
-              List<Document> documents=new ArrayList<>();
-              if(DocumentIds.size()!=0)
-              {
-		      documents = primarySecondaryDocumentRepository.findDocumentsByDocIdInAndVoucherType(DocumentIds,
-				VoucherType.DAMAGE);
-		
-              }
-            
-              if(inventoryVoucherHeaders.size()!=0) {
-	    	for (Object[] obj : inventoryVoucherHeaders) {
-			StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
+			List<StockDetailsDTO> stockDetailsDTOs = new ArrayList<>();
+			List<Long> DocumentIds = new ArrayList<>();
+			if (inventoryVoucherHeaders.size() != 0) {
+				for (Object[] obj : inventoryVoucherHeaders) {
 
-			stockDetailsDTO.setProductName(obj[3] != null ? obj[3].toString() : "");
-//            Long id = Long.parseLong(obj[0].toString());
-		
-//            Optional<User> user = userRepository.findOneById(id);
-//            String name = user.get().getFirstName();
-//            System.out.println("Name:"+name);
-//            stockDetailsDTO.setEmployeeName(name);
-            
-       
-            stockDetailsDTO.setEmployeeName(obj[10].toString());
-         
-			double slStock = 0.0;
-			double freeQuantity = 0.0;
-		
+					Long docIds = Long.parseLong(obj[2].toString());
 
-			if (obj[5] != null) {
-				slStock = Double.parseDouble(obj[5].toString());
+					DocumentIds.add(docIds);
+				}
+			}
+			List<Document> documents = new ArrayList<>();
+			if (DocumentIds.size() != 0) {
+				documents = primarySecondaryDocumentRepository.findDocumentsByDocIdInAndVoucherType(DocumentIds,
+						VoucherType.DAMAGE);
+
 			}
 
-			if (obj[8] != null) {
-				freeQuantity = Double.parseDouble(obj[8].toString());
-			}
+			if (inventoryVoucherHeaders.size() != 0) {
+				for (Object[] obj : inventoryVoucherHeaders) {
+					StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
 
-			double saledQuantity = slStock + freeQuantity;			
-		
-			if (documents.size() > 0) {
-				for (Document doc : documents) {
+					stockDetailsDTO.setProductName(obj[3] != null ? obj[3].toString() : "");
 
-					if (Long.parseLong(obj[2].toString()) == doc.getId()) {
+					stockDetailsDTO.setEmployeeName(obj[10].toString());
 
-						stockDetailsDTO.setDamageQty(saledQuantity);
+					double slStock = 0.0;
+					double freeQuantity = 0.0;
 
+					if (obj[5] != null) {
+						slStock = Double.parseDouble(obj[5].toString());
+					}
+
+					if (obj[8] != null) {
+						freeQuantity = Double.parseDouble(obj[8].toString());
+					}
+
+					double saledQuantity = slStock + freeQuantity;
+
+					if (documents.size() > 0) {
+						for (Document doc : documents) {
+
+							if (Long.parseLong(obj[2].toString()) == doc.getId()) {
+
+								stockDetailsDTO.setDamageQty(saledQuantity);
+
+							} else {
+
+								stockDetailsDTO.setSaledQuantity(saledQuantity);
+							}
+						}
 					} else {
-
 						stockDetailsDTO.setSaledQuantity(saledQuantity);
 					}
+					stockDetailsDTOs.add(stockDetailsDTO);
 				}
-			} else {
-				stockDetailsDTO.setSaledQuantity(saledQuantity);
 			}
-			stockDetailsDTOs.add(stockDetailsDTO);
-		}
-              }
-		System.out.println(stockDetailsDTOs.size());
-		stockDetailsDTOs.forEach(stock ->System.out.println("EmployeeName:"+stock.getEmployeeName()));
-		Map<String,Map<String, List<StockDetailsDTO>>> groupedList = stockDetailsDTOs.stream()
-				.collect(Collectors.groupingBy(StockDetailsDTO::getEmployeeName,Collectors.groupingBy(StockDetailsDTO::getProductName)));
-            System.out.println("List.........."+groupedList);
-		
-		List<String> keySet = new ArrayList<String>(groupedList.keySet());
+			System.out.println(stockDetailsDTOs.size());
 
-		List<StockDetailsDTO> proccessedStockDetailsDTOs = new ArrayList<>();
+			Map<String, Map<String, List<StockDetailsDTO>>> groupedList = stockDetailsDTOs.stream()
+					.collect(Collectors.groupingBy(StockDetailsDTO::getEmployeeName,
+							Collectors.groupingBy(StockDetailsDTO::getProductName)));
+			System.out.println("List.........." + groupedList);
 
-		log.info("Key set size = " + keySet.size() + "*******");
-		
+			List<String> keySet = new ArrayList<String>(groupedList.keySet());
 
-		for (String employeeName : keySet) {
-			
-    	Map<String, List<StockDetailsDTO>> valuesList = groupedList.get(employeeName);
-			
-			List<String> productSet = new ArrayList<String>(valuesList.keySet());
-		
-			
-			for(String productName :productSet)
-			{
-			
-				List<StockDetailsDTO> productList = valuesList.get(productName);
-				
-			StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
+			List<StockDetailsDTO> proccessedStockDetailsDTOs = new ArrayList<>();
 
-			Optional<ProductProfileDTO> opProductProfile = productProfileDtos.stream()
-					.filter(ppDto -> ppDto.getName().equalsIgnoreCase(productName)).findAny();
+			log.info("Key set size = " + keySet.size() + "*******");
 
-			double openingStock = productList.get(0).getOpeningStock();
-			double saledQuantity = productList.stream()
-					.collect(Collectors.summingDouble((StockDetailsDTO::getSaledQuantity)));
-			
-			double damageQty = productList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getDamageQty)));
-      
-			
-			if (opProductProfile.isPresent()) {
-				if (productNameTextSettings.size() > 0) {
-					ProductProfileDTO productProfileDTO = opProductProfile.get();
-					String name = " (";
-					for (ProductNameTextSettings productNameText : productNameTextSettings) {
-						if (productNameText.getName().equals("DESCRIPTION")) {
-							if (productProfileDTO.getDescription() != null
-									&& !productProfileDTO.getDescription().isEmpty())
-								name += productProfileDTO.getDescription() + ",";
-						} else if (productNameText.getName().equals("MRP")) {
-							name += productProfileDTO.getMrp() + ",";
-						} else if (productNameText.getName().equals("SELLING RATE")) {
-							name += productProfileDTO.getPrice() + ",";
-						} else if (productNameText.getName().equals("STOCK")) {
-							name += openingStock + ",";
-						} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
-							if (productProfileDTO.getProductDescription() != null
-									&& !productProfileDTO.getProductDescription().isEmpty())
-								name += productProfileDTO.getProductDescription() + ",";
-						} else if (productNameText.getName().equals("BARCODE")) {
-							if (productProfileDTO.getBarcode() != null && !productProfileDTO.getBarcode().isEmpty())
-								name += productProfileDTO.getBarcode() + ",";
-						} else if (productNameText.getName().equals("REMARKS")) {
-							if (productProfileDTO.getRemarks() != null && !productProfileDTO.getRemarks().isEmpty())
-								name += productProfileDTO.getRemarks() + ",";
+			for (String employeeName : keySet) {
+
+				Map<String, List<StockDetailsDTO>> valuesList = groupedList.get(employeeName);
+
+				List<String> productSet = new ArrayList<String>(valuesList.keySet());
+
+				for (String productName : productSet) {
+
+					List<StockDetailsDTO> productList = valuesList.get(productName);
+
+					StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
+
+					Optional<ProductProfileDTO> opProductProfile = productProfileDtos.stream()
+							.filter(ppDto -> ppDto.getName().equalsIgnoreCase(productName)).findAny();
+
+					double openingStock = productList.get(0).getOpeningStock();
+					double saledQuantity = productList.stream()
+							.collect(Collectors.summingDouble((StockDetailsDTO::getSaledQuantity)));
+
+					double damageQty = productList.stream()
+							.collect(Collectors.summingDouble((StockDetailsDTO::getDamageQty)));
+
+					if (opProductProfile.isPresent()) {
+						if (productNameTextSettings.size() > 0) {
+							ProductProfileDTO productProfileDTO = opProductProfile.get();
+							String name = " (";
+							for (ProductNameTextSettings productNameText : productNameTextSettings) {
+								if (productNameText.getName().equals("DESCRIPTION")) {
+									if (productProfileDTO.getDescription() != null
+											&& !productProfileDTO.getDescription().isEmpty())
+										name += productProfileDTO.getDescription() + ",";
+								} else if (productNameText.getName().equals("MRP")) {
+									name += productProfileDTO.getMrp() + ",";
+								} else if (productNameText.getName().equals("SELLING RATE")) {
+									name += productProfileDTO.getPrice() + ",";
+								} else if (productNameText.getName().equals("STOCK")) {
+									name += openingStock + ",";
+								} else if (productNameText.getName().equals("PRODUCT DESCRIPTION")) {
+									if (productProfileDTO.getProductDescription() != null
+											&& !productProfileDTO.getProductDescription().isEmpty())
+										name += productProfileDTO.getProductDescription() + ",";
+								} else if (productNameText.getName().equals("BARCODE")) {
+									if (productProfileDTO.getBarcode() != null
+											&& !productProfileDTO.getBarcode().isEmpty())
+										name += productProfileDTO.getBarcode() + ",";
+								} else if (productNameText.getName().equals("REMARKS")) {
+									if (productProfileDTO.getRemarks() != null
+											&& !productProfileDTO.getRemarks().isEmpty())
+										name += productProfileDTO.getRemarks() + ",";
+								}
+							}
+							name = name.substring(0, name.length() - 1);
+							if (name.length() > 1) {
+								name += ")";
+							}
+							stockDetailsDTO.setProductName(productName + name);
+
+						} else {
+
+							stockDetailsDTO.setProductName(productName);
 						}
+					} else {
+						log.info("Optional Product Profile not present");
+						stockDetailsDTO.setProductName(productName);
 					}
-					name = name.substring(0, name.length() - 1);
-					if (name.length() > 1) {
-						name += ")";
-					}
-					stockDetailsDTO.setProductName(productName + name);
 
-				} else {
-
-					stockDetailsDTO.setProductName(productName);
+					stockDetailsDTO.setSaledQuantity(saledQuantity);
+					stockDetailsDTO.setDamageQty(damageQty);
+					stockDetailsDTO.setEmployeeName(employeeName);
+					stockDetailsDTO.setProductList(
+							productProfiles.stream().map(pp -> pp.getName()).collect(Collectors.toList()));
+					proccessedStockDetailsDTOs.add(stockDetailsDTO);
+					proccessedStockDetailsDTOs.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName()
+							.compareTo(s2.getProductName()));
 				}
-			} else {
-				log.info("Optional Product Profile not present");
-				stockDetailsDTO.setProductName(productName);
 			}
-			
-			stockDetailsDTO.setSaledQuantity(saledQuantity);
-			stockDetailsDTO.setDamageQty(damageQty);
-			stockDetailsDTO.setEmployeeName(employeeName);
-			stockDetailsDTO.setProductList(productProfiles.stream().map(pp->pp.getName()).collect(Collectors.toList()));
-			proccessedStockDetailsDTOs.add(stockDetailsDTO);
-			proccessedStockDetailsDTOs
-			.sort((StockDetailsDTO s1, StockDetailsDTO s2) -> s1.getProductName().compareTo(s2.getProductName()));
+			Map<String, List<StockDetailsDTO>> employeeWiseList = proccessedStockDetailsDTOs.stream()
+					.collect(Collectors.groupingBy(StockDetailsDTO::getEmployeeName));
+
+			return employeeWiseList;
 		}
-		}
-		Map<String, List<StockDetailsDTO>> employeeWiseList = proccessedStockDetailsDTOs.stream()
-				.collect(Collectors.groupingBy(StockDetailsDTO::getEmployeeName));
-		
-		return employeeWiseList;
 	}
-}
-	
 
 	@Override
 	public List<StockDetailsDTO> findAllStockDetails(Long companyId, Long userId, LocalDateTime fromDate,
@@ -787,25 +778,24 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 			DocumentIds.add(docIds);
 		}
-              List<Document> documents=new ArrayList<>();
-              if(DocumentIds.size()!=0)
-              {
-		      documents = primarySecondaryDocumentRepository.findDocumentsByDocIdInAndVoucherType(DocumentIds,
-				VoucherType.DAMAGE);
-		
-              }
-              
+		List<Document> documents = new ArrayList<>();
+		if (DocumentIds.size() != 0) {
+			documents = primarySecondaryDocumentRepository.findDocumentsByDocIdInAndVoucherType(DocumentIds,
+					VoucherType.DAMAGE);
+
+		}
+
 		for (Object[] obj : inventoryVoucherHeaders) {
 			StockDetailsDTO stockDetailsDTO = new StockDetailsDTO();
 
 			stockDetailsDTO.setProductName(obj[3] != null ? obj[3].toString() : "");
-            Long id = Long.parseLong(obj[0].toString());
-		
-            Optional<User> user = userRepository.findOneById(id);
-            String name = user.get().getFirstName();
-       
-            stockDetailsDTO.setEmployeeName(name);
-           double opStock = 0.0;
+			Long id = Long.parseLong(obj[0].toString());
+
+			Optional<User> user = userRepository.findOneById(id);
+			String name = user.get().getFirstName();
+
+			stockDetailsDTO.setEmployeeName(name);
+			double opStock = 0.0;
 			double slStock = 0.0;
 			double freeQuantity = 0.0;
 			if (obj[6] != null) {
@@ -821,7 +811,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				freeQuantity = Double.parseDouble(obj[11].toString());
 			}
 
-			double saledQuantity = slStock + freeQuantity;			
+			double saledQuantity = slStock + freeQuantity;
 			stockDetailsDTO.setSaleStock(slStock);
 			stockDetailsDTO.setFreeQnty(freeQuantity);
 			stockDetailsDTO.setOpeningStock(opStock);
@@ -842,7 +832,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			}
 			stockDetailsDTOs.add(stockDetailsDTO);
 		}
-		
+
 		Map<String, List<StockDetailsDTO>> groupedList = stockDetailsDTOs.stream()
 				.collect(Collectors.groupingBy(StockDetailsDTO::getProductName));
 
@@ -867,9 +857,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			double saleStock = valuesList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getSaleStock)));
 			double freeQnty = valuesList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getFreeQnty)));
 			double damageQty = valuesList.stream().collect(Collectors.summingDouble((StockDetailsDTO::getDamageQty)));
-      
+
 			double closingStock = openingStock - (saledQuantity + damageQty);
-             String empName =valuesList.get(0).getEmployeeName();
+			String empName = valuesList.get(0).getEmployeeName();
 			if (opProductProfile.isPresent()) {
 				if (productNameTextSettings.size() > 0) {
 					ProductProfileDTO productProfileDTO = opProductProfile.get();
