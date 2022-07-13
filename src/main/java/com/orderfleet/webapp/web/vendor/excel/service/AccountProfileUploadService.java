@@ -273,6 +273,7 @@ public class AccountProfileUploadService {
 
 				accountProfile.setName(apDto.getName());
 			}
+		
 			accountProfile.setCustomerId(apDto.getCustomerId());
 			accountProfile.setTrimChar(apDto.getTrimChar());
 			accountProfile.setCustomerId(apDto.getAlias());
@@ -285,7 +286,9 @@ public class AccountProfileUploadService {
 			if (isValidEmail(apDto.getEmail1())) {
 				accountProfile.setEmail1(apDto.getEmail1());
 			}
-
+			if(apDto.getCustomerCode()!=null) {
+			accountProfile.setCustomerCode(apDto.getCustomerCode());}
+			
 			accountProfile.setTinNo(apDto.getTinNo());
 			accountProfile.setPin(apDto.getPin());
 			accountProfile.setDescription(apDto.getDescription());
@@ -321,17 +324,18 @@ public class AccountProfileUploadService {
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}
+			List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyId();
 
-			// Optional<AccountType> optionalAccountType = accountTypes.stream()
-			// .filter(atn ->
-			// apDto.getAccountTypeName().equals(atn.getName())).findAny();
-			// if (optionalAccountType.isPresent()) {
-			// accountProfile.setAccountType(optionalAccountType.get());
-			// } else {
-			// accountProfile.setAccountType(defaultAccountType);
-			// }
+			 Optional<AccountType> optionalAccountType = accountTypes.stream()
+			 .filter(atn -> apDto.getAccountTypeName().equals(atn.getName())).findAny();
+			 if (optionalAccountType.isPresent()) {
+			 accountProfile.setAccountType(optionalAccountType.get());
+			 } else {
+			 accountProfile.setAccountType(defaultAccountType);
+			 }
 			Optional<AccountProfile> opAcp = saveUpdateAccountProfiles.stream()
 					.filter(acp -> acp.getName().equalsIgnoreCase(apDto.getName())).findAny();
+			
 			if (opAcp.isPresent()) {
 				continue;
 			}
