@@ -1207,12 +1207,19 @@ public class ExecutiveTaskSubmissionController {
 	
 	private void sendEmailToComplaint(ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO)  {
 		log.info("Sending Email To Complaint");
-		String toMassage = "santhosh.admin@moderndistropolis.com";
+//		String toMassage = "santhosh.admin@moderndistropolis.com";
+		String toMassage = "";
 		String fromMassage = "salesnrich.info@gmail.com";
 		
 		if(!executiveTaskSubmissionDTO.getDynamicDocuments().isEmpty()) {
 			User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 			Company company = user.getCompany();
+			if(company.getId() == 8402) {
+				toMassage = "santhosh.admin@moderndistropolis.com";
+			}
+			if(company.getId() == 7700) {
+				toMassage = "moderntnb@gmail.com";
+			}
 			EmployeeProfile employeeProfile = employeeProfileRepository.findEmployeeProfileByUser(user);
 			String emString = employeeProfile.getName() != null ? employeeProfile.getName() : "";
 			LocalDateTime issueDate = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO().getSendDate();

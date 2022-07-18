@@ -144,6 +144,8 @@ public class AccountProfileDTO {
 	private Long districtId;
 
 	private String mailingName;
+	
+	private String employeeName;
 
 	public String getAitrichCode() {
 		return AitrichCode;
@@ -634,6 +636,14 @@ public class AccountProfileDTO {
 
 	public void setCustomerCode(String customerCode) {
 		this.customerCode = customerCode;
+	}
+	
+	public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
 	}
 
 	@Override

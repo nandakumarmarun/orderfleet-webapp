@@ -336,6 +336,8 @@ if (!this.VerifyAccountProfile) {
 							"<tr><td><input name='accountprofile' type='checkbox' value='" + accountProfile.pid + "' /></td><td>"
 							+ accountProfile.userName
 							+ "</td><td>"
+							+ accountProfile.employeeName
+							+ "</td><td>"
 							+ accountProfile.name
 							+ "</td><td>"
 							+ accountProfile.alias

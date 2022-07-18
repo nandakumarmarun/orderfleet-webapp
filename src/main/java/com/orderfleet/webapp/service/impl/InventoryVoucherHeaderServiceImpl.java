@@ -1332,5 +1332,44 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				+ description);
 		return ivDTO;
 	}
+	
+	@Override
+	public List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndInventoryPidInXLSDounlods(List<String> inventoryPids) {
+		List<InventoryVoucherHeaderDTO> result = new ArrayList<>();
+		if(inventoryPids.size() > 0) {
+			
+		List<Object[]> ivhs = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionpIdIn(inventoryPids);
+		if(!ivhs.isEmpty()) {		
+			List<Long> ivhIds = ivhs.stream().map(data ->Long.valueOf( data[0].toString())).collect(Collectors.toList());
+			List<Object[]> ivds = inventoryVoucherDetailRepository.findByInventoryHeaderIdInOnly(ivhIds);
+			for(Object[] ivh :  ivhs) {
+				InventoryVoucherHeaderDTO ivhDto = new InventoryVoucherHeaderDTO();
+				List<InventoryVoucherDetailDTO> ivhDtos = new ArrayList<>();
+				ivhDto.setDocumentNumberLocal(ivh[1] == null ? "" :ivh[1].toString());
+				ivhDto.setUserName(ivh[2] == null ? "" : ivh[2].toString());
+				ivhDto.setDocumentDate((LocalDateTime)ivh[3]);
+				ivhDto.setReceiverAccountName(ivh[4] == null ?"":ivh[4].toString());
+				ivhDto.setCustomeraddress(ivh[5] == null ?"" : ivh[5].toString());
+				ivhDto.setSupplierAccountName(ivh[6] == null ?"" : ivh[6].toString());
+				for(Object[] ivd : ivds) {
+					if(ivh[0].equals(ivd[0])) {
+						InventoryVoucherDetailDTO ivdDto = new InventoryVoucherDetailDTO();
+						ivdDto.setProductName(ivd[1] == null ?"" : ivd[1].toString());
+						ivdDto.setSellingRate((double)ivd[2]);
+						ivdDto.setQuantity((double)ivd[3]);
+						ivdDto.setDiscountPercentage((double)ivd[4]);
+						ivdDto.setTaxAmount((double)ivd[5]);
+						ivdDto.setRowTotal((double)ivd[6]);
+						ivhDtos.add(ivdDto);
+					}
+				}
+				ivhDto.setInventoryVoucherDetails(ivhDtos); 
+				result.add(ivhDto);
+			}
+		}
+		}
+		return result;
+	}
+
 
 }

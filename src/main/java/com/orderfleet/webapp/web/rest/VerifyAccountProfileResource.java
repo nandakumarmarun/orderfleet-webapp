@@ -261,7 +261,7 @@ public class VerifyAccountProfileResource {
 
 		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		EmployeeProfileDTO employeeProfileDTO = new EmployeeProfileDTO();
-
+		
 		if (!employeePid.equals("no")) {
 			employeeProfileDTO = employeeProfileService.findOneByPid(employeePid).get();
 		}
@@ -296,6 +296,20 @@ public class VerifyAccountProfileResource {
 								userIds, fromDate, toDate, active);
 			}
 		}
+		
+		if(userIds.size() > 0) {
+			 List<Object[]> employeeList = employeeProfileRepository.findEmployeeByUserIdInAndActivatedin(userIds,true);
+			 if(employeeList.size() > 0) {
+				 for(AccountProfileDTO accountObj: accountProfileDTOs) {
+					 employeeList.forEach(data -> {
+						 if(accountObj.getUserPid().equals(data[2].toString())) {
+							 accountObj.setEmployeeName(data[1].toString());
+						 }
+					 });
+				 }
+			 }
+		}
+		
 		return accountProfileDTOs;
 	}
 

@@ -357,4 +357,7 @@ public interface InventoryVoucherDetailRepository extends JpaRepository<Inventor
 
 	@Query("select voucherDetail from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.id in ?1")
      List<InventoryVoucherDetail> findByInventoryHeaderIdIn(List<Long> ivId);
+	
+	@Query("select voucherDetail.inventoryVoucherHeader.id, voucherDetail.product.name, voucherDetail.sellingRate, voucherDetail.quantity, voucherDetail.discountPercentage, voucherDetail.taxAmount, voucherDetail.rowTotal from InventoryVoucherDetail voucherDetail where voucherDetail.inventoryVoucherHeader.id in ?1")
+    List<Object[]> findByInventoryHeaderIdInOnly(List<Long> ivId);
 }

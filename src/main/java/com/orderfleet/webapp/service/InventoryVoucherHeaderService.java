@@ -160,6 +160,7 @@ public interface InventoryVoucherHeaderService {
 	Map<String, List<StockDetailsDTO>> findAllSalesDetails(Long companyId, List<Long> userId, LocalDateTime fromDate,
 			LocalDateTime toDate);
 
-	
+
+	List<InventoryVoucherHeaderDTO> findAllByCompanyIdAndInventoryPidInXLSDounlods(List<String> inventoryPids);
 
 }

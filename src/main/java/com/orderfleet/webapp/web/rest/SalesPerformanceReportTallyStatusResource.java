@@ -632,8 +632,9 @@ public class SalesPerformanceReportTallyStatusResource {
 	@Timed
 	public void downloadInventoryXls(@RequestParam("inventoryVoucherHeaderPids") String[] inventoryVoucherHeaderPids,
 			HttpServletResponse response) {
-		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = inventoryVoucherService
-				.findAllByCompanyIdAndInventoryPidIn(Arrays.asList(inventoryVoucherHeaderPids));
+//		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = inventoryVoucherService
+//				.findAllByCompanyIdAndInventoryPidIn(Arrays.asList(inventoryVoucherHeaderPids));
+		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = inventoryVoucherService.findAllByCompanyIdAndInventoryPidInXLSDounlods(Arrays.asList(inventoryVoucherHeaderPids));
 		if (inventoryVoucherHeaderDTOs.isEmpty()) {
 			return;
 		}

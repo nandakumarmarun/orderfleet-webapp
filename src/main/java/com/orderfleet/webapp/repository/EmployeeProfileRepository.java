@@ -80,7 +80,10 @@ public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile
 
 	@Query("select employeeProfile.pid, employeeProfile.name from EmployeeProfile employeeProfile where employeeProfile.company.id = ?#{principal.companyId} and employeeProfile.user.id in ?1 and employeeProfile.activated = ?2 Order By employeeProfile.name asc")
 	List<Object[]> findEmployeeByUserIdInAndActivated(List<Long> userIds, boolean activate);
-
+	
+	@Query("select employeeProfile.pid, employeeProfile.name, employeeProfile.user.pid from EmployeeProfile employeeProfile where employeeProfile.company.id = ?#{principal.companyId} and employeeProfile.user.id in ?1 and employeeProfile.activated = ?2 Order By employeeProfile.name asc")
+	List<Object[]> findEmployeeByUserIdInAndActivatedin(List<Long> userIds, boolean activate);
+	
 	@Query("select employeeProfile.name from EmployeeProfile employeeProfile where employeeProfile.company.id = ?#{principal.companyId}")
 	List<String> findEmployeeNamesByCompanyId();
 

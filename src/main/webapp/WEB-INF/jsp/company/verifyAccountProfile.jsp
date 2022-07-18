@@ -122,6 +122,7 @@
 							<th><input type="checkbox" class="allcheckbox"> All
 								Select</th>
 							<th>Created By</th>
+							<th>Created By(Emp)</th>
 							<th>Name</th>
 							<th>Alias</th>
 							<th>Address</th>
