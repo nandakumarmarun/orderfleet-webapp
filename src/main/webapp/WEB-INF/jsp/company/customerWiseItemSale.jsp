@@ -155,7 +155,7 @@
 					<!--table header-->
 					<thead>
 						<tr id="rowhead">
-							<th rowspan="2" style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: normal;font-size:18px; vertical-align: middle;">Employee Name</th>
+							<th rowspan="2" style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: normal;font-size:18px; vertical-align: middle;">Customer Name</th>
 
 							<c:forEach items="${products}" var="product">
 
@@ -176,15 +176,13 @@
 			<div id="loadingData" style="display: none;">
 				<h3 id="hLoadId"></h3>
 			</div>
-		</div>
-		<hr />
-		<!-- Footer -->
+			<hr/>
 		<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
+		</div>
+
+		<!-- Footer -->
 	</div>
-	<!-- </div> -->
-
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
-
 
 
 

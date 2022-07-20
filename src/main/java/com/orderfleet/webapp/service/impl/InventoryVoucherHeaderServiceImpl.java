@@ -614,6 +614,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 					stockDetailsDTO.setProductName(obj[3] != null ? obj[3].toString() : "");
 
 					stockDetailsDTO.setEmployeeName(obj[10].toString());
+					stockDetailsDTO.setCustomerName(obj[11].toString());
 
 					double slStock = 0.0;
 					double freeQuantity = 0.0;
@@ -649,7 +650,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 			System.out.println(stockDetailsDTOs.size());
 
 			Map<String, Map<String, List<StockDetailsDTO>>> groupedList = stockDetailsDTOs.stream()
-					.collect(Collectors.groupingBy(StockDetailsDTO::getEmployeeName,
+					.collect(Collectors.groupingBy(StockDetailsDTO::getCustomerName,
 							Collectors.groupingBy(StockDetailsDTO::getProductName)));
 			System.out.println("List.........." + groupedList);
 
@@ -659,9 +660,9 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 			log.info("Key set size = " + keySet.size() + "*******");
 
-			for (String employeeName : keySet) {
+			for (String customerName : keySet) {
 
-				Map<String, List<StockDetailsDTO>> valuesList = groupedList.get(employeeName);
+				Map<String, List<StockDetailsDTO>> valuesList = groupedList.get(customerName);
 
 				List<String> productSet = new ArrayList<String>(valuesList.keySet());
 
@@ -727,7 +728,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 
 					stockDetailsDTO.setSaledQuantity(saledQuantity);
 					stockDetailsDTO.setDamageQty(damageQty);
-					stockDetailsDTO.setEmployeeName(employeeName);
+					stockDetailsDTO.setCustomerName(customerName);
 					stockDetailsDTO.setProductList(
 							productProfiles.stream().map(pp -> pp.getName()).collect(Collectors.toList()));
 					proccessedStockDetailsDTOs.add(stockDetailsDTO);
@@ -735,10 +736,10 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 							.compareTo(s2.getProductName()));
 				}
 			}
-			Map<String, List<StockDetailsDTO>> employeeWiseList = proccessedStockDetailsDTOs.stream()
+			Map<String, List<StockDetailsDTO>> customerWiseList = proccessedStockDetailsDTOs.stream()
 					.collect(Collectors.groupingBy(StockDetailsDTO::getEmployeeName));
 
-			return employeeWiseList;
+			return customerWiseList;
 		}
 	}
 

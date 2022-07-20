@@ -32,6 +32,7 @@ public class StockDetailsDTO implements Cloneable {
 	private LocalDateTime reportingTime;
 	private String employeeName;
 	private List<String> productList;
+	private String customerName;
 
 	private List<StockDetailsTotalDTO> stocktotal;
 
@@ -181,11 +182,27 @@ public class StockDetailsDTO implements Cloneable {
 	}
 
 
+	public String getCustomerName() {
+		return customerName;
+	}
+
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+
 	@Override
 	public String toString() {
 		return "StockDetailsDTO [productName=" + productName + ", saledQuantity=" + saledQuantity + ", damageQty="
-				+ damageQty + ", employeeName=" + employeeName + ", productList=" + productList + "]";
+				+ damageQty + ", employeeName=" + employeeName + ", customerName=" + customerName + "]";
 	}
+
+
+	
+
+
+	
 
 
 	
