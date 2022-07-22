@@ -52,7 +52,7 @@ CustomerWiseItemSale.downloadXls = function() {
 			}
 		}
 
-		$('#tblSalesTargetAchievedReport').html(
+		$('#tBodyInvoiceWiseReport').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
 		$
 				.ajax({
@@ -91,6 +91,7 @@ CustomerWiseItemSale.downloadXls = function() {
 
 		$.each(invoiceWiseReports, function(key, value) {
 			row = "<tr><td>" + key + "</td>"
+			
          var saledquantity=0;
 			var damagequantity=0;
 			var list;

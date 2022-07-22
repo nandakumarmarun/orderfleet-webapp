@@ -737,7 +737,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 				}
 			}
 			Map<String, List<StockDetailsDTO>> customerWiseList = proccessedStockDetailsDTOs.stream()
-					.collect(Collectors.groupingBy(StockDetailsDTO::getEmployeeName));
+					.collect(Collectors.groupingBy(StockDetailsDTO::getCustomerName));
 
 			return customerWiseList;
 		}
