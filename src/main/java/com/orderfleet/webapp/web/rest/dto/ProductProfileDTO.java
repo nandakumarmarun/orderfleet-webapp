@@ -121,6 +121,8 @@ public class ProductProfileDTO {
 	
 	private double igst;
 
+	private double rateConversion;
+
 	public ProductProfileDTO() {
 		super();
 	}
@@ -592,6 +594,14 @@ public class ProductProfileDTO {
 
 	public void setAlterId(Long alterId) {
 		this.alterId = alterId;
+	}
+
+	public double getRateConversion() {
+		return rateConversion;
+	}
+
+	public void setRateConversion(double rateConversion) {
+		this.rateConversion = rateConversion;
 	}
 
 	@Override

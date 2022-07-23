@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"Base_Unit", "CGST", "Cess", "GSTPer", "HSN_Code", "IGST", "Item_Code", "Item_Name", "Item_Type", "SGST", "Sales_Unit", "Selling_Rate"})
+@JsonPropertyOrder({"Base_Unit", "CGST", "Cess", "GSTPer", "HSN_Code", "IGST", "Item_Code", "Item_Name", "Item_Type","Item_Width","RateConversion", "SGST", "Sales_Unit", "Selling_Rate"})
 public class ProductProfileNewFocus {
 	@JsonProperty("Base_Unit")
 	private String baseUnits;
@@ -45,6 +45,9 @@ public class ProductProfileNewFocus {
 	
 	@JsonProperty("Item_Width")
 	public String itemwidth;
+
+	@JsonProperty("RateConversion")
+	public String rateConversion;
 	
 	@JsonProperty("Base_Unit")
 	public String getBaseUnits() {
@@ -155,7 +158,12 @@ public class ProductProfileNewFocus {
 	public void setSellingRate(double sellingRate) {
 		this.sellingRate = sellingRate;
 	}
-	
-	
 
+	public String getRateConversion() {
+		return rateConversion;
+	}
+
+	public void setRateConversion(String rateConversion) {
+		this.rateConversion = rateConversion;
+	}
 }

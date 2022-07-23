@@ -207,6 +207,8 @@ public class ProductProfile implements Serializable, Cloneable {
 	@Column(name = "Base_Unit")
 	private String baseUnits;
 
+	@Column(name = "rate_Conversion",columnDefinition = "double precision DEFAULT 0")
+	private double RateConversion;
 
 	public Units getUnits() {
 		return units;
@@ -539,6 +541,14 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public void setCessTaxRate(double cessTaxRate) {
 		this.cessTaxRate = cessTaxRate;
+	}
+
+	public double getRateConversion() {
+		return RateConversion;
+	}
+
+	public void setRateConversion(double rateConversion) {
+		RateConversion = rateConversion;
 	}
 
 	@Override

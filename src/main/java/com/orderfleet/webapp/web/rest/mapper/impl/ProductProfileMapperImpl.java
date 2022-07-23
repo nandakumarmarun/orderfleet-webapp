@@ -69,6 +69,7 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 			productProfileDTO.setFilesPid(filePids);
 		}
 		productProfileDTO.setItemWidth(productProfile.getWidth());
+		productProfileDTO.setRateConversion(productProfile.getRateConversion());
 		productProfileDTO.setBaseUnits(productProfile.getBaseUnits());
 		return productProfileDTO;
 	}
@@ -122,8 +123,8 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfileDTO.setUnitQty(productProfile.getUnitQty());
 		productProfileDTO.setDiscountPercentage(productProfile.getDiscountPercentage());
 		productProfileDTO.setItemWidth(productProfile.getWidth());
+		productProfileDTO.setRateConversion(productProfile.getRateConversion());
 		productProfileDTO.setBaseUnits(productProfile.getBaseUnits());
-
 		return productProfileDTO;
 	}
 
