@@ -1,14 +1,16 @@
 package com.orderfleet.webapp.web.vendor.excel.api;
 
 import java.net.URISyntaxException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+
 import java.time.Duration;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -136,6 +138,8 @@ public class ReceiptDownloadController {
 		}
                 logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
+                
+                
 		if (accountingVoucherHeaders.size() > 0) {
 
 			Set<Long> avhIds = new HashSet<>();
@@ -329,6 +333,8 @@ public class ReceiptDownloadController {
 			accountingVoucherHeaderDTO.setAccountProfilePid(accountProfile.getPid());
 			accountingVoucherHeaderDTO.setAccountProfileName(accountProfile.getName());
 			accountingVoucherHeaderDTO.setPhone(accountProfile.getPhone1());
+			accountingVoucherHeaderDTO.setCustomerCode(accountProfile.getCustomerCode());
+		
 		}
 
 		LocalDateTime createdDate = null;
@@ -337,6 +343,8 @@ public class ReceiptDownloadController {
 			String[] splitDate = obj[5].toString().split(" ");
 			createdDate = LocalDate.parse(splitDate[0], formatter).atTime(0, 0);
 		}
+		
+
 
 		LocalDateTime documentDate = null;
 		if (obj[6] != null) {
@@ -350,6 +358,7 @@ public class ReceiptDownloadController {
 		if (employee != null) {
 			accountingVoucherHeaderDTO.setEmployeePid(employee.getPid());
 			accountingVoucherHeaderDTO.setEmployeeName(employee.getName());
+			accountingVoucherHeaderDTO.setEmployeeProfileCode(employee.getUser().getLogin());
 		}
 		if (user != null) {
 			accountingVoucherHeaderDTO.setUserName(user.getFirstName());
@@ -372,7 +381,7 @@ public class ReceiptDownloadController {
 		}
 		accountingVoucherHeaderDTO.setCashAmount(cashAmount);
 		accountingVoucherHeaderDTO.setChequeAmount(chequeAmount);
-
+System.out.println("returned.......................................");
 		return accountingVoucherHeaderDTO;
 	}
 

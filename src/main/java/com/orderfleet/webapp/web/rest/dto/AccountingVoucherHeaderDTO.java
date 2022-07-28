@@ -48,6 +48,8 @@ public class AccountingVoucherHeaderDTO {
 	private String accountProfilePid;
 
 	private String accountProfileName;
+	
+	private String customerCode;
 
 	private LocalDateTime createdDate;
 
@@ -58,6 +60,8 @@ public class AccountingVoucherHeaderDTO {
 	private String employeePid;
 
 	private String employeeName;
+	
+	private String employeeProfileCode;
 
 	private String userName;
 
@@ -103,6 +107,10 @@ public class AccountingVoucherHeaderDTO {
 
 	private boolean sendToOdoo;
 	private String description;
+	
+	private LocalDateTime time;
+	
+	
 
 	public AccountingVoucherHeaderDTO() {
 		super();
@@ -130,13 +138,16 @@ public class AccountingVoucherHeaderDTO {
 				this.accountProfileName = accountingVoucherHeader.getAccountProfile().getName();	
 			this.description =accountingVoucherHeader.getAccountProfile().getDescription();
 			this.phone = accountingVoucherHeader.getAccountProfile().getPhone1();
+			this.customerCode=accountingVoucherHeader.getAccountProfile().getCustomerCode();
 		}
 		
 		this.createdDate = accountingVoucherHeader.getCreatedDate();
+		this.time =accountingVoucherHeader.getCreatedDate();
 		this.documentDate = accountingVoucherHeader.getDocumentDate();
 		if (accountingVoucherHeader.getEmployee() != null) {
 			this.employeePid = accountingVoucherHeader.getEmployee().getPid();
 			this.employeeName = accountingVoucherHeader.getEmployee().getName();
+			this.employeeProfileCode=accountingVoucherHeader.getEmployee().getUser().getLogin();
 		}
 		if (accountingVoucherHeader.getCreatedBy() != null) {
 			this.userName = accountingVoucherHeader.getCreatedBy().getFirstName();
@@ -472,6 +483,23 @@ public class AccountingVoucherHeaderDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	public String getCustomerCode() {
+		return customerCode;
+	}
+
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
+	}
+
+	public String getEmployeeProfileCode() {
+		return employeeProfileCode;
+	}
+
+	public void setEmployeeProfileCode(String employeeProfileCode) {
+		this.employeeProfileCode = employeeProfileCode;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

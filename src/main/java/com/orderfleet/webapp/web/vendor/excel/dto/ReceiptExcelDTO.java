@@ -29,6 +29,13 @@ public class ReceiptExcelDTO {
 	private PaymentMode mode;
 	private AccountingVoucherHeaderDTO accountingVoucherHeaderDTO = new AccountingVoucherHeaderDTO();
 	private String employeeName;
+	private String employeeProfileCode;
+	private String documentNo;
+	private String ledgerCode;
+	private String time;
+	private String createdDate;
+	
+	
 
 	public ReceiptExcelDTO() {
 		super();
@@ -54,6 +61,14 @@ public class ReceiptExcelDTO {
 		this.trimChar = accountingVoucherDetail.getBy().getTrimChar();
 		this.chequeDate = accountingVoucherDetail.getInstrumentDate()==null?"":accountingVoucherDetail.getInstrumentDate().format(formatter);
 		this.employeeName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
+		this.employeeProfileCode=accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getUser().getLogin();
+		this.documentNo =accountingVoucherDetail.getAccountingVoucherHeader().getDocumentNumberServer();
+		String str =accountingVoucherDetail.getBy().getCustomerCode();
+		String res = str.split("[.]")[0];
+		this.ledgerCode=res;
+		this.createdDate =accountingVoucherDetail.getAccountingVoucherHeader().getCreatedDate().format(formatter);
+		DateTimeFormatter formatters = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		this.time=accountingVoucherDetail.getAccountingVoucherHeader().getCreatedDate().format(formatters);
 	}
 
 	public ReceiptExcelDTO(AccountingVoucherAllocation accountingVoucherAllocation) {
@@ -77,6 +92,12 @@ public class ReceiptExcelDTO {
 		this.chequeDate = accountingVoucherAllocation.getAccountingVoucherDetail()
 				.getInstrumentDate()==null?"":accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate().toString();
 		this.employeeName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader().getEmployee().getName();
+		this.employeeProfileCode=accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader().getEmployee().getUser().getLogin();
+		String str =accountingVoucherAllocation.getAccountingVoucherDetail().getBy().getCustomerCode();
+		String res = str.split("[.]")[0];
+		this.ledgerCode=res;
+		this.documentNo =accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader().getDocumentNumberServer();
+		
 	}
 
 	public String getAccountingVoucherHeaderPid() {
@@ -221,6 +242,46 @@ public class ReceiptExcelDTO {
 
 	public void setEmployeeName(String employeeName) {
 		this.employeeName = employeeName;
+	}
+
+	public String getEmployeeProfileCode() {
+		return employeeProfileCode;
+	}
+
+	public void setEmployeeProfileCode(String employeeProfileCode) {
+		this.employeeProfileCode = employeeProfileCode;
+	}
+
+	public String getDocumentNo() {
+		return documentNo;
+	}
+
+	public void setDocumentNo(String documentNo) {
+		this.documentNo = documentNo;
+	}
+
+	public String getLedgerCode() {
+		return ledgerCode;
+	}
+
+	public void setLedgerCode(String ledgerCode) {
+		this.ledgerCode = ledgerCode;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
+	}
+
+	public String getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(String createdDate) {
+		this.createdDate = createdDate;
 	}
 
 	

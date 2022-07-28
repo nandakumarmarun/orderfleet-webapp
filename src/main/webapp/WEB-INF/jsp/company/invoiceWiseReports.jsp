@@ -176,11 +176,11 @@
 										style="font-size: 18px" onclick="InvoiceWiseReport.filter()"
 										title="Apply"></button>
 								</div>
-								<div class="col-sm-3">
+								<!-- <div class="col-sm-3">
 									<br />
 									<button id="btnDownload" type="button" style="font-size: 18px"
 										class="btn btn-orange entypo-download" title="Download Xls"></button>
-								</div>
+								</div> -->
 								<div class="col-sm-3">
 									<br />
 									<button id="btnTestdownload" type="button" 
