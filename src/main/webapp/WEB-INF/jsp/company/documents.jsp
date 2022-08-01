@@ -285,6 +285,12 @@
 											id="field_discountScaleBar" /> &nbsp;<span>Discount Scale Bar</span>
 										</label>
 									</div>
+										<div class="form-group" id="smsApiEnable">
+										<label for="smsApiEnable"> <input type="checkbox"
+											id="field_smsApiEnable" /> &nbsp;<span>Sms Api Enable</span>
+										</label>
+									</div>
+									
 									<div class="form-group" id="enableHeaderPrintOut">
 										<label for="enableHeaderPrintOut"> <input type="checkbox"
 											id="field_enableHeaderPrintOut" /> &nbsp;<span>Enable Header PrintOut</span>

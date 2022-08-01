@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.google.common.cache.LoadingCache;
 import com.orderfleet.webapp.domain.AccountingVoucherDetail;
@@ -81,6 +82,7 @@ public class ExecutiveTaskExecutionSmsService {
 			log.info("Mobile Number ->  " + mobileNumber);
 		}
 
+		
 		if (inventoryVouchers != null && inventoryVouchers.size() > 0) {
 			inventoryVocherDocument = inventoryVouchers.get(0).getDocument();
 		}
@@ -118,6 +120,25 @@ public class ExecutiveTaskExecutionSmsService {
 
 					if (userDocumentDTO.getSmsOption()) {
 						if (sendAccountingVoucherMessage(accountingVouchers, mobileNumber, company)) {
+							log.info("Accounting Voucher SMS Sent to "
+									+ executiveTaskExecution.getAccountProfile().getName() + " Successfully");
+						} else {
+							log.info("Accounting Voucher SMS Sent to "
+									+ executiveTaskExecution.getAccountProfile().getName() + " Failed");
+						}
+					}
+
+				}
+			}
+		}
+		
+		if (accountingVocherDocument != null) {
+			for (UserDocumentDTO userDocumentDTO : userdocuments) {
+
+				if (userDocumentDTO.getDocumentName().equalsIgnoreCase(accountingVocherDocument.getName())) {
+
+					if (userDocumentDTO.getSmsApienable()) {
+						if (sendAccountingVoucherMessageApiNew(accountingVouchers, mobileNumber, company)) {
 							log.info("Accounting Voucher SMS Sent to "
 									+ executiveTaskExecution.getAccountProfile().getName() + " Successfully");
 						} else {
@@ -275,6 +296,90 @@ public class ExecutiveTaskExecutionSmsService {
 			log.info("ResponseMessage :- " + uc.getResponseMessage());
 			log.info("ResponseCode :- " + uc.getResponseCode());
 			uc.disconnect();
+
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+		return false;
+	}
+	
+	
+	public boolean sendAccountingVoucherMessageApiNew(List<AccountingVoucherHeader> accountingVouchers, String mobileNumber,
+			Company company) {
+		try {
+			System.out.println("smss issssssssssssssssssssssssss send gsnlllll");
+			// String authkey = "102303Axh5n6kDaubM5694f339";
+
+			String authkey = company.getSmsApiKey();
+			String sender = "GSIFGS";
+
+			String companyName = company.getAlias();
+
+			if (!companyName.isEmpty() || companyName != null) {
+				if (companyName.length() > 6) {
+					sender = companyName.substring(0, 6).toUpperCase();
+				} else if (companyName.length() == 6) {
+					sender = companyName.toUpperCase();
+				} else {
+					sender = "GSIFGS";
+				}
+
+			}
+
+			StringBuilder stringBuilder = new StringBuilder();
+
+			/*
+			 * String abc="Dear Customer, \n" +
+			 * "Our sales officer had visited your firm on 24/11/2018. Cheque amount Rs 256.0. He has collected total 256.0."
+			 */
+
+			for (AccountingVoucherHeader accountingVoucherHeader : accountingVouchers) {
+
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				LocalDateTime documentDate = accountingVoucherHeader.getDocumentDate();
+				String date = documentDate.format(formatter);
+
+//				stringBuilder.append("Dear Customer,\n\n");
+//				stringBuilder.append("Our sales officer had visited your firm on " + date + ". \n\n");
+
+//				for (AccountingVoucherDetail accountingVoucherDetail : accountingVoucherHeader
+//						.getAccountingVoucherDetails()) {
+//
+//					String type = "";
+//					if (PaymentMode.Cheque.equals(accountingVoucherDetail.getMode())
+//							|| PaymentMode.Bank.equals(accountingVoucherDetail.getMode())) {
+//						type = "Cheque";
+//					} else {
+//						type = accountingVoucherDetail.getMode().name();
+//					}
+//
+//					stringBuilder.append("\n" + type + " amount Rs." + accountingVoucherDetail.getAmount());
+//
+//				}
+
+				stringBuilder.append("Your Ac.no:"+accountingVoucherHeader.getAccountProfile().getCustomerCode()+ " has been Credited Rs."+accountingVoucherHeader.getTotalAmount()+ " on "+date+" Info: "+accountingVoucherHeader.getDocumentNumberLocal()+" GSIF");
+
+//				stringBuilder.append("We acknowledge with thanks the receipt of payment as above.\n\n" + company.getLegalName());
+
+			}
+			
+			RestTemplate restTemplate = new RestTemplate();
+
+			String message = stringBuilder.toString();
+			log.info(sender + "\n \n" + message);
+			String requestUrl = "http://bhashsms.com/api/sendmsg.php?user=GSIF&pass=123456&sender=GSIFGS&phone="+mobileNumber+"&text="+message+"&priority=ndnd&stype=normal";
+			String response =restTemplate.getForObject(requestUrl, String.class);
+			System.out.println("ResponseMessage : "+response);
+//			String requestUrl = " https://api.msg91.com/api/sendhttp.php?mobiles=" + mobileNumber + "&authkey="
+//					+ authkey + "&route=4&sender=" + sender + "&message=" + URLEncoder.encode(message, "UTF-8")
+//					+ "&country=91";
+//			URL url = new URL(requestUrl);
+//			HttpURLConnection uc = (HttpURLConnection) url.openConnection();
+//			log.info("ResponseMessage :- " + uc.getResponseMessage());
+//			log.info("ResponseCode :- " + uc.getResponseCode());
+//			uc.disconnect();
 
 			return true;
 		} catch (Exception e) {

@@ -159,6 +159,9 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "rate_With_Tax", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean rateWithTax;
 	
+	@Column(name = "sms_api_enable", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean smsApiEnable;
+	
 	@Column(name = "discount_Scale_Bar", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean discountScaleBar;
 	
@@ -441,6 +444,14 @@ public class Document implements Serializable, Cloneable {
 	}
 	
 	
+
+	public boolean getSmsApiEnable() {
+		return smsApiEnable;
+	}
+
+	public void setSmsApiEnable(boolean smsApiEnable) {
+		this.smsApiEnable = smsApiEnable;
+	}
 
 	public boolean getEnableHeaderPrintOut() {
 		return enableHeaderPrintOut;

@@ -106,7 +106,7 @@ public class DocumentResource {
 					HeaderUtil.createFailureAlert("document", "documentPrefixexists", "Document Prefix already in use"))
 					.body(null);
 		}
-
+		System.out.println("smssmsmsmmsmsmsmsm" + documentDTO.getSmsApiEnable());
 		DocumentDTO result = documentService.save(documentDTO);
 		return ResponseEntity.created(new URI("/web/documents/" + result.getPid()))
 				.headers(HeaderUtil.createEntityCreationAlert("document", result.getPid().toString())).body(result);

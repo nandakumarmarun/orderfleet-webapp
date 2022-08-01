@@ -28,6 +28,7 @@ import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 import com.orderfleet.webapp.domain.enums.StageNameType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
@@ -1547,6 +1548,8 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			newAccountType.setActivated(true);
 			newAccountType.setPid(AccountTypeService.PID_PREFIX + RandomUtil.generatePid());
 			newAccountType.setCompany(company);
+			newAccountType.setAccountNameType(AccountNameType.LEAD_MANAGEMENT);
+			newAccountType.setReceiverSupplierType(ReceiverSupplierType.Receiver);
 			newAccountType = accountTypeRepository.save(newAccountType);
 			accountProfile.setAccountType(newAccountType);
 		}

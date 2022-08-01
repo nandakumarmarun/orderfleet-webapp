@@ -99,6 +99,8 @@ public class DocumentDTO implements Cloneable {
 	private boolean rateWithTax;
 	
 	private boolean discountScaleBar;
+		
+	private boolean smsApiEnable;
 
 	private byte[] headerImage;
 
@@ -147,6 +149,7 @@ public class DocumentDTO implements Cloneable {
 		this.hasTelephonicOrder = document.getHasTelephonicOrder();
 		this.rateWithTax = document.getRateWithTax();
 		this.discountScaleBar =document.getDiscountScaleBar();
+		this.smsApiEnable = document.getSmsApiEnable();
 		this.headerImage = document.getHeaderImage();
 		this.footerImage = document.getFooterImage();
 		this.headerImageContentType = document.getHeaderImageContentType();
@@ -483,8 +486,17 @@ public class DocumentDTO implements Cloneable {
 	public void setRateWithTax(boolean rateWithTax) {
 		this.rateWithTax = rateWithTax;
 	}
-
 	
+	
+	
+	public boolean getSmsApiEnable() {
+		return smsApiEnable;
+	}
+
+	public void setSmsApiEnable(boolean smsApiEnable) {
+		this.smsApiEnable = smsApiEnable;
+	}
+
 	public boolean getDiscountScaleBar() {
 		return discountScaleBar;
 	}

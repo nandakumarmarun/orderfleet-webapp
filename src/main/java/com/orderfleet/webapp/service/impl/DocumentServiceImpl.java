@@ -151,6 +151,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setHasTelephonicOrder(documentDTO.getHasTelephonicOrder());
 			document.setRateWithTax(documentDTO.getRateWithTax());
 			document.setDiscountScaleBar(documentDTO.getDiscountScaleBar());
+			document.setSmsApiEnable(documentDTO.getSmsApiEnable());
 			document.setEnableHeaderPrintOut(documentDTO.getEnableHeaderPrintOut());
 			if (documentDTO.getHeaderImage() != null) {
 				document.setHeaderImage(documentDTO.getHeaderImage());
