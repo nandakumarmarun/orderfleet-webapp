@@ -63,9 +63,8 @@ public class ReceiptExcelDTO {
 		this.employeeName = accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getName();
 		this.employeeProfileCode=accountingVoucherDetail.getAccountingVoucherHeader().getEmployee().getUser().getLogin();
 		this.documentNo =accountingVoucherDetail.getAccountingVoucherHeader().getDocumentNumberServer();
-		String str =accountingVoucherDetail.getBy().getCustomerCode();
-		String res = str.split("[.]")[0];
-		this.ledgerCode=res;
+		this.ledgerCode=accountingVoucherDetail.getBy().getCustomerCode();
+	
 		this.createdDate =accountingVoucherDetail.getAccountingVoucherHeader().getCreatedDate().format(formatter);
 		DateTimeFormatter formatters = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		this.time=accountingVoucherDetail.getAccountingVoucherHeader().getCreatedDate().format(formatters);
@@ -93,9 +92,10 @@ public class ReceiptExcelDTO {
 				.getInstrumentDate()==null?"":accountingVoucherAllocation.getAccountingVoucherDetail().getInstrumentDate().toString();
 		this.employeeName = accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader().getEmployee().getName();
 		this.employeeProfileCode=accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader().getEmployee().getUser().getLogin();
-		String str =accountingVoucherAllocation.getAccountingVoucherDetail().getBy().getCustomerCode();
-		String res = str.split("[.]")[0];
-		this.ledgerCode=res;
+		
+		
+		this.ledgerCode=accountingVoucherAllocation.getAccountingVoucherDetail().getBy().getCustomerCode();
+		
 		this.documentNo =accountingVoucherAllocation.getAccountingVoucherDetail().getAccountingVoucherHeader().getDocumentNumberServer();
 		
 	}
