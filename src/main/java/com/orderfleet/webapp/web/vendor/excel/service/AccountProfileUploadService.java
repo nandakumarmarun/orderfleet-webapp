@@ -325,14 +325,17 @@ public class AccountProfileUploadService {
 				accountProfile.setAccountType(defaultAccountType);
 			}
 			List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyId();
-
+			
+			if (apDto.getAccountTypeName() != null ) {
 			 Optional<AccountType> optionalAccountType = accountTypes.stream()
 			 .filter(atn -> apDto.getAccountTypeName().equals(atn.getName())).findAny();
+			
 			 if (optionalAccountType.isPresent()) {
 			 accountProfile.setAccountType(optionalAccountType.get());
 			 } else {
 			 accountProfile.setAccountType(defaultAccountType);
 			 }
+			}
 			Optional<AccountProfile> opAcp = saveUpdateAccountProfiles.stream()
 					.filter(acp -> acp.getName().equalsIgnoreCase(apDto.getName())).findAny();
 			

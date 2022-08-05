@@ -1411,7 +1411,7 @@ public class InvoiceWiseReportResource {
 		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
 		// Create Cell Style for formatting Date
 		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
-		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM/DD/YYYY"));
+		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("DD/MM/YY"));
 		
 		HSSFCellStyle timeCellStyle = worksheet.getWorkbook().createCellStyle();
 		timeCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("h:mm:ss"));
@@ -1484,9 +1484,18 @@ public class InvoiceWiseReportResource {
 			createTimeCell.setCellStyle(timeCellStyle);
 			}
 			row.createCell(10).setCellValue(invoice.getLocation()+",  Customer Location "+invoice.getAccountProfileLocation());
+			if(invoice.getMockLocationStatus()== true)
+			{
 			row.createCell(11).setCellValue(invoice.getMockLocationStatus());
+			}
 			row.createCell(12).setCellValue(invoice.getTowerLocation());
+			if(invoice.getWithCustomer() == true)
+			{
 			row.createCell(13).setCellValue(invoice.getWithCustomer());
+			}else
+			{
+				row.createCell(13).setCellValue("Remote Visit");
+			}
 			row.createCell(14).setCellValue(invoice.getTotalSalesOrderAmount());
 			row.createCell(15).setCellValue(invoice.getTotalRecieptAmount());
 			row.createCell(16).setCellValue(invoice.getVehicleRegistrationNumber());
