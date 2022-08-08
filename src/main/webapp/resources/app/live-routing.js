@@ -158,10 +158,12 @@ function showUserRouteHistory(userPid) {
 							var trackingPoints = userData.trackingPoints;
 							if (trackingPoints.length > 0) {
 								var list = "";
+								var number=0;
 								$
 										.each(
 												trackingPoints,
 												function(index, trackingPoint) {
+													number = number + 1;
 													var location;
 													if (trackingPoint.locationType == "TowerLocation") {
 														location = trackingPoint.towerLocation;
@@ -182,7 +184,7 @@ function showUserRouteHistory(userPid) {
 															+ ", "
 															+ trackingPoint.longitude
 															+ ")'><i class='fa fa-caret-left'></i><span>"
-															+ trackingPoint.accountProfileName
+															+ trackingPoint.accountProfileName+" :"+number
 															+ "</span><br><span style='color: #542C2C;'>"
 															+ location
 															+ "</span><br><span>"
@@ -273,10 +275,12 @@ function createMarker(trackingPoint, number, employeeName) {
 			zIndex : number,
 			labelClass : "labels",
 			labelStyle : {
-				opacity : 0.85
+				opacity : 0
+				
+				
 			}
 		});
-
+ 
 		if (trackingPoint.locationType == "TowerLocation") {
 			marker.setIcon(contextPath
 					+ '/resources/assets/images/map/tower.png');
@@ -284,7 +288,7 @@ function createMarker(trackingPoint, number, employeeName) {
 			if (trackingPoint.accountProfileName == "Attendance") {
 				marker
 						.setIcon(contextPath
-								+ '/resources/assets/images/map/Locations.png');
+								+ '/resources/assets/images/map/locations.png');
 			} else if(trackingPoint.accountProfileName == "CurrentLocation") {
 				marker
 						.setIcon(contextPath
@@ -293,16 +297,11 @@ function createMarker(trackingPoint, number, employeeName) {
 			else{
 				marker
 				.setIcon(contextPath
-						+ '/resources/assets/images/map/Locations.png');
+						+ '/resources/assets/images/map/locations.png');
 			}
 		}
 
-		if(trackingPoint.clientTransactionKey== "key")
-			{
-			marker
-			.setIcon(contextPath
-					+ '/resources/assets/images/map/pin.png');
-			}
+
 		var infowindow = new google.maps.InfoWindow({
 			content : contentString
 		});
@@ -471,6 +470,7 @@ var dvRendererOptions = {
 		suppressPolylines : true,
 		geodesic : true,
 		strokeColor : "#2c7ea1",
+	
 		strokeWeight : 4,
 		strokeOpacity : 1
 	}

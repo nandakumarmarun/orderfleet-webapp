@@ -39,6 +39,8 @@ public class FirebaseLocation {
 	private BigDecimal latitude;
 
 	private BigDecimal longitude;
+	
+	private Long companyId;
 
 	public FirebaseLocation() {
 		super();
@@ -46,13 +48,14 @@ public class FirebaseLocation {
 	}
 
 	public FirebaseLocation(String key, String companyName, LocalDateTime date, BigDecimal latitude,
-			BigDecimal longitude) {
+			BigDecimal longitude,Long companyId) {
 		super();
 		this.key = key;
 		this.companyName = companyName;
 		this.date = date;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.companyId = companyId;
 	}
 
 	
@@ -111,6 +114,14 @@ public class FirebaseLocation {
 
 	public void setLongitude(BigDecimal longitude) {
 		this.longitude = longitude;
+	}
+
+	public Long getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(Long companyId) {
+		this.companyId = companyId;
 	}
 	
 	

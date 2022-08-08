@@ -6,4 +6,6 @@ import com.orderfleet.webapp.domain.FirebaseLocation;
 
 public interface FirebaseLocationRepository extends JpaRepository<FirebaseLocation, Long> {
 
+	void deleteByCompanyId(Long companyId);
+
 }

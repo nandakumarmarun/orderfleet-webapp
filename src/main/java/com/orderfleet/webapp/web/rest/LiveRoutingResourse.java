@@ -120,6 +120,7 @@ public class LiveRoutingResourse {
 
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		String companyName = company.getLegalName();
+		Long companyId = company.getId();
 
 		List<EmployeeProfileDTO> dashboardEmployees;
 		List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
@@ -173,7 +174,7 @@ public class LiveRoutingResourse {
 					routing.add(liveRouting);
 				}
 
-				liveRoutingService.saveLocationDetails(routing);
+				liveRoutingService.saveLocationDetails(routing,companyId);
 
 				for (LiveRoutingResponse responses : routing) {
 
@@ -225,9 +226,21 @@ public class LiveRoutingResourse {
 				SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 				Date date1 = format.parse(time1);
 				Date date2 = format.parse(parts[1]);
-				long difference = date2.getTime() - date1.getTime();
+				long difference = 0;
+				if(date2.getTime()>=date1.getTime())
+				{
+				difference = date2.getTime()- date1.getTime();
+				}
+				else {
+					difference = date1.getTime()- date2.getTime();
+				}
 				 long minutes = (difference / 1000) / 60;
-				
+				 System.out.println("Time1 :"+time1);
+				 System.out.println("Time2: "+parts[1]);
+				 System.out.println("date :"+date2.getTime() );
+				 System.out.println("dates :"+date1.getTime());
+				 System.out.println("Diffence :"+difference);
+				System.out.println("Minutes :"+minutes);
 				if (minutes < 5) {
 					dtos.setAccountProfileName("CurrentLocation");
 					System.out.println(dtos.getAccountProfileName() + " " + dtos.getDate() + " " + dtos.getLatitude());
