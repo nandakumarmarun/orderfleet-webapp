@@ -26,6 +26,8 @@ import com.orderfleet.webapp.domain.enums.DashboardUIType;
 import com.orderfleet.webapp.domain.enums.DeviceType;
 import com.orderfleet.webapp.repository.AuthorityRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.LicenseRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.AuthoritiesConstants;
@@ -64,6 +66,9 @@ public class UserService {
 
 	@Inject
 	private CompanyRepository companyRepository;
+	
+	@Inject 
+	private EmployeeProfileLocationRepository employeeProfileRepository;
 
 	public Optional<User> activateRegistration(String key) {
 		log.debug("Activating user for activation key {}", key);
@@ -608,5 +613,19 @@ public class UserService {
 			System.out.println("USERCOUNT is ****************"+com.getUserCount());
 		}
 		return compDTO;
+	}
+
+	public List<UserDTO> findAllByLocationPid(String territoryPid) {
+		// TODO Auto-generated method stub
+		log.debug("Request to get all users by location Pid");
+		Set<Long> userIds = employeeProfileRepository.findUserIdByLocationPid(territoryPid);
+		List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+		List<UserDTO> result = new ArrayList<>();
+		users.forEach(user -> {
+			UserDTO userDTO = new UserDTO(user);
+			result.add(userDTO);
+		});
+		return result;
+		
 	}
 }

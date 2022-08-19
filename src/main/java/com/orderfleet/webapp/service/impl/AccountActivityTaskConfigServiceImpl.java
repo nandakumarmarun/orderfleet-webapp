@@ -1,8 +1,10 @@
 package com.orderfleet.webapp.service.impl;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,19 +22,25 @@ import com.orderfleet.webapp.domain.AccountActivityTaskConfig;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Activity;
+import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
 import com.orderfleet.webapp.domain.Task;
 import com.orderfleet.webapp.domain.UserDevice;
 import com.orderfleet.webapp.domain.enums.NotificationMessageType;
+import com.orderfleet.webapp.domain.enums.TaskCreatedType;
+import com.orderfleet.webapp.domain.enums.TaskPlanStatus;
 import com.orderfleet.webapp.domain.model.FirebaseData;
 import com.orderfleet.webapp.repository.AccountActivityTaskConfigRepository;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.ActivityRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
+import com.orderfleet.webapp.repository.ExecutiveTaskPlanRepository;
 import com.orderfleet.webapp.repository.TaskRepository;
 import com.orderfleet.webapp.repository.UserDeviceRepository;
+import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountActivityTaskConfigService;
+import com.orderfleet.webapp.service.ExecutiveTaskPlanService;
 import com.orderfleet.webapp.service.TaskService;
 import com.orderfleet.webapp.service.async.FirebaseService;
 import com.orderfleet.webapp.service.util.RandomUtil;
@@ -66,6 +74,12 @@ public class AccountActivityTaskConfigServiceImpl implements AccountActivityTask
 
 	@Inject
 	private TaskRepository taskRepository;
+	
+	@Inject
+	private UserRepository userRepository;
+	
+	@Inject
+	private ExecutiveTaskPlanRepository executiveTaskPlanRepository;
 
 	@Override
 	public AccountActivityTaskConfigDTO saveActivityAccountTypeConfig(AccountActivityTaskConfigDTO activityAccountTypeConfigDTO) {
@@ -139,15 +153,54 @@ public class AccountActivityTaskConfigServiceImpl implements AccountActivityTask
 		}
                 logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 				+ description1);
+              
+                System.out.println("LocationPid :"+leadmanagementDTO.getLocationPid());
+//                String userPid = employeeProfileRepository.findUserPidByLocationPid(leadmanagementDTO.getLocationPid());
+                
+                String str = leadmanagementDTO.getDate(); 
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate dateTime = LocalDate.parse(str, formatter);
 
-		Map<String, String> activityNamesAndTaskPid = new HashMap<>();
+            
+//                LocalDateTime plannedDate =LocalDateTime.now();
+                List<ExecutiveTaskPlan> executiveTaskPlanList = new ArrayList<>();
+	     	Map<String, String> activityNamesAndTaskPid = new HashMap<>();
 		for (AccountActivityTaskConfig activityConfig : activityAccountType) {
+			
 			Task task = taskRepository.save(createTask(accountProfile, activityConfig.getActivity(), leadmanagementDTO.getRemarks()));
+		 
+			
+			userRepository.findOneByPid(leadmanagementDTO.getUserPid()).ifPresent(user -> {
+			
+//				// delete and save new
+//				executiveTaskPlanRepository.deleteByUserPidAndTaskPlanStatusAndPlannedDateBetween(leadmanagementDTO.getUserPid(),
+//						TaskPlanStatus.CREATED, dateTime.atTime(0, 0),dateTime.atTime(23,59));
+				
+				// create new executive plan	 	 
+				ExecutiveTaskPlan newExecutiveTaskPlan = new ExecutiveTaskPlan();
+				newExecutiveTaskPlan.setPid(ExecutiveTaskPlanService.PID_PREFIX + RandomUtil.generatePid());
+				newExecutiveTaskPlan.setAccountProfile(task.getAccountProfile());
+				newExecutiveTaskPlan.setAccountType(task.getAccountType());
+				newExecutiveTaskPlan.setActivity(task.getActivity());
+				newExecutiveTaskPlan.setCreatedDate(LocalDateTime.now());
+				newExecutiveTaskPlan.setCreatedBy(SecurityUtils.getCurrentUserLogin());
+				newExecutiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.CREATED);
+				newExecutiveTaskPlan.setPlannedDate(dateTime.atStartOfDay());
+				newExecutiveTaskPlan.setTaskCreatedType(TaskCreatedType.TASK_SERVER);
+				newExecutiveTaskPlan.setUser(user);
+				newExecutiveTaskPlan.setCompany(user.getCompany());
+				newExecutiveTaskPlan.setTask(task);
+				executiveTaskPlanList.add(newExecutiveTaskPlan);
+			});
+			executiveTaskPlanRepository.save(executiveTaskPlanList);
+			
 			if(activityConfig.getAssignNotification()) {
 				activityNamesAndTaskPid.put(activityConfig.getActivity().getName(), task.getPid());
 			}
 		}
 		if(!activityNamesAndTaskPid.isEmpty()) {
+			
+			
 			sendContactCreatedNotification(leadmanagementDTO, activityNamesAndTaskPid);
 		}
 		
@@ -173,6 +226,7 @@ public class AccountActivityTaskConfigServiceImpl implements AccountActivityTask
 		String location = leadmanagementDTO.getLocationName()==null || leadmanagementDTO.getLocationName().isEmpty() ? notProvided :"\""+leadmanagementDTO.getLocationName()+"\"";
 		
 		String address = "\""+leadmanagementDTO.getAddress()+"\"";
+		
 		
 		StringBuilder message = new StringBuilder();
 		message.append(accountName).append(" has assigned you a Contact ").append(contactPerson)

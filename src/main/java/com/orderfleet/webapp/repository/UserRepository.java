@@ -51,6 +51,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findOneById(Long Id);
 
 	List<User> findByPidIn(List<String> pids);
+	
+	Optional<User> findByPidIn(Set<String> pids);
 
 	@Query(value = "select distinct user from User user join fetch user.authorities", countQuery = "select count(user) from User user")
 	Page<User> findAllWithAuthorities(Pageable pageable);

@@ -71,8 +71,30 @@ if (!this.LeadManagement) {
 			}
 		});
 		LeadManagement.loadAccountProfiles();
+		
+		$('#field_territory').on('change', function() {
+			var territoryPid = $('#field_territory').val();
+			loadUserByTerritoryId(territoryPid);
+		});
+
+		$('.selectpicker').selectpicker();
 	});
-	
+	function loadUserByTerritoryId(territoryPid) {
+		$("#dbUser").html("<option>Users loading...</option>")
+		$.ajax({
+			url : leadManagementContextPath+ "/loadUsers/"
+					+ territoryPid,
+			type : 'GET',
+			success : function(users) {
+				$("#dbUser").html("<option value='no'>Select User</option>")
+				$.each(users, function(key, user) {
+					$("#dbUser").append(
+							"<option value='" + user.pid + "'>" + user.login
+									+ "</option>");
+				});
+			}
+		});
+	}
 	LeadManagement.loadAccountProfiles = function() {
 		$('#tBodyLeadManagement').html(
 		"<tr><td colspan='13' align='center'>Please wait...</td></tr>");
@@ -131,6 +153,8 @@ if (!this.LeadManagement) {
 		accountProfileModel.address = $('#field_address').val();
 		accountProfileModel.contactPerson = $('#field_contactPerson').val();
 		accountProfileModel.locationPid = $('#field_territory').val();
+		accountProfileModel.userPid = $('#dbUser').val();
+		accountProfileModel.date = $("#txtFromDate").val(),
 		accountProfileModel.locationName = $('#field_territory option:selected').text();
 		accountProfileModel.remarks = $('#field_remarks').val();
 		$.ajax({
@@ -159,6 +183,7 @@ if (!this.LeadManagement) {
 				$('#field_address').val(data.address);
 				$('#field_contactPerson').val(data.contactPerson);
 				$('#field_territory').val(data.locationPid);
+				 $('#dbUser').val(data.userPid);
 				$('#field_remarks').val(data.remarks);
 				// set pid
 				accountProfileModel.pid = data.pid;

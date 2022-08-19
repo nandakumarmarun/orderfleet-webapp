@@ -1,5 +1,7 @@
 package com.orderfleet.webapp.web.rest.dto;
 
+import java.time.LocalDateTime;
+
 import com.orderfleet.webapp.domain.AccountProfile;
 
 public class LeadManagementDTO {
@@ -16,7 +18,8 @@ public class LeadManagementDTO {
 	private String accountTypePid;
 	private String accountTypeName;
 	private String remarks;
-	
+	private String userPid;
+	private String date;
 	public LeadManagementDTO() {
 		super();
 	}
@@ -37,6 +40,12 @@ public class LeadManagementDTO {
 	}
 	
 	
+	public LeadManagementDTO(String userPid, String date) {
+		super();
+		this.userPid = userPid;
+		this.date = date;
+	}
+
 	public String getPid() {
 		return pid;
 	}
@@ -120,6 +129,22 @@ public class LeadManagementDTO {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public String getUserPid() {
+		return userPid;
+	}
+
+	public void setUserPid(String userPid) {
+		this.userPid = userPid;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 	
 	

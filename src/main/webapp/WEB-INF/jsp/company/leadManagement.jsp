@@ -36,7 +36,10 @@
 						<i class="entypo-plus-circled"></i> Create
 					</button>
 				</div>
-			</div>
+				
+				
+				</div>
+			
 			
 			<div class="clearfix"></div>
 			<hr/>
@@ -74,7 +77,7 @@
 								</button>
 								<h4 class="modal-title" id="myModalLabel">Create or edit Lead Management</h4>
 							</div>
-							<div class="modal-body" style="height: 500px; overflow: auto;">
+							<div class="modal-body" style="height: 700px; overflow: auto;">
 								<div class="alert alert-danger alert-dismissible" role="alert"
 									style="display: none;">
 									<button type="button" class="close"
@@ -106,14 +109,28 @@
 								<div class="form-group">
 									<label class="control-label" for="field_territory">Territory</label> 
 									<select id="field_territory" name="territory"
-										class="form-control"><!-- <option value="-1">Select
-											Account Type</option> -->
+											class="form-control selectpicker" data-live-search="true"><option value="-1">Select
+											Territory</option> 
 										<c:forEach items="${territories}" var="territory">
 											<option value="${territory.pid}">${territory.name}</option>
 										</c:forEach>
 									</select>
 								</div>
-								<div class="form-group">
+								<div class="row">
+								<div class="col-sm-3"> 
+						     User <select id="dbUser" name="userPid"
+							class="form-control">
+							<option value="no">All User</option>
+						</select>
+					  </div>
+					   <div class="col-sm-2 ">Select Date 
+								<br />
+								<div class="input-group">
+									<input type="date" class="form-control" id="txtFromDate"
+									style="background-color: #fff;">
+								</div>
+							</div>
+							</div>	<div class="form-group">
 									<label class="control-label" for="field_contactPerson">Contact
 										Person</label>
 									<input type="text" class="form-control" name="contactPerson"

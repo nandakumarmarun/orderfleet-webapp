@@ -26,8 +26,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.repository.LocationRepository;
+import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.service.AccountActivityTaskConfigService;
 import com.orderfleet.webapp.service.AccountProfileService;
+import com.orderfleet.webapp.service.UserService;
+import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LeadManagementDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
@@ -46,12 +49,19 @@ public class LeadManagementResource {
 	
 	@Inject
 	private AccountActivityTaskConfigService activityConfigService;
+	
+	@Inject
+	private UserRepository userRepository;
+	
+	@Inject
+	private UserService userService;
 
 	@RequestMapping(value = "/leadManagement", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
 	public String getAllAccountProfiles(Pageable pageable, Model model) {
 		model.addAttribute("territories",locationRepository.findAllByCompanyId());
+		
 		return "company/leadManagement";
 	}
 	
@@ -125,5 +135,12 @@ public class LeadManagementResource {
 	}
 	
 	
-	
+	@RequestMapping(value = "/leadManagement/loadUsers/{territoryPid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	@Timed
+	public List<UserDTO> getAllUsersByTerritory(@Valid @PathVariable("territoryPid") String territoryPid) throws URISyntaxException {
+		log.debug("Web request to Get Users by LocationPid: {}", territoryPid);
+		List<UserDTO> users=userService.findAllByLocationPid(territoryPid);
+		return users;
+	}
 }

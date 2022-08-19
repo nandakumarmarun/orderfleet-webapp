@@ -71,4 +71,7 @@ public interface EmployeeProfileLocationRepository extends JpaRepository<Employe
 	//Edit Mode (8-2-19)
 	@Query("select employeeProfileLocation.employeeProfile.pid from EmployeeProfileLocation employeeProfileLocation where employeeProfileLocation.employeeProfile in ?1")
 	List<String> findEmployeeProfilePidByEmployeeProfileIn(List<EmployeeProfile> employees);
+	
+	@Query("select employeeProfileLocation.employeeProfile.user.pid from EmployeeProfileLocation employeeProfileLocation where employeeProfileLocation.location.pid = ?1")
+	String findUserPidByLocationPid(String locationPid);
 }
