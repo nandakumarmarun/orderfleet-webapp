@@ -58,6 +58,7 @@ public class SalesOrderItemDTO {
 	private String referenceInventoryVoucherHeaderPid;
 	private Long referenceInventoryVoucherDetailId;
 	private String remarks;
+	private String alias;
 	private String stockLocationName;
 	private double updatedQuantity;
 	private double updatedRowTotal;
@@ -85,6 +86,12 @@ public class SalesOrderItemDTO {
 			unitQty = inventoryVoucherDetail.getProduct().getUnitQty();
 		}
 		this.unitQuantity = unitQty;
+		
+		String alias = "";
+		if (inventoryVoucherDetail.getProduct().getAlias() != null) {
+			alias = inventoryVoucherDetail.getProduct().getAlias();
+		}
+		this.alias = alias;
 
 		this.itemFreeQuantity = inventoryVoucherDetail.getFreeQuantity();
 		this.sellingRate = inventoryVoucherDetail.getSellingRate();
@@ -504,6 +511,16 @@ public class SalesOrderItemDTO {
 
 	public void setCessRateOfVat(double cessRateOfVat) {
 		this.cessRateOfVat = cessRateOfVat;
+	}
+	
+	
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
 	}
 
 	@Override
