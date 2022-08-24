@@ -117,6 +117,8 @@ public class ExecutiveTaskExecutionDTO {
 	private String description;
 
 	private String VehicleRegistrationNumber;
+	
+	private Double batteryPercentage;
 
 	public ExecutiveTaskExecutionDTO() {
 		super();
@@ -200,8 +202,10 @@ public class ExecutiveTaskExecutionDTO {
 		this.mockLocationStatus = mockLocationStatus;
 		this.withCustomer = withCustomer;
 		this.setDescription(description);
+		
 	}
 
+	
 	public String getPid() {
 		return pid;
 	}
@@ -618,6 +622,15 @@ public class ExecutiveTaskExecutionDTO {
 		VehicleRegistrationNumber = vehicleRegistrationNumber;
 	}
 
+	
+	public Double getBatteryPercentage() {
+		return batteryPercentage;
+	}
+
+	public void setBatteryPercentage(Double batteryPercentage) {
+		this.batteryPercentage = batteryPercentage;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -642,24 +655,11 @@ public class ExecutiveTaskExecutionDTO {
 
 	@Override
 	public String toString() {
-		return "ExecutiveTaskExecutionDTO [pid=" + pid + ", clientTransactionKey=" + clientTransactionKey
-				+ ", createdDate=" + createdDate + ", date=" + date + ", sendDate=" + sendDate + ", startTime="
-				+ startTime + ", endTime=" + endTime + ", timeSpend=" + timeSpend + ", remarks=" + remarks
-				+ ", userPid=" + userPid + ", userName=" + userName + ", activityPid=" + activityPid + ", activityName="
-				+ activityName + ", accountTypePid=" + accountTypePid + ", accountTypeName=" + accountTypeName
-				+ ", accountProfilePid=" + accountProfilePid + ", accountProfileName=" + accountProfileName
-				+ ", accountLocation=" + accountLocation + ", latitude=" + latitude + ", longitude=" + longitude
-				+ ", towerLatitude=" + towerLatitude + ", towerLongitude=" + towerLongitude + ", mnc=" + mnc + ", mcc="
-				+ mcc + ", cellId=" + cellId + ", lac=" + lac + ", locationType=" + locationType + ", isGpsOff="
-				+ isGpsOff + ", isMobileDataOff=" + isMobileDataOff + ", startLocation=" + startLocation
-				+ ", startLatitude=" + startLatitude + ", startLongitude=" + startLongitude + ", startMnc=" + startMnc
-				+ ", startMcc=" + startMcc + ", startCellId=" + startCellId + ", startLac=" + startLac
-				+ ", startLocationType=" + startLocationType + ", startIsGpsOff=" + startIsGpsOff
-				+ ", startIsMobileDataOff=" + startIsMobileDataOff + ", location=" + location + ", towerLocation="
-				+ towerLocation + ", activityStatus=" + activityStatus + ", executiveTaskPlanPid="
-				+ executiveTaskPlanPid + ", rejectReasonRemark=" + rejectReasonRemark + ", employeeName=" + employeeName
-				+ ", interimSave=" + interimSave + ", punchInDate=" + punchInDate + ", mockLocationStatus="
-				+ mockLocationStatus + ", withCustomer=" + withCustomer + "]";
+		return "ExecutiveTaskExecutionDTO [pid=" + pid + ", createdDate=" + createdDate + ", date=" + date
+				+ ", latitude=" + latitude + ", longitude=" + longitude + ", location=" + location + ", employeeName="
+				+ employeeName + ", mockLocationStatus=" + mockLocationStatus + ", withCustomer=" + withCustomer
+				+ ", batteryPercentage=" + batteryPercentage + "]";
 	}
 
+	
 }

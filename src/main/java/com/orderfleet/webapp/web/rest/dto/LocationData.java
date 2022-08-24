@@ -14,6 +14,8 @@ public class LocationData {
 
 		private String key;
 	
+		private Double battery_percentage;
+		
 		public String getCompanyName() {
 			return companyName;
 		}
@@ -54,11 +56,24 @@ public class LocationData {
 			this.key = key;
 		}
 
+		
+		
+
+		public Double getBattery_percentage() {
+			return battery_percentage;
+		}
+
+		public void setBattery_percentage(Double battery_percentage) {
+			this.battery_percentage = battery_percentage;
+		}
+
 		@Override
 		public String toString() {
 			return "LocationData [companyName=" + companyName + ", date=" + date + ", latitude=" + latitude
-					+ ", longitude=" + longitude + ", key=" + key + "]";
+					+ ", longitude=" + longitude + ", key=" + key + ", batteryPercentage=" + battery_percentage + "]";
 		}
+
+		
 
 	}
 

@@ -266,6 +266,12 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 			+ "tally_download_status FROM tbl_accounting_voucher_header where tally_download_status ='PENDING' and company_id = ?#{principal.companyId} "
 			+ "order by created_date desc", nativeQuery = true)
 	List<Object[]> findByCompanyIdAndTallyStatusByCreatedDateDesc();
+	
+	@Query(value = "SELECT id,pid,executive_task_execution_id,document_id,account_profile_id,created_date,document_date,total_amount,"
+			+ "outstanding_amount,remarks,created_by_id,employee_id,document_number_local,document_number_server,status,updated_date,"
+			+ "tally_download_status FROM tbl_accounting_voucher_header where tally_download_status ='PENDING' and company_id = ?#{principal.companyId} and employee_id = ?1 "
+			+ "order by created_date desc", nativeQuery = true)
+	List<Object[]> findByCompanyIdAndEmployeeIdAndTallyStatusByCreatedDateDesc(Long empId);
 
 	@Query(value = "SELECT id,pid,executive_task_execution_id,document_id,account_profile_id,created_date,document_date,total_amount,"
 			+ "outstanding_amount,remarks,created_by_id,employee_id,document_number_local,document_number_server,status,updated_date,"

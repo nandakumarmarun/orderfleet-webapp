@@ -340,6 +340,8 @@ function createContentString(trackingPoint, number, employeeName) {
 			+ trackingPoint.accountProfileName + '<tr><td>Location</td><td>'
 			+ location + " " + locationIcon + '</td></tr><tr><td>Date</td><td>'
 			+ convertDateTime(trackingPoint.date)
+			+ '</td></tr><tr><td>Battery Percentage</td><td>'
+			+ trackingPoint.batteryPercentage
 			+ '</td></tr><tr><td>Number</td><td>' + number
 			+ '</td></tr></table></div>';
 

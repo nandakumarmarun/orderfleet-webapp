@@ -169,6 +169,8 @@ public class LiveRoutingResourse {
 					fbid.setDate(entries.getValue().getDate());
 					fbid.setLatitude(entries.getValue().getLatitude());
 					fbid.setLongitude(entries.getValue().getLongitude());
+					fbid.setBattery_percentage(entries.getValue().getBattery_percentage());
+					
 					loc.add(fbid);
 					liveRouting.setLocations(loc);
 					routing.add(liveRouting);
@@ -194,7 +196,7 @@ public class LiveRoutingResourse {
 							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 							LocalDateTime createdDate = LocalDateTime.parse(locations.getDate(), formatter);
 							executiveTaskExecutionDTO.setDate(createdDate);
-
+							executiveTaskExecutionDTO.setBatteryPercentage(locations.getBattery_percentage());
 							executiveTaskExecutionDTO.setLocationType(LocationType.GpsLocation);
 							executiveTaskExecutionDTO.setAccountProfileName("Attendance");
 							trackingPoints.add(executiveTaskExecutionDTO);
@@ -235,15 +237,10 @@ public class LiveRoutingResourse {
 					difference = date1.getTime()- date2.getTime();
 				}
 				 long minutes = (difference / 1000) / 60;
-				 System.out.println("Time1 :"+time1);
-				 System.out.println("Time2: "+parts[1]);
-				 System.out.println("date :"+date2.getTime() );
-				 System.out.println("dates :"+date1.getTime());
-				 System.out.println("Diffence :"+difference);
-				System.out.println("Minutes :"+minutes);
+				
 				if (minutes < 5) {
 					dtos.setAccountProfileName("CurrentLocation");
-					System.out.println(dtos.getAccountProfileName() + " " + dtos.getDate() + " " + dtos.getLatitude());
+				
 					ltdto.getTrackingPoints().add(dtos);
 				}
 				else {

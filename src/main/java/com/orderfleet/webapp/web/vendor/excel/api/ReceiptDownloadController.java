@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
@@ -44,6 +45,7 @@ import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherDetailRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
@@ -91,6 +93,8 @@ public class ReceiptDownloadController {
 
 	@Inject
 	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
+	
+	
 
 	@RequestMapping(value = "/get-receipts.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -464,4 +468,141 @@ System.out.println("returned.......................................");
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
+	@RequestMapping(value = "/get-receipts-userwise.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public List<ReceiptExcelDTO> downloadReceiptsUserWiseJson(@RequestParam(value = "employeeName", required = true) String employeeName) throws URISyntaxException {
+		CompanyViewDTO company = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		log.debug("REST request to download receipts userwise <" + company.getLegalName() + "> : {}");
+
+		List<ReceiptExcelDTO> receiptDTOs = new ArrayList<>();
+     Optional<EmployeeProfile> employee = employeeProfileRepository.findByCompanyIdAndNameIgnoreCase(company.getId(), employeeName);
+     System.out.println("Employee:"+employee.get().getName());
+     List<Object[]> accountingVoucherHeaders =null;
+      if(employee.isPresent())
+      {
+		accountingVoucherHeaders = accountingVoucherHeaderRepository
+				.findByCompanyIdAndEmployeeIdAndTallyStatusByCreatedDateDesc(employee.get().getId());
+		
+      }     
+              System.out.println("size:"+accountingVoucherHeaders.size());  
+		if (accountingVoucherHeaders.size() > 0) {
+
+			Set<Long> avhIds = new HashSet<>();
+			Set<String> avhPids = new HashSet<>();
+			Set<Long> documentIds = new HashSet<>();
+			Set<Long> employeeIds = new HashSet<>();
+			Set<Long> accountProfileIds = new HashSet<>();
+			Set<Long> userIds = new HashSet<>();
+			Set<Long> exeIds = new HashSet<>();
+
+			for (Object[] obj : accountingVoucherHeaders) {
+
+				avhIds.add(Long.parseLong(obj[0].toString()));
+				avhPids.add(obj[1].toString());
+				userIds.add(Long.parseLong(obj[10].toString()));
+				documentIds.add(Long.parseLong(obj[3].toString()));
+				employeeIds.add(Long.parseLong(obj[11].toString()));
+				exeIds.add(Long.parseLong(obj[2].toString()));
+				accountProfileIds.add(Long.parseLong(obj[4].toString()));
+
+			}
+
+			List<Document> documents = documentRepository.findAllByCompanyIdAndIdsIn(documentIds);
+			List<EmployeeProfile> employeeProfiles = employeeProfileRepository.findAllByCompanyIdAndIdsIn(employeeIds);
+			List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository
+					.findAllByCompanyIdAndIdsIn(exeIds);
+			
+			List<AccountProfile> accountProfiles = accountProfileRepository
+					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+			 
+			List<User> users = userRepository.findAllByCompanyIdAndIdsIn(userIds);
+			DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id11 = "AVD_QUERY_111" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description11 ="get all by accVoucherHeaderPidIn";
+			LocalDateTime startLCTime11 = LocalDateTime.now();
+			String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
+			String startDate11 = startLCTime11.format(DATE_FORMAT11);
+			logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
+			List<AccountingVoucherDetail> accountingVoucherDetails = accountingVoucherDetailRepository
+					.findAllByAccountingVoucherHeaderPidIn(avhPids);
+			 String flag11 = "Normal";
+				LocalDateTime endLCTime11 = LocalDateTime.now();
+				String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
+				String endDate11 = startLCTime11.format(DATE_FORMAT11);
+				Duration duration11 = Duration.between(startLCTime11, endLCTime11);
+				long minutes11 = duration11.toMinutes();
+				if (minutes11 <= 1 && minutes11 >= 0) {
+					flag11 = "Fast";
+				}
+				if (minutes11 > 1 && minutes11 <= 2) {
+					flag11 = "Normal";
+				}
+				if (minutes11 > 2 && minutes11 <= 10) {
+					flag11 = "Slow";
+				}
+				if (minutes11 > 10) {
+					flag11 = "Dead Slow";
+				}
+		                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
+						+ description11);
+			for (Object[] obj : accountingVoucherHeaders) {
+
+				String rferenceInventoryVoucherHeaderExecutiveExecutionPid = "";
+
+				Optional<User> opUser = users.stream().filter(u -> u.getId() == Long.parseLong(obj[10].toString()))
+						.findAny();
+
+				Optional<Document> opDocument = documents.stream()
+						.filter(doc -> doc.getId() == Long.parseLong(obj[3].toString())).findAny();
+
+				Optional<EmployeeProfile> opEmployeeProfile = employeeProfiles.stream()
+						.filter(emp -> emp.getId() == Long.parseLong(obj[11].toString())).findAny();
+
+				Optional<ExecutiveTaskExecution> opExe = executiveTaskExecutions.stream()
+						.filter(doc -> doc.getId() == Long.parseLong(obj[2].toString())).findAny();
+
+				Optional<AccountProfile> opAccPro = accountProfiles.stream()
+						.filter(a -> a.getId() == Long.parseLong(obj[4].toString())).findAny();
+
+				List<AccountingVoucherDetail> avDetails = accountingVoucherDetails.stream()
+						.filter(ivd -> ivd.getAccountingVoucherHeader().getId() == Long.parseLong(obj[0].toString()))
+						.collect(Collectors.toList()).stream()
+						.sorted(Comparator.comparingLong(AccountingVoucherDetail::getId)).collect(Collectors.toList());
+
+				for (AccountingVoucherDetail accountingVoucherDetail : avDetails) {
+					if (accountingVoucherDetail.getAccountingVoucherAllocations().isEmpty()) {
+						ReceiptExcelDTO receiptDTO = new ReceiptExcelDTO(accountingVoucherDetail);
+						receiptDTO.setAccountingVoucherHeaderDTO(avdObjectToDto(obj, opUser.get(), opDocument.get(),
+								opEmployeeProfile.get(), opExe.get(), opAccPro.get(), avDetails));
+						receiptDTOs.add(receiptDTO);
+					} else {
+						for (AccountingVoucherAllocation accountingVoucherAllocation : accountingVoucherDetail
+								.getAccountingVoucherAllocations()) {
+							ReceiptExcelDTO receiptDTO = new ReceiptExcelDTO(accountingVoucherAllocation);
+							receiptDTO.setAccountingVoucherHeaderDTO(avdObjectToDto(obj, opUser.get(), opDocument.get(),
+									opEmployeeProfile.get(), opExe.get(), opAccPro.get(), avDetails));
+							receiptDTO.setHeaderAmount(Double.parseDouble(obj[7].toString()));
+							receiptDTO.setNarrationMessage(
+									accountingVoucherAllocation.getAccountingVoucherDetail().getRemarks());
+							receiptDTOs.add(receiptDTO);
+						}
+					}
+
+				}
+
+			}
+		}
+
+		if (!receiptDTOs.isEmpty()) {
+			
+			int updated = accountingVoucherHeaderRepository
+					.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PROCESSING,
+							receiptDTOs.stream().map(avh -> avh.getAccountingVoucherHeaderPid())
+									.collect(Collectors.toList()));
+			
+			log.debug("updated " + updated + " to PROCESSING");
+		}
+		return receiptDTOs;
+	}
 }
