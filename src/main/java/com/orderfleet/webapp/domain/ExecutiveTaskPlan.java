@@ -99,6 +99,10 @@ public class ExecutiveTaskPlan implements Serializable {
 	@NotNull
 	@Column(name = "sort_order", nullable = false, columnDefinition = "integer DEFAULT 0 ")
 	private int sortOrder;
+	
+	@NotNull
+	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
+	private boolean activated = true;
 
 	public Long getId() {
 		return id;
@@ -242,6 +246,14 @@ public class ExecutiveTaskPlan implements Serializable {
 
 	public void setUserRemarks(String userRemarks) {
 		this.userRemarks = userRemarks;
+	}
+
+	public boolean isActivated() {
+		return activated;
+	}
+
+	public void setActivated(boolean activated) {
+		this.activated = activated;
 	}
 
 	@Override

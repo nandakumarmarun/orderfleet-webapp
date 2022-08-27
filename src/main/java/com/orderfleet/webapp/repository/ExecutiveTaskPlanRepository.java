@@ -106,4 +106,9 @@ public interface ExecutiveTaskPlanRepository extends JpaRepository<ExecutiveTask
 
 	void deleteByUserPidAndTaskListPidAndPlannedDateBetween(String userPid, String taskListPid,
 			LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+	List<ExecutiveTaskPlan> findAllByCompanyIdAndTaskPlanStatusAndActivatedAndPlannedDateBetween(Long companyid, TaskPlanStatus pending,boolean active,LocalDateTime fromdate,LocalDateTime
+			toDate);
+
+	List<ExecutiveTaskPlan> findByUserPidAndTaskPid(String userPid, String taskPid);
 }
