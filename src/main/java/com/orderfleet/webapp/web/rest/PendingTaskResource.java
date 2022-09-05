@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Period;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -92,10 +93,12 @@ public class PendingTaskResource {
 		List<ExecutiveTaskPlan> taskPlans = null;
 
 		Long companyid = SecurityUtils.getCurrentUsersCompanyId();
-		TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
-		LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
+		LocalDate tDate = LocalDate.now();
+		Period days_7 = Period.ofDays(7);
+		LocalDate fDate = tDate.minus(days_7);
+		System.out.println("Date:@@@@@@@@@@@@@@@@  "+fDate);
 		taskPlans = executiveTaskPlanRepository.findAllByCompanyIdAndTaskPlanStatusAndActivatedAndPlannedDateBetween(companyid,
-				TaskPlanStatus.PENDING, true,weekStartDate.atTime(0,0),LocalDateTime.now());
+				TaskPlanStatus.PENDING, true,fDate.atTime(0,0),LocalDateTime.now());
 
 		System.out.println("Size of TaskPlan :" + taskPlans.size());
 

@@ -62,14 +62,15 @@ if (!this.PendingTask) {
 																	+ "</td><td>"
 																	+ invoiceWiseReport.unattendedTask
 																	+ "</td></tr>");
-											var series=0
+											var series=0;
 											$
 													.each(
 															invoiceWiseReport.taskList,
 
 															function(index,
 																	executionDetail) {
-																series =+ 1;
+																series++;
+																console.log("number:"+series)
 																$(
 																		'#tBodyInvoiceWiseReport')
 																		.append(
