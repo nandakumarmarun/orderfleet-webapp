@@ -101,7 +101,9 @@ public class DocumentDTO implements Cloneable {
 	private boolean discountScaleBar;
 		
 	private boolean smsApiEnable;
-
+	
+	private boolean preventNegativeStock;
+	
 	private byte[] headerImage;
 
 	private String headerImageContentType;
@@ -150,6 +152,7 @@ public class DocumentDTO implements Cloneable {
 		this.rateWithTax = document.getRateWithTax();
 		this.discountScaleBar =document.getDiscountScaleBar();
 		this.smsApiEnable = document.getSmsApiEnable();
+		this.preventNegativeStock = document.getPreventNegativeStock();
 		this.headerImage = document.getHeaderImage();
 		this.footerImage = document.getFooterImage();
 		this.headerImageContentType = document.getHeaderImageContentType();
@@ -538,6 +541,15 @@ public class DocumentDTO implements Cloneable {
 
 	public void setEnableHeaderPrintOut(boolean enableHeaderPrintOut) {
 		this.enableHeaderPrintOut = enableHeaderPrintOut;
+	}
+	
+
+	public boolean getPreventNegativeStock() {
+		return preventNegativeStock;
+	}
+
+	public void setPreventNegativeStock(boolean preventNegativeStock) {
+		this.preventNegativeStock = preventNegativeStock;
 	}
 
 	@Override

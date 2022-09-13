@@ -162,6 +162,10 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "sms_api_enable", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean smsApiEnable;
 	
+	@Column(name = "prevent_negative_Stock", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean preventNegativeStock;
+	
+	
 	@Column(name = "discount_Scale_Bar", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean discountScaleBar;
 	
@@ -451,6 +455,15 @@ public class Document implements Serializable, Cloneable {
 
 	public void setSmsApiEnable(boolean smsApiEnable) {
 		this.smsApiEnable = smsApiEnable;
+	}
+	
+	
+	public boolean getPreventNegativeStock() {
+		return preventNegativeStock;
+	}
+
+	public void setPreventNegativeStock(boolean preventNegativeStock) {
+		this.preventNegativeStock = preventNegativeStock;
 	}
 
 	public boolean getEnableHeaderPrintOut() {

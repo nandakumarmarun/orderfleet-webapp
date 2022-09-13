@@ -55,6 +55,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		documentDTO.setRateWithTax(document.getRateWithTax());
 		documentDTO.setDiscountScaleBar(document.getDiscountScaleBar());
 		documentDTO.setSmsApiEnable(document.getSmsApiEnable());
+		documentDTO.setPreventNegativeStock(document.getPreventNegativeStock());
 		documentDTO.setHeaderImageContentType(document.getHeaderImageContentType());
 		documentDTO.setFooterImageContentType(document.getFooterImageContentType());
         documentDTO.setDiscountPercentage(document.getDiscountPercentage());
@@ -106,6 +107,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		documentDTO.setRateWithTax(document.getRateWithTax());
 		documentDTO.setDiscountScaleBar(document.getDiscountScaleBar());
 		documentDTO.setSmsApiEnable(document.getSmsApiEnable());
+		documentDTO.setPreventNegativeStock(document.getPreventNegativeStock());
 		documentDTO.setHeaderImageContentType(document.getHeaderImageContentType());
 		documentDTO.setFooterImageContentType(document.getFooterImageContentType());
         documentDTO.setDiscountPercentage(document.getDiscountPercentage());
@@ -168,6 +170,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		document.setHasTelephonicOrder(documentDTO.getHasTelephonicOrder());
 		document.setRateWithTax(documentDTO.getRateWithTax());
 		document.setSmsApiEnable(documentDTO.getSmsApiEnable());
+		document.setPreventNegativeStock(documentDTO.getPreventNegativeStock());
 		document.setDiscountScaleBar(documentDTO.getDiscountScaleBar());
 		document.setEnableHeaderPrintOut(documentDTO.getEnableHeaderPrintOut());
 		document.setDiscountPercentage(documentDTO.getDiscountPercentage());

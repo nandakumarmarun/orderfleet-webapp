@@ -37,6 +37,7 @@ if (!this.Document) {
 		rateWithTax : false,
 		discountScaleBar:false,
 		smsApiEnable : false,
+		preventNegativeStock : false,
 		enableHeaderPrintOut:false,
 		headerImage : null,
 		headerImageContentType : null,
@@ -222,9 +223,8 @@ if (!this.Document) {
 				'checked');
 		documentModel.rateWithTax = $('#field_rateWithTax').prop('checked');
 		documentModel.discountScaleBar = $('#field_discountScaleBar').prop('checked');
-		console.log($('#field_smsApiEnable').prop('checked'));
 		documentModel.smsApiEnable = $('#field_smsApiEnable').prop('checked');
-		
+		documentModel.preventNegativeStock = $('#field_preventNegativeStock').prop('checked');
 		documentModel.enableHeaderPrintOut = $('#field_enableHeaderPrintOut').prop('checked');
 		console.log(documentModel);
 		$.ajax({
@@ -363,6 +363,8 @@ if (!this.Document) {
 								data.discountScaleBar);
 						$("#field_smsApiEnable").prop("checked",
 								data.smsApiEnable);
+						$("#field_preventNegativeStock").prop("checked",
+								data.preventNegativeStock);
 						
 						$("#field_enableHeaderPrintOut").prop("checked",
 								data.enableHeaderPrintOut);

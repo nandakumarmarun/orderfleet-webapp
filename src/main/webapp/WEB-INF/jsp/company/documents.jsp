@@ -290,6 +290,12 @@
 											id="field_smsApiEnable" /> &nbsp;<span>Sms Api Enable</span>
 										</label>
 									</div>
+									</div>
+										<div class="form-group" id="preventNegativeStock">
+										<label for="preventNegativeStock"> <input type="checkbox"
+											id="field_preventNegativeStock" /> &nbsp;<span>Prevent Negative Stock</span>
+										</label>
+									</div>
 									
 									<div class="form-group" id="enableHeaderPrintOut">
 										<label for="enableHeaderPrintOut"> <input type="checkbox"
