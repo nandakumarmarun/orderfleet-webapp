@@ -86,4 +86,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	@Query("update Location location set location.name = CONCAT(location.name, '_old'),location.activated = false where location.company.id = ?#{principal.companyId} AND location.id IN ?1")
 	void deactivatelocationId(Set<Long> id);
 
+	@Query("select location.pid from Location location where location.company.id= ?#{principal.companyId}")
+	List<String> findAllPidsByCompany();
+
 }

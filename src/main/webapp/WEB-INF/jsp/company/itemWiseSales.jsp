@@ -106,7 +106,7 @@
 							</div>
 							
 							<div class="col-sm-2">
-								Account <select id="dbproductGroup" name="productGroup"
+								ProductGroup <select id="dbproductGroup" name="productGroup"
 									class="form-control selectpicker" data-live-search="true">
 									<option value="-1">All Product Groups</option>
 									<c:forEach items="${productGroups}" var="productGroup">
@@ -116,7 +116,7 @@
 							</div>
 							
 							<div class="col-sm-2">
-								Account <select id="dbTerittory" name="terittory"
+								Territory <select id="dbTerittory" name="terittory"
 									class="form-control selectpicker" data-live-search="true">
 									<option value="-1">All Terittories</option>
 									<c:forEach items="${territories}" var="locationAccountProfile">

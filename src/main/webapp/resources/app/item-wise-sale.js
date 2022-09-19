@@ -96,6 +96,7 @@ if (!this.ItemWiseSale) {
 		var productGroupPids = $('#dbproductGroup').val();
 		var territtoryPids = $('#dbTerittory').val();
 
+		
 		$('#lblTotal').text("0");
 		if ($("#includeStockLocationDetails").is(':checked')) {
 			value = $('#includeStockLocationDetails').val();
@@ -112,11 +113,11 @@ if (!this.ItemWiseSale) {
 			}).get().join(',');
 		}
 
-		if ("-1" == accountPids) {
-			accountPids = $('#dbAccount option').map(function() {
-				return $(this).val();
-			}).get().join(',');
-		}
+//		if ("-1" == accountPids) {
+//			accountPids = $('#dbAccount option').map(function() {
+//				return $(this).val();
+//			}).get().join(',');
+//		}
 
 		if ("-1" == productGroupPids) {
 			productGroupPids = $('#dbproductGroup option').map(function() {
@@ -124,11 +125,11 @@ if (!this.ItemWiseSale) {
 			}).get().join(',');
 		}
 
-		if ("-1" == territtoryPids) {
-			territtoryPids = $('#dbTerittory option').map(function() {
-				return $(this).val();
-			}).get().join(',');
-		}
+//		if ("-1" == territtoryPids) {
+//			territtoryPids = $('#dbTerittory option').map(function() {.0
+//				return $(this).val();
+//			}).get().join(',');
+//		}
 
 		if ($("#dbDocumentType").val() == "no") {
 			alert("Please Select Document Type")
@@ -140,39 +141,39 @@ if (!this.ItemWiseSale) {
 		if (value == "no") {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>OderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>DeliveryDate</th><th>Quantity</th><th>Amount</th></tr>");
+							"<tr><th>Date</th><th>OrderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Source</th><th>Destination</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>Quantity</th><th>Amount</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='8' align='center'>Please wait...</td></tr>");
 		} else {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>OderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>DeliveryDate</th><th>Quantity</th><th>Unit Quantity</th><th>Voulume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
+							"<tr><th>Date</th><th>OrderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>Quantity</th><th>Unit Quantity</th><th>Voulume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='7' align='center'>Please wait...</td></tr>");
 		}
 		$
-				.ajax({
-					url : itemWiseSaleContextPath + "/filter",
-					type : 'GET',
-					data : {
-						sort : $('input[name=sorting]:checked').val(),
-						order : $('input[name=order]:checked').val(),
-						categoryPids : "",
-						groupPids : productGroupPids,
-						terittoryPids : territtoryPids,
-						voucherType : $("#dbDocumentType").val(),
-						documentPid : $("#dbDocument").val(),
-						filterBy : $("#dbDateSearch").val(),
-						fromDate : $("#txtFromDate").val(),
-						toDate : $("#txtToDate").val(),
-						stockLocations : "",
-						employeePid : empPids,
-						inclSubordinate : $('#inclSubOrdinates').is(":checked"),
-						profilePids : "",
-						accountPids : $("#dbAccount").val(),
-					},
+		.ajax({
+			url : itemWiseSaleContextPath + "/filter",
+			type : 'GET',
+			data : {
+				sort : $('input[name=sorting]:checked').val(),
+				order : $('input[name=order]:checked').val(),
+				categoryPids : "",
+				groupPids : productGroupPids,
+				terittoryPids :  $("#dbTerittory").val(),
+				voucherType : $("#dbDocumentType").val(),
+				documentPid : $("#dbDocument").val(),
+				filterBy : $("#dbDateSearch").val(),
+				fromDate : $("#txtFromDate").val(),
+				toDate : $("#txtToDate").val(),
+				stockLocations : "",
+				employeePid : empPids,
+				inclSubordinate : $('#inclSubOrdinates').is(":checked"),
+				profilePids : "",
+				accountPids : $("#dbAccount").val(),
+			},
 					success : function(itemWiseSales) {
 						$('#tBodyItemWiseSale').html("");
 
@@ -224,9 +225,7 @@ if (!this.ItemWiseSale) {
 															+ "</td><td>"
 															+ itemWiseSale.productGroup
 															+ "</td><td>"
-															+ itemWiseSales.territory
-															+ "</td><td>"
-															+ convertDateTimeFromServer(itemWiseSale.deliveryDate)
+															+ itemWiseSale.territory
 															+ "</td><td>"
 															+ itemWiseSale.quantity
 															+ "</td><td>"
@@ -242,6 +241,7 @@ if (!this.ItemWiseSale) {
 										.each(
 												itemWiseSales,
 												function(key, itemWiseSale) {
+													console.log("Entered here......")
 													console
 															.log(itemWiseSale.productGroup);
 													console
@@ -267,8 +267,7 @@ if (!this.ItemWiseSale) {
 															+ itemWiseSale.productGroup
 															+ "</td><td>"
 															+ itemWiseSale.territory
-															+ "</td><td>"
-															+ convertDateTimeFromServer(itemWiseSale.deliveryDate)
+														
 															+ "</td><td>"
 															+ itemWiseSale.quantity
 															+ "</td><td>"

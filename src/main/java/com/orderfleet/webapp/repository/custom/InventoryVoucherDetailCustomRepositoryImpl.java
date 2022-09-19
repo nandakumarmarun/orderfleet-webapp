@@ -145,7 +145,7 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 						
 			ivd.setProductUnitQty(object[11] != null ? Double.valueOf(object[11].toString()) : 1);
 			ivd.setVolume(Double.valueOf(object[12].toString()));
-			ivd.setCustomerLocation(object[13] != null ? object[12].toString() : "");
+			ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
 			
 			if (AccountTypeColumn.valueOf(object[15].toString()).equals(AccountTypeColumn.Supplier)) {
 				ivd.setCustomerLocation(object[14] != null ? object[14].toString() : "");

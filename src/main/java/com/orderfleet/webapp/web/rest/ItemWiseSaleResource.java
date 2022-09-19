@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
@@ -139,11 +140,9 @@ public class ItemWiseSaleResource {
 			@RequestParam("filterBy") String filterBy,
 			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 			@RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-			@RequestParam(value = "fromdeliveryDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDeliveryDate,
-			@RequestParam(value = "	toDeliveryDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDeliveryDate,
 			@RequestParam String stockLocations, @RequestParam String profilePids,
 			@RequestParam("employeePid") String employeePids, @RequestParam boolean inclSubordinate,
-			@RequestParam String accountPids, @RequestParam String terittoryPids) {
+			@RequestParam String accountPids,  @RequestParam String terittoryPids) {
 
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
 
@@ -192,6 +191,9 @@ public class ItemWiseSaleResource {
 		List<String> stockLocationPids = new ArrayList<>();
 		List<String> productCategoryPids = new ArrayList<>();
 		List<String> productGroupPids = new ArrayList<>();
+		
+		
+		
 		List<String> productProfilePids = new ArrayList<>();
 		List<String> productTerritoryPids = new ArrayList<>();
 		List<String> documentPids = new ArrayList<>();
@@ -204,7 +206,8 @@ public class ItemWiseSaleResource {
 		productCategoryPids = categoryPids != "" ? Arrays.asList(categoryPids.split(",")) : productCategoryPids;
 		productGroupPids = groupPids != "" ? Arrays.asList(groupPids.split(",")) : productGroupPids;
 		productProfilePids = profilePids != "" ? Arrays.asList(profilePids.split(",")) : productProfilePids;
-		productTerritoryPids = terittoryPids != "" ? Arrays.asList(terittoryPids.split(",")) : productTerritoryPids;
+		productTerritoryPids = !terittoryPids.equals("-1") ? Arrays.asList(terittoryPids)
+				: locationRepository.findAllPidsByCompany();
 		System.out.println(	productTerritoryPids);
 		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
