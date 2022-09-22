@@ -3,6 +3,7 @@ package com.orderfleet.webapp.service.impl;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -158,6 +159,7 @@ public class AccountActivityTaskConfigServiceImpl implements AccountActivityTask
 //                String userPid = employeeProfileRepository.findUserPidByLocationPid(leadmanagementDTO.getLocationPid());
                 
                 String str = leadmanagementDTO.getDate(); 
+             
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 LocalDate dateTime = LocalDate.parse(str, formatter);
 
@@ -185,7 +187,7 @@ public class AccountActivityTaskConfigServiceImpl implements AccountActivityTask
 				newExecutiveTaskPlan.setCreatedDate(LocalDateTime.now());
 				newExecutiveTaskPlan.setCreatedBy(SecurityUtils.getCurrentUserLogin());
 				newExecutiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.CREATED);
-				newExecutiveTaskPlan.setPlannedDate(dateTime.atStartOfDay());
+				newExecutiveTaskPlan.setPlannedDate(dateTime.atTime(LocalTime.now()));
 				newExecutiveTaskPlan.setTaskCreatedType(TaskCreatedType.TASK_SERVER);
 				newExecutiveTaskPlan.setUser(user);
 				newExecutiveTaskPlan.setCompany(user.getCompany());

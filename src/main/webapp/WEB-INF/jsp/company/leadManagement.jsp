@@ -77,6 +77,7 @@
 								</button>
 								<h4 class="modal-title" id="myModalLabel">Create or edit Lead Management</h4>
 							</div>
+							
 							<div class="modal-body" style="height: 700px; overflow: auto;">
 								<div class="alert alert-danger alert-dismissible" role="alert"
 									style="display: none;">
@@ -86,6 +87,7 @@
 									</button>
 									<p></p>
 								</div>
+								<br>
 								<div class="form-group">
 									<label class="control-label" for="field_name">Name</label> <input
 										autofocus="autofocus" type="text" class="form-control"
@@ -106,6 +108,14 @@
 									<textarea class="form-control" name="address" maxlength="250"
 										id="field_address" placeholder="Address"></textarea>
 								</div>
+								<div class="form-group">
+									<label class="control-label" for="field_contactPerson">Contact
+										Person</label>
+									<input type="text" class="form-control" name="contactPerson"
+										maxlength="250" id="field_contactPerson"
+										placeholder="Contact Person">
+								</div>
+								<br>
 								<div class="form-group">
 									<label class="control-label" for="field_territory">Territory</label> 
 									<select id="field_territory" name="territory"
@@ -130,13 +140,7 @@
 									style="background-color: #fff;">
 								</div>
 							</div>
-							</div>	<div class="form-group">
-									<label class="control-label" for="field_contactPerson">Contact
-										Person</label>
-									<input type="text" class="form-control" name="contactPerson"
-										maxlength="250" id="field_contactPerson"
-										placeholder="Contact Person">
-								</div>
+							</div>	
 								<div class="form-group">
 									<label class="control-label" for="field_remarks">Remarks</label>
 									<textarea class="form-control" name="remarks" maxlength="250"
