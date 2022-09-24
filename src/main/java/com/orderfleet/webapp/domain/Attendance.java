@@ -125,6 +125,9 @@ public class Attendance implements Serializable {
 	@Column(name = "oodoMeter", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double oodoMeter;
 	
+	@Column(name = "attendace_log_upload", columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean attendaceLogUpload;
+	
 	@ManyToOne
 	private DistanceFare distanceFare;
 
@@ -379,6 +382,15 @@ public class Attendance implements Serializable {
 
 	public void setOodoMeter(double oodoMeter) {
 		this.oodoMeter = oodoMeter;
+	}
+	
+
+	public boolean getAttendaceLogUpload() {
+		return attendaceLogUpload;
+	}
+
+	public void setAttendaceLogUpload(boolean attendaceLogUpload) {
+		this.attendaceLogUpload = attendaceLogUpload;
 	}
 
 	@Override

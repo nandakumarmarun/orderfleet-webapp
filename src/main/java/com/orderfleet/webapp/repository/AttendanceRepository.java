@@ -9,13 +9,16 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.Attendance;
 import com.orderfleet.webapp.domain.AttendanceStatusSubgroup;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AttendanceStatus;
+import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 
 /**
@@ -111,6 +114,15 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 	
 		@Query("select attendance.remarks,attendance.createdDate,ep.name from Attendance attendance inner join EmployeeProfile ep on attendance.user.id=ep.user.id where attendance.user.id in ?1 and attendance.createdDate between ?2 and ?3")
 	  List<Object[]> findByUserIdInAndDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
+	  
+		@Query("select attendance.createdDate,ep.name,attendance.pid,ep.orgEmpId,po.punchOutDate from Attendance attendance inner join EmployeeProfile ep on attendance.user.id=ep.user.id left join PunchOut po on attendance.id=po.attendance.id  where attendance.company.id = ?#{principal.companyId}  and attendance.createdDate <= ?1 and attendance.attendaceLogUpload = 'false'")
+		List<Object[]> findByCompanyanddateBtween(LocalDateTime toDate);
+		
+		
+		@Modifying(clearAutomatically = true)
+		@Transactional
+		@Query("UPDATE Attendance attendance SET attendance.attendaceLogUpload = 'true'  WHERE  attendance.company.id = ?#{principal.companyId}  AND attendance.pid in ?1")
+		int updateAttendaceLogIsUploadedUsingPid(List<String> attendancePids);
 	 
 	
 	/*
