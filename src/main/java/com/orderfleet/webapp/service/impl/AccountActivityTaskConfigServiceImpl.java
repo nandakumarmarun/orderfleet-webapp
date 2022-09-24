@@ -200,6 +200,7 @@ public class AccountActivityTaskConfigServiceImpl implements AccountActivityTask
 				activityNamesAndTaskPid.put(activityConfig.getActivity().getName(), task.getPid());
 			}
 		}
+		
 		if(!activityNamesAndTaskPid.isEmpty()) {
 			
 			
