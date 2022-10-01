@@ -2,7 +2,9 @@
 "release-number" : "1.101.0",
 "release-date" : "30/09/2022",
 "features" : [
-"relese-info api",
-"cicd"
+  "Release-info API",
+  "Database scripts automation",
+  "CI/CD",
+  "Release Management"
 ]
 }
