@@ -2,6 +2,11 @@ pipeline{
     agent{
         label "master"
     }
+
+    parameters {
+        string(name: 'RELEASE_NO', defaultValue: '1.101.0', description: 'Release Number')
+    }
+
     stages{
         stage("checkout"){
             steps{
@@ -19,16 +24,11 @@ pipeline{
                 }
             }
         }
-    }
-    post{
-        always{
-            echo "========always========"
-        }
-        success{
-            echo "========pipeline executed successfully ========"
-        }
-        failure{
-            echo "========pipeline execution failed========"
+
+        stage("parameters") {
+            steps{
+                echo "Release Number:  ${params.RELEASE_NO}"
+            }
         }
     }
 }
