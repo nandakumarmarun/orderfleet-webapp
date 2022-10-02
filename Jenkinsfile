@@ -40,8 +40,15 @@ pipeline{
                 script {
                     def data = readFile(file: 'pom.xml')
                     println(data)
+
                 }
             }
         }
+
+        stage("read pom.xml") {
+            steps{
+                def settings = load('pom.xml')
+                    echo "floopi: ${project.parent.version}"
+            }
     }
 }
