@@ -49,13 +49,19 @@ pipeline {
             steps{
                 script {
                 def pom = readMavenPom file: 'pom.xml'
-                def version = pom.getVersion();
-                println(${params.RELEASE_NO});
-                println(version.equals("1.101.0"))
+                def pomVersion = pom.getVersion();
+                def releaseNumber = params.RELEASE_NO
+                println(params.RELEASE_NO);
+                println(releaseNumber.equals("1.101.0"))
+
+                if (releaseNumber.equals("1.101.0")) {
+                    echo "Success"
+                } else {
+                    error("Build failed because of this and that..")
+                }
 
                 println(pom)
-//                     def settings = load('pom.xml')
-//                     echo "version: ${project.parent.version}"
+
                 }
             }
         }
