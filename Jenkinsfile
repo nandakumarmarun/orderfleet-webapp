@@ -48,6 +48,8 @@ pipeline {
         stage("read pom.xml") {
             steps{
                 script {
+                def pom = readMavenPom file: 'pom.xml'
+                println(pom)
                     def settings = load('pom.xml')
                     echo "version: ${project.parent.version}"
                 }
