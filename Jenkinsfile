@@ -39,7 +39,7 @@ pipeline {
                 '''
                 script {
                     def data = readFile(file: 'pom.xml')
-                    println(data)
+                    // println(data)
 
                 }
             }
@@ -50,7 +50,8 @@ pipeline {
                 script {
                 def pom = readMavenPom file: 'pom.xml'
                 def version = pom.getVersion();
-                println(version.equals($RELEASE_NO))
+                println(${params.RELEASE_NO});
+                println(version.equals("1.101.0"))
 
                 println(pom)
 //                     def settings = load('pom.xml')
