@@ -1,4 +1,4 @@
-pipeline{
+pipeline {
     agent{
         label "master"
     }
@@ -47,8 +47,11 @@ pipeline{
 
         stage("read pom.xml") {
             steps{
-                def settings = load('pom.xml')
-                    echo "floopi: ${project.parent.version}"
+                script {
+                    def settings = load('pom.xml')
+                    echo "version: ${project.parent.version}"
+                }
             }
+        }
     }
 }
