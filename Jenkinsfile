@@ -34,8 +34,11 @@ pipeline{
         stage("validations") {
             steps{
                 echo "Validations"
+                sh'''
+                ls -la
+                '''
                 script {
-                    def data = readFile(file: '/src/main/releases/1.101.0/db-scripts.sql')
+                    def data = readFile(file: 'pom.xml')
                     println(data)
                 }
             }
