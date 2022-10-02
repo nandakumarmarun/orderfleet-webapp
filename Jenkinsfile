@@ -49,6 +49,8 @@ pipeline {
             steps{
                 script {
                 def pom = readMavenPom file: 'pom.xml'
+                def version = pom.getVersion();
+                println(version.equals($RELEASE_NO))
 
                 println(pom)
 //                     def settings = load('pom.xml')
