@@ -8,26 +8,36 @@ pipeline{
     }
 
     stages{
-        stage("checkout"){
-            steps{
-                echo "========executing checkout========"
-            }
-            post{
-                always{
-                    echo "========always========"
-                }
-                success{
-                    echo "========checkout executed successfully========"
-                }
-                failure{
-                    echo "========checkout execution failed========"
-                }
-            }
-        }
+        // stage("checkout"){
+        //     steps{
+        //         echo "========executing checkout========"
+        //     }
+        //     post{
+        //         always{
+        //             echo "========always========"
+        //         }
+        //         success{
+        //             echo "========checkout executed successfully========"
+        //         }
+        //         failure{
+        //             echo "========checkout execution failed========"
+        //         }
+        //     }
+        // }
 
-        stage("parameters") {
+        // stage("parameters") {
+        //     steps{
+        //         echo "Release Number:  ${params.RELEASE_NO}"
+        //     }
+        // }
+
+        stage("validations") {
             steps{
-                echo "Release Number:  ${params.RELEASE_NO}"
+                echo "Validations"
+                script {
+                    def data = readFile(file: 'zorg.txt')
+                    println(data)
+                }
             }
         }
     }
