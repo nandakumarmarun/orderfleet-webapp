@@ -35,7 +35,7 @@ pipeline{
             steps{
                 echo "Validations"
                 script {
-                    def data = readFile(file: '/src/main/releases/'+${params.RELEASE_NO}+'/db-scripts.sql')
+                    def data = readFile(file: '/src/main/releases/1.101.0/db-scripts.sql')
                     println(data)
                 }
             }
