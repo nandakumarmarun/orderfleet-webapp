@@ -73,7 +73,7 @@ pipeline {
             }
             steps {
                 sh'''
-                    java --version
+                    java -version
                     mvn clean package
                 '''
             }
