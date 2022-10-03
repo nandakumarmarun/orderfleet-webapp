@@ -31,39 +31,43 @@ pipeline {
         //     }
         // }
 
-        stage("validations") {
-            steps{
-                echo "Validations"
-                sh'''
-                ls -la
-                '''
-                script {
-                    def data = readFile(file: 'pom.xml')
-                    // println(data)
+        // stage("validations") {
+        //     steps{
+        //         echo "Validations"
+        //         sh'''
+        //         ls -la
+        //         '''
+        //         script {
+        //             def data = readFile(file: 'pom.xml')
+        //             // println(data)
 
-                }
-            }
-        }
+        //         }
+        //     }
+        // }
 
-        stage("read pom.xml") {
-            steps{
-                script {
-                def pom = readMavenPom file: 'pom.xml'
-                def pomVersion = pom.getVersion();
-                def releaseNumber = params.RELEASE_NO
-                println(params.RELEASE_NO);
-                println(releaseNumber.equals("1.101.0"))
+        // stage("read pom.xml") {
+        //     steps{
+        //         script {
+        //         def pom = readMavenPom file: 'pom.xml'
+        //         def pomVersion = pom.getVersion();
+        //         def releaseNumber = params.RELEASE_NO
+        //         println(params.RELEASE_NO);
+        //         println(releaseNumber.equals("1.101.0"))
 
-                if (releaseNumber.equals("1.101.0")) {
-                    echo "Success"
-                } else {
-                    error("Build failed because of this and that..")
-                }
+        //         if (releaseNumber.equals("1.101.0")) {
+        //             echo "Success"
+        //         } else {
+        //             error("Build failed because of this and that..")
+        //         }
 
-                println(pom)
+        //         println(pom)
 
-                }
-            }
+        //         }
+        //     }
+        // }
+
+        stage("build war file") {
+            mvn --version
         }
     }
 }
