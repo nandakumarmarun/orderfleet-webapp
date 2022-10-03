@@ -69,7 +69,7 @@ pipeline {
 
         stage("build war file") {
             tools {
-                jdk "jdk-1.8.221"
+                jdk "java8"
             }
             steps {
                 sh'''
