@@ -87,7 +87,7 @@ pipeline {
                     ls
                     ls /home
                 '''
-                sh 'scp ./target/orderfleet-webapp-0.0.1-SNAPSHOT.war ec2-user@13.232.79.102:/home/ec2-user/home/deployments/new/1.101.1/'
+                sh 'scp ./target/orderfleet-webapp-0.0.1-SNAPSHOT.war ec2-user@13.232.79.102:/home/ec2-user/home/deployments/new/1.101.1/orderfleet-webapp-0.0.1-SNAPSHOT.war'
                 }
             }
         }
