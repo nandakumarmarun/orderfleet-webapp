@@ -83,7 +83,9 @@ pipeline {
             steps {
                 sshagent(['9e7473c2-7976-4fbf-9f49-badc35ce1538']) {
                     sh'''
-                    hostname
+                    ssh -o StrictHostKeyChecking=no -l ec2-user 13.232.79.102 'whoami'
+                    ls
+                    ls /home
                 '''
                 }
             }
