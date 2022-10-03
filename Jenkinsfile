@@ -67,17 +67,17 @@ pipeline {
         // }
 
 
-        stage("build war file") {
-            tools {
-                jdk "java8"
-            }
-            steps {
-                sh'''
-                    java -version
-                    mvn clean package
-                '''
-            }
-        }
+        // stage("build war file") {
+        //     tools {
+        //         jdk "java8"
+        //     }
+        //     steps {
+        //         sh'''
+        //             java -version
+        //             mvn clean package
+        //         '''
+        //     }
+        // }
 
         stage("ssh") {
             steps {
