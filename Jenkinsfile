@@ -73,8 +73,19 @@ pipeline {
             }
             steps {
                 sh'''
+                    java --version
                     mvn clean package
                 '''
+            }
+        }
+
+        stage("ssh") {
+            steps {
+                sshagent(['9e7473c2-7976-4fbf-9f49-badc35ce1538']) {
+                    sh'''
+                    hostname
+                '''
+                }
             }
         }
     }
