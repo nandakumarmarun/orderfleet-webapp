@@ -70,7 +70,7 @@ pipeline {
         stage("build war file") {
             steps {
                 sh'''
-                    mvn --version
+                    mvn clean package
                 '''
             }
         }
