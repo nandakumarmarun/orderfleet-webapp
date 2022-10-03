@@ -97,7 +97,7 @@ pipeline {
             steps {
                 sshagent(['9e7473c2-7976-4fbf-9f49-badc35ce1538']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -l ec2-user 13.232.79.102 'cd /opt/test-salesnrich/ && echo "running another cmds" && nohup java -jar /orderfleet-webapp-0.0.1-SNAPSHOT.war --spring.profiles.active=prod -Dspring.config.location=file:/application-prod.yml > service.out 2> errors.txt < /dev/null &'
+                        ssh -o StrictHostKeyChecking=no -l ec2-user 13.232.79.102 'cd /home/ec2-user/deploy/test-salesnrich/ && echo "running another cmds" && nohup java -jar /orderfleet-webapp-0.0.1-SNAPSHOT.war --spring.profiles.active=prod -Dspring.config.location=file:/application-prod.yml > service.out 2> errors.txt < /dev/null &'
                     '''
                 }
             }
