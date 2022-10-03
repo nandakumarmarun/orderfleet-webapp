@@ -66,8 +66,13 @@ pipeline {
         //     }
         // }
 
+
         stage("build war file") {
-            mvn --version
+            steps {
+                sh'''
+                    mvn --version
+                '''
+            }
         }
     }
 }
