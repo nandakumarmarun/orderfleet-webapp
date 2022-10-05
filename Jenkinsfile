@@ -48,36 +48,34 @@ pipeline {
         //     }
         // }
 
-        stage("validation") {
-            steps{
-                script {
-                    def pom = readMavenPom file: 'pom.xml'
-                    def pomVersion = pom.getVersion();
-                    def releaseNumber = params.RELEASE_NO
-                    println("Pom version: "+ pomVersion + " Release Number: "+ releaseNumber);
-                    if (releaseNumber.equals(pomVersion)) {
-                        echo "Validation completed"
-                    } else {
-                        error("Build failed because of this and that..")
-                    }
-                }
-            }
-        }
+        // stage("validation") {
+        //     steps{
+        //         script {
+        //             def pom = readMavenPom file: 'pom.xml'
+        //             def pomVersion = pom.getVersion();
+        //             def releaseNumber = params.RELEASE_NO
+        //             println("Pom version: "+ pomVersion + " Release Number: "+ releaseNumber);
+        //             if (releaseNumber.equals(pomVersion)) {
+        //                 echo "Validation completed"
+        //             } else {
+        //                 error("Build failed because of this and that..")
+        //             }
+        //         }
+        //     }
+        // }
 
 
-        stage("build war file") {
-            tools {
-                jdk "java8"
-            }
-            steps {
-                sh'''
-                    java -version
-                    mvn clean package
-
-                    echo ${test_server_ip}
-                '''
-            }
-        }
+        // stage("build war file") {
+        //     tools {
+        //         jdk "java8"
+        //     }
+        //     steps {
+        //         sh'''
+        //             java -version
+        //             mvn clean package
+        //         '''
+        //     }
+        // }
 
         stage("ssh") {
             steps {
@@ -88,20 +86,20 @@ pipeline {
                 //     ls /home
                 // '''
                 // create directory
-                sh 'scp ./target/orderfleet-webapp-0.0.1-SNAPSHOT.war ec2-user@${test_server_ip}:/home/ec2-user/deploy/test-salesnrich/'
+                sh 'scp ./target/orderfleet-webapp-${params.RELEASE_NO}.war ec2-user@${test_server_ip}:/home/ec2-user/deploy/test-salesnrich/'
                 }
             }
         }
 
-        stage("running war file") {
-            steps {
-                sshagent(['9e7473c2-7976-4fbf-9f49-badc35ce1538']) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no -l ec2-user ${test_server_ip} 'sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill &'
-                        ssh -o StrictHostKeyChecking=no -l ec2-user ${test_server_ip} 'cd /home/ec2-user/deploy/test-salesnrich/ && sudo nohup bash -c "java -jar ./orderfleet-webapp-0.0.1-SNAPSHOT.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
-                    '''
-                }
-            }
-        }
+        // stage("running war file") {
+        //     steps {
+        //         sshagent(['9e7473c2-7976-4fbf-9f49-badc35ce1538']) {
+        //             sh '''
+        //                 ssh -o StrictHostKeyChecking=no -l ec2-user ${test_server_ip} 'sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill &'
+        //                 ssh -o StrictHostKeyChecking=no -l ec2-user ${test_server_ip} 'cd /home/ec2-user/deploy/test-salesnrich/ && sudo nohup bash -c "java -jar ./orderfleet-webapp-0.0.1-SNAPSHOT.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
+        //             '''
+        //         }
+        //     }
+        // }
     }
 }
