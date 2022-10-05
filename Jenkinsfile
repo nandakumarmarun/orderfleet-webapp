@@ -54,7 +54,7 @@ pipeline {
                     def pom = readMavenPom file: 'pom.xml'
                     def pomVersion = pom.getVersion();
                     def releaseNumber = params.RELEASE_NO
-                    println("Pom version: "+ releaseNumber + "Release Number: "+ releaseNumber);
+                    println("Pom version: "+ pomVersion + " Release Number: "+ releaseNumber);
                     if (releaseNumber.equals(pomVersion)) {
                         echo "Validation completed"
                     } else {
