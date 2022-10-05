@@ -50,9 +50,8 @@ pipeline {
         stage("ssh") {
             steps {
                 sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
-                        sh'''
-                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'cd /opt/test-salesnrich/ && mkdir ${params.RELEASE_NO}'
-                    '''
+                    sh 'ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} cd /opt/test-salesnrich/ &&  mkdir '+ params.RELEASE_NO+ ' '
+
                     // create directory
                     // sh 'scp ./target/orderfleet-webapp-'+params.RELEASE_NO+'.war ec2-user@${test_server_ip}:/home/ec2-user/deploy/test-salesnrich/'
                 }
