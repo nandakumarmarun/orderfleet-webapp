@@ -4,6 +4,7 @@ pipeline {
     }
     environment {
      test_server_ip = "13.232.79.102"
+     test_server_user = "devops-user"
    }
 
     parameters {
@@ -11,40 +12,9 @@ pipeline {
     }
 
     stages{
-        // stage("checkout"){
-        //     steps{
-        //         echo "========executing checkout========"
-        //     }
-        //     post{
-        //         always{
-        //             echo "========always========"
-        //         }
-        //         success{
-        //             echo "========checkout executed successfully========"
-        //         }
-        //         failure{
-        //             echo "========checkout execution failed========"
-        //         }
-        //     }
-        // }
-
         // stage("parameters") {
         //     steps{
         //         echo "Release Number:  ${params.RELEASE_NO}"
-        //     }
-        // }
-
-        // stage("validations") {
-        //     steps{
-        //         echo "Validations"
-        //         sh'''
-        //         ls -la
-        //         '''
-        //         script {
-        //             def data = readFile(file: 'pom.xml')
-        //             // println(data)
-
-        //         }
         //     }
         // }
 
@@ -79,14 +49,12 @@ pipeline {
 
         stage("ssh") {
             steps {
-                sshagent(['9e7473c2-7976-4fbf-9f49-badc35ce1538']) {
-                //     sh'''
-                //     ssh -o StrictHostKeyChecking=no -l ec2-user 13.232.79.102 'whoami'
-                //     ls
-                //     ls /home
-                // '''
+                sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
+                        sh'''
+                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'cd /opt/test-salesnrich/ && mkdir ${params.RELEASE_NO}'
+                    '''
                     // create directory
-                    sh 'scp ./target/orderfleet-webapp-'+params.RELEASE_NO+'.war ec2-user@${test_server_ip}:/home/ec2-user/deploy/test-salesnrich/'
+                    // sh 'scp ./target/orderfleet-webapp-'+params.RELEASE_NO+'.war ec2-user@${test_server_ip}:/home/ec2-user/deploy/test-salesnrich/'
                 }
             }
         }
