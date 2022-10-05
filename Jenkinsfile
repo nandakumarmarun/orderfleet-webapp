@@ -35,17 +35,17 @@ pipeline {
         // }
 
 
-        stage("build war file") {
-            tools {
-                jdk "java8"
-            }
-            steps {
-                sh'''
-                    java -version
-                    mvn clean package
-                '''
-            }
-        }
+        // stage("build war file") {
+        //     tools {
+        //         jdk "java8"
+        //     }
+        //     steps {
+        //         sh'''
+        //             java -version
+        //             mvn clean package
+        //         '''
+        //     }ssh
+        // }
 
         stage("ssh") {
             steps {
@@ -62,7 +62,7 @@ pipeline {
                 sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill &'
-                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'cd /opt/test-salesnrich/ && sudo nohup bash -c "java -jar .'+ params.RELEASE_NO+ '/orderfleet-webapp-0.0.1-SNAPSHOT.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
+                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'cd /opt/test-salesnrich/ && sudo nohup bash -c java -jar ./'+ params.RELEASE_NO+'/orderfleet-webapp-0.0.1-SNAPSHOT.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &' && sleep 4'
                     '''
                 }
             }
