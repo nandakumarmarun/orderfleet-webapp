@@ -85,8 +85,8 @@ pipeline {
                 //     ls
                 //     ls /home
                 // '''
-                // create directory
-                sh 'scp ./target/orderfleet-webapp-${params.RELEASE_NO}.war ec2-user@${test_server_ip}:/home/ec2-user/deploy/test-salesnrich/'
+                    // create directory
+                    sh 'scp ./target/orderfleet-webapp-'+params.RELEASE_NO+'.war ec2-user@${test_server_ip}:/home/ec2-user/deploy/test-salesnrich/'
                 }
             }
         }
