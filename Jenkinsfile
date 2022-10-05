@@ -52,7 +52,7 @@ pipeline {
                 sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
                     sh 'ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} mkdir -p /opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
                     // create directory
-                    sh 'scp ./target/orderfleet-webapp-0.0.1-SNAPSHOT.war ${test_server_user}@${test_server_ip}:/opt/test-salesnrich/'+ params.RELEASE_NO+ ' ''
+                    sh 'scp ./target/orderfleet-webapp-0.0.1-SNAPSHOT.war ${test_server_user}@${test_server_ip}:/opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
                 }
             }
         }
