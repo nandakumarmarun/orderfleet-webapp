@@ -67,31 +67,31 @@ pipeline {
         // }
 
 
-        // stage("build war file") {
-        //     tools {
-        //         jdk "java8"
-        //     }
-        //     steps {
-        //         sh'''
-        //             java -version
-        //             mvn clean package
-        //         '''
-        //     }
-        // }
+        stage("build war file") {
+            tools {
+                jdk "java8"
+            }
+            steps {
+                sh'''
+                    java -version
+                    mvn clean package
+                '''
+            }
+        }
 
-        // stage("ssh") {
-        //     steps {
-        //         sshagent(['9e7473c2-7976-4fbf-9f49-badc35ce1538']) {
-        //             sh'''
-        //             ssh -o StrictHostKeyChecking=no -l ec2-user 13.232.79.102 'whoami'
-        //             ls
-        //             ls /home
-        //         '''
-        //         // create directory
-        //         sh 'scp ./target/orderfleet-webapp-0.0.1-SNAPSHOT.war ec2-user@13.232.79.102:/home/ec2-user/home/deployments/new/'
-        //         }
-        //     }
-        // }
+        stage("ssh") {
+            steps {
+                sshagent(['9e7473c2-7976-4fbf-9f49-badc35ce1538']) {
+                //     sh'''
+                //     ssh -o StrictHostKeyChecking=no -l ec2-user 13.232.79.102 'whoami'
+                //     ls
+                //     ls /home
+                // '''
+                // create directory
+                sh 'scp ./target/orderfleet-webapp-0.0.1-SNAPSHOT.war ec2-user@13.232.79.102:/home/ec2-user/deploy/test-salesnrich/'
+                }
+            }
+        }
 
         stage("running war file") {
             steps {
