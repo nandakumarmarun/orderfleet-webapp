@@ -124,7 +124,7 @@
 						<li class="topbar-devider"></li>
 						<!-- <li><a>+91 8893 499 106</a></li>
 						<li class="topbar-devider"></li> -->
-						<li><a>Help</a></li>
+						<li><a>Help peaple</a></li>
 						<li class="topbar-devider"></li>
 						<li><a href="../login">Login</a></li>
 						<!-- <li class="topbar-devider"></li>
