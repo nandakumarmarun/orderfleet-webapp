@@ -48,26 +48,21 @@ pipeline {
         //     }
         // }
 
-        // stage("read pom.xml") {
-        //     steps{
-        //         script {
-        //         def pom = readMavenPom file: 'pom.xml'
-        //         def pomVersion = pom.getVersion();
-        //         def releaseNumber = params.RELEASE_NO
-        //         println(params.RELEASE_NO);
-        //         println(releaseNumber.equals("1.101.0"))
-
-        //         if (releaseNumber.equals("1.101.0")) {
-        //             echo "Success"
-        //         } else {
-        //             error("Build failed because of this and that..")
-        //         }
-
-        //         println(pom)
-
-        //         }
-        //     }
-        // }
+        stage("validation") {
+            steps{
+                script {
+                    def pom = readMavenPom file: 'pom.xml'
+                    def pomVersion = pom.getVersion();
+                    def releaseNumber = params.RELEASE_NO
+                    println("Pom version: "+ releaseNumber + "Release Number: "+ releaseNumber);
+                    if (releaseNumber.equals(pomVersion)) {
+                        echo "Validation completed"
+                    } else {
+                        error("Build failed because of this and that..")
+                    }
+                }
+            }
+        }
 
 
         stage("build war file") {
