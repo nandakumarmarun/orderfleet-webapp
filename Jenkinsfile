@@ -93,7 +93,7 @@ pipeline {
                 //     ls /home
                 // '''
                 // create directory
-                sh 'scp ./target/orderfleet-webapp-0.0.1-SNAPSHOT.war ec2-user${test_server_ip}:/home/ec2-user/deploy/test-salesnrich/'
+                sh 'scp ./target/orderfleet-webapp-0.0.1-SNAPSHOT.war ec2-user@${test_server_ip}:/home/ec2-user/deploy/test-salesnrich/'
                 }
             }
         }
