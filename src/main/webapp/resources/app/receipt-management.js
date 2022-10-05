@@ -11,59 +11,81 @@ if (!this.AccountVoucher) {
 	var accountVoucherContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
 
-	$(document).ready(function() {
-		$("#txtToDate").datepicker({
-			dateFormat : "dd-mm-yy"
-		});
-		$("#txtFromDate").datepicker({
-			dateFormat : "dd-mm-yy"
-		});
-		// load today data
-		AccountVoucher.filter();
+	var updateReciept = document.getElementById("updateReciept").value;
 
-		$('#selectAll').on('click', function() {
-			selectAllAccountVoucher(this);
-		});
-		$('#downloadXls').on('click', function() {
-			downloadXls();
-		});
-		
-		$('#sendTransactionsSapPravesh').on('click', function() {
-			sendTransactionsSapPravesh();
-		});
-		/*
-		 * if($("#dbDocumentType").val!="no"){ loadAllDocumentByDocumentType(); }
-		 */
-		/*
-		 * $("#dbDocumentType").change(function() {
-		 * loadAllDocumentByDocumentType(); });
-		 */
-	});
-	
+	$(document)
+			.ready(
+					function() {
+
+						$('#accountingVoucherTable').html("")
+						console.log(updateReciept);
+						if (updateReciept == "true") {
+							console.log("true")
+							$('#accountingVoucherTable')
+									.append(
+											'<thead><tr><th style="width: 80px;">Mode</th><th>Amount</th><th>Instrument Number</th><th>Instrument Date</th><th>Bank Name</th><th>By Account</th><th>To Account</th><th>Expense Type</th><th>Voucher Number</th><th>Voucher Date</th><th>Reference Number</th><th>Provisional Receipt Number</th><th>Remarks</th><th>Actions</th></tr></thead><tbody id="tblVoucherDetails">');
+						} else {
+							$('#accountingVoucherTable')
+									.append(
+											'<thead><tr><th style="width: 80px;">Mode</th><th>Amount</th><th>Instrument Number</th><th>Instrument Date</th><th>Bank Name</th><th>By Account</th><th>To Account</th><th>Expense Type</th><th>Voucher Number</th><th>Voucher Date</th><th>Reference Number</th><th>Provisional Receipt Number</th><th>Remarks</th></tr></thead><tbody id="tblVoucherDetails">');
+						}
+
+						$("#txtToDate").datepicker({
+							dateFormat : "dd-mm-yy"
+						});
+						$("#txtFromDate").datepicker({
+							dateFormat : "dd-mm-yy"
+						});
+						// load today data
+						AccountVoucher.filter();
+
+						$('#selectAll').on('click', function() {
+							selectAllAccountVoucher(this);
+						});
+						$('#downloadXls').on('click', function() {
+							downloadXls();
+						});
+
+						$('#sendTransactionsSapPravesh').on('click',
+								function() {
+									sendTransactionsSapPravesh();
+								});
+						/*
+						 * if($("#dbDocumentType").val!="no"){
+						 * loadAllDocumentByDocumentType(); }
+						 */
+						/*
+						 * $("#dbDocumentType").change(function() {
+						 * loadAllDocumentByDocumentType(); });
+						 */
+					});
+
 	function sendTransactionsSapPravesh() {
 
 		$(".loader").addClass('show');
 
 		if (confirm("Are you sure?")) {
 
-			$.ajax({
-				url : accountVoucherContextPath + "/sendTransactionsSapPravesh",
-				method : 'GET',
-				beforeSend : function() {
-					// Show image container
-					$("#loader").modal('show');
+			$
+					.ajax({
+						url : accountVoucherContextPath
+								+ "/sendTransactionsSapPravesh",
+						method : 'GET',
+						beforeSend : function() {
+							// Show image container
+							$("#loader").modal('show');
 
-				},
-				success : function(data) {
-					$("#loader").modal('hide');
-					AccountVoucher.filter();
-					
-					// onSaveSuccess(data);
-				},
-				error : function(xhr, error) {
-					onError(xhr, error);
-				}
-			});
+						},
+						success : function(data) {
+							$("#loader").modal('hide');
+							AccountVoucher.filter();
+
+							// onSaveSuccess(data);
+						},
+						error : function(xhr, error) {
+							onError(xhr, error);
+						}
+					});
 		}
 
 	}
@@ -108,12 +130,13 @@ if (!this.AccountVoucher) {
 						$('#lbl_totalAmount').text(data.totalAmount);
 						$('#lbl_remarks').text(
 								(data.remarks == null ? "" : data.remarks));
-
+						console.log(updateReciept);
 						$('#tblVoucherDetails').html("");
 						$
 								.each(
 										data.accountingVoucherDetails,
 										function(index, voucherDetail) {
+											console.log(voucherDetail.detailid)
 											$('#tblVoucherDetails')
 													.append(
 															"<tr data-id='"
@@ -121,7 +144,11 @@ if (!this.AccountVoucher) {
 																	+ "' ><td>"
 																	+ voucherDetail.mode
 																	+ "</td><td>"
-																	+ voucherDetail.amount
+																	+ (updateReciept == "true" ? "<div class='input-group'><input type='number'  id='updatedAmt"
+																			+ "' class='form-control' style='width: 150px;border-radius: 5px;border: navy 1 solid;' value='"
+																			+ voucherDetail.amount
+																			+ "'></div>"
+																			: voucherDetail.amount)
 																	+ "</td><td>"
 																	+ (voucherDetail.instrumentNumber == null ? ""
 																			: voucherDetail.instrumentNumber)
@@ -150,7 +177,13 @@ if (!this.AccountVoucher) {
 																	+ "</td><td>"
 																	+ (voucherDetail.remarks == null ? ""
 																			: voucherDetail.remarks)
-																	+ "</td>");
+																	+ "</td><td>"
+																	+ (updateReciept == "true" ? "<div class='input-group-btn'><input type='button' class='btn btn-info'  onClick='AccountVoucher.updateInventory(\""
+																			+ pid
+																			+ "\",\""
+																			+ voucherDetail.detailid
+																			+ "\");' value='update'></div>"
+																			: "</td></tr>"));
 
 											$
 													.each(
@@ -247,7 +280,8 @@ if (!this.AccountVoucher) {
 								.each(
 										accountVouchers,
 										function(index, accountVoucher) {
-											console.log(accountVoucher.salesManagementStatus);
+											console
+													.log(accountVoucher.salesManagementStatus);
 											counts += 1;
 											totAmount += accountVoucher.totalAmount;
 											chequeTotal += accountVoucher.chequeAmount
@@ -304,7 +338,7 @@ if (!this.AccountVoucher) {
 					}
 				});
 	}
-	
+
 	function spanSalesManagementStatus(inventoryVoucherPid, status, tallyStatus) {
 
 		var hold = "'" + 'HOLD' + "'";
@@ -474,6 +508,25 @@ if (!this.AccountVoucher) {
 		window.location = accountVoucherContextPath;
 	}
 
+	AccountVoucher.updateInventory = function(ivhPid, ivdId) {
+		console.log(ivdId);
+		if (confirm("Are you sure?")) {
+			$.ajax({
+				url : accountVoucherContextPath + "/updateAmount",
+				data : {
+					detailid : ivdId,
+					pid : ivhPid,
+					amount : $('#updatedAmt').val(),
+				},
+				method : 'GET',
+				success : function(data) {
+					showAccountVoucher(ivhPid);
+					AccountVoucher.filter();
+				}
+			});
+		}
+	}
+
 	AccountVoucher.setStatus = function(pid, tallyDownloadStatus) {
 
 		if (confirm("Are you sure?")) {
@@ -497,7 +550,7 @@ if (!this.AccountVoucher) {
 		}
 
 	}
-	
+
 	AccountVoucher.setSalesManagementStatus = function(pid,
 			salesManagementStatus) {
 

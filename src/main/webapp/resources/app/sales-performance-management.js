@@ -202,7 +202,7 @@ if (!this.InventoryVoucher) {
 						console.log();
 					
 						if(data.inventoryVoucherDetails[0].editOrder){
-							$('#tblVoucherDetailshead').append('<thead ><tr><th>Product</th><th>Quantity</th><th>Unit Qty</th><th>Total Qty</th><th>Free Qty</th><th>Selling Rate</th><th>Tax%</th><th>Discount%</th><th>Total</th><th>Action</th>L̥</tr></thead><tbody id="tblVoucherDetails">');
+							$('#tblVoucherDetailshead').append('<thead ><tr><th>Product</th><th>Quantity</th><th>Unit Qty</th><th>Total Qty</th><th>Free Qty</th><th>Selling Rate</th><th>Tax%</th><th>Discount%</th><th>Total</th><th>Action</th></tr></thead><tbody id="tblVoucherDetails">');
 						}
 						else{
 							$('#tblVoucherDetailshead').append('<thead ><tr><th>Product</th><th>Quantity</th><th>Unit Qty</th><th>Total Qty</th><th>Free Qty</th><th>Selling Rate</th><th>Tax%</th><th>Discount%</th><th>Total</th></tr></thead><tbody id="tblVoucherDetails">');

@@ -668,21 +668,21 @@ public class AccountProfileDTO {
 		return Objects.hashCode(pid);
 	}
 
-//	@Override
-//	public String toString() {
-//		return "AccountProfileDTO [pid=" + pid + ", name=" + name + ", alias=" + alias + ", userPid=" + userPid
-//				+ ", userName=" + userName + ", description=" + description + ", accountTypePid=" + accountTypePid
-//				+ ", accountTypeName=" + accountTypeName + ", address=" + address + ", city=" + city + ", location="
-//				+ location + ", pin=" + pin + ", latitude=" + latitude + ", longitude=" + longitude + ", phone1="
-//				+ phone1 + ", phone2=" + phone2 + ", email1=" + email1 + ", email2=" + email2 + ", whatsAppNo="
-//				+ whatsAppNo + ", defaultPriceLevelPid=" + defaultPriceLevelPid + ", defaultPriceLevelName="
-//				+ defaultPriceLevelName + ", accountStatus=" + accountStatus + ", importStatus=" + importStatus
-//				+ ", creditDays=" + creditDays + ", creditLimit=" + creditLimit + ", contactPerson=" + contactPerson
-//				+ ", activated=" + activated + ", lastModifiedDate=" + lastModifiedDate + ", createdDate=" + createdDate
-//				+ ", leadToCashStage=" + leadToCashStage + ", tinNo=" + tinNo + ", closingBalance=" + closingBalance
-//				+ ", defaultDiscountPercentage=" + defaultDiscountPercentage + ", trimChar=" + trimChar
-//				+ ", hasDefaultAccountInventory=" + hasDefaultAccountInventory + ", promptStockLocationInventory="
-//				+ promptStockLocationInventory + ", dataSourceType=" + dataSourceType + "]";
-//	}
+	@Override
+	public String toString() {
+		return "AccountProfileDTO [pid=" + pid + ", name=" + name + ", alias=" + alias + ", userPid=" + userPid
+				+ ", userName=" + userName + ", description=" + description + ", accountTypePid=" + accountTypePid
+				+ ", accountTypeName=" + accountTypeName + ", address=" + address + ", city=" + city + ", location="
+				+ location + ", pin=" + pin + ", latitude=" + latitude + ", longitude=" + longitude + ", phone1="
+				+ phone1 + ", phone2=" + phone2 + ", email1=" + email1 + ", email2=" + email2 + ", whatsAppNo="
+				+ whatsAppNo + ", defaultPriceLevelPid=" + defaultPriceLevelPid + ", defaultPriceLevelName="
+				+ defaultPriceLevelName + ", accountStatus=" + accountStatus + ", importStatus=" + importStatus
+				+ ", creditDays=" + creditDays + ", creditLimit=" + creditLimit + ", contactPerson=" + contactPerson
+				+ ", activated=" + activated + ", lastModifiedDate=" + lastModifiedDate + ", createdDate=" + createdDate
+				+ ", leadToCashStage=" + leadToCashStage + ", tinNo=" + tinNo + ", closingBalance=" + closingBalance
+				+ ", defaultDiscountPercentage=" + defaultDiscountPercentage + ", trimChar=" + trimChar
+				+ ", hasDefaultAccountInventory=" + hasDefaultAccountInventory + ", promptStockLocationInventory="
+				+ promptStockLocationInventory + ", dataSourceType=" + dataSourceType + "]";
+	}
 
 }

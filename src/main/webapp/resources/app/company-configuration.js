@@ -68,6 +68,7 @@ if (!this.CompanyConfiguration) {
 		var employeeCreateBtn =  $('#employeeCreateBtn').is(":checked");
 		var modernSpecialConfig =  $('#modernSpecialConfig').is(":checked");
 		var salesOrderStatus = $("#salesOrderStatus").is(":checked");
+		var updateReciept = $("#updateReciept").is(":checked");
 		/* var findLocation = $('#findLocation').is(":checked"); */
 		$.ajax({
 			url : contextPath,
@@ -101,7 +102,8 @@ if (!this.CompanyConfiguration) {
 				stockApi : stockApi,
 				employeeCreateBtn : employeeCreateBtn,
 				modernSpecialConfig :modernSpecialConfig,
-				salesorderstatus : salesOrderStatus
+				salesorderstatus : salesOrderStatus,
+				updateReciept:updateReciept
 			/* findLocation : findLocation */
 			},
 			success : function(data) {
@@ -173,6 +175,7 @@ if (!this.CompanyConfiguration) {
 						$("#modernSpecialConfig").prop("checked",
 								data.modernSpecialConfig);
 						$("#salesOrderStatus").prop("checked", data.salesOrderStatus);
+						$("#updateReciept").prop("checked", data.updateReciept);
 						/*
 						 * $("#findLocation").prop("checked",
 						 * data.findLocation);

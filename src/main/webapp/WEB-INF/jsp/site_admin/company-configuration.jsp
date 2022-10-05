@@ -65,6 +65,7 @@
 						<th>Employee Create Btn</th>
 						<th>Modern Special Config</th>
 						<th>Sales Order Status</th>
+						<th>Update Reciept</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -102,6 +103,7 @@
 							<th>${companyConfiguration.employeeCreateBtn}</th>
 							<th>${companyConfiguration.modernSpecialConfig}</th>
 							<th>${companyConfiguration.salesOrderStatus}</th>
+							<th>${companyConfiguration.updateReciept}</th>
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
@@ -328,15 +330,15 @@
 														class="form-control" />
 												</div></td>
 										</tr>
-										
+
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Description TO Name</label> <input
-														id="descriptionToName" name='checksdescriptionToName' type='checkbox'
-														class="form-control" />
+														id="descriptionToName" name='checksdescriptionToName'
+														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
-										
+
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Stock Api</label> <input
@@ -345,28 +347,35 @@
 												</div></td>
 										</tr>
 
-											<tr>
+										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Employee Create Btn</label> <input
-														id="employeeCreateBtn" name='checksemployeeCreateBtn' type='checkbox'
-														class="form-control" />
+														id="employeeCreateBtn" name='checksemployeeCreateBtn'
+														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
 											<td><div class="form-group">
-													<label class="control-label">Modern Special Config</label> <input
-														id="modernSpecialConfig" name='checksmodernSpecialConfig' type='checkbox'
+													<label class="control-label">Modern Special Config</label>
+													<input id="modernSpecialConfig"
+														name='checksmodernSpecialConfig' type='checkbox'
 														class="form-control" />
 												</div></td>
 										</tr>
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Sale Order status</label> <input
-														id="salesOrderStatus" name='checksmodernSpecialConfig' type='checkbox'
-														class="form-control" />
+														id="salesOrderStatus" name='checksmodernSpecialConfig'
+														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
-
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">Update Receipt</label> <input
+														id="updateReciept" name='checksmodernSpecialConfig'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
 										<!-- <tr>
 											<td><div class="form-group">
 													<label class="control-label">Find Location</label>

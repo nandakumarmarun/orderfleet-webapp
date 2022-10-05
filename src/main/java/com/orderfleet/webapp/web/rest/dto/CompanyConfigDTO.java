@@ -41,8 +41,7 @@ public class CompanyConfigDTO {
 	private boolean employeeCreateBtn;
 	private boolean modernSpecialConfig;
 	private boolean salesOrderStatus;
-
-	
+	private boolean updateReciept;
 
 	public CompanyConfigDTO() {
 		super();
@@ -295,6 +294,13 @@ public class CompanyConfigDTO {
 	public void setSalesOrderStatus(boolean salesOrderStatus) {
 		this.salesOrderStatus = salesOrderStatus;
 	}
-	
-	
+
+	public boolean isUpdateReciept() {
+		return updateReciept;
+	}
+
+	public void setUpdateReciept(boolean updateReciept) {
+		this.updateReciept = updateReciept;
+	}
+
 }
