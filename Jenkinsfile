@@ -12,6 +12,17 @@ pipeline {
     }
 
     stages{
+        stage("Running Script file") {
+            steps {
+                sh'''
+                    PGPASSWORD=snrichpg2022 psql -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/db-scripts.sql
+                '''
+            }
+        }
+
+
+
+
         // stage("parameters") {
         //     steps{
         //         echo "Release Number:  ${params.RELEASE_NO}"
@@ -62,7 +73,7 @@ pipeline {
                 sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill &'
-                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} cd /opt/test-salesnrich/ && sudo nohup bash -c java -jar ./'''+params.RELEASE_NO+'''/orderfleet-webapp-0.0.1-SNAPSHOT.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &' && sleep 4  
+                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'cd /opt/test-salesnrich/ && sudo nohup bash -c "java -jar ./'''+params.RELEASE_NO+'''/orderfleet-webapp-0.0.1-SNAPSHOT.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
                     '''
                 }
             }
