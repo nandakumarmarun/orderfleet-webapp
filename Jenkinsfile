@@ -46,7 +46,7 @@ pipeline {
                     java -version
                     mvn clean package
                 '''
-            }ssh
+            }
         }
 
         stage("ssh") {
