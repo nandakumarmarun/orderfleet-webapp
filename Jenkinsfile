@@ -12,7 +12,7 @@ pipeline {
     }
 
     stages{
-        stage("Running Script file") {
+        stage("DB-Update") {
             steps {
                 sh'''
                     PGPASSWORD=snrichpg2022 psql -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/db-scripts.sql
@@ -20,7 +20,7 @@ pipeline {
             }
         }
 
-        stage("validation") {
+        stage("Src-Validate") {
             steps{
                 script {
                     def pom = readMavenPom file: 'pom.xml'
@@ -37,7 +37,7 @@ pipeline {
         }
 
 
-        stage("build war file") {
+        stage("Build-War") {
             tools {
                 jdk "java8"
             }
@@ -49,7 +49,7 @@ pipeline {
             }
         }
 
-        stage("ssh") {
+        stage("Copy-War") {
             steps {
                 sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
                     sh 'ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} mkdir -p /opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
@@ -59,7 +59,7 @@ pipeline {
             }
         }
 
-        stage("running war file") {
+        stage("Deploy") {
             steps {
                 sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
                     sh '''
