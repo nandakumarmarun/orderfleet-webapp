@@ -1,12 +1,17 @@
 package com.orderfleet.webapp.service;
 
+import java.io.File;
 import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.ResourceUtils;
 
 import com.orderfleet.webapp.web.rest.api.dto.ReleaseInfo;
 
@@ -24,8 +29,13 @@ public class ReleaseInfoService {
 		JSONParser parser = new JSONParser();
 		 ReleaseInfo releaseInfo = new ReleaseInfo();
 		try {
-			Object obj = parser.parse(new FileReader(System.getProperty("user.dir")+"/src/main/resources/release-info.json"));
-			JSONObject jsonObj = (JSONObject) obj;
+			ClassPathResource classPathResource = new ClassPathResource("release-info.json");
+			byte[] binaryData = FileCopyUtils.copyToByteArray(classPathResource.getInputStream());
+            String strJson = new String(binaryData, StandardCharsets.UTF_8);
+//			File file = ResourceUtils.getFile("classpath:release-info.json");
+//			Object obj = parser.parse(new FileReader(file));
+            
+			JSONObject jsonObj = (JSONObject) parser.parse(strJson);
 			 String releaseNumber = (String)jsonObj.get("release-number");
 	         String releaseDate = (String)jsonObj.get("release-date");
 	         JSONArray features = (JSONArray)jsonObj.get("features");
