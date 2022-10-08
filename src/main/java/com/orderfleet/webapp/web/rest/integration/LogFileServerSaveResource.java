@@ -21,6 +21,7 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -104,6 +105,9 @@ public class LogFileServerSaveResource {
 	private CompanyRepository companyRepository;
 
 	private static final String LOG_FILE_SAVE_DIRECTORY = "C:/orderfleet_clientapp_logFiles/";
+	
+	@Value("${file.logPath}")
+    private String logFilePath;
 
 	@RequestMapping(value = "/save-log-files", method = RequestMethod.POST)
 	@Timed
@@ -171,7 +175,7 @@ public class LogFileServerSaveResource {
 	private File processFileUpload(byte[] fileBytes, String originalFilename, String contentType, Company company)
 			throws FileManagerException {
 
-		String filePath = LOG_FILE_SAVE_DIRECTORY + company.getLegalName() + "/";
+		String filePath = logFilePath + company.getLegalName() + "/";
 
 		String fileLocation = filePath + originalFilename;
 

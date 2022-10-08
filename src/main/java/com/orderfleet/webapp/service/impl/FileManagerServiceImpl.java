@@ -20,6 +20,7 @@ import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,8 @@ public class FileManagerServiceImpl implements FileManagerService {
 
 	private static final String FILE_PID_PREFIX = "file";
 	private static final String FILE_SAVE_DIRECTORY = "C:/orderfleet/files/";
+	@Value("${file.path}")
+    private String path;
 	// private static final String FILE_EXTENSION = ".of";
 
 	private final PersistentFileRepository persistentFileRepository;
@@ -171,7 +174,7 @@ public class FileManagerServiceImpl implements FileManagerService {
 	}
 
 	private String getFileSaveDirectory() {
-		return FILE_SAVE_DIRECTORY + SecurityUtils.getCurrentUsersCompanyId() + "/"
+		return path + SecurityUtils.getCurrentUsersCompanyId() + "/"
 				+ String.valueOf(LocalDate.now().getYear()) + "-" + String.valueOf(LocalDate.now().getMonth().name());
 	}
 
