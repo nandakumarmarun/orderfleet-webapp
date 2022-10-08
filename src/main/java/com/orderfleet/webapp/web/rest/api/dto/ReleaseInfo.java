@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ReleaseInfo {
 	
-	    @JsonProperty("release-number") 
+	  
 	    public String releaseNumber;
-	    @JsonProperty("release-date") 
+	   
 	    public String releaseDate;
 	    public List<String> features;
 	    
