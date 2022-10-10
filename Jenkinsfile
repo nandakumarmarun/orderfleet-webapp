@@ -74,7 +74,7 @@ pipeline {
             steps {
                 sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'cd /opt/test-salesnrich/ && sudo nohup bash -c "java -jar ./'''+params.RELEASE_NO+'''/orderfleet-webapp-'''+params.RELEASE_NO+'''.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
+                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'cd /opt/test-salesnrich/ && sudo nohup bash -c "java -jar ./'''+params.RELEASE_NO+'''/orderfleet-webapp-'''+params.RELEASE_NO+'''.war --spring.profiles.active=test -Dspring.config.location=file:./application-test.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
                     '''
                 }
             }
