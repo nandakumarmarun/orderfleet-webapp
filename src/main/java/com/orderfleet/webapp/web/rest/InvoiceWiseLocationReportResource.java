@@ -433,15 +433,16 @@ public class InvoiceWiseLocationReportResource {
 					.findAccountProfileByLocationPidInAndActivated(locationPids, true);
 
 			accountProfilePids = accountProfiles.stream().map(AccountProfileDTO::getPid).collect(Collectors.toList());
-
+       
 			if (accountProfilePids.size() > 0) {
 
 				executiveTaskExecutions = executiveTaskExecutionRepository
 						.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids,
 								userIds, accountProfilePids);
 			}
+      
 		}
-boolean cmp=getCompanyCofig();
+      boolean cmp=getCompanyCofig();
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			double totalSalesOrderAmount = 0.0;
@@ -1390,4 +1391,100 @@ boolean cmp=getCompanyCofig();
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/invoice-wise-location-reports/filterSkippedCustomers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	@Timed
+	@Transactional(readOnly = true)
+	public ResponseEntity<List<AccountProfile>> filterSkippedCustomers(
+			@RequestParam("documentPid") String documentPid, @RequestParam("employeePid") String employeePid,
+			@RequestParam("activityPid") String activityPid, @RequestParam("locationPid") String locationPid,
+			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
+			@RequestParam boolean inclSubordinate) {
+		List<AccountProfile> accountProfile = new ArrayList<>();
+		if (filterBy.equals("TODAY")) {
+			accountProfile = getSkippedData(employeePid, documentPid, activityPid, locationPid, LocalDate.now(),
+					LocalDate.now(), inclSubordinate);
+		} else if (filterBy.equals("YESTERDAY")) {
+			LocalDate yeasterday = LocalDate.now().minusDays(1);
+			accountProfile = getSkippedData(employeePid, documentPid, activityPid, locationPid, yeasterday,
+					yeasterday, inclSubordinate);
+		} else if (filterBy.equals("WTD")) {
+			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+			LocalDate weekStartDate = LocalDate.now().with(fieldISO, 1);
+			accountProfile = getSkippedData(employeePid, documentPid, activityPid, locationPid, weekStartDate,
+					LocalDate.now(), inclSubordinate);
+		} else if (filterBy.equals("MTD")) {
+			LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
+			accountProfile = getSkippedData(employeePid, documentPid, activityPid, locationPid, monthStartDate,
+					LocalDate.now(), inclSubordinate);
+		} else if (filterBy.equals("CUSTOM")) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
+			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
+			accountProfile = getSkippedData(employeePid, documentPid, activityPid, locationPid, fromDateTime,
+					toFateTime, inclSubordinate);
+		} else if (filterBy.equals("SINGLE")) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
+			accountProfile = getSkippedData(employeePid, documentPid, activityPid, locationPid, fromDateTime,
+					fromDateTime, inclSubordinate);
+		}
+		return new ResponseEntity<>(accountProfile, HttpStatus.OK);
+	}
+
+	private List<AccountProfile> getSkippedData(String employeePid, String documentPid, String activityPid,
+			String locationPid, LocalDate fDate, LocalDate tDate, boolean inclSubordinate) {
+		// TODO Auto-generated method stub
+		LocalDateTime fromDate = fDate.atTime(0, 0);
+		LocalDateTime toDate = tDate.atTime(23, 59);
+
+		List<String> activityPids;
+		List<String> locationPids;
+		List<String> accountProfilePids;
+
+		List<Long> userIds = getUserIdsUnderCurrentUser(employeePid, inclSubordinate);
+		if (userIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		if (activityPid.equalsIgnoreCase("no") || activityPid.equalsIgnoreCase("planed")
+				|| activityPid.equalsIgnoreCase("unPlaned")) {
+			activityPids = getActivityPids(activityPid, userIds);
+		} else {
+			activityPids = Arrays.asList(activityPid);
+		}
+
+		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
+
+		
+			// if a specific account is selected load data based on that particular account
+			locationPids = Arrays.asList(locationPid);
+
+
+			List<AccountProfileDTO> accountProfiles = locationAccountProfileService
+					.findAccountProfileByLocationPidInAndActivated(locationPids, true);
+
+			accountProfilePids = accountProfiles.stream().map(AccountProfileDTO::getPid).collect(Collectors.toList());
+			
+			
+
+			if (accountProfilePids.size() > 0) {
+
+				executiveTaskExecutions = executiveTaskExecutionRepository
+						.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids,
+								userIds, accountProfilePids);
+			}
+			List<String> accountPid = executiveTaskExecutions.stream().map(data ->data.getAccountProfile().getPid()).collect(Collectors.toList());
+			
+			
+			
+			List<String> skippedList = new ArrayList<String>(accountProfilePids);
+			skippedList.removeAll(accountPid);
+		
+			
+			
+			List<AccountProfile> accounts =accountProfileRepository.findAllByAccountProfilePids(skippedList);
+			
+		
+			return accounts;
+	}
 }

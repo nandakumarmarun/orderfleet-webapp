@@ -10,7 +10,7 @@
 <spring:url value="/resources/assets/css/jquery-ui.css"
 	var="jqueryUiCss"></spring:url>
 <link href="${jqueryUiCss}" rel="stylesheet">
-	
+
 <style type="text/css">
 .error {
 	color: red;
@@ -43,6 +43,7 @@
 								</div>
 							</div>
 						</div>
+
 						<div class="form-group">
 							<div class="col-sm-3">
 								Employee
@@ -72,8 +73,7 @@
 												Employees</a>
 										</div> -->
 									</div>
-									<select id="dbEmployee" name="employeePid"
-										class="form-control">
+									<select id="dbEmployee" name="employeePid" class="form-control">
 										<option value="Dashboard Employee">All Dashboard
 											Employees</option>
 									</select>
@@ -91,7 +91,7 @@
 							<div class="col-sm-2">
 								Location <select id="dbLocation" name="locationPid"
 									class="form-control selectpicker" data-live-search="true">
-									<option value="no">All Locations</option>
+									<option value="-1">Select Location</option>
 									<c:forEach items="${locations}" var="location">
 										<option value="${location.pid}">${location.name}</option>
 									</c:forEach>
@@ -126,8 +126,7 @@
 										</div>
 
 									</div>
-									<select id="dbActivity" name="employeePid"
-										class="form-control">
+									<select id="dbActivity" name="employeePid" class="form-control">
 										<option value="no">All Activity</option>
 										<c:forEach items="${activities}" var="activity">
 											<option value="${activity.pid}">${activity.name}</option>
@@ -173,14 +172,24 @@
 								<div class="col-sm-3">
 									<br />
 									<button type="button" class="btn btn-info entypo-search"
-										style="font-size: 18px" onclick="InvoiceWiseLocationReport.filter()"
-										title="Apply"></button>
+										style="font-size: 18px"
+										onclick="InvoiceWiseLocationReport.filter()" title="Apply"></button>
 								</div>
 								<div class="col-sm-3">
 									<br />
 									<button id="btnDownload" type="button" style="font-size: 18px"
 										class="btn btn-orange entypo-download" title="Download Xls"></button>
 								</div>
+								<div class="col-sm-3">
+									<br />
+									<button type="button" class="btn btn-info "
+										style="font-size: 15px"
+										onclick="InvoiceWiseLocationReport.skippedCustomerList()">skipped
+										customers</button>
+
+								</div>
+
+
 							</div>
 						</div>
 					</form>
@@ -516,8 +525,7 @@
 
 				<!-- /.modal-dialog -->
 			</div>
-
-			<div class="modal fade container" id="imagesModal">
+					<div class="modal fade container" id="imagesModal">
 				<!-- model Dialog -->
 				<div class="modal-dialog">
 					<div class="modal-content">
@@ -932,8 +940,8 @@
 
 							$('#btnSearch').click(
 									function() {
-										InvoiceWiseLocationReport.searchTable($(
-												"#search").val(),
+										InvoiceWiseLocationReport.searchTable(
+												$("#search").val(),
 												$('#tbodyAccountProfile'));
 									});
 
@@ -952,13 +960,17 @@
 								InvoiceWiseLocationReport.getForms();
 							});
 
-							$('#createAndChangeAccount').click(function() {
-								InvoiceWiseLocationReport.createAndChangeAccount();
-							});
+							$('#createAndChangeAccount').click(
+									function() {
+										InvoiceWiseLocationReport
+												.createAndChangeAccount();
+									});
 
-							$('#loadAccountProfile').click(function() {
-								InvoiceWiseLocationReport.loadAccountFromForm();
-							});
+							$('#loadAccountProfile').click(
+									function() {
+										InvoiceWiseLocationReport
+												.loadAccountFromForm();
+									});
 
 							$('#btnDownload')
 									.on(
@@ -974,7 +986,8 @@
 													alert("no values available");
 													return;
 												}
-												InvoiceWiseLocationReport.downloadXls();
+												InvoiceWiseLocationReport
+														.downloadXls();
 											});
 
 							InvoiceWiseLocationReport.filter();
