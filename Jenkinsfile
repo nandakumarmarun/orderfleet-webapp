@@ -13,6 +13,12 @@ pipeline {
 
     stages{
 
+        stage("Current-Version") {
+            steps {
+                echo params.RELEASE_NO
+            }
+        }
+
         stage("Stop-Current-Application") {
             steps {
                 sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
