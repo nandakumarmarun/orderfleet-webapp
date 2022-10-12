@@ -42,6 +42,7 @@ public class CompanyConfigDTO {
 	private boolean modernSpecialConfig;
 	private boolean salesOrderStatus;
 	private boolean updateReciept;
+	private boolean sendToFocus;
 
 	public CompanyConfigDTO() {
 		super();
@@ -301,6 +302,14 @@ public class CompanyConfigDTO {
 
 	public void setUpdateReciept(boolean updateReciept) {
 		this.updateReciept = updateReciept;
+	}
+
+	public boolean isSendToFocus() {
+		return sendToFocus;
+	}
+
+	public void setSendToFocus(boolean sendToFocus) {
+		this.sendToFocus = sendToFocus;
 	}
 
 }

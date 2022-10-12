@@ -81,7 +81,7 @@ public class AccountingVoucherHeader implements Serializable {
 	@Column(name = "updated_amount", nullable = false, columnDefinition = "double precision DEFAULT '0'")
 	private double existingAmount;
 
-	@Column(name = "updated_status", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	@Column(name = "updated_status", columnDefinition = "boolean DEFAULT 'FALSE'")
 	private Boolean isupdated;
 
 	@Column(name = "outstanding_amount", nullable = false)

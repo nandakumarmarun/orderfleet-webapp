@@ -66,6 +66,7 @@
 						<th>Modern Special Config</th>
 						<th>Sales Order Status</th>
 						<th>Update Reciept</th>
+						<th>Send To Focus</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -104,6 +105,7 @@
 							<th>${companyConfiguration.modernSpecialConfig}</th>
 							<th>${companyConfiguration.salesOrderStatus}</th>
 							<th>${companyConfiguration.updateReciept}</th>
+							<th>${companyConfiguration.sendToFocus}</th>
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
@@ -373,6 +375,13 @@
 											<td><div class="form-group">
 													<label class="control-label">Update Receipt</label> <input
 														id="updateReciept" name='checksmodernSpecialConfig'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+										<tr>
+											<td><div class="form-group">
+													<label class="control-label">SendToFocus</label> <input
+														id="sendToFocus" name='checksmodernSpecialConfig'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>

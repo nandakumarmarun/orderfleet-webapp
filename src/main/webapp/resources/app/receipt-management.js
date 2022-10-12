@@ -520,6 +520,7 @@ if (!this.AccountVoucher) {
 				},
 				method : 'GET',
 				success : function(data) {
+					$('#viewModal').modal('hide');
 					showAccountVoucher(ivhPid);
 					AccountVoucher.filter();
 				}

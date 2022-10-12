@@ -46,7 +46,7 @@ public class CompanyConfigurationDTO {
 	public void setCompanyPid(String companyPid) {
 		this.companyPid = companyPid;
 	}
-
+        
 	public CompanyConfig getCompanyConfig() {
 		return companyConfig;
 	}

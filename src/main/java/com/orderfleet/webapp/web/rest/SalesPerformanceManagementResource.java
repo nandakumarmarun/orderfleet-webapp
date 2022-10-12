@@ -125,6 +125,7 @@ import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.SalesPerformanceDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.util.RestClientUtil;
+import com.orderfleet.webapp.web.vendor.focus.service.SendSalesOrderFocusService;
 import com.orderfleet.webapp.web.vendor.odoo.dto.RequestBodyOdoo;
 import com.orderfleet.webapp.web.vendor.odoo.dto.ResponseBodyOdooAccountProfile;
 import com.orderfleet.webapp.web.vendor.sap.prabhu.dto.SalesOrderItemDetailsSap;
@@ -152,7 +153,7 @@ public class SalesPerformanceManagementResource {
 
 	@Inject
 	private InventoryVoucherHeaderService inventoryVoucherService;
-	
+
 	@Inject
 	private ProductProfileService productProfileService;
 
@@ -161,7 +162,7 @@ public class SalesPerformanceManagementResource {
 
 	@Inject
 	private InventoryVoucherUpdateHistoryRepository inventoryVoucherUpdateHistoryRepository;
-	
+
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
 
@@ -208,13 +209,17 @@ public class SalesPerformanceManagementResource {
 	private SendSalesOrderSapService sendSalesOrderSapService;
 
 	@Inject
+	private SendSalesOrderFocusService sendSalesOrderFocusService;
+
+	@Inject
 	private AccountProfileMapper accountProfileMapper;
-	
+
 	@Inject
 	private ProductProfileRepository productRepository;
-	
+
 	@Inject
 	private PriceLevelRepository priceLevelRepository;
+
 	@Inject
 	private SendTransactionSapPraveshService sendTransactionSapPraveshService;
 
@@ -263,7 +268,7 @@ public class SalesPerformanceManagementResource {
 			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id1 = "AP_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description1 ="get all by compId and IdsIn";
+			String description1 = "get all by compId and IdsIn";
 			LocalDateTime startLCTime1 = LocalDateTime.now();
 			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 			String startDate1 = startLCTime1.format(DATE_FORMAT1);
@@ -288,8 +293,8 @@ public class SalesPerformanceManagementResource {
 			if (minutes1 > 10) {
 				flag1 = "Dead Slow";
 			}
-	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-					+ description1);
+			logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
+					+ "," + description1);
 			// remove duplicates
 			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
 
@@ -303,7 +308,7 @@ public class SalesPerformanceManagementResource {
 		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id1 = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description1 ="get by compId and name";
+		String description1 = "get by compId and name";
 		LocalDateTime startLCTime1 = LocalDateTime.now();
 		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 		String startDate1 = startLCTime1.format(DATE_FORMAT1);
@@ -328,7 +333,7 @@ public class SalesPerformanceManagementResource {
 		if (minutes1 > 10) {
 			flag1 = "Dead Slow";
 		}
-                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+		logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 				+ description1);
 		if (opCompanyConfigurationPdf.isPresent()) {
 
@@ -341,10 +346,11 @@ public class SalesPerformanceManagementResource {
 		model.addAttribute("pdfDownloadStatus", pdfDownloadStatus);
 
 		boolean sendTransactionsSapPravesh = false;
+		boolean sendTOFocs = false;
 		DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-        DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id11 = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description11 ="get by compId and name";
+		String description11 = "get by compId and name";
 		LocalDateTime startLCTime11 = LocalDateTime.now();
 		String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
 		String startDate11 = startLCTime11.format(DATE_FORMAT11);
@@ -352,6 +358,8 @@ public class SalesPerformanceManagementResource {
 		Optional<CompanyConfiguration> opCompanyConfigurationSapPravesh = companyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(),
 						CompanyConfig.SEND_TRANSACTIONS_SAP_PRAVESH);
+		Optional<CompanyConfiguration> opSendTOFocus = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_TO_FOCUS);
 		String flag11 = "Normal";
 		LocalDateTime endLCTime11 = LocalDateTime.now();
 		String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
@@ -370,8 +378,8 @@ public class SalesPerformanceManagementResource {
 		if (minutes11 > 10) {
 			flag11 = "Dead Slow";
 		}
-                logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11 + ","
-				+ description11);
+		logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END," + flag11
+				+ "," + description11);
 		if (opCompanyConfigurationSapPravesh.isPresent()) {
 
 			if (opCompanyConfigurationSapPravesh.get().getValue().equals("true")) {
@@ -382,6 +390,16 @@ public class SalesPerformanceManagementResource {
 		}
 		model.addAttribute("sendTransactionsSapPravesh", sendTransactionsSapPravesh);
 
+		if (opSendTOFocus.isPresent()) {
+
+			if (opSendTOFocus.get().getValue().equals("true")) {
+				sendTOFocs = true;
+			} else {
+				sendTOFocs = false;
+			}
+		}
+		System.out.println("sendTOFocus" + sendTOFocs);
+		model.addAttribute("focusConfiguration", sendTOFocs);
 		return "company/salesPerformanceManagement";
 	}
 
@@ -500,7 +518,7 @@ public class SalesPerformanceManagementResource {
 		userIds.add(currentUserId);
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
-		}
+		}     
 
 		List<TallyDownloadStatus> tallyStatus = null;
 
@@ -514,77 +532,80 @@ public class SalesPerformanceManagementResource {
 		case "COMPLETED":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED);
 			break;
+		case "FAILED":
+			tallyStatus = Arrays.asList(TallyDownloadStatus.FAILED);
+			break;
 		case "ALL":
 			tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED, TallyDownloadStatus.PROCESSING,
-					TallyDownloadStatus.PENDING);
+					TallyDownloadStatus.PENDING, TallyDownloadStatus.FAILED);
 			break;
 		}
 
 		List<Object[]> inventoryVouchers;
 		if ("-1".equals(accountPid)) {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "INV_QUERY_157" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description = "get all ByUserIdIn And DocumentPidIn AndTallyDownloadStatusDateBetween";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_157" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all ByUserIdIn And DocumentPidIn AndTallyDownloadStatusDateBetween";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(userIds,
 							documentPids, tallyStatus, fromDate, toDate);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		} else {
-			 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-				DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				String id = "INV_QUERY_160" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-				String description ="get all By UserIdIn and AccountPidIn and DocumentPidIn and TallyDownloadStatusDateBetween";
-				LocalDateTime startLCTime = LocalDateTime.now();
-				String startTime = startLCTime.format(DATE_TIME_FORMAT);
-				String startDate = startLCTime.format(DATE_FORMAT);
-				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_160" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "get all By UserIdIn and AccountPidIn and DocumentPidIn and TallyDownloadStatusDateBetween";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 			inventoryVouchers = inventoryVoucherHeaderRepository
 					.findByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
 							userIds, accountPid, documentPids, tallyStatus, fromDate, toDate);
-			 String flag = "Normal";
-				LocalDateTime endLCTime = LocalDateTime.now();
-				String endTime = endLCTime.format(DATE_TIME_FORMAT);
-				String endDate = startLCTime.format(DATE_FORMAT);
-				Duration duration = Duration.between(startLCTime, endLCTime);
-				long minutes = duration.toMinutes();
-				if (minutes <= 1 && minutes >= 0) {
-					flag = "Fast";
-				}
-				if (minutes > 1 && minutes <= 2) {
-					flag = "Normal";
-				}
-				if (minutes > 2 && minutes <= 10) {
-					flag = "Slow";
-				}
-				if (minutes > 10) {
-					flag = "Dead Slow";
-				}
-		                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-						+ description);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
 		}
 		if (inventoryVouchers.isEmpty()) {
 			return Collections.emptyList();
@@ -614,7 +635,7 @@ public class SalesPerformanceManagementResource {
 		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id1 = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description1 ="get by compId and name";
+		String description1 = "get by compId and name";
 		LocalDateTime startLCTime1 = LocalDateTime.now();
 		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 		String startDate1 = startLCTime1.format(DATE_FORMAT1);
@@ -639,7 +660,7 @@ public class SalesPerformanceManagementResource {
 		if (minutes1 > 10) {
 			flag1 = "Dead Slow";
 		}
-                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+		logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 				+ description1);
 		Optional<CompanyConfiguration> opCompanyConfigurationSalesEdit = companyConfigurationRepository
 				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SALES_EDIT_ENABLED);
@@ -672,10 +693,10 @@ public class SalesPerformanceManagementResource {
 				sendSalesOrderSapButtonStatus = false;
 			}
 		}
-boolean compconfig= getCompanyCofig();
+		boolean compconfig = getCompanyCofig();
 		DecimalFormat df = new DecimalFormat("0.00");
 		int size = inventoryVouchers.size();
-		
+
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
 			SalesPerformanceDTO salesPerformanceDTO = new SalesPerformanceDTO();
@@ -688,12 +709,9 @@ boolean compconfig= getCompanyCofig();
 			salesPerformanceDTO.setCreatedDate((LocalDateTime) ivData[5]);
 			salesPerformanceDTO.setDocumentDate((LocalDateTime) ivData[6]);
 			salesPerformanceDTO.setReceiverAccountPid(ivData[7].toString());
-			if(compconfig)
-			{
-			salesPerformanceDTO.setReceiverAccountName(ivData[27].toString());
-			}
-			else
-			{
+			if (compconfig) {
+				salesPerformanceDTO.setReceiverAccountName(ivData[27].toString());
+			} else {
 				salesPerformanceDTO.setReceiverAccountName(ivData[8].toString());
 			}
 			salesPerformanceDTO.setSupplierAccountPid(ivData[9].toString());
@@ -729,20 +747,36 @@ boolean compconfig= getCompanyCofig();
 		}
 		return salesPerformanceDTOs;
 	}
-	public boolean getCompanyCofig(){
-		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
-		if(optconfig.isPresent()) {
-		if(Boolean.valueOf(optconfig.get().getValue())) {
-		return true;
-		}
+
+	public boolean getCompanyCofig() {
+		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		if (optconfig.isPresent()) {
+			if (Boolean.valueOf(optconfig.get().getValue())) {
+				return true;
+			}
 		}
 		return false;
-		}
+	}
+
 	@RequestMapping(value = "/sales-performance-management/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed
 	public List<DocumentDTO> getDocuments(@Valid @RequestParam VoucherType voucherType) {
 		return primarySecondaryDocumentService.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
+	}
+
+	@RequestMapping(value = "/sales-performance-management/sendTransactionsFocusDeva", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<InventoryVoucherHeaderDTO> downloadSalesOrderFocus(@RequestParam String inventoryPid)
+			throws IOException {
+
+		log.info("sendSalesOrderSap()-----");
+		System.out.println(inventoryPid);
+
+		sendSalesOrderFocusService.sendSalesOrder(inventoryPid);
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/sales-performance-management/download-inventory-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -947,23 +981,23 @@ boolean compconfig= getCompanyCofig();
 	public ResponseEntity<InventoryVoucherHeaderDTO> updateInventoryDetail(@RequestParam long id,
 			@RequestParam long quantity, @RequestParam String ivhPid, @RequestParam String sellingrate) {
 		System.out.println("------------------------------------------------------------------------");
-		System.out.println("quantity : " + quantity + "\n Id :" + id + " \n IVHPid : " + ivhPid + "sellingrate" + sellingrate);
+		System.out.println(
+				"quantity : " + quantity + "\n Id :" + id + " \n IVHPid : " + ivhPid + "sellingrate" + sellingrate);
 		InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = inventoryVoucherService.findOneByPid(ivhPid).get();
 		List<InventoryVoucherDetailDTO> ivdList = inventoryVoucherHeaderDTO.getInventoryVoucherDetails();
 		Optional<InventoryVoucherDetailDTO> opIvDetail = ivdList.stream().filter(ivd -> ivd.getDetailId() == id)
 				.findAny();
-		
-		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository.findOneByPid(ivhPid).get(); 
-		List<InventoryVoucherUpdateHistory> inventoryVoucherUpdateHistoryList = inventoryVoucherUpdateHistoryRepository.findAllByInventoryVoucherHeaderId(inventoryVoucherHeader.getId()); 
-		inventoryVoucherUpdateHistoryList.forEach(c->System.out.println(c.getInventoryVoucherHeader().getId()));
-		
-		long numMatches = inventoryVoucherUpdateHistoryList.stream()
-                .filter(c -> c.isUpdated() == true)
-                .count();
-		
+
+		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository.findOneByPid(ivhPid).get();
+		List<InventoryVoucherUpdateHistory> inventoryVoucherUpdateHistoryList = inventoryVoucherUpdateHistoryRepository
+				.findAllByInventoryVoucherHeaderId(inventoryVoucherHeader.getId());
+		inventoryVoucherUpdateHistoryList.forEach(c -> System.out.println(c.getInventoryVoucherHeader().getId()));
+
+		long numMatches = inventoryVoucherUpdateHistoryList.stream().filter(c -> c.isUpdated() == true).count();
+
 		System.out.println(numMatches);
-		if(numMatches == 0) {
-			InventoryVoucherUpdateHistory inventoryVoucherUpdateHistory = new  InventoryVoucherUpdateHistory();
+		if (numMatches == 0) {
+			InventoryVoucherUpdateHistory inventoryVoucherUpdateHistory = new InventoryVoucherUpdateHistory();
 			inventoryVoucherUpdateHistory.setPid(inventoryVoucherService.PID_PREFIX + RandomUtil.generatePid());
 			inventoryVoucherUpdateHistory.setQuantity(opIvDetail.get().getQuantity());
 			inventoryVoucherUpdateHistory.setUpdated(false);
@@ -973,42 +1007,38 @@ boolean compconfig= getCompanyCofig();
 			inventoryVoucherUpdateHistory.setInventoryVoucherHeader(inventoryVoucherHeader);
 			inventoryVoucherUpdateHistoryRepository.save(inventoryVoucherUpdateHistory);
 		}
-		
-		
-		
+
 		if (opIvDetail.isPresent()) {
 			InventoryVoucherDetailDTO ivdDto = opIvDetail.get();
 			// ivdDto.setUpdatedQty(quantity);
 			double discAmt = ivdDto.getDiscountAmount();
 			double discPer = ivdDto.getDiscountPercentage();
-			
+
 			ivdDto.setSellingRate(Double.parseDouble(sellingrate));
 			double sellingRate = ivdDto.getSellingRate();
-			
+
 			double taxPer = ivdDto.getTaxPercentage();
 			sellingRate = sellingRate - discAmt;
-			
+
 			sellingRate = sellingRate - (sellingRate * (discPer * 0.01));
-			
+
 			double rowTotal = sellingRate * quantity;
-			
+
 			double totalTax = rowTotal * (taxPer * 0.01);
 			double updatedRowTotal = totalTax + rowTotal;
-			
 
 			double rowTotalDiff = 0.0;
 			double quantityDiff = 0.0;
 			if (ivdDto.getUpdatedStatus()) {
-				
+
 				rowTotalDiff = Math.abs(ivdDto.getUpdatedRowTotal() - updatedRowTotal);
-				
+
 				quantityDiff = Math.abs(ivdDto.getUpdatedQty() - quantity);
-				
+
 			} else {
 				rowTotalDiff = Math.abs(ivdDto.getRowTotal() - updatedRowTotal);
 
 				quantityDiff = Math.abs(ivdDto.getQuantity() - quantity);
-
 
 			}
 
@@ -1017,30 +1047,32 @@ boolean compconfig= getCompanyCofig();
 			if (inventoryVoucherHeaderDTO.getUpdatedStatus()) {
 				if (ivdDto.getUpdatedStatus()) {
 					if (ivdDto.getUpdatedQty() <= quantity) {
-					
+
 						updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
-					
+
 					} else {
-				
+
 						updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
-					
+
 					}
 
 					if (ivdDto.getUpdatedRowTotal() <= updatedRowTotal) {
-						
+
 						updatedDocTotal = inventoryVoucherHeaderDTO.getDocumentTotalUpdated() + rowTotalDiff;
-					
+
 					} else {
-					
+
 						updatedDocTotal = Math.abs(rowTotalDiff - inventoryVoucherHeaderDTO.getDocumentTotalUpdated());
-						
+
 					}
 				} else {
 					if (ivdDto.getQuantity() <= quantity) {
-						System.out.println("3DocumentVolumeUpdatedless"+inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
+						System.out.println(
+								"3DocumentVolumeUpdatedless" + inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
 						updatedDocVol = inventoryVoucherHeaderDTO.getDocumentVolumeUpdated() + quantityDiff;
 					} else {
-						System.out.println("3DocumentVolumeUpdatedmore"+inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
+						System.out.println(
+								"3DocumentVolumeUpdatedmore" + inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
 						updatedDocVol = Math.abs(quantityDiff - inventoryVoucherHeaderDTO.getDocumentVolumeUpdated());
 					}
 
@@ -1090,7 +1122,7 @@ boolean compconfig= getCompanyCofig();
 			inventoryVoucherDetailService.updateInventoryVoucherDetail(ivdDto);
 			inventoryVoucherService.updateInventoryVoucherHeader(inventoryVoucherHeaderDTO);
 
-			InventoryVoucherUpdateHistory inventoryVoucherUpdateHistory = new  InventoryVoucherUpdateHistory();
+			InventoryVoucherUpdateHistory inventoryVoucherUpdateHistory = new InventoryVoucherUpdateHistory();
 			inventoryVoucherUpdateHistory.setPid(inventoryVoucherService.PID_PREFIX + RandomUtil.generatePid());
 			inventoryVoucherUpdateHistory.setQuantity(quantity);
 			inventoryVoucherUpdateHistory.setUpdated(true);
@@ -1106,7 +1138,7 @@ boolean compconfig= getCompanyCofig();
 		return new ResponseEntity<>(inventoryVoucherHeaderDTO, HttpStatus.OK);
 
 	}
-	
+
 	@RequestMapping(value = "/sales-performance-management/changeSalesOrderStatus", method = RequestMethod.GET)
 	@Timed
 	public ResponseEntity<String> changeSalesOrderStatus(@RequestParam String pid,
@@ -1118,11 +1150,8 @@ boolean compconfig= getCompanyCofig();
 			inventoryVoucherService.updateInventoryVoucherHeaderSalesOrderStatus(inventoryVoucherHeaderDTO);
 			return new ResponseEntity<>("success", HttpStatus.OK);
 		}
-
 		return new ResponseEntity<>("failed", HttpStatus.OK);
-
 	}
-	
 
 	@RequestMapping(value = "/sales-performance-management/changeSalesManagementStatus", method = RequestMethod.GET)
 	@Timed
@@ -1326,27 +1355,30 @@ boolean compconfig= getCompanyCofig();
 
 		return salesOrderMasterSap;
 	}
-	
+
 	@RequestMapping(value = "/sales-performance-management/addNewProduct", method = RequestMethod.POST)
 	@Timed
-	public ResponseEntity<Void> saveAssignedProducts(@RequestParam String inventoryHeaderPid , @RequestParam String assignedproducts) {
-		log.debug("REST request to save assigned account type : {}",inventoryHeaderPid);
+	public ResponseEntity<Void> saveAssignedProducts(@RequestParam String inventoryHeaderPid,
+			@RequestParam String assignedproducts) {
+		log.debug("REST request to save assigned account type : {}", inventoryHeaderPid);
 		System.out.println(assignedproducts);
-		String selectdproducts =  assignedproducts;
+		String selectdproducts = assignedproducts;
 		String[] products = selectdproducts.split(",");
-		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository.findOneByPid(inventoryHeaderPid).get(); 
+		InventoryVoucherHeader inventoryVoucherHeader = inventoryVoucherHeaderRepository
+				.findOneByPid(inventoryHeaderPid).get();
 		InventoryVoucherDetail InventoryVoucherDetail = new InventoryVoucherDetail();
-		List<InventoryVoucherDetail> inventoryVoucherDetailList = inventoryVoucherDetailRepository.findAllByInventoryVoucherHeaderId(inventoryVoucherHeader.getId());
-		
+		List<InventoryVoucherDetail> inventoryVoucherDetailList = inventoryVoucherDetailRepository
+				.findAllByInventoryVoucherHeaderId(inventoryVoucherHeader.getId());
+
 		for (String productPid : products) {
 			ProductProfile product = productRepository.findOneByPid(productPid).get();
 			InventoryVoucherDetail.setProduct(product);
 			InventoryVoucherDetail.setSellingRate(Double.parseDouble(product.getPrice().toString()));
 			InventoryVoucherDetail.setTaxPercentage(product.getTaxRate());
 			InventoryVoucherDetail.setDiscountPercentage(product.getDiscountPercentage());
-			Optional<InventoryVoucherDetail> opIvDetail = inventoryVoucherDetailList.stream().filter(ivd -> ivd.getProduct().equals(product))
-					.findAny();
-			if(!opIvDetail.isPresent()){
+			Optional<InventoryVoucherDetail> opIvDetail = inventoryVoucherDetailList.stream()
+					.filter(ivd -> ivd.getProduct().equals(product)).findAny();
+			if (!opIvDetail.isPresent()) {
 				inventoryVoucherDetailList.add(InventoryVoucherDetail);
 			}
 		}
@@ -1354,14 +1386,13 @@ boolean compconfig= getCompanyCofig();
 		inventoryVoucherHeaderRepository.save(inventoryVoucherHeader);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/sales-performance-management/searchByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ProductProfileDTO>>searchByName(@RequestParam String input) {
+	public ResponseEntity<List<ProductProfileDTO>> searchByName(@RequestParam String input) {
 		log.debug("Web request to get searchbyname : {}");
 		List<ProductProfileDTO> productProfileDTOs = productProfileService.searchByName(input);
 		return new ResponseEntity<>(productProfileDTOs, HttpStatus.OK);
 	}
-	
 
 	@RequestMapping(value = "/sales-performance-management/downloadPdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -1392,32 +1423,32 @@ boolean compconfig= getCompanyCofig();
 					DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 					String id = "INV_QUERY_187" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-					String description ="Updating pdf download status by pid";
+					String description = "Updating pdf download status by pid";
 					LocalDateTime startLCTime = LocalDateTime.now();
 					String startTime = startLCTime.format(DATE_TIME_FORMAT);
 					String startDate = startLCTime.format(DATE_FORMAT);
 					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 					inventoryVoucherHeaderRepository.updatePdfDownlodStatusByPid(inventoryVoucherHeaderDTO.getPid());
-					 String flag = "Normal";
-						LocalDateTime endLCTime = LocalDateTime.now();
-						String endTime = endLCTime.format(DATE_TIME_FORMAT);
-						String endDate = startLCTime.format(DATE_FORMAT);
-						Duration duration = Duration.between(startLCTime, endLCTime);
-						long minutes = duration.toMinutes();
-						if (minutes <= 1 && minutes >= 0) {
-							flag = "Fast";
-						}
-						if (minutes > 1 && minutes <= 2) {
-							flag = "Normal";
-						}
-						if (minutes > 2 && minutes <= 10) {
-							flag = "Slow";
-						}
-						if (minutes > 10) {
-							flag = "Dead Slow";
-						}
-				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-								+ description);
+					String flag = "Normal";
+					LocalDateTime endLCTime = LocalDateTime.now();
+					String endTime = endLCTime.format(DATE_TIME_FORMAT);
+					String endDate = startLCTime.format(DATE_FORMAT);
+					Duration duration = Duration.between(startLCTime, endLCTime);
+					long minutes = duration.toMinutes();
+					if (minutes <= 1 && minutes >= 0) {
+						flag = "Fast";
+					}
+					if (minutes > 1 && minutes <= 2) {
+						flag = "Normal";
+					}
+					if (minutes > 2 && minutes <= 10) {
+						flag = "Slow";
+					}
+					if (minutes > 10) {
+						flag = "Dead Slow";
+					}
+					logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag
+							+ "," + description);
 				}
 		}
 

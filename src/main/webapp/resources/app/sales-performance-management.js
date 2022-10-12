@@ -13,7 +13,8 @@ if (!this.InventoryVoucher) {
 
 	var inventoryVoucherHeaderPid = "";
 	var inventoryPidsPdf = "";
-
+	var sendTOFocusConfiguration = document
+			.getElementById("focusConfiguration").value;
 	$(document)
 			.ready(
 					function() {
@@ -103,6 +104,45 @@ if (!this.InventoryVoucher) {
 
 	}
 
+	InventoryVoucher.sendTransactionsFocus = function(invPid,
+			tallyDownloadStatus, salesManagementStatus) {
+		var inventoryPid = ""
+		if (confirm("Are you sure?")) {
+			console.log(tallyDownloadStatus);
+			if (tallyDownloadStatus == "PENDING") {
+				console.log(salesManagementStatus);
+				if (salesManagementStatus == "APPROVE") {
+					$.ajax({
+						url : inventoryVoucherContextPath
+								+ "/sendTransactionsFocusDeva",
+						method : 'GET',
+						data : {
+							inventoryPid : invPid
+						},
+						success : function(data) {
+							$("#loader").modal('hide');
+							InventoryVoucher.filter();
+							// onSaveSuccess(data);
+						},
+						error : function(xhr, error) {
+							onError(xhr, error);
+						}
+					});
+				} else {
+					errorPopUp("Please Change SalesManagementStatus to APPROVE")
+				}
+			} else {
+				errorPopUp("Please Change TallydownloadStatus to Pending")
+			}
+		}
+
+	}
+
+	function errorPopUp(text) {
+		$("#errorMsg").text(text);
+		$("#ErrorPopModel").modal("show");
+	}
+
 	function addProducts() {
 		$(".error-msg").html("");
 		var selectedProducts = "";
@@ -117,7 +157,7 @@ if (!this.InventoryVoucher) {
 		}
 
 		console.log(selectedinventoryVoucherHeaderPid);
-		if (confirm("Are you sure?")){
+		if (confirm("Are you sure?")) {
 			$.ajax({
 				url : inventoryVoucherContextPath + "/addNewProduct",
 				type : "POST",
@@ -198,17 +238,19 @@ if (!this.InventoryVoucher) {
 
 						$('#tblVoucherDetails').html("");
 						$('#tblVoucherDetailshead').html("")
-						
+
 						console.log();
-					
-						if(data.inventoryVoucherDetails[0].editOrder){
-							$('#tblVoucherDetailshead').append('<thead ><tr><th>Product</th><th>Quantity</th><th>Unit Qty</th><th>Total Qty</th><th>Free Qty</th><th>Selling Rate</th><th>Tax%</th><th>Discount%</th><th>Total</th><th>Action</th></tr></thead><tbody id="tblVoucherDetails">');
+
+						if (data.inventoryVoucherDetails[0].editOrder) {
+							$('#tblVoucherDetailshead')
+									.append(
+											'<thead ><tr><th>Product</th><th>Quantity</th><th>Unit Qty</th><th>Total Qty</th><th>Free Qty</th><th>Selling Rate</th><th>Tax%</th><th>Discount%</th><th>Total</th><th>Action</th>L̥</tr></thead><tbody id="tblVoucherDetails">');
+						} else {
+							$('#tblVoucherDetailshead')
+									.append(
+											'<thead ><tr><th>Product</th><th>Quantity</th><th>Unit Qty</th><th>Total Qty</th><th>Free Qty</th><th>Selling Rate</th><th>Tax%</th><th>Discount%</th><th>Total</th></tr></thead><tbody id="tblVoucherDetails">');
 						}
-						else{
-							$('#tblVoucherDetailshead').append('<thead ><tr><th>Product</th><th>Quantity</th><th>Unit Qty</th><th>Total Qty</th><th>Free Qty</th><th>Selling Rate</th><th>Tax%</th><th>Discount%</th><th>Total</th></tr></thead><tbody id="tblVoucherDetails">');
-						}
-						
-						
+
 						$
 								.each(
 										data.inventoryVoucherDetails,
@@ -220,8 +262,7 @@ if (!this.InventoryVoucher) {
 											let totQty = Math
 													.round(((voucherDetail.updatedStatus ? voucherDetail.updatedQty
 															: voucherDetail.quantity) * unitQty) * 100) / 100;
-											
-											
+
 											$('#tblVoucherDetails')
 													.append(
 															"<tr data-id='"
@@ -264,10 +305,9 @@ if (!this.InventoryVoucher) {
 																			+ pid
 																			+ "\",\""
 																			+ voucherDetail.detailId
-																			+ "\");'  value='update'></div></div>" 
-																			+"</td></tr>"
-																			:"</tr>"));
-											
+																			+ "\");'  value='update'></div></div>"
+																			+ "</td></tr>"
+																			: "</tr>"));
 
 											$
 													.each(
@@ -344,8 +384,8 @@ if (!this.InventoryVoucher) {
 	}
 
 	InventoryVoucher.updateInventory = function(ivhPid, ivdId) {
-		
-		if (confirm("Are you sure?")){
+
+		if (confirm("Are you sure?")) {
 			$.ajax({
 				url : inventoryVoucherContextPath + "/updateInventory",
 				data : {
@@ -435,6 +475,8 @@ if (!this.InventoryVoucher) {
 
 											var sendSalesOrderSapButton = "";
 
+											var sendTOFocus = ""
+
 											if (inventoryVoucher.sendSalesOrderSapButtonStatus) {
 
 												if (inventoryVoucher.tallyDownloadStatus == "PENDING") {
@@ -448,6 +490,22 @@ if (!this.InventoryVoucher) {
 												} else if (inventoryVoucher.tallyDownloadStatus == "COMPLETED") {
 													sendSalesOrderSapButton = "<br><br><button type='button' class='btn btn-success'>Sending Success</button>";
 												}
+											}
+
+											console
+													.log(sendTOFocusConfiguration);
+											if (sendTOFocusConfiguration == "true") {
+												console
+														.log(inventoryVoucher.tallyDownloadStatus);
+												console
+														.log(inventoryVoucher.salesManagementStatus);
+												sendTOFocus = "<button type='button' class='btn btn-blue' style='margin-top: 10px;' onclick='InventoryVoucher.sendTransactionsFocus(\""
+														+ inventoryVoucher.pid
+														+ "\",\""
+														+ inventoryVoucher.tallyDownloadStatus
+														+ "\",\""
+														+ inventoryVoucher.salesManagementStatus
+														+ "\");'>UploadToFocus</button>"
 											}
 
 											if (inventoryVoucher.pdfDownloadButtonStatus) {
@@ -534,13 +592,15 @@ if (!this.InventoryVoucher) {
 																	+ "\",1);'>Add Products</button>"
 																	+ button
 																	+ ""
+																	+ sendTOFocus
+																	+ button
+																	+ ""
 																	+ sendSalesOrderSapButton
 																	+ "</td><td>"
-																	+spanSalesOrderStatus(
+																	+ spanSalesOrderStatus(
 																			inventoryVoucher.pid,
 																			inventoryVoucher.salesOrderStatus,
-																			inventoryVoucher.tallyDownloadStatus
-																			)
+																			inventoryVoucher.tallyDownloadStatus)
 																	+ "</td><td>"
 																	+ inventoryVoucher.visitRemarks
 																	+ "</td></tr>");
@@ -645,6 +705,7 @@ if (!this.InventoryVoucher) {
 		var pending = "'" + 'PENDING' + "'";
 		var processing = "'" + 'PROCESSING' + "'";
 		var completed = "'" + 'COMPLETED' + "'";
+		var failed = "'" + 'FAILED' + "'";
 		var spanStatus = "";
 		var pid = "'" + inventoryVoucherPid + "'";
 
@@ -701,6 +762,30 @@ if (!this.InventoryVoucher) {
 			// + '</ul></div>';
 
 			break;
+		case 'FAILED':
+			pointerEnable = '<div class="dropdown"><span class="label label-danger" data-toggle="dropdown" style="cursor: pointer" >';
+			pointerDisable = '<div class="dropdown"><span class="label label-danger" >';
+
+			spanStatus = (managementStatus == "APPROVE" ? pointerEnable
+					: pointerDisable)
+					+ 'FAILED <span></span></span></div>';
+			// <span class="'
+			// + (managementStatus == "APPROVE" ? 'caret' : '')
+			// + '"></span></span>'
+			// + '<ul class="dropdown-menu">'
+			// + '<li onclick="InventoryVoucher.setStatus('
+			// + pid
+			// + ','
+			// + pending
+			// + ')" style="cursor: pointer;"><a>PENDING</a></li>'
+			// + '<li onclick="InventoryVoucher.setStatus('
+			// + pid
+			// + ','
+			// + completed
+			// + ')" style="cursor: pointer;"><a>COMPLETED</a></li>'
+			// + '</ul></div>';
+
+			break;
 		case 'COMPLETED':
 
 			pointerEnable = '<div class="dropdown"><span class="label label-success dropdown-toggle" data-toggle="dropdown" style="cursor: pointer" >';
@@ -721,17 +806,17 @@ if (!this.InventoryVoucher) {
 	}
 
 	function spanSalesOrderStatus(inventoryVoucherPid, status, tallyStatus) {
-		var created = "'" +'CREATED'+ "'";
-		var canceld = "'" +'CANCELED'+"'";
-		var deliverd = "'" +'DELIVERD'+"'";
-		var confirmed = "'" +'CONFIRM'+"'";
+		var created = "'" + 'CREATED' + "'";
+		var canceld = "'" + 'CANCELED' + "'";
+		var deliverd = "'" + 'DELIVERD' + "'";
+		var confirmed = "'" + 'CONFIRM' + "'";
 		var salesOrderStatus = "";
 		var pid = "'" + inventoryVoucherPid + "'";
 		switch (status) {
 		case 'CREATED':
 			salesOrderStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-				+ 'CREATED<span class="caret"></span></span>'
-				+ '<ul class="dropdown-menu">'
+					+ 'CREATED<span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
 					+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
 					+ pid
 					+ ','
@@ -745,14 +830,14 @@ if (!this.InventoryVoucher) {
 					+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
 					+ pid
 					+ ','
-					+ deliverd 
+					+ deliverd
 					+ ')" style="cursor: pointer;"><a>DELIVERD</a></li>'
 					+ '</ul></div>';
 			break;
-			case 'DELIVERD':
+		case 'DELIVERD':
 			salesOrderStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-				+ 'DELIVERD<span class="caret"></span></span>'
-				+ '<ul class="dropdown-menu">'
+					+ 'DELIVERD<span class="caret"></span></span>'
+					+ '<ul class="dropdown-menu">'
 					+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
 					+ pid
 					+ ','
@@ -766,59 +851,59 @@ if (!this.InventoryVoucher) {
 					+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
 					+ pid
 					+ ','
-					+ created 
+					+ created
 					+ ')" style="cursor: pointer;"><a>DELIVERD</a></li>'
 					+ '</ul></div>';
 			break;
-			case 'CANCELED':
-				salesOrderStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
+		case 'CANCELED':
+			salesOrderStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
 					+ 'CANCELED<span class="caret"></span></span>'
 					+ '<ul class="dropdown-menu">'
+					+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
+					+ pid
+					+ ','
+					+ created
+					+ ')" style="cursor: pointer;"><a>CANCELD</a></li>'
+					+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
+					+ pid
+					+ ','
+					+ confirmed
+					+ ')" style="cursor: pointer;"><a>CONFIRMED</a></li>'
+					+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
+					+ pid
+					+ ','
+					+ deliverd
+					+ ')" style="cursor: pointer;"><a>DELIVERD</a></li>'
+					+ '</ul></div>';
+			break;
+		case 'CONFIRM':
+			if (tallyStatus == 'COMPLETED') {
+				salesOrderStatus = '<div ><span class="label label-success dropdown-toggle" data-toggle="dropdown" >'
+						+ 'CONFIRME <span></span></span></div>';
+			} else {
+				salesOrderStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
+						+ 'CONFIRM<span class="caret"></span></span>'
+						+ '<ul class="dropdown-menu">'
 						+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
 						+ pid
 						+ ','
-						+ created
+						+ canceld
 						+ ')" style="cursor: pointer;"><a>CANCELD</a></li>'
 						+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
 						+ pid
 						+ ','
-						+ confirmed
-						+ ')" style="cursor: pointer;"><a>CONFIRMED</a></li>'
+						+ created
+						+ ')" style="cursor: pointer;"><a>CREATED</a></li>'
 						+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
 						+ pid
 						+ ','
-						+ deliverd 
+						+ deliverd
 						+ ')" style="cursor: pointer;"><a>DELIVERD</a></li>'
 						+ '</ul></div>';
-				break;
-			case 'CONFIRM':
-				if (tallyStatus == 'COMPLETED') {
-					salesOrderStatus = '<div ><span class="label label-success dropdown-toggle" data-toggle="dropdown" >'
-							+ 'CONFIRME <span></span></span></div>';
-				}else{
-					salesOrderStatus = '<div class="dropdown"><span class="label label-default dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">'
-						+ 'CONFIRM<span class="caret"></span></span>'
-						+ '<ul class="dropdown-menu">'
-							+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
-							+ pid
-							+ ','
-							+ canceld
-							+ ')" style="cursor: pointer;"><a>CANCELD</a></li>'
-							+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
-							+ pid
-							+ ','
-							+ created
-							+ ')" style="cursor: pointer;"><a>CREATED</a></li>'
-							+ '<li onclick="InventoryVoucher.setSalesOrderStatus('
-							+ pid
-							+ ','
-							+ deliverd 
-							+ ')" style="cursor: pointer;"><a>DELIVERD</a></li>'
-							+ '</ul></div>';
-				}
-				break;
+			}
+			break;
 		}
-		
+
 		return salesOrderStatus;
 	}
 
@@ -946,16 +1031,13 @@ if (!this.InventoryVoucher) {
 
 	}
 
-	
-	InventoryVoucher.setSalesOrderStatus = function(pid,
-			salesOrderStatus) {
+	InventoryVoucher.setSalesOrderStatus = function(pid, salesOrderStatus) {
 
 		if (confirm("Are you sure?")) {
 			// update status;changeStatus
 
 			$.ajax({
-				url : inventoryVoucherContextPath
-						+ "/changeSalesOrderStatus",
+				url : inventoryVoucherContextPath + "/changeSalesOrderStatus",
 				method : 'GET',
 				data : {
 					pid : pid,
@@ -976,8 +1058,7 @@ if (!this.InventoryVoucher) {
 		}
 
 	}
-	
-	
+
 	InventoryVoucher.setSalesManagementStatus = function(pid,
 			salesManagementStatus) {
 
@@ -1069,7 +1150,7 @@ if (!this.InventoryVoucher) {
 
 	InventoryVoucher.closeModalPopup = function(el) {
 		el.modal('hide');
-		  $('#search').val('');
+		$('#search').val('');
 	}
 
 	function addErrorAlert(message, key, data) {
