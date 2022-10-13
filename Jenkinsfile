@@ -15,14 +15,14 @@ pipeline {
 
         stage("Validation") {
             steps {
-                sh'''
-                     if ["ok" = $(PGPASSWORD=snrichpg2022 psql -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql)]
-                     then
-                            echo "Both variables are the same"
-                    else
-                            echo "Both variables are different"
-                    fi
-                 '''
+                sh '''
+                if [ "ok" = $(PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql) ]
+                then
+                        echo "Both variables are the same"
+                else
+                        echo "Both variables are different"
+                fi
+                '''
             }
         }
 
