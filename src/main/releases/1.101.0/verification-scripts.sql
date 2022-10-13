@@ -1,1 +1,1 @@
-﻿select isSuccess();
+﻿select true;
