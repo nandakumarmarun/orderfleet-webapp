@@ -19,4 +19,4 @@ begin
 end;
 $$;
 
-select if_table_exist('public', 'cicd_sample');
+select "ok";
