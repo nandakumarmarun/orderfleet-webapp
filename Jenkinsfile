@@ -16,11 +16,12 @@ pipeline {
         stage("Validation") {
             steps {
                 sh '''
-                if [ "ok" = $(PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql) ]
+                if [ "false" = $(PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql) ]
                 then
-                        echo "Both variables are the same"
+                        echo "Verification Failed"
+                        error("Build Failed: change pom version")
                 else
-                        echo "Both variables are different"
+                        echo "Verification Success"
                 fi
                 '''
             }
