@@ -16,8 +16,8 @@ pipeline {
         stage("Validation") {
             steps {
                 script {
-                    result = sh ('''PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql''')
-                    echo "Result ${result}"
+                    def result = sh ('''PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql''')
+                    println result
                 }
             }
         }
