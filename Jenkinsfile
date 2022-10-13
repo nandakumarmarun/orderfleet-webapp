@@ -21,6 +21,7 @@ pipeline {
                         echo "Verification Success"
                 else
                         echo "Verification Failed"
+                        error ("Verification Failed Error")
                 fi
                 '''
             }
