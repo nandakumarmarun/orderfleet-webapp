@@ -16,7 +16,12 @@ pipeline {
         stage("Validation") {
             steps {
                 script {
-                    if ("true" == sh ('''PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql''')) {
+                    res = sh (
+                        script: 'PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'+params.RELEASE_NO+'/verification-scripts.sql', 
+                        returnStdout: true
+                        ).trim()
+                    echo res
+                    if ("true".equals(res)) {
                         println "Validation success";    
                     } else {
                         println "Validation failed"
