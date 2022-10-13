@@ -1,1 +1,1 @@
-﻿select true
+﻿select 'ok'

@@ -16,7 +16,7 @@ pipeline {
         stage("Validation") {
             steps {
                 sh'''
-                     if [$(PGPASSWORD=snrichpg2022 psql -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql)]
+                     if ["ok" = $(PGPASSWORD=snrichpg2022 psql -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql)]
                      then
                             echo "Both variables are the same"
                     else
