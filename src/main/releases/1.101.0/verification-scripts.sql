@@ -1,1 +1,1 @@
-﻿select 'hello'
+﻿select true
