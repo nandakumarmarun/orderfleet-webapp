@@ -7,6 +7,7 @@ BEGIN
 	WHERE table_schema = 'public'
 	AND table_name = 'cicd_sample'
 ) THEN
-PERFORM 'ok';
+
+    RAISE NOTICE 'ok';
   END IF;
 END $$;
