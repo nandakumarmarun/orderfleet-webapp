@@ -18,7 +18,6 @@ pipeline {
                 sh '''
                 if [ "false" = $(PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/verification-scripts.sql) ]
                 then
-                        echo "Verification Failed"
                         error("Build Failed: change pom version")
                 else
                         echo "Verification Success"
