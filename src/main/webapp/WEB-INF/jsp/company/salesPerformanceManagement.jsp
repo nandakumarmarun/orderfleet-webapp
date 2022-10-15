@@ -25,9 +25,13 @@
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
 			<h2>Transaction Summary</h2>
+			<h2>${sendTOFocs}</h2>
 			<div class="row col-xs-12"></div>
 			<div class="clearfix"></div>
 			<hr />
+
+			<input id="focusConfiguration" type="hidden"
+				value='${focusConfiguration}' />
 
 			<div class="row">
 				<!-- Profile Info and Notifications -->
@@ -82,6 +86,7 @@
 									<option value="CUSTOM">CUSTOM</option>
 								</select>
 							</div>
+
 							<div class="col-sm-2 hide custom_date1">
 								<br />
 								<div class="input-group">
@@ -112,6 +117,7 @@
 									<option value="PENDING">PENDING</option>
 									<option value="PROCESSING">PROCESSING</option>
 									<option value="COMPLETED">COMPLETED</option>
+									<option value="FAILED">FAILED</option>
 								</select>
 							</div>
 							<div class="col-sm-1">
@@ -268,8 +274,9 @@
 								<td id="lbl_documentDiscountPercentage"></td>
 							</tr>
 						</table>
-						<table class="collaptable table table-striped table-bordered" id="tblVoucherDetailshead">
-							
+						<table class="collaptable table table-striped table-bordered"
+							id="tblVoucherDetailshead">
+
 						</table>
 					</div>
 					<div class="modal-footer">
@@ -283,7 +290,7 @@
 
 		<div class="modal fade container" id="productModel">
 			<!-- model Dialog -->
-			<div class="modal-dialog" style="width:500px;">
+			<div class="modal-dialog" style="width: 500px;">
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal"
@@ -305,8 +312,9 @@
 
 						<div class="col-sm-6" style="margin-bottom: 20px;">
 							<div class="input-group">
-								<input type="text" class="form-control" name="productSearch" placeholder="Search"
-									id="search" /> <span class="input-group-btn">
+								<input type="text" class="form-control" name="productSearch"
+									placeholder="Search" id="search" /> <span
+									class="input-group-btn">
 									<button class="btn btn-default entypo-search" id="btnSearch"
 										type="button" style="font-size: 18px"
 										onclick="InventoryVoucher.searchByName($('#search').val());"></button>
@@ -327,7 +335,9 @@
 						</table>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default " data-dismiss="modal" onclick="InventoryVoucher.closeModalPopup($('#productModel'))">Cancel</button>
+						<button type="button" class="btn btn-default "
+							data-dismiss="modal"
+							onclick="InventoryVoucher.closeModalPopup($('#productModel'))">Cancel</button>
 						<button type="button" class="btn btn-default" id="btnSaveProducts">Add</button>
 					</div>
 				</div>
@@ -335,7 +345,40 @@
 			</div>
 			<!-- /.modal-dialog -->
 		</div>
+
+		<div class="modal fade container" id="ErrorPopModel">
+			<!-- model Dialog -->
+			<div class="modal-dialog" style="width: 500px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<!-- error message -->
+						<div class="alert alert-danger alert-dismissible" role="alert"
+							style="display: none;">
+							<button type="button" class="close" onclick="$('.alert').hide();"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<p></p>
+						</div>
+						<p id=errorMsg style="color: red;"></p>
+					</div>
+					<div class="modal-footer"></div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
 	</div>
+
+
+	</div>
+
 
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
 

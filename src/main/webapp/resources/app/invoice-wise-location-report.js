@@ -91,6 +91,7 @@ if (!this.InvoiceWiseLocationReport) {
 						fromDate : $("#txtFromDate").val(),
 						toDate : $("#txtToDate").val(),
 						inclSubordinate : $('#inclSubOrdinates').is(":checked")
+
 					},
 					success : function(invoiceWiseReports) {
 						$('#tBodyInvoiceWiseLocationReport').html("");
@@ -373,8 +374,8 @@ if (!this.InvoiceWiseLocationReport) {
 				});
 	}
 
-	InvoiceWiseLocationReport.setGeoTag = function(pid, accLat, accLon, accLoc, newLat,
-			newLon, newLoc, obj) {
+	InvoiceWiseLocationReport.setGeoTag = function(pid, accLat, accLon, accLoc,
+			newLat, newLon, newLoc, obj) {
 
 		$("#oldLatitude").text(
 				(accLat == "null" || accLat == null ? "" : accLat));
@@ -439,7 +440,8 @@ if (!this.InvoiceWiseLocationReport) {
 		});
 	}
 
-	InvoiceWiseLocationReport.editDetails = function(pid, documentType, documentTypePid) {
+	InvoiceWiseLocationReport.editDetails = function(pid, documentType,
+			documentTypePid) {
 		if (documentType == "INVENTORY_VOUCHER") {
 			window.location = location.protocol + '//' + location.host
 					+ "/web/inventory-voucher-transaction?etePid=" + pid
@@ -891,11 +893,66 @@ if (!this.InvoiceWiseLocationReport) {
 			case 0:
 				showDynamicDocumentImages(pid);
 				break;
+
 			}
 		}
-		el.modal('show');
+
 	}
 
+	InvoiceWiseLocationReport.skippedCustomerList = function() {
+		if ($('#dbDateSearch').val() == "SINGLE") {
+			if ($("#txtFromDate").val() == "") {
+				return;
+			}
+		}
+		if ($('#dbDateSearch').val() == "CUSTOM") {
+			if ($("#txtFromDate").val() == "" || $("#txtToDate").val() == "") {
+				return;
+			}
+		}
+
+		$('#tBodycustomerLocationReport').html(
+				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
+		$
+				.ajax({
+					url : invoiceWiseReportContextPath
+							+ "/filterSkippedCustomers",
+					type : 'GET',
+					data : {
+						employeePid : $('#dbEmployee').val(),
+						documentPid : $("#dbDocument").val(),
+						activityPid : $("#dbActivity").val(),
+						locationPid : $("#dbLocation").val(),
+						filterBy : $("#dbDateSearch").val(),
+						fromDate : $("#txtFromDate").val(),
+						toDate : $("#txtToDate").val(),
+						inclSubordinate : $('#inclSubOrdinates').is(":checked")
+
+					},
+					success : function(accountProfile) {
+						$('#tBodyInvoiceWiseLocationReport').html("");
+
+						if (accountProfile.length == 0) {
+							$('#tBodyInvoiceWiseLocationReport')
+									.html(
+											"<tr><td colspan='9' align='center'>No data available</td></tr>");
+							return;
+						}
+						$
+								.each(
+										accountProfile,
+										function(index, accounts) {
+											$('#tBodyInvoiceWiseLocationReport')
+													.append(
+															"<tr><td></td><td>"
+																	+ accounts.name
+																	+ "</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
+										});
+
+					}
+				});
+
+	}
 	function showDynamicDocumentImages(pid) {
 		$('#divInvoiceWiseLocationReportImages')
 				.html(
@@ -909,7 +966,8 @@ if (!this.InvoiceWiseLocationReport) {
 						$('#divInvoiceWiseLocationReportImages').html("");
 						if (filledFormFiles.length == 0) {
 							var table = '<table class="table  table-striped table-bordered"><tr><td style="font-weight: bold;">Image Not Found</td></tr></table>';
-							$('#divInvoiceWiseLocationReportImages').append(table);
+							$('#divInvoiceWiseLocationReportImages').append(
+									table);
 						}
 						$
 								.each(
@@ -932,7 +990,8 @@ if (!this.InvoiceWiseLocationReport) {
 																		+ '"/></td></tr>';
 															});
 											table += '</table>';
-											$('#divInvoiceWiseLocationReportImages')
+											$(
+													'#divInvoiceWiseLocationReportImages')
 													.append(table);
 
 										});

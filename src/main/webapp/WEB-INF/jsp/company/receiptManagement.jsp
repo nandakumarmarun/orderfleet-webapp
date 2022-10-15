@@ -56,7 +56,7 @@
 									</c:forEach>
 								</select>
 							</div>
-
+							<input id="updateReciept" type="hidden" value='${updateReciept}' />
 							<div class="col-sm-2">
 								Account <select id="dbAccount" name="accountPid"
 									class="form-control">
@@ -301,27 +301,9 @@
 							</tr>
 						</table>
 						<div class="table-responsive">
-							<table class="collaptable table  table-striped table-bordered">
-								<thead>
-									<tr>
-										<th style="width: 80px;">Mode</th>
-										<th>Amount</th>
-										<th>Instrument Number</th>
-										<th>Instrument Date</th>
-										<th>Bank Name</th>
-										<th>By Account</th>
-										<th>To Account</th>
-										<th>Expense Type</th>
-										<th>Voucher Number</th>
-										<th>Voucher Date</th>
-										<th>Reference Number</th>
-										<th>Provisional Receipt Number</th>
-										<th>Remarks</th>
-									</tr>
-								</thead>
-								<tbody id="tblVoucherDetails">
+							<table class="collaptable table  table-striped table-bordered"
+								id="accountingVoucherTable">
 
-								</tbody>
 							</table>
 						</div>
 					</div>

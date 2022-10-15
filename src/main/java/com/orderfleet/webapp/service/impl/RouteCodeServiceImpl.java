@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class RouteCodeServiceImpl implements RouteCodeService {
 
 	private final CompanyRepository companyRepository;
 	
+	@Inject
 	private final RouteCodeRepository routeCodeRepository;
 	
 
@@ -48,19 +51,16 @@ public class RouteCodeServiceImpl implements RouteCodeService {
 			routeCodeop =  RouteCodeList.stream().filter(pc -> pc.getMasterCode().equals(routeCodeDTO.getMasterCode())).findAny();
 			RouteCode  routeCode  = new RouteCode();
 			if(routeCodeop.isPresent()){
-				
 				RouteCode BussinessUnitoptional = routeCodeop.get();
 				routeCode.setId(BussinessUnitoptional.getId());
 				routeCode.setPid(BussinessUnitoptional.getPid());
-				routeCode .setMasterCode( routeCodeDTO.getMasterCode());
+				routeCode.setMasterCode( routeCodeDTO.getMasterCode());
 			
 				routeCode.setMasterName(  routeCodeDTO.getMasterName());
 				routeCode.setCompany(company);
 			}else {
-			
 				routeCode.setPid(PID_PREFIX + RandomUtil.generatePid() );
 				routeCode.setMasterCode(routeCodeDTO.getMasterCode());
-			
 				routeCode.setMasterName(routeCodeDTO.getMasterName());
 				routeCode.setCompany(company);
 			}

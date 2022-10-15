@@ -78,6 +78,12 @@ public class AccountingVoucherHeader implements Serializable {
 	@Column(name = "total_amount", nullable = false)
 	private double totalAmount;
 
+	@Column(name = "updated_amount", nullable = false, columnDefinition = "double precision DEFAULT '0'")
+	private double existingAmount;
+
+	@Column(name = "updated_status", columnDefinition = "boolean DEFAULT 'FALSE'")
+	private Boolean isupdated;
+
 	@Column(name = "outstanding_amount", nullable = false)
 	private double outstandingAmount;
 
@@ -344,6 +350,22 @@ public class AccountingVoucherHeader implements Serializable {
 
 	public void setErpStatus(String erpStatus) {
 		this.erpStatus = erpStatus;
+	}
+
+	public double getExistingAmount() {
+		return existingAmount;
+	}
+
+	public void setExistingAmount(double existingAmount) {
+		this.existingAmount = existingAmount;
+	}
+
+	public Boolean getIsupdated() {
+		return isupdated;
+	}
+
+	public void setIsupdated(Boolean isupdated) {
+		this.isupdated = isupdated;
 	}
 
 }

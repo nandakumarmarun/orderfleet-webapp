@@ -40,10 +40,12 @@ import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
+import com.orderfleet.webapp.service.RouteCodeService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
+import com.orderfleet.webapp.web.rest.dto.RouteCodeDTO;
 import com.orderfleet.webapp.web.vendor.focus.dto.AccountProfileFocus;
 
 @Service
@@ -74,13 +76,15 @@ public class AccountProfileFocusUploadService {
 
 	private final LocationHierarchyRepository locationHierarchyRepository;
 
+	private final RouteCodeRepository routeCodeRepository;
+
 	public AccountProfileFocusUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
 			AccountProfileService accountProfileService, LocationRepository locationRepository,
 			LocationAccountProfileRepository locationAccountProfileRepository,
 			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
 			LocationService locationService, CompanyRepository companyRepository,
-			LocationHierarchyRepository locationHierarchyRepository) {
+			LocationHierarchyRepository locationHierarchyRepository, RouteCodeRepository routeCodeRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.accountProfileRepository = accountProfileRepository;
@@ -93,6 +97,7 @@ public class AccountProfileFocusUploadService {
 		this.locationService = locationService;
 		this.companyRepository = companyRepository;
 		this.locationHierarchyRepository = locationHierarchyRepository;
+		this.routeCodeRepository = routeCodeRepository;
 	}
 
 	public void saveUpdateAccountProfiles(List<AccountProfileFocus> accountProfileDTos) {
@@ -176,7 +181,9 @@ public class AccountProfileFocusUploadService {
 
 		List<LocationDTO> locationDtos = new ArrayList<>();
 		List<LocationAccountProfileDTO> locationAccountProfileDtos = new ArrayList<>();
-
+		List<RouteCode> routecodeList = new ArrayList<>();
+		List<RouteCode> RouteCodeList = routeCodeRepository.findAll();
+		
 		if (accountProfileDTos != null) {
 			for (AccountProfileFocus apDto : accountProfileDTos) {
 				// check exist by name, only one exist with a name
@@ -208,7 +215,7 @@ public class AccountProfileFocusUploadService {
 					Float floatnum = Float.parseFloat(apDto.getCreditLimit());
 					accountProfile.setCreditLimit((Long) floatnum.longValue());
 				}
-				
+
 				accountProfile.setActivated(true);
 				if (apDto.getAddress() != null && !apDto.getAddress().equals("")) {
 					accountProfile.setAddress(apDto.getAddress());
@@ -227,7 +234,7 @@ public class AccountProfileFocusUploadService {
 				} else {
 					accountProfile.setPhone1("");
 				}
-				
+
 				// account type
 
 //				if (accountProfile.getAccountType() == null) {
@@ -262,18 +269,43 @@ public class AccountProfileFocusUploadService {
 					locationAccountProfileDto.setLocationName("No Location");
 
 				} else {
-
+					System.out.println("routecode"+apDto.getRouteCode());
 					locationDTO.setLocationId(apDto.getRouteCode());
 					locationDTO.setName(apDto.getRouteName());
 					locationDtos.add(locationDTO);
 					locationAccountProfileDto.setAccountProfileName(apDto.getName());
 					locationAccountProfileDto.setLocationName(apDto.getRouteName());
-
 				}
-
+   
+				RouteCode routecode = new RouteCode();
+				if (!apDto.getRouteCode().equalsIgnoreCase("null") && !apDto.getRouteName().equalsIgnoreCase("null")) {
+					
+					Optional<RouteCode> routeCodeop =  RouteCodeList.stream().filter(pc -> pc.getMasterCode().equals(apDto.getRouteCode())).findAny();	
+					if(routeCodeop.isPresent()) {
+						routecode = routeCodeop.get();
+						routecode.setId(routeCodeop.get().getId());
+						routecode.setMasterCode(apDto.getRouteCode());
+						routecode.setMasterName(apDto.getRouteName());
+						routecode.setAccountProfile(accountProfile);
+						routecode.setCompany(company);
+						System.out.println("present");
+						System.out.println(apDto.getRouteCode());
+						System.out.println(apDto.getRouteName());
+					}else {
+						routecode.setPid(RouteCodeService.PID_PREFIX + RandomUtil.generatePid() );
+						routecode.setMasterCode(apDto.getRouteCode());
+						routecode.setMasterName(apDto.getRouteName());
+						routecode.setAccountProfile(accountProfile);
+						routecode.setCompany(company);
+						System.out.println("presentelse");
+						System.out.println(apDto.getRouteCode());
+						System.out.println(apDto.getRouteName());
+					}
+				}     
 				locationAccountProfileDtos.add(locationAccountProfileDto);
 				accountProfile.setDataSourceType(DataSourceType.TALLY);
 				saveUpdateAccountProfiles.add(accountProfile);
+				routecodeList.add(routecode);
 			}
 
 			if (locationDtos.size() > 0)
@@ -284,7 +316,7 @@ public class AccountProfileFocusUploadService {
 			}
 
 			bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
-
+			routeCodeRepository.save(routecodeList);
 			saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
 		}
 		long end = System.nanoTime();
@@ -306,6 +338,7 @@ public class AccountProfileFocusUploadService {
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
+		
 		Set<Location> saveUpdateLocations = new HashSet<>();
 		// find all locations
 		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());

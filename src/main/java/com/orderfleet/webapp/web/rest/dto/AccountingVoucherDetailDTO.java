@@ -15,6 +15,8 @@ import com.orderfleet.webapp.domain.enums.PaymentMode;
  */
 public class AccountingVoucherDetailDTO {
 
+	private long detailid;
+
 	private PaymentMode mode;
 
 	private double amount;
@@ -48,7 +50,7 @@ public class AccountingVoucherDetailDTO {
 	private String incomeExpenseHeadPid;
 
 	private String incomeExpenseHeadName;
-	
+
 	private String provisionalReceiptNo;
 
 	public AccountingVoucherDetailDTO() {
@@ -56,6 +58,7 @@ public class AccountingVoucherDetailDTO {
 
 	public AccountingVoucherDetailDTO(AccountingVoucherDetail accountingVoucherDetail) {
 		super();
+		this.setDetailid(accountingVoucherDetail.getId());
 		this.mode = accountingVoucherDetail.getMode();
 		this.amount = accountingVoucherDetail.getAmount();
 		this.instrumentNumber = accountingVoucherDetail.getInstrumentNumber();
@@ -83,6 +86,14 @@ public class AccountingVoucherDetailDTO {
 			this.incomeExpenseHeadName = accountingVoucherDetail.getIncomeExpenseHead().getName();
 		}
 		this.provisionalReceiptNo = accountingVoucherDetail.getProvisionalReceiptNo();
+	}
+
+	public long getDetailid() {
+		return detailid;
+	}
+
+	public void setDetailid(long detailid) {
+		this.detailid = detailid;
 	}
 
 	public PaymentMode getMode() {

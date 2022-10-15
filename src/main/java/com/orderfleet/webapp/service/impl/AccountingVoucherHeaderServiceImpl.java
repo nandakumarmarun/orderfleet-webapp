@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -27,7 +28,9 @@ import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.AccountingVoucherDetailRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.AccountingVoucherUpdateHistoryRepository;
 import com.orderfleet.webapp.repository.BankRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
@@ -40,6 +43,7 @@ import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
+import com.orderfleet.webapp.domain.AccountingVoucherUpdateHistory;
 
 /**
  * Service Implementation for managing AccountingVoucherHeader.
@@ -55,6 +59,9 @@ public class AccountingVoucherHeaderServiceImpl implements AccountingVoucherHead
 	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountingVoucherHeaderRepository accountingVoucherHeaderRepository;
+
+	@Inject
+	private AccountingVoucherDetailRepository accountingVoucherDetailRepository;
 
 	@Inject
 	private CompanyRepository companyRepository;
@@ -76,6 +83,9 @@ public class AccountingVoucherHeaderServiceImpl implements AccountingVoucherHead
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private AccountingVoucherUpdateHistoryRepository accountingVoucherUpdateHistoryRepository;
 
 	/**
 	 * Save a accountingVoucherHeader.
@@ -1058,6 +1068,70 @@ public class AccountingVoucherHeaderServiceImpl implements AccountingVoucherHead
 		accountingVoucherHeader.setSalesManagementStatus(accountingVoucherHeaderDTO.getSalesManagementStatus());
 		accountingVoucherHeaderRepository.save(accountingVoucherHeader);
 
+	}
+
+	/*
+	 * This working to update Recipt amount
+	 * 
+	 * @pram amount
+	 * 
+	 * @pram accounting voucher details id
+	 * 
+	 * @param accounting voucher Header Pid
+	 * 
+	 * @author Muhammed Riyas T
+	 * 
+	 * @since June 04, 2016
+	 */
+	public void updateAccountingVoucherAmount(double amount, long detailid, String pid) {
+		// fetching accounting Voucher Data using pid
+		AccountingVoucherHeader accountingVoucherHeader = accountingVoucherHeaderRepository.findOneByPid(pid).get();
+
+		// creating ListObject
+		List<AccountingVoucherDetail> avdList = accountingVoucherHeader.getAccountingVoucherDetails();
+		List<AccountingVoucherDetail> accountVoucherDetails = new ArrayList<AccountingVoucherDetail>();
+
+		Optional<AccountingVoucherDetail> opIvDetail = avdList.stream().filter(ivd -> ivd.getId() == detailid)
+				.findAny();
+
+		// checking the object tallyStatus not Completed
+		if (accountingVoucherHeader.getTallyDownloadStatus() != TallyDownloadStatus.COMPLETED) {
+			if (opIvDetail.isPresent()) {
+
+				// creating Object
+				AccountingVoucherUpdateHistory accountingVoucherUpdateHistory = new AccountingVoucherUpdateHistory();
+				AccountingVoucherDetail accountingVoucherDetail = opIvDetail.get();
+
+				// assigning Updated Value
+				accountingVoucherDetail.setAmount(amount);
+				accountVoucherDetails.add(accountingVoucherDetail);
+				accountingVoucherHeader.setAccountingVoucherDetails(accountVoucherDetails);
+				accountingVoucherHeader.setExistingAmount(accountingVoucherHeader.getTotalAmount());
+				accountingVoucherHeader.setTotalAmount(amount);
+				accountingVoucherHeader
+						.setUpdatedBy(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
+
+				// assigning Updated History
+				accountingVoucherUpdateHistory.setAccountingVoucherHeader(accountingVoucherHeader);
+				accountingVoucherUpdateHistory.setAmount(accountingVoucherHeader.getExistingAmount());
+				accountingVoucherUpdateHistory
+						.setUpdateBy(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
+				accountingVoucherUpdateHistory
+						.setPid(AccountingVoucherHeaderService.PID_PREFIX + RandomUtil.generatePid());
+				accountingVoucherUpdateHistory
+						.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
+				accountingVoucherUpdateHistory.setUpdated(true);
+				accountingVoucherUpdateHistory.setUpdatedDate(LocalDateTime.now());
+				accountingVoucherUpdateHistory.setNewAmount(amount);
+     
+				System.out.println(accountingVoucherUpdateHistory);
+
+				// saving models
+				accountingVoucherHeaderRepository.save(accountingVoucherHeader);
+				accountingVoucherDetailRepository.save(accountVoucherDetails);
+				accountingVoucherUpdateHistoryRepository.save(accountingVoucherUpdateHistory);
+			}
+		}
 	}
 
 }

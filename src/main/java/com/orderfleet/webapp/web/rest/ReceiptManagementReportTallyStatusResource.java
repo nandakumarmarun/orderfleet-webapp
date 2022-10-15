@@ -11,6 +11,7 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -81,6 +82,7 @@ import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.FileDTO;
 import com.orderfleet.webapp.web.rest.dto.FormFileDTO;
+import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPraveshService;
@@ -90,7 +92,7 @@ import com.orderfleet.webapp.web.vendor.sap.pravesh.service.SendTransactionSapPr
 public class ReceiptManagementReportTallyStatusResource {
 
 	private final Logger log = LoggerFactory.getLogger(ReceiptManagementReportTallyStatusResource.class);
-	 private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private static final String YESTERDAY = "YESTERDAY";
 	private static final String WTD = "WTD";
 	private static final String MTD = "MTD";
@@ -186,33 +188,33 @@ public class ReceiptManagementReportTallyStatusResource {
 			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id1 = "AP_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description1 ="get all by compId and IdsIn";
+			String description1 = "get all by compId and IdsIn";
 			LocalDateTime startLCTime1 = LocalDateTime.now();
 			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 			String startDate1 = startLCTime1.format(DATE_FORMAT1);
 			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
 			List<AccountProfile> accountProfiles = accountProfileRepository
 					.findAllByCompanyIdAndIdsIn(accountProfileIds);
-			 String flag1 = "Normal";
-				LocalDateTime endLCTime1 = LocalDateTime.now();
-				String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-				String endDate1 = startLCTime1.format(DATE_FORMAT1);
-				Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-				long minutes1 = duration1.toMinutes();
-				if (minutes1 <= 1 && minutes1 >= 0) {
-					flag1 = "Fast";
-				}
-				if (minutes1 > 1 && minutes1 <= 2) {
-					flag1 = "Normal";
-				}
-				if (minutes1 > 2 && minutes1 <= 10) {
-					flag1 = "Slow";
-				}
-				if (minutes1 > 10) {
-					flag1 = "Dead Slow";
-				}
-		                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-						+ description1);
+			String flag1 = "Normal";
+			LocalDateTime endLCTime1 = LocalDateTime.now();
+			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+			String endDate1 = startLCTime1.format(DATE_FORMAT1);
+			Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+			long minutes1 = duration1.toMinutes();
+			if (minutes1 <= 1 && minutes1 >= 0) {
+				flag1 = "Fast";
+			}
+			if (minutes1 > 1 && minutes1 <= 2) {
+				flag1 = "Normal";
+			}
+			if (minutes1 > 2 && minutes1 <= 10) {
+				flag1 = "Slow";
+			}
+			if (minutes1 > 10) {
+				flag1 = "Dead Slow";
+			}
+			logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
+					+ "," + description1);
 			// remove duplicates
 			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
 
@@ -225,10 +227,11 @@ public class ReceiptManagementReportTallyStatusResource {
 						companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid()));
 
 		boolean sendTransactionsSapPravesh = false;
+		boolean updateReciept = false;
 		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id1 = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description1 ="get by compId and name";
+		String description1 = "get by compId and name";
 		LocalDateTime startLCTime1 = LocalDateTime.now();
 		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 		String startDate1 = startLCTime1.format(DATE_FORMAT1);
@@ -253,7 +256,7 @@ public class ReceiptManagementReportTallyStatusResource {
 		if (minutes1 > 10) {
 			flag1 = "Dead Slow";
 		}
-                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+		logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 				+ description1);
 		if (opCompanyConfigurationSapPravesh.isPresent()) {
 
@@ -265,6 +268,17 @@ public class ReceiptManagementReportTallyStatusResource {
 		}
 		model.addAttribute("sendTransactionsSapPravesh", sendTransactionsSapPravesh);
 
+		Optional<CompanyConfiguration> optupdateReciept = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.UPDATE_RECEIPT);
+
+		if (optupdateReciept.isPresent()) {
+			if (optupdateReciept.get().getValue().equals("true")) {
+				updateReciept = true;
+			} else {
+				updateReciept = false;
+			}
+			model.addAttribute("updateReciept", updateReciept);
+		}             
 		return "company/receiptManagement";
 	}
 
@@ -337,12 +351,12 @@ public class ReceiptManagementReportTallyStatusResource {
 		if ("-1".equals(accountPid)) {
 			accountVouchers = accountingVoucherHeaderService.getAllByCompanyIdUserPidDocumentPidAndDateBetween(userPids,
 					documentPids, tallyStatus, fromDate, toDate);
-			
+
 		} else {
 			accountVouchers = accountingVoucherHeaderService
 					.getAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetween(userPids, accountPid, documentPids,
 							tallyStatus, fromDate, toDate);
-			
+
 		}
 		if (accountVouchers.isEmpty()) {
 			return Collections.emptyList();
@@ -397,7 +411,7 @@ public class ReceiptManagementReportTallyStatusResource {
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "ACC_QUERY_165" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get one by pid";
+		String description = "get one by pid";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
@@ -422,7 +436,7 @@ public class ReceiptManagementReportTallyStatusResource {
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 		AccountingVoucherHeader accountingVoucherHeader = new AccountingVoucherHeader();
 
@@ -589,6 +603,20 @@ public class ReceiptManagementReportTallyStatusResource {
 
 		return new ResponseEntity<>("failed", HttpStatus.OK);
 
+	}
+
+	@RequestMapping(value = "/receipt-management/updateAmount", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<String> updateRecipt(@RequestParam String pid, @RequestParam String detailid,
+			@RequestParam String amount) {
+		log.info("================Query Parameters====================");
+		log.info("Receipt Amount                 : " + amount);
+		log.info("Accounting Voucher Pid         : " + pid);
+		log.info("acccounting Voucher Details Id : " + detailid);
+		log.info("====================================================");
+		accountingVoucherService.updateAccountingVoucherAmount(Double.parseDouble(amount), Long.parseLong(detailid),
+				pid);
+		return new ResponseEntity<>("Successfully updated", HttpStatus.OK);
 	}
 
 }

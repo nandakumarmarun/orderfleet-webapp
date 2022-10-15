@@ -173,7 +173,7 @@ public class CompanyConfigurationResource {
 					mcDto.setAliasToName(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
-				
+
 				if (cc.getName().equals(CompanyConfig.DESCRIPTION_TO_NAME)) {
 					mcDto.setDescriptionToName(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
@@ -182,17 +182,25 @@ public class CompanyConfigurationResource {
 					mcDto.setStockApi(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
-				if(cc.getName().equals(CompanyConfig.EMPLOYEE_CREATE_BTN)) {
+				if (cc.getName().equals(CompanyConfig.EMPLOYEE_CREATE_BTN)) {
 					mcDto.setEmployeeCreateBtn(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
-				if(cc.getName().equals(CompanyConfig.MODERN_SPECIAL_CONFIG)) {
+				if (cc.getName().equals(CompanyConfig.MODERN_SPECIAL_CONFIG)) {
 					mcDto.setModernSpecialConfig(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
-				
+
 				if (cc.getName().equals(CompanyConfig.SALES_ORDER_STATUS)) {
 					mcDto.setSalesOrderStatus(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
+				if (cc.getName().equals(CompanyConfig.UPDATE_RECEIPT)) {
+					mcDto.setUpdateReciept(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
+				if (cc.getName().equals(CompanyConfig.SEND_TO_FOCUS)) {
+					mcDto.setSendToFocus(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
 
@@ -224,9 +232,10 @@ public class CompanyConfigurationResource {
 			@RequestParam String sendSalesOrderSap, @RequestParam String piecesToQuantity,
 			@RequestParam String sendSalesOrderOdoo, @RequestParam String sendTransactionsSapPravesh,
 			@RequestParam String addCompoundUnit, @RequestParam String updateStockLocation,
-			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName, @RequestParam String descriptionToName,
-			@RequestParam String stockApi,@RequestParam String employeeCreateBtn,@RequestParam String modernSpecialConfig,@RequestParam String salesorderstatus)
-			throws URISyntaxException {
+			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName,
+			@RequestParam String descriptionToName, @RequestParam String stockApi,
+			@RequestParam String employeeCreateBtn, @RequestParam String modernSpecialConfig,
+			@RequestParam String salesorderstatus, @RequestParam String updateReciept,@RequestParam String sendToFocus) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -284,14 +293,18 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
 		Optional<CompanyConfiguration> optdescriptionToName = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DESCRIPTION_TO_NAME);
-		Optional<CompanyConfiguration> optStockApi = companyConfigurationRepository
-				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
+		Optional<CompanyConfiguration> optStockApi = companyConfigurationRepository.findByCompanyPidAndName(companyPid,
+				CompanyConfig.STOCK_API);
 		Optional<CompanyConfiguration> optemployeeCreateBtn = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
 		Optional<CompanyConfiguration> optmodernSpecialConfig = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.MODERN_SPECIAL_CONFIG);
 		Optional<CompanyConfiguration> optsalesOrderStatus = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_ORDER_STATUS);
+		Optional<CompanyConfiguration> optUpdateReciept = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.UPDATE_RECEIPT);
+		Optional<CompanyConfiguration> optsendTOFocus = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_FOCUS);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -324,8 +337,10 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration descriptionToNameCompany = null;
 		CompanyConfiguration stockApiCompany = null;
 		CompanyConfiguration employeeCreateBtnCompany = null;
-		CompanyConfiguration modernSpecialConfigCompany =null;
+		CompanyConfiguration modernSpecialConfigCompany = null;
 		CompanyConfiguration salesorderstatusCompany = null;
+		CompanyConfiguration updateRecieptCompany = null;
+		CompanyConfiguration sendToFocusCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -580,9 +595,9 @@ public class CompanyConfigurationResource {
 			aliasToNameCompany.setValue(aliasToName);
 		}
 		companyConfigurationRepository.save(aliasToNameCompany);
-		
+
 		if (optdescriptionToName.isPresent()) {
-			descriptionToNameCompany= optdescriptionToName.get();
+			descriptionToNameCompany = optdescriptionToName.get();
 			descriptionToNameCompany.setValue(descriptionToName);
 		} else {
 			descriptionToNameCompany = new CompanyConfiguration();
@@ -591,9 +606,9 @@ public class CompanyConfigurationResource {
 			descriptionToNameCompany.setValue(descriptionToName);
 		}
 		companyConfigurationRepository.save(descriptionToNameCompany);
-		
+
 		if (optStockApi.isPresent()) {
-			stockApiCompany= optStockApi.get();
+			stockApiCompany = optStockApi.get();
 			stockApiCompany.setValue(stockApi);
 		} else {
 			stockApiCompany = new CompanyConfiguration();
@@ -602,9 +617,9 @@ public class CompanyConfigurationResource {
 			stockApiCompany.setValue(stockApi);
 		}
 		companyConfigurationRepository.save(stockApiCompany);
-		
+
 		if (optemployeeCreateBtn.isPresent()) {
-			employeeCreateBtnCompany= optemployeeCreateBtn.get();
+			employeeCreateBtnCompany = optemployeeCreateBtn.get();
 			employeeCreateBtnCompany.setValue(employeeCreateBtn);
 		} else {
 			employeeCreateBtnCompany = new CompanyConfiguration();
@@ -614,7 +629,7 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(employeeCreateBtnCompany);
 		if (optmodernSpecialConfig.isPresent()) {
-			modernSpecialConfigCompany= optmodernSpecialConfig.get();
+			modernSpecialConfigCompany = optmodernSpecialConfig.get();
 			modernSpecialConfigCompany.setValue(modernSpecialConfig);
 		} else {
 			modernSpecialConfigCompany = new CompanyConfiguration();
@@ -625,15 +640,37 @@ public class CompanyConfigurationResource {
 		companyConfigurationRepository.save(modernSpecialConfigCompany);
 
 		if (optsalesOrderStatus.isPresent()) {
-				salesorderstatusCompany = optsalesOrderStatus.get();
-				salesorderstatusCompany.setValue(salesorderstatus);
-			} else {
-				salesorderstatusCompany = new CompanyConfiguration();
-				salesorderstatusCompany.setCompany(company);
-				salesorderstatusCompany.setName(CompanyConfig.SALES_ORDER_STATUS);
-				salesorderstatusCompany.setValue(salesorderstatus);
-			}
-			companyConfigurationRepository.save(salesorderstatusCompany);
+			salesorderstatusCompany = optsalesOrderStatus.get();
+			salesorderstatusCompany.setValue(salesorderstatus);
+		} else {
+			salesorderstatusCompany = new CompanyConfiguration();
+			salesorderstatusCompany.setCompany(company);
+			salesorderstatusCompany.setName(CompanyConfig.SALES_ORDER_STATUS);
+			salesorderstatusCompany.setValue(salesorderstatus);
+		}
+		companyConfigurationRepository.save(salesorderstatusCompany);
+
+		if (optUpdateReciept.isPresent()) {
+			updateRecieptCompany = optUpdateReciept.get();
+			updateRecieptCompany.setValue(updateReciept);
+		} else {
+			updateRecieptCompany = new CompanyConfiguration();
+			updateRecieptCompany.setCompany(company);
+			updateRecieptCompany.setName(CompanyConfig.UPDATE_RECEIPT);
+			updateRecieptCompany.setValue(updateReciept);
+		}
+		companyConfigurationRepository.save(updateRecieptCompany);
+
+		if (optsendTOFocus.isPresent()) {
+			sendToFocusCompany = optsendTOFocus.get();
+			sendToFocusCompany.setValue(sendToFocus);
+		} else {
+			sendToFocusCompany = new CompanyConfiguration();
+			sendToFocusCompany.setCompany(company);
+			sendToFocusCompany.setName(CompanyConfig.SEND_TO_FOCUS);
+			sendToFocusCompany.setValue(sendToFocus);
+		}
+		companyConfigurationRepository.save(sendToFocusCompany);
 		
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
@@ -654,36 +691,36 @@ public class CompanyConfigurationResource {
 	public @ResponseBody CompanyConfigDTO getCompanyConfiguration(@PathVariable String companyPid)
 			throws URISyntaxException {
 		log.debug("Web request to get Company Configuration");
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "COMP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get by compPid and name";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "COMP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get by compPid and name";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DISTANCE_TRAVELED);
-		  String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 
 		Optional<CompanyConfiguration> optLocationVariance = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.LOCATION_VARIANCE);
@@ -745,18 +782,22 @@ public class CompanyConfigurationResource {
 
 		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
-		
+
 		Optional<CompanyConfiguration> optdescriptionToName = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DESCRIPTION_TO_NAME);
 
-		Optional<CompanyConfiguration> optstoApi = companyConfigurationRepository
-				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
+		Optional<CompanyConfiguration> optstoApi = companyConfigurationRepository.findByCompanyPidAndName(companyPid,
+				CompanyConfig.STOCK_API);
 		Optional<CompanyConfiguration> optemployeeCreateBtn = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
 		Optional<CompanyConfiguration> optmodernSpecialConfig = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.MODERN_SPECIAL_CONFIG);
 		Optional<CompanyConfiguration> optSalesOrderStatus = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_ORDER_STATUS);
+		Optional<CompanyConfiguration> optUpdateReciept = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.UPDATE_RECEIPT);
+		Optional<CompanyConfiguration> optsendTOFocus = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_FOCUS);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -840,20 +881,27 @@ public class CompanyConfigurationResource {
 		if (optdescriptionToName.isPresent()) {
 			companyConfigurationDTO.setDescriptionToName(Boolean.valueOf(optdescriptionToName.get().getValue()));
 		}
-		
+
 		if (optstoApi.isPresent()) {
 			companyConfigurationDTO.setStockApi(Boolean.valueOf(optstoApi.get().getValue()));
 		}
-		
+
 		if (optemployeeCreateBtn.isPresent()) {
 			companyConfigurationDTO.setEmployeeCreateBtn(Boolean.valueOf(optemployeeCreateBtn.get().getValue()));
 		}
 		if (optmodernSpecialConfig.isPresent()) {
 			companyConfigurationDTO.setModernSpecialConfig(Boolean.valueOf(optmodernSpecialConfig.get().getValue()));
 		}
-		
+
 		if (optSalesOrderStatus.isPresent()) {
 			companyConfigurationDTO.setSalesOrderStatus(Boolean.valueOf(optSalesOrderStatus.get().getValue()));
+		}
+
+		if (optUpdateReciept.isPresent()) {
+			companyConfigurationDTO.setUpdateReciept(Boolean.valueOf(optUpdateReciept.get().getValue()));
+		}
+		if (optsendTOFocus.isPresent()) {
+			companyConfigurationDTO.setSendToFocus(Boolean.valueOf(optsendTOFocus.get().getValue()));
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {
@@ -868,14 +916,14 @@ public class CompanyConfigurationResource {
 	@RequestMapping(value = "/company-configuration/delete/{companyPid}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> deleteCompanyConfiguration(@PathVariable String companyPid) throws URISyntaxException {
 		log.debug("Web request to delete Company Configuration compantPid : {}", companyPid);
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "COMP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get by compPid and name";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "COMP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description = "get by compPid and name";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DISTANCE_TRAVELED);
 		String flag = "Normal";
@@ -896,7 +944,7 @@ public class CompanyConfigurationResource {
 		if (minutes > 10) {
 			flag = "Dead Slow";
 		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 		Optional<CompanyConfiguration> optLocationVariance = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.LOCATION_VARIANCE);
@@ -955,14 +1003,18 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ALIAS_TO_NAME);
 		Optional<CompanyConfiguration> optdescriptionToName = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.DESCRIPTION_TO_NAME);
-		Optional<CompanyConfiguration> optstockApi = companyConfigurationRepository
-				.findByCompanyPidAndName(companyPid, CompanyConfig.STOCK_API);
+		Optional<CompanyConfiguration> optstockApi = companyConfigurationRepository.findByCompanyPidAndName(companyPid,
+				CompanyConfig.STOCK_API);
 		Optional<CompanyConfiguration> optemployeeCreateBtn = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.EMPLOYEE_CREATE_BTN);
 		Optional<CompanyConfiguration> optmodernSpecialConfig = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.MODERN_SPECIAL_CONFIG);
 		Optional<CompanyConfiguration> optSalesOrderStatus = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SALES_ORDER_STATUS);
+		Optional<CompanyConfiguration> optUpdateReciept = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.UPDATE_RECEIPT);
+		Optional<CompanyConfiguration> optsendTOFocus = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_FOCUS);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1074,7 +1126,7 @@ public class CompanyConfigurationResource {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optdescriptionToName.get().getCompany().getId(),
 					CompanyConfig.DESCRIPTION_TO_NAME);
 		}
-		
+
 		if (optstockApi.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optstockApi.get().getCompany().getId(),
 					CompanyConfig.STOCK_API);
@@ -1088,8 +1140,16 @@ public class CompanyConfigurationResource {
 					CompanyConfig.MODERN_SPECIAL_CONFIG);
 		}
 		if (optSalesOrderStatus.isPresent()) {
-			companyConfigurationRepository.deleteByCompanyIdAndName( optSalesOrderStatus.get().getCompany().getId(),
+			companyConfigurationRepository.deleteByCompanyIdAndName(optSalesOrderStatus.get().getCompany().getId(),
 					CompanyConfig.SALES_ORDER_STATUS);
+		}
+		if (optUpdateReciept.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optUpdateReciept.get().getCompany().getId(),
+					CompanyConfig.UPDATE_RECEIPT);
+		}
+		if (optDistanceTraveled.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optDistanceTraveled.get().getCompany().getId(),
+					CompanyConfig.SEND_TO_FOCUS);
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {

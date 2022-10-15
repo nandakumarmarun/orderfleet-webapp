@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -31,6 +32,9 @@ public class RouteCode {
 	
 	@Column(name="master_name")
 	private String masterName;
+	
+	@OneToOne
+	private AccountProfile accountProfile;
 	
 	@ManyToOne
 	@NotNull
@@ -76,4 +80,12 @@ public class RouteCode {
 		this.company = company;
 	}
 
+	public AccountProfile getAccountProfile() {
+		return accountProfile;
+	}
+
+	public void setAccountProfile(AccountProfile accountProfile) {
+		this.accountProfile = accountProfile;
+	}
+	
 }

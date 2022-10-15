@@ -27,8 +27,7 @@ public interface AccountingVoucherHeaderService {
 	/**
 	 * Save a accountingVoucherHeader.
 	 * 
-	 * @param accountingVoucherHeaderDTO
-	 *            the entity to save
+	 * @param accountingVoucherHeaderDTO the entity to save
 	 * @return the persisted entity
 	 */
 	AccountingVoucherHeaderDTO save(AccountingVoucherHeaderDTO accountingVoucherHeaderDTO);
@@ -36,8 +35,7 @@ public interface AccountingVoucherHeaderService {
 	/**
 	 * Get all the accountingVoucherHeaders.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	Page<AccountingVoucherHeader> findAll(Pageable pageable);
@@ -52,8 +50,7 @@ public interface AccountingVoucherHeaderService {
 	/**
 	 * Get all the accountingVoucherHeaders of a company.
 	 * 
-	 * @param pageable
-	 *            the pagination information
+	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
 	Page<AccountingVoucherHeaderDTO> findAllByCompany(Pageable pageable);
@@ -61,8 +58,7 @@ public interface AccountingVoucherHeaderService {
 	/**
 	 * Get the "id" accountingVoucherHeader.
 	 * 
-	 * @param id
-	 *            the id of the entity
+	 * @param id the id of the entity
 	 * @return the entity
 	 */
 	AccountingVoucherHeaderDTO findOne(Long id);
@@ -70,8 +66,7 @@ public interface AccountingVoucherHeaderService {
 	/**
 	 * Get the accountingVoucherHeader by "pid".
 	 * 
-	 * @param pid
-	 *            the pid of the entity
+	 * @param pid the pid of the entity
 	 * @return the entity
 	 */
 	Optional<AccountingVoucherHeaderDTO> findOneByPid(String pid);
@@ -102,17 +97,35 @@ public interface AccountingVoucherHeaderService {
 
 	List<AccountingVoucherHeaderDTO> findAllByCompanyIdAccountPidDocumentPidAndDateBetween(String accountPid,
 			String documentPid, LocalDateTime fromDate, LocalDateTime toDate);
-	
-	AccountingVoucherHeaderDTO findAllByCompanyIdAccountPidDocumentPidAndExecutiveTaskExecutionIn(String accountPid,String documentPid,List<ExecutiveTaskExecutionDTO>executiveTaskExecutionDTOs);
+
+	AccountingVoucherHeaderDTO findAllByCompanyIdAccountPidDocumentPidAndExecutiveTaskExecutionIn(String accountPid,
+			String documentPid, List<ExecutiveTaskExecutionDTO> executiveTaskExecutionDTOs);
 
 	Set<Document> findDocumentsByUserIdIn(List<Long> userIds);
-	
-	public List<AccountingVoucherHeaderDTO> getAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetween(List<String> userPids,
-			String accountPid, List<String> documentPid, List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
-	
-	public List<AccountingVoucherHeaderDTO> getAllByCompanyIdUserPidDocumentPidAndDateBetween(List<String> userPids, 
-			List<String> documentPid, List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
+
+	public List<AccountingVoucherHeaderDTO> getAllByCompanyIdUserPidAccountPidDocumentPidAndDateBetween(
+			List<String> userPids, String accountPid, List<String> documentPid,
+			List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate, LocalDateTime toDate);
+
+	public List<AccountingVoucherHeaderDTO> getAllByCompanyIdUserPidDocumentPidAndDateBetween(List<String> userPids,
+			List<String> documentPid, List<TallyDownloadStatus> tallyDownloadStatus, LocalDateTime fromDate,
+			LocalDateTime toDate);
 
 	void updateAccountingVoucherHeaderSalesManagementStatus(AccountingVoucherHeaderDTO accountingVoucherHeaderDTO);
+
+	/**
+	 * This method working to update Recipt amount
+	 * 
+	 * @pram New Amount
+	 * 
+	 * @pram Accounting voucher details id
+	 * 
+	 * @param Accounting voucher Header Pid
+	 * 
+	 * @author Nandakumar M
+	 * 
+	 * @since September 29, 2022
+	 */
+	void updateAccountingVoucherAmount(double amount, long detailid, String pid);
 
 }

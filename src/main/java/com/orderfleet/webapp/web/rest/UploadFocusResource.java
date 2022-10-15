@@ -752,8 +752,6 @@ public class UploadFocusResource {
 
 		List<MasterDataResponseObject> branddeva = MasterDataReponseFocus.getGetMasterDataFocus().getMasterDatas();
 
-	
-
 		MasterDataReponseFocus.getGetMasterDataFocus().getMasterDatas().forEach(masterdataresponseObject -> {
 			ContryFocusDTO contryFocusDTO = new ContryFocusDTO();
 			contryFocusDTO.setMasterCode(masterdataresponseObject.getMasterCode());
@@ -769,7 +767,7 @@ public class UploadFocusResource {
 		AuthenticationRequstFocus authenticationRequstFocus = new AuthenticationRequstFocus();
 		authenticationRequstFocus.setUserName("su");
 		authenticationRequstFocus.setPassword("deva$focus");
-		authenticationRequstFocus.setCompanyCode("020");
+		authenticationRequstFocus.setCompanyCode("070");
 
 		return authenticationRequstFocus;
 	}

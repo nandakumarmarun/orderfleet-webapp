@@ -813,7 +813,7 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 		}
 
 	}
-
+       
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProductProfileDTO> findAllByCompanyIdAndActivatedAndStockAvailabilityStatusProductProfileOrderByName(

@@ -13,6 +13,10 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -90,8 +94,17 @@ public class UserOnPremiseImportResource {
 		String apiBaseUrl = companyRepository.findApiUrlByCompanyPid(pid);
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-		ResponseEntity<UserDTO[]> response = restTemplate.getForEntity(apiBaseUrl + "/api/onpremise-users/" + pid,
-				UserDTO[].class);
+		HttpHeaders httpheders = new HttpHeaders();
+		httpheders.add("User-Agent",
+				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
+		HttpEntity<String> entity = new HttpEntity<>(httpheders);
+		
+		ResponseEntity<UserDTO[]> response = restTemplate.exchange(apiBaseUrl + "/api/onpremise-users/" + pid, HttpMethod.GET, entity,
+				new ParameterizedTypeReference<UserDTO[]>() {
+				});
+		
+//		ResponseEntity<UserDTO[]> response = restTemplate.getForEntity(apiBaseUrl + "/api/onpremise-users/" + pid,
+//				UserDTO[].class);
 		if (response.getStatusCode().equals(HttpStatus.OK)) {
 			UserDTO[] userArrays = response.getBody();
 			if (userArrays.length > 0) {

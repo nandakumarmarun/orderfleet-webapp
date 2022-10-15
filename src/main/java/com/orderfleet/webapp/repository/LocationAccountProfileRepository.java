@@ -42,7 +42,7 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	@Transactional
 	@Modifying
 	void deleteByCompanyIdAndAccountProfilePidIn(Long currentUsersCompanyId, List<String> accountProfilePids);
-
+	
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?#{principal.companyId}")
 	List<LocationAccountProfile> findAllByCompanyId();
 
