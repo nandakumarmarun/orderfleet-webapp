@@ -3,7 +3,7 @@ pipeline {
         label "master"
     }
     environment {
-     prod_server_ip = "13.234.231.2"
+     prod_server_ip = "52.66.139.17"
      test_server_ip = "13.232.79.102"
      test_server_user = "devops-user"
      prod_server_user = "devops-user"
