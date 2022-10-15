@@ -3,8 +3,10 @@ pipeline {
         label "master"
     }
     environment {
+     prod_server_ip = "13.234.231.2"
      test_server_ip = "13.232.79.102"
      test_server_user = "devops-user"
+     prod_server_user = "devops-user"
    }
 
     parameters {
@@ -39,9 +41,9 @@ pipeline {
 
         stage("Stop-Current-Application") {
             steps {
-                sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
+                sshagent(['prod-devops-user']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill &'
+                        ssh -o StrictHostKeyChecking=no -l ${prod_server_user} ${prod_server_ip} 'sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill &'
                     '''
                 }
             }
@@ -86,19 +88,19 @@ pipeline {
 
         stage("Copy-War") {
             steps {
-                sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
-                    sh 'ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} mkdir -p /opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
+                sshagent(['prod-devops-user']) {
+                    sh 'ssh -o StrictHostKeyChecking=no -l ${prod_server_user} ${prod_server_ip} mkdir -p /opt/salesnrich/'+ params.RELEASE_NO+ ' '
                     // create directory
-                    sh 'scp ./target/orderfleet-webapp-'+params.RELEASE_NO+'.war ${test_server_user}@${test_server_ip}:/opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
+                    sh 'scp ./target/orderfleet-webapp-'+params.RELEASE_NO+'.war ${prod_server_user}@${prod_server_ip}:/opt/salesnrich/'+ params.RELEASE_NO+ ' '
                 }
             }
         }
 
         stage("Deploy") {
             steps {
-                sshagent(['58453ca2-20ca-43ec-9283-c0e12d432741']) {
+                sshagent(['prod-devops-user']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server_ip} 'cd /opt/test-salesnrich/ && sudo nohup bash -c "java -jar ./'''+params.RELEASE_NO+'''/orderfleet-webapp-'''+params.RELEASE_NO+'''.war --spring.profiles.active=test -Dspring.config.location=file:./application-test.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
+                        ssh -o StrictHostKeyChecking=no -l ${prod_server_user} ${prod_server_ip} 'cd /opt/salesnrich/ && sudo nohup bash -c "java -jar ./'''+params.RELEASE_NO+'''/orderfleet-webapp-'''+params.RELEASE_NO+'''.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
                     '''
                 }
             }
