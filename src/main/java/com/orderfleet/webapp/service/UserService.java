@@ -187,6 +187,14 @@ public class UserService {
 		});
 	}
 
+	public void updatePassword(String password,String userLogin) {
+		userRepository.findOneByLogin(userLogin).ifPresent(user -> {
+			user.setPassword(password);
+			
+			log.debug("Changed Information for User: {}", user);
+		});
+	}
+
 	public void updateUser(String pid, String login, String firstName, String lastName, String email, boolean activated,
 			String langKey, Set<String> authorities, boolean showAllUsersData, DashboardUIType dashboardUIType) {
 

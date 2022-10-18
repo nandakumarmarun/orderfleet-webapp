@@ -78,6 +78,8 @@ public class UserDTO {
 	private String employeeName;
 
 	private String employeeAlias;
+	
+	private String userPassword;
 
 	public UserDTO() {
 	}
@@ -88,13 +90,13 @@ public class UserDTO {
 				user.getLangKey(), user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()),
 				user.getShowAllUsersData(), user.getDashboardUIType(), user.getDiscontinued(), user.getDeviceKey(),
 				user.getCompany().getGstNo(), user.getCompany().getPhoneNo(), user.getCompany().getAddress1(),
-				user.getCompany().getEmail());
+				user.getCompany().getEmail(),user.getPassword());
 	}
 
 	public UserDTO(String pid, String companyPid, String companyName, String login, String firstName, String lastName,
 			String email, String mobile, boolean activated, String langKey, Set<String> authorities,
 			boolean showAllUserData, DashboardUIType dashboardUIType, boolean discontinued, String deviceKey,
-			String gstNumber, String companyPhoneNo, String companyAddress, String companyEmail) {
+			String gstNumber, String companyPhoneNo, String companyAddress, String companyEmail,String userPassword) {
 		this.pid = pid;
 		this.companyPid = companyPid;
 		this.companyName = companyName;
@@ -114,6 +116,7 @@ public class UserDTO {
 		this.companyPhoneNo = companyPhoneNo;
 		this.companyAddress = companyAddress;
 		this.companyEmail = companyEmail;
+		this.userPassword = userPassword;
 	}
 
 	public UserDTO(String pid, String firstName, String lastName) {
@@ -121,6 +124,8 @@ public class UserDTO {
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}
+
+	
 
 	public String getPid() {
 		return pid;
@@ -304,6 +309,13 @@ public class UserDTO {
 
 	public void setCompanyEmail(String companyEmail) {
 		this.companyEmail = companyEmail;
+	}
+	public String getUserPassword() {
+		return userPassword;
+	}
+
+	public void setUserPassword(String userPassword) {
+		this.userPassword = userPassword;
 	}
 
 	@Override
