@@ -19,6 +19,7 @@ public class ManagedUserDTO extends UserDTO {
 
 	public static final int PASSWORD_MIN_LENGTH = 4;
 	public static final int PASSWORD_MAX_LENGTH = 60;
+	
 
 	private String pid;
 
@@ -42,7 +43,7 @@ public class ManagedUserDTO extends UserDTO {
 		this.createdDate = user.getCreatedDate();
 		this.lastModifiedBy = user.getLastModifiedBy();
 		this.lastModifiedDate = user.getLastModifiedDate();
-		this.password = null;
+		this.password = user.getPassword();
 	}
 
 	public ManagedUserDTO(Long id, String pid, String companyPid, String companyName, String login, String password,
@@ -52,7 +53,7 @@ public class ManagedUserDTO extends UserDTO {
 			String gstNumber, String companyPhoneNo, String companyAddress, String companyEmail) {
 		super(pid, companyPid, companyName, login, firstName, lastName, email, mobile, activated, langKey, authorities,
 				showAllUserData, dashboardUIType, discontinued, deviceKey, gstNumber, companyPhoneNo, companyAddress,
-				companyEmail);
+				companyEmail,password);
 		this.pid = pid;
 		this.createdDate = createdDate;
 		this.lastModifiedBy = lastModifiedBy;
