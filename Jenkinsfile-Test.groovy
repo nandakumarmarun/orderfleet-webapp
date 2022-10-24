@@ -3,7 +3,7 @@ pipeline {
         label "master"
     }
     environment {
-     test_server_ip = "13.232.79.102"
+     test_server_ip = "3.110.42.45"
      test_server_user = "devops-user"
    }
 
@@ -19,23 +19,23 @@ pipeline {
             }
         }
 
-        stage("Validation") {
-            steps {
-                script {
-                    res = sh (
-                        script: 'PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'+params.RELEASE_NO+'/verification-scripts.sql', 
-                        returnStdout: true
-                        ).trim()
-                    echo res
-                    if ("true".equals(res)) {
-                        println "Validation success";    
-                    } else {
-                        println "Validation failed"
-                        error("Validation Failed: cannot execute query")
-                    }
-                }
-            }
-        }
+        // stage("Validation") {
+        //     steps {
+        //         script {
+        //             res = sh (
+        //                 script: 'PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -d snrich -f ./src/main/releases/'+params.RELEASE_NO+'/verification-scripts.sql', 
+        //                 returnStdout: true
+        //                 ).trim()
+        //             echo res
+        //             if ("true".equals(res)) {
+        //                 println "Validation success";    
+        //             } else {
+        //                 println "Validation failed"
+        //                 error("Validation Failed: cannot execute query")
+        //             }
+        //         }
+        //     }
+        // }
 
         stage("Stop-Current-Application") {
             steps {
@@ -50,7 +50,7 @@ pipeline {
         stage("DB-Update") {
             steps {
                 sh'''
-                    PGPASSWORD=snrichpg2022 psql -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/db-scripts.sql
+                    PGPASSWORD=admin123sn psql -h salesnrichtestdb-instance-1.cekzt74pbkzf.ap-south-1.rds.amazonaws.com -p 5432 -U postgres -d testsnrich -f ./src/main/releases/'''+params.RELEASE_NO+'''/db-scripts.sql
                 '''
             }
         }

@@ -30,6 +30,7 @@ import com.orderfleet.webapp.web.rest.dto.LocationHierarchyDTO;
 import com.orderfleet.webapp.web.rest.dto.PriceLevelAccountProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
 import com.orderfleet.webapp.web.rest.tallypartner.DocumentUserWiseUpdateController;
+import com.orderfleet.webapp.web.vendor.excel.service.AccountProfileGsifUploadService;
 import com.orderfleet.webapp.web.vendor.excel.service.AccountProfileUploadService;
 
 @RestController
@@ -49,6 +50,9 @@ public class AccountProfileExcel {
 
 	@Inject
 	private DocumentUserWiseUpdateController documentUserWiseUpdateController;
+	
+	@Inject
+	private AccountProfileGsifUploadService accountProfileGsifUploadService;
 
 	@RequestMapping(value = "/account-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -230,4 +234,103 @@ public class AccountProfileExcel {
 						"pricelevel_account_productgroup sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
 	}
+	
+	@RequestMapping(value = "/account-profiles-gsif.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> bulkSaveAccountProfilesGsif(
+			@Valid @RequestBody List<AccountProfileDTO> accountProfileDTOs) {
+		log.debug("REST request to save AccountProfiles : {}", accountProfileDTOs.size());
+		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+				SyncOperationType.ACCOUNT_PROFILE).map(so -> {
+					// update sync status
+					so.setCompleted(false);
+					so.setLastSyncStartedDate(LocalDateTime.now());
+					syncOperationRepository.save(so);
+					// save/update
+					accountProfileGsifUploadService.saveUpdateAccountProfiles(accountProfileDTOs, so);
+					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+				}).orElse(new ResponseEntity<>("Account-Profile sync operation not registered for this company",
+						HttpStatus.BAD_REQUEST));
+	}
+
+	@RequestMapping(value = "/locations-gsif.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> bulkSaveLocationsGsif(@Valid @RequestBody List<LocationDTO> locationDTOs) {
+		log.debug("REST request to save locations : {}", locationDTOs.size());
+		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+				SyncOperationType.LOCATION).map(so -> {
+					// update sync status
+					so.setCompleted(false);
+					so.setLastSyncStartedDate(LocalDateTime.now());
+					syncOperationRepository.save(so);
+					// save/update
+					accountProfileGsifUploadService.saveUpdateLocations(locationDTOs, so);
+
+					if (so.getUser()) {
+						documentUserWiseUpdateController.assignSaveUserLocations();
+						so.setUser(false);
+						so.setCompleted(true);
+						syncOperationRepository.save(so);
+					}
+
+					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+				}).orElse(new ResponseEntity<>("Locations sync operation not registered for this company",
+						HttpStatus.BAD_REQUEST));
+	}
+
+	@RequestMapping(value = "/location-hierarchy-gsif.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> createUpdateLocationHierarchyGsif(
+			@RequestBody List<LocationHierarchyDTO> locationHierarchyDTOs) {
+		log.debug("REST request to save location hierarchy : {}", locationHierarchyDTOs.size());
+		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+				SyncOperationType.LOCATION_HIRARCHY).map(so -> {
+					// update sync status
+					so.setCompleted(false);
+					so.setLastSyncStartedDate(LocalDateTime.now());
+					syncOperationRepository.save(so);
+					// save/update
+					accountProfileGsifUploadService.saveUpdateLocationHierarchy(locationHierarchyDTOs, so);
+					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+				}).orElse(new ResponseEntity<>("Location-Hierarchy sync operation not registered for this company",
+						HttpStatus.BAD_REQUEST));
+	}
+
+	@RequestMapping(value = "/location-account-profile-gsif.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> bulkSaveLocationAccountProfilesGsif(
+			@Valid @RequestBody List<LocationAccountProfileDTO> locationAccountProfileDTOs) {
+		log.debug("REST request to save location-accountprofiles : {}", locationAccountProfileDTOs.size());
+		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+				SyncOperationType.LOCATION_ACCOUNT_PROFILE).map(so -> {
+
+					Optional<SyncOperation> opSyncLO = syncOperationRepository.findOneByCompanyIdAndOperationType(
+							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.LOCATION);
+
+					if (!opSyncLO.get().getCompleted()) {
+						return new ResponseEntity<>("location save processing try after some time.",
+								HttpStatus.BAD_REQUEST);
+					}
+
+					Optional<SyncOperation> opSyncAP = syncOperationRepository.findOneByCompanyIdAndOperationType(
+							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.ACCOUNT_PROFILE);
+
+					if (!opSyncAP.get().getCompleted()) {
+						return new ResponseEntity<>("account-profile save processing try after some time.",
+								HttpStatus.BAD_REQUEST);
+					}
+
+					// update sync status
+					so.setCompleted(false);
+					so.setLastSyncStartedDate(LocalDateTime.now());
+					syncOperationRepository.save(so);
+					// save/update
+					accountProfileGsifUploadService.saveUpdateLocationAccountProfiles(locationAccountProfileDTOs, so);
+					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+				})
+				.orElse(new ResponseEntity<>("Location-Account-Profile sync operation not registered for this company",
+						HttpStatus.BAD_REQUEST));
+	}
+	
+	
 }
