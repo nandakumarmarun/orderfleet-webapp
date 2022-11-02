@@ -5,7 +5,7 @@ pipeline {
     environment {
         test_server1_ip = "10.0.2.82"
         test_server2_ip = "10.0.2.140"
-        test_server_user = "ec2-user"
+        test_server_user = "devops-user"
     }
 
     parameters {
@@ -99,7 +99,7 @@ pipeline {
         stage("Copy-War-1") {
             steps {
                 sshagent(['test-server-1']) {
-                    sh 'ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server1_ip} sudo mkdir -p /opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
+                    sh 'ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server1_ip} mkdir -p /opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
                     // create directory
                     sh 'scp ./target/orderfleet-webapp-'+params.RELEASE_NO+'.war ${test_server_user}@${test_server1_ip}:/opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
                 }
@@ -108,7 +108,7 @@ pipeline {
         stage("Copy-War-2") {
             steps {
                 sshagent(['test-server-2']) {
-                    sh 'ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server2_ip} sudo mkdir -p /opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
+                    sh 'ssh -o StrictHostKeyChecking=no -l ${test_server_user} ${test_server2_ip} mkdir -p /opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
                     // create directory
                     sh 'scp ./target/orderfleet-webapp-'+params.RELEASE_NO+'.war ${test_server_user}@${test_server2_ip}:/opt/test-salesnrich/'+ params.RELEASE_NO+ ' '
                 }
