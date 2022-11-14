@@ -21,23 +21,23 @@ pipeline {
             }
         }
 
-        stage("Validation") {
-            steps {
-                script {
-                    res = sh (
-                        script: 'PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'+params.RELEASE_NO+'/verification-scripts.sql', 
-                        returnStdout: true
-                        ).trim()
-                    echo res
-                    if ("true".equals(res)) {
-                        println "Validation success";    
-                    } else {
-                        println "Validation failed"
-                        error("Validation Failed: cannot execute query")
-                    }
-                }
-            }
-        }
+    //    stage("Validation") {
+        //    steps {
+          //      script {
+              //      res = sh (
+               //         script: 'PGPASSWORD=snrichpg2022 psql -t -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'+params.RELEASE_NO+'/verification-scripts.sql', 
+               //         returnStdout: true
+                //        ).trim()
+               //     echo res
+               //     if ("true".equals(res)) {
+                //        println "Validation success";    
+                //    } else {
+                //        println "Validation failed"
+                 //       error("Validation Failed: cannot execute query")
+               //     }
+             //   }
+           // }
+      //  }
 
         stage("Stop-Current-Application") {
             steps {
@@ -49,13 +49,13 @@ pipeline {
             }
         }
 
-        stage("DB-Update") {
-            steps {
-                sh'''
-                    PGPASSWORD=snrichpg2022 psql -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/db-scripts.sql
-                '''
-            }
-        }
+      //  stage("DB-Update") {
+        //    steps {
+         //       sh'''
+          //          PGPASSWORD=snrichpg2022 psql -h ${test_server_ip} -p 5432 -U postgres -f ./src/main/releases/'''+params.RELEASE_NO+'''/db-scripts.sql
+         //       '''
+     //       }
+     //   }
 
         stage("Src-Validate") {
             steps{

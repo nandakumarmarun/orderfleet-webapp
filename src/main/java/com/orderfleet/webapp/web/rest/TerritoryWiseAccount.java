@@ -1,12 +1,17 @@
 package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +22,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
@@ -28,6 +37,7 @@ import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 @RequestMapping("/web")
 public class TerritoryWiseAccount {
 
+	private final Logger log = LoggerFactory.getLogger(TerritoryWiseAccount.class);
 	@Inject
 	private LocationService locationService;
 	
@@ -36,6 +46,12 @@ public class TerritoryWiseAccount {
 	
 	@Inject
 	private LocationAccountProfileService locationAccountProfileService;
+	
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
+	
+	@Inject
+	private LocationAccountProfileRepository locationAccountProfileRepository;
 	
 	@RequestMapping("/territory-wise-account")
 	@Timed
@@ -79,6 +95,29 @@ public class TerritoryWiseAccount {
 		for (String accountprofile : accountProfiles) {
 			accountProfileService.updateAccountProfileStatus(accountprofile, status);
 		}
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	@RequestMapping(value = "/territory-wise-account/locations", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<List<LocationDTO>> locationAccountProfiles(@RequestParam String accountProfilePid) {
+		System.out.println(("REST request to location Account Profiles : {}  ,"+ accountProfilePid));
+		List<LocationDTO> locationDTOs = locationAccountProfileService
+				.findAllLocationByAccountProfilePid(accountProfilePid);
+		return new ResponseEntity<>(locationDTOs, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/territory-wise-account/assign-locations", method = RequestMethod.POST)
+	@Timed
+	public ResponseEntity<Void> saveAssignedLocations(@RequestParam String locationPid,
+			@RequestParam String assignedAccountProfiles) {
+		log.debug("REST request to save assigned Account Profiles : {}", locationPid);
+		String[] locationPids = locationPid.split(",");
+		
+		AccountProfile accountProfile = accountProfileRepository.findOneByPid(assignedAccountProfiles).get();
+		
+
+		locationAccountProfileRepository.deleteByAccountProfilePid(SecurityUtils.getCurrentUsersCompanyId(),
+				accountProfile.getId());
+		locationAccountProfileService.save(locationPids[0], assignedAccountProfiles);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

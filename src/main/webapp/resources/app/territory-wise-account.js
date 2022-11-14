@@ -40,6 +40,10 @@ if (!this.TerritoryWiseAccount) {
 			downloadXls();
 			
 		});
+		
+		$('#btnSaveLocations').on('click', function() {
+			saveAssignedLocations();
+		});
 	});
 
 	function changeButton(){
@@ -124,7 +128,9 @@ if (!this.TerritoryWiseAccount) {
 																	+ (territoryWiseAccount.alias == null ? "" : territoryWiseAccount.alias)
 																	+ "</td><td>"
 																	+ (territoryWiseAccount.description == null ? "" : territoryWiseAccount.description)
-																	+ "</td></tr>");
+																	+ "</td><td><button type='button' class='btn btn-info' onclick='TerritoryWiseAccount.assignLocations($(\"#assignLocationModal\"),\""
+													                + territoryWiseAccount.pid
+												                  	+ "\");'>Assign Location</button></td></tr>");
 										});
 					}
 				});
@@ -140,7 +146,80 @@ if (!this.TerritoryWiseAccount) {
 		 $("#tblTerritoryWiseAccounts th:first-child, #tblTerritoryWiseAccounts td:first-child").show();
 	}
 	
+	var accProfilePid = "";
 
+	TerritoryWiseAccount.assignLocations = function(el, pid, type) {
+		// locationModel.pid = pid;
+
+		accProfilePid = pid;
+		// clear all check box
+		$("#divLocations input:checkbox").attr('checked', false);
+		$(".error-msg").html("");
+
+		$.ajax({
+			url : territoryWiseAccountContextPath + "/locations",
+			type : "GET",
+			data : {
+				accountProfilePid : accProfilePid
+			},
+			success : function(locations) {
+				if (locations) {
+					$.each(locations, function(index, location) {
+						$(
+								"#divLocations input:checkbox[value="
+										+ location.pid + "]").prop("checked",
+								true);
+					});
+				}
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+		el.modal('show');
+
+	}
+
+	function saveAssignedLocations() {
+
+		$(".error-msg").html("");
+		var selectedLocations = "";
+
+		$.each($("input[name='location']:checked"), function() {
+			selectedLocations += $(this).val() + ",";
+		});
+
+		console.log(selectedLocations);
+
+		var str_array = selectedLocations.split(',');
+
+		console.log(str_array.length);
+
+		if ((str_array.length - 1) > 1) {
+			$(".error-msg").html("Please select only one Location");
+			return;
+		}
+
+		if (selectedLocations == "") {
+			$(".error-msg").html("Please select Locations");
+			return;
+		}
+		$(".error-msg").html("Please wait.....");
+		$.ajax({
+			url : territoryWiseAccountContextPath + "/assign-locations",
+			type : "POST",
+			data : {
+				locationPid : selectedLocations,
+				assignedAccountProfiles : accProfilePid
+			},
+			success : function(status) {
+				$("#assignLocationModal").modal("hide");
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			},
+		});
+	}
 	
 
 	function addErrorAlert(message, key, data) {

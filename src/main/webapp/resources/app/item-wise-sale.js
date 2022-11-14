@@ -148,7 +148,7 @@ if (!this.ItemWiseSale) {
 		} else {
 			$('#tHeadItemWiseSale')
 					.html(
-							"<tr><th>Date</th><th>OrderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>Quantity</th><th>Unit Quantity</th><th>Voulume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
+							"<tr><th>Date</th><th>OrderID</th><th>Employee</th><th>Receiver Account Profile</th><th>Supplier Account Profile</th><th>Customer Location</th><th>Category</th><th>Item</th><th>ProductGroup</th><th>Territory</th><th>Quantity</th><th>Unit Quantity</th><th>Volume</th><th>Rate</th><th>Amount(tax,disc,etc..)</th></tr>");
 			$('#tBodyItemWiseSale')
 					.html(
 							"<tr><td colspan='7' align='center'>Please wait...</td></tr>");
