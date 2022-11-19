@@ -21,10 +21,10 @@
 			<div class="clearfix"></div>
 			<hr />
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-md-6">
 					<div class="form-group">
 						<div class="col-sm-6">
-							<label class="col-sm-3 control-label">Plan Date</label>
+							<label class="col-sm-4 control-label">Plan Date</label>
 							<div class="input-group">
 								<input type="text" id="planDatePicker"
 									class="form-control datepicker" data-format="D, dd MM yyyy">
@@ -33,6 +33,20 @@
 								</div>
 							</div>
 						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-group">
+						<div class="col-sm-6">
+								Territory <select id="dbTerrtory" name="terrtoryPid"
+									class="form-control">
+									 <option value="no">select location </option> 
+									<c:forEach items="${locations}" var="location">
+										<option value="${location.pid}">${location.name}</option>
+									</c:forEach>
+								</select>
+							</div>
+
 					</div>
 				</div>
 			</div>
@@ -179,7 +193,7 @@
 										</div>
 									</form>
 
-									<table class="table table-bordered of-tbl-search">
+									 <table class="table table-bordered of-tbl-search">
 										<thead>
 											<tr>
 												<th><input id="cbAllTasks" type="checkbox" /></th>
@@ -189,7 +203,7 @@
 											</tr>
 										</thead>
 										<tbody id="tblTabTasks">
-											<c:forEach items="${tasks}" var="task" varStatus="loopStatus">
+											 <c:forEach items="${tasks}" var="task" varStatus="loopStatus">
 												<tr>
 													<td><input id="${task.pid}" type="checkbox" /></td>
 													<td id="${task.activityPid}">${task.activityName}</td>
@@ -199,7 +213,7 @@
 											</c:forEach>
 										</tbody>
 										</tbody>
-									</table>
+									</table> 
 								</div>
 								<div class="tab-pane" id="tabUserTaskDownloaded">
 									<table class="table table-bordered">

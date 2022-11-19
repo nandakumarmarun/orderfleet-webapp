@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,10 +31,13 @@ import com.orderfleet.webapp.repository.TaskRepository;
 import com.orderfleet.webapp.repository.UserActivityRepository;
 import com.orderfleet.webapp.service.ActivityService;
 import com.orderfleet.webapp.service.ExecutiveTaskPlanService;
+import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.TaskListService;
 import com.orderfleet.webapp.service.UserService;
+import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskPlanDTO;
+import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.TaskDTO;
 
 /**
@@ -61,6 +67,8 @@ public class UserTaskPlanResource {
 	private final LocationAccountProfileRepository locationAccountProfileRepository;
 	
 	private final UserActivityRepository userActivityRepository;
+	@Inject
+	private LocationAccountProfileService locationAccountProfileService;
 	
 	public UserTaskPlanResource(UserService userService, ExecutiveTaskPlanService executiveTaskPlanService,
 			TaskRepository taskRepository, TaskListService taskListService, ActivityService activityService,
@@ -87,6 +95,7 @@ public class UserTaskPlanResource {
 		model.addAttribute("taskList", taskListService.findAllByCompany());
 		model.addAttribute("activities", activityService.findAllByCompany());
 		model.addAttribute("locations", locationService.findAllByCompany());
+		
 		List<Object[]> tasks = taskRepository.findTaskPropertyByCompanyId();
 		List<TaskDTO> taskDtos = new ArrayList<>();
 		for (Object[] taskObj : tasks) {
@@ -104,6 +113,30 @@ public class UserTaskPlanResource {
 		return "company/user-task-plan";
 	}
 
+	@RequestMapping(value="/user-task-plan/filter",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<TaskDTO>> filterTaskByLocation(@RequestParam("territoryPid") String territoryPid) {
+            
+		System.out.println("Entered to get task by territory:"+territoryPid);
+		List<TaskDTO> taskdto =  new ArrayList<>();
+		List<AccountProfile> accountProfileDTOs=new ArrayList<>();
+		
+		
+			accountProfileDTOs=locationAccountProfileService.findAccountProfileByTerritoryPid(territoryPid);
+		
+		
+		System.out.println("size of account :"+accountProfileDTOs.size());
+		
+			List<Long> accountId = accountProfileDTOs.stream().map(data ->data.getId()).collect(Collectors.toList());
+			
+			if(accountId.size()>0) {
+			taskdto=taskRepository.findTaskByAccountProfileIdIn(accountId);
+			}
+			System.out.println("size of task :"+taskdto.size());
+			
+		
+		return new ResponseEntity<>(taskdto, HttpStatus.OK);
+	}
 	@GetMapping(value = "/user-tasks", params = { "userPid", "plannedDate" })
 	public ResponseEntity<List<ExecutiveTaskPlanDTO>> getUserTasks(@RequestParam(value = "userPid") String userPid,
 			@RequestParam(value = "plannedDate") LocalDate plannedDate) {

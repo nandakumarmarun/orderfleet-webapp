@@ -1,7 +1,7 @@
 {
-"release-number" : "1.101.1",
-"release-date" : "24/10/2022",
+"release-number" : "1.101.2",
+"release-date" : "19/11/2022",
 "features" : [
-  "account profile dectivate excel"
+  "Territory wise selection in user-task-plan"
 ]
 }
