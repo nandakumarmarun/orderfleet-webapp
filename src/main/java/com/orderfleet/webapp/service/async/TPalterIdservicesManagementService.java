@@ -678,7 +678,8 @@ public class TPalterIdservicesManagementService {
 		}
 		//find pp is not tally
 		if(fullUpdate == true){
-			for(ProductProfile pp :productProfiles) {
+			 List<ProductProfile> tallyproductProfiles = productProfiles.stream().filter(data -> data.getDataSourceType().equals(DataSourceType.TALLY)).collect(Collectors.toList());
+			for(ProductProfile pp :tallyproductProfiles) {
 				 flag = false;
 				productProfileDTOs.forEach(data ->{
 					if(pp.getProductId().equals(data.getProductId())) {
@@ -931,9 +932,10 @@ public class TPalterIdservicesManagementService {
 		// find all locations
 		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
 		Set<Long> dectivatedloc = new HashSet<>();
+		if(fullUpdate == true) {
 		for(Location pp :locations) {
-			if(fullUpdate == true) {
-				if(!pp.getName().equals("Primary") && !pp.getName().equals("Territory") && pp.getActivated()){
+			
+				if(!pp.getName().equals("Primary") && !pp.getName().equals("Territory") && pp.getActivated() && pp.getLocationId() != null){
 					  flag = false;
 						 locationDTOs.forEach(data ->{
 							if(pp.getLocationId().equals(data.getLocationId())) {
@@ -1343,7 +1345,8 @@ public class TPalterIdservicesManagementService {
 			List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyId(company.getId());
 			if(!accountProfiles.isEmpty() && accountProfiles.size() > 1 && !accountProfileDTOs.isEmpty()) {
 				accountProfiles.remove(0);
-				for(AccountProfile ac :accountProfiles) {
+				List<AccountProfile> tallyAccountProfile = accountProfiles.stream().filter(data -> data.getDataSourceType().equals(DataSourceType.TALLY)).collect(Collectors.toList());
+				for(AccountProfile ac :tallyAccountProfile) {
 				flagac = false;
 				 accountProfileDTOs.forEach(data ->{
 					if(ac.getCustomerId().equals(data.getCustomerId())) {
