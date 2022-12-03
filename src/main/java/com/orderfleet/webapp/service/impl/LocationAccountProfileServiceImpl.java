@@ -605,7 +605,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfileList);
 		return result;
 	}
-
+	
 	@Override
 	public List<LocationDTO> findAllLocationByAccountProfilePid(String accountProfilePid) {
 		List<Location> locationList = locationAccountProfileRepository
@@ -630,6 +630,13 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 				.findAccountProfileByLocationPidAndAccountProfileActivated(locationPid, activated);
 		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfileList);
 		return result;
+	}
+	@Override
+	public List<AccountProfile> findAccountProfileByTerritoryPid(String locationPid) {
+		List<AccountProfile> accountProfileList = locationAccountProfileRepository
+				.findAccountProfileByLocationPid(locationPid);
+		
+		return accountProfileList;
 	}
 
 	@Override

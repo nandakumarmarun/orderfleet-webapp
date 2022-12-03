@@ -8,6 +8,7 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
@@ -92,4 +93,8 @@ public interface LocationAccountProfileService {
 	List<AccountProfileDTO> findAccountProfilesByCurrentUserLocationsAndImpotedStatusLimitCount(boolean imports);
 
 	List<AccountProfileDTO> findAccountByCurrentUserLocationsAndAllImpotedStatusLimitCount();
+
+	List<AccountProfile> findAccountProfileByTerritoryPid(String locationPid);
+
+	
 }

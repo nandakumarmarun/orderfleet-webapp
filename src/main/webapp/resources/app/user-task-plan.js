@@ -1,3 +1,7 @@
+if (!this.UserTaskPlan) {
+	this.UserTaskPlan = {};
+}
+
 var contextPath = location.protocol + '//' + location.host;
 var selectedDate = moment(new Date()).format('YYYY-MM-DD'); // default to
 															// current date
@@ -10,6 +14,8 @@ $(document).ready(
 				selectedDate = moment(event.date).format('YYYY-MM-DD');
 				$(this).datepicker('hide');
 			});
+			
+		
 			$('#sbUsers').change(function() {
 				loadUserTasks($(this).val());
 				loadDownloadedTask($(this).val())
@@ -19,6 +25,11 @@ $(document).ready(
 						$('#tblTabTasks tr td input[type="checkbox"]').prop(
 								'checked', $(this).prop('checked'));
 					});
+			$('#dbTerrtory').on('change', function() {
+//				territoryid = $('#dbTerrtory').val();
+				
+				UserTaskPlan.filter();
+			});
 			$('#btnAddTabTasks').click(function() {
 				addTaskToUserTasks();
 			});
@@ -52,6 +63,50 @@ $(document).ready(
 				Orderfleet.searchTable($(this).val(), $('#tblAssignTasks'));
 			});
 		});
+
+
+UserTaskPlan.filter = function() {
+	
+console.log("enter in to filter function")
+	$
+			.ajax({
+				url : contextPath + "/web/user-task-plan/filter",
+				type : 'GET',
+				data : {
+					territoryPid : $("#dbTerrtory").val(),
+				},
+				success : function(taskDTO) {
+					console.log("success")
+					$('#tblTabTasks').html("");
+					if (taskDTO.length == 0) {
+						$('#tblTabTasks')
+								.html(
+										"<tr><td colspan='5' align='center'>No data available</td></tr>");
+						return;
+					}
+					$
+							.each(
+									taskDTO,
+									function(index, territoryWiseTask) {
+										$('#tblTabTasks')
+												.append(
+														"<tr><td><input type='checkbox' name='task' value='"+territoryWiseTask.pid+"'/>"
+																+ "</td><td id = '"
+															    +territoryWiseTask.activityPid+"'>" 
+																+ territoryWiseTask.activityName
+																+ "</td><td id = '"
+																+territoryWiseTask.accountProfilePid+"'>"
+																+ territoryWiseTask.accountProfileName
+																+ "</td><td>"
+																+ territoryWiseTask.remarks
+																+ "</td></tr>");
+									});
+				}
+			});
+}
+
+
+
 
 function saveAssignedTasks() {
 	var selectedTasks = "";

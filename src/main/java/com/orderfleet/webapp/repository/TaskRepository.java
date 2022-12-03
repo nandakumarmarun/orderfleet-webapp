@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Task;
+import com.orderfleet.webapp.web.rest.dto.TaskDTO;
 
 /**
  * Spring Data JPA repository for the Task entity.
@@ -63,5 +64,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 	
 	@Query("select task.accountProfile from Task task where task.company.id = ?#{principal.companyId} and task.accountType.pid= ?1 and task.activity.pid = ?2")
 	List<AccountProfile> findAllAccountProfileByCompanyAndAccountTypePid(String accountTypePid, String activityPid);
+
+	@Query("select task from Task task where task.accountProfile.id in ?1 and task.activated = 'TRUE'")
+	List<TaskDTO> findTaskByAccountProfileIdIn(List<Long> accProfileIds);
 
 }
