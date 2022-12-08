@@ -1,7 +1,7 @@
 {
-"release-number" : "1.101.2",
-"release-date" : "19/11/2022",
+"release-number" : "1.101.3",
+"release-date" : "8/12/2022",
 "features" : [
-  "Territory wise selection in user-task-plan"
+  "Sale Order Automation for Nellara"
 ]
 }

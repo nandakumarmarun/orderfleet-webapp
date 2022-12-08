@@ -327,7 +327,7 @@ public class SalesPerformanceReportTallyStatusResource {
 	/**
 	 * GET /primary-sales-performance/:id : get the "id" InventoryVoucher.
 	 *
-	 * @param id the id of the InventoryVoucherDTO to retrieve
+	 * @param pid the id of the InventoryVoucherDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the
 	 *         InventoryVoucherDTO, or with status 404 (Not Found)
 	 */

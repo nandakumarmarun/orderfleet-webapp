@@ -4,13 +4,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -991,27 +985,46 @@ public class SendInvoiceOdooService {
 	}
 
 	public void sendInvoiceAsync(List<InventoryVoucherHeader> inventoryVouchers) {
+		log.debug("Send invoice to  Odoo");
+
 		String companyPid = inventoryVouchers.get(0).getCompany().getPid();
 		Long companyId = inventoryVouchers.get(0).getCompany().getId();
-
 		String documentNumber = inventoryVouchers.get(0).getDocumentNumberServer() + "";
-
 		log.info(documentNumber + "--Document Number");
-
 		InventoryVoucherHeader obj = inventoryVouchers.get(0);
 
+		log.debug("Creating Registeries");
 		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
+		List<PrimarySecondaryDocument> primarySalesorderDoc = new ArrayList<>();
+
+		log.debug("Fetching  Document Types ");
 		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
 				companyId);
+		primarySalesorderDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES_ORDER,
+				companyId);
 
-		if (primarySecDoc.isEmpty()) {
+		if (primarySecDoc.isEmpty() && primarySalesorderDoc.isEmpty()) {
 			log.info("........No PrimarySecondaryDocument configuration Available...........");
 			// return salesOrderDTOs;
 		}
+
+		log.debug("Assigning documets");
 		Document document = primarySecDoc.get(0).getDocument();
+		Document primarySalesOrderDocument = primarySalesorderDoc.get(0).getDocument();
 
-		if (document.getPid().equals(obj.getDocument().getPid())) {
+		log.debug(" Document = "+ document.getName() + " : "+ document.getPid() + " == " + obj.getDocument().getPid());
+		log.debug(" Document = "+ primarySalesOrderDocument.getName() + " : "+ primarySalesOrderDocument.getPid() + " == " + obj.getDocument().getPid());
 
+		if(document.getPid().equals(obj.getDocument().getPid())){
+			log.debug("Document Name : " + document.getName());
+		}
+
+		if(primarySalesOrderDocument.getPid().equals(obj.getDocument().getPid())){
+			log.debug("Document Name : " + primarySalesOrderDocument.getName());
+		}
+
+		log.debug("Processing Order To Odoo");
+		if (document.getPid().equals(obj.getDocument().getPid())  || primarySalesOrderDocument.getPid().equals(obj.getDocument().getPid())) {
 			DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 			Set<Long> userIds = new HashSet<>();
@@ -1082,6 +1095,7 @@ public class SendInvoiceOdooService {
 
 			odooInvoice.setInvoice_lines(odooInvoiceLines);
 
+			log.debug("sending Sales Order To Odoo");
 			sendToOdooSingle(odooInvoice, obj);
 		}
 
