@@ -120,7 +120,11 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
         employeeProfile.setName( employeeProfileDTO.getName() );
         employeeProfile.setAlias( employeeProfileDTO.getAlias() );
         employeeProfile.setReferenceId( employeeProfileDTO.getReferenceId() );
-        employeeProfile.setOrgEmpId( employeeProfileDTO.getOrgEmpId() );
+        if(employeeProfileDTO.getOrgEmpId() != null) {
+            employeeProfile.setOrgEmpId( employeeProfileDTO.getOrgEmpId().replaceAll("\\s", "") );
+        }else {
+            employeeProfile.setOrgEmpId( employeeProfileDTO.getOrgEmpId() );
+        }
         employeeProfile.setAddress( employeeProfileDTO.getAddress() );
         employeeProfile.setPhone( employeeProfileDTO.getPhone() );
         employeeProfile.setEmail( employeeProfileDTO.getEmail() );

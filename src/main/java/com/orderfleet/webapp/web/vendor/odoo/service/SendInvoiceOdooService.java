@@ -127,13 +127,22 @@ public class SendInvoiceOdooService {
 
 		List<OdooInvoice> odooInvoices = new ArrayList<>();
 		List<PrimarySecondaryDocument> primarySecDoc = new ArrayList<>();
-		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
+
+		List<VoucherType> documentVoucherTypes = Arrays.asList(VoucherType.PRIMARY_SALES,VoucherType.PRIMARY_SALES_ORDER);
+		log.debug("Document Voucher Types "+documentVoucherTypes.toString());
+//		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.PRIMARY_SALES,
+//				company.getId());
+
+		primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypesAndCompany(documentVoucherTypes,
 				company.getId());
+
+
 
 		if (primarySecDoc.isEmpty()) {
 			log.info("........No PrimarySecondaryDocument configuration Available...........");
 			// return salesOrderDTOs;
 		}
+
 		List<Long> documentIdList = primarySecDoc.stream().map(psd -> psd.getDocument().getId())
 				.collect(Collectors.toList());
 
