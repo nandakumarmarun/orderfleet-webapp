@@ -46,8 +46,9 @@ public class AttendanceLogService {
 				attendancelog.setOrgEmpId(data[3] == null ? "" : data[3].toString());
 				if(data[4] != null) {
 					attendancelog.setPunchOutDate(LocalDateTime.parse(data[4].toString()));
+					attendanceLogList.add(attendancelog);
 				}
-				attendanceLogList.add(attendancelog);
+
 			});
 		}
 //		if(!attendanceLogList.isEmpty()) {
