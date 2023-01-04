@@ -115,7 +115,7 @@ public class LogFileServerSaveResource {
 			throws IOException, FileManagerException {
 		log.info("REST request to save multipartFile : {}", file.getOriginalFilename());
 
-		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+//		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 
 		LocalDate currentDate = LocalDate.now();
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
@@ -126,8 +126,8 @@ public class LogFileServerSaveResource {
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		Optional<ClientAppLogFiles> opClientAppLogFiles = clientAppLogFilesRepository
-				.findOneByLogDateAndFileNameAndCompanyId(currentDate, file.getOriginalFilename(), company.getId());
+//		Optional<ClientAppLogFiles> opClientAppLogFiles = clientAppLogFilesRepository
+//				.findOneByLogDateAndFileNameAndCompanyId(currentDate, file.getOriginalFilename(), company.getId());
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -149,25 +149,25 @@ public class LogFileServerSaveResource {
 		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 
-		ClientAppLogFiles clientAppLogFile = new ClientAppLogFiles();
-
-		if (!opClientAppLogFiles.isPresent()) {
-
-			String PID_PREFIX = "LOGFILE-";
-
-			clientAppLogFile.setPid(PID_PREFIX + RandomUtil.generatePid());
-			clientAppLogFile.setCompany(company);
-			clientAppLogFile.setFileName(file.getOriginalFilename());
-			clientAppLogFile.setLogDate(currentDate);
-
-		} else {
-			clientAppLogFile = opClientAppLogFiles.get();
-			clientAppLogFile.setLastModifiedDate(LocalDateTime.now());
-
-		}
-		clientAppLogFilesRepository.save(clientAppLogFile);
-
-		processFileUpload(file.getBytes(), file.getOriginalFilename(), file.getContentType(), company);
+//		ClientAppLogFiles clientAppLogFile = new ClientAppLogFiles();
+//
+//		if (!opClientAppLogFiles.isPresent()) {
+//
+//			String PID_PREFIX = "LOGFILE-";
+//
+//			clientAppLogFile.setPid(PID_PREFIX + RandomUtil.generatePid());
+//			clientAppLogFile.setCompany(company);
+//			clientAppLogFile.setFileName(file.getOriginalFilename());
+//			clientAppLogFile.setLogDate(currentDate);
+//
+//		} else {
+//			clientAppLogFile = opClientAppLogFiles.get();
+//			clientAppLogFile.setLastModifiedDate(LocalDateTime.now());
+//
+//		}
+//		clientAppLogFilesRepository.save(clientAppLogFile);
+//
+//		processFileUpload(file.getBytes(), file.getOriginalFilename(), file.getContentType(), company);
 
 		return null;
 	}
