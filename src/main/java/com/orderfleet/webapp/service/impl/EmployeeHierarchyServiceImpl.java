@@ -172,7 +172,7 @@ public class EmployeeHierarchyServiceImpl implements EmployeeHierarchyService {
 		List<EmployeeHierarchy> employeesHierarchies = employeeHierarchyRepository
 				.findByCompanyIdAndActivatedTrue();
 		List<EmployeeHierarchyDTO> result = employeeHierarchyMapper
-				.employeeHierarchiesToEmployeeHierarchyDTOs(employeesHierarchies);
+				.employeeHierarchiesToEmployeeHierarchyDTOsCustumName(employeesHierarchies);
 		return result;
 	}
 

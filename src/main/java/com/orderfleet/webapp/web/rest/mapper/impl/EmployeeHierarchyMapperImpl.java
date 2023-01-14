@@ -31,6 +31,25 @@ public class EmployeeHierarchyMapperImpl extends EmployeeHierarchyMapper {
 
 	        return employeeHierarchyDTO;
 	    }
+	 
+	 
+	    public EmployeeHierarchyDTO employeeHierarchyToEmployeeHierarchyDTOCustomName(EmployeeHierarchy employeeHierarchy) {
+	        if ( employeeHierarchy == null ) {
+	            return null;
+	        }
+
+	        EmployeeHierarchyDTO employeeHierarchyDTO = new EmployeeHierarchyDTO();
+
+	        employeeHierarchyDTO.setDesignationName( employeeHierarchyEmployeeDesignationName( employeeHierarchy ));
+	        employeeHierarchyDTO.setEmployeeName( employeeHierarchyEmployeCustomeName( employeeHierarchy ) );
+	        employeeHierarchyDTO.setParentName( employeeHierarchyParentCustomeName( employeeHierarchy ) );
+	        employeeHierarchyDTO.setEmployeePid( employeeHierarchyEmployeePid( employeeHierarchy ) );
+	        employeeHierarchyDTO.setParentPid( employeeHierarchyParentPid( employeeHierarchy ) );
+	        employeeHierarchyDTO.setEmployeeId( employeeHierarchyEmployeeId( employeeHierarchy ) );
+	        employeeHierarchyDTO.setParentId( employeeHierarchyParentId( employeeHierarchy ) );
+
+	        return employeeHierarchyDTO;
+	    }
 
 	    @Override
 	    public List<EmployeeHierarchyDTO> employeeHierarchiesToEmployeeHierarchyDTOs(List<EmployeeHierarchy> employeeHierarchies) {
@@ -115,6 +134,26 @@ public class EmployeeHierarchyMapperImpl extends EmployeeHierarchyMapper {
 		       
 	        return name;
 	    }
+	    
+	    private String employeeHierarchyEmployeCustomeName(EmployeeHierarchy employeeHierarchy) {
+
+	        if ( employeeHierarchy == null ) {
+	            return null;
+	        }
+	        EmployeeProfile employee = employeeHierarchy.getEmployee();
+	        if ( employee == null ) {
+	            return null;
+	        }
+	        
+	        String name = employee.getName()+"\n"+"("+employee.getUser().getLogin()+")";
+	        if ( name == null ) {
+	            return null;
+	        }
+	       
+		       
+	        return name;
+	    }
+
 
 	    private String employeeHierarchyParentName(EmployeeHierarchy employeeHierarchy) {
 
@@ -133,6 +172,26 @@ public class EmployeeHierarchyMapperImpl extends EmployeeHierarchyMapper {
 		       
 	        return name;
 	    }
+	    
+	    private String employeeHierarchyParentCustomeName(EmployeeHierarchy employeeHierarchy) {
+
+	        if ( employeeHierarchy == null ) {
+	            return null;
+	        }
+	        EmployeeProfile parent = employeeHierarchy.getParent();
+	        if ( parent == null ) {
+	            return null;
+	        }
+	        String name = parent.getName()+"\n"+"("+parent.getUser().getLogin()+")";
+	        if ( name == null ) {
+	            return null;
+	        }
+	        
+	       
+		       
+	        return name;
+	    }
+
 
 	    private String employeeHierarchyEmployeePid(EmployeeHierarchy employeeHierarchy) {
 
@@ -197,4 +256,19 @@ public class EmployeeHierarchyMapperImpl extends EmployeeHierarchyMapper {
 	        }
 	        return id;
 	    }
+
+		@Override
+		public List<EmployeeHierarchyDTO> employeeHierarchiesToEmployeeHierarchyDTOsCustumName(
+				List<EmployeeHierarchy> employeeHierarchies) {
+			  if ( employeeHierarchies == null ) {
+		            return null;
+		        }
+
+		        List<EmployeeHierarchyDTO> list = new ArrayList<EmployeeHierarchyDTO>();
+		        for ( EmployeeHierarchy employeeHierarchy : employeeHierarchies ) {
+		            list.add( employeeHierarchyToEmployeeHierarchyDTOCustomName( employeeHierarchy ) );
+		        }
+
+		        return list;
+		}
 }

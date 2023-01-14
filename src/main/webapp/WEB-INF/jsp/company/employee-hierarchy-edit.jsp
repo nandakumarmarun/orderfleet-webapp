@@ -57,6 +57,10 @@
 						class="img-circle" width="80" /></td>
 				</tr>
 				<tr>
+					<td>LoginId</td>
+					<td><span>${employee.userLogin}</span></td>
+				</tr>
+				<tr>
 					<td>Designation</td>
 					<td><span>${employee.designationName}</span></td>
 				</tr>

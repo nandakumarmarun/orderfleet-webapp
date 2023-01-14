@@ -1203,6 +1203,8 @@ public class TPalterIdservicesManagementService {
 						accountProfile.setDefaultPriceLevel(priceLevel);
 					}
 				}
+			}else {
+				accountProfile.setDefaultPriceLevel(null);
 			}
 			// account type
 
@@ -1347,16 +1349,18 @@ public class TPalterIdservicesManagementService {
 				accountProfiles.remove(0);
 				List<AccountProfile> tallyAccountProfile = accountProfiles.stream().filter(data -> data.getDataSourceType().equals(DataSourceType.TALLY)).collect(Collectors.toList());
 				for(AccountProfile ac :tallyAccountProfile) {
+				
 				flagac = false;
 				 accountProfileDTOs.forEach(data ->{
 					if(ac.getCustomerId().equals(data.getCustomerId())) {
 						flagac = true;
 					}
+					
 				});
 				if(!flagac) {
 					dectivatedac.add(ac.getId());
 				}
-			}}
+					}}
 				if(!dectivatedac.isEmpty()) {
 					accountProfileRepository.deactivateAcoundProfileUsingInId(dectivatedac);
 				}
@@ -1449,6 +1453,8 @@ public class TPalterIdservicesManagementService {
 						accountProfile.setDefaultPriceLevel(priceLevel);
 					}
 				}
+			}else {
+				accountProfile.setDefaultPriceLevel(null);
 			}
 			// account type
 

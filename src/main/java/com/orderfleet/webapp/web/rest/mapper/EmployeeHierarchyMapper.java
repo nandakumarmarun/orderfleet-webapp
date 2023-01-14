@@ -39,6 +39,8 @@ public abstract class EmployeeHierarchyMapper {
 	public abstract  EmployeeHierarchyDTO employeeHierarchyToEmployeeHierarchyDTO(EmployeeHierarchy employeeHierarchy);
 
 	public abstract  List<EmployeeHierarchyDTO> employeeHierarchiesToEmployeeHierarchyDTOs(List<EmployeeHierarchy> employeeHierarchies);
+	
+	public abstract  List<EmployeeHierarchyDTO> employeeHierarchiesToEmployeeHierarchyDTOsCustumName(List<EmployeeHierarchy> employeeHierarchies);
 
 //    @Mapping(target = "id", ignore = true)
 //    @Mapping(target = "company", ignore = true)
