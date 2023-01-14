@@ -1,7 +1,10 @@
 {
-"release-number" : "1.101.3",
-"release-date" : "8/12/2022",
+"release-number" : "1.101.4",
+"release-date" : "14/01/2023",
 "features" : [
-  "Sale Order Automation for Nellara"
+  "product profile limit 1000",
+  "pincode Show in sales order and sales",
+  "price level defult null saved in account profile",
+  "user Id show with employee name"
 ]
 }
