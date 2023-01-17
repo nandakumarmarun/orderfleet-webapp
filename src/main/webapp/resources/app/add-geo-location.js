@@ -169,9 +169,11 @@ if(lat!=""){
 	// get the name of the location on click event
 	function getLocationNameByLatLng(lat, lng) {
 		
-				/*var locationName = geocode(lat+","+lng);
-				$("#newLocation").text(
-					locationName + "( " + lat + "," + lng + " )");*/
+				/*
+				 * var locationName = geocode(lat+","+lng);
+				 * $("#newLocation").text( locationName + "( " + lat + "," + lng + "
+				 * )");
+				 */
 					var query=lat+","+lng;
 				
 				 $.ajax({
@@ -296,6 +298,8 @@ if(lat!=""){
 										"<tr><td>"
 										+ accountProfile.name
 										+ "</td><td>"
+										+ (accountProfile.employeeName == null ? "" : accountProfile.employeeName)
+										+ "</td><td>"
 										+ (accountProfile.latitude == null ? ""
 											: accountProfile.latitude)
 										+ "</td><td>"
@@ -306,11 +310,11 @@ if(lat!=""){
 											: accountProfile.location)
 										+ "</td><td>"
 										+ (accountProfile.geoTaggingType == null ?"":"<b>Type:</b>"+accountProfile.geoTaggingType 
-												+",<br><b>Date:</b>"+ formatDate(accountProfile.geoTaggedTime,'MMM DD YYYY, h:mm:ss a') 
-												+",<br><b>User:</b>"+ accountProfile.geoTaggedUserLogin)	
+												+"<br><b>Date:</b>"+ formatDate(accountProfile.geoTaggedTime,'MMM DD YYYY, h:mm:ss a') 
+												+"<br><b>User:</b>"+ accountProfile.geoTaggedUserLogin)	
 										+ "</td><td><button type='button' class='btn btn-blue' onclick='AddGeoLocation.showModalPopup($(\"#viewModal\"),\""
 										+ accountProfile.pid + "\",\"" + accountProfile.latitude + "\",\"" + accountProfile.longitude + "\",\""
-										+ accountProfile.location
+										+ accountProfile.location+ "\",\"" + accountProfile.geoTaggedTime + "\",\"" + accountProfile.geoTaggedUserLogin 
 										+ "\",0);'>Location From Geo Tag Mobile</button><button type='button'data-target='#enableMapModal' class='btn btn-success' onclick='AddGeoLocation.oldLatLngValues($(\"#enableMapModal\"),\""
 										+ accountProfile.pid
 										+ "\",this);'>Location From Map</button></td></tr>");
@@ -363,6 +367,8 @@ if(lat!=""){
 										"<tr><tr><td>"
 										+ accountProfile.name
 										+ "</td><td>"
+										+ (accountProfile.employeeName == null ? "" : accountProfile.employeeName)
+										+ "</td><td>"
 										+ (accountProfile.latitude == null ? ""
 											: accountProfile.latitude)
 										+ "</td><td>"
@@ -377,7 +383,7 @@ if(lat!=""){
 												+",<br><b>User:</b>"+ accountProfile.geoTaggedUserLogin)
 										+ "</td><td><button type='button' class='btn btn-blue' onclick='AddGeoLocation.showModalPopup($(\"#viewModal\"),\""
 										+ accountProfile.pid + "\",\"" + accountProfile.latitude + "\",\"" + accountProfile.longitude + "\",\""
-										+ accountProfile.location
+										+ accountProfile.location + "\",\"" + accountProfile.geoTaggedTime + "\",\"" + accountProfile.geoTaggedUserLogin 
 										+ "\",0);'>Location From Geo Tag Mobile</button>"		
 										+ "<button type='button' data-target='#enableMapModal' class='btn btn-success' onclick='AddGeoLocation.oldLatLngValues($(\"#enableMapModal\"),\""
 										+ accountProfile.pid
@@ -397,20 +403,20 @@ if(lat!=""){
 // + accountProfile.location
 // + "\",0);'>Add Geo Location From Order</button>
 
-	AddGeoLocation.showModalPopup = function(el, id, lat, long, loc, action) {
+	AddGeoLocation.showModalPopup = function(el, id, lat, long, loc,time,user, action) {
 		
 		// resetForm();
 		if (id) {
 			switch (action) {
 			case 0:
-				addGeoLocationFromOrder(id, lat, long, loc);
+				addGeoLocationFromOrder(id, lat, long, loc,time,user);
 				break;
 			}
 			el.modal('show');
 		}
 	}
 
-	function addGeoLocationFromOrder(id, lat, long, loc) {
+	function addGeoLocationFromOrder(id, lat, long, loc,time,user) {
 		
 		accountProfilePid=id;
 		$("#tblAccountProfileGeoLocation").html("");
@@ -426,9 +432,13 @@ if(lat!=""){
 				$("#oldLatitude").text((lat == "null" || lat == null ? "": lat));
 				$("#oldLongitude").text((long == "null" || long == null ? "": long));
 				$("#oldGeoLocation").text((loc == "null" || loc == null? "": loc));
+				var dateTime = convertDateTimeFromServer(time);
+				console.log(dateTime);
+				$("#oldDate").text((dateTime == "null" || dateTime == null? "": dateTime));
+				$("#oldUser").text((dateTime == "null" || dateTime == null? "": user));
 				$.each(result,function(index, geoLocation){
 					row += "<tr><td><input type='radio' name='geoLocation' id='geoLocation' value='"+geoLocation.pid+"' ></td>" 
-					+"<td>"+geoLocation.latitude+"</td><td>"+geoLocation.longitude+"</td><td>"+geoLocation.location+"</td></tr>";
+					+"<td>"+geoLocation.latitude+"</td><td>"+geoLocation.longitude+"</td><td>"+geoLocation.location+"</td><td>"+ convertDateTimeFromServer(geoLocation.sendDate)+"</td><td>"+geoLocation.userFirstName+"</td></tr>";
 				});
 				$("#tblAccountProfileGeoLocation").html(row);
 			},
@@ -467,6 +477,13 @@ if(lat!=""){
 				onError(xhr, error);
 			},
 		});
+	}
+	function convertDateTimeFromServer(createdDate) {
+		if (createdDate) {
+			return moment(createdDate).format('MMM DD YYYY, h:mm:ss a');
+		} else {
+			return "";
+		}
 	}
 	function onSaveSuccess(result) {
 		// reloading page to see the updated data

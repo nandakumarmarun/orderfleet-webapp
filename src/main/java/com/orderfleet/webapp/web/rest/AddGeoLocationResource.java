@@ -7,7 +7,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
@@ -34,7 +37,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
+import com.orderfleet.webapp.domain.AccountProfile;
+import com.orderfleet.webapp.domain.AccountProfileGeoLocationTagging;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.enums.GeoTaggingType;
+import com.orderfleet.webapp.repository.AccountProfileGeoLocationTaggingRepository;
+import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileGeoLocationTaggingService;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -64,6 +72,12 @@ public class AddGeoLocationResource {
 	@Inject
 	private AccountProfileGeoLocationTaggingService accountProfileGeoLocationTaggingService;
 
+	@Inject
+	private AccountProfileGeoLocationTaggingRepository accountProfileGeoLocationTaggingRepository;
+	
+	@Inject
+	private EmployeeProfileRepository employeeProfileRepository;
+
 	@RequestMapping(value = "/add-geo-location", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -84,21 +98,51 @@ public class AddGeoLocationResource {
 		boolean imports;
 		log.info("GeoTagg ----- " + geoTag);
 		// Not selected
+		List<AccountProfileGeoLocationTagging> geolocations = accountProfileGeoLocationTaggingRepository
+				.findAllByCompanyId();
+		List<AccountProfileDTO> accountProfiles = new ArrayList<>();
 		if (accountTypePids.isEmpty() && importedStatus.isEmpty()) {
+			System.out.println("Enter here.......................................1");
 			accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+
+ 			for (AccountProfileDTO account : accountProfileDTOs) {
+
+				if (account.getGeoTaggingType() != null
+						&& account.getGeoTaggingType().equals(GeoTaggingType.MOBILE_TAGGED)) {
+
+					List<AccountProfileGeoLocationTagging> geolocation = geolocations.stream()
+							.filter(a -> a.getAccountProfile().getPid().equals(account.getPid())).collect(Collectors.toList());
+					
+					Comparator<AccountProfileGeoLocationTagging> comparator = Comparator.comparing(AccountProfileGeoLocationTagging::getSendDate);
+					 AccountProfileGeoLocationTagging lastGeoLocation = geolocation.stream().filter(date->date.getSendDate()!= null).max(comparator).get();
+					account.setGeoTaggedTime(lastGeoLocation.getSendDate());
+					account.setGeoTaggedUserLogin(lastGeoLocation.getUser().getLogin());
+                   EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUserLogin(lastGeoLocation.getUser().getLogin());
+                  
+                    account.setEmployeeName(employee.getName());
+					
+				}
+				else {
+					
+					account.setEmployeeName(account.getGeoTaggedUserName());
+				}
+				accountProfiles.add(account);
+
+			}
 			if ("true".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() == null);
-				accountProfileDTOs.sort((a1, a2) -> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
+				accountProfiles.removeIf(acc -> acc.getGeoTaggingType() == null);
+				accountProfiles.sort((a1, a2) -> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
 			} else if ("false".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() != null);
+				accountProfiles.removeIf(acc -> acc.getGeoTaggingType() != null);
 			} else {
 				// do nothing
 			}
-			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
+			return new ResponseEntity<>(accountProfiles, HttpStatus.OK);
 		}
 
 		// Both selected
 		if (!accountTypePids.isEmpty() && !importedStatus.isEmpty()) {
+			System.out.println("Enter here.......................................2");
 			if (importedStatus.equals("true")) {
 				imports = true;
 				accountProfileDTOs
@@ -114,19 +158,45 @@ public class AddGeoLocationResource {
 						.findAccountProfileByAccountTypePidInAndActivated(Arrays.asList(accountTypePids.split(","))));
 			}
 
+			for (AccountProfileDTO account : accountProfileDTOs) {
+
+				if (account.getGeoTaggingType() != null
+						&& account.getGeoTaggingType().equals(GeoTaggingType.MOBILE_TAGGED)) {
+
+					List<AccountProfileGeoLocationTagging> geolocation = geolocations.stream()
+							.filter(a -> a.getAccountProfile().getPid().equals(account.getPid())).collect(Collectors.toList());
+					
+					Comparator<AccountProfileGeoLocationTagging> comparator = Comparator.comparing(AccountProfileGeoLocationTagging::getSendDate);
+					 AccountProfileGeoLocationTagging lastGeoLocation = geolocation.stream().filter(date->date.getSendDate()!= null).max(comparator).get();
+					account.setGeoTaggedTime(lastGeoLocation.getSendDate());
+					account.setGeoTaggedUserLogin(lastGeoLocation.getUser().getLogin());
+                   EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUserLogin(lastGeoLocation.getUser().getLogin());
+                  
+                    account.setEmployeeName(employee.getName());
+					
+				}
+				else {
+					
+					account.setEmployeeName(account.getGeoTaggedUserName());
+				}
+				accountProfiles.add(account);
+
+			}
+			
 			if ("true".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() == null);
-				accountProfileDTOs.sort((a1, a2) -> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
+				accountProfiles.removeIf(acc -> acc.getGeoTaggingType() == null);
+				accountProfiles.sort((a1, a2) -> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
 			} else if ("false".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() != null);
+				accountProfiles.removeIf(acc -> acc.getGeoTaggingType() != null);
 			} else {
 				// do nothing
 			}
-			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
+			return new ResponseEntity<>(accountProfiles, HttpStatus.OK);
 		}
 
 		// ImportStatus Selected
 		if (accountTypePids.isEmpty() && !importedStatus.isEmpty()) {
+			System.out.println("Enter here.......................................3");
 			if (importedStatus.equals("true")) {
 				imports = true;
 				accountProfileDTOs
@@ -139,35 +209,85 @@ public class AddGeoLocationResource {
 				accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
 			}
 
+			for (AccountProfileDTO account : accountProfileDTOs) {
+
+				if (account.getGeoTaggingType() != null
+						&& account.getGeoTaggingType().equals(GeoTaggingType.MOBILE_TAGGED)) {
+
+					List<AccountProfileGeoLocationTagging> geolocation = geolocations.stream()
+							.filter(a -> a.getAccountProfile().getPid().equals(account.getPid())).collect(Collectors.toList());
+					
+					Comparator<AccountProfileGeoLocationTagging> comparator = Comparator.comparing(AccountProfileGeoLocationTagging::getSendDate);
+					 AccountProfileGeoLocationTagging lastGeoLocation = geolocation.stream().filter(date->date.getSendDate()!= null).max(comparator).get();
+					account.setGeoTaggedTime(lastGeoLocation.getSendDate());
+					account.setGeoTaggedUserLogin(lastGeoLocation.getUser().getLogin());
+                   EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUserLogin(lastGeoLocation.getUser().getLogin());
+                  
+                    account.setEmployeeName(employee.getName());
+					
+				}
+				else {
+					
+					account.setEmployeeName(account.getGeoTaggedUserName());
+				}
+				accountProfiles.add(account);
+
+			}
 			if ("true".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() == null);
-				accountProfileDTOs.sort((a1, a2) -> a2.getGeoTaggedTime() != null && a1.getGeoTaggedTime() != null
+				accountProfiles.removeIf(acc -> acc.getGeoTaggingType() == null);
+				accountProfiles.sort((a1, a2) -> a2.getGeoTaggedTime() != null && a1.getGeoTaggedTime() != null
 						? a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime())
 						: 0);
 			} else if ("false".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() != null);
+				accountProfiles.removeIf(acc -> acc.getGeoTaggingType() != null);
 			} else {
 				// do nothing
 			}
-			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
+			return new ResponseEntity<>(accountProfiles, HttpStatus.OK);
 		}
 
 		// AccountType Selected
 		if (!accountTypePids.isEmpty() && importedStatus.isEmpty()) {
+			System.out.println("Enter here.......................................4");
 			accountProfileDTOs.addAll(accountProfileService
 					.findAccountProfileByAccountTypePidInAndActivated(Arrays.asList(accountTypePids.split(","))));
 
+			for (AccountProfileDTO account : accountProfileDTOs) {
+
+				if (account.getGeoTaggingType() != null
+						&& account.getGeoTaggingType().equals(GeoTaggingType.MOBILE_TAGGED)) {
+
+					List<AccountProfileGeoLocationTagging> geolocation = geolocations.stream()
+							.filter(a -> a.getAccountProfile().getPid().equals(account.getPid())).collect(Collectors.toList());
+					
+					Comparator<AccountProfileGeoLocationTagging> comparator = Comparator.comparing(AccountProfileGeoLocationTagging::getSendDate);
+					 AccountProfileGeoLocationTagging lastGeoLocation = geolocation.stream().filter(date->date.getSendDate()!= null).max(comparator).get();
+					account.setGeoTaggedTime(lastGeoLocation.getSendDate());
+					account.setGeoTaggedUserLogin(lastGeoLocation.getUser().getLogin());
+                   EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUserLogin(lastGeoLocation.getUser().getLogin());
+                  
+                    account.setEmployeeName(employee.getName());
+					
+				}
+				else {
+					
+					account.setEmployeeName(account.getGeoTaggedUserName());
+				}
+				accountProfiles.add(account);
+
+			}
 			if ("true".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() == null);
-				accountProfileDTOs.sort((a1, a2) -> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
+				accountProfiles.removeIf(acc -> acc.getGeoTaggingType() == null);
+				accountProfiles.sort((a1, a2) -> a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime()));
 			} else if ("false".equals(geoTag)) {
-				accountProfileDTOs.removeIf(acc -> acc.getGeoTaggingType() != null);
+				accountProfiles.removeIf(acc -> acc.getGeoTaggingType() != null);
 			} else {
 				// do nothing
 			}
-			return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
+			return new ResponseEntity<>(accountProfiles, HttpStatus.OK);
 		}
-		return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
+
+		return new ResponseEntity<>(accountProfiles, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/add-geo-location/download-account-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -175,23 +295,51 @@ public class AddGeoLocationResource {
 	public void downloadProductProfileXls(@RequestParam String geoTag, HttpServletResponse response) {
 		List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
 		accountProfileDTOs.addAll(accountProfileService.findAllByCompanyAndActivated(true));
+		
+		List<AccountProfileGeoLocationTagging> geolocations = accountProfileGeoLocationTaggingRepository
+				.findAllByCompanyId();
+		List<AccountProfileDTO> accountProfiles = new ArrayList<>();
+		for (AccountProfileDTO account : accountProfileDTOs) {
+
+			if (account.getGeoTaggingType() != null
+					&& account.getGeoTaggingType().equals(GeoTaggingType.MOBILE_TAGGED)) {
+
+				List<AccountProfileGeoLocationTagging> geolocation = geolocations.stream()
+						.filter(a -> a.getAccountProfile().getPid().equals(account.getPid())).collect(Collectors.toList());
+				
+				Comparator<AccountProfileGeoLocationTagging> comparator = Comparator.comparing(AccountProfileGeoLocationTagging::getSendDate);
+				 AccountProfileGeoLocationTagging lastGeoLocation = geolocation.stream().filter(date->date.getSendDate()!= null).max(comparator).get();
+				account.setGeoTaggedTime(lastGeoLocation.getSendDate());
+				account.setGeoTaggedUserLogin(lastGeoLocation.getUser().getLogin());
+               EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUserLogin(lastGeoLocation.getUser().getLogin());
+              
+                account.setEmployeeName(employee.getName());
+				
+			}
+			else {
+				
+				account.setEmployeeName(account.getGeoTaggedUserName());
+			}
+			accountProfiles.add(account);
+
+		}
 
 		switch (geoTag) {
 		case "all":
 			// do nothing
 			break;
 		case "true":
-			accountProfileDTOs.removeIf(accDto -> accDto.getGeoTaggingType() == null);
-			accountProfileDTOs.sort((a1, a2) ->a2.getGeoTaggedTime() != null && a1.getGeoTaggedTime() != null
+			accountProfiles.removeIf(accDto -> accDto.getGeoTaggingType() == null);
+			accountProfiles.sort((a1, a2) -> a2.getGeoTaggedTime() != null && a1.getGeoTaggedTime() != null
 					? a2.getGeoTaggedTime().compareTo(a1.getGeoTaggedTime())
-					: 0 );
+					: 0);
 			break;
 		case "false":
-			accountProfileDTOs.removeIf(accDto -> accDto.getGeoTaggingType() != null);
+			accountProfiles.removeIf(accDto -> accDto.getGeoTaggingType() != null);
 			break;
 		}
-		if (accountProfileDTOs.size() != 0) {
-			buildExcelDocument(accountProfileDTOs, response);
+		if (accountProfiles.size() != 0) {
+			buildExcelDocument(accountProfiles, response);
 		}
 
 	}
@@ -200,8 +348,8 @@ public class AddGeoLocationResource {
 		log.debug("Downloading Geo Tag Excel report");
 		String excelFileName = "geotag_accounts" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = { "Customer", "Tag Type", "Tag Time", "Tagged User", "Geo Location", "Latitude",
-				"Longitude" };
+		String[] headerColumns = { "Customer","Employee", "Tag Type", "Tag Time", "Tagged User", "Latitude",
+				"Longitude", "Geo Location" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -235,18 +383,18 @@ public class AddGeoLocationResource {
 		for (AccountProfileDTO ap : accountProfileDTOs) {
 			HSSFRow row = worksheet.createRow(rowNum++);
 			row.createCell(0).setCellValue(ap.getName().replace("#13;#10;", " "));
-			row.createCell(1).setCellValue(ap.getGeoTaggingType() == null ? "" : ap.getGeoTaggingType().toString());
+			row.createCell(1).setCellValue(ap.getEmployeeName()== null ? "":ap.getEmployeeName());
+			row.createCell(2).setCellValue(ap.getGeoTaggingType() == null ? "" : ap.getGeoTaggingType().toString());
 			String formatDateTime = null;
 			if (ap.getGeoTaggedTime() != null) {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
 				formatDateTime = ap.getGeoTaggedTime().format(formatter);
 			}
-			row.createCell(2).setCellValue(ap.getGeoTaggedTime() == null ? "" : formatDateTime);
-			row.createCell(3).setCellValue(ap.getGeoTaggedUserLogin() == null ? "" : ap.getGeoTaggedUserLogin());
-			row.createCell(4).setCellValue(ap.getLocation() == null ? "" : ap.getLocation().toString());
+			row.createCell(3).setCellValue(ap.getGeoTaggedTime() == null ? "" : formatDateTime);
+			row.createCell(4).setCellValue(ap.getGeoTaggedUserLogin() == null ? "" : ap.getGeoTaggedUserLogin());
 			row.createCell(5).setCellValue(ap.getLatitude() == null ? "" : ap.getLatitude().toString());
 			row.createCell(6).setCellValue(ap.getLongitude() == null ? "" : ap.getLongitude().toString());
-
+			row.createCell(7).setCellValue(ap.getLocation() == null ? "" : ap.getLocation().toString());
 		}
 
 	}

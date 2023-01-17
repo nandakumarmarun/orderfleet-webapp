@@ -192,7 +192,9 @@ if (!this.AttachGeoLocation) {
 									"<tr><td>"
 											+ convertDateTimeFromServer(mobileGeoData.sendDate)
 											+ "</td><td>"
-											+ mobileGeoData.userName
+											+ mobileGeoData.employeeName
+											+ "</td><td>"
+											+mobileGeoData.userName
 											+ "</td><td>"
 											+ mobileGeoData.accountProfileName
 											+ "</td><td>"
@@ -252,6 +254,8 @@ if (!this.AttachGeoLocation) {
 													+ "</td><td>"
 													+ attachGeoLocation.employeeName
 													+ "</td><td>"
+													+attachGeoLocation.userName
+													+"</td><td>"
 													+ attachGeoLocation.accountProfileName
 													+ "</td><td>"
 													+ (attachGeoLocation.latitude == null ? ""

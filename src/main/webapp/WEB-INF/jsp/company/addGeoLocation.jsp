@@ -52,7 +52,8 @@
 					id="tblAddGeoLocation">
 					<thead>
 						<tr>
-							<th>Name</th>
+							<th>CustomerName</th>
+							<th>Employee</th>
 							<th>Latitude</th>
 							<th>Longitude</th>
 							<th>Geo Location</th>
@@ -199,9 +200,11 @@
 							<table class='table table-striped table-bordered'>
 								<thead>
 									<tr>
-										<th>Old Latitude</th>
-										<th>Old Longitude</th>
-										<th>Old Geo Location</th>
+										<th>Current Latitude</th>
+										<th>Current Longitude</th>
+										<th>Current Geo Location</th>
+										<th>Current Date</th>
+										<th>User</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -209,6 +212,8 @@
 										<td id="oldLatitude"></td>
 										<td id="oldLongitude"></td>
 										<td id="oldGeoLocation"></td>
+										<td id="oldDate"></td>
+										<td id="oldUser"></td>
 									</tr>
 								</tbody>
 							</table>
@@ -222,6 +227,8 @@
 												<th>New Latitude</th>
 												<th>New Longitude</th>
 												<th>New Geo Location</th>
+												<th>New Date</th>
+												<th>User</th>
 											</tr>
 										</thead>
 										<tbody id="tblAccountProfileGeoLocation">

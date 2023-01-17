@@ -41,7 +41,7 @@ public class AccountProfileGeoLocationTaggingDTO {
 		super();
 		this.pid=accountProfileGeoLocationTagging.getPid();
 		this.accountProfilePid = accountProfileGeoLocationTagging.getAccountProfile().getPid();
-		this.userFirstName = accountProfileGeoLocationTagging.getUser().getFirstName();
+		this.userFirstName = accountProfileGeoLocationTagging.getUser().getLogin();
 		this.longitude = accountProfileGeoLocationTagging.getLongitude();
 		this.latitude = accountProfileGeoLocationTagging.getLatitude();
 		this.location = accountProfileGeoLocationTagging.getLocation();
@@ -49,7 +49,7 @@ public class AccountProfileGeoLocationTaggingDTO {
 	}
 	
 	public AccountProfileGeoLocationTaggingDTO(String pid, String accountProfilePid, BigDecimal longitude, BigDecimal latitude,
-			String location, LocalDateTime sendDate) {
+			String location, LocalDateTime sendDate,String userFirstName) {
 		super();
 		this.pid=pid;
 		this.accountProfilePid = accountProfilePid;
@@ -57,6 +57,7 @@ public class AccountProfileGeoLocationTaggingDTO {
 		this.latitude = latitude;
 		this.location = location;
 		this.sendDate = sendDate;
+		this.userFirstName = userFirstName;
 	}
 
 	

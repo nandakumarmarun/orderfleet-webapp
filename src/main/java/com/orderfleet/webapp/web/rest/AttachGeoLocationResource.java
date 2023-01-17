@@ -262,7 +262,7 @@ public class AttachGeoLocationResource {
 			MobileGeoLocationView mobileGeoLocationView = new MobileGeoLocationView();
 			mobileGeoLocationView.setPid(object[0].toString());
 			mobileGeoLocationView.setSendDate((LocalDateTime) object[1]);
-			mobileGeoLocationView.setUserName(object[3].toString());
+			
 			mobileGeoLocationView.setAccountPid(object[4].toString());
 			if (compCon) {
 				mobileGeoLocationView.setAccountProfileName(object[9].toString());
@@ -272,8 +272,13 @@ public class AttachGeoLocationResource {
 			mobileGeoLocationView.setLatitude((BigDecimal) object[6]);
 			mobileGeoLocationView.setLongitude((BigDecimal) object[7]);
 			mobileGeoLocationView.setLocation(object[8] == null ? "" : object[8].toString());
+			mobileGeoLocationView.setUserName(object[10].toString());
+			EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUserLogin(object[10].toString());
+			mobileGeoLocationView.setEmployeeName(employee.getName());
+			
 			mobileGeoLocationViews.add(mobileGeoLocationView);
 		}
+		System.out.println("Dataaa...............:"+mobileGeoLocationViews.toString());
 		return mobileGeoLocationViews;
 	}
 
@@ -369,6 +374,7 @@ public class AttachGeoLocationResource {
 			} else {
 				visitGeoLocationView.setAccountProfileName(visitGeoLocationView.getAccountProfileName());
 			}
+			
 			List<ExecutiveTaskExecutionDetailView> executiveTaskExecutionDetailViews = new ArrayList<>();
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -483,8 +489,10 @@ public class AttachGeoLocationResource {
 					.filter(emp -> emp.getUserPid().equals(executiveTaskExecution.getUser().getPid())).findAny();
 			if (opEmployee.isPresent()) {
 				visitGeoLocationView.setEmployeeName(opEmployee.get().getName());
+				visitGeoLocationView.setUserName(opEmployee.get().getUserLogin());
 			} else {
 				visitGeoLocationView.setEmployeeName("");
+				visitGeoLocationView.setUserName("");
 			}
 			visitGeoLocationViews.add(visitGeoLocationView);
 		}
@@ -536,7 +544,7 @@ public class AttachGeoLocationResource {
 		accountProfileDTO.setLatitude(accountProfileGeoLocationTaggingDTO.getLatitude());
 		accountProfileDTO.setLongitude(accountProfileGeoLocationTaggingDTO.getLongitude());
 		accountProfileDTO.setLocation(accountProfileGeoLocationTaggingDTO.getLocation());
-		accountProfileDTO.setGeoTaggingType(GeoTaggingType.WEB_TAGGED_MOBILE);
+		accountProfileDTO.setGeoTaggingType(GeoTaggingType.WEB_TAGGED_MOBILE); 
 		accountProfileDTO.setGeoTaggedTime(LocalDateTime.now());
 		accountProfileDTO.setGeoTaggedUserLogin(SecurityUtils.getCurrentUserLogin());
 		accountProfileDTO = accountProfileService.update(accountProfileDTO);
@@ -594,7 +602,7 @@ public class AttachGeoLocationResource {
 		log.debug("Downloading Excel report");
 		String excelFileName = "attachGeoLocation" + ".xls";
 		String sheetName = "Sheet1";
-		String[] headerColumns = { "Date", "Employee", "AccountProfile", "Latitude","Location","Longitude" };
+		String[] headerColumns = { "Date", "Employee","UserLogin", "AccountProfile", "Latitude","Longitude","Location" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -641,11 +649,12 @@ public class AttachGeoLocationResource {
 				Cell sendDateCell = row.createCell(0);
 				sendDateCell.setCellValue(date);
 				sendDateCell.setCellStyle(dateCellStyle);
-				row.createCell(1).setCellValue(pp.getUserName());
-				row.createCell(2).setCellValue(pp.getAccountProfileName().toString());
-				row.createCell(3).setCellValue(pp.getLatitude().toString());
-				row.createCell(4).setCellValue(pp.getLocation());
+				row.createCell(1).setCellValue(pp.getEmployeeName());
+				row.createCell(2).setCellValue(pp.getUserName());
+				row.createCell(3).setCellValue(pp.getAccountProfileName().toString());
+				row.createCell(4).setCellValue(pp.getLatitude().toString());
 				row.createCell(5).setCellValue(pp.getLongitude().toString());
+				row.createCell(6).setCellValue(pp.getLocation());
 				System.out.println("username" + pp.getUserName());
 				System.out.println("latitude" + pp.getLatitude().toString());
 				System.out.println("acccountprofile" + pp.getAccountProfileName().toString());
@@ -660,11 +669,15 @@ public class AttachGeoLocationResource {
 				LocalDateTime localDateTime = pp.getCreatedDate();		
 				Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
 				Date date = Date.from(i);
-				row.createCell(0).setCellValue(pp.getEmployeeName());
-				row.createCell(1).setCellValue(pp.getLatitude().toString());
-				row.createCell(2).setCellValue(pp.getAccountProfileName().toString());
-				row.createCell(3).setCellValue(pp.getLocation());
-				row.createCell(4).setCellValue(pp.getLongitude().toString());
+				Cell sendDateCell = row.createCell(0);
+				sendDateCell.setCellValue(date);
+				sendDateCell.setCellStyle(dateCellStyle);
+				row.createCell(1).setCellValue(pp.getEmployeeName());
+				row.createCell(2).setCellValue(pp.getUserName());
+				row.createCell(3).setCellValue(pp.getAccountProfileName().toString());
+				row.createCell(4).setCellValue(pp.getLatitude().toString());
+				row.createCell(5).setCellValue(pp.getLongitude().toString());
+				row.createCell(6).setCellValue(pp.getLocation());
 			}
 		}
 

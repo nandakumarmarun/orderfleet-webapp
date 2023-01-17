@@ -73,7 +73,7 @@ public class VisitGeoLocationView {
 		this.pid = executiveTaskExecution.getPid();
 		this.createdDate = executiveTaskExecution.getCreatedDate();
 		this.plannedDate=executiveTaskExecution.getDate();
-		this.userName = executiveTaskExecution.getUser().getFirstName();
+		this.userName = executiveTaskExecution.getUser().getLogin();
 		this.activityName = executiveTaskExecution.getActivity().getName();
 		this.accountTypeName = executiveTaskExecution.getAccountType().getName();
 		this.accountProfilePid = executiveTaskExecution.getAccountProfile().getPid();

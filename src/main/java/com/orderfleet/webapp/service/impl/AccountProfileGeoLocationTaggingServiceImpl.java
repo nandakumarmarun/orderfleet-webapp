@@ -79,6 +79,7 @@ public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfi
 		accountProfile.setLongitude(accountProfileGeoLocationTaggingDTO.getLongitude());
 		accountProfile.setLocation(accountProfileGeoLocationTaggingDTO.getLocation());
 		accountProfile.setGeoTaggingType(accountProfileGeoLocationTaggingDTO.getGeoTaggingType());
+//		accountProfile.setGeoTaggedTime(accountProfileGeoLocationTaggingDTO.getSendDate());
 		accountProfileRepository.save(accountProfile);
 		
 		User user=userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
@@ -94,7 +95,7 @@ public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfi
 		accountProfileGeoLocationTagging.setCompany(company);
 		accountProfileGeoLocationTagging.setSendDate(accountProfileGeoLocationTaggingDTO.getSendDate());
 		accountProfileGeoLocationTagging = accountProfileGeoLocationTaggingRepository.save(accountProfileGeoLocationTagging);
-		return new AccountProfileGeoLocationTaggingDTO(accountProfileGeoLocationTagging.getPid(),accountProfileGeoLocationTagging.getAccountProfile().getPid(), accountProfileGeoLocationTagging.getLongitude(), accountProfileGeoLocationTagging.getLatitude(), accountProfileGeoLocationTagging.getLocation(), accountProfileGeoLocationTagging.getSendDate());
+		return new AccountProfileGeoLocationTaggingDTO(accountProfileGeoLocationTagging.getPid(),accountProfileGeoLocationTagging.getAccountProfile().getPid(), accountProfileGeoLocationTagging.getLongitude(), accountProfileGeoLocationTagging.getLatitude(), accountProfileGeoLocationTagging.getLocation(), accountProfileGeoLocationTagging.getSendDate(),accountProfileGeoLocationTagging.getUser().getFirstName());
 	}
 
 	@Override
@@ -137,7 +138,7 @@ public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfi
 	public List<AccountProfileGeoLocationTaggingDTO> setGeoLocationTaggingListToGeoLocationTaggingDTOList(List<AccountProfileGeoLocationTagging> accountProfileGeoLocationTaggings) {
 		List<AccountProfileGeoLocationTaggingDTO> accountProfileGeoLocationTaggingDTOs=new ArrayList<>();
 		for(AccountProfileGeoLocationTagging accountProfileGeoLocationTagging:accountProfileGeoLocationTaggings){
-			AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO=new AccountProfileGeoLocationTaggingDTO(accountProfileGeoLocationTagging.getPid(), accountProfileGeoLocationTagging.getAccountProfile().getPid(), accountProfileGeoLocationTagging.getLongitude(), accountProfileGeoLocationTagging.getLatitude(), accountProfileGeoLocationTagging.getLocation(), accountProfileGeoLocationTagging.getSendDate());
+			AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO=new AccountProfileGeoLocationTaggingDTO(accountProfileGeoLocationTagging.getPid(), accountProfileGeoLocationTagging.getAccountProfile().getPid(), accountProfileGeoLocationTagging.getLongitude(), accountProfileGeoLocationTagging.getLatitude(), accountProfileGeoLocationTagging.getLocation(), accountProfileGeoLocationTagging.getSendDate(),accountProfileGeoLocationTagging.getUser().getLogin());
 			accountProfileGeoLocationTaggingDTOs.add(accountProfileGeoLocationTaggingDTO);
 		}
 		return accountProfileGeoLocationTaggingDTOs;

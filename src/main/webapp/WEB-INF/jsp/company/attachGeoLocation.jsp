@@ -150,6 +150,7 @@
 						<tr>
 							<th>Date</th>
 							<th>Employee</th>
+							<th>User Login</th>
 							<th>Account Profile</th>
 							<th>Latitude</th>
 							<th>Longitude</th>
@@ -191,7 +192,7 @@
 									<thead>
 										<tr>
 											<th></th>
-											<th>Old</th>
+											<th>Current</th>
 											<th>New</th>
 										</tr>
 									</thead>
@@ -228,9 +229,9 @@
 							<table class='table table-striped table-bordered'>
 								<thead>
 									<tr>
-										<th>Old Latitude</th>
-										<th>Old Longitude</th>
-										<th>Old Geo Location</th>
+										<th>Current Latitude</th>
+										<th>Current Longitude</th>
+										<th>Current Geo Location</th>
 									</tr>
 								</thead>
 								<tbody>
