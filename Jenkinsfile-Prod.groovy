@@ -100,7 +100,7 @@ pipeline {
             steps {
                 sshagent(['prod-devops-user']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -l ${prod_server_user} ${prod_server_ip} 'cd /opt/salesnrich/ && sudo nohup bash -c "java -Xms6g -Xmx6g -jar ./'''+params.RELEASE_NO+'''/orderfleet-webapp-'''+params.RELEASE_NO+'''.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
+                        ssh -o StrictHostKeyChecking=no -l ${prod_server_user} ${prod_server_ip} 'cd /opt/salesnrich/ && sudo nohup bash -c "java -Xms10g -Xmx10g -jar ./'''+params.RELEASE_NO+'''/orderfleet-webapp-'''+params.RELEASE_NO+'''.war --spring.profiles.active=prod -Dspring.config.location=file:./application-prod.yml > service.out 2> errors.txt < /dev/null &" && sleep 4'
                     '''
                 }
             }

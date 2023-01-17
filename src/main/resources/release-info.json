@@ -1,10 +1,7 @@
 {
-"release-number" : "1.101.4",
-"release-date" : "14/01/2023",
+"release-number" : "1.101.5",
+"release-date" : "17/01/2023",
 "features" : [
-  "product profile limit 1000",
-  "pincode Show in sales order and sales",
-  "price level defult null saved in account profile",
-  "user Id show with employee name"
+  "geo tagging Report"
 ]
 }
