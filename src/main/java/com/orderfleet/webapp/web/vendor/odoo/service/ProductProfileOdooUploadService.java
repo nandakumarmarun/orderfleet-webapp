@@ -296,11 +296,11 @@ public class ProductProfileOdooUploadService {
 			productProfile.setTaxRate(taxRate);
 
 			productProfile.setAlias(ppDto.getDefault_code());
-			if (ppDto.getStandard_price() != null && !ppDto.getStandard_price().equals("")) {
-				productProfile.setPrice(BigDecimal.valueOf(Double.valueOf(ppDto.getStandard_price())));
-			} else {
+//			if (ppDto.getStandard_price() != null && !ppDto.getStandard_price().equals("")) {
+//				productProfile.setPrice(BigDecimal.valueOf(Double.valueOf(ppDto.getStandard_price())));
+//			} else {
 				productProfile.setPrice(BigDecimal.valueOf(0));
-			}
+//			}
 			productProfile.setMrp(0);
 
 			if (ppDto.getHsn_code() != null && !ppDto.getHsn_code().equals("")) {
