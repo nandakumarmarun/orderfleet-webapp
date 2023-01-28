@@ -128,6 +128,11 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and UPPER(accountProfile.alias) in ?2")
 	List<AccountProfile> findByCompanyIdAndAliasIgnoreCaseIn(Long companyId, List<String> names);
+	
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.customerId in ?2")
+	List<AccountProfile> findByCompanyIdAndCustomerIdIn(Long companyId, List<String> customerId);
+	
+	
 
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE AccountProfile lh SET  lh.closingBalance =0 WHERE  lh.company.id = ?1")

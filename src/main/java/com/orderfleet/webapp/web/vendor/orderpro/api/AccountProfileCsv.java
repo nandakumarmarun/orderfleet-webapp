@@ -35,6 +35,7 @@ import com.orderfleet.webapp.web.rest.dto.PriceLevelAccountProductGroupDTO;
 import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
 import com.orderfleet.webapp.web.rest.tallypartner.DocumentUserWiseUpdateController;
 import com.orderfleet.webapp.web.vendor.orderpro.service.AccountProfileCsvUploadService;
+import com.orderfleet.webapp.web.vendor.orderpro.service.ReceivablePayableExcelUploadService;
 
 @RestController
 @RequestMapping(value = "/api/orderpro/v1")
@@ -53,6 +54,9 @@ public class AccountProfileCsv {
 
 	@Inject
 	private DocumentUserWiseUpdateController documentUserWiseUpdateController;
+	
+	@Inject
+	private ReceivablePayableExcelUploadService receivablePayableExcelUploadService;
 
 	@RequestMapping(value = "/account-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -211,6 +215,32 @@ public class AccountProfileCsv {
 					syncOperationRepository.save(so);
 					// save/update
 					accountProfileCsvUploadService.saveUpdateReceivablePayables(receivablePayableDTOs, so);
+					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+				}).orElse(new ResponseEntity<>("Receivable-Payable sync operation not registered for this company",
+						HttpStatus.BAD_REQUEST));
+	}
+	@RequestMapping(value = "/receivable-payable-excel.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> bulkSaveReceivablePayablesExcel(
+			@Valid @RequestBody List<ReceivablePayableDTO> receivablePayableDTOs) {
+		log.debug("REST request to save Receivable Payable : {}", receivablePayableDTOs.size());
+		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+				SyncOperationType.RECEIVABLE_PAYABLE).map(so -> {
+
+//					Optional<SyncOperation> opSyncAP = syncOperationRepository.findOneByCompanyIdAndOperationType(
+//							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.ACCOUNT_PROFILE);
+
+//					if (!opSyncAP.get().getCompleted()) {
+//						return new ResponseEntity<>("account-profile save processing try after some time.",
+//								HttpStatus.BAD_REQUEST);
+//					}
+
+					// update sync status
+					so.setCompleted(false);
+					so.setLastSyncStartedDate(LocalDateTime.now());
+					syncOperationRepository.save(so);
+					// save/update
+					receivablePayableExcelUploadService.saveUpdateReceivablePayables(receivablePayableDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Receivable-Payable sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));

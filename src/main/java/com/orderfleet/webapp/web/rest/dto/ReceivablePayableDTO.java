@@ -52,6 +52,10 @@ public class ReceivablePayableDTO {
 	private String receivablePayableId;
 
 	private double closingBalance;
+	
+	private String customerCode;
+	
+	private Long creditDays;
 
 	public ReceivablePayableDTO() {
 		super();
@@ -83,6 +87,8 @@ public class ReceivablePayableDTO {
 		this.receivablePayableId = receivablePayable.getReceivablePayableId() != null
 				&& !receivablePayable.getReceivablePayableId().equals("") ? receivablePayable.getReceivablePayableId()
 						: "";
+				this.customerCode =receivablePayable.getAccountProfile().getCustomerId();
+				this.creditDays = receivablePayable.getAccountProfile().getCreditDays();
 	}
 
 	public String getPid() {
@@ -243,6 +249,23 @@ public class ReceivablePayableDTO {
 		this.receivablePayableId = receivablePayableId;
 	}
 
+	public String getCustomerCode() {
+		return customerCode;
+	}
+
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
+	}
+
+	public Long getCreditDays() {
+		return creditDays;
+	}
+
+	public void setCreditDays(Long creditDays) {
+		this.creditDays = creditDays;
+	}
+
+	
 //	@Override
 //	public String toString() {
 //		return "ReceivablePayableDTO [accountName=" + accountName + ", receivablePayableType=" + receivablePayableType
