@@ -60,7 +60,6 @@
 												onclick='GetAllEmployees(this,"no","All Employee")'>All
 												Employee</a>
 										</div>
-										
 									</div>
 									<select id="dbEmployee" name="employeePid"
 										class="form-control">
@@ -86,28 +85,7 @@
 										class='input-group-addon btn  dropdown-toggle glyphicon glyphicon-filter'
 										data-toggle='dropdown' aria-haspopup='true'
 										aria-expanded='false' title='filter employee'></span>
-									<!-- <div class='dropdown-menu dropdown-menu-left'
-										style='background-color: #F0F0F0'>
-										<div>
-											<a class='btn btn-default dropdown-item'
-												style='width: 100%; text-align: left;'
-												onclick='InvoiceWiseReport.getActivities("all")'>All
-												Activity</a>
-										</div>
-										<div>
-											<a class='btn btn-default dropdown-item'
-												style='width: 100%; text-align: left;'
-												onclick='InWiseReport.getActivities("planed")'>Planned
-												Activity</a>
-										</div>
-										<div>
-											<a class='btn btn-default dropdown-item'
-												style='width: 100%; text-align: left;'
-												onclick='InvoiceWiseReport.getActivities("unPlaned")'>UnPlanned
-												Activity</a>
-										</div>
-
-									</div> -->
+									
 									<select id="dbActivity" name="employeePid"
 										class="form-control">
 										<option value="no">All Activity</option>
@@ -158,11 +136,7 @@
 										style="font-size: 18px" onclick="DeliveryWiseReport.filter()"
 										title="Apply"></button>
 								</div>
-								<!-- <div class="col-sm-3">
-									<br />
-									<button id="btnDownload" type="button" style="font-size: 18px"
-										class="btn btn-orange entypo-download" title="Download Xls"></button>
-								</div> -->
+								
 							</div>
 						</div>
 					</form>
@@ -184,7 +158,7 @@
 							<th>Invoice Date</th>
 							<th>Vehicle Number</th>
 							<th>Submission Date</th>
-							<th>Action</th>
+							<th>View Image</th>
 							
 						</tr>
 					</thead>
@@ -347,10 +321,7 @@
 											});
 
 							DeliveryWiseReport.filter();
-							//if(documentType == null){
-							//execute on normal page load
-
-							//}
+							
 						});
 	</script>
 

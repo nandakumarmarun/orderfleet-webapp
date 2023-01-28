@@ -45,6 +45,7 @@ import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.UserActivity;
 import com.orderfleet.webapp.domain.enums.DocumentType;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
@@ -56,6 +57,7 @@ import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.UserActivityRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -65,6 +67,7 @@ import com.orderfleet.webapp.service.DocumentFormsService;
 import com.orderfleet.webapp.service.DocumentService;
 import com.orderfleet.webapp.service.DynamicDocumentHeaderService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
+import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.ExecutiveTaskExecutionService;
 import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
@@ -131,6 +134,11 @@ public class DeliveryReportResource {
 	@Inject
 	private FileManagerService fileManagerService;
 
+	@Inject
+	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
+	
+	
+
 	@RequestMapping(value = "/delivery-wise-reports", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -165,7 +173,11 @@ public class DeliveryReportResource {
 			@RequestParam("accountPid") String accountPid, @RequestParam("filterBy") String filterBy,
 			@RequestParam String fromDate, @RequestParam String toDate) {
 
-		String documentPid = "DOC-nx6mcvKb9G1653966130937";
+		List<String> documentPid = primarySecondaryDocumentRepository
+				.findByVoucherTypeAndCompanyId(VoucherType.DELIVERY).stream().map(doc -> doc.getDocument().getPid())
+				.collect(Collectors.toList());
+
+//		String documentPid = "DOC-nx6mcvKb9G1653966130937";
 
 		List<InvoiceWiseReportView> executiveTaskExecutions = new ArrayList<>();
 		if (filterBy.equals("TODAY")) {
@@ -199,7 +211,7 @@ public class DeliveryReportResource {
 		return new ResponseEntity<>(executiveTaskExecutions, HttpStatus.OK);
 	}
 
-	private List<InvoiceWiseReportView> getFilterData(String employeePid, String documentPid, String activityPid,
+	private List<InvoiceWiseReportView> getFilterData(String employeePid, List<String> documentPid, String activityPid,
 			String accountPid, LocalDate fDate, LocalDate tDate) {
 		log.info("Get Fileter Data");
 		LocalDateTime fromDate = fDate.atTime(0, 0);
@@ -210,7 +222,6 @@ public class DeliveryReportResource {
 
 		List<Long> userIds = getUserIdsUnderCurrentUser(employeePid);
 
-		
 		if (userIds.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -224,7 +235,7 @@ public class DeliveryReportResource {
 		List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
 		log.info("Finding executive Task execution");
 		if (accountPid.equalsIgnoreCase("no")) {
-			
+
 			executiveTaskExecutions = executiveTaskExecutionRepository
 					.getByCreatedDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
 		} else {
@@ -242,18 +253,14 @@ public class DeliveryReportResource {
 
 		System.out.println("Execution ids:" + exeIds);
 		log.info("Finding executive Task execution Inventory Vouchers...");
-		
+
 		List<Object[]> inventoryVouchers = new ArrayList<>();
 		List<InventoryVoucherHeader> deliveryVoucher = new ArrayList<>();
 		if (exeIds.size() > 0) {
-			if (documentPid.equals("no")) {
-				inventoryVouchers = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionIdIn(exeIds);
 
-			} else {
-				deliveryVoucher = inventoryVoucherHeaderRepository
-						.findByExecutiveTaskExecutionIdInAndDocumentsPid(exeIds, documentPid);
+			deliveryVoucher = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionIdInAndDocumentsPidIn(exeIds,
+					documentPid);
 
-			}
 		}
 
 		List<Long> ivId = deliveryVoucher.stream().map(dv -> dv.getId()).collect(Collectors.toList());
@@ -267,7 +274,7 @@ public class DeliveryReportResource {
 		if (invoiceNo.size() > 0) {
 			inventoryVouchers = inventoryVoucherHeaderRepository.findByDocumentNumberlocalIn(invoiceNo);
 		}
-		List<Long> exetId = new ArrayList();
+		List<Long> exetId = new ArrayList<>();
 
 		inventoryVouchers.forEach(data -> {
 			exetId.add(Long.parseLong(data[1].toString()));
@@ -277,36 +284,55 @@ public class DeliveryReportResource {
 		if (exetId.size() > 0) {
 			executive = executiveTaskExecutionRepository.findByExecutiveTaskExecutionIdIn(exetId);
 		}
-		EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByPid(employeePid);
-		log.info("executive task execution looping started :");
+
+
+//		EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByPid(employeePid);
+		log.info("executive task execution looping started ");
 		List<InvoiceWiseReportView> invoiceWiseReportViews = new ArrayList<>();
 
-		for (Object[] obj : inventoryVouchers) {
-			InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView();
+		for (InventoryVoucherDetail detail : invDetail) {
+			for (InventoryVoucherHeader ivh : deliveryVoucher) {
 
-			double totalSalesOrderAmount = 0.0;
-			for (Object[] object : executive) {
+				InvoiceWiseReportView invoiceWiseReportView = new InvoiceWiseReportView();
+				double totalSalesOrderAmount = 0.0;
 
-				if (obj[1].toString().equals(object[3].toString())) {
+				if (ivh.getId() == detail.getInventoryVoucherHeader().getId()) {
 
-					invoiceWiseReportView.setPid(obj[5].toString());
-					invoiceWiseReportView.setEmployeeName(employee.getName());
-					invoiceWiseReportView.setAccountProfileName(object[1].toString());
-					invoiceWiseReportView
-							.setVehicleRegistrationNumber(object[2] == null ? "No vehicle" : object[2].toString());
-					invoiceWiseReportView.setCreatedDate(LocalDateTime.parse(object[0].toString()));
-					invoiceWiseReportView.setInvoiceNo(obj[0].toString());
-					invoiceWiseReportView.setSendDate(LocalDateTime.parse(obj[4].toString()));
+					for (Object[] obj : inventoryVouchers) {
 
-					totalSalesOrderAmount += Double.valueOf(obj[2].toString());
-					invoiceWiseReportView.setTotalSalesOrderAmount(totalSalesOrderAmount);
-					invoiceWiseReportViews.add(invoiceWiseReportView);
+						if (obj[0].toString().equals(detail.getReferenceInvoiceNo())) {
+
+							for (Object[] object : executive) {
+
+								if (obj[1].toString().equals(object[3].toString())) {
+
+									invoiceWiseReportView.setSendDate(ivh.getCreatedDate());
+									if(!ivh.getImageRefNo().isEmpty()) {
+									invoiceWiseReportView.setImageButtonVisible(true);
+									}
+									invoiceWiseReportView.setEmployeeName(ivh.getEmployee().getName());
+									invoiceWiseReportView.setPid(ivh.getPid());
+									invoiceWiseReportView.setInvoiceNo(obj[0].toString());
+									totalSalesOrderAmount += Double.valueOf(obj[2].toString());
+									invoiceWiseReportView.setTotalSalesOrderAmount(totalSalesOrderAmount);
+
+									invoiceWiseReportView.setAccountProfileName(object[1].toString());
+									invoiceWiseReportView.setVehicleRegistrationNumber(
+											object[2] == null ? "No vehicle" : object[2].toString());
+									invoiceWiseReportView.setCreatedDate(LocalDateTime.parse(object[0].toString()));
+
+									invoiceWiseReportViews.add(invoiceWiseReportView);
+								}
+							}
+						}
+					}
 				}
 			}
 		}
 
-		log.info("executive task execution looping ended :");
-		invoiceWiseReportViews.forEach(data -> System.out.println(data.getInvoiceNo()));
+		log.info("executive task execution looping ended ");
+		invoiceWiseReportViews
+				.forEach(data -> System.out.println(data.getInvoiceNo() + "submit date :" + data.getSendDate()+"image :"+data.getImageButtonVisible()));
 		return invoiceWiseReportViews;
 	}
 
@@ -396,7 +422,7 @@ public class DeliveryReportResource {
 
 	@Timed
 	@RequestMapping(value = "/delivery-wise-reports/images/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<FormFileDTO>> getAttendanceImages(@PathVariable String pid) {
+	public ResponseEntity<List<FormFileDTO>> getSignedImages(@PathVariable String pid) {
 		log.debug("Web request to get Attendance images by pid : {}", pid);
 
 		Optional<InventoryVoucherHeader> invDTO = inventoryVoucherHeaderRepository.findOneByPid(pid);

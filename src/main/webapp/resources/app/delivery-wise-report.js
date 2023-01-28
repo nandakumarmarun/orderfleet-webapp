@@ -19,11 +19,11 @@ if (!this.DeliveryWiseReport) {
 	
 	$(document).ready(function() {
 		
-		let filterBy = getParameterByName('filterBy');
-		if (filterBy) {
-			$('#dbDateSearch').val(filterBy);
-			DeliveryWiseReport.filter();
-		}
+//		let filterBy = getParameterByName('filterBy');
+//		if (filterBy) {
+//			$('#dbDateSearch').val(filterBy);
+//			DeliveryWiseReport.filter();
+//		}
 
 		$('.selectpicker').selectpicker();
 	});
@@ -40,6 +40,8 @@ if (!this.DeliveryWiseReport) {
 	}
 
 	DeliveryWiseReport.filter = function() {
+		
+		console.log("Entered in to the loop")
 		if ($('#dbDateSearch').val() == "SINGLE") {
 			if ($("#txtFromDate").val() == "") {
 				return;
@@ -82,8 +84,9 @@ if (!this.DeliveryWiseReport) {
 										deliveryWiseReports,
 										function(index, invoiceWiseReport) {
 											var content = "";
-											
+											console.log("image: "+invoiceWiseReport.imageButtonVisible)
 											if (invoiceWiseReport.imageButtonVisible) {
+												console.log("Enter heree....")
 												content = "<td><button type='button' class='btn btn-info' onclick='DeliveryWiseReport.showModalPopup($(\"#imagesModal\"),\""
 														+ invoiceWiseReport.pid
 														+ "\",0);'>View Images</button></td>";
@@ -117,7 +120,9 @@ if (!this.DeliveryWiseReport) {
 																	invoiceWiseReport.sendDate,
 																	'MMM DD YYYY, h:mm:ss a')
 															
-															+ "</td></tr>");
+															+ "</td>"
+															+ content
+															+"</tr>");
 											
 										});
 

@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +41,14 @@ import com.orderfleet.webapp.domain.InventoryVoucherDetail;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
 import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.FileManagerService;
@@ -86,6 +89,9 @@ public class InventoryVoucherBatchDetailController {
 	@Inject
 	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
 
+	@Inject
+	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
+
 	private final Logger log = LoggerFactory.getLogger(InventoryVoucherBatchDetailController.class);
 
 	/**
@@ -110,8 +116,15 @@ public class InventoryVoucherBatchDetailController {
 	public ResponseEntity<List<InvoiceDTO>> sendInviceDetails(@RequestParam(required = false) String accountPid) {
 		log.debug("API request to fetch Customers Invoice Details (sales)");
 
-		String docPid = "DOC-KKcTOuI90C1522998462406";
-		String documentPid = "DOC-nx6mcvKb9G1653966130937";
+		List<String> documentPid = primarySecondaryDocumentRepository
+				.findByVoucherTypeAndCompanyId(VoucherType.DELIVERY).stream().map(doc -> doc.getDocument().getPid())
+				.collect(Collectors.toList());
+
+		List<String> docPid = primarySecondaryDocumentRepository
+				.findByVoucherTypeAndCompanyId(VoucherType.PRIMARY_SALES).stream()
+				.map(doc -> doc.getDocument().getPid()).collect(Collectors.toList());
+
+		System.out.println("docPid:" + docPid + "documentPid :" + documentPid);
 		List<InvoiceDTO> invoiceDto = new ArrayList<>();
 
 		List<String> accountPids = new ArrayList<>();
@@ -137,25 +150,26 @@ public class InventoryVoucherBatchDetailController {
 		List<InventoryVoucherHeader> deliveryVoucher = new ArrayList<>();
 		if (exeIds.size() > 0) {
 
-			inventoryVouchers = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionsIdInAndDocumentPid(exeIds,
-					docPid);
-			deliveryVoucher = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionIdInAndDocumentsPid(exeIds,
+			inventoryVouchers = inventoryVoucherHeaderRepository
+					.findByExecutiveTaskExecutionsIdInAndDocumentPidIn(exeIds, docPid);
+			deliveryVoucher = inventoryVoucherHeaderRepository.findByExecutiveTaskExecutionIdInAndDocumentsPidIn(exeIds,
 					documentPid);
 		}
 
+		System.out.println("Size :"+inventoryVouchers.size() +"   "+deliveryVoucher.size());
 		List<Long> ivId = deliveryVoucher.stream().map(dv -> dv.getId()).collect(Collectors.toList());
 		List<InventoryVoucherDetail> invDetail = new ArrayList<>();
 		if (ivId.size() > 0) {
 			invDetail = inventoryVoucherDetailRepository.findByInventoryHeaderIdIn(ivId);
 		}
-		
+
 		for (InventoryVoucherDetail obj1 : invDetail) {
-			if(obj1.getReferenceInvoiceNo() != null) {
+			if (obj1.getReferenceInvoiceNo() != null) {
 				Object[] ivh = inventoryVouchers.stream()
 						.filter(abc -> abc[0].toString().equals(obj1.getReferenceInvoiceNo())).findAny().get();
 				inventoryVouchers.remove(ivh);
 			}
-   
+
 		}
 
 		List<Object[]> inventory = inventoryVouchers.stream().limit(5).collect(Collectors.toList());
@@ -178,13 +192,14 @@ public class InventoryVoucherBatchDetailController {
 
 			}
 		}
+		invoiceDto.forEach(ab->System.out.println("inviceDTO :"+invoiceDto.toString()));
 		return new ResponseEntity<>(invoiceDto, HttpStatus.OK);
 
 	}
 
 	@Transactional
 	@RequestMapping(value = "/upload/invoiceimage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> uploadAttendanceImageFile(@RequestParam("imageRefNo") String imageRefNo,
+	public ResponseEntity<?> uploadDeliveryImageFile(@RequestParam("imageRefNo") String imageRefNo,
 			@RequestParam("file") MultipartFile file) {
 		log.debug("Request Inventory Image to upload a file : {}", file);
 		if (file.isEmpty()) {

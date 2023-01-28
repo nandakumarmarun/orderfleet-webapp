@@ -135,6 +135,7 @@ public class InvoiceWiseReportView {
 		this.withCustomer = executiveTaskExecution.getWithCustomer();
 		this.setDescription(executiveTaskExecution.getAccountProfile().getDescription());
 		
+		
 	}
 
 	public InvoiceWiseReportView(String pid, LocalDateTime createdDate, LocalDateTime plannedDate,
@@ -148,7 +149,7 @@ public class InvoiceWiseReportView {
 			BigDecimal towerLatitude, BigDecimal towerLongitude, String employeeName, String towerLocation,
 			double totalRecieptAmount, double totalSalesOrderAmount, LocalDateTime punchInDate,
 			boolean mockLocationStatus, boolean withCustomer, String description, String vehicleRegistrationNumber,
-			String vehiclename) {
+			String vehiclename,boolean imageButtonVisible) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -190,6 +191,8 @@ public class InvoiceWiseReportView {
 		this.description = description;
 		this.vehicleRegistrationNumber = vehicleRegistrationNumber;
 		this.vehiclename = vehiclename;
+		this.imageButtonVisible = imageButtonVisible;
+		
 	}
 
 	public String getVehicleRegistrationNumber() {
@@ -525,6 +528,14 @@ public class InvoiceWiseReportView {
 
 	public void setInvoiceNo(String invoiceNo) {
 		this.invoiceNo = invoiceNo;
+	}
+
+	public Boolean getImageButtonVisible() {
+		return imageButtonVisible;
+	}
+
+	public void setImageButtonVisible(Boolean imageButtonVisible) {
+		this.imageButtonVisible = imageButtonVisible;
 	}
 
 	@Override
