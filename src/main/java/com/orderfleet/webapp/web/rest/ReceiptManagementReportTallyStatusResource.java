@@ -166,60 +166,60 @@ public class ReceiptManagementReportTallyStatusResource {
 			Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
 			userIds.add(currentUserId);
 			Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserIdIn(userIds);
-//			List<Object[]> accountPidNames = locationAccountProfileRepository
-//			.findAccountProfilesByLocationIdIn(locationIds);
-//	int size = accountPidNames.size();
-//	List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>(size);
-//	for (int i = 0; i < size; i++) {
-//		AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
-//		accountProfileDTO.setPid(accountPidNames.get(i)[0].toString());
-//		accountProfileDTO.setName(accountPidNames.get(i)[1].toString());
-//		accountProfileDTOs.add(accountProfileDTO);
-//	}
 
-			Set<BigInteger> apIds = locationAccountProfileRepository
-					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+			List<Object[]> accountPidNames = locationAccountProfileRepository
+					.findAccountProfilesByLocationIdIn(locationIds);
+         	List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
+			for (Object[] AcDTo : accountPidNames) {
+				AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
+				accountProfileDTO.setPid(AcDTo[0].toString());
+				accountProfileDTO.setName(AcDTo[1].toString());
+				accountProfileDTOs.add(accountProfileDTO);
+			}
 
-			Set<Long> accountProfileIds = new HashSet<>();
-
-			for (BigInteger apId : apIds) {
-				accountProfileIds.add(apId.longValue());
-			}
-			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id1 = "AP_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description1 = "get all by compId and IdsIn";
-			LocalDateTime startLCTime1 = LocalDateTime.now();
-			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-			String startDate1 = startLCTime1.format(DATE_FORMAT1);
-			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-			List<AccountProfile> accountProfiles = accountProfileRepository
-					.findAllByCompanyIdAndIdsIn(accountProfileIds);
-			String flag1 = "Normal";
-			LocalDateTime endLCTime1 = LocalDateTime.now();
-			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-			String endDate1 = startLCTime1.format(DATE_FORMAT1);
-			Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-			long minutes1 = duration1.toMinutes();
-			if (minutes1 <= 1 && minutes1 >= 0) {
-				flag1 = "Fast";
-			}
-			if (minutes1 > 1 && minutes1 <= 2) {
-				flag1 = "Normal";
-			}
-			if (minutes1 > 2 && minutes1 <= 10) {
-				flag1 = "Slow";
-			}
-			if (minutes1 > 10) {
-				flag1 = "Dead Slow";
-			}
-			logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
-					+ "," + description1);
-			// remove duplicates
-			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
-
-			List<AccountProfileDTO> accountProfileDTOs = accountProfileMapper
-					.accountProfilesToAccountProfileDTOs(result);
+//			Set<BigInteger> apIds = locationAccountProfileRepository
+//					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+//
+//			Set<Long> accountProfileIds = new HashSet<>();
+//
+//			for (BigInteger apId : apIds) {
+//				accountProfileIds.add(apId.longValue());
+//			}
+//			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+//			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//			String id1 = "AP_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+//			String description1 = "get all by compId and IdsIn";
+//			LocalDateTime startLCTime1 = LocalDateTime.now();
+//			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+//			String startDate1 = startLCTime1.format(DATE_FORMAT1);
+//			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+//			List<AccountProfile> accountProfiles = accountProfileRepository
+//					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+//			String flag1 = "Normal";
+//			LocalDateTime endLCTime1 = LocalDateTime.now();
+//			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+//			String endDate1 = startLCTime1.format(DATE_FORMAT1);
+//			Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+//			long minutes1 = duration1.toMinutes();
+//			if (minutes1 <= 1 && minutes1 >= 0) {
+//				flag1 = "Fast";
+//			}
+//			if (minutes1 > 1 && minutes1 <= 2) {
+//				flag1 = "Normal";
+//			}
+//			if (minutes1 > 2 && minutes1 <= 10) {
+//				flag1 = "Slow";
+//			}
+//			if (minutes1 > 10) {
+//				flag1 = "Dead Slow";
+//			}
+//			logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
+//					+ "," + description1);
+//			// remove duplicates
+//			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+//
+//			List<AccountProfileDTO> accountProfileDTOs = accountProfileMapper
+//					.accountProfilesToAccountProfileDTOs(result);
 			model.addAttribute("accounts", accountProfileDTOs);
 		}
 		model.addAttribute("documents",
@@ -278,7 +278,7 @@ public class ReceiptManagementReportTallyStatusResource {
 				updateReciept = false;
 			}
 			model.addAttribute("updateReciept", updateReciept);
-		}             
+		}
 		return "company/receiptManagement";
 	}
 
