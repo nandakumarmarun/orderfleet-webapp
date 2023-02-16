@@ -190,64 +190,44 @@ public class ProductProfileFocusUploadService {
 				log.info("Sync completed in {} ms", elapsedTime);
 			}
 
+
 	private void saveUpdateProductGroupProduct(List<TPProductGroupProductDTO> productGroupProductDTOs) {
-		// TODO Auto-generated method stub
-		log.info("Saving Product Group Products.........");
+		log.debug("Saving Product Group Products : ");
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
+		log.debug("Login details : " +"["+ companyId + "," + company.getLegalName()+"]");
+		log.debug("initializing session Registries");
 		List<ProductGroupProduct> newProductGroupProducts = new ArrayList<>();
-		List<ProductGroupProduct> productGroupProducts = productGroupProductRepository
-				.findAllByCompanyPid(company.getPid());
-
-		// delete all assigned location account profile from tally
-		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
+		log.debug("Clearing Existing Association");
+		productGroupProductRepository.deleteByCompany(companyId);
+		log.debug("Fetching product profiles");
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+		log.debug("Fetching product Groups");
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
-		List<Long> productGroupProductsIds = new ArrayList<>();
-
-		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
+		log.debug("Processing With New data");
+		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs)
+		{
 			ProductGroupProduct productGroupProduct = new ProductGroupProduct();
-			// find location
-
 			Optional<ProductGroup> opPg = productGroups.stream()
 					.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findFirst();
-			// find accountprofile
-			// System.out.println(loc.get()+"===Location");
-
 			Optional<ProductProfile> opPp = productProfiles.stream()
 					.filter(pp -> pgpDto.getProductName().equals(pp.getName())).findFirst();
-			if (opPp.isPresent()) {
-				List<Long> productGroupProductIds = productGroupProducts.stream()
-						.filter(pgp -> opPp.get().getPid().equals(pgp.getProduct().getPid())).map(pgp -> pgp.getId())
-						.collect(Collectors.toList());
-				if (productGroupProductIds.size() != 0) {
-					productGroupProductsIds.addAll(productGroupProductIds);
-				}
-				if (opPg.isPresent()) {
-					productGroupProduct.setProductGroup(opPg.get());
-				} else if (opPp.isPresent()) {
-					productGroupProduct.setProductGroup(productGroups.get(0));
-				}
+			if (opPp.isPresent() && opPg.isPresent())
+			{
+				productGroupProduct.setProductGroup(opPg.get());
 				productGroupProduct.setProduct(opPp.get());
 				productGroupProduct.setCompany(company);
 				newProductGroupProducts.add(productGroupProduct);
 			}
 		}
-		if (productGroupProductsIds.size() != 0) {
-			productGroupProductRepository.deleteByIdIn(companyId, productGroupProductsIds);
-		}
-
-		productGroupProductRepository.save(newProductGroupProducts);
-
+		log.debug("Saving new Product Group product Association");
+		List<ProductGroupProduct> result = productGroupProductRepository.save(newProductGroupProducts);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
-
 		log.info("Sync completed in {} ms", elapsedTime);
-
-		
 	}
+
 
 	private void saveUpdateProductGroups(List<ProductGroupDTO> productGroupDtos) {
 		// TODO Auto-generated method stub
