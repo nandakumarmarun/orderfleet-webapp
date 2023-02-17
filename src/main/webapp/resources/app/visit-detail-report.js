@@ -98,6 +98,8 @@ if (!this.InvoiceWiseReport) {
 																			invoiceWiseReport.attndncTime,
 																			'MMM DD YYYY,h:mm:ss a')
 																	+ "</td></tr>");
+											if(invoiceWiseReport.visitDetailReportView!= null)
+												{
 											$
 											.each(
 													 invoiceWiseReport.visitDetailReportView,
@@ -139,7 +141,7 @@ if (!this.InvoiceWiseReport) {
 																	+ " </div></td></tr>");
 													});
 											
-
+												}
 										});
 
 

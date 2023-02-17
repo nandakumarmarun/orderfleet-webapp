@@ -70,6 +70,7 @@ import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.UserActivity;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
+import com.orderfleet.webapp.domain.enums.AttendanceStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.LocationType;
@@ -161,7 +162,7 @@ public class VisitDetailReportResource {
 
 	@Inject
 	private AttendanceRepository attendanceRepository;
-	
+
 	@Inject
 	private AccountingVoucherDetailRepository accountingVoucherDetailRepository;
 
@@ -192,7 +193,7 @@ public class VisitDetailReportResource {
 			@RequestParam String fromDate, @RequestParam String toDate, @RequestParam boolean inclSubordinate) {
 
 		List<Document> documents = primarySecondaryDocumentRepository.findAllDocumentsByCompanyId();
-		System.out.println("Documents :"+documents.isEmpty());
+		System.out.println("Documents :" + documents.isEmpty());
 		if (documents.isEmpty()) {
 			return null;
 		}
@@ -232,12 +233,12 @@ public class VisitDetailReportResource {
 		if (etExtecutions.isEmpty()) {
 			return null;
 		}
-     
+
 		Map<String, List<Long>> employeeWiseGrouped = etExtecutions.stream().collect(Collectors.groupingBy(
 				obj -> (String) obj[1], TreeMap::new, Collectors.mapping(ete -> (Long) ete[0], Collectors.toList())));
 
 		List<Long> eteIds = employeeWiseGrouped.values().stream().flatMap(List::stream).collect(Collectors.toList());
- 
+
 		log.info("Finding Visit Details");
 		List<Object[]> visitDetails = new ArrayList<>();
 		if (eteIds.size() > 0) {
@@ -251,7 +252,7 @@ public class VisitDetailReportResource {
 			inventoryVouchers = inventoryVoucherHeaderRepository.findByDocumentsAndExecutiveTaskIdIn(documents, eteIds);
 
 		}
-		
+
 		log.info("Finding  Inventory Vouchers...");
 		List<Object[]> ivhDtos = new ArrayList<>();
 		if (eteIds.size() > 0) {
@@ -267,44 +268,40 @@ public class VisitDetailReportResource {
 		if (ivhPids.size() > 0) {
 			ivDetails = inventoryVoucherDetailRepository.findAllByInventoryVoucherHeaderPidIn(ivhPids);
 		}
-		
+
 		log.info("Finding executive Task execution Accounting Vouchers...");
 		List<Object[]> accountingVouchers = new ArrayList<>();
 		if (eteIds.size() > 0) {
 			accountingVouchers = accountingVoucherHeaderRepository.findByExecutiveTaskExecutionsIdIn(eteIds);
 
 		}
-		
+
 		List<AccountingVoucherHeader> accountingHeader = accountingVoucherHeaderRepository
 				.findByExecutiveTaskExecutionIdIn(eteIds);
 		List<Long> accId = accountingHeader.stream().map(acc -> acc.getId()).collect(Collectors.toList());
-		List<Object[]> netCollectionAmountCash= new ArrayList<>();
-		List<Object[]> netCollectionAmountCheque=new ArrayList<>();
+		List<Object[]> netCollectionAmountCash = new ArrayList<>();
+		List<Object[]> netCollectionAmountCheque = new ArrayList<>();
 		List<Object[]> netCollectionAmountRtgs = new ArrayList<>();
-		
-		if(!accId.isEmpty())
-		{
-		log.info("Finding executive Task execution Accounting Vouchers Details...");
-		netCollectionAmountCash = accountingVoucherDetailRepository
-				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCash(accId,
-						PaymentMode.Cash);
-		netCollectionAmountCheque = accountingVoucherDetailRepository
-				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCheque(accId,
-						PaymentMode.Cheque);
-		
-		 netCollectionAmountRtgs = accountingVoucherDetailRepository
-				.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeRtgs(accId,
-						PaymentMode.RTGS);
+
+		if (!accId.isEmpty()) {
+			log.info("Finding executive Task execution Accounting Vouchers Details...");
+			netCollectionAmountCash = accountingVoucherDetailRepository
+					.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCash(accId, PaymentMode.Cash);
+			netCollectionAmountCheque = accountingVoucherDetailRepository
+					.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeCheque(accId, PaymentMode.Cheque);
+
+			netCollectionAmountRtgs = accountingVoucherDetailRepository
+					.findnetCollectionAmountByUserIdandDateBetweenAndPaymentModeRtgs(accId, PaymentMode.RTGS);
 		}
-		
+
 		List<Object[]> accountProfile = new ArrayList<>();
 		accountProfile = accountProfileRepository.findByUserIdInAndDateBetween(userIds, fromDate, toDate);
 
 		log.info("Finding Attendance details.......");
 		List<Object[]> attendance = new ArrayList<>();
 		attendance = attendanceRepository.findByUserIdInAndDateBetween(userIds, fromDate, toDate);
-		
-		log.info("executive task execution looping started :");
+
+		log.info("executive task execution looping started ");
 		List<VisitReportView> visitReportView = new ArrayList<>();
 
 		for (Map.Entry<String, List<Long>> entry : employeeWiseGrouped.entrySet()) {
@@ -316,13 +313,13 @@ public class VisitDetailReportResource {
 
 			String employeeName = entry.getKey();
 			visitreport.setEmployeeName(employeeName);
-			
+
 			for (Object[] obj : attendance) {
 				if (obj[2].toString().equals(employeeName)) {
 
 					LocalDateTime attTime = LocalDateTime.parse(obj[1].toString());
 					visitreport.setRoute(obj[0].toString());
-				    visitreport.setAttndncTime(attTime);
+					visitreport.setAttndncTime(attTime);
 				}
 			}
 
@@ -366,24 +363,18 @@ public class VisitDetailReportResource {
 
 			}
 
-			for(Object[] obj:netCollectionAmountCash)
-			{
-				if(obj[1].toString().equals(employeeName))
-				{
+			for (Object[] obj : netCollectionAmountCash) {
+				if (obj[1].toString().equals(employeeName)) {
 					executiveView.setTotalCash(Double.valueOf(obj[0].toString()));
 				}
 			}
-			for(Object[] obj:netCollectionAmountCheque)
-			{
-				if(obj[1].toString().equals(employeeName))
-				{
+			for (Object[] obj : netCollectionAmountCheque) {
+				if (obj[1].toString().equals(employeeName)) {
 					executiveView.setTotalCheque(Double.valueOf(obj[0].toString()));
 				}
 			}
-			for(Object[] obj:netCollectionAmountRtgs)
-			{
-				if(obj[1].toString().equals(employeeName))
-				{
+			for (Object[] obj : netCollectionAmountRtgs) {
+				if (obj[1].toString().equals(employeeName)) {
 					executiveView.setTotalRtgs(Double.valueOf(obj[0].toString()));
 				}
 			}
@@ -399,6 +390,39 @@ public class VisitDetailReportResource {
 
 		}
 
+		log.info("Employees without Transaction attendance details");
+		Set<String> transactionEmployees = employeeWiseGrouped.keySet();
+		Set<String> presentEmployee = attendanceRepository.findUserIdInAndDateBetweenAndAttendanceStatus(userIds,
+				fromDate, toDate, AttendanceStatus.PRESENT);
+
+		// Prepare a union
+		Set<String> union = new HashSet<>(transactionEmployees);
+		union.addAll(presentEmployee);
+		// Prepare an intersection
+		Set<String> intersection = new HashSet<String>(transactionEmployees);
+		intersection.retainAll(presentEmployee);
+		// Subtract the intersection from the union
+		union.removeAll(intersection);
+
+		for (String name : union) {
+
+			for (Object[] obj : attendance) {
+
+				if (name.equals(obj[2].toString())) {
+
+					VisitReportView visitreport = new VisitReportView();
+					visitreport.setEmployeeName(name);
+					LocalDateTime attTime = LocalDateTime.parse(obj[1].toString());
+					visitreport.setRoute(obj[0].toString());
+					visitreport.setAttndncTime(attTime);
+					visitReportView.add(visitreport);
+
+				}
+
+			}
+		}
+
+		log.info("executive task execution looping ended");
 		return visitReportView;
 
 	}
@@ -438,7 +462,7 @@ public class VisitDetailReportResource {
 
 		String[] headerColumns = { "Employee", "Route", "Atendance MarkedTime", "First Visit Time", "Last Visit Time",
 				"Total Visit", "First SO Time", "Last SO Time", "Total SO", "New Ledger Created", "Total KG",
-				"Total Value", "Total Collection value","Total Cash","Total Cheque","Total RtgsAmount" };
+				"Total Value", "Total Collection value", "Total Cash", "Total Cheque", "Total RtgsAmount" };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
@@ -477,69 +501,69 @@ public class VisitDetailReportResource {
 			row.createCell(0).setCellValue(executivetask.getEmployeeName());
 
 			row.createCell(1).setCellValue(executivetask.getRoute());
-			if(executivetask.getAttndncTime()!=null)
-			{
-			LocalDateTime localDateTime = executivetask.getAttndncTime();
-			Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-			Date date = Date.from(i);
-			HSSFCell attndncDateCell = row.createCell(2);
-			attndncDateCell.setCellValue(date);
-			attndncDateCell.setCellStyle(dateCellStyle);
+			if (executivetask.getAttndncTime() != null) {
+				LocalDateTime localDateTime = executivetask.getAttndncTime();
+				Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+				Date date = Date.from(i);
+				HSSFCell attndncDateCell = row.createCell(2);
+				attndncDateCell.setCellValue(date);
+				attndncDateCell.setCellStyle(dateCellStyle);
 			}
-			for (VisitDetailReportView vdrv : executivetask.getVisitDetailReportView()) {
-				if (vdrv.getFirstVisitTime() != null) {
-					LocalDateTime abc = vdrv.getFirstVisitTime();
-					Instant it = abc.atZone(ZoneId.systemDefault()).toInstant();
-					Date firstVisit = Date.from(it);
-					HSSFCell firstVisitDateCell = row.createCell(3);
-					firstVisitDateCell.setCellValue(firstVisit);
-					firstVisitDateCell.setCellStyle(dateCellStyle);
+			if (executivetask.getVisitDetailReportView() != null) {
+				for (VisitDetailReportView vdrv : executivetask.getVisitDetailReportView()) {
+					if (vdrv.getFirstVisitTime() != null) {
+						LocalDateTime abc = vdrv.getFirstVisitTime();
+						Instant it = abc.atZone(ZoneId.systemDefault()).toInstant();
+						Date firstVisit = Date.from(it);
+						HSSFCell firstVisitDateCell = row.createCell(3);
+						firstVisitDateCell.setCellValue(firstVisit);
+						firstVisitDateCell.setCellStyle(dateCellStyle);
+					}
+
+					LocalDateTime xyz = vdrv.getLastVisitTime();
+					Instant inst = xyz.atZone(ZoneId.systemDefault()).toInstant();
+					Date lastVisit = Date.from(inst);
+					HSSFCell lastVisitDateCell = row.createCell(4);
+					lastVisitDateCell.setCellValue(lastVisit);
+					lastVisitDateCell.setCellStyle(dateCellStyle);
+
+					row.createCell(5).setCellValue(vdrv.getTotalVisit());
+
+					HSSFCell firstsoDateCell = row.createCell(6);
+					if (vdrv.getFirstSoTime() != null) {
+						LocalDateTime fs = vdrv.getFirstSoTime();
+						Instant insta = fs.atZone(ZoneId.systemDefault()).toInstant();
+						Date firstso = Date.from(insta);
+						firstsoDateCell.setCellValue(firstso);
+						firstsoDateCell.setCellStyle(dateCellStyle);
+					} else {
+						firstsoDateCell.setCellValue("");
+					}
+
+					HSSFCell lastsoDateCell = row.createCell(7);
+					if (vdrv.getLastSoTime() != null) {
+						LocalDateTime ls = vdrv.getLastSoTime();
+						Instant ista = ls.atZone(ZoneId.systemDefault()).toInstant();
+						Date lastso = Date.from(ista);
+						lastsoDateCell.setCellValue(lastso);
+						lastsoDateCell.setCellStyle(dateCellStyle);
+					} else {
+						lastsoDateCell.setCellValue("");
+					}
+					row.createCell(8).setCellValue(vdrv.getTotalSo());
+					if (vdrv.getLedgerCount() != null) {
+						row.createCell(9).setCellValue(vdrv.getLedgerCount());
+					} else {
+						row.createCell(9).setCellValue(0);
+					}
+					row.createCell(10).setCellValue(vdrv.getTotalKG());
+					row.createCell(11).setCellValue(vdrv.getTotalSaleOrderAmount());
+					row.createCell(12).setCellValue(vdrv.getTotalReceiptAmount());
+					row.createCell(13).setCellValue(vdrv.getTotalCash());
+					row.createCell(14).setCellValue(vdrv.getTotalCheque());
+					row.createCell(15).setCellValue(vdrv.getTotalRtgs());
+
 				}
-
-				LocalDateTime xyz = vdrv.getLastVisitTime();
-				Instant inst = xyz.atZone(ZoneId.systemDefault()).toInstant();
-				Date lastVisit = Date.from(inst);
-				HSSFCell lastVisitDateCell = row.createCell(4);
-				lastVisitDateCell.setCellValue(lastVisit);
-				lastVisitDateCell.setCellStyle(dateCellStyle);
-
-				row.createCell(5).setCellValue(vdrv.getTotalVisit());
-
-				HSSFCell firstsoDateCell = row.createCell(6);
-				if (vdrv.getFirstSoTime() != null) {
-					LocalDateTime fs = vdrv.getFirstSoTime();
-					Instant insta = fs.atZone(ZoneId.systemDefault()).toInstant();
-					Date firstso = Date.from(insta);
-					firstsoDateCell.setCellValue(firstso);
-					firstsoDateCell.setCellStyle(dateCellStyle);
-				} else {
-					firstsoDateCell.setCellValue("");
-				}
-
-				HSSFCell lastsoDateCell = row.createCell(7);
-				if (vdrv.getLastSoTime() != null) {
-					LocalDateTime ls = vdrv.getLastSoTime();
-					Instant ista = ls.atZone(ZoneId.systemDefault()).toInstant();
-					Date lastso = Date.from(ista);
-					lastsoDateCell.setCellValue(lastso);
-					lastsoDateCell.setCellStyle(dateCellStyle);
-				} else {
-					lastsoDateCell.setCellValue("");
-				}
-				row.createCell(8).setCellValue(vdrv.getTotalSo());
-				if (vdrv.getLedgerCount() != null) {
-					row.createCell(9).setCellValue(vdrv.getLedgerCount());
-				} else {
-					row.createCell(9).setCellValue(0);
-				}
-				row.createCell(10).setCellValue(vdrv.getTotalKG());
-				row.createCell(11).setCellValue(vdrv.getTotalSaleOrderAmount());
-				row.createCell(12).setCellValue(vdrv.getTotalReceiptAmount());
-				row.createCell(13).setCellValue(vdrv.getTotalCash());
-				row.createCell(14).setCellValue(vdrv.getTotalCheque());
-				row.createCell(15).setCellValue(vdrv.getTotalRtgs());
-				
-
 			}
 		}
 	}

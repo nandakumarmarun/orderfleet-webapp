@@ -123,6 +123,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 		@Transactional
 		@Query("UPDATE Attendance attendance SET attendance.attendaceLogUpload = 'true'  WHERE  attendance.company.id = ?#{principal.companyId}  AND attendance.pid in ?1")
 		int updateAttendaceLogIsUploadedUsingPid(List<String> attendancePids);
+
+		@Query("select ep.name from Attendance attendance inner join EmployeeProfile ep on attendance.user.id=ep.user.id where attendance.user.id in ?1 and attendance.createdDate between ?2 and ?3 and attendance.attendanceStatus = ?4")
+       Set<String> findUserIdInAndDateBetweenAndAttendanceStatus(List<Long> userIds, LocalDateTime fromDate,
+				LocalDateTime toDate, AttendanceStatus attendanceStatus);
 	 
 	
 	/*
