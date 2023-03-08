@@ -24,7 +24,8 @@ if (!this.Activity) {
 		contactManagement : null,
 		geoFencing : null,
 		hasTelephonicOrder : null,
-		emailTocomplaint : null
+		emailTocomplaint : null,
+		locationRadius : null
 	};
 
 	// Specify the validation rules
@@ -168,6 +169,7 @@ if (!this.Activity) {
 				.prop("checked");
 		activityModel.emailTocomplaint = $('#emailTocomplaint')
 		.prop("checked");
+		activityModel.locationRadius =$('#field_locationRadius').val();
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -258,6 +260,9 @@ if (!this.Activity) {
 								data.targetDisplayOnDayplan);
 						$("#emailTocomplaint").prop("checked",
 								data.emailTocomplaint);
+						$('#field_locationRadius').val(
+							      (data.locationRadius == null ? ""
+							            : data.locationRadius));
 						// set pid
 						activityModel.pid = data.pid;
 					},

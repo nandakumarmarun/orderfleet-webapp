@@ -66,6 +66,8 @@ public class ActivityDTO {
 	private boolean geoFencing;
 	
 	private boolean hasTelephonicOrder;
+	
+	private Double locationRadius;
 
 
 
@@ -97,6 +99,7 @@ public class ActivityDTO {
 		this.companyPid = activity.getCompany().getPid();
 		this.companyName = activity.getCompany().getLegalName();
 		this.contactManagement = activity.getContactManagement();
+		this.locationRadius = activity.getLocationRadius();
 	}
 
 	public ActivityDTO(Activity activity, boolean saveActivityDuration, boolean planThrouchOnly,
@@ -113,6 +116,7 @@ public class ActivityDTO {
 		this.hasSecondarySales = activity.getHasSecondarySales();
 		this.geoFencing = activity.getGeoFencing();
 		this.hasTelephonicOrder = activity.getHasTelephonicOrder();
+		this.locationRadius = activity.getLocationRadius();
 
 
 		
@@ -314,6 +318,14 @@ public class ActivityDTO {
 
 	public void setEmailTocomplaint(boolean emailTocomplaint) {
 		this.emailTocomplaint = emailTocomplaint;
+	}
+
+	public Double getLocationRadius() {
+		return locationRadius;
+	}
+
+	public void setLocationRadius(Double locationRadius) {
+		this.locationRadius = locationRadius;
 	}
 
 	@Override

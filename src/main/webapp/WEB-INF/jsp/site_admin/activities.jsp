@@ -42,14 +42,14 @@
 				</div>
 
 				<div class="col-sm-4">
-				<div class="col-sm-8">
-					<select id="field_mainCompany" name="mainCompanyPid"
-						class="form-control selectpicker" data-live-search="true"><option value="-1">Select
-							Company</option>
-						<c:forEach items="${companies}" var="company">
-							<option value="${company.pid}">${company.legalName}</option>
-						</c:forEach>
-					</select>
+					<div class="col-sm-8">
+						<select id="field_mainCompany" name="mainCompanyPid"
+							class="form-control selectpicker" data-live-search="true"><option
+								value="-1">Select Company</option>
+							<c:forEach items="${companies}" var="company">
+								<option value="${company.pid}">${company.legalName}</option>
+							</c:forEach>
+						</select>
 					</div>
 				</div>
 
@@ -131,9 +131,9 @@
 										maxlength="55" placeholder="Alias" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="contactManagement">Contact Management</label>
-									<select id="contactManagement" name="contactManagementStatus"
-										class="form-control">
+									<label class="control-label" for="contactManagement">Contact
+										Management</label> <select id="contactManagement"
+										name="contactManagementStatus" class="form-control">
 										<option value="ENABLED">ENABLED</option>
 										<option value="DISABLED">DISABLED</option>
 										<option value="HIDDEN">HIDDEN</option>
@@ -163,24 +163,29 @@
 										style="width: 4%;" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="geoFencing">Geo Fencing
-										</label> <input type="checkbox" class="form-control"
-										name="geoFencing" id="geoFencing"
-										style="width: 4%;" />
+									<label class="control-label" for="geoFencing">Geo
+										Fencing </label> <input type="checkbox" class="form-control"
+										name="geoFencing" id="geoFencing" style="width: 4%;" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="hasTelephonicOrder">Has Telephonic Order
-										</label> <input type="checkbox" class="form-control"
+									<label class="control-label" for="hasTelephonicOrder">Has
+										Telephonic Order </label> <input type="checkbox" class="form-control"
 										name="hasTelephonicOrder" id="hasTelephonicOrder"
 										style="width: 4%;" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="emailTocomplaint">Email To Complaint
-										</label> <input type="checkbox" class="form-control"
+									<label class="control-label" for="emailTocomplaint">Email
+										To Complaint </label> <input type="checkbox" class="form-control"
 										name="emailTocomplaint" id="emailTocomplaint"
 										style="width: 4%;" />
 								</div>
-								
+								<div class="form-group">
+									<label class="control-label" for="field_locationRadius">Location
+										Radius </label> <input type="number" class="form-control"
+										name="locationRadius" id="field_locationRadius" max="10000"
+										placeholder="Location Radius" />
+								</div>
+
 								<div class="form-group">
 									<label class="control-label" for="field_description">Description</label>
 									<textarea class="form-control" name="description"

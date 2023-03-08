@@ -25,7 +25,8 @@ if (!this.Activity) {
 		contactManagement : null,
 		geoFencing : null,
 		hasTelephonicOrder : null,
-		emailTocomplaint : null
+		emailTocomplaint : null,
+		locationRadius : null
 	};
 
 	// Specify the validation rules
@@ -245,6 +246,7 @@ if (!this.Activity) {
 		activityModel.completePlans = $('#completePlans').prop("checked");
 		activityModel.targetDisplayOnDayplan = $('#targetDisplayOnDayplan')
 				.prop("checked");
+		activityModel.locationRadius =$('#field_locationRadius').val();
 		activityModel.companyPid = $('#field_company').val();
 
 		$.ajax({
@@ -336,7 +338,9 @@ if (!this.Activity) {
 						$("#targetDisplayOnDayplan").prop("checked",
 								data.targetDisplayOnDayplan);
 						$("#field_company").val(data.companyPid);
-						
+						$('#field_locationRadius').val(
+							      (data.locationRadius == null ? ""
+							            : data.locationRadius));
 
 						$("#field_company").prop('disabled', true);
 

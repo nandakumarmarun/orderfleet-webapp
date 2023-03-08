@@ -171,7 +171,13 @@
 										name="emailTocomplaint" id="emailTocomplaint" 
 										style="width: 4%;" />
 								</div>
-								
+								<div class="form-group">
+									<label class="control-label" for="field_locationRadius">Location
+										Radius </label> <input type="number" class="form-control"
+										name="locationRadius" id="field_locationRadius" max="10000"
+										placeholder="Location Radius" />
+								</div>
+
 								<div class="form-group">
 									<label class="control-label" for="field_description">Description</label>
 									<textarea class="form-control" name="description"

@@ -47,6 +47,7 @@ public class ActivityMapperImpl extends ActivityMapper {
 		activityDTO.setPid(activity.getPid());
 		activityDTO.setTargetDisplayOnDayplan(activity.getTargetDisplayOnDayplan());
 		activityDTO.setEmailTocomplaint(activity.getEmailTocomplaint());
+		activityDTO.setLocationRadius(activity.getLocationRadius());
 		return activityDTO;
 	}
 
@@ -77,6 +78,7 @@ public class ActivityMapperImpl extends ActivityMapper {
 		activityDTO.setPid(activity.getPid());
 		activityDTO.setTargetDisplayOnDayplan(activity.getTargetDisplayOnDayplan());
 		activityDTO.setEmailTocomplaint(activity.getEmailTocomplaint());
+		activityDTO.setLocationRadius(activity.getLocationRadius());
 
 		return activityDTO;
 	}
@@ -127,7 +129,7 @@ public class ActivityMapperImpl extends ActivityMapper {
 		activity.setPid(activityDTO.getPid());
 		activity.setTargetDisplayOnDayplan(activityDTO.getTargetDisplayOnDayplan());
 		activity.setEmailTocomplaint(activityDTO.getEmailTocomplaint());
-
+           activity.setLocationRadius(activityDTO.getLocationRadius());
 		return activity;
 	}
 

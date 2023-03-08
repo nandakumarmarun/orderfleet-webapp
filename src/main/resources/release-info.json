@@ -1,7 +1,7 @@
 {
 "release-number" : "1.101.10",
-"release-date" : "06/03/2023",
+"release-date" : "08/03/2023",
 "features" : [
-  "Invoice report without Account Filter"
+  "Invoice report without Account Filter,Activity congiguration"
 ]
 }

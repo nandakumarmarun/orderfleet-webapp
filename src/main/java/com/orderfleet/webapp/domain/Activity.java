@@ -115,6 +115,8 @@ public class Activity implements Serializable {
 	@Column(name = "contact_management", nullable = false, columnDefinition = "varchar(20) DEFAULT 'ENABLED'")
 	private ContactManagement contactManagement;
 
+	@Column(name = "location_radius", columnDefinition = "double precision DEFAULT 0")
+    private double locationRadius;
 	@PreUpdate
 	public void preUpdate() {
 		this.lastModifiedDate = LocalDateTime.now();
@@ -257,6 +259,15 @@ public class Activity implements Serializable {
 
 	public void setEmailTocomplaint(boolean emailTocomplaint) {
 		this.emailTocomplaint = emailTocomplaint;
+	}
+	
+
+	public double getLocationRadius() {
+		return locationRadius;
+	}
+
+	public void setLocationRadius(double locationRadius) {
+		this.locationRadius = locationRadius;
 	}
 
 	@Override
