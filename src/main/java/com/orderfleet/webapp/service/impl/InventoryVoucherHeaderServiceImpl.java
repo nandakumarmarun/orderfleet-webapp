@@ -249,7 +249,7 @@ public class InventoryVoucherHeaderServiceImpl implements InventoryVoucherHeader
 	public Optional<InventoryVoucherHeaderDTO> findOneByPid(String pid) {
 		log.debug("Request to get InventoryVoucherHeader by pid : {}", pid);
 
-		Optional<InventoryVoucherHeaderDTO> ivDTO = inventoryVoucherHeaderRepository.findOneByPid(pid)
+		Optional<InventoryVoucherHeaderDTO> ivDTO = inventoryVoucherHeaderRepository.findByPid(pid)
 				.map(InventoryVoucherHeaderDTO::new);
 
 		return ivDTO;
