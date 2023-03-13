@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Sync Focus Masters</title>
+<title>SalesNrich | Sync Uncle Jhon Masters</title>
 </head>
 <body class="page-body" data-url="">
 	<div class="page-container">
@@ -14,7 +14,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Sync DevSteel Masters</h2>
+			<h2>Sync Uncle John Masters</h2>
 
 			<div class="row">
 				<hr />
