@@ -14,7 +14,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Sync Uncle John Masters</h2>
+			<h2>Sync Masters</h2>
 
 			<div class="row">
 				<hr />
