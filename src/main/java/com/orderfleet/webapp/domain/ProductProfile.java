@@ -209,6 +209,9 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	@Column(name = "rate_Conversion",columnDefinition = "double precision DEFAULT 0")
 	private double RateConversion;
+	
+	@Column(name = "stock_qty" ,columnDefinition = "double precision DEFAULT 0")
+	private double stockQty;
 
 	public Units getUnits() {
 		return units;
@@ -549,6 +552,14 @@ public class ProductProfile implements Serializable, Cloneable {
 
 	public void setRateConversion(double rateConversion) {
 		RateConversion = rateConversion;
+	}
+
+	public double getStockQty() {
+		return stockQty;
+	}
+
+	public void setStockQty(double stockQty) {
+		this.stockQty = stockQty;
 	}
 
 	@Override

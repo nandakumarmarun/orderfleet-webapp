@@ -122,6 +122,8 @@ public class ProductProfileDTO {
 	private double igst;
 
 	private double rateConversion;
+	
+	
 
 	public ProductProfileDTO() {
 		super();
@@ -228,7 +230,7 @@ public class ProductProfileDTO {
 			String productCategoryName, String divisionPid, String divisionName, byte[] colorImage,
 			String colorImageContentType, String size, String filesPid, boolean activated,
 			LocalDateTime lastModifiedDate, String defaultLedger, List<TaxMasterDTO> productProfileTaxMasterDTOs,
-			StockAvailabilityStatus stockAvailabilityStatus, String productGroup, String unitpid, String unitName) {
+			StockAvailabilityStatus stockAvailabilityStatus, String productGroup, String unitpid, String unitName,Double stockQty) {
 		super();
 		this.pid = pid;
 		this.name = name;
@@ -256,6 +258,7 @@ public class ProductProfileDTO {
 		this.productProfileTaxMasterDTOs = productProfileTaxMasterDTOs;
 		this.stockAvailabilityStatus = stockAvailabilityStatus;
 		this.productGroup = productGroup;
+		this.stockQty = stockQty;
 	}
 
 	public String getPid() {
