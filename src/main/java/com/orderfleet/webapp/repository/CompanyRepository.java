@@ -62,11 +62,18 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 	List<Company> findAllByOnPremiseTrue();
 	
 	Optional<Company> findById(Long companyId);
+	
     @Query("select count(company) from Company company where company.activated= true")
 	Integer findcountOfActiveCompany();
     
     @Query("select count(company) from Company company where company.activated= false")
     Integer findcountOfDeactiveCompany();
+
+    @Query("select company from Company company where company.activated = ?1 order by company.legalName asc")
+	List<Company> findAllCompanyByActivated(boolean data);
+
+    @Query("select count(company) from Company company where company.activated= ?1")
+      int findCountOfActiveCompany(boolean data);
    
     
 

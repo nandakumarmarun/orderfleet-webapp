@@ -62,6 +62,8 @@ public interface CompanyService {
 	List<CompanyUserCountDTO> findActiveCompanyName();
 
 	List<CompanyUserCountDTO> findDeactiveCompanyName();
+	
+	List<CompanyViewDTO> findAllCompanyByStatus(boolean data);
 
 	  
 	  

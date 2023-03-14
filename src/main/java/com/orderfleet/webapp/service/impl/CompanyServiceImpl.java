@@ -333,17 +333,18 @@ public class CompanyServiceImpl implements CompanyService {
 
 	public Integer findActiveCompanyCount() {
 		// TODO Auto-generated method stub
-		Integer activeCount=companyRepository.findcountOfActiveCompany();
-		System.out.println("*******"+activeCount);
-		CompanyUserCountDTO cs= new CompanyUserCountDTO();
+		Integer activeCount = companyRepository.findcountOfActiveCompany();
+		System.out.println("*******" + activeCount);
+		CompanyUserCountDTO cs = new CompanyUserCountDTO();
 		cs.setUserCount(activeCount);
-		System.out.println("*******"+cs.getUserCount());
+		System.out.println("*******" + cs.getUserCount());
 		return cs.getUserCount();
 	}
+
 	public Integer findDeactiveCompanyCount() {
 		// TODO Auto-generated method stub
-		Integer deActiveCount=companyRepository.findcountOfDeactiveCompany();
-		CompanyUserCountDTO cs= new CompanyUserCountDTO();
+		Integer deActiveCount = companyRepository.findcountOfDeactiveCompany();
+		CompanyUserCountDTO cs = new CompanyUserCountDTO();
 		cs.setUserCount(deActiveCount);
 		return cs.getUserCount();
 	}
@@ -351,34 +352,41 @@ public class CompanyServiceImpl implements CompanyService {
 	@Override
 	public List<CompanyUserCountDTO> findActiveCompanyName() {
 		// TODO Auto-generated method stub
-		List<String> activeName=companyRepository.findAllCompanyNameByActivatedTrueOrderByCreatedDate();
+		List<String> activeName = companyRepository.findAllCompanyNameByActivatedTrueOrderByCreatedDate();
 		List<CompanyUserCountDTO> activeNames = new ArrayList<>();
-		for(String names:activeName)
-		{
-			CompanyUserCountDTO cucDTO=new CompanyUserCountDTO();
+		for (String names : activeName) {
+			CompanyUserCountDTO cucDTO = new CompanyUserCountDTO();
 			cucDTO.setCompanyName(names);
 			activeNames.add(cucDTO);
 		}
-		
+
 		return activeNames;
 	}
 
 	@Override
 	public List<CompanyUserCountDTO> findDeactiveCompanyName() {
 		// TODO Auto-generated method stub
-		List<String> activeName=companyRepository.findAllCompanyNameByDeActivatedTrueOrderByCreatedDate();
+		List<String> activeName = companyRepository.findAllCompanyNameByDeActivatedTrueOrderByCreatedDate();
 		List<CompanyUserCountDTO> activeNames = new ArrayList<>();
-		for(String names:activeName)
-		{
-			CompanyUserCountDTO cucDTO=new CompanyUserCountDTO();
+		for (String names : activeName) {
+			CompanyUserCountDTO cucDTO = new CompanyUserCountDTO();
 			cucDTO.setCompanyName(names);
 			activeNames.add(cucDTO);
 		}
-		for(CompanyUserCountDTO an:activeNames)
-		{
+		for (CompanyUserCountDTO an : activeNames) {
 			System.out.println(an.getCompanyName());
 		}
 		return activeNames;
+	}
+
+	@Override
+	public List<CompanyViewDTO> findAllCompanyByStatus(boolean data) {
+		log.debug("Request to get companies by status");
+		List<Company> companies = companyRepository.findAllCompanyByActivated(data);
+		List<CompanyViewDTO> result = companies.stream().map(CompanyViewDTO::new).collect(Collectors.toList());
+		
+		System.out.println("List of compnaies :"+result.toString());
+		return result;
 	}
 
 }

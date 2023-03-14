@@ -112,8 +112,43 @@ if (!this.Company) {
 		$('#btnSearchCompany').click(function() {
 			searchTableCompany($("#searchCompany").val());
 		});
+		
+		$('#btnDownload').on('click', function() {
+			var tblCompany = $("#tblCompany tbody");
+			if (tblCompany.children().length == 0) {
+				alert("no values available");
+				return;
+			}
+			if (tblCompany[0].textContent == "No data available") {
+				alert("no values available");
+				return;
+			}
+
+			downloadXls();
+		});
 	});
 
+	function downloadXls() {
+		console.log("Ready to download")
+		// When the stripped button is clicked, clone the existing source
+		var clonedTable = $("#tBodyCompany").clone();
+		// Strip your empty characters from the cloned table (hidden didn't seem
+		// to work since the cloned table isn't visible)
+		clonedTable.find('[style*="display: none"]').remove();
+
+		var excelName = "CompanyList";
+
+		clonedTable.table2excel({
+			// exclude CSS class
+			// exclude : ".odd .even",
+			// name : "Dynamic Document Form",
+			filename : excelName, // do not include extension
+		// fileext : ".xls",
+		// exclude_img : true,
+		// exclude_links : true,
+		// exclude_inputs : true
+		});
+	}
 	function searchTableCompany(inputVal) {
 		var table = $('#tBodyCompany');
 		table.find('tr').each(function(index, row) {
@@ -137,6 +172,7 @@ if (!this.Company) {
 		});
 	}
 
+	
 	function createUpdateCompany(el) {
 		companyModel.legalName = $('#field_legalName').val();
 		companyModel.alias = $('#field_alias').val();
@@ -302,7 +338,34 @@ if (!this.Company) {
 		});
 
 	}
+	
+	Company.onChangeStatus = function() {
+		var status = $('#select_status').val();
+		var data;
 
+		if (status == "Active") {
+			data = true;
+		} else if (status == "Deactive") {
+			data = false;
+		}
+     console.log("Data :"+data)
+		$.ajax({
+			url : companyContextPath + "/get-by-status-filter",
+			type : "GET",
+			data : {
+				data : data
+			},
+			success : function(data) {
+				loadCompanyTables(data);
+			},
+			error : function(xhr, error) {
+				onError(xhr, error);
+			}
+		});
+
+	}
+
+	
 	function loadCompanyTables(companies) {
 
 		$('#tBodyCompany').html(
@@ -316,6 +379,10 @@ if (!this.Company) {
 		}
 
 		$('#tBodyCompany').html("");
+//		$("#lblCount").text("0");
+		console.log("length:"+companies.length)
+		var count = companies.length;
+		$("#lblCount").text(count);
 		$
 				.each(
 						companies,

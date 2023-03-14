@@ -35,6 +35,17 @@
 						</select>
 					</div>
 				</div>
+				<div class="col-sm-4">
+					<div class="form-group col-sm-5">
+						<select id="select_status" name="status"
+							onchange="Company.onChangeStatus();" class="form-control">
+							<option value ="All">All</option>
+							<option value="Active">Activated</option>
+							<option value="Deactive">Deactivated</option>
+
+						</select>
+					</div>
+				</div>
 				<div class="pull-left">
 					<form class="form-inline">
 						<div class="form-group">
@@ -49,15 +60,27 @@
 						</div>
 					</form>
 				</div>
-				<div class="pull-right">
+				 <div class="col-sm-4">
+									<br />
+									<button id="btnDownload" type="button" 
+										class="btn btn-success" >  Download Xls</button>
+								</div> 
+				<div class="col-sm-4 pull-right">
 					<button type="button" class="btn btn-success"
 						onclick="Company.showModalPopup($('#myModal'));">Create
 						new Company</button>
 				</div>
+				<div class="col-md-12 col-sm-12 clearfix"
+					style="font-size: 14px; color: black;">
+					<div class="col-sm-2">
+						<label>Count : </label> <label id="lblCount"></label>
+					</div>
+				</div>
 			</div>
 			<div class="clearfix"></div>
 			<hr />
-			<table class="table  table-striped table-bordered">
+			<table class="table  table-striped table-bordered"
+			id= "tblCompany" >
 				<thead>
 					<tr>
 						<th>Legal Name</th>
@@ -425,5 +448,9 @@
 
 	<spring:url value="/resources/app/company.js" var="companyJs"></spring:url>
 	<script type="text/javascript" src="${companyJs}"></script>
+	
+	<spring:url value="/resources/assets/js/jquery.table2excel.min.js"
+		var="table2excelMin"></spring:url>
+	<script type="text/javascript" src="${table2excelMin}"></script>
 </body>
 </html>

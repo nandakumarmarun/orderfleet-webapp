@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
@@ -34,6 +35,7 @@ import com.orderfleet.webapp.domain.PartnerCompany;
 import com.orderfleet.webapp.domain.State;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.Industry;
+import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.CountryRepository;
 import com.orderfleet.webapp.repository.DistrictRepository;
 import com.orderfleet.webapp.repository.PartnerCompanyRepository;
@@ -43,6 +45,7 @@ import com.orderfleet.webapp.security.AuthoritiesConstants;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.SyncOperationService;
+import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
@@ -72,11 +75,13 @@ public class CompanyManagementResource {
 
 	private SyncOperationService syncOperationService;
 	
+	private CompanyRepository companyRepository;
+	
 
 	@Inject
 	public CompanyManagementResource(DistrictRepository districtRepository, StateRepository stateRepository,
 			CountryRepository countryRepository, CompanyService companyService, UserRepository userRepository,
-			PartnerCompanyRepository partnerCompanyRepository, SyncOperationService syncOperationService) {
+			PartnerCompanyRepository partnerCompanyRepository, SyncOperationService syncOperationService,CompanyRepository companyRepository) {
 		super();
 		this.districtRepository = districtRepository;
 		this.stateRepository = stateRepository;
@@ -85,6 +90,7 @@ public class CompanyManagementResource {
 		this.userRepository = userRepository;
 		this.partnerCompanyRepository = partnerCompanyRepository;
 		this.syncOperationService = syncOperationService;
+		this.companyRepository = companyRepository;
 	}
 
 	/**
@@ -290,5 +296,21 @@ public class CompanyManagementResource {
 		log.debug("Web request to get Companies by industry : {}", industry);
 		List<CompanyViewDTO> companyViewDTOs = companyService.findAllCompanyByIndustrySortedByName(industry);
 		return new ResponseEntity<>(companyViewDTOs, HttpStatus.OK);
+	}
+	
+	@Timed
+	@RequestMapping(value = "/company/get-by-status-filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<CompanyViewDTO>> getCompanyByStatus(@RequestParam boolean data) {
+		log.debug("Web request to filter by status : {}"+data);
+		List<CompanyViewDTO> companyViewDTO = new ArrayList<>();
+		if (data == true ) {
+			companyViewDTO.addAll(companyService.findAllCompanyByStatus(true));
+		}
+		else if(data == false)
+		{
+			companyViewDTO.addAll(companyService.findAllCompanyByStatus(false));
+		}
+		
+		return new ResponseEntity<>(companyViewDTO, HttpStatus.OK);
 	}
 }
