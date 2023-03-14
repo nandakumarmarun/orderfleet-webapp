@@ -1661,14 +1661,28 @@ public class TaskSubmissionPostSave {
 		try {
 			LocalDateTime date = executiveTaskExecution.getDate();
 			lastExecutiveTaskExecution = executiveTaskExecutionRepository
-					.findTop2ByUserPidAndDateBetweenAndLocationTypeInOrderByDateDesc(
+					.findTop4ByUserPidAndDateBetweenAndLocationTypeInOrderByDateDesc(
 							executiveTaskExecution.getUser().getPid(), date.toLocalDate().atTime(0, 0),
 							date.toLocalDate().atTime(23, 59), locationTypes);
 			if (lastExecutiveTaskExecution == null || lastExecutiveTaskExecution.isEmpty()) {
 				return;
 			}
 			int size = lastExecutiveTaskExecution.size();
+
+			log.debug("PrintIng latest Order");
+			log.debug("New One : "+"[ account : "+executiveTaskExecution.getAccountProfile().getName() + " lattitude : " + executiveTaskExecution.getLatitude()+ " longitude : " + executiveTaskExecution.getLongitude()+"]");
+			
 			if (size >= 2) {
+				if (lastExecutiveTaskExecution.size() > 0) {
+					lastExecutiveTaskExecution.remove(0);
+				}
+
+				log.debug("Printing Previous Orders");
+				lastExecutiveTaskExecution.forEach(data->log.debug("[ account : "+data.getAccountProfile().getName() + " lattitude : " + data.getLatitude()+ " longitude : " + data.getLongitude()+"]"));
+				
+
+				System.out.println(executiveTaskExecution.getLatitude());
+				System.out.println(executiveTaskExecution.getLongitude());
 				updateDistanceWithPreviousTaskExecution(executiveTaskExecution, lastExecutiveTaskExecution);
 			} else if (size == 1) {
 				updateDistanceInAttendance(executiveTaskExecution, lastExecutiveTaskExecution);
@@ -1689,27 +1703,80 @@ public class TaskSubmissionPostSave {
 		double kilometers = 0;
 		double metres = 0;
 		Long companyId = executiveTaskExecution.getCompany().getId();
-		if (lastExecutiveTaskExecution.get(1).getLatitude() != null
-				&& lastExecutiveTaskExecution.get(1).getLatitude().doubleValue() != 0
+		String origin = null;
+		String destination = null;
+		StringBuilder kilometer = new StringBuilder();
+		StringBuilder logdata = new StringBuilder();
+		logdata.append(" from ");
+ 
+		for(ExecutiveTaskExecution executiveTaskExecutions : lastExecutiveTaskExecution) {
+
+			if (executiveTaskExecutions.getLatitude() != null
+					&& executiveTaskExecutions.getLatitude().doubleValue() != 0
+					&& executiveTaskExecutions.getLongitude() != null
+					&& executiveTaskExecutions.getLongitude().doubleValue() != 0) {
+
+				 logdata.append(executiveTaskExecutions.getAccountProfile().getName() + " To ");
+				 origin = executiveTaskExecutions.getLatitude() + ","
+						+ executiveTaskExecutions.getLongitude();
+				 log.debug("Previous Customer : " + executiveTaskExecutions.getAccountProfile().getName());
+				 log.debug("Origin : " + origin);
+				break;
+			}
+			log.debug(executiveTaskExecutions.getAccountProfile().getName()  + " : " +"NO Location" );
+		}
+		
+		if (executiveTaskExecution.getLatitude() != null
+				&& executiveTaskExecution.getLatitude().doubleValue() != 0
 				&& executiveTaskExecution.getLongitude() != null
 				&& executiveTaskExecution.getLongitude().doubleValue() != 0) {
-			String origin = lastExecutiveTaskExecution.get(1).getLatitude() + ","
-					+ lastExecutiveTaskExecution.get(1).getLongitude();
-			String destination = executiveTaskExecution.getLatitude() + "," + executiveTaskExecution.getLongitude();
+			
+			destination = executiveTaskExecution.getLatitude() + "," + executiveTaskExecution.getLongitude();
+			log.debug("Current Customer : " + executiveTaskExecution.getAccountProfile().getName());
+			log.debug("Destination : " + destination);
+			logdata.append(executiveTaskExecution.getAccountProfile().getName());
+
 			if (!origin.equals(destination)) {
 				MapDistanceDTO distance = saveKilometreDifference(executiveTaskExecution, origin, destination,
 						companyId, lastExecutiveTaskExecution, null);
+
 				if (distance != null) {
 					kilometers = distance.getValue() * 0.001;
 					metres = distance.getValue();
+					log.debug("Total kilometers : "+ kilometers);
+					log.debug("Total meters : "+ metres);
+					kilometer.append(kilometers+" kilometers Traveled");
+					kilometer.append(logdata.toString());
+					log.debug(kilometer.toString());
 				}
+			}else{
+				log.debug("Origin And Destinations are same");
 			}
 		}
+		else {
+			String notdisatance = "distance not avilable";
+			logdata.append(executiveTaskExecution.getAccountProfile().getName());
+			log.debug(notdisatance + logdata.toString());
+			KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
+			kiloCalDTO.setKilometre(0);
+			kiloCalDTO.setMetres(0);
+			kiloCalDTO.setUserPid(executiveTaskExecution.getUser().getPid());
+			kiloCalDTO.setUserName(executiveTaskExecution.getUser().getFirstName());
+			kiloCalDTO.setDate(executiveTaskExecution.getDate().toLocalDate());
+			kiloCalDTO.setStartLocation("NoLocation");
+			kiloCalDTO.setEndLocation(executiveTaskExecution.getLocation());
+			kiloCalDTO.setTaskExecutionPid(executiveTaskExecution.getPid());
+			log.debug("Saving Kilometre calculation...");
+			kilometreCalculationService.save(kiloCalDTO, companyId);
+		}
+
 		// save or update executive traveled distance
 		Optional<UserDistanceDTO> userDistanceDTO = userDistanceService.findByCompanyIdAndUserIdAndDate(companyId,
 				executiveTaskExecution.getUser().getPid(), executiveTaskExecution.getDate().toLocalDate());
+
 		if (userDistanceDTO.isPresent()) {
 			// update
+
 			if (metres > 0) {
 				UserDistanceDTO udDTO = userDistanceDTO.get();
 				udDTO.setKilometre(userDistanceDTO.get().getKilometre() + kilometers);
@@ -1813,7 +1880,7 @@ public class TaskSubmissionPostSave {
 						kiloCalDTO.setStartLocation("Attendance");
 					} else {
 						log.debug("Start location not attendance");
-						kiloCalDTO.setStartLocation(lastExecutiveTaskExecution.get(0).getLocation());
+						kiloCalDTO.setStartLocation(executiveTaskExecution.getLocation());
 					}
 					kiloCalDTO.setEndLocation(executiveTaskExecution.getLocation());
 					kiloCalDTO.setTaskExecutionPid(executiveTaskExecution.getPid());

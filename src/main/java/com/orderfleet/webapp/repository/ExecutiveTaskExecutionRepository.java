@@ -150,6 +150,8 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	List<ExecutiveTaskExecution> findTop2ByUserPidAndDateBetweenAndLocationTypeInOrderByDateDesc(String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate, List<LocationType> locationTypes);
 
+	List<ExecutiveTaskExecution> findTop4ByUserPidAndDateBetweenAndLocationTypeInOrderByDateDesc(String userPid, LocalDateTime fromDate, LocalDateTime toDate, List<LocationType> locationTypes);
+
 	// User wise - start
 	@Query("select count(exeTaskExecution) from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.date between ?1 and ?2 and exeTaskExecution.activity in ?3 and exeTaskExecution.user.id in ?4")
 	Long countByDateBetweenAndActivitiesAndUserIdIn(LocalDateTime fromDate, LocalDateTime toDate,
