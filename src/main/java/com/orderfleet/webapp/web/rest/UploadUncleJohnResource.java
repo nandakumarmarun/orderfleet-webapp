@@ -1,6 +1,8 @@
 package com.orderfleet.webapp.web.rest;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderfleet.webapp.web.vendor.uncleJhon.DTO.AccountProfileResponseUj;
 import com.orderfleet.webapp.web.vendor.uncleJhon.DTO.DealerResponseUJ;
 import com.orderfleet.webapp.web.vendor.uncleJhon.DTO.ProductProfileResponceUJ;
@@ -40,8 +43,9 @@ public class UploadUncleJohnResource {
 
 	private final Logger log = LoggerFactory.getLogger(UploadUncleJohnResource.class);
 
-	String baseUrl = "http://192.168.2.54/?request=apiNtrich";
-	
+
+	String url = "http://192.168.2.54/?request=apiNtrich";
+
 	@Inject
 	private ProductProfileUncleJhonUploadService productUJUploadService;
 
@@ -57,39 +61,31 @@ public class UploadUncleJohnResource {
 		return "company/uploadUncleJhon";
 	}
 
+	
 	@RequestMapping(value = "/upload-uncleJhon/uploadProductProfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Void> uploadProductProfiles() throws IOException, JSONException, ParseException {
 
 		log.debug("Web request to upload Product Profiles...");
 
-		RestTemplate restTemplate = new RestTemplate();
+		ProductProfileResponceUJ productProfileResponse = new ProductProfileResponceUJ();
 
-		// Set the request headers
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
+		String[] command = {
+				"curl -d '{\"endPoint\" : \"ret_itemmast\",\"apiKey\":11111,\"payload\" : {\"factory\":\"KG\"}}' \\ -H \"Content-Type: application/json",
+				url };
 
-		// Set the request body
-		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("endPoint", "ret_itemmast");
-		requestBody.put("apiKey", 11111);
-		Map<String, String> payload = new HashMap<>();
-		payload.put("factory", "KG");
-		requestBody.put("payload", payload);
+		String productData = curlProcessRequest(command);
 
-		HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+		ObjectMapper objectMapper = new ObjectMapper();
+		productProfileResponse = objectMapper.readValue(productData, ProductProfileResponceUJ.class);
 
-		ResponseEntity<ProductProfileResponceUJ> productProfileResponse = restTemplate.exchange(
-				baseUrl, HttpMethod.GET, requestEntity,
-				ProductProfileResponceUJ.class);
 		System.out.println("Response created....");
-		System.out.println("Size :" + productProfileResponse.getBody().getProductProfileUJ().getProductUJ().size());
-		if (productProfileResponse.getBody().getProductProfileUJ().getProductUJ() != null) {
+		System.out.println("Size :" + productProfileResponse.getProductProfileUJ().getProductUJ().size());
+		if (productProfileResponse.getProductProfileUJ().getProductUJ() != null) {
 
 			productUJUploadService
-					.saveUpdateProductProfiles(productProfileResponse.getBody().getProductProfileUJ().getProductUJ());
-			productUJUploadService
-					.saveProductGroupProduct(productProfileResponse.getBody().getProductProfileUJ().getProductUJ());
+					.saveUpdateProductProfiles(productProfileResponse.getProductProfileUJ().getProductUJ());
+			productUJUploadService.saveProductGroupProduct(productProfileResponse.getProductProfileUJ().getProductUJ());
 		}
 
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -101,57 +97,66 @@ public class UploadUncleJohnResource {
 
 		log.debug("Web request to upload Account Profiles and dealer Master...");
 
-		RestTemplate restTemplate = new RestTemplate();
+		AccountProfileResponseUj accountProfileResponse = new AccountProfileResponseUj();
+		DealerResponseUJ dealerResponse = new DealerResponseUJ();
 
-		// Set the request headers
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
+	
+		String[] command = {
+				"curl -d '{\"endPoint\" : \"ret_custmast\",\"apiKey\":11111,\"payload\" : {\"factory\":\"KG\"}}' \\ -H \"Content-Type: application/json",
+				url };
+		String customertData = curlProcessRequest(command);
 
-		// Set the request body
-		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("endPoint", "ret_custmast");
-		requestBody.put("apiKey", 11111);
-		Map<String, String> payload = new HashMap<>();
-		payload.put("factory", "KG");
-		requestBody.put("payload", payload);
+		ObjectMapper objectMapper = new ObjectMapper();
+		accountProfileResponse = objectMapper.readValue(customertData, AccountProfileResponseUj.class);
+	
+		String[] dealercommand = {
+				"curl -d '{\"endPoint\" : \"ret_dealmast\",\"apiKey\":11111,\"payload\" : {\"factory\":\"KG\"}}' \\ -H \"Content-Type: application/json",
+				url };
 
-		HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+		String dealerData = curlProcessRequest(dealercommand);
 		
-		ResponseEntity<AccountProfileResponseUj> accountProfileResponse = restTemplate.exchange(baseUrl, HttpMethod.GET,requestEntity,AccountProfileResponseUj.class);
-		
-		Map<String, Object> dealerBody = new HashMap<>();
-		dealerBody.put("endPoint", "ret_dealmast");
-		dealerBody.put("apiKey", 11111);
-		Map<String, String> dealerpayload = new HashMap<>();
-		dealerpayload.put("factory", "KG");
-		dealerBody.put("dpayload", dealerpayload);
-
-		HttpEntity<Map<String, Object>> dealerEntity = new HttpEntity<>(dealerBody, headers);
-
-		ResponseEntity<DealerResponseUJ> dealerResponse = restTemplate.exchange(baseUrl, HttpMethod.GET, dealerEntity,
-				DealerResponseUJ.class);
+		ObjectMapper dealerMapper = new ObjectMapper();
+		dealerResponse = dealerMapper.readValue(dealerData, DealerResponseUJ.class);
 
 		System.out.println("Response created....");
-		
-		System.out.println("Size :" + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
-		if (accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ() != null
-				&& dealerResponse.getBody().getDealerUJ().getDealer() != null) {
+
+		System.out.println("Size :" + accountProfileResponse.getAccountProfileUJ().getAccountUJ().size());
+		if (accountProfileResponse.getAccountProfileUJ().getAccountUJ() != null
+				&& dealerResponse.getDealerUJ().getDealer() != null) {
 
 			accountProfileUJUploadService.saveUpdateLocations(
-					accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
-					dealerResponse.getBody().getDealerUJ().getDealer());
+					accountProfileResponse.getAccountProfileUJ().getAccountUJ(),
+					dealerResponse.getDealerUJ().getDealer());
 			accountProfileUJUploadService
-					.saveUpdateAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
-			accountProfileUJUploadService.saveDealer(dealerResponse.getBody().getDealerUJ().getDealer());
-			accountProfileUJUploadService
-					.saveDistributorDealerAssociation(dealerResponse.getBody().getDealerUJ().getDealer());
+					.saveUpdateAccounts(accountProfileResponse.getAccountProfileUJ().getAccountUJ());
+			accountProfileUJUploadService.saveDealer(dealerResponse.getDealerUJ().getDealer());
+			accountProfileUJUploadService.saveDistributorDealerAssociation(dealerResponse.getDealerUJ().getDealer());
 			accountProfileUJUploadService.saveUpdateLocationAccounts(
-					accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
-					dealerResponse.getBody().getDealerUJ().getDealer());
+					accountProfileResponse.getAccountProfileUJ().getAccountUJ(),
+					dealerResponse.getDealerUJ().getDealer());
 
 		}
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	private String curlProcessRequest(String[] command) throws IOException {
+		Process p;
+		String result = null;
+		StringBuilder builder = new StringBuilder();
+		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		Process process = processBuilder.start();
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String line;
+		while ((line = reader.readLine()) != null) {
+			builder.append(line);
+			builder.append(System.getProperty("line.separator"));
+		}
+		result = builder.toString();
+		System.out.print(result);
+
+		return result;
+
+	}
 }
