@@ -43,7 +43,6 @@ public class UploadUncleJohnResource {
 
 	private final Logger log = LoggerFactory.getLogger(UploadUncleJohnResource.class);
 
-
 	String url = "http://192.168.2.54/?request=apiNtrich";
 
 	@Inject
@@ -61,7 +60,6 @@ public class UploadUncleJohnResource {
 		return "company/uploadUncleJhon";
 	}
 
-	
 	@RequestMapping(value = "/upload-uncleJhon/uploadProductProfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Void> uploadProductProfiles() throws IOException, JSONException, ParseException {
@@ -70,9 +68,9 @@ public class UploadUncleJohnResource {
 
 		ProductProfileResponceUJ productProfileResponse = new ProductProfileResponceUJ();
 
-		String[] command = {
-				"curl -d '{\"endPoint\" : \"ret_itemmast\",\"apiKey\":11111,\"payload\" : {\"factory\":\"KG\"}}' \\ -H \"Content-Type: application/json",
-				url };
+		String command = "curl -d '{\"endPoint\" : \"ret_itemmast\",\"apiKey\":11111,\"payload\" : {\"factory\":\"KG\"}}' -H \"Content-Type: application/json\" http://192.168.2.54/?request=apiNtrich";
+
+		System.out.println("curl command" + command);
 
 		String productData = curlProcessRequest(command);
 
@@ -100,21 +98,17 @@ public class UploadUncleJohnResource {
 		AccountProfileResponseUj accountProfileResponse = new AccountProfileResponseUj();
 		DealerResponseUJ dealerResponse = new DealerResponseUJ();
 
-	
-		String[] command = {
-				"curl -d '{\"endPoint\" : \"ret_custmast\",\"apiKey\":11111,\"payload\" : {\"factory\":\"KG\"}}' \\ -H \"Content-Type: application/json",
-				url };
+		String command = "curl -d '{\"endPoint\" : \"ret_custmast\",\"apiKey\":11111,\"payload\" : {\"factory\":\"KG\"}}' -H \"Content-Type: application/json\" http://192.168.2.54/?request=apiNtrich";
+		;
 		String customertData = curlProcessRequest(command);
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		accountProfileResponse = objectMapper.readValue(customertData, AccountProfileResponseUj.class);
-	
-		String[] dealercommand = {
-				"curl -d '{\"endPoint\" : \"ret_dealmast\",\"apiKey\":11111,\"payload\" : {\"factory\":\"KG\"}}' \\ -H \"Content-Type: application/json",
-				url };
+
+		String dealercommand = "curl -d '{\"endPoint\" : \"ret_dealmast\",\"apiKey\":11111,\"payload\" : {\"factory\":\"KG\"}}' -H \"Content-Type: application/json\" http://192.168.2.54/?request=apiNtrich";
 
 		String dealerData = curlProcessRequest(dealercommand);
-		
+
 		ObjectMapper dealerMapper = new ObjectMapper();
 		dealerResponse = dealerMapper.readValue(dealerData, DealerResponseUJ.class);
 
@@ -140,7 +134,7 @@ public class UploadUncleJohnResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	private String curlProcessRequest(String[] command) throws IOException {
+	private String curlProcessRequest(String command) throws IOException {
 		Process p;
 		String result = null;
 		StringBuilder builder = new StringBuilder();

@@ -129,7 +129,10 @@ public class ActivityMapperImpl extends ActivityMapper {
 		activity.setPid(activityDTO.getPid());
 		activity.setTargetDisplayOnDayplan(activityDTO.getTargetDisplayOnDayplan());
 		activity.setEmailTocomplaint(activityDTO.getEmailTocomplaint());
-           activity.setLocationRadius(activityDTO.getLocationRadius());
+		if(activityDTO.getLocationRadius()!= null)
+		{
+        activity.setLocationRadius(activityDTO.getLocationRadius());
+		}
 		return activity;
 	}
 
