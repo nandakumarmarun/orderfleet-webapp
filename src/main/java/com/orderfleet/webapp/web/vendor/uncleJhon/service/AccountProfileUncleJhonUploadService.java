@@ -115,10 +115,10 @@ public class AccountProfileUncleJhonUploadService {
 			} else {
 				location = new Location();
 				location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
-				location.setName(locDto.getLocation().trim());
 				location.setCompany(company);
+				location.setLocationId(locDto.getLocation().trim());
 			}
-			location.setLocationId(locDto.getLocation().trim());
+			location.setName(locDto.getLocation().trim());
 			location.setAlias(locDto.getLocation());
 			location.setActivated(true);
 
@@ -128,7 +128,7 @@ public class AccountProfileUncleJhonUploadService {
 		}
 
 		log.info("Saving Dealer locations.....s");
-		Set<Location> distinctloc = new HashSet();
+		Set<Location> distinctloc = new HashSet<>();
 		for (Dealer DealLoc : dealer) {
 
 			// check exist by name, only one exist with a name
@@ -145,10 +145,10 @@ public class AccountProfileUncleJhonUploadService {
 			} else {
 				location = new Location();
 				location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
-				location.setName(DealLoc.getTown().trim());
 				location.setCompany(company);
+				location.setLocationId(DealLoc.getTown().trim());
 			}
-			location.setLocationId(DealLoc.getTown().trim());
+			location.setName(DealLoc.getTown().trim());
 			location.setAlias(DealLoc.getTown());
 			location.setActivated(true);
 
@@ -172,7 +172,6 @@ public class AccountProfileUncleJhonUploadService {
 
 		log.info("Saving Account Profiles.........");
 
-		long start = System.nanoTime();
 
 		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
@@ -189,7 +188,7 @@ public class AccountProfileUncleJhonUploadService {
 				// check exist by name, only one exist with a name
 
 				Optional<AccountProfile> optionalAP = accountProfiles.stream()
-						.filter(pc -> pc.getCustomerId().equalsIgnoreCase(apDto.getCode())).findAny();
+						.filter(pc -> pc.getCustomerId().equalsIgnoreCase(apDto.getCode().trim())).findAny();
 				AccountProfile accountProfile;
 				if (optionalAP.isPresent()) {
 					accountProfile = optionalAP.get();
@@ -199,7 +198,7 @@ public class AccountProfileUncleJhonUploadService {
 
 					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
 					accountProfile.setAddress(apDto.getAddress());
-					accountProfile.setCustomerId(apDto.getCode());
+					accountProfile.setCustomerId(apDto.getCode().trim());
 					accountProfile.setTinNo(apDto.getGstNo());
 					accountProfile.setUser(user);
 					accountProfile.setCompany(company);
@@ -220,7 +219,7 @@ public class AccountProfileUncleJhonUploadService {
 				} else {
 					accountProfile.setAccountType(defaultAccount);
 				}
-				accountProfile.setName(apDto.getName() + "-" + apDto.getCode());
+				accountProfile.setName(apDto.getName().trim() + "-" + apDto.getCode().trim());
 
 				accountProfile.setClosingBalance(apDto.getClosingBalance());
 
@@ -277,7 +276,7 @@ public class AccountProfileUncleJhonUploadService {
 			LocationAccountProfile profile = new LocationAccountProfile();
 
 			Optional<AccountProfile> locAcc = accountProfiles.stream()
-					.filter(acc -> acc.getCustomerId().equalsIgnoreCase(locAccDto.getCode())).findAny();
+					.filter(acc -> acc.getCustomerId().equalsIgnoreCase(locAccDto.getCode().trim())).findAny();
 
 			Optional<Location> location = locations.stream()
 					.filter(pl -> pl.getName().equalsIgnoreCase(locAccDto.getLocation().trim())).findAny();
@@ -316,7 +315,7 @@ public class AccountProfileUncleJhonUploadService {
 			LocationAccountProfile dealerprofile = new LocationAccountProfile();
 
 			Optional<AccountProfile> locAcc = accountProfiles.stream()
-					.filter(acc -> acc.getCustomerId().equalsIgnoreCase(dealerLocAcc.getDlrcode())).findAny();
+					.filter(acc -> acc.getCustomerId().equalsIgnoreCase(dealerLocAcc.getDlrcode().trim())).findAny();
 
 			Optional<Location> location = locations.stream()
 					.filter(pl -> pl.getName().equalsIgnoreCase(dealerLocAcc.getTown().trim())).findAny();
@@ -368,7 +367,7 @@ public class AccountProfileUncleJhonUploadService {
 				// check exist by name, only one exist with a name
 
 				Optional<AccountProfile> optionalAP = accountProfiles.stream()
-						.filter(pc -> pc.getCustomerId().equalsIgnoreCase(apDto.getDlrcode())).findAny();
+						.filter(pc -> pc.getCustomerId().equalsIgnoreCase(apDto.getDlrcode().trim())).findAny();
 				AccountProfile accountProfile;
 				if (optionalAP.isPresent()) {
 					accountProfile = optionalAP.get();
@@ -379,7 +378,7 @@ public class AccountProfileUncleJhonUploadService {
 					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
 					accountProfile.setAddress(apDto.getDoor() + "~" + apDto.getLandmark() + "~" + apDto.getStreet()
 							+ "~" + apDto.getState());
-					accountProfile.setCustomerId(apDto.getDlrcode());
+					accountProfile.setCustomerId(apDto.getDlrcode().trim());
 					accountProfile.setTinNo(String.valueOf(0.0));
 					accountProfile.setUser(user);
 					accountProfile.setCompany(company);
@@ -400,7 +399,7 @@ public class AccountProfileUncleJhonUploadService {
 				} else {
 					accountProfile.setAccountType(defaultAccount);
 				}
-				accountProfile.setName(apDto.getDlrname() + "-" + apDto.getDlrcode());
+				accountProfile.setName(apDto.getDlrname().trim() + "-" + apDto.getDlrcode().trim());
 
 				accountProfile.setClosingBalance(Double.valueOf(0.0));
 
@@ -462,8 +461,8 @@ public class AccountProfileUncleJhonUploadService {
 		for (Dealer dealers : dealer) {
 
 			Optional<DistributorDealerAssociation> association = distributDeal.stream()
-					.filter(dd -> dd.getDealer().getCustomerId().equalsIgnoreCase(dealers.getDlrcode())
-							&& dd.getDistributor().getCustomerId().equalsIgnoreCase(dealers.getDistcode()))
+					.filter(dd -> dd.getDealer().getCustomerId().equalsIgnoreCase(dealers.getDlrcode().trim())
+							&& dd.getDistributor().getCustomerId().equalsIgnoreCase(dealers.getDistcode().trim()))
 					.findAny();
 			DistributorDealerAssociation distributorDealer = new DistributorDealerAssociation();
 			if (association.isPresent()) {
@@ -471,9 +470,9 @@ public class AccountProfileUncleJhonUploadService {
 				distributorDealer = association.get();
 			} else {
 				Optional<AccountProfile> dist = accountProfiles.stream()
-						.filter(dis -> dis.getCustomerId().equalsIgnoreCase(dealers.getDistcode())).findAny();
+						.filter(dis -> dis.getCustomerId().equalsIgnoreCase(dealers.getDistcode().trim())).findAny();
 				Optional<AccountProfile> deal = accountProfiles.stream()
-						.filter(del -> del.getCustomerId().equalsIgnoreCase(dealers.getDlrcode())).findAny();
+						.filter(del -> del.getCustomerId().equalsIgnoreCase(dealers.getDlrcode().trim())).findAny();
 
 				if (dist.isPresent() && deal.isPresent()) {
 					distributorDealer.setDistributor(dist.get());

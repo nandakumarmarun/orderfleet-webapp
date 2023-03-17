@@ -69,6 +69,7 @@ public class ProductProfileUncleJhonUploadService {
 	}
 
 	public void saveProductGroupProduct(List<ProductUJ> productUJ) {
+		log.info("Saving ProductGroup Product");
 		long start = System.nanoTime();
 
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
@@ -86,7 +87,7 @@ public class ProductProfileUncleJhonUploadService {
 		for (ProductUJ product : productUJ) {
 			ProductGroupProduct productGroupProduct = new ProductGroupProduct();
 			Optional<ProductProfile> opPp = productProfiles.stream()
-					.filter(pp -> product.getCode().equals(pp.getProductId())).findAny();
+					.filter(pp -> product.getCode().trim().equalsIgnoreCase(pp.getProductId().trim())).findAny();
 
 			if (opPp.isPresent()) {
 				productGroupProduct.setProductGroup(defaultGroup.get());
@@ -96,7 +97,7 @@ public class ProductProfileUncleJhonUploadService {
 			}
 		}
 
-		List<ProductGroupProduct> result = productGroupProductRepository.save(newProductGroupProducts);
+	      productGroupProductRepository.save(newProductGroupProducts);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		log.info("Sync completed in {} ms", elapsedTime);
@@ -127,7 +128,7 @@ public class ProductProfileUncleJhonUploadService {
 		for (ProductUJ ppDto : productUJ) {
 			// check exist by name, only one exist with a name
 			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getProductId().equals(ppDto.getCode())).findAny();
+					.filter(p -> p.getProductId().trim().equalsIgnoreCase(ppDto.getCode().trim())).findAny();
 			ProductProfile productProfile;
 			if (optionalPP.isPresent()) {
 				productProfile = optionalPP.get();
@@ -138,11 +139,11 @@ public class ProductProfileUncleJhonUploadService {
 				productProfile.setCompany(company);
 				productProfile.setDivision(defaultDivision);
 				productProfile.setDataSourceType(DataSourceType.VENDOR);
+				productProfile.setProductId(ppDto.getCode().trim());
 
 			}
 
-			productProfile.setName(ppDto.getName()+"-"+ppDto.getCode());
-			productProfile.setProductId(ppDto.getCode());
+			productProfile.setName(ppDto.getName().trim()+"-"+ppDto.getCode().trim());
 			productProfile.setPrice(BigDecimal.valueOf(ppDto.getWholesalePrice()));
 			productProfile.setTaxRate(ppDto.getTaxRate());
 			productProfile.setMrp(ppDto.getMrp());

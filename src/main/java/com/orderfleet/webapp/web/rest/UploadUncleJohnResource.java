@@ -42,8 +42,6 @@ public class UploadUncleJohnResource {
 
 	private final Logger log = LoggerFactory.getLogger(UploadUncleJohnResource.class);
 
-//	String baseUrl = "http://192.168.2.54/?request=apiNtrich";
-	
 	@Inject
 	private ProductProfileUncleJhonUploadService productUJUploadService;
 
@@ -80,8 +78,8 @@ public class UploadUncleJohnResource {
 		requestBody.put("payload", payload);
 
 		HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-		
-		log.info("RequestEntity :"+requestEntity);
+
+		log.info("RequestEntity :" + requestEntity);
 
 		ResponseEntity<ProductProfileResponceUJ> productProfileResponse = restTemplate.exchange(
 				"http://192.168.2.54/?request=apiNtrich", HttpMethod.POST, requestEntity,
@@ -103,7 +101,7 @@ public class UploadUncleJohnResource {
 	@Timed
 	public ResponseEntity<Void> uploadAccountProfiles() throws IOException, JSONException, ParseException {
 
-		log.debug("Web request to upload Account Profiles and dealer Master...");
+		log.debug("Web request to upload Account Profiles ...");
 
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -120,35 +118,44 @@ public class UploadUncleJohnResource {
 		requestBody.put("payload", payload);
 
 		HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+		log.debug("RequestEntity :" + requestEntity);
+
+		ResponseEntity<AccountProfileResponseUj> accountProfileResponse = restTemplate.exchange(
+				"http://192.168.2.54/?request=apiNtrich", HttpMethod.POST, requestEntity,AccountProfileResponseUj.class);
 		
-		ResponseEntity<AccountProfileResponseUj> accountProfileResponse = restTemplate.exchange("http://192.168.2.54/?request=apiNtrich", HttpMethod.POST,requestEntity,AccountProfileResponseUj.class);
-		
+		log.debug("Web request to upload Dealer Profiles ...");
+
 		Map<String, Object> dealerBody = new HashMap<>();
 		dealerBody.put("endPoint", "ret_dealmast");
 		dealerBody.put("apiKey", 11111);
-		Map<String, String> dealerpayload = new HashMap<>();
-		dealerpayload.put("factory", "KG");
-		dealerBody.put("dpayload", dealerpayload);
+		payload.put("factory", "KG");
+		dealerBody.put("payload", payload);
 
 		HttpEntity<Map<String, Object>> dealerEntity = new HttpEntity<>(dealerBody, headers);
-
-		ResponseEntity<DealerResponseUJ> dealerResponse = restTemplate.exchange("http://192.168.2.54/?request=apiNtrich", HttpMethod.POST, dealerEntity,
-				DealerResponseUJ.class);
+		log.debug("dealerEntity :" + dealerEntity);
+		
+		ResponseEntity<DealerResponseUJ> dealerResponse = restTemplate.exchange(
+				"http://192.168.2.54/?request=apiNtrich", HttpMethod.POST, dealerEntity, DealerResponseUJ.class);
 
 		log.debug("Response created....");
-		
+
 		log.debug("Size :" + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
+		
 		if (accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ() != null
 				&& dealerResponse.getBody().getDealerUJ().getDealer() != null) {
 
 			accountProfileUJUploadService.saveUpdateLocations(
 					accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
 					dealerResponse.getBody().getDealerUJ().getDealer());
+			
 			accountProfileUJUploadService
 					.saveUpdateAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
+			
 			accountProfileUJUploadService.saveDealer(dealerResponse.getBody().getDealerUJ().getDealer());
+			
 			accountProfileUJUploadService
 					.saveDistributorDealerAssociation(dealerResponse.getBody().getDealerUJ().getDealer());
+			
 			accountProfileUJUploadService.saveUpdateLocationAccounts(
 					accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
 					dealerResponse.getBody().getDealerUJ().getDealer());
