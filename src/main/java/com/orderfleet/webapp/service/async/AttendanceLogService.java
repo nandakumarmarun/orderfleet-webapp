@@ -56,7 +56,6 @@ public class AttendanceLogService {
 //			
 //		}
 		System.out.println("attenstelogs sizeeee==="+attendanceLogs.size());
-		attendanceLogs.forEach(data -> System.out.println("attenstelogs==="+ data[0] + data[1]));
 		return attendanceLogList;
 	}
 

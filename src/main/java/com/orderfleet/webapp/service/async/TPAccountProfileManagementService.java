@@ -760,7 +760,6 @@ public class TPAccountProfileManagementService {
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
-//		dectivatedac.forEach(data -> log.info("deactivated id " + dectivatedac.size() +" +"+ data));
 	}
 
 	@Transactional
@@ -990,7 +989,6 @@ public class TPAccountProfileManagementService {
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
-//		dectivatedac.forEach(data -> log.info("deactivated id " + dectivatedac.size() +" +"+ data));
 	}
 	
 	
@@ -1234,7 +1232,6 @@ public class TPAccountProfileManagementService {
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
-		dectivatedloc.forEach(data -> log.info("deactivated id " + dectivatedloc.size() + data));
 	}
 	
 	

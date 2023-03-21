@@ -236,8 +236,6 @@ public class TPalterIdservicesManagementService {
 	@Transactional
 	public void saveUpdateProductCategoriesUpdateIdNew(final List<ProductCategoryDTO> productCategoryDTOs,
 			final SyncOperation syncOperation) {
-		
-		productCategoryDTOs.forEach(data->System.out.println("categoryId"+data.getProductCategoryId()));
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		Set<ProductCategory> saveUpdateProductCategories = new HashSet<>();
@@ -432,7 +430,7 @@ public class TPalterIdservicesManagementService {
 			}
 			saveUpdateProductGroups.add(productGroup);
 		}
-//		saveUpdateProductGroups.forEach(i -> System.out.println("save prg"+i));
+
 		bulkOperationRepositoryCustom.bulkSaveProductGroup(saveUpdateProductGroups);
 		Long Listcount = productGroupDTOs.parallelStream().filter(productGroupDTO -> productGroupDTO.getAlterId() == null).count();
 	    System.out.println("productGroupDTOsnullcount"+Listcount);
@@ -723,8 +721,7 @@ public class TPalterIdservicesManagementService {
 						? p.getProductId().equals(ppDto.getProductId())
 								: false)
 						.findAny();
-				
-				System.out.println("isPresent"+optionalPP);
+
 			ProductProfile productProfile = new ProductProfile();
 			if (optionalPP.isPresent()) {
 				productProfile = optionalPP.get();
@@ -839,6 +836,7 @@ public class TPalterIdservicesManagementService {
 
 		Long Listcount = productProfileDTOs.parallelStream().filter(productProfileDTO -> productProfileDTO.getAlterId() == null).count();
 	    System.out.println("productProfileDTOsnullcount"+Listcount);
+
 		if(Listcount == 0) {
 			ProductProfileDTO productProflleDTO = productProfileDTOs.stream()
 					.max(Comparator.comparingLong(ProductProfileDTO::getAlterId)).get();
@@ -848,6 +846,7 @@ public class TPalterIdservicesManagementService {
 			alterIdMasterDTO.setCompanyId(company.getId());
 			alterIdMasterService.save(alterIdMasterDTO);
 		}
+
 		//update name
 //		List<ProductCategory> productCategorycopy = productCategoryRepository.findByCompanyId(company.getId());
 //		if(!productCategorycopy.isEmpty()) {
@@ -857,6 +856,8 @@ public class TPalterIdservicesManagementService {
 //				}
 //			});}
 //		productCategoryRepository.save(productCategorycopy);
+
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -864,10 +865,7 @@ public class TPalterIdservicesManagementService {
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
-		
 		log.info("Sync completed in {} ms", elapsedTime);
-		dectivatedpp.forEach(data -> log.info("deactivated id " + dectivatedpp.size() + data));
-		
 	}
 	
 	@Transactional

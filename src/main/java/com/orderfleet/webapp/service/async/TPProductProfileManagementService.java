@@ -959,8 +959,7 @@ public class TPProductProfileManagementService {
 			}
 			saveUpdateProductProfiles.add(productProfile);
 		}
-		saveUpdateProductProfiles
-				.forEach(obj -> System.out.println("saved product pro======" + saveUpdateProductProfiles));
+
 		bulkOperationRepositoryCustom.bulkSaveProductProfile(saveUpdateProductProfiles);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;

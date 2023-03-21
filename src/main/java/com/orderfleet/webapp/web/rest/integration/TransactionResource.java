@@ -1351,13 +1351,13 @@ public class TransactionResource {
 					List<StockLocation> stockLocations = new ArrayList<>();
 					for (DocumentStockLocationSource documentStockLocationSource : documentStockLocationSources) {
 
-						log.info("Document Stock Location Name: "
-								+ documentStockLocationSource.getStockLocation().getName());
+//						log.info("Document Stock Location Name: "
+//								+ documentStockLocationSource.getStockLocation().getName());
 						stockLocations = userStockLocations.stream().filter(
 								usl -> usl.getPid().equals(documentStockLocationSource.getStockLocation().getPid()))
 								.collect(Collectors.toList());
 						if (stockLocations.size() > 0) {
-							log.info("Stock Location Name: " + stockLocations.get(0).getName());
+//							log.info("Stock Location Name: " + stockLocations.get(0).getName());
 							salesOrderItemDTO.setStockLocationName(stockLocations.get(0).getName());
 							break;
 						}
