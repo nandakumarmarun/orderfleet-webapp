@@ -2977,45 +2977,51 @@ public class TPProductProfileManagementService {
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
-	@Transactional
-	@Async
-	public void saveUpdateProductProfileTaxMasters(List<ProductProfileDTO> ppDTOs, SyncOperation syncOperation) {
 
-		long start = System.nanoTime();
-		final Company company = syncOperation.getCompany();
-		Set<String> ppNames = ppDTOs.stream().map(p -> p.getName()).collect(Collectors.toSet());
-		List<ProductProfile> productProfiles = productProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
 
-		for (ProductProfileDTO ppDto : ppDTOs) {
-			// check exist by name, only one exist with a name
-			Optional<ProductProfile> optionalPP = productProfiles.stream()
-					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
-			ProductProfile productProfile;
-			if (optionalPP.isPresent()) {
-				productProfile = optionalPP.get();
-				List<TaxMaster> taxMasters = new ArrayList<>();
-				for (TaxMasterDTO taxMasterDTO : ppDto.getProductProfileTaxMasterDTOs()) {
-					TaxMaster taxMaster = taxMasterRepository.findAllByCompanyIdAndVatClassAndVatPercentage(
-							company.getId(), taxMasterDTO.getVatClass(), taxMasterDTO.getVatPercentage());
-					if (taxMaster != null) {
-						taxMasters.add(taxMaster);
-					}
-				}
-				productProfile.setTaxMastersList(taxMasters);
-				productProfileRepository.save(productProfile);
-			}
-		}
-
-		long end = System.nanoTime();
-		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
-		syncOperation.setCompleted(true);
-		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
-		syncOperation.setLastSyncTime(elapsedTime);
-		syncOperationRepository.save(syncOperation);
-		log.info("Sync completed in {} ms", elapsedTime);
-	}
+	/*
+	 * Not using
+	 */
+//
+//	@Transactional
+//	@Async
+//	public void saveUpdateProductProfileTaxMasters(List<ProductProfileDTO> ppDTOs, SyncOperation syncOperation) {
+//
+//		long start = System.nanoTime();
+//		final Company company = syncOperation.getCompany();
+//		Set<String> ppNames = ppDTOs.stream().map(p -> p.getName()).collect(Collectors.toSet());
+//		List<ProductProfile> productProfiles = productProfileRepository
+//				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
+//
+//		for (ProductProfileDTO ppDto : ppDTOs) {
+//			// check exist by name, only one exist with a name
+//			Optional<ProductProfile> optionalPP = productProfiles.stream()
+//					.filter(p -> p.getName().equals(ppDto.getName())).findAny();
+//			ProductProfile productProfile;
+//			if (optionalPP.isPresent()) {
+//				productProfile = optionalPP.get();
+//				List<TaxMaster> taxMasters = new ArrayList<>();
+//				for (TaxMasterDTO taxMasterDTO : ppDto.getProductProfileTaxMasterDTOs()) {
+//					TaxMaster taxMaster = taxMasterRepository.findAllByCompanyIdAndVatClassAndVatPercentage(
+//							company.getId(), taxMasterDTO.getVatClass(), taxMasterDTO.getVatPercentage());
+//					if (taxMaster != null) {
+//						taxMasters.add(taxMaster);
+//					}
+//				}
+//				productProfile.setTaxMastersList(taxMasters);
+//				productProfileRepository.save(productProfile);
+//			}
+//		}
+//
+//		long end = System.nanoTime();
+//		double elapsedTime = (end - start) / 1000000.0;
+//		// update sync table
+//		syncOperation.setCompleted(true);
+//		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+//		syncOperation.setLastSyncTime(elapsedTime);
+//		syncOperationRepository.save(syncOperation);
+//		log.info("Sync completed in {} ms", elapsedTime);
+//	}
 
 	@Transactional
 	@Async

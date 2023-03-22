@@ -499,7 +499,7 @@ public class MasterDataProductResource {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					tpProductProfileManagementService.saveUpdateProductProfileTaxMasters(ppDTOs, so);
+//					tpProductProfileManagementService.saveUpdateProductProfileTaxMasters(ppDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				})
 				.orElse(new ResponseEntity<>(
