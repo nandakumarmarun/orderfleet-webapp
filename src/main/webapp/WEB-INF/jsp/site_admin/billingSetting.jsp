@@ -73,8 +73,8 @@
 							<td>${bill.lastBilledDate}</td>
 							<td>${bill.next_bill_date}</td>
 							<td>
-								<%-- <button type="button" class="btn btn-blue"
-									onclick="BillingSetting.showModalPopup($('#editModal'),'${bill.pid}',1);">Edit</button>   --%>
+								 <button type="button" class="btn btn-blue"
+									onclick="BillingSetting.showModalPopup($('#editModal'),'${bill.pid}',1);">Edit</button>   
 								<button type="button" class="btn btn-blue"
 									onclick="BillingSetting.changeBillDate('${bill.company.pid}');">Change
 									bill Date</button>
@@ -195,9 +195,9 @@
 									<div class="form-group">
 										
 										<div class="form-group">
-										<label class="control-label" for="dbCompany">CompanyName
+										<label class="control-label" for="dbCompanys">CompanyName
 											</label> <input type="text" class="form-control"
-											name="companyPid" id="dbCompanys" maxlength="55" />
+											name="companyName" id="dbCompanys" maxlength="55" />
 									</div>
 									</div>
 									<div class="form-group">

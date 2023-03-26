@@ -28,9 +28,10 @@ public class CompanyBillingDTO {
 		// TODO Auto-generated constructor stub
 	}
 
-	public CompanyBillingDTO(String companyName, String noOfMonths, BillingPeriod billingPeriod,
+	public CompanyBillingDTO(String pid,String companyName, String noOfMonths, BillingPeriod billingPeriod,
 			LocalDate lastBillDate, LocalDate dueBillDate) {
 		super();
+		this.pid = pid;
 		this.companyName = companyName;
 		this.noOfMonths = noOfMonths;
 		this.billingPeriod = billingPeriod;
@@ -41,6 +42,7 @@ public class CompanyBillingDTO {
 	public CompanyBillingDTO(CompanyBilling billing) {
 		
 		// TODO Auto-generated constructor stub
+		this.pid = billing.getPid();
 		this.companyPid = billing.getCompany().getPid();
 		this.companyName = billing.getCompany().getLegalName();
 		this.noOfMonths = billing.getNoOfMonths();

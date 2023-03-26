@@ -153,9 +153,9 @@ if (!this.BillingSetting) {
 			url : billingSettingPath + "/" + id,
 			method : 'GET',
 			success : function(data) {
-				console.log("succesfuly get :"+data)
+				console.log("succesfuly get :"+data.companyName)
 			
-				$('#dbCompanys').text(data.companyName);
+				$('#dbCompanys').val(data.companyName);
 				$('#field_billingPeriods').val(data.billingPeriod);
 				$('#field_noOfMonths').val(data.noOfMonths);
 				$('#txtFromDates').val(data.lastBillDate);
@@ -163,7 +163,7 @@ if (!this.BillingSetting) {
 				
 				// set pid
 				companyModel.pid = data.pid;
-				companyModel.companyPid =	$('#dbCompanys').val(data.companyPid);
+				companyModel.companyPid =data.companyPid;
 			console.log(companyModel.companyPid)
 			},
 			error : function(xhr, error) {
@@ -175,7 +175,7 @@ if (!this.BillingSetting) {
 	function editCompanydetail(el) {
          console.log("Enter to edit create")
          
-		companyModel.companyPid = $("#dbCompanys").val();
+		companyModel.companyName = $("#dbCompanys").val();
 		companyModel.billingPeriod = $('#field_billingPeriods').val();
 		companyModel.noOfMonths = $('#field_noOfMonths').val();
 		companyModel.lastBillDate = $("#txtFromDates").val();

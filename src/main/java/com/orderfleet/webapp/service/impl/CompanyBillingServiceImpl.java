@@ -75,6 +75,7 @@ public class CompanyBillingServiceImpl {
 		log.debug("Request to get Company by pid : {}", pid);
 		return companyBillingRepository.findOneByPid(pid).map(company -> {
 			CompanyBillingDTO companyDTO = new CompanyBillingDTO(company);
+			System.out.println("DTO********************** :"+companyDTO);
 			return companyDTO;
 		});
 	}
@@ -83,7 +84,7 @@ public class CompanyBillingServiceImpl {
 		// TODO Auto-generated method stub
 		log.debug("Request to Update Company : {}", companyDTO);
 
-		Optional<Company> comp = companyRepository.findOneByPid(companyDTO.getCompanyPid());
+		Optional<Company> comp = companyRepository.findByLegalName(companyDTO.getCompanyName());
 		return companyBillingRepository.findOneByPid(companyDTO.getPid()).map(company -> {
 
 			company.setCompany(comp.get());
