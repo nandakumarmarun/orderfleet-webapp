@@ -46,4 +46,13 @@ public class BillingUserDTO {
 		this.employeeName = employeeName;
 	}
 
+	@Override
+	public String toString() {
+		return "BillingUserDTO{" +
+				"login='" + login + '\'' +
+				", executionCount=" + executionCount +
+				", attendanceCount=" + attendanceCount +
+				", employeeName='" + employeeName + '\'' +
+				'}';
+	}
 }

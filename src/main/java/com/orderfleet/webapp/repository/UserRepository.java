@@ -153,6 +153,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query(value = "select company.legal_name as company_name,count(u.id) as user_count from tbl_user u INNER JOIN tbl_company company on company.id=u.company_id where u.company_id = ?1 and u.activated='FALSE' GROUP BY company.legal_name Order by company.legal_name",nativeQuery = true)
 	List<Object[]> findDeactivatedUserByCompanyId(Long companyid);
+
+	@Query("select user from User user where user.company.id in ?1 and user.activated = 'TRUE' order by user.firstName asc")
+	List<User> findAllByCompanyIdInAndActivated(List<Long> companyId);
 	
 
 }
