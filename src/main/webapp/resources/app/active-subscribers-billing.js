@@ -43,6 +43,7 @@ if (!this.ActiveSubscriberBilling) {
 	ActiveSubscriberBilling.details = function(Pid,companyPid) {
 	     $('#tbodyDetails').html("");
 	     $('#lbl_active_user').html("");
+	     $("#lbl_CompanyName").text("");
         $
         		        .ajax({
         					url : contextPath + "/web/subscribers-billing/details",
