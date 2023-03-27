@@ -141,7 +141,7 @@ if (!this.ActiveSubscriberBilling) {
                             "</td><td>" +
                             billingDTO.noOfMonth +
                             "</td><td>" +
-                            "<button type='button' class='btn btn-white' onclick='ActiveSubscriberBilling.showModalPopup($(\"#viewModal\"),\""
+                            "<button type='button' class='btn btn-blue' onclick='ActiveSubscriberBilling.showModalPopup($(\"#viewModal\"),\""
                             																			+ billingDTO.pid
                             																			+ "\",\""
                             																			+ billingDTO.companyPid

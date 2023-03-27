@@ -154,8 +154,8 @@
                                                 					<!--table header-->
                                                 					<thead>
                                                 						<tr>
-                                                							<th style="min-width: 80px;">SalbName</th>
-                                                							<th>SlabTotal</th>
+                                                							<th style="min-width: 80px;">SlabName</th>
+                                                							<th>SlabRate</th>
                                                 						</tr>
                                                 					</thead>
                                                 					<!--table header-->
