@@ -270,10 +270,10 @@ public class SendSalesOrderFocusService {
 		salesOrderMasterFocus.setEmployee(inventoryVoucherHeaderDTO.getEmployeeName());
 		salesOrderMasterFocus.setSnrDocId(inventoryVoucherHeaderDTO.getDocumentNumberServer());
 		salesOrderMasterFocus.setSnrDocDate(date);
-		salesOrderMasterFocus.setNarration("Na");
+		salesOrderMasterFocus.setNarration("NA");
 		salesOrderMasterFocus.setBusinessUnit("EKM");
-		salesOrderMasterFocus.setDelivery_Site("Na");
-		salesOrderMasterFocus.setFiscalYear("22-23");
+		salesOrderMasterFocus.setDelivery_Site("NA");
+		salesOrderMasterFocus.setFiscalYear("23-24");
 		salesOrderMasterFocus.setIsIGST("No");
 
 		List<SalesOrderItemDetailsFocus> salesOrderItems = new ArrayList<>();
@@ -291,7 +291,7 @@ public class SendSalesOrderFocusService {
 			}
 
 			salesOrderItemDetailsFocus.setUnit(inventoryVoucherDetailDTO.getProductSKU());
-			salesOrderItemDetailsFocus.setBrandDeva("Na");
+			salesOrderItemDetailsFocus.setBrandDeva("NA");
 			salesOrderItemDetailsFocus.setLengthType(inventoryVoucherDetailDTO.getLengthType());
 			salesOrderItemDetailsFocus.setMtrConv(0.0);
 			System.out.println("LengthTYPE" + inventoryVoucherDetailDTO.getLengthType());
