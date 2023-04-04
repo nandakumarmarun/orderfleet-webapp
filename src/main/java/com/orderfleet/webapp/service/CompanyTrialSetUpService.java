@@ -1049,6 +1049,18 @@ public class CompanyTrialSetUpService {
 		formElementValue3.setFormElement(formElement);
 		formElementValue3.setSortOrder(0);
 		formElementValues.add(formElementValue3);
+		
+		FormElementValue formElementValue4 = new FormElementValue();
+		formElementValue4.setName("Competitor stock available");
+		formElementValue4.setFormElement(formElement);
+		formElementValue4.setSortOrder(0);
+		formElementValues.add(formElementValue4);
+		
+		FormElementValue formElementValue5 = new FormElementValue();
+		formElementValue5.setName("Shop closed");
+		formElementValue5.setFormElement(formElement);
+		formElementValue5.setSortOrder(0);
+		formElementValues.add(formElementValue5);
 
 		formElement.setFormElementValues(formElementValues);
 		formElements.add(formElement);

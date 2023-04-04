@@ -185,10 +185,9 @@ public class AccountProfileUncleJhonUploadService {
 			for (AccountUJ apDto : accountUJ) {
 				// check exist by name, only one exist with a name
 
-			
-				Optional<AccountProfile> optionalAP = accountProfiles.stream().filter(
-						pc -> pc.getCustomerId().equalsIgnoreCase(apDto.getCode().trim())).findAny();
-			
+				Optional<AccountProfile> optionalAP = accountProfiles.stream()
+						.filter(pc -> pc.getCustomerId().equalsIgnoreCase(apDto.getNumcode().trim())).findAny();
+
 				AccountProfile accountProfile;
 				if (optionalAP.isPresent()) {
 					accountProfile = optionalAP.get();
@@ -239,19 +238,18 @@ public class AccountProfileUncleJhonUploadService {
 				}
 
 				String coordinates = apDto.getLatitude();
-				if(!apDto.getLatitude().trim().isEmpty())
-				{
-				String[] parts = coordinates.split(",");
+				if (!apDto.getLatitude().trim().isEmpty()) {
+					String[] parts = coordinates.split(",");
 
-				String latitudeString = parts[0];
-				String longitudeString = parts[1];
-				if (!latitudeString.trim().isEmpty() && !longitudeString.trim().isEmpty()) {
-					double latitude = Double.parseDouble(latitudeString.trim());
-					double longitude = Double.parseDouble(longitudeString.trim());
-					accountProfile.setLatitude(BigDecimal.valueOf(latitude));
-					accountProfile.setLongitude(BigDecimal.valueOf(longitude));
+					String latitudeString = parts[0];
+					String longitudeString = parts[1];
+					if (!latitudeString.trim().isEmpty() && !longitudeString.trim().isEmpty()) {
+						double latitude = Double.parseDouble(latitudeString.trim());
+						double longitude = Double.parseDouble(longitudeString.trim());
+						accountProfile.setLatitude(BigDecimal.valueOf(latitude));
+						accountProfile.setLongitude(BigDecimal.valueOf(longitude));
 
-				}
+					}
 				}
 //				if (apDto.getPhone2() != null && !apDto.getPhone2().equals("")) {
 //                    
@@ -394,8 +392,8 @@ public class AccountProfileUncleJhonUploadService {
 					accountProfile = new AccountProfile();
 
 					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-					accountProfile.setAddress(apDto.getDoor().trim() + "~" + apDto.getLandmark().trim() + "~" + apDto.getStreet().trim()
-							+ "~" + apDto.getState().trim());
+					accountProfile.setAddress(apDto.getDoor().trim() + "~" + apDto.getLandmark().trim() + "~"
+							+ apDto.getStreet().trim() + "~" + apDto.getState().trim());
 					accountProfile.setCustomerId(apDto.getDlrcode().trim());
 					accountProfile.setTinNo(String.valueOf(0.0));
 					accountProfile.setUser(user);
@@ -479,8 +477,8 @@ public class AccountProfileUncleJhonUploadService {
 		for (Dealer dealers : dealer) {
 
 			Optional<DistributorDealerAssociation> association = distributDeal.stream()
-					.filter(dd -> dd.getDealer().getCustomerId().equalsIgnoreCase(dealers.getDlrcode().trim())
-							&& dd.getDistributor().getCustomerId().equalsIgnoreCase(dealers.getDistcode().trim()))
+					.filter(dd -> dd.getDealer().getCustomerId().trim().equalsIgnoreCase(dealers.getDlrcode().trim())
+							&& dd.getDistributor().getCustomerCode().trim().equalsIgnoreCase(dealers.getDistcode().trim()))
 					.findAny();
 			DistributorDealerAssociation distributorDealer = new DistributorDealerAssociation();
 			if (association.isPresent()) {
@@ -488,17 +486,18 @@ public class AccountProfileUncleJhonUploadService {
 				distributorDealer = association.get();
 			} else {
 				Optional<AccountProfile> dist = accountProfiles.stream()
-						.filter(dis -> dis.getCustomerId().equalsIgnoreCase(dealers.getDistcode().trim())).findAny();
+						.filter(dis -> dis.getCustomerCode().trim().equalsIgnoreCase(dealers.getDistcode().trim())).findAny();
 				Optional<AccountProfile> deal = accountProfiles.stream()
-						.filter(del -> del.getCustomerId().equalsIgnoreCase(dealers.getDlrcode().trim())).findAny();
+						.filter(del -> del.getCustomerId().trim().equalsIgnoreCase(dealers.getDlrcode().trim())).findAny();
 
 				if (dist.isPresent() && deal.isPresent()) {
 					distributorDealer.setDistributor(dist.get());
 					distributorDealer.setDealer(deal.get());
 					distributorDealer.setCompany(company);
 				}
-
+       
 			}
+			
 			DistributorDealerList.add(distributorDealer);
 		}
 		distributorDealerProfileRepository.save(DistributorDealerList);
