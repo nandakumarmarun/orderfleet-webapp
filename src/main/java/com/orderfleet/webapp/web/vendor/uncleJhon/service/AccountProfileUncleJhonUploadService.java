@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.vendor.uncleJhon.service;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -69,7 +70,7 @@ public class AccountProfileUncleJhonUploadService {
 	private final CompanyRepository companyRepository;
 
 	private final DistributorDealerProfileRepository distributorDealerProfileRepository;
-	
+
 	private final LocationHierarchyRepository locationHierarchyRepository;
 
 	public AccountProfileUncleJhonUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
@@ -77,7 +78,7 @@ public class AccountProfileUncleJhonUploadService {
 			AccountProfileService accountProfileService, LocationRepository locationRepository,
 			LocationAccountProfileRepository locationAccountProfileRepository, UserRepository userRepository,
 			DistributorDealerProfileRepository distributorDealerProfileRepository, LocationService locationService,
-			CompanyRepository companyRepository,LocationHierarchyRepository locationHierarchyRepository) {
+			CompanyRepository companyRepository, LocationHierarchyRepository locationHierarchyRepository) {
 		super();
 
 		this.accountProfileRepository = accountProfileRepository;
@@ -122,8 +123,6 @@ public class AccountProfileUncleJhonUploadService {
 			location.setAlias(locDto.getLocation());
 			location.setActivated(true);
 
-
-
 			saveUpdateLocations.add(location);
 		}
 
@@ -158,8 +157,8 @@ public class AccountProfileUncleJhonUploadService {
 				.collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Location::getLocationId))));
 
 		locationRepository.save(distinctloc);
-			locationRepository.flush();
-			saveUpdateLocationHierarchy(distinctloc);
+		locationRepository.flush();
+		saveUpdateLocationHierarchy(distinctloc);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
@@ -171,7 +170,6 @@ public class AccountProfileUncleJhonUploadService {
 	public void saveUpdateAccounts(List<AccountUJ> accountUJ) {
 
 		log.info("Saving Account Profiles.........");
-
 
 		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
@@ -187,8 +185,10 @@ public class AccountProfileUncleJhonUploadService {
 			for (AccountUJ apDto : accountUJ) {
 				// check exist by name, only one exist with a name
 
-				Optional<AccountProfile> optionalAP = accountProfiles.stream()
-						.filter(pc -> pc.getCustomerId().equalsIgnoreCase(apDto.getCode().trim())).findAny();
+			
+				Optional<AccountProfile> optionalAP = accountProfiles.stream().filter(
+						pc -> pc.getCustomerId().equalsIgnoreCase(apDto.getCode().trim())).findAny();
+			
 				AccountProfile accountProfile;
 				if (optionalAP.isPresent()) {
 					accountProfile = optionalAP.get();
@@ -198,7 +198,6 @@ public class AccountProfileUncleJhonUploadService {
 
 					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
 					accountProfile.setAddress(apDto.getAddress());
-					accountProfile.setCustomerId(apDto.getCode().trim());
 					accountProfile.setTinNo(apDto.getGstNo());
 					accountProfile.setUser(user);
 					accountProfile.setCompany(company);
@@ -207,6 +206,9 @@ public class AccountProfileUncleJhonUploadService {
 					accountProfile.setImportStatus(true);
 
 				}
+				accountProfile.setCustomerId(apDto.getNumcode().trim());
+
+				accountProfile.setCustomerCode(apDto.getCode().trim());
 
 				String accountCode = apDto.getCode().substring(0, apDto.getCode().indexOf('.'));
 
@@ -234,6 +236,22 @@ public class AccountProfileUncleJhonUploadService {
 
 				} else {
 					accountProfile.setPhone1("");
+				}
+
+				String coordinates = apDto.getLatitude();
+				if(!apDto.getLatitude().trim().isEmpty())
+				{
+				String[] parts = coordinates.split(",");
+
+				String latitudeString = parts[0];
+				String longitudeString = parts[1];
+				if (!latitudeString.trim().isEmpty() && !longitudeString.trim().isEmpty()) {
+					double latitude = Double.parseDouble(latitudeString.trim());
+					double longitude = Double.parseDouble(longitudeString.trim());
+					accountProfile.setLatitude(BigDecimal.valueOf(latitude));
+					accountProfile.setLongitude(BigDecimal.valueOf(longitude));
+
+				}
 				}
 //				if (apDto.getPhone2() != null && !apDto.getPhone2().equals("")) {
 //                    
@@ -276,7 +294,7 @@ public class AccountProfileUncleJhonUploadService {
 			LocationAccountProfile profile = new LocationAccountProfile();
 
 			Optional<AccountProfile> locAcc = accountProfiles.stream()
-					.filter(acc -> acc.getCustomerId().equalsIgnoreCase(locAccDto.getCode().trim())).findAny();
+					.filter(acc -> acc.getCustomerId().equalsIgnoreCase(locAccDto.getNumcode().trim())).findAny();
 
 			Optional<Location> location = locations.stream()
 					.filter(pl -> pl.getName().equalsIgnoreCase(locAccDto.getLocation().trim())).findAny();
@@ -309,7 +327,7 @@ public class AccountProfileUncleJhonUploadService {
 		log.debug("location account Profile Upload Sucess");
 
 		log.debug("Saving dealer location accounts");
-	
+
 		for (Dealer dealerLocAcc : dealer) {
 
 			LocationAccountProfile dealerprofile = new LocationAccountProfile();
@@ -376,8 +394,8 @@ public class AccountProfileUncleJhonUploadService {
 					accountProfile = new AccountProfile();
 
 					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-					accountProfile.setAddress(apDto.getDoor() + "~" + apDto.getLandmark() + "~" + apDto.getStreet()
-							+ "~" + apDto.getState());
+					accountProfile.setAddress(apDto.getDoor().trim() + "~" + apDto.getLandmark().trim() + "~" + apDto.getStreet().trim()
+							+ "~" + apDto.getState().trim());
 					accountProfile.setCustomerId(apDto.getDlrcode().trim());
 					accountProfile.setTinNo(String.valueOf(0.0));
 					accountProfile.setUser(user);
@@ -487,7 +505,7 @@ public class AccountProfileUncleJhonUploadService {
 		System.out.println("Successfully Saved");
 
 	}
-	
+
 	private void saveUpdateLocationHierarchy(Set<Location> distinctloc) {
 
 		List<LocationHierarchyDTO> locationHierarchyDTOs = locationToLocationHierarchyDtos(distinctloc);
@@ -575,6 +593,5 @@ public class AccountProfileUncleJhonUploadService {
 
 		return locationHierarchyDTOs;
 	}
-
 
 }
