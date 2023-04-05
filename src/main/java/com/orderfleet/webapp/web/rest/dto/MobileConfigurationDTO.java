@@ -78,6 +78,8 @@ public class MobileConfigurationDTO {
 	private boolean showDistanceFare;
 	private boolean multipleProduct;
 	private boolean showAccountBalanceInReceiptAmount;
+
+	private boolean enableOutstandingAmountDeduction;
  
 	public MobileConfigurationDTO() {
 		super();
@@ -142,6 +144,7 @@ public class MobileConfigurationDTO {
         this.bluetoothPaperType = mobileConfiguration.getBluetoothPaperType();
         this.multipleProduct = mobileConfiguration.getMultipleProduct();
         this.showAccountBalanceInReceiptAmount=mobileConfiguration.getShowAccountBalanceInReceiptAmount();
+		this.enableOutstandingAmountDeduction = mobileConfiguration.getEnableOutstandingAmountDeduction();
 	}
 
 	public String getPid() {
@@ -599,6 +602,12 @@ public class MobileConfigurationDTO {
 	public void setShowAccountBalanceInReceiptAmount(boolean showAccountBalanceInReceiptAmount) {
 		this.showAccountBalanceInReceiptAmount = showAccountBalanceInReceiptAmount;
 	}
-	
-	
+
+	public boolean getEnableOutstandingAmountDeduction() {
+		return enableOutstandingAmountDeduction;
+	}
+
+	public void setEnableOutstandingAmountDeduction(boolean enableOutstandingAmountDeduction) {
+		this.enableOutstandingAmountDeduction = enableOutstandingAmountDeduction;
+	}
 }

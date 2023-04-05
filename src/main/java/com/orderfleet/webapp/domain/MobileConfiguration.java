@@ -228,6 +228,10 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "show_AccountBalanceIn_ReceiptAmount", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean showAccountBalanceInReceiptAmount;
 
+
+	@Column(name = "enable_outstanding_amount_deduction", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enableOutstandingAmountDeduction;
+
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -699,6 +703,14 @@ public class MobileConfiguration implements Serializable {
 
 	public void setShowAccountBalanceInReceiptAmount(boolean showAccountBalanceInReceiptAmount) {
 		this.showAccountBalanceInReceiptAmount = showAccountBalanceInReceiptAmount;
+	}
+
+	public boolean getEnableOutstandingAmountDeduction() {
+		return enableOutstandingAmountDeduction;
+	}
+
+	public void setEnableOutstandingAmountDeduction(boolean enableOutstandingAmountDeduction) {
+		this.enableOutstandingAmountDeduction = enableOutstandingAmountDeduction;
 	}
 
 	@Override

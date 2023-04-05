@@ -91,6 +91,7 @@
 						<th>Bluetooth Paper Type</th>
 						<th>MultipleProduct</th>
 						<th>Show AccountBalance In Receipt Amount</th>
+						<th>Enable OutstandingAmount Deduction</th>
 						<th>Action</th>
 
 					</tr>
@@ -154,6 +155,7 @@
        			            <td>${mobileConfiguration.bluetoothPaperType}</td>
        			            <td>${mobileConfiguration.multipleProduct}</td>
        			            <td>${mobileConfiguration.showAccountBalanceInReceiptAmount}</td>
+       			            <td>${mobileConfiguration.enableOutstandingAmountDeduction}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -537,6 +539,15 @@
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
+										<tr>
+                                            <td>
+                                                <div class="form-group">
+                                        		     <label class="control-label">Enable OutstandingAmount Deduction
+                                        		     </label> <input id="outstandingDeduction" name='outstandingDeduction'
+                                        			  type='checkbox' class="form-control" />
+                                        	    </div>
+                                             </td>
+                                        </tr>
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Vchr.No Generation

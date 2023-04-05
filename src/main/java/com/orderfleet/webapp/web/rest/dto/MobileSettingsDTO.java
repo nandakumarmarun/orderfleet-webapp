@@ -133,6 +133,8 @@ public class MobileSettingsDTO {
      private boolean multipleProduct;
      
      private boolean showAccountBalanceInReceiptAmount;
+
+	private boolean enableOutstandingAmountDeduction;
      
 	public MobileSettingsDTO() {
 		super();
@@ -194,6 +196,7 @@ public class MobileSettingsDTO {
 		this.bluetoothPaperType = mobileConfigurationDTO.getBluetoothPaperType();
 		this.multipleProduct = mobileConfigurationDTO.getMultipleProduct();
 		this.showAccountBalanceInReceiptAmount =mobileConfigurationDTO.getShowAccountBalanceInReceiptAmount();
+		this.enableOutstandingAmountDeduction=mobileConfigurationDTO.getEnableOutstandingAmountDeduction();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -659,6 +662,12 @@ public class MobileSettingsDTO {
 	public void setShowAccountBalanceInReceiptAmount(boolean showAccountBalanceInReceiptAmount) {
 		this.showAccountBalanceInReceiptAmount = showAccountBalanceInReceiptAmount;
 	}
-	
-	
+
+	public boolean isEnableOutstandingAmountDeduction() {
+		return enableOutstandingAmountDeduction;
+	}
+
+	public void setEnableOutstandingAmountDeduction(boolean enableOutstandingAmountDeduction) {
+		this.enableOutstandingAmountDeduction = enableOutstandingAmountDeduction;
+	}
 }

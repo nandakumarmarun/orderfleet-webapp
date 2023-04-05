@@ -65,7 +65,8 @@ if (!this.MobileConfiguration) {
 			roundOffAutomation : false,
 			ptenQuotationLayout:false,
 			multipleProduct:false,
-			showAccountBalanceInReceiptAmount:false
+			showAccountBalanceInReceiptAmount:false,
+			enableOutstandingAmountDeduction:false
 			
 	};
 
@@ -202,6 +203,8 @@ if (!this.MobileConfiguration) {
 		":checked");
 		mobileConfigurationDTO.showAccountBalanceInReceiptAmount = $("#accountBalance").is(
 		":checked");
+		mobileConfigurationDTO.enableOutstandingAmountDeduction = $("#outstandingDeduction").is(
+        		":checked");
 		
 		$.ajax({
 			url : contextPath,
@@ -333,6 +336,8 @@ if (!this.MobileConfiguration) {
 									data.multipleProduct);
 							$('#accountBalance').prop("checked",
 									data.showAccountBalanceInReceiptAmount);
+							$('#outstandingDeduction').prop("checked",
+                            		data.enableOutstandingAmountDeduction);
 						}
 
 					},
