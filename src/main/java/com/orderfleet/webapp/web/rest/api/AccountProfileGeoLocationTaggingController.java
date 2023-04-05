@@ -143,7 +143,7 @@ if (minutes > 10) {
 					+ description);
 		if (opAccp.isPresent()) {
 			geoLocationTaggingDTOs = accountProfileGeoLocationTaggingService
-					.getAllAccountProfileGeoLocationTaggingByAccountProfile(opAccp.get().getPid());
+					.getAllAccountProfileGeoLocationTaggingByAccountProfileNew(opAccp.get().getPid(),opAccp.get());
 
 		}
 

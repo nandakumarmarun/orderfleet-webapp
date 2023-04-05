@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -132,6 +133,13 @@ public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfi
 					+ description);
 
 		List<AccountProfileGeoLocationTaggingDTO>accountProfileGeoLocationTaggingDTOs=setGeoLocationTaggingListToGeoLocationTaggingDTOList(accountProfileGeoLocationTaggings);
+		return accountProfileGeoLocationTaggingDTOs;
+	}
+	@Override
+	public List<AccountProfileGeoLocationTaggingDTO> getAllAccountProfileGeoLocationTaggingByAccountProfileNew(String pid, AccountProfile accountProfile) {
+		List<AccountProfileGeoLocationTagging>accountProfileGeoLocationTaggings=accountProfileGeoLocationTaggingRepository.findAllAccountProfileGeoLocationTaggingByAccountProfilePid(pid);
+		List<AccountProfileGeoLocationTagging> filterByLongitudeAndLatitude = accountProfileGeoLocationTaggings.stream().filter(data -> data.getLatitude().equals(accountProfile.getLatitude()) && data.getLongitude().equals(accountProfile.getLongitude())).collect(Collectors.toList());
+		List<AccountProfileGeoLocationTaggingDTO>accountProfileGeoLocationTaggingDTOs=setGeoLocationTaggingListToGeoLocationTaggingDTOList(filterByLongitudeAndLatitude);
 		return accountProfileGeoLocationTaggingDTOs;
 	}
 
