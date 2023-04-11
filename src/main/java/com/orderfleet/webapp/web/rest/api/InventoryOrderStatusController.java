@@ -14,14 +14,13 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.web.rest.api.dto.LastOrderItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.InventoryVoucherDetail;
@@ -271,5 +270,36 @@ public class InventoryOrderStatusController {
 		}
 		return new ResponseEntity<List<InventoryVoucherHeaderDTO>>(inventoryVoucherHeaderDTOs, HttpStatus.OK);
 
+	}
+
+	@RequestMapping(value = "/lastOrder-products", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<LastOrderItem>> getLastOrderProduct(@RequestParam String accountProfilePid, @RequestParam String UserPid) {
+		log.info("Get product last Order"+accountProfilePid + UserPid);
+		List<LastOrderItem> lastOrderItems = new ArrayList<>();
+		if(accountProfilePid == null || UserPid == null){
+			return new ResponseEntity<List<LastOrderItem>>(lastOrderItems, HttpStatus.OK);
+		}
+		List<Object[]> ivh = inventoryVoucherHeaderRepository.findFirstByInventoryVoucherHeaderByCreatedDateDesc(UserPid,accountProfilePid);
+		if (!ivh.isEmpty()){
+			Object[] lastOrder = ivh.get(0);
+			List<Object[]> pp = inventoryVoucherDetailRepository.findProductByInventoryVoucherHeaderId((Long) lastOrder[0]);
+			pp.forEach(product -> {
+				LastOrderItem lastOrderItem = new LastOrderItem();
+				lastOrderItem.setProductPid(product[0] == null ?"" :product[0].toString());
+				lastOrderItem.setProductName(product[1] == null ? "" : product[1].toString());
+				lastOrderItem.setQuantity(product[2] == null ? 0 : (double) product[2]);
+				lastOrderItem.setOrderDate(lastOrder[1] == null ? null : lastOrder[1].toString());
+				lastOrderItems.add(lastOrderItem);
+			});
+//			List<ProductProfileDTO> result = pp.stream().map(ProductProfileDTO::new)
+//				.collect(Collectors.toList());
+		}
+
+//		Long ivh = inventoryVoucherHeaderRepository.findTop1ByCreatedByLoginOrderAndCustomerIdByCreatedDateDesc(UserId, accountProfileId);
+//		List<ProductProfile> pp = inventoryVoucherDetailRepository.findProductByInventoryVoucherHeaderId(ivh);
+//		List<ProductProfileDTO> result = pp.stream().map(ProductProfileDTO::new)
+//				.collect(Collectors.toList());
+		return new ResponseEntity<List<LastOrderItem>>(lastOrderItems, HttpStatus.OK);
 	}
 }
