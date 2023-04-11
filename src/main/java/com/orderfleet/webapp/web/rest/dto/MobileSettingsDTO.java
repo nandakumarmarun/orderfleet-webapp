@@ -135,7 +135,11 @@ public class MobileSettingsDTO {
      private boolean showAccountBalanceInReceiptAmount;
 
 	private boolean enableOutstandingAmountDeduction;
-     
+
+	private boolean enablePreviousOrderItems;
+
+	private boolean enablelivetracking;
+
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -197,6 +201,8 @@ public class MobileSettingsDTO {
 		this.multipleProduct = mobileConfigurationDTO.getMultipleProduct();
 		this.showAccountBalanceInReceiptAmount =mobileConfigurationDTO.getShowAccountBalanceInReceiptAmount();
 		this.enableOutstandingAmountDeduction=mobileConfigurationDTO.getEnableOutstandingAmountDeduction();
+		this.enablePreviousOrderItems = mobileConfigurationDTO.getEnablePreviousOrderItems();
+		this.enablelivetracking = mobileConfigurationDTO.getEnablelivetracking();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -669,5 +675,21 @@ public class MobileSettingsDTO {
 
 	public void setEnableOutstandingAmountDeduction(boolean enableOutstandingAmountDeduction) {
 		this.enableOutstandingAmountDeduction = enableOutstandingAmountDeduction;
+	}
+
+	public boolean getEnablePreviousOrderItems() {
+		return enablePreviousOrderItems;
+	}
+
+	public void setEnablePreviousOrderItems(boolean enablePreviousOrderItems) {
+		this.enablePreviousOrderItems = enablePreviousOrderItems;
+	}
+
+	public boolean getEnablelivetracking() {
+		return enablelivetracking;
+	}
+
+	public void setEnablelivetracking(boolean enablelivetracking) {
+		this.enablelivetracking = enablelivetracking;
 	}
 }

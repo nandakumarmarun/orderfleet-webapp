@@ -151,6 +151,8 @@ public class KilometerCalculationResource {
 		List<KilometerCalculationDTO> result = kilometreCalculations.stream().map(KilometerCalculationDTO::new)
 				.collect(Collectors.toList());
 
+		log.debug(result.toString());
+
 		for (KilometerCalculationDTO kilocalc : result) {
 			if (kilocalc.getLocation() == null) {
 				LocalDateTime fromDate = kilocalc.getDate().atTime(0, 0);

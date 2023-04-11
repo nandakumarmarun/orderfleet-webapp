@@ -100,6 +100,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setMultipleProduct(mobileConfigurationDTO.getMultipleProduct());
 		configuration.setShowAccountBalanceInReceiptAmount(mobileConfigurationDTO.getShowAccountBalanceInReceiptAmount());
 		configuration.setEnableOutstandingAmountDeduction(mobileConfigurationDTO.getEnableOutstandingAmountDeduction());
+		configuration.setEnablePreviousOrderItems(mobileConfigurationDTO.getEnablePreviousOrderItems());
+		configuration.setEnablelivetracking(mobileConfigurationDTO.getEnablelivetracking());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -164,6 +166,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setMultipleProduct(mobileConfigurationDTO.getMultipleProduct());
 			configuration.setShowAccountBalanceInReceiptAmount(mobileConfigurationDTO.getShowAccountBalanceInReceiptAmount());
 			configuration.setEnableOutstandingAmountDeduction(mobileConfigurationDTO.getEnableOutstandingAmountDeduction());
+			configuration.setEnablePreviousOrderItems(mobileConfigurationDTO.getEnablePreviousOrderItems());
+			configuration.setEnablelivetracking(mobileConfigurationDTO.getEnablelivetracking());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

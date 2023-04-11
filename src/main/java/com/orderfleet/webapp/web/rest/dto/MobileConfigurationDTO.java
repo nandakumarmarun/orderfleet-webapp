@@ -80,6 +80,8 @@ public class MobileConfigurationDTO {
 	private boolean showAccountBalanceInReceiptAmount;
 
 	private boolean enableOutstandingAmountDeduction;
+	private boolean enablePreviousOrderItems;
+	private boolean enablelivetracking;
  
 	public MobileConfigurationDTO() {
 		super();
@@ -145,6 +147,8 @@ public class MobileConfigurationDTO {
         this.multipleProduct = mobileConfiguration.getMultipleProduct();
         this.showAccountBalanceInReceiptAmount=mobileConfiguration.getShowAccountBalanceInReceiptAmount();
 		this.enableOutstandingAmountDeduction = mobileConfiguration.getEnableOutstandingAmountDeduction();
+		this.enablePreviousOrderItems = mobileConfiguration.getEnablePreviousOrderItems();
+		this.enablelivetracking = mobileConfiguration.getEnablelivetracking();
 	}
 
 	public String getPid() {
@@ -609,5 +613,21 @@ public class MobileConfigurationDTO {
 
 	public void setEnableOutstandingAmountDeduction(boolean enableOutstandingAmountDeduction) {
 		this.enableOutstandingAmountDeduction = enableOutstandingAmountDeduction;
+	}
+
+	public boolean getEnablePreviousOrderItems() {
+		return enablePreviousOrderItems;
+	}
+
+	public void setEnablePreviousOrderItems(boolean enablePreviousOrderItems) {
+		this.enablePreviousOrderItems = enablePreviousOrderItems;
+	}
+
+	public boolean getEnablelivetracking() {
+		return enablelivetracking;
+	}
+
+	public void setEnablelivetracking(boolean enablelivetracking) {
+		this.enablelivetracking = enablelivetracking;
 	}
 }

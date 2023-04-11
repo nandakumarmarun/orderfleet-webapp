@@ -232,6 +232,12 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "enable_outstanding_amount_deduction", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean enableOutstandingAmountDeduction;
 
+	@Column(name = "enable_previous_order_items", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enablePreviousOrderItems;
+
+	@Column(name = "enable_live_tracking", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enablelivetracking;
+
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -711,6 +717,23 @@ public class MobileConfiguration implements Serializable {
 
 	public void setEnableOutstandingAmountDeduction(boolean enableOutstandingAmountDeduction) {
 		this.enableOutstandingAmountDeduction = enableOutstandingAmountDeduction;
+	}
+
+	public boolean getEnablePreviousOrderItems() {
+		return enablePreviousOrderItems;
+	}
+
+	public void setEnablePreviousOrderItems(boolean enablePreviousOrderItems) {
+		this.enablePreviousOrderItems = enablePreviousOrderItems;
+	}
+
+
+	public boolean getEnablelivetracking() {
+		return enablelivetracking;
+	}
+
+	public void setEnablelivetracking(boolean enablelivetracking) {
+		this.enablelivetracking = enablelivetracking;
 	}
 
 	@Override

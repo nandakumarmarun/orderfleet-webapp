@@ -190,4 +190,25 @@ public class KilometerCalculationDTO {
 		this.punchingTime = punchingTime;
 	}
 
+	@Override
+	public String toString() {
+		return "KilometerCalculationDTO{" +
+				"kilometre=" + kilometre +
+				", metres=" + metres +
+				", date=" + date +
+				", startLocation='" + startLocation + '\'' +
+				", endLocation='" + endLocation + '\'' +
+				", userName='" + userName + '\'' +
+				", UserPid='" + UserPid + '\'' +
+				", createdDate=" + createdDate +
+				", punchingDate='" + punchingDate + '\'' +
+				", punchingTime='" + punchingTime + '\'' +
+				", lastModifiedDate=" + lastModifiedDate +
+				", employeePid='" + employeePid + '\'' +
+				", employeeName='" + employeeName + '\'' +
+				", taskExecutionPid='" + taskExecutionPid + '\'' +
+				", accountProfileName='" + accountProfileName + '\'' +
+				", location='" + location + '\'' +
+				'}';
+	}
 }

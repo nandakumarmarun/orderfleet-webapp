@@ -92,6 +92,8 @@
 						<th>MultipleProduct</th>
 						<th>Show AccountBalance In Receipt Amount</th>
 						<th>Enable OutstandingAmount Deduction</th>
+						<th>Enable Previous Order Items</th>
+						<th>Enable Live Tracking</th>
 						<th>Action</th>
 
 					</tr>
@@ -148,14 +150,16 @@
 							<td>${mobileConfiguration.productProfileDisplayName}</td>
 							<td>${mobileConfiguration.productProfilePrintName}</td>
 							<td>${mobileConfiguration.maxCartNos}</td>
-							<td>${mobileConfiguration. cartMaxSize}</td>
-							<td>${mobileConfiguration. roundOffAutomation}</td>
+							<td>${mobileConfiguration.cartMaxSize}</td>
+							<td>${mobileConfiguration.roundOffAutomation}</td>
 							<td>${mobileConfiguration.ptenQuotationLayout}</td>
        			            <td>${mobileConfiguration.showDistanceFare}</td>
        			            <td>${mobileConfiguration.bluetoothPaperType}</td>
        			            <td>${mobileConfiguration.multipleProduct}</td>
        			            <td>${mobileConfiguration.showAccountBalanceInReceiptAmount}</td>
        			            <td>${mobileConfiguration.enableOutstandingAmountDeduction}</td>
+       			            <td>${mobileConfiguration.enablePreviousOrderItems}</td>
+       			            <td>${mobileConfiguration.enablelivetracking}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -548,6 +552,25 @@
                                         	    </div>
                                              </td>
                                         </tr>
+
+                                        <tr>
+                                         <td>
+                                              <div class="form-group">
+                                                   <label class="control-label">Enable Previous Order Items
+                                                      </label> <input id="enablePreviousOrderItems" name='enablePreviousOrderItems'
+                                                         type='checkbox' class="form-control" />
+                                                         </div>
+                                                      </td>
+                                         </tr>
+                                         <tr>
+                                            <td>
+                                               <div class="form-group">
+                                                   <label class="control-label">Enable Live Tracking
+                                                        </label> <input id="enablelivetracking" name='enablelivetracking'
+                                                        type='checkbox' class="form-control" />
+                                                         </div>
+                                            </td>
+                                         </tr>
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Vchr.No Generation

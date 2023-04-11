@@ -66,8 +66,9 @@ if (!this.MobileConfiguration) {
 			ptenQuotationLayout:false,
 			multipleProduct:false,
 			showAccountBalanceInReceiptAmount:false,
-			enableOutstandingAmountDeduction:false
-			
+			enableOutstandingAmountDeduction:false,
+			enablePreviousOrderItems:false,
+			enablelivetracking:false
 	};
 
 	$(document).ready(function() {
@@ -205,6 +206,10 @@ if (!this.MobileConfiguration) {
 		":checked");
 		mobileConfigurationDTO.enableOutstandingAmountDeduction = $("#outstandingDeduction").is(
         		":checked");
+        mobileConfigurationDTO.enablePreviousOrderItems = $("#enablePreviousOrderItems").is(
+                		":checked");
+        mobileConfigurationDTO.enablelivetracking = $("#enablelivetracking").is(
+                		":checked");
 		
 		$.ajax({
 			url : contextPath,
@@ -338,6 +343,10 @@ if (!this.MobileConfiguration) {
 									data.showAccountBalanceInReceiptAmount);
 							$('#outstandingDeduction').prop("checked",
                             		data.enableOutstandingAmountDeduction);
+                            $('#enablePreviousOrderItems').prop("checked",
+                               data.enablePreviousOrderItems);
+                            $('#enablelivetracking').prop("checked",
+                               data.enablelivetracking);
 						}
 
 					},
