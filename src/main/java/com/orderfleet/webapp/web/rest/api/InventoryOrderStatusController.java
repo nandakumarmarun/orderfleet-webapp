@@ -281,7 +281,6 @@ public class InventoryOrderStatusController {
 			return new ResponseEntity<List<LastOrderItem>>(lastOrderItems, HttpStatus.OK);
 		}
 		List<Object[]> ivh = inventoryVoucherHeaderRepository.findFirstByInventoryVoucherHeaderByCreatedDateDesc(UserPid,accountProfilePid);
-		System.out.println("sasasasasasas"+ivh.size());
 		if (!ivh.isEmpty()){
 			Object[] lastOrder = ivh.get(0);
 			List<Object[]> pp = inventoryVoucherDetailRepository.findProductByInventoryVoucherHeaderId((Long) lastOrder[0]);
