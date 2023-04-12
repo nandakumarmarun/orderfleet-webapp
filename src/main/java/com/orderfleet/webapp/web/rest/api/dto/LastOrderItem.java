@@ -5,6 +5,8 @@ public class LastOrderItem {
     private String productName;
     private double quantity;
 
+    private double sellingRate;
+
     private String orderDate;
 
     public LastOrderItem() {
@@ -40,5 +42,13 @@ public class LastOrderItem {
 
     public void setOrderDate(String orderDate) {
         this.orderDate = orderDate;
+    }
+
+    public double getSellingRate() {
+        return sellingRate;
+    }
+
+    public void setSellingRate(double sellingRate) {
+        this.sellingRate = sellingRate;
     }
 }

@@ -281,6 +281,7 @@ public class InventoryOrderStatusController {
 			return new ResponseEntity<List<LastOrderItem>>(lastOrderItems, HttpStatus.OK);
 		}
 		List<Object[]> ivh = inventoryVoucherHeaderRepository.findFirstByInventoryVoucherHeaderByCreatedDateDesc(UserPid,accountProfilePid);
+		System.out.println("sasasasasasas"+ivh.size());
 		if (!ivh.isEmpty()){
 			Object[] lastOrder = ivh.get(0);
 			List<Object[]> pp = inventoryVoucherDetailRepository.findProductByInventoryVoucherHeaderId((Long) lastOrder[0]);
@@ -289,6 +290,7 @@ public class InventoryOrderStatusController {
 				lastOrderItem.setProductPid(product[0] == null ?"" :product[0].toString());
 				lastOrderItem.setProductName(product[1] == null ? "" : product[1].toString());
 				lastOrderItem.setQuantity(product[2] == null ? 0 : (double) product[2]);
+				lastOrderItem.setSellingRate(product[3] == null ? 0 : (double) product[3]);
 				lastOrderItem.setOrderDate(lastOrder[1] == null ? null : lastOrder[1].toString());
 				lastOrderItems.add(lastOrderItem);
 			});
