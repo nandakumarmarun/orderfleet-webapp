@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.vendor.uncleJhon.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -12,11 +13,14 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.orderfleet.webapp.domain.AccountProfile;
+import com.orderfleet.webapp.domain.AccountProfileGeoLocationTagging;
 import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.DistributorDealerAssociation;
@@ -26,6 +30,7 @@ import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.repository.AccountProfileGeoLocationTaggingRepository;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
@@ -37,6 +42,7 @@ import com.orderfleet.webapp.repository.RouteCodeRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.service.AccountProfileGeoLocationTaggingService;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.service.LocationService;
@@ -72,6 +78,9 @@ public class AccountProfileUncleJhonUploadService {
 	private final DistributorDealerProfileRepository distributorDealerProfileRepository;
 
 	private final LocationHierarchyRepository locationHierarchyRepository;
+	
+	@Inject
+	private AccountProfileGeoLocationTaggingRepository accountProfileGeoLocationTaggingRepository;
 
 	public AccountProfileUncleJhonUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
@@ -237,6 +246,7 @@ public class AccountProfileUncleJhonUploadService {
 					accountProfile.setPhone1("");
 				}
 
+			
 				String coordinates = apDto.getLatitude();
 				if (!apDto.getLatitude().trim().isEmpty()) {
 					String[] parts = coordinates.split(",");
@@ -364,6 +374,57 @@ public class AccountProfileUncleJhonUploadService {
 		log.debug("location account Profile Upload Sucess in dealer");
 	}
 
+	public void saveAccountProfileGeoLocation(List<AccountUJ> accountUJ) {
+		// TODO Auto-generated method stub
+		
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		log.debug("CompnayId :" + companyId);
+		
+		String userLogin = SecurityUtils.getCurrentUserLogin();
+		User user = userRepository.findByCompanyIdAndLogin(companyId, userLogin);
+		
+		         List<String> customerId = accountUJ.stream().map(acc ->acc.getNumcode()).collect(Collectors.toList());
+		         
+		         List<AccountProfile> acccountProfiles = accountProfileRepository.findAccountProfilesByCompanyIdAndCustomerIdIn(companyId,customerId);
+		         
+		         List<AccountProfileGeoLocationTagging> geotag = accountProfileGeoLocationTaggingRepository.findAllByCompanyId(companyId);
+		         
+		         List<Long> geoLocationAccountProfilesIds = new ArrayList<>();
+		         
+		         List<AccountProfileGeoLocationTagging> newAssociaton = new ArrayList<>();
+		         
+		         for(AccountProfile accProfile :acccountProfiles)
+		         {
+		        	 AccountProfileGeoLocationTagging apglt = new AccountProfileGeoLocationTagging();
+		        	      Optional<AccountProfileGeoLocationTagging>accGeotag    =  geotag.stream().filter(acc->acc.getAccountProfile().getCustomerId().equals(accProfile.getCustomerId())).findAny();
+		        	 
+		        	      if(accGeotag.isPresent())
+		        	      {
+		        	    	  geoLocationAccountProfilesIds.add(accGeotag.get().getId());
+		        	      }
+		        	      
+		        	      apglt.setPid(AccountProfileGeoLocationTaggingService.PID_PREFIX+RandomUtil.generatePid());
+		        	      apglt.setAccountProfile(accProfile);
+		        	      apglt.setLatitude(accProfile.getLatitude());
+		        	      apglt.setLongitude(accProfile.getLatitude());
+		        	      apglt.setLocation(accProfile.getLocation());
+		        	      apglt.setSendDate(LocalDateTime.now());
+		        	      apglt.setCompany(company);
+		        	      apglt.setCreatedDate(LocalDateTime.now());
+		        	      apglt.setUser(user);
+		        	      newAssociaton.add(apglt);
+		         }
+		         
+		         if(geoLocationAccountProfilesIds.size() != 0)
+		         {
+		        	 accountProfileGeoLocationTaggingRepository.deleteByIdIn(companyId,geoLocationAccountProfilesIds) ;
+		         }
+		         
+		         accountProfileGeoLocationTaggingRepository.save(newAssociaton); 
+		
+	}
+	
 	public void saveDealer(List<Dealer> dealer) {
 
 		log.info("Saving Dealer Master.........");
@@ -394,7 +455,6 @@ public class AccountProfileUncleJhonUploadService {
 					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
 					accountProfile.setAddress(apDto.getDoor().trim() + "~" + apDto.getLandmark().trim() + "~"
 							+ apDto.getStreet().trim() + "~" + apDto.getState().trim());
-					accountProfile.setCustomerId(apDto.getDlrcode().trim());
 					accountProfile.setTinNo(String.valueOf(0.0));
 					accountProfile.setUser(user);
 					accountProfile.setCompany(company);
@@ -404,6 +464,8 @@ public class AccountProfileUncleJhonUploadService {
 
 				}
 
+				accountProfile.setCustomerId(apDto.getDlrcode().trim());
+				accountProfile.setCustomerCode(apDto.getDlrcode().trim());
 				String accountCode = apDto.getDlrcode().substring(0, apDto.getDlrcode().indexOf('.'));
 
 				Optional<AccountType> accountType = accountTypes.stream()
@@ -470,6 +532,11 @@ public class AccountProfileUncleJhonUploadService {
 		Company company = companyRepository.findOne(companyId);
 
 		List<AccountProfile> accountProfiles = accountProfileService.findAllAccountProfileByCompanyId(companyId);
+		List<AccountProfile> codelessAccounts = accountProfiles.stream().filter(acc -> acc.getCustomerCode() == null)
+				.collect(Collectors.toList());
+
+		accountProfiles.removeAll(codelessAccounts);
+
 		List<DistributorDealerAssociation> distributDeal = distributorDealerProfileRepository
 				.findAllByCompanyId(companyId);
 		List<DistributorDealerAssociation> DistributorDealerList = new ArrayList<>();
@@ -478,26 +545,30 @@ public class AccountProfileUncleJhonUploadService {
 
 			Optional<DistributorDealerAssociation> association = distributDeal.stream()
 					.filter(dd -> dd.getDealer().getCustomerId().trim().equalsIgnoreCase(dealers.getDlrcode().trim())
-							&& dd.getDistributor().getCustomerCode().trim().equalsIgnoreCase(dealers.getDistcode().trim()))
+							&& dd.getDistributor().getCustomerCode().trim()
+									.equalsIgnoreCase(dealers.getDistcode().trim()))
 					.findAny();
 			DistributorDealerAssociation distributorDealer = new DistributorDealerAssociation();
 			if (association.isPresent()) {
 
 				distributorDealer = association.get();
 			} else {
+
 				Optional<AccountProfile> dist = accountProfiles.stream()
-						.filter(dis -> dis.getCustomerCode().trim().equalsIgnoreCase(dealers.getDistcode().trim())).findAny();
+						.filter(dis -> dis.getCustomerCode().trim().equalsIgnoreCase(dealers.getDistcode().trim()))
+						.findAny();
 				Optional<AccountProfile> deal = accountProfiles.stream()
-						.filter(del -> del.getCustomerId().trim().equalsIgnoreCase(dealers.getDlrcode().trim())).findAny();
+						.filter(del -> del.getCustomerId().trim().equalsIgnoreCase(dealers.getDlrcode().trim()))
+						.findAny();
 
 				if (dist.isPresent() && deal.isPresent()) {
 					distributorDealer.setDistributor(dist.get());
 					distributorDealer.setDealer(deal.get());
 					distributorDealer.setCompany(company);
 				}
-       
+
 			}
-			
+
 			DistributorDealerList.add(distributorDealer);
 		}
 		distributorDealerProfileRepository.save(DistributorDealerList);
@@ -592,5 +663,7 @@ public class AccountProfileUncleJhonUploadService {
 
 		return locationHierarchyDTOs;
 	}
+
+	
 
 }

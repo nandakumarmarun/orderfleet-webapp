@@ -257,4 +257,6 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.createdDate between ?2 and ?3")
       List<AccountProfile> findByCompanyIdAndCreatedDateBetween(Long companyId, LocalDateTime fromDate, LocalDateTime toDate);
 
+	
+
 }

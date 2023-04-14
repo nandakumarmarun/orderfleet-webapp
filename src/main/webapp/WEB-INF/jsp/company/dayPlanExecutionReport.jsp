@@ -51,24 +51,33 @@
 								<button type="button" class="btn btn-info"
 									onclick="DayPlanExecutionReport.filter()">Apply</button>
 							</div>
+							<div class="col-sm-3">
+							<button id="btnDownload" type="button" class="btn btn-success">Download
+								Xls</button>
+						</div>
 						</div>
 					</form>
 				</div>
 			</div>
-			<table class="table  table-striped table-bordered">
+			<table id =tblDayPlans class="table  table-striped table-bordered">
 				<thead>
 					<tr>
 						<th>Created Date</th>
 						<th>Day Plan</th>
+						<th>Execution Date &Time</th>
+						<th>Planned Order</th>
 						<th>Execution Order</th>
 						<th>Execution Status</th>
 						<th>Remarks</th>
+						<th>GeoLocation</th>
+						<th>Geo Tag</th>
+						<th>Variance</th>
 						
 					</tr>
 				</thead>
 				<tbody id="tBodyDayPlans">
 					<tr>
-						<td colspan='4' align='center'>No data available</td>
+						<td colspan='10' align='center'>No data available</td>
 					</tr>
 				</tbody>
 			</table>
@@ -85,6 +94,13 @@
 	<spring:url value="/resources/app/day-plan-execution-report.js"
 		var="dayPlanExecutionReportJs"></spring:url>
 	<script type="text/javascript" src="${dayPlanExecutionReportJs}"></script>
+	<spring:url value="/resources/assets/js/table2excel.js"
+		var="table2excel"></spring:url>
+	<script type="text/javascript" src="${table2excel}"></script>
+	
+	<spring:url value="/resources/assets/js/jquery.table2excel.min.js"
+		var="table2excelMin"></spring:url>
+	<script type="text/javascript" src="${table2excelMin}"></script>
 	<script type="text/javascript">
 		// call from dash board
 		$(document).ready(function() {

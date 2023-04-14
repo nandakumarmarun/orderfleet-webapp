@@ -1,11 +1,13 @@
 package com.orderfleet.webapp.web.rest.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
 
 import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
+import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.domain.enums.TaskCreatedType;
 import com.orderfleet.webapp.domain.enums.TaskPlanStatus;
 
@@ -57,6 +59,28 @@ public class ExecutiveTaskPlanDTO {
 	private String taskListAlias;
 
 	private int sortOrder;
+	
+	private LocalDateTime serverDate;
+	
+	private String executiveTaskExecutionPid;
+	
+	private String geoLocation;
+	
+	private String geoTagLocation;
+	
+	private BigDecimal executionLatitude;
+	
+	private BigDecimal executionLongitude;
+	
+	private BigDecimal accountLatitude;
+	
+	private BigDecimal accountLongitude;
+	
+	private LocationType locationType;
+	
+	private String variance;
+	
+	
 
 	public ExecutiveTaskPlanDTO() {
 		super();
@@ -72,13 +96,14 @@ public class ExecutiveTaskPlanDTO {
 				executiveTaskPlan.getTask() == null ? null : executiveTaskPlan.getTask().getPid(),
 				executiveTaskPlan.getTaskGroup() == null ? null : executiveTaskPlan.getTaskGroup().getPid(),
 				executiveTaskPlan.getTaskList() == null ? null : executiveTaskPlan.getTaskList().getPid(),
-				executiveTaskPlan.getSortOrder(), executiveTaskPlan.getUserRemarks(),executiveTaskPlan.getTaskList() == null ? null : executiveTaskPlan.getTaskList().getAlias());
+				executiveTaskPlan.getSortOrder(), executiveTaskPlan.getUserRemarks(),executiveTaskPlan.getTaskList() == null ? null : executiveTaskPlan.getTaskList().getAlias(),
+						executiveTaskPlan.getAccountProfile().getLatitude(),executiveTaskPlan.getAccountProfile().getLongitude());
 	}
 
 	public ExecutiveTaskPlanDTO(String pid, LocalDateTime createdDate, String createdBy, TaskPlanStatus taskPlanStatus,
 			String remarks, LocalDateTime plannedDate, String activityPid, String activityName, String accountTypePid,
 			String accountTypeName, String accountProfilePid, String accountProfileName, String taskPid,
-			String taskGroupPid, String taskListPid, int sortOrder, String userRemarks,String taskListAlias) {
+			String taskGroupPid, String taskListPid, int sortOrder, String userRemarks,String taskListAlias,BigDecimal accountLatitude,BigDecimal accountLongitude) {
 		super();
 		this.pid = pid;
 		this.createdBy = createdBy;
@@ -98,6 +123,47 @@ public class ExecutiveTaskPlanDTO {
 		this.sortOrder = sortOrder;
 		this.userRemarks = userRemarks;
 		this.taskListAlias=taskListAlias;
+		this.accountLatitude = accountLatitude;
+		this.accountLongitude = accountLongitude;
+	}
+	
+
+	public ExecutiveTaskPlanDTO(String pid, LocalDateTime createdDate, String createdBy, TaskPlanStatus taskPlanStatus,
+			String remarks, String userRemarks, LocalDateTime plannedDate, String activityPid, String activityName,
+			String accountTypePid, String accountTypeName, String accountProfilePid, String accountProfileName,
+			TaskCreatedType taskCreatedType, String taskPid, String taskGroupPid, String taskListPid,
+			String taskListAlias, int sortOrder, LocalDateTime serverDate, String executiveTaskExecutionPid,
+			String geoLocation, String geoTagLocation, BigDecimal executionLatitude, BigDecimal executionLongitude,
+			BigDecimal accountLatitude, BigDecimal accountLongitude, LocationType locationType) {
+		super();
+		this.pid = pid;
+		this.createdDate = createdDate;
+		this.createdBy = createdBy;
+		this.taskPlanStatus = taskPlanStatus;
+		this.remarks = remarks;
+		this.userRemarks = userRemarks;
+		this.plannedDate = plannedDate;
+		this.activityPid = activityPid;
+		this.activityName = activityName;
+		this.accountTypePid = accountTypePid;
+		this.accountTypeName = accountTypeName;
+		this.accountProfilePid = accountProfilePid;
+		this.accountProfileName = accountProfileName;
+		this.taskCreatedType = taskCreatedType;
+		this.taskPid = taskPid;
+		this.taskGroupPid = taskGroupPid;
+		this.taskListPid = taskListPid;
+		this.taskListAlias = taskListAlias;
+		this.sortOrder = sortOrder;
+		this.serverDate = serverDate;
+		this.executiveTaskExecutionPid = executiveTaskExecutionPid;
+		this.geoLocation = geoLocation;
+		this.geoTagLocation = geoTagLocation;
+		this.executionLatitude = executionLatitude;
+		this.executionLongitude = executionLongitude;
+		this.accountLatitude = accountLatitude;
+		this.accountLongitude = accountLongitude;
+		this.locationType = locationType;
 	}
 
 	public String getPid() {
@@ -254,6 +320,90 @@ public class ExecutiveTaskPlanDTO {
 		this.taskListAlias = taskListAlias;
 	}
 
+	
+
+	public LocalDateTime getServerDate() {
+		return serverDate;
+	}
+
+	public void setServerDate(LocalDateTime serverDate) {
+		this.serverDate = serverDate;
+	}
+
+	public String getExecutiveTaskExecutionPid() {
+		return executiveTaskExecutionPid;
+	}
+
+	public void setExecutiveTaskExecutionPid(String executiveTaskExecutionPid) {
+		this.executiveTaskExecutionPid = executiveTaskExecutionPid;
+	}
+	
+
+	public String getGeoLocation() {
+		return geoLocation;
+	}
+
+	public void setGeoLocation(String geoLocation) {
+		this.geoLocation = geoLocation;
+	}
+
+	public String getGeoTagLocation() {
+		return geoTagLocation;
+	}
+
+	public void setGeoTagLocation(String geoTagLocation) {
+		this.geoTagLocation = geoTagLocation;
+	}
+
+	
+	public BigDecimal getExecutionLatitude() {
+		return executionLatitude;
+	}
+
+	public void setExecutionLatitude(BigDecimal executionLatitude) {
+		this.executionLatitude = executionLatitude;
+	}
+
+	public BigDecimal getExecutionLongitude() {
+		return executionLongitude;
+	}
+
+	public void setExecutionLongitude(BigDecimal executionLongitude) {
+		this.executionLongitude = executionLongitude;
+	}
+
+	public BigDecimal getAccountLatitude() {
+		return accountLatitude;
+	}
+
+	public void setAccountLatitude(BigDecimal accountLatitude) {
+		this.accountLatitude = accountLatitude;
+	}
+
+	public BigDecimal getAccountLongitude() {
+		return accountLongitude;
+	}
+
+	public void setAccountLongitude(BigDecimal accountLongitude) {
+		this.accountLongitude = accountLongitude;
+	}
+
+	public LocationType getLocationType() {
+		return locationType;
+	}
+
+	public void setLocationType(LocationType locationType) {
+		this.locationType = locationType;
+	}
+
+	public String getVariance() {
+		return variance;
+	}
+
+	public void setVariance(String variance) {
+		this.variance = variance;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -278,13 +428,17 @@ public class ExecutiveTaskPlanDTO {
 
 	@Override
 	public String toString() {
-		return "ExecutiveTaskPlanDTO [pid=" + pid + ", createdDate=" + createdDate + ", createdBy=" + createdBy
-				+ ", taskPlanStatus=" + taskPlanStatus + ", remarks=" + remarks + ", userRemarks=" + userRemarks
-				+ ", plannedDate=" + plannedDate + ", activityPid=" + activityPid + ", activityName=" + activityName
-				+ ", accountTypePid=" + accountTypePid + ", accountTypeName=" + accountTypeName + ", accountProfilePid="
-				+ accountProfilePid + ", accountProfileName=" + accountProfileName + ", taskCreatedType="
-				+ taskCreatedType + ", taskPid=" + taskPid + ", taskGroupPid=" + taskGroupPid + ", taskListPid="
-				+ taskListPid + ", taskListAlias=" + taskListAlias + ", sortOrder=" + sortOrder + "]";
+		return "ExecutiveTaskPlanDTO [createdDate=" + createdDate + ", plannedDate=" + plannedDate + ", activityName="
+				+ activityName + ", accountTypeName=" + accountTypeName + ", accountProfilePid=" + accountProfilePid
+				+ ", accountProfileName=" + accountProfileName + ", sortOrder=" + sortOrder + ", serverDate="
+				+ serverDate + ", executiveTaskExecutionPid=" + executiveTaskExecutionPid + ", geoLocation="
+				+ geoLocation + ", geoTagLocation=" + geoTagLocation + ", executionLatitude=" + executionLatitude
+				+ ", executionLongitude=" + executionLongitude + ", accountLatitude=" + accountLatitude
+				+ ", accountLongitude=" + accountLongitude + ", locationType=" + locationType + "]";
 	}
+
+	
+
+	
 
 }

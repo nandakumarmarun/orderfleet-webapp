@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.orderfleet.webapp.domain.AccountProfileGeoLocationTagging;
@@ -30,6 +33,14 @@ public interface AccountProfileGeoLocationTaggingRepository extends JpaRepositor
 
 	@Query("select accountProfileGeoLocationTagging from AccountProfileGeoLocationTagging accountProfileGeoLocationTagging where accountProfileGeoLocationTagging.company.id = ?#{principal.companyId}")
 	List<AccountProfileGeoLocationTagging> findAllByCompanyId();
+	
+	@Query("select accountProfileGeoLocationTagging from AccountProfileGeoLocationTagging accountProfileGeoLocationTagging where accountProfileGeoLocationTagging.company.id = ?1")
+	List<AccountProfileGeoLocationTagging> findAllByCompanyId(Long companyId);
+
+	@Transactional
+	@Modifying
+	@Query("delete from AccountProfileGeoLocationTagging accountProfileGeoLocationTagging where accountProfileGeoLocationTagging.company.id = ?1 and accountProfileGeoLocationTagging.id in ?2")
+	void deleteByIdIn(Long companyId, List<Long> geoLocationAccountProfilesIds);
 	
 	
 }
