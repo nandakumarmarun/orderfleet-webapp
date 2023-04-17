@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -124,6 +125,9 @@ public class KilometerCalculationNewResource {
 
 		String userlogin = null;
 
+		LocalDateTime fromDate = fDate.atTime(0, 0);
+		LocalDateTime toDate = tDate.atTime(23, 59);
+
 		List<ExecutiveTaskExecution> lastExecutiveTaskExecution = new ArrayList<>();
 
 		List<KilometreCalculation> kilometreCalculations = new ArrayList<>();
@@ -134,7 +138,7 @@ public class KilometerCalculationNewResource {
 
 		Optional<EmployeeProfile> employee = employeeProfileRepository.findByUserPid(userPid);
 
-		Optional<Attendance> attendance = attendanceRepository.findTop1ByCompanyPidAndUserPidOrderByCreatedDateDesc(company.getPid(), userPid);
+		Optional<Attendance> attendance = attendanceRepository.findTop1ByCompanyPidAndUserPidAndCreatedDateBetweenOrderByCreatedDateDesc(company.getPid(), userPid,fromDate,toDate);
 
 		kilometreCalculations = kilometreCalculationRepository.findAllByCompanyIdAndUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fDate, tDate);
 
@@ -142,33 +146,38 @@ public class KilometerCalculationNewResource {
 
 		Optional<KilometreCalculation> optionalKilometreCalculation = kilometreCalculations.stream().filter(kilocalc -> kilocalc.getExecutiveTaskExecution() == null).findAny();
 
-		log.debug(userlogin+" : " + "ExecutiveTaskExecutions Size  :  " + lastExecutiveTaskExecution.size());
-
 		if(employee.isPresent())
 		{
 			userlogin = employee.get().getUser().getLogin();
 		}
 
+		log.debug(userlogin+" : " + "Order Details :  " + lastExecutiveTaskExecution.size());
+
 		if(optionalKilometreCalculation.isPresent()){
-				log.debug(userlogin +" : Present" );
+				log.debug(userlogin +" : Attandence" );
 				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO(optionalKilometreCalculation.get());
 				kiloCalDTO.setLocation(attendance.get().getLocation());
 				kiloCalDTOs.add(kiloCalDTO);
 		}
 
-		if (attendance.isPresent() && attendance.get().getCreatedDate().toLocalDate().isEqual(LocalDate.now())) {
+		if (attendance.isPresent() && attendance.get().getCreatedDate().toLocalDate().isEqual(fDate)) {
+			log.debug(userlogin +" : "+ "Attendence :  Present" + " On " + attendance.get().getCreatedDate().toLocalDate());
 			if (attendance.get().getLatitude() != null && attendance.get().getLongitude() != null && !attendance.get().getLatitude().equals(BigDecimal.ZERO) && !attendance.get().getLongitude().equals(BigDecimal.ZERO)) {
+				log.debug(userlogin +" : "+ " Tracking Attendance gps location ");
 				originatt = attendance.get().getLatitude() + " , " + attendance.get().getLongitude();
-				log.info(userlogin +" : Attendance gps location tracked : " + originatt);
+				log.info(userlogin +" : "+" : Attendance gps location tracked : " + originatt);
 
 			} else if (attendance.get().getTowerLatitude() != null && attendance.get().getTowerLongitude() != null && !attendance.get().getTowerLatitude().equals(BigDecimal.ZERO) && !attendance.get().getTowerLongitude().equals(BigDecimal.ZERO)) {
+				log.debug(userlogin +" : "+ " Tracking Attendance tower location");
 				originatt = attendance.get().getTowerLatitude() + " , " + attendance.get().getTowerLongitude();
 				log.info(userlogin+" : "+"Attendance tower location tracked : " + originatt);
 			}
 		}
 
 		if( originatt != null && !originatt.isEmpty()){
+			log.debug(userlogin +" : "+ " : Processing Distance From Attendence");
 			if(lastExecutiveTaskExecution.size()>0){
+				log.debug(userlogin+" : " + " ExecutiveTaskExecutions Size  :  " + lastExecutiveTaskExecution.size());
 				KilometerCalculationDTO kiloCalDTO = null;
 				ExecutiveTaskExecution destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(0);
 				String destination = destinationExecutiveTaskExecution.getLatitude() +","+destinationExecutiveTaskExecution.getLongitude();
@@ -202,8 +211,8 @@ public class KilometerCalculationNewResource {
 			}
 			else
 			{
-				log.debug(userlogin+" : "+"Destination is not Present");
 				destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(i + 1);
+				log.debug(userlogin+" : "+ destinationExecutiveTaskExecution.getAccountProfile() +" : Location Not Found");
 				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
 				kiloCalDTO.setKilometre(0);
 				kiloCalDTO.setMetres(0);
