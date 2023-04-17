@@ -78,7 +78,7 @@ public class AccountProfileUncleJhonUploadService {
 	private final DistributorDealerProfileRepository distributorDealerProfileRepository;
 
 	private final LocationHierarchyRepository locationHierarchyRepository;
-	
+
 	@Inject
 	private AccountProfileGeoLocationTaggingRepository accountProfileGeoLocationTaggingRepository;
 
@@ -246,7 +246,8 @@ public class AccountProfileUncleJhonUploadService {
 					accountProfile.setPhone1("");
 				}
 
-			
+				accountProfile.setLocation(apDto.getLocation());
+
 				String coordinates = apDto.getLatitude();
 				if (!apDto.getLatitude().trim().isEmpty()) {
 					String[] parts = coordinates.split(",");
@@ -376,55 +377,52 @@ public class AccountProfileUncleJhonUploadService {
 
 	public void saveAccountProfileGeoLocation(List<AccountUJ> accountUJ) {
 		// TODO Auto-generated method stub
-		
+
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		log.debug("CompnayId :" + companyId);
-		
+
 		String userLogin = SecurityUtils.getCurrentUserLogin();
 		User user = userRepository.findByCompanyIdAndLogin(companyId, userLogin);
-		
-		         List<String> customerId = accountUJ.stream().map(acc ->acc.getNumcode()).collect(Collectors.toList());
-		         
-		         List<AccountProfile> acccountProfiles = accountProfileRepository.findAccountProfilesByCompanyIdAndCustomerIdIn(companyId,customerId);
-		         
-		         List<AccountProfileGeoLocationTagging> geotag = accountProfileGeoLocationTaggingRepository.findAllByCompanyId(companyId);
-		         
-		         List<Long> geoLocationAccountProfilesIds = new ArrayList<>();
-		         
-		         List<AccountProfileGeoLocationTagging> newAssociaton = new ArrayList<>();
-		         
-		         for(AccountProfile accProfile :acccountProfiles)
-		         {
-		        	 AccountProfileGeoLocationTagging apglt = new AccountProfileGeoLocationTagging();
-		        	      Optional<AccountProfileGeoLocationTagging>accGeotag    =  geotag.stream().filter(acc->acc.getAccountProfile().getCustomerId().equals(accProfile.getCustomerId())).findAny();
-		        	 
-		        	      if(accGeotag.isPresent())
-		        	      {
-		        	    	  geoLocationAccountProfilesIds.add(accGeotag.get().getId());
-		        	      }
-		        	      
-		        	      apglt.setPid(AccountProfileGeoLocationTaggingService.PID_PREFIX+RandomUtil.generatePid());
-		        	      apglt.setAccountProfile(accProfile);
-		        	      apglt.setLatitude(accProfile.getLatitude());
-		        	      apglt.setLongitude(accProfile.getLatitude());
-		        	      apglt.setLocation(accProfile.getLocation());
-		        	      apglt.setSendDate(LocalDateTime.now());
-		        	      apglt.setCompany(company);
-		        	      apglt.setCreatedDate(LocalDateTime.now());
-		        	      apglt.setUser(user);
-		        	      newAssociaton.add(apglt);
-		         }
-		         
-		         if(geoLocationAccountProfilesIds.size() != 0)
-		         {
-		        	 accountProfileGeoLocationTaggingRepository.deleteByIdIn(companyId,geoLocationAccountProfilesIds) ;
-		         }
-		         
-		         accountProfileGeoLocationTaggingRepository.save(newAssociaton); 
-		
+
+		List<String> customerId = accountUJ.stream().map(acc -> acc.getNumcode()).collect(Collectors.toList());
+
+		List<AccountProfile> acccountProfiles = accountProfileRepository
+				.findAccountProfilesByCompanyIdAndCustomerIdIn(companyId, customerId);
+
+		List<AccountProfileGeoLocationTagging> geotag = accountProfileGeoLocationTaggingRepository
+				.findAllByCompanyId(companyId);
+
+		List<AccountProfileGeoLocationTagging> newAssociaton = new ArrayList<>();
+
+		for (AccountProfile accProfile : acccountProfiles) {
+			AccountProfileGeoLocationTagging apglt = new AccountProfileGeoLocationTagging();
+			Optional<AccountProfileGeoLocationTagging> accGeotag = geotag.stream()
+					.filter(acc -> acc.getAccountProfile().getCustomerId().equals(accProfile.getCustomerId()))
+					.findAny();
+
+			if (accGeotag.isPresent()) {
+				continue;
+			} else {
+				apglt.setPid(AccountProfileGeoLocationTaggingService.PID_PREFIX + RandomUtil.generatePid());
+				apglt.setAccountProfile(accProfile);
+				apglt.setLatitude(accProfile.getLatitude());
+				apglt.setLongitude(accProfile.getLatitude());
+				apglt.setLocation(accProfile.getLocation());
+				apglt.setSendDate(LocalDateTime.now());
+				apglt.setCompany(company);
+				apglt.setCreatedDate(LocalDateTime.now());
+				apglt.setUser(user);
+				newAssociaton.add(apglt);
+			}
+		}
+
+		System.out.println("Geolocation size :" + newAssociaton.size());
+		if (newAssociaton.size() != 0) {
+			accountProfileGeoLocationTaggingRepository.save(newAssociaton);
+		}
 	}
-	
+
 	public void saveDealer(List<Dealer> dealer) {
 
 		log.info("Saving Dealer Master.........");
@@ -663,7 +661,5 @@ public class AccountProfileUncleJhonUploadService {
 
 		return locationHierarchyDTOs;
 	}
-
-	
 
 }

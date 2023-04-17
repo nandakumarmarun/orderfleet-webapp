@@ -151,7 +151,6 @@ public class UploadUncleJohnResource {
 
 			accountProfileUJUploadService
 					.saveUpdateAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
-		
 			accountProfileUJUploadService.saveAccountProfileGeoLocation(
 					accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
 

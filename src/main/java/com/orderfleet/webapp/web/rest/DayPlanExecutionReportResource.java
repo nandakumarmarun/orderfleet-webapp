@@ -278,7 +278,8 @@ public class DayPlanExecutionReportResource {
 				if (!origin.equals(destination)) {
 					double distance = geoLocationService.computeDistanceBetween(accLocLat, accLocLng, exeLocLat,
 							exeLocLng);
-					variance = distance + " KM";
+					double roundedNum = Math.round(distance * 100.0) / 100.0;
+					variance = roundedNum + " KM";
 				} else {
 					variance = "0 KM";
 				}
