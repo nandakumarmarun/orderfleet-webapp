@@ -99,13 +99,15 @@ import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
 import com.orderfleet.webapp.web.rest.dto.ReferenceDocumentDto;
 import com.orderfleet.webapp.web.rest.dto.VoucherNumberGeneratorDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
+import com.orderfleet.webapp.web.vendor.focus.Thread.SaleOrderFocusThread;
+import com.orderfleet.webapp.web.vendor.focus.service.SendSalesOrderFocusService;
 import com.orderfleet.webapp.web.vendor.service.ModernSalesDataService;
 import com.orderfleet.webapp.web.vendor.service.YukthiSalesDataService;
 import com.snr.yukti.util.YuktiApiUtil;
 
 /**
  * REST controller for managing ExecutiveTaskExecution.
- * 
+ *
  * @author Muhammed Riyas T
  * @since July 13, 2016
  */
@@ -174,12 +176,15 @@ public class ExecutiveTaskSubmissionController {
 
 	@Inject
 	private DocumentRepository documentRepository;
-	
+
 	@Inject
 	private EmployeeProfileRepository employeeProfileRepository;
-	
+
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private SendSalesOrderFocusService sendSalesOrderFocusService;
 
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
@@ -622,18 +627,34 @@ public class ExecutiveTaskSubmissionController {
 
 			// send sales orders to third party ERP
 			sendSalesOrderToThirdPartyErp(tsTransactionWrapper);
-			
-			
-			//send EmailToComplaint Modern
-			
-				if(tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getEmailTocomplaint()) {
-					sendEmailToComplaint(executiveTaskSubmissionDTO);
+
+
+			Optional<CompanyConfiguration> optSendTofocus = companyConfigurationRepository
+					.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_FOCUS);
+
+			// send sales order automaticaly to focus
+			if (optSendTofocus.isPresent()) {
+
+				if (Boolean.valueOf(optSendTofocus.get().getValue())) {
+					log.debug(user.getLogin() + " : " + " Sending Sales Order To Focus  : ");
+					Thread foucsThread = new SaleOrderFocusThread(tsTransactionWrapper.getInventoryVouchers(),sendSalesOrderFocusService);
+					foucsThread.start();
 				}
-			
-			
+
+			}
+
+
+
+
+			// send EmailToComplaint Modern
+
+			if (tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getEmailTocomplaint()) {
+				sendEmailToComplaint(executiveTaskSubmissionDTO);
+			}
+
 			taskSubmissionResponse.setStatus("Success");
 			taskSubmissionResponse.setMessage("Activity submitted successfully...");
-			
+
 		} catch (DataIntegrityViolationException dive) {
 			taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Duplicate Key");
 			taskSubmissionResponse.setMessage(LocalDateTime.now() + " " + dive.getMessage());
@@ -661,8 +682,8 @@ public class ExecutiveTaskSubmissionController {
 	public ResponseEntity<TaskSubmissionResponse> updateExecutiveTaskSubmission(
 			@Valid @RequestBody ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO) {
 		log.debug("Web request to save ExecutiveTaskExecution start");
-		
-				TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
+
+		TaskSubmissionResponse taskSubmissionResponse = new TaskSubmissionResponse();
 		try {
 			ExecutiveTaskSubmissionTransactionWrapper transactionWrapper = executiveTaskSubmissionService
 					.updationExecutiveTaskExecution(executiveTaskSubmissionDTO);
@@ -842,7 +863,7 @@ public class ExecutiveTaskSubmissionController {
 
 	/**
 	 * for upload filled form images
-	 * 
+	 *
 	 * @param executiveTaskExecutionPid
 	 * @param dynamicDocumentRefNo
 	 * @param imageRefNo
@@ -1024,7 +1045,7 @@ public class ExecutiveTaskSubmissionController {
 	/**
 	 * delete execution when interimSave is true; interim save used to upadte
 	 * execution part by part.
-	 * 
+	 *
 	 * @param executionDTO
 	 */
 	private void deleteOldAllExecutions(ExecutiveTaskExecutionDTO executionDTO) {
@@ -1204,63 +1225,64 @@ public class ExecutiveTaskSubmissionController {
 			}
 		}
 	}
-	
-	private void sendEmailToComplaint(ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO)  {
+
+	private void sendEmailToComplaint(ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO) {
 		log.info("Sending Email To Complaint");
 //		String toMassage = "santhosh.admin@moderndistropolis.com";
 		String toMassage = "";
 		String fromMassage = "salesnrich.info@gmail.com";
-		
-		if(!executiveTaskSubmissionDTO.getDynamicDocuments().isEmpty()) {
+
+		if (!executiveTaskSubmissionDTO.getDynamicDocuments().isEmpty()) {
 			User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 			Company company = user.getCompany();
-			if(company.getId() == 8402) {
+			if (company.getId() == 8402) {
 				toMassage = "santhosh.admin@moderndistropolis.com";
 			}
-			if(company.getId() == 7700) {
+			if (company.getId() == 7700) {
 				toMassage = "moderntnb@gmail.com";
 			}
 			EmployeeProfile employeeProfile = employeeProfileRepository.findEmployeeProfileByUser(user);
 			String emString = employeeProfile.getName() != null ? employeeProfile.getName() : "";
 			LocalDateTime issueDate = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO().getSendDate();
 			String acName = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO().getAccountProfileName();
-	
-	for(DynamicDocumentHeaderDTO dynamicDTO : executiveTaskSubmissionDTO.getDynamicDocuments())	{
-		String compliantSlip = createComplaintSlip(dynamicDTO);
-		JavaMailSender mailSender = getJavaMailSender();
-		MimeMessage massage = mailSender.createMimeMessage();
-			MimeMessageHelper helper;
-			try {
-				helper = new MimeMessageHelper(massage, true);
-				helper.setSubject("Complaint From " + acName);
-				helper.setText("EMPLOYEE NAME : "+emString +"\n" + "ISSUE DATE  : "+issueDate +"\n"+"CUSTOMER NAME : "+acName +"\n"+compliantSlip);
-				helper.setTo(toMassage);
-				helper.setFrom(fromMassage);
-				//XlFILE AttacCHing.........
-				mailSender.send(massage);				
-				log.debug("Sent email successfully");
-			} catch (MessagingException e) {
-				// TODO Auto-generated catch block
-				 log.warn("Email could not be sent to user '{}'", e);
+
+			for (DynamicDocumentHeaderDTO dynamicDTO : executiveTaskSubmissionDTO.getDynamicDocuments()) {
+				String compliantSlip = createComplaintSlip(dynamicDTO);
+				JavaMailSender mailSender = getJavaMailSender();
+				MimeMessage massage = mailSender.createMimeMessage();
+				MimeMessageHelper helper;
+				try {
+					helper = new MimeMessageHelper(massage, true);
+					helper.setSubject("Complaint From " + acName);
+					helper.setText("EMPLOYEE NAME : " + emString + "\n" + "ISSUE DATE  : " + issueDate + "\n"
+							+ "CUSTOMER NAME : " + acName + "\n" + compliantSlip);
+					helper.setTo(toMassage);
+					helper.setFrom(fromMassage);
+					// XlFILE AttacCHing.........
+					mailSender.send(massage);
+					log.debug("Sent email successfully");
+				} catch (MessagingException e) {
+					// TODO Auto-generated catch block
+					log.warn("Email could not be sent to user '{}'", e);
+				}
+
 			}
-			
-		}	
 		}
 	}
-	
+
 	private String createComplaintSlip(DynamicDocumentHeaderDTO dynamicDTO) {
 		StringBuilder builder = null;
-		for(FilledFormDTO ff: dynamicDTO.getFilledForms()) {
-		      builder =  new StringBuilder();
-		      builder.append("                 Complaint Details                 "+"\n");
-		      builder.append("               ---------------------                 "+"\n");
-			for (FilledFormDetailDTO ffDetails:ff.getFilledFormDetails()) {
-				builder.append("Qus: "+ffDetails.getFormElementName());
+		for (FilledFormDTO ff : dynamicDTO.getFilledForms()) {
+			builder = new StringBuilder();
+			builder.append("                 Complaint Details                 " + "\n");
+			builder.append("               ---------------------                 " + "\n");
+			for (FilledFormDetailDTO ffDetails : ff.getFilledFormDetails()) {
+				builder.append("Qus: " + ffDetails.getFormElementName());
 				builder.append("\n");
-				builder.append("Ans: "+ffDetails.getValue()+"\n");
+				builder.append("Ans: " + ffDetails.getValue() + "\n");
 				builder.append("\n");
 			}
-		     builder.append("----------------------------------------------"); 
+			builder.append("----------------------------------------------");
 		}
 		return builder.toString();
 	}

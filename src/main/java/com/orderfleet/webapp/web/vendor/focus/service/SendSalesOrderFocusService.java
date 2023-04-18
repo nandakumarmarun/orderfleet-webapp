@@ -49,6 +49,7 @@ import com.orderfleet.webapp.repository.RouteCodeRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.util.RestClientUtil;
 import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
+import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import com.orderfleet.webapp.web.vendor.focus.dto.ApiResponeDataFocus;
@@ -163,17 +164,12 @@ public class SendSalesOrderFocusService {
 			String authToken = getAuthenticationToken();
 
 			try {
-//				ResponseEntity<ApiResponeDataFocus> authenticateResponse = restTemplate.exchange(
-//						API_URL_SALES_ORDER + authToken , HttpMethod.POST, entity,
-//						new ParameterizedTypeReference<ApiResponeDataFocus>() {
-//						});
-
 				ApiResponeDataFocus authenticationResponseFocus = restTemplate
 						.postForObject(API_URL_SALES_ORDER + authToken, entity, ApiResponeDataFocus.class);
 
 				log.debug("Focus Sales Order Created Success Size" + "----" + authenticationResponseFocus);
 
-				changeSalesOrderServerDownloadStatus(authenticationResponseFocus, ivhPids);
+				changeSalesOrderServerDownloadStatus(authenticationResponseFocus, ivhPids,companyId);
 			}
 
 			catch (HttpClientErrorException exception) {
@@ -196,18 +192,92 @@ public class SendSalesOrderFocusService {
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
-	private void changeSalesOrderServerDownloadStatus(ApiResponeDataFocus authenticateResponse, List<String> ivhPids) {
+	public void salesOrderPushToFocus(List<InventoryVoucherHeader> inventoryVoucherHeader) {
+		long start = System.nanoTime();
+
+		log.debug("REST request to download sales orders  automatically: {} " + " : " + "Enter : salesOrderPushToFocus() - [" + inventoryVoucherHeader.toString()+"]");
+
+		List<String> ivhPids = new ArrayList<>();
+
+		for (InventoryVoucherHeader ivh : inventoryVoucherHeader) {
+
+			InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO = new InventoryVoucherHeaderDTO(ivh);
+
+			ivhPids.add(ivh.getPid());
+
+			if (inventoryVoucherHeaderDTO.getTallyDownloadStatus().equals(TallyDownloadStatus.PENDING)) {
+
+				RestTemplate restTemplate = new RestTemplate();
+
+				inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(TallyDownloadStatus.PROCESSING, ivhPids,ivh.getCompany().getId());
+
+				SaleOrderFocusObject requestBody = getRequestBody(inventoryVoucherHeaderDTO);
+
+				log.debug(ivh.getCompany().getLegalName() +" : "+ ivh.getDocumentNumberLocal() +" : SalesOrder RequestBody : "+requestBody.toString() + "\n");
+
+				HttpEntity<SaleOrderFocusObject> entity = new HttpEntity<>(requestBody, createTokenAuthHeaders());
+
+				log.debug(ivh.getCompany().getLegalName() +" : "+ ivh.getDocumentNumberLocal() +" : HTTP Request Object String : "+ entity.getBody().toString() + "\n");
+
+				restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+				parseTOJsonString(entity);
+
+				try {
+
+					String authToken = getAuthenticationToken();
+
+					ApiResponeDataFocus authenticationResponseFocus = restTemplate.postForObject(API_URL_SALES_ORDER + authToken, entity, ApiResponeDataFocus.class);
+
+					log.debug(ivh.getCompany().getLegalName() +" : "+ ivh.getDocumentNumberLocal() +" : Focus Sales Order Created Success Size" + "----" + authenticationResponseFocus);
+
+					changeSalesOrderServerDownloadStatus(authenticationResponseFocus, ivhPids,ivh.getCompany().getId());
+				}
+				catch (HttpClientErrorException exception) {
+					if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+						log.info(exception.getResponseBodyAsString());
+						exception.printStackTrace();
+					}
+					exception.printStackTrace();
+				} catch (Exception exception) {
+					log.info(exception.getMessage());
+					exception.printStackTrace();
+				}
+
+			}
+			long end = System.nanoTime();
+			double elapsedTime = (end - start) / 1000000.0;
+			log.info("Sync completed in {} ms", elapsedTime);
+		}
+	}
+
+	private void parseTOJsonString(HttpEntity<SaleOrderFocusObject> entity) {
+		ObjectMapper Obj = new ObjectMapper();
+		String jsonStr;
+		try {
+			jsonStr = Obj.writeValueAsString(entity.getBody());
+			log.debug("\n");
+			log.debug("Parsing Sales Order Object   : "+jsonStr);
+			System.out.println("------------------------------------------------------------------------------");
+			System.out.println("Request Body String : " + jsonStr);
+			System.out.println("------------------------------------------------------------------------------");
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void changeSalesOrderServerDownloadStatus(ApiResponeDataFocus authenticateResponse, List<String> ivhPids, Long companyId) {
 		System.out.println("Updating Sales Order Download Status");
 		if (authenticateResponse != null) {
-			System.out.println("REsponse Status" + authenticateResponse.getiStatus());
+			System.out.println("Response Status" + authenticateResponse.getiStatus());
 			if (authenticateResponse.getiStatus() == 1) {
 				System.out.println("please wait......");
-				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
-						TallyDownloadStatus.COMPLETED, ivhPids);
+				int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(
+						TallyDownloadStatus.COMPLETED, ivhPids, companyId);
 				log.debug("updated " + updated + " to COMPLETED");
 			} else {
 				int updated = inventoryVoucherHeaderRepository
-						.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus.FAILED, ivhPids);
+						.updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(TallyDownloadStatus.FAILED, ivhPids,companyId);
 				log.debug("Failed " + updated + " Failed");
 			}
 		}
@@ -221,51 +291,44 @@ public class SendSalesOrderFocusService {
 	}
 
 	private SaleOrderFocusObject getRequestBody(InventoryVoucherHeaderDTO inventoryVoucherHeaderDTO) {
-		double meterConversionFeet;
-		double meterConversionInch;
-		double meterConversionmtr;
-		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
-		List<AccountProfile> accountProfiles = accountProfilerepository.findAllByCompanyId();
-		List<LocationAccountProfile> locationAccountProfile = locationAccountProfileRepository.findAllByCompanyId();
+
+		log.debug("Enter : getRequestBody() - [" + inventoryVoucherHeaderDTO.toString()+"]");
+
+		List<AccountProfile> accountProfiles = accountProfilerepository.findAllByCompanyId(inventoryVoucherHeaderDTO.getCompanyId());
 
 		List<LengthType> lengthType = lengthTypeRepository.findAll();
 
-		System.out.println(company.getId());
-		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
-
-//		Optional<CompanyConfiguration> opPiecesToQuantity = companyConfigurationRepository
-//				.findByCompanyPidAndName(company.getPid(), CompanyConfig.PIECES_TO_QUANTITY);
+		List<ProductProfile> productProfiles = productProfileRepository.findByCompanyId(inventoryVoucherHeaderDTO.getCompanyId());
 
 		SalesOrderMasterFocus salesOrderMasterFocus = new SalesOrderMasterFocus();
 
 		SaleOrderFocusObject saleOrderFocusObject = new SaleOrderFocusObject();
 
-		salesOrderMasterFocus.setdocNo("");
-
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
 		LocalDateTime localDateTime = inventoryVoucherHeaderDTO.getDocumentDate();
-		System.out.println("date" + inventoryVoucherHeaderDTO.getDocumentDate());
+
 		String date = localDateTime.format(formatter);
 
-		Optional<AccountProfile> optAccountProfile = accountProfiles.stream()
-				.filter(data -> data.getPid().equals(inventoryVoucherHeaderDTO.getReceiverAccountPid())).findAny();
+		log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() +" : " + inventoryVoucherHeaderDTO.getReceiverAccountPid());
 
-		System.out.println("accountProfilesprestennnn" + optAccountProfile.isPresent());
-		System.out.println("accountProfile" + inventoryVoucherHeaderDTO.getReceiverAccountPid());
+		Optional<AccountProfile> optAccountProfile = accountProfiles.stream().filter(data -> data.getPid().equals(inventoryVoucherHeaderDTO.getReceiverAccountPid())).findAny();
+
+		log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() +" : " +optAccountProfile.isPresent());
+
 		if (optAccountProfile.isPresent()) {
+
 			List<RouteCode> routeCodeList = routeCodeRepository.findAllByAccountId(optAccountProfile.get().getId());
-			routeCodeList.forEach(data -> System.out.println(data.getAccountProfile().getId() + "=="
-					+ data.getAccountProfile().getName() + "==" + data.getMasterCode()));
-			System.out.println(routeCodeList.size());
+			routeCodeList.forEach(data -> log.debug(data.getAccountProfile().getId() + "==" + data.getAccountProfile().getName() + "==" + data.getMasterCode()));
+			log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Route code : "+String.valueOf(routeCodeList.size()));
 			salesOrderMasterFocus.setCustomerAc(optAccountProfile.get().getCustomerId());
-			Optional<RouteCode> optRouteCode = routeCodeList.stream().filter(
-					data -> data.getAccountProfile().getPid().equalsIgnoreCase(optAccountProfile.get().getPid()))
-					.findAny();
-			if (optRouteCode.isPresent()) {
-				salesOrderMasterFocus.setRouteCode(optRouteCode.get().getMasterCode());
-			}
+			Optional<RouteCode> optRouteCode = routeCodeList.stream().filter(data -> data.getAccountProfile().getPid().equalsIgnoreCase(optAccountProfile.get().getPid())).findAny();
+			optRouteCode.ifPresent(routeCode -> salesOrderMasterFocus.setRouteCode(routeCode.getMasterCode()));
 		}
-		System.out.println("reciverAccountname" + inventoryVoucherHeaderDTO.getReceiverAccountName());
+
+		log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Reciver Accountname : " + inventoryVoucherHeaderDTO.getReceiverAccountName());
+
+		salesOrderMasterFocus.setdocNo("");
 		salesOrderMasterFocus.setDate(date);
 		salesOrderMasterFocus.setEmployee(inventoryVoucherHeaderDTO.getEmployeeName());
 		salesOrderMasterFocus.setSnrDocId(inventoryVoucherHeaderDTO.getDocumentNumberServer());
@@ -277,26 +340,32 @@ public class SendSalesOrderFocusService {
 		salesOrderMasterFocus.setIsIGST("No");
 
 		List<SalesOrderItemDetailsFocus> salesOrderItems = new ArrayList<>();
-		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO
-				.getInventoryVoucherDetails()) {
+
+		for (InventoryVoucherDetailDTO inventoryVoucherDetailDTO : inventoryVoucherHeaderDTO.getInventoryVoucherDetails()) {
 
 			SalesOrderItemDetailsFocus salesOrderItemDetailsFocus = new SalesOrderItemDetailsFocus();
-
 			double quantity = inventoryVoucherDetailDTO.getQuantity();
-			Optional<ProductProfile> optProductProfile = productProfiles.stream()
-					.filter(data -> data.getPid().equals(inventoryVoucherDetailDTO.getProductPid())).findAny();
+			Optional<ProductProfile> optProductProfile = productProfiles.stream().filter(data -> data.getPid().equals(inventoryVoucherDetailDTO.getProductPid())).findAny();
+
 			if (optProductProfile.isPresent()) {
+
 				salesOrderItemDetailsFocus.setItem(optProductProfile.get().getProductId());
 				salesOrderItemDetailsFocus.setWidth(optProductProfile.get().getWidth());
+
 			}
 
 			salesOrderItemDetailsFocus.setUnit(inventoryVoucherDetailDTO.getProductSKU());
 			salesOrderItemDetailsFocus.setBrandDeva("NA");
 			salesOrderItemDetailsFocus.setLengthType(inventoryVoucherDetailDTO.getLengthType());
 			salesOrderItemDetailsFocus.setMtrConv(0.0);
-			System.out.println("LengthTYPE" + inventoryVoucherDetailDTO.getLengthType());
+
+			log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "LengthType : " + inventoryVoucherDetailDTO.getLengthType());
+
 			if (inventoryVoucherDetailDTO.getLengthType() != null) {
+
 				if (inventoryVoucherDetailDTO.getLengthType().equalsIgnoreCase("IF LENGTH IN FEET AND INCH")) {
+
+					log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " +"Calculating Total By Length In Feet And Inch Values");
 					salesOrderItemDetailsFocus.setLengthInFeet(inventoryVoucherDetailDTO.getLengthInFeet());
 					salesOrderItemDetailsFocus.setLengthInInch(inventoryVoucherDetailDTO.getLengthInInch());
 
@@ -307,73 +376,107 @@ public class SendSalesOrderFocusService {
 							.filter(data -> data.getMasterCode().equalsIgnoreCase("Feet")).findAny();
 
 					if (optLengthTypefeet.isPresent()) {
+
 						if (optLengthTypeInch.isPresent()) {
-							System.out.println("present both");
-							System.out.println("feetmeter Conversion" + optLengthTypefeet.get().getMeterConversion());
-							System.out.println("Inchmeter Conversion" + optLengthTypeInch.get().getMeterConversion());
+							log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Present Both IF LENGTH IN INCH && Feet ");
+							log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Feet meter Conversion :" + optLengthTypefeet.get().getMeterConversion());
+							log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Inch meter Conversion :" + optLengthTypeInch.get().getMeterConversion());
+
 							double lengthInMeter = (optLengthTypefeet.get().getMeterConversion()
 									* inventoryVoucherDetailDTO.getLengthInFeet())
 									+ (optLengthTypeInch.get().getMeterConversion()
 											* inventoryVoucherDetailDTO.getLengthInInch());
-							System.out.println("lengthInMeter" + lengthInMeter);
+
+							log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "LengthInMeter : " + lengthInMeter);
+
 							double totalQuantity = (lengthInMeter * quantity * salesOrderItemDetailsFocus.getWidth());
-							System.out.println("totalQuantity" + totalQuantity);
+
+							log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "TotalQuantity : " + totalQuantity);
 							salesOrderItemDetailsFocus.setQuantity(totalQuantity);
 						}
+
 					}
 
-				} else if (inventoryVoucherDetailDTO.getLengthType().equalsIgnoreCase("Feet")) {
-					System.out.println("LengthTYPE" + inventoryVoucherDetailDTO.getLengthType());
-					System.out.println("lengthInFEET" + inventoryVoucherDetailDTO.getLengthInFeet());
+				}
+				else if (inventoryVoucherDetailDTO.getLengthType().equalsIgnoreCase("Feet")) {
+
+					log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " +"Calculating Total By Length In Feet Value");
+					log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Length In Feet : " + inventoryVoucherDetailDTO.getLengthInFeet());
 
 					Optional<LengthType> optLengthType = lengthType.stream()
 							.filter(data -> data.getMasterCode().equalsIgnoreCase("Feet")).findAny();
 
 					if (optLengthType.isPresent()) {
-						System.out.println("present feet");
+
+						log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Length Type Feet Is Present");
+
 						double lengthInMeter = (optLengthType.get().getMeterConversion()
 								* inventoryVoucherDetailDTO.getLengthInFeet());
-						System.out.println("lengthInMeter" + lengthInMeter);
+
+						log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Length In Meter : " + lengthInMeter);
+
 						double totalQuantity = (lengthInMeter * quantity * salesOrderItemDetailsFocus.getWidth());
-						System.out.println("totalQuantity" + totalQuantity);
+
+						log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Total Quantity : " + totalQuantity);
+
 						salesOrderItemDetailsFocus.setQuantity(totalQuantity);
 						salesOrderItemDetailsFocus.setMtrConv(optLengthType.get().getMeterConversion());
 					}
 					salesOrderItemDetailsFocus.setLengthInFeet(inventoryVoucherDetailDTO.getLengthInFeet());
-				} else if (inventoryVoucherDetailDTO.getLengthType().equalsIgnoreCase("IF LENGTH IN INCH")) {
+				}
+				else if (inventoryVoucherDetailDTO.getLengthType().equalsIgnoreCase("IF LENGTH IN INCH")) {
+
+					log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " +"Calculating Total By Length In Inch Value");
+
 					salesOrderItemDetailsFocus.setLengthInInch(inventoryVoucherDetailDTO.getLengthInInch());
 
 					Optional<LengthType> optLengthType = lengthType.stream()
 							.filter(data -> data.getMasterCode().equalsIgnoreCase("IF LENGTH IN INCH")).findAny();
 
 					if (optLengthType.isPresent()) {
-						System.out.println("present inch");
+
+						log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Length Type Inch Is Present");
 
 						double lengthInMeter = (optLengthType.get().getMeterConversion()
 								* inventoryVoucherDetailDTO.getLengthInInch());
-						System.out.println("lengthInMeter" + lengthInMeter);
+
+						log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " +"Length In Meter : " + lengthInMeter);
+
 						double totalQuantity = (lengthInMeter * quantity * salesOrderItemDetailsFocus.getWidth());
-						System.out.println("totalQuantity" + totalQuantity);
+
+						log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " +"Total Quantity : " + totalQuantity);
+
 						salesOrderItemDetailsFocus.setQuantity(totalQuantity);
 						salesOrderItemDetailsFocus.setMtrConv(optLengthType.get().getMeterConversion());
 					}
 
 				} else if (inventoryVoucherDetailDTO.getLengthType().equalsIgnoreCase("mtr")) {
+
+					log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " +"Calculating Total By Meter Value");
+
 					Optional<LengthType> optLengthType = lengthType.stream()
 							.filter(data -> data.getMasterCode().equalsIgnoreCase("mtr")).findAny();
+
 					salesOrderItemDetailsFocus.setLength(inventoryVoucherDetailDTO.getLengthInInch());
+
 					if (optLengthType.isPresent()) {
-						System.out.println("present mtr");
+
+						log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Length Type Meter Is Present");
 
 						double lengthInMeter = (optLengthType.get().getMeterConversion()
 								* inventoryVoucherDetailDTO.getLengthInInch());
-						System.out.println("lengthInMeter" + lengthInMeter);
+
+						log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Length In Meter : " + lengthInMeter);
+
 						double totalQuantity = (lengthInMeter * quantity * salesOrderItemDetailsFocus.getWidth());
-						System.out.println("totalQuantity" + totalQuantity);
+
+						log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " +"Total Quantity  : " + totalQuantity);
+
 						salesOrderItemDetailsFocus.setQuantity(totalQuantity);
 						salesOrderItemDetailsFocus.setMtrConv(optLengthType.get().getMeterConversion());
 					}
 				} else {
+					log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : " + "Length Type Number Is Present");
 					salesOrderItemDetailsFocus.setLengthInFeet(0.0);
 					salesOrderItemDetailsFocus.setLengthInInch(0.0);
 					salesOrderItemDetailsFocus.setLength(inventoryVoucherDetailDTO.getLengthInInch());
@@ -388,9 +491,10 @@ public class SendSalesOrderFocusService {
 			salesOrderItemDetailsFocus.setSellingRateInclTax(inventoryVoucherDetailDTO.getSellingRate());
 			salesOrderItems.add(salesOrderItemDetailsFocus);
 		}
-		System.out.println(salesOrderItems);
-		System.out.println(salesOrderItems.size());
-//		salesOrderMasterFocus.setSalesOrderItemDetailsFocus(salesOrderItems);
+
+		log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : Product Details : " + salesOrderItems.toString());
+		log.debug(inventoryVoucherHeaderDTO.getDocumentNumberLocal() + " : Product Volume : " + String.valueOf(salesOrderItems.size()));
+
 		saleOrderFocusObject.setSalesOrderMasterFocus(salesOrderMasterFocus);
 		saleOrderFocusObject.setSalesOrderItemDetailsFocus(salesOrderItems);
 		return saleOrderFocusObject;

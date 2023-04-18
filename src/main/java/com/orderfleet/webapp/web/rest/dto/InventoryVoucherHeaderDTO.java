@@ -145,6 +145,8 @@ public class InventoryVoucherHeaderDTO {
 	private String salesLedgerName;
 	
 	private String description;
+	
+	private Long companyId;
 
 	public InventoryVoucherHeaderDTO() {
 		super();
@@ -256,6 +258,8 @@ public class InventoryVoucherHeaderDTO {
 				: "";
 		this.receiverAccountCustomerId = inventoryVoucherHeader.getReceiverAccount().getCustomerId() == null ? ""
 				: inventoryVoucherHeader.getReceiverAccount().getCustomerId();
+		
+		this.companyId = inventoryVoucherHeader.getCompany().getId();
 	}
 
 	public String getDeliveryDateDocument() {
@@ -303,7 +307,7 @@ public class InventoryVoucherHeaderDTO {
 			String documentPid, String documentName, LocalDateTime createdDate, LocalDateTime documentDate,
 			String receiverAccountPid, String receiverAccountName, String supplierAccountPid,
 			String supplierAccountName, String employeePid, String employeeName, String userName, double documentTotal,
-			double documentVolume,String description) {
+			double documentVolume,String description,Long companyId) {
 		super();
 		this.pid = pid;
 		this.documentNumberLocal = documentNumberLocal;
@@ -322,6 +326,7 @@ public class InventoryVoucherHeaderDTO {
 		this.documentTotal = documentTotal;
 		this.documentVolume = documentVolume;
 		this.description = description;
+		this.companyId = companyId;
 	}
 
 	public String getReceiverAccountCustomerId() {
@@ -834,6 +839,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
 		this.salesOrderStatus = salesOrderStatus;
+	}
+
+	public Long getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(Long companyId) {
+		this.companyId = companyId;
 	}
 
 	@Override

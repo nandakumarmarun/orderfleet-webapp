@@ -498,8 +498,13 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Modifying(clearAutomatically = true)
 	@Transactional
 	@Query("UPDATE InventoryVoucherHeader iv SET iv.tallyDownloadStatus = ?1  WHERE  iv.company.id = ?#{principal.companyId}  AND iv.pid in ?2")
-	int updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus tallyDownloadStatus,
-			List<String> inventoryPids);
+	int updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(TallyDownloadStatus tallyDownloadStatus,List<String> inventoryPids);
+
+	@Modifying(clearAutomatically = true)
+	@Transactional
+	@Query("UPDATE InventoryVoucherHeader iv SET iv.tallyDownloadStatus = ?1  WHERE  iv.company.id = ?3  AND iv.pid in ?2")
+	int updateInventoryVoucherHeaderTallyDownloadStatusUsingPidAndCompanyId(TallyDownloadStatus tallyDownloadStatus,
+																			List<String> inventoryPids,Long companyId);
 
 	@Query("select iv.pid, iv.documentNumberLocal, iv.documentNumberServer, iv.document.pid, iv.document.name, iv.createdDate, "
 			+ "iv.documentDate, iv.receiverAccount.pid, iv.receiverAccount.name, iv.supplierAccount.pid, "
