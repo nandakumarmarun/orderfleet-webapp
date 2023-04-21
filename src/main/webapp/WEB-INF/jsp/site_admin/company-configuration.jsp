@@ -67,6 +67,7 @@
 						<th>Sales Order Status</th>
 						<th>Update Reciept</th>
 						<th>Send To Focus</th>
+						<th>Send SalesOrder Email Automatically</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -106,6 +107,7 @@
 							<th>${companyConfiguration.salesOrderStatus}</th>
 							<th>${companyConfiguration.updateReciept}</th>
 							<th>${companyConfiguration.sendToFocus}</th>
+							<th>${companyConfiguration.sendEmailAutomaticaly}</th>
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
@@ -382,6 +384,13 @@
 											<td><div class="form-group">
 													<label class="control-label">SendToFocus</label> <input
 														id="sendToFocus" name='checksmodernSpecialConfig'
+														type='checkbox' class="form-control" />
+												</div></td>
+										</tr>
+											<tr>
+											<td><div class="form-group">
+													<label class="control-label">Send SalesOrder Email Automatically</label> <input
+														id="sendEmailAutomatically" name='checksendEmailAutomatically'
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>

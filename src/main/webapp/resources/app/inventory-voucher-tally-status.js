@@ -304,6 +304,21 @@ if (!this.InventoryVoucher) {
 												sendSalesOrderEmailTd = "";
 												supplierName = "";
 											}
+											if (inventoryVoucher.sendEmailAutoColumn) {
+
+												sendSalesOrderEmailTd = "<td>"
+														+ spanSendEmailStatus(
+																inventoryVoucher.pid,
+																inventoryVoucher.sendSalesOrderEmailStatus)
+														+ "</td>";
+
+												supplierName = "<td>"
+														+ inventoryVoucher.supplierAccountName
+														+ "</td>";
+											} else {
+												sendSalesOrderEmailTd = "";
+												supplierName = "";
+											}
 
 											$('#tBodyInventoryVoucher')
 													.append(

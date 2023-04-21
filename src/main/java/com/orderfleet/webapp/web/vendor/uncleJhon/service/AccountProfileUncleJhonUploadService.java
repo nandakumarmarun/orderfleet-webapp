@@ -56,6 +56,8 @@ import com.orderfleet.webapp.web.vendor.uncleJhon.DTO.Dealer;
 
 @Service
 public class AccountProfileUncleJhonUploadService {
+	
+	String PID_PREFIX = "DDA-";
 
 	private final Logger log = LoggerFactory.getLogger(AccountProfileUncleJhonUploadService.class);
 
@@ -524,16 +526,20 @@ public class AccountProfileUncleJhonUploadService {
 	}
 
 	public void saveDistributorDealerAssociation(List<Dealer> dealer) {
+		
 		System.out.println("Enter here to save distributor dealer association");
 
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 
-		List<AccountProfile> accountProfiles = accountProfileService.findAllAccountProfileByCompanyId(companyId);
-		List<AccountProfile> codelessAccounts = accountProfiles.stream().filter(acc -> acc.getCustomerCode() == null)
-				.collect(Collectors.toList());
+		List<String> customerId = dealer.stream().map(deal -> deal.getDlrcode().trim()).collect(Collectors.toList());
+		List<AccountProfile> dealerProfiles = accountProfileRepository
+				.findAllAccountProfileByCustomerIdInAndCompanyId(customerId, companyId);
 
-		accountProfiles.removeAll(codelessAccounts);
+		List<String> distCode = dealer.stream().map(dist -> dist.getDistcode().trim()).collect(Collectors.toList());
+
+		List<AccountProfile> customerprofiles = accountProfileRepository
+				.findAllAccountProfleByCompanyIdAndCustomerCodeIn(companyId, distCode);
 
 		List<DistributorDealerAssociation> distributDeal = distributorDealerProfileRepository
 				.findAllByCompanyId(companyId);
@@ -549,28 +555,29 @@ public class AccountProfileUncleJhonUploadService {
 			DistributorDealerAssociation distributorDealer = new DistributorDealerAssociation();
 			if (association.isPresent()) {
 
-				distributorDealer = association.get();
+				continue;
 			} else {
 
-				Optional<AccountProfile> dist = accountProfiles.stream()
-						.filter(dis -> dis.getCustomerCode().trim().equalsIgnoreCase(dealers.getDistcode().trim()))
-						.findAny();
-				Optional<AccountProfile> deal = accountProfiles.stream()
+				Optional<AccountProfile> dist = customerprofiles.stream()
+						.filter(dis -> dis.getCustomerCode().equalsIgnoreCase(dealers.getDistcode().trim())).findAny();
+				Optional<AccountProfile> deal = dealerProfiles.stream()
 						.filter(del -> del.getCustomerId().trim().equalsIgnoreCase(dealers.getDlrcode().trim()))
 						.findAny();
 
 				if (dist.isPresent() && deal.isPresent()) {
+					distributorDealer.setPid(PID_PREFIX + RandomUtil.generatePid());
 					distributorDealer.setDistributor(dist.get());
 					distributorDealer.setDealer(deal.get());
 					distributorDealer.setCompany(company);
+					DistributorDealerList.add(distributorDealer);
 				}
 
 			}
 
-			DistributorDealerList.add(distributorDealer);
 		}
+
 		distributorDealerProfileRepository.save(DistributorDealerList);
-		System.out.println("Successfully Saved");
+		System.out.println("Successfully Saved :" + DistributorDealerList.size());
 
 	}
 

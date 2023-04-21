@@ -184,6 +184,9 @@
 							<c:if test="${sendSalesOrderEmailStatus=='true'}">
 								<th>Supplier</th>
 							</c:if>
+							<c:if test="${sendSalesOrderEmailAuto=='true'}">
+								<th>Supplier</th>
+							</c:if> 
 							<th>Receiver</th>
 							<th>Customer Location</th>
 							<th>Document</th>
@@ -199,6 +202,9 @@
 							<c:if test="${sendSalesOrderEmailStatus=='true'}">
 								<th>Email Sent Status</th>
 							</c:if>
+							 <c:if test="${sendSalesOrderEmailAuto=='true'}">
+								<th>Email Sent Status</th>
+							</c:if> 
 
 							<th>Action</th>
 							<th>VisitRemarks</th>

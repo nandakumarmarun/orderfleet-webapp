@@ -23,6 +23,7 @@ public class SecondarySalesOrderExcelDTO {
 	private String employeeName;
 	private String refDocNo;
 	private Double freeQuantity;
+	private Long companyId;
 
 	public SecondarySalesOrderExcelDTO() {
 
@@ -170,6 +171,14 @@ public class SecondarySalesOrderExcelDTO {
 
 	public void setFreeQuantity(Double freeQuantity) {
 		this.freeQuantity = freeQuantity;
+	}
+
+	public Long getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(Long companyId) {
+		this.companyId = companyId;
 	}
 
 }

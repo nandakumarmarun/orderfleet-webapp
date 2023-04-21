@@ -121,9 +121,8 @@ public class UploadUncleJohnResource {
 		log.debug("RequestEntity :" + requestEntity);
 
 		ResponseEntity<AccountProfileResponseUj> accountProfileResponse = restTemplate.exchange(
-				"http://192.168.2.54/?request=apiNtrich", HttpMethod.POST, requestEntity,
-				AccountProfileResponseUj.class);
-
+				"http://192.168.2.54/?request=apiNtrich", HttpMethod.POST, requestEntity,AccountProfileResponseUj.class);
+		
 		log.debug("Web request to upload Dealer Profiles ...");
 
 		Map<String, Object> dealerBody = new HashMap<>();
@@ -134,31 +133,32 @@ public class UploadUncleJohnResource {
 
 		HttpEntity<Map<String, Object>> dealerEntity = new HttpEntity<>(dealerBody, headers);
 		log.debug("dealerEntity :" + dealerEntity);
-
+		
 		ResponseEntity<DealerResponseUJ> dealerResponse = restTemplate.exchange(
 				"http://192.168.2.54/?request=apiNtrich", HttpMethod.POST, dealerEntity, DealerResponseUJ.class);
 
 		log.debug("Response created....");
 
 		log.debug("Size :" + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
-
+		
 		if (accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ() != null
 				&& dealerResponse.getBody().getDealerUJ().getDealer() != null) {
 
 			accountProfileUJUploadService.saveUpdateLocations(
 					accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
 					dealerResponse.getBody().getDealerUJ().getDealer());
-
+			
 			accountProfileUJUploadService
 					.saveUpdateAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
-			accountProfileUJUploadService.saveAccountProfileGeoLocation(
+                           accountProfileUJUploadService.saveAccountProfileGeoLocation(
 					accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
 
+			
 			accountProfileUJUploadService.saveDealer(dealerResponse.getBody().getDealerUJ().getDealer());
-
+			
 			accountProfileUJUploadService
 					.saveDistributorDealerAssociation(dealerResponse.getBody().getDealerUJ().getDealer());
-
+			
 			accountProfileUJUploadService.saveUpdateLocationAccounts(
 					accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
 					dealerResponse.getBody().getDealerUJ().getDealer());

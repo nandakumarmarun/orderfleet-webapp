@@ -172,6 +172,12 @@
 										style="width: 4%;" />
 								</div>
 								<div class="form-group">
+									<label class="control-label" for="secondarySalesThroughApi">
+										Secondary Sales Through Api ?</label> <input type="checkbox" class="form-control"
+										name="secondarySalesThroughApi" id="secondarySalesThroughApi"
+										style="width: 4%;" />
+								</div>
+								<div class="form-group">
 									<label class="control-label" for="field_locationRadius">Location
 										Radius </label> <input type="number" class="form-control"
 										name="locationRadius" id="field_locationRadius" max="10000"

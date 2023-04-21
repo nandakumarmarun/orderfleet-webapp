@@ -117,6 +117,11 @@ public class Activity implements Serializable {
 
 	@Column(name = "location_radius", columnDefinition = "double precision DEFAULT 0")
     private double locationRadius;
+	
+	@NotNull
+	@Column(name = "secondary_sale_through_api", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean secondarySalesThroughApi;
+	
 	@PreUpdate
 	public void preUpdate() {
 		this.lastModifiedDate = LocalDateTime.now();
@@ -268,6 +273,14 @@ public class Activity implements Serializable {
 
 	public void setLocationRadius(double locationRadius) {
 		this.locationRadius = locationRadius;
+	}
+
+	public boolean getSecondarySalesThroughApi() {
+		return secondarySalesThroughApi;
+	}
+
+	public void setSecondarySalesThroughApi(boolean secondarySalesThroughApi) {
+		this.secondarySalesThroughApi = secondarySalesThroughApi;
 	}
 
 	@Override

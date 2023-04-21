@@ -43,6 +43,7 @@ public class CompanyConfigDTO {
 	private boolean salesOrderStatus;
 	private boolean updateReciept;
 	private boolean sendToFocus;
+	private boolean sendEmailAutomaticaly;
 
 	public CompanyConfigDTO() {
 		super();
@@ -310,6 +311,14 @@ public class CompanyConfigDTO {
 
 	public void setSendToFocus(boolean sendToFocus) {
 		this.sendToFocus = sendToFocus;
+	}
+
+	public boolean getSendEmailAutomaticaly() {
+		return sendEmailAutomaticaly;
+	}
+
+	public void setSendEmailAutomaticaly(boolean sendEmailAutomaticaly) {
+		this.sendEmailAutomaticaly = sendEmailAutomaticaly;
 	}
 
 }

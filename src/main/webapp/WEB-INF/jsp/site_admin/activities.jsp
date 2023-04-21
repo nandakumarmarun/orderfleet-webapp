@@ -192,6 +192,12 @@
 										maxlength="250" id="field_description"
 										placeholder="Description"></textarea>
 								</div>
+								<div class="form-group">
+									<label class="control-label" for="secondarySalesThroughApi">
+										Secondary Sales Through Api ?</label> <input type="checkbox" class="form-control"
+										name="secondarySalesThroughApi" id="secondarySalesThroughApi"
+										style="width: 4%;" />
+								</div>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default"

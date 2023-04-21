@@ -257,6 +257,17 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.createdDate between ?2 and ?3")
       List<AccountProfile> findByCompanyIdAndCreatedDateBetween(Long companyId, LocalDateTime fromDate, LocalDateTime toDate);
 
+	@Query(value="select * from tbl_account_profile where company_id ?=1 and customer_code ISNULL",nativeQuery = true)
+	List<AccountProfile> findAllAccountProfileByCompanyAndCustomerCode(Long companyId);
+
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.customerId in ?1 and accountProfile.company.id = ?2 ")
+    List<AccountProfile> findAllAccountProfileByCustomerIdInAndCompanyId(List<String> customerId,Long companyId);
+
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.customerCode in ?2 and accountProfile.company.id = ?1 ")
+    List<AccountProfile> findAllAccountProfleByCompanyIdAndCustomerCodeIn(Long companyId, List<String> distCode);
+
+
+
 	
 
 }

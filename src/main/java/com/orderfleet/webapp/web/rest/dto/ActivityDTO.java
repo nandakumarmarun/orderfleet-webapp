@@ -68,6 +68,8 @@ public class ActivityDTO {
 	private boolean hasTelephonicOrder;
 	
 	private Double locationRadius;
+	
+	private boolean secondarySalesThroughApi;
 
 
 
@@ -100,6 +102,7 @@ public class ActivityDTO {
 		this.companyName = activity.getCompany().getLegalName();
 		this.contactManagement = activity.getContactManagement();
 		this.locationRadius = activity.getLocationRadius();
+		this.secondarySalesThroughApi = activity.getSecondarySalesThroughApi();
 	}
 
 	public ActivityDTO(Activity activity, boolean saveActivityDuration, boolean planThrouchOnly,
@@ -131,6 +134,8 @@ public class ActivityDTO {
 		this.companyPid = activity.getCompany().getPid();
 		this.companyName = activity.getCompany().getLegalName();
 		this.contactManagement = activity.getContactManagement();
+		this.secondarySalesThroughApi = activity.getSecondarySalesThroughApi();
+
 	}
 
 	public String getPid() {
@@ -326,6 +331,15 @@ public class ActivityDTO {
 
 	public void setLocationRadius(Double locationRadius) {
 		this.locationRadius = locationRadius;
+	}
+
+	
+	public boolean getSecondarySalesThroughApi() {
+		return secondarySalesThroughApi;
+	}
+
+	public void setSecondarySalesThroughApi(boolean secondarySalesThroughApi) {
+		this.secondarySalesThroughApi = secondarySalesThroughApi;
 	}
 
 	@Override

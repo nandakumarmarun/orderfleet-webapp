@@ -25,7 +25,8 @@ if (!this.Activity) {
 		geoFencing : null,
 		hasTelephonicOrder : null,
 		emailTocomplaint : null,
-		locationRadius : null
+		locationRadius : null,
+		secondarySalesThroughApi : null
 	};
 
 	// Specify the validation rules
@@ -170,6 +171,8 @@ if (!this.Activity) {
 		activityModel.emailTocomplaint = $('#emailTocomplaint')
 		.prop("checked");
 		activityModel.locationRadius =$('#field_locationRadius').val();
+		activityModel.secondarySalesThroughApi = $('#secondarySalesThroughApi').prop(
+		"checked");
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -263,6 +266,8 @@ if (!this.Activity) {
 						$('#field_locationRadius').val(
 							      (data.locationRadius == null ? ""
 							            : data.locationRadius));
+						$("#secondarySalesThroughApi").prop("checked",
+								data.secondarySalesThroughApi);
 						// set pid
 						activityModel.pid = data.pid;
 					},

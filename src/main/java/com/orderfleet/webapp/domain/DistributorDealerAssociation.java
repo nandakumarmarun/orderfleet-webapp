@@ -28,6 +28,10 @@ public class DistributorDealerAssociation implements Serializable{
 	private Long id;
 
 	@NotNull
+	@Column(name = "pid", unique = true, nullable = false, updatable = false)
+	private String pid;
+	
+	@NotNull
 	@ManyToOne
 	private AccountProfile distributor;
 
@@ -50,6 +54,15 @@ public class DistributorDealerAssociation implements Serializable{
 		this.distributor = distributor;
 		this.dealer = dealer;
 		this.company = company;
+	}
+
+	
+	public String getPid() {
+		return pid;
+	}
+
+	public void setPid(String pid) {
+		this.pid = pid;
 	}
 
 	public Long getId() {

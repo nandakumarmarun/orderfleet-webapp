@@ -63,6 +63,8 @@ public class SalesPerformanceDTO {
 	private boolean pdfDownloadStatus;
 
 	private boolean sendSalesOrderEmailStatusColumn;
+	
+	private boolean sendEmailAutoColumn;
 
 	private boolean sendSalesOrderSapButtonStatus;
 
@@ -513,6 +515,15 @@ public class SalesPerformanceDTO {
 	public void setSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
 		this.salesOrderStatus = salesOrderStatus;
 	}
+
+	public boolean isSendEmailAutoColumn() {
+		return sendEmailAutoColumn;
+	}
+
+	public void setSendEmailAutoColumn(boolean sendEmailAutoColumn) {
+		this.sendEmailAutoColumn = sendEmailAutoColumn;
+	}
+
 
 	
 }

@@ -55,12 +55,14 @@ import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.File;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
+import com.orderfleet.webapp.domain.PrimarySecondaryDocument;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.VoucherNumberGenerator;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.CustomerTimeSpentType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
+import com.orderfleet.webapp.domain.enums.VoucherType;
 import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyIntegrationModuleRepository;
@@ -72,6 +74,7 @@ import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.FilledFormRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
+import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.VoucherNumberGeneratorRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -103,6 +106,8 @@ import com.orderfleet.webapp.web.vendor.focus.Thread.SaleOrderFocusThread;
 import com.orderfleet.webapp.web.vendor.focus.service.SendSalesOrderFocusService;
 import com.orderfleet.webapp.web.vendor.service.ModernSalesDataService;
 import com.orderfleet.webapp.web.vendor.service.YukthiSalesDataService;
+import com.orderfleet.webapp.web.vendor.uncleJhon.Thread.SaleOrderuncleJhonThread;
+import com.orderfleet.webapp.web.vendor.uncleJhon.service.SendSalesOrderEmailService;
 import com.snr.yukti.util.YuktiApiUtil;
 
 /**
@@ -185,6 +190,12 @@ public class ExecutiveTaskSubmissionController {
 
 	@Inject
 	private SendSalesOrderFocusService sendSalesOrderFocusService;
+	
+	@Inject
+	private SendSalesOrderEmailService sendSalesOrderEmailService;
+	
+	@Inject
+	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
 
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
@@ -639,6 +650,29 @@ public class ExecutiveTaskSubmissionController {
 					log.debug(user.getLogin() + " : " + " Sending Sales Order To Focus  : ");
 					Thread foucsThread = new SaleOrderFocusThread(tsTransactionWrapper.getInventoryVouchers(),sendSalesOrderFocusService);
 					foucsThread.start();
+				}
+
+			}
+			//Send sales order email to uncleJhon secondary sales
+			
+			Optional<CompanyConfiguration> optsendEmailAutomatically = companyConfigurationRepository
+					.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
+			
+			List<PrimarySecondaryDocument> primarySecDoc = primarySecondaryDocumentRepository.findByVoucherTypeAndCompany(VoucherType.SECONDARY_SALES_ORDER,
+					company.getId());
+			Document document = primarySecDoc.get(0).getDocument();
+			             Document ivDocument = tsTransactionWrapper.getInventoryVouchers().get(0).getDocument();
+			        log.debug("Doc name :"+document.getName());     
+		
+			        
+			   if (optsendEmailAutomatically.isPresent() && document.getPid().equalsIgnoreCase(ivDocument.getPid())) {
+				
+				   System.out.println("Enter to the loop");
+
+				if (Boolean.valueOf(optsendEmailAutomatically.get().getValue())) {
+					log.debug(user.getLogin() + " : " + " Sending Sales Order Email to Supplier automatically : ");
+					Thread uncleJhonThread = new SaleOrderuncleJhonThread(tsTransactionWrapper.getInventoryVouchers(),sendSalesOrderEmailService);
+					uncleJhonThread.start();
 				}
 
 			}

@@ -11,6 +11,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Email;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.GeoTaggingType;
@@ -198,6 +199,33 @@ public class AccountProfileDTO {
 		this.locationRadius = customAccount.getlocationRadius();
 	}
 
+	public AccountProfileDTO(AccountProfile accountProfile)
+	{
+		this.pid= accountProfile.getPid();
+		this.name = accountProfile.getName();
+		this.alias = accountProfile.getAlias();
+		this.userName = accountProfile.getUser().getFirstName();
+		this.description = accountProfile.getDescription();
+		this.accountTypePid = accountProfile.getAccountType().getPid();
+		this.accountTypeName = accountProfile.getAccountType().getName();
+		this.address = accountProfile.getAddress();
+		this.city = accountProfile.getCity();
+		this.location = accountProfile.getLocation();
+		this.pin = accountProfile.getPin();
+		this.latitude = accountProfile.getLatitude();
+		this.longitude = accountProfile.getLongitude();
+		this.phone1 = accountProfile.getPhone1();
+		this.phone2 = accountProfile.getPhone2();
+		this.email1 = accountProfile.getEmail1();
+		this.email2 = accountProfile.getEmail2();
+	
+		this.activated = accountProfile.getActivated();
+		this.lastModifiedDate = accountProfile.getLastModifiedDate();
+		this.createdDate = accountProfile.getCreatedDate();
+		
+		this.closingBalance = accountProfile.getClosingBalance();
+		
+	}
 	public Long getAlterId() {
 		return alterId;
 	}

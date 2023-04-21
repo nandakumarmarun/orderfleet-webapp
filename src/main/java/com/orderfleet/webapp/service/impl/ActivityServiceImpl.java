@@ -429,6 +429,7 @@ public class ActivityServiceImpl implements ActivityService {
 			activity.setHasTelephonicOrder(activityDTO.getHasTelephonicOrder());
 			activity.setEmailTocomplaint(activityDTO.getEmailTocomplaint());
 			activity.setLocationRadius(activityDTO.getLocationRadius());
+			activity.setSecondarySalesThroughApi(activityDTO.getSecondarySalesThroughApi());
 
 			activity = activityRepository.save(activity);
 			ActivityDTO result = activityMapper.activityToActivityDTO(activity);

@@ -295,6 +295,18 @@ public class SalesPerformanceReportTallyStatusResource {
 			}
 		}
 		model.addAttribute("sendSalesOrderEmailStatus", sendSalesOrderEmailStatus);
+		boolean sendSalesOrderEmailauto = false;
+		Optional<CompanyConfiguration> opCompanyConfig = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
+		if (opCompanyConfig.isPresent()) {
+
+			if (opCompanyConfig.get().getValue().equals("true")) {
+				sendSalesOrderEmailauto = true;
+			} else {
+				sendSalesOrderEmailauto = false;
+			}
+		}
+		model.addAttribute("sendSalesOrderEmailAuto", sendSalesOrderEmailauto);
 
 		boolean sendSalesOrderOdoo = false;
 		Optional<CompanyConfiguration> opCompanyConfigurationOdoo = companyConfigurationRepository
@@ -574,6 +586,18 @@ public class SalesPerformanceReportTallyStatusResource {
 				sendSalesOrderEmailStatusColumn = false;
 			}
 		}
+		
+		boolean sendEmailAutoColumn = false;
+		Optional<CompanyConfiguration> opsendEmailAuto = companyConfigurationRepository
+				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
+		if (opsendEmailAuto.isPresent()) {
+
+			if (opsendEmailAuto.get().getValue().equals("true")) {
+				sendEmailAutoColumn = true;
+			} else {
+				sendEmailAutoColumn = false;
+			}
+		}
 
 		int size = inventoryVouchers.size();
 		List<SalesPerformanceDTO> salesPerformanceDTOs = new ArrayList<>(size);
@@ -605,7 +629,7 @@ public class SalesPerformanceReportTallyStatusResource {
 			salesPerformanceDTO.setTotalVolume(ivTotalVolume.get(salesPerformanceDTO.getPid()));
 			salesPerformanceDTO.setPdfDownloadButtonStatus(pdfDownloadButtonStatus);
 			salesPerformanceDTO.setSendSalesOrderEmailStatusColumn(sendSalesOrderEmailStatusColumn);
-
+              salesPerformanceDTO.setSendEmailAutoColumn(sendEmailAutoColumn);
 			salesPerformanceDTO.setTallyDownloadStatus(TallyDownloadStatus.valueOf(ivData[16].toString()));
 			salesPerformanceDTO.setVisitRemarks(ivData[17] == null ? null : ivData[17].toString());
 
