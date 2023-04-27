@@ -64,6 +64,10 @@
 								type="checkbox" value="account_profiles"></input></td>
 							<td>Account Profiles</td>
 						</tr>
+						<tr>
+                        	<td><input class="check-one" name='uploadMasters' type="checkbox" value="account_profiles_halasuru"></input></td>
+                        	<td> Account Profiles (Halasuru) </td>
+                        </tr>
 
 
 					</tbody>

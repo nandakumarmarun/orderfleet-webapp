@@ -13,7 +13,8 @@ if (!this.uploadUJ) {
 			
 	var ajaxes = [
 		{name: 'product_profiles', path: '/uploadProductProfiles', alias: 'Product Profiles'},
-		{name: 'account_profiles', path: '/uploadAccountProfiles', alias: 'Account Profiles'}
+		{name: 'account_profiles', path: '/uploadAccountProfiles', alias: 'Account Profiles'},
+		{name: 'account_profiles_halasuru', path: '/upload-account-profiles-halasuru', alias: 'Account Profiles halasuru'}
 		
 		
 	];
