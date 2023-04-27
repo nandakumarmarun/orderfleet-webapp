@@ -973,11 +973,21 @@ public class UploadXlsResource {
 						if (cell == null) {
 							productProfile.setProductId(" ");
 						} else {
-							String proId = String.valueOf(row.getCell(productIdNumber).getNumericCellValue());
+							String proId = "";
+							if(row.getCell(productIdNumber).getCellType() == 0) {
+							 proId = String.valueOf(row.getCell(productIdNumber).getNumericCellValue());
 
-							String s1 = proId.substring(0, proId.indexOf("."));
-							s1.trim();
-							productProfile.setProductId(s1);
+//							 s1 = proId.substring(0, proId.indexOf("."));
+//							s1.trim();
+							}
+							if(row.getCell(productIdNumber).getCellType() == 1)
+							{proId = String.valueOf(row.getCell(productIdNumber).getStringCellValue());
+
+//							 s1 = proId.substring(0, proId.indexOf("."));
+//							s1.trim();
+								
+							}
+							productProfile.setProductId(proId);
 						}
 					}
 					if (productCodeNumber != -1) {
