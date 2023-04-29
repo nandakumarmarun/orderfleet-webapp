@@ -264,17 +264,17 @@ public class AccountProfileUncleJhonUploadService {
 
 					}
 				}
-//				if (apDto.getPhone2() != null && !apDto.getPhone2().equals("")) {
-//                    
-//					accountProfile.setPhone2(apDto.getPhone2());
-//					
-//					
-//				} else {
-//					accountProfile.setPhone2("");
-//				}
+				if (apDto.getPhone2().trim() != null && !apDto.getPhone2().trim().equals("")) {
+                    
+					accountProfile.setPhone2(apDto.getPhone2().trim());
+					
+					
+				} else {
+					accountProfile.setPhone2("");
+				}
 
-//				if (apDto.getEmail1() != null && !apDto.getEmail1().equals("")) {
-//					accountProfile.setEmail1(apDto.getEmail1());
+//				if (apDto.getEmail1().trim() != null && !apDto.getEmail1().trim().equals("")) {
+//					accountProfile.setEmail1(apDto.getEmail1().trim());
 //				} else {
 //					accountProfile.setEmail1(" ");
 //				}

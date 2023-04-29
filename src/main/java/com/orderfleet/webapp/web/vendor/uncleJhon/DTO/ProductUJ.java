@@ -3,6 +3,18 @@ package com.orderfleet.webapp.web.vendor.uncleJhon.DTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ProductUJ {
+
+	@JsonProperty("Group")
+	public String getGroup() {
+		return Group;
+	}
+
+	public void setGroup(String group) {
+		Group = group;
+	}
+
+	String Group;
+
 	@JsonProperty("alphaCode")
 	public String getAlphaCode() {
 		return this.alphaCode;

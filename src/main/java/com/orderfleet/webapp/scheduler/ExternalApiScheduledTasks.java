@@ -1,13 +1,19 @@
 package com.orderfleet.webapp.scheduler;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +21,11 @@ import com.orderfleet.webapp.config.Constants;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyIntegrationModule;
 import com.orderfleet.webapp.repository.CompanyIntegrationModuleRepository;
+import com.orderfleet.webapp.web.rest.UploadFocusResourceAutoShedule;
 import com.orderfleet.webapp.web.vendor.service.YuktiMasterDataService;
 import com.snr.yukti.util.YuktiApiUtil;
+
+import net.minidev.json.parser.ParseException;
 
 @Component
 public class ExternalApiScheduledTasks {
@@ -28,6 +37,9 @@ public class ExternalApiScheduledTasks {
 	
 	@Inject
 	private YuktiMasterDataService yuktiMasterDataService;
+	
+	@Inject
+	private UploadFocusResourceAutoShedule uploadFocusResourceAutoShedule;
 	
 	//run on 11pm every day
 	@Scheduled(cron = "0 0 23 * * ?")
@@ -78,4 +90,16 @@ public class ExternalApiScheduledTasks {
 			break;
 		}
 	}
+	
+	@Async
+	@Scheduled(fixedRate = 3600000)
+    public void scheduleKoglandWithCronExpression() throws URISyntaxException, IOException, JSONException, ParseException {
+        log.info("External API Master Data Update Cron Task in focus :: Execution Time - {}", LocalDateTime.now());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
+        Date now = new Date();
+        String strDate = sdf.format(now);
+        System.out.println("Fixed Rate scheduler:: " + strDate);
+        uploadFocusResourceAutoShedule.uploadToFocusAutomatically();
+    }
 }
