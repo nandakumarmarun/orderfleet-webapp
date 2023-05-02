@@ -93,7 +93,7 @@ public class ExternalApiScheduledTasks {
 	
 	@Async
 	@Scheduled(fixedRate = 3600000)
-    public void scheduleKoglandWithCronExpression() throws URISyntaxException, IOException, JSONException, ParseException {
+    public void scheduleFocusWithCronExpression() throws URISyntaxException, IOException, JSONException, ParseException {
         log.info("External API Master Data Update Cron Task in focus :: Execution Time - {}", LocalDateTime.now());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 

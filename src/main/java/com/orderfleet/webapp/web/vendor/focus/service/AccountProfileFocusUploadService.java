@@ -24,9 +24,11 @@ import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.domain.RouteCode;
+import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.SyncOperationType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
@@ -34,6 +36,7 @@ import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationHierarchyRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.RouteCodeRepository;
+import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -77,6 +80,8 @@ public class AccountProfileFocusUploadService {
 	private final LocationHierarchyRepository locationHierarchyRepository;
 
 	private final RouteCodeRepository routeCodeRepository;
+	
+	private final SyncOperationRepository syncOperationRepository;
 
 	public AccountProfileFocusUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
@@ -84,7 +89,8 @@ public class AccountProfileFocusUploadService {
 			LocationAccountProfileRepository locationAccountProfileRepository,
 			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
 			LocationService locationService, CompanyRepository companyRepository,
-			LocationHierarchyRepository locationHierarchyRepository, RouteCodeRepository routeCodeRepository) {
+			LocationHierarchyRepository locationHierarchyRepository, RouteCodeRepository routeCodeRepository,SyncOperationRepository syncOperationRepository ) {
+		
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.accountProfileRepository = accountProfileRepository;
@@ -98,6 +104,7 @@ public class AccountProfileFocusUploadService {
 		this.companyRepository = companyRepository;
 		this.locationHierarchyRepository = locationHierarchyRepository;
 		this.routeCodeRepository = routeCodeRepository;
+		this.syncOperationRepository = syncOperationRepository;
 	}
 
 	public void saveUpdateAccountProfiles(List<AccountProfileFocus> accountProfileDTos) {
@@ -322,6 +329,27 @@ public class AccountProfileFocusUploadService {
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
+		Optional<SyncOperation> oPsyncOperation = syncOperationRepository.findOneByCompanyIdAndOperationType(companyId, SyncOperationType.ACCOUNT_PROFILE);
+		SyncOperation syncOperation;
+		if(oPsyncOperation.isPresent()){
+			syncOperation = oPsyncOperation.get();
+			syncOperation.setOperationType(SyncOperationType.ACCOUNT_PROFILE);
+			syncOperation.setCompleted(true);
+			syncOperation.setLastSyncStartedDate(LocalDateTime.now());
+			syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+			syncOperation.setLastSyncTime(elapsedTime);
+			syncOperation.setCompany(company);
+		}else{
+			syncOperation = new SyncOperation();
+			syncOperation.setOperationType(SyncOperationType.ACCOUNT_PROFILE);
+			syncOperation.setCompleted(true);
+			syncOperation.setLastSyncStartedDate(LocalDateTime.now());
+			syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+			syncOperation.setLastSyncTime(elapsedTime);
+			syncOperation.setCompany(company);
+		}
+		System.out.println( "syncCompleted Date : "+syncOperation.getLastSyncCompletedDate());
+		syncOperationRepository.save(syncOperation);
 
 		log.info("Sync completed in {} ms", elapsedTime);
 	}

@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.vendor.focus.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,13 +19,16 @@ import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
+import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.SyncOperationType;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
+import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ProductCategoryService;
@@ -54,11 +58,13 @@ public class ProductProfileFocusUploadService {
 	private final ProductGroupProductRepository productGroupProductRepository;
 
 	private final CompanyRepository companyRepository;
+	
+	private final SyncOperationRepository syncOperationRepository;
 
 	public ProductProfileFocusUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			DivisionRepository divisionRepository, ProductCategoryRepository productCategoryRepository,
 			ProductGroupRepository productGroupRepository, ProductProfileRepository productProfileRepository,
-			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository) {
+			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository,SyncOperationRepository syncOperationRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.divisionRepository = divisionRepository;
@@ -67,6 +73,7 @@ public class ProductProfileFocusUploadService {
 		this.productProfileRepository = productProfileRepository;
 		this.productGroupProductRepository = productGroupProductRepository;
 		this.companyRepository = companyRepository;
+		this.syncOperationRepository = syncOperationRepository;
 	}
 
 	public void saveUpdateProductProfiles(List<ProductProfileNewFocus> list) {
@@ -186,7 +193,27 @@ public class ProductProfileFocusUploadService {
 				long end = System.nanoTime();
 				double elapsedTime = (end - start) / 1000000.0;
 				// update sync table
-
+				Optional<SyncOperation> oPsyncOperation = syncOperationRepository.findOneByCompanyIdAndOperationType(companyId, SyncOperationType.PRODUCTPROFILE);
+				SyncOperation syncOperation;
+				if(oPsyncOperation.isPresent()){
+					syncOperation = oPsyncOperation.get();
+					syncOperation.setOperationType(SyncOperationType.PRODUCTPROFILE);
+					syncOperation.setCompleted(true);
+					syncOperation.setLastSyncStartedDate(LocalDateTime.now());
+					syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+					syncOperation.setLastSyncTime(elapsedTime);
+					syncOperation.setCompany(company);
+				}else{
+					syncOperation = new SyncOperation();
+					syncOperation.setOperationType(SyncOperationType.PRODUCTPROFILE);
+					syncOperation.setCompleted(true);
+					syncOperation.setLastSyncStartedDate(LocalDateTime.now());
+					syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+					syncOperation.setLastSyncTime(elapsedTime);
+					syncOperation.setCompany(company);
+				}
+				System.out.println( "syncCompleted Date : "+syncOperation.getLastSyncCompletedDate());
+				syncOperationRepository.save(syncOperation);
 				log.info("Sync completed in {} ms", elapsedTime);
 			}
 
