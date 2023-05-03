@@ -107,6 +107,7 @@ public class AccountProfileFocusUploadService {
 		this.syncOperationRepository = syncOperationRepository;
 	}
 
+	final Long companyId = (long) 304975;
 	public void saveUpdateAccountProfiles(List<AccountProfileFocus> accountProfileDTos) {
 
 		log.info("Saving Account Profiles.........");
@@ -114,7 +115,7 @@ public class AccountProfileFocusUploadService {
 		long start = System.nanoTime();
 
 		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
-		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		log.info("Company ID" + companyId);
 		Company company = companyRepository.findOne(companyId);
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
@@ -364,7 +365,7 @@ public class AccountProfileFocusUploadService {
 
 		log.info("Saving Locations.........");
 		long start = System.nanoTime();
-		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		
 		Set<Location> saveUpdateLocations = new HashSet<>();
@@ -412,7 +413,7 @@ public class AccountProfileFocusUploadService {
 
 		log.info("Saving Location Account Profiles.........");
 		long start = System.nanoTime();
-		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		List<LocationAccountProfile> newLocationAccountProfiles = new ArrayList<>();
 		List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileService
@@ -473,7 +474,7 @@ public class AccountProfileFocusUploadService {
 
 		long start = System.nanoTime();
 
-		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 
 		Long version;
 

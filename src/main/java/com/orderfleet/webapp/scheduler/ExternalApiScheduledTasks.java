@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -19,7 +20,10 @@ import org.springframework.stereotype.Component;
 
 import com.orderfleet.webapp.config.Constants;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.CompanyIntegrationModule;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyIntegrationModuleRepository;
 import com.orderfleet.webapp.web.rest.UploadFocusResourceAutoShedule;
 import com.orderfleet.webapp.web.vendor.service.YuktiMasterDataService;
@@ -40,6 +44,9 @@ public class ExternalApiScheduledTasks {
 	
 	@Inject
 	private UploadFocusResourceAutoShedule uploadFocusResourceAutoShedule;
+	
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
 	
 	//run on 11pm every day
 	@Scheduled(cron = "0 0 23 * * ?")
@@ -100,6 +107,13 @@ public class ExternalApiScheduledTasks {
         Date now = new Date();
         String strDate = sdf.format(now);
         System.out.println("Fixed Rate scheduler:: " + strDate);
-        uploadFocusResourceAutoShedule.uploadToFocusAutomatically();
+        final Long companyId = (long) 304975;
+        Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(companyId, CompanyConfig.SEND_TO_FOCUS);
+		if(optconfig.isPresent()) {
+		if(Boolean.valueOf(optconfig.get().getValue())) {
+			uploadFocusResourceAutoShedule.uploadToFocusAutomatically();
+		
+		}
+		}
     }
 }

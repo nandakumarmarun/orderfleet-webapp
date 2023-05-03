@@ -93,7 +93,7 @@ public class UploadFocusResourceAutoShedule {
 
 	@Transactional
 	public void uploadToFocusAutomatically() throws URISyntaxException, IOException, JSONException, ParseException {
-		log.debug("Web request to get a page of Kogland Upload Masters");
+		log.debug("Web request to get a page of focus Upload Masters");
 		uploadAccountProfiles();
 		uploadProductProfiles();
 		uploadReceivablePayable();

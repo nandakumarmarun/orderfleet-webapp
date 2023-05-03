@@ -76,12 +76,13 @@ public class ProductProfileFocusUploadService {
 		this.syncOperationRepository = syncOperationRepository;
 	}
 
+	final Long companyId = (long) 304975;
 	public void saveUpdateProductProfiles(List<ProductProfileNewFocus> list) {
 		
 		log.info("Saving Product Profiles.........");
 		
 		long start = System.nanoTime();
-		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
@@ -221,7 +222,7 @@ public class ProductProfileFocusUploadService {
 	private void saveUpdateProductGroupProduct(List<TPProductGroupProductDTO> productGroupProductDTOs) {
 		log.debug("Saving Product Group Products : ");
 		long start = System.nanoTime();
-		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		log.debug("Login details : " +"["+ companyId + "," + company.getLegalName()+"]");
 		log.debug("initializing session Registries");
@@ -262,7 +263,7 @@ public class ProductProfileFocusUploadService {
 		long start = System.nanoTime();
 		Set<ProductGroup> saveUpdateProductGroups = new HashSet<>();
 
-		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		// find all product group
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());

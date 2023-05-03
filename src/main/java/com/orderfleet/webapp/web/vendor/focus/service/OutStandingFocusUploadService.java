@@ -61,12 +61,12 @@ public class OutStandingFocusUploadService {
 		this.receivablePayableRepository = receivablePayableRepository;
 		this.syncOperationRepository = syncOperationRepository;
 	}
-	
+	final Long companyId = (long) 304975;
 	@Transactional
 	public void saveUpdateReceivablePayable(List<OutStandingFocus> OutStandingFocusDTos) {
 		log.info("Saving Outstanding Invoice...");
 		long start = System.nanoTime();
-		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		receivablePayableRepository.deleteByCompanyId(company.getId());
 		Set<ReceivablePayable> saveReceivablePayable = new HashSet<>();
