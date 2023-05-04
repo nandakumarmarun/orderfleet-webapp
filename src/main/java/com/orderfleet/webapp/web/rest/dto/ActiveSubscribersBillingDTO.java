@@ -117,8 +117,11 @@ public class ActiveSubscribersBillingDTO {
 
 	@Override
 	public String toString() {
-		return "ActiveSubscribersBillingDTO [companyName=" + companyName + ", countOfActiveUser=" + countOfActiveUser
-				+ ", fromDate=" + fromDate + ", toDate=" + toDate + ", noOfMonth=" + noOfMonth + ", Total=" + Total + "]";
+		return "ActiveSubscribersBillingDTO [pid=" + pid + ", companyPid=" + companyPid + ", companyName=" + companyName
+				+ ", countOfActiveUser=" + countOfActiveUser + ", fromDate=" + fromDate + ", toDate=" + toDate
+				+ ", noOfMonth=" + noOfMonth + ", Total=" + Total + ", billingDetail=" + billingDetail + "]";
 	}
+
+	
 
 }

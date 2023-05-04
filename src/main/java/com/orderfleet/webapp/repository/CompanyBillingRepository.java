@@ -25,4 +25,5 @@ public interface CompanyBillingRepository extends JpaRepository<CompanyBilling, 
 	@Query("select companyBilling from CompanyBilling companyBilling where companyBilling.billingPeriod =?1 and companyBilling.next_bill_date between ?2 and ?3")
 	List<CompanyBilling> findBybillingPeriodAndDateBetween(BillingPeriod billingPeriod, LocalDate fromDate, LocalDate toDate);
 
+	List<CompanyBilling> findOneByPidIn(String[] billingSettingPids);
 }

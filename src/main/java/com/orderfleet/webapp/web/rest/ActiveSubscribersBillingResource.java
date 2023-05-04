@@ -18,6 +18,15 @@ import com.orderfleet.webapp.service.impl.CompanyBillingServiceImpl;
 import com.orderfleet.webapp.web.rest.dto.ActiveSubscribersBillingDTO;
 import com.orderfleet.webapp.web.rest.dto.BillingDetail;
 import com.orderfleet.webapp.web.rest.dto.BillingUserDTO;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -37,6 +46,9 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -54,12 +66,7 @@ public class ActiveSubscribersBillingResource {
 
 	private final Logger log = LoggerFactory.getLogger(ActiveSubscribersBillingResource.class);
 
-	@Inject
-	private CompanyService companyService;
-
-	@Inject
-	private CompanyBillingServiceImpl companyBillingServiceImpl;
-
+	
 	@Inject
 	private CompanyBillingRepository companyBillingRepository;
 
@@ -68,9 +75,6 @@ public class ActiveSubscribersBillingResource {
 
 	@Inject
 	private SlabRepository slabRepository;
-
-	@Inject
-	private CompanyRepository companyRepository;
 
 	@Inject
 	private BillingJsCodeRepository billingJsCodeRepository;
@@ -141,48 +145,7 @@ public class ActiveSubscribersBillingResource {
 			subscriberBill.setFromDate(compBill.getLastBilledDate());
 			subscriberBill.setToDate(compBill.getNext_bill_date());
 			billingDTO.add(subscriberBill);
-//			List<User> userList = user.stream()
-//					.filter(usr -> usr.getCompany().getId().equals(compBill.getCompany().getId()))
-//					.collect(Collectors.toList());
 
-//			subscriberBill.setCountOfActiveUser(userList.size());
-//			subscriberBill.setCountOfActiveUser(usercount);
-
-//			List<Slab> slabs = slabList.stream()
-//					.filter(slb -> slb.getCompany().getId().equals(compBill.getCompany().getId()))
-//					.collect(Collectors.toList());
-
-//			if (slabs.size() > 0) {
-//				slabs.stream().sorted(Comparator.comparingInt(Slab::getMinimumUser)).collect(Collectors.toList());
-//				slabTotal = calculateBillAmount(usercount, slabs, compBill.getCompany().getId());
-//				double totalAmount;
-//
-//
-//				List<BillingDetail> details = new ArrayList<>();
-//				for (Map.Entry<String, Integer> entry : slabTotal.entrySet()) {
-//					BillingDetail billDetail = new BillingDetail();
-//					String key = entry.getKey();
-//					Integer value = entry.getValue();
-//					System.out.println("Key: " + key + ", Value: " + value);
-//					if (!key.equalsIgnoreCase("total")) {
-//						Slab slabdata = slabs.stream().filter(sl -> sl.getId().equals(Long.valueOf(key))).findAny()
-//								.get();
-//						billDetail.setSlabName(slabdata.getMinimumUser() + "-" + slabdata.getMaximumUser());
-//						billDetail.setSlabRate(Double.valueOf(value));
-//						billDetail.setHeaderPid(compBill.getPid());
-//						details.add(billDetail);
-//					} else {
-//						totalAmount = (Double.valueOf(value) * Double.valueOf(compBill.getNoOfMonths()));
-//						subscriberBill.setTotal(totalAmount );
-//						billDetail.setSlabName("Total");
-//						billDetail.setSlabRate(totalAmount);
-//						billDetail.setHeaderPid(compBill.getPid());
-//						details.add(billDetail);
-//					}
-//				}
-//				subscriberBill.setBillingDetail(details);
-
-//			}
 		}
 		return billingDTO;
 	}
@@ -354,4 +317,171 @@ public class ActiveSubscribersBillingResource {
 		}
 		return ExicutionCount;
 	}
+	
+	@RequestMapping(value = "/subscribers-billing/download-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public void downloadBillingXls(@RequestParam("billingSettingPids") String[] billingSettingPids,
+			HttpServletResponse response) throws JsonParseException, JsonMappingException, ScriptException, IOException {
+
+		log.debug("request to get details...");
+		List<ActiveSubscribersBillingDTO> subscriberBilling = new ArrayList<>();
+		Map<String, Integer> slabTotal = new HashMap<String, Integer>();
+		List<Slab> slabList = new ArrayList<>();
+		double totalAmount = 0;
+
+		List<CompanyBilling> optBillingSetting = companyBillingRepository.findOneByPidIn(billingSettingPids);
+
+		for(CompanyBilling billingSetting: optBillingSetting){
+			
+			List<BillingDetail> details = new ArrayList<>();
+			ActiveSubscribersBillingDTO billingDTO = new ActiveSubscribersBillingDTO();
+			log.debug("billsetting present");
+			
+			Long companyId = billingSetting.getCompany().getId();
+			System.out.println("billsetting company: "+billingSetting.getCompany().getLegalName());
+			slabList = slabRepository.findAllByCompanyId(companyId);
+			
+
+			List<Slab> slabs = slabList.stream()
+					.filter(slb -> slb.getCompany().getId().equals(companyId))
+					.collect(Collectors.toList());
+          System.out.println("slabSize:"+slabs.size());
+
+          billingDTO.setCompanyName(billingSetting.getCompany().getLegalName());
+          billingDTO.setFromDate(billingSetting.getLastBilledDate());
+          billingDTO.setToDate(billingSetting.getNext_bill_date());
+          billingDTO.setNoOfMonth(billingSetting.getNoOfMonths());
+			if (slabs.size() > 0) {
+				slabs.stream().sorted(Comparator.comparingInt(Slab::getMinimumUser)).collect(Collectors.toList());
+
+				int usercount = getTransactionDetailsByCompany(billingSetting.getCompany().getPid(),billingSetting.getLastBilledDate(),billingSetting.getNext_bill_date());
+				log.debug("active User count: ",+usercount);
+				billingDTO.setCountOfActiveUser(usercount);
+				slabTotal = calculateBillAmount(usercount, slabs, billingSetting.getCompany().getId());
+				System.out.println("slabTotal :"+slabTotal);
+				for (Map.Entry<String, Integer> entry : slabTotal.entrySet()) {
+					System.out.println("Enterd to for loop:");
+					BillingDetail billDetail = new BillingDetail();
+					String key = entry.getKey();
+					Integer value = entry.getValue();
+					System.out.println("Key: " + key + ", Value: " + value);
+					if (!key.equalsIgnoreCase("total")) {
+						System.out.println("enter into the if loop");
+						Slab slabdata = slabs.stream().filter(sl -> sl.getId().equals(Long.valueOf(key))).findAny()
+								.get();
+						billDetail.setSlabName(slabdata.getMinimumUser() + "-" + slabdata.getMaximumUser());
+						billDetail.setSlabRate(Double.valueOf(value));
+						totalAmount = (Double.valueOf(value) * Double.valueOf(billingSetting.getNoOfMonths()));
+						billDetail.setTotalAmount(totalAmount );
+						details.add(billDetail);
+					
+						billingDTO.setBillingDetail(details);
+					}
+
+				}
+				
+				System.out.println("SubscriberBilling :"+billingDTO.toString());
+			}
+			subscriberBilling.add(billingDTO);
+		}
+
+		
+	
+		buildExcelDocument(subscriberBilling, response);
+	}
+
+	private void buildExcelDocument(List<ActiveSubscribersBillingDTO> subscriberBilling, HttpServletResponse response) {
+
+		log.debug("Downloading Excel report");
+		String excelFileName = "Subscriber Billing" + ".xls";
+		String sheetName = "Sheet1";
+		String[] headerColumns = {"CompanyName","From Date","To Date","No of Month","Active Users","SlabName","Slab Rate","Total"};
+		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
+			HSSFSheet worksheet = workbook.createSheet(sheetName);
+			createHeaderRow(worksheet, headerColumns);
+			createReportRows(worksheet, subscriberBilling);
+			// Resize all columns to fit the content size
+			for (int i = 0; i < headerColumns.length; i++) {
+				worksheet.autoSizeColumn(i);
+			}
+			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
+			response.setContentType("application/vnd.ms-excel");
+			// Writes the report to the output stream
+			ServletOutputStream outputStream = response.getOutputStream();
+			worksheet.getWorkbook().write(outputStream);
+			outputStream.flush();
+		} catch (IOException ex) {
+			log.error("IOException on downloading Subscriber billing {}", ex.getMessage());
+		}
+	
+		
+	}
+
+	private void createReportRows(HSSFSheet worksheet, List<ActiveSubscribersBillingDTO> subscriberBilling) {
+		// TODO Auto-generated method stub
+		HSSFCreationHelper createHelper = worksheet.getWorkbook().getCreationHelper();
+		// Create Cell Style for formatting Date
+		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
+		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
+		// Create Other rows and cells with Sales data
+		int rowNum = 1;
+		for(ActiveSubscribersBillingDTO billing:subscriberBilling)
+		{
+			
+			System.out.println("Enter here first:"+billing.getCompanyName());
+				HSSFRow row = worksheet.createRow(rowNum++);
+				
+				row.createCell(0).setCellValue(billing.getCompanyName());
+				HSSFCell docDateCell = row.createCell(1);
+				docDateCell.setCellValue(billing.getFromDate().toString());
+				docDateCell.setCellStyle(dateCellStyle);
+				HSSFCell docDateCell1 = row.createCell(2);
+				docDateCell1.setCellValue(billing.getToDate().toString());
+				docDateCell1.setCellStyle(dateCellStyle);
+				row.createCell(3).setCellValue(billing.getNoOfMonth());
+				if(billing.getCountOfActiveUser() == null)
+				{
+					row.createCell(4).setCellValue(0);	
+				}
+				else {
+				row.createCell(4).setCellValue(billing.getCountOfActiveUser());
+				}
+				if(billing.getBillingDetail() != null)
+				{
+				for(BillingDetail detail: billing.getBillingDetail())
+				{
+					System.out.println("Enter here second ");
+				row.createCell(5).setCellValue(detail.getSlabName());
+
+				row.createCell(6).setCellValue(detail.getSlabRate());
+				row.createCell(7).setCellValue(detail.getTotalAmount());
+				
+				}}
+		}
+		
+	}
+
+	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
+		// TODO Auto-generated method stub
+
+		// Create a Font for styling header cells
+		Font headerFont = worksheet.getWorkbook().createFont();
+		headerFont.setFontName("Arial");
+		headerFont.setBold(true);
+		headerFont.setFontHeightInPoints((short) 14);
+		headerFont.setColor(IndexedColors.RED.getIndex());
+		// Create a CellStyle with the font
+		HSSFCellStyle headerCellStyle = worksheet.getWorkbook().createCellStyle();
+		headerCellStyle.setFont(headerFont);
+		// Create a Row
+		HSSFRow headerRow = worksheet.createRow(0);
+		// Create cells
+		for (int i = 0; i < headerColumns.length; i++) {
+			HSSFCell cell = headerRow.createCell(i);
+			cell.setCellValue(headerColumns[i]);
+			cell.setCellStyle(headerCellStyle);
+		}
+	
+	}
+	
 }

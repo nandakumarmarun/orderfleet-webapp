@@ -85,10 +85,9 @@
 										style="font-size: 18px"
 										onclick="ActiveSubscriberBilling.filter()" title="Apply"></button>
 								</div>
-								<div class="col-sm-3">
-									<br />
-									<button id="btnDownload" type="button" style="font-size: 18px"
-										class="btn btn-orange entypo-download" title="Download Xls"></button>
+								<div class="col-sm-3 ">
+									<button id="btnDownloadxls" type="button" class="btn btn-info">Download
+										Xls</button>
 								</div>
 							</div>
 						</div>
@@ -103,11 +102,13 @@
 					<!--table header-->
 					<thead>
 						<tr>
+						<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
+								All</th>
 							<th>Company Name</th>
 							<th>From Date</th>
 							<th>To Date</th>
 							<th>No Of Months</th>
-							<th>Total</th>
+							<th></th>
 
 						</tr>
 					</thead>
@@ -117,65 +118,66 @@
 				</table>
 			</div>
 			<form name="viewForm" role="form">
-            				<!-- Model Container-->
-            				<div class="modal fade container" id="viewModal">
-            					<!-- model Dialog -->
-            					<div class="modal-dialog">
-            						<div class="modal-content">
-            							<div class="modal-header">
-            								<button type="button" class="close" data-dismiss="modal"
-            									aria-label="Close">
-            									<span aria-hidden="true">&times;</span>
-            								</button>
-            								<h4 class="modal-title" id="viewModalLabel">Account Profile</h4>
-            							</div>
-            							<div class="modal-body" style="height: 500px; overflow: auto;">
-            								<div class="modal-body">
-            									<!-- error message -->
-            									<div class="alert alert-danger alert-dismissible" role="alert"
-            										style="display: none;">
-            										<button type="button" class="close"
-            											onclick="$('.alert').hide();" aria-label="Close">
-            											<span aria-hidden="true">&times;</span>
-            										</button>
-            										<p></p>
-            									</div>
-            									<table class="table  table-striped table-bordered"
-                                                										id="tbAccountProfile">
-            									<th style="min-width: 80px;" id="lbl_CompanyName" colspan="2" >please wait...</th>
-            									<tr>
-                                                	<td>Active Users</td>
-                                                	<td id="lbl_active_user"></td>
-                                                </tr>
-                                                </table>
-            									<div class="table-responsive">
-                                                				<table class="collaptable table  table-striped table-bordered"
-                                                					id="tblInvoiceWiseReport">
-                                                					<!--table header-->
-                                                					<thead>
-                                                						<tr>
-                                                							<th style="min-width: 80px;">SlabName</th>
-                                                							<th>SlabRate</th>
-                                                						</tr>
-                                                					</thead>
-                                                					<!--table header-->
-                                                					<tbody id="tbodyDetails">
-                                                					</tbody>
-                                                				</table>
-                                                			</div>
-            								</div>
-            							</div>
-            							<div class="modal-footer">
-            								<button type="button" class="btn btn-default"
-            									data-dismiss="modal">Cancel</button>
-            							</div>
-            						</div>
-            						<!-- /.modal-content -->
-            					</div>
-            					<!-- /.modal-dialog -->
-            				</div>
-            				<!-- /.Model Container-->
-            			</form>
+				<!-- Model Container-->
+				<div class="modal fade container" id="viewModal">
+					<!-- model Dialog -->
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+								<h4 class="modal-title" id="viewModalLabel">Account Profile</h4>
+							</div>
+							<div class="modal-body" style="height: 500px; overflow: auto;">
+								<div class="modal-body">
+									<!-- error message -->
+									<div class="alert alert-danger alert-dismissible" role="alert"
+										style="display: none;">
+										<button type="button" class="close"
+											onclick="$('.alert').hide();" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+										<p></p>
+									</div>
+									<table class="table  table-striped table-bordered"
+										id="tbAccountProfile">
+										<th style="min-width: 80px;" id="lbl_CompanyName" colspan="2">please
+											wait...</th>
+										<tr>
+											<td>Active Users</td>
+											<td id="lbl_active_user"></td>
+										</tr>
+									</table>
+									<div class="table-responsive">
+										<table class="collaptable table  table-striped table-bordered"
+											id="tblInvoiceWiseReport">
+											<!--table header-->
+											<thead>
+												<tr>
+													<th style="min-width: 80px;">SlabName</th>
+													<th>SlabRate</th>
+												</tr>
+											</thead>
+											<!--table header-->
+											<tbody id="tbodyDetails">
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Cancel</button>
+							</div>
+						</div>
+						<!-- /.modal-content -->
+					</div>
+					<!-- /.modal-dialog -->
+				</div>
+				<!-- /.Model Container-->
+			</form>
 			<hr />
 
 

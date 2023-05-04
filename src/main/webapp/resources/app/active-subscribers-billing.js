@@ -15,30 +15,42 @@ if (!this.ActiveSubscriberBilling) {
 			dateFormat : 'yy-mm-dd'
 		});
 		
-		$('#downloadXls').on('click', function() {
-			var tblSale = $("#tblActiveBillingReport tbody");
-			if (tblSale.children().length == 0) {
-				alert("no values available");
-				return;
-			}
-			downloadXls();
+		$('#selectAll').on('click', function() {
+			selectAllBilling(this);
 		});
 		
 		// load default
 		ActiveSubscriberBilling.filter();
 	});
 	
-	
-	
-	function downloadXls() {
-		var clonedTable = $("#tblActiveBillingReport").clone();
-		clonedTable.find('[style*="display: none"]').remove();
-		var excelName = "employees_visit_report";
-		clonedTable.table2excel({
-			filename : excelName,
-		});
+	function selectAllBilling(checkbox) {
+		$('.check-one').prop('checked', checkbox.checked);
 	}
+	
+	$('#btnDownloadxls').on('click', function() {
+		downloadXls();
+	});
 
+	function downloadXls()
+	{
+		var billingSettingPids = "";
+		$("input[type='checkbox']:checked").each(function() {
+			var billingSettingPid = $(this).val();
+			if (billingSettingPid != "on") {
+				billingSettingPids += billingSettingPid + ",";
+			}
+		});
+
+		if (billingSettingPids == "") {
+			alert("please select billing setting");
+		} else {
+			window.location.href = contextPath
+					+ "/web/subscribers-billing/download-xls?billingSettingPids="
+					+ billingSettingPids;
+			console.log("sucess.......");
+		}
+		
+	}
 
 	ActiveSubscriberBilling.details = function(Pid,companyPid) {
 	     $('#tbodyDetails').html("");
@@ -132,7 +144,10 @@ if (!this.ActiveSubscriberBilling) {
                             "<tr style='" +
                             "'data-id='" +
                             billingDTO.pid +
-                            "' data-parent=\"\"><td class='tableexport-string target'>" +
+                            "' data-parent=\"\"><td><input type='checkbox' class='check-one' value='"
+																	+ billingDTO.pid
+																	+ "' />"
+																	+ "</td><td class='tableexport-string target'>" +
                             billingDTO.companyName +
                             "</td><td class='tableexport-string target'>" +
                             billingDTO.fromDate +
