@@ -114,7 +114,7 @@ public class AccountProfileFocusUploadService {
 
 		long start = System.nanoTime();
 
-		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+		final User user = userRepository.findOneByLogin("admin@deva").get();
 //		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		log.info("Company ID" + companyId);
 		Company company = companyRepository.findOne(companyId);
@@ -123,7 +123,7 @@ public class AccountProfileFocusUploadService {
 		// All product must have a division/category, if not, set a default one
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "AT_QUERY_109" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String id = "AT_QUERY_109" + "_" + "admin@deva" + "_" + LocalDateTime.now();
 		String description = "get first by compId";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
@@ -159,7 +159,7 @@ public class AccountProfileFocusUploadService {
 //				apNames);
 		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id1 = "AP_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String id1 = "AP_QUERY_104" + "_" + "admin@deva" + "_" + LocalDateTime.now();
 		String description1 = "get all by compId";
 		LocalDateTime startLCTime1 = LocalDateTime.now();
 		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
