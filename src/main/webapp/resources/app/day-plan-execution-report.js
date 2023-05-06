@@ -113,13 +113,13 @@ if (!this.DayPlanExecutionReport) {
 																	+ (dayPlanExecution.createdDate == null ? "" : moment(
 																			dayPlanExecution.createdDate)
 																			.format(
-																					'DD MMM YYYY hh:mm'))
+																					'DD MMM YYYY hh:mm a'))
 																	+ "</td><td>"
 																	+ dayPlanExecution.activityName
 																	+ " - "
 																	+ dayPlanExecution.accountProfileName
 																	+"</td><td>"
-																	+ moment(dayPlanExecution.serverDate).format('DD MMM YYYY hh:mm')
+																	+ moment(dayPlanExecution.serverDate).format('DD MMM YYYY hh:mm a')
 																	+ "</td><td>"
 																	+ actualOrder
 																	+ "</td><td>"

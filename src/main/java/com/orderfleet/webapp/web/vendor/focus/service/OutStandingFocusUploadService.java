@@ -80,7 +80,7 @@ public class OutStandingFocusUploadService {
 		
 //		Map<String, Double> accountBalanceMap = new HashMap<>();
 		
-		List<AccountProfile> accProfiles = accountProfileRepository.findAccountProfileAndCustomerIds(customerIds);
+		List<AccountProfile> accProfiles = accountProfileRepository.findAccountProfileAndCustomerIds(companyId,customerIds);
 	
 	     for(OutStandingFocus OutStandingFocusDTO : OutStandingFocusDTos) {
 	    	 

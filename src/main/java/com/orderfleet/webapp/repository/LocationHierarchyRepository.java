@@ -48,6 +48,11 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version = ?2 AND lh.company.id = ?#{principal.companyId}")
 	int updateLocationHierarchyInactivatedFor(ZonedDateTime inactivatedDate, Long version);
 	
+	@Transactional
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version = ?2 AND lh.company.id = ?3")
+	int updateLocationHierarchyInactivated(ZonedDateTime inactivatedDate, Long version,Long companyId);
+	
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version <= ?2 AND lh.company.id = ?#{principal.companyId}")
 	int updateLocationHierarchyInactivatedForLessThanVersion(ZonedDateTime inactivatedDate, Long version);
@@ -61,6 +66,12 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id)"
 			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId},?2, ?3)", nativeQuery = true)
 	void insertLocationHierarchyWithParent(Long version, Long locationId, Long parentId);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id)"
+			+ "VALUES (TRUE, now(), ?1, ?4,?2, ?3)", nativeQuery = true)
+	void insertLocationHierarchyWithParent(Long version, Long locationId, Long parentId,Long id);
 	
 	@Modifying
 	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id,is_custom)"
@@ -77,6 +88,12 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id)"
 			+ "VALUES (TRUE, now(), ?1, ?#{principal.companyId}, ?2, null)", nativeQuery = true)
 	void insertLocationHierarchyWithNoParent(Long version, Long locationId);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id)"
+			+ "VALUES (TRUE, now(), ?1, ?3, ?2, null)", nativeQuery = true)
+	void insertLocationHierarchyWithNoParentAndCompanyId(Long version, Long locationId,Long companyId);
 	
 	@Modifying
 	@Query(value = "INSERT INTO tbl_location_hierarchy(activated, activated_date, version, company_id, location_id, parent_id, is_custom)"

@@ -35,6 +35,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} order by accountProfile.name asc")
 	List<AccountProfile> findAllByCompanyId();
+	
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and accountProfile.activated=true order by accountProfile.id")
 	List<AccountProfile> findAllByCompanyIdAndActivatedTrue();
@@ -221,6 +222,9 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and accountProfile.customerId in ?1")
 	List<AccountProfile> findAccountProfileAndCustomerIds(List<String> customerIds);
+	
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.customerId in ?2")
+	List<AccountProfile> findAccountProfileAndCustomerIds(Long companyId,List<String> customerIds);
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} and accountProfile.customerId not in ?1")
 	List<AccountProfile> findAccountProfileAndCustomerIdsNotIn(List<String> customerIds);

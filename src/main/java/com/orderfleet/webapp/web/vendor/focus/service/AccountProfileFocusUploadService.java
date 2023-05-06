@@ -130,7 +130,7 @@ public class AccountProfileFocusUploadService {
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
-		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyIdAndActivated(true);
+		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyIdAndActivated(companyId,true);
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -165,7 +165,7 @@ public class AccountProfileFocusUploadService {
 		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 		String startDate1 = startLCTime1.format(DATE_FORMAT1);
 		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
+		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId(companyId);
 		String flag1 = "Normal";
 		LocalDateTime endLCTime1 = LocalDateTime.now();
 		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
@@ -483,8 +483,8 @@ public class AccountProfileFocusUploadService {
 				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
 
 		if (locationHierarchy.isPresent()) {
-			locationHierarchyRepository.updateLocationHierarchyInactivatedFor(ZonedDateTime.now(),
-					locationHierarchy.get().getVersion());
+			locationHierarchyRepository.updateLocationHierarchyInactivated(ZonedDateTime.now(),
+					locationHierarchy.get().getVersion(),companyId);
 			version = locationHierarchy.get().getVersion() + 1;
 
 		} else {
@@ -509,10 +509,10 @@ public class AccountProfileFocusUploadService {
 
 					if (optionalParentLoc.isPresent()) {
 						locationHierarchyRepository.insertLocationHierarchyWithParent(version,
-								optionalLoc.get().getId(), optionalParentLoc.get().getId());
+								optionalLoc.get().getId(), optionalParentLoc.get().getId(),companyId);
 					}
 				} else {
-					locationHierarchyRepository.insertLocationHierarchyWithNoParent(version, optionalLoc.get().getId());
+					locationHierarchyRepository.insertLocationHierarchyWithNoParentAndCompanyId(version, optionalLoc.get().getId(),companyId);
 				}
 			}
 		}

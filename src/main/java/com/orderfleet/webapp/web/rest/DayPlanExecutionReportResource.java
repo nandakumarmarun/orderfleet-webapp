@@ -133,6 +133,7 @@ public class DayPlanExecutionReportResource {
 		List<ExecutiveTaskPlan> actualEcutiveTaskPlans = executiveTaskPlanRepository
 				.findByUserPidInAndPlannedDateBetweenAndCompanyIdOrderByIdAsc(userPids, dateTime.atTime(0, 0),
 						dateTime.atTime(23, 59), SecurityUtils.getCurrentUsersCompanyId());
+		
 		List<ExecutiveTaskPlanDTO> result = new ArrayList<>();
 		List<Long> ids = new ArrayList<>();
 		List<ExecutiveTaskPlanDTO> executiveTaskPlanDTO = new ArrayList<>();
@@ -155,12 +156,12 @@ public class DayPlanExecutionReportResource {
 
 			List<ExecutiveTaskExecution> executiveTaskExecution = new ArrayList<>();
 
+			System.out.println("report size :"+ids);
 			if (ids.size() != 0) {
 				executiveTaskExecution = executiveTaskExecutionRepository
 						.findExecutiveTaskExecutionByExecutiveTaskPlanIdIn(ids);
 
 			}
-
 			String variance;
 
 			for (ExecutiveTaskPlanDTO extDTO : result) {
@@ -182,10 +183,16 @@ public class DayPlanExecutionReportResource {
 
 				}
 				if (extDTO.getTaskPlanStatus().equals(TaskPlanStatus.PENDING)) {
-					extDTO.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
-					extDTO.setUserRemarks("Unattended");
+					extDTO.setTaskPlanStatus(TaskPlanStatus.PENDING);
+					extDTO.setUserRemarks("");
 					executiveTaskPlanDTO.add(extDTO);
 				}
+				else if(extDTO.getTaskPlanStatus().equals(TaskPlanStatus.SKIPPED))
+				{
+					extDTO.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
+					executiveTaskPlanDTO.add(extDTO);
+				}
+				
 			}
 
 		}
