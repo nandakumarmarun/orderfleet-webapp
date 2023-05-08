@@ -124,19 +124,19 @@ if (!this.DayPlanExecutionSummery) {
 		    				}
 		    				if(dayPlanExecution.taskListAlias==null || dayPlanExecution.taskListAlias==""){
 		    					$("#tblBody").append('<tr data-id="'+ dayPlanExecution.date +'" data-parent="' + innerIndex + '">'
-		    							+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm') + '</td>'
+		    							+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm a') + '</td>'
 			    						+ '<td class="janvary">'+ dayPlanExecution.activityName +' - '+ dayPlanExecution.accountProfileName +'</td>'
 							    		+ '<td>'+ executionOrder +'</td>'
 							    		+ '<td>'+ dayPlanExecution.taskPlanStatus +'</td>'
-							    		+ '<td>'+ dayPlanExecution.userRemarks +'</td>'
+							    		+ '<td>'+ (dayPlanExecution.userRemarks == null ? "" : dayPlanExecution.userRemarks)+'</td>'
 							    		+ '</tr>');
 		    				}else{
 		    				$("#tblBody").append('<tr data-id="'+ dayPlanExecution.date +'" data-parent="' + innerIndex + '">'
-		    						+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm') + '</td>'
+		    						+ '<td class="janvary">' + moment(dayPlanExecution.createdDate).format('DD MMM YYYY hh:mm a') + '</td>'
 		    						+ '<td class="janvary">'+ dayPlanExecution.activityName +' - '+ dayPlanExecution.accountProfileName +' - '+dayPlanExecution.taskListAlias+'</td>'
 						    		+ '<td>'+ executionOrder +'</td>'
 						    		+ '<td>'+ dayPlanExecution.taskPlanStatus +'</td>'
-						    		+ '<td>'+ dayPlanExecution.userRemarks +'</td>'
+						    		+ '<td>'+ (dayPlanExecution.userRemarks == null ? "" : dayPlanExecution.userRemarks)+'</td>'
 						    		+ '</tr>');
 		    				}
 						});

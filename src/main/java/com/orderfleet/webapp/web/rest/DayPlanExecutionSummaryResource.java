@@ -186,13 +186,16 @@ public class DayPlanExecutionSummaryResource {
 						for (ExecutiveTaskPlan executiveTaskPlan : childValue) {
 							
 							if (executiveTaskPlan.getTaskPlanStatus().equals(TaskPlanStatus.PENDING)) {
-								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
-								executiveTaskPlan.setUserRemarks("Unattended");
+								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.PENDING);
+								
 							} else if (executiveTaskPlan.getTaskPlanStatus().equals(TaskPlanStatus.CREATED)) {
-								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
-								executiveTaskPlan.setUserRemarks("Unattended");
+								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.CREATED);
+								
 							}
-							
+							else if(executiveTaskPlan.getTaskPlanStatus().equals(TaskPlanStatus.SKIPPED))
+							{
+								executiveTaskPlan.setTaskPlanStatus(TaskPlanStatus.SKIPPED);
+							}
 						}
 						
 						List<ExecutiveTaskPlan> savedExecutedPlan = executiveTaskExecutionRepository
