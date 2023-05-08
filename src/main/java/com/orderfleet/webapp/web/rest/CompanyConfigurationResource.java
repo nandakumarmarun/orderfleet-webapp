@@ -207,6 +207,10 @@ public class CompanyConfigurationResource {
 					mcDto.setSendEmailAutomaticaly(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.CRM_ENABLE)) {
+					mcDto.setCrmEnable(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
@@ -239,7 +243,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName,
 			@RequestParam String descriptionToName, @RequestParam String stockApi,
 			@RequestParam String employeeCreateBtn, @RequestParam String modernSpecialConfig,
-			@RequestParam String salesorderstatus, @RequestParam String updateReciept,@RequestParam String sendToFocus,@RequestParam String sendEmailAutomaticaly) throws URISyntaxException {
+			@RequestParam String salesorderstatus, @RequestParam String updateReciept,@RequestParam String sendToFocus,@RequestParam String sendEmailAutomaticaly,@RequestParam String crmEnable) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -311,6 +315,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_FOCUS);
 		Optional<CompanyConfiguration> optsendEmailAutomatically = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
+		Optional<CompanyConfiguration> optcrmEnable = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -348,6 +354,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration updateRecieptCompany = null;
 		CompanyConfiguration sendToFocusCompany = null;
 		CompanyConfiguration sendEmailAutomaticallyCompany = null;
+		CompanyConfiguration crmEnableCompany = null;
 		
 		/* CompanyConfiguration findLocationCompany = null; */
 
@@ -690,7 +697,19 @@ public class CompanyConfigurationResource {
 			sendEmailAutomaticallyCompany.setValue(sendEmailAutomaticaly);
 		}
 		companyConfigurationRepository.save(sendEmailAutomaticallyCompany);
-		
+
+		if (optcrmEnable.isPresent()) {
+			crmEnableCompany = optcrmEnable.get();
+			crmEnableCompany.setValue(crmEnable);
+		} else {
+			crmEnableCompany = new CompanyConfiguration();
+			crmEnableCompany.setCompany(company);
+			crmEnableCompany.setName(CompanyConfig.CRM_ENABLE);
+			crmEnableCompany.setValue(crmEnable);
+		}
+		companyConfigurationRepository.save(crmEnableCompany);
+
+
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -819,6 +838,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_FOCUS);
 		Optional<CompanyConfiguration> optsendEmailAutomatically = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
+		Optional<CompanyConfiguration> optcrmEnable = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -926,6 +947,10 @@ public class CompanyConfigurationResource {
 		}
 		if (optsendEmailAutomatically.isPresent()) {
 			companyConfigurationDTO.setSendEmailAutomaticaly(Boolean.valueOf(optsendEmailAutomatically.get().getValue()));
+		}
+
+		if (optcrmEnable.isPresent()) {
+			companyConfigurationDTO.setCrmEnable(Boolean.valueOf(optcrmEnable.get().getValue()));
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {
@@ -1041,6 +1066,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_FOCUS);
 		Optional<CompanyConfiguration> optsendEmailAutomatically = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
+		Optional<CompanyConfiguration> optcrmEnable = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1180,6 +1207,10 @@ public class CompanyConfigurationResource {
 		if (optsendEmailAutomatically.isPresent()) {
 			companyConfigurationRepository.deleteByCompanyIdAndName(optsendEmailAutomatically.get().getCompany().getId(),
 					CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
+		}
+
+		if(optcrmEnable.isPresent()){
+			companyConfigurationRepository.deleteByCompanyIdAndName(optcrmEnable.get().getId(), CompanyConfig.CRM_ENABLE);
 		}
 		
 		/*

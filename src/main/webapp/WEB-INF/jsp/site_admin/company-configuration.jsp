@@ -68,6 +68,7 @@
 						<th>Update Reciept</th>
 						<th>Send To Focus</th>
 						<th>Send SalesOrder Email Automatically</th>
+						<th>CRM Enabled</th>
 						<!-- <th>Find Location</th> -->
 						<th>Action</th>
 					</tr>
@@ -108,6 +109,7 @@
 							<th>${companyConfiguration.updateReciept}</th>
 							<th>${companyConfiguration.sendToFocus}</th>
 							<th>${companyConfiguration.sendEmailAutomaticaly}</th>
+							<th>${companyConfiguration.crmEnable}</th>
 							<%-- <th>${companyConfiguration.findLocation}</th> --%>
 							<td><button type="button" class="btn btn-danger"
 									onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button></td>
@@ -394,6 +396,14 @@
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
+										</tr>
+                                        	 <tr>
+                                        		 <td><div class="form-group">
+                                        		<label class="control-label">Crm Enabled</label> <input
+                                        		id="CrmEnabled" name='checkCrmEnabled'
+                                        		type='checkbox' class="form-control" />
+                                        		</div></td>
+                                        	 </tr>
 										<!-- <tr>
 											<td><div class="form-group">
 													<label class="control-label">Find Location</label>

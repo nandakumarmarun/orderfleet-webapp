@@ -45,6 +45,8 @@ public class CompanyConfigDTO {
 	private boolean sendToFocus;
 	private boolean sendEmailAutomaticaly;
 
+	private boolean crmEnable;
+
 	public CompanyConfigDTO() {
 		super();
 	}
@@ -319,6 +321,14 @@ public class CompanyConfigDTO {
 
 	public void setSendEmailAutomaticaly(boolean sendEmailAutomaticaly) {
 		this.sendEmailAutomaticaly = sendEmailAutomaticaly;
+	}
+
+	public boolean getCrmEnable() {
+		return crmEnable;
+	}
+
+	public void setCrmEnable(boolean crmEnable) {
+		this.crmEnable = crmEnable;
 	}
 
 }

@@ -71,6 +71,8 @@ if (!this.CompanyConfiguration) {
 		var updateReciept = $("#updateReciept").is(":checked");
 		var sendToFocus = $("#sendToFocus").is(":checked");
 		var sendEmailAutomatically = $("#sendEmailAutomatically").is(":checked");
+		var CrmEnable = $("#CrmEnabled").is(":checked");
+		console.log("crmEnbaled",CrmEnable);
 		/* var findLocation = $('#findLocation').is(":checked"); */
 		$.ajax({
 			url : contextPath,
@@ -107,7 +109,8 @@ if (!this.CompanyConfiguration) {
 				salesorderstatus : salesOrderStatus,
 				updateReciept:updateReciept,
 				sendToFocus : sendToFocus,
-				sendEmailAutomaticaly : sendEmailAutomatically
+				sendEmailAutomaticaly : sendEmailAutomatically,
+				crmEnable:CrmEnable
 			/* findLocation : findLocation */
 			},
 			success : function(data) {
@@ -182,6 +185,7 @@ if (!this.CompanyConfiguration) {
 						$("#updateReciept").prop("checked", data.updateReciept);
 						$("#sendToFocus").prop("checked", data.sendToFocus);
 						$("#sendEmailAutomatically").prop("checked", data.sendEmailAutomaticaly);
+						$("#CrmEnabled").prop("checked",data.crmEnable);
 						/*
 						 * $("#findLocation").prop("checked",
 						 * data.findLocation);
