@@ -636,4 +636,14 @@ public class UserService {
 		return result;
 		
 	}
+		public List<UserDTO> findByUserPidIn(List<String> userPids) {
+				log.debug("Request to get all users");
+				List<User> users = userRepository.findByUserPidIn(userPids);
+				List<UserDTO> result = new ArrayList<>();
+				users.forEach(user -> {
+						UserDTO userDTO = new UserDTO(user);
+			result.add(userDTO);
+					});
+				return result;
+			}
 }

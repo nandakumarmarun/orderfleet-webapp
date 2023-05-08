@@ -7,11 +7,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.async.event.EventProducer;
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,23 +31,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.Attendance;
-import com.orderfleet.webapp.domain.AttendanceSubgroupApprovalRequest;
-import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.DashboardAttendance;
-import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
-import com.orderfleet.webapp.domain.File;
-import com.orderfleet.webapp.domain.PunchOut;
-import com.orderfleet.webapp.domain.RootPlanSubgroupApprove;
 import com.orderfleet.webapp.domain.enums.ApprovalStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.geolocation.api.GeoLocationServiceException;
-import com.orderfleet.webapp.repository.AttendanceRepository;
-import com.orderfleet.webapp.repository.AttendanceSubgroupApprovalRequestRepository;
-import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
-import com.orderfleet.webapp.repository.DashboardAttendanceUserRepository;
-import com.orderfleet.webapp.repository.PunchOutRepository;
-import com.orderfleet.webapp.repository.RootPlanSubgroupApproveRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AttendanceService;
 import com.orderfleet.webapp.service.FileManagerService;
@@ -99,6 +90,12 @@ public class AttendanceController {
 	
 	@Inject
 	private PunchOutRepository punchOutRepository;
+
+	@Autowired
+	private EventProducer eventProducer;
+
+	@Inject
+	private CompanyRepository companyRepository;
 
 	/**
 	 * POST /attendance : mark attendance.
@@ -237,6 +234,19 @@ public class AttendanceController {
 		}
 		simpMessagingTemplate.convertAndSend("/live-tracking/attendance/" + SecurityUtils.getCurrentUsersCompanyId(),
 				activityDTO);
+
+				Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+				String companyPid = company.getPid();
+				Optional<CompanyConfiguration> optCrm = companyConfigurationRepository
+								.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
+			if (optCrm.isPresent() && Boolean.valueOf(optCrm.get().getValue())) {
+					if (attendance != null) {
+							Attendance finalAttendance = attendance;
+							CompletableFuture.supplyAsync(() -> {
+									sendAttendanceModCApplication(finalAttendance);
+									return "submitted successfully...";
+								});
+						}}
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 
@@ -404,4 +414,9 @@ public class AttendanceController {
 		kiloCalDTO.setTaskExecutionPid(null);
 		kilometreCalculationService.save(kiloCalDTO, attendance.getCompany().getId());
 	}
+
+		public void sendAttendanceModCApplication(Attendance attendance){
+				AttendanceDTO attendanceDTO = new AttendanceDTO(attendance);
+				eventProducer.attendancePublish(attendanceDTO);
+			}
 }

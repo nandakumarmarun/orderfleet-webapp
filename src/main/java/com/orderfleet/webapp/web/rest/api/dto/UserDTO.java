@@ -78,8 +78,10 @@ public class UserDTO {
 	private String employeeName;
 
 	private String employeeAlias;
-	
+
 	private String userPassword;
+
+	private boolean enableModcFeature;
 
 	public UserDTO() {
 	}
@@ -90,13 +92,12 @@ public class UserDTO {
 				user.getLangKey(), user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()),
 				user.getShowAllUsersData(), user.getDashboardUIType(), user.getDiscontinued(), user.getDeviceKey(),
 				user.getCompany().getGstNo(), user.getCompany().getPhoneNo(), user.getCompany().getAddress1(),
-				user.getCompany().getEmail(),user.getPassword());
+				user.getCompany().getEmail(),user.getPassword(),user.getEnableModcFeature());
 	}
-
 	public UserDTO(String pid, String companyPid, String companyName, String login, String firstName, String lastName,
-			String email, String mobile, boolean activated, String langKey, Set<String> authorities,
-			boolean showAllUserData, DashboardUIType dashboardUIType, boolean discontinued, String deviceKey,
-			String gstNumber, String companyPhoneNo, String companyAddress, String companyEmail,String userPassword) {
+				   String email, String mobile, boolean activated, String langKey, Set<String> authorities,
+				   boolean showAllUserData, DashboardUIType dashboardUIType, boolean discontinued, String deviceKey,
+				   String gstNumber, String companyPhoneNo, String companyAddress, String companyEmail,String userPassword) {
 		this.pid = pid;
 		this.companyPid = companyPid;
 		this.companyName = companyName;
@@ -118,6 +119,32 @@ public class UserDTO {
 		this.companyEmail = companyEmail;
 		this.userPassword = userPassword;
 	}
+	public UserDTO(String pid, String companyPid, String companyName, String login, String firstName, String lastName,
+				   String email, String mobile, boolean activated, String langKey, Set<String> authorities,
+				   boolean showAllUserData, DashboardUIType dashboardUIType, boolean discontinued, String deviceKey,
+				   String gstNumber, String companyPhoneNo, String companyAddress, String companyEmail,String userPassword,boolean enableModcFeature) {
+		this.pid = pid;
+		this.companyPid = companyPid;
+		this.companyName = companyName;
+		this.login = login;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.mobile = mobile;
+		this.activated = activated;
+		this.langKey = langKey;
+		this.authorities = authorities;
+		this.showAllUserData = showAllUserData;
+		this.dashboardUIType = dashboardUIType;
+		this.discontinued = discontinued;
+		this.deviceKey = deviceKey;
+		this.gstNumber = gstNumber;
+		this.companyPhoneNo = companyPhoneNo;
+		this.companyAddress = companyAddress;
+		this.companyEmail = companyEmail;
+		this.userPassword = userPassword;
+		this.enableModcFeature = enableModcFeature;
+	}
 
 	public UserDTO(String pid, String firstName, String lastName) {
 		this.pid = pid;
@@ -125,7 +152,20 @@ public class UserDTO {
 		this.lastName = lastName;
 	}
 
-	
+	public UserDTO(String pid,String login,String userPassword,String companyName,Long companyId,String companyEmail,String companyAddress,String email, String firstName, String lastName) {
+		this.pid = pid;
+		this.login = login;
+		this.userPassword=userPassword;
+		this.companyName = companyName;
+		this.companyEmail = companyEmail;
+		this.companyId = companyId;
+		this.companyAddress = companyAddress;
+		this.email = email;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+
+
 
 	public String getPid() {
 		return pid;
@@ -316,6 +356,14 @@ public class UserDTO {
 
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
+	}
+
+	public boolean getEnableModcFeature() {
+		return enableModcFeature;
+	}
+
+	public void setEnableModcFeature(boolean enableModcFeature) {
+		this.enableModcFeature = enableModcFeature;
 	}
 
 	@Override

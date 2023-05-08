@@ -42,6 +42,8 @@ public class AttendanceDTO {
 	private BigDecimal towerLatitude;
 	private BigDecimal towerLongitude;
 	private double oodoMeter;
+
+	private long companyId;
 	private String distanceFarePid;
 	private String imageRefNo;
 	private String vehicleType;
@@ -93,6 +95,7 @@ public class AttendanceDTO {
 		this.attendanceStatus = attendance.getAttendanceStatus();
 		this.latitude = attendance.getLatitude();
 		this.longitude = attendance.getLongitude();
+		this.companyId = attendance.getCompany().getId();
 		this.mnc = attendance.getMnc();
 		this.mcc = attendance.getMcc();
 		this.cellId = attendance.getCellId();
@@ -353,8 +356,15 @@ public class AttendanceDTO {
 	public void setImageButtonVisible(Boolean imageButtonVisible) {
 		this.imageButtonVisible = imageButtonVisible;
 	}
-	
-	
+
+
+	public long getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(long companyId) {
+		this.companyId = companyId;
+	}
 
 	public double getOodoMeter() {
 		return oodoMeter;

@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -19,8 +20,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.async.event.EventProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.MimeMappings;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -196,6 +199,9 @@ public class ExecutiveTaskSubmissionController {
 
 	@Inject
 	private PrimarySecondaryDocumentRepository primarySecondaryDocumentRepository;
+
+	@Autowired
+	private EventProducer eventProducer;
 
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
@@ -654,10 +660,9 @@ public class ExecutiveTaskSubmissionController {
 
 			}
 			// Send sales order email to uncleJhon secondary sales
-			System.out.println("startttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt");
 			Optional<CompanyConfiguration> optsendEmailAutomatically = companyConfigurationRepository
 					.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
-			if (optsendEmailAutomatically.isPresent()) {
+			if (optsendEmailAutomatically.isPresent() && Boolean.valueOf(optsendEmailAutomatically.get().getValue())) {
 				List<PrimarySecondaryDocument> primarySecDoc = primarySecondaryDocumentRepository
 						.findByVoucherTypeAndCompany(VoucherType.SECONDARY_SALES_ORDER, company.getId());
 				Document document = primarySecDoc.get(0).getDocument();
@@ -677,7 +682,6 @@ public class ExecutiveTaskSubmissionController {
 					}
 				}
 			}
-			System.out.println("stoopppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp");
 
 			// send EmailToComplaint Modern
 
@@ -687,6 +691,17 @@ public class ExecutiveTaskSubmissionController {
 
 			taskSubmissionResponse.setStatus("Success");
 			taskSubmissionResponse.setMessage("Activity submitted successfully...");
+
+			Optional<CompanyConfiguration> optCrm = companyConfigurationRepository
+										.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
+					if (optCrm.isPresent() && Boolean.valueOf(optCrm.get().getValue())) {
+								if (tsTransactionWrapper.getDynamicDocuments() != null) {
+										CompletableFuture.supplyAsync(() -> {
+											sendDynamicDocumentModCApplication(tsTransactionWrapper);
+											return "submitted successfully...";
+											});
+								}
+							}
 
 		} catch (DataIntegrityViolationException dive) {
 			taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Duplicate Key");
@@ -1335,4 +1350,11 @@ public class ExecutiveTaskSubmissionController {
 
 		return mailSender;
 	}
+		public void sendDynamicDocumentModCApplication(ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper){
+			if(!tsTransactionWrapper.getDynamicDocuments().isEmpty()) {
+						List<DynamicDocumentHeader> ddhlist = tsTransactionWrapper.getDynamicDocuments();
+						List<DynamicDocumentHeaderDTO> ddhDTO = ddhlist.stream().map(data -> new DynamicDocumentHeaderDTO(data,data.getCompany())).collect(Collectors.toList());
+						ddhDTO.forEach(ddhDto -> eventProducer.dynamicDocumentPublish(ddhDto));
+					}
+			}
 }

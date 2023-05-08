@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.DynamicDocumentHeader;
 import com.orderfleet.webapp.domain.DynamicDocumentHeaderHistory;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
@@ -38,6 +39,12 @@ public class DynamicDocumentHeaderDTO {
 	private String userName;
 
 	private String userPid;
+
+	private String companyId;
+
+	private String companyPid;
+
+	private String companyName;
 
 	private List<FilledFormDTO> filledForms;
 
@@ -98,6 +105,46 @@ public class DynamicDocumentHeaderDTO {
 			this.accountPhone = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getPhone1();
 			this.accountEmail = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getEmail1();
 			this.description   = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getDescription();
+		}
+		if (dynamicDocumentHeader.getTallyDownloadStatus() != null) {
+			this.tallyDownloadStatus = dynamicDocumentHeader.getTallyDownloadStatus();
+		}
+		this.filledForms = dynamicDocumentHeader.getFilledForms().stream().map(FilledFormDTO::new)
+				.collect(Collectors.toList());
+	}
+
+	public DynamicDocumentHeaderDTO(DynamicDocumentHeader dynamicDocumentHeader, Company company) {
+		super();
+		this.pid = dynamicDocumentHeader.getPid();
+		this.documentNumberLocal = dynamicDocumentHeader.getDocumentNumberLocal();
+		this.documentNumberServer = dynamicDocumentHeader.getDocumentNumberServer();
+		if (dynamicDocumentHeader.getDocument() != null) {
+			this.documentPid = dynamicDocumentHeader.getDocument().getPid();
+			this.documentName = dynamicDocumentHeader.getDocument().getName();
+		}
+		this.createdDate = dynamicDocumentHeader.getCreatedDate();
+		this.documentDate = dynamicDocumentHeader.getDocumentDate();
+		if (dynamicDocumentHeader.getEmployee() != null) {
+			this.employeePid = dynamicDocumentHeader.getEmployee().getPid();
+			this.employeeName = dynamicDocumentHeader.getEmployee().getName();
+			this.emplyeePhone = dynamicDocumentHeader.getEmployee().getPhone();
+		}
+		if (dynamicDocumentHeader.getCreatedBy() != null) {
+			this.userName = dynamicDocumentHeader.getCreatedBy().getFirstName();
+			this.userPid = dynamicDocumentHeader.getCreatedBy().getPid();
+		}
+		if (dynamicDocumentHeader.getExecutiveTaskExecution() != null) {
+			this.activityName = dynamicDocumentHeader.getExecutiveTaskExecution().getActivity().getName();
+			this.accountName = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getName();
+			this.accountAddress = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getAddress();
+			this.accountPhone = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getPhone1();
+			this.accountEmail = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getEmail1();
+			this.description   = dynamicDocumentHeader.getExecutiveTaskExecution().getAccountProfile().getDescription();
+		}
+		if (company != null) {
+			this.companyId = String.valueOf(company.getId());
+			this.companyName = company.getLegalName();
+			this.companyPid =company.getPid();
 		}
 		if (dynamicDocumentHeader.getTallyDownloadStatus() != null) {
 			this.tallyDownloadStatus = dynamicDocumentHeader.getTallyDownloadStatus();
@@ -238,6 +285,31 @@ public class DynamicDocumentHeaderDTO {
 	public String getAccountName() {
 		return accountName;
 	}
+
+		public String getCompanyId() {
+				return companyId;
+			}
+
+			public void setCompanyId(String companyId) {
+				this.companyId = companyId;
+			}
+
+			public String getCompanyPid() {
+				return companyPid;
+			}
+
+			public void setCompanyPid(String companyPid) {
+				this.companyPid = companyPid;
+			}
+
+			public String getCompanyName() {
+				return companyName;
+			}
+
+			public void setCompanyName(String companyName) {
+				this.companyName = companyName;
+			}
+
 
 	public void setAccountName(String accountName) {
 		this.accountName = accountName;

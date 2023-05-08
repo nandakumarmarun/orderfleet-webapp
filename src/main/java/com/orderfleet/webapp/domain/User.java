@@ -147,7 +147,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	
 	@Column(name = "enable_websocket", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
 	private boolean enableWebsocket = true;
-	
+	@Column(name = "enableModcFeature", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean enableModcFeature = false;
 	@Column(name = "chart_color")
 	private String chartColor;
 	
@@ -353,6 +354,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	}
 	
 
+		public boolean getEnableModcFeature() {
+				return enableModcFeature;
+			}
+
+			public void setEnableModcFeature(boolean enableModcFeature) {
+				this.enableModcFeature = enableModcFeature;
+			}
 	public boolean getDiscontinued() {
 		return discontinued;
 	}
