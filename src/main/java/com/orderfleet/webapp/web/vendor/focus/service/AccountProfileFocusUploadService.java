@@ -277,7 +277,7 @@ public class AccountProfileFocusUploadService {
 					locationAccountProfileDto.setLocationName("No Location");
 
 				} else {
-					System.out.println("routecode"+apDto.getRouteCode());
+					
 					locationDTO.setLocationId(apDto.getRouteCode());
 					locationDTO.setName(apDto.getRouteName());
 					locationDtos.add(locationDTO);
@@ -296,18 +296,15 @@ public class AccountProfileFocusUploadService {
 						routecode.setMasterName(apDto.getRouteName());
 						routecode.setAccountProfile(accountProfile);
 						routecode.setCompany(company);
-						System.out.println("present");
-						System.out.println(apDto.getRouteCode());
-						System.out.println(apDto.getRouteName());
+						
+						
 					}else {
 						routecode.setPid(RouteCodeService.PID_PREFIX + RandomUtil.generatePid() );
 						routecode.setMasterCode(apDto.getRouteCode());
 						routecode.setMasterName(apDto.getRouteName());
 						routecode.setAccountProfile(accountProfile);
 						routecode.setCompany(company);
-						System.out.println("presentelse");
-						System.out.println(apDto.getRouteCode());
-						System.out.println(apDto.getRouteName());
+						
 					}
 				}     
 				locationAccountProfileDtos.add(locationAccountProfileDto);
@@ -370,7 +367,7 @@ public class AccountProfileFocusUploadService {
 		
 		Set<Location> saveUpdateLocations = new HashSet<>();
 		// find all locations
-		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
+		List<Location> locations = locationRepository.findAllByCompanyId(companyId);
 		for (LocationDTO locDto : locationDTOs) {
 			// check exist by name, only one exist with a name
 			Optional<Location> optionalLoc = locations.stream().filter(p -> p.getName().equals(locDto.getName()))

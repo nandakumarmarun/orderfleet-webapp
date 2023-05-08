@@ -68,7 +68,7 @@ public class OutStandingFocusUploadService {
 		long start = System.nanoTime();
 //		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
-		receivablePayableRepository.deleteByCompanyId(company.getId());
+		receivablePayableRepository.deleteByCompanyId(companyId);
 		Set<ReceivablePayable> saveReceivablePayable = new HashSet<>();
 		
 		List<String> customerIds = OutStandingFocusDTos.stream().map(a -> a.getCustomerCode())

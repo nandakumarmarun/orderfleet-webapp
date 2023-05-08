@@ -91,18 +91,18 @@ public class ProductProfileFocusUploadService {
 		
 		List<ProductProfile> productProfiles = productProfileRepository
 				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
-		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
+		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(companyId);
 
 		List<ProductGroupDTO> productGroupDtos = new ArrayList<>();
 
 		List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
 
 		// All product must have a division/category, if not, set a default one
-				Division defaultDivision = divisionRepository.findFirstByCompanyId(company.getId());
+				Division defaultDivision = divisionRepository.findFirstByCompanyId(companyId);
 				
 				String cat = productCategorys.get(0).getName();
 				Optional<ProductCategory> defaultCategory = productCategoryRepository
-						.findByCompanyIdAndNameIgnoreCase(company.getId(), cat);
+						.findByCompanyIdAndNameIgnoreCase(companyId, cat);
 				ProductCategory productCategory = new ProductCategory();
 				if (!defaultCategory.isPresent()) {
 					productCategory = new ProductCategory();
@@ -232,7 +232,7 @@ public class ProductProfileFocusUploadService {
 		log.debug("Fetching product profiles");
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
 		log.debug("Fetching product Groups");
-		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
 		log.debug("Processing With New data");
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs)
 		{
@@ -266,7 +266,7 @@ public class ProductProfileFocusUploadService {
 //		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		// find all product group
-		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
 		for (ProductGroupDTO pgDto : productGroupDtos) {
 			// check exist by name, only one exist with a name
 			Optional<ProductGroup> optionalPG = productGroups.stream().filter(p -> p.getName().equals(pgDto.getName()))

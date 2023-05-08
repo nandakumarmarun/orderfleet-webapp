@@ -156,7 +156,7 @@ public class DayPlanExecutionReportResource {
 
 			List<ExecutiveTaskExecution> executiveTaskExecution = new ArrayList<>();
 
-			System.out.println("report size :"+ids);
+			
 			if (ids.size() != 0) {
 				executiveTaskExecution = executiveTaskExecutionRepository
 						.findExecutiveTaskExecutionByExecutiveTaskPlanIdIn(ids);

@@ -63,6 +63,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	@Query("select location from Location location where location.company.id= ?#{principal.companyId} and location.activated= ?1 order by location.name asc")
 	Page<Location> findAllByCompanyIdAndActivatedLocationOrderByName(Pageable pageable,boolean active);
 
+	@Query("select location from Location location where location.company.id = ?1 ")
 	List<Location> findAllByCompanyId(Long companyId);
 
 	List<Location> findByCompanyIdAndActivatedTrue(Long companyId);
