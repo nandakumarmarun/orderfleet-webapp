@@ -119,7 +119,7 @@ if (!this.DayPlanExecutionReport) {
 																	+ " - "
 																	+ dayPlanExecution.accountProfileName
 																	+"</td><td>"
-																	+ moment(dayPlanExecution.serverDate).format('DD MMM YYYY hh:mm a')
+																	+ (dayPlanExecution.serverDate == null ? "" : moment(dayPlanExecution.serverDate).format('DD MMM YYYY hh:mm a'))
 																	+ "</td><td>"
 																	+ actualOrder
 																	+ "</td><td>"
