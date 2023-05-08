@@ -654,7 +654,7 @@ public class ExecutiveTaskSubmissionController {
 
 			}
 			// Send sales order email to uncleJhon secondary sales
-			
+			System.out.println("startttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt");
 			Optional<CompanyConfiguration> optsendEmailAutomatically = companyConfigurationRepository
 					.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
 			if (optsendEmailAutomatically.isPresent()) {
@@ -666,7 +666,7 @@ public class ExecutiveTaskSubmissionController {
 
 				if (document.getPid().equalsIgnoreCase(ivDocument.getPid())) {
 
-					
+					System.out.println("Enter to the loop");
 
 					if (Boolean.valueOf(optsendEmailAutomatically.get().getValue())) {
 
@@ -677,7 +677,7 @@ public class ExecutiveTaskSubmissionController {
 					}
 				}
 			}
-			
+			System.out.println("stoopppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp");
 
 			// send EmailToComplaint Modern
 
