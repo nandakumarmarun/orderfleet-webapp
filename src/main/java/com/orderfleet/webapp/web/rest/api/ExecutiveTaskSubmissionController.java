@@ -691,11 +691,11 @@ public class ExecutiveTaskSubmissionController {
 
 			taskSubmissionResponse.setStatus("Success");
 			taskSubmissionResponse.setMessage("Activity submitted successfully...");
-
+          if (tsTransactionWrapper.getDynamicDocuments() != null) {
 			Optional<CompanyConfiguration> optCrm = companyConfigurationRepository
 										.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
 					if (optCrm.isPresent() && Boolean.valueOf(optCrm.get().getValue())) {
-								if (tsTransactionWrapper.getDynamicDocuments() != null) {
+								
 										CompletableFuture.supplyAsync(() -> {
 											sendDynamicDocumentModCApplication(tsTransactionWrapper);
 											return "submitted successfully...";
