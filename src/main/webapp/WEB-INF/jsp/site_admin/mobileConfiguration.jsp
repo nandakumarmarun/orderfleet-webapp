@@ -94,6 +94,8 @@
 						<th>Enable OutstandingAmount Deduction</th>
 						<th>Enable Previous Order Items</th>
 						<th>Enable Live Tracking</th>
+						<th>Receipt Share option </th>
+						<th>My plan sequence</th>
 						<th>Action</th>
 
 					</tr>
@@ -160,6 +162,8 @@
        			            <td>${mobileConfiguration.enableOutstandingAmountDeduction}</td>
        			            <td>${mobileConfiguration.enablePreviousOrderItems}</td>
        			            <td>${mobileConfiguration.enablelivetracking}</td>
+       			             <td>${mobileConfiguration.receiptShareOption}</td>
+       			              <td>${mobileConfiguration.myPlanSequence}</td>
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -567,6 +571,24 @@
                                                <div class="form-group">
                                                    <label class="control-label">Enable Live Tracking
                                                         </label> <input id="enablelivetracking" name='enablelivetracking'
+                                                        type='checkbox' class="form-control" />
+                                                         </div>
+                                            </td>
+                                         </tr>
+                                         <tr>
+                                            <td>
+                                               <div class="form-group">
+                                                   <label class="control-label">Receipt Share option 
+                                                        </label> <input id="receiptShareOption" name='receiptShareOption'
+                                                        type='checkbox' class="form-control" />
+                                                         </div>
+                                            </td>
+                                         </tr>
+                                         <tr>
+                                            <td>
+                                               <div class="form-group">
+                                                   <label class="control-label">My Plan Sequence
+                                                        </label> <input id="myPlanSequence" name='myPlanSequence'
                                                         type='checkbox' class="form-control" />
                                                          </div>
                                             </td>

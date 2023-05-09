@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.vendor.focus.service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -121,14 +122,15 @@ public class OutStandingFocusUploadService {
 			long end = System.nanoTime();
 			double elapsedTime = (end - start) / 1000000.0;
 			// update sync table
+			LocalDate date = LocalDate.now();
 			Optional<SyncOperation> oPsyncOperation = syncOperationRepository.findOneByCompanyIdAndOperationType(companyId, SyncOperationType.RECEIVABLE_PAYABLE);
 			SyncOperation syncOperation;
 			if(oPsyncOperation.isPresent()){
 				syncOperation = oPsyncOperation.get();
 				syncOperation.setOperationType(SyncOperationType.RECEIVABLE_PAYABLE);
 				syncOperation.setCompleted(true);
-				syncOperation.setLastSyncStartedDate(LocalDateTime.now());
-				syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+				syncOperation.setLastSyncStartedDate(date.atTime(LocalTime.ofNanoOfDay(start)));
+				syncOperation.setLastSyncCompletedDate(date.atTime(LocalTime.ofNanoOfDay(end)));
 				syncOperation.setLastSyncTime(elapsedTime);
 				syncOperation.setCompany(company);
 			}else{

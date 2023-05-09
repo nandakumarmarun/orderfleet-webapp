@@ -102,6 +102,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setEnableOutstandingAmountDeduction(mobileConfigurationDTO.getEnableOutstandingAmountDeduction());
 		configuration.setEnablePreviousOrderItems(mobileConfigurationDTO.getEnablePreviousOrderItems());
 		configuration.setEnablelivetracking(mobileConfigurationDTO.getEnablelivetracking());
+		configuration.setReceiptShareOption(mobileConfigurationDTO.getReceiptShareOption());
+		configuration.setMyPlanSequence(mobileConfigurationDTO.getMyPlanSequence());
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 		return result;
@@ -168,6 +170,8 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setEnableOutstandingAmountDeduction(mobileConfigurationDTO.getEnableOutstandingAmountDeduction());
 			configuration.setEnablePreviousOrderItems(mobileConfigurationDTO.getEnablePreviousOrderItems());
 			configuration.setEnablelivetracking(mobileConfigurationDTO.getEnablelivetracking());
+			configuration.setReceiptShareOption(mobileConfigurationDTO.getReceiptShareOption());
+			configuration.setMyPlanSequence(mobileConfigurationDTO.getMyPlanSequence());
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
 			return result;

@@ -1,7 +1,9 @@
 package com.orderfleet.webapp.web.vendor.focus.service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -327,14 +329,15 @@ public class AccountProfileFocusUploadService {
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
+		LocalDate date = LocalDate.now();
 		Optional<SyncOperation> oPsyncOperation = syncOperationRepository.findOneByCompanyIdAndOperationType(companyId, SyncOperationType.ACCOUNT_PROFILE);
 		SyncOperation syncOperation;
 		if(oPsyncOperation.isPresent()){
 			syncOperation = oPsyncOperation.get();
 			syncOperation.setOperationType(SyncOperationType.ACCOUNT_PROFILE);
 			syncOperation.setCompleted(true);
-			syncOperation.setLastSyncStartedDate(LocalDateTime.now());
-			syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+			syncOperation.setLastSyncStartedDate(date.atTime(LocalTime.ofNanoOfDay(start)));
+			syncOperation.setLastSyncCompletedDate(date.atTime(LocalTime.ofNanoOfDay(end)));
 			syncOperation.setLastSyncTime(elapsedTime);
 			syncOperation.setCompany(company);
 		}else{

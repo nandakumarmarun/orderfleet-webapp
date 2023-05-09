@@ -139,6 +139,9 @@ public class MobileSettingsDTO {
 	private boolean enablePreviousOrderItems;
 
 	private boolean enablelivetracking;
+	
+	private boolean receiptShareOption;
+	private boolean myPlanSequence;
 
 	public MobileSettingsDTO() {
 		super();
@@ -203,6 +206,8 @@ public class MobileSettingsDTO {
 		this.enableOutstandingAmountDeduction=mobileConfigurationDTO.getEnableOutstandingAmountDeduction();
 		this.enablePreviousOrderItems = mobileConfigurationDTO.getEnablePreviousOrderItems();
 		this.enablelivetracking = mobileConfigurationDTO.getEnablelivetracking();
+		this.receiptShareOption = mobileConfigurationDTO.getReceiptShareOption();
+		this.myPlanSequence = mobileConfigurationDTO.getMyPlanSequence();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -692,4 +697,21 @@ public class MobileSettingsDTO {
 	public void setEnablelivetracking(boolean enablelivetracking) {
 		this.enablelivetracking = enablelivetracking;
 	}
+
+	public boolean isReceiptShareOption() {
+		return receiptShareOption;
+	}
+
+	public void setReceiptShareOption(boolean receiptShareOption) {
+		this.receiptShareOption = receiptShareOption;
+	}
+
+	public boolean isMyPlanSequence() {
+		return myPlanSequence;
+	}
+
+	public void setMyPlanSequence(boolean myPlanSequence) {
+		this.myPlanSequence = myPlanSequence;
+	}
+	
 }

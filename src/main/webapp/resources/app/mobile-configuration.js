@@ -68,7 +68,9 @@ if (!this.MobileConfiguration) {
 			showAccountBalanceInReceiptAmount:false,
 			enableOutstandingAmountDeduction:false,
 			enablePreviousOrderItems:false,
-			enablelivetracking:false
+			enablelivetracking:false,
+			receiptShareOption  : false,
+			myPlanSequence : false
 	};
 
 	$(document).ready(function() {
@@ -210,6 +212,10 @@ if (!this.MobileConfiguration) {
                 		":checked");
         mobileConfigurationDTO.enablelivetracking = $("#enablelivetracking").is(
                 		":checked");
+        mobileConfigurationDTO.receiptShareOption = $("#receiptShareOption").is(
+		":checked");
+        mobileConfigurationDTO.myPlanSequence = $("#myPlanSequence").is(
+		":checked");
 		
 		$.ajax({
 			url : contextPath,
@@ -347,6 +353,10 @@ if (!this.MobileConfiguration) {
                                data.enablePreviousOrderItems);
                             $('#enablelivetracking').prop("checked",
                                data.enablelivetracking);
+                            $('#receiptShareOption').prop("checked",
+                                    data.receiptShareOption);
+                            $('#myPlanSequence').prop("checked",
+                                    data.myPlanSequence);
 						}
 
 					},

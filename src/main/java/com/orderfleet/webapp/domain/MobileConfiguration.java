@@ -237,6 +237,12 @@ public class MobileConfiguration implements Serializable {
 
 	@Column(name = "enable_live_tracking", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean enablelivetracking;
+	
+	@Column(name = "receipt_Share_option", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean receiptShareOption;
+	
+	@Column(name = "my_plan_sequence", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean myPlanSequence;
 
 	@NotNull
 	@ManyToOne
@@ -734,6 +740,22 @@ public class MobileConfiguration implements Serializable {
 
 	public void setEnablelivetracking(boolean enablelivetracking) {
 		this.enablelivetracking = enablelivetracking;
+	}
+
+	public boolean getReceiptShareOption() {
+		return receiptShareOption;
+	}
+
+	public void setReceiptShareOption(boolean receiptShareOption) {
+		this.receiptShareOption = receiptShareOption;
+	}
+
+	public boolean getMyPlanSequence() {
+		return myPlanSequence;
+	}
+
+	public void setMyPlanSequence(boolean myPlanSequence) {
+		this.myPlanSequence = myPlanSequence;
 	}
 
 	@Override
