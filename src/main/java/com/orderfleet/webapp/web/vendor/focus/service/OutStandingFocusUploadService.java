@@ -3,7 +3,6 @@ package com.orderfleet.webapp.web.vendor.focus.service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -22,13 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.ReceivablePayable;
-import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
-import com.orderfleet.webapp.domain.enums.SyncOperationType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.ReceivablePayableRepository;
-import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ReceivablePayableService;
@@ -48,28 +44,25 @@ public class OutStandingFocusUploadService {
 	private final AccountProfileRepository accountProfileRepository;
 
 	private final ReceivablePayableRepository receivablePayableRepository;
-	
-	private final SyncOperationRepository syncOperationRepository;
 
 	public OutStandingFocusUploadService(CompanyRepository companyRepository,
 			BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			AccountProfileRepository accountProfileRepository,
-			ReceivablePayableRepository receivablePayableRepository,SyncOperationRepository syncOperationRepository) {
+			ReceivablePayableRepository receivablePayableRepository) {
 		super();
 		this.companyRepository = companyRepository;
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.accountProfileRepository = accountProfileRepository;
 		this.receivablePayableRepository = receivablePayableRepository;
-		this.syncOperationRepository = syncOperationRepository;
 	}
-	final Long companyId = (long) 304975;
+	
 	@Transactional
 	public void saveUpdateReceivablePayable(List<OutStandingFocus> OutStandingFocusDTos) {
 		log.info("Saving Outstanding Invoice...");
 		long start = System.nanoTime();
-//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
-		receivablePayableRepository.deleteByCompanyId(companyId);
+		receivablePayableRepository.deleteByCompanyId(company.getId());
 		Set<ReceivablePayable> saveReceivablePayable = new HashSet<>();
 		
 		List<String> customerIds = OutStandingFocusDTos.stream().map(a -> a.getCustomerCode())
@@ -81,7 +74,7 @@ public class OutStandingFocusUploadService {
 		
 //		Map<String, Double> accountBalanceMap = new HashMap<>();
 		
-		List<AccountProfile> accProfiles = accountProfileRepository.findAccountProfileAndCustomerIds(companyId,customerIds);
+		List<AccountProfile> accProfiles = accountProfileRepository.findAccountProfileAndCustomerIds(customerIds);
 	
 	     for(OutStandingFocus OutStandingFocusDTO : OutStandingFocusDTos) {
 	    	 
@@ -122,28 +115,6 @@ public class OutStandingFocusUploadService {
 			long end = System.nanoTime();
 			double elapsedTime = (end - start) / 1000000.0;
 			// update sync table
-			LocalDate date = LocalDate.now();
-			Optional<SyncOperation> oPsyncOperation = syncOperationRepository.findOneByCompanyIdAndOperationType(companyId, SyncOperationType.RECEIVABLE_PAYABLE);
-			SyncOperation syncOperation;
-			if(oPsyncOperation.isPresent()){
-				syncOperation = oPsyncOperation.get();
-				syncOperation.setOperationType(SyncOperationType.RECEIVABLE_PAYABLE);
-				syncOperation.setCompleted(true);
-				syncOperation.setLastSyncStartedDate(date.atTime(LocalTime.ofNanoOfDay(start)));
-				syncOperation.setLastSyncCompletedDate(date.atTime(LocalTime.ofNanoOfDay(end)));
-				syncOperation.setLastSyncTime(elapsedTime);
-				syncOperation.setCompany(company);
-			}else{
-				syncOperation = new SyncOperation();
-				syncOperation.setOperationType(SyncOperationType.RECEIVABLE_PAYABLE);
-				syncOperation.setCompleted(true);
-				syncOperation.setLastSyncStartedDate(LocalDateTime.now());
-				syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
-				syncOperation.setLastSyncTime(elapsedTime);
-				syncOperation.setCompany(company);
-			}
-			System.out.println( "syncCompleted Date : "+syncOperation.getLastSyncCompletedDate());
-			syncOperationRepository.save(syncOperation);
 			log.info("Sync completed in {} ms", elapsedTime);
 	                
 	}

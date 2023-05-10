@@ -1,9 +1,6 @@
 package com.orderfleet.webapp.web.vendor.focus.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,16 +18,13 @@ import com.orderfleet.webapp.domain.ProductCategory;
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductGroupProduct;
 import com.orderfleet.webapp.domain.ProductProfile;
-import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
-import com.orderfleet.webapp.domain.enums.SyncOperationType;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.DivisionRepository;
 import com.orderfleet.webapp.repository.ProductCategoryRepository;
 import com.orderfleet.webapp.repository.ProductGroupProductRepository;
 import com.orderfleet.webapp.repository.ProductGroupRepository;
 import com.orderfleet.webapp.repository.ProductProfileRepository;
-import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.ProductCategoryService;
@@ -60,13 +54,11 @@ public class ProductProfileFocusUploadService {
 	private final ProductGroupProductRepository productGroupProductRepository;
 
 	private final CompanyRepository companyRepository;
-	
-	private final SyncOperationRepository syncOperationRepository;
 
 	public ProductProfileFocusUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			DivisionRepository divisionRepository, ProductCategoryRepository productCategoryRepository,
 			ProductGroupRepository productGroupRepository, ProductProfileRepository productProfileRepository,
-			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository,SyncOperationRepository syncOperationRepository) {
+			ProductGroupProductRepository productGroupProductRepository, CompanyRepository companyRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.divisionRepository = divisionRepository;
@@ -75,16 +67,14 @@ public class ProductProfileFocusUploadService {
 		this.productProfileRepository = productProfileRepository;
 		this.productGroupProductRepository = productGroupProductRepository;
 		this.companyRepository = companyRepository;
-		this.syncOperationRepository = syncOperationRepository;
 	}
 
-	final Long companyId = (long) 304975;
 	public void saveUpdateProductProfiles(List<ProductProfileNewFocus> list) {
 		
 		log.info("Saving Product Profiles.........");
 		
 		long start = System.nanoTime();
-//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
@@ -93,18 +83,18 @@ public class ProductProfileFocusUploadService {
 		
 		List<ProductProfile> productProfiles = productProfileRepository
 				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
-		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(companyId);
+		List<ProductCategory> productCategorys = productCategoryRepository.findByCompanyId(company.getId());
 
 		List<ProductGroupDTO> productGroupDtos = new ArrayList<>();
 
 		List<TPProductGroupProductDTO> productGroupProductDTOs = new ArrayList<>();
 
 		// All product must have a division/category, if not, set a default one
-				Division defaultDivision = divisionRepository.findFirstByCompanyId(companyId);
+				Division defaultDivision = divisionRepository.findFirstByCompanyId(company.getId());
 				
 				String cat = productCategorys.get(0).getName();
 				Optional<ProductCategory> defaultCategory = productCategoryRepository
-						.findByCompanyIdAndNameIgnoreCase(companyId, cat);
+						.findByCompanyIdAndNameIgnoreCase(company.getId(), cat);
 				ProductCategory productCategory = new ProductCategory();
 				if (!defaultCategory.isPresent()) {
 					productCategory = new ProductCategory();
@@ -196,28 +186,7 @@ public class ProductProfileFocusUploadService {
 				long end = System.nanoTime();
 				double elapsedTime = (end - start) / 1000000.0;
 				// update sync table
-				LocalDate date = LocalDate.now();
-				Optional<SyncOperation> oPsyncOperation = syncOperationRepository.findOneByCompanyIdAndOperationType(companyId, SyncOperationType.PRODUCTPROFILE);
-				SyncOperation syncOperation;
-				if(oPsyncOperation.isPresent()){
-					syncOperation = oPsyncOperation.get();
-					syncOperation.setOperationType(SyncOperationType.PRODUCTPROFILE);
-					syncOperation.setCompleted(true);
-					syncOperation.setLastSyncStartedDate(date.atTime(LocalTime.ofNanoOfDay(start)));
-					syncOperation.setLastSyncCompletedDate(date.atTime(LocalTime.ofNanoOfDay(end)));
-					syncOperation.setLastSyncTime(elapsedTime);
-					syncOperation.setCompany(company);
-				}else{
-					syncOperation = new SyncOperation();
-					syncOperation.setOperationType(SyncOperationType.PRODUCTPROFILE);
-					syncOperation.setCompleted(true);
-					syncOperation.setLastSyncStartedDate(LocalDateTime.now());
-					syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
-					syncOperation.setLastSyncTime(elapsedTime);
-					syncOperation.setCompany(company);
-				}
-				System.out.println( "syncCompleted Date : "+syncOperation.getLastSyncCompletedDate());
-				syncOperationRepository.save(syncOperation);
+
 				log.info("Sync completed in {} ms", elapsedTime);
 			}
 
@@ -225,7 +194,7 @@ public class ProductProfileFocusUploadService {
 	private void saveUpdateProductGroupProduct(List<TPProductGroupProductDTO> productGroupProductDTOs) {
 		log.debug("Saving Product Group Products : ");
 		long start = System.nanoTime();
-//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		log.debug("Login details : " +"["+ companyId + "," + company.getLegalName()+"]");
 		log.debug("initializing session Registries");
@@ -235,7 +204,7 @@ public class ProductProfileFocusUploadService {
 		log.debug("Fetching product profiles");
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
 		log.debug("Fetching product Groups");
-		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
 		log.debug("Processing With New data");
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs)
 		{
@@ -266,10 +235,10 @@ public class ProductProfileFocusUploadService {
 		long start = System.nanoTime();
 		Set<ProductGroup> saveUpdateProductGroups = new HashSet<>();
 
-//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		// find all product group
-		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
+		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(company.getId());
 		for (ProductGroupDTO pgDto : productGroupDtos) {
 			// check exist by name, only one exist with a name
 			Optional<ProductGroup> optionalPG = productGroups.stream().filter(p -> p.getName().equals(pgDto.getName()))

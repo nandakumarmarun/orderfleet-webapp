@@ -1,9 +1,7 @@
 package com.orderfleet.webapp.web.vendor.focus.service;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,11 +24,9 @@ import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.domain.RouteCode;
-import com.orderfleet.webapp.domain.SyncOperation;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
-import com.orderfleet.webapp.domain.enums.SyncOperationType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
@@ -38,7 +34,6 @@ import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationHierarchyRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
 import com.orderfleet.webapp.repository.RouteCodeRepository;
-import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
@@ -82,8 +77,6 @@ public class AccountProfileFocusUploadService {
 	private final LocationHierarchyRepository locationHierarchyRepository;
 
 	private final RouteCodeRepository routeCodeRepository;
-	
-	private final SyncOperationRepository syncOperationRepository;
 
 	public AccountProfileFocusUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
@@ -91,8 +84,7 @@ public class AccountProfileFocusUploadService {
 			LocationAccountProfileRepository locationAccountProfileRepository,
 			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
 			LocationService locationService, CompanyRepository companyRepository,
-			LocationHierarchyRepository locationHierarchyRepository, RouteCodeRepository routeCodeRepository,SyncOperationRepository syncOperationRepository ) {
-		
+			LocationHierarchyRepository locationHierarchyRepository, RouteCodeRepository routeCodeRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.accountProfileRepository = accountProfileRepository;
@@ -106,18 +98,16 @@ public class AccountProfileFocusUploadService {
 		this.companyRepository = companyRepository;
 		this.locationHierarchyRepository = locationHierarchyRepository;
 		this.routeCodeRepository = routeCodeRepository;
-		this.syncOperationRepository = syncOperationRepository;
 	}
 
-	final Long companyId = (long) 304975;
 	public void saveUpdateAccountProfiles(List<AccountProfileFocus> accountProfileDTos) {
 
 		log.info("Saving Account Profiles.........");
 
 		long start = System.nanoTime();
 
-		final User user = userRepository.findOneByLogin("admin@deva").get();
-//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		log.info("Company ID" + companyId);
 		Company company = companyRepository.findOne(companyId);
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
@@ -125,14 +115,14 @@ public class AccountProfileFocusUploadService {
 		// All product must have a division/category, if not, set a default one
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "AT_QUERY_109" + "_" + "admin@deva" + "_" + LocalDateTime.now();
+		String id = "AT_QUERY_109" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 		String description = "get first by compId";
 		LocalDateTime startLCTime = LocalDateTime.now();
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
-		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyIdAndActivated(companyId,true);
+		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyIdAndActivated(true);
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -161,13 +151,13 @@ public class AccountProfileFocusUploadService {
 //				apNames);
 		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id1 = "AP_QUERY_104" + "_" + "admin@deva" + "_" + LocalDateTime.now();
+		String id1 = "AP_QUERY_104" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
 		String description1 = "get all by compId";
 		LocalDateTime startLCTime1 = LocalDateTime.now();
 		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 		String startDate1 = startLCTime1.format(DATE_FORMAT1);
 		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId(companyId);
+		List<AccountProfile> accountProfiles = accountProfileRepository.findAllByCompanyId();
 		String flag1 = "Normal";
 		LocalDateTime endLCTime1 = LocalDateTime.now();
 		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
@@ -221,6 +211,9 @@ public class AccountProfileFocusUploadService {
 					accountProfile.setImportStatus(true);
 
 				}
+
+				accountProfile.setClosingBalance(Double.parseDouble(apDto.getClosing_Balance()));
+
 				if (apDto.getCreditLimit() != null && !apDto.getCreditLimit().equals("")) {
 					Float floatnum = Float.parseFloat(apDto.getCreditLimit());
 					accountProfile.setCreditLimit((Long) floatnum.longValue());
@@ -279,7 +272,7 @@ public class AccountProfileFocusUploadService {
 					locationAccountProfileDto.setLocationName("No Location");
 
 				} else {
-					
+					System.out.println("routecode"+apDto.getRouteCode());
 					locationDTO.setLocationId(apDto.getRouteCode());
 					locationDTO.setName(apDto.getRouteName());
 					locationDtos.add(locationDTO);
@@ -298,15 +291,18 @@ public class AccountProfileFocusUploadService {
 						routecode.setMasterName(apDto.getRouteName());
 						routecode.setAccountProfile(accountProfile);
 						routecode.setCompany(company);
-						
-						
+						System.out.println("present");
+						System.out.println(apDto.getRouteCode());
+						System.out.println(apDto.getRouteName());
 					}else {
 						routecode.setPid(RouteCodeService.PID_PREFIX + RandomUtil.generatePid() );
 						routecode.setMasterCode(apDto.getRouteCode());
 						routecode.setMasterName(apDto.getRouteName());
 						routecode.setAccountProfile(accountProfile);
 						routecode.setCompany(company);
-						
+						System.out.println("presentelse");
+						System.out.println(apDto.getRouteCode());
+						System.out.println(apDto.getRouteName());
 					}
 				}     
 				locationAccountProfileDtos.add(locationAccountProfileDto);
@@ -329,28 +325,6 @@ public class AccountProfileFocusUploadService {
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
-		LocalDate date = LocalDate.now();
-		Optional<SyncOperation> oPsyncOperation = syncOperationRepository.findOneByCompanyIdAndOperationType(companyId, SyncOperationType.ACCOUNT_PROFILE);
-		SyncOperation syncOperation;
-		if(oPsyncOperation.isPresent()){
-			syncOperation = oPsyncOperation.get();
-			syncOperation.setOperationType(SyncOperationType.ACCOUNT_PROFILE);
-			syncOperation.setCompleted(true);
-			syncOperation.setLastSyncStartedDate(date.atTime(LocalTime.ofNanoOfDay(start)));
-			syncOperation.setLastSyncCompletedDate(date.atTime(LocalTime.ofNanoOfDay(end)));
-			syncOperation.setLastSyncTime(elapsedTime);
-			syncOperation.setCompany(company);
-		}else{
-			syncOperation = new SyncOperation();
-			syncOperation.setOperationType(SyncOperationType.ACCOUNT_PROFILE);
-			syncOperation.setCompleted(true);
-			syncOperation.setLastSyncStartedDate(LocalDateTime.now());
-			syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
-			syncOperation.setLastSyncTime(elapsedTime);
-			syncOperation.setCompany(company);
-		}
-		System.out.println( "syncCompleted Date : "+syncOperation.getLastSyncCompletedDate());
-		syncOperationRepository.save(syncOperation);
 
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
@@ -365,12 +339,12 @@ public class AccountProfileFocusUploadService {
 
 		log.info("Saving Locations.........");
 		long start = System.nanoTime();
-//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		
 		Set<Location> saveUpdateLocations = new HashSet<>();
 		// find all locations
-		List<Location> locations = locationRepository.findAllByCompanyId(companyId);
+		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
 		for (LocationDTO locDto : locationDTOs) {
 			// check exist by name, only one exist with a name
 			Optional<Location> optionalLoc = locations.stream().filter(p -> p.getName().equals(locDto.getName()))
@@ -413,7 +387,7 @@ public class AccountProfileFocusUploadService {
 
 		log.info("Saving Location Account Profiles.........");
 		long start = System.nanoTime();
-//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 		List<LocationAccountProfile> newLocationAccountProfiles = new ArrayList<>();
 		List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileService
@@ -474,7 +448,7 @@ public class AccountProfileFocusUploadService {
 
 		long start = System.nanoTime();
 
-//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 
 		Long version;
 
@@ -483,8 +457,8 @@ public class AccountProfileFocusUploadService {
 				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
 
 		if (locationHierarchy.isPresent()) {
-			locationHierarchyRepository.updateLocationHierarchyInactivated(ZonedDateTime.now(),
-					locationHierarchy.get().getVersion(),companyId);
+			locationHierarchyRepository.updateLocationHierarchyInactivatedFor(ZonedDateTime.now(),
+					locationHierarchy.get().getVersion());
 			version = locationHierarchy.get().getVersion() + 1;
 
 		} else {
@@ -509,10 +483,10 @@ public class AccountProfileFocusUploadService {
 
 					if (optionalParentLoc.isPresent()) {
 						locationHierarchyRepository.insertLocationHierarchyWithParent(version,
-								optionalLoc.get().getId(), optionalParentLoc.get().getId(),companyId);
+								optionalLoc.get().getId(), optionalParentLoc.get().getId());
 					}
 				} else {
-					locationHierarchyRepository.insertLocationHierarchyWithNoParentAndCompanyId(version, optionalLoc.get().getId(),companyId);
+					locationHierarchyRepository.insertLocationHierarchyWithNoParent(version, optionalLoc.get().getId());
 				}
 			}
 		}
