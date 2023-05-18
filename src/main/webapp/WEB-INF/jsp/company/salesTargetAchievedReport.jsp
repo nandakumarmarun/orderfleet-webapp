@@ -41,6 +41,9 @@
 				<!-- Profile Info and Notifications -->
 				<div class="col-md-12 col-sm-12 clearfix">
 					<form role="form" class="form-horizontal form-groups-bordered">
+					<div class="form-group">
+							
+						</div>
 						<div class="form-group">
 							<div class="col-sm-3">
 								<div class=" input-group">
@@ -53,13 +56,13 @@
 										<div>
 											<a class='btn btn-default dropdown-item'
 												style='width: 100%; text-align: left;'
-												onclick='GetDashboardEmployees(this,"no","Select Dashboard Employee")'>Dashboard
+												onclick='GetDashboardEmployees(this,"no","All Dashboard Employee")'>Dashboard
 												Employee</a>
 										</div>
 										<div>
 											<a class='btn btn-default dropdown-item'
 												style='width: 100%; text-align: left;'
-												onclick='GetAllEmployees(this,"no","Select Employee")'>All
+												onclick='GetAllEmployees(this,"all"," Select Employee")'>All
 												Employee</a>
 										</div>
 										<!-- <div>
@@ -123,6 +126,8 @@
 					id="tblSalesTargetAchievedReport">
 					<thead>
 						<tr>
+						<th rowspan="2"
+								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">EMPLOYEE</th>
 							<th rowspan="2"
 								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">ACTIVITY</th>
 							<th rowspan="2"
@@ -140,6 +145,9 @@
 								style="text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; vertical-align: middle;">ACHIEVED</th>
 						</tr>
 						<tr id="txtRowHeader">
+					
+					        <td
+								style="color: white; background-color: #35aa47; text-align: center; vertical-align: middle;"></td>
 							<td
 								style="color: white; background-color: #35aa47; text-align: center; vertical-align: middle;"></td>
 							<td

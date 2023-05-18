@@ -542,6 +542,11 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select iv.id from InventoryVoucherHeader iv where iv.createdBy.pid = ?1 and iv.document.id in ?2 and iv.documentDate between ?3 and ?4")
 	Set<Long> findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(String userPid, Set<Long> documentIds,
 			LocalDateTime fromDate, LocalDateTime toDate);
+	// All employee
+	@Query("select iv.id from InventoryVoucherHeader iv where iv.createdBy.pid in ?1 and iv.document.id in ?2 and iv.documentDate between ?3 and ?4")
+	Set<Long> findIdByUserPidInAndDocumentsAndProductsAndCreatedDateBetween(List<String>userid, Set<Long> documentIds,
+			LocalDateTime fromDate, LocalDateTime toDate);
+
 
 	@Query("select iv.id from InventoryVoucherHeader iv where iv.receiverAccount.id in ?1 and iv.document.id in ?2 and iv.documentDate between ?3 and ?4")
 	Set<Long> findIdByAccountProfileAndDocumentDateBetween(Set<Long> accountProfileIds, List<Long> documentIds,

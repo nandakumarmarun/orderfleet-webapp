@@ -13,7 +13,7 @@
 
 	<groupId>com.orderfleet.webapp</groupId>
 	<artifactId>orderfleet-webapp</artifactId>
-	<version>1.101.27</version>
+	<version>1.101.28</version>
 	<packaging>war</packaging>
 	<name>orderfleet-webapp</name>
 	<description>Orderfleet Web application</description>

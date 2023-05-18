@@ -34,12 +34,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.CompanySetting;
+import com.orderfleet.webapp.domain.EmployeeProfile;
 import com.orderfleet.webapp.domain.SalesSummaryAchievment;
 import com.orderfleet.webapp.domain.SalesTargetGroup;
 import com.orderfleet.webapp.domain.SalesTargetGroupUserTarget;
+import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanySettingRepository;
+import com.orderfleet.webapp.repository.DashboardUserRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
@@ -110,6 +113,9 @@ public class SalesTargetAchievedReportResource {
 	@Inject
 	private ProductGroupSalesTargetGrouprepository productGroupSalesTargetGrouprepository;
 
+	@Inject
+	private DashboardUserRepository dashboardUserRepository;
+
 	/**
 	 * GET /sales-target-vs-achieved-report
 	 *
@@ -131,32 +137,50 @@ public class SalesTargetAchievedReportResource {
 			@RequestParam("productGroupPids") List<String> productGroupPids,
 			@RequestParam(value = "fromDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 			@RequestParam(value = "toDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-		log.info("Rest Request to load sales target vs achieved report : {} , and date between {}, {}", employeePid,
-				fromDate, toDate);
+		log.info("Rest Request to load sales target vs achieved report : {} , and date between {}, {}", fromDate,
+				toDate, employeePid);
+
+		if (employeePid.equals("all")) {
+			return null;
+		}
+		List<String> userPids = new ArrayList<>();
 		if (employeePid.equals("no")) {
-			return null;
+			List<User> dashboardUsers = dashboardUserRepository.findUsersByCompanyId();
+
+			userPids = dashboardUsers.stream().map(user -> user.getPid()).collect(Collectors.toList());
+		} else {
+
+			userPids = employeeRepository.findUserPidsByEmployeePid(employeePid);
+
 		}
-		String userPid = employeeRepository.findUserPidByEmployeePid(employeePid);
-		if (userPid == null || userPid.isEmpty()) {
-			return null;
-		}
+       
+		List<EmployeeProfile> employee = employeeRepository.findByUserPidIn(userPids);
 		// filter based on product group
 		List<SalesTargetGroup> salesTargetGroups = productGroupSalesTargetGrouprepository
 				.findSalesTargetGroupByProductGroupPidIn(productGroupPids);
 
+		
 		List<String> salesTargetGroupPids = salesTargetGroups.stream().map(a -> a.getPid())
 				.collect(Collectors.toList());
+
+
+
 		List<SalesTargetGroupUserTarget> salesTargetGroupUserTargets = salesTargetGroupUserTargetRepository
-				.findBySalesTargetGroupPidInAndUserPidAndFromDateGreaterThanEqualAndToDateLessThanEqualAndAccountWiseTargetFalse(
-						salesTargetGroupPids, userPid, fromDate, toDate);
+				.findBySalesTargetGroupPidInAndUserPidInAndFromDateGreaterThanEqualAndToDateLessThanEqualAndAccountWiseTargetFalse(
+						salesTargetGroupPids, userPids, fromDate, toDate);
+
+	
 
 		if (!salesTargetGroupUserTargets.isEmpty()) {
+
 			SalesPerformaceDTO salesPerformaceDTO = new SalesPerformaceDTO();
+
 			// Get months date between the date
 			List<LocalDate> monthsBetweenDates = monthsDateBetweenDates(fromDate, toDate);
 
 			List<SalesTargetGroupUserTargetDTO> salesTargetGroupUserTargetDTOs = salesTargetGroupUserTargetMapper
 					.salesTargetGroupUserTargetsToSalesTargetGroupUserTargetDTOs(salesTargetGroupUserTargets);
+
 			// group by SalesTargetGroupName
 			Map<String, List<SalesTargetGroupUserTargetDTO>> salesTargetGroupUserTargetBySalesTargetGroupName = salesTargetGroupUserTargetDTOs
 					.parallelStream()
@@ -170,6 +194,8 @@ public class SalesTargetAchievedReportResource {
 			Set<Object[]> docIdWithSTGroupName = new HashSet<>();
 			Set<Object[]> pProfileIdWithSTGroupNames = new HashSet<>();
 			if (companySetting == null || !companySetting.getSalesConfiguration().getAchievementSummaryTableEnabled()) {
+
+				
 				docIdWithSTGroupName = salesTargetGroupDocumentRepository
 						.findDocumentIdWithSalesTargetGroupNameBySalesTargetGroupPid(salesTargetGroupPids);
 				pProfileIdWithSTGroupNames = salesTargetGroupProductRepository
@@ -179,91 +205,137 @@ public class SalesTargetAchievedReportResource {
 						.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.LOCATION_WISE);
 			}
 			// actual sales user target
-			Map<String, List<SalesTargetGroupUserTargetDTO>> salesTargetGroupUserTargetMap = new HashMap<>();
+
 			List<Double> targetTotal = new ArrayList<>();
 			List<Double> achievedTotal = new ArrayList<>();
 
-			for (SalesTargetGroup salesTargetGroup : salesTargetGroups) {
-				String groupName = salesTargetGroup.getName();
+			List<Map<String, List<SalesTargetGroupUserTargetDTO>>> finalList = new ArrayList<>();
+			for (EmployeeProfile employ : employee) {
 
-				List<SalesTargetGroupUserTargetDTO> salesTargetGroupUserTargetList = new ArrayList<>();
-				for (LocalDate monthDate : monthsBetweenDates) {
-					String month = monthDate.getMonth().toString();
+				Map<String, List<SalesTargetGroupUserTargetDTO>> salesTargetGroupUserTargetMap = new HashMap<>();
+				
+				for (SalesTargetGroup salesTargetGroup : salesTargetGroups) {
 
-					// group by month, one month has only one
-					// user-target
-					Map<String, List<SalesTargetGroupUserTargetDTO>> salesTargetGroupUserTargetByMonth = null;
-					List<SalesTargetGroupUserTargetDTO> userTarget = salesTargetGroupUserTargetBySalesTargetGroupName
-							.get(groupName);
+					String groupName = salesTargetGroup.getName();
 
-					SalesTargetGroupUserTargetDTO salesTargetGroupUserTargetDTO = null;
-					if (userTarget != null) {
+					
 
-						salesTargetGroupUserTargetByMonth = userTarget.stream()
-								.collect(Collectors.groupingBy(a -> a.getFromDate().getMonth().toString()));
+					List<SalesTargetGroupUserTargetDTO> salesTargetGroupUserTargetList = new ArrayList<>();
 
-						if (salesTargetGroupUserTargetByMonth != null
-								&& salesTargetGroupUserTargetByMonth.get(month) != null) {
-							salesTargetGroupUserTargetDTO = salesTargetGroupUserTargetByMonth.get(month).get(0);
+					for (LocalDate monthDate : monthsBetweenDates) {
 
-						}
+						String month = monthDate.getMonth().toString();
 
-					}
-					// no target saved, add a default one
-					if (salesTargetGroupUserTargetDTO == null) {
-						salesTargetGroupUserTargetDTO = new SalesTargetGroupUserTargetDTO();
-						salesTargetGroupUserTargetDTO.setSalesTargetGroupName(groupName);
-						salesTargetGroupUserTargetDTO.setSalesTargetGroupPid(salesTargetGroup.getPid());
-						salesTargetGroupUserTargetDTO.setVolume(0);
-						salesTargetGroupUserTargetDTO.setAmount(0);
-					}
-					if (companySetting != null
-							&& companySetting.getSalesConfiguration().getAchievementSummaryTableEnabled()) {
-						salesTargetGroupUserTargetDTO.setAchievedAmount(
-								getAchievedAmountFromSummary(userPid, salesTargetGroupUserTargetDTO, monthDate));
+						
 
-					} else {
-						Set<Long> documentIds = new HashSet<>();
-						Set<Long> productProfileIds = new HashSet<>();
-						// check territory wise or user wise
-						for (Object[] obj : docIdWithSTGroupName) {
-							if (obj[1].toString().equals(groupName)) {
-								documentIds.add(Long.parseLong(obj[0].toString()));
+						// group by month, one month has only one
+						// user-target
+						Map<String, Map<String, List<SalesTargetGroupUserTargetDTO>>> salesTargetGroupUserTargetByEmployee = null;
+
+						List<SalesTargetGroupUserTargetDTO> userTarget = salesTargetGroupUserTargetBySalesTargetGroupName
+								.get(groupName);
+						
+						Map<String, List<SalesTargetGroupUserTargetDTO>> salesTargetGroupUserTargetByemp = null;
+
+						SalesTargetGroupUserTargetDTO salesTargetGroupUserTargetDTO = null;
+
+						if (userTarget != null) {
+
+							salesTargetGroupUserTargetByEmployee = userTarget.stream()
+									.collect(Collectors.groupingBy(SalesTargetGroupUserTargetDTO::getUserName,
+											Collectors.groupingBy(a -> a.getFromDate().getMonth().toString())));
+
+							
+
+							
+							salesTargetGroupUserTargetByemp = salesTargetGroupUserTargetByEmployee
+									.get(employ.getName());
+
+							
+							
+							if (salesTargetGroupUserTargetByemp != null) {
+								
+								salesTargetGroupUserTargetDTO = salesTargetGroupUserTargetByemp.get(month).get(0);
 							}
+							
+							
 						}
-						for (Object[] obj : pProfileIdWithSTGroupNames) {
-							if (obj[1].toString().equals(groupName)) {
-								productProfileIds.add(Long.parseLong(obj[0].toString()));
+							if (salesTargetGroupUserTargetDTO == null) {
+								salesTargetGroupUserTargetDTO = new SalesTargetGroupUserTargetDTO();
+								salesTargetGroupUserTargetDTO.setSalesTargetGroupName(groupName);
+								salesTargetGroupUserTargetDTO.setSalesTargetGroupPid(salesTargetGroup.getPid());
+								salesTargetGroupUserTargetDTO.setVolume(0);
+								salesTargetGroupUserTargetDTO.setAmount(0);
 							}
-						}
-						if (optLocWiseCompanyConfig.isPresent()) {
-							salesTargetGroupUserTargetDTO
-									.setAchievedAmount(getAchievedAmountFromTransactionTerritoryWise(userPid, monthDate,
-											documentIds, productProfileIds));
+						
+						// no target saved, add a default one
+						
+						salesTargetGroupUserTargetList.add(salesTargetGroupUserTargetDTO);
+
+						
+						String user = employeeRepository.findUserPidByEmployeePid(employ.getPid());
+						if (companySetting != null
+								&& companySetting.getSalesConfiguration().getAchievementSummaryTableEnabled()) {
+							
+							
+							salesTargetGroupUserTargetDTO.setAchievedAmount(
+									getAchievedAmountFromSummary(user, salesTargetGroupUserTargetDTO, monthDate));
+
 						} else {
-							salesTargetGroupUserTargetDTO.setAchievedAmount(getAchievedAmountFromTransactionUserWise(
-									userPid, monthDate, documentIds, productProfileIds));
+							Set<Long> documentIds = new HashSet<>();
+							Set<Long> productProfileIds = new HashSet<>();
+							// check territory wise or user wise
+							for (Object[] obj : docIdWithSTGroupName) {
+								if (obj[1].toString().equals(groupName)) {
+									documentIds.add(Long.parseLong(obj[0].toString()));
+								}
+							}
+							for (Object[] obj : pProfileIdWithSTGroupNames) {
+								if (obj[1].toString().equals(groupName)) {
+									productProfileIds.add(Long.parseLong(obj[0].toString()));
+								}
+							}
+							if (optLocWiseCompanyConfig.isPresent()) {
+								salesTargetGroupUserTargetDTO
+										.setAchievedAmount(getAchievedAmountFromTransactionTerritoryWise(user,
+												monthDate, documentIds, productProfileIds));
+							} else {
+								salesTargetGroupUserTargetDTO
+										.setAchievedAmount(getAchievedAmountFromTransactionUserWise(user, monthDate,
+												documentIds, productProfileIds));
+							}
 						}
 					}
-					salesTargetGroupUserTargetList.add(salesTargetGroupUserTargetDTO);
+					salesTargetGroupUserTargetMap.put(groupName, salesTargetGroupUserTargetList);
+				
+
 				}
-				salesTargetGroupUserTargetMap.put(groupName, salesTargetGroupUserTargetList);
+				finalList.add(salesTargetGroupUserTargetMap);
+
+				
 
 			}
+
 			for (LocalDate monthDate : monthsBetweenDates) {
+
 				List<SalesTargetGroupUserTargetDTO> userTargetByMonth = salesTargetGroupUserTargetByMonths
 						.get(monthDate);
+
 				if (userTargetByMonth != null) {
+
 					Map<Object, List<SalesTargetGroupUserTargetDTO>> saleTargetGroups = userTargetByMonth.stream()
 							.collect(Collectors.groupingBy(a -> a.getFromDate()));
 
 					for (Map.Entry map : saleTargetGroups.entrySet()) {
+
 						System.out.println("key :" + map.getKey());
 						List<SalesTargetGroupUserTargetDTO> values = (List<SalesTargetGroupUserTargetDTO>) map
 								.getValue();
 						double total = 0;
 						double achieved_total = 0;
+
 						for (SalesTargetGroupUserTargetDTO stgt : values) {
+
 							if (stgt.getAmount() != 0) {
 								total += stgt.getAmount();
 
@@ -277,8 +349,7 @@ public class SalesTargetAchievedReportResource {
 						targetTotal.add(total);
 						achievedTotal.add(achieved_total);
 					}
-				}
-				else {
+				} else {
 					double total = 0;
 					targetTotal.add(total);
 					achievedTotal.add(total);
@@ -286,18 +357,20 @@ public class SalesTargetAchievedReportResource {
 			}
 			List<String> monthList = new ArrayList<>();
 			for (LocalDate monthDate : monthsBetweenDates) {
+
 				monthList.add(monthDate.getMonth().toString());
 			}
 			salesPerformaceDTO.setAchievedList(achievedTotal);
 			salesPerformaceDTO.setTotalList(targetTotal);
 			salesPerformaceDTO.setMonthList(monthList);
-			salesPerformaceDTO.setSalesTargetGroupUserTargets(salesTargetGroupUserTargetMap);
+			salesPerformaceDTO.setSalesTargetFinalList(finalList);
 			return salesPerformaceDTO;
+
 		}
 		return null;
 	}
 
-	private double getAchievedAmountFromTransactionUserWise(String userPid, LocalDate initialDate,
+	private double getAchievedAmountFromTransactionUserWise(String user, LocalDate initialDate,
 			Set<Long> documentIds, Set<Long> productProfileIds) {
 		LocalDate start = initialDate.with(TemporalAdjusters.firstDayOfMonth());
 		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
@@ -305,7 +378,7 @@ public class SalesTargetAchievedReportResource {
 		if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
 
 			Set<Long> ivHeaderIds = inventoryVoucherHeaderRepository
-					.findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(userPid, documentIds,
+					.findIdByUserPidAndDocumentsAndProductsAndCreatedDateBetween(user, documentIds,
 							start.atTime(0, 0), end.atTime(23, 59));
 
 			if (!ivHeaderIds.isEmpty()) {
@@ -316,13 +389,13 @@ public class SalesTargetAchievedReportResource {
 		return achievedAmount == null ? 0 : achievedAmount;
 	}
 
-	private double getAchievedAmountFromTransactionTerritoryWise(String userPid, LocalDate initialDate,
+	private double getAchievedAmountFromTransactionTerritoryWise(String user, LocalDate initialDate,
 			Set<Long> documentIds, Set<Long> productProfileIds) {
 		LocalDate start = initialDate.with(TemporalAdjusters.firstDayOfMonth());
 		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
 		Double achievedAmount = 0D;
 		// user's account profile
-		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserPidIn(Arrays.asList(userPid));
+		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserPidIn(Arrays.asList(user));
 		Set<Long> accountProfileIds = locationAccountProfileRepository
 				.findAccountProfileIdsByUserLocationIdsIn(locationIds);
 		if (!documentIds.isEmpty() && !productProfileIds.isEmpty()) {
@@ -334,12 +407,12 @@ public class SalesTargetAchievedReportResource {
 		return achievedAmount == null ? 0 : achievedAmount;
 	}
 
-	private double getAchievedAmountFromSummary(String userPid,
+	private double getAchievedAmountFromSummary(String user,
 			SalesTargetGroupUserTargetDTO salesTargetGroupUserTargetDTO, LocalDate initialDate) {
 		LocalDate start = initialDate.with(TemporalAdjusters.firstDayOfMonth());
 		LocalDate end = initialDate.with(TemporalAdjusters.lastDayOfMonth());
 		List<SalesSummaryAchievment> salesSummaryAchievmentList = salesSummaryAchievmentRepository
-				.findByUserPidAndSalesTargetGroupPidAndAchievedDateBetween(userPid,
+				.findByUserPidAndSalesTargetGroupPidAndAchievedDateBetween(user,
 						salesTargetGroupUserTargetDTO.getSalesTargetGroupPid(), start, end);
 		double achievedAmount = 0;
 		if (!salesSummaryAchievmentList.isEmpty()) {

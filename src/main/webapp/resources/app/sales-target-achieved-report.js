@@ -42,6 +42,7 @@ if (!this.SalesTargetAchievedReport) {
 		$('#loadingData').css('display','block');
 		var employeePid = $("#dbEmployee").val();
 		var productGroupPids = $("#dbProduct").val();
+	    var inclSubordinate = $('#inclSubOrdinates').is(":checked");
 		if(productGroupPids == "no") {
 			$('#dbProduct option').each(function() {
 				productGroupPids += $(this).val() + ",";
@@ -50,10 +51,10 @@ if (!this.SalesTargetAchievedReport) {
 		var fromDate = $('#txtFromMonth').MonthPicker('GetSelectedMonthYear');
 		var toDate = $('#txtToMonth').MonthPicker('GetSelectedMonthYear');
 		// validate data
-		if(employeePid === "no"){
-			alert("please select employee");
-			return;
-		}
+      if(employeePid === "all"){
+        alert("please select employee");
+        return;
+        }
 		if(fromDate === null){
 			alert("please select from month");
 			return;
@@ -73,10 +74,11 @@ if (!this.SalesTargetAchievedReport) {
 			url : salesTargetAchievedReportContextPath + "/load-data",
 			type : 'GET',
 			data : {
-				employeePid : employeePid,
+                employeePid : employeePid,
 				productGroupPids : productGroupPids,
 				fromDate : convertLocalDateToServer(fromDate),
-				toDate : convertLocalDateToServer(toDate)
+				toDate : convertLocalDateToServer(toDate),
+				inclSubordinate : inclSubordinate
 			},
 			success : function(response) {
 				$('#loadingData').css('display','none');
@@ -125,7 +127,11 @@ if (!this.SalesTargetAchievedReport) {
 		var sumTarget=0;
 		var sumAchieved=0;
 		
-		$.each(targetData.salesTargetGroupUserTargets, function(salesTargetGroupName, targets) {
+	 $.each(targetData.salesTargetFinalList,function(index,salesTargetGroupUserTargetMap){
+		 
+	
+		$.each(salesTargetGroupUserTargetMap, function(salesTargetGroupName, targets) {
+		
 		
 			var targetRow = "";
 			var achivedRow = "";
@@ -133,13 +139,19 @@ if (!this.SalesTargetAchievedReport) {
 			var achivedTotal = 0;
 			var cloumtotal = 0;
 			var cloumn = 0 ;
+			var name;
 			
-
 			for(var i = 0, size = targets.length; i < size ; i++) {
               
+				if(targets[i].userName != null)
+				{
 				var tVolume = targets[i].volume;
-				console.log(targets[i].volume);
+				
 				var tAmount = targets[i].amount;
+				
+			   name = targets[i].userName;
+				
+			   
 
 				if(tAmount != 0){
 					targetTotal += tAmount;
@@ -159,14 +171,15 @@ if (!this.SalesTargetAchievedReport) {
 				achivedTotal += aAmount;
 				var aAmount1 = (aAmount).toFixed(2);
 				achivedRow += "<td>"+ aAmount1 +"</td>";
-					
+				}	
 			}
 
 			var targetTotal1 = (targetTotal).toFixed(2);
 			console.log((targetTotal).toFixed(2))
 			var achivedTotal1 = (achivedTotal).toFixed(2);
 			if(targetTotal!=0 || achivedTotal!=0){
-			performanceRow += "<tr><td>" + salesTargetGroupName + "</td>";
+			performanceRow += "<tr><td>" +name+ "</td>";
+			performanceRow += "<td>" +salesTargetGroupName + "</td>";
 			performanceRow += "<td>"+targetTotal1 +"</td>";
 			performanceRow += "<td>"+ achivedTotal1 +"</td>";
 			
@@ -192,7 +205,11 @@ if (!this.SalesTargetAchievedReport) {
 			sumAchieved +=achivedTotal;
 			performanceRow += "</tr>"
 			}
+		
 		});
+		
+	 });
+		
     var abc=0;
     var itemRow="";
     targetData.totalList.forEach(myfunction)
@@ -212,7 +229,7 @@ if (!this.SalesTargetAchievedReport) {
     	}
  
     	totalRow += "<br>"
-		totalRow +="<tr> <td style ='text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; font-size:24px'>"+"Total"+"</td>";
+		totalRow +="<tr> <td style ='text-align: center; color: white; background-color: rgb(48, 54, 65); font-weight: bold; font-size:24px' colspan='2'>"+"Total"+"</td>";
 		targetsumRow += "<td>"+(sumTarget).toFixed(2) +"</td>";
 		achievedtotalRow+="<td>"+ (sumAchieved).toFixed(2) +"</td>";
 		
