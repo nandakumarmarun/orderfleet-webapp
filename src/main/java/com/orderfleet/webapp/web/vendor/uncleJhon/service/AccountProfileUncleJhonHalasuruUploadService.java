@@ -373,7 +373,7 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 				apglt.setPid(AccountProfileGeoLocationTaggingService.PID_PREFIX + RandomUtil.generatePid());
 				apglt.setAccountProfile(accProfile);
 				apglt.setLatitude(accProfile.getLatitude());
-				apglt.setLongitude(accProfile.getLatitude());
+				apglt.setLongitude(accProfile.getLongitude());
 				apglt.setLocation(accProfile.getLocation());
 				apglt.setSendDate(LocalDateTime.now());
 				apglt.setCompany(company);
