@@ -42,7 +42,7 @@ if (!this.SalesTargetAchievedReport) {
 		$('#loadingData').css('display','block');
 		var employeePid = $("#dbEmployee").val();
 		var productGroupPids = $("#dbProduct").val();
-	    var inclSubordinate = $('#inclSubOrdinates').is(":checked");
+	   
 		if(productGroupPids == "no") {
 			$('#dbProduct option').each(function() {
 				productGroupPids += $(this).val() + ",";
@@ -78,7 +78,7 @@ if (!this.SalesTargetAchievedReport) {
 				productGroupPids : productGroupPids,
 				fromDate : convertLocalDateToServer(fromDate),
 				toDate : convertLocalDateToServer(toDate),
-				inclSubordinate : inclSubordinate
+				
 			},
 			success : function(response) {
 				$('#loadingData').css('display','none');
