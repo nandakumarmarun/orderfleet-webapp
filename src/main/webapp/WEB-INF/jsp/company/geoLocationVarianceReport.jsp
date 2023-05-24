@@ -62,7 +62,7 @@
 
 							<div class="col-sm-2">
 								<br /> <select id="dbUser" name="userPid" class="form-control">
-									<option value="no">Select Employee</option>
+									<option value="no">All Employee</option>
 									<c:forEach items="${employees}" var="employee">
 										<option value="${employee.userPid}">${employee.name}</option>
 									</c:forEach>
@@ -70,8 +70,11 @@
 							</div>
 							<div class="col-sm-4">
 								<br /> <select id="dbAccountProfile" name="accountProfilePid"
-									class="form-control">
+									class="form-control selectpicker" data-live-search="true">
 									<option value="no">All Account Profiles</option>
+									<c:forEach items="${accounts}" var="account">
+										<option value="${account.pid}">${account.name}</option>
+									</c:forEach>
 								</select>
 							</div>
 							<div class="col-sm-2">

@@ -13,6 +13,8 @@ public class SalesPerformaceDTO {
 	private List<Double> achievedList;
 	
 	private List<Map<String, List<SalesTargetGroupUserTargetDTO>>> salesTargetFinalList;
+	
+	private Map<String, List<Map<String, SalesTargetTotalDTO>>>finalList;
 
 	public List<String> getMonthList() {
 		return monthList;
@@ -55,5 +57,17 @@ public class SalesPerformaceDTO {
 		this.salesTargetFinalList = salesTargetFinalList;
 	}
 
+	public Map<String, List<Map<String, SalesTargetTotalDTO>>> getFinalList() {
+		return finalList;
+	}
+
+	public void setFinalList(Map<String, List<Map<String, SalesTargetTotalDTO>>> finalList) {
+		this.finalList = finalList;
+	}
+
 	
-}
+		
+	}
+
+	
+

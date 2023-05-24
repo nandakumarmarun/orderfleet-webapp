@@ -32,4 +32,7 @@ public interface SalesSummaryAchievmentRepository extends JpaRepository<SalesSum
 	List<SalesSummaryAchievment> findByUserPidAndSalesTargetGroupPidAndAchievedDateBetween(String userPid,
 			String salesTargetGroupPid, LocalDate startDate, LocalDate endDate);
 
+	List<SalesSummaryAchievment> findByUserPidInAndSalesTargetGroupPidAndAchievedDateBetween(List<String> userPids,
+			String groupPid, LocalDate start, LocalDate end);
+
 }

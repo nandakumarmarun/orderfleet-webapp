@@ -38,6 +38,7 @@ import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileLocationService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
@@ -79,6 +80,9 @@ public class GeoLocationVarianceReportResource {
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
 	
+	@Inject
+	private AccountProfileService accountProfileService;
+	
 
 	@RequestMapping(value = "/geo-location-variance-report", method = RequestMethod.GET)
 	@Timed
@@ -99,24 +103,29 @@ public class GeoLocationVarianceReportResource {
 
 		if (userIds.isEmpty()) {
 			model.addAttribute("employees", employeeProfileService.findAllByCompany());
+			model.addAttribute("accounts", accountProfileService.findAllByCompanyAndActivated(true));
 		} else {
 			model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
+			model.addAttribute("accounts", locationAccountProfileService.findAccountProfilesByCurrentUserLocations());
 		}
+		
 		return "company/geoLocationVarianceReport";
 	}
 
-	@RequestMapping(value = "/geo-location-variance-report/get-account-profile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<List<AccountProfileDTO>> getAllAccountProfiles(@RequestParam("userPid") String userPid) {
-		log.debug("Web request to get list of Account Profiles using userPid ", userPid);
-
-		List<String> locationPids = employeeProfileLocationService.findLocationsByUserPid(userPid).stream()
-				.map(a -> a.getPid()).collect(Collectors.toList());
-		List<AccountProfileDTO> accountProfiles = locationAccountProfileService
-				.findAccountProfileByLocationPidIn(locationPids);
-
-		return new ResponseEntity<>(accountProfiles, HttpStatus.OK);
-	}
+//	@RequestMapping(value = "/geo-location-variance-report/get-account-profile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//	@Timed
+//	public ResponseEntity<List<AccountProfileDTO>> getAllAccountProfiles(@RequestParam("userPid") String userPid) {
+//		log.debug("Web request to get list of Account Profiles using userPid ", userPid);
+//
+//		List<String> locationPids = employeeProfileLocationService.findLocationsByUserPid(userPid).stream()
+//				.map(a -> a.getPid()).collect(Collectors.toList());
+//		List<AccountProfileDTO> accountProfiles = locationAccountProfileService
+//				.findAccountProfileByLocationPidIn(locationPids);
+//		
+//		System.out.println("Size :" +accountProfiles.size());
+//
+//		return new ResponseEntity<>(accountProfiles, HttpStatus.OK);
+//	}
 
 	@RequestMapping(value = "/geo-location-variance-report/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -224,6 +233,16 @@ public class GeoLocationVarianceReportResource {
 			executiveTaskExecutions = executiveTaskExecutionRepository
 					.findAllByDateBetweenAndUserPidAndAccountProfilePidIn(fromDate, toDate, userPid,
 							Arrays.asList(accountProfilePid));
+		}
+		else if(userPid.equals("no" )&& !accountProfilePid.equals("no"))
+		{
+			
+			List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
+			
+				executiveTaskExecutions = executiveTaskExecutionRepository
+						.findAllByUserIdInAndAccountProfilePidInAndDateBetweenOrderByDateDesc(userIds,Arrays.asList(accountProfilePid), fromDate, toDate);
+			
+			
 		}
 
 		List<GeoLocationVarianceDTO> result = executiveTaskExecutions.stream().map(GeoLocationVarianceDTO::new)

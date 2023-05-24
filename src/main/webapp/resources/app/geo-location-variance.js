@@ -9,6 +9,8 @@ if (!this.GeoLocationVariance) {
 			+ location.host + location.pathname;
 
 	$(document).ready(function() {
+		
+		$('.selectpicker').selectpicker();
 
 		$("#txtToDate").datepicker({
 			dateFormat : "dd-mm-yy"
@@ -56,39 +58,39 @@ if (!this.GeoLocationVariance) {
 	     table2excel.export(document.getElementById('tblGeoLocationVariance'),excelName);
 	}
 		
-		$('#dbUser').on('change', function() {
-			$('#dbAccountProfile').html("Loading...");
-			
-			$
-			.ajax({
-				url : geoLocationVarianceContextPath + "/get-account-profile",
-				type : 'GET',
-				data : {
-					userPid : $("#dbUser").val(),
-				},
-				success : function(data) {
-					$('#dbAccountProfile').html("");
-					if (data.length == 0) {
-						$('#dbAccountProfile').append($('<option>', { 
-					        val: "no",
-					        text : "No Account Profiles"
-					    }));
-						return;
-					}
-					$('#dbAccountProfile').append($('<option>', { 
-				        val: "no",
-				        text : "All Account Profile"
-				    }));
-					$.each(data, function (index,accountProfile ) {
-					    $('#dbAccountProfile').append($('<option>', { 
-					        val: accountProfile.pid,
-					        text : accountProfile.name 
-					    }));
-					});
-				},
-				
-		});
-		});
+//		$('#dbUser').on('change', function() {
+//			$('#dbAccountProfile').html("Loading...");
+//			
+//			$
+//			.ajax({
+//				url : geoLocationVarianceContextPath + "/get-account-profile",
+//				type : 'GET',
+//				data : {
+//					userPid : $("#dbUser").val(),
+//				},
+//				success : function(data) {
+//					$('#dbAccountProfile').html("");
+//					if (data.length == 0) {
+//						$('#dbAccountProfile').append($('<option>', { 
+//					        val: "no",
+//					        text : "No Account Profiles"
+//					    }));
+//						return;
+//					}
+//					$('#dbAccountProfile').append($('<option>', { 
+//				        val: "no",
+//				        text : "All Account Profile"
+//				    }));
+//					$.each(data, function (index,accountProfile ) {
+//					    $('#dbAccountProfile').append($('<option>', { 
+//					        val: accountProfile.pid,
+//					        text : accountProfile.name 
+//					    }));
+//					});
+//				},
+//				
+//		});
+//		});
 	
 	GeoLocationVariance.showDatePicker = function() {
 		$("#txtFromDate").val("");
@@ -109,6 +111,7 @@ if (!this.GeoLocationVariance) {
 	}
 
 	GeoLocationVariance.filter = function() {
+		console.log("Pid:"+$("#dbAccountProfile").val())
 		
 		var radioVariance=$("input[name='optVariance']:checked").val();
 		
