@@ -153,6 +153,8 @@ public class InventoryVoucherDetailDTO {
 	
 	private double lengthInFeet;
 	
+	private double compoundUnitQty;
+	
 	private SalesOrderStatus  salesOrderStatus = SalesOrderStatus.CREATED;
 
 	public InventoryVoucherDetailDTO() {
@@ -252,6 +254,7 @@ public class InventoryVoucherDetailDTO {
 				.map(InventoryVoucherBatchDetailDTO::new).collect(Collectors.toList());
 		
 		this.referenceInvoiceNo =inventoryVoucherDetail.getReferenceInvoiceNo();
+		this.compoundUnitQty = inventoryVoucherDetail.getProduct().getCompoundUnitQty();
 	}
 	
 
@@ -817,6 +820,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
 		this.salesOrderStatus = salesOrderStatus;
+	}
+
+	public double getCompoundUnitQty() {
+		return compoundUnitQty;
+	}
+
+	public void setCompoundUnitQty(double compoundUnitQty) {
+		this.compoundUnitQty = compoundUnitQty;
 	}
 
 	@Override

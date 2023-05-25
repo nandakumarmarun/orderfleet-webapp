@@ -55,7 +55,7 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 				+ "ivd.product.name," + "ivd.quantity," + "ivd.sellingRate," + "ivd.rowTotal," + "ivd.product.pid,"
 				+ "ivd.product.unitQty," + "ivd.volume," + "ivd.inventoryVoucherHeader.receiverAccount.location,"
 				+ "ivd.inventoryVoucherHeader.supplierAccount.location,"
-				+ "ivd.inventoryVoucherHeader.document.activityAccount," + "ivd.product.productDescription,"+"ivd.inventoryVoucherHeader.receiverAccount.pid,"+"ivd.inventoryVoucherHeader.deliveryDate,"+"ivd.inventoryVoucherHeader.salesOrderStatus");
+				+ "ivd.inventoryVoucherHeader.document.activityAccount," + "ivd.product.productDescription,"+"ivd.inventoryVoucherHeader.receiverAccount.pid,"+"ivd.inventoryVoucherHeader.deliveryDate,"+"ivd.inventoryVoucherHeader.salesOrderStatus,"+"ivd.product.compoundUnitQty");
 		if (!stockLocationPids.isEmpty()) {
 			subQueryString.append(",ivd.sourceStockLocation.name," + "ivd.destinationStockLocation.name ");
 		}
@@ -144,7 +144,9 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			}
 						
 			ivd.setProductUnitQty(object[11] != null ? Double.valueOf(object[11].toString()) : 1);
-			ivd.setVolume(Double.valueOf(object[12].toString()));
+			double volume=Double.valueOf(object[12].toString());
+			double compoundqty =object[20] != null ? Double.valueOf(object[20].toString()) : 1;
+			ivd.setVolume(volume * compoundqty);
 			ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
 			
 			if (AccountTypeColumn.valueOf(object[15].toString()).equals(AccountTypeColumn.Supplier)) {
@@ -159,6 +161,7 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 				ivd.setDeliveryDate(deliveryDate);
 			}
 			ivd.setSalesOrderStatus(SalesOrderStatus.valueOf(object[19].toString()));
+		
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
 		return inventoryVoucherDetailDTOs;

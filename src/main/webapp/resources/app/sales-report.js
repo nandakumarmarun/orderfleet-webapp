@@ -121,7 +121,7 @@ if (!this.SalesReport) {
 							if(sale.productUnitQty){
 								unitQty = sale.productUnitQty;
 							}
-							var qty = Math.round((sale.quantity * unitQty) * 100) / 100;
+							var qty = Math.round((sale.quantity * unitQty * sale.compoundUnitQty) * 100) / 100;
 							totalSales += qty;
 							$('#tBodySalesReport')
 							.append("<tr data-id='"

@@ -123,7 +123,7 @@ public class ProductProfileDTO {
 
 	private double rateConversion;
 	
-	
+	private Double totalVolume;
 
 	public ProductProfileDTO() {
 		super();
@@ -217,6 +217,7 @@ public class ProductProfileDTO {
 		this.itemWidth=profile.getWidth();
 		this.sellingRate=profile.getSellingRate();
 		this.baseUnits =profile.getBaseUnits();
+		this.totalVolume =profile.getUnitQty()*profile.getCompoundUnitQty();
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
 		this.productProfileTaxMasterDTOs = profile.getTaxMastersList() == null || profile.getTaxMastersList().isEmpty()
@@ -230,7 +231,7 @@ public class ProductProfileDTO {
 			String productCategoryName, String divisionPid, String divisionName, byte[] colorImage,
 			String colorImageContentType, String size, String filesPid, boolean activated,
 			LocalDateTime lastModifiedDate, String defaultLedger, List<TaxMasterDTO> productProfileTaxMasterDTOs,
-			StockAvailabilityStatus stockAvailabilityStatus, String productGroup, String unitpid, String unitName,Double stockQty) {
+			StockAvailabilityStatus stockAvailabilityStatus, String productGroup, String unitpid, String unitName,Double stockQty,Double totalVolume) {
 		super();
 		this.pid = pid;
 		this.name = name;
@@ -259,6 +260,7 @@ public class ProductProfileDTO {
 		this.stockAvailabilityStatus = stockAvailabilityStatus;
 		this.productGroup = productGroup;
 		this.stockQty = stockQty;
+		this.totalVolume = totalVolume;
 	}
 
 	public String getPid() {
@@ -605,6 +607,14 @@ public class ProductProfileDTO {
 
 	public void setRateConversion(double rateConversion) {
 		this.rateConversion = rateConversion;
+	}
+
+	public Double getTotalVolume() {
+		return totalVolume;
+	}
+
+	public void setTotalVolume(Double totalVolume) {
+		this.totalVolume = totalVolume;
 	}
 
 	@Override
