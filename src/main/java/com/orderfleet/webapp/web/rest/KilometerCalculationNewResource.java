@@ -76,6 +76,9 @@ public class KilometerCalculationNewResource {
 	@Inject
 	private EmployeeProfileRepository employeeProfileRepository;
 
+	@Inject
+	private PunchOutRepository punchOutRepository;
+
 	@RequestMapping(value = "/kilo-calc-new", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -95,7 +98,7 @@ public class KilometerCalculationNewResource {
 	@Timed
 	public ResponseEntity<List<KilometerCalculationDTO>> getAllKilometerCalculationByAccountProfile(
 			@RequestParam("userPid") String userPid, /* @RequestParam String accountProfilePid, */
-			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate) {
+			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate) throws TaskSubmissionPostSaveException {
 		log.debug("Web request to get kilometre calculation filtered report by userPid " + userPid);
 		String accountProfilePid = "no";
 		List<KilometerCalculationDTO> kilometreCalculationDTO = new ArrayList<>();
@@ -118,33 +121,40 @@ public class KilometerCalculationNewResource {
 		return new ResponseEntity<>(kilometreCalculationDTO, HttpStatus.OK);
 	}
 
-	private List<KilometerCalculationDTO> getFilterData(String userPid, String accountProfilePid, LocalDate fDate, LocalDate tDate) {
+	private List<KilometerCalculationDTO> getFilterData(String userPid, String accountProfilePid, LocalDate fDate, LocalDate tDate) throws TaskSubmissionPostSaveException {
 		log.debug("Request to get distance Traveled : Enter:getFilterData() - "+"[ userPid : "+userPid+" accountProfilePid : "+ accountProfilePid +" fromDate : "+fDate+" toDate : "+tDate+"]" );
-
+		System.out.println();
 		String originatt = null;
-
 		String userlogin = null;
+		boolean ispunchouted = false;
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 
-		List<ExecutiveTaskExecution> lastExecutiveTaskExecution = new ArrayList<>();
+        Optional<PunchOut> optionalPunchOut = null;
 
+        List<ExecutiveTaskExecution> lastExecutiveTaskExecution = new ArrayList<>();
 		List<KilometreCalculation> kilometreCalculations = new ArrayList<>();
-
 		List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
 
-		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
-
-		Optional<EmployeeProfile> employee = employeeProfileRepository.findByUserPid(userPid);
-
-		Optional<Attendance> attendance = attendanceRepository.findTop1ByCompanyPidAndUserPidAndCreatedDateBetweenOrderByCreatedDateDesc(company.getPid(), userPid,fromDate,toDate);
-
-		kilometreCalculations = kilometreCalculationRepository.findAllByCompanyIdAndUserPidAndDateBetweenOrderByCreatedDateDesc(userPid, fDate, tDate);
-
-		lastExecutiveTaskExecution = executiveTaskExecutionRepository.findAllByCompanyIdUserPidAndDateBetweenOrderByDateAsc(userPid, fDate.atTime(0, 0), tDate.atTime(23, 59));
-
-		Optional<KilometreCalculation> optionalKilometreCalculation = kilometreCalculations.stream().filter(kilocalc -> kilocalc.getExecutiveTaskExecution() == null).findAny();
+		Company company = companyRepository.
+				findOne(SecurityUtils.getCurrentUsersCompanyId());
+		Optional<EmployeeProfile> employee = employeeProfileRepository
+				.findByUserPid(userPid);
+		Optional<Attendance> attendance = attendanceRepository
+				.findTop1ByCompanyPidAndUserPidAndCreatedDateBetweenOrderByCreatedDateDesc(
+						company.getPid(), userPid,fromDate,toDate);
+		kilometreCalculations = kilometreCalculationRepository
+				.findAllByCompanyIdAndUserPidAndDateBetweenOrderByCreatedDateDesc(
+						userPid, fDate, tDate);
+		lastExecutiveTaskExecution = executiveTaskExecutionRepository
+				.findAllByCompanyIdUserPidAndDateBetweenOrderByDateAsc(
+						userPid, fDate.atTime(0, 0), tDate.atTime(23, 59));
+		Optional<KilometreCalculation> optionalKilometreCalculation =
+				kilometreCalculations
+						.stream()
+						.filter(kilocalc -> kilocalc.getExecutiveTaskExecution() == null)
+						.findAny();
 
 		if(employee.isPresent())
 		{
@@ -152,26 +162,42 @@ public class KilometerCalculationNewResource {
 		}
 
 		log.debug(userlogin+" : " + "Order Details :  " + lastExecutiveTaskExecution.size());
-
-		if(optionalKilometreCalculation.isPresent()){
-				log.debug(userlogin +" : Attandence" );
-				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO(optionalKilometreCalculation.get());
-				kiloCalDTO.setLocation(attendance.get().getLocation());
-				kiloCalDTOs.add(kiloCalDTO);
-		}
+		System.out.println();
 
 		if (attendance.isPresent() && attendance.get().getCreatedDate().toLocalDate().isEqual(fDate)) {
 			log.debug(userlogin +" : "+ "Attendence :  Present" + " On " + attendance.get().getCreatedDate().toLocalDate());
-			if (attendance.get().getLatitude() != null && attendance.get().getLongitude() != null && !attendance.get().getLatitude().equals(BigDecimal.ZERO) && !attendance.get().getLongitude().equals(BigDecimal.ZERO)) {
+			if(optionalKilometreCalculation.isPresent()){
+				log.debug(userlogin +" : Attandence" );
+				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO(optionalKilometreCalculation.get());
+				kiloCalDTO.setLocation(attendance.get().getLocation());
+				kiloCalDTO.setAttendence(true);
+				kiloCalDTOs.add(kiloCalDTO);
+			}
+			if (attendance.get().getLatitude() != null
+					&& attendance.get().getLongitude() != null
+					&& !attendance.get().getLatitude().equals(BigDecimal.ZERO)
+					&& !attendance.get().getLongitude().equals(BigDecimal.ZERO)) {
+
 				log.debug(userlogin +" : "+ " Tracking Attendance gps location ");
 				originatt = attendance.get().getLatitude() + " , " + attendance.get().getLongitude();
 				log.info(userlogin +" : "+" : Attendance gps location tracked : " + originatt);
 
-			} else if (attendance.get().getTowerLatitude() != null && attendance.get().getTowerLongitude() != null && !attendance.get().getTowerLatitude().equals(BigDecimal.ZERO) && !attendance.get().getTowerLongitude().equals(BigDecimal.ZERO)) {
+			} else if (attendance.get().getTowerLatitude() != null
+					&& attendance.get().getTowerLongitude() != null
+					&& !attendance.get().getTowerLatitude().equals(BigDecimal.ZERO)
+					&& !attendance.get().getTowerLongitude().equals(BigDecimal.ZERO)) {
+
 				log.debug(userlogin +" : "+ " Tracking Attendance tower location");
 				originatt = attendance.get().getTowerLatitude() + " , " + attendance.get().getTowerLongitude();
 				log.info(userlogin+" : "+"Attendance tower location tracked : " + originatt);
+				System.out.println();
+
 			}
+            optionalPunchOut = punchOutRepository
+                    .findIsAttendancePresent(
+							attendance.get().getPid());
+			log.debug(" is Punchouted : " + optionalPunchOut.isPresent());
+			System.out.println();
 		}
 
 		if( originatt != null && !originatt.isEmpty()){
@@ -198,16 +224,23 @@ public class KilometerCalculationNewResource {
 			ExecutiveTaskExecution destinationExecutiveTaskExecution = new ExecutiveTaskExecution();
 
 			for(int j = i; j<lastExecutiveTaskExecution.size(); j--){
-				if (lastExecutiveTaskExecution.get(j).getLongitude() != null && lastExecutiveTaskExecution.get(j).getLongitude().doubleValue() != 0 && lastExecutiveTaskExecution.get(j).getLatitude()  != null && lastExecutiveTaskExecution.get(j).getLatitude().doubleValue() != 0) {
-					originExecutiveTaskExecution = lastExecutiveTaskExecution.get(j);
+				if (lastExecutiveTaskExecution.get(j).getLongitude() != null
+                        && lastExecutiveTaskExecution.get(j).getLongitude().doubleValue() != 0
+                        && lastExecutiveTaskExecution.get(j).getLatitude()  != null
+                        && lastExecutiveTaskExecution.get(j).getLatitude().doubleValue() != 0) {
+
+                    originExecutiveTaskExecution = lastExecutiveTaskExecution.get(j);
 					break;
 				}
 				log.debug(userlogin+" : "+lastExecutiveTaskExecution.get(j).getAccountProfile().getName().toString() + " : " + "NoLocation");
 			}
 
-			if (lastExecutiveTaskExecution.get(i + 1).getLongitude() != null && lastExecutiveTaskExecution.get(i + 1).getLongitude().doubleValue() != 0 && lastExecutiveTaskExecution.get(i + 1).getLatitude() != null && lastExecutiveTaskExecution.get(i + 1).getLatitude().doubleValue() != 0)
-			{
-				destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(i + 1);
+			if (lastExecutiveTaskExecution.get(i + 1).getLongitude() != null
+                    && lastExecutiveTaskExecution.get(i + 1).getLongitude().doubleValue() != 0
+                    && lastExecutiveTaskExecution.get(i + 1).getLatitude() != null
+                    && lastExecutiveTaskExecution.get(i + 1).getLatitude().doubleValue() != 0) {
+
+                destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(i + 1);
 			}
 			else
 			{
@@ -231,20 +264,76 @@ public class KilometerCalculationNewResource {
 				continue;
 			}
 
-			String origin = originExecutiveTaskExecution.getLatitude() +","+originExecutiveTaskExecution.getLongitude();
+			if(optionalPunchOut.isPresent()
+					&& originExecutiveTaskExecution.getPunchInDate().isBefore(optionalPunchOut.get().getPunchOutDate())
+					&& destinationExecutiveTaskExecution.getPunchInDate().isAfter(optionalPunchOut.get().getPunchOutDate())){
 
-			String destination = destinationExecutiveTaskExecution.getLatitude()+","+destinationExecutiveTaskExecution.getLongitude();
+				if(ispunchouted == false) {
+						log.debug("Enter Punchout");
+						log.debug("punch out Time : " + optionalPunchOut.get().getPunchOutDate());
+						log.debug("Origin Punch in Date : " + originExecutiveTaskExecution.getPunchInDate());
+						log.debug("Origin Punch out Date : " + destinationExecutiveTaskExecution.getPunchInDate());
+						if (optionalPunchOut.isPresent()) {
+							log.debug("Punch Out Present");
+							KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
+							PunchOut punchout = optionalPunchOut.get();
 
-			log.debug(userlogin+" : "+"Distance traveled From " + originExecutiveTaskExecution.getAccountProfile().getName() + " TO "+ destinationExecutiveTaskExecution.getAccountProfile().getName());
+							log.debug("Account Profiles : " + originExecutiveTaskExecution.getAccountProfile().getName());
+							System.lineSeparator();
 
-			log.debug(userlogin+" : "+"origin   :  " + origin + "destination   :  " + destination);
+							String originToPunchout = originExecutiveTaskExecution.getLatitude() + "," + originExecutiveTaskExecution.getLongitude();
+							String destination = destinationExecutiveTaskExecution.getLatitude() + "," + destinationExecutiveTaskExecution.getLongitude();
+							String punchoutlocation = punchout.getLatitude() + "," + punchout.getLongitude();
 
-			try {
-				kiloCalDTOs.add(getdistance(origin,destination,destinationExecutiveTaskExecution));
-			} catch (TaskSubmissionPostSaveException e) {
-				throw new RuntimeException(e);
+							log.debug(userlogin + " : " + "Distance traveled From " + originExecutiveTaskExecution.getAccountProfile().getName() + " TO " + punchout.getLocation() + "(Punchout)");
+							log.debug(userlogin + " : " + " punch out origin   :  " + originToPunchout + "destination   :  " + punchoutlocation);
+							kiloCalDTO = getpunchoutdistance(originToPunchout, punchoutlocation, punchout);
+							kiloCalDTO.setPunchOut(true);
+							kiloCalDTOs.add(kiloCalDTO);
+							log.debug(userlogin + " : " + " punch out destination   :  " + originToPunchout + " destination   :  " + destination);
+							kiloCalDTOs.add(getdistance(punchoutlocation, destination, destinationExecutiveTaskExecution));
+						}
+						ispunchouted=true;
+					}
+				}
+			else{
+				String origin = originExecutiveTaskExecution.getLatitude() +","+originExecutiveTaskExecution.getLongitude();
+
+				String destination = destinationExecutiveTaskExecution.getLatitude()+","+destinationExecutiveTaskExecution.getLongitude();
+
+				log.debug(userlogin+" : "+"Distance traveled From " + originExecutiveTaskExecution.getAccountProfile().getName() + " TO "+ destinationExecutiveTaskExecution.getAccountProfile().getName());
+
+				log.debug(userlogin+" : "+"origin   :  " + origin + "destination   :  " + destination);
+				System.out.println();
+
+				try {
+					kiloCalDTOs.add(getdistance(origin,destination,destinationExecutiveTaskExecution));
+				} catch (TaskSubmissionPostSaveException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		}
+
+		log.debug("kilo meter Calculation : " + kiloCalDTOs);
+
+		if(ispunchouted == false){
+			if (optionalPunchOut != null  && optionalPunchOut.isPresent()) {
+				PunchOut punchout = optionalPunchOut.get();
+				System.out.println();
+				log.debug("Enter Punch-out no oders After");
+				log.debug("punch out Time : " + optionalPunchOut.get().getPunchOutDate());
+				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
+				ExecutiveTaskExecution originExecutiveTaskExecution = lastExecutiveTaskExecution.get(lastExecutiveTaskExecution.size()-1);
+				log.debug("Origin Punch in Date : " + originExecutiveTaskExecution.getPunchInDate());
+				log.debug("Origin Punch out Date : " + punchout.getPunchOutDate());
+				String origin = originExecutiveTaskExecution.getLatitude() +","+originExecutiveTaskExecution.getLongitude();
+				String destination = punchout.getLatitude()+","+punchout.getLongitude();
+				kiloCalDTO = getpunchoutdistance(origin, destination, punchout);
+				kiloCalDTO.setPunchOut(true);
+				kiloCalDTOs.add(kiloCalDTO);
+			}
+		}
+
 
 		kiloCalDTOs = kiloCalDTOs.stream().sorted(Comparator.comparing(KilometerCalculationDTO::getPunchingTime).reversed()).collect(Collectors.toList());
 
@@ -252,6 +341,7 @@ public class KilometerCalculationNewResource {
 
 		return kiloCalDTOs;
 	}
+
 
 	public  KilometerCalculationDTO getdistance(String origin ,String destination,ExecutiveTaskExecution destinationExecutiveTaskExecution) throws TaskSubmissionPostSaveException {
 
@@ -278,13 +368,19 @@ public class KilometerCalculationNewResource {
 					kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
 					kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
 					kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
+					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
 					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
+					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
 					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getPunchInDate().toLocalDate().toString());
 					kiloCalDTO.setEmployeeName(employee.getName());
+					log.debug("Location : "+destinationExecutiveTaskExecution.getLocation());
 					kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
 					kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
 				}
 			}
+			System.out.println();
+			log.debug(kiloCalDTO.toString());
+			System.out.println();
 			return kiloCalDTO;
 		}
 		catch (Exception e) {
@@ -292,6 +388,51 @@ public class KilometerCalculationNewResource {
 			throw new TaskSubmissionPostSaveException("Exception while processing saveKilometreDifference method. "
 					+ "Company : " + destinationExecutiveTaskExecution.getCompany().getLegalName() + " User:"
 					+ destinationExecutiveTaskExecution.getUser().getLogin() + " Disatance API JSON :" + distanceApiJson
+					+ " Exception : " + e);
+		}
+
+	}
+
+	public  KilometerCalculationDTO getpunchoutdistance(String origin ,String destination,PunchOut punchOut) throws TaskSubmissionPostSaveException {
+		log.debug("punch Out Fetching : " + punchOut.toString());
+		List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
+
+		KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
+
+		MapDistanceApiDTO distanceApiJson = null;
+
+		MapDistanceDTO distance = null;
+
+		EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUser(punchOut.getUser());
+		try{
+			distanceApiJson = geoLocationService.findDistance(origin, destination);
+			log.debug("distanceApiJson : " + distanceApiJson.toString());
+			if (distanceApiJson != null && !distanceApiJson.getRows().isEmpty()) {
+
+				distance = distanceApiJson.getRows().get(0).getElements().get(0).getDistance();
+				log.debug("distance : " + distance.toString());
+				if (distance != null) {
+					log.debug("distance not null to punchout");
+					kiloCalDTO.setKilometre(distance.getValue() * 0.001);
+					kiloCalDTO.setMetres(distance.getValue());
+					kiloCalDTO.setUserPid(punchOut.getUser().getPid());
+					kiloCalDTO.setUserName(punchOut.getUser().getFirstName());
+					kiloCalDTO.setDate(punchOut.getPunchOutDate().toLocalDate());
+					kiloCalDTO.setPunchingTime(punchOut.getPunchOutDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingDate(punchOut.getPunchOutDate().toLocalDate().toString());
+					kiloCalDTO.setEmployeeName(employee.getName());
+					log.debug("PunchoutLocation : " + punchOut.getLocation());
+					kiloCalDTO.setLocation(punchOut.getLocation());
+				}
+			}
+			log.debug(kiloCalDTO.toString());
+			return kiloCalDTO;
+		}
+		catch (Exception e) {
+			log.debug("Exception while processing saveKilometreDifference method {}", e);
+			throw new TaskSubmissionPostSaveException("Exception while processing saveKilometreDifference method. "
+					+ "Company : " + punchOut.getCompany().getLegalName() + " User:"
+					+ punchOut.getUser().getLogin() + " Disatance API JSON :" + distanceApiJson
 					+ " Exception : " + e);
 		}
 
@@ -322,5 +463,30 @@ public class KilometerCalculationNewResource {
 		return new ResponseEntity<>(executionView, HttpStatus.OK);
 	}
 
-
 }
+
+
+
+
+//		if(attendance.isPresent()){
+//			log.debug("attendance present");
+//			Optional<PunchOut> optionalPunchOut = punchOutRepository
+//					.findIsAttendancePresent(attendance.get().getPid());
+//			if(optionalPunchOut.isPresent()){
+//				log.debug("punch out present");
+//				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
+//				PunchOut punchout = optionalPunchOut.get();
+//				lastExecutiveTaskExecution = lastExecutiveTaskExecution.stream().sorted(Comparator.comparing(ExecutiveTaskExecution::getPunchInDate).reversed()).collect(Collectors.toList());
+//					ExecutiveTaskExecution lastexecutiveTaskExecutionDTO = lastExecutiveTaskExecution.get(0);
+//					log.debug("Account Profiles : "+lastexecutiveTaskExecutionDTO.getAccountProfile().getName());
+//
+//					String origin = lastexecutiveTaskExecutionDTO.getLatitude() +","+lastexecutiveTaskExecutionDTO.getLongitude();
+//					String destination = punchout.getLatitude()+","+punchout.getLongitude();
+//
+//					log.debug(userlogin+" : "+"Distance traveled From " + lastexecutiveTaskExecutionDTO.getAccountProfile().getName() + " TO "+ punchout.getLocation()+"(Punchout)");
+//					log.debug(userlogin+" : "+" punch out origin   :  " + origin + "destination   :  " + destination);
+//					kiloCalDTO = getpunchoutdistance(origin,destination,punchout);
+//					kiloCalDTO.setPunchOut(true);
+//					kiloCalDTOs.add(kiloCalDTO);
+//			}
+//		}

@@ -160,6 +160,20 @@ if (!this.KilometerCalculation) {
 											let lastlocation = kilometerCalc.location == null ? ""
 													: kilometerCalc.location;
 
+												var AccountName = "";
+												if(kilometerCalc.accountProfileName == null){
+												   if(kilometerCalc.attendence == true){
+                                                    	AccountName = "Attendance"
+                                                   	}
+                                                   if(kilometerCalc.punchOut == true){
+                                                        AccountName = "Punch Out"
+                                                   }
+												}
+												else{
+												   AccountName = kilometerCalc.accountProfileName
+												}
+
+
 											if (lastlocation == "No Location") {
 												lastlocation = "<span class='btn btn-success'  id='"
 														+ kilometerCalc.taskExecutionPid
@@ -167,13 +181,15 @@ if (!this.KilometerCalculation) {
 
 											}
 
+
 											$('#tBodyKilometerCalculation')
 													.append(
 															"<tr><td>"
 																	+ kilometerCalc.employeeName
 																	+ "</td><td>"
-																	+ (kilometerCalc.accountProfileName == null ? "Attendance"
-																			: kilometerCalc.accountProfileName)
+																	+ AccountName
+//																	+ (kilometerCalc.isAttendence == true ? "Attendance"
+//																			: kilometerCalc.accountProfileName)
 																	+ "</td><td class='tableexport-string target'>"
 																	+ kilometerCalc.punchingDate
 																	+ "</td><td class='tableexport-string target'>"

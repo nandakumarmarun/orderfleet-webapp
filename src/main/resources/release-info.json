@@ -1,7 +1,7 @@
 {
-"release-number" : "1.101.28",
-"release-date" : "18/05/2023",
+"release-number" : "1.106.0",
+"release-date" : "29/05/2023",
 "features" : [
-  "Modern report changes"
+  "Kilometer Calcualtion Punchout Updation "
 ]
 }

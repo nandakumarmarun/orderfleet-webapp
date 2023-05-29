@@ -29,6 +29,8 @@ public class KilometerCalculationDTO {
 	private String taskExecutionPid;
 	private String accountProfileName;
 	private String location;
+	private boolean isAttendence;
+	private  boolean isPunchOut;
 
 	public KilometerCalculationDTO() {
 		super();
@@ -190,6 +192,22 @@ public class KilometerCalculationDTO {
 		this.punchingTime = punchingTime;
 	}
 
+	public boolean isAttendence() {
+		return isAttendence;
+	}
+
+	public void setAttendence(boolean attendence) {
+		isAttendence = attendence;
+	}
+
+	public boolean isPunchOut() {
+		return isPunchOut;
+	}
+
+	public void setPunchOut(boolean punchOut) {
+		isPunchOut = punchOut;
+	}
+
 	@Override
 	public String toString() {
 		return "KilometerCalculationDTO{" +
@@ -209,6 +227,8 @@ public class KilometerCalculationDTO {
 				", taskExecutionPid='" + taskExecutionPid + '\'' +
 				", accountProfileName='" + accountProfileName + '\'' +
 				", location='" + location + '\'' +
+				", isAttendence=" + isAttendence +
+				", isPunchOut=" + isPunchOut +
 				'}';
 	}
 }
