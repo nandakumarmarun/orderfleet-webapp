@@ -30,6 +30,7 @@ import com.orderfleet.webapp.domain.LocationHierarchy;
 import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
+import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 import com.orderfleet.webapp.repository.AccountProfileGeoLocationTaggingRepository;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
@@ -216,6 +217,7 @@ public class AccountProfileUncleJhonUploadService {
 					accountProfile.setImportStatus(true);
 
 				}
+			
 				accountProfile.setCustomerId(apDto.getNumcode().trim());
 
 				accountProfile.setCustomerCode(apDto.getCode().trim());
@@ -261,9 +263,11 @@ public class AccountProfileUncleJhonUploadService {
 						double longitude = Double.parseDouble(longitudeString.trim());
 						accountProfile.setLatitude(BigDecimal.valueOf(latitude));
 						accountProfile.setLongitude(BigDecimal.valueOf(longitude));
-
+                        accountProfile.setGeoTaggingType(GeoTaggingType.WEB_TAGGED);
 					}
 				}
+				
+				
 //				if (apDto.getPhone2().trim() != null && !apDto.getPhone2().trim().equals("")) {
 //                    
 //					accountProfile.setPhone2(apDto.getPhone2().trim());
@@ -283,6 +287,7 @@ public class AccountProfileUncleJhonUploadService {
 			}
 
 			accountProfileRepository.save(saveUpdateAccountProfiles);
+		
 
 		}
 

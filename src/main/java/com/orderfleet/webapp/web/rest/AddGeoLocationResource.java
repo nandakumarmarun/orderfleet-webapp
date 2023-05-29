@@ -100,6 +100,8 @@ public class AddGeoLocationResource {
 		// Not selected
 		List<AccountProfileGeoLocationTagging> geolocations = accountProfileGeoLocationTaggingRepository
 				.findAllByCompanyId();
+		
+	     	System.out.println("Size:"+geolocations.size());
 		List<AccountProfileDTO> accountProfiles = new ArrayList<>();
 		if (accountTypePids.isEmpty() && importedStatus.isEmpty()) {
 			System.out.println("Enter here.......................................1");
@@ -113,6 +115,11 @@ public class AddGeoLocationResource {
 					List<AccountProfileGeoLocationTagging> geolocation = geolocations.stream()
 							.filter(a -> a.getAccountProfile().getPid().equals(account.getPid())).collect(Collectors.toList());
 					
+					System.out.println("Geolocation Size :"+geolocation.size());
+					if(geolocation.size() == 0)
+					{
+						continue;
+					}
 					Comparator<AccountProfileGeoLocationTagging> comparator = Comparator.comparing(AccountProfileGeoLocationTagging::getSendDate);
 					 AccountProfileGeoLocationTagging lastGeoLocation = geolocation.stream().filter(date->date.getSendDate()!= null).max(comparator).get();
 					account.setGeoTaggedTime(lastGeoLocation.getSendDate());
