@@ -34,8 +34,10 @@ public class FilledFormDTO {
 		super();
 		this.pid = filledForm.getPid();
 		this.imageRefNo = filledForm.getImageRefNo();
-		this.formPid = filledForm.getForm().getPid();
-		this.formName = filledForm.getForm().getName();
+		if(filledForm.getForm() != null) {
+			this.formPid = filledForm.getForm().getPid();
+			this.formName = filledForm.getForm().getName();
+		}
 		this.filledFormDetails = filledForm.getFilledFormDetails().stream().map(FilledFormDetailDTO::new)
 				.collect(Collectors.toList());
 		if(filledForm.getForm() != null) {

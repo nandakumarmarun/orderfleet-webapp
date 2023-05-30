@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 
+import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
 import com.orderfleet.webapp.domain.enums.ProcessFlowStatus;
@@ -58,6 +59,8 @@ public class InventoryVoucherHeaderDTO {
 	private String employeeAlias;
 
 	private String userName;
+
+	private String userPid;
 
 	private double documentTotal;
 
@@ -147,6 +150,10 @@ public class InventoryVoucherHeaderDTO {
 	private String description;
 	
 	private Long companyId;
+
+	private String companyPid;
+
+	private String companyName;
 
 	public InventoryVoucherHeaderDTO() {
 		super();
@@ -260,6 +267,122 @@ public class InventoryVoucherHeaderDTO {
 				: inventoryVoucherHeader.getReceiverAccount().getCustomerId();
 		
 		this.companyId = inventoryVoucherHeader.getCompany().getId();
+	}
+
+	public InventoryVoucherHeaderDTO(Company company, InventoryVoucherHeader inventoryVoucherHeader) {
+		super();
+		this.pid = inventoryVoucherHeader.getPid();
+		this.documentNumberLocal = inventoryVoucherHeader.getDocumentNumberLocal();
+		this.documentNumberServer = inventoryVoucherHeader.getDocumentNumberServer();
+		if (inventoryVoucherHeader.getDocument() != null) {
+			this.documentPid = inventoryVoucherHeader.getDocument().getPid();
+			this.documentName = inventoryVoucherHeader.getDocument().getName();
+		}
+		this.createdDate = inventoryVoucherHeader.getCreatedDate();
+		this.documentDate = inventoryVoucherHeader.getDocumentDate();
+		if (inventoryVoucherHeader.getReceiverAccount() != null) {
+			this.receiverAccountPid = inventoryVoucherHeader.getReceiverAccount().getPid();
+			this.receiverAccountName = inventoryVoucherHeader.getReceiverAccount().getName();
+			this.receiverAccountAlias = inventoryVoucherHeader.getReceiverAccount().getAlias() == null ? ""
+					: inventoryVoucherHeader.getReceiverAccount().getAlias();
+			this.receiverAccountLocation = inventoryVoucherHeader.getReceiverAccount().getLocation() == null ? ""
+					: inventoryVoucherHeader.getReceiverAccount().getLocation();
+			this.setDescription(inventoryVoucherHeader.getReceiverAccount().getDescription());
+		}
+		this.processStatus = inventoryVoucherHeader.getProcessStatus();
+		if (!inventoryVoucherHeader.getInventoryVoucherDetails().isEmpty()) {
+			this.inventoryVoucherDetails = inventoryVoucherHeader.getInventoryVoucherDetails().stream()
+					.map(InventoryVoucherDetailDTO::new).collect(Collectors.toList());
+		}
+		if (inventoryVoucherHeader.getSupplierAccount() != null) {
+			this.supplierAccountPid = inventoryVoucherHeader.getSupplierAccount().getPid();
+			this.supplierAccountName = inventoryVoucherHeader.getSupplierAccount().getName();
+		}
+		if (inventoryVoucherHeader.getEmployee() != null) {
+			this.employeePid = inventoryVoucherHeader.getEmployee().getPid();
+			this.employeeName = inventoryVoucherHeader.getEmployee().getName();
+			this.employeeAlias = inventoryVoucherHeader.getEmployee().getAlias();
+		}
+		if (inventoryVoucherHeader.getCreatedBy() != null) {
+			this.userName = inventoryVoucherHeader.getCreatedBy().getFirstName();
+			this.userPid = inventoryVoucherHeader.getCreatedBy().getPid();
+		}
+		this.paymentReceived = inventoryVoucherHeader.getPaymentReceived();
+		this.documentTotal = inventoryVoucherHeader.getDocumentTotal();
+		this.documentVolume = inventoryVoucherHeader.getDocumentVolume();
+		this.documentTotalUpdated = inventoryVoucherHeader.getDocumentTotalUpdated();
+		this.documentVolumeUpdated = inventoryVoucherHeader.getDocumentVolumeUpdated();
+		this.docDiscountAmount = inventoryVoucherHeader.getDocDiscountAmount();
+		this.docDiscountPercentage = inventoryVoucherHeader.getDocDiscountPercentage();
+		this.docDiscountPercentage = inventoryVoucherHeader.getDocDiscountPercentage();
+		this.status = inventoryVoucherHeader.getStatus();
+		if (inventoryVoucherHeader.getPriceLevel() != null) {
+			this.priceLevelPid = inventoryVoucherHeader.getPriceLevel().getPid();
+			this.priceLevelName = inventoryVoucherHeader.getPriceLevel().getName();
+		}
+//		if (inventoryVoucherHeader.getOrderStatus() != null) {
+//			this.orderStatusId = inventoryVoucherHeader.getOrderStatus().getId();
+//			this.orderStatusName = inventoryVoucherHeader.getOrderStatus().getName();
+//		}
+		if (inventoryVoucherHeader.getTallyDownloadStatus() != null) {
+			this.tallyDownloadStatus = inventoryVoucherHeader.getTallyDownloadStatus();
+		}
+
+//		if (inventoryVoucherHeader.getProcessFlowStatus() != null) {
+//			this.processFlowStatus = inventoryVoucherHeader.getProcessFlowStatus();
+//		}
+
+		this.orderNumber = inventoryVoucherHeader.getOrderNumber() == null ? 0
+				: inventoryVoucherHeader.getOrderNumber();
+		this.customeraddress = inventoryVoucherHeader.getReceiverAccount().getAddress();
+		this.customerEmail = inventoryVoucherHeader.getReceiverAccount().getEmail1();
+		this.customerPhone = inventoryVoucherHeader.getReceiverAccount().getPhone1();
+
+		this.visitRemarks = inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks() == null ? ""
+				: inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks();
+
+		this.remarks = inventoryVoucherHeader.getRemarks() == null ? "" : inventoryVoucherHeader.getRemarks();
+		this.rejectedStatus = inventoryVoucherHeader.getRejectedStatus();
+
+		this.visitRemarks = inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks() == null ? ""
+				: inventoryVoucherHeader.getExecutiveTaskExecution().getRemarks();
+
+		this.pdfDownloadStatus = inventoryVoucherHeader.getPdfDownloadStatus();
+
+//		if (inventoryVoucherHeader.getSalesManagementStatus() != null) {
+//			this.salesManagementStatus = inventoryVoucherHeader.getSalesManagementStatus();
+//		}
+
+//		if (inventoryVoucherHeader.getSalesOrderStatus() != null) {
+//			this.salesOrderStatus = inventoryVoucherHeader.getSalesOrderStatus();
+//		}
+
+//		if (inventoryVoucherHeader.getSendSalesOrderEmailStatus() != null) {
+//			this.sendSalesOrderEmailStatus = inventoryVoucherHeader.getSendSalesOrderEmailStatus();
+//		}
+
+		this.clientDate = inventoryVoucherHeader.getExecutiveTaskExecution().getSendDate();
+//		this.updatedStatus = inventoryVoucherHeader.getUpdatedStatus();
+
+//		this.bookingId = inventoryVoucherHeader.getBookingId() != null ? inventoryVoucherHeader.getBookingId() : "";
+//		this.deliveryDate = inventoryVoucherHeader.getDeliveryDate();
+		// this.bookingDate = inventoryVoucherHeader.getBookingDate().toString();
+		// this.bookingDate = inventoryVoucherHeader.getBookingDate();
+		// this.deliveryDateDocument=inventoryVoucherHeader.getDeliveryDate().toString();
+
+		this.roundedOff = inventoryVoucherHeader.getRoundedOff();
+//		this.referenceInvoiceNumber = inventoryVoucherHeader.getReferenceInvoiceNumber() != null
+//				? inventoryVoucherHeader.getReferenceInvoiceNumber()
+//				: "";
+//		this.receiverAccountCustomerId = inventoryVoucherHeader.getReceiverAccount().getCustomerId() == null ? ""
+//				: inventoryVoucherHeader.getReceiverAccount().getCustomerId();
+
+		this.companyId = inventoryVoucherHeader.getCompany().getId();
+
+		this.companyName = inventoryVoucherHeader.getCompany().getLegalName();
+
+		this.companyPid = inventoryVoucherHeader.getCompany().getPid();
+
 	}
 
 	public String getDeliveryDateDocument() {
@@ -843,6 +966,30 @@ public class InventoryVoucherHeaderDTO {
 
 	public Long getCompanyId() {
 		return companyId;
+	}
+
+	public String getUserPid() {
+		return userPid;
+	}
+
+	public void setUserPid(String userPid) {
+		this.userPid = userPid;
+	}
+
+	public String getCompanyPid() {
+		return companyPid;
+	}
+
+	public void setCompanyPid(String companyPid) {
+		this.companyPid = companyPid;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
 	public void setCompanyId(Long companyId) {

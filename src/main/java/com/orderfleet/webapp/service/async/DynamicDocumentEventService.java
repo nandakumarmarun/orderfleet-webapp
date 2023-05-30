@@ -15,4 +15,15 @@ public class DynamicDocumentEventService {
         }
 
     }
+    public void InventoryChooser(String content) {
+        if(!content.isEmpty()) {
+            EventProducer.inventoryContentPublishedEventPublished(content);
+        }
+    }
+
+    public void AccountingChooser(String content) {
+        if(!content.isEmpty()) {
+            EventProducer.accountingContentPublishedEventPublished(content);
+        }
+    }
 }

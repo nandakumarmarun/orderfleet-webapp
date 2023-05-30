@@ -32,6 +32,8 @@ public interface FilledFormRepository extends JpaRepository<FilledForm, Long> {
 	@Query("select filledForm.filledFormDetails from FilledForm filledForm where filledForm.dynamicDocumentHeader.document.pid = ?1 and filledForm.form.pid = ?2")
 	List<FilledFormDetail> findFilledFormDetailsByDocumentAndFormPid(String documentPid, String formPid);
 
+	@Query("select filledForm.filledFormDetails from FilledForm filledForm where filledForm.pid IN ?1")
+	List<FilledFormDetail> findFilledFormDetailsByDocumentAndFormPidIN(List<String> formPid);
 	List<FilledForm> findByDynamicDocumentHeaderPid(String dynamicDocumentPid);
 
 	 List<FilledForm> findByDynamicDocumentHeaderPidIn(Set<String> dynamicDocumentPids);
@@ -142,6 +144,9 @@ public interface FilledFormRepository extends JpaRepository<FilledForm, Long> {
 	
 	@Query(value="SELECT f.pid FROM FilledForm AS f WHERE f.dynamicDocumentHeader.pid IN ?1")
 	List<Object[]> findByDynamicDocumentHeaderPidsIn(Set<String> dynamicDocumentPids);
+
+	@Query(value="SELECT f.pid, f.dynamicDocumentHeader.id FROM FilledForm AS f WHERE f.dynamicDocumentHeader.pid IN ?1")
+	List<Object[]> findByAndDynamicPidDynamicDocumentHeaderPidsIn(Set<String> dynamicDocumentPids);
 	
 	@Query(value="SELECT filled_form_id FROM tbl_filled_form_file",nativeQuery = true)
 	Set<BigInteger> findfilledForms();

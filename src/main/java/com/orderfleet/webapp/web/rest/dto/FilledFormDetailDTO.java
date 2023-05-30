@@ -30,7 +30,7 @@ public class FilledFormDetailDTO {
 		this.value = filledFormDetail.getValue() == null ? "" : filledFormDetail.getValue();
 		this.formElementPid = filledFormDetail.getFormElement().getPid();
 		this.formElementName = filledFormDetail.getFormElement().getName();
-		this.formElementType = filledFormDetail.getFormElement().getFormElementType().getName();
+		this.formElementType = filledFormDetail.getFormElement().getFormElementType() == null ? "" :filledFormDetail.getFormElement().getFormElementType().getName();
 	}
 
 	public Long getId() {

@@ -695,13 +695,35 @@ public class ExecutiveTaskSubmissionController {
 			Optional<CompanyConfiguration> optCrm = companyConfigurationRepository
 										.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
 					if (optCrm.isPresent() && Boolean.valueOf(optCrm.get().getValue())) {
-								
 										CompletableFuture.supplyAsync(() -> {
 											sendDynamicDocumentModCApplication(tsTransactionWrapper);
 											return "submitted successfully...";
 											});
 								}
 							}
+//			if (tsTransactionWrapper.getInventoryVouchers() != null) {
+//				Optional<CompanyConfiguration> optCrm = companyConfigurationRepository
+//						.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
+//				if (optCrm.isPresent() && Boolean.valueOf(optCrm.get().getValue())) {
+//
+//					CompletableFuture.supplyAsync(() -> {
+//						sendInventoryVoucherModCApplication(tsTransactionWrapper);
+//						return "submitted successfully...";
+//					});
+//				}
+//			}
+//
+//			if (tsTransactionWrapper.getAccountingVouchers() != null) {
+//				Optional<CompanyConfiguration> optCrm = companyConfigurationRepository
+//						.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
+//				if (optCrm.isPresent() && Boolean.valueOf(optCrm.get().getValue())) {
+//
+//					CompletableFuture.supplyAsync(() -> {
+//						sendAccountingVoucherModCApplication(tsTransactionWrapper);
+//						return "submitted successfully...";
+//					});
+//				}
+//			}
 
 		} catch (DataIntegrityViolationException dive) {
 			taskSubmissionResponse.setStatus(LocalDateTime.now() + " " + "Duplicate Key");
@@ -1357,4 +1379,20 @@ public class ExecutiveTaskSubmissionController {
 						ddhDTO.forEach(ddhDto -> eventProducer.dynamicDocumentPublish(ddhDto));
 					}
 			}
+
+
+	public void sendInventoryVoucherModCApplication(ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper){
+		if(!tsTransactionWrapper.getInventoryVouchers().isEmpty()) {
+			List<InventoryVoucherHeader> Ivhlist = tsTransactionWrapper.getInventoryVouchers();
+			List<InventoryVoucherHeaderDTO> ivhDTOs = Ivhlist.stream().map(data -> new InventoryVoucherHeaderDTO(data.getCompany(), data)).collect(Collectors.toList());
+			ivhDTOs.forEach(ivhDTO -> eventProducer.inventoryVoucherPublish(ivhDTO));
+		}
+	}
+	public void sendAccountingVoucherModCApplication(ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper){
+		if(!tsTransactionWrapper.getAccountingVouchers().isEmpty()) {
+			List<AccountingVoucherHeader> AccvList = tsTransactionWrapper.getAccountingVouchers();
+			List<AccountingVoucherHeaderDTO> accDTOs = AccvList.stream().map(data -> new AccountingVoucherHeaderDTO(data.getCompany(), data)).collect(Collectors.toList());
+			accDTOs.forEach(ivhDTO -> eventProducer.accountingVoucherPublish(ivhDTO));
+		}
+	}
 }

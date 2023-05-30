@@ -35,6 +35,16 @@ public class EventListener {
                 JsonNode rootNode = objectMapper.readTree(event.getMetaData());
                 dynamicDocumentEventService.DynamicDocumentChooser( event.getMetaData());
             }
+            if(event != null && event.getEventType().toString().equals("inventoryVoucherACK")){
+                System.out.println("ackk++++++++"+event.getMetaData());
+//                JsonNode rootNode = objectMapper.readTree(event.getMetaData());
+                dynamicDocumentEventService.InventoryChooser(event.getMetaData());
+            }
+            if(event != null && event.getEventType().toString().equals("accountingVoucherACK")){
+                System.out.println("ackk++++++++"+event.getMetaData());
+//                JsonNode rootNode = objectMapper.readTree(event.getMetaData());
+                dynamicDocumentEventService.AccountingChooser(event.getMetaData());
+            }
             if(event != null && event.getEventType().toString().equals("SnrichCompanyUserApprovedAck")){
                 System.out.println("ackk++++++++"+event.getMetaData());
                 String[] userPid = objectMapper.readValue(event.getMetaData(), String[].class);

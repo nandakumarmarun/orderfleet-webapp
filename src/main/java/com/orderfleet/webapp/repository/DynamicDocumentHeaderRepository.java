@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.orderfleet.webapp.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,10 +13,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.Document;
-import com.orderfleet.webapp.domain.DynamicDocumentHeader;
-import com.orderfleet.webapp.domain.FilledForm;
 import com.orderfleet.webapp.domain.enums.TallyDownloadStatus;
 
 /**
@@ -163,6 +160,9 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	@Query("select dd from DynamicDocumentHeader dd LEFT JOIN FETCH dd.filledForms where dd.company.id = ?#{principal.companyId} and dd.pid = ?1 Order By dd.createdDate desc")
 	List<DynamicDocumentHeader> findDynamicDocumentHeaderByPid(String dynamicDocumentHeaderPid);
 
+	@Query("select dd from DynamicDocumentHeader dd LEFT JOIN FETCH dd.filledForms where dd.company.id = ?#{principal.companyId} and dd.createdDate between ?1 and ?2 Order By dd.documentDate desc")
+	List<DynamicDocumentHeader> findDynamicDocumentHeaderByPidBetweenCreatedDate(LocalDateTime fromDate, LocalDateTime toDate);
+
 	@Query("select dd.pid,dd.document.name,dd.document.pid from DynamicDocumentHeader dd where dd.company.id = ?#{principal.companyId} and dd.executiveTaskExecution.id in ?1")
 	List<Object[]> findDynamicDocumentsHeaderByExecutiveTaskExecutionIdin(Set<Long> exeIds);
 
@@ -204,4 +204,9 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	// "dDocument.document.id in ?1 and dDocument.accountProfile.pid = ?2")
 	// List<Object[]> findAllByAccountProfilePidAndDocumentIn(Set<Long> documentPids
 	// ,String accountProfilePid);
+
+	@Query("select dynamicDocumentHeader from DynamicDocumentHeader dynamicDocumentHeader where dynamicDocumentHeader.company.id = ?#{principal.companyId}  and dynamicDocumentHeader.createdDate between ?1 and ?2 Order By dynamicDocumentHeader.documentDate desc")
+	List<DynamicDocumentHeader> findAllByCompanyIdAndDateBetweenOrderByDocumentDateDesc(
+			LocalDateTime fromDate, LocalDateTime toDate);
+
 }

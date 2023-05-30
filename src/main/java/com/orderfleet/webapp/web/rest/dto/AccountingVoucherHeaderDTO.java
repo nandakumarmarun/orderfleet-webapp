@@ -10,10 +10,7 @@ import javax.inject.Inject;
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 
-import com.orderfleet.webapp.domain.AccountingVoucherDetail;
-import com.orderfleet.webapp.domain.AccountingVoucherHeader;
-import com.orderfleet.webapp.domain.AccountingVoucherHeaderHistory;
-import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
@@ -65,6 +62,8 @@ public class AccountingVoucherHeaderDTO {
 
 	private String userName;
 
+	private String userPid;
+
 	private double totalAmount;
 
 	private double outstandingAmount;
@@ -109,6 +108,12 @@ public class AccountingVoucherHeaderDTO {
 	private String description;
 	
 	private LocalDateTime time;
+
+	private Long companyId;
+
+	private String companyPid;
+
+	private String companyName;
 	
 	
 
@@ -181,6 +186,80 @@ public class AccountingVoucherHeaderDTO {
 
 		if (accountingVoucherHeader.getFiles().size() > 0) {
 			this.imageButtonVisible = true;
+		}
+	}
+
+	public AccountingVoucherHeaderDTO(Company company, AccountingVoucherHeader accountingVoucherHeader) {
+
+		super();
+
+		this.pid = accountingVoucherHeader.getPid();
+		if (accountingVoucherHeader.getDocument() != null) {
+			this.documentPid = accountingVoucherHeader.getDocument().getPid();
+			this.documentName = accountingVoucherHeader.getDocument().getName();
+			if (accountingVoucherHeader.getDocument().getActivityAccount() != null
+					&& accountingVoucherHeader.getDocument().getActivityAccount().equals(AccountTypeColumn.By)) {
+				this.byAmount = accountingVoucherHeader.getTotalAmount();
+			} else if (accountingVoucherHeader.getDocument().getActivityAccount() != null
+					&& accountingVoucherHeader.getDocument().getActivityAccount().equals(AccountTypeColumn.To)) {
+				this.toAmount = accountingVoucherHeader.getTotalAmount();
+			}
+		}
+		if (accountingVoucherHeader.getAccountProfile() != null) {
+			this.accountProfilePid = accountingVoucherHeader.getAccountProfile().getPid();
+
+			this.accountProfileName = accountingVoucherHeader.getAccountProfile().getName();
+			this.description =accountingVoucherHeader.getAccountProfile().getDescription();
+			this.phone = accountingVoucherHeader.getAccountProfile().getPhone1();
+			this.customerCode=accountingVoucherHeader.getAccountProfile().getCustomerCode();
+		}
+
+		this.createdDate = accountingVoucherHeader.getCreatedDate();
+		this.time =accountingVoucherHeader.getCreatedDate();
+		this.documentDate = accountingVoucherHeader.getDocumentDate();
+		if (accountingVoucherHeader.getEmployee() != null) {
+			this.employeePid = accountingVoucherHeader.getEmployee().getPid();
+			this.employeeName = accountingVoucherHeader.getEmployee().getName();
+			this.employeeProfileCode=accountingVoucherHeader.getEmployee().getUser().getLogin();
+		}
+		if (accountingVoucherHeader.getCreatedBy() != null) {
+			this.userName = accountingVoucherHeader.getCreatedBy().getFirstName();
+			this.userPid = accountingVoucherHeader.getCreatedBy().getPid();
+		}
+
+		if (!accountingVoucherHeader.getAccountingVoucherDetails().isEmpty()) {
+			this.accountingVoucherDetails = accountingVoucherHeader.getAccountingVoucherDetails().stream()
+					.map(AccountingVoucherDetailDTO::new).collect(Collectors.toList());
+		}
+		this.totalAmount = accountingVoucherHeader.getTotalAmount();
+		this.outstandingAmount = accountingVoucherHeader.getOutstandingAmount();
+		this.remarks = accountingVoucherHeader.getRemarks();
+		this.documentNumberLocal = accountingVoucherHeader.getDocumentNumberLocal();
+		this.documentNumberServer = accountingVoucherHeader.getDocumentNumberServer();
+		this.status = accountingVoucherHeader.getStatus();
+		for (AccountingVoucherDetail avd : accountingVoucherHeader.getAccountingVoucherDetails()) {
+			if (avd.getMode() == PaymentMode.Cheque || avd.getMode() == PaymentMode.Bank) {
+				this.chequeAmount += avd.getAmount();
+			} else if (avd.getMode() == PaymentMode.Cash) {
+				this.cashAmount += avd.getAmount();
+			}
+		}
+
+		if (accountingVoucherHeader.getTallyDownloadStatus() != null) {
+			this.tallyDownloadStatus = accountingVoucherHeader.getTallyDownloadStatus();
+		}
+
+		if (accountingVoucherHeader.getSalesManagementStatus() != null) {
+			this.salesManagementStatus = accountingVoucherHeader.getSalesManagementStatus();
+		}
+
+		if (accountingVoucherHeader.getFiles().size() > 0) {
+			this.imageButtonVisible = true;
+		}
+		if(company != null){
+			this.companyId = company.getId();
+			this.companyName = company.getLegalName();
+			this.companyPid =  company.getPid();
 		}
 	}
 
@@ -336,6 +415,38 @@ public class AccountingVoucherHeaderDTO {
 
 	public String getUserName() {
 		return userName;
+	}
+
+	public String getUserPid() {
+		return userPid;
+	}
+
+	public void setUserPid(String userPid) {
+		this.userPid = userPid;
+	}
+
+	public Long getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(Long companyId) {
+		this.companyId = companyId;
+	}
+
+	public String getCompanyPid() {
+		return companyPid;
+	}
+
+	public void setCompanyPid(String companyPid) {
+		this.companyPid = companyPid;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
 	public void setUserName(String userName) {

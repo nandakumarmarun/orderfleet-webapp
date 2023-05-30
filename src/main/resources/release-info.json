@@ -1,7 +1,7 @@
 {
-"release-number" : "1.106.0",
-"release-date" : "29/05/2023",
+"release-number" : "1.106.1",
+"release-date" : "31/05/2023",
 "features" : [
-  "Kilometer Calcualtion Punchout Updation "
+  "sales And Receipt integration in crm and history data Streaming"
 ]
 }

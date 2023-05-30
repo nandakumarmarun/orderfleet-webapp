@@ -47,6 +47,9 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	List<AccountingVoucherHeader> findAllByCompanyIdUserPidAndDateBetweenOrderByCreatedDateDesc(String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
+	@Query("select accVoucher from AccountingVoucherHeader accVoucher where accVoucher.company.id = ?#{principal.companyId} and accVoucher.createdDate between ?1 and ?2 Order By accVoucher.createdDate desc")
+	List<AccountingVoucherHeader> findAllByCompanyIdAndDateBetweenOrderByCreatedDateDes(LocalDateTime fromDate, LocalDateTime toDate);
+
   @Query("select accVoucher from AccountingVoucherHeader accVoucher where accVoucher.company.id = ?#{principal.companyId} and accVoucher.accountProfile.pid = ?1 and accVoucher.createdDate between ?2 and ?3 Order By accVoucher.createdDate desc")
 	List<AccountingVoucherHeader> findAllByCompanyIdAccountPidAndDateBetweenOrderByCreatedDateDesc(String accountPid,
 			LocalDateTime fromDate, LocalDateTime toDate);
