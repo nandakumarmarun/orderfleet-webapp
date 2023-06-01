@@ -19,11 +19,11 @@ public interface CompanyBillingRepository extends JpaRepository<CompanyBilling, 
 	@Query("select companyBilling from CompanyBilling companyBilling where companyBilling.company.pid =?1")
 	Optional<CompanyBilling> findOneBycompanyPid(String companyPid);
 
-	@Query("select companyBilling from CompanyBilling companyBilling where companyBilling.next_bill_date between ?1 and ?2")
-	List<CompanyBilling> findCompanyBillingByDateBetween(LocalDate fromDate, LocalDate toDate);
+	@Query("select companyBilling from CompanyBilling companyBilling where companyBilling.next_bill_date between ?1 and ?2 and companyBilling.company.activated = true")
+	List<CompanyBilling> findCompanyBillingByDateBetweenAndActivated(LocalDate fromDate, LocalDate toDate);
 
-	@Query("select companyBilling from CompanyBilling companyBilling where companyBilling.billingPeriod =?1 and companyBilling.next_bill_date between ?2 and ?3")
-	List<CompanyBilling> findBybillingPeriodAndDateBetween(BillingPeriod billingPeriod, LocalDate fromDate, LocalDate toDate);
+	@Query("select companyBilling from CompanyBilling companyBilling where companyBilling.billingPeriod =?1 and companyBilling.next_bill_date between ?2 and ?3 and companyBilling.company.activated = true")
+	List<CompanyBilling> findBybillingPeriodAndDateBetweenAndActivated(BillingPeriod billingPeriod, LocalDate fromDate, LocalDate toDate);
 
 	List<CompanyBilling> findOneByPidIn(String[] billingSettingPids);
 }

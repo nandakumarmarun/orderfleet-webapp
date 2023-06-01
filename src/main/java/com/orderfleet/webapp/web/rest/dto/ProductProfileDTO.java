@@ -217,7 +217,7 @@ public class ProductProfileDTO {
 		this.itemWidth=profile.getWidth();
 		this.sellingRate=profile.getSellingRate();
 		this.baseUnits =profile.getBaseUnits();
-		this.totalVolume = 0.0;
+		this.totalVolume =profile.getUnitQty()*profile.getCompoundUnitQty();
 		List<TaxMasterDTO> taxMasterDTOs = new ArrayList<>();
 
 		this.productProfileTaxMasterDTOs = profile.getTaxMastersList() == null || profile.getTaxMastersList().isEmpty()

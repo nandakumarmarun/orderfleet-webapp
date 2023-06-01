@@ -39,7 +39,12 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 			productProfileDTO.setColorImage(Arrays.copyOf(colorImage, colorImage.length));
 		}
 		productProfileDTO.setColorImageContentType(productProfile.getColorImageContentType());
+		if(productProfile.getCompoundUnitQty() != null) {
 		productProfileDTO.setCompoundUnitQty(productProfile.getCompoundUnitQty());
+		}
+		else {
+			productProfileDTO.setCompoundUnitQty(1.0);
+		}
 		productProfileDTO.setCreatedDate(productProfile.getCreatedDate());
 		productProfileDTO.setDefaultLedger(productProfile.getDefaultLedger());
 		productProfileDTO.setDescription(productProfile.getDescription());
@@ -72,7 +77,16 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfileDTO.setRateConversion(productProfile.getRateConversion());
 		productProfileDTO.setBaseUnits(productProfile.getBaseUnits());
 		productProfileDTO.setStockQty(productProfile.getStockQty());
-		productProfileDTO.setTotalVolume(0.0);
+	
+
+		 if(productProfile.getCompoundUnitQty()!= null) {
+			  
+				productProfileDTO.setTotalVolume(productProfile.getCompoundUnitQty()*productProfile.getUnitQty());
+		     	
+			  }
+			  else {
+				  productProfileDTO.setTotalVolume(1.0*productProfile.getUnitQty());
+			  }
 		return productProfileDTO;
 	}
 
@@ -128,7 +142,15 @@ public class ProductProfileMapperImpl extends ProductProfileMapper {
 		productProfileDTO.setRateConversion(productProfile.getRateConversion());
 		productProfileDTO.setBaseUnits(productProfile.getBaseUnits());
 		productProfileDTO.setStockQty(productProfile.getStockQty());
-		productProfileDTO.setTotalVolume(0.0);
+	
+	  if(productProfile.getCompoundUnitQty()!= null) {
+		  
+		productProfileDTO.setTotalVolume(productProfile.getCompoundUnitQty()*productProfile.getUnitQty());
+     	
+	  }
+	  else {
+		  productProfileDTO.setTotalVolume(1.0*productProfile.getUnitQty());
+	  }
 		return productProfileDTO;
 	}
 

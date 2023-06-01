@@ -112,10 +112,10 @@ public class ActiveSubscribersBillingResource {
 		log.info(fromDate + " " + toDate);
 		List<CompanyBilling> billingSetting = new ArrayList<>();
 		if (billingPeriod.equalsIgnoreCase("no")) {
-			billingSetting = companyBillingRepository.findCompanyBillingByDateBetween(fromDate, toDate);
+			billingSetting = companyBillingRepository.findCompanyBillingByDateBetweenAndActivated(fromDate, toDate);
 		} else {
 			billingSetting = companyBillingRepository
-					.findBybillingPeriodAndDateBetween(BillingPeriod.valueOf(billingPeriod), fromDate, toDate);
+					.findBybillingPeriodAndDateBetweenAndActivated(BillingPeriod.valueOf(billingPeriod), fromDate, toDate);
 		}
 
 		log.debug("billSeting Size :", String.valueOf(billingSetting.size()));
