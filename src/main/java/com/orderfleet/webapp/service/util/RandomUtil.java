@@ -13,6 +13,8 @@ public final class RandomUtil {
 	private static final int PASSWORD_COUNT = 6;
     private static final int DEF_COUNT = 20;
     private static final int PID_DEF_COUNT = 10;
+
+    private static final int THREAD_COUNT = 4;
    
 
     private RandomUtil() {
@@ -81,4 +83,15 @@ public final class RandomUtil {
       public static String generateServerDocumentNo() {
      	 return RandomStringUtils.randomAlphanumeric(DEF_COUNT);  
       }
+
+
+
+    /**
+     * Generates a reset key.
+     *
+     * @return the generated reset key
+     */
+    public static String generateThread() {
+        return RandomStringUtils.randomNumeric(THREAD_COUNT);
+    }
 }

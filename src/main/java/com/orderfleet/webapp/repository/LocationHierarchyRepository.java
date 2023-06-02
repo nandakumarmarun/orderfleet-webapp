@@ -31,6 +31,12 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 
 	Optional<LocationHierarchy> findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(Long companyId);
 
+	@Query("select lh from LocationHierarchy lh where lh.company.id = ?1 and lh.parent.id = ?2")
+	Optional<LocationHierarchy> findByCompanyIdAndParent(Long companyId,Long parentId);
+
+	@Query("select lh from LocationHierarchy lh where lh.company.id = ?1 and lh.location.id = ?2")
+	Optional<LocationHierarchy> findByCompanyIdAndLocation(Long companyId,Long locationId);
+
 	LocationHierarchy findTopByLocationPidAndParentPidAndActivatedTrueOrderByActivatedDateDesc(String locationPid,
 			String parentPid);
 
@@ -158,6 +164,11 @@ public interface LocationHierarchyRepository extends JpaRepository<LocationHiera
 	@Modifying
 	@Query("delete from LocationHierarchy lh where lh.company.id = ?1 and lh.parent is not null")
 	void deleteByCompanyIdAndParentNotNull(Long companyId);
+
+	@Transactional
+	@Modifying
+	@Query("delete from LocationHierarchy lh where lh.company.id = ?1 and lh.parent.id = ?2")
+	void deleteByCompanyIdAndParent(Long companyId,Long parentId);
 
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE LocationHierarchy lh SET lh.activated = FALSE , lh.inactivatedDate = ?1 WHERE  lh.version = ?2 AND lh.company.id = ?3 AND lh.parent is not null")

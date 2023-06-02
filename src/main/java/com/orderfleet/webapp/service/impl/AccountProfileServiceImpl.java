@@ -1704,7 +1704,6 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	public List<AccountProfile> findAllAccountProfileByCompanyId(Long companyId) {
 		List<AccountProfile> accountProfiles = new ArrayList<>();
 
-		System.out.println(companyId + "------------------------------------");
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "AT_QUERY_108" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
@@ -1735,7 +1734,6 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 
-		System.out.println(accountTypes.size() + "----------------------------");
 		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id1 = "AP_QUERY_134" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();

@@ -235,4 +235,24 @@ public class Location implements Serializable, Cloneable {
 		return super.clone();
 	}
 
+
+	@Override
+	public String toString() {
+		return "Location{" +
+				"id=" + id +
+				", pid='" + pid + '\'' +
+				", name='" + name + '\'' +
+				", alias='" + alias + '\'' +
+				", latitude=" + latitude +
+				", longitude=" + longitude +
+				", description='" + description + '\'' +
+				", locationId='" + locationId + '\'' +
+				", locationCode='" + locationCode + '\'' +
+				", company=" + company +
+				", activated=" + activated +
+				", activatedLocations=" + activatedLocations +
+				", createdDate=" + createdDate +
+				", lastModifiedDate=" + lastModifiedDate +
+				'}';
+	}
 }

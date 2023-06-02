@@ -33,6 +33,9 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 
 	Optional<Location> findOneByPid(String pid);
 
+	Optional<Location> findOneByLocationIdAndCompanyId(String locationid,Long companyId);
+
+
 	@Query("select location from Location location where location.company.id = ?#{principal.companyId}")
 	List<Location> findAllByCompanyId();
 
