@@ -514,7 +514,7 @@ public class StockDetailsResource {
 			Instant i = dateTime.atZone(ZoneId.systemDefault()).toInstant();
 			Date dates = Date.from(i);
 			
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss a");
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a");
 			 strDate = dateFormat.format(dates);
 			}
 			Optional<EmployeeProfileDTO> employeeProfileDTO = employeeProfileService.findOneByPid(employeePid);
