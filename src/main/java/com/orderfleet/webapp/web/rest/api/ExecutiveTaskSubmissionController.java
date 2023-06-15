@@ -645,44 +645,16 @@ public class ExecutiveTaskSubmissionController {
 			// send sales orders to third party ERP
 			sendSalesOrderToThirdPartyErp(tsTransactionWrapper);
 
-			Optional<CompanyConfiguration> optSendTofocus = companyConfigurationRepository
-					.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_FOCUS);
-
 			// send sales order automaticaly to focus
-			if (optSendTofocus.isPresent()) {
-
-				if (Boolean.valueOf(optSendTofocus.get().getValue())) {
-					log.debug(user.getLogin() + " : " + " Sending Sales Order To Focus  : ");
-					Thread foucsThread = new SaleOrderFocusThread(tsTransactionWrapper.getInventoryVouchers(),
-							sendSalesOrderFocusService);
-					foucsThread.start();
-				}
-
+			if(company.getId() == 304975)
+			{
+			sendSalesOrderToFocus(companyPid, user, tsTransactionWrapper);
 			}
 			// Send sales order email to uncleJhon secondary sales
-			Optional<CompanyConfiguration> optsendEmailAutomatically = companyConfigurationRepository
-					.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
-			if (optsendEmailAutomatically.isPresent() && Boolean.valueOf(optsendEmailAutomatically.get().getValue())) {
-				List<PrimarySecondaryDocument> primarySecDoc = primarySecondaryDocumentRepository
-						.findByVoucherTypeAndCompany(VoucherType.SECONDARY_SALES_ORDER, company.getId());
-				Document document = primarySecDoc.get(0).getDocument();
-				Document ivDocument = tsTransactionWrapper.getInventoryVouchers().get(0).getDocument();
-				log.debug("Doc name :" + ivDocument.getName());
-
-				if (document.getPid().equalsIgnoreCase(ivDocument.getPid())) {
-
-					System.out.println("Enter to the loop");
-
-					if (Boolean.valueOf(optsendEmailAutomatically.get().getValue())) {
-
-						log.debug(user.getLogin() + " : " + " Sending Sales Order Email to Supplier automatically : ");
-						Thread uncleJhonThread = new SaleOrderuncleJhonThread(
-								tsTransactionWrapper.getInventoryVouchers(), sendSalesOrderEmailService);
-						uncleJhonThread.start();
-					}
-				}
+			if(company.getId() == 305131)
+			{
+			sendSecondarysalesOrderEmail(company, companyPid, user, tsTransactionWrapper);
 			}
-
 			// send EmailToComplaint Modern
 
 			if (tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getEmailTocomplaint()) {
@@ -737,6 +709,49 @@ public class ExecutiveTaskSubmissionController {
 			return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.OK);
+	}
+
+	public void sendSecondarysalesOrderEmail(Company company, String companyPid, User user,
+			ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper) {
+		Optional<CompanyConfiguration> optsendEmailAutomatically = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
+		if (optsendEmailAutomatically.isPresent() && Boolean.valueOf(optsendEmailAutomatically.get().getValue())) {
+			List<PrimarySecondaryDocument> primarySecDoc = primarySecondaryDocumentRepository
+					.findByVoucherTypeAndCompany(VoucherType.SECONDARY_SALES_ORDER, company.getId());
+			Document document = primarySecDoc.get(0).getDocument();
+			Document ivDocument = tsTransactionWrapper.getInventoryVouchers().get(0).getDocument();
+			log.debug("Doc name :" + ivDocument.getName());
+
+			if (document.getPid().equalsIgnoreCase(ivDocument.getPid())) {
+
+				System.out.println("Enter to the loop");
+
+				if (Boolean.valueOf(optsendEmailAutomatically.get().getValue())) {
+
+					log.debug(user.getLogin() + " : " + " Sending Sales Order Email to Supplier automatically : ");
+					Thread uncleJhonThread = new SaleOrderuncleJhonThread(
+							tsTransactionWrapper.getInventoryVouchers(), sendSalesOrderEmailService);
+					uncleJhonThread.start();
+				}
+			}
+		}
+	}
+
+	public void sendSalesOrderToFocus(String companyPid, User user,
+			ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper) {
+		Optional<CompanyConfiguration> optSendTofocus = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_TO_FOCUS);
+
+		if (optSendTofocus.isPresent()) {
+
+			if (Boolean.valueOf(optSendTofocus.get().getValue())) {
+				log.debug(user.getLogin() + " : " + " Sending Sales Order To Focus  : ");
+				Thread foucsThread = new SaleOrderFocusThread(tsTransactionWrapper.getInventoryVouchers(),
+						sendSalesOrderFocusService);
+				foucsThread.start();
+			}
+
+		}
 	}
 
 	/**

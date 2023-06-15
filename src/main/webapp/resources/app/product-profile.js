@@ -33,8 +33,8 @@ if (!this.ProductProfile) {
 		description : null,
 		hsnCode : null,
 		productId : null,
-		compoundUnitQty : null,
-		totalVolume :null
+		compoundUnitQty : null
+		
 	};
 
 	// Specify the validation rules
@@ -543,7 +543,7 @@ if (!this.ProductProfile) {
 		productProfileModel.hsnCode = $('#field_hsnCode').val();
 		productProfileModel.productId = $('#field_productId').val();
 		productProfileModel.compoundUnitQty = $('#field_cuq').val();
-		productProfileModel.totalVolume = $('#field_totalVolume').val();
+		
 		console.log(productProfileModel);
 		$.ajax({
 			method : $(el).attr('method'),
@@ -618,7 +618,7 @@ if (!this.ProductProfile) {
 						$('#field_hsnCode').val(data.hsnCode);
 						$('#field_productId').val(data.productId);
 						$('#field_cuq').val(data.compoundUnitQty);
-						$('#field_totalVolume').val(data.totalVolume);
+					
 						
 						// set pid
 						productProfileModel.pid = data.pid;
@@ -838,9 +838,6 @@ if (!this.ProductProfile) {
 													+ "</td><td>"
 													+ (productProfile.alias == null ? ""
 															: productProfile.alias)
-													+ "</td><td>"
-													+ (productProfile.totalVolume == null ? ""
-															: productProfile.totalVolume)
 													+ "</td><td>"
 													+ convertDateTimeFromServer(productProfile.createdDate)
 													+ "</td><td>"

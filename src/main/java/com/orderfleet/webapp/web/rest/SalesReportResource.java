@@ -368,7 +368,7 @@ public class SalesReportResource {
 				ivDetailDto.setCreatedDate((LocalDateTime) object[6]);
 				ivDetailDto.setVisitRemarks(object[7] == null ? null : object[7].toString());
 				ivDetailDto.setProductDescription(object[8].toString());
-				ivDetailDto.setCompoundUnitQty(object[14] == null ? 1d : (Double) object[14]);
+			
 				inventoryVoucherDetailDTOs.add(ivDetailDto);
 			}
 		}

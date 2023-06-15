@@ -144,7 +144,6 @@
 						<th>SKU</th>
 						<th>Price</th>
 						<th>Alias</th>
-						<th>Total Volume</th>
 						<th>Created Date</th>
 						<th>Last Updated Date</th>
 						<th>Status</th>
@@ -256,12 +255,7 @@
 										name="cuq" id="field_cuq" maxlength="20"
 										placeholder="Compound Unit Quantity" value="1" />
 								</div>
-								<div class="form-group">
-									<label class="control-label" for="field_totalVolume">Total Volume
-										</label> <input type="number" class="form-control"
-										name="totalVolume" id="field_totalVolume" maxlength="20"
-										placeholder="Total volume" value="1" />
-								</div>
+								
 								<div class="form-group">
 									<label class="control-label" for="field_price">Price</label> <input
 										type="number" class="form-control" name="price"
