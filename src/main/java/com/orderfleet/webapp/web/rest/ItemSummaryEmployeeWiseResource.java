@@ -19,6 +19,9 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.web.rest.dto.QueryTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -87,6 +90,10 @@ public class ItemSummaryEmployeeWiseResource {
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
 
+	@Inject
+	private CompanyRepository companyRepository;
+
+
 	@RequestMapping(value = "/item-summary-employee-wise", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -102,6 +109,7 @@ public class ItemSummaryEmployeeWiseResource {
 		return "company/item-summary-employee-wise";
 	}
 
+
 	@RequestMapping(value = "/item-summary-employee-wise/load-document", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@Timed
@@ -110,6 +118,7 @@ public class ItemSummaryEmployeeWiseResource {
 				.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
 		return documentDTOs;
 	}
+
 
 	@RequestMapping(value = "/item-summary-employee-wise/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -154,10 +163,17 @@ public class ItemSummaryEmployeeWiseResource {
 
 	}
 
-	private List<InventoryVoucherDetailDTO> getFilterData(String sort, String order, String categoryPids,
-			String groupPids, VoucherType voucherType, String documentPid, LocalDate fDate, LocalDate tDate,
-			String stockLocations, String profilePids, String territoryPids, String employeePids, String status,
+
+
+	private List<InventoryVoucherDetailDTO> getFilterData(
+			String sort, String order, String categoryPids, String groupPids,
+			VoucherType voucherType, String documentPid, LocalDate fDate,
+			LocalDate tDate, String stockLocations, String profilePids,
+			String territoryPids, String employeePids, String status,
 			String accountPids) {
+
+		Company company =
+				companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
@@ -179,41 +195,27 @@ public class ItemSummaryEmployeeWiseResource {
 		productProfilePids = profilePids != "" ? Arrays.asList(profilePids.split(",")) : productProfilePids;
 		productTerritoryPids = territoryPids != "" ? Arrays.asList(territoryPids.split(",")) : productTerritoryPids;
 		employeePidList = employeePids != "" ? Arrays.asList(employeePids.split(",")) : employeePidList;
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "AP_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get all pids by company";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
+		String AP_QUERY_146_ID = "AP_QUERY_146" + "_"
+				+ SecurityUtils.getCurrentUserLogin() + "_"
+				+ LocalDateTime.now();
+
+		String AP_QUERY_146_DESCRIPTION = "get all pids by company";
+
+		QueryTime ap146 =    queryRunStatusIntialize(
+				AP_QUERY_146_ID,AP_QUERY_146_DESCRIPTION);
+
 		accountPidList = !accountPids.equals("-1") ? Arrays.asList(accountPids)
 				: accountProfileRepository.findAllPidsByCompany();
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+
+		queryRunStatus(
+				AP_QUERY_146_ID,AP_QUERY_146_DESCRIPTION,
+				ap146.getStartLCTime(),ap146.getStartTime());
 
 		if (documentPid.equals("no")) {
-			List<DocumentDTO> documentDTOs = primarySecondaryDocumentService
-					.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
-
+			List<DocumentDTO> documentDTOs =
+					primarySecondaryDocumentService
+							.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
 			for (DocumentDTO documentDTO : documentDTOs) {
 				documentPids.add(documentDTO.getPid());
 			}
@@ -221,15 +223,38 @@ public class ItemSummaryEmployeeWiseResource {
 			documentPids = Arrays.asList(documentPid.split(","));
 		}
 
-		inventoryVoucherDetailDTOs = inventoryVoucherDetailCustomRepository.getInventoryDetailListBy(
-				productCategoryPids, productGroupPids, productProfilePids, stockLocationPids, fromDate, toDate,
-				documentPids, productTerritoryPids, employeePidList, status, accountPidList);
+		log.debug("==================ENTER :  "+LocalDateTime.now()+"=======================================================");
+		log.debug( "Enter :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
+		inventoryVoucherDetailDTOs =
+				inventoryVoucherDetailCustomRepository
+						.getInventoryDetailListByItemSummaryEmployeeWiseResourceOptmised(
+								company.getId(),productCategoryPids, productGroupPids,
+								productProfilePids, stockLocationPids, fromDate, toDate,
+								documentPids, productTerritoryPids, employeePidList, status,
+								accountPidList);
+		log.debug("=====================EXIt : "+LocalDateTime.now()+"=======================================================");
+
+
+
+//		log.debug("----------------------------ENTER :"+LocalDateTime.now()+"----------------------------------------------------------------------------------------");
+
+//		log.debug("ENTER  : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start Old Query At : " + LocalDateTime.now());
+//		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOsold = new ArrayList<>();
+//		inventoryVoucherDetailDTOsold =
+//				inventoryVoucherDetailCustomRepository
+//						.getInventoryDetailListBy( productCategoryPids, productGroupPids,
+//								productProfilePids, stockLocationPids, fromDate, toDate,
+//								documentPids, productTerritoryPids, employeePidList,
+//								status, accountPidList);
+//		log.debug("EXIT : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start Old Query At : " + LocalDateTime.now());
+//		log.debug("------------------------EXIT : "+LocalDateTime.now()+"--------------------------------------------------------------------------------------------");
+
 
 		return filterByCumulative(filterBySortAndOrder(sort, order, inventoryVoucherDetailDTOs));
 	}
 
-	private List<InventoryVoucherDetailDTO> filterBySortAndOrder(String sort, String order,
-			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs) {
+	private List<InventoryVoucherDetailDTO> filterBySortAndOrder(
+			String sort, String order, List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs) {
 
 		if (sort.equals("date")) {
 			if (order.equals("desc")) {
@@ -264,6 +289,7 @@ public class ItemSummaryEmployeeWiseResource {
 
 	}
 
+
 	private List<InventoryVoucherDetailDTO> filterByCumulative(
 			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs) {
 
@@ -292,6 +318,49 @@ public class ItemSummaryEmployeeWiseResource {
 
 		return ivdDTOs;
 	}
+
+
+	private QueryTime queryRunStatusIntialize(
+			String id, String description) {
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		QueryTime queryTime = new QueryTime(startLCTime,startTime,startDate);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		return queryTime;
+	}
+
+
+	private void queryRunStatus(
+			String id, String description,
+			LocalDateTime startLCTime, String startTime) {
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
+	}
+
+
 	public boolean getCompanyCofig(){
 		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
 		if(optconfig.isPresent()) {

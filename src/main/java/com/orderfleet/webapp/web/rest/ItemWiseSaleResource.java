@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.web.rest.dto.QueryTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,18 +37,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.LocationAccountProfile;
-import com.orderfleet.webapp.domain.ProductGroupProduct;
-import com.orderfleet.webapp.domain.ProductProfile;
-import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.enums.VoucherType;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.EmployeeProfileRepository;
-import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
-import com.orderfleet.webapp.repository.LocationRepository;
-import com.orderfleet.webapp.repository.ProductGroupProductRepository;
-import com.orderfleet.webapp.repository.ProductProfileRepository;
-import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.custom.InventoryVoucherDetailCustomRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -104,6 +96,10 @@ public class ItemWiseSaleResource {
 	
 	@Inject
 	private LocationRepository locationRepository;
+
+	@Inject
+	private CompanyRepository companyRepository;
+
 
 	@RequestMapping(value = "/item-wise-sale", method = RequestMethod.GET)
 	@Timed
@@ -174,26 +170,35 @@ public class ItemWiseSaleResource {
 	}
 
 	
-	private List<InventoryVoucherDetailDTO> getFilterData(String sort, String order, String categoryPids,
-			String groupPids, VoucherType voucherType, String documentPid, LocalDate fDate, LocalDate tDate,
-			String stockLocations, String profilePids, String employeePids, boolean inclSubordinate,
+	private List<InventoryVoucherDetailDTO> getFilterData(
+			String sort, String order, String categoryPids,
+			String groupPids, VoucherType voucherType,
+			String documentPid, LocalDate fDate, LocalDate tDate,
+			String stockLocations, String profilePids,
+			String employeePids, boolean inclSubordinate,
 			String accountPids, String terittoryPids) {
+		log.debug("Enter : "+ "getFilterData() : ");
+
+		Company company =
+				companyRepository
+						.findOne(SecurityUtils.getCurrentUsersCompanyId());
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
+
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOList = new ArrayList<>();
-		List<ProductGroupProduct> productProfilesProductGroup = productGroupProductRepository.findAllByCompanyId();
-		List<LocationAccountProfile> LocationAccountProfile = locationAccountProfileRepository.findAllByCompanyId();
+		List<ProductGroupProduct> productProfilesProductGroup =
+				productGroupProductRepository.findAllByCompanyId();
+		List<LocationAccountProfile> LocationAccountProfile =
+				locationAccountProfileRepository.findAllByCompanyId();
 		System.out.println(productProfilesProductGroup.size());
 
 		List<String> stockLocationPids = new ArrayList<>();
 		List<String> productCategoryPids = new ArrayList<>();
 		List<String> productGroupPids = new ArrayList<>();
-		
-		
-		
+
 		List<String> productProfilePids = new ArrayList<>();
 		List<String> productTerritoryPids = new ArrayList<>();
 		List<String> documentPids = new ArrayList<>();
@@ -206,76 +211,100 @@ public class ItemWiseSaleResource {
 		productCategoryPids = categoryPids != "" ? Arrays.asList(categoryPids.split(",")) : productCategoryPids;
 		productGroupPids = groupPids != "" ? Arrays.asList(groupPids.split(",")) : productGroupPids;
 		productProfilePids = profilePids != "" ? Arrays.asList(profilePids.split(",")) : productProfilePids;
-		productTerritoryPids = !terittoryPids.equals("-1") ? Arrays.asList(terittoryPids)
-				: locationRepository.findAllPidsByCompany();
-		System.out.println(	productTerritoryPids);
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "AP_QUERY_146" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all pids by company";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		accountPidList = !accountPids.equals("-1") ? Arrays.asList(accountPids)
-				: accountProfileRepository.findAllPidsByCompany();
 
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		productTerritoryPids =
+				!terittoryPids.equals("-1")
+				? Arrays.asList(terittoryPids)
+						: locationRepository.findAllPidsByCompany();
+
+		accountPidList = getAccountPidList(accountPids);
 
 		if (documentPid.equals("no")) {
-			List<DocumentDTO> documentDTOs = primarySecondaryDocumentService
-					.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
+			log.debug("Conditon - TRUE : "+ "documentPid.equals(no) : "+ documentPid );
+			List<DocumentDTO> documentDTOs =
+					primarySecondaryDocumentService
+							.findAllDocumentsByCompanyIdAndVoucherType(voucherType);
 
 			for (DocumentDTO documentDTO : documentDTOs) {
+				log.debug("Conditon - FALSE  : " + "documentPid.equals(no) : "+ documentPids );
 				documentPids.add(documentDTO.getPid());
 			}
 		} else {
 			documentPids = Arrays.asList(documentPid.split(","));
 		}
 
+		log.debug("Enter : " + "if(inclSubordinate && employeePidList.size() == 1)" );
 		if (inclSubordinate && employeePidList.size() == 1) {
-			List<Long> employeeIds = employeeHierarchyService.getEmployeeSubordinateEmployeeIds(employeePidList.get(0));
-			employeePidList = employeeProfileRepository.findEmployeeByIdsIn(employeeIds);
-		}
 
-		inventoryVoucherDetailDTOs = inventoryVoucherDetailCustomRepository.getInventoryDetailListBy(
-				productCategoryPids, productGroupPids, productProfilePids, stockLocationPids, fromDate, toDate,
-				documentPids, productTerritoryPids, employeePidList, status, accountPidList);
+			List<Long> employeeIds =
+					employeeHierarchyService
+							.getEmployeeSubordinateEmployeeIds(employeePidList.get(0));
+
+			employeePidList =
+					employeeProfileRepository
+							.findEmployeeByIdsIn(employeeIds);
+		}
+		log.debug("Exit : "+ "if (inclSubordinate && employeePidList.size() == 1)" );
+		log.debug("========================================================================================================");
+		log.debug("Enter : "+ "inventoryVoucherDetailCustomRepository.getInventoryDetailListBy() : Start : " + LocalDateTime.now());
+    log.debug("Start New query At : " + LocalDateTime.now());
+
+		inventoryVoucherDetailDTOs =
+				inventoryVoucherDetailCustomRepository
+						.getInventoryDetailListByItemWiseSaleResourceOptmised(
+								company.getId(), productCategoryPids, productGroupPids,
+								productProfilePids, stockLocationPids, fromDate, toDate,
+								documentPids, productTerritoryPids, employeePidList,
+								status, accountPidList);
+		log.debug("End New query At At : " + LocalDateTime.now());
+		log.debug("Exit  : "+ "inventoryVoucherDetailCustomRepository.getInventoryDetailListBy() ");
+		log.debug("========================================================================================================");
+
+
+//
+//		log.debug("--------------------------------------------------------------------------------------------------------------------");
+//		log.debug("ENTER : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start Old Query At : " + LocalDateTime.now());
+//		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOsold = new ArrayList<>();
+//		inventoryVoucherDetailDTOsold =
+//				inventoryVoucherDetailCustomRepository
+//						.getInventoryDetailListBy( productCategoryPids, productGroupPids,
+//								productProfilePids, stockLocationPids, fromDate, toDate,
+//								documentPids, productTerritoryPids, employeePidList,
+//								status, accountPidList);
+//		log.debug("EXIT  : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start Old Query At : " + LocalDateTime.now());
+//		log.debug("--------------------------------------------------------------------------------------------------------------------");
 		
 		for(InventoryVoucherDetailDTO inventoryVoucherDTO : inventoryVoucherDetailDTOs) {
+
 			List<String> productGroups = new ArrayList();
-			List<ProductGroupProduct> optProductGroupProductList = productProfilesProductGroup.stream().filter(p -> p.getProduct().getPid().equals(inventoryVoucherDTO.getProductPid())).collect(Collectors.toList());
+
+			List<ProductGroupProduct> optProductGroupProductList =
+					productProfilesProductGroup
+							.stream()
+							.filter(p -> p.getProduct().getPid()
+							.equals(inventoryVoucherDTO.getProductPid()))
+							.collect(Collectors.toList());
 			
-			Optional<LocationAccountProfile> LocationAccountProfileOp = LocationAccountProfile.stream().
-				    filter(a->a.getAccountProfile().getPid().equals(inventoryVoucherDTO.getAccountPid())).findAny();
+			Optional<LocationAccountProfile> LocationAccountProfileOp =
+					LocationAccountProfile
+							.stream()
+							.filter(a->a.getAccountProfile().getPid()
+									.equals(inventoryVoucherDTO.getAccountPid()))
+							.findAny();
 		
 			if(LocationAccountProfileOp.isPresent()) {
-			
-				LocationAccountProfile locationAccountProfile = LocationAccountProfileOp.get();
+				LocationAccountProfile locationAccountProfile =
+						LocationAccountProfileOp.get();
 				inventoryVoucherDTO.setTerritory(locationAccountProfile.getLocation().getName());
 			}
 			
 			
-			Optional<ProductGroupProduct> optProductGroupProduct = productProfilesProductGroup.stream().filter(p -> p.getProduct().getPid().equals(inventoryVoucherDTO.getProductPid())).findAny();
+			Optional<ProductGroupProduct> optProductGroupProduct =
+					productProfilesProductGroup
+							.stream()
+							.filter(p -> p.getProduct().getPid()
+									.equals(inventoryVoucherDTO.getProductPid()))
+							.findAny();
 	         
 			if(!optProductGroupProductList.isEmpty()) {
 				for(ProductGroupProduct productGroupProduct : optProductGroupProductList) {
@@ -285,17 +314,37 @@ public class ItemWiseSaleResource {
 			}
 			
 			if(optProductGroupProduct.isPresent()) {
-				
 				ProductGroupProduct productGroupProduct = optProductGroupProduct.get();
 				inventoryVoucherDTO.setProductGroup(productGroupProduct.getProductGroup().getName());
 			}
 			inventoryVoucherDetailDTOList.add(inventoryVoucherDTO);
 		}
-
 		return filterBySortAndOrder(sort, order, inventoryVoucherDetailDTOList);
 	}
 
-	private List<InventoryVoucherDetailDTO> filterBySortAndOrder(String sort, String order,
+
+	private List<String> getAccountPidList(String accountPids) {
+		List<String> accountPidList;
+		String AP_QUERY_146_ID = "AP_QUERY_146" + "_"
+				+ SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+
+		String AP_QUERY_146_DESCRIPTION ="get all pids by company";
+
+		QueryTime ap146 =  queryRunStatusIntialize(
+				AP_QUERY_146_ID,AP_QUERY_146_DESCRIPTION);
+
+		accountPidList = !accountPids.equals("-1") ? Arrays.asList(accountPids)
+				: accountProfileRepository.findAllPidsByCompany();
+
+		queryRunStatus(
+				AP_QUERY_146_ID,AP_QUERY_146_DESCRIPTION,
+				ap146.getStartLCTime(),ap146.getStartTime());
+		return accountPidList;
+	}
+
+
+	private List<InventoryVoucherDetailDTO> filterBySortAndOrder(
+			String sort, String order,
 			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs) {
 
 		if (sort.equals("date")) {
@@ -328,6 +377,43 @@ public class ItemWiseSaleResource {
 			}
 		}
 		return inventoryVoucherDetailDTOs;
+	}
+
+	private QueryTime queryRunStatusIntialize(String id, String description) {
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		QueryTime queryTime = new QueryTime(startLCTime,startTime,startDate);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+		return queryTime;
+	}
+
+
+	private void queryRunStatus(String id, String description, LocalDateTime startLCTime, String startTime) {
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 	}
 
 }

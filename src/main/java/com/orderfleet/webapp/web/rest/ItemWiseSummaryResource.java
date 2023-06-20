@@ -17,6 +17,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.repository.CompanyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -81,6 +83,10 @@ public class ItemWiseSummaryResource {
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
 
+	@Inject
+	private CompanyRepository companyRepository;
+
+
 	@RequestMapping(value = "/item-wise-summary", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -142,9 +148,16 @@ public class ItemWiseSummaryResource {
 
 	}
 
-	private List<InventoryVoucherDetailDTO> getFilterData(String sort, String order, String categoryPids,
-			String groupPids, VoucherType voucherType, String documentPid, LocalDate fDate, LocalDate tDate,
-			String stockLocations, String profilePids, String territoryPids, String status) {
+	private List<InventoryVoucherDetailDTO> getFilterData(
+			String sort, String order, String categoryPids,
+			String groupPids, VoucherType voucherType,
+			String documentPid, LocalDate fDate, LocalDate tDate,
+			String stockLocations, String profilePids,
+			String territoryPids, String status) {
+
+		Company company =
+				companyRepository
+						.findOne(SecurityUtils.getCurrentUsersCompanyId());
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
@@ -177,9 +190,35 @@ public class ItemWiseSummaryResource {
 			documentPids = Arrays.asList(documentPid.split(","));
 		}
 
-		inventoryVoucherDetailDTOs = inventoryVoucherDetailCustomRepository.getInventoryDetailListBy(
-				productCategoryPids, productGroupPids, productProfilePids, stockLocationPids, fromDate, toDate,
-				documentPids, productTerritoryPids, employeePids, status, accountPids);
+		log.debug("dicumentPids : "+ documentPids );
+		log.debug("accountPids : "+ accountPids );
+
+		log.debug("=========================================================================================================");
+		log.debug("Enter  : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start New Query At : " + LocalDateTime.now());
+		inventoryVoucherDetailDTOs =
+				inventoryVoucherDetailCustomRepository
+						.getInventoryDetailListByItemWiseSummaryResourceOptmised(
+				company.getId(), productCategoryPids, productGroupPids,
+				productProfilePids, stockLocationPids, fromDate, toDate,
+				documentPids, productTerritoryPids, employeePids, status,
+				accountPids);
+		log.debug("Exit  : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start New Query At : " + LocalDateTime.now());
+		log.debug("==========================================================================================================");
+
+
+
+//		log.debug("--------------------------------------------------------------------------------------------------------------------");
+
+//		log.debug("Enter  : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start Old Query At : " + LocalDateTime.now());
+//		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOsold = new ArrayList<>();
+//		inventoryVoucherDetailDTOsold =
+//				inventoryVoucherDetailCustomRepository
+//						.getInventoryDetailListBy( productCategoryPids, productGroupPids,
+//								productProfilePids, stockLocationPids, fromDate, toDate,
+//								documentPids, productTerritoryPids, employeePids,
+//								status, accountPids);
+//		log.debug("Exit  : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start Old Query At : " + LocalDateTime.now());
+//		log.debug("--------------------------------------------------------------------------------------------------------------------");
 
 		return filterByCumulative(filterBySortAndOrder(sort, order, inventoryVoucherDetailDTOs));
 	}
@@ -220,6 +259,7 @@ public class ItemWiseSummaryResource {
 
 	}
 
+
 	private List<InventoryVoucherDetailDTO> filterByCumulative(
 			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs) {
   boolean companyconfig=getCompanyCofig();
@@ -247,8 +287,15 @@ public class ItemWiseSummaryResource {
 
 		return ivdDTOs;
 	}
+
+
 	public boolean getCompanyCofig(){
-		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
+		Optional<CompanyConfiguration> optconfig =
+				companyConfigurationRepository
+						.findByCompanyIdAndName(
+								SecurityUtils.getCurrentUsersCompanyId(),
+								CompanyConfig.DESCRIPTION_TO_NAME);
+
 		if(optconfig.isPresent()) {
 		if(Boolean.valueOf(optconfig.get().getValue())) {
 		return true;

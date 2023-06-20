@@ -13,27 +13,40 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import com.orderfleet.webapp.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.orderfleet.webapp.domain.ProductGroup;
 import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.enums.AccountTypeColumn;
 import com.orderfleet.webapp.domain.enums.SalesOrderStatus;
-import com.orderfleet.webapp.repository.ProductGroupRepository;
-import com.orderfleet.webapp.repository.ProductProfileRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 
 @Component
 public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVoucherDetailCustomRepository {
 
+	private final Logger log = LoggerFactory.getLogger(InventoryVoucherDetailCustomRepositoryImpl.class);
+
 	@PersistenceContext
 	private EntityManager entityManager;
 	
 	@Inject
 	private ProductGroupRepository productGroupRepository;
-	
 
+	@Inject
+	private ProductGroupProductRepository productGroupProductRepository;
+
+	@Inject
+	private LocationAccountProfileRepository locationAccountProfileRepository;
+
+	@Inject
+	private InventoryVoucherDetailRepository inventoryVoucherDetailRepository;
+	
 
 
 	@Override
@@ -44,9 +57,6 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 
 		Map<String, List<String>> queryParameters = new HashMap<>();
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
-
-//		
-//		System.out.println("productProfiel"+productProfiles.size());
 		
 		StringBuilder subQueryString = new StringBuilder("select " + "ivd.inventoryVoucherHeader.createdDate,"
 				+ "ivd.inventoryVoucherHeader.employee.name," + "ivd.inventoryVoucherHeader.documentNumberServer,"
@@ -122,8 +132,12 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 		typedQuery.setParameter("companyId", companyId);
 		typedQuery.setParameter("fromDate", fromDate);
 		typedQuery.setParameter("toDate", toDate);
+
+		log.debug( "Enter : typedQuery.getResultList() " + LocalDateTime.now());
 		List<Object[]> objectArray = typedQuery.getResultList();
-		System.out.println("querycompleted"+objectArray.size());
+		log.debug( "Exit : typedQuery.getResultList() " + LocalDateTime.now());
+
+		log.debug("Enter : for(Object[] object : objectArray) { } ");
 		for (Object[] object : objectArray) { 
 			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
 			ivd.setCreatedDate((LocalDateTime) object[0]);
@@ -161,6 +175,325 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			ivd.setSalesOrderStatus(SalesOrderStatus.valueOf(object[19].toString()));
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
+		log.debug("Exit : for(Object[] object : objectArray) { } - " + inventoryVoucherDetailDTOs.size());
 		return inventoryVoucherDetailDTOs;
 	}
+
+
+	@Override
+	public List<InventoryVoucherDetailDTO> getInventoryDetailListByItemWiseSalesJonarinOptmised(
+			Long companyid,List<String> productCategoryPids, List<String> productGroupPids,
+			List<String> productProfilePids, List<String> stockLocationPids, LocalDateTime fromDate,
+			LocalDateTime toDate, List<String> documentPids, List<String> productTerritoryPids,
+			List<String> employeePids, String status, List<String> accountPids) {
+
+		log.debug("Enter : InventoryVoucherDetailCustomRepositoryImpl.getInventoryDetailListBy()");
+
+		Map<String, List<String>> queryParameters = new HashMap<>();
+		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
+
+		log.debug("Enter : ProductPids : " +  productGroupPids.size());
+
+		List<String>  ProductPids =
+				productGroupProductRepository
+						.findProductPidsByProductGroupPidIn(productGroupPids);
+
+		log.debug("Exit : ProductPids : "+ ProductPids.size());
+
+		log.debug("Enter : productaTerrotoryccountPids : " + productTerritoryPids.size());
+
+		List<String> productaTerrotoryccountPids =
+				locationAccountProfileRepository
+						.findAccountProfilePidByLocationPidIn(productTerritoryPids);
+
+		log.debug("Exit : productaTerrotoryccountPids  : " + productaTerrotoryccountPids.size());
+		log.debug("Enter : objectArray ");
+
+		log.debug( "Enter :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
+		List<Object[]> objectArray =
+				inventoryVoucherDetailRepository.getInventoryDetailList(
+						companyid,fromDate,toDate,ProductPids,
+						documentPids,productaTerrotoryccountPids,
+						employeePids,accountPids);
+		log.debug( "Exit :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
+
+		log.debug("Exit : ProductPids : "+ ProductPids.size());
+
+		log.debug("Enter : for(Object[] object : objectArray){}");
+		for (Object[] object : objectArray) {
+			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
+			ivd.setCreatedDate((LocalDateTime) object[0]);
+			ivd.setEmployeeName((String) object[1]);
+			ivd.setOderID((String) object[2]);
+			ivd.setAccountName((String) object[3]);
+			ivd.setSupplierAccountName((String) object[4]);
+			ivd.setProductCategory((String) object[5]);
+			ivd.setProductName((String) object[6]);
+			ivd.setQuantity((double) object[7]);
+			ivd.setSellingRate((double) object[8]);
+			ivd.setRowTotal((double) object[9]);
+
+			ivd.setProductPid((String) object[10]);
+			if (!stockLocationPids.isEmpty()) {
+				ivd.setSourceStockLocationName((String) object[13]);
+				ivd.setDestinationStockLocationName((String) object[14]);
+			}
+
+			ivd.setProductUnitQty(object[11] != null ? Double.valueOf(object[11].toString()) : 1);
+			double volume=Double.valueOf(object[12].toString());
+			ivd.setVolume(volume);
+			ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
+
+			if (AccountTypeColumn.valueOf(object[15].toString()).equals(AccountTypeColumn.Supplier)) {
+				ivd.setCustomerLocation(object[14] != null ? object[14].toString() : "");
+			}
+			ivd.setProductDescription((String) object[16]);
+			ivd.setAccountPid((String) object[17]);
+
+			if(object[18] != null){
+				LocalDate deliveryDateLocal = (LocalDate) object[18];
+				LocalDateTime deliveryDate = deliveryDateLocal.atTime(0, 0);
+				ivd.setDeliveryDate(deliveryDate);
+			}
+			ivd.setSalesOrderStatus(SalesOrderStatus.valueOf(object[19].toString()));
+
+			inventoryVoucherDetailDTOs.add(ivd);
+		}
+		log.debug("Exit : for(Object[] object : objectArray) { }");
+		return inventoryVoucherDetailDTOs;
+	}
+
+
+	@Override
+	public List<InventoryVoucherDetailDTO> getInventoryDetailListByItemSummaryEmployeeWiseResourceOptmised(
+			Long companyid, List<String> productCategoryPids, List<String> productGroupPids,
+			List<String> productProfilePids, List<String> stockLocationPids, LocalDateTime fromDate,
+			LocalDateTime toDate, List<String> documentPids, List<String> productTerritoryPids,
+			List<String> employeePids, String status, List<String> accountPids) {
+
+		log.debug("Enter : InventoryVoucherDetailCustomRepositoryImpl.getInventoryDetailListBy()");
+
+		Map<String, List<String>> queryParameters = new HashMap<>();
+		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
+		List<String>  ProductPids ;
+		List<String> productaTerrotoryccountPids;
+
+//		if(productGroupPids != null){
+//			log.debug("Enter : ProductPids : " +  productGroupPids.size());
+//			ProductPids =  productGroupProductRepository
+//					.findProductPidsByProductGroupPidIn(productGroupPids);
+//			log.debug("Exit : ProductPids : "+ ProductPids.size());
+//		}
+//
+//		if (productTerritoryPids != null) {
+//			log.debug("Enter : productaTerrotoryccountPids : " + productTerritoryPids.size());
+//			productaTerrotoryccountPids = locationAccountProfileRepository
+//					.findAccountProfilePidByLocationPidIn(productTerritoryPids);
+//			log.debug("Exit : productaTerrotoryccountPids  : " + productaTerrotoryccountPids.size());
+//		}
+
+		log.debug( "Enter :  inventoryVoucherDetailRepository.getInventoryDetailListsummery" + LocalDateTime.now());
+		List<Object[]> objectArray = inventoryVoucherDetailRepository.getInventoryDetailListsummery(
+				companyid,fromDate,toDate,documentPids,
+				employeePids,accountPids);
+		log.debug( "Exit :  inventoryVoucherDetailRepository.getInventoryDetailListsummery" + LocalDateTime.now());
+
+		log.debug("Enter : for(Object[] object : objectArray){}");
+		for (Object[] object : objectArray) {
+			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
+			ivd.setCreatedDate((LocalDateTime) object[0]);
+			ivd.setEmployeeName((String) object[1]);
+			ivd.setOderID((String) object[2]);
+			ivd.setAccountName((String) object[3]);
+			ivd.setSupplierAccountName((String) object[4]);
+			ivd.setProductCategory((String) object[5]);
+			ivd.setProductName((String) object[6]);
+			ivd.setQuantity((double) object[7]);
+			ivd.setSellingRate((double) object[8]);
+			ivd.setRowTotal((double) object[9]);
+			ivd.setProductPid((String) object[10]);
+
+			if (!stockLocationPids.isEmpty()) {
+				ivd.setSourceStockLocationName((String) object[13]);
+				ivd.setDestinationStockLocationName((String) object[14]);
+			}
+
+			ivd.setProductUnitQty(object[11] != null ? Double.valueOf(object[11].toString()) : 1);
+
+			double volume=Double.valueOf(object[12].toString());
+			ivd.setVolume(volume);
+
+			ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
+
+			if (AccountTypeColumn.valueOf(object[15].toString()).equals(AccountTypeColumn.Supplier)) {
+				ivd.setCustomerLocation(object[14] != null ? object[14].toString() : "");
+			}
+
+			ivd.setProductDescription((String) object[16]);
+			ivd.setAccountPid((String) object[17]);
+
+			if(object[18] != null){
+				LocalDate deliveryDateLocal = (LocalDate) object[18];
+				LocalDateTime deliveryDate = deliveryDateLocal.atTime(0, 0);
+				ivd.setDeliveryDate(deliveryDate);
+			}
+			ivd.setSalesOrderStatus(SalesOrderStatus.valueOf(object[19].toString()));
+
+			inventoryVoucherDetailDTOs.add(ivd);
+		}
+		log.debug("Exit : for(Object[] object : objectArray) { } - " + inventoryVoucherDetailDTOs.size());
+		return inventoryVoucherDetailDTOs;
+	}
+
+
+	@Override
+	public List<InventoryVoucherDetailDTO> getInventoryDetailListByItemWiseSaleResourceOptmised(
+			Long companyid, List<String> productCategoryPids, List<String> productGroupPids,
+			List<String> productProfilePids, List<String> stockLocationPids, LocalDateTime fromDate,
+			LocalDateTime toDate, List<String> documentPids, List<String> productTerritoryPids,
+			List<String> employeePids, String status, List<String> accountPids) {
+		log.debug("Enter : InventoryVoucherDetailCustomRepositoryImpl.getInventoryDetailListByItemWiseSaleResourceOptmised");
+
+		Map<String, List<String>> queryParameters = new HashMap<>();
+		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
+
+		log.debug("Enter : ProductPids : " +  productGroupPids.size());
+		List<String>  ProductPids =  productGroupProductRepository
+				.findProductPidsByProductGroupPidIn(productGroupPids);
+		log.debug("Exit : ProductPids : "+ ProductPids.size());
+
+		log.debug("Enter : productaTerrotoryccountPids : " + productTerritoryPids.size());
+		List<String> productaTerrotoryccountPids = locationAccountProfileRepository
+				.findAccountProfilePidByLocationPidIn(productTerritoryPids);
+		log.debug("Exit : productaTerrotoryccountPids  : " + productaTerrotoryccountPids.size());
+
+
+		log.debug( "Enter :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
+		List<Object[]> objectArray = inventoryVoucherDetailRepository.getInventoryDetailList(
+				companyid,fromDate,toDate,ProductPids, documentPids,productaTerrotoryccountPids,
+				employeePids,accountPids);
+		log.debug( "Exit :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
+
+		log.debug("Enter : for(Object[] object : objectArray){}");
+		for (Object[] object : objectArray) {
+			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
+			ivd.setCreatedDate((LocalDateTime) object[0]);
+			ivd.setEmployeeName((String) object[1]);
+			ivd.setOderID((String) object[2]);
+			ivd.setAccountName((String) object[3]);
+			ivd.setSupplierAccountName((String) object[4]);
+			ivd.setProductCategory((String) object[5]);
+			ivd.setProductName((String) object[6]);
+			ivd.setQuantity((double) object[7]);
+			ivd.setSellingRate((double) object[8]);
+			ivd.setRowTotal((double) object[9]);
+			ivd.setProductPid((String) object[10]);
+
+			if (!stockLocationPids.isEmpty()) {
+				ivd.setSourceStockLocationName((String) object[13]);
+				ivd.setDestinationStockLocationName((String) object[14]);
+			}
+
+			ivd.setProductUnitQty(object[11] != null ? Double.valueOf(object[11].toString()) : 1);
+
+			double volume=Double.valueOf(object[12].toString());
+			ivd.setVolume(volume);
+
+			ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
+
+			if (AccountTypeColumn.valueOf(object[15].toString()).equals(AccountTypeColumn.Supplier)) {
+				ivd.setCustomerLocation(object[14] != null ? object[14].toString() : "");
+			}
+
+			ivd.setProductDescription((String) object[16]);
+			ivd.setAccountPid((String) object[17]);
+
+			if(object[18] != null){
+				LocalDate deliveryDateLocal = (LocalDate) object[18];
+				LocalDateTime deliveryDate = deliveryDateLocal.atTime(0, 0);
+				ivd.setDeliveryDate(deliveryDate);
+			}
+			ivd.setSalesOrderStatus(SalesOrderStatus.valueOf(object[19].toString()));
+
+			inventoryVoucherDetailDTOs.add(ivd);
+		}
+		log.debug("Exit : for(Object[] object : objectArray) { } - " + inventoryVoucherDetailDTOs.size());
+		return inventoryVoucherDetailDTOs;
+	}
+
+
+	@Override
+	public List<InventoryVoucherDetailDTO> getInventoryDetailListByItemWiseSummaryResourceOptmised(
+			Long companyid, List<String> productCategoryPids, List<String> productGroupPids,
+			List<String> productProfilePids, List<String> stockLocationPids, LocalDateTime fromDate,
+			LocalDateTime toDate, List<String> documentPids, List<String> productTerritoryPids,
+			List<String> employeePids, String status, List<String> accountPids) {
+
+		log.debug("Enter : InventoryVoucherDetailCustomRepositoryImpl.getInventoryDetailListBy()");
+
+		Map<String, List<String>> queryParameters = new HashMap<>();
+		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
+
+//		log.debug("Enter : ProductPids : " +  productGroupPids.size());
+//		List<String>  ProductPids =  productGroupProductRepository
+//				.findProductPidsByProductGroupPidIn(productGroupPids);
+//		log.debug("Exit : ProductPids : "+ ProductPids.size());
+
+//		log.debug("Enter : productaTerrotoryccountPids : " + productTerritoryPids.size());
+//		List<String> productaTerrotoryccountPids = locationAccountProfileRepository
+//				.findAccountProfilePidByLocationPidIn(productTerritoryPids);
+//		log.debug("Exit : productaTerrotoryccountPids  : " + productaTerrotoryccountPids.size());
+
+		log.debug( "Enter :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
+		List<Object[]> objectArray = inventoryVoucherDetailRepository.getInventoryDetailListsummeryitemwise(
+				companyid,fromDate,toDate,documentPids);
+		log.debug( "Exit :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
+
+		log.debug("Enter : for(Object[] object : objectArray){}");
+		for (Object[] object : objectArray) {
+			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
+			ivd.setCreatedDate((LocalDateTime) object[0]);
+			ivd.setEmployeeName((String) object[1]);
+			ivd.setOderID((String) object[2]);
+			ivd.setAccountName((String) object[3]);
+			ivd.setSupplierAccountName((String) object[4]);
+			ivd.setProductCategory((String) object[5]);
+			ivd.setProductName((String) object[6]);
+			ivd.setQuantity((double) object[7]);
+			ivd.setSellingRate((double) object[8]);
+			ivd.setRowTotal((double) object[9]);
+			ivd.setProductPid((String) object[10]);
+
+			if (!stockLocationPids.isEmpty()) {
+				ivd.setSourceStockLocationName((String) object[13]);
+				ivd.setDestinationStockLocationName((String) object[14]);
+			}
+
+			ivd.setProductUnitQty(object[11] != null ? Double.valueOf(object[11].toString()) : 1);
+
+			double volume=Double.valueOf(object[12].toString());
+			ivd.setVolume(volume);
+
+			ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
+
+			if (AccountTypeColumn.valueOf(object[15].toString()).equals(AccountTypeColumn.Supplier)) {
+				ivd.setCustomerLocation(object[14] != null ? object[14].toString() : "");
+			}
+
+			ivd.setProductDescription((String) object[16]);
+			ivd.setAccountPid((String) object[17]);
+
+			if(object[18] != null){
+				LocalDate deliveryDateLocal = (LocalDate) object[18];
+				LocalDateTime deliveryDate = deliveryDateLocal.atTime(0, 0);
+				ivd.setDeliveryDate(deliveryDate);
+			}
+			ivd.setSalesOrderStatus(SalesOrderStatus.valueOf(object[19].toString()));
+
+			inventoryVoucherDetailDTOs.add(ivd);
+		}
+		log.debug("Exit : for(Object[] object : objectArray) { } : " + inventoryVoucherDetailDTOs.size() );
+		return inventoryVoucherDetailDTOs;
+	}
+
 }

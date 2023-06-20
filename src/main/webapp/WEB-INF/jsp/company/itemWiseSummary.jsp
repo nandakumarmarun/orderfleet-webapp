@@ -28,9 +28,11 @@
 			<form class="form-group">
 				<div class="col-md-12">
 					<div class="input-group col-md-4" style="float: left;">
-						<span class="input-group-addon btn btn-default"
-							onclick="$(this).next('input').val('');$('#ofModalSearch').modal('show', {backdrop: 'static'});"><i
-							class="glyphicon glyphicon-filter"></i></span> <input type="text"
+						<!-- <span class="input-group-addon btn btn-default"
+                        							onclick="$(this).next('input').val('');$('#ofModalSearch').modal('show', {backdrop: 'static'});"><i
+                        							class="glyphicon glyphicon-filter"></i></span> -->
+
+							<input type="text"
 							class="form-control" placeholder="Search" id="search"
 							style="width: 200px;" />
 						<button id="btnSearch" class="btn btn-info" type="button">Search</button>
