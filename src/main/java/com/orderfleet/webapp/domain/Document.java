@@ -70,6 +70,8 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "terms_and_conditions", length = 15000)
 	private String termsAndConditions;
 
+	@Column(name = "pdf_body_content", length = 15000)
+	private String pdfBodyContent;
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "document_type", nullable = false)
@@ -408,6 +410,8 @@ public class Document implements Serializable, Cloneable {
 		return rateWithTax;
 	}
 
+
+
 	public void setRateWithTax(boolean rateWithTax) {
 		this.rateWithTax = rateWithTax;
 	}
@@ -464,6 +468,14 @@ public class Document implements Serializable, Cloneable {
 
 	public void setPreventNegativeStock(boolean preventNegativeStock) {
 		this.preventNegativeStock = preventNegativeStock;
+	}
+
+	public String getPdfBodyContent() {
+		return pdfBodyContent;
+	}
+
+	public void setPdfBodyContent(String pdfBodyContent) {
+		this.pdfBodyContent = pdfBodyContent;
 	}
 
 	public boolean getEnableHeaderPrintOut() {

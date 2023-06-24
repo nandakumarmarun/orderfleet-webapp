@@ -21,6 +21,7 @@ if (!this.Document) {
 		activityAccount : null,
 		description : null,
 		termsAndConditions : null,
+		pdfBodyContent : null,
 		discountPercentage : null,
 		save : true,
 		editable : true,
@@ -193,6 +194,7 @@ if (!this.Document) {
 		documentModel.description = $('#field_description').val();
 		documentModel.termsAndConditions = $('#field_terms_and_conditions')
 				.val();
+		documentModel.pdfBodyContent = $('#field_pdfBodyContent').val();
 		documentModel.discountPercentage =$('#field_discountPercent').val();
 		documentModel.documentType = $('#field_documentType').val();
 		documentModel.activityAccount = $('#field_activityAccount').val();
@@ -292,6 +294,9 @@ if (!this.Document) {
 				$('#lbl_terms_and_conditions').text(
 						(data.termsAndConditions == null ? ""
 								: data.termsAndConditions));
+		        $('#lbl_pdfBodyContent').text(
+        						(data.pdfBodyContent == null ? ""
+        								: data.pdfBodyContent));
 				$('#lbl_discountPercent').text(
 						(data.discountPercentage == null ? ""
 								: data.discountPercentage));
@@ -324,6 +329,10 @@ if (!this.Document) {
 						$('#field_terms_and_conditions').val(
 								(data.termsAndConditions == null ? ""
 										: data.termsAndConditions));
+						$('#field_pdfBodyContent').val(
+                				(data.pdfBodyContent == null ? ""
+                					: data.pdfBodyContent));
+
 						$('#field_discountPercent').val(
 								(data.discountPercentage == null ? ""
 										: data.discountPercentage));

@@ -131,6 +131,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setAlias(documentDTO.getAlias());
 			document.setDescription(documentDTO.getDescription());
 			document.setTermsAndConditions(documentDTO.getTermsAndConditions());
+			document.setPdfBodyContent(documentDTO.getPdfBodyContent());
 			document.setDiscountPercentage(documentDTO.getDiscountPercentage());
 			document.setDocumentType(documentDTO.getDocumentType());
 			document.setActivityAccount(documentDTO.getActivityAccount());

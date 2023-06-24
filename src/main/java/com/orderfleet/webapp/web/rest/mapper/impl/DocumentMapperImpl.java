@@ -21,6 +21,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		DocumentDTO documentDTO = new DocumentDTO();
 
 		documentDTO.setTermsAndConditions(document.getTermsAndConditions());
+		documentDTO.setPdfBodyContent(document.getPdfBodyContent());
 		documentDTO.setTermsAndConditionsColumn(document.isTermsAndConditionsColumn());
 		documentDTO.setHasTelephonicOrder(document.getHasTelephonicOrder());
 		documentDTO.setPid(document.getPid());
@@ -71,6 +72,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		DocumentDTO documentDTO = new DocumentDTO();
 
 		documentDTO.setTermsAndConditions(document.getTermsAndConditions());
+		documentDTO.setPdfBodyContent(document.getPdfBodyContent());
 		documentDTO.setTermsAndConditionsColumn(document.isTermsAndConditionsColumn());
 		documentDTO.setHasTelephonicOrder(document.getHasTelephonicOrder());
 		documentDTO.setPid(document.getPid());
@@ -166,6 +168,7 @@ public class DocumentMapperImpl extends DocumentMapper {
 		document.setVoucherNumberGenerationType(documentDTO.getVoucherNumberGenerationType());
 		document.setAddNewCustomer(documentDTO.getAddNewCustomer());
 		document.setTermsAndConditions(documentDTO.getTermsAndConditions());
+		document.setPdfBodyContent(documentDTO.getPdfBodyContent());
 		document.setTermsAndConditionsColumn(documentDTO.isTermsAndConditionsColumn());
 		document.setHasTelephonicOrder(documentDTO.getHasTelephonicOrder());
 		document.setRateWithTax(documentDTO.getRateWithTax());

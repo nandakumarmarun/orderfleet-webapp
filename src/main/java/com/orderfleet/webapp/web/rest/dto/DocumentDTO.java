@@ -40,6 +40,8 @@ public class DocumentDTO implements Cloneable {
 
 	private String termsAndConditions;
 
+	private String pdfBodyContent;
+
 	private double discountPercentage;
 	
 	private DocumentType documentType;
@@ -128,6 +130,7 @@ public class DocumentDTO implements Cloneable {
 		this.alias = document.getAlias();
 		this.description = document.getDescription();
 		this.termsAndConditions = document.getTermsAndConditions();
+		this.pdfBodyContent = document.getPdfBodyContent();
 		this.discountPercentage =document.getDiscountPercentage();
 		this.documentType = document.getDocumentType();
 		this.activityAccount = document.getActivityAccount();
@@ -169,6 +172,7 @@ public class DocumentDTO implements Cloneable {
 		this.alias = document.getAlias();
 		this.description = document.getDescription();
 		this.termsAndConditions = document.getTermsAndConditions();
+		this.pdfBodyContent = document.getPdfBodyContent();
 		this.discountPercentage =document.getDiscountPercentage();
 		this.headerImage = document.getHeaderImage();
 		this.footerImage = document.getFooterImage();
@@ -332,6 +336,14 @@ public class DocumentDTO implements Cloneable {
 
 	public boolean getBatchEnabled() {
 		return batchEnabled;
+	}
+
+	public String getPdfBodyContent() {
+		return pdfBodyContent;
+	}
+
+	public void setPdfBodyContent(String pdfBodyContent) {
+		this.pdfBodyContent = pdfBodyContent;
 	}
 
 	public void setBatchEnabled(boolean batchEnabled) {

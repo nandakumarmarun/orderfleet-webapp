@@ -187,6 +187,12 @@
 											placeholder="Terms & Conditions"></textarea>
 									</div>
 									<div class="form-group">
+                                    	<label class="control-label" for="field_pdfBodyContent">Pdf Body Content</label>
+                                    	<textarea class="form-control" name="terms_and_conditions"
+                                    	id="field_pdfBodyContent"
+                                    	placeholder="Pdf Body Content"></textarea>
+                                    </div>
+									<div class="form-group">
 									<label class="control-label" for="field_discountPercent">Discount Percentage
 										</label> <input type="number" class="form-control" name="discountPercentage"
 										id="field_discountPercent"  max="10000"
@@ -393,6 +399,13 @@
 											<span id="lbl_terms_and_conditions"></span>
 										</dd>
 										<hr />
+										<dt>
+                                        <span>Pdf Body Content</span>
+                                        </dt>
+                                        <dd>
+                                        <span id="lbl_pdfBodyContent"></span>
+                                        </dd>
+                                        <hr />
 										<dt>
 											<span>Discount Percentage</span>
 											</dt>
