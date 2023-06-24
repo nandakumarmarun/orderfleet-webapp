@@ -394,15 +394,51 @@ public interface InventoryVoucherDetailRepository extends JpaRepository<Inventor
 			"  and ?3\n" +
 			"  and ivd.product.pid in ?4\n" +
 			"  and ivd.inventoryVoucherHeader.document.pid in ?5\n" +
-			"  and ivd.inventoryVoucherHeader.receiverAccount.pid in ?6\n" +
-			"  and ivd.inventoryVoucherHeader.employee.pid in ?7\n" +
-			"  and ivd.inventoryVoucherHeader.receiverAccount.pid in ?8\n";
+			"  and ivd.inventoryVoucherHeader.employee.pid in ?6\n" +
+			"  and ivd.inventoryVoucherHeader.receiverAccount.pid in ?7\n";
 
 	@Query(value = INVENTORY_DETAIL_LIST)
 	List<Object[]> getInventoryDetailList(
 			long companyId, LocalDateTime fromDate, LocalDateTime toDate, List<String> productProfilePids,
-			List<String> documentPids, List<String> productTerritoryaccountPid,
+			List<String> documentPids,
 			List<String> employeePids, List<String> accountPids);
+
+
+	public String INVENTORY_DETAIL_LIST_FILLTERD= "select \n" +
+			"  ivd.inventoryVoucherHeader.createdDate, \n" +
+			"  ivd.inventoryVoucherHeader.employee.name, \n" +
+			"  ivd.inventoryVoucherHeader.documentNumberServer, \n" +
+			"  ivd.inventoryVoucherHeader.receiverAccount.name, \n" +
+			"  ivd.inventoryVoucherHeader.supplierAccount.name, \n" +
+			"  ivd.product.productCategory.name, \n" +
+			"  ivd.product.name, \n" +
+			"  ivd.quantity, \n" +
+			"  ivd.sellingRate, \n" +
+			"  ivd.rowTotal, \n" +
+			"  ivd.product.pid, \n" +
+			"  ivd.product.unitQty, \n" +
+			"  ivd.volume, \n" +
+			"  ivd.inventoryVoucherHeader.receiverAccount.location, \n" +
+			"  ivd.inventoryVoucherHeader.supplierAccount.location, \n" +
+			"  ivd.inventoryVoucherHeader.document.activityAccount, \n" +
+			"  ivd.product.productDescription, \n" +
+			"  ivd.inventoryVoucherHeader.receiverAccount.pid, \n" +
+			"  ivd.inventoryVoucherHeader.deliveryDate, \n" +
+			"  ivd.inventoryVoucherHeader.salesOrderStatus, \n" +
+			"  ivd.product.compoundUnitQty \n" +
+			"from \n" +
+			"  InventoryVoucherDetail ivd \n" +
+			"where \n" +
+			"  ivd.inventoryVoucherHeader.company.id = ?1\n" +
+			"  and ivd.inventoryVoucherHeader.createdDate between ?2\n" +
+			"  and ?3\n" +
+			"  and ivd.product.pid in ?4\n" +
+			"  and ivd.inventoryVoucherHeader.document.pid in ?5\n" +
+			"  and ivd.inventoryVoucherHeader.employee.pid in ?6\n";
+	@Query(value = INVENTORY_DETAIL_LIST_FILLTERD)
+	List<Object[]> getInventoryDetailListFIlltered(
+			long companyId, LocalDateTime fromDate, LocalDateTime toDate, List<String> productProfilePids,
+			List<String> documentPids, List<String> employeePids);
 
 	public String INVENTORY_DETAILS_LIST_SUMMERY = "select \n" +
 			"  ivd.inventoryVoucherHeader.createdDate, \n" +

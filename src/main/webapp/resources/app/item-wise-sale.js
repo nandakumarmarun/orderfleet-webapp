@@ -16,6 +16,10 @@ if (!this.ItemWiseSale) {
 			loadAllDocumentByDocumentType();
 		});
 
+		$("#dbTerittory").change(function() {
+        	 onChangeTerritory();
+        });
+
 		$('#downloadXls').on('click', function() {
 			var tblItemWiseSale = $("#tblItemWiseSale tbody");
 			if (tblItemWiseSale.children().length == 0) {
@@ -64,6 +68,28 @@ if (!this.ItemWiseSale) {
 		});
 	}
 
+
+	function onChangeTerritory() {
+    		var territtoryPid = $('#dbTerittory').val();
+    		$.ajax({
+    			url : itemWiseSaleContextPath + "/getAccounts",
+    			method : 'GET',
+    			data : {
+                	terittoryPids : territtoryPid,
+                },
+    			success : function(accounts) {
+    			 console.log("location accounts : ",accounts.length)
+    				$("#dbAccount").html("<option value='-1'>All</option>")
+                				$.each(accounts, function(key, account) {
+                					$("#dbAccount").append("<option value='" + account[0] + "'>" + account[1] + "</option>");
+                				});
+    			},
+    			error : function(xhr, error) {
+    				onError(xhr, error);
+    			}
+    		});
+    	}
+
 	function loadAllDocumentByDocumentType() {
 		if ($('#dbDocumentType').val() == "no") {
 			$("#dbDocument").html("<option>All</option>");
@@ -95,6 +121,7 @@ if (!this.ItemWiseSale) {
 		var accountPids = $('#dbAccount').val();
 		var productGroupPids = $('#dbproductGroup').val();
 		var territtoryPids = $('#dbTerittory').val();
+		var accounts = [];
 
 		
 		$('#lblTotal').text("0");
@@ -115,9 +142,14 @@ if (!this.ItemWiseSale) {
 
 //		if ("-1" == accountPids) {
 //			accountPids = $('#dbAccount option').map(function() {
+//			    var value = $(this).val();
+//                accounts.push(value)
 //				return $(this).val();
-//			}).get().join(',');
+//			})
+//			console.log(accounts.length)
+//			console.log(accounts)
 //		}
+
 
 		if ("-1" == productGroupPids) {
 			productGroupPids = $('#dbproductGroup option').map(function() {
@@ -172,7 +204,7 @@ if (!this.ItemWiseSale) {
 				employeePid : empPids,
 				inclSubordinate : $('#inclSubOrdinates').is(":checked"),
 				profilePids : "",
-				accountPids : $("#dbAccount").val(),
+				accountPids : $('#dbAccount').val(),
 			},
 					success : function(itemWiseSales) {
 						$('#tBodyItemWiseSale').html("");

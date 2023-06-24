@@ -98,14 +98,27 @@
 							</div>
 
 							<div class="col-sm-2">
+                            	Territory <select id="dbTerittory" name="terittory"
+                            									class="form-control selectpicker"  data-live-search="true">
+                            									<option value="-1">All Terittories</option>
+                            									<c:forEach items="${territories}" var="locationAccountProfile">
+                            										<option value="${locationAccountProfile.pid}">${locationAccountProfile.name}</option>
+                            									</c:forEach>
+                            								</select>
+                            							</div>
+
+							<!--<div class="col-sm-2">
 								Account <select id="dbAccount" name="accountPid"
-									class="form-control selectpicker" data-live-search="true">
-									<option value="-1">All Account</option>
-									<c:forEach items="${accounts}" var="account">
-										<option value="${account.pid}">${account.name}</option>
-									</c:forEach>
+									class="form-control">
 								</select>
-							</div>
+							</div>-->
+
+							<div class="col-sm-2">
+                                Account <select id="dbAccount" name="accountPid"
+                            									class="form-control">
+                            									<option value="-1">All</option>
+                            								</select>
+                            							</div>
 							
 							<div class="col-sm-2">
 								ProductGroup <select id="dbproductGroup" name="productGroup"
@@ -117,15 +130,7 @@
 								</select>
 							</div>
 							
-							<div class="col-sm-2">
-								Territory <select id="dbTerittory" name="terittory"
-									class="form-control selectpicker" data-live-search="true">
-									<option value="-1">All Terittories</option>
-									<c:forEach items="${territories}" var="locationAccountProfile">
-										<option value="${locationAccountProfile.pid}">${locationAccountProfile.name}</option>
-									</c:forEach>
-								</select>
-							</div>
+
 							
 							<div class="col-sm-2">
 								Document Type <select id="dbDocumentType" name="documentType"

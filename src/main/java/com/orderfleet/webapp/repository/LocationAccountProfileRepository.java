@@ -46,6 +46,7 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id = ?#{principal.companyId}")
 	List<LocationAccountProfile> findAllByCompanyId();
 
+
 	List<LocationAccountProfile> findByLocationIn(List<Location> locations);
 
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location in  ?1 ")
@@ -270,5 +271,17 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	@Query("select locationAccountProfile.accountProfile.pid from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid in ?1 and locationAccountProfile.location.activated=true order by locationAccountProfile.accountProfile.name asc")
 	List<String> findAccountProfilePidByLocationPidIn(List<String> locationPids);
+
+	@Query("select locationAccountProfile.accountProfile.pid,locationAccountProfile.accountProfile.name from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid in ?1 and locationAccountProfile.location.activated=true order by locationAccountProfile.accountProfile.name asc")
+	List<Object[]> findAccountProfilePidByLocationPids(List<String> locationPids);
+
+	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid in ?1 and locationAccountProfile.location.activated=true order by locationAccountProfile.accountProfile.name asc")
+	List<LocationAccountProfile> findByLocationPids(List<String> locationPids);
+
+	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.company.id in ?1 and locationAccountProfile.location.activated=true order by locationAccountProfile.accountProfile.name asc")
+	List<LocationAccountProfile> findByCompanyID(long companyId);
+
+	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.accountProfile.pid in ?1 and locationAccountProfile.location.activated=true order by locationAccountProfile.accountProfile.name asc")
+	List<LocationAccountProfile> findByAccountPids(List<String> accountpids);
 
 }

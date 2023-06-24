@@ -197,12 +197,6 @@ public class ItemWiseSaleResourceJonarin {
 				productGroupProductRepository.findAllByCompanyId();
 
 		log.debug("Exit :  productGroupProductRepository.findAllByCompanyId() : " + productProfilesProductGroup.size());
-		log.debug("Enter :  locationAccountProfileRepository.findAllByCompanyId()");
-
-		List<LocationAccountProfile> LocationAccountProfile =
-				locationAccountProfileRepository.findAllByCompanyId();
-
-		log.debug("Exit :  locationAccountProfileRepository.findAllByCompanyId()" + LocationAccountProfile.size());
 
 		List<String> stockLocationPids = new ArrayList<>();
 		List<String> productCategoryPids = new ArrayList<>();
@@ -228,22 +222,11 @@ public class ItemWiseSaleResourceJonarin {
 		log.debug("productProfilePids  	 : " +  productProfilePids.size());
 		log.debug("productTerritoryPids  : " +  productTerritoryPids.size());
 
-		String AP_QUERY_146_ID = "AP_QUERY_146" + "_"
-				+ SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		List<LocationAccountProfile> LocationAccountProfiles = getLocationAccounts(accountPids,terittoryPids,company);
 
-		String AP_QUERY_146_DESCRIPTION ="get all pids by company";
+		accountPidList = getAccountPids(accountPids, terittoryPids, accountPidList, LocationAccountProfiles);
 
-		QueryTime ap146 =    queryRunStatusIntialize(
-				AP_QUERY_146_ID,AP_QUERY_146_DESCRIPTION);
-
-
-	   	accountPidList = !accountPids.equals("-1")
-					? Arrays.asList(accountPids)
-					: accountProfileRepository.findAllPidsByCompany();
-
-			 queryRunStatus(
-					 AP_QUERY_146_ID,AP_QUERY_146_DESCRIPTION,
-					 ap146.getStartLCTime(),ap146.getStartTime());
+		log.debug("productTerritoryPids : " + "  " + productTerritoryPids.size());
 
 			 log.debug("accountPidList : " +  accountPidList.size());
 			 log.debug("Enter : "+ "documentPid.equals(no) : ");
@@ -291,19 +274,6 @@ public class ItemWiseSaleResourceJonarin {
 		log.debug("========================================================================================================");
 
 
-//		log.debug("Enter  : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start Old Query At : " + LocalDateTime.now());
-//		log.debug("--------------------------------------------------------------------------------------------------------------------");
-//
-//		inventoryVoucherDetailDTOs =
-//				inventoryVoucherDetailCustomRepository
-//						.getInventoryDetailListBy( productCategoryPids, productGroupPids,
-//								productProfilePids, stockLocationPids, fromDate, toDate,
-//								documentPids, productTerritoryPids, employeePidList,
-//								status, accountPidList);
-//		log.debug("Exit  : "+ "getInventoryDetailListBy.getInventoryDetailListBy() " + "Start Old Query At : " + LocalDateTime.now());
-//		log.debug("--------------------------------------------------------------------------------------------------------------------");
-
-
 		log.debug("Enter : for(InventoryVoucherDetailDTO inventoryVoucherDTO : inventoryVoucherDetailDTOs)");
 		for(InventoryVoucherDetailDTO inventoryVoucherDTO : inventoryVoucherDetailDTOs) {
 			List<String> productGroups = new ArrayList();
@@ -317,12 +287,12 @@ public class ItemWiseSaleResourceJonarin {
 			
 			Optional<LocationAccountProfile>
 					LocationAccountProfileOp =
-					LocationAccountProfile
+					LocationAccountProfiles
 							.stream()
 							.filter(a->a.getAccountProfile().getPid()
 									.equals(inventoryVoucherDTO.getAccountPid()))
 							.findAny();
-		
+
 			if(LocationAccountProfileOp.isPresent()) {
 				LocationAccountProfile locationAccountProfile = LocationAccountProfileOp.get();
 				inventoryVoucherDTO.setTerritory(locationAccountProfile.getLocation().getName());
@@ -351,6 +321,46 @@ public class ItemWiseSaleResourceJonarin {
 		}
 		log.debug("Exit : "+ "getFilterData() : ");
 		return filterBySortAndOrder(sort, order, inventoryVoucherDetailDTOList);
+	}
+
+	private 	List<LocationAccountProfile> getLocationAccounts(String accountPids, String terittoryPids, Company company) {
+		log.debug("Enter : Method - getLocationAccounts");
+		List<String> productTerritoryPids  = !terittoryPids.equals("-1") ? Arrays.asList(terittoryPids) : Arrays.asList("-1");
+		List<String> accountPidList = accountPids != "-1" ? Arrays.asList(accountPids.split(",")) : Arrays.asList("-1");
+		List<LocationAccountProfile> LocationAccountProfile = new ArrayList<>();
+		if(terittoryPids.equals("-1")){
+			log.debug("Enter : Query - locationAccountProfileRepository.findByCompanyID ");
+			LocationAccountProfile =
+					locationAccountProfileRepository.findByCompanyID(company.getId());
+			log.debug("Enter : Query - locationAccountProfileRepository.findByCompanyID  : " +LocationAccountProfile.size() );
+		} else if(!terittoryPids.equals("-1") && !accountPids.equals("-1") ){
+			log.debug("Enter : Query - locationAccountProfileRepository.findAllByCompanyId : ");
+			LocationAccountProfile =
+					locationAccountProfileRepository
+							.findByAccountPids(accountPidList);
+			log.debug("Exit : Query - locationAccountProfileRepository.findAllByCompanyId : " + LocationAccountProfile.size() );
+		}else{
+			log.debug("Enter : Query - locationAccountProfileRepository.findAllByCompanyId : ");
+			LocationAccountProfile =
+					locationAccountProfileRepository
+							.findByLocationPids(productTerritoryPids);
+			log.debug("Exit  : Query - locationAccountProfileRepository.findAllByCompanyId : " + LocationAccountProfile.size() );
+		}
+		log.debug("Exit : Method - getLocationAccounts");
+		return LocationAccountProfile;
+	}
+
+	private List<String> getAccountPids(String accountPids, String terittoryPids,
+																			List<String> accountPidList, List<LocationAccountProfile> LocationAccountProfiles) {
+		if(!terittoryPids.equals("-1") && accountPids.equals("-1")){
+			log.debug("Streaming LocationAccountProfiles : " + LocationAccountProfiles.size());
+			accountPidList = LocationAccountProfiles.stream().map(data->data.getAccountProfile().getPid()).collect(Collectors.toList());
+		}
+		else{
+			accountPidList = Arrays.asList(accountPids.split(","));
+		}
+		log.debug("accountPidList  : "+ " Size : " + accountPidList.size());
+		return accountPidList;
 	}
 
 

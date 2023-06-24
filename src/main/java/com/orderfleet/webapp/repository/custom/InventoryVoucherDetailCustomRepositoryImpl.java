@@ -2,11 +2,7 @@ package com.orderfleet.webapp.repository.custom;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -187,79 +183,41 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			LocalDateTime toDate, List<String> documentPids, List<String> productTerritoryPids,
 			List<String> employeePids, String status, List<String> accountPids) {
 
-		log.debug("Enter : InventoryVoucherDetailCustomRepositoryImpl.getInventoryDetailListBy()");
+		log.debug("Enter : InventoryVoucherDetailCustomRepositoryImpl.getInventoryDetailListByItemWiseSaleResourceOptimised");
 
+		List<Object[]> objectArray;
 		Map<String, List<String>> queryParameters = new HashMap<>();
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
 
-		log.debug("Enter : ProductPids : " +  productGroupPids.size());
-
+		log.debug("Enter : productGroupProductRepository.findProductPidsByProductGroupPidIn : " +  productGroupPids.size());
 		List<String>  ProductPids =
 				productGroupProductRepository
 						.findProductPidsByProductGroupPidIn(productGroupPids);
+		log.debug("Exit  : productGroupProductRepository.findProductPidsByProductGroupPidIn : "+ ProductPids.size());
 
-		log.debug("Exit : ProductPids : "+ ProductPids.size());
+		log.debug("ProductPids : " + ProductPids.size());
+		log.debug("documentPids : " + documentPids.size());
+		log.debug("Territory-accountPids: " + productTerritoryPids.size());
+		log.debug("employeePids : " + employeePids.size());
+		log.debug("accountPids : " + accountPids.size());
 
-		log.debug("Enter : productaTerrotoryccountPids : " + productTerritoryPids.size());
-
-		List<String> productaTerrotoryccountPids =
-				locationAccountProfileRepository
-						.findAccountProfilePidByLocationPidIn(productTerritoryPids);
-
-		log.debug("Exit : productaTerrotoryccountPids  : " + productaTerrotoryccountPids.size());
-		log.debug("Enter : objectArray ");
-
-		log.debug( "Enter :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
-		List<Object[]> objectArray =
-				inventoryVoucherDetailRepository.getInventoryDetailList(
-						companyid,fromDate,toDate,ProductPids,
-						documentPids,productaTerrotoryccountPids,
-						employeePids,accountPids);
-		log.debug( "Exit :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
-
-		log.debug("Exit : ProductPids : "+ ProductPids.size());
-
-		log.debug("Enter : for(Object[] object : objectArray){}");
-		for (Object[] object : objectArray) {
-			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
-			ivd.setCreatedDate((LocalDateTime) object[0]);
-			ivd.setEmployeeName((String) object[1]);
-			ivd.setOderID((String) object[2]);
-			ivd.setAccountName((String) object[3]);
-			ivd.setSupplierAccountName((String) object[4]);
-			ivd.setProductCategory((String) object[5]);
-			ivd.setProductName((String) object[6]);
-			ivd.setQuantity((double) object[7]);
-			ivd.setSellingRate((double) object[8]);
-			ivd.setRowTotal((double) object[9]);
-
-			ivd.setProductPid((String) object[10]);
-			if (!stockLocationPids.isEmpty()) {
-				ivd.setSourceStockLocationName((String) object[13]);
-				ivd.setDestinationStockLocationName((String) object[14]);
-			}
-
-			ivd.setProductUnitQty(object[11] != null ? Double.valueOf(object[11].toString()) : 1);
-			double volume=Double.valueOf(object[12].toString());
-			ivd.setVolume(volume);
-			ivd.setCustomerLocation(object[13] != null ? object[13].toString() : "");
-
-			if (AccountTypeColumn.valueOf(object[15].toString()).equals(AccountTypeColumn.Supplier)) {
-				ivd.setCustomerLocation(object[14] != null ? object[14].toString() : "");
-			}
-			ivd.setProductDescription((String) object[16]);
-			ivd.setAccountPid((String) object[17]);
-
-			if(object[18] != null){
-				LocalDate deliveryDateLocal = (LocalDate) object[18];
-				LocalDateTime deliveryDate = deliveryDateLocal.atTime(0, 0);
-				ivd.setDeliveryDate(deliveryDate);
-			}
-			ivd.setSalesOrderStatus(SalesOrderStatus.valueOf(object[19].toString()));
-
-			inventoryVoucherDetailDTOs.add(ivd);
+		if(productTerritoryPids.get(0).equals("-1")){
+			log.debug("Enter : inventoryVoucherDetailRepository.getInventoryDetailListFIlltered - first Query : All Data ");
+			objectArray = inventoryVoucherDetailRepository
+					.getInventoryDetailListFIlltered(
+							companyid,fromDate,toDate,ProductPids, documentPids,
+							employeePids);
+			log.debug("Exit  : inventoryVoucherDetailRepository.getInventoryDetailListFIlltered " +  objectArray.size());
 		}
-		log.debug("Exit : for(Object[] object : objectArray) { }");
+		else{
+			log.debug("Enter : inventoryVoucherDetailRepository.getInventoryDetailList - second Query : fetch Data using account pids ");
+			objectArray = inventoryVoucherDetailRepository.getInventoryDetailList(
+					companyid,fromDate,toDate,ProductPids, documentPids,
+					employeePids,accountPids);
+			log.debug("Exit  :  inventoryVoucherDetailRepository.getInventoryDetailList " + objectArray.size());
+		}
+		inventoryVoucherDetailDTOs = getFillterdData(objectArray);
+		log.debug("Exit  : for(Object[] object : objectArray) { } - " + inventoryVoucherDetailDTOs.size());
 		return inventoryVoucherDetailDTOs;
 	}
 
@@ -277,20 +235,6 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
 		List<String>  ProductPids ;
 		List<String> productaTerrotoryccountPids;
-
-//		if(productGroupPids != null){
-//			log.debug("Enter : ProductPids : " +  productGroupPids.size());
-//			ProductPids =  productGroupProductRepository
-//					.findProductPidsByProductGroupPidIn(productGroupPids);
-//			log.debug("Exit : ProductPids : "+ ProductPids.size());
-//		}
-//
-//		if (productTerritoryPids != null) {
-//			log.debug("Enter : productaTerrotoryccountPids : " + productTerritoryPids.size());
-//			productaTerrotoryccountPids = locationAccountProfileRepository
-//					.findAccountProfilePidByLocationPidIn(productTerritoryPids);
-//			log.debug("Exit : productaTerrotoryccountPids  : " + productaTerrotoryccountPids.size());
-//		}
 
 		log.debug( "Enter :  inventoryVoucherDetailRepository.getInventoryDetailListsummery" + LocalDateTime.now());
 		List<Object[]> objectArray = inventoryVoucherDetailRepository.getInventoryDetailListsummery(
@@ -352,28 +296,48 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			List<String> productProfilePids, List<String> stockLocationPids, LocalDateTime fromDate,
 			LocalDateTime toDate, List<String> documentPids, List<String> productTerritoryPids,
 			List<String> employeePids, String status, List<String> accountPids) {
-		log.debug("Enter : InventoryVoucherDetailCustomRepositoryImpl.getInventoryDetailListByItemWiseSaleResourceOptmised");
+			log.debug("Enter : InventoryVoucherDetailCustomRepositoryImpl.getInventoryDetailListByItemWiseSaleResourceOptimised");
 
-		Map<String, List<String>> queryParameters = new HashMap<>();
+		  List<Object[]> objectArray;
+			Map<String, List<String>> queryParameters = new HashMap<>();
+			List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
+
+			log.debug("Enter : productGroupProductRepository.findProductPidsByProductGroupPidIn : " +  productGroupPids.size());
+			List<String>  ProductPids =
+					productGroupProductRepository
+							.findProductPidsByProductGroupPidIn(productGroupPids);
+		log.debug("Exit : productGroupProductRepository.findProductPidsByProductGroupPidIn : "+ ProductPids.size());
+
+		log.debug("ProductPids 		 : " + ProductPids.size());
+		log.debug("documentPids 	 : " + documentPids.size());
+		log.debug("Territory-accountPids : " + productTerritoryPids.size());
+		log.debug("employeePids 	 : " + employeePids.size());
+		log.debug("accountPids		 : " + accountPids.size());
+
+		if(productTerritoryPids.get(0).equals("-1")){
+
+			log.debug("Enter inventoryVoucherDetailRepository.getInventoryDetailListFIlltered - first Query : All Data ");
+			objectArray = inventoryVoucherDetailRepository
+					.getInventoryDetailListFIlltered(
+							companyid,fromDate,toDate,ProductPids, documentPids,
+							employeePids);
+			log.debug("Exit : inventoryVoucherDetailRepository.getInventoryDetailListFIlltered " +  objectArray.size());
+		}
+		else{
+			log.debug("Enter inventoryVoucherDetailRepository.getInventoryDetailList - second Query : fetch Data using account pids ");
+			objectArray = inventoryVoucherDetailRepository.getInventoryDetailList(
+					companyid,fromDate,toDate,ProductPids, documentPids,
+					employeePids,accountPids);
+			log.debug("Exit :  inventoryVoucherDetailRepository.getInventoryDetailList " + objectArray.size());
+		}
+		inventoryVoucherDetailDTOs = getFillterdData(objectArray);
+		log.debug("Exit : for(Object[] object : objectArray) { } - " + inventoryVoucherDetailDTOs.size());
+		return inventoryVoucherDetailDTOs;
+	}
+
+
+	private List<InventoryVoucherDetailDTO> getFillterdData(List<Object[]> objectArray) {
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOs = new ArrayList<>();
-
-		log.debug("Enter : ProductPids : " +  productGroupPids.size());
-		List<String>  ProductPids =  productGroupProductRepository
-				.findProductPidsByProductGroupPidIn(productGroupPids);
-		log.debug("Exit : ProductPids : "+ ProductPids.size());
-
-		log.debug("Enter : productaTerrotoryccountPids : " + productTerritoryPids.size());
-		List<String> productaTerrotoryccountPids = locationAccountProfileRepository
-				.findAccountProfilePidByLocationPidIn(productTerritoryPids);
-		log.debug("Exit : productaTerrotoryccountPids  : " + productaTerrotoryccountPids.size());
-
-
-		log.debug( "Enter :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
-		List<Object[]> objectArray = inventoryVoucherDetailRepository.getInventoryDetailList(
-				companyid,fromDate,toDate,ProductPids, documentPids,productaTerrotoryccountPids,
-				employeePids,accountPids);
-		log.debug( "Exit :  inventoryVoucherDetailRepository.getInventoryDetailList" + LocalDateTime.now());
-
 		log.debug("Enter : for(Object[] object : objectArray){}");
 		for (Object[] object : objectArray) {
 			InventoryVoucherDetailDTO ivd = new InventoryVoucherDetailDTO();
@@ -388,11 +352,6 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 			ivd.setSellingRate((double) object[8]);
 			ivd.setRowTotal((double) object[9]);
 			ivd.setProductPid((String) object[10]);
-
-			if (!stockLocationPids.isEmpty()) {
-				ivd.setSourceStockLocationName((String) object[13]);
-				ivd.setDestinationStockLocationName((String) object[14]);
-			}
 
 			ivd.setProductUnitQty(object[11] != null ? Double.valueOf(object[11].toString()) : 1);
 
@@ -417,7 +376,6 @@ public class InventoryVoucherDetailCustomRepositoryImpl implements InventoryVouc
 
 			inventoryVoucherDetailDTOs.add(ivd);
 		}
-		log.debug("Exit : for(Object[] object : objectArray) { } - " + inventoryVoucherDetailDTOs.size());
 		return inventoryVoucherDetailDTOs;
 	}
 

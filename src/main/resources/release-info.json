@@ -1,7 +1,7 @@
 {
-"release-number" : "1.108.0",
-"release-date" : "20/06/2023",
+"release-number" : "1.108.1",
+"release-date" : "24/06/2023",
 "features" : [
-  "Query Optimisation - Item Wise Summary,Item Wise Transactions,Item Summary Employee Wise, "
+  "Query Optimisation ERROR FIX - Item Wise Summary,Item Wise Transactions, "
 ]
 }
