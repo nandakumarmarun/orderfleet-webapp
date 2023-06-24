@@ -44,6 +44,7 @@ public class CompanyConfigDTO {
 	private boolean updateReciept;
 	private boolean sendToFocus;
 	private boolean sendEmailAutomaticaly;
+	private boolean outstandingDateSorting;
 
 	private boolean crmEnable;
 
@@ -329,6 +330,14 @@ public class CompanyConfigDTO {
 
 	public void setCrmEnable(boolean crmEnable) {
 		this.crmEnable = crmEnable;
+	}
+
+	public boolean isOutstandingDateSorting() {
+		return outstandingDateSorting;
+	}
+
+	public void setOutstandingDateSorting(boolean outstandingDateSorting) {
+		this.outstandingDateSorting = outstandingDateSorting;
 	}
 
 }

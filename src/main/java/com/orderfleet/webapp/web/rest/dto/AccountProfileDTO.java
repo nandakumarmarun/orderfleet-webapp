@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -147,6 +148,8 @@ public class AccountProfileDTO {
 	private String mailingName;
 	
 	private String employeeName;
+	
+	private LocalDate minVoucherDate;
 
 	public String getAitrichCode() {
 		return AitrichCode;
@@ -672,6 +675,14 @@ public class AccountProfileDTO {
 
 	public void setEmployeeName(String employeeName) {
 		this.employeeName = employeeName;
+	}
+
+	public LocalDate getMinVoucherDate() {
+		return minVoucherDate;
+	}
+
+	public void setMinVoucherDate(LocalDate minVoucherDate) {
+		this.minVoucherDate = minVoucherDate;
 	}
 
 	@Override

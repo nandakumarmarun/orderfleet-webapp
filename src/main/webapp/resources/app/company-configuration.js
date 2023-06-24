@@ -72,6 +72,7 @@ if (!this.CompanyConfiguration) {
 		var sendToFocus = $("#sendToFocus").is(":checked");
 		var sendEmailAutomatically = $("#sendEmailAutomatically").is(":checked");
 		var CrmEnable = $("#CrmEnabled").is(":checked");
+		var outstandingDateSorting = $("#outstandingDateSorting").is(":checked");
 		console.log("crmEnbaled",CrmEnable);
 		/* var findLocation = $('#findLocation').is(":checked"); */
 		$.ajax({
@@ -110,7 +111,8 @@ if (!this.CompanyConfiguration) {
 				updateReciept:updateReciept,
 				sendToFocus : sendToFocus,
 				sendEmailAutomaticaly : sendEmailAutomatically,
-				crmEnable:CrmEnable
+				crmEnable:CrmEnable,
+				outstandingDateSorting : outstandingDateSorting
 			/* findLocation : findLocation */
 			},
 			success : function(data) {
@@ -186,6 +188,7 @@ if (!this.CompanyConfiguration) {
 						$("#sendToFocus").prop("checked", data.sendToFocus);
 						$("#sendEmailAutomatically").prop("checked", data.sendEmailAutomaticaly);
 						$("#CrmEnabled").prop("checked",data.crmEnable);
+						$("#outstandingDateSorting").prop("checked",data.outstandingDateSorting);
 						/*
 						 * $("#findLocation").prop("checked",
 						 * data.findLocation);

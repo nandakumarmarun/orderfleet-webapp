@@ -1,7 +1,7 @@
 {
-"release-number" : "1.108.1",
+"release-number" : "1.109.0",
 "release-date" : "24/06/2023",
 "features" : [
-  "Query Optimisation ERROR FIX - Item Wise Summary,Item Wise Transactions, "
+  "Query Optimisation ERROR FIX - Item Wise Summary,Item Wise Transactions,account Profile with min outstanding voucher date"
 ]
 }

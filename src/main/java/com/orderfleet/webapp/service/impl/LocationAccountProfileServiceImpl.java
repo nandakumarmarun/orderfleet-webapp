@@ -2,6 +2,7 @@ package com.orderfleet.webapp.service.impl;
 
 import java.math.BigInteger;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,22 +30,28 @@ import org.springframework.transaction.annotation.Transactional;
 import com.orderfleet.webapp.domain.AccountNameTextSettings;
 import com.orderfleet.webapp.domain.AccountProfile;
 import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
 import com.orderfleet.webapp.domain.OpeningStock;
 import com.orderfleet.webapp.domain.ProductNameTextSettings;
+import com.orderfleet.webapp.domain.ReceivablePayable;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.repository.AccountNameTextSettingsRepository;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
 import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
 import com.orderfleet.webapp.repository.LocationRepository;
+import com.orderfleet.webapp.repository.ReceivablePayableRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
+import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
 import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
@@ -78,6 +86,12 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 
 	@Inject
 	private AccountNameTextSettingsRepository accountNameTextSettingsRepository;
+
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private ReceivablePayableRepository receivablePayableRepository;
 
 	@Override
 	public void save(String locationPid, String assignedAccountProfile) {
@@ -341,6 +355,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		// employeeProfileLocationRepository.findLocationsByEmployeeProfileIsCurrentUser();
 		// get accounts in employee locations
 		List<AccountProfile> result = new ArrayList<>();
+		List<AccountProfileDTO> accountDTOs = new ArrayList<>();
 		log.info("===============================================================");
 		log.info("get accountProfiles..........");
 		log.info("Page : {}" + page);
@@ -353,7 +368,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 			Page<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
 					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdOrderByIdAsc(
 							locationIds, companyId, new PageRequest(page, count));
-	
+
 			result = accountProfiles.getContent().stream().map(la -> la.getAccountProfile())
 					.collect(Collectors.toList());
 
@@ -413,8 +428,11 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
 
-		Page<AccountProfileDTO> accountProfileDtoPage = new PageImpl<>(
-				accountProfileMapper.accountProfilesToAccountProfileDTOs(result));
+		accountDTOs = accountProfileMapper.accountProfilesToAccountProfileDTOs(result);
+
+		minDateOfOutStanding(accountDTOs);
+
+		Page<AccountProfileDTO> accountProfileDtoPage = new PageImpl<>(accountDTOs);
 		if (accountNameTextSettings.size() > 0) {
 			for (AccountProfileDTO dto : accountProfileDtoPage) {
 				String name = " (";
@@ -498,6 +516,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 
 		// get accounts in employee locations
 		List<AccountProfile> result = new ArrayList<>();
+		List<AccountProfileDTO> accountDTOs = new ArrayList<>();
 		if (locationIds.size() > 0) {
 //			Page<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
 //					.findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDate(locations, true, lastSyncdate,
@@ -508,8 +527,60 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 							locationIds, companyId, lastSyncdate, new PageRequest(page, count));
 			result = accountProfiles.getContent().stream().map(la -> la.getAccountProfile())
 					.collect(Collectors.toList());
+			accountDTOs = accountProfileMapper.accountProfilesToAccountProfileDTOs(result);
+
+			minDateOfOutStanding(accountDTOs);
+
 		}
-		return new PageImpl<>(accountProfileMapper.accountProfilesToAccountProfileDTOs(result));
+		return new PageImpl<>(accountDTOs);
+	}
+
+	public void minDateOfOutStanding(List<AccountProfileDTO> accountDTOs) {
+
+		log.info("Enter here to find min Date of outstanding");
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+		Optional<CompanyConfiguration> optoutstandingDateSorting = companyConfigurationRepository
+				.findByCompanyPidAndName(company.getPid(), CompanyConfig.OUTSTANDING_DATE_SORTING);
+
+		if (optoutstandingDateSorting.isPresent() && Boolean.valueOf(optoutstandingDateSorting.get().getValue())) {
+
+			List<String> accountPids = accountDTOs.stream().map(account -> account.getPid())
+					.collect(Collectors.toList());
+
+			List<ReceivablePayable> receivablePayables = new ArrayList<>();
+			if (!accountPids.isEmpty()) {
+				receivablePayables = receivablePayableRepository.findAllByCompanyIdAndAccountprofileIn(accountPids);
+			}
+			System.out.println("Receivable Payable Size:" + receivablePayables.size());
+
+			List<ReceivablePayableDTO> receivable = new ArrayList<>();
+			if (receivablePayables.size() != 0) {
+				for (ReceivablePayable receivablePayable : receivablePayables) {
+					ReceivablePayableDTO payableDTO = new ReceivablePayableDTO(receivablePayable);
+					receivable.add(payableDTO);
+				}
+			
+				Map<String, Optional<LocalDate>> minDatesByAccountPid = receivable.stream()
+						.collect(Collectors.groupingBy(ReceivablePayableDTO::getAccountPid,
+								Collectors.mapping(ReceivablePayableDTO::getReferenceDocumentDate,
+										Collectors.minBy(LocalDate::compareTo))));
+			
+				List<AccountProfileDTO> updatedAccountDTOs = new ArrayList<>();
+				for (AccountProfileDTO accounts : accountDTOs) {
+					
+			    	Optional<LocalDate> value = minDatesByAccountPid.get(accounts.getPid());
+					
+					if(value != null && value.isPresent())
+					{
+					accounts.setMinVoucherDate(value.get());
+					updatedAccountDTOs.add(accounts);
+				}
+				}
+				accountDTOs = updatedAccountDTOs;
+			}
+		}
+
 	}
 
 	@Override
@@ -605,7 +676,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfileList);
 		return result;
 	}
-	
+
 	@Override
 	public List<LocationDTO> findAllLocationByAccountProfilePid(String accountProfilePid) {
 		List<Location> locationList = locationAccountProfileRepository
@@ -631,11 +702,12 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfileList);
 		return result;
 	}
+
 	@Override
 	public List<AccountProfile> findAccountProfileByTerritoryPid(String locationPid) {
 		List<AccountProfile> accountProfileList = locationAccountProfileRepository
 				.findAccountProfileByLocationPid(locationPid);
-		
+
 		return accountProfileList;
 	}
 

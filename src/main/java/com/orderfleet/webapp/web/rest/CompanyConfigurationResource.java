@@ -211,6 +211,10 @@ public class CompanyConfigurationResource {
 					mcDto.setCrmEnable(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.OUTSTANDING_DATE_SORTING)) {
+					mcDto.setOutstandingDateSorting(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
@@ -243,7 +247,8 @@ public class CompanyConfigurationResource {
 			@RequestParam String sendToOdoo, @RequestParam String productGroupTax, @RequestParam String aliasToName,
 			@RequestParam String descriptionToName, @RequestParam String stockApi,
 			@RequestParam String employeeCreateBtn, @RequestParam String modernSpecialConfig,
-			@RequestParam String salesorderstatus, @RequestParam String updateReciept,@RequestParam String sendToFocus,@RequestParam String sendEmailAutomaticaly,@RequestParam String crmEnable) throws URISyntaxException {
+			@RequestParam String salesorderstatus, @RequestParam String updateReciept,@RequestParam String sendToFocus,
+			@RequestParam String sendEmailAutomaticaly,@RequestParam String crmEnable,@RequestParam String outstandingDateSorting) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -317,6 +322,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
 		Optional<CompanyConfiguration> optcrmEnable = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
+		Optional<CompanyConfiguration> optoutstandingDateSorting = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.OUTSTANDING_DATE_SORTING);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -355,6 +362,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration sendToFocusCompany = null;
 		CompanyConfiguration sendEmailAutomaticallyCompany = null;
 		CompanyConfiguration crmEnableCompany = null;
+		CompanyConfiguration outstandingDateSortingCompany = null;
 		
 		/* CompanyConfiguration findLocationCompany = null; */
 
@@ -707,7 +715,16 @@ public class CompanyConfigurationResource {
 			crmEnableCompany.setName(CompanyConfig.CRM_ENABLE);
 			crmEnableCompany.setValue(crmEnable);
 		}
-		companyConfigurationRepository.save(crmEnableCompany);
+		if (optoutstandingDateSorting.isPresent()) {
+			outstandingDateSortingCompany= optoutstandingDateSorting.get();
+			outstandingDateSortingCompany.setValue(outstandingDateSorting);
+		} else {
+			outstandingDateSortingCompany = new CompanyConfiguration();
+			outstandingDateSortingCompany.setCompany(company);
+			outstandingDateSortingCompany.setName(CompanyConfig.OUTSTANDING_DATE_SORTING);
+			outstandingDateSortingCompany.setValue(outstandingDateSorting);
+		}
+		companyConfigurationRepository.save(outstandingDateSortingCompany);
 
 
 		/*
@@ -840,6 +857,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
 		Optional<CompanyConfiguration> optcrmEnable = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
+		Optional<CompanyConfiguration> optoutstandingDateSorting= companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.OUTSTANDING_DATE_SORTING);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -951,6 +970,10 @@ public class CompanyConfigurationResource {
 
 		if (optcrmEnable.isPresent()) {
 			companyConfigurationDTO.setCrmEnable(Boolean.valueOf(optcrmEnable.get().getValue()));
+		}
+		
+		if (optoutstandingDateSorting.isPresent()) {
+			companyConfigurationDTO.setOutstandingDateSorting(Boolean.valueOf(optoutstandingDateSorting.get().getValue()));
 		}
 		/*
 		 * if (optFindLocation.isPresent()) {
@@ -1068,6 +1091,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.SEND_EMAIL_AUTOMATICALLY);
 		Optional<CompanyConfiguration> optcrmEnable = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
+		Optional<CompanyConfiguration> optoutstandingDateSorting = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.OUTSTANDING_DATE_SORTING);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1212,6 +1237,10 @@ public class CompanyConfigurationResource {
 		if(optcrmEnable.isPresent()){
 			companyConfigurationRepository.deleteByCompanyIdAndName(optcrmEnable.get().getId(), CompanyConfig.CRM_ENABLE);
 		}
+		if(optoutstandingDateSorting.isPresent()){
+			companyConfigurationRepository.deleteByCompanyIdAndName(optoutstandingDateSorting.get().getId(), CompanyConfig.OUTSTANDING_DATE_SORTING);
+		}
+		
 		
 		/*
 		 * if (optFindLocation.isPresent()) {
