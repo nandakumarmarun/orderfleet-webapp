@@ -380,16 +380,13 @@ public class ProductProfileOdooUploadService {
 	@Transactional
 	public void saveUpdateStockLocations(final List<OdooStockLocation> list) {
 
-		log.info("Saving Stock Locations.........");
+		log.info("Saving Stock Locations");
 
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
 
 		Set<StockLocation> saveUpdateStockLocations = new HashSet<>();
-
-		// Set<String> stkAlias = list.stream().map(p ->
-		// String.valueOf(p.getId())).collect(Collectors.toSet());
 		List<StockLocation> stockLocations = stockLocationRepository.findAllByCompanyId();
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId();
 
@@ -402,7 +399,7 @@ public class ProductProfileOdooUploadService {
 
 		List<LocationDTO> locationDtos = new ArrayList<>();
 
-		log.info("Stock Locations........." + stockLocations.size());
+		log.info("Stock Locations " + stockLocations.size());
 
 		for (OdooStockLocation stkDto : list) {
 			// check exist by name, only one exist with a name
@@ -423,8 +420,12 @@ public class ProductProfileOdooUploadService {
 
 			String name = stkDto.getName();
 
-			Optional<StockLocation> opAccP = saveUpdateStockLocations.stream()
-					.filter(so -> so.getName().equalsIgnoreCase(stkDto.getName())).findAny();
+			Optional<StockLocation> opAccP = saveUpdateStockLocations
+					.stream()
+					.filter(so -> so.getName()
+							.equalsIgnoreCase(stkDto.getName()))
+					.findAny();
+
 			if (opAccP.isPresent()) {
 				name = stkDto.getName() + "~" + i;
 				i++;
@@ -473,13 +474,9 @@ public class ProductProfileOdooUploadService {
 					openingStockDto.setStockLocationName(name);
 					openingStockDto.setQuantity(osList.getQty());
 					openingStockDtos.add(openingStockDto);
-
 				}
-
 			}
-
 			saveUpdateStockLocations.add(stockLocation);
-
 		}
 
 		if (locationDtos.size() > 0) {
@@ -1071,8 +1068,7 @@ public class ProductProfileOdooUploadService {
 
 	@Transactional
 	public void saveUpdateLocations(final List<LocationDTO> locationDTOs) {
-
-		log.info("Saving Locations........." + locationDTOs.size());
+		log.info("Saving Locations" + locationDTOs.size());
 		long start = System.nanoTime();
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
@@ -1080,14 +1076,11 @@ public class ProductProfileOdooUploadService {
 		// find all locations
 		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
 		for (LocationDTO locDto : locationDTOs) {
-			// check exist by name, only one exist with a name
 			Optional<Location> optionalLoc = locations.stream().filter(p -> p.getName().equals(locDto.getName()))
 					.findAny();
 			Location location = new Location();
 			if (optionalLoc.isPresent()) {
 				location = optionalLoc.get();
-				// if not update, skip this iteration.
-				// if (!location.getThirdpartyUpdate()) {continue;}
 			} else {
 				location = new Location();
 				location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
@@ -1101,20 +1094,16 @@ public class ProductProfileOdooUploadService {
 			if (opLoc.isPresent()) {
 				continue;
 			}
-
 			saveUpdateLocations.add(location);
 		}
-		log.info(saveUpdateLocations.size() + "---------------------");
-		// bulkOperationRepositoryCustom.bulkSaveLocations(saveUpdateLocations);
+		log.info("Enter : locationRepository.save()"+saveUpdateLocations.size());
 		List<Location> updated = locationRepository.save(saveUpdateLocations);
-
-		log.info("Saved " + updated.size() + "  Locations---------------------");
+		log.info("Enter : locationRepository.save()"+saveUpdateLocations.size());
 
 		locationRepository.flush();
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table
-
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
@@ -1169,7 +1158,6 @@ public class ProductProfileOdooUploadService {
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
 
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
@@ -1225,6 +1213,61 @@ public class ProductProfileOdooUploadService {
 
 	}
 
+
+	@Transactional
+	public void LocationAccountAssociation(final List<OdooStockLocation> list) {
+		log.info("Enter : LocationAccountAssociation()");
+		long start = System.nanoTime();
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+
+		log.debug("Enter : CompanyRepository.findOne(companyId)");
+		Company company = companyRepository.findOne(companyId);
+		log.debug("Exit : CompanyRepository.findOne(companyId)");
+
+		List<TPLocationAccountProfilesDTO> tpLocationAccountProfieDTOs = new ArrayList<>();
+		List<LocationDTO> locationDtos = new ArrayList<>();
+
+		for (OdooStockLocation stkDto : list) {
+			String name = stkDto.getName();
+			LocationDTO locationDTO = new LocationDTO();
+			locationDTO.setAlias(name);
+			locationDTO.setName(name);
+			locationDtos.add(locationDTO);
+
+			if (stkDto.getCustomer_ids().size() > 0) {
+				TPLocationAccountProfilesDTO tpLocationAccountProfieDTO = new TPLocationAccountProfilesDTO();
+				tpLocationAccountProfieDTO.setLocationName(name);
+				tpLocationAccountProfieDTO.setAccountProfileIds(stkDto.getCustomer_ids());
+				tpLocationAccountProfieDTOs.add(tpLocationAccountProfieDTO);
+			}
+		}
+
+		if (locationDtos.size() > 0) {
+			log.debug("Enter : SaveUpdateLocations()");
+			saveUpdateLocations(locationDtos);
+			log.debug("Exit : SaveUpdateLocations()");
+
+			log.debug("Enter : SaveUpdateLocationHierarchy()");
+			saveUpdateLocationHierarchy(locationDtos);
+			log.debug("Exit : SaveUpdateLocationHierarchy()");
+		}
+
+		if (tpLocationAccountProfieDTOs.size() > 0) {
+			log.debug("Enter : SavingStockLocationAccountProfiles()");
+			savingStockLocationAccountProfiles(tpLocationAccountProfieDTOs);
+			log.debug("Exit : SavingStockLocationAccountProfiles()");
+		}
+		saveSyncOperation(start);
+		log.info("Exit : LocationAccountAssociation()");
+	}
+
+
+	private void saveSyncOperation(long start) {
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
 	@Transactional
 	private void savingStockLocationAccountProfiles(List<TPLocationAccountProfilesDTO> tpLocationAccountProfieDTOs) {
 
@@ -1246,7 +1289,6 @@ public class ProductProfileOdooUploadService {
 
 			locationAccountProfileDto.setAccountProfileName(companyAccountProOptional.get().getName());
 			locationAccountProfileDto.setLocationName("Territory");
-
 			locationAccountProfileDTOs.add(locationAccountProfileDto);
 		}
 
@@ -1263,10 +1305,8 @@ public class ProductProfileOdooUploadService {
 				if (accountProOptional.isPresent()) {
 
 					LocationAccountProfileDTO locationAccountProfileDto = new LocationAccountProfileDTO();
-
 					locationAccountProfileDto.setAccountProfileName(accountProOptional.get().getName());
 					locationAccountProfileDto.setLocationName(tpLocationAccountProfilesDTO.getLocationName());
-
 					locationAccountProfileDTOs.add(locationAccountProfileDto);
 				}
 			}
@@ -1276,8 +1316,6 @@ public class ProductProfileOdooUploadService {
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
-
 		log.info("Sync completed in {} ms", elapsedTime);
 
 	}

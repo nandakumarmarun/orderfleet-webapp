@@ -210,11 +210,7 @@ public class UploadOdooResource {
 	@RequestMapping(value = "/upload-odoo/uploadAccountProfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Void> uploadAccountProfiles() throws IOException, JSONException, ParseException {
-
-		// ResponseBodyOdooAuthentication responseBodyOdooAuthentication =
-		// authenticateServer();
-
-		log.debug("Web request to upload Account Profiles ...");
+		log.debug("Web request to upload Account Profiles");
 
 		String jsonString = getOdooRequestBody();
 
@@ -229,13 +225,19 @@ public class UploadOdooResource {
 
 		try {
 
-			ResponseBodyOdooAccountProfile responseBodyAccountProfile = restTemplate.postForObject(CUSTOMER_API_URL,
-					entity, ResponseBodyOdooAccountProfile.class);
-			log.info("Account Profile Size= " + responseBodyAccountProfile.getResult().getResponse().size()
-					+ "------------");
+			ResponseBodyOdooAccountProfile
+					responseBodyAccountProfile = restTemplate.postForObject(
+							CUSTOMER_API_URL, entity, ResponseBodyOdooAccountProfile.class);
+
+			log.info("Account Profile Size= "
+					+ responseBodyAccountProfile.getResult().getResponse().size());
 
 			accountProfileOdooUploadService
-					.saveUpdateAccountProfiles(responseBodyAccountProfile.getResult().getResponse());
+					.saveUpdateAccountProfiles(
+							responseBodyAccountProfile.getResult().getResponse());
+
+			log.debug("Saving Location Account Profiles ");
+			accountProfileLocationAssociation();
 
 		} catch (HttpClientErrorException exception) {
 			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
@@ -329,7 +331,7 @@ public class UploadOdooResource {
 
 			ResponseBodyOdooStockLocation responseBodyStockLocation = restTemplate.postForObject(STOCK_LOCATION_API_URL,
 					entity, ResponseBodyOdooStockLocation.class);
-			log.info("Stock Location Size= " + responseBodyStockLocation.getResult().getResponse().size()
+			log.info("Stock Location Size = " + responseBodyStockLocation.getResult().getResponse().size()
 					+ "------------");
 
 			productProfileOdooUploadService
@@ -435,6 +437,56 @@ public class UploadOdooResource {
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+
+	public ResponseEntity<Void> accountProfileLocationAssociation() throws IOException, JSONException, ParseException {
+		log.debug("Enter : AccountProfileLocationAssociation() ");
+
+		HttpEntity<String> entity = getStringHttpEntity();
+		RestTemplate restTemplate = getRestTemplate();
+
+		try {
+			log.debug("POST request to "+ STOCK_LOCATION_API_URL+" with " + entity +" in the request body" );
+			ResponseBodyOdooStockLocation responseBodyStockLocation =
+					restTemplate
+							.postForObject(
+									STOCK_LOCATION_API_URL,
+									entity,
+									ResponseBodyOdooStockLocation.class);
+			log.debug("Message : "+responseBodyStockLocation.getResult().getMessage()
+					+" Status : "+responseBodyStockLocation.getResult().getStatus() );
+
+			productProfileOdooUploadService
+					.LocationAccountAssociation(
+							responseBodyStockLocation.getResult().getResponse());
+
+		} catch (HttpClientErrorException exception) {
+			if (exception.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				log.info(exception.getMessage());
+				throw new ServiceException(exception.getResponseBodyAsString());
+			}
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		} catch (Exception exception) {
+			log.info(exception.getMessage());
+			throw new ServiceException(exception.getMessage());
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	private HttpEntity<String> getStringHttpEntity() throws JSONException, ParseException {
+		String jsonString = getOdooRequestBody();
+		HttpEntity<String> entity = new HttpEntity<>(jsonString, RestClientUtil.createTokenAuthHeaders());
+		log.info(entity.getBody().toString());
+		return entity;
+	}
+
+	private static RestTemplate getRestTemplate() {
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+		return restTemplate;
+	}
+
 
 	private RequestBodyOdoo getRequestBody() throws IOException {
 
