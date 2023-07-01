@@ -253,6 +253,7 @@ public class KilometerCalculationNewResource {
 				kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
 				kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
 				kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
+				log.debug("Date : " + destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
 				kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
 				kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getPunchInDate().toLocalDate().toString());
 				if(employee.isPresent()){kiloCalDTO.setEmployeeName(employee.get().getName());}
@@ -334,7 +335,6 @@ public class KilometerCalculationNewResource {
 			}
 		}
 
-
 		kiloCalDTOs = kiloCalDTOs.stream().sorted(Comparator.comparing(KilometerCalculationDTO::getPunchingTime).reversed()).collect(Collectors.toList());
 
 		log.debug(userlogin+" : "+"Request to get distance Traveled : Exit :getFilterData() - " + kiloCalDTOs.toString());
@@ -377,6 +377,76 @@ public class KilometerCalculationNewResource {
 					kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
 					kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
 				}
+				else{
+					log.debug("attandence latitude and longitudes are not aqurate ");
+					kiloCalDTO.setKilometre(0.0);
+					kiloCalDTO.setMetres(0.0);
+					kiloCalDTO.setUserPid(destinationExecutiveTaskExecution.getUser().getPid());
+					kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
+					kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
+					kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
+					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
+					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getPunchInDate().toLocalDate().toString());
+					kiloCalDTO.setEmployeeName(employee.getName());
+					log.debug("Location : "+destinationExecutiveTaskExecution.getLocation());
+					kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
+					kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
+				}
+			}
+			System.out.println();
+			log.debug(kiloCalDTO.toString());
+			System.out.println();
+			return kiloCalDTO;
+		}
+		catch (Exception e) {
+			log.debug("Exception while processing saveKilometreDifference method {}", e);
+			throw new TaskSubmissionPostSaveException("Exception while processing saveKilometreDifference method. "
+					+ "Company : " + destinationExecutiveTaskExecution.getCompany().getLegalName() + " User:"
+					+ destinationExecutiveTaskExecution.getUser().getLogin() + " Disatance API JSON :" + distanceApiJson
+					+ " Exception : " + e);
+		}
+
+	}
+
+
+	public  KilometerCalculationDTO getDistanceFromAttandance(String origin ,String destination,ExecutiveTaskExecution destinationExecutiveTaskExecution) throws TaskSubmissionPostSaveException {
+
+		List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
+
+		KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
+
+		MapDistanceApiDTO distanceApiJson = null;
+
+		MapDistanceDTO distance = null;
+
+		EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUser(destinationExecutiveTaskExecution.getUser());
+		try{
+			distanceApiJson = geoLocationService.findDistance(origin, destination);
+
+			if (distanceApiJson != null && !distanceApiJson.getRows().isEmpty()) {
+
+				distance = distanceApiJson.getRows().get(0).getElements().get(0).getDistance();
+
+				if (distance != null) {
+					log.debug("attadence format currect ");
+					kiloCalDTO.setKilometre(distance.getValue() * 0.001);
+					kiloCalDTO.setMetres(distance.getValue());
+					kiloCalDTO.setUserPid(destinationExecutiveTaskExecution.getUser().getPid());
+					kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
+					kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
+					kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
+					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
+					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getPunchInDate().toLocalDate().toString());
+					kiloCalDTO.setEmployeeName(employee.getName());
+					log.debug("Location : "+destinationExecutiveTaskExecution.getLocation());
+					kiloCalDTO.setLocation("Location Not Found");
+					kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
+				}
+
 			}
 			System.out.println();
 			log.debug(kiloCalDTO.toString());
