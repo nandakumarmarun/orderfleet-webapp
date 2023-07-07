@@ -295,7 +295,7 @@ public class KilometerCalculationNewResource {
 							kiloCalDTOs.add(getdistance(punchoutlocation, destination, destinationExecutiveTaskExecution));
 						}
 						ispunchouted=true;
-					}
+				   }
 				}
 			else{
 				String origin = originExecutiveTaskExecution.getLatitude() +","+originExecutiveTaskExecution.getLongitude();
@@ -480,8 +480,8 @@ public class KilometerCalculationNewResource {
 			if (distanceApiJson != null && !distanceApiJson.getRows().isEmpty()) {
 
 				distance = distanceApiJson.getRows().get(0).getElements().get(0).getDistance();
-				log.debug("distance : " + distance.toString());
 				if (distance != null) {
+					log.debug("distance : " + distance.toString());
 					log.debug("distance not null to punchout");
 					kiloCalDTO.setKilometre(distance.getValue() * 0.001);
 					kiloCalDTO.setMetres(distance.getValue());
@@ -493,6 +493,20 @@ public class KilometerCalculationNewResource {
 					kiloCalDTO.setEmployeeName(employee.getName());
 					log.debug("PunchoutLocation : " + punchOut.getLocation());
 					kiloCalDTO.setLocation(punchOut.getLocation());
+				}
+				else{
+						log.debug("distance null to punchout");
+						kiloCalDTO.setKilometre(0);
+						kiloCalDTO.setMetres(0);
+						kiloCalDTO.setUserPid(punchOut.getUser().getPid());
+						kiloCalDTO.setUserName(punchOut.getUser().getFirstName());
+						kiloCalDTO.setDate(punchOut.getPunchOutDate().toLocalDate());
+						kiloCalDTO.setPunchingTime(punchOut.getPunchOutDate().toLocalTime().toString());
+						kiloCalDTO.setPunchingDate(punchOut.getPunchOutDate().toLocalDate().toString());
+						kiloCalDTO.setEmployeeName(employee.getName());
+						log.debug("PunchoutLocation : " + punchOut.getLocation());
+						kiloCalDTO.setLocation(punchOut.getLocation());
+
 				}
 			}
 			log.debug(kiloCalDTO.toString());
