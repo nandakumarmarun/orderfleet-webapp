@@ -59,7 +59,6 @@
 									<option value="TODAY">Today</option>
 									<option value="YESTERDAY">Yesterday</option>
 									<option value="SINGLE">Single Date</option>
-									<option value="CUSTOM">CUSTOM</option>
 								</select>
 							</div>
 							<div class="col-sm-2 hide custom_date1">
