@@ -117,39 +117,54 @@ public class KilometerCalculationNewResource {
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
 			kilometreCalculationDTO = getFilterData(userPid, accountProfilePid, fromDateTime, toFateTime);
 		}
-
 		return new ResponseEntity<>(kilometreCalculationDTO, HttpStatus.OK);
 	}
 
-	private List<KilometerCalculationDTO> getFilterData(String userPid, String accountProfilePid, LocalDate fDate, LocalDate tDate) throws TaskSubmissionPostSaveException {
-		log.debug("Request to get distance Traveled : Enter:getFilterData() - "+"[ userPid : "+userPid+" accountProfilePid : "+ accountProfilePid +" fromDate : "+fDate+" toDate : "+tDate+"]" );
+
+
+	private List<KilometerCalculationDTO> getFilterData(
+			String userPid, String accountProfilePid,
+			LocalDate fDate, LocalDate tDate)
+			throws TaskSubmissionPostSaveException {
+		log.debug("Request to get distance Traveled : Enter:getFilterData() - " +
+				"[ userPid : "+userPid+" accountProfilePid : "+"accountProfilePid " +
+				" fromDate : "+fDate+" toDate : "+tDate+"]" );
+
 		System.out.println();
 		String originatt = null;
 		String userlogin = null;
 		boolean ispunchouted = false;
+
 
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
 
         Optional<PunchOut> optionalPunchOut = null;
 
-        List<ExecutiveTaskExecution> lastExecutiveTaskExecution = new ArrayList<>();
-		List<KilometreCalculation> kilometreCalculations = new ArrayList<>();
-		List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
+				List<ExecutiveTaskExecution> lastExecutiveTaskExecution = new ArrayList<>();
+				List<KilometreCalculation> kilometreCalculations = new ArrayList<>();
+				List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
 
-		Company company = companyRepository.
-				findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+
+				Company company = companyRepository.
+						findOne(SecurityUtils.getCurrentUsersCompanyId());
+
 		Optional<EmployeeProfile> employee = employeeProfileRepository
-				.findByUserPid(userPid);
+						.findByUserPid(userPid);
+
 		Optional<Attendance> attendance = attendanceRepository
 				.findTop1ByCompanyPidAndUserPidAndCreatedDateBetweenOrderByCreatedDateDesc(
 						company.getPid(), userPid,fromDate,toDate);
+
 		kilometreCalculations = kilometreCalculationRepository
 				.findAllByCompanyIdAndUserPidAndDateBetweenOrderByCreatedDateDesc(
 						userPid, fDate, tDate);
+
 		lastExecutiveTaskExecution = executiveTaskExecutionRepository
 				.findAllByCompanyIdUserPidAndDateBetweenOrderByDateAsc(
 						userPid, fDate.atTime(0, 0), tDate.atTime(23, 59));
+
 		Optional<KilometreCalculation> optionalKilometreCalculation =
 				kilometreCalculations
 						.stream()
@@ -162,7 +177,6 @@ public class KilometerCalculationNewResource {
 		}
 
 		log.debug(userlogin+" : " + "Order Details :  " + lastExecutiveTaskExecution.size());
-		System.out.println();
 
 		if (attendance.isPresent() && attendance.get().getCreatedDate().toLocalDate().isEqual(fDate)) {
 			log.debug(userlogin +" : "+ "Attendence :  Present" + " On " + attendance.get().getCreatedDate().toLocalDate());
@@ -253,9 +267,9 @@ public class KilometerCalculationNewResource {
 				kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
 				kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
 				kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
-				log.debug("Date : " + destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-				kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-				kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getPunchInDate().toLocalDate().toString());
+				log.debug("Date : " + destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+				kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+				kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getSendDate().toLocalDate().toString());
 				if(employee.isPresent()){kiloCalDTO.setEmployeeName(employee.get().getName());}
 				kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
 				kiloCalDTO.setEndLocation(destinationExecutiveTaskExecution.getLocation());
@@ -266,14 +280,14 @@ public class KilometerCalculationNewResource {
 			}
 
 			if(optionalPunchOut.isPresent()
-					&& originExecutiveTaskExecution.getPunchInDate().isBefore(optionalPunchOut.get().getPunchOutDate())
-					&& destinationExecutiveTaskExecution.getPunchInDate().isAfter(optionalPunchOut.get().getPunchOutDate())){
+					&& originExecutiveTaskExecution.getSendDate().isBefore(optionalPunchOut.get().getPunchOutDate())
+					&& destinationExecutiveTaskExecution.getSendDate().isAfter(optionalPunchOut.get().getPunchOutDate())){
 
 				if(ispunchouted == false) {
 						log.debug("Enter Punchout");
 						log.debug("punch out Time : " + optionalPunchOut.get().getPunchOutDate());
-						log.debug("Origin Punch in Date : " + originExecutiveTaskExecution.getPunchInDate());
-						log.debug("Origin Punch out Date : " + destinationExecutiveTaskExecution.getPunchInDate());
+						log.debug("Origin Punch in Date : " + originExecutiveTaskExecution.getSendDate());
+						log.debug("Origin Punch out Date : " + destinationExecutiveTaskExecution.getSendDate());
 						if (optionalPunchOut.isPresent()) {
 							log.debug("Punch Out Present");
 							KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
@@ -325,7 +339,7 @@ public class KilometerCalculationNewResource {
 				log.debug("punch out Time : " + optionalPunchOut.get().getPunchOutDate());
 				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
 				ExecutiveTaskExecution originExecutiveTaskExecution = lastExecutiveTaskExecution.get(lastExecutiveTaskExecution.size()-1);
-				log.debug("Origin Punch in Date : " + originExecutiveTaskExecution.getPunchInDate());
+				log.debug("Origin Punch in Date : " + originExecutiveTaskExecution.getSendDate());
 				log.debug("Origin Punch out Date : " + punchout.getPunchOutDate());
 				String origin = originExecutiveTaskExecution.getLatitude() +","+originExecutiveTaskExecution.getLongitude();
 				String destination = punchout.getLatitude()+","+punchout.getLongitude();
@@ -368,10 +382,10 @@ public class KilometerCalculationNewResource {
 					kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
 					kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
 					kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
-					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getPunchInDate().toLocalDate().toString());
+					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getSendDate().toLocalDate().toString());
 					kiloCalDTO.setEmployeeName(employee.getName());
 					log.debug("Location : "+destinationExecutiveTaskExecution.getLocation());
 					kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
@@ -385,10 +399,10 @@ public class KilometerCalculationNewResource {
 					kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
 					kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
 					kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
-					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getPunchInDate().toLocalDate().toString());
+					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getSendDate().toLocalDate().toString());
 					kiloCalDTO.setEmployeeName(employee.getName());
 					log.debug("Location : "+destinationExecutiveTaskExecution.getLocation());
 					kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
@@ -437,10 +451,10 @@ public class KilometerCalculationNewResource {
 					kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
 					kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
 					kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
-					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getPunchInDate().toLocalTime().toString());
-					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getPunchInDate().toLocalDate().toString());
+					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getSendDate().toLocalDate().toString());
 					kiloCalDTO.setEmployeeName(employee.getName());
 					log.debug("Location : "+destinationExecutiveTaskExecution.getLocation());
 					kiloCalDTO.setLocation("Location Not Found");
@@ -560,7 +574,7 @@ public class KilometerCalculationNewResource {
 //				log.debug("punch out present");
 //				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
 //				PunchOut punchout = optionalPunchOut.get();
-//				lastExecutiveTaskExecution = lastExecutiveTaskExecution.stream().sorted(Comparator.comparing(ExecutiveTaskExecution::getPunchInDate).reversed()).collect(Collectors.toList());
+//				lastExecutiveTaskExecution = lastExecutiveTaskExecution.stream().sorted(Comparator.comparing(ExecutiveTaskExecution::getSendDate()).reversed()).collect(Collectors.toList());
 //					ExecutiveTaskExecution lastexecutiveTaskExecutionDTO = lastExecutiveTaskExecution.get(0);
 //					log.debug("Account Profiles : "+lastexecutiveTaskExecutionDTO.getAccountProfile().getName());
 //
