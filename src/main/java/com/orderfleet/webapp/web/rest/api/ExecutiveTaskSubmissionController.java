@@ -708,7 +708,9 @@ public class ExecutiveTaskSubmissionController {
 			log.error(e.getMessage());
 			return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<>(taskSubmissionResponse, HttpStatus.OK);
+		ResponseEntity<TaskSubmissionResponse> result = new ResponseEntity<>(taskSubmissionResponse, HttpStatus.OK);
+		log.debug("Status : " + result );
+		return result;
 	}
 
 	public void sendSecondarysalesOrderEmail(Company company, String companyPid, User user,
@@ -719,7 +721,10 @@ public class ExecutiveTaskSubmissionController {
 			List<PrimarySecondaryDocument> primarySecDoc = primarySecondaryDocumentRepository
 					.findByVoucherTypeAndCompany(VoucherType.SECONDARY_SALES_ORDER, company.getId());
 			Document document = primarySecDoc.get(0).getDocument();
-			Document ivDocument = tsTransactionWrapper.getInventoryVouchers().get(0).getDocument();
+
+			if(tsTransactionWrapper.getInventoryVouchers() != null){
+				Document ivDocument = tsTransactionWrapper.getInventoryVouchers().get(0).getDocument();
+
 			log.debug("Doc name :" + ivDocument.getName());
 
 			if (document.getPid().equalsIgnoreCase(ivDocument.getPid())) {
@@ -734,6 +739,8 @@ public class ExecutiveTaskSubmissionController {
 					uncleJhonThread.start();
 				}
 			}
+		}
+
 		}
 	}
 

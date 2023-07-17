@@ -2767,4 +2767,99 @@ public class TransactionResource {
 		}
 		return inventoryVoucherHeaderDTO;
 	}
+
+
+	@RequestMapping(value = "/v2/update-order-status-pending", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	@Transactional
+	public ResponseEntity<Void> UpdarteOrderStatusWithTallyStatusByError(
+			@Valid @RequestBody List<String> inventoryVoucherHeaderPids) throws URISyntaxException {
+
+		CompanyViewDTO company = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		log.debug("REST request to update Inventory Voucher Header Status <" + company.getLegalName() + "> : {}",
+				inventoryVoucherHeaderPids.size());
+
+		if (!inventoryVoucherHeaderPids.isEmpty()) {
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "INV_QUERY_161" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "update InvVoucherHeader TallyDownloadStatus Using Pid";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
+			int updated = inventoryVoucherHeaderRepository.updateInventoryVoucherHeaderTallyDownloadStatusUsingPid(
+					TallyDownloadStatus.PENDING, inventoryVoucherHeaderPids);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+			log.debug("updated " + updated + " to COMPLETED");
+		}
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@RequestMapping(value = "/v2/update-receipt-status-pending", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> UpdateReceiptStatusByError(@Valid @RequestBody List<String> accountingVoucherHeaderPids)
+			throws URISyntaxException {
+		CompanyViewDTO company = companyService.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		log.debug("REST request to update Accounting Voucher Header Status <" + company.getLegalName() + "> : {}",
+				accountingVoucherHeaderPids.size());
+		if (!accountingVoucherHeaderPids.isEmpty()) {
+			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String id = "ACC_QUERY_149" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+			String description = "Updating AccVoucher Tally download status using  pid and company";
+			LocalDateTime startLCTime = LocalDateTime.now();
+			String startTime = startLCTime.format(DATE_TIME_FORMAT);
+			String startDate = startLCTime.format(DATE_FORMAT);
+			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+			int updated = accountingVoucherHeaderRepository
+					.updateAccountingVoucherHeaderTallyDownloadStatusUsingPidAndCompany(TallyDownloadStatus.PENDING,
+							accountingVoucherHeaderPids);
+			String flag = "Normal";
+			LocalDateTime endLCTime = LocalDateTime.now();
+			String endTime = endLCTime.format(DATE_TIME_FORMAT);
+			String endDate = startLCTime.format(DATE_FORMAT);
+			Duration duration = Duration.between(startLCTime, endLCTime);
+			long minutes = duration.toMinutes();
+			if (minutes <= 1 && minutes >= 0) {
+				flag = "Fast";
+			}
+			if (minutes > 1 && minutes <= 2) {
+				flag = "Normal";
+			}
+			if (minutes > 2 && minutes <= 10) {
+				flag = "Slow";
+			}
+			if (minutes > 10) {
+				flag = "Dead Slow";
+			}
+			logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+					+ description);
+
+			log.debug("updated " + updated + " to COMPLETED");
+		}
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+
 }
