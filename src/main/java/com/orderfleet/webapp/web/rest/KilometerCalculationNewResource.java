@@ -2,6 +2,9 @@
 package com.orderfleet.webapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.repository.*;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -79,6 +83,12 @@ public class KilometerCalculationNewResource {
 	@Inject
 	private PunchOutRepository punchOutRepository;
 
+	/***
+	 *
+	 * @param model
+	 * @return
+	 * @throws URISyntaxException
+	 */
 	@RequestMapping(value = "/kilo-calc-new", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -93,7 +103,15 @@ public class KilometerCalculationNewResource {
 		}
 		return "company/kilometer-calculation-new";
 	}
-
+	/***
+	 *
+	 * @param userPid
+	 * @param filterBy
+	 * @param fromDate
+	 * @param toDate
+	 * @return
+	 * @throws TaskSubmissionPostSaveException
+	 */
 	@RequestMapping(value = "/kilo-calc-new/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<List<KilometerCalculationDTO>> getAllKilometerCalculationByAccountProfile(
@@ -120,8 +138,17 @@ public class KilometerCalculationNewResource {
 		return new ResponseEntity<>(kilometreCalculationDTO, HttpStatus.OK);
 	}
 
-
-
+	/**
+	 * Retrieves filtered data of distance traveled for a specific user and account profile
+	 * between the specified start and end dates.
+	 *
+	 * @param userPid The unique identifier for the user.
+	 * @param accountProfilePid The unique identifier for the account profile (not used in the method).
+	 * @param fDate The start date (LocalDate) for filtering data.
+	 * @param tDate The end date (LocalDate) for filtering data.
+	 * @return A list of KilometerCalculationDTO objects representing the distance traveled.
+	 * @throws TaskSubmissionPostSaveException If an error occurs during the distance calculation.
+	 */
 	private List<KilometerCalculationDTO> getFilterData(
 			String userPid, String accountProfilePid,
 			LocalDate fDate, LocalDate tDate)
@@ -129,253 +156,272 @@ public class KilometerCalculationNewResource {
 		log.debug("Request to get distance Traveled : Enter:getFilterData() - " +
 				"[ userPid : "+userPid+" accountProfilePid : "+"accountProfilePid " +
 				" fromDate : "+fDate+" toDate : "+tDate+"]" );
-
-		System.out.println();
-		String originatt = null;
+		// Initialize variables
 		String userlogin = null;
-		boolean ispunchouted = false;
-
-
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
+    Optional<PunchOut> optionalPunchOut = null;
+		List<ExecutiveTaskExecution> lastExecutiveTaskExecution = new ArrayList<>();
+		List<KilometreCalculation> kilometreCalculations = new ArrayList<>();
+		List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
 
-        Optional<PunchOut> optionalPunchOut = null;
+		// Retrieve company and employee information from the database
+		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
+		Optional<EmployeeProfile> employee = employeeProfileRepository.findByUserPid(userPid);
+		userlogin = getUser(userlogin, employee);
+		String Thread = userlogin +"-"+ company.getId();
 
-				List<ExecutiveTaskExecution> lastExecutiveTaskExecution = new ArrayList<>();
-				List<KilometreCalculation> kilometreCalculations = new ArrayList<>();
-				List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
+		// Find attendance data for the user within the specified date range
+		Optional<Attendance> attendance =
+				attendanceRepository.findTop1ByCompanyPidAndUserPidAndCreatedDateBetweenOrderByCreatedDateDesc(
+								company.getPid(), userPid,fromDate,toDate);
 
-
-
-				Company company = companyRepository.
-						findOne(SecurityUtils.getCurrentUsersCompanyId());
-
-		Optional<EmployeeProfile> employee = employeeProfileRepository
-						.findByUserPid(userPid);
-
-		Optional<Attendance> attendance = attendanceRepository
-				.findTop1ByCompanyPidAndUserPidAndCreatedDateBetweenOrderByCreatedDateDesc(
-						company.getPid(), userPid,fromDate,toDate);
-
-		kilometreCalculations = kilometreCalculationRepository
-				.findAllByCompanyIdAndUserPidAndDateBetweenOrderByCreatedDateDesc(
-						userPid, fDate, tDate);
-
-		lastExecutiveTaskExecution = executiveTaskExecutionRepository
-				.findAllByCompanyIdUserPidAndDateBetweenOrderByDateAsc(
+		// Retrieve a list of executive task executions for the user within the date range
+		lastExecutiveTaskExecution =
+				executiveTaskExecutionRepository.findAllByCompanyIdUserPidAndDateBetweenOrderBySendDateAsc(
 						userPid, fDate.atTime(0, 0), tDate.atTime(23, 59));
+		log.debug(Thread+" : " + "Order Details :  " + lastExecutiveTaskExecution.size());
 
-		Optional<KilometreCalculation> optionalKilometreCalculation =
-				kilometreCalculations
-						.stream()
-						.filter(kilocalc -> kilocalc.getExecutiveTaskExecution() == null)
-						.findAny();
-
-		if(employee.isPresent())
-		{
-			userlogin = employee.get().getUser().getLogin();
-		}
-
-		log.debug(userlogin+" : " + "Order Details :  " + lastExecutiveTaskExecution.size());
-
+		// Assign attendance and punch-out data if available
+		// Adding Attendance object to the list of ExecutiveTaskExecution objects
 		if (attendance.isPresent() && attendance.get().getCreatedDate().toLocalDate().isEqual(fDate)) {
-			log.debug(userlogin +" : "+ "Attendence :  Present" + " On " + attendance.get().getCreatedDate().toLocalDate());
-			if(optionalKilometreCalculation.isPresent()){
-				log.debug(userlogin +" : Attandence" );
-				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO(optionalKilometreCalculation.get());
-				kiloCalDTO.setLocation(attendance.get().getLocation());
-				kiloCalDTO.setAttendence(true);
-				kiloCalDTOs.add(kiloCalDTO);
-			}
-			if (attendance.get().getLatitude() != null
-					&& attendance.get().getLongitude() != null
-					&& !attendance.get().getLatitude().equals(BigDecimal.ZERO)
-					&& !attendance.get().getLongitude().equals(BigDecimal.ZERO)) {
+			log.debug(Thread +" : " + "Attendence :  Present" + " On " + attendance.get().getCreatedDate().toLocalDate());
 
-				log.debug(userlogin +" : "+ " Tracking Attendance gps location ");
-				originatt = attendance.get().getLatitude() + " , " + attendance.get().getLongitude();
-				log.info(userlogin +" : "+" : Attendance gps location tracked : " + originatt);
+			// Retrieve punchout information from the database
+			optionalPunchOut = punchOutRepository.findIsAttendancePresent(attendance.get().getPid());
+			log.debug("Punchouted : " + optionalPunchOut.isPresent());
+			log.debug(Thread +" : Assigning sAttandence" );
 
-			} else if (attendance.get().getTowerLatitude() != null
-					&& attendance.get().getTowerLongitude() != null
-					&& !attendance.get().getTowerLatitude().equals(BigDecimal.ZERO)
-					&& !attendance.get().getTowerLongitude().equals(BigDecimal.ZERO)) {
+			// Create a new AccountProfile object for the attendance
+			AccountProfile attendenceaccountProfile = new AccountProfile();
+			attendenceaccountProfile.setName("Attendence");
 
-				log.debug(userlogin +" : "+ " Tracking Attendance tower location");
-				originatt = attendance.get().getTowerLatitude() + " , " + attendance.get().getTowerLongitude();
-				log.info(userlogin+" : "+"Attendance tower location tracked : " + originatt);
-				System.out.println();
+			// Create a new ExecutiveTaskExecution object for the attendance
+			ExecutiveTaskExecution attadenceExecutiveTaskExecution = new ExecutiveTaskExecution();
 
-			}
-            optionalPunchOut = punchOutRepository
-                    .findIsAttendancePresent(
-							attendance.get().getPid());
-			log.debug(" is Punchouted : " + optionalPunchOut.isPresent());
-			System.out.println();
-		}
+			// Set properties for the ExecutiveTaskExecution object based on attendance data
+			attadenceExecutiveTaskExecution.setUser(attendance.get().getUser());
+			attadenceExecutiveTaskExecution.setLatitude(attendance.get().getLatitude());
+			attadenceExecutiveTaskExecution.setLongitude(attendance.get().getLongitude());
+			attadenceExecutiveTaskExecution.setDate(attendance.get().getPlannedDate());
+			attadenceExecutiveTaskExecution.setSendDate(attendance.get().getPlannedDate());
+			attadenceExecutiveTaskExecution.setAccountProfile(attendenceaccountProfile);
+			attadenceExecutiveTaskExecution.setLocation(attendance.get().getLocation());
+			attadenceExecutiveTaskExecution.setPid(attendance.get().getPid());
 
-		if( originatt != null && !originatt.isEmpty()){
-			log.debug(userlogin +" : "+ " : Processing Distance From Attendence");
-			if(lastExecutiveTaskExecution.size()>0){
-				log.debug(userlogin+" : " + " ExecutiveTaskExecutions Size  :  " + lastExecutiveTaskExecution.size());
-				KilometerCalculationDTO kiloCalDTO = null;
-				ExecutiveTaskExecution destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(0);
-				String destination = destinationExecutiveTaskExecution.getLatitude() +","+destinationExecutiveTaskExecution.getLongitude();
-				log.debug(userlogin+" : "+"From Attendance " + " TO " + destinationExecutiveTaskExecution.getAccountProfile().getName());
-				log.debug(userlogin+" : "+"origin   :  " + originatt +" destination   :  " + destination);
-				try {
-					kiloCalDTO = getdistance(originatt,destination,destinationExecutiveTaskExecution);
-				} catch (TaskSubmissionPostSaveException e) {
-					throw new RuntimeException(e);
-				}
-				kiloCalDTOs.add(kiloCalDTO);
+			// Add the ExecutiveTaskExecution object to the beginning of the lastExecutiveTaskExecution list
+			lastExecutiveTaskExecution.add(0,attadenceExecutiveTaskExecution);
+
+		 	//Assigning Punchout origin
+			if(optionalPunchOut.isPresent()){
+				log.debug(Thread +" : Assigning Punchout" );
+				PunchOut punchOut = optionalPunchOut.get();
+
+				// Create a new AccountProfile object for the punch Out
+				AccountProfile PunchoutaccountProfile = new AccountProfile();
+				ExecutiveTaskExecution punchoutExecutiveTaskExecution = new ExecutiveTaskExecution();
+				PunchoutaccountProfile.setName("PunchOut");
+				punchoutExecutiveTaskExecution.setUser(punchOut.getUser());
+				punchoutExecutiveTaskExecution.setLatitude(punchOut.getLatitude());
+				punchoutExecutiveTaskExecution.setLongitude(punchOut.getLongitude());
+				punchoutExecutiveTaskExecution.setDate(punchOut.getCreatedDate());
+				punchoutExecutiveTaskExecution.setSendDate(punchOut.getPunchOutDate());
+				punchoutExecutiveTaskExecution.setAccountProfile(PunchoutaccountProfile);
+				punchoutExecutiveTaskExecution.setLocation(punchOut.getLocation());
+				punchoutExecutiveTaskExecution.setPid(punchOut.getPid());
+
+				// Add the ExecutiveTaskExecution object to the lastExecutiveTaskExecution list
+				lastExecutiveTaskExecution.add(punchoutExecutiveTaskExecution);
 			}
 		}
 
+		// Sort the list of ExecutiveTaskExecution objects by the sendDate
+		lastExecutiveTaskExecution = lastExecutiveTaskExecution.stream()
+				.sorted(Comparator.comparing(ExecutiveTaskExecution::getSendDate))
+				.collect(Collectors.toList());
+		log.debug(Thread+" : " + "Order Details :  " + lastExecutiveTaskExecution.size());
+
+		// Calculate the starting point kilometer
+		if(lastExecutiveTaskExecution.size() > 0){
+			startingPointkilometerDTO(lastExecutiveTaskExecution,kiloCalDTOs, employee, Thread);
+		}
+
+		//Iterating through the list of ExecutiveTaskExecution objects to calculate the distance between points.
 		for (int i = 0; i < lastExecutiveTaskExecution.size()-1; i++)
 		{
-			ExecutiveTaskExecution originExecutiveTaskExecution = new ExecutiveTaskExecution();
+			ExecutiveTaskExecution originExecutiveTaskExecution = null;
 			ExecutiveTaskExecution destinationExecutiveTaskExecution = new ExecutiveTaskExecution();
 
-			for(int j = i; j<lastExecutiveTaskExecution.size(); j--){
+			// Iterating to find the origin location for the current destination
+			for(int j = i; j<lastExecutiveTaskExecution.size() && j>=0; j--){
+				originExecutiveTaskExecution = new ExecutiveTaskExecution();
+
+				// Iterating Origin if null its go-to backwards
 				if (lastExecutiveTaskExecution.get(j).getLongitude() != null
                         && lastExecutiveTaskExecution.get(j).getLongitude().doubleValue() != 0
                         && lastExecutiveTaskExecution.get(j).getLatitude()  != null
                         && lastExecutiveTaskExecution.get(j).getLatitude().doubleValue() != 0) {
-
                     originExecutiveTaskExecution = lastExecutiveTaskExecution.get(j);
 					break;
 				}
-				log.debug(userlogin+" : "+lastExecutiveTaskExecution.get(j).getAccountProfile().getName().toString() + " : " + "NoLocation");
+				log.debug(Thread+" : " +lastExecutiveTaskExecution.get(j).getAccountProfile().getName().toString() + " : " + "NoLocation");
 			}
 
+			// Iterating Destination if null, add default
 			if (lastExecutiveTaskExecution.get(i + 1).getLongitude() != null
                     && lastExecutiveTaskExecution.get(i + 1).getLongitude().doubleValue() != 0
                     && lastExecutiveTaskExecution.get(i + 1).getLatitude() != null
                     && lastExecutiveTaskExecution.get(i + 1).getLatitude().doubleValue() != 0) {
-
                 destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(i + 1);
-			}
-			else
-			{
-				destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(i + 1);
-				log.debug(userlogin+" : "+ destinationExecutiveTaskExecution.getAccountProfile() +" : Location Not Found");
-				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
-				kiloCalDTO.setKilometre(0);
-				kiloCalDTO.setMetres(0);
-				kiloCalDTO.setUserPid(destinationExecutiveTaskExecution.getUser().getPid());
-				kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
-				kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
-				kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
-				log.debug("Date : " + destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
-				kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
-				kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getSendDate().toLocalDate().toString());
-				if(employee.isPresent()){kiloCalDTO.setEmployeeName(employee.get().getName());}
-				kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
-				kiloCalDTO.setEndLocation(destinationExecutiveTaskExecution.getLocation());
-				kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
-				kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
-				kiloCalDTOs.add(kiloCalDTO);
+			} else {
+
+				//Adding Default kilometre
+				defaultkilometerDTO(lastExecutiveTaskExecution, kiloCalDTOs, employee, Thread, i);
 				continue;
 			}
 
-			if(optionalPunchOut.isPresent()
-					&& originExecutiveTaskExecution.getSendDate().isBefore(optionalPunchOut.get().getPunchOutDate())
-					&& destinationExecutiveTaskExecution.getSendDate().isAfter(optionalPunchOut.get().getPunchOutDate())){
-
-				if(ispunchouted == false) {
-						log.debug("Enter Punchout");
-						log.debug("punch out Time : " + optionalPunchOut.get().getPunchOutDate());
-						log.debug("Origin Punch in Date : " + originExecutiveTaskExecution.getSendDate());
-						log.debug("Origin Punch out Date : " + destinationExecutiveTaskExecution.getSendDate());
-						if (optionalPunchOut.isPresent()) {
-							log.debug("Punch Out Present");
-							KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
-							PunchOut punchout = optionalPunchOut.get();
-
-							log.debug("Account Profiles : " + originExecutiveTaskExecution.getAccountProfile().getName());
-							System.lineSeparator();
-
-							String originToPunchout = originExecutiveTaskExecution.getLatitude() + "," + originExecutiveTaskExecution.getLongitude();
-							String destination = destinationExecutiveTaskExecution.getLatitude() + "," + destinationExecutiveTaskExecution.getLongitude();
-							String punchoutlocation = punchout.getLatitude() + "," + punchout.getLongitude();
-
-							log.debug(userlogin + " : " + "Distance traveled From " + originExecutiveTaskExecution.getAccountProfile().getName() + " TO " + punchout.getLocation() + "(Punchout)");
-							log.debug(userlogin + " : " + " punch out origin   :  " + originToPunchout + "destination   :  " + punchoutlocation);
-							kiloCalDTO = getpunchoutdistance(originToPunchout, punchoutlocation, punchout);
-							kiloCalDTO.setPunchOut(true);
-							kiloCalDTOs.add(kiloCalDTO);
-							log.debug(userlogin + " : " + " punch out destination   :  " + originToPunchout + " destination   :  " + destination);
-							kiloCalDTOs.add(getdistance(punchoutlocation, destination, destinationExecutiveTaskExecution));
-						}
-						ispunchouted=true;
-				   }
-				}
-			else{
-				String origin = originExecutiveTaskExecution.getLatitude() +","+originExecutiveTaskExecution.getLongitude();
-
-				String destination = destinationExecutiveTaskExecution.getLatitude()+","+destinationExecutiveTaskExecution.getLongitude();
-
-				log.debug(userlogin+" : "+"Distance traveled From " + originExecutiveTaskExecution.getAccountProfile().getName() + " TO "+ destinationExecutiveTaskExecution.getAccountProfile().getName());
-
-				log.debug(userlogin+" : "+"origin   :  " + origin + "destination   :  " + destination);
-				System.out.println();
-
+			// Adding Default kilometer in case the origin is null
+			if(originExecutiveTaskExecution.getLatitude() == null
+					&& originExecutiveTaskExecution.getLongitude() == null){
+			defaultkilometerDTO(lastExecutiveTaskExecution, kiloCalDTOs, employee, Thread, i);
+		  } else{
+				String origin = originExecutiveTaskExecution.getLatitude()+","+originExecutiveTaskExecution.getLongitude();
+				String destination = destinationExecutiveTaskExecution.getLatitude() +","+destinationExecutiveTaskExecution.getLongitude();
+				log.debug(Thread+" : "+"Distance traveled From " + originExecutiveTaskExecution.getAccountProfile().getName()
+						+ " TO "+ destinationExecutiveTaskExecution.getAccountProfile().getName());
+				log.debug(Thread+" : "+"origin   :  " + origin + "destination   :  " + destination);
 				try {
-					kiloCalDTOs.add(getdistance(origin,destination,destinationExecutiveTaskExecution));
+
+					// Calculating Distance from origin to Destination
+					kiloCalDTOs.add(getDistance(origin, destination, destinationExecutiveTaskExecution));
 				} catch (TaskSubmissionPostSaveException e) {
 					throw new RuntimeException(e);
 				}
 			}
 		}
-
 		log.debug("kilo meter Calculation : " + kiloCalDTOs);
 
-		if(ispunchouted == false){
-			if (optionalPunchOut != null  && optionalPunchOut.isPresent()) {
-				PunchOut punchout = optionalPunchOut.get();
-				System.out.println();
-				log.debug("Enter Punch-out no oders After");
-				log.debug("punch out Time : " + optionalPunchOut.get().getPunchOutDate());
-				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
-				ExecutiveTaskExecution originExecutiveTaskExecution = lastExecutiveTaskExecution.get(lastExecutiveTaskExecution.size()-1);
-				log.debug("Origin Punch in Date : " + originExecutiveTaskExecution.getSendDate());
-				log.debug("Origin Punch out Date : " + punchout.getPunchOutDate());
-				String origin = originExecutiveTaskExecution.getLatitude() +","+originExecutiveTaskExecution.getLongitude();
-				String destination = punchout.getLatitude()+","+punchout.getLongitude();
-				kiloCalDTO = getpunchoutdistance(origin, destination, punchout);
-				kiloCalDTO.setPunchOut(true);
-				kiloCalDTOs.add(kiloCalDTO);
-			}
-		}
-
-		kiloCalDTOs = kiloCalDTOs.stream().sorted(Comparator.comparing(KilometerCalculationDTO::getPunchingTime).reversed()).collect(Collectors.toList());
-
-		log.debug(userlogin+" : "+"Request to get distance Traveled : Exit :getFilterData() - " + kiloCalDTOs.toString());
-
+		// Sort the list of KilometerCalculationDTO objects by the punchingTime in descending order
+		kiloCalDTOs = kiloCalDTOs
+				.stream()
+				.sorted(Comparator.comparing(KilometerCalculationDTO::getPunchingTime)
+						.reversed())
+				.collect(Collectors.toList());
+		log.debug(Thread +" : " +"Request to get distance Traveled : Exit :getFilterData() - " + kiloCalDTOs.toString());
 		return kiloCalDTOs;
 	}
+	/**
+	 *
+	 * This method is used to generate a KilometerCalculationDTO object based on the given data.
+	 * The object is then added to the list of KilometerCalculationDTOs.
+	 * @param lastExecutiveTaskExecution
+	 * @param kiloCalDTOs
+	 * @param employee
+	 * @param Thread
+	 * @param i
+	 */
+	private void defaultkilometerDTO(
+			List<ExecutiveTaskExecution> lastExecutiveTaskExecution,
+			List<KilometerCalculationDTO> kiloCalDTOs,
+			Optional<EmployeeProfile> employee, String Thread, int i) {
+		ExecutiveTaskExecution destinationExecutiveTaskExecution;
 
+		// Get the next ExecutiveTaskExecution from the provided list
+		destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(i + 1);
+		log.debug(Thread +" : "+ destinationExecutiveTaskExecution.getAccountProfile() +" : Location Not Found");
 
-	public  KilometerCalculationDTO getdistance(String origin ,String destination,ExecutiveTaskExecution destinationExecutiveTaskExecution) throws TaskSubmissionPostSaveException {
+		// Create a new KilometerCalculationDTO object and set its properties
+		KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
+		kiloCalDTO.setKilometre(0);
+		kiloCalDTO.setMetres(0);
+		kiloCalDTO.setUserPid(destinationExecutiveTaskExecution.getUser().getPid());
+		kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
+		kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
+		kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
+		log.debug("Date : " + destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+		kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+		kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getSendDate().toLocalDate().toString());
+		if(employee.isPresent()){kiloCalDTO.setEmployeeName(employee.get().getName());}
+		kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
+		kiloCalDTO.setEndLocation(destinationExecutiveTaskExecution.getLocation());
+		kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
+		kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
 
-		List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
+		// Add the KilometerCalculationDTO object to the kiloCalDTOs list
+		kiloCalDTOs.add(kiloCalDTO);
+	}
+	/**
+	 * Initializes a KilometerCalculationDTO object based on the provided parameters.
+	 *
+	 * @param lastExecutiveTaskExecution The list of last executed executive task executions.
+	 * @param kiloCalDTOs                The list of KilometerCalculationDTO objects to store the data.
+	 * @param employee                   An optional EmployeeProfile object representing the employee information.
+	 * @param Thread                     The thread identifier (possibly for logging purposes).
+	 */
+	private void startingPointkilometerDTO(
+			List<ExecutiveTaskExecution> lastExecutiveTaskExecution,
+			List<KilometerCalculationDTO> kiloCalDTOs,
+			Optional<EmployeeProfile> employee, String Thread) {
+		ExecutiveTaskExecution destinationExecutiveTaskExecution;
 
+		// Get the first ExecutiveTaskExecution from the list as the destinationExecutiveTaskExecution.
+		destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(0);
+
+		// Create a new KilometerCalculationDTO object.
 		KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
 
+		// Set initial values for the KilometerCalculationDTO object.
+		kiloCalDTO.setKilometre(0);
+		kiloCalDTO.setMetres(0);
+		kiloCalDTO.setUserPid(destinationExecutiveTaskExecution.getUser().getPid());
+		kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
+		kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
+		kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
+		log.debug("Date : " + destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+		kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
+		kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getSendDate().toLocalDate().toString());
+		if(employee.isPresent()){kiloCalDTO.setEmployeeName(employee.get().getName());}
+		kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
+		kiloCalDTO.setEndLocation(destinationExecutiveTaskExecution.getLocation());
+		kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
+		kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
+
+		// Add the initialized KilometerCalculationDTO object to the list of DTOs.
+		kiloCalDTOs.add(kiloCalDTO);
+	}
+	/**
+	 * Calculates the distance between the given origin and destination using a distance API.
+	 *
+	 * @param origin The latitude and longitude of the origin location in the format "latitude,longitude".
+	 * @param destination The latitude and longitude of the destination location in the format "latitude,longitude".
+	 * @param destinationExecutiveTaskExecution The ExecutiveTaskExecution object associated with the destination location.
+	 * @return A KilometerCalculationDTO object containing the calculated distance details.
+	 * @throws TaskSubmissionPostSaveException If an error occurs during the distance calculation or API call.
+	 */
+	public  KilometerCalculationDTO getDistance(
+			String origin ,
+			String destination,
+			ExecutiveTaskExecution destinationExecutiveTaskExecution)
+			throws TaskSubmissionPostSaveException {
+		List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
+		KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
 		MapDistanceApiDTO distanceApiJson = null;
-
 		MapDistanceDTO distance = null;
-
-		EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUser(destinationExecutiveTaskExecution.getUser());
+		EmployeeProfile employee =
+				employeeProfileRepository
+						.findEmployeeProfileByUser(
+								destinationExecutiveTaskExecution.getUser());
 		try{
-			distanceApiJson = geoLocationService.findDistance(origin, destination);
 
+			// Call the distance API to get the distance between the origin and destination
+			distanceApiJson = geoLocationService.findDistance(origin, destination);
 			if (distanceApiJson != null && !distanceApiJson.getRows().isEmpty()) {
 
+				// Extract distance details from the API response
 				distance = distanceApiJson.getRows().get(0).getElements().get(0).getDistance();
-
 				if (distance != null) {
+
+					// Populate the KilometerCalculationDTO object with the calculated distance details
 					kiloCalDTO.setKilometre(distance.getValue() * 0.001);
 					kiloCalDTO.setMetres(distance.getValue());
 					kiloCalDTO.setUserPid(destinationExecutiveTaskExecution.getUser().getPid());
@@ -390,9 +436,10 @@ public class KilometerCalculationNewResource {
 					log.debug("Location : "+destinationExecutiveTaskExecution.getLocation());
 					kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
 					kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
-				}
-				else{
-					log.debug("attandence latitude and longitudes are not aqurate ");
+				} else{
+
+					// If distance is not available, set default values in the KilometerCalculationDTO object
+					log.debug("Attendance latitude and longitudes are not accurate.");
 					kiloCalDTO.setKilometre(0.0);
 					kiloCalDTO.setMetres(0.0);
 					kiloCalDTO.setUserPid(destinationExecutiveTaskExecution.getUser().getPid());
@@ -409,182 +456,85 @@ public class KilometerCalculationNewResource {
 					kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
 				}
 			}
-			System.out.println();
 			log.debug(kiloCalDTO.toString());
-			System.out.println();
 			return kiloCalDTO;
 		}
 		catch (Exception e) {
+
+			// Handle exceptions and throw a custom exception with relevant information
 			log.debug("Exception while processing saveKilometreDifference method {}", e);
 			throw new TaskSubmissionPostSaveException("Exception while processing saveKilometreDifference method. "
 					+ "Company : " + destinationExecutiveTaskExecution.getCompany().getLegalName() + " User:"
 					+ destinationExecutiveTaskExecution.getUser().getLogin() + " Disatance API JSON :" + distanceApiJson
 					+ " Exception : " + e);
 		}
-
 	}
-
-
-	public  KilometerCalculationDTO getDistanceFromAttandance(String origin ,String destination,ExecutiveTaskExecution destinationExecutiveTaskExecution) throws TaskSubmissionPostSaveException {
-
-		List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
-
-		KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
-
-		MapDistanceApiDTO distanceApiJson = null;
-
-		MapDistanceDTO distance = null;
-
-		EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUser(destinationExecutiveTaskExecution.getUser());
-		try{
-			distanceApiJson = geoLocationService.findDistance(origin, destination);
-
-			if (distanceApiJson != null && !distanceApiJson.getRows().isEmpty()) {
-
-				distance = distanceApiJson.getRows().get(0).getElements().get(0).getDistance();
-
-				if (distance != null) {
-					log.debug("attadence format currect ");
-					kiloCalDTO.setKilometre(distance.getValue() * 0.001);
-					kiloCalDTO.setMetres(distance.getValue());
-					kiloCalDTO.setUserPid(destinationExecutiveTaskExecution.getUser().getPid());
-					kiloCalDTO.setUserName(destinationExecutiveTaskExecution.getUser().getFirstName());
-					kiloCalDTO.setAccountProfileName(destinationExecutiveTaskExecution.getAccountProfile().getName());
-					kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
-					log.debug("Punching Time : "+destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
-					kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
-					log.debug("Punching Date : "+destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
-					kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getSendDate().toLocalDate().toString());
-					kiloCalDTO.setEmployeeName(employee.getName());
-					log.debug("Location : "+destinationExecutiveTaskExecution.getLocation());
-					kiloCalDTO.setLocation("Location Not Found");
-					kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
-				}
-
-			}
-			System.out.println();
-			log.debug(kiloCalDTO.toString());
-			System.out.println();
-			return kiloCalDTO;
-		}
-		catch (Exception e) {
-			log.debug("Exception while processing saveKilometreDifference method {}", e);
-			throw new TaskSubmissionPostSaveException("Exception while processing saveKilometreDifference method. "
-					+ "Company : " + destinationExecutiveTaskExecution.getCompany().getLegalName() + " User:"
-					+ destinationExecutiveTaskExecution.getUser().getLogin() + " Disatance API JSON :" + distanceApiJson
-					+ " Exception : " + e);
-		}
-
-	}
-
-	public  KilometerCalculationDTO getpunchoutdistance(String origin ,String destination,PunchOut punchOut) throws TaskSubmissionPostSaveException {
-		log.debug("punch Out Fetching : " + punchOut.toString());
-		List<KilometerCalculationDTO> kiloCalDTOs = new ArrayList<KilometerCalculationDTO>();
-
-		KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
-
-		MapDistanceApiDTO distanceApiJson = null;
-
-		MapDistanceDTO distance = null;
-
-		EmployeeProfile employee = employeeProfileRepository.findEmployeeProfileByUser(punchOut.getUser());
-		try{
-			distanceApiJson = geoLocationService.findDistance(origin, destination);
-			log.debug("distanceApiJson : " + distanceApiJson.toString());
-			if (distanceApiJson != null && !distanceApiJson.getRows().isEmpty()) {
-
-				distance = distanceApiJson.getRows().get(0).getElements().get(0).getDistance();
-				if (distance != null) {
-					log.debug("distance : " + distance.toString());
-					log.debug("distance not null to punchout");
-					kiloCalDTO.setKilometre(distance.getValue() * 0.001);
-					kiloCalDTO.setMetres(distance.getValue());
-					kiloCalDTO.setUserPid(punchOut.getUser().getPid());
-					kiloCalDTO.setUserName(punchOut.getUser().getFirstName());
-					kiloCalDTO.setDate(punchOut.getPunchOutDate().toLocalDate());
-					kiloCalDTO.setPunchingTime(punchOut.getPunchOutDate().toLocalTime().toString());
-					kiloCalDTO.setPunchingDate(punchOut.getPunchOutDate().toLocalDate().toString());
-					kiloCalDTO.setEmployeeName(employee.getName());
-					log.debug("PunchoutLocation : " + punchOut.getLocation());
-					kiloCalDTO.setLocation(punchOut.getLocation());
-				}
-				else{
-						log.debug("distance null to punchout");
-						kiloCalDTO.setKilometre(0);
-						kiloCalDTO.setMetres(0);
-						kiloCalDTO.setUserPid(punchOut.getUser().getPid());
-						kiloCalDTO.setUserName(punchOut.getUser().getFirstName());
-						kiloCalDTO.setDate(punchOut.getPunchOutDate().toLocalDate());
-						kiloCalDTO.setPunchingTime(punchOut.getPunchOutDate().toLocalTime().toString());
-						kiloCalDTO.setPunchingDate(punchOut.getPunchOutDate().toLocalDate().toString());
-						kiloCalDTO.setEmployeeName(employee.getName());
-						log.debug("PunchoutLocation : " + punchOut.getLocation());
-						kiloCalDTO.setLocation(punchOut.getLocation());
-
-				}
-			}
-			log.debug(kiloCalDTO.toString());
-			return kiloCalDTO;
-		}
-		catch (Exception e) {
-			log.debug("Exception while processing saveKilometreDifference method {}", e);
-			throw new TaskSubmissionPostSaveException("Exception while processing saveKilometreDifference method. "
-					+ "Company : " + punchOut.getCompany().getLegalName() + " User:"
-					+ punchOut.getUser().getLogin() + " Disatance API JSON :" + distanceApiJson
-					+ " Exception : " + e);
-		}
-
-	}
-
-	@RequestMapping(value = "/kilo-calc-new/updateLocationExeTask/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	/**
+	 * This method handles a GET request to update the location information of an executive task execution.
+	 *
+	 * @param pid The unique identifier for the executive task execution.
+	 * @return ResponseEntity containing the updated InvoiceWiseReportView with the location information.
+	 */
+	@RequestMapping(value = "/kilo-calc-new/updateLocationExeTask/{pid}",
+			method = RequestMethod.GET,
+			produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
-		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
-		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
-		if (opExecutiveeExecution.isPresent()) {
-			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
+	public ResponseEntity<InvoiceWiseReportView>
+	updateLocationExecutiveTaskExecutions(
+			@PathVariable String pid) {
 
+		// Find the ExecutiveTaskExecution by its unique identifier (pid) using the repository.
+		Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
+
+		// Create a new InvoiceWiseReportView to store the updated information.
+		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
+
+		// Check if the ExecutiveTaskExecution is present in the repository.
+		if (opExecutiveeExecution.isPresent()) {
+
+			// Get the ExecutiveTaskExecution object from the Optional.
+			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
 			if (execution.getLatitude() != BigDecimal.ZERO) {
+
+				// Call the geoLocationService to find the address from the latitude and longitude.
 				System.out.println("-------lat != 0");
 				String location = geoLocationService
 						.findAddressFromLatLng(execution.getLatitude() + "," + execution.getLongitude());
 				System.out.println("-------" + location);
-				execution.setLocation(location);
 
+				// Update the location of the ExecutiveTaskExecution.
+				execution.setLocation(location);
 			} else {
 				System.out.println("-------No Location");
+
+				// Set the location as "No Location" if latitude is zero (invalid location).
 				execution.setLocation("No Location");
 			}
+
+			// Save the updated ExecutiveTaskExecution object in the repository.
 			execution = executiveTaskExecutionRepository.save(execution);
+
+			// Create a new InvoiceWiseReportView with the updated ExecutiveTaskExecution object.
 			executionView = new InvoiceWiseReportView(execution);
 		}
+
+		// Return the ResponseEntity with the InvoiceWiseReportView containing the updated location information.
 		return new ResponseEntity<>(executionView, HttpStatus.OK);
 	}
 
+
+	private static String getUser(
+			String userlogin,
+			Optional<EmployeeProfile> employee) {
+		if(employee.isPresent())
+		{
+			userlogin =
+					employee
+							.get()
+							.getUser()
+							.getLogin();
+		}
+		return userlogin;
+	}
+
 }
-
-
-
-
-//		if(attendance.isPresent()){
-//			log.debug("attendance present");
-//			Optional<PunchOut> optionalPunchOut = punchOutRepository
-//					.findIsAttendancePresent(attendance.get().getPid());
-//			if(optionalPunchOut.isPresent()){
-//				log.debug("punch out present");
-//				KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
-//				PunchOut punchout = optionalPunchOut.get();
-//				lastExecutiveTaskExecution = lastExecutiveTaskExecution.stream().sorted(Comparator.comparing(ExecutiveTaskExecution::getSendDate()).reversed()).collect(Collectors.toList());
-//					ExecutiveTaskExecution lastexecutiveTaskExecutionDTO = lastExecutiveTaskExecution.get(0);
-//					log.debug("Account Profiles : "+lastexecutiveTaskExecutionDTO.getAccountProfile().getName());
-//
-//					String origin = lastexecutiveTaskExecutionDTO.getLatitude() +","+lastexecutiveTaskExecutionDTO.getLongitude();
-//					String destination = punchout.getLatitude()+","+punchout.getLongitude();
-//
-//					log.debug(userlogin+" : "+"Distance traveled From " + lastexecutiveTaskExecutionDTO.getAccountProfile().getName() + " TO "+ punchout.getLocation()+"(Punchout)");
-//					log.debug(userlogin+" : "+" punch out origin   :  " + origin + "destination   :  " + destination);
-//					kiloCalDTO = getpunchoutdistance(origin,destination,punchout);
-//					kiloCalDTO.setPunchOut(true);
-//					kiloCalDTOs.add(kiloCalDTO);
-//			}
-//		}

@@ -1,5 +1,8 @@
 package com.orderfleet.webapp.web.rest.DownloadLog;
 
+import com.orderfleet.webapp.web.rest.CompanyConfigurationResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +25,9 @@ import java.time.LocalDateTime;
 @Controller
 @RequestMapping("/web")
 public class DownloadLog {
+
+  private final Logger log = LoggerFactory.getLogger(CompanyConfigurationResource.class);
+  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 
   @RequestMapping(value = "/get-log", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public String  initializeView(Model model){
@@ -49,7 +55,7 @@ public class DownloadLog {
     String fileName = "logFile." + date + ".log";
     String userDirectory = System.getProperty("user.dir");
     Path filePath = Paths.get(userDirectory +"\\"+ fileName);
-    System.out.println("Path : " + userDirectory);
+    log.debug("log Path : " + userDirectory);
     Resource resource = new UrlResource(filePath.toUri());
 
     if (resource.exists()) {
