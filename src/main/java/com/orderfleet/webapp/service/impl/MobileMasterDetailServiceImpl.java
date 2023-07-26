@@ -50,8 +50,9 @@ public class MobileMasterDetailServiceImpl implements MobileMasterDetailService 
 														MobileMasterUpdate mobileMasterUpdate) {
 		List<MobileMasterDetail> mmdList = new ArrayList<>();
 		List<MobileMasterDetail> mmdExistingList = new ArrayList<>();
-		mmdExistingList =  mobileMasterDetailRepository.findByMobileMasterUpdateId(mobileMasterUpdate.getId());
-		
+		if(mobileMasterUpdate.getId() != null) {
+			mmdExistingList = mobileMasterDetailRepository.findByMobileMasterUpdateId(mobileMasterUpdate.getId());
+		}
 		for(MobileMasterDetailDTO dto : mobileMasterDetailDtos) {
 			MobileMasterDetail mmd = new MobileMasterDetail();
 			Optional<MobileMasterDetail> opMobileExisting = 
