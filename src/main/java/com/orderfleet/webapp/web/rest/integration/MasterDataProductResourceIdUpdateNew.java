@@ -147,79 +147,91 @@ public class MasterDataProductResourceIdUpdateNew {
 				}).orElse(new ResponseEntity<>("Product-profile sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
 	}
-	
-	@RequestMapping(value = "/product-group_product-profileUpdateIdNew.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+
+	/**
+	 * @apiNote  Endpoint for bulk saving or updating product-group_Product-Profiles.
+	 * This method receives a list of TPProductGroupProductDTO objects containing product-group_Product-Profile information
+	 * and performs the necessary operations based on the provided data.
+	 *
+	 * @param productGroupProductDTOs A list of TPProductGroupProductDTO objects representing product-group_Product-Profile data.
+	 *                                Each object contains information about a specific product-group_Product-Profile mapping.
+	 *                                The data must be validated before processing.
+	 * @return ResponseEntity<String> A response entity with a status code and message indicating the result of the operation.
+	 *                                If successful, the response entity will have a status code of 200 (OK) and a message "Uploaded".
+	 *                                If there is an error, the response entity will have a status code of 400 (Bad Request)
+	 *                                and an appropriate error message.
+	 * @since 1.109.5
+	 */
+	@RequestMapping(value = "/product-group_product-profileUpdateIdNew.json",
+			method = RequestMethod.POST,
+			produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<String> bulkSaveProductGroupProductProfile(
 			@Valid @RequestBody List<TPProductGroupProductDTO> productGroupProductDTOs) {
-		log.debug("REST request to save product-group_Product-Profiles : {}", productGroupProductDTOs.size());
+		log.debug("Received a request to bulk save/update product-group_Product-Profiles.",
+				productGroupProductDTOs.size());
 
+		// Get the current user's companyId
 		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "COMP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all by compId and name";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		Optional<CompanyConfiguration> optionaldistanceTarvel = companyConfigurationRepository
-		.findByCompanyIdAndName(companyId, CompanyConfig.REFRESH_PRODUCT_GROUP_PRODUCT);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
 
-			if(optionaldistanceTarvel.isPresent()) {
+		// Check if the company configuration "REFRESH_PRODUCT_GROUP_PRODUCT" exists for the current companyId
+		Optional<CompanyConfiguration> refreshProductGroupProductConfig =
+					companyConfigurationRepository.findByCompanyIdAndName(
+							companyId, CompanyConfig.REFRESH_PRODUCT_GROUP_PRODUCT);
+
+			if(refreshProductGroupProductConfig.isPresent()
+					&& refreshProductGroupProductConfig.get().getValue().equalsIgnoreCase("true")) {
+				// If productGroupProductDTOs list is not empty,
+				// delete all existing product-product group mappings for the companyId
 				if(!productGroupProductDTOs.isEmpty()) {
-					
-					tpProductProfileManagementService.deleteProductProductGroups(companyId);
-					
+					log.info("Deleting existing product-product group mappings for companyId: {}", companyId);
+					tpProductProfileManagementService
+							.deleteProductProductGroups(companyId);
 				}
 			}
-		
-		
-		
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.PRODUCTGROUP_PRODUCTPROFILE).map(so -> {
 
-					Optional<SyncOperation> opSyncPP = syncOperationRepository.findOneByCompanyIdAndOperationType(
-							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.PRODUCTPROFILE);
+		return syncOperationRepository
+				.findOneByCompanyIdAndOperationType(
+						SecurityUtils.getCurrentUsersCompanyId(),
+						SyncOperationType.PRODUCTGROUP_PRODUCTPROFILE)
+				.map(so -> {
+
+					// Check if a sync operation for PRODUCTPROFILE is already in progress
+					Optional<SyncOperation> opSyncPP =
+							syncOperationRepository.findOneByCompanyIdAndOperationType(
+									SecurityUtils.getCurrentUsersCompanyId(),
+									SyncOperationType.PRODUCTPROFILE);
 
 					if (!opSyncPP.get().getCompleted()) {
+						log.warn("Product-profile save processing is not allowed at this time due to an ongoing operation.");
+
+						// If a sync operation for PRODUCTPROFILE is in progress, return an error response
 						return new ResponseEntity<>("product-profile save processing try after some time.",
 								HttpStatus.BAD_REQUEST);
 					}
 
-					// update sync status
+					// Update sync status for the current sync operation (PRODUCTGROUP_PRODUCTPROFILE)
 					so.setCompleted(false);
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
-					// save/update
-					log.info("Insert product product groups.......");
-					if(optionaldistanceTarvel.isPresent()) {
-						tpProductProfileManagementService.saveDeleteProductGroupProductUpdateIdNew(productGroupProductDTOs, so);
+
+					// Save/Update product-group_Product-Profiles based on the configuration
+					if(refreshProductGroupProductConfig.isPresent()
+							&& refreshProductGroupProductConfig.get().getValue().equalsIgnoreCase("true")) {
+						log.info("Deleting and Inserting product product groups for companyId: {}", companyId);
+						tpProductProfileManagementService
+								.saveDeleteProductGroupProductUpdateIdNew(
+										productGroupProductDTOs, so);
 					}else {
-						tpProductProfileManagementService.saveUpdateProductGroupProductUpdateIdNew(productGroupProductDTOs, so);
+						log.info("Updating and inserting product product groups for companyId: {}", companyId);
+						tpProductProfileManagementService
+								.saveUpdateProductGroupProductUpdateIdNew(
+										productGroupProductDTOs, so);
 					}
-					
-					
+
+					// Return a success response
+					log.info("Product-group_Product-Profiles bulk save/update completed successfully.");
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				})
 				.orElse(new ResponseEntity<>(

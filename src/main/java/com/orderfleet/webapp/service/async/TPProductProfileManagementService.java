@@ -1479,46 +1479,76 @@ public class TPProductProfileManagementService {
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
-	
+	/**
+	 * Asynchronously saves or updates product-group_Product-Profile mappings based on the provided DTOs.
+	 * The method performs the necessary database operations and updates the sync operation status accordingly.
+	 *
+	 * @param productGroupProductDTOs A list of TPProductGroupProductDTO objects representing product-group_Product-Profile data.
+	 *                                Each object contains information about a specific product-group_Product-Profile mapping.
+	 * @param syncOperation The SyncOperation entity representing the current sync operation.
+	 */
 	@Transactional
-	@Async
-	public void saveUpdateProductGroupProduct(final List<TPProductGroupProductDTO> productGroupProductDTOs,
+	public void saveUpdateProductGroupProduct(
+			final List<TPProductGroupProductDTO> productGroupProductDTOs,
 			final SyncOperation syncOperation) {
-		
+
+		// Record the start time for performance measurement
 		long start = System.nanoTime();
+
 		final Company company = syncOperation.getCompany();
 		final Long companyId = syncOperation.getCompany().getId();
 
+		// Initialize data structures for saving/updating product-group_Product-Profile mappings
 		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
+
 		if (syncOperation.getReset()) {
+			// Inactivate existing product-group_Product-Profile mappings if reset is requested
+			log.info("Inactivating existing product-group_Product-Profile mappings for companyId: {}", companyId);
 			productGroupProductRepository.updateProductGroupProductInactivate(companyId);
 		}
+
+		// Fetch all activated ProductGroupProduct entities for the company from the database
+		List<ProductGroupProduct> optionalPGPlist = productGroupProductRepository
+				.findByProductGroupProductActivatedAndCompanyId(companyId);
+
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
 
+		// Check if the "ALIAS_TO_NAME" configuration is enabled for the company
 		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
 				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
 
+		if(optAliasToName.isPresent()){
+			log.info("optAliasToName {}" + optAliasToName.get().getValue() + ":" +companyId);
+		}
+
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
-			// check exist by names,
-			Optional<ProductGroupProduct> optionalPGP = productGroupProductRepository
-					.findByCompanyIdAndProductGroupNameIgnoreCaseAndProductNameIgnoreCase(companyId,
-							pgpDto.getGroupName(), pgpDto.getProductName());
-			// if not exist save
+
+			// Check if the product-group_Product-Profile mapping already exists in the fetched list
+			Optional<ProductGroupProduct> optionalPGP = optionalPGPlist.stream()
+					.filter(data -> data.getProduct().getName() == pgpDto.getProductName()
+							&& data.getProductGroup().getName() == pgpDto.getGroupName()).findAny();
+
+//				productGroupProductRepository
+//					.findByCompanyIdAndProductGroupNameIgnoreCaseAndProductNameIgnoreCase(companyId,
+//							pgpDto.getGroupName(), pgpDto.getProductName());
+
+			// If the mapping does not exist, create a new one
 			if (!optionalPGP.isPresent()) {
+
 				Optional<ProductGroup> optionalGroup = productGroups.stream()
 						.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findAny();
+
 				Optional<ProductProfile> optionalpp = productProfiles.stream()
 						.filter(pl -> pgpDto.getProductName().equals(pl.getName())).findAny();
 
+				// If "ALIAS_TO_NAME" configuration is enabled, check for product alias names as well
 				if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
-
 					optionalpp = productProfiles.stream()
 							.filter(pl -> pl.getAlias() != null && !pl.getAlias().equals("")
 									? pgpDto.getProductName().equals(pl.getAlias())
 									: pgpDto.getProductName().equals(pl.getName()))
 							.findAny();
-
 				}
 
 				if (optionalpp.isPresent() && optionalGroup.isPresent()) {
@@ -1529,21 +1559,30 @@ public class TPProductProfileManagementService {
 					pgp.setActivated(true);
 					saveUpdateProductGroupProducts.add(pgp);
 				}
+
 			} else {
+				// If the mapping exists, update its activation status
 				optionalPGP.get().setActivated(true);
 				saveUpdateProductGroupProducts.add(optionalPGP.get());
 			}
 		}
-		bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+
+		//bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+		log.debug("ProductGroupProducts Size : "+ saveUpdateProductGroupProducts.size());
+		productGroupProductRepository.save(saveUpdateProductGroupProducts);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
+
+		// Record the end time for performance measurement
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
+
+		// Log the completion of the sync operation with the elapsed time
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
+
 	@Transactional
 	@Async
 	public void saveUpdateProductGroupProductUpdateId(final List<TPProductGroupProductDTO> productGroupProductDTOs,
@@ -1628,54 +1667,76 @@ public class TPProductProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
+
+
+	/**
+	 * Saves product-group_Product-Profile mappings based on the provided DTOs.
+	 * The method performs the necessary database operations and updates the sync operation status accordingly.
+	 *
+	 * @param productGroupProductDTOs A list of TPProductGroupProductDTO objects representing product-group_Product-Profile data.
+	 *                                Each object contains information about a specific product-group_Product-Profile mapping.
+	 * @param syncOperation The SyncOperation entity representing the current sync operation.
+	 */
 	@Transactional
 	@Async
-	public void saveUpdateProductGroupProductUpdateIdNew(final List<TPProductGroupProductDTO> productGroupProductDTOs,
+	public void saveUpdateProductGroupProductUpdateIdNew(
+			final List<TPProductGroupProductDTO> productGroupProductDTOs,
 			final SyncOperation syncOperation) {
-		
+		log.debug("Enter : saveUpdateProductGroupProductUpdateIdNew "
+				+ syncOperation.getCompany().getLegalName());
+
+		// Record the start time for measuring elapsed time
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		final Long companyId = syncOperation.getCompany().getId();
 		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
+
+		// If syncOperation.getReset() is true, update the status of existing products
 		if (syncOperation.getReset()) {
 			productGroupProductRepository.updateProductGroupProductInactivate(companyId);
 		}
+
+		// Retrieve necessary data for processing
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
-//		productGroups.forEach(data -> {
-//			String[] name = data.getName().split("~");
-//			data.setName(name[0]);
-//		});
-//		productProfiles.forEach(data -> {
-//			String[] name = data.getName().split("~");
-//			data.setName(name[0]);
-//		});
+		List<ProductGroupProduct> productGroups_productProfiles = productGroupProductRepository.findByProductGroupProductActivatedAndCompanyId(companyId);
+
+		// Fetch a company configuration (if it exists) to determine whether to use aliases for names
 		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
 				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
 
+
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
-			// check exist by names,
-			Optional<ProductGroupProduct> optionalPGP = productGroupProductRepository
-					.findByCompanyIdAndProductGroupNameIgnoreCaseAndProductNameIgnoreCase(companyId,
-							pgpDto.getGroupName(), pgpDto.getProductName());
-			// if not exist save
+			// Check if the product group and product exist by their names
+			Optional<ProductGroupProduct> optionalPGP = productGroups_productProfiles.stream()
+					.filter(pgp -> pgp.getProduct().getName().trim().equalsIgnoreCase(pgpDto.getProductName().trim())
+							&& pgp.getProductGroup().getName().trim().equalsIgnoreCase(pgpDto.getGroupName().trim()))
+					.findAny();
+
+
+			// If the product group and product do not exist, create and save them
 			if (!optionalPGP.isPresent()) {
+
+				// Find the matching product group and product
 				Optional<ProductGroup> optionalGroup = productGroups.stream()
 						.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findAny();
+
 				Optional<ProductProfile> optionalpp = productProfiles.stream()
 						.filter(pl -> pgpDto.getProductName().equals(pl.getName())).findAny();
 
+				// If the company configuration allows aliases for names,
+				// attempt to find a matching product profile using aliases
 				if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
-
 					optionalpp = productProfiles.stream()
 							.filter(pl -> pl.getAlias() != null && !pl.getAlias().equals("")
 									? pgpDto.getProductName().equals(pl.getAlias())
 									: pgpDto.getProductName().equals(pl.getName()))
 							.findAny();
-
 				}
 
+				// If both product group and product are found,
+				// create and save the ProductGroupProduct entity
 				if (optionalpp.isPresent() && optionalGroup.isPresent()) {
 					ProductGroupProduct pgp = new ProductGroupProduct();
 					pgp.setProductGroup(optionalGroup.get());
@@ -1685,55 +1746,71 @@ public class TPProductProfileManagementService {
 					saveUpdateProductGroupProducts.add(pgp);
 				}
 			} else {
+				// If the product group and product already exist, set them as activated
 				optionalPGP.get().setActivated(true);
 				saveUpdateProductGroupProducts.add(optionalPGP.get());
 			}
 		}
-//		saveUpdateProductGroupProducts.forEach(data -> {
-//			if(!data.getProductGroup().getName().contains("~")) {
-//				data.getProductGroup().setName(data.getProductGroup().getName() + "~" + data.getProductGroup().getProductGroupId());
-//			}
-//		});
-		bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+
+		// Save or update the product-group_Product-Profile mappings in the database
+		productGroupProductRepository.save(saveUpdateProductGroupProducts);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		//update name
-//				List<ProductProfile> productProfilesCopy = productProfileRepository
-//						.findByCompanyIdAndActivatedTrue(companyId);
-//				if(!productProfilesCopy.isEmpty()) {
-//					productProfilesCopy.forEach(data -> {
-//						if(!data.getName().contains("~")) {
-//						data.setName(data.getName() + "~" + data.getProductId());
-//						}
-//					});}
-//				productProfileRepository.save(productProfilesCopy);
+
+		// Update the sync operation status
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
+
+		// Log the completion of the sync operation with the elapsed time
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
+	/**
+	 * Saves product-group_Product-Profile mappings based on the provided DTOs.
+	 * The method performs the necessary database operations and updates the sync operation status accordingly.
+	 *
+	 * @param productGroupProductDTOs A list of TPProductGroupProductDTO objects representing product-group_Product-Profile data.
+	 *                                Each object contains information about a specific product-group_Product-Profile mapping.
+	 * @param syncOperation The SyncOperation entity representing the current sync operation.
+	 */
 	@Transactional
-	@Async
-	public void saveDeleteProductGroupProduct(final List<TPProductGroupProductDTO> productGroupProductDTOs,
+	public void saveDeleteProductGroupProduct(
+			final List<TPProductGroupProductDTO> productGroupProductDTOs,
 			final SyncOperation syncOperation) {
+
+		// Record the start time for performance measurement
 		long start = System.nanoTime();
+
 		final Company company = syncOperation.getCompany();
 		final Long companyId = syncOperation.getCompany().getId();
 
+		// Initialize data structures for saving/updating product-group_Product-Profile mappings
 		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
+
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+
+		// Check if the "ALIAS_TO_NAME" configuration is enabled for the company
 		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
 				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
 
+		if(optAliasToName.isPresent()){
+			log.info("optAliasToName {}" + optAliasToName.get().getValue() + ":" +companyId);
+		}
+
+		log.debug("productGroupProductDTOs size {} - "+productGroupProductDTOs.size());
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
+
 			Optional<ProductGroup> optionalGroup = productGroups.stream()
 					.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findAny();
+
 			Optional<ProductProfile> optionalpp = productProfiles.stream()
 					.filter(pl -> pgpDto.getProductName().equals(pl.getName())).findAny();
 
+
+			// If "ALIAS_TO_NAME" configuration is enabled, check for product alias names as well
 			if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
 				optionalpp = productProfiles.stream()
 						.filter(pl -> pl.getAlias() != null && !pl.getAlias().equals("")
@@ -1743,6 +1820,7 @@ public class TPProductProfileManagementService {
 
 			}
 
+			// If the mapping does not exist, create a new one
 			if (optionalpp.isPresent() && optionalGroup.isPresent()) {
 				ProductGroupProduct pgp = new ProductGroupProduct();
 				pgp.setProductGroup(optionalGroup.get());
@@ -1752,14 +1830,23 @@ public class TPProductProfileManagementService {
 				saveUpdateProductGroupProducts.add(pgp);
 			}
 		}
-		bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+
+		//bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+
+		// Save or update the product-group_Product-Profile mappings in the database
+		productGroupProductRepository.save(saveUpdateProductGroupProducts);
+
+		// Record the end time for performance measurement
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
+
+		// Update the sync operation status
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
+
+		// Log the completion of the sync operation with the elapsed time
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 	@Transactional
@@ -1833,43 +1920,64 @@ public class TPProductProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
+
+	/**
+	 * Asynchronously saves or updates product-group_Product-Profile mappings based on the provided DTOs.
+	 * The method performs the necessary database operations and updates the sync operation status accordingly.
+	 *
+	 * @param productGroupProductDTOs A list of TPProductGroupProductDTO objects representing product-group_Product-Profile data.
+	 *                                Each object contains information about a specific product-group_Product-Profile mapping.
+	 * @param syncOperation The SyncOperation entity representing the current sync operation.
+	 */
 	@Transactional
 	@Async
-	public void saveDeleteProductGroupProductUpdateIdNew(final List<TPProductGroupProductDTO> productGroupProductDTOs,
+	public void saveDeleteProductGroupProductUpdateIdNew(
+			final List<TPProductGroupProductDTO> productGroupProductDTOs,
 			final SyncOperation syncOperation) {
+
+		log.debug("Enter : saveDeleteProductGroupProductUpdateIdNew "+ syncOperation.getCompany().getLegalName());
+		// Record the start time for performance measurement
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		final Long companyId = syncOperation.getCompany().getId();
+
+		// Initialize data structures for saving/updating product-group_Product-Profile mappings
 		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
-//		productGroups.forEach(data -> {
-//			String[] name = data.getName().split("~");
-//			data.setName(name[0]);
-//		});
-//		productProfiles.forEach(data -> {
-//			String[] name = data.getName().split("~");
-//			data.setName(name[0]);
-//		});
-		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
-				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
+
+		// Check if the "ALIAS_TO_NAME" configuration is enabled for the company
+		Optional<CompanyConfiguration> optAliasToName =
+				companyConfigurationRepository
+						.findByCompanyPidAndName(company.getPid(),
+								CompanyConfig.ALIAS_TO_NAME);
 
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
+
+			// Find the corresponding ProductGroup and ProductProfile entities based on the DTO data
 			Optional<ProductGroup> optionalGroup = productGroups.stream()
 					.filter(pl -> pgpDto.getGroupName().equals(pl.getName())).findAny();
+
 			Optional<ProductProfile> optionalpp = productProfiles.stream()
 					.filter(pl -> pgpDto.getProductName().equals(pl.getName())).findAny();
 
-			if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
+			// If "ALIAS_TO_NAME" configuration is enabled, check for product alias names as well
+			if (optAliasToName.isPresent()
+					&& optAliasToName.get()
+					.getValue()
+					.equalsIgnoreCase("true")) {
+
+				log.debug("optAliasToName : " + optAliasToName.isPresent());
 				optionalpp = productProfiles.stream()
 						.filter(pl -> pl.getAlias() != null && !pl.getAlias().equals("")
 								? pgpDto.getProductName().equals(pl.getAlias())
 								: pgpDto.getProductName().equals(pl.getName()))
 						.findAny();
-
 			}
 
+			// If both ProductGroup and ProductProfile entities are found,
+			// create a new ProductGroupProduct mapping
 			if (optionalpp.isPresent() && optionalGroup.isPresent()) {
 				ProductGroupProduct pgp = new ProductGroupProduct();
 				pgp.setProductGroup(optionalGroup.get());
@@ -1879,30 +1987,20 @@ public class TPProductProfileManagementService {
 				saveUpdateProductGroupProducts.add(pgp);
 			}
 		}
-		
-//		saveUpdateProductGroupProducts.forEach(data -> {
-//			if(!data.getProductGroup().getName().contains("~")) {
-//				data.getProductGroup().setName(data.getProductGroup().getName() + "~" + data.getProductGroup().getProductGroupId());
-//			}
-//		});
+
+		// Save or update the product-group_Product-Profile mappings in the database
+		log.debug("Save Product and Group Association  : " + saveUpdateProductGroupProducts.size());
 		productGroupProductRepository.save(saveUpdateProductGroupProducts);
-//		bulkOperationRepositoryCustom.bulkSaveProductGroupProductProfile(saveUpdateProductGroupProducts);
+
+		// Update the sync operation status
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-//		List<ProductProfile> productProfilesCopy = productProfileRepository
-//				.findByCompanyIdAndActivatedTrue(companyId);
-//		if(!productProfilesCopy.isEmpty()) {
-//			productProfilesCopy.forEach(data -> {
-//				if(!data.getName().contains("~")) {
-//				data.setName(data.getName() + "~" + data.getProductId());
-//				}
-//			});}
-//		productProfileRepository.save(productProfilesCopy);
-		// update sync table
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
+
+		//Log the completion of the sync operation with the elapsed time
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 	

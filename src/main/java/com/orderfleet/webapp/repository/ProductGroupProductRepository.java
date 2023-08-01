@@ -50,6 +50,9 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 	@Query("select productGroupProduct from ProductGroupProduct productGroupProduct where productGroupProduct.company.id = ?#{principal.companyId} and productGroupProduct.productGroup.activated=true and productGroupProduct.product.activated=true")
 	List<ProductGroupProduct> findByProductGroupProductActivatedAndCompanyId();
 
+	@Query("select productGroupProduct from ProductGroupProduct productGroupProduct where productGroupProduct.company.id = ?1")
+	List<ProductGroupProduct> findByProductGroupProductActivatedAndCompanyId(long companyId);
+
 	@Query("select productGroupProduct from ProductGroupProduct productGroupProduct where productGroupProduct.company.pid = ?1")
 	List<ProductGroupProduct> findAllByCompanyPid(String companyPid);
 
