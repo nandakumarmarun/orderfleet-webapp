@@ -212,7 +212,135 @@
 				</div>
 				<!-- /.modal-dialog -->
 			</div>
+            <form name="viewForm" role="form">
+				<!-- Model Container-->
+				<div class="modal fade container" id="viewModal">
+					<!-- model Dialog -->
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+								<h4 class="modal-title" id="viewModalLabel">Account Profile</h4>
+							</div>
+							<div class="modal-body" style="height: 500px; overflow: auto;">
+								<div class="modal-body">
+									<!-- error message -->
+									<div class="alert alert-danger alert-dismissible" role="alert"
+										style="display: none;">
+										<button type="button" class="close"
+											onclick="$('.alert').hide();" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+										<p></p>
+									</div>
+									<table class="table  table-striped table-bordered"
+										id="tbAccountProfile">
+										<tr>
+											<td>Name</td>
+											<td id="lbl_name"></td>
+										</tr>
+										<tr>
+											<td>Alias</td>
+											<td id="lbl_alias"></td>
+										</tr>
+										<tr>
+											<td>Customer Id</td>
+											<td id="lbl_customerId"></td>
+										</tr>
+										<tr>
+											<td>Type</td>
+											<td id="lbl_accountType"></td>
+										</tr>
+										<tr>
+											<td>Price Level</td>
+											<td id="lbl_priceLevel"></td>
+										</tr>
+										<tr>
+											<td>City</td>
+											<td id="lbl_city"></td>
+										</tr>
+										<tr>
+											<td>Location</td>
+											<td id="lbl_location"></td>
+										</tr>
+										<tr>
+                                        <td>Address</td>
+                                        <td id="lbl_address"></td>
+                                         </tr>
+										<tr>
+											<td>PIN</td>
+											<td id="lbl_pin"></td>
+										</tr>
+										<tr>
+											<td>Phone 1</td>
+											<td id="lbl_phone1"></td>
+										</tr>
+										<tr>
+											<td>Phone 2</td>
+											<td id="lbl_phone2"></td>
+										</tr>
+										<tr>
+											<td>Email 1</td>
+											<td id="lbl_email1"></td>
+										</tr>
+										<tr>
+											<td>Email 2</td>
+											<td id="lbl_email2"></td>
+										</tr>
+										<tr>
+											<td>WhatsApp No</td>
+											<td id="lbl_whatsAppNo"></td>
+										</tr>
 
+										<tr>
+											<td>GSTIN</td>
+											<td id="lbl_tinNo"></td>
+										</tr>
+										<tr>
+											<td>Description</td>
+											<td id="lbl_description"></td>
+										</tr>
+										<tr>
+											<td>Credit Days</td>
+											<td id="lbl_creditDays"></td>
+										</tr>
+										<tr>
+											<td>Credit Limit</td>
+											<td id="lbl_creditLimit"></td>
+										</tr>
+										<tr>
+											<td>Default Discount Percentage</td>
+											<td id="lbl_defaultDiscountPercentage"></td>
+										</tr>
+										<tr>
+											<td>Closing Balance</td>
+											<td id="lbl_closingBalance"></td>
+										</tr>
+										<tr>
+											<td>Contact Person</td>
+											<td id="lbl_contactPerson"></td>
+										</tr>
+										<tr>
+											<td>Location Radius</td>
+											<td id="lbl_locationRadius"></td>
+										</tr>
+									</table>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Cancel</button>
+							</div>
+						</div>
+						<!-- /.modal-content -->
+					</div>
+					<!-- /.modal-dialog -->
+				</div>
+				<!-- /.Model Container-->
+			</form>
 			<!-- Model Container for Mobile Geo location -->
 			<div class="modal fade container" id="viewModalMobile">
 				<!-- model Dialog -->

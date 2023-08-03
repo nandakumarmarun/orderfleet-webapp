@@ -368,6 +368,13 @@ public class ActiveSubscribersBillingResource {
 						details.add(billDetail);
 
 						billingDTO.setBillingDetail(details);
+					}else {
+						totalAmount = (Double.valueOf(value) * Double.valueOf(billingSetting.getNoOfMonths()));
+						billDetail.setTotalAmount(totalAmount);
+						billDetail.setSlabName("Total");
+						billDetail.setSlabRate(totalAmount);
+						details.add(billDetail);
+						billingDTO.setBillingDetail(details);
 					}
 
 				}

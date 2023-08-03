@@ -195,9 +195,11 @@ if (!this.AttachGeoLocation) {
 											+ mobileGeoData.employeeName
 											+ "</td><td>"
 											+mobileGeoData.userName
-											+ "</td><td>"
-											+ mobileGeoData.accountProfileName
-											+ "</td><td>"
+											+ "</td><td title='click to view' class='sa'><span style='color: #2C7BD0; cursor: pointer;' onclick='AttachGeoLocation.showModalPopup($(\"#viewModal\"),\""
+                                           	+ mobileGeoData.accountPid
+                                            + "\",0);'>"
+                                            + mobileGeoData.accountProfileName
+                                          	+ "</span></td><td>"
 											+ (mobileGeoData.latitude == null ? ""
 													: mobileGeoData.latitude)
 											+ "</td><td>"
@@ -255,9 +257,11 @@ if (!this.AttachGeoLocation) {
 													+ attachGeoLocation.employeeName
 													+ "</td><td>"
 													+attachGeoLocation.userName
-													+"</td><td>"
-													+ attachGeoLocation.accountProfileName
-													+ "</td><td>"
+													+"</td><td title='click to view' class='sa'><span style='color: #2C7BD0; cursor: pointer;' onclick='AttachGeoLocation.showModalPopup($(\"#viewModal\"),\""
+                                                   	+ attachGeoLocation.accountProfilePid
+                                                    + "\",0);'>"
+                                                    + attachGeoLocation.accountProfileName
+                                                   	+ "</span></td><td>"
 													+ (attachGeoLocation.latitude == null ? ""
 															: attachGeoLocation.latitude)
 													+ "</td><td>"
@@ -278,7 +282,83 @@ if (!this.AttachGeoLocation) {
 													+ "\");'>Attach to AccountProfile</button></td></tr>");
 						});
 	}
-	
+	AttachGeoLocation.showModalPopup = function(el, id, action) {
+    		$(".error-msg").html("");
+//    		resetForm();
+    		if (id) {
+    			switch (action) {
+    			case 0:
+    				showAccountProfile(id);
+    				break;
+    			}
+    		}
+    		el.modal('show');
+    	}
+    	function showAccountProfile(id) {
+        		$(".error-msg").html("");
+        		$
+        				.ajax({
+        					url : attachGeoLocationContextPath + "/" + id,
+        					method : 'GET',
+        					success : function(data) {
+        						$('#lbl_name').text(data.name);
+        						$('#lbl_alias').text(
+        								(data.alias == null ? "" : data.alias));
+        						$('#lbl_accountType').text(data.accountTypeName);
+        						$('#lbl_priceLevel').text(data.defaultPriceLevelName);
+        						$('#lbl_city').text(data.city);
+        						$('#lbl_location').text(
+        								(data.location == null ? "" : data.location));
+        						$('#lbl_pin').text((data.pin == null ? "" : data.pin));
+        						$('#lbl_phone1').text(
+        								(data.phone1 == null ? "" : data.phone1));
+        						$('#lbl_phone2').text(
+        								(data.phone2 == null ? "" : data.phone2));
+        						$('#lbl_email1').text(
+        								(data.email1 == null ? "" : data.email1));
+        						$('#lbl_email2').text(
+        								(data.email2 == null ? "" : data.email2));
+        						$('#lbl_whatsAppNo')
+        								.text(
+        										(data.whatsAppNo == null ? ""
+        												: data.whatsAppNo));
+        						$('#lbl_address').text(data.address);
+        						$('#lbl_description').text(
+        								(data.description == null ? ""
+        										: data.description));
+        						$('#lbl_creditDays')
+        								.text(
+        										(data.creditDays == null ? ""
+        												: data.creditDays));
+        						$('#lbl_creditLimit').text(
+        								(data.creditLimit == null ? ""
+        										: data.creditLimit));
+        						$('#lbl_contactPerson').text(
+        								(data.contactPerson == null ? ""
+        										: data.contactPerson));
+        						$('#lbl_locationRadius').text(
+        								(data.locationRadius == null ? ""
+        										: data.locationRadius));
+
+        						$('#lbl_defaultDiscountPercentage').text(
+        								(data.defaultDiscountPercentage == null ? 0
+        										: data.defaultDiscountPercentage));
+        						$('#lbl_closingBalance').text(
+        								(data.closingBalance == null ? 0
+        										: data.closingBalance));
+        						$('#lbl_tinNo').text(
+        								(data.tinNo == null ? "" : data.tinNo));
+        						$('#lbl_customerId')
+        								.text(
+        										(data.customerId == null ? ""
+        												: data.customerId));
+        					},
+        					error : function(xhr, error) {
+        						onError(xhr, error);
+        					}
+        				});
+        	}
+
 	AttachGeoLocation.attachtoAccountProfile = function(pid, latitude,
 			longitude, location) {
 		newLatitude = latitude;

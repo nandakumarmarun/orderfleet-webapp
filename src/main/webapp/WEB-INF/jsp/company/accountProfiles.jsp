@@ -603,6 +603,10 @@
 											<td id="lbl_location"></td>
 										</tr>
 										<tr>
+                                       	<td>Address</td>
+                                      	<td id="lbl_address"></td>
+                                        </tr>
+										<tr>
 											<td>PIN</td>
 											<td id="lbl_pin"></td>
 										</tr>

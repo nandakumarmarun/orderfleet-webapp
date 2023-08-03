@@ -41,6 +41,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -369,6 +370,7 @@ public class AttachGeoLocationResource {
 		boolean compCon = getCompanyCofig();
 		for (ExecutiveTaskExecution executiveTaskExecution : executiveTaskExecutions) {
 			VisitGeoLocationView visitGeoLocationView = new VisitGeoLocationView(executiveTaskExecution);
+		visitGeoLocationView.setAccountProfilePid(visitGeoLocationView.getAccountProfilePid());
 			if (compCon) {
 				visitGeoLocationView.setAccountProfileName(visitGeoLocationView.getDescription());
 			} else {
@@ -550,7 +552,14 @@ public class AttachGeoLocationResource {
 		accountProfileDTO = accountProfileService.update(accountProfileDTO);
 		return new ResponseEntity<AccountProfileDTO>(accountProfileDTO, HttpStatus.OK);
 	}
-
+	@RequestMapping(value = "/attach-geo-location/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<AccountProfileDTO> getAccountProfileByPid(@PathVariable String pid) {
+		log.debug("Web request to get AccountProfile by pid : {}", pid);
+		return accountProfileService.findOneByPid(pid)
+				.map(accountProfileDTO -> new ResponseEntity<>(accountProfileDTO, HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	}
 	@RequestMapping(value = "/attach-geo-location/download-attach-geo-Location-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public void DownloadExel(@RequestParam("employeePid") String employeePid,
