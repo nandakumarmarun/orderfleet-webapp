@@ -41,7 +41,7 @@ public interface DashboardUserRepository extends JpaRepository<DashboardUser, Lo
 	@Query(nativeQuery = true , value = "select count(*) from tbl_dashboard_user where user_id in ?1")
 	long countByUserIdIn(List<Long> userIds);
 	
-	@Query("select dashboardUser.user from DashboardUser dashboardUser where dashboardUser.user.id in ?1 order by dashboardUser.user.firstName")
+	@Query("select dashboardUser.user from DashboardUser dashboardUser where dashboardUser.user.id in ?1 order by dashboardUser.sortOrder asc")
 	List<User> findUserByUserIdIn(List<Long> userIds);
 	
 	@Query("select dashboardUser.user.id from DashboardUser dashboardUser where dashboardUser.user.id in ?1 order by dashboardUser.user.firstName")

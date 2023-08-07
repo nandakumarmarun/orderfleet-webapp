@@ -478,8 +478,8 @@ public class DayPlanExecutionSummaryResource {
 		String excelFileName = "DayPlanExecutionSummary" + ".xls";
 		String sheetName = "Sheet1";
 
-		String[] headerColumns = { "Date", "Activity", "AccountProfile", "Sort Order", "Status",
-				"Remarks","EmployeeName","Submission Date","Submission Time"  };
+		String[] headerColumns = { "Created Date", "Activity", "AccountProfile", "Sort Order", "Status",
+				"Remarks","User Name","Planned Date","Time"  };
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			createHeaderRow(worksheet, headerColumns);
