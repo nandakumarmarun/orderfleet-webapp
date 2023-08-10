@@ -115,6 +115,9 @@ if (!this.DayPlanExecutionReport) {
 																			.format(
 																					'DD MMM YYYY hh:mm a'))
 																	+ "</td><td>"
+																	+ (dayPlanExecution.plannedDate == null ? "" : moment(
+                                                                       dayPlanExecution.plannedDate)
+                                               								.format('DD MMM YYYY hh:mm a'))+ "</td><td>"
 																	+ dayPlanExecution.activityName
 																	+ " - "
 																	+ dayPlanExecution.accountProfileName

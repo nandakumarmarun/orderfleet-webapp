@@ -63,6 +63,7 @@
 				<thead>
 					<tr>
 						<th>Created Date</th>
+						<th>Planned Date</th>
 						<th>Day Plan</th>
 						<th>Execution Date &Time</th>
 						<th>Planned Order</th>

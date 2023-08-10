@@ -59,7 +59,7 @@
 				<thead>
 					<tr style="font-weight: bold;" class="td-color">
 						<th>Created Date</th>
-						<th>Date</th>
+						<th>Planned Date</th>
 						<th>Scheduled</th>
 						<th>Achieved</th>
 						<th>Percentage(%)</th>
