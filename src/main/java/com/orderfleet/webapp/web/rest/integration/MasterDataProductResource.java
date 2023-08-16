@@ -194,6 +194,7 @@ public class MasterDataProductResource {
 	@Timed
 	public ResponseEntity<String> bulkSaveProductGroupProductProfile(
 			@Valid @RequestBody List<TPProductGroupProductDTO> productGroupProductDTOs) {
+		log.debug("Save Product and Group AssociationNotUsing");
 		log.debug("REST request to save product-group_Product-Profiles : {}", productGroupProductDTOs.size());
 
 		Long companyId = SecurityUtils.getCurrentUsersCompanyId();

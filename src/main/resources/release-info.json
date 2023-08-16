@@ -1,7 +1,7 @@
 {
-"release-number" : "1.110.1",
-"release-date" : "03/08/2023",
+"release-number" : "1.110.3",
+"release-date" : "16/08/2023",
 "features" : [
-  " Lamit dashboard tile sorting,"
+  "Log Added TO Product Group , Location AccountProfile "
 ]
 }

@@ -174,6 +174,7 @@ public class MasterDataProductResourceIdUpdateNew {
 
 		// Get the current user's companyId
 		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		String Tread = String.valueOf(System.nanoTime() +"-"+companyId );
 
 		// Check if the company configuration "REFRESH_PRODUCT_GROUP_PRODUCT" exists for the current companyId
 		Optional<CompanyConfiguration> refreshProductGroupProductConfig =
@@ -182,10 +183,11 @@ public class MasterDataProductResourceIdUpdateNew {
 
 			if(refreshProductGroupProductConfig.isPresent()
 					&& refreshProductGroupProductConfig.get().getValue().equalsIgnoreCase("true")) {
+				log.info(Tread + " : refreshProductGroupProductConfig : {}", companyId);
 				// If productGroupProductDTOs list is not empty,
 				// delete all existing product-product group mappings for the companyId
 				if(!productGroupProductDTOs.isEmpty()) {
-					log.info("Deleting existing product-product group mappings for companyId: {}", companyId);
+					log.info(Tread + " : Deleting existing product-product group mappings for companyId: {}", companyId);
 					tpProductProfileManagementService
 							.deleteProductProductGroups(companyId);
 				}
@@ -204,7 +206,7 @@ public class MasterDataProductResourceIdUpdateNew {
 									SyncOperationType.PRODUCTPROFILE);
 
 					if (!opSyncPP.get().getCompleted()) {
-						log.warn("Product-profile save processing is not allowed at this time due to an ongoing operation.");
+						log.warn( Tread + " : Product-profile save processing is not allowed at this time due to an ongoing operation.");
 
 						// If a sync operation for PRODUCTPROFILE is in progress, return an error response
 						return new ResponseEntity<>("product-profile save processing try after some time.",
@@ -219,15 +221,15 @@ public class MasterDataProductResourceIdUpdateNew {
 					// Save/Update product-group_Product-Profiles based on the configuration
 					if(refreshProductGroupProductConfig.isPresent()
 							&& refreshProductGroupProductConfig.get().getValue().equalsIgnoreCase("true")) {
-						log.info("Deleting and Inserting product product groups for companyId: {}", companyId);
+						log.info(Tread + " : Deleting and Inserting product product groups for companyId: {}", companyId);
 						tpProductProfileManagementService
 								.saveDeleteProductGroupProductUpdateIdNew(
-										productGroupProductDTOs, so);
+										productGroupProductDTOs, so,Tread);
 					}else {
-						log.info("Updating and inserting product product groups for companyId: {}", companyId);
+						log.info(Tread + " : Updating and inserting product product groups for companyId: {}", companyId);
 						tpProductProfileManagementService
 								.saveUpdateProductGroupProductUpdateIdNew(
-										productGroupProductDTOs, so);
+										productGroupProductDTOs, so,Tread);
 					}
 
 					// Return a success response
@@ -267,6 +269,7 @@ public class MasterDataProductResourceIdUpdateNew {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
+			        log.debug(String.valueOf(System.nanoTime() + so.getCompany().getId()));
 					tpProductProfileManagementService.saveUpdateOpeningStockUpadetIdNew(openingStockDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("opening-stock sync operation not registered for this company",

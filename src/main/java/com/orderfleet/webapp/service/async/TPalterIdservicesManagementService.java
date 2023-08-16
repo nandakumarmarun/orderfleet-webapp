@@ -1574,19 +1574,22 @@ public class TPalterIdservicesManagementService {
 	}
 	
 	@Transactional
-	@Async
 	public void saveUpdateLocationAccountProfilesUpdateIdNew(final List<LocationAccountProfileDTO> locationAccountProfileDTOs,
 			final SyncOperation syncOperation) {
 		long start = System.nanoTime();
+		log.debug(String.valueOf(start)+"-"+syncOperation.getCompany().getId());
 		final Company company = syncOperation.getCompany();
 		final Long companyId = syncOperation.getCompany().getId();
 		List<LocationAccountProfile> newLocationAccountProfiles = new ArrayList<>();
 		List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileService
 				.findAllLocationAccountProfiles(companyId);
+		log.debug(String.valueOf(start)+"-"+syncOperation.getCompany().getId() + " : locationAccountProfiles : " + locationAccountProfiles.size() );
 		// delete all assigned location account profile from tally
 		// locationAccountProfileRepository.deleteByCompanyIdAndDataSourceTypeAndThirdpartyUpdateTrue(company.getId(),DataSourceType.TALLY);
 		List<AccountProfile> accountProfiles = accountProfileService.findAllAccountProfileByCompanyId(companyId);
+		log.debug(String.valueOf(start)+"-"+syncOperation.getCompany().getId() + " : AccountProfiles : " + accountProfiles.size());
 		List<Location> locations = locationService.findAllLocationByCompanyId(companyId);
+		log.debug(String.valueOf(start)+"-"+syncOperation.getCompany().getId() + " : locations : " + locations.size());
 		List<Long> locationAccountProfilesIds = new ArrayList<>();
 //		locations.forEach(data -> {
 //			String[] name = data.getName().split("~");
@@ -1622,9 +1625,11 @@ public class TPalterIdservicesManagementService {
 			}
 		}
 		if (locationAccountProfilesIds.size() != 0) {
+			log.debug(String.valueOf(start)+"-"+syncOperation.getCompany().getId() + " : locationAccountProfilesIds : " + locationAccountProfilesIds.size());
 			locationAccountProfileRepository.deleteByIdIn(companyId, locationAccountProfilesIds);
 		}
-		
+
+		log.debug(String.valueOf(start)+"-"+syncOperation.getCompany().getId() + " : newLocationAccountProfiles : " + newLocationAccountProfiles.size());
 		locationAccountProfileRepository.save(newLocationAccountProfiles);
 		LocationAccountProfileDTO locationAccountProfileDTO = locationAccountProfileDTOs.stream()
 				.max(Comparator.comparingLong(LocationAccountProfileDTO::getAlterId)).get();
@@ -1641,7 +1646,7 @@ public class TPalterIdservicesManagementService {
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
-		log.info("Sync completed in {} ms", elapsedTime);
+		log.info(String.valueOf(start)+"-"+syncOperation.getCompany().getId() + " : Sync completed in {} ms", elapsedTime);
 	}
 
 	private static boolean isValidEmail(String email) {

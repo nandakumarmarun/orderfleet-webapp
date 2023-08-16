@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1491,7 +1492,7 @@ public class TPProductProfileManagementService {
 	public void saveUpdateProductGroupProduct(
 			final List<TPProductGroupProductDTO> productGroupProductDTOs,
 			final SyncOperation syncOperation) {
-
+		log.debug("Save Product and Group AssociationNotUsing");
 		// Record the start time for performance measurement
 		long start = System.nanoTime();
 
@@ -1587,7 +1588,7 @@ public class TPProductProfileManagementService {
 	@Async
 	public void saveUpdateProductGroupProductUpdateId(final List<TPProductGroupProductDTO> productGroupProductDTOs,
 			final SyncOperation syncOperation) {
-		
+		log.debug("Save Product and Group AssociationNotUsingggg");
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		final Long companyId = syncOperation.getCompany().getId();
@@ -1679,11 +1680,10 @@ public class TPProductProfileManagementService {
 	 * @param syncOperation The SyncOperation entity representing the current sync operation.
 	 */
 	@Transactional
-	@Async
 	public void saveUpdateProductGroupProductUpdateIdNew(
 			final List<TPProductGroupProductDTO> productGroupProductDTOs,
-			final SyncOperation syncOperation) {
-		log.debug("Enter : saveUpdateProductGroupProductUpdateIdNew "
+			final SyncOperation syncOperation,String Thread) {
+		log.debug(Thread + " : Enter : saveUpdateProductGroupProductUpdateIdNew "
 				+ syncOperation.getCompany().getLegalName());
 
 		// Record the start time for measuring elapsed time
@@ -1694,6 +1694,7 @@ public class TPProductProfileManagementService {
 
 		// If syncOperation.getReset() is true, update the status of existing products
 		if (syncOperation.getReset()) {
+			log.debug(Thread + " : Enter syncOperation");
 			productGroupProductRepository.updateProductGroupProductInactivate(companyId);
 		}
 
@@ -1706,6 +1707,7 @@ public class TPProductProfileManagementService {
 		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
 				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
 
+		log.debug(Thread +" Save Product and Group Association  : " + saveUpdateProductGroupProducts.size());
 
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
 			// Check if the product group and product exist by their names
@@ -1753,6 +1755,7 @@ public class TPProductProfileManagementService {
 		}
 
 		// Save or update the product-group_Product-Profile mappings in the database
+		log.debug(Thread +" Save Product and Group Association  : " + saveUpdateProductGroupProducts.size());
 		productGroupProductRepository.save(saveUpdateProductGroupProducts);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
@@ -1764,7 +1767,7 @@ public class TPProductProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 
 		// Log the completion of the sync operation with the elapsed time
-		log.info("Sync completed in {} ms", elapsedTime);
+		log.info(Thread + ": Sync completed in {} ms", elapsedTime);
 	}
 
 	/**
@@ -1779,7 +1782,7 @@ public class TPProductProfileManagementService {
 	public void saveDeleteProductGroupProduct(
 			final List<TPProductGroupProductDTO> productGroupProductDTOs,
 			final SyncOperation syncOperation) {
-
+		log.debug("Save Product and Group AssociationNotUsing");
 		// Record the start time for performance measurement
 		long start = System.nanoTime();
 
@@ -1853,6 +1856,7 @@ public class TPProductProfileManagementService {
 	@Async
 	public void saveDeleteProductGroupProductUpdateId(final List<TPProductGroupProductDTO> productGroupProductDTOs,
 			final SyncOperation syncOperation) {
+		log.debug("Save Product and Group AssociationNotUsingggg");
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		final Long companyId = syncOperation.getCompany().getId();
@@ -1931,12 +1935,11 @@ public class TPProductProfileManagementService {
 	 * @param syncOperation The SyncOperation entity representing the current sync operation.
 	 */
 	@Transactional
-	@Async
 	public void saveDeleteProductGroupProductUpdateIdNew(
 			final List<TPProductGroupProductDTO> productGroupProductDTOs,
-			final SyncOperation syncOperation) {
+			final SyncOperation syncOperation,String Thread) {
 
-		log.debug("Enter : saveDeleteProductGroupProductUpdateIdNew "+ syncOperation.getCompany().getLegalName());
+		log.debug(Thread +" : Enter : saveDeleteProductGroupProductUpdateIdNew "+ syncOperation.getCompany().getLegalName());
 		// Record the start time for performance measurement
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
@@ -1952,6 +1955,8 @@ public class TPProductProfileManagementService {
 				companyConfigurationRepository
 						.findByCompanyPidAndName(company.getPid(),
 								CompanyConfig.ALIAS_TO_NAME);
+
+		log.debug(Thread +" :  optAliasToName : "+ optAliasToName.get().getValue());
 
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
 
@@ -1989,7 +1994,7 @@ public class TPProductProfileManagementService {
 		}
 
 		// Save or update the product-group_Product-Profile mappings in the database
-		log.debug("Save Product and Group Association  : " + saveUpdateProductGroupProducts.size());
+		log.debug(Thread +" Save Product and Group Association  : " + saveUpdateProductGroupProducts.size());
 		productGroupProductRepository.save(saveUpdateProductGroupProducts);
 
 		// Update the sync operation status
@@ -2001,7 +2006,7 @@ public class TPProductProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 
 		//Log the completion of the sync operation with the elapsed time
-		log.info("Sync completed in {} ms", elapsedTime);
+		log.info(Thread + ": Sync completed in {} ms", elapsedTime);
 	}
 	
 	@Transactional
@@ -2219,7 +2224,6 @@ public class TPProductProfileManagementService {
 	}
 	
 	@Transactional
-	@Async
 	public void saveUpdateOpeningStockUpadetIdNew(final List<OpeningStockDTO> openingStockDTOs,
 			final SyncOperation syncOperation) {
 		long start = System.nanoTime();

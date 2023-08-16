@@ -153,6 +153,7 @@ public class MasterDataProductResourceIdUpdate {
 	@Timed
 	public ResponseEntity<String> bulkSaveProductGroupProductProfile(
 			@Valid @RequestBody List<TPProductGroupProductDTO> productGroupProductDTOs) {
+		log.debug("Save Product and Group AssociationNotUsingggg");
 		log.debug("REST request to save product-group_Product-Profiles : {}", productGroupProductDTOs.size());
 
 		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
