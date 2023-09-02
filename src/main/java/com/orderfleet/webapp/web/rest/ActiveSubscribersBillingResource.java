@@ -356,11 +356,11 @@ public class ActiveSubscribersBillingResource {
 					BillingDetail billDetail = new BillingDetail();
 					String key = entry.getKey();
 					Integer value = entry.getValue();
-
-					if (!key.equalsIgnoreCase("total")) {
-
-						Slab slabdata = slabs.stream().filter(sl -> sl.getId().equals(Long.valueOf(key))).findAny()
-								.get();
+					System.out.println("Key: " + key + ", Value: " + value);
+					if (slabs.size() > 0) {
+						if (!key.equalsIgnoreCase("total")){
+							Slab slabdata = slabs.stream().filter(sl -> sl.getId().equals(Long.valueOf(key))).findAny()
+									.get();
 						billDetail.setSlabName(slabdata.getMinimumUser() + "-" + slabdata.getMaximumUser());
 						billDetail.setSlabRate(Double.valueOf(value));
 						totalAmount = (Double.valueOf(value) * Double.valueOf(billingSetting.getNoOfMonths()));
@@ -368,7 +368,7 @@ public class ActiveSubscribersBillingResource {
 						details.add(billDetail);
 
 						billingDTO.setBillingDetail(details);
-					}else {
+					} }else {
 						totalAmount = (Double.valueOf(value) * Double.valueOf(billingSetting.getNoOfMonths()));
 						billDetail.setTotalAmount(totalAmount);
 						billDetail.setSlabName("Total");

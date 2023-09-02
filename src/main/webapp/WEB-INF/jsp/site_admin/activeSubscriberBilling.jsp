@@ -37,8 +37,9 @@
 						<div class="form-group">
 							<div class="col-sm-2">
 
-								<label class="control-label" for="field_billingPeriod">
-									Select BillingPeriod </label> <select id="field_billingPeriod"
+								<!-- <label class="control-label" for="field_billingPeriod">
+									Select BillingPeriod </label> -->
+									<select id="field_billingPeriod"
 									name="billingPeriod" class="form-control">
 									<option value="no">All</option>
 									<option value="MONTHLY">MONTHLY(1 MONTH)</option>
@@ -48,7 +49,7 @@
 								</select>
 							</div>
 							<div class="col-sm-2">
-								<br /> <select class="form-control" id="dbDateSearch"
+								 <select class="form-control" id="dbDateSearch"
 									onclick="ActiveSubscriberBilling.showDatePicker()">
 
 									<option value="CUSTOM">CUSTOM</option>
@@ -56,7 +57,7 @@
 								</select>
 							</div>
 							<div class="col-sm-2 hide custom_date1">
-								<br />
+
 								<div class="input-group">
 									<input type="text" class="form-control" id="txtFromDate"
 										placeholder="Select From Date" style="background-color: #fff;"
@@ -68,7 +69,7 @@
 								</div>
 							</div>
 							<div class="col-sm-2 hide custom_date2">
-								<br />
+
 								<div class="input-group">
 									<input type="text" class="form-control" id="txtToDate"
 										placeholder="Select To Date" style="background-color: #fff;"
@@ -80,7 +81,7 @@
 							</div>
 							<div class="input-group col-sm-2">
 								<div class="col-sm-3">
-									<br />
+
 									<button type="button" class="btn btn-info entypo-search"
 										style="font-size: 18px"
 										onclick="ActiveSubscriberBilling.filter()" title="Apply"></button>

@@ -86,9 +86,13 @@ if (!this.BillingSetting) {
 		var clonedTable = $("#tBodyCompany").clone();
 		// Strip your empty characters from the cloned table (hidden didn't seem
 		// to work since the cloned table isn't visible)
+		clonedTable.find('tr').each(function() {
+                $(this).find('td:eq(6)').remove();
+            });
+
 		clonedTable.find('[style*="display: none"]').remove();
 
-		var excelName = "CompanyList";
+		var excelName = "Billing-Setting";
 
 		clonedTable.table2excel({
 			// exclude CSS class

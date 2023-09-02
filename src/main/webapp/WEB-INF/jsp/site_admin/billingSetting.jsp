@@ -39,15 +39,13 @@
 						</div>
 					</form>
 				</div>
-				<!-- 	<div class="col-sm-4">
-					<br />
-					<button id="btnDownload" type="button" class="btn btn-success">
-						Download Xls</button>
-				</div> -->
+
 				<div class="col-sm-4 pull-right">
 					<button type="button" class="btn btn-success"
 						onclick="BillingSetting.showModalPopup($('#myModal'));">Create
 						Company Biiling</button>
+                        	<button id="btnDownload" type="button" class="btn btn-success">
+                        Download Xls</button>
 				</div>
 
 			</div>
@@ -57,6 +55,7 @@
 				<thead>
 					<tr>
 						<th>Company Name</th>
+						<th>Legal Name</th>
 						<th>Billing Period</th>
 						<th>No Of Months</th>
 						<th>Last Billed Date(From)</th>
@@ -68,6 +67,7 @@
 					<c:forEach items="${billList}" var="bill" varStatus="loopStatus">
 						<tr class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'}">
 							<td>${bill.company.legalName}</td>
+							<td>${bill.company.alias}</td>
 							<td>${bill.billingPeriod }</td>
 							<td>${bill.noOfMonths}</td>
 							<td>${bill.lastBilledDate}</td>
