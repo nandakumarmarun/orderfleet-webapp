@@ -284,4 +284,7 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.accountProfile.pid in ?1 and locationAccountProfile.location.activated=true order by locationAccountProfile.accountProfile.name asc")
 	List<LocationAccountProfile> findByAccountPids(List<String> accountpids);
 
+	@Query("select locationAccountProfile.accountProfile.id from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.id in  ?1 and locationAccountProfile.accountProfile.activated = 'true'")
+	Set<Long> findAccountProfileIdsByUserLocationsOrderByAccountProfilesNameAndActivated(Set<Long> locationIds);
+
 }

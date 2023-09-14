@@ -156,14 +156,19 @@ public class LeadsTrackerResource {
 //				accountProfileDTOs.add(accountProfileDTO);
 //			}
 
-			Set<BigInteger> apIds = locationAccountProfileRepository
-					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+//			Set<BigInteger> apIds = locationAccountProfileRepository
+//					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
 
-			Set<Long> accountProfileIds = new HashSet<>();
+			Set<Long> accountProfileIds = locationAccountProfileRepository
+					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesNameAndActivated(locationIds);
 
-			for (BigInteger apId : apIds) {
-				accountProfileIds.add(apId.longValue());
-			}
+			log.debug("size of Ap ids :"+accountProfileIds.size());
+
+//			Set<Long> accountProfileIds = new HashSet<>();
+//
+//			for (BigInteger apId : apIds) {
+//				accountProfileIds.add(apId.longValue());
+//			}
 			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id1 = "AP_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
