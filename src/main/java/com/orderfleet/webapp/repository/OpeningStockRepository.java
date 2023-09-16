@@ -58,6 +58,9 @@ public interface OpeningStockRepository extends JpaRepository<OpeningStock, Long
 	@Query("select MAX(openingStock.createdDate) from OpeningStock openingStock where openingStock.productProfile.pid = ?1 and openingStock.stockLocation in  ?2")
 	LocalDateTime findMaxDateByProductAndStockLocations(String productPid, List<StockLocation> stockLocations);
 
+	@Query("select MAX(openingStock.createdDate) from OpeningStock openingStock where openingStock.productProfile.pid in ?1 and openingStock.stockLocation.pid in  ?2 and openingStock.company.id = ?3 ")
+	LocalDateTime findMaxDateByProductAndStockLocations(List<String> productPid, List<String> stockLocations,long companyId);
+
 	List<OpeningStock> findByProductProfileIn(List<ProductProfile> productProfiles);
 
 	@Query("select openingStock from OpeningStock openingStock where openingStock.company.id = ?#{principal.companyId} and openingStock.productProfile.pid=?1")

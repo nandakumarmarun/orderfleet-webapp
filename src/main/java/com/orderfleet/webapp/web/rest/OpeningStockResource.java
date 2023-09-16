@@ -6,15 +6,15 @@ import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.domain.OpeningStock;
+import com.orderfleet.webapp.service.StockCalculationService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
@@ -85,6 +85,7 @@ public class OpeningStockResource {
 	public ResponseEntity<OpeningStockDTO> createOpeningStock(@Valid @RequestBody OpeningStockDTO openingStockDTO)
 			throws URISyntaxException {
 		log.debug("Web request to save OpeningStock : {}", openingStockDTO);
+
 		if (openingStockDTO.getPid() != null) {
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("openingStock", "idexists",
 					"A new Opening Stock cannot already have an ID")).body(null);
@@ -98,6 +99,7 @@ public class OpeningStockResource {
 		}
 		openingStockDTO.setActivated(true);
 		OpeningStockDTO result = openingStockService.save(openingStockDTO);
+
 		return ResponseEntity.created(new URI("/web/openingStocks/" + result.getPid()))
 				.headers(HeaderUtil.createEntityCreationAlert("openingStock", result.getPid().toString())).body(result);
 	}

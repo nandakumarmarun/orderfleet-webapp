@@ -1,11 +1,14 @@
 package com.orderfleet.webapp.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.service.StockCalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -58,6 +61,9 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	@Inject
 	private CompanyRepository companyRepository;
 
+	@Inject
+	private StockCalculationService stockCalculationService;
+
 	/**
 	 * Save a openingStock.
 	 * 
@@ -67,6 +73,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	@Override
 	public OpeningStockDTO save(OpeningStockDTO openingStockDTO) {
 		log.debug("Request to save EmployeeProfile : {}", openingStockDTO);
+		Set<OpeningStock> saveOpeningStocks = new HashSet<>();
 		openingStockDTO.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
 		openingStockDTO.setOpeningStockDate(LocalDateTime.now());
 		openingStockDTO.setCreatedDate(LocalDateTime.now());
@@ -74,6 +81,8 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 		// set company
 		openingStock.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		openingStock = openingStockRepository.save(openingStock);
+		saveOpeningStocks.add(openingStock);
+		stockCalculationService.saveProductdstockdata(saveOpeningStocks,SecurityUtils.getCurrentUsersCompanyId());
 		OpeningStockDTO result = openingStockMapper.openingStockToOpeningStockDTO(openingStock);
 		return result;
 	}
@@ -100,6 +109,9 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 			// openingStock.setOpeningStockDate(openingStockDTO.getOpeningStockDate());
 			openingStock.setQuantity(openingStockDTO.getQuantity());
 			openingStock = openingStockRepository.save(openingStock);
+			Set<OpeningStock> saveOpeningStocks = new HashSet<>();
+			saveOpeningStocks.add(openingStock);
+			stockCalculationService.saveProductdstockdata(saveOpeningStocks,SecurityUtils.getCurrentUsersCompanyId());
 			OpeningStockDTO result = openingStockMapper.openingStockToOpeningStockDTO(openingStock);
 			return result;
 		}).orElse(null);
@@ -209,11 +221,12 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 	/**
 	 * Delete the openingStock by id.
 	 * 
-	 * @param id the id of the entity
+	 * @param pid the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete EmployeeProfile : {}", pid);
 		openingStockRepository.findOneByPid(pid).ifPresent(openingStock -> {
+			stockCalculationService.deleteStockdata(openingStock);
 			openingStockRepository.delete(openingStock.getId());
 		});
 	}

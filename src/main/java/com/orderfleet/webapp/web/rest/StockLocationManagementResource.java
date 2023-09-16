@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.service.StockCalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -93,6 +94,9 @@ public class StockLocationManagementResource {
 
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private StockCalculationService stockCalculationService;
 
 	@RequestMapping(value = "/stock-location-management", method = RequestMethod.GET)
 	@Timed
@@ -388,6 +392,8 @@ public class StockLocationManagementResource {
 			}			
 		}
 		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+		log.debug("Opening Stock  : " + saveOpeningStocks.size());
+		stockCalculationService.saveProductdstockdata(saveOpeningStocks,companyId);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		// update sync table

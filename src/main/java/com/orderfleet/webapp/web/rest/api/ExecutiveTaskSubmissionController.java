@@ -7,12 +7,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -21,10 +19,11 @@ import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
 
 import com.orderfleet.webapp.async.event.EventProducer;
+import com.orderfleet.webapp.service.*;
+import com.orderfleet.webapp.web.thread.StockCalculationThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.MimeMappings;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -43,9 +42,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.orderfleet.webapp.config.Constants;
 import com.orderfleet.webapp.domain.AccountingVoucherHeader;
 import com.orderfleet.webapp.domain.Company;
@@ -81,29 +77,18 @@ import com.orderfleet.webapp.repository.PrimarySecondaryDocumentRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.VoucherNumberGeneratorRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.EmployeeProfileService;
-import com.orderfleet.webapp.service.ExecutiveTaskExecutionService;
-import com.orderfleet.webapp.service.ExecutiveTaskSubmissionService;
-import com.orderfleet.webapp.service.FileManagerService;
-import com.orderfleet.webapp.service.MobileConfigurationService;
 import com.orderfleet.webapp.service.async.TaskSubmissionPostSave;
 import com.orderfleet.webapp.service.impl.FileManagerException;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
 import com.orderfleet.webapp.web.rest.api.dto.TaskSubmissionResponse;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.CompanyViewDTO;
 import com.orderfleet.webapp.web.rest.dto.DashboardWebSocketDataDTO;
 import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 import com.orderfleet.webapp.web.rest.dto.FilledFormDTO;
 import com.orderfleet.webapp.web.rest.dto.FilledFormDetailDTO;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.MobileConfigurationDTO;
-import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
-import com.orderfleet.webapp.web.rest.dto.ReferenceDocumentDto;
-import com.orderfleet.webapp.web.rest.dto.VoucherNumberGeneratorDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 import com.orderfleet.webapp.web.vendor.focus.Thread.SaleOrderFocusThread;
 import com.orderfleet.webapp.web.vendor.focus.service.SendSalesOrderFocusService;
@@ -202,6 +187,9 @@ public class ExecutiveTaskSubmissionController {
 
 	@Autowired
 	private EventProducer eventProducer;
+
+	@Inject
+	private StockCalculationService stockCalculationService;
 
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
@@ -650,16 +638,23 @@ public class ExecutiveTaskSubmissionController {
 			{
 			sendSalesOrderToFocus(companyPid, user, tsTransactionWrapper);
 			}
+
 			// Send sales order email to uncleJhon secondary sales
 			if(company.getId() == 305131)
 			{
 			sendSecondarysalesOrderEmail(company, companyPid, user, tsTransactionWrapper);
 			}
-			// send EmailToComplaint Modern
 
+			// send EmailToComplaint Modern
 			if (tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getEmailTocomplaint()) {
 				sendEmailToComplaint(executiveTaskSubmissionDTO);
 			}
+
+			//Update Stock Data
+			if (tsTransactionWrapper != null && tsTransactionWrapper.getInventoryVouchers() != null) {
+				stockDataUpload(company, tsTransactionWrapper, stockCalculationService);
+			}
+
 
 			taskSubmissionResponse.setStatus("Success");
 			taskSubmissionResponse.setMessage("Activity submitted successfully...");
@@ -712,6 +707,31 @@ public class ExecutiveTaskSubmissionController {
 		log.debug("Status : " + result );
 		return result;
 	}
+
+
+	/**
+	 * Uploads stock data for a company based on the provided ExecutiveTaskSubmissionTransactionWrapper.
+	 *
+	 * This method iterates through the inventory vouchers in the transaction wrapper and calls the
+	 * saveSolidOrders method of the StockCalculationService to process and save stock data for each voucher.
+	 *
+	 * @param company The company for which stock data is being uploaded.
+	 * @param tsTransactionWrapper The ExecutiveTaskSubmissionTransactionWrapper containing inventory vouchers.
+	 * @param stockCalculationService The service responsible for stock calculation and data saving.
+	 */
+	private static void stockDataUpload(
+			Company company,
+			ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper,
+			StockCalculationService stockCalculationService) {
+
+		tsTransactionWrapper.getInventoryVouchers().forEach(data -> {
+			stockCalculationService
+					.saveSolidOrders(data,
+							System.nanoTime() +"-"+ company.getId());
+		});
+	}
+
+
 
 	public void sendSecondarysalesOrderEmail(Company company, String companyPid, User user,
 			ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper) {

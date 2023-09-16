@@ -12,9 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
-import org.apache.poi.ss.formula.functions.T;
+import com.orderfleet.webapp.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +88,8 @@ import com.orderfleet.webapp.web.rest.integration.dto.TPProductGroupProductDTO;
 import com.orderfleet.webapp.web.rest.integration.dto.TPProductProfileCustomDTO;
 import com.orderfleet.webapp.web.rest.mapper.TaxMasterMapper;
 
+import javax.inject.Inject;
+
 /**
  * Service for save/update product profile related data from third party
  * softwares like tally.
@@ -139,6 +139,9 @@ public class TPProductProfileManagementService {
 	private final ProductGroupEcomProductsRepository productGroupEcomProductsRepository;
 
 	private final CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private StockCalculationService stockCalculationService;
 	
 	boolean flag= false;
 
@@ -148,19 +151,19 @@ public class TPProductProfileManagementService {
 	private Collection<ProductCategoryDTO> productGroups;
 
 	public TPProductProfileManagementService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
-			SyncOperationRepository syncOperationRepository, DivisionRepository divisionRepository,
-			ProductCategoryRepository productCategoryRepository, ProductGroupRepository productGroupRepository,
-			ProductProfileRepository productProfileRepository,
-			ProductGroupProductRepository productGroupProductRepository,
-			StockLocationRepository stockLocationRepository, OpeningStockRepository openingStockRepository,
-			PriceLevelRepository priceLevelRepository, PriceLevelListRepository priceLevelListRepository,
-			TaxMasterRepository taxMasterRepository, TaxMasterMapper taxMasterMapper,
-			EcomProductProfileRepository ecomProductProfileRepository,
-			EcomProductProfileMapper ecomProductProfileMapper,
-			EcomProductProfileProductRepository ecomProductProfileProductRepository,
-			ProductGroupEcomProductsRepository productGroupEcomProductsRepository,
-			CompanyConfigurationRepository companyConfigurationRepository,
-			TemporaryOpeningStockRepository temporaryOpeningStockRepository) {
+											 SyncOperationRepository syncOperationRepository, DivisionRepository divisionRepository,
+											 ProductCategoryRepository productCategoryRepository, ProductGroupRepository productGroupRepository,
+											 ProductProfileRepository productProfileRepository,
+											 ProductGroupProductRepository productGroupProductRepository,
+											 StockLocationRepository stockLocationRepository, OpeningStockRepository openingStockRepository,
+											 PriceLevelRepository priceLevelRepository, PriceLevelListRepository priceLevelListRepository,
+											 TaxMasterRepository taxMasterRepository, TaxMasterMapper taxMasterMapper,
+											 EcomProductProfileRepository ecomProductProfileRepository,
+											 EcomProductProfileMapper ecomProductProfileMapper,
+											 EcomProductProfileProductRepository ecomProductProfileProductRepository,
+											 ProductGroupEcomProductsRepository productGroupEcomProductsRepository,
+											 CompanyConfigurationRepository companyConfigurationRepository,
+											 TemporaryOpeningStockRepository temporaryOpeningStockRepository) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.syncOperationRepository = syncOperationRepository;
@@ -1685,6 +1688,8 @@ public class TPProductProfileManagementService {
 			final SyncOperation syncOperation,String Thread) {
 		log.debug(Thread + " : Enter : saveUpdateProductGroupProductUpdateIdNew "
 				+ syncOperation.getCompany().getLegalName());
+		log.debug(Thread +" : ProductGroupProductDTOs "+ productGroupProductDTOs.size());
+
 
 		// Record the start time for measuring elapsed time
 		long start = System.nanoTime();
@@ -1703,11 +1708,15 @@ public class TPProductProfileManagementService {
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
 		List<ProductGroupProduct> productGroups_productProfiles = productGroupProductRepository.findByProductGroupProductActivatedAndCompanyId(companyId);
 
+
+
 		// Fetch a company configuration (if it exists) to determine whether to use aliases for names
 		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
 				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
 
-		log.debug(Thread +" Save Product and Group Association  : " + saveUpdateProductGroupProducts.size());
+		log.debug(Thread +" : productGroups "+ productGroups.size());
+		log.debug(Thread +" : productProfiles "+ productProfiles.size());
+		log.debug(Thread +" : Save Product and Group Association  : " + productGroups_productProfiles.size());
 
 		for (TPProductGroupProductDTO pgpDto : productGroupProductDTOs) {
 			// Check if the product group and product exist by their names
@@ -1940,6 +1949,8 @@ public class TPProductProfileManagementService {
 			final SyncOperation syncOperation,String Thread) {
 
 		log.debug(Thread +" : Enter : saveDeleteProductGroupProductUpdateIdNew "+ syncOperation.getCompany().getLegalName());
+		log.debug(Thread +" : ProductGroupProductDTOs "+ productGroupProductDTOs.size());
+
 		// Record the start time for performance measurement
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
@@ -1949,6 +1960,9 @@ public class TPProductProfileManagementService {
 		Set<ProductGroupProduct> saveUpdateProductGroupProducts = new HashSet<>();
 		List<ProductGroup> productGroups = productGroupRepository.findByCompanyId(companyId);
 		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
+
+		log.debug(Thread +" :  productGroups : "+ productGroups.size());
+		log.debug(Thread +" :  productProfiles : "+ productProfiles.size());
 
 		// Check if the "ALIAS_TO_NAME" configuration is enabled for the company
 		Optional<CompanyConfiguration> optAliasToName =
@@ -2048,6 +2062,7 @@ public class TPProductProfileManagementService {
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
+
 	@Transactional
 	@Async
 	public void saveUpdateOpeningStock(final List<OpeningStockDTO> openingStockDTOs,
@@ -2127,6 +2142,8 @@ public class TPProductProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
+
+
 	@Transactional
 	@Async
 	public void saveUpdateOpeningStockUpadetId(final List<OpeningStockDTO> openingStockDTOs,
@@ -2222,57 +2239,77 @@ public class TPProductProfileManagementService {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
+
+
+	/**
+	 * Saves and updates opening stock data based on the provided OpeningStockDTOs and SyncOperation.
+	 *
+	 * This method takes a list of OpeningStockDTOs, processes each DTO, and saves or updates the opening stock data accordingly.
+	 * It also updates the SyncOperation to track the synchronization process.
+	 *
+	 * @param openingStockDTOs A list of OpeningStockDTOs containing opening stock data to be saved or updated.
+	 * @param syncOperation The SyncOperation object representing the synchronization process.
+	 */
 	@Transactional
-	public void saveUpdateOpeningStockUpadetIdNew(final List<OpeningStockDTO> openingStockDTOs,
+	public void saveUpdateOpeningStockUpadetIdNew(
+			final List<OpeningStockDTO> openingStockDTOs,
 			final SyncOperation syncOperation) {
+		String thread = "OPT-"+syncOperation.getCompany();
+		log.debug(thread + "Request To Save Opening Stock");
+
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		final Long companyId = company.getId();
 		Set<OpeningStock> saveOpeningStocks = new HashSet<>();
+
 		// All opening-stock must have a stock-location, if not, set a default
-		// one
-		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(company.getId());
-		// find all exist product profiles
-		Set<String> ppNames = openingStockDTOs.stream().map(os -> os.getProductProfileName())
-				.collect(Collectors.toSet());
+		StockLocation defaultStockLocation =
+				stockLocationRepository
+						.findFirstByCompanyId(company.getId());
 
-		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
+		log.debug(thread + "defaultStockLocation : " + defaultStockLocation);
 
-		Optional<CompanyConfiguration> optAliasToName = companyConfigurationRepository
-				.findByCompanyPidAndName(company.getPid(), CompanyConfig.ALIAS_TO_NAME);
+		List<StockLocation> StockLocations =
+				stockLocationService
+						.findAllStockLocationByCompanyId(companyId);
 
-//		List<ProductProfile> productProfiles = productProfileRepository
-//				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), ppNames);
+		log.debug(thread + " StockLocations : " + StockLocations.size());
 
-		List<ProductProfile> productProfiles = productProfileRepository.findAllByCompanyId(companyId);
-//		productProfiles.forEach(data -> {
-//			String[] name = data.getName().split("~");
-//			data.setName(name[0]);
-//		});
+		Optional<CompanyConfiguration> optAliasToName =
+				companyConfigurationRepository
+						.findByCompanyPidAndName(
+								company.getPid(), CompanyConfig.ALIAS_TO_NAME);
+
+		log.debug(thread + " optAliasToName  : " + optAliasToName.isPresent());
+
+		List<ProductProfile> productProfiles =
+				productProfileRepository
+						.findAllByCompanyId(companyId);
+
+		log.debug(thread + " productProfiles  : " + productProfiles.size());
 		// delete all opening stock
+
 		openingStockRepository.deleteByCompanyId(company.getId());
+
 		for (OpeningStockDTO osDto : openingStockDTOs) {
 
 			Optional<ProductProfile> optionalpp = productProfiles.stream()
 					.filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny();
-			if (optAliasToName.isPresent() && optAliasToName.get().getValue().equalsIgnoreCase("true")) {
 
+			if (optAliasToName.isPresent()
+					&& optAliasToName.get().getValue().equalsIgnoreCase("true")) {
 				optionalpp = productProfiles.stream()
 						.filter(pl -> pl.getAlias() != null && !pl.getAlias().equals("")
 								? osDto.getProductProfileName().equals(pl.getAlias())
 								: osDto.getProductProfileName().equals(pl.getName()))
 						.findAny();
-
 			}
 
 			// only save if account profile exist
-//			productProfiles.stream().filter(pp -> pp.getName().equals(osDto.getProductProfileName())).findAny()
-//					.ifPresent(pp -> {
-
 			if (optionalpp.isPresent()) {
 				OpeningStock openingStock = new OpeningStock();
-				openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
+				openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid());
 				openingStock.setOpeningStockDate(LocalDateTime.now());
 				openingStock.setCreatedDate(LocalDateTime.now());
 				openingStock.setCompany(company);
@@ -2290,34 +2327,27 @@ public class TPProductProfileManagementService {
 						openingStock.setStockLocation(defaultStockLocation);
 					}
 				}
-				
 				openingStock.setBatchNumber(osDto.getBatchNumber());
 				openingStock.setQuantity(osDto.getQuantity());
 				saveOpeningStocks.add(openingStock);
 			}
 		}
-		
+		log.debug(thread + " saveOpeningStocks  : " + saveOpeningStocks.size());
+
 		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+
+		stockCalculationService.saveProductdstockdata(saveOpeningStocks,companyId);
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		//update name
-//		List<ProductProfile> productProfilesCopy = productProfileRepository
-//				.findByCompanyIdAndActivatedTrue(companyId);
-//		if(!productProfilesCopy.isEmpty()) {
-//			productProfilesCopy.forEach(data -> {
-//				if(!data.getName().contains("~")) {
-//				data.setName(data.getName() + "~" + data.getProductId());
-//				}
-//			});}
-//		productProfileRepository.save(productProfilesCopy);
-		// update sync table
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
-	
+
+
 	@Transactional
 	@Async
 	public void saveUpdateTemporaryOpeningStockUpdatedId(final List<OpeningStockDTO> openingStockDTOs,
@@ -3265,3 +3295,23 @@ public class TPProductProfileManagementService {
 		productGroupProductRepository.deleteByCompany(companyId);
 	}
 }
+
+
+
+//update name
+//		List<ProductProfile> productProfilesCopy = productProfileRepository
+//				.findByCompanyIdAndActivatedTrue(companyId);
+//		if(!productProfilesCopy.isEmpty()) {
+//			productProfilesCopy.forEach(data -> {
+//				if(!data.getName().contains("~")) {
+//				data.setName(data.getName() + "~" + data.getProductId());
+//				}
+//			});}
+//		productProfileRepository.save(productProfilesCopy);
+// update sync table
+
+
+//		productProfiles.forEach(data -> {
+//			String[] name = data.getName().split("~");
+//			data.setName(name[0]);
+//		});

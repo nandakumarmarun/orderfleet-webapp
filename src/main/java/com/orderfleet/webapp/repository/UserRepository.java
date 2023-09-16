@@ -156,6 +156,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query("select user from User user where user.company.id in ?1 and user.activated = 'TRUE' order by user.firstName asc")
 	List<User> findAllByCompanyIdInAndActivated(List<Long> companyId);
+
+	@Query("select user.company.id from User user where user.login = ?1")
+	Long getCompanyIdByLogin(String login);
 	
 
 }
