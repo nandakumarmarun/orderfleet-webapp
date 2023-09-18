@@ -65,9 +65,18 @@ public class SalesPerformaceDTO {
 		this.finalList = finalList;
 	}
 
-	
-		
+	@Override
+	public String toString() {
+		return "SalesPerformaceDTO{" +
+				"monthList=" + monthList +
+				", salesTargetGroupUserTargets=" + salesTargetGroupUserTargets +
+				", totalList=" + totalList +
+				", achievedList=" + achievedList +
+				", salesTargetFinalList=" + salesTargetFinalList +
+				", finalList=" + finalList +
+				'}';
 	}
+}
 
 	
 

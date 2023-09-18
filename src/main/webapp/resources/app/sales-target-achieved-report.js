@@ -132,7 +132,7 @@ if (!this.SalesTargetAchievedReport) {
 	
 		$.each(salesTargetGroupUserTargetMap, function(salesTargetGroupName, targets) {
 		
-		
+
 			var targetRow = "";
 			var achivedRow = "";
 			var targetTotal = 0;
@@ -146,14 +146,11 @@ if (!this.SalesTargetAchievedReport) {
 				if(targets[i].userName != null)
 				{
 				var tVolume = targets[i].volume;
-				
+				console.log("tVolume :"+tVolume)
 				var tAmount = targets[i].amount;
-				
 			   name = targets[i].userName;
 				
-			   
-
-				if(tAmount != 0){
+			  	if(tAmount != 0){
 					targetTotal += tAmount;
 					 var tAmount1 = (tAmount).toFixed(2);
 					 
@@ -168,6 +165,7 @@ if (!this.SalesTargetAchievedReport) {
 				}
 				
 				var aAmount = targets[i].achievedAmount;
+				console.log("aAmount :"+aAmount)
 				achivedTotal += aAmount;
 				var aAmount1 = (aAmount).toFixed(2);
 				achivedRow += "<td>"+ aAmount1 +"</td>";

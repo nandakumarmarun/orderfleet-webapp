@@ -4,6 +4,7 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
@@ -226,9 +227,6 @@ public class SalesTargetAchievedReportResource {
 					for (LocalDate monthDate : monthsBetweenDates) {
 
 						String month = monthDate.getMonth().toString();
-
-						
-
 						// group by month, one month has only one
 						// user-target
 						Map<String, Map<String, List<SalesTargetGroupUserTargetDTO>>> salesTargetGroupUserTargetByEmployee = null;
@@ -245,21 +243,31 @@ public class SalesTargetAchievedReportResource {
 							salesTargetGroupUserTargetByEmployee = userTarget.stream()
 									.collect(Collectors.groupingBy(SalesTargetGroupUserTargetDTO::getUserName,
 											Collectors.groupingBy(a -> a.getFromDate().getMonth().toString())));
-
-							
-
-							
 							
 							salesTargetGroupUserTargetByemp = salesTargetGroupUserTargetByEmployee
 									.get(employ.getName());
 
 							
-							if (salesTargetGroupUserTargetByemp != null) {
-								
-								salesTargetGroupUserTargetDTO = salesTargetGroupUserTargetByemp.get(month).get(0);
+							if (salesTargetGroupUserTargetByemp != null ) {
+								if (salesTargetGroupUserTargetByemp.get(month) != null) {
+									salesTargetGroupUserTargetDTO = salesTargetGroupUserTargetByemp.get(month).get(0);
+								}
+								else {
+									salesTargetGroupUserTargetDTO = new SalesTargetGroupUserTargetDTO();
+									salesTargetGroupUserTargetDTO.setSalesTargetGroupName(groupName);
+									salesTargetGroupUserTargetDTO.setSalesTargetGroupPid(salesTargetGroup.getPid());
+									salesTargetGroupUserTargetDTO.setVolume(0);
+									salesTargetGroupUserTargetDTO.setAmount(0);
+									Month monthName = Month.valueOf(month.toUpperCase());
+									LocalDate firstDayOfMonth = LocalDate.of(LocalDate.now().getYear(), monthName, 1);
+									salesTargetGroupUserTargetDTO.setFromDate(firstDayOfMonth);
+									LocalDate lastDayOfMonth = LocalDate.of(LocalDate.now().getYear(), monthName, 1)
+											.withDayOfMonth(monthName.length(LocalDate.now().isLeapYear()));
+									salesTargetGroupUserTargetDTO.setToDate(lastDayOfMonth);
+									salesTargetGroupUserTargetDTO.setUserName(employ.getName());
+								}
+
 							}
-							
-							
 						}
 							if (salesTargetGroupUserTargetDTO == null) {
 								salesTargetGroupUserTargetDTO = new SalesTargetGroupUserTargetDTO();
@@ -419,6 +427,8 @@ public class SalesTargetAchievedReportResource {
 			for (SalesSummaryAchievment summaryAchievment : salesSummaryAchievmentList) {
 				achievedAmount += summaryAchievment.getAmount();
 			}
+		}else {
+			achievedAmount= 0;
 		}
 		return achievedAmount;
 	}

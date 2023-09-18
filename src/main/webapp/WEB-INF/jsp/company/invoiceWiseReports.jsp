@@ -10,7 +10,7 @@
 <spring:url value="/resources/assets/css/jquery-ui.css"
 	var="jqueryUiCss"></spring:url>
 <link href="${jqueryUiCss}" rel="stylesheet">
-	
+
 <style type="text/css">
 .error {
 	color: red;
@@ -143,7 +143,7 @@
 									<option value="WTD">WTD</option>
 									<option value="MTD">MTD</option>
 									<option value="SINGLE">Single Date</option>
-									<option value="CUSTOM">CUSTOM</option>
+									<option value="CUSTOM">CUSTOM(Max 3 Months)</option>
 								</select>
 							</div>
 							<div class="col-sm-2 hide custom_date1">
@@ -932,10 +932,29 @@
 										'selected', 'selected');
 							}
 							$("#txtToDate").datepicker({
-								dateFormat : "dd-mm-yy"
+								 dateFormat: 'mm-dd-yy',
+                                            minDate: 0,
+                                onSelect: function(selectedDate) {
+                                var toDate = new Date(selectedDate);
+                                var fromDate = new Date(toDate);
+                                fromDate.setMonth(toDate.getMonth() - 3);
+                                $("#txtFromDate").datepicker("option", "minDate", fromDate);
+                                $("#txtFromDate").datepicker("option", "maxDate",toDate);
+
+                                                                                        }
 							});
 							$("#txtFromDate").datepicker({
-								dateFormat : "dd-mm-yy"
+								dateFormat : "mm-dd-yy",
+								onSelect: function(selectedDate) {
+
+                                                var fromDate = new Date(selectedDate);
+                                                console.log("fromDate :"+fromDate)
+                                                var toDate = new Date(fromDate);
+                                                toDate.setMonth(toDate.getMonth() + 3);
+                                            $("#txtToDate").datepicker("option", "minDate", fromDate);
+                                                $("#txtToDate").datepicker("option", "maxDate",toDate);
+
+                                            }
 							});
 
 							$('#myFormSubmit').on('click', function() {
