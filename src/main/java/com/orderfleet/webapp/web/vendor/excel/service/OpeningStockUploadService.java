@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.orderfleet.webapp.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.AccountType;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
@@ -32,9 +32,6 @@ import com.orderfleet.webapp.domain.ProductProfile;
 import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.StockLocation;
 import com.orderfleet.webapp.domain.SyncOperation;
-import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.enums.AccountStatus;
-import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
 import com.orderfleet.webapp.repository.AccountProfileRepository;
 import com.orderfleet.webapp.repository.AccountTypeRepository;
@@ -52,14 +49,6 @@ import com.orderfleet.webapp.repository.SyncOperationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.AccountProfileService;
-import com.orderfleet.webapp.service.LocationAccountProfileService;
-import com.orderfleet.webapp.service.LocationService;
-import com.orderfleet.webapp.service.OpeningStockService;
-import com.orderfleet.webapp.service.PriceLevelAccountProductGroupService;
-import com.orderfleet.webapp.service.PriceLevelService;
-import com.orderfleet.webapp.service.ReceivablePayableService;
-import com.orderfleet.webapp.service.StockLocationService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
@@ -119,19 +108,21 @@ public class OpeningStockUploadService {
 
 	private final ProductProfileRepository productProfileRepository;
 
+	private final StockCalculationService stockCalculationService;
+
 	public OpeningStockUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
-			SyncOperationRepository syncOperationRepository, PriceLevelRepository priceLevelRepository,
-			AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
-			AccountProfileService accountProfileService, LocationRepository locationRepository,
-			LocationHierarchyRepository locationHierarchyRepository,
-			LocationAccountProfileRepository locationAccountProfileRepository,
-			ReceivablePayableRepository receivablePayableRepository,
-			LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
-			ProductGroupRepository productGroupRepository,
-			PriceLevelAccountProductGroupRepository priceLevelAccountProductGroupRepository,
-			LocationService locationService, StockLocationRepository stockLocationRepository,
-			StockLocationService stockLocationService, OpeningStockRepository openingStockRepository,
-			ProductProfileRepository productProfileRepository) {
+									 SyncOperationRepository syncOperationRepository, PriceLevelRepository priceLevelRepository,
+									 AccountProfileRepository accountProfileRepository, AccountTypeRepository accountTypeRepository,
+									 AccountProfileService accountProfileService, LocationRepository locationRepository,
+									 LocationHierarchyRepository locationHierarchyRepository,
+									 LocationAccountProfileRepository locationAccountProfileRepository,
+									 ReceivablePayableRepository receivablePayableRepository,
+									 LocationAccountProfileService locationAccountProfileService, UserRepository userRepository,
+									 ProductGroupRepository productGroupRepository,
+									 PriceLevelAccountProductGroupRepository priceLevelAccountProductGroupRepository,
+									 LocationService locationService, StockLocationRepository stockLocationRepository,
+									 StockLocationService stockLocationService, OpeningStockRepository openingStockRepository,
+									 ProductProfileRepository productProfileRepository, StockCalculationService stockCalculationService) {
 		super();
 		this.bulkOperationRepositoryCustom = bulkOperationRepositoryCustom;
 		this.syncOperationRepository = syncOperationRepository;
@@ -152,75 +143,140 @@ public class OpeningStockUploadService {
 		this.stockLocationService = stockLocationService;
 		this.openingStockRepository = openingStockRepository;
 		this.productProfileRepository = productProfileRepository;
+		this.stockCalculationService = stockCalculationService;
 	}
 
+	/**
+	 * Asynchronously saves or updates opening stock data.
+	 *
+	 * @param openingStockDTOs A list of OpeningStockDTO objects
+	 * containing the opening stock data to be saved or updated.
+	 * @param syncOperation    The synchronization operation associated with the data.
+	 *
+	 * @Updated  since 1.111.0
+	 */
 	@Transactional
 	@Async
-	public void saveUpdateOpeningStock(final List<OpeningStockDTO> openingStockDTOs,
+	public void saveUpdateOpeningStock(
+			final List<OpeningStockDTO> openingStockDTOs,
 			final SyncOperation syncOperation) {
+
+		// Record the start time for performance measurement
 		long start = System.nanoTime();
+
+		// Retrieve the company associated with the synchronization operation
 		final Company company = syncOperation.getCompany();
 		final Long companyId = company.getId();
+
+		// Initialize a set to store the opening stock entities to be saved
 		Set<OpeningStock> saveOpeningStocks = new HashSet<>();
+
 		// All opening-stock must have a stock-location, if not, set a default
-		// one
-		StockLocation defaultStockLocation = stockLocationRepository.findFirstByCompanyId(company.getId());
-		// find all exist product profiles
+		// Retrieve the default stock location for the company
+		StockLocation defaultStockLocation =
+				stockLocationRepository
+						.findFirstByCompanyId(company.getId());
 
+		// Find the ID of the stock location associated with the first OpeningStockDTO,
+		// If it matches the default location
 		long stockLocationId = 0L;
-
 		if (defaultStockLocation != null) {
-			String stockLocationName = openingStockDTOs.get(0).getStockLocationName();
-			if (defaultStockLocation.getName().equalsIgnoreCase(stockLocationName)) {
+			String stockLocationName =
+					openingStockDTOs.get(0).getStockLocationName();
+			if (defaultStockLocation.getName()
+					.equalsIgnoreCase(stockLocationName)) {
 				stockLocationId = defaultStockLocation.getId();
 			}
 		}
 
+		// Delete existing opening stock records for the specified stock location and company
+		// if stockLocationId is not 0
 		if (stockLocationId != 0) {
-			openingStockRepository.deleteByStockLocationIdAndCompanyId(stockLocationId, companyId);
+			openingStockRepository
+					.deleteByStockLocationIdAndCompanyId(
+							stockLocationId, companyId);
 		}
 
-		Set<String> ppAlias = openingStockDTOs.stream().map(os -> os.getProductProfileName())
-				.collect(Collectors.toSet());
+		// Extract unique product profile aliases from the provided DTOs
+		Set<String> ppAlias =
+				openingStockDTOs
+						.stream()
+						.map(os -> os.getProductProfileName())
+						.collect(Collectors.toSet());
 
-		List<StockLocation> StockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
+		// Retrieve all stock locations for the company
+		List<StockLocation> StockLocations =
+				stockLocationService
+						.findAllStockLocationByCompanyId(companyId);
 
-		List<ProductProfile> productProfiles = productProfileRepository
-				.findByCompanyIdAndAliasIgnoreCaseIn(company.getId(), ppAlias);
+		// Find product profiles matching the aliases for the company
+		List<ProductProfile> productProfiles =
+				productProfileRepository
+						.findByCompanyIdAndAliasIgnoreCaseIn(
+								company.getId(), ppAlias);
 
+		// Iterate through the provided OpeningStockDTOs and process them
 		for (OpeningStockDTO osDto : openingStockDTOs) {
-			// only save if account profile exist
-			productProfiles.stream().filter(pp -> pp.getAlias().equals(osDto.getProductProfileName())).findAny()
+			// Filter and find a matching product profile based on the alias
+			productProfiles
+					.stream()
+					.filter(pp -> pp.getAlias().equals(osDto.getProductProfileName()))
+					.findAny()
 					.ifPresent(pp -> {
 						OpeningStock openingStock = new OpeningStock();
-						openingStock.setPid(OpeningStockService.PID_PREFIX + RandomUtil.generatePid()); // set
+						openingStock.setPid(getPid());
 						openingStock.setOpeningStockDate(LocalDateTime.now());
 						openingStock.setCreatedDate(LocalDateTime.now());
 						openingStock.setCompany(company);
 						openingStock.setProductProfile(pp);
 
+						// Set the stock location for the opening stock entity
 						if (osDto.getStockLocationName() == null) {
 							openingStock.setStockLocation(defaultStockLocation);
 						} else {
 							// stock location
-							Optional<StockLocation> optionalStockLocation = StockLocations.stream()
-									.filter(pl -> osDto.getStockLocationName().equals(pl.getAlias())).findAny();
+							Optional<StockLocation> optionalStockLocation =
+									StockLocations
+											.stream()
+											.filter(pl -> osDto.getStockLocationName()
+													.equals(pl.getAlias())).findAny();
+
 							if (optionalStockLocation.isPresent()) {
 								openingStock.setStockLocation(optionalStockLocation.get());
 							} else {
 								openingStock.setStockLocation(defaultStockLocation);
 							}
 						}
+
 						openingStock.setQuantity(osDto.getQuantity());
 						if (osDto.getQuantity() != 0.0) {
 							saveOpeningStocks.add(openingStock);
 						}
+
 					});
 		}
-		bulkOperationRepositoryCustom.bulkSaveOpeningStocks(saveOpeningStocks);
+
+		// Bulk save the collected opening stock entities
+		bulkOperationRepositoryCustom
+				.bulkSaveOpeningStocks(
+						saveOpeningStocks);
+
+
+		stockCalculationService
+				.saveProductdstockdata(saveOpeningStocks,companyId);
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
+
+		// Update the synchronization operation with completion information
+		saveSyncOperation(syncOperation, elapsedTime);
+	}
+
+	private static String getPid() {
+		return OpeningStockService.PID_PREFIX + RandomUtil.generatePid();
+	}
+
+	private void saveSyncOperation(SyncOperation syncOperation, double elapsedTime) {
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);

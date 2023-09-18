@@ -216,6 +216,11 @@ public class CompanyConfigurationResource {
 					anyValueExist = true;
 				}
 
+				if (cc.getName().equals(CompanyConfig.ENABLE_STOCK_CALCULATIONS)) {
+					mcDto.setEnableStockCalculations(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
+
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
 				 * mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue())); anyValueExist =
@@ -248,7 +253,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String descriptionToName, @RequestParam String stockApi,
 			@RequestParam String employeeCreateBtn, @RequestParam String modernSpecialConfig,
 			@RequestParam String salesorderstatus, @RequestParam String updateReciept,@RequestParam String sendToFocus,
-			@RequestParam String sendEmailAutomaticaly,@RequestParam String crmEnable,@RequestParam String outstandingDateSorting) throws URISyntaxException {
+			@RequestParam String sendEmailAutomaticaly,@RequestParam String crmEnable,@RequestParam String outstandingDateSorting,@RequestParam String enableStockCalculations) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -324,6 +329,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
 		Optional<CompanyConfiguration> optoutstandingDateSorting = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.OUTSTANDING_DATE_SORTING);
+		Optional<CompanyConfiguration> optEnableStockCalculations = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_STOCK_CALCULATIONS);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -363,6 +370,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration sendEmailAutomaticallyCompany = null;
 		CompanyConfiguration crmEnableCompany = null;
 		CompanyConfiguration outstandingDateSortingCompany = null;
+		CompanyConfiguration stockCalculationsCompany= null;
 		
 		/* CompanyConfiguration findLocationCompany = null; */
 
@@ -727,6 +735,18 @@ public class CompanyConfigurationResource {
 		companyConfigurationRepository.save(outstandingDateSortingCompany);
 
 
+		if (optEnableStockCalculations.isPresent()) {
+			stockCalculationsCompany= optEnableStockCalculations.get();
+			stockCalculationsCompany.setValue(enableStockCalculations);
+		} else {
+			stockCalculationsCompany = new CompanyConfiguration();
+			stockCalculationsCompany.setCompany(company);
+			stockCalculationsCompany.setName(CompanyConfig.ENABLE_STOCK_CALCULATIONS);
+			stockCalculationsCompany.setValue(enableStockCalculations);
+		}
+		companyConfigurationRepository.save(stockCalculationsCompany);
+
+
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -859,6 +879,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
 		Optional<CompanyConfiguration> optoutstandingDateSorting= companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.OUTSTANDING_DATE_SORTING);
+		Optional<CompanyConfiguration> optEnableStockCalculations= companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_STOCK_CALCULATIONS);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -975,6 +997,11 @@ public class CompanyConfigurationResource {
 		if (optoutstandingDateSorting.isPresent()) {
 			companyConfigurationDTO.setOutstandingDateSorting(Boolean.valueOf(optoutstandingDateSorting.get().getValue()));
 		}
+
+		if (optEnableStockCalculations.isPresent()) {
+			companyConfigurationDTO.setEnableStockCalculations(Boolean.valueOf(optEnableStockCalculations.get().getValue()));
+		}
+
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
@@ -1093,6 +1120,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.CRM_ENABLE);
 		Optional<CompanyConfiguration> optoutstandingDateSorting = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.OUTSTANDING_DATE_SORTING);
+		Optional<CompanyConfiguration> optEnableStockCalculations = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_STOCK_CALCULATIONS);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1239,6 +1268,9 @@ public class CompanyConfigurationResource {
 		}
 		if(optoutstandingDateSorting.isPresent()){
 			companyConfigurationRepository.deleteByCompanyIdAndName(optoutstandingDateSorting.get().getId(), CompanyConfig.OUTSTANDING_DATE_SORTING);
+		}
+		if(optEnableStockCalculations.isPresent()){
+			companyConfigurationRepository.deleteByCompanyIdAndName(optEnableStockCalculations.get().getId(), CompanyConfig.ENABLE_STOCK_CALCULATIONS);
 		}
 		
 		

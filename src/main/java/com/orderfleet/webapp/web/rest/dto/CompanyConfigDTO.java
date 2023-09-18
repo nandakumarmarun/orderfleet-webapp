@@ -45,8 +45,8 @@ public class CompanyConfigDTO {
 	private boolean sendToFocus;
 	private boolean sendEmailAutomaticaly;
 	private boolean outstandingDateSorting;
-
 	private boolean crmEnable;
+	private boolean EnableStockCalculations;
 
 	public CompanyConfigDTO() {
 		super();
@@ -340,4 +340,11 @@ public class CompanyConfigDTO {
 		this.outstandingDateSorting = outstandingDateSorting;
 	}
 
+	public boolean getEnableStockCalculations() {
+		return EnableStockCalculations;
+	}
+
+	public void setEnableStockCalculations(boolean enableStockCalculations) {
+		EnableStockCalculations = enableStockCalculations;
+	}
 }

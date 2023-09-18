@@ -652,7 +652,13 @@ public class ExecutiveTaskSubmissionController {
 
 			//Update Stock Data
 			if (tsTransactionWrapper != null && tsTransactionWrapper.getInventoryVouchers() != null) {
-				stockDataUpload(company, tsTransactionWrapper, stockCalculationService);
+				Optional<CompanyConfiguration> optStockCalculations = companyConfigurationRepository
+						.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_STOCK_CALCULATIONS);
+
+				if (optStockCalculations.isPresent() && !Boolean.valueOf(optStockCalculations.get().getValue())) {
+					stockDataUpload(company, tsTransactionWrapper, stockCalculationService);
+				}
+
 			}
 
 

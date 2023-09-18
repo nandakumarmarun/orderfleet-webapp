@@ -224,6 +224,12 @@ public class StockCalculationServiceImpl implements StockCalculationService {
         String Thread = "OPT-"+companyId + " : ";
         log.debug( Thread +"Entering saveProductdstockdata method : " + saveOpeningStocks.size());
 
+        if(saveOpeningStocks.size() == 0){
+            log.debug(Thread + "Exiting saveProductdstockdata By No Values Found : " + saveOpeningStocks.size());
+            List<Stock> orderProductsList = new ArrayList<>();
+            return orderProductsList ;
+        }
+
         // Initialize a counter for updated stock entries.
         int updated_count_stock_count = 0;
 

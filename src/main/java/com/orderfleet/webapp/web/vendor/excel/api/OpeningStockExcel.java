@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -65,43 +66,62 @@ public class OpeningStockExcel {
 	@Inject
 	private OpeningStockRepository openingStockRepository;
 
-//	@PostMapping("/opening-stock.json")
-//	@ResponseBody
-//	public ResponseEntity<String> uploadOpeningStock(@RequestBody List<OpeningStockVendorDTO> openingStockDtos,
-//			@RequestHeader("X-COMPANY") String companyId) {
-//		
-//		SnrichPartnerCompany snrichPartnerCompany = snrichPartnerCompanyRepository.findByDbCompany(companyId);
-//		Company company = snrichPartnerCompany.getCompany();
-//		if(company != null){
-//			masterDataUploadService.saveOrUpdateOpeningStock(openingStockDtos, company);
-//			return new ResponseEntity<String>("Success",HttpStatus.OK);	
-//		}else{
-//			return new ResponseEntity<String>("Failed",HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//	}
-	
-	@RequestMapping(value = "/opening-stock.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> bulkSaveOpeningStock(@Valid @RequestBody List<OpeningStockDTO> openingStockDTOs) {
-		log.debug("REST request to save opening stock : {}", openingStockDTOs.size());
-		
+
+	/**
+	 * REST endpoint to bulk save opening stock data from a JSON request.
+	 *
+	 * @param openingStockDTOs A list of OpeningStockDTO objects containing the opening stock data to be saved.
+	 * @param request          The HTTP servlet request.
+	 * @return A ResponseEntity containing a status message indicating the result of the operation.
+	 */
+	@RequestMapping(value = "/opening-stock.json",
+			method = RequestMethod.POST,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> bulkSaveOpeningStock(
+			@Valid @RequestBody List<OpeningStockDTO> openingStockDTOs,
+			HttpServletRequest request) {
+		log.debug(request.getRequestedSessionId() +" : "+"REST request to save opening stock : {} "
+				+ request.getRequestURI()+"   : size  "
+				+ openingStockDTOs.size());
+
+		// Get the current user's company ID from the security context
 		long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		long stockLocationId = 0L;
-		List<StockLocation> stockLocations = stockLocationService.findAllStockLocationByCompanyId(companyId);
+
+		// Retrieve all stock locations for the current company
+		List<StockLocation> stockLocations =
+				stockLocationService.findAllStockLocationByCompanyId(companyId);
+
+		// Check if the openingStockDTOs list is not empty
 		if(!openingStockDTOs.isEmpty()) {
 			String stockLocationName = openingStockDTOs.get(0).getStockLocationName();
-			Optional<StockLocation> stockLocation = 
-					stockLocations.stream().filter(sl -> sl.getAlias()!=null?sl.getAlias().equals(stockLocationName):false).findFirst();
+
+			// Find the first stock location with a matching alias
+			Optional<StockLocation> stockLocation =
+					stockLocations
+							.stream()
+							.filter(sl -> sl.getAlias()!=null?sl.getAlias()
+									.equals(stockLocationName):false)
+							.findFirst();
+
+			// If a matching stock location is found, set the stockLocationId
 			if(stockLocation.isPresent()) {
 				stockLocationId = stockLocation.get().getId();
 			}
 		}
-		if(stockLocationId!=0) {
-			openingStockRepository.deleteByStockLocationIdAndCompanyId(stockLocationId,companyId);
-		}
-		
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.OPENING_STOCK).map(so -> {
 
+		// If stockLocationId is not 0,
+		// delete existing opening stock records for the specified stock location and company
+			if(stockLocationId!=0) {
+			openingStockRepository
+					.deleteByStockLocationIdAndCompanyId(
+							stockLocationId,companyId);
+			}
+
+		return syncOperationRepository.findOneByCompanyIdAndOperationType(
+				SecurityUtils.getCurrentUsersCompanyId(),
+				SyncOperationType.OPENING_STOCK)
+				.map(so -> {
 					// update sync status
 					so.setCompleted(false);
 					so.setLastSyncStartedDate(LocalDateTime.now());
