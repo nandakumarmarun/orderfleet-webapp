@@ -1,7 +1,7 @@
 {
-"release-number" : "1.111.3",
-"release-date" : "18/09/2023",
+"release-number" : "1.111.4",
+"release-date" : "19/09/2023",
 "features" : [
-  "Stock Calculations-Company Configuration,"
+  "Stock Calculations-Company Configuration,Login-Logout Report"
 ]
 }

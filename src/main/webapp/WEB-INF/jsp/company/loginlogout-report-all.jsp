@@ -157,8 +157,10 @@
 						<th>Punch Out OdoMeter Reading</th>
 						<th>Punch Out Remarks</th>
 						<th>Total Kilometer Reading</th>
+						<th>No Of Visits </th>
 						<th>View Attendance Image</th>
 						<th>View PunchOut Image</th>
+
 					</tr>
 				</thead>
 				<tbody id="tBodyLoginLogOut">

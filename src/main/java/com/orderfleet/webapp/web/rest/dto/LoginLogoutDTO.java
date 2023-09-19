@@ -44,6 +44,7 @@ public class LoginLogoutDTO {
 	private double totalOdoMeter;
 	private String attendancePid;
 	private String punchoutPid;
+	private Integer noOfVisits;
 	
 	public LoginLogoutDTO() {
 		super();
@@ -54,7 +55,7 @@ public class LoginLogoutDTO {
 			BigDecimal longitude, String mnc, String mcc, String cellId, String lac, LocationType locationType,
 			String location, String attendanceSubGroupName, String towerLocation, BigDecimal towerLatitude,
 			BigDecimal towerLongitude, LocalDateTime punchoutServerDate, LocalDateTime punchoutClientDate,
-			String punchoutRemarks) {
+			String punchoutRemarks,Integer noOfVisits) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -72,6 +73,7 @@ public class LoginLogoutDTO {
 		this.punchoutServerDate = punchoutServerDate;
 		this.punchoutClientDate = punchoutClientDate;
 		this.punchoutRemarks = punchoutRemarks;
+		this.noOfVisits = noOfVisits;
 	}
 
 	public LoginLogoutDTO(Attendance attendance, PunchOut punchout) {
@@ -335,6 +337,14 @@ public class LoginLogoutDTO {
 
 	public void setPunchoutPid(String punchoutPid) {
 		this.punchoutPid = punchoutPid;
+	}
+
+	public Integer getNoOfVisits() {
+		return noOfVisits;
+	}
+
+	public void setNoOfVisits(Integer noOfVisits) {
+		this.noOfVisits = noOfVisits;
 	}
 
 	@Override

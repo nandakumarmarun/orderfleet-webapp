@@ -21,6 +21,9 @@ import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.web.rest.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -36,30 +39,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.io.Files;
-import com.orderfleet.webapp.domain.Attendance;
-import com.orderfleet.webapp.domain.EmployeeProfile;
-import com.orderfleet.webapp.domain.File;
-import com.orderfleet.webapp.domain.PunchOut;
-import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AttendanceStatus;
-import com.orderfleet.webapp.repository.AttendanceRepository;
-import com.orderfleet.webapp.repository.DashboardUserRepository;
-import com.orderfleet.webapp.repository.EmployeeProfileRepository;
-import com.orderfleet.webapp.repository.PunchOutRepository;
-import com.orderfleet.webapp.repository.RootPlanDetailRepository;
-import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AttendanceService;
 import com.orderfleet.webapp.service.EmployeeHierarchyService;
 import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.FileManagerService;
 import com.orderfleet.webapp.service.PunchOutService;
-import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
-import com.orderfleet.webapp.web.rest.dto.AttendanceReportDTO;
-import com.orderfleet.webapp.web.rest.dto.FileDTO;
-import com.orderfleet.webapp.web.rest.dto.FormFileDTO;
-import com.orderfleet.webapp.web.rest.dto.LoginLogoutDTO;
-import com.orderfleet.webapp.web.rest.dto.PunchOutDTO;
 
 @Controller
 @RequestMapping("/web")
@@ -95,6 +81,9 @@ public class LoginLogoutReportResource {
 	
 	@Inject 
     private	PunchOutRepository punchOutRepository;
+
+    @Inject
+    private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
 
 	/**
 	 * GET /attendance-report : get attendance list.
@@ -298,6 +287,9 @@ public class LoginLogoutReportResource {
 				fromDate, toDate);
 		List<PunchOutDTO> punchoutList = punchoutService.findAllByCompanyIdUserPidInAndPunchDateBetween(userIds,
 				fromDate, toDate);
+        List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository.findAllByCompanyIdUserIdInAndDateBetween(userIds,
+				fromDate, toDate);
+
 		List<LocalDate> dates = getDaysBetweenDates(fromDate.toLocalDate(), toDate.toLocalDate());
 		List<LoginLogoutDTO> loginlogoutDtos = new ArrayList<>();
 		for (LocalDate localDate : dates) {
@@ -310,6 +302,15 @@ public class LoginLogoutReportResource {
 						.filter(a -> a.getLogin().equals(employee.getUser().getLogin())
 								&& localDate.equals(a.getPunchOutDate().toLocalDate()))
 						.findAny();
+				List<ExecutiveTaskExecution> filteredExecutions = executiveTaskExecutions
+						.stream()
+						.filter(execution -> execution.getUser().getId().equals(employee.getUser().getId()))
+						.collect(Collectors.toList())
+						.stream()
+						.filter(execution ->localDate.equals(execution.getCreatedDate().toLocalDate()))
+						.collect(Collectors.toList());
+
+
 				LoginLogoutDTO loginlogoutDTO = new LoginLogoutDTO();
 				loginlogoutDTO.setAttendanceDay(localDate);
 
@@ -326,6 +327,7 @@ public class LoginLogoutReportResource {
 					loginlogoutDTO.setVehicleType(attDto.getVehicleType());					
 					loginlogoutDTO.setRemarks(attDto.getRemarks());
 					loginlogoutDTO.setImageButtonVisible(true);
+
 				} else {
 					loginlogoutDTO.setEmployeeName(employee.getName());
 					loginlogoutDTO.setAttendanceStatus("NOT MARKED");
@@ -349,9 +351,9 @@ public class LoginLogoutReportResource {
 					loginlogoutDTO.setPunchoutStatus("NOT MARKED");
 					loginlogoutDTO.setPunchoutRemarks("");
 				}
-				
-				
 
+
+				loginlogoutDTO.setNoOfVisits(filteredExecutions.size());
 				loginlogoutDtos.add(loginlogoutDTO);
 			}
 		}

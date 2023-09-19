@@ -176,7 +176,9 @@ if (!this.LoginLogOut) {
 											: loginLogOut.punchoutRemarks)
 										+ "</td><td>"
 										+ loginLogOut.totalOdoMeter
-										+ "</td>"
+										+ "</td><td>"
+                                        + loginLogOut.noOfVisits
+                                        + "</td>"
 										+ content
 										+ pcontent
 										+ "</tr>");

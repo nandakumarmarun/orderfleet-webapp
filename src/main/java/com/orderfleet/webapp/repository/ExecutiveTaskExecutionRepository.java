@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -327,5 +328,6 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
     List<ExecutiveTaskExecution> findAllByUserIdInAndAccountProfilePidInAndDateBetweenOrderByDateDesc(
 			List<Long> userIds, List<String> asList, LocalDateTime fromDate, LocalDateTime toDate);
 
-	
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.user.id in ?1 and exeTaskExecution.createdDate between ?2 and ?3 ")
+	List<ExecutiveTaskExecution> findAllByCompanyIdUserIdInAndDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
 }
