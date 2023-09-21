@@ -56,6 +56,7 @@ public class Stock {
     @Column(name = "company_id")
     private long company;
 
+    @Column(name = "batch_no")
     private  String  batchNo;
 
 
