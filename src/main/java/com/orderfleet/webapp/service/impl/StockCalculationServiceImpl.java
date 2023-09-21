@@ -115,25 +115,16 @@ public class StockCalculationServiceImpl implements StockCalculationService {
                            && data.getStockLocationPid().equals(inventoryVoucherDetail.getSourceStockLocation().getPid()))
                    .findAny();
 
-           log.debug(thread + " Opening Stock is present   : " + optStock.isPresent());
-
             // Check if closingActual and closingLogical are enabled in stock calculation
            if(optionalStockCalculation.isPresent()
                    && optionalStockCalculation.get().getClosingActual()
                    && optionalStockCalculation.get().getClosingLogical()){
 
-               log.debug(thread + " Actual  : "+optionalStockCalculation.get().getClosingActual());
-               log.debug(thread + " Logical : "+optionalStockCalculation.get().getClosingLogical());
 
                // Existing Stock found; update its properties
                if(optStock.isPresent()){
                    // Use the existing Stock
                    stock = optStock.get();
-
-                   log.debug(thread + " Existing Stock : " + stock.getProductName() + " New Stock : "  + inventoryVoucherDetail.getProduct().getName() );
-                   log.debug(thread + " Existing Opening Stock  : " + stock.getOpeningQuantity());
-                   log.debug(thread + " Existing Available Stock : " + stock.getAvilableQuantity());
-                   log.debug(thread + " solid Stock  : " + inventoryVoucherDetail.getQuantity());
 
                    // Update Stock properties
                    stock.setSolidQuantity(stock.getSolidQuantity() + inventoryVoucherDetail.getQuantity() + inventoryVoucherDetail.getFreeQuantity());
@@ -143,9 +134,6 @@ public class StockCalculationServiceImpl implements StockCalculationService {
                    stock.setStockLocationName(inventoryVoucherDetail.getSourceStockLocation().getName());
                }else{
 
-                   log.debug(thread + "New stock : " +  inventoryVoucherDetail.getProduct().getId() +" : " +inventoryVoucherDetail.getProduct().getName());
-                   log.debug(thread + "New Opening Stock  : " +inventoryVoucherDetail.getQuantity());
-
                    // Create a new Stock entry if not found
                    stock.setProductId(inventoryVoucherDetail.getProduct().getId());
                    stock.setProductPid(inventoryVoucherDetail.getProduct().getPid());
@@ -153,6 +141,7 @@ public class StockCalculationServiceImpl implements StockCalculationService {
                    stock.setSolidQuantity(0 + inventoryVoucherDetail.getQuantity());
                    stock.setDamageQuantity(0.0);
                    stock.setOpeningQuantity(0.0);
+                   stock.setBatchNo("123");
                    stock.setAvilableQuantity(stock.getOpeningQuantity() - stock.getSolidQuantity());
                    stock.setCreatedate(LocalDateTime.now());
                    stock.setLastModifiedDate(LocalDateTime.now());
@@ -164,17 +153,10 @@ public class StockCalculationServiceImpl implements StockCalculationService {
            } else if (optionalStockCalculation.isPresent()
                    && optionalStockCalculation.get().getOpening()){
 
-               log.debug(thread + " opening   : "+optionalStockCalculation.get().getOpening());
-
                // Check if an existing Stock is found
                if(optStock.isPresent()){
                    // Use the existing Stock
                    stock = optStock.get();
-
-                   log.debug(thread + " Existing Stock : " + stock.getProductName() + " New Stock : "  + inventoryVoucherDetail.getProduct().getName() );
-                   log.debug(thread + " Existing Opening Stock  : " + stock.getOpeningQuantity());
-                   log.debug(thread + " Existing Available Stock : " + stock.getAvilableQuantity());
-                   log.debug(thread + " solid Stock  : " + inventoryVoucherDetail.getQuantity());
 
                    // Update Stock properties
                    stock.setSolidQuantity(stock.getSolidQuantity() + inventoryVoucherDetail.getQuantity() + inventoryVoucherDetail.getFreeQuantity());
@@ -184,14 +166,13 @@ public class StockCalculationServiceImpl implements StockCalculationService {
                }else{
 
                    // Create a new Stock entry if not found
-                   log.debug(thread + "New stock : " +  inventoryVoucherDetail.getProduct().getId() +" : " +inventoryVoucherDetail.getProduct().getName());
-                   log.debug(thread + "New Opening Stock  : " +inventoryVoucherDetail.getQuantity());
                    stock.setProductId(inventoryVoucherDetail.getProduct().getId());
                    stock.setProductPid(inventoryVoucherDetail.getProduct().getPid());
                    stock.setProductName(inventoryVoucherDetail.getProduct().getName());
                    stock.setSolidQuantity(0 + inventoryVoucherDetail.getQuantity());
                    stock.setDamageQuantity(0.0);
                    stock.setOpeningQuantity(0.0);
+                   stock.setBatchNo("123");
                    stock.setAvilableQuantity(stock.getOpeningQuantity() - stock.getSolidQuantity());
                    stock.setCreatedate(LocalDateTime.now());
                    stock.setLastModifiedDate(LocalDateTime.now());
@@ -204,15 +185,14 @@ public class StockCalculationServiceImpl implements StockCalculationService {
        }
 
         log.debug(thread + " Order Size : " + orderProductsList.size());
-
         convertToJson(orderProductsList);
         List<Stock> result = stockCalculationRepository.save(orderProductsList);
         return result ;
     }
     /**
-     * This method saves and updates stock data based on opening stock information.
+     * This method remove and saves stock data based on opening stock information.
      *
-     * @param saveOpeningStocks A set of opening stock data to be used for updating or adding stock entries.
+     * @param saveOpeningStocks A set of opening stock data to be used for remove and adding stock entries.
      * @param companyId         The ID of the company for which stock data is being managed.
      * @return A list of Stock objects representing the updated stock data.
      */
@@ -221,13 +201,113 @@ public class StockCalculationServiceImpl implements StockCalculationService {
     public List<Stock> saveProductdstockdata(
             Set<OpeningStock> saveOpeningStocks,long companyId) {
 
-        String Thread = "OPT-"+companyId + " : ";
-        log.debug( Thread +"Entering saveProductdstockdata method : " + saveOpeningStocks.size());
+        String Thread = "PID02-"+companyId + " : ";
+
+        log.debug( Thread
+                +"Entering saveProductdstockdata method : "
+                + saveOpeningStocks.size());
 
         if(saveOpeningStocks.size() == 0){
-            log.debug(Thread + "Exiting saveProductdstockdata By No Values Found : " + saveOpeningStocks.size());
-            List<Stock> orderProductsList = new ArrayList<>();
-            return orderProductsList ;
+
+            log.debug(Thread
+                    + "Exiting saveProductdstockdata By No Values Found : "
+                    + saveOpeningStocks.size());
+
+            return new ArrayList<>();
+        }
+
+        // Initialize a counter for updated stock entries.
+        int updated_count_stock_count = 0;
+
+        // Initialize a list to store updated stock data.
+        List<Stock> orderProductsList = new ArrayList<>();
+
+        log.debug(Thread + "Current login company Id : " + companyId);
+
+        // Extract stock location PIDs from the opening stock data.
+        List<String> stockLocationPids = saveOpeningStocks
+                .stream()
+                .map(p -> p.getStockLocation().getPid())
+                .distinct() // To remove duplicates
+                .collect(Collectors.toList());
+
+        // Fetch live stock data from the repository based on company and stock location.
+        int livestocks =
+                stockCalculationRepository.
+                        findByCountCompanyProductAndOrderDateBetween(
+                                companyId,stockLocationPids);
+
+        log.debug(Thread + "Existing Live Stock Count : " + livestocks);
+
+        int deleted =
+                stockCalculationRepository
+                        .deleteByStockLocatonPid(
+                                companyId,stockLocationPids);
+
+
+        log.debug(Thread + " Stock Locations : " + stockLocationPids.toString());
+        log.debug(Thread + " Removed Live Stock : " + deleted);
+        log.debug(Thread + " Existing Opening Stock Size : " + saveOpeningStocks.size());
+        log.debug(Thread + " updated_count_stock_count : " + updated_count_stock_count);
+
+
+        // Iterate through the opening stock entries to add new stock entries,
+        for(OpeningStock openingStock : saveOpeningStocks){
+                Stock stock = new Stock();
+                stock.setProductId(openingStock.getProductProfile().getId());
+                stock.setProductPid(openingStock.getProductProfile().getPid());
+                stock.setProductName(openingStock.getProductProfile().getName());
+                stock.setSolidQuantity(0.0);
+                stock.setDamageQuantity(0.0);
+                stock.setOpeningQuantity(openingStock.getQuantity());
+                stock.setAvilableQuantity(openingStock.getQuantity());
+                stock.setCreatedate(LocalDateTime.now());
+                stock.setLastModifiedDate(LocalDateTime.now());
+                stock.setStockLocationPid(openingStock.getStockLocation().getPid());
+                stock.setStockLocationName(openingStock.getStockLocation().getName());
+                stock.setBatchNo(openingStock.getId().toString());
+                stock.setCompany(companyId);
+                // Add the new stock entry to the list.
+                orderProductsList.add(stock);
+        }
+
+        log.debug(Thread + " New Opening Stock Size : " + orderProductsList.size());
+
+        // Save the updated stock data to the repository and log the result.
+        List<Stock> result =
+                stockCalculationRepository
+                        .save(orderProductsList);
+
+        convertToJson(result);
+
+        log.debug(Thread + "Exiting saveProductstockdata method" + result.size());
+        return result;
+    }
+
+    /**
+     * This method updates stock data based on opening stock information.
+     *
+     * @param saveOpeningStocks A set of opening stock data to be used for updating entries.
+     * @param companyId         The ID of the company for which stock data is being managed.
+     * @return A list of Stock objects representing the updated stock data.
+     */
+    @Override
+    public List<Stock> updateProductdstockdata(
+            Set<OpeningStock> saveOpeningStocks, long companyId) {
+
+        String Thread = "PID01-"+companyId + " : ";
+
+        log.debug( Thread +
+                "Entering updateProductdstockdata method : "
+                + saveOpeningStocks.size());
+
+        if(saveOpeningStocks.size() == 0){
+
+            log.debug(Thread +
+                    "Exiting UpdateProductdstockdata By No Values Found : "
+                    + saveOpeningStocks.size());
+
+            return new ArrayList<>();
         }
 
         // Initialize a counter for updated stock entries.
@@ -245,54 +325,39 @@ public class StockCalculationServiceImpl implements StockCalculationService {
                 .distinct() // To remove duplicates
                 .collect(Collectors.toList());
 
-        // Fetch live stock data from the repository based on company,
-        // product, and stock location.
+        // Fetch live stock data from the repository based on company and stock location.
         List<Stock>  livestocks =
                 stockCalculationRepository
                         .findByCompanyProductAndOrderDateBetween(
                                 companyId,stockLocationPids);
 
-        log.debug(Thread + "stock Locations : " + stockLocationPids.toString());
-        log.debug(Thread + "Live Stock : " + livestocks.size());
+        convertToJson(livestocks);
 
-        // Iterate through the retrieved live stock entries.
-        for(Stock liveStock : livestocks){
+        log.debug(Thread + " Stock Locations : " + stockLocationPids.toString());
+        log.debug(Thread + " Existing Opening Stock Size : " + saveOpeningStocks.size());
+        log.debug(Thread + " updated_count_stock_count : " + updated_count_stock_count);
 
-            // Create a reference to the live stock entry.
-            Stock stock = liveStock;
 
-            // Find the corresponding opening stock entry, if present.
-            Optional<OpeningStock> optStock = saveOpeningStocks
+        // Iterate through the opening stock entries to add new stock entries, if needed.
+        for(OpeningStock openingStock : saveOpeningStocks){
+
+            log.debug(openingStock.getProductProfile().getName()
+                    + openingStock.getStockLocation().getName()
+                    + "=====" +openingStock.getId());
+
+            Stock stock = new Stock();
+
+            // Check if there is no corresponding live stock entry.
+            Optional<Stock> optStock = livestocks
                     .stream()
-                    .filter(data->liveStock.getProductId()
-                            .equals(data.getProductProfile().getId())
-                            && liveStock.getStockLocationPid()
-                            .equals(data.getStockLocation().getPid()))
-                    .findAny();
+                    .filter(data->data.getProductId()
+                            .equals(openingStock.getProductProfile().getId())
+                            && data.getStockLocationPid()
+                            .equals(openingStock.getStockLocation().getPid())
+                            && data.getBatchNo().equals(openingStock.getId().toString())).findAny();
 
-
-            // Check if an opening stock entry was found.
             if(optStock.isPresent()){
-                OpeningStock openingStock = optStock.get();
-                System.out.println();
-                log.debug("===========================opening stock Present ====================================");
-                log.debug("-------------------------------------------------------------------------------------");
-                log.debug(Thread + "stock.Product id       : " +  stock.getProductId());
-                log.debug(Thread + "stock.Product pid      : " +  stock.getProductPid());
-                log.debug(Thread + "stock.Product Name     : " +  stock.getProductName());
-                log.debug(Thread + "stock.Opening Stock    : " + stock.getOpeningQuantity());
-                log.debug(Thread + "stock.Available Stock  : " + stock.getAvilableQuantity());
-                log.debug(Thread + "stock.damage Stock     : " + stock.getDamageQuantity());
-                log.debug(Thread + "stock.solid Stock      : " + stock.getSolidQuantity());
-                log.debug("-------------------------------------------------------------------------------------");
-                log.debug("-------------------------------------------------------------------------------------");
-                log.debug(Thread + "Opening Stock.Product id       : " +  openingStock.getProductProfile().getId());
-                log.debug(Thread + "Opening Stock.Product pid      : " +  openingStock.getProductProfile().getPid());
-                log.debug(Thread + "Opening Stock.Product Name     : " +  openingStock.getProductProfile().getName());
-                log.debug(Thread + "Opening Stock.Opening Stock    : " +  openingStock.getQuantity());
-                log.debug("-------------------------------------------------------------------------------------");
-                log.debug("=====================================================================================");
-
+                stock = optStock.get();
                 stock.setSolidQuantity(0.0);
                 stock.setDamageQuantity(0.0);
                 stock.setOpeningQuantity(openingStock.getQuantity());
@@ -301,55 +366,7 @@ public class StockCalculationServiceImpl implements StockCalculationService {
                 stock.setLastModifiedDate(LocalDateTime.now());
                 stock.setStockLocationName(openingStock.getStockLocation().getName());
                 updated_count_stock_count = updated_count_stock_count + 1;
-
             } else{
-                log.debug("==============================opening stock not present==============================");
-                log.debug(Thread + "stock.Product id       : " +  stock.getProductId());
-                log.debug(Thread + "stock.Product pid      : " +  stock.getProductPid());
-                log.debug(Thread + "stock.Product Name     : " +  stock.getProductName());
-                log.debug(Thread + "stock.Opening Stock    : " + stock.getOpeningQuantity());
-                log.debug(Thread + "stock.Available Stock  : " + stock.getAvilableQuantity());
-                log.debug(Thread + "stock.damage Stock     : " + stock.getDamageQuantity());
-                log.debug(Thread + "stock.solid Stock      : " + stock.getSolidQuantity());
-                log.debug("=====================================================================================");
-                stock.setSolidQuantity(0.0);
-                stock.setDamageQuantity(0.0);
-                stock.setOpeningQuantity(0.0);
-                stock.setAvilableQuantity(0.0);
-                stock.setLastModifiedDate(LocalDateTime.now());
-            }
-
-            // Add the updated or reset stock entry to the list.
-            orderProductsList.add(stock);
-        }
-
-        log.debug(Thread + " Existing Opening Stock Size : " + orderProductsList.size());
-        log.debug(Thread + " updated_count_stock_count : " + updated_count_stock_count);
-
-
-        // Iterate through the opening stock entries to add new stock entries, if needed.
-        for(OpeningStock openingStock : saveOpeningStocks){
-                Stock stock = new Stock();
-
-            // Find the corresponding live stock entry, if present.
-            Optional<Stock> optStock = livestocks
-                        .stream()
-                        .filter(data->data.getProductId()
-                                .equals(openingStock.getProductProfile().getId())
-                                && data.getStockLocationPid()
-                                .equals(openingStock.getStockLocation().getPid()))
-                        .findAny();
-
-            // Check if there is no corresponding live stock entry.
-            if(!optStock.isPresent()){
-
-                log.debug("---------------------------------------new stock-----------------------------------------");
-                log.debug(Thread + "Opening Stock.Product id       : " +  openingStock.getProductProfile().getId());
-                log.debug(Thread + "Opening Stock.Product pid      : " +  openingStock.getProductProfile().getPid());
-                log.debug(Thread + "Opening Stock.Product Name     : " +  openingStock.getProductProfile().getName());
-                log.debug(Thread + "Opening Stock.Opening Stock    : " +  openingStock.getQuantity());
-                log.debug("-----------------------------------------------------------------------------------------");
-
                 stock.setProductId(openingStock.getProductProfile().getId());
                 stock.setProductPid(openingStock.getProductProfile().getPid());
                 stock.setProductName(openingStock.getProductProfile().getName());
@@ -358,18 +375,17 @@ public class StockCalculationServiceImpl implements StockCalculationService {
                 stock.setOpeningQuantity(openingStock.getQuantity());
                 stock.setAvilableQuantity(openingStock.getQuantity());
                 stock.setCreatedate(LocalDateTime.now());
+                stock.setBatchNo(openingStock.getId().toString());
                 stock.setLastModifiedDate(LocalDateTime.now());
                 stock.setStockLocationPid(openingStock.getStockLocation().getPid());
                 stock.setStockLocationName(openingStock.getStockLocation().getName());
                 stock.setCompany(companyId);
-                // Add the new stock entry to the list.
-                orderProductsList.add(stock);
             }
+            // Add the new stock entry to the list.
+            orderProductsList.add(stock);
         }
 
         log.debug(Thread + " New Opening Stock Size : " + orderProductsList.size());
-
-        convertToJson(orderProductsList);
 
         // Save the updated stock data to the repository and log the result.
         List<Stock> result =
@@ -378,9 +394,10 @@ public class StockCalculationServiceImpl implements StockCalculationService {
 
         convertToJson(result);
 
-        log.debug(Thread + "Exiting saveProductstockdata method.");
+        log.debug(Thread + "Exiting UpdateProductstockdata method.");
         return result;
     }
+
     /**
      * Asynchronously resets stock data for a specific product profile and stock location.
      *
@@ -430,6 +447,8 @@ public class StockCalculationServiceImpl implements StockCalculationService {
         return LiveStock;
     }
 
+
+
     public ObjectMapper getObjectMapper(){
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -451,9 +470,10 @@ public class StockCalculationServiceImpl implements StockCalculationService {
         ObjectMapper objectMapper = getObjectMapper();
         try {
             String jsonString = objectMapper.writeValueAsString(collection);
-            log.debug("json Data : " + jsonString);
+            log.debug("Data : " + jsonString);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
+
 }

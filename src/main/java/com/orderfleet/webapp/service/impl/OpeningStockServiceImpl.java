@@ -82,7 +82,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 		openingStock.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		openingStock = openingStockRepository.save(openingStock);
 		saveOpeningStocks.add(openingStock);
-		stockCalculationService.saveProductdstockdata(saveOpeningStocks,SecurityUtils.getCurrentUsersCompanyId());
+		stockCalculationService.updateProductdstockdata(saveOpeningStocks,SecurityUtils.getCurrentUsersCompanyId());
 		OpeningStockDTO result = openingStockMapper.openingStockToOpeningStockDTO(openingStock);
 		return result;
 	}
@@ -111,7 +111,7 @@ public class OpeningStockServiceImpl implements OpeningStockService {
 			openingStock = openingStockRepository.save(openingStock);
 			Set<OpeningStock> saveOpeningStocks = new HashSet<>();
 			saveOpeningStocks.add(openingStock);
-			stockCalculationService.saveProductdstockdata(saveOpeningStocks,SecurityUtils.getCurrentUsersCompanyId());
+			stockCalculationService.updateProductdstockdata(saveOpeningStocks,SecurityUtils.getCurrentUsersCompanyId());
 			OpeningStockDTO result = openingStockMapper.openingStockToOpeningStockDTO(openingStock);
 			return result;
 		}).orElse(null);

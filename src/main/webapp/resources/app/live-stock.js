@@ -157,6 +157,8 @@ if (!this.OpeningStock) {
           "</td><td>" +
           livestock.stockLocationName +
           "</td><td>" +
+          livestock.batchNo +
+          "</td><td>" +
           livestock.openingQuantity +
           "</td><td>" +
           livestock.soldQuantity +

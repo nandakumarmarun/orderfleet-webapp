@@ -126,11 +126,9 @@ public class StockDetailsServiceImpl implements StockDetailsService {
 					stockDetailsDTO.setProductName(stockDetailsDTO.getProductName() + name);
 
 				} else {
-					log.info("Product Profile Size < 0");
 					stockDetailsDTO.setProductName(stockDetailsDTO.getProductName());
 				}
 			} else {
-				log.info("Optional Product Profile not present");
 				stockDetailsDTO.setProductName(stockDetailsDTO.getProductName());
 			}
 		}

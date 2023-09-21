@@ -56,6 +56,8 @@ public class Stock {
     @Column(name = "company_id")
     private long company;
 
+    private  String  batchNo;
+
 
     public Long getProductId() {
         return productId;
@@ -173,6 +175,14 @@ public class Stock {
         StockLocationName = stockLocationName;
     }
 
+    public String getBatchNo() {
+        return batchNo;
+    }
+
+    public void setBatchNo(String batchNo) {
+        this.batchNo = batchNo;
+    }
+
     @Override
     public String toString() {
         return "Stock{" +
@@ -189,6 +199,7 @@ public class Stock {
                 ", StockLocationPid='" + StockLocationPid + '\'' +
                 ", StockLocationName='" + StockLocationName + '\'' +
                 ", company=" + company +
+                ", batchNo='" + batchNo + '\'' +
                 '}';
     }
 }

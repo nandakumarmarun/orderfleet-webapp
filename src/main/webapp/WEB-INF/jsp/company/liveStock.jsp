@@ -72,6 +72,7 @@
 											<th>ProductID</th>
 											<th>Product Name</th>
 											<th>Stock Location</th>
+											<th>Batch</th>
 											<th>Opening Stock</th>
 											<th>Sold Stock</th>
 											<th>Avilable stock</th>

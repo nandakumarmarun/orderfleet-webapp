@@ -59,4 +59,6 @@ public interface StockCalculationService {
      */
     List<Stock> findAllLiveStocksByCompanyId(long Companyid);
 
+    List<Stock> updateProductdstockdata(Set<OpeningStock> saveOpeningStocks,long companyId);
+
 }

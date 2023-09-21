@@ -2241,7 +2241,6 @@ public class TPProductProfileManagementService {
 	}
 
 
-
 	/**
 	 * Saves and updates opening stock data based on the provided OpeningStockDTOs and SyncOperation.
 	 *
@@ -2250,6 +2249,8 @@ public class TPProductProfileManagementService {
 	 *
 	 * @param openingStockDTOs A list of OpeningStockDTOs containing opening stock data to be saved or updated.
 	 * @param syncOperation The SyncOperation object representing the synchronization process.
+	 *
+	 *
 	 */
 	@Transactional
 	public void saveUpdateOpeningStockUpadetIdNew(

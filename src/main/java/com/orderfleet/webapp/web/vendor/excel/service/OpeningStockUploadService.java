@@ -153,7 +153,8 @@ public class OpeningStockUploadService {
 	 * containing the opening stock data to be saved or updated.
 	 * @param syncOperation    The synchronization operation associated with the data.
 	 *
-	 * @Updated  since 1.111.0
+	 * @Updated :   since 1.111.0
+	 * @implSpec :   PHARAMA EXCEL CLIENTAPP
 	 */
 	@Transactional
 	@Async
