@@ -124,7 +124,7 @@ public class ProductProfileCsvUploadService {
 
 	@Autowired
 	private StockLocationService stockLocationService;
-
+	boolean flag = false;
 	public ProductProfileCsvUploadService(BulkOperationRepositoryCustom bulkOperationRepositoryCustom,
 			SyncOperationRepository syncOperationRepository, DivisionRepository divisionRepository,
 			ProductCategoryRepository productCategoryRepository, ProductGroupRepository productGroupRepository,
@@ -247,6 +247,27 @@ public class ProductProfileCsvUploadService {
 		Long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		Set<ProductProfile> saveUpdateProductProfiles = new HashSet<>();
+		List<ProductProfile> productSProfile = productProfileRepository.findAllByCompanyIdAndActivated(company.getId());
+		System.out.println("Size :"+productSProfile.size());
+		List<ProductProfile> tallyproductProfiles = productSProfile.stream().filter(data -> data.getDataSourceType().equals(DataSourceType.TALLY)).collect(Collectors.toList());
+		System.out.println("tallyproductProfiles Size :"+tallyproductProfiles.size());
+		Set<Long> dectivatedpp = new HashSet<>();
+		for(ProductProfile pp :tallyproductProfiles) {
+			flag = false;
+			System.out.println("Size of productProfileDTOs: "+ productProfileDTOs.size());
+			productProfileDTOs.forEach(data ->{
+				if(pp.getAlias().equals(data.getAlias())) {
+					flag = true;
+				}
+			});
+			if(!flag) {
+				dectivatedpp.add(pp.getId());
+			}
+		}
+		System.out.println("Size of dectivatedpp :"+dectivatedpp.size());
+		if(!dectivatedpp.isEmpty()) {
+			productProfileRepository.deactivateProductProfileUsingInIdAndLastModifiedDate(dectivatedpp,LocalDateTime.now());
+		}
 		// find all exist product profiles
 		Set<String> ppAlias = productProfileDTOs.stream().map(p -> p.getAlias()).collect(Collectors.toSet());
 		List<ProductProfile> productProfiles = productProfileRepository

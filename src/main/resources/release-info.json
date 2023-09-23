@@ -1,7 +1,7 @@
 {
-"release-number" : "1.111.5",
-"release-date" : "21/09/2023",
+"release-number" : "1.112.0",
+"release-date" : "23/09/2023",
 "features" : [
-  "Batch Wise Stock Calculations"
+  "Deactivating products not in tally,Report Download error "
 ]
 }

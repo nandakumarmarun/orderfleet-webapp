@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -120,9 +121,9 @@ public class ProductProfileCsv {
 	@RequestMapping(value = "/product-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<String> bulkSaveProductProfiles(
-			@Valid @RequestBody List<ProductProfileDTO> productProfileDTOs) {
+			@Valid @RequestBody List<ProductProfileDTO> productProfileDTOs, HttpServletRequest request) {
 		
-		log.debug("REST request to save ProductProfiles : {}", productProfileDTOs.size());
+		log.debug("REST request to save ProductProfiles : {}", request.getRequestURL(),productProfileDTOs.size());
 		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
 				SyncOperationType.PRODUCTPROFILE).map(so -> {
 					// update sync status

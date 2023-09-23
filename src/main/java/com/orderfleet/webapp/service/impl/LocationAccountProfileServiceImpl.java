@@ -207,14 +207,14 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		List<AccountProfile> result = new ArrayList<>();
 		if (!locationIds.isEmpty()) {
 
-			Set<BigInteger> apIds = locationAccountProfileRepository
-					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesName(locationIds);
+			Set<Long> accountProfileIds = locationAccountProfileRepository
+					.findAccountProfileIdsByUserLocationsOrderByAccountProfilesNameAndActivated(locationIds);
 
-			Set<Long> accountProfileIds = new HashSet<>();
-
-			for (BigInteger apId : apIds) {
-				accountProfileIds.add(apId.longValue());
-			}
+//			Set<Long> accountProfileIds = new HashSet<>();
+//
+//			for (BigInteger apId : apIds) {
+//				accountProfileIds.add(apId.longValue());
+//			}
 
 			// List<AccountProfile> accountProfiles =
 			// locationAccountProfileRepository.findAccountProfilesByUserLocationsOrderByAccountProfilesName(locations);

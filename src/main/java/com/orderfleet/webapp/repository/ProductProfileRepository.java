@@ -147,10 +147,15 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	@Modifying
 	@Query("update ProductProfile productProfile set productProfile.activated = false where productProfile.company.id = ?#{principal.companyId} AND productProfile.id IN ?1")
 	void deactivateProductProfileUsingInId(Set<Long> id);
+	@Modifying
+	@Query("update ProductProfile productProfile set productProfile.activated = false ,productProfile.lastModifiedDate = ?2 where productProfile.company.id = ?#{principal.companyId} AND productProfile.id IN ?1")
+	void deactivateProductProfileUsingInIdAndLastModifiedDate(Set<Long> id,LocalDateTime localDateTime);
 
 	@Query("select productProfile.productDescription from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and activated=true and productProfile.createdDate <= ?1 Order By productProfile.productDescription asc")
 	List<String> findProductDescriptionByCompanyIdAndActivatedTrueAndCreatedLessThan(LocalDateTime atTime);
 
 	@Query("Select productProfile from ProductProfile  productProfile where productProfile.company.id = ?#{principal.companyId} and lower(productProfile.name) like lower(concat('%', :name,'%'))")
 	public List<ProductProfile> searchByName(@Param("name") String name);
+	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?1 and productProfile.activated = 'true' order by productProfile.name asc")
+	List<ProductProfile> findAllByCompanyIdAndActivated(Long id);
 }
