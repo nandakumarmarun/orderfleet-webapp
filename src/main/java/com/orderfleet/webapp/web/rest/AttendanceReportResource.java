@@ -238,7 +238,7 @@ public class AttendanceReportResource {
 					attendanceReportDTO.setAttendanceSubGroupName(attDto.getAttendanceSubGroupName());
 					attendanceReportDTO.setImageButtonVisible(attDto.getImageButtonVisible());
 					attendanceReportDTO.setAttendancePid(attDto.getPid());
-
+                    attendanceReportDTO.setMockLocationStatus(attDto.getMockLocationStatus());
 				} else {
 					attendanceReportDTO.setEmployeeName(employee.getName());
 					attendanceReportDTO.setAttendanceStatus("NOT MARKED");

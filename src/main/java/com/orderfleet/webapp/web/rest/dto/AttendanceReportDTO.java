@@ -30,6 +30,7 @@ public class AttendanceReportDTO {
 	private String userPid;
 
 	private Boolean imageButtonVisible = Boolean.FALSE;;
+	private Boolean mockLocationStatus ;
 
 	public LocalDate getAttendanceDay() {
 		return attendanceDay;
@@ -135,4 +136,11 @@ public class AttendanceReportDTO {
 		this.attendancePid = attendancePid;
 	}
 
+	public Boolean getMockLocationStatus() {
+		return mockLocationStatus;
+	}
+
+	public void setMockLocationStatus(Boolean mockLocationStatus) {
+		this.mockLocationStatus = mockLocationStatus;
+	}
 }

@@ -150,6 +150,7 @@
 						<th>Server Date</th>
 						<th>GPS Location</th>
 						<th>Tower Location</th>
+						<th>Mock Location Status</th>
 						<th>Remarks</th>
 						<th>Action</th>
 					</tr>

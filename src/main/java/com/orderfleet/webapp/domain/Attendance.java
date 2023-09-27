@@ -130,6 +130,8 @@ public class Attendance implements Serializable {
 	
 	@ManyToOne
 	private DistanceFare distanceFare;
+	@Column(name = "mock_location_status", columnDefinition = "boolean DEFAULT 'FALSE'")
+	private Boolean mockLocationStatus;
 
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -145,7 +147,7 @@ public class Attendance implements Serializable {
 	public Attendance(Long id, String pid, LocalDateTime createdDate, boolean completed, String remarks,
 			LocalDateTime plannedDate, Company company, User user, AttendanceStatus attendanceStatus, String location,
 			BigDecimal latitude, BigDecimal longitude, String mnc, String mcc, String cellId, String lac,
-			LocationType locationType) {
+			LocationType locationType,Boolean mockLocationStatus) {
 		super();
 		this.id = id;
 		this.pid = pid;
@@ -164,6 +166,7 @@ public class Attendance implements Serializable {
 		this.cellId = cellId;
 		this.lac = lac;
 		this.locationType = locationType;
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	public String getClientTransactionKey() {
@@ -391,6 +394,14 @@ public class Attendance implements Serializable {
 
 	public void setAttendaceLogUpload(boolean attendaceLogUpload) {
 		this.attendaceLogUpload = attendaceLogUpload;
+	}
+
+	public Boolean getMockLocationStatus() {
+		return mockLocationStatus;
+	}
+
+	public void setMockLocationStatus(Boolean mockLocationStatus) {
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	@Override

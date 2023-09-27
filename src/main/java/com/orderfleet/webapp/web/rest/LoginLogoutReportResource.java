@@ -351,8 +351,9 @@ public class LoginLogoutReportResource {
 					loginlogoutDTO.setPunchoutStatus("NOT MARKED");
 					loginlogoutDTO.setPunchoutRemarks("");
 				}
-
-
+				if(attendanceExists.isPresent()) {
+					loginlogoutDTO.setMockLocationStatus(attendanceExists.get().getMockLocationStatus());
+				}
 				loginlogoutDTO.setNoOfVisits(filteredExecutions.size());
 				loginlogoutDtos.add(loginlogoutDTO);
 			}

@@ -132,7 +132,14 @@ if (!this.AttendanceReport) {
 											} else {
 												content = "<td></td>";
 											}
-
+                                            var mockLocation =  "";
+                                            if(attendance.mockLocationStatus)
+                                            {
+                                            mockLocation= "Enabled"
+                                            }
+                                            else{
+                                            mockLocation = "Not Enabled"
+                                            }
 											if (attendance.attendanceSubGroupName == null) {
 												$('#tBodyAttendanceReport')
 														.append(
@@ -172,6 +179,8 @@ if (!this.AttendanceReport) {
 																		+ (attendance.towerLocation == null ? ""
 																				: attendance.towerLocation)
 																		+ "</a></td><td>"
+																		+ mockLocation
+																		+"</td><td>"
 																		+ (attendance.remarks == null ? ""
 																				: attendance.remarks)
 																		+ "</td>"
@@ -226,6 +235,8 @@ if (!this.AttendanceReport) {
 																		+ (attendance.towerLocation == null ? ""
 																				: attendance.towerLocation)
 																		+ "</a></td><td>"
+																		+ mockLocation
+                                                                       	+"</td><td>"
 																		+ (attendance.remarks == null ? ""
 																				: attendance.remarks)
 																		+ "</td>"

@@ -45,6 +45,8 @@ public class LoginLogoutDTO {
 	private String attendancePid;
 	private String punchoutPid;
 	private Integer noOfVisits;
+
+	private Boolean mockLocationStatus;
 	
 	public LoginLogoutDTO() {
 		super();
@@ -55,7 +57,7 @@ public class LoginLogoutDTO {
 			BigDecimal longitude, String mnc, String mcc, String cellId, String lac, LocationType locationType,
 			String location, String attendanceSubGroupName, String towerLocation, BigDecimal towerLatitude,
 			BigDecimal towerLongitude, LocalDateTime punchoutServerDate, LocalDateTime punchoutClientDate,
-			String punchoutRemarks,Integer noOfVisits) {
+			String punchoutRemarks,Integer noOfVisits,Boolean mockLocationStatus) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -74,6 +76,7 @@ public class LoginLogoutDTO {
 		this.punchoutClientDate = punchoutClientDate;
 		this.punchoutRemarks = punchoutRemarks;
 		this.noOfVisits = noOfVisits;
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	public LoginLogoutDTO(Attendance attendance, PunchOut punchout) {
@@ -98,6 +101,7 @@ public class LoginLogoutDTO {
 		this.attendaceOdooMeter = attendance.getOodoMeter();
 		this.attendancePid = attendance.getPid();
 		this.punchoutPid = punchout.getPid();
+		this.mockLocationStatus = attendance.getMockLocationStatus();
 				
 		if(attendance.getDistanceFare() != null) {
 			this.vehicleType = attendance.getDistanceFare().getVehicleType();
@@ -345,6 +349,14 @@ public class LoginLogoutDTO {
 
 	public void setNoOfVisits(Integer noOfVisits) {
 		this.noOfVisits = noOfVisits;
+	}
+
+	public Boolean getMockLocationStatus() {
+		return mockLocationStatus;
+	}
+
+	public void setMockLocationStatus(Boolean mockLocationStatus) {
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	@Override

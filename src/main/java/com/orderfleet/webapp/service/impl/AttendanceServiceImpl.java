@@ -198,6 +198,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 			log.info("Attendance No Location/Flight Mode----");
 			attendance.setLocation("No Location");
 		}
+		attendance.setMockLocationStatus(attendanceDTO.getMockLocationStatus());
 		attendance = attendanceRepository.save(attendance);
 		return attendance;
 	}

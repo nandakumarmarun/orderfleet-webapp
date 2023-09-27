@@ -158,6 +158,7 @@
 						<th>Punch Out Remarks</th>
 						<th>Total Kilometer Reading</th>
 						<th>No Of Visits </th>
+						<th>MockLocation Status</th>
 						<th>View Attendance Image</th>
 						<th>View PunchOut Image</th>
 

@@ -117,7 +117,15 @@ if (!this.LoginLogOut) {
 								
 								var content = "";
 								var pcontent = "";
-
+                               var mockLocation = "";
+                               if(loginLogOut.mockLocationStatus)
+                               {
+                               mockLocation = "Enabled"
+                               }
+                               else
+                               {
+                               mockLocation = "Not Enabled"
+                               }
 								if (loginLogOut.imageButtonVisible) {
 									content = "<td><button type='button' class='btn btn-info' onclick='LoginLogOut.showModalPopup($(\"#imagesModal\"),\""
 											+ loginLogOut.attendancePid
@@ -178,6 +186,8 @@ if (!this.LoginLogOut) {
 										+ loginLogOut.totalOdoMeter
 										+ "</td><td>"
                                         + loginLogOut.noOfVisits
+                                        + "</td><td>"
+                                        + mockLocation
                                         + "</td>"
 										+ content
 										+ pcontent

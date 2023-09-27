@@ -48,6 +48,7 @@ public class AttendanceDTO {
 	private String imageRefNo;
 	private String vehicleType;
 	private Boolean imageButtonVisible = Boolean.FALSE;;
+	private Boolean mockLocationStatus;
 
 	public AttendanceDTO() {
 		super();
@@ -57,7 +58,7 @@ public class AttendanceDTO {
 			boolean completed, String remarks, LocalDateTime plannedDate, AttendanceStatus attendanceStatus,
 			BigDecimal latitude, BigDecimal longitude, String mnc, String mcc, String cellId, String lac,
 			LocationType locationType, String location, String attendanceSubGroupName, String towerLocation,
-			BigDecimal towerLatitude, BigDecimal towerLongitude) {
+			BigDecimal towerLatitude, BigDecimal towerLongitude,Boolean mockLocationStatus) {
 		super();
 		this.pid = pid;
 		this.login = login;
@@ -80,6 +81,7 @@ public class AttendanceDTO {
 		this.towerLocation = towerLocation;
 		this.towerLatitude = towerLatitude;
 		this.towerLongitude = towerLongitude;
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	public AttendanceDTO(Attendance attendance) {
@@ -107,6 +109,7 @@ public class AttendanceDTO {
 		this.towerLongitude = attendance.getTowerLongitude();
 		this.imageRefNo = attendance.getImageRefNo();
 		this.oodoMeter = attendance.getOodoMeter();
+		this.mockLocationStatus = attendance.getMockLocationStatus();
 		if(attendance.getDistanceFare() != null) {
 			this.distanceFarePid = attendance.getDistanceFare().getPid();
 		}
@@ -389,6 +392,14 @@ public class AttendanceDTO {
 
 	public void setVehicleType(String vehicleType) {
 		this.vehicleType = vehicleType;
+	}
+
+	public Boolean getMockLocationStatus() {
+		return mockLocationStatus;
+	}
+
+	public void setMockLocationStatus(Boolean mockLocationStatus) {
+		this.mockLocationStatus = mockLocationStatus;
 	}
 
 	@Override
