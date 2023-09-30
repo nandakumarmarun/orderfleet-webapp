@@ -137,9 +137,7 @@ if (!this.AttendanceReport) {
                                             {
                                             mockLocation= "Enabled"
                                             }
-                                            else{
-                                            mockLocation = "Not Enabled"
-                                            }
+
 											if (attendance.attendanceSubGroupName == null) {
 												$('#tBodyAttendanceReport')
 														.append(

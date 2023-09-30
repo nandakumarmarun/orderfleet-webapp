@@ -60,4 +60,8 @@ public interface AccountTypeRepository extends JpaRepository<AccountType, Long> 
 
 	@Query("select accountType from AccountType accountType where accountType.company.id = ?1 and accountType.activated = ?2 order by accountType.name asc")
     List<AccountType> findAllByCompanyIdAndActivated(Long companyId, boolean b);
+
+
+	@Query("select accountType from AccountType accountType where  accountType.pid = ?1 and accountType.company.id = ?2")
+	AccountType findByAccountTypePidAndCompanyId(String pid, Long companyId);
 }

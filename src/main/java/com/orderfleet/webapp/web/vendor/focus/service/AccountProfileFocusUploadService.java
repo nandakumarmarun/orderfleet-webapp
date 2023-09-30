@@ -121,7 +121,8 @@ public class AccountProfileFocusUploadService {
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(companyId);
+		AccountType customerAccount = accountTypeRepository.findByCompanyIdAndName("Customer");
+		AccountType defaultAccountType = accountTypeRepository.findByAccountTypePidAndCompanyId(customerAccount.getPid(),companyId);
 		List<AccountType> accountTypes = accountTypeRepository.findAllByCompanyIdAndActivated(true);
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();

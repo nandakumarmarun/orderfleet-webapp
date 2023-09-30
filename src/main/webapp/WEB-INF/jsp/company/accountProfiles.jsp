@@ -338,7 +338,7 @@
 								<div class="form-group">
 									<label class="control-label" for="field_closingBalance">Closing
 										Balance</label> <input type="number" step="0.01" class="form-control"
-										name="closingBalance" id="field_closingBalance" maxlength="8"
+										name="closingBalance" id="field_closingBalance" maxlength="15"
 										placeholder="closing balance" />
 								</div>
 								<div class="form-group">

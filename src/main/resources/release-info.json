@@ -1,7 +1,7 @@
 {
-"release-number" : "1.112.1",
-"release-date" : "27/09/2023",
+"release-number" : "1.112.2",
+"release-date" : "30/09/2023",
 "features" : [
-  "Mock Location Status in Attendance Report"
+  "Mock Location Status in Attendance Report,Deva steel accountType change"
 ]
 }

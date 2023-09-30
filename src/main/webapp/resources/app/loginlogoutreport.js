@@ -123,9 +123,7 @@ if (!this.LoginLogOut) {
                                mockLocation = "Enabled"
                                }
                                else
-                               {
-                               mockLocation = "Not Enabled"
-                               }
+
 								if (loginLogOut.imageButtonVisible) {
 									content = "<td><button type='button' class='btn btn-info' onclick='LoginLogOut.showModalPopup($(\"#imagesModal\"),\""
 											+ loginLogOut.attendancePid
