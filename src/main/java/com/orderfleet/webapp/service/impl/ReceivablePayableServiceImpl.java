@@ -9,9 +9,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.domain.AccountingVoucherHeader;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -542,5 +545,75 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 //		}
 		List<ReceivablePayableDTO> receivablePayableDTO = receivablePayableMapper.receivablePayablesToReceivablePayableDTOs(receivablePayables);
 		return receivablePayableDTO;
+	}
+
+	@Override
+	public void saveReceivableFromTransaction(List<InventoryVoucherHeader> tsTransactionWrapper) {
+		System.out.println("Enter here to save Transaction details");
+          List<ReceivablePayable> receivablePayables = new ArrayList<>();
+		List<String> pids = tsTransactionWrapper.stream().map(ivh -> ivh.getReceiverAccount().getPid()).collect(Collectors.toList());
+		Optional<AccountProfile> accounts = accountProfileRepository.findOneByPid(pids);
+		tsTransactionWrapper.forEach(inventoryVoucherHeader -> {
+
+			ReceivablePayable receivablePayable = new ReceivablePayable();
+			receivablePayable.setPid(ReceivablePayableService.PID_PREFIX +RandomUtil.generatePid());
+			receivablePayable.setAccountProfile(inventoryVoucherHeader.getReceiverAccount());
+			receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
+			receivablePayable.setReferenceDocumentNumber(inventoryVoucherHeader.getDocumentNumberLocal());
+			receivablePayable.setReferenceDocumentDate(inventoryVoucherHeader.getDocumentDate().toLocalDate());
+			receivablePayable.setReferenceDocumentType(inventoryVoucherHeader.getReferenceDocumentType());
+			receivablePayable.setReferenceDocumentAmount(inventoryVoucherHeader.getDocumentTotal());
+			receivablePayable.setReferenceDocumentBalanceAmount(inventoryVoucherHeader.getDocumentTotal());
+			receivablePayable.setCompany(inventoryVoucherHeader.getCompany());
+			receivablePayable.setSupplierAccountProfile(inventoryVoucherHeader.getSupplierAccount());
+			accounts.get().setClosingBalance(accounts.get().getClosingBalance() + inventoryVoucherHeader.getDocumentTotal());
+			receivablePayables.add(receivablePayable);
+		});
+		accountProfileRepository.save(accounts.get());
+      receivablePayableRepository.save(receivablePayables);
+	  System.out.println("Successfully Saved ....");
+	}
+
+	@Override
+	public void UpdateReceivablesByReceipt(List<AccountingVoucherHeader> accountingVoucherHeaders) {
+
+//		List<String> pidList;
+//		accountingVoucherHeaders.forEach(accountingVoucherHeader -> {
+//			accountingVoucherHeader.getAccountingVoucherDetails()
+//					.forEach(accountingVoucherDetail -> {
+//						 pidList = accountingVoucherDetail.getAccountingVoucherAllocations()
+//								.stream().map(acc -> acc.getReceivablePayablePid())
+//								.collect(Collectors.toList());
+//			});
+//		});
+		List<String> pidList = new ArrayList<>();
+
+		accountingVoucherHeaders.forEach(accountingVoucherHeader -> {
+			accountingVoucherHeader.getAccountingVoucherDetails().forEach(accountingVoucherDetail -> {
+				accountingVoucherDetail.getAccountingVoucherAllocations().forEach(acc -> {
+					pidList.add(acc.getReceivablePayablePid());
+				});
+			});
+		});
+
+
+		System.out.println("pidList :"+pidList);
+		Optional<ReceivablePayable> receivablePayable = receivablePayableRepository.findOneByPid(pidList);
+		System.out.println("AMount :"+receivablePayable.get().getReferenceDocumentAmount());
+		accountingVoucherHeaders.forEach(accountingVoucherHeader -> {
+			if(accountingVoucherHeader.getTotalAmount() == receivablePayable.get().getReferenceDocumentAmount())
+			{
+				receivablePayableRepository.delete(receivablePayable.get());
+			}
+			else{
+				double amount = receivablePayable.get().getReferenceDocumentAmount() - accountingVoucherHeader.getTotalAmount();
+			receivablePayable.get().setReferenceDocumentAmount(amount);
+			receivablePayable.get().setReferenceDocumentBalanceAmount(amount);
+			receivablePayableRepository.save(receivablePayable.get());
+
+			}
+			System.out.println("Updating Receipt amount");
+		});
+
 	}
 }

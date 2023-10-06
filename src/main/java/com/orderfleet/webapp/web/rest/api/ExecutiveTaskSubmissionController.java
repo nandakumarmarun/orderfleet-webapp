@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.api;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +19,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orderfleet.webapp.async.event.EventProducer;
 import com.orderfleet.webapp.service.*;
 import com.orderfleet.webapp.web.thread.StockCalculationThread;
@@ -190,6 +194,9 @@ public class ExecutiveTaskSubmissionController {
 
 	@Inject
 	private StockCalculationService stockCalculationService;
+
+	@Inject
+	private ReceivablePayableService receivablePayableService;
 
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
@@ -624,12 +631,32 @@ public class ExecutiveTaskSubmissionController {
 			}
 			ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper = executiveTaskSubmissionService
 					.executiveTaskSubmission(executiveTaskSubmissionDTO);
+
 			if (tsTransactionWrapper != null) {
 				taskSubmissionResponse = tsTransactionWrapper.getTaskSubmissionResponse();
 				taskSubmissionPostSave.doPostSaveExecutivetaskSubmission(tsTransactionWrapper,
 						executiveTaskSubmissionDTO);
 			}
 
+            //Save receivable payable from sales order
+			if(tsTransactionWrapper != null && tsTransactionWrapper.getInventoryVouchers() != null) {
+				Optional<CompanyConfiguration> optOutstanding = companyConfigurationRepository
+						.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_OUTSTANDING);
+				if (optOutstanding.isPresent() && Boolean.valueOf(optOutstanding.get().getValue())) {
+
+					SaveReceivableFromSalesOrder(company, tsTransactionWrapper.getInventoryVouchers());
+				}
+			}
+			//Update receivable Payable using Receipt
+			if(tsTransactionWrapper != null && tsTransactionWrapper.getAccountingVouchers() != null)
+			{
+				Optional<CompanyConfiguration> optOutstanding = companyConfigurationRepository
+						.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_OUTSTANDING);
+				if (optOutstanding.isPresent() && Boolean.valueOf(optOutstanding.get().getValue())) {
+
+					UpdateReceivablePayableByReceipt(company,tsTransactionWrapper.getAccountingVouchers());
+			}
+				}
 			// send sales orders to third party ERP
 			sendSalesOrderToThirdPartyErp(tsTransactionWrapper);
 
@@ -713,6 +740,8 @@ public class ExecutiveTaskSubmissionController {
 		log.debug("Status : " + result );
 		return result;
 	}
+
+
 
 
 	/**
@@ -1442,5 +1471,32 @@ public class ExecutiveTaskSubmissionController {
 			List<AccountingVoucherHeaderDTO> accDTOs = AccvList.stream().map(data -> new AccountingVoucherHeaderDTO(data.getCompany(), data)).collect(Collectors.toList());
 			accDTOs.forEach(ivhDTO -> eventProducer.accountingVoucherPublish(ivhDTO));
 		}
+	}
+
+	public void SaveReceivableFromSalesOrder(
+			Company company, List<InventoryVoucherHeader> tsTransactionWrapper) {
+		receivablePayableService.saveReceivableFromTransaction(tsTransactionWrapper);
+	}
+	private void UpdateReceivablePayableByReceipt(
+			Company company, List<AccountingVoucherHeader> accountingVouchers) {
+
+		receivablePayableService.UpdateReceivablesByReceipt(accountingVouchers);
+	}
+	public <T> void convertToJson(Object collection , String message) {
+		ObjectMapper objectMapper = getObjectMapper();
+		try {
+			log.info(System.lineSeparator());
+			String jsonString = objectMapper.writeValueAsString(collection);
+			log.debug(message + jsonString + System.lineSeparator());
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public ObjectMapper getObjectMapper(){
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
+		mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		return mapper;
 	}
 }

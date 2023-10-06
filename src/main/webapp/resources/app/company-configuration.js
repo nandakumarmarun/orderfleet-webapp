@@ -76,6 +76,7 @@ if (!this.CompanyConfiguration) {
     var CrmEnable = $("#CrmEnabled").is(":checked");
     var outstandingDateSorting = $("#outstandingDateSorting").is(":checked");
 	var enableStockCalculations = $("#enableStockCalculations").is(":checked");
+	var enableOutStanding = $("#enableOutStanding").is(":checked");
     console.log("crmEnbaled", CrmEnable);
     /* var findLocation = $('#findLocation').is(":checked"); */
     $.ajax({
@@ -117,7 +118,8 @@ if (!this.CompanyConfiguration) {
         crmEnable: CrmEnable,
         outstandingDateSorting: outstandingDateSorting,
         enableStockCalculations: enableStockCalculations,
-        /* findLocation : findLocation */
+        enableOutStanding : enableOutStanding
+
       },
       success: function (data) {
         onSaveSuccess(data);
@@ -187,10 +189,11 @@ if (!this.CompanyConfiguration) {
 			"checked",
 			data.enableStockCalculations
 		  );
-        /*
-         * $("#findLocation").prop("checked",
-         * data.findLocation);
-         */
+		  $("#enableOutStanding").prop(
+          			"checked",
+          			data.enableOutStanding
+          		  );
+
       },
       error: function (xhr, error) {
         onError(xhr, error);

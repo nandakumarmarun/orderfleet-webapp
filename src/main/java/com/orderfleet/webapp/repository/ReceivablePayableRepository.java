@@ -26,7 +26,7 @@ public interface ReceivablePayableRepository extends JpaRepository<ReceivablePay
 	Optional<ReceivablePayable> findByCompanyIdAndAccountProfileNameIgnoreCase(Long id, String name);
 
 	Optional<ReceivablePayable> findOneByPid(String pid);
-
+	Optional<ReceivablePayable> findOneByPid(List<String> pid);
 	@Query("select receivablePayable from ReceivablePayable receivablePayable where receivablePayable.company.id = ?#{principal.companyId}")
 	List<ReceivablePayable> findAllByCompanyId();
 
@@ -70,4 +70,6 @@ public interface ReceivablePayableRepository extends JpaRepository<ReceivablePay
 	@Query("select receivablePayable from ReceivablePayable receivablePayable where receivablePayable.company.id = ?#{principal.companyId} and receivablePayable.accountProfile.pid = ?1 and receivablePayable.referenceDocumentDate between ?2 and ?3 order by receivablePayable.referenceDocumentDate desc")
 	List<ReceivablePayable> findAllByAccountProfilePidAndDateBetween(String accountPid, LocalDate fromDate,
 			LocalDate toDate);
+	@Query("select receivablePayable from ReceivablePayable receivablePayable where receivablePayable.company.id = ?#{principal.companyId} and receivablePayable.referenceDocumentNumber in ?1")
+	ReceivablePayable findOneByReferenceDocumentNumber(List<String> docNo);
 }

@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.orderfleet.webapp.domain.AccountingVoucherHeader;
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -139,4 +141,7 @@ public interface ReceivablePayableService {
 
 	List<ReceivablePayableDTO> findAllByAccountProfilePidAndDateBetween(String accountPid, LocalDate fromDate,
 			LocalDate toDate);
+
+	void saveReceivableFromTransaction(List<InventoryVoucherHeader> tsTransactionWrapper);
+	void UpdateReceivablesByReceipt(List<AccountingVoucherHeader> accountingVoucherHeaders);
 }

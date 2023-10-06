@@ -48,6 +48,8 @@ public class CompanyConfigDTO {
 	private boolean crmEnable;
 	private boolean EnableStockCalculations;
 
+	private boolean enableOutStanding;
+
 	public CompanyConfigDTO() {
 		super();
 	}
@@ -346,5 +348,13 @@ public class CompanyConfigDTO {
 
 	public void setEnableStockCalculations(boolean enableStockCalculations) {
 		EnableStockCalculations = enableStockCalculations;
+	}
+
+	public boolean isEnableOutStanding() {
+		return enableOutStanding;
+	}
+
+	public void setEnableOutStanding(boolean enableOutStanding) {
+		this.enableOutStanding = enableOutStanding;
 	}
 }

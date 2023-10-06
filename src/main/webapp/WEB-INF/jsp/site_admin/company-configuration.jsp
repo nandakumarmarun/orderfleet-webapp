@@ -72,7 +72,8 @@
 											<th>CRM Enabled</th>
 											<th>Outstanding Datewise Sorting</th>
 											<th>EnableStockCalculations</th>
-											<!-- <th>Find Location</th> -->
+											<th>EnableOutStanding</th>
+
 											<th>Action</th>
 										</tr>
 									</thead>
@@ -115,7 +116,8 @@
 												<th>${companyConfiguration.crmEnable}</th>
 												<th>${companyConfiguration.outstandingDateSorting}</th>
 												<th>${companyConfiguration.enableStockCalculations}</th>
-												<%-- <th>${companyConfiguration.findLocation}</th> --%>
+												<th>${companyConfiguration.enableOutStanding}</th>
+
 													<td><button type="button" class="btn btn-danger"
 															onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button>
 													</td>
@@ -532,14 +534,15 @@
 																	</div>
 																</td>
 															</tr>
-															<!-- <tr>
+														<tr>
 											<td><div class="form-group">
-													<label class="control-label">Find Location</label>
-													<input id="findLocation"
-														name='checksFindLocation"' type='checkbox'
+													<label class="control-label">Enable OutStanding</label>
+													<input id="enableOutStanding"
+														name='checksEnableOutStanding"' type='checkbox'
 														class="form-control" />
 												</div></td>
-										</tr> -->
+										</tr>
+
 
 														</table>
 													</div>

@@ -993,6 +993,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 					List<AccountingVoucherAllocationDTO> accountingVoucherAllocationDTOs = accountingVoucherDetailDTO
 							.getAccountingVoucherAllocations();
 					if (accountingVoucherAllocationDTOs != null && accountingVoucherAllocationDTOs.size() > 0) {
+						log.info("************accountingVoucherAllocationDTOs.size() :"+accountingVoucherAllocationDTOs.size());
 						List<AccountingVoucherAllocation> accountingVoucherAllocations = new ArrayList<AccountingVoucherAllocation>();
 						for (AccountingVoucherAllocationDTO accountingVoucherAllocationDTO : accountingVoucherAllocationDTOs) {
 							AccountingVoucherAllocation accountingVoucherAllocation = new AccountingVoucherAllocation();

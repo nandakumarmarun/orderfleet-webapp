@@ -33,6 +33,8 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	Optional<AccountProfile> findOneByPid(String pid);
 
+	Optional<AccountProfile> findOneByPid(List<String> pid);
+
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?#{principal.companyId} order by accountProfile.name asc")
 	List<AccountProfile> findAllByCompanyId();
 	
