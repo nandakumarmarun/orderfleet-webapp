@@ -178,7 +178,7 @@
 				<table class="table  table-striped table-bordered">
 					<thead>
 						<tr>
-							<th><input type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
+							<th><input name="ivhSelectAll" type="checkbox" id="selectAll" />&nbsp;&nbsp;Select
 								All</th>
 							<th>Employee</th>
 							<c:if test="${sendSalesOrderEmailStatus=='true'}">

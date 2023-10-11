@@ -322,7 +322,7 @@ if (!this.InventoryVoucher) {
 
 											$('#tBodyInventoryVoucher')
 													.append(
-															"<tr><td><input type='checkbox' class='check-one' value='"
+															"<tr><td><input name='ivhCheckbox' type='checkbox' class='check-one' value='"
 																	+ inventoryVoucher.pid
 																	+ "' />"
 																	+ "</td><td>"
@@ -710,26 +710,52 @@ if (!this.InventoryVoucher) {
 	}
 
 	function selectAllInventoryVoucher(checkbox) {
+	console.log("Select all");
 		$('.check-one').prop('checked', checkbox.checked);
+		$('.check-one').prop('disabled', checkbox.checked);
 	}
 
 	function downloadXls() {
-		// var inventoryVoucherHeaderPids = [];
-		console.log("excel download started");
-		var inventoryVoucherHeaderPids = "";
-		$("input[type='checkbox']:checked").each(function() {
-			var inventoryVoucherPid = $(this).val();
-			if (inventoryVoucherPid != "on") {
-				inventoryVoucherHeaderPids += inventoryVoucherPid + ",";
-			}
-		});
 
+	let docPids = $('#dbDocument').val();
+    let empPids = $('#dbEmployee').val();
+     if ("no" == docPids) {
+    docPids = $('#dbDocument option').map(function() {
+   	return $(this).val();
+    }).get().join(',');
+    }
+    if ("no" == empPids) {
+    empPids = $('#dbEmployee option').map(function() {
+    return $(this).val();
+   	}).get().join(',');
+    }
+		var tallyDownloadStatus = $("#dbStatus").val();
+        var employeePids = empPids;
+        var accountPid = $("#dbAccount").val();
+        var	filterBy = $("#dbDateSearch").val();
+       	var	fromDate = $("#txtFromDate").val();
+        var toDate = $("#txtToDate").val();
+        var	voucherType = $("#dbDocumentType").val();
+        var documentPids = docPids;
+        var inventoryVoucherHeaderPids = "";
+
+        if ($("input[name='ivhSelectAll']").is(":checked")) {
+            // Your code here
+            inventoryVoucherHeaderPids = "on";
+        }else{
+        $("input[name='ivhCheckbox']:checked").each(function() {
+        			var inventoryVoucherPid = $(this).val();
+        	          inventoryVoucherHeaderPids += inventoryVoucherPid + ",";
+        		});
+        }
+         console.log("inventory :"+inventoryVoucherHeaderPids)
 		if (inventoryVoucherHeaderPids == "") {
 			alert("please select inventory vouchers");
 		} else {
-			window.location.href = inventoryVoucherContextPath
-					+ "/download-inventory-xls?inventoryVoucherHeaderPids="
-					+ inventoryVoucherHeaderPids;
+		window.location.href = inventoryVoucherContextPath + "/download-inventory-xls?&employeePids="+employeePids+
+		'&documentPids='+documentPids+'&tallyDownloadStatus='+tallyDownloadStatus+'&voucherType='+voucherType+
+        '&accountPid='+accountPid+'&filterBy='+filterBy+'&fromDate='+fromDate+'&toDate='+toDate+'&inventoryVoucherHeaderPids='
+		+ inventoryVoucherHeaderPids;
 		console.log("sucess.......");
 		}
 	}

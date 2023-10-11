@@ -1,7 +1,7 @@
 {
-"release-number" : "1.113.0",
-"release-date" : "06/10/2023",
+"release-number" : "1.113.1",
+"release-date" : "11/10/2023",
 "features" : [
-  "Receivable Payables from sales order"
+  "Download salesOrderDownload status Report"
 ]
 }

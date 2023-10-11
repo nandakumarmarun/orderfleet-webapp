@@ -34,6 +34,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.domain.InventoryVoucherHeader;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
@@ -654,16 +655,103 @@ public class SalesPerformanceReportTallyStatusResource {
 
 	@RequestMapping(value = "/primary-sales-performance-download-status/download-inventory-xls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public void downloadInventoryXls(@RequestParam("inventoryVoucherHeaderPids") String[] inventoryVoucherHeaderPids,
-			HttpServletResponse response) {
-//		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = inventoryVoucherService
-//				.findAllByCompanyIdAndInventoryPidIn(Arrays.asList(inventoryVoucherHeaderPids));
-		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = inventoryVoucherService.findAllByCompanyIdAndInventoryPidInXLSDounlods(Arrays.asList(inventoryVoucherHeaderPids));
-		if (inventoryVoucherHeaderDTOs.isEmpty()) {
-			return;
+	public void downloadInventoryXls(@RequestParam("employeePids") List<String> employeePids,
+									 @RequestParam("tallyDownloadStatus") String tallyDownloadStatus,
+									 @RequestParam("accountPid") String accountPid, @RequestParam("filterBy") String filterBy,
+									 @RequestParam("documentPids") List<String> documentPids, @RequestParam String fromDate,
+									 @RequestParam String toDate,@RequestParam("inventoryVoucherHeaderPids") String[] inventoryVoucherHeaderPids,
+		                          	HttpServletResponse response) {
+
+
+		List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs = new ArrayList<>();
+		if (!inventoryVoucherHeaderPids[0].equals("on")) {
+			 inventoryVoucherHeaderDTOs = inventoryVoucherService.findAllByCompanyIdAndInventoryPidInXLSDounlods(Arrays.asList(inventoryVoucherHeaderPids));
+		log.info("Size :"+inventoryVoucherHeaderDTOs.size());
+			if (inventoryVoucherHeaderDTOs.isEmpty()) {
+				return;
+			}
+
+		}
+		else{
+			List<String> inventeryDTO = getInventoryVoucherForDownload(employeePids, tallyDownloadStatus, accountPid, filterBy, documentPids, fromDate, toDate, inventoryVoucherHeaderPids);
+	    inventoryVoucherHeaderDTOs = inventoryVoucherService.findAllByCompanyIdAndInventoryPidInXLSDounlods(inventeryDTO);
 		}
 		buildExcelDocument(inventoryVoucherHeaderDTOs, response);
 	}
+
+	private List<String> getInventoryVoucherForDownload(List<String> employeePids,
+																		   String tallyDownloadStatus,String accountPid, String filterBy,
+																		   List<String> documentPids, String fromDate, String toDate,
+																		   String[] inventoryVoucherHeaderPids) {
+
+		if (documentPids.isEmpty()) {
+			return (List<String>) new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+		}
+		LocalDate fDate = LocalDate.now();
+		LocalDate tDate = LocalDate.now();
+		if (filterBy.equals(SalesPerformanceReportTallyStatusResource.CUSTOM)) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			fDate = LocalDate.parse(fromDate, formatter);
+			tDate = LocalDate.parse(toDate, formatter);
+		} else if (filterBy.equals(SalesPerformanceReportTallyStatusResource.YESTERDAY)) {
+			fDate = LocalDate.now().minusDays(1);
+			tDate = fDate;
+		} else if (filterBy.equals(SalesPerformanceReportTallyStatusResource.WTD)) {
+			TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+			fDate = LocalDate.now().with(fieldISO, 1);
+		} else if (filterBy.equals(SalesPerformanceReportTallyStatusResource.MTD)) {
+			fDate = LocalDate.now().withDayOfMonth(1);
+		}
+
+		LocalDateTime fromDates = fDate.atTime(0, 0);
+		LocalDateTime toDates = tDate.atTime(23, 59);
+		List<Long> userIds = employeeProfileRepository.findUserIdByEmployeePidIn(employeePids);
+		Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
+		userIds.add(currentUserId);
+		if (userIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<TallyDownloadStatus> tallyStatus = null;
+
+		switch (tallyDownloadStatus) {
+			case "PENDING":
+				tallyStatus = Arrays.asList(TallyDownloadStatus.PENDING);
+				break;
+			case "PROCESSING":
+				tallyStatus = Arrays.asList(TallyDownloadStatus.PROCESSING);
+				break;
+			case "COMPLETED":
+				tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED);
+				break;
+			case "FAILED":
+				tallyStatus = Arrays.asList(TallyDownloadStatus.FAILED);
+				break;
+			case "ALL":
+				tallyStatus = Arrays.asList(TallyDownloadStatus.COMPLETED, TallyDownloadStatus.PROCESSING,
+						TallyDownloadStatus.PENDING, TallyDownloadStatus.FAILED);
+				break;
+		}
+
+		List<String> inventoryVoucherPid;
+		if ("-1".equals(accountPid)) {
+
+			inventoryVoucherPid = inventoryVoucherHeaderRepository
+					.findInventoryVoucherHeaderByUserIdInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(userIds,
+							documentPids, tallyStatus, fromDates, toDates);
+
+		} else {
+
+			inventoryVoucherPid = inventoryVoucherHeaderRepository
+					.findInventoryVoucherHeaderByUserIdInAndAccountPidInAndDocumentPidInAndTallyDownloadStatusDateBetweenOrderByCreatedDateDesc(
+							userIds, accountPid, documentPids, tallyStatus, fromDates, toDates);
+
+		}
+
+
+			return inventoryVoucherPid;
+		}
+
 
 	private void buildExcelDocument(List<InventoryVoucherHeaderDTO> inventoryVoucherHeaderDTOs,
 			HttpServletResponse response) {
