@@ -566,6 +566,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 			receivablePayable.setReferenceDocumentBalanceAmount(inventoryVoucherHeader.getDocumentTotal());
 			receivablePayable.setCompany(inventoryVoucherHeader.getCompany());
 			receivablePayable.setSupplierAccountProfile(inventoryVoucherHeader.getSupplierAccount());
+			receivablePayable.setBillOverDue(0L);
 			accounts.get().setClosingBalance(accounts.get().getClosingBalance() + inventoryVoucherHeader.getDocumentTotal());
 			receivablePayables.add(receivablePayable);
 		});

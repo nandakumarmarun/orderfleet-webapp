@@ -315,10 +315,11 @@ if (!this.InventoryVoucher) {
 												supplierName = "<td>"
 														+ inventoryVoucher.supplierAccountName
 														+ "</td>";
-											} else {
-												sendSalesOrderEmailTd = "";
-												supplierName = "";
 											}
+//											 else {
+//												sendSalesOrderEmailTd = "";
+//												supplierName = "";
+//											}
 
 											$('#tBodyInventoryVoucher')
 													.append(
