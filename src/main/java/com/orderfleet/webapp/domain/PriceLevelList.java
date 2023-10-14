@@ -59,6 +59,9 @@ public class PriceLevelList implements Serializable {
 	@Column(name = "range_to")
 	private double rangeTo;
 
+	@Column(name = "discount_percentage")
+	private double discount;
+
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -146,6 +149,14 @@ public class PriceLevelList implements Serializable {
 
 	public LocalDateTime getLastModifiedDate() {
 		return lastModifiedDate;
+	}
+
+	public double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(double discount) {
+		this.discount = discount;
 	}
 
 	@Override

@@ -2756,8 +2756,13 @@ public class TPProductProfileManagementService {
 	
 	@Transactional
 	@Async
-	public void saveUpdatePriceLevelListUpdatedIdNew(final List<PriceLevelListDTO> priceLevelListDTOs,
+	public void saveUpdatePriceLevelListUpdatedIdNew(
+			final List<PriceLevelListDTO> priceLevelListDTOs,
 			final SyncOperation syncOperation) {
+
+		priceLevelListDTOs.forEach(dat->System.out.println(
+				dat.getPriceLevelName()+"======="+ dat.getPriceLevelName() +"===="+ dat.discount));
+
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		final Long companyId = company.getId();
@@ -2794,10 +2799,12 @@ public class TPProductProfileManagementService {
 				priceLevelList = optionalPll.get();
 				// if not update, skip this iteration.
 				// if (!priceLevel.getThirdpartyUpdate()) {continue;}
+				priceLevelList.setDiscount(pllDto.getDiscount());
 			} else {
 				priceLevelList = new PriceLevelList();
 				priceLevelList.setPid(PriceLevelListService.PID_PREFIX + RandomUtil.generatePid());
 				priceLevelList.setCompany(company);
+				priceLevelList.setDiscount(pllDto.getDiscount());
 			}
 			// set product profile and price level, if present
 			Optional<ProductProfile> optionalPP;
@@ -2817,6 +2824,7 @@ public class TPProductProfileManagementService {
 				priceLevelList.setPrice(pllDto.getPrice());
 				priceLevelList.setRangeFrom(pllDto.getRangeFrom());
 				priceLevelList.setRangeTo(pllDto.getRangeTo());
+				priceLevelList.setDiscount(pllDto.getDiscount());
 				saveUpdatePriceLevelLists.add(priceLevelList);
 			}
 		}

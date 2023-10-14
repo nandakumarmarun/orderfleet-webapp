@@ -92,6 +92,7 @@
 						<th>Range From</th>
 						<th>Range To</th>
 						<th>Price</th>
+						<th>Discount</th>
 						<th>Actions</th>
 					</tr>
 				</thead>

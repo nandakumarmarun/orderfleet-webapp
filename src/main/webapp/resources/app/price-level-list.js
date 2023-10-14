@@ -321,6 +321,8 @@ if (!this.PriceLevelList) {
 																	+ priceLevelList.rangeTo
 																	+ "</td><td>"
 																	+ priceLevelList.price
+																	+ "</td><td>"
+																	+ priceLevelList.discount
 																	+ "</td><td><button type='button' class='btn btn-blue' onclick='PriceLevelList.showModalPopup($(\"#viewModal\"),\""
 																	+ priceLevelList.pid
 																	+ "\",0);'>View</button>&nbsp;<button type='button' class='btn btn-blue' onclick='PriceLevelList.showModalPopup($(\"#myModal\"),\""

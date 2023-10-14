@@ -30,6 +30,8 @@ public class PriceLevelListDTO {
 
 	private double rangeTo;
 
+	public double discount;
+
 	private LocalDateTime lastModifiedDate;
 
 	public PriceLevelListDTO() {
@@ -46,6 +48,7 @@ public class PriceLevelListDTO {
 		this.price = priceLevelList.getPrice();
 		this.rangeFrom = priceLevelList.getRangeFrom();
 		this.rangeTo = priceLevelList.getRangeTo();
+		this.discount = priceLevelList.getDiscount();
 		this.lastModifiedDate = priceLevelList.getLastModifiedDate();
 	}
 
@@ -129,6 +132,14 @@ public class PriceLevelListDTO {
 
 	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(double discount) {
+		this.discount = discount;
 	}
 
 	@Override
