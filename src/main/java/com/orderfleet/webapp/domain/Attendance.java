@@ -54,6 +54,9 @@ public class Attendance implements Serializable {
 	@Column(name = "client_transaction_key", updatable = false)
 	private String clientTransactionKey;
 
+	@Column(name = "attendence_transaction_id", updatable = false)
+	private String attendenceTransactionId;
+
 	@NotNull
 	@Column(name = "created_date", nullable = false)
 	private LocalDateTime createdDate;
@@ -130,6 +133,7 @@ public class Attendance implements Serializable {
 	
 	@ManyToOne
 	private DistanceFare distanceFare;
+	
 	@Column(name = "mock_location_status", columnDefinition = "boolean DEFAULT 'FALSE'")
 	private Boolean mockLocationStatus;
 
@@ -403,6 +407,16 @@ public class Attendance implements Serializable {
 	public void setMockLocationStatus(Boolean mockLocationStatus) {
 		this.mockLocationStatus = mockLocationStatus;
 	}
+
+
+	public String getAttendenceTransactionId() {
+		return attendenceTransactionId;
+	}
+
+	public void setAttendenceTransactionId(String attendenceTransactionId) {
+		this.attendenceTransactionId = attendenceTransactionId;
+	}
+
 
 	@Override
 	public String toString() {

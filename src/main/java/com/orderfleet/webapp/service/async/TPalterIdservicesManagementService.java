@@ -715,7 +715,6 @@ public class TPalterIdservicesManagementService {
 		for (ProductProfileDTO ppDto : productProfileDTOs) {
 			Optional<ProductProfile> optionalPP = null;
 			// check exist by name, only one exist with a name
-		
 				optionalPP = productProfiles.stream()
 						.filter(p -> p.getProductId() != null && !p.getProductId().equals("")
 						? p.getProductId().equals(ppDto.getProductId())
@@ -734,7 +733,7 @@ public class TPalterIdservicesManagementService {
 			} else {
 				Optional<ProductProfile> optionalPPName = productProfiles.stream()
 						.filter(p -> p.getName() != null && !p.getName().equals("")
-						? p.getName().equals(ppDto.getName())
+						? p.getName().trim().equals(ppDto.getName().trim())
 								: false)
 						.findAny();
 				if(!optionalPPName.isPresent()) {
@@ -1367,7 +1366,6 @@ public class TPalterIdservicesManagementService {
 		for (AccountProfileDTO apDto : accountProfileDTOs) {
 			Optional<AccountProfile> optionalAP = null;
 			// check exist by name, only one exist with a name
-
 			optionalAP = accountProfiles.stream()
 					.filter(p -> p.getCustomerId() != null && !p.getCustomerId().equals("")
 							? p.getCustomerId().equals(apDto.getCustomerId())
@@ -1382,10 +1380,9 @@ public class TPalterIdservicesManagementService {
 				// if not update, skip this iteration. Not implemented now
 				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
 			} else {
-				
 				Optional<AccountProfile> optionalAPName = accountProfiles.stream()
 						.filter(p -> p.getName() != null && !p.getName().equals("")
-								? p.getName().equals(apDto.getName())
+								? p.getName().trim().equals(apDto.getName().trim())
 								: false)
 						.findAny();
 				if(!optionalAPName.isPresent()) {

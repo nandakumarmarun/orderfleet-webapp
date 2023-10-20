@@ -2,15 +2,24 @@ package com.orderfleet.webapp.web.rest.api;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orderfleet.webapp.async.event.EventProducer;
 import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.repository.*;
@@ -48,7 +57,7 @@ import com.orderfleet.webapp.web.websocket.dto.ActivityDTO;
 
 /**
  * REST controller for managing Attendance.
- * 
+ *
  * @author Muhammed Riyas T
  * @since October 15, 2016
  */
@@ -97,6 +106,9 @@ public class AttendanceController {
 	@Inject
 	private CompanyRepository companyRepository;
 
+
+	@Inject
+	private UserRepository userRepository;
 	/**
 	 * POST /attendance : mark attendance.
 	 * 
@@ -121,13 +133,43 @@ public class AttendanceController {
 		 * e.printStackTrace(); return new ResponseEntity<>(HttpStatus.CONFLICT); }
 		 */
 
-		log.debug("Rest request to save attendance : {}", attendanceDTO);
+		log.debug("Rest request to save attendance : {}");
+
+		convertToJson(attendanceDTO,"Attendence : ");
 
 		Attendance attendance = null;
+		LocalDateTime fromDate = LocalDate.now().atStartOfDay();
+		LocalDateTime toDate = LocalDate.now().atTime(23,59);
+
+		log.debug("fromDate : " +  fromDate);
+		log.debug("toDate 	: " +  toDate);
+
 
 		try {
+			Optional<User> optUser =
+					userRepository
+							.findOneByLogin(
+									SecurityUtils.getCurrentUser().getUsername());
 
-			attendance = attendanceService.saveAttendance(attendanceDTO);
+			if(optUser.isPresent()){
+				User user = optUser.get();
+				long companyId = user.getCompany().getId();
+				log.debug("companyId : " +  user.getCompany().getId());
+				Optional<Attendance> optionalAttendance = attendanceRepository
+						.findByCompanyIdAndUserPidAndPlannedDateBetweenOrderByCreatedDate(
+								companyId,
+								user.getPid(),
+								fromDate,
+								toDate);
+
+				if(!optionalAttendance.isPresent()){
+					log.debug("Attenddnce Not Added");
+					attendance = attendanceService.saveAttendance(attendanceDTO);
+				}else{
+					log.debug("ATTENDENCE ALREADY_REPORTED");
+					return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
+				}
+			}
 
 			if (attendance != null) {
 				log.info("Saving Attendance Success....");
@@ -185,7 +227,7 @@ public class AttendanceController {
 			if (Boolean.valueOf(optDistanceTraveled.get().getValue())) {
 				log.info("Update Distance travelled");
 				// saveUpdate distance
-				saveKilometreDifference(attendance);
+//				saveKilometreDifference(attendance);
 			}
 		}
 
@@ -295,7 +337,8 @@ public class AttendanceController {
 	@Timed
 	public ResponseEntity<Void> changeSubgroup(@RequestParam Long subgroupId) {
 
-		Attendance attendance = attendanceService.update(subgroupId);
+		Attendance attendance = attendanceService.
+				update(subgroupId);
 
 		if (attendance.getAttendanceStatusSubgroup() != null) {
 			// Save for approval if approval required status equal to true.
@@ -334,8 +377,39 @@ public class AttendanceController {
 	@Timed
 	public ResponseEntity<Void> punchOut(@RequestBody PunchOutDTO punchOutDTO) {
 		log.debug("Rest request to save punchOut : {}", punchOutDTO);
+		PunchOutDTO punchOut = null;
+		LocalDateTime fromDate = LocalDate.now().atStartOfDay();
+		LocalDateTime toDate = LocalDate.now().atTime(23,59);
+
+		log.debug("fromDate : " +  fromDate);
+		log.debug("toDate 	: " +  toDate);
+
 		try {
-			PunchOutDTO punchOut = punchOutService.savePunchOut(punchOutDTO);
+
+			Optional<User> optUser =
+					userRepository
+							.findOneByLogin(
+									SecurityUtils.getCurrentUser().getUsername());
+
+			if(optUser.isPresent()){
+				User user = optUser.get();
+				long companyId = user.getCompany().getId();
+				log.debug("companyId : " +  user.getCompany().getId());
+				Optional<PunchOut> optionalAttendance = punchOutRepository
+						.findAllByCompanyIdUserPidAndCreatedDateBetween(
+								companyId,
+								user.getPid(),
+								fromDate,
+								toDate);
+
+				if(!optionalAttendance.isPresent()){
+					log.debug(LocalDateTime.now() +": PunchOuting " + user.getLogin()  );
+					punchOut = punchOutService.savePunchOut(punchOutDTO);
+				}else{
+					log.debug("PUNCHOUT ALREADY_REPORTED : " + user.getLogin() );
+					return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
+				}
+			}
 
 			if (punchOut != null) {
 				log.info("Saving punchOut Success");
@@ -400,6 +474,116 @@ public class AttendanceController {
 				.headers(HeaderUtil.createFailureAlert("fileUpload", "formNotExists", "FilledForm not found."))
 				.body(null));
 	return upload;
+	}
+
+	@Transactional
+	@RequestMapping(value = "/is-punchout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Boolean> isPunchouted(HttpServletRequest request){
+		log.debug("Request  to : http://salesnrich.com"+request.getRequestURI());
+		LocalDateTime fromDate = LocalDate.now().atStartOfDay();
+		LocalDateTime toDate = LocalDate.now().atTime(23,59);
+
+		log.debug("fromDate : " +  fromDate);
+		log.debug("toDate 	: " +  toDate);
+
+		Optional<User> optUser =
+					userRepository
+							.findOneByLogin(SecurityUtils.getCurrentUser().getUsername());
+
+			if(optUser.isPresent()) {
+				User user = optUser.get();
+				long companyId = user.getCompany().getId();
+				log.debug("companyId : " + user.getCompany().getId());
+				return	punchOutRepository
+						.findAllByCompanyIdUserPidAndCreatedDateBetween(
+								companyId, user.getPid(),
+								fromDate, toDate)
+						.map(data -> new ResponseEntity<>(true, HttpStatus.OK))
+						.orElse(new ResponseEntity<>(false,HttpStatus.NOT_FOUND));
+			}
+		return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+	}
+
+	@Transactional
+	@RequestMapping(value = "/user-punchout/today", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<PunchOutDTO> getPunchout(HttpServletRequest request){
+		log.debug("Request  to : http://salesnrich.com"+request.getRequestURI());
+		log.debug(" User : " + SecurityUtils.getCurrentUser().getUsername());
+
+		LocalDateTime fromDate = LocalDate.now().atStartOfDay();
+		LocalDateTime toDate = LocalDate.now().atTime(23,59);
+
+		log.debug("fromDate : " +  fromDate);
+		log.debug("toDate 	: " +  toDate);
+
+		Optional<User> optUser =
+				userRepository
+						.findOneByLogin(SecurityUtils.getCurrentUser().getUsername());
+
+		if(optUser.isPresent()) {
+			User user = optUser.get();
+			long companyId = user.getCompany().getId();
+			log.debug("companyId : " + user.getCompany().getId());
+			return	punchOutRepository
+					.findAllByCompanyIdUserPidAndCreatedDateBetween(
+							companyId, user.getPid(),
+							fromDate, toDate)
+					.map(data -> new ResponseEntity<>(new PunchOutDTO(data) , HttpStatus.OK))
+					.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+
+	@Transactional
+	@RequestMapping(value = "/user-punchouts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<PunchOutDTO>> getAllUserPunchout(HttpServletRequest request){
+		log.debug("Request  to : http://salesnrich.com"+request.getRequestURI());
+		log.debug(" User : " + SecurityUtils.getCurrentUser().getUsername());
+		LocalDateTime fromDate = LocalDate.now().atTime(23,59).minusMonths(2);
+		LocalDateTime toDate = LocalDate.now().atTime(23,59);
+
+		log.debug("fromDate : " +  fromDate);
+		log.debug("toDate 	: " +  toDate);
+
+		Optional<User> optUser =
+				userRepository
+						.findOneByLogin(SecurityUtils.getCurrentUser().getUsername());
+
+		if(optUser.isPresent()) {
+			User user = optUser.get();
+			long companyId = user.getCompany().getId();
+			log.debug("companyId : " + user.getCompany().getId());
+
+			List<PunchOut> Punchouts = punchOutRepository
+					.findAllByCompanyIdUserPid(
+							companyId, user.getPid(),fromDate,toDate);
+
+			List<PunchOutDTO> punchoutDTOS = Punchouts.stream().map(ksu -> new PunchOutDTO(ksu)).collect(Collectors.toList());
+
+			 punchoutDTOS.forEach(data-> log.debug(data.getPunchOutDate().toString()));
+
+			List<PunchOutDTO>  sortedpunchoutDTOS = punchoutDTOS.stream().sorted(Comparator.comparing(PunchOutDTO::getPunchOutDate).reversed()).collect(Collectors.toList());
+			return new ResponseEntity<>(sortedpunchoutDTOS,HttpStatus.OK);
+		}
+		return new ResponseEntity<>(Collections.emptyList(),HttpStatus.NOT_FOUND);
+	}
+
+	public <T> void convertToJson(Object collection , String message) {
+		ObjectMapper objectMapper = getObjectMapper();
+		try {
+			log.info(System.lineSeparator());
+			String jsonString = objectMapper.writeValueAsString(collection);
+			log.debug(message + jsonString + System.lineSeparator());
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public ObjectMapper getObjectMapper(){
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
+		mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		return mapper;
 	}
 
 	private void saveKilometreDifference(Attendance attendance) {

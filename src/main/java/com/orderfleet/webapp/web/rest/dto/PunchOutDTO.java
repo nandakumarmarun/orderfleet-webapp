@@ -37,6 +37,8 @@ public class PunchOutDTO {
 	private double oodoMeter;
 	private String imageRefNo;
 
+	private long companyId;
+
 	public PunchOutDTO() {
 		super();
 	}
@@ -62,6 +64,7 @@ public class PunchOutDTO {
 		this.createdDate = punchOut.getCreatedDate();
 		this.oodoMeter = punchOut.getOodoMeter();
 		this.imageRefNo = punchOut.getImageRefNo();
+		this.companyId = punchOut.getCompany().getId();
 
 	}
 
@@ -227,15 +230,39 @@ public class PunchOutDTO {
 		this.imageRefNo = imageRefNo;
 	}
 
-	@Override
-	public String toString() {
-		return "PunchOutDTO [pid=" + pid + ", clientTransactionKey=" + clientTransactionKey + ", punchOutRemarks="
-				+ punchOutRemarks + ", latitude=" + latitude + ", longitude=" + longitude + ", mnc=" + mnc + ", mcc="
-				+ mcc + ", cellId=" + cellId + ", lac=" + lac + ", locationType=" + locationType + ", location="
-				+ location + ", login=" + login + ", userName=" + userName + ", userPid=" + userPid + ", attendancePid="
-				+ attendancePid + ", punchOutDate=" + punchOutDate + ", createdDate=" + createdDate + ", employeeName="
-				+ employeeName + "]";
+
+	public long getCompanyId() {
+		return companyId;
 	}
 
-	
+	public void setCompanyId(long companyId) {
+		this.companyId = companyId;
+	}
+
+	@Override
+	public String toString() {
+		return "PunchOutDTO{" +
+				"pid='" + pid + '\'' +
+				", clientTransactionKey='" + clientTransactionKey + '\'' +
+				", punchOutRemarks='" + punchOutRemarks + '\'' +
+				", latitude=" + latitude +
+				", longitude=" + longitude +
+				", mnc='" + mnc + '\'' +
+				", mcc='" + mcc + '\'' +
+				", cellId='" + cellId + '\'' +
+				", lac='" + lac + '\'' +
+				", locationType=" + locationType +
+				", location='" + location + '\'' +
+				", login='" + login + '\'' +
+				", userName=" + userName +
+				", userPid='" + userPid + '\'' +
+				", attendancePid='" + attendancePid + '\'' +
+				", punchOutDate=" + punchOutDate +
+				", createdDate=" + createdDate +
+				", employeeName='" + employeeName + '\'' +
+				", oodoMeter=" + oodoMeter +
+				", imageRefNo='" + imageRefNo + '\'' +
+				", companyId=" + companyId +
+				'}';
+	}
 }

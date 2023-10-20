@@ -98,6 +98,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 		attendance.setLongitude(attendanceDTO.getLongitude());
 		attendance.setAttendanceStatus(attendanceDTO.getAttendanceStatus());
 		attendance.setUser(user);
+		attendance.setAttendenceTransactionId(attendanceDTO.getClientTransactionKey());
 		attendance.setCompany(user.getCompany());
 		attendance.setImageRefNo(attendanceDTO.getImageRefNo());
 		// set subgroup
@@ -233,7 +234,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	/**
 	 * Update a attendance.
 	 * 
-	 * @param attendanceDTO the entity to update
+	 * @param subgroupId the entity to update
 	 * @return the persisted entity
 	 */
 	@Override
@@ -489,7 +490,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	/**
 	 * Delete the attendance by id.
 	 * 
-	 * @param id the id of the entity
+	 * @param pid the id of the entity
 	 */
 	public void delete(String pid) {
 		log.debug("Request to delete Attendance : {}", pid);

@@ -1,7 +1,7 @@
 {
-"release-number" : "1.113.2",
-"release-date" : "14/10/2023",
+"release-number" : "1.113.3",
+"release-date" : "20/10/2023",
 "features" : [
-  "Price Level Discount Percentage"
+  "Attendence Validation"
 ]
 }
