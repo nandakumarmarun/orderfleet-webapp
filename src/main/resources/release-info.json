@@ -1,7 +1,7 @@
 {
-"release-number" : "1.113.3",
-"release-date" : "20/10/2023",
+"release-number" : "1.113.4",
+"release-date" : "23/10/2023",
 "features" : [
-  "Attendence Validation"
+  "Location Transfer"
 ]
 }

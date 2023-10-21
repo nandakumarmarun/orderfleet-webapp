@@ -26,6 +26,30 @@ import com.orderfleet.webapp.domain.enums.DataSourceType;
  * @since August 31, 2016
  */
 public interface LocationAccountProfileRepository extends JpaRepository<LocationAccountProfile, Long> {
+	@Modifying
+	@Query(value = "DELETE FROM tbl_location_account_profile WHERE account_profile_id = ?1 AND location_id = ?2", nativeQuery = true)
+	void deleteByAccountProfileIdAndLocationId(long accountProfileId, long locationId);
+
+	@Query("SELECT lap.location FROM LocationAccountProfile lap JOIN lap.accountProfile ap JOIN ap.user u WHERE u.pid = ?1")
+	List<Location> findLocationByAccountProfileUser(String userPid);
+
+
+	@Query("DELETE FROM LocationAccountProfile l WHERE l.accountProfile = ?1")
+	void deleteByAccountProfile(AccountProfile accountProfile);
+	@Query("SELECT lap " +
+			"FROM LocationAccountProfile lap " +
+			"JOIN lap.accountProfile ap " +
+			"JOIN ap.user u " +
+			"JOIN lap.location l " +
+			"WHERE u.pid = ?1 " + // Argument for User PID
+			"AND l.pid = ?2 " +    // Argument for Location PID
+			"ORDER BY u.pid, l.pid") // Sort by User PID and Location PID
+	List<LocationAccountProfile> findLocationAccountProfilesSortedByUserAndLocation(String userPid, String locationPid);
+	@Query("SELECT lap " +
+			"FROM LocationAccountProfile lap " +
+			"JOIN lap.accountProfile ap " +
+			"JOIN ap.user u " +"WHERE u.pid = ?1 ")
+	List<LocationAccountProfile> findByAccountUser(String userPid);
 
 	@Query("select locationAccountProfile.accountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.pid = ?1 ")
 	List<AccountProfile> findAccountProfileByLocationPid(String locationPid);

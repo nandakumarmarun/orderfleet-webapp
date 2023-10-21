@@ -96,5 +96,7 @@ public interface LocationAccountProfileService {
 
 	List<AccountProfile> findAccountProfileByTerritoryPid(String locationPid);
 
+	List<LocationAccountProfile> findByAccountUser(String userPid);
+
 	
 }

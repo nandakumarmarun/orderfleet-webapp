@@ -943,4 +943,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		}
 		return locationAccountProfiles;
 	}
+	public List<LocationAccountProfile> findByAccountUser(String userPid) {
+		return locationAccountProfileRepository.findByAccountUser(userPid);
+	}
 }
