@@ -733,7 +733,7 @@ public class TPalterIdservicesManagementService {
 			} else {
 				Optional<ProductProfile> optionalPPName = productProfiles.stream()
 						.filter(p -> p.getName() != null && !p.getName().equals("")
-						? p.getName().trim().equals(ppDto.getName().trim())
+						? p.getName().equals(ppDto.getName())
 								: false)
 						.findAny();
 				if(!optionalPPName.isPresent()) {
@@ -1382,7 +1382,7 @@ public class TPalterIdservicesManagementService {
 			} else {
 				Optional<AccountProfile> optionalAPName = accountProfiles.stream()
 						.filter(p -> p.getName() != null && !p.getName().equals("")
-								? p.getName().trim().equals(apDto.getName().trim())
+								? p.getName().equals(apDto.getName())
 								: false)
 						.findAny();
 				if(!optionalAPName.isPresent()) {

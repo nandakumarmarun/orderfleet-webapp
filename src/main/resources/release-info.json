@@ -1,7 +1,7 @@
 {
-"release-number" : "1.113.4",
-"release-date" : "23/10/2023",
+"release-number" : "1.113.5",
+"release-date" : "25/10/2023",
 "features" : [
-  "Location Transfer"
+  "trimbug"
 ]
 }
