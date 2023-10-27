@@ -341,19 +341,19 @@ public class CompanyTrialSetUpService {
 	}
 
 	public void setUpActivityCompanyData(Company company) {
-		Activity activity = createActivity(company);
+		List<Activity> activity = (List<Activity>) createActivity(company);
 		assignDocumentToActivity(company, activity);
 	}
 
 	public void setUpOrderActivityCompanyData(Company company) {
-		Activity activity = createActivity(company);
+		List<Activity> activity = createActivity(company);
 		assignOrderProDocumentToActivity(company, activity);
 	}
 
 	public void setUpDocumentCompanyData(Company company) {
 		List<Document> documents = createDocumentProfile(company);
 		List<FormElement> formElements = createFormElement(company);
-		Form form = createForm(company);
+		List<Form> form = createForm(company);
 
 		assignStockCalculation(company, documents);
 		assignSupplierReceiverAccountType(company, documents);
@@ -1018,6 +1018,17 @@ public class CompanyTrialSetUpService {
 		document2.setSave(true);
 		document2.setVoucherNumberGenerationType(VoucherNumberGenerationType.TYPE_1);
 		documents.add(document2);
+
+		Document document3 = new Document();
+		document3.setName("Day Close");
+		document3.setCompany(company);
+		document3.setDocumentType(DocumentType.DYNAMIC_DOCUMENT);
+		document3.setDescription("Day close");
+		document3.setDocumentPrefix("DC");
+		document3.setPid(DocumentService.PID_PREFIX + RandomUtil.generatePid());
+		document3.setSave(true);
+		document3.setVoucherNumberGenerationType(VoucherNumberGenerationType.TYPE_1);
+		documents.add(document3);
 		return documentRepository.save(documents);
 
 	}
@@ -1072,11 +1083,80 @@ public class CompanyTrialSetUpService {
 		formElement1.setFormElementType(formElementTypeRepository.findOne(1L));
 		formElement1.setPid(FormElementService.PID_PREFIX + RandomUtil.generatePid());
 		formElements.add(formElement1);
+
+		FormElement formElement2 = new FormElement();
+		formElement2.setActivated(true);
+		formElement2.setCompany(company);
+		formElement2.setName("Mode Of Travel");
+		formElement2.setFormElementType(formElementTypeRepository.findOne(6L));
+		formElement2.setPid(FormElementService.PID_PREFIX + RandomUtil.generatePid());
+		// Form Element Value
+		Set<FormElementValue> formElementValueList = new HashSet<>();
+		FormElementValue formElementValueA = new FormElementValue();
+		formElementValueA.setName("Bike");
+		formElementValueA.setFormElement(formElement);
+		formElementValueA.setSortOrder(0);
+		formElementValueList.add(formElementValueA);
+
+		FormElementValue formElementValueB = new FormElementValue();
+		formElementValueB.setName("Car");
+		formElementValueB.setFormElement(formElement);
+		formElementValueB.setSortOrder(0);
+		formElementValueList.add(formElementValueB);
+
+		FormElementValue formElementValueC = new FormElementValue();
+		formElementValueC.setName("Own Car");
+		formElementValueC.setFormElement(formElement);
+		formElementValueC.setSortOrder(0);
+		formElementValueList.add(formElementValueC);
+		formElement2.setFormElementValues(formElementValueList);
+		formElements.add(formElement2);
+
+		FormElement formElement3 = new FormElement();
+		formElement3.setActivated(true);
+		formElement3.setCompany(company);
+		formElement3.setName("Kilometer Travelled");
+		formElement3.setFormElementType(formElementTypeRepository.findOne(7L));
+		formElement3.setPid(FormElementService.PID_PREFIX + RandomUtil.generatePid());
+		formElements.add(formElement3);
+
+		FormElement formElement4 = new FormElement();
+		formElement4.setActivated(true);
+		formElement4.setCompany(company);
+		formElement4.setName("Other Expense");
+		formElement4.setFormElementType(formElementTypeRepository.findOne(7L));
+		formElement4.setPid(FormElementService.PID_PREFIX + RandomUtil.generatePid());
+		formElements.add(formElement4);
+
+		FormElement formElement5 = new FormElement();
+		formElement5.setActivated(true);
+		formElement5.setCompany(company);
+		formElement5.setName("Description");
+		formElement5.setFormElementType(formElementTypeRepository.findOne(1L));
+		formElement5.setPid(FormElementService.PID_PREFIX + RandomUtil.generatePid());
+		formElements.add(formElement5);
+
+		FormElement formElement6 = new FormElement();
+		formElement6.setActivated(true);
+		formElement6.setCompany(company);
+		formElement6.setName("Total Amount");
+		formElement6.setFormElementType(formElementTypeRepository.findOne(7L));
+		formElement6.setPid(FormElementService.PID_PREFIX + RandomUtil.generatePid());
+		formElements.add(formElement6);
+
+		FormElement formElement7 = new FormElement();
+		formElement7.setActivated(true);
+		formElement7.setCompany(company);
+		formElement7.setName("Route");
+		formElement7.setFormElementType(formElementTypeRepository.findOne(1L));
+		formElement7.setPid(FormElementService.PID_PREFIX + RandomUtil.generatePid());
+		formElements.add(formElement7);
 		return formElementRepository.save(formElements);
 
 	}
 
-	private Form createForm(Company company) {
+	private List<Form> createForm(Company company) {
+		List<Form> formList = new ArrayList<>();
 		Form form = new Form();
 		form.setActivated(true);
 		form.setCompany(company);
@@ -1084,45 +1164,194 @@ public class CompanyTrialSetUpService {
 		form.setDescription("No Order");
 		form.setMultipleRecord(false);
 		form.setPid(FormService.PID_PREFIX + RandomUtil.generatePid());
-		form = formRepository.save(form);
-		return form;
+		formList.add(form);
+
+		Form form1 = new Form();
+		form1.setActivated(true);
+		form1.setCompany(company);
+		form1.setName("Day Close Details");
+		form1.setDescription("Day Close Details");
+		form1.setMultipleRecord(false);
+		form1.setPid(FormService.PID_PREFIX + RandomUtil.generatePid());
+		form1.setJsCode("\tfunction validateMobileElements(inElements) {\n" +
+				"\t\t\tvar reqElem = new Object();\n" +
+				"\t\t\tresult = {\n" +
+				"\t\t\t\toutElements : [],\n" +
+				"\t\t\t\terrorMsg : ''\n" +
+				"\t\t\t};\n" +
+				"\t\t\tinElements.forEach(function(entry) {\n" +
+				"\t\t\t\tvar elementName = String(entry.name);\n" +
+				"\t\t\t\tvar elementValue = String(entry.value);\n" +
+				"\t\t\t\tif (elementName == \"Kilometer Travelled\" || elementName == \"Other Expense\" || elementName == \"Mode Of Travel\")             \n" +
+				"\n" +
+				"                                {\n" +
+				"\t\t\t\t\treqElem[elementName] = elementValue;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t});\n" +
+				"\t\t\tvar travelExpense = 0.0;\n" +
+				"\t\t\tvar otherExp = 0.0;\n" +
+				"            var kmtraveled = 0.0;\n" +
+				"         if (reqElem[\"Kilometer Travelled\"] != null && reqElem[\"Kilometer Travelled\"] != \"\")\n" +
+				"         {\n" +
+				"          kmtraveled = reqElem[\"Kilometer Travelled\"];\n" +
+				"           \n" +
+				"         }\n" +
+				"          if (reqElem[\"Other Expense\"] != null && reqElem[\"Other Expense\"] != \"\")\n" +
+				"         {\n" +
+				"          otherExp = reqElem[\"Other Expense\"];\n" +
+				"           \n" +
+				"         }\n" +
+				"                        if(reqElem[\"Mode Of Travel\"] == \"Car\"){\n" +
+				"\t\t\t\ttravelExpense = 4.0 * kmtraveled;\n" +
+				"\t\t\t} else if(reqElem[\"Mode Of Travel\"] == \"Own Car\"){\n" +
+				"\t\t\t\ttravelExpense = 7.0 * kmtraveled;\n" +
+				"\t\t\t}else if(reqElem[\"Mode Of Travel\"] == \"Bike\"){\n" +
+				"\t\t\t\ttravelExpense = 3.0 * kmtraveled;\n" +
+				"\t\t\t}\n" +
+				"          \n" +
+				"\t\t\t\ttravelExpense = (travelExpense) + otherExp*1.0;\n" +
+				"          \n" +
+				"\t\t\t\n" +
+				"\t\t\tvar elem = new Object();\n" +
+				"\t\t\telem[\"name\"] = \"Total Amount\";\n" +
+				"\t\t\telem[\"value\"] = travelExpense;\n" +
+				"\t\t\tresult.outElements.push(elem);\n" +
+				"\t\t\treturn result;\n" +
+				"\t\t}\n");
+		formList.add(form1);
+		return formRepository.save(formList);
 	}
 
-	private void assignFormtoFormElement(Form form, Company company, List<FormElement> formElements) {
+	private void assignFormtoFormElement(List<Form> form, Company company, List<FormElement> formElements) {
 		Set<FormFormElement> formFormElements = new HashSet<FormFormElement>();
-		for (FormElement formElement : formElements) {
-			if (formElement.getName().equals("Reason")) {
-				FormFormElement formFormElement = new FormFormElement();
-				formFormElement.setForm(form);
-				formFormElement.setFormElement(formElement);
-				formFormElement.setSortOrder(1);
-				formFormElement.setReportOrder(1);
-				formFormElement.setCompany(company);
-				formFormElement.setEditable(true);
-				formFormElements.add(formFormElement);
-			} else {
-				FormFormElement formFormElement = new FormFormElement();
-				formFormElement.setForm(form);
-				formFormElement.setFormElement(formElement);
-				formFormElement.setSortOrder(2);
-				formFormElement.setReportOrder(2);
-				formFormElement.setCompany(company);
-				formFormElement.setEditable(true);
-				formFormElements.add(formFormElement);
-			}
-		}
-		formFormElementRepository.save(formFormElements);
-	}
+		for (Form forms : form) {
+			if(forms.getName().equals("Day Close Details"))
+			{
+				for (FormElement formElement : formElements) {
+					if(formElement.getName().equals("Mode Of Travel")){
+						FormFormElement formFormElement = new FormFormElement();
+						formFormElement.setForm(forms);
+						formFormElement.setFormElement(formElement);
+						formFormElement.setSortOrder(1);
+						formFormElement.setReportOrder(1);
+						formFormElement.setCompany(company);
+						formFormElement.setEditable(true);
+						formFormElement.setValidationEnabled(true);
+						formFormElement.setMandatory(true);
+						formFormElement.setDashboardVisibility(true);
+						formFormElements.add(formFormElement);
+					}
+					else if(formElement.getName().equals("Kilometer Travelled")){
+						FormFormElement formFormElement = new FormFormElement();
+						formFormElement.setForm(forms);
+						formFormElement.setFormElement(formElement);
+						formFormElement.setSortOrder(2);
+						formFormElement.setReportOrder(2);
+						formFormElement.setCompany(company);
+						formFormElement.setEditable(true);
+						formFormElement.setValidationEnabled(true);
+						formFormElement.setMandatory(true);
+						formFormElement.setDashboardVisibility(true);
+						formFormElements.add(formFormElement);
+					}
+					else if(formElement.getName().equals("Other Expense")){
+						FormFormElement formFormElement = new FormFormElement();
+						formFormElement.setForm(forms);
+						formFormElement.setFormElement(formElement);
+						formFormElement.setSortOrder(3);
+						formFormElement.setReportOrder(3);
+						formFormElement.setCompany(company);
+						formFormElement.setEditable(true);
+						formFormElement.setValidationEnabled(true);
+						formFormElement.setMandatory(true);
+						formFormElement.setDashboardVisibility(true);
+						formFormElements.add(formFormElement);
+					}
+					else if(formElement.getName().equals("Description")){
+						FormFormElement formFormElement = new FormFormElement();
+						formFormElement.setForm(forms);
+						formFormElement.setFormElement(formElement);
+						formFormElement.setSortOrder(4);
+						formFormElement.setReportOrder(4);
+						formFormElement.setCompany(company);
+						formFormElement.setEditable(true);
+						formFormElement.setMandatory(true);
+						formFormElement.setDashboardVisibility(true);
+						formFormElements.add(formFormElement);
+					}
+					else if(formElement.getName().equals("Total Amount")){
+						FormFormElement formFormElement = new FormFormElement();
+						formFormElement.setForm(forms);
+						formFormElement.setFormElement(formElement);
+						formFormElement.setSortOrder(5);
+						formFormElement.setReportOrder(5);
+						formFormElement.setCompany(company);
+						formFormElement.setEditable(false);
+						formFormElement.setMandatory(true);
+						formFormElement.setDashboardVisibility(true);
+						formFormElements.add(formFormElement);
+					}
+					else if(formElement.getName().equals("Route")){
+						FormFormElement formFormElement = new FormFormElement();
+						formFormElement.setForm(forms);
+						formFormElement.setFormElement(formElement);
+						formFormElement.setSortOrder(6);
+						formFormElement.setReportOrder(6);
+						formFormElement.setCompany(company);
+						formFormElement.setEditable(true);
+						formFormElements.add(formFormElement);
+					}
+				}
 
-	private void assignDocumenttoForm(Form form, List<Document> documents) {
-		for (Document document : documents) {
-			if (document.getName().equals("No Order")) {
-				DocumentForms documentForms = new DocumentForms();
-				documentForms.setDocument(document);
-				documentForms.setForm(form);
-				documentForms.setSortOrder(1);
-				documentFormsRepository.save(documentForms);
 			}
+			else{
+			for (FormElement formElement : formElements) {
+				if (formElement.getName().equals("Reason")) {
+					FormFormElement formFormElement = new FormFormElement();
+					formFormElement.setForm(forms);
+					formFormElement.setFormElement(formElement);
+					formFormElement.setSortOrder(1);
+					formFormElement.setReportOrder(1);
+					formFormElement.setCompany(company);
+					formFormElement.setEditable(true);
+					formFormElements.add(formFormElement);
+				} else if(formElement.getName().equals("Any other reason")){
+					FormFormElement formFormElement = new FormFormElement();
+					formFormElement.setForm(forms);
+					formFormElement.setFormElement(formElement);
+					formFormElement.setSortOrder(2);
+					formFormElement.setReportOrder(2);
+					formFormElement.setCompany(company);
+					formFormElement.setEditable(true);
+					formFormElements.add(formFormElement);
+				}
+			}
+		}}
+			formFormElementRepository.save(formFormElements);
+		}
+
+	private void assignDocumenttoForm(List<Form> form, List<Document> documents) {
+		for(Form forms: form) {
+			DocumentForms documentForms = new DocumentForms();
+			if (forms.getName().equals("Day Close Details")) {
+				for (Document document : documents) {
+					if (document.getName().equals("Day Close")) {
+						documentForms.setDocument(document);
+						documentForms.setForm(forms);
+						documentForms.setSortOrder(1);
+					}
+				}
+			} else {
+				for (Document document : documents) {
+					if (document.getName().equals("No Order")) {
+						documentForms.setDocument(document);
+						documentForms.setForm(forms);
+						documentForms.setSortOrder(1);
+
+					}
+				}
+			}
+			documentFormsRepository.save(documentForms);
 		}
 
 	}
@@ -1331,7 +1560,11 @@ public class CompanyTrialSetUpService {
 		}
 	}
 
-	private Activity createActivity(Company company) {
+	private List<Activity> createActivity(Company company) {
+		List<Activity> activities = new ArrayList<>();
+		Set<AccountType> activityAccountTypes = new HashSet<AccountType>();
+		activityAccountTypes
+				.add(accountTypeRepository.findByCompanyIdAndNameIgnoreCase(company.getId(), "Sundry Debtors").get());
 		Activity activity = new Activity();
 		activity.setActivated(true);
 		activity.setCompany(company);
@@ -1339,135 +1572,123 @@ public class CompanyTrialSetUpService {
 		activity.setName("Dealer Visit");
 		activity.setAlias("DV");
 		activity.setContactManagement(ContactManagement.ENABLED);
-		Set<AccountType> activityAccountTypes = new HashSet<AccountType>();
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "AT_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get by compId and name ignore case";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		activityAccountTypes
-				.add(accountTypeRepository.findByCompanyIdAndNameIgnoreCase(company.getId(), "Sundry Debtors").get());
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
-
 		activity.setActivityAccountTypes(activityAccountTypes);
-		activity = activityRepository.save(activity);
-		return activity;
+		activities.add(activity);
+
+		Activity activity1 = new Activity();
+		activity1.setActivated(true);
+		activity1.setCompany(company);
+		activity1.setPid(ActivityService.PID_PREFIX + RandomUtil.generatePid());
+		activity1.setName("Day End");
+		activity1.setAlias("DE");
+		activity1.setHasDefaultAccount(true);
+		activity1.setContactManagement(ContactManagement.ENABLED);
+        Set<AccountType> activityAccountType = new HashSet<AccountType>();
+        activityAccountType
+                .add(accountTypeRepository.findByCompanyIdAndNameIgnoreCase(company.getId(), "Company").get());
+		activity1.setActivityAccountTypes(activityAccountType);
+		activities.add(activity1);
+
+		return activityRepository.save(activities);
 	}
 
-	private void assignDocumentToActivity(Company company, Activity activity) {
+	private void assignDocumentToActivity(Company company, List<Activity> activity) {
 		List<ActivityDocument> listDocuments = new ArrayList<>();
+
 		List<Document> documents = documentRepository.findAllDocumentsByCompanyPid(company.getPid());
-		for (Document document : documents) {
-			if (document.getName().equals("Sales Order")) {
-				ActivityDocument activityDocument = new ActivityDocument();
-				activityDocument.setActivity(activity);
-				activityDocument.setCompany(company);
-				activityDocument.setDocument(document);
-				activityDocument.setSortOrder(1);
-				listDocuments.add(activityDocument);
-			} else if (document.getName().equals("Receipt")) {
-				ActivityDocument activityDocument = new ActivityDocument();
-				activityDocument.setActivity(activity);
-				activityDocument.setCompany(company);
-				activityDocument.setDocument(document);
-				activityDocument.setSortOrder(2);
-				listDocuments.add(activityDocument);
+		for(Activity activiti :activity) {
+			if (activiti.getName().equals("Day End")) {
+				for (Document document : documents) {
+					if (document.getName().equals("Day Close")) {
+						ActivityDocument activityDocument = new ActivityDocument();
+						activityDocument.setActivity(activiti);
+						activityDocument.setCompany(company);
+						activityDocument.setDocument(document);
+						activityDocument.setSortOrder(1);
+						listDocuments.add(activityDocument);
+					}
+				}
 			} else {
-				ActivityDocument activityDocument = new ActivityDocument();
-				activityDocument.setActivity(activity);
-				activityDocument.setCompany(company);
-				activityDocument.setDocument(document);
-				activityDocument.setSortOrder(3);
-				listDocuments.add(activityDocument);
+				for (Document document : documents) {
+					if (document.getName().equals("Sales Order")) {
+						ActivityDocument activityDocument = new ActivityDocument();
+						activityDocument.setActivity(activiti);
+						activityDocument.setCompany(company);
+						activityDocument.setDocument(document);
+						activityDocument.setSortOrder(1);
+						listDocuments.add(activityDocument);
+					} else if (document.getName().equals("Receipt")) {
+						ActivityDocument activityDocument = new ActivityDocument();
+						activityDocument.setActivity(activiti);
+						activityDocument.setCompany(company);
+						activityDocument.setDocument(document);
+						activityDocument.setSortOrder(2);
+						listDocuments.add(activityDocument);
+					} else if(!document.getName().equals("Day Close")){
+						ActivityDocument activityDocument = new ActivityDocument();
+						activityDocument.setActivity(activiti);
+						activityDocument.setCompany(company);
+						activityDocument.setDocument(document);
+						activityDocument.setSortOrder(3);
+						listDocuments.add(activityDocument);
+					}
+				}
 			}
 		}
 		activityDocumentRepository.save(listDocuments);
 	}
 
 	// for orderpro users
-	private void assignOrderProDocumentToActivity(Company company, Activity activity) {
+	private void assignOrderProDocumentToActivity(Company company, List<Activity> activity) {
 		List<ActivityDocument> listDocuments = new ArrayList<>();
 		List<Document> documents = documentRepository.findAllDocumentsByCompanyPid(company.getPid());
-		for (Document document : documents) {
-			if (document.getName().equals("Sales Order")) {
-				ActivityDocument activityDocument = new ActivityDocument();
-				activityDocument.setActivity(activity);
-				activityDocument.setCompany(company);
-				activityDocument.setDocument(document);
-				activityDocument.setSortOrder(1);
-				listDocuments.add(activityDocument);
-			} else if (document.getName().equals("Receipt")) {
-				ActivityDocument activityDocument = new ActivityDocument();
-				activityDocument.setActivity(activity);
-				activityDocument.setCompany(company);
-				activityDocument.setDocument(document);
-				activityDocument.setSortOrder(2);
-				listDocuments.add(activityDocument);
+		for(Activity activiti :activity) {
+			if (activiti.getName().equals("Day End")) {
+				for (Document document : documents) {
+					if (document.getName().equals("Day Close")) {
+						ActivityDocument activityDocument = new ActivityDocument();
+						activityDocument.setActivity(activiti);
+						activityDocument.setCompany(company);
+						activityDocument.setDocument(document);
+						activityDocument.setSortOrder(1);
+						listDocuments.add(activityDocument);
+					}
+				}
 			} else {
+				for (Document document : documents) {
+					if (document.getName().equals("Sales Order")) {
+						ActivityDocument activityDocument = new ActivityDocument();
+						activityDocument.setActivity(activiti);
+						activityDocument.setCompany(company);
+						activityDocument.setDocument(document);
+						activityDocument.setSortOrder(1);
+						listDocuments.add(activityDocument);
+					} else if (document.getName().equals("Receipt")) {
+						ActivityDocument activityDocument = new ActivityDocument();
+						activityDocument.setActivity(activiti);
+						activityDocument.setCompany(company);
+						activityDocument.setDocument(document);
+						activityDocument.setSortOrder(2);
+						listDocuments.add(activityDocument);
+					} else {
 
+					}
+				}
 			}
 		}
-		activityDocumentRepository.save(listDocuments);
-	}
-
+		activityDocumentRepository.save(listDocuments);}
 	private void assignUserToActivity(Company company, User user) {
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "ACTIVITY_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get all by compId and name ignore";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		Activity activity = activityRepository.findByCompanyIdAndNameIgnoreCase(company.getId(), "Dealer Visit").get();
-		
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
-	                UserActivity userActivity = new UserActivity();
-		userActivity.setActivity(activity);
-		userActivity.setCompany(company);
-		userActivity.setUser(user);
-		userActivityRepository.save(userActivity);
+
+		List<Activity> activity = activityRepository.findAllByCompanyPid(company.getPid());
+		List<UserActivity> activityList= new ArrayList<>();
+		 for(Activity activity1 : activity) {
+			 UserActivity userActivity = new UserActivity();
+			 userActivity.setActivity(activity1);
+			 userActivity.setCompany(company);
+			 userActivity.setUser(user);
+			 activityList.add(userActivity);
+		 }
+		userActivityRepository.save(activityList);
 	}
 
 	private void assignUserToDocument(Company company, User user) {
@@ -1550,7 +1771,17 @@ public class CompanyTrialSetUpService {
 				userFavouriteDocument.setSortOrder(2);
 				userFavouriteDocument.setUser(user);
 				userFavouriteDocuments.add(userFavouriteDocument);
-			} else {
+			}
+			else if (activityDocument.getDocument().getName().equals("Day Close")) {
+				UserFavouriteDocument userFavouriteDocument = new UserFavouriteDocument();
+				userFavouriteDocument.setActivity(activityDocument.getActivity());
+				userFavouriteDocument.setCompany(user.getCompany());
+				userFavouriteDocument.setDocument(activityDocument.getDocument());
+				userFavouriteDocument.setSortOrder(4);
+				userFavouriteDocument.setUser(user);
+				userFavouriteDocuments.add(userFavouriteDocument);
+			}
+				else {
 				UserFavouriteDocument userFavouriteDocument = new UserFavouriteDocument();
 				userFavouriteDocument.setActivity(activityDocument.getActivity());
 				userFavouriteDocument.setCompany(user.getCompany());
