@@ -4,6 +4,7 @@ package com.orderfleet.webapp.web.rest.dto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import com.orderfleet.webapp.domain.KilometreCalculation;
 
@@ -21,6 +22,7 @@ public class KilometerCalculationDTO {
 	private String userName;
 	private String UserPid;
 	private LocalDateTime createdDate;
+	private LocalDateTime ExecreatedDate;
 	private String punchingDate;
 	private String punchingTime;
 	private LocalDateTime lastModifiedDate;
@@ -61,6 +63,7 @@ public class KilometerCalculationDTO {
 		this.punchingTime = dateFormatter1.format(kilometreCalculation.getCreatedDate());
 		this.location = kilometreCalculation.getExecutiveTaskExecution() == null ? null
 				: kilometreCalculation.getExecutiveTaskExecution().getLocation();
+		this.ExecreatedDate = kilometreCalculation.getCreatedDate();
 
 	}
 
@@ -206,6 +209,23 @@ public class KilometerCalculationDTO {
 
 	public void setPunchOut(boolean punchOut) {
 		isPunchOut = punchOut;
+	}
+
+	public LocalDateTime getExecreatedDate() {
+		return ExecreatedDate;
+	}
+
+	public void setExecreatedDate(LocalDateTime execreatedDate) {
+		ExecreatedDate = execreatedDate;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		KilometerCalculationDTO myObject = (KilometerCalculationDTO) o;
+		return Objects.equals(punchingDate, myObject.punchingDate) &&
+				Objects.equals(taskExecutionPid, myObject.taskExecutionPid);
 	}
 
 	@Override

@@ -49,6 +49,7 @@ public class CompanyConfigDTO {
 	private boolean EnableStockCalculations;
 
 	private boolean enableOutStanding;
+	private boolean kilometercalculationsenable;
 
 	public CompanyConfigDTO() {
 		super();
@@ -356,5 +357,14 @@ public class CompanyConfigDTO {
 
 	public void setEnableOutStanding(boolean enableOutStanding) {
 		this.enableOutStanding = enableOutStanding;
+	}
+
+
+	public boolean getKilometercalculationsenable() {
+		return kilometercalculationsenable;
+	}
+
+	public void setKilometercalculationsenable(boolean kilometercalculationsenable) {
+		this.kilometercalculationsenable = kilometercalculationsenable;
 	}
 }

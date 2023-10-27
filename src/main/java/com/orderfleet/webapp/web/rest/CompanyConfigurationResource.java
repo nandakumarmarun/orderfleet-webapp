@@ -224,6 +224,11 @@ public class CompanyConfigurationResource {
 					mcDto.setEnableOutStanding(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.KILO_CALC)) {
+					mcDto.setKilometercalculationsenable(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
+
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
 				 * mcDto.setSendSalesOrderEmail(Boolean.valueOf(cc.getValue())); anyValueExist =
@@ -257,7 +262,7 @@ public class CompanyConfigurationResource {
 			@RequestParam String employeeCreateBtn, @RequestParam String modernSpecialConfig,
 			@RequestParam String salesorderstatus, @RequestParam String updateReciept,@RequestParam String sendToFocus,
 			@RequestParam String sendEmailAutomaticaly,@RequestParam String crmEnable,@RequestParam String outstandingDateSorting,
-														   @RequestParam String enableStockCalculations,@RequestParam String enableOutStanding) throws URISyntaxException {
+														   @RequestParam String enableStockCalculations,@RequestParam String enableOutStanding,@RequestParam String kilometerCalculationsenbled) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -337,6 +342,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_STOCK_CALCULATIONS);
 		Optional<CompanyConfiguration> optEnableoutstanding = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_OUTSTANDING);
+		Optional<CompanyConfiguration> optEnablekilocalc = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.KILO_CALC);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -378,6 +385,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration outstandingDateSortingCompany = null;
 		CompanyConfiguration stockCalculationsCompany= null;
 		CompanyConfiguration enableOutstandingCompany = null;
+		CompanyConfiguration enableKiloCalcCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -762,6 +770,17 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(enableOutstandingCompany);
 
+		if (optEnablekilocalc.isPresent()) {
+			enableKiloCalcCompany= optEnablekilocalc.get();
+			enableKiloCalcCompany.setValue(kilometerCalculationsenbled);
+		} else {
+			enableKiloCalcCompany = new CompanyConfiguration();
+			enableKiloCalcCompany.setCompany(company);
+			enableKiloCalcCompany.setName(CompanyConfig.KILO_CALC);
+			enableKiloCalcCompany.setValue(kilometerCalculationsenbled);
+		}
+		companyConfigurationRepository.save(enableKiloCalcCompany);
+
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -898,6 +917,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_STOCK_CALCULATIONS);
 		Optional<CompanyConfiguration> optEnableoutstanding= companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_OUTSTANDING);
+		Optional<CompanyConfiguration> optEnableKiloCalc= companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.KILO_CALC);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1021,6 +1042,9 @@ public class CompanyConfigurationResource {
 		if (optEnableoutstanding.isPresent()) {
 			companyConfigurationDTO.setEnableOutStanding(Boolean.valueOf(optEnableoutstanding.get().getValue()));
 		}
+		if (optEnableKiloCalc.isPresent()) {
+			companyConfigurationDTO.setKilometercalculationsenable(Boolean.valueOf(optEnableKiloCalc.get().getValue()));
+		}
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
@@ -1143,6 +1167,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_STOCK_CALCULATIONS);
 		Optional<CompanyConfiguration> optEnableoutstanding = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_OUTSTANDING);
+		Optional<CompanyConfiguration> optEnableKiloCalc = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.KILO_CALC);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1295,6 +1321,9 @@ public class CompanyConfigurationResource {
 		}
 		if(optEnableoutstanding.isPresent()){
 			companyConfigurationRepository.deleteByCompanyIdAndName(optEnableoutstanding.get().getId(), CompanyConfig.ENABLE_OUTSTANDING);
+		}
+		if(optEnableKiloCalc.isPresent()){
+			companyConfigurationRepository.deleteByCompanyIdAndName(optEnableKiloCalc.get().getId(), CompanyConfig.KILO_CALC);
 		}
 		
 		/*

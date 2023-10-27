@@ -23,6 +23,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orderfleet.webapp.async.event.EventProducer;
 import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +45,6 @@ import com.orderfleet.webapp.domain.enums.ApprovalStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.geolocation.api.GeoLocationServiceException;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.AttendanceService;
-import com.orderfleet.webapp.service.FileManagerService;
-import com.orderfleet.webapp.service.KilometreCalculationService;
-import com.orderfleet.webapp.service.PunchOutService;
 import com.orderfleet.webapp.service.impl.FileManagerException;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 import com.orderfleet.webapp.web.rest.dto.KilometerCalculationDTO;
@@ -106,6 +103,8 @@ public class AttendanceController {
 	@Inject
 	private CompanyRepository companyRepository;
 
+	@Inject
+	private KilometerCalculationsDenormalisationService kilometerCalculationsDenormalisationService;
 
 	@Inject
 	private UserRepository userRepository;
@@ -146,6 +145,7 @@ public class AttendanceController {
 
 
 		try {
+
 			Optional<User> optUser =
 					userRepository
 							.findOneByLogin(
@@ -177,6 +177,7 @@ public class AttendanceController {
 				log.info("Saving Attendance failed");
 				return new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
+
 		} catch (HttpClientErrorException e) {
 			log.info("Saving Attendance failed");
 			log.error("HttpClientErrorException :---" + e.getMessage());
@@ -193,6 +194,7 @@ public class AttendanceController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
+
 		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id = "COMP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
@@ -202,7 +204,7 @@ public class AttendanceController {
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository
-				.findByCompanyPidAndName(attendance.getCompany().getPid(), CompanyConfig.DISTANCE_TRAVELED);
+				.findByCompanyPidAndName(attendance.getCompany().getPid(), CompanyConfig.KILO_CALC);
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -223,10 +225,19 @@ public class AttendanceController {
 		}
                 logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
 				+ description);
+
 		if (optDistanceTraveled.isPresent()) {
 			if (Boolean.valueOf(optDistanceTraveled.get().getValue())) {
 				log.info("Update Distance travelled");
+				Optional<User> optUser =
+						userRepository
+								.findOneByLogin(
+										SecurityUtils.getCurrentUser().getUsername());
 				// saveUpdate distance
+				log.debug(" login : " + SecurityUtils.getCurrentUser().getUsername());
+				if(optUser.isPresent()){
+					kilometerCalculationsDenormalisationService.saveAttendenceKilometer(attendance,optUser.get());
+				}
 //				saveKilometreDifference(attendance);
 			}
 		}
@@ -248,16 +259,17 @@ public class AttendanceController {
 					asApprovalRequest.setApprovalStatus(ApprovalStatus.REQUEST_FOR_APPROVAL);
 					asApprovalRequest.setRequestedDate(attendance.getPlannedDate());
 					attendanceSubgroupApprovalRequestRepository.save(asApprovalRequest);
-
 					return new ResponseEntity<>(HttpStatus.CREATED);
 				}
 			}
 		}
+
 		// mark attendance in dash board view
 		ActivityDTO activityDTO = new ActivityDTO();
 		activityDTO.setUserPid(attendance.getUser().getPid());
 		activityDTO.setRemarks(attendance.getRemarks());
 		activityDTO.setTime(attendance.getPlannedDate().toString());
+
 		if (attendance.getAttendanceStatusSubgroup() != null) {
 			// dash board item configured to user
 			List<DashboardAttendance> dashboardAttendances = dashboardAttendanceUserRepository
@@ -274,6 +286,7 @@ public class AttendanceController {
 			activityDTO.setAttendanceSubGroupName(attendance.getAttendanceStatusSubgroup().getName());
 			activityDTO.setAttendanceSubGroupCode(attendance.getAttendanceStatusSubgroup().getCode());
 		}
+
 		simpMessagingTemplate.convertAndSend("/live-tracking/attendance/" + SecurityUtils.getCurrentUsersCompanyId(),
 				activityDTO);
 
@@ -405,6 +418,15 @@ public class AttendanceController {
 				if(!optionalAttendance.isPresent()){
 					log.debug(LocalDateTime.now() +": PunchOuting " + user.getLogin()  );
 					punchOut = punchOutService.savePunchOut(punchOutDTO);
+					Optional<CompanyConfiguration> optDistanceTraveled = companyConfigurationRepository
+							.findByCompanyPidAndName(user.getCompany().getPid(), CompanyConfig.KILO_CALC);
+					if (optDistanceTraveled.isPresent()) {
+						if (Boolean.valueOf(optDistanceTraveled.get().getValue())) {
+							log.info("Update Distance travelled");
+							// saveUpdate distance
+							kilometerCalculationsDenormalisationService.savePunchoutKilometer(punchOut,user);
+						}
+					}
 				}else{
 					log.debug("PUNCHOUT ALREADY_REPORTED : " + user.getLogin() );
 					return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
@@ -434,7 +456,6 @@ public class AttendanceController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
-
 	}
 	
 	@Transactional
@@ -494,6 +515,7 @@ public class AttendanceController {
 				User user = optUser.get();
 				long companyId = user.getCompany().getId();
 				log.debug("companyId : " + user.getCompany().getId());
+
 				return	punchOutRepository
 						.findAllByCompanyIdUserPidAndCreatedDateBetween(
 								companyId, user.getPid(),

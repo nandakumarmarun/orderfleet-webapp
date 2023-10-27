@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orderfleet.webapp.async.event.EventProducer;
 import com.orderfleet.webapp.service.*;
-import com.orderfleet.webapp.web.thread.StockCalculationThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,6 +196,9 @@ public class ExecutiveTaskSubmissionController {
 
 	@Inject
 	private ReceivablePayableService receivablePayableService;
+
+	@Inject
+	private KilometerCalculationsDenormalisationService kilometerCalculationsDenormalisationService;
 
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
@@ -636,6 +638,11 @@ public class ExecutiveTaskSubmissionController {
 				taskSubmissionResponse = tsTransactionWrapper.getTaskSubmissionResponse();
 				taskSubmissionPostSave.doPostSaveExecutivetaskSubmission(tsTransactionWrapper,
 						executiveTaskSubmissionDTO);
+			}
+
+			if(tsTransactionWrapper != null && tsTransactionWrapper.getExecutiveTaskExecution() != null) {
+				log.debug(" Calculating Distance ");
+				kilometerCalculationsDenormalisationService.calculateDistanceOnCall(tsTransactionWrapper,user);
 			}
 
             //Save receivable payable from sales order

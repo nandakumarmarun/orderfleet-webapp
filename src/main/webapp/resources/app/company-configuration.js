@@ -77,6 +77,7 @@ if (!this.CompanyConfiguration) {
     var outstandingDateSorting = $("#outstandingDateSorting").is(":checked");
 	var enableStockCalculations = $("#enableStockCalculations").is(":checked");
 	var enableOutStanding = $("#enableOutStanding").is(":checked");
+	var enableKiloCalc = $("#enablekiloCalc").is(":checked");
     console.log("crmEnbaled", CrmEnable);
     /* var findLocation = $('#findLocation').is(":checked"); */
     $.ajax({
@@ -118,7 +119,8 @@ if (!this.CompanyConfiguration) {
         crmEnable: CrmEnable,
         outstandingDateSorting: outstandingDateSorting,
         enableStockCalculations: enableStockCalculations,
-        enableOutStanding : enableOutStanding
+        enableOutStanding : enableOutStanding,
+        kilometerCalculationsenbled : enableKiloCalc
 
       },
       success: function (data) {
@@ -189,10 +191,14 @@ if (!this.CompanyConfiguration) {
 			"checked",
 			data.enableStockCalculations
 		  );
-		  $("#enableOutStanding").prop(
+		$("#enableOutStanding").prop(
           			"checked",
           			data.enableOutStanding
           		  );
+        $("#enablekiloCalc").prop(
+                  			"checked",
+                  			data.kilometercalculationsenable
+                  		  );
 
       },
       error: function (xhr, error) {

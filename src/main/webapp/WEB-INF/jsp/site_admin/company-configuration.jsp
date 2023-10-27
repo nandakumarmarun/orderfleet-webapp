@@ -73,7 +73,7 @@
 											<th>Outstanding Datewise Sorting</th>
 											<th>EnableStockCalculations</th>
 											<th>EnableOutStanding</th>
-
+											<th>EnableKiloCalc</th>
 											<th>Action</th>
 										</tr>
 									</thead>
@@ -117,7 +117,7 @@
 												<th>${companyConfiguration.outstandingDateSorting}</th>
 												<th>${companyConfiguration.enableStockCalculations}</th>
 												<th>${companyConfiguration.enableOutStanding}</th>
-
+												<th>${companyConfiguration.kilometercalculationsenable}</th>
 													<td><button type="button" class="btn btn-danger"
 															onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button>
 													</td>
@@ -534,14 +534,23 @@
 																	</div>
 																</td>
 															</tr>
+															<tr>
+                                                               <td>
+                                                            		<div class="form-group">
+                                                            		 <label class="control-label"> Enable Kilometer Calculations</label> <input
+                                                            		 id="enablekiloCalc" name='checkEnablekiloCalc'
+                                                            		 type='checkbox' class="form-control" />
+                                                            		</div>
+                                                               </td>
+                                                            </tr>
 														<tr>
-											<td><div class="form-group">
-													<label class="control-label">Enable OutStanding</label>
-													<input id="enableOutStanding"
-														name='checksEnableOutStanding"' type='checkbox'
-														class="form-control" />
-												</div></td>
-										</tr>
+											                  <td><div class="form-group">
+													           <label class="control-label">Enable OutStanding</label>
+													            <input id="enableOutStanding"
+														        name='checksEnableOutStanding"' type='checkbox'
+														         class="form-control" />
+												                   </div></td>
+										                </tr>
 
 
 														</table>
