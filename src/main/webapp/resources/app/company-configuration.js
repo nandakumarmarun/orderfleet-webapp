@@ -75,9 +75,10 @@ if (!this.CompanyConfiguration) {
     var sendEmailAutomatically = $("#sendEmailAutomatically").is(":checked");
     var CrmEnable = $("#CrmEnabled").is(":checked");
     var outstandingDateSorting = $("#outstandingDateSorting").is(":checked");
-	var enableStockCalculations = $("#enableStockCalculations").is(":checked");
-	var enableOutStanding = $("#enableOutStanding").is(":checked");
-	var enableKiloCalc = $("#enablekiloCalc").is(":checked");
+    var enableStockCalculations = $("#enableStockCalculations").is(":checked");
+    var enableOutStanding = $("#enableOutStanding").is(":checked");
+    var enableKiloCalc = $("#enablekiloCalc").is(":checked");
+    var enableDistanceSalbCalc = $("#enableDistanceSlabCalc").is(":checked");
     console.log("crmEnbaled", CrmEnable);
     /* var findLocation = $('#findLocation').is(":checked"); */
     $.ajax({
@@ -119,9 +120,9 @@ if (!this.CompanyConfiguration) {
         crmEnable: CrmEnable,
         outstandingDateSorting: outstandingDateSorting,
         enableStockCalculations: enableStockCalculations,
-        enableOutStanding : enableOutStanding,
-        kilometerCalculationsenbled : enableKiloCalc
-
+        enableOutStanding: enableOutStanding,
+        kilometerCalculationsenbled: enableKiloCalc,
+        enableDistanceSlabCalc: enableDistanceSalbCalc,
       },
       success: function (data) {
         onSaveSuccess(data);
@@ -187,19 +188,16 @@ if (!this.CompanyConfiguration) {
           "checked",
           data.outstandingDateSorting
         );
-		$("#enableStockCalculations").prop(
-			"checked",
-			data.enableStockCalculations
-		  );
-		$("#enableOutStanding").prop(
-          			"checked",
-          			data.enableOutStanding
-          		  );
-        $("#enablekiloCalc").prop(
-                  			"checked",
-                  			data.kilometercalculationsenable
-                  		  );
-
+        $("#enableStockCalculations").prop(
+          "checked",
+          data.enableStockCalculations
+        );
+        $("#enableOutStanding").prop("checked", data.enableOutStanding);
+        $("#enablekiloCalc").prop("checked", data.kilometercalculationsenable);
+        $("#enableDistanceSlabCalc").prop(
+          "checked",
+          data.enableDistanceSlabCalc
+        );
       },
       error: function (xhr, error) {
         onError(xhr, error);

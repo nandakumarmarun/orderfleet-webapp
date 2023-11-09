@@ -34,4 +34,8 @@ public interface TaskListRepository extends JpaRepository<TaskList, Long> {
 	
 	@Query("select taskList.tasks from TaskList taskList where taskList.company.id = ?#{principal.companyId} and taskList.pid = ?1")
 	List<Task> findAllByTaskListPid(String pid);
+
+	@Query("select taskList.tasks from TaskList taskList where taskList.company.id = ?#{principal.companyId}")
+	List<Task> findAllByNotInTaskListPid();
+
 }

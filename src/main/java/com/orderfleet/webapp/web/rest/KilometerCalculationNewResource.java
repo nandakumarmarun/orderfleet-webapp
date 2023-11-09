@@ -241,7 +241,6 @@ public class KilometerCalculationNewResource {
 		}
 
 		log.debug(" All User Punchings  : " + lastExecutive.size());
-
 		// Sort the list of ExecutiveTaskExecution objects by the sendDate
 		lastExecutiveTaskExecution = lastExecutive.stream()
 				.filter(data -> data.getLongitude() != null
@@ -460,14 +459,11 @@ public class KilometerCalculationNewResource {
 			List<KilometerCalculationDTO> kiloCalDTOs,
 			Optional<EmployeeProfile> employee, String Thread) {
 		ExecutiveTaskExecution destinationExecutiveTaskExecution;
-
 		// Get the first ExecutiveTaskExecution from the list as the
 		// destinationExecutiveTaskExecution.
 		destinationExecutiveTaskExecution = lastExecutiveTaskExecution.get(0);
-
 		// Create a new KilometerCalculationDTO object.
 		KilometerCalculationDTO kiloCalDTO = new KilometerCalculationDTO();
-
 		// Set initial values for the KilometerCalculationDTO object.
 		kiloCalDTO.setKilometre(0);
 		kiloCalDTO.setMetres(0);
@@ -478,14 +474,11 @@ public class KilometerCalculationNewResource {
 		kiloCalDTO.setPunchingTime(destinationExecutiveTaskExecution.getSendDate().toLocalTime().toString());
 		kiloCalDTO.setPunchingDate(destinationExecutiveTaskExecution.getSendDate().toLocalDate().toString());
 		kiloCalDTO.setExecreatedDate(destinationExecutiveTaskExecution.getSendDate());
-		if (employee.isPresent()) {
-			kiloCalDTO.setEmployeeName(employee.get().getName());
-		}
+		if (employee.isPresent()) {kiloCalDTO.setEmployeeName(employee.get().getName());}
 		kiloCalDTO.setLocation(destinationExecutiveTaskExecution.getLocation());
 		kiloCalDTO.setEndLocation(destinationExecutiveTaskExecution.getLocation());
 		kiloCalDTO.setDate(destinationExecutiveTaskExecution.getDate().toLocalDate());
 		kiloCalDTO.setTaskExecutionPid(destinationExecutiveTaskExecution.getPid());
-
 		// Add the initialized KilometerCalculationDTO object to the list of DTOs.
 		kiloCalDTOs.add(kiloCalDTO);
 	}

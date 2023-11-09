@@ -74,6 +74,7 @@
 											<th>EnableStockCalculations</th>
 											<th>EnableOutStanding</th>
 											<th>EnableKiloCalc</th>
+											<th>Enable Distance Slab Calculation</th>
 											<th>Action</th>
 										</tr>
 									</thead>
@@ -118,9 +119,10 @@
 												<th>${companyConfiguration.enableStockCalculations}</th>
 												<th>${companyConfiguration.enableOutStanding}</th>
 												<th>${companyConfiguration.kilometercalculationsenable}</th>
-													<td><button type="button" class="btn btn-danger"
-															onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button>
-													</td>
+												<th>${companyConfiguration.enableDistanceSlabCalc}</th>
+												<td><button type="button" class="btn btn-danger"
+														onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button>
+												</td>
 											</tr>
 										</c:forEach>
 									</tbody>
@@ -527,7 +529,8 @@
 															<tr>
 																<td>
 																	<div class="form-group">
-																		<label class="control-label"> Disable Stock Calculations</label> <input
+																		<label class="control-label"> Disable Stock
+																			Calculations</label> <input
 																			id="enableStockCalculations"
 																			name='checkenableStockCalculations'
 																			type='checkbox' class="form-control" />
@@ -535,22 +538,38 @@
 																</td>
 															</tr>
 															<tr>
-                                                               <td>
-                                                            		<div class="form-group">
-                                                            		 <label class="control-label"> Enable Kilometer Calculations</label> <input
-                                                            		 id="enablekiloCalc" name='checkEnablekiloCalc'
-                                                            		 type='checkbox' class="form-control" />
-                                                            		</div>
-                                                               </td>
-                                                            </tr>
-														<tr>
-											                  <td><div class="form-group">
-													           <label class="control-label">Enable OutStanding</label>
-													            <input id="enableOutStanding"
-														        name='checksEnableOutStanding"' type='checkbox'
-														         class="form-control" />
-												                   </div></td>
-										                </tr>
+																<td>
+																	<div class="form-group">
+																		<label class="control-label"> Enable Kilometer
+																			Calculations</label> <input
+																			id="enablekiloCalc"
+																			name='checkEnablekiloCalc' type='checkbox'
+																			class="form-control" />
+																	</div>
+																</td>
+															</tr>
+															<tr>
+																<td>
+																	<div class="form-group">
+																		<label class="control-label">Enable
+																			OutStanding</label>
+																		<input id="enableOutStanding"
+																			name='checksEnableOutStanding"'
+																			type='checkbox' class="form-control" />
+																	</div>
+																</td>
+															</tr>
+															<tr>
+																<td>
+																	<div class="form-group">
+																		<label class="control-label">Enable
+																			Distance Slab Calculation </label>
+																		<input id="enableDistanceSlabCalc"
+																			name='checksenableDistanceSlabCalc'
+																			type='checkbox' class="form-control" />
+																	</div>
+																</td>
+															</tr>
 
 
 														</table>

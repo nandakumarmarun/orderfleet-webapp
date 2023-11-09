@@ -51,6 +51,8 @@ public class CompanyConfigDTO {
 	private boolean enableOutStanding;
 	private boolean kilometercalculationsenable;
 
+	private boolean enableDistanceSlabCalc;
+
 	public CompanyConfigDTO() {
 		super();
 	}
@@ -366,5 +368,12 @@ public class CompanyConfigDTO {
 
 	public void setKilometercalculationsenable(boolean kilometercalculationsenable) {
 		this.kilometercalculationsenable = kilometercalculationsenable;
+	}
+	public boolean isEnableDistanceSlabCalc() {
+		return enableDistanceSlabCalc;
+	}
+
+	public void setEnableDistanceSlabCalc(boolean enableDistanceSlabCalc) {
+		this.enableDistanceSlabCalc = enableDistanceSlabCalc;
 	}
 }

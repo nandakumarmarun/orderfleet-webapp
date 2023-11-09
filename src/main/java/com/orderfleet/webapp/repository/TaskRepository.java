@@ -68,4 +68,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 	@Query("select task from Task task where task.accountProfile.id in ?1 and task.activated = 'TRUE'")
 	List<TaskDTO> findTaskByAccountProfileIdIn(List<Long> accProfileIds);
 
+	@Query("select task from Task task where task.company.id = ?#{principal.companyId} and task.activated = 'TRUE'")
+	List<Task> findAllPidsCompanyId();
+
 }

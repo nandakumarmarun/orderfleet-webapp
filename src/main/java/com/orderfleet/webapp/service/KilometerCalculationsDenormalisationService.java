@@ -1,10 +1,13 @@
 package com.orderfleet.webapp.service;
 
 import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.web.rest.Features.KilometerCalculations.KmDistanceFare.KmDistanceFare;
+import com.orderfleet.webapp.web.rest.Features.KilometerCalculations.KmDistanceFare.KmDistanceFareDTO;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
 import com.orderfleet.webapp.web.rest.dto.KilometerCalculationDTO;
 import com.orderfleet.webapp.web.rest.dto.PunchOutDTO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,4 +31,7 @@ public interface KilometerCalculationsDenormalisationService {
 
     public KilometerCalculationDenormalised testQuery(String userPid, LocalDateTime fromDate , LocalDateTime toDate , long companyId);
 
-    }
+    KmDistanceFare getDistanceFare(LocalDate plannedDate, String userPid, KilometerCalculationDenormalised KilometerCalculationDenormalised);
+
+
+}

@@ -159,6 +159,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query("select user.company.id from User user where user.login = ?1")
 	Long getCompanyIdByLogin(String login);
+
+	@Query("select user from User user where user.pid in ?1 and user.company.id=?#{principal.companyId}")
+	List<User> findAllUserByUserPids(List<String> userPids);;
 	
 
 }

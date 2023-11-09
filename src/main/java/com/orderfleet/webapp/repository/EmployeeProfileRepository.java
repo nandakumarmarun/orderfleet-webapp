@@ -124,9 +124,9 @@ public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile
 	
 	@Query("select employeeProfile.id from EmployeeProfile employeeProfile where employeeProfile.user.id in ?1 and employeeProfile.company.id = ?2")
      Set<Long> getAllByUserIdInAndCompanyId(List<Long> id, Long companyId);
-	
-	
-	
-	
+
+	@Query("select employeeProfile.user.pid from EmployeeProfile employeeProfile where employeeProfile.pid = ?1")
+	String findUserByEmployeePid(String employeePid);
+
 
 }

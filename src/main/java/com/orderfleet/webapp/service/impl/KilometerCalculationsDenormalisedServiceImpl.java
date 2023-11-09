@@ -9,6 +9,9 @@ import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.repository.*;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.KilometerCalculationsDenormalisationService;
+import com.orderfleet.webapp.web.rest.Features.KilometerCalculations.KmDistanceFare.KmDistanceFare;
+import com.orderfleet.webapp.web.rest.Features.KilometerCalculations.KmDistanceFare.KmDistanceFareDTO;
+import com.orderfleet.webapp.web.rest.Features.KilometerCalculations.KmDistanceFare.KmDistanceFareService;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
 import com.orderfleet.webapp.web.rest.dto.KilometerCalculationDTO;
 import com.orderfleet.webapp.web.rest.dto.MapDistanceApiDTO;
@@ -53,6 +56,8 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
     @Inject
     private EmployeeProfileRepository employeeProfileRepository;
 
+    @Inject
+    private KmDistanceFareService kmDistanceFareService;
 
 
     @Override
@@ -181,6 +186,17 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
                             && executiveTaskExecution.getLatitude() != null
                             && executiveTaskExecution.getLatitude().doubleValue() != 0){
                         log.debug("Coordinates : " + executiveTaskExecution.getLatitude()+","+executiveTaskExecution.getLongitude());
+                        log.debug(" Calculating  kilometer from  Executive task ");
+
+                        Optional<CompanyConfiguration> optSalbdistnceCalculations = getCompanyConfiguration(user);
+
+                        if (optSalbdistnceCalculations.isPresent()) {
+                            if (Boolean.valueOf(optSalbdistnceCalculations.get().getValue())) {
+                                getDistanceFare(executiveTaskExecution.getSendDate().toLocalDate(),
+                                        executiveTaskExecution.getUser().getPid(),KilometerCalculationDenormalised);
+                            }
+                        }
+
                         KilometerCalculationDenormalised.setCalculatd(true);
                     }else{
                         log.debug("Not Calculatable " + executiveTaskExecution.getLongitude());
@@ -189,6 +205,14 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
                     KilometerCalculationDenormalisedRepository.save(KilometerCalculationDenormalised);
                 }
             }
+    }
+
+    private Optional<CompanyConfiguration> getCompanyConfiguration(User user) {
+        Optional<CompanyConfiguration> optSalbdistnceCalculations =
+                companyConfigurationRepository
+                        .findByCompanyPidAndName(
+                                user.getCompany().getPid(), CompanyConfig.ENABLE_DISATNCE_SLAB_CALC);
+        return optSalbdistnceCalculations;
     }
 
 
@@ -289,6 +313,16 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
                 && attendance.getLatitude() != null
                 && attendance.getLatitude().doubleValue() != 0){
             KilometerCalculationDenormalised.setCalculatd(true);
+            log.debug(" Calculating  kilometer from  attandence ");
+
+            Optional<CompanyConfiguration> optSalbdistnceCalculations = getCompanyConfiguration(user);
+
+            if (optSalbdistnceCalculations.isPresent()) {
+                if (Boolean.valueOf(optSalbdistnceCalculations.get().getValue())) {
+                    getDistanceFare(attendance.getPlannedDate().toLocalDate(),
+                            attendance.getUser().getPid(),KilometerCalculationDenormalised);
+                }
+            }
         }else{
             KilometerCalculationDenormalised.setCalculatd(false);
         }
@@ -323,8 +357,6 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
         KilometerCalculationDenormalised.setCompanyId(attendance.getCompany().getId());
         return KilometerCalculationDenormalised;
     }
-
-
 
     @Override
     @Async
@@ -388,6 +420,16 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
                 && punchOut.getLatitude() != null
                 && punchOut.getLatitude().doubleValue() != 0){
                KilometerCalculationDenormalised.setCalculatd(true);
+            log.debug(" Calculating  kilometer from  Executive task punchout ");
+
+            Optional<CompanyConfiguration> optSalbdistnceCalculations = getCompanyConfiguration(user);
+
+            if (optSalbdistnceCalculations.isPresent()) {
+                if (Boolean.valueOf(optSalbdistnceCalculations.get().getValue())) {
+                    getDistanceFare(punchOut.getPunchOutDate().toLocalDate(),
+                            punchOut.getUserPid(),KilometerCalculationDenormalised);
+                }
+            }
         }else{
             KilometerCalculationDenormalised.setCalculatd(false);
         }
@@ -422,9 +464,6 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
         KilometerCalculationDenormalised.setCompanyId(punchOut.getCompanyId());
         return KilometerCalculationDenormalised;
     }
-
-
-
 
 
     @Override
@@ -474,19 +513,11 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
     }
 
 
-
-
-
-
     @Override
     public void saveLocation(
             KilometerCalculationDenormalised kcd) {
         KilometerCalculationDenormalisedRepository.save(kcd);
     }
-
-
-
-
 
 
     @Override
@@ -498,8 +529,14 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
                         companyId,fromDate,toDate,userPid).get();
     }
 
-
-
+    @Override
+    @Async
+    public KmDistanceFare getDistanceFare(LocalDate plannedDate, String userPid,
+                                          KilometerCalculationDenormalised KilometerCalculationDenormalised) {
+        log.debug("Saving Distance Fare Data");
+        kmDistanceFareService.getDistanceFare(plannedDate,userPid,KilometerCalculationDenormalised);
+        return null;
+    }
 
 
     public <T> void convertToJson(
