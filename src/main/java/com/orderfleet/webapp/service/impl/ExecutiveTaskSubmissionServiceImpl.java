@@ -420,6 +420,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		executiveTaskExecution.setLocationType(locationType);
 		executiveTaskExecution.setLatitude(lat);
 		executiveTaskExecution.setLongitude(lon);
+		log.debug("locationType : " + locationType);
 
 		LocationType startLocationType = executiveTaskExecutionDTO.getStartLocationType();
 		executiveTaskExecution.setStartLocationType(startLocationType);
@@ -428,14 +429,17 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		if (locationType.equals(LocationType.TowerLocation) || (executiveTaskExecutionDTO.getMcc() != null
 				&& executiveTaskExecutionDTO.getMnc() != null && executiveTaskExecutionDTO.getCellId() != null
 				&& executiveTaskExecutionDTO.getLac() != null)) {
+			log.debug("startLocationType : "+ startLocationType);
 			executiveTaskExecution.setMcc(executiveTaskExecutionDTO.getMcc());
 			executiveTaskExecution.setMnc(executiveTaskExecutionDTO.getMnc());
 			executiveTaskExecution.setCellId(executiveTaskExecutionDTO.getCellId());
 			executiveTaskExecution.setLac(executiveTaskExecutionDTO.getLac());
 		} else if (locationType.equals(LocationType.NoLocation) || locationType.equals(LocationType.FlightMode)) {
+			log.debug(" locationType : TowerLocation : " + executiveTaskExecution.getPid() + " : No Location");
 			executiveTaskExecution.setLocation("No Location");
 		}
 		if (startLocationType != null) {
+			log.debug("startLocationType : "+ startLocationType);
 			if (startLocationType.equals(LocationType.TowerLocation) || (executiveTaskExecutionDTO.getStartMcc() != null
 					&& executiveTaskExecutionDTO.getStartMnc() != null
 					&& executiveTaskExecutionDTO.getStartCellId() != null
@@ -446,9 +450,11 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				executiveTaskExecution.setStartLac(executiveTaskExecutionDTO.getStartLac());
 			} else if (startLocationType.equals(LocationType.NoLocation)
 					|| startLocationType.equals(LocationType.FlightMode)) {
+				log.debug(" locationType : NoLocation || FlightMode : " + executiveTaskExecution.getPid() + " : No Location");
 				executiveTaskExecution.setStartLocation("No Location");
 			}
 		} else {
+			log.debug(" StartLocationType is null : " + executiveTaskExecution.getPid() + " : No Location");
 			executiveTaskExecution.setStartLocation("No Location");
 		}
 
@@ -458,8 +464,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		executiveTaskExecution.setCompany(company);
 		executiveTaskExecution.setVehicleNumber(executiveTaskExecutionDTO.getVehicleRegistrationNumber() == null ? "No Vehicle " : executiveTaskExecutionDTO.getVehicleRegistrationNumber());
 		executiveTaskExecution = executiveTaskExecutionRepository.save(executiveTaskExecution);
-		
-	
+
 		log.info("----Saving Executive task Execution Completed----- " + user.getLogin());
 		return executiveTaskExecution;
 	}

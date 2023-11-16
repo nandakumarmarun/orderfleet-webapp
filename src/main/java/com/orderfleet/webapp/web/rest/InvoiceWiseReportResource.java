@@ -298,16 +298,14 @@ public class InvoiceWiseReportResource {
 		InvoiceWiseReportView executionView = new InvoiceWiseReportView();
 		if (opExecutiveeExecution.isPresent()) {
 			ExecutiveTaskExecution execution = opExecutiveeExecution.get();
-
 			if (execution.getLatitude() != BigDecimal.ZERO) {
-				System.out.println("-------lat != 0");
+				log.debug("lat != 0");
 				String location = geoLocationService
 						.findAddressFromLatLng(execution.getLatitude() + "," + execution.getLongitude());
-				System.out.println("-------" + location);
+				log.debug("Location : " + location);
 				execution.setLocation(location);
-
 			} else {
-				System.out.println("-------No Location");
+				log.debug("No Location");
 				execution.setLocation("No Location");
 			}
 			/*

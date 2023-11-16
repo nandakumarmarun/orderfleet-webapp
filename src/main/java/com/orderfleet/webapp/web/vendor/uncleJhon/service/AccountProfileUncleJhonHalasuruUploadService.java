@@ -29,6 +29,10 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 
 	String PID_PREFIX = "DDA-";
 
+	final String FACTORY_CODE ="KI";
+
+	final String FACTORY_NAME = "HALASURU DEPOT";
+
 	private final Logger log = LoggerFactory.getLogger(AccountProfileUncleJhonHalasuruUploadService.class);
 
 	private final AccountProfileRepository accountProfileRepository;
@@ -74,22 +78,56 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 		this.locationHierarchyRepository = locationHierarchyRepository;
 	}
 
-	public void saveUpdateLocations(List<AccountUJ> accountUJ, List<Dealer> dealer) {
-
-		log.info("Saving Locations.........");
-		long start = System.nanoTime();
+	public void saveUpdateLocations(
+			List<AccountUJ> accountUJ,
+			List<Dealer> dealer) {
 		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
 		Company company = companyRepository.findOne(companyId);
+		String Thread = "Thread "+RandomUtil.generateThread()+" -- ["+company.getLegalName()+"] : ";
+		log.info(Thread + "Enter : saveUpdateLocations() ");
+		long start = System.nanoTime();
 
 		Set<Location> saveUpdateLocations = new HashSet<>();
+		Set<Location> distinctloc = new HashSet<>();
 
-		// find all locations
-		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
-		for (AccountUJ locDto : accountUJ) {
-			// check exist by name, only one exist with a name
-			Optional<Location> optionalLoc = locations.stream()
-					.filter(p -> p.getLocationId().equalsIgnoreCase(locDto.getLocation().trim())).findAny();
+		List<Location> locations =
+				locationRepository
+						.findAllByCompanyId(company.getId());
+
+		Optional<Location> optionalParentLoc =
+				locations
+						.stream()
+						.filter(p -> p.getLocationId()
+								.equalsIgnoreCase(FACTORY_CODE))
+						.findAny();
+
+		log.info(Thread + "Parent Location : " + ( optionalParentLoc.isPresent() ? optionalParentLoc.get().getName() : "No Location Present"));
+
+		if(!optionalParentLoc.isPresent()){
 			Location location;
+			location = new Location();
+			location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
+			location.setCompany(company);
+			location.setLocationId(FACTORY_CODE);
+			location.setName(FACTORY_NAME);
+			location.setAlias(FACTORY_NAME);
+			location.setDescription(FACTORY_NAME);
+			location.setActivated(true);
+			saveUpdateLocations.add(location);
+		}
+
+		log.info(Thread + "Processing Data");
+		log.info(Thread + "Saving Customer Locations");
+
+		for (AccountUJ locDto : accountUJ) {
+			Location location;
+			Optional<Location> optionalLoc =
+					locations
+							.stream()
+							.filter(p -> p.getLocationId()
+									.equalsIgnoreCase(locDto.getLocation().trim()))
+							.findAny();
+
 			if (optionalLoc.isPresent()) {
 				location = optionalLoc.get();
 			} else {
@@ -101,21 +139,23 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 			location.setName(locDto.getLocation().trim());
 			location.setAlias(locDto.getLocation());
 			location.setActivated(true);
-
+			location.setDescription(FACTORY_NAME);
 			saveUpdateLocations.add(location);
 		}
 
-		log.info("Saving Dealer locations.....s");
-		Set<Location> distinctloc = new HashSet<>();
+		log.info(Thread + "Saving Dealer Locations");
+
 		for (Dealer DealLoc : dealer) {
-
-			// check exist by name, only one exist with a name
-			Optional<Location> optionalLoc = locations.stream()
-					.filter(p -> p.getLocationId().equalsIgnoreCase(DealLoc.getTown().trim())).findAny();
-
 			Location location;
-			if (optionalLoc.isPresent()) {
+			Optional<Location> optionalLoc =
+					locations
+							.stream()
+							.filter(p -> p.getLocationId()
+									.equalsIgnoreCase(DealLoc.getTown().trim()))
+							.findAny();
 
+
+			if (optionalLoc.isPresent()) {
 				location = optionalLoc.get();
 			} else {
 				location = new Location();
@@ -126,22 +166,24 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 			location.setName(DealLoc.getTown().trim());
 			location.setAlias(DealLoc.getTown());
 			location.setActivated(true);
-
+			location.setDescription(FACTORY_NAME);
 			saveUpdateLocations.add(location);
 		}
-		distinctloc = saveUpdateLocations.stream()
-				.collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Location::getLocationId))));
+
+		distinctloc = saveUpdateLocations
+				.stream()
+				.collect(
+						Collectors.toCollection(()
+								-> new TreeSet<>(Comparator
+								.comparing(Location::getLocationId))));
 
 		locationRepository.save(distinctloc);
 		locationRepository.flush();
 		saveUpdateLocationHierarchy(distinctloc);
-		long end = System.nanoTime();
-		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
-
-		log.info("Sync completed in {} ms", elapsedTime);
-
+		saveSync(start);
 	}
+
+
 
 	public void saveUpdateAccounts(List<AccountUJ> accountUJ) {
 		log.info("Saving Account Profiles.........");
@@ -165,7 +207,6 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 				AccountProfile accountProfile;
 				if (optionalAP.isPresent()) {
 					accountProfile = optionalAP.get();
-
 				} else {
 					accountProfile = new AccountProfile();
 					accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
@@ -176,7 +217,6 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 					accountProfile.setAccountStatus(AccountStatus.Unverified);
 					accountProfile.setDataSourceType(DataSourceType.VENDOR);
 					accountProfile.setImportStatus(true);
-
 				}
 				accountProfile.setCustomerId(apDto.getNumcode().trim());
 
@@ -203,15 +243,11 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 					accountProfile.setCity("No City");
 				}
 				if (apDto.getPhone1() != null && !apDto.getPhone1().equals("")) {
-
 					accountProfile.setPhone1(apDto.getPhone1());
-
 				} else {
 					accountProfile.setPhone1("");
 				}
-
 				accountProfile.setLocation(apDto.getLocation());
-
 				String coordinates = apDto.getLatitude();
 				if (!apDto.getLatitude().trim().isEmpty()) {
 					String[] parts = coordinates.split(",");
@@ -223,7 +259,6 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 						double longitude = Double.parseDouble(longitudeString.trim());
 						accountProfile.setLatitude(BigDecimal.valueOf(latitude));
 						accountProfile.setLongitude(BigDecimal.valueOf(longitude));
-
 					}
 				}
 //				if (apDto.getPhone2() != null && !apDto.getPhone2().equals("")) {
@@ -240,14 +275,10 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 //				} else {
 //					accountProfile.setEmail1(" ");
 //				}
-
 				saveUpdateAccountProfiles.add(accountProfile);
 			}
-
 			accountProfileRepository.save(saveUpdateAccountProfiles);
-
 		}
-
 	}
 
 	public void saveUpdateLocationAccounts(List<AccountUJ> accountUJ, List<Dealer> dealer) {
@@ -279,11 +310,8 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 
 				if (acc.isPresent()) {
 					locationAccountProfilesIds.add(acc.get().getId());
-
 				}
-
 			}
-
 			profile.setLocation(location.get());
 			profile.setAccountProfile(locAcc.get());
 			profile.setCompany(company);
@@ -313,19 +341,13 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 			Optional<Location> location = locations.stream().filter(pl -> pl.getName().equalsIgnoreCase(dealerLocAcc.getTown().trim())).findAny();
 
 			if (locAcc.isPresent() && location.isPresent()) {
-
 				Optional<LocationAccountProfile> acc = locationAccountProfiles.stream()
 						.filter(ap -> locAcc.get().getName().equalsIgnoreCase(ap.getAccountProfile().getName()))
 						.findAny();
-
 				if (acc.isPresent()) {
-
 					locationAccountProfilesIds.add(acc.get().getId());
-
 				}
-
 			}
-
 			dealerprofile.setLocation(location.get());
 			dealerprofile.setAccountProfile(locAcc.get());
 			dealerprofile.setCompany(company);
@@ -497,6 +519,7 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 		Company company = companyRepository.findOne(companyId);
 
 		List<String> customerId = dealer.stream().map(deal -> deal.getDlrcode().trim()).collect(Collectors.toList());
+
 		List<AccountProfile> dealerProfiles = accountProfileRepository
 				.findAllAccountProfileByCustomerIdInAndCompanyId(customerId, companyId);
 
@@ -510,7 +533,6 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 		List<DistributorDealerAssociation> DistributorDealerList = new ArrayList<>();
 
 		for (Dealer dealers : dealer) {
-
 			Optional<DistributorDealerAssociation> association = distributDeal.stream()
 					.filter(dd -> dd.getDealer().getCustomerId().trim().equalsIgnoreCase(dealers.getDlrcode().trim())
 							&& dd.getDistributor().getCustomerCode().trim()
@@ -518,7 +540,6 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 					.findAny();
 			DistributorDealerAssociation distributorDealer = new DistributorDealerAssociation();
 			if (association.isPresent()) {
-
 				continue;
 			} else {
 
@@ -545,92 +566,272 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 
 	}
 
-	private void saveUpdateLocationHierarchy(Set<Location> distinctloc) {
+	private void saveUpdateLocationHierarchy(
+			Set<Location> distinctloc) {
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		String Thread = " Thread " + RandomUtil.generateThread() +" -- [ "+company.getLegalName()+" ] : ";
+		log.info(Thread + " Enter : saveUpdateLocationHierarchy() ");
+
+		long start = System.nanoTime();
+		Long version;
 
 		List<LocationHierarchyDTO> locationHierarchyDTOs = locationToLocationHierarchyDtos(distinctloc);
 
-		log.info("Saving Location Hierarchies.........");
+		Optional<LocationHierarchy> locationHierarchy =
+				locationHierarchyRepository
+						.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(
+								companyId);
 
-		long start = System.nanoTime();
-
-		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
-
-		Long version;
-
-		// Only one version of a company hierarchy is active at a time
-		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
-				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
-
+		log.debug(Thread +" Location Hierarchy is present : " + locationHierarchy.isPresent());
 		if (locationHierarchy.isPresent()) {
-			locationHierarchyRepository.updateLocationHierarchyInactivatedFor(ZonedDateTime.now(),
-					locationHierarchy.get().getVersion());
-			version = locationHierarchy.get().getVersion() + 1;
+			log.debug(" Location Hierarchy Is Present ");
+			Optional<Location> optionalParentLoc = locationRepository
+					.findOneByLocationIdAndCompanyId(
+							FACTORY_CODE,companyId);
 
+			if(optionalParentLoc.isPresent()){
+				log.debug(Thread + " Parent Location : " + (optionalParentLoc.isPresent() ? optionalParentLoc.get().getName() : "No Parent"));
+				locationHierarchyRepository.deleteByCompanyIdAndParent(companyId,optionalParentLoc.get().getId());
+			}
+			version = locationHierarchy.get().getVersion() + 1;
+			log.debug(Thread + " Hierarchy Version : " + version );
 		} else {
+			log.debug(" Location Hierarchy Not Present ");
 			version = 1L;
+			log.debug(Thread + " Hierarchy Version : " + version );
 		}
 
-		// find all locations
-		List<Location> locations = locationRepository.findByCompanyIdAndActivatedTrue(companyId);
+		List<Location> locations =
+				locationRepository
+						.findByCompanyIdAndActivatedTrue(companyId);
 
-		// create hierarchy
+		log.debug(Thread +" locations: " + locations.size());
+
 		for (LocationHierarchyDTO locationDTO : locationHierarchyDTOs) {
-
-			// check location exist
-			Optional<Location> optionalLoc = locations.stream()
-					.filter(p -> p.getName().equals(locationDTO.getLocationName())).findAny();
+			Optional<Location> optionalLoc =
+					locations
+							.stream()
+							.filter(p -> p.getName()
+									.equals(locationDTO.getLocationName()))
+							.findAny();
 
 			if (optionalLoc.isPresent()) {
-				if (locationDTO.getParentName() != null && locationDTO.getParentName().length() > 0) {
-					// check parent location exist
-					Optional<Location> optionalParentLoc = locations.stream()
-							.filter(p -> p.getName().equals(locationDTO.getParentName())).findAny();
+				if (locationDTO.getParentName() != null
+						&& locationDTO.getParentName().length() > 0) {
+
+					Optional<Location> optionalParentLoc =
+							locations
+									.stream()
+									.filter(p -> p.getName()
+											.equals(locationDTO.getParentName()))
+									.findAny();
 
 					if (optionalParentLoc.isPresent()) {
-						locationHierarchyRepository.insertLocationHierarchyWithParent(version,
-								optionalLoc.get().getId(), optionalParentLoc.get().getId());
+						locationHierarchyRepository
+								.insertLocationHierarchyWithParent(
+										version,
+										optionalLoc.get().getId(),
+										optionalParentLoc.get().getId());
 					}
 				} else {
-					locationHierarchyRepository.insertLocationHierarchyWithNoParent(version, optionalLoc.get().getId());
+					locationHierarchyRepository
+							.insertLocationHierarchyWithNoParent(
+									version,
+									optionalLoc.get().getId());
 				}
 			}
 		}
-		long end = System.nanoTime();
-		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
-
-		log.info("Sync completed in {} ms", elapsedTime);
-
+		saveSync(start);
 	}
-
-	private List<LocationHierarchyDTO> locationToLocationHierarchyDtos(Set<Location> locationDtos) {
-
+	private List<LocationHierarchyDTO> locationToLocationHierarchyDtos(
+			Set<Location> locationDtos) {
+		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		Company company = companyRepository.findOne(companyId);
+		String Thread = "Thread "+RandomUtil.generateThread()+" -- ["+company.getLegalName()+"] : ";
+		LocationHierarchyDTO defaultLocationHierarchyDTO = new LocationHierarchyDTO();
 		Set<String> locations = new HashSet<>();
+		List<LocationHierarchyDTO> locationHierarchyDTOs = new ArrayList<>();
+		Optional<Location> optionalParent = locationRepository.findOneByLocationIdAndCompanyId("Territory",companyId);
+		if(optionalParent.isPresent()){
+			Optional<LocationHierarchy> optTerritory =
+					locationHierarchyRepository
+							.findByCompanyIdAndLocation(
+									companyId,optionalParent.get().getId());
+			if(!optTerritory.isPresent()){
+				defaultLocationHierarchyDTO.setLocationName("Territory");
+				defaultLocationHierarchyDTO.setParentName(null);
+				locationHierarchyDTOs.add(defaultLocationHierarchyDTO);
+			}
+		}
+
+		Optional<Location> optionalParentLoc = locationRepository.findOneByLocationIdAndCompanyId(FACTORY_CODE,companyId);
+		if(optionalParentLoc.isPresent()){
+			Optional<LocationHierarchy> optLocationHierarchy =
+					locationHierarchyRepository
+							.findByCompanyIdAndLocation(
+									companyId,optionalParentLoc.get().getId());
+			if(!optLocationHierarchy.isPresent()){
+				LocationHierarchyDTO parentLocationHierarchyDTO = new LocationHierarchyDTO();
+				parentLocationHierarchyDTO.setLocationName(optionalParentLoc.get().getName());
+				parentLocationHierarchyDTO.setParentName("Territory");
+				locationHierarchyDTOs.add(parentLocationHierarchyDTO);
+			}
+		}
+
+		log.debug(Thread + "Parent Location : " + (optionalParentLoc.isPresent() ? optionalParentLoc.get().getName() : "No Parent"));
 
 		for (Location locationDTO : locationDtos) {
-
 			locations.add(locationDTO.getName());
 		}
 
-		List<LocationHierarchyDTO> locationHierarchyDTOs = new ArrayList<>();
-
-		LocationHierarchyDTO defaultLocationHierarchyDTO = new LocationHierarchyDTO();
-
-		defaultLocationHierarchyDTO.setLocationName("Territory");
-		defaultLocationHierarchyDTO.setParentName(null);
-		locationHierarchyDTOs.add(defaultLocationHierarchyDTO);
-
+		log.debug(Thread + "Processing Locations");
 		for (String location : locations) {
-
 			LocationHierarchyDTO locationHierarchyDTO = new LocationHierarchyDTO();
-
 			locationHierarchyDTO.setLocationName(location);
-			locationHierarchyDTO.setParentName("Territory");
+			if (optionalParentLoc.isPresent()){
+				locationHierarchyDTO.setParentName(optionalParentLoc.get().getName());
+			}
 			locationHierarchyDTOs.add(locationHierarchyDTO);
-
 		}
-
 		return locationHierarchyDTOs;
 	}
+
+	private void saveSync(long start) {
+		long end = System.nanoTime();
+		double elapsedTime = (end - start) / 1000000.0;
+		log.info("Sync completed in {} ms", elapsedTime);
+	}
+
+
+	//	private void saveUpdateLocationHierarchy(Set<Location> distinctloc) {
+//
+//		List<LocationHierarchyDTO> locationHierarchyDTOs = locationToLocationHierarchyDtos(distinctloc);
+//
+//		log.info("Saving Location Hierarchies.........");
+//
+//		long start = System.nanoTime();
+//
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//
+//		Long version;
+//
+//		// Only one version of a company hierarchy is active at a time
+//		Optional<LocationHierarchy> locationHierarchy = locationHierarchyRepository
+//				.findFirstByCompanyIdAndActivatedTrueOrderByIdDesc(companyId);
+//
+//		if (locationHierarchy.isPresent()) {
+//			locationHierarchyRepository.updateLocationHierarchyInactivatedFor(ZonedDateTime.now(),
+//					locationHierarchy.get().getVersion());
+//			version = locationHierarchy.get().getVersion() + 1;
+//
+//		} else {
+//			version = 1L;
+//		}
+//
+//		// find all locations
+//		List<Location> locations = locationRepository.findByCompanyIdAndActivatedTrue(companyId);
+//
+//		// create hierarchy
+//		for (LocationHierarchyDTO locationDTO : locationHierarchyDTOs) {
+//
+//			// check location exist
+//			Optional<Location> optionalLoc = locations.stream()
+//					.filter(p -> p.getName().equals(locationDTO.getLocationName())).findAny();
+//
+//			if (optionalLoc.isPresent()) {
+//				if (locationDTO.getParentName() != null && locationDTO.getParentName().length() > 0) {
+//					// check parent location exist
+//					Optional<Location> optionalParentLoc = locations.stream()
+//							.filter(p -> p.getName().equals(locationDTO.getParentName())).findAny();
+//
+//					if (optionalParentLoc.isPresent()) {
+//						locationHierarchyRepository.insertLocationHierarchyWithParent(version,
+//								optionalLoc.get().getId(), optionalParentLoc.get().getId());
+//					}
+//				} else {
+//					locationHierarchyRepository.insertLocationHierarchyWithNoParent(version, optionalLoc.get().getId());
+//				}
+//			}
+//		}
+//		long end = System.nanoTime();
+//		double elapsedTime = (end - start) / 1000000.0;
+//		// update sync table
+//
+//		log.info("Sync completed in {} ms", elapsedTime);
+//
+//	}
+
+
+
+	//	public void saveUpdateLocations(List<AccountUJ> accountUJ, List<Dealer> dealer) {
+//
+//		log.info("Saving Locations.........");
+//		long start = System.nanoTime();
+//		final Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+//		Company company = companyRepository.findOne(companyId);
+//
+//		Set<Location> saveUpdateLocations = new HashSet<>();
+//
+//		// find all locations
+//		List<Location> locations = locationRepository.findAllByCompanyId(company.getId());
+//		for (AccountUJ locDto : accountUJ) {
+//			// check exist by name, only one exist with a name
+//			Optional<Location> optionalLoc = locations.stream()
+//					.filter(p -> p.getLocationId().equalsIgnoreCase(locDto.getLocation().trim())).findAny();
+//			Location location;
+//			if (optionalLoc.isPresent()) {
+//				location = optionalLoc.get();
+//			} else {
+//				location = new Location();
+//				location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
+//				location.setCompany(company);
+//				location.setLocationId(locDto.getLocation().trim());
+//			}
+//			location.setName(locDto.getLocation().trim());
+//			location.setAlias(locDto.getLocation());
+//			location.setActivated(true);
+//
+//			saveUpdateLocations.add(location);
+//		}
+//
+//		log.info("Saving Dealer locations.....s");
+//		Set<Location> distinctloc = new HashSet<>();
+//		for (Dealer DealLoc : dealer) {
+//
+//			// check exist by name, only one exist with a name
+//			Optional<Location> optionalLoc = locations.stream()
+//					.filter(p -> p.getLocationId().equalsIgnoreCase(DealLoc.getTown().trim())).findAny();
+//
+//			Location location;
+//			if (optionalLoc.isPresent()) {
+//
+//				location = optionalLoc.get();
+//			} else {
+//				location = new Location();
+//				location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
+//				location.setCompany(company);
+//				location.setLocationId(DealLoc.getTown().trim());
+//			}
+//			location.setName(DealLoc.getTown().trim());
+//			location.setAlias(DealLoc.getTown());
+//			location.setActivated(true);
+//
+//			saveUpdateLocations.add(location);
+//		}
+//		distinctloc = saveUpdateLocations.stream()
+//				.collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Location::getLocationId))));
+//
+//		locationRepository.save(distinctloc);
+//		locationRepository.flush();
+//		saveUpdateLocationHierarchy(distinctloc);
+//		long end = System.nanoTime();
+//		double elapsedTime = (end - start) / 1000000.0;
+//		// update sync table
+//
+//		log.info("Sync completed in {} ms", elapsedTime);
+//
+//	}
+
 
 }

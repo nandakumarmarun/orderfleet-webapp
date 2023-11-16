@@ -641,7 +641,7 @@ public class ExecutiveTaskSubmissionController {
 			}
 
 			if(tsTransactionWrapper != null && tsTransactionWrapper.getExecutiveTaskExecution() != null) {
-				log.debug(" Calculating Distance ");
+				log.debug("Calculating Distance");
 				kilometerCalculationsDenormalisationService.calculateDistanceOnCall(tsTransactionWrapper,user);
 			}
 
