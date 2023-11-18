@@ -254,6 +254,11 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 		Company company = user.getCompany();
 		EmployeeProfile employeeProfile = employeeProfileRepository.findEmployeeProfileByUser(user);
 		ExecutiveTaskExecutionDTO executionDTO = executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO();
+		if (executionDTO.getBatteryPercentage()!=null)
+		{
+			employeeProfile.setBatteryPercentage(executionDTO.getBatteryPercentage());
+			employeeProfileRepository.save(employeeProfile);
+		}
 		Optional<UserVehicleAssociation> userVehicleAssociationOpt =  userVehicleAssociationRepository.findByVehicleAndUserPid(employeeProfile.getPid());
 		if(userVehicleAssociationOpt.isPresent()) {
 			UserVehicleAssociation userVehicleAssociation = userVehicleAssociationOpt.get();

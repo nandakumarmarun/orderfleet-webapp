@@ -1,7 +1,7 @@
 {
-"release-number" : "1.114.3",
-"release-date" : "16/11/2023",
+"release-number" : "1.114.4",
+"release-date" : "18/11/2023",
 "features" : [
-  "Halauru location Territory ,"
+  "Question Attributes,Battery percentage"
 ]
 }

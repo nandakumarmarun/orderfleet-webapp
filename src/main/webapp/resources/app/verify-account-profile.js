@@ -175,7 +175,7 @@ if (!this.VerifyAccountProfile) {
 
 	function downloadXls() {
 		// Avoid last column in each row
-		$("#tblVerifyAccountProfile th:last-child, #tblVerifyAccountProfile td:last-child").hide();
+//		$("#tblVerifyAccountProfile th:last-child, #tblVerifyAccountProfile td:last-child").hide();
 		var excelName = "verifyAccountProfile";
 		var table2excel = new Table2Excel();
 		    table2excel.export(document.getElementById('tblVerifyAccountProfile'),excelName);
@@ -331,6 +331,17 @@ if (!this.VerifyAccountProfile) {
 			.each(
 				accountProfiles,
 				function(index, accountProfile) {
+				var answers;
+				if(accountProfile.answers != null){
+				console.log("Enter here................")
+				$
+                   		.each(
+                                   	accountProfile.answers,
+                                        function(index,answer) {
+                                          answers+= "<td>"+answer+"</td>"
+                                               });
+                                              }
+
 					$('#tBodyVerifyAccountProfile')
 						.append(
 							"<tr><td><input name='accountprofile' type='checkbox' value='" + accountProfile.pid + "' /></td><td>"
@@ -360,10 +371,13 @@ if (!this.VerifyAccountProfile) {
 							+ "</td><td>"
 							+ accountProfile.activated
 							+ "</td><td>"
-							+"<i class='btn btn-blue entypo-pencil' title='Edit AccountProfile' onclick='VerifyAccountProfile.showModalPopup($(\"#myModal\"),\""
+
+                            +"<i class='btn btn-blue entypo-pencil' title='Edit AccountProfile' onclick='VerifyAccountProfile.showModalPopup($(\"#myModal\"),\""
 													+ accountProfile.pid
 													+ "\",1);'"
-							+ "</td></tr>");
+							+"</td></td>"
+							+answers
+							+"</tr>");
 				});
 	}
 	

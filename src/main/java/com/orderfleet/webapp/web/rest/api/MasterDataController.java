@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.api;
 
 import java.lang.reflect.Array;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +16,11 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.orderfleet.webapp.service.*;
+import com.orderfleet.webapp.web.rest.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,12 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.ActivityStage;
@@ -65,66 +66,6 @@ import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.repository.VoucherNumberGeneratorRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.AccountTypeService;
-import com.orderfleet.webapp.service.ActivityGroupService;
-import com.orderfleet.webapp.service.AttendanceStatusSubgroupService;
-import com.orderfleet.webapp.service.BankDetailsService;
-import com.orderfleet.webapp.service.CompetitorProfileService;
-import com.orderfleet.webapp.service.DistanceFareService;
-import com.orderfleet.webapp.service.DocumentAccountTypeService;
-import com.orderfleet.webapp.service.DocumentAccountingVoucherColumnService;
-import com.orderfleet.webapp.service.DocumentEcomProductGroupService;
-import com.orderfleet.webapp.service.DocumentFormsService;
-import com.orderfleet.webapp.service.DocumentInventoryVoucherColumnService;
-import com.orderfleet.webapp.service.DocumentPriceLevelService;
-import com.orderfleet.webapp.service.DocumentPrintService;
-import com.orderfleet.webapp.service.DocumentProductCategoryService;
-import com.orderfleet.webapp.service.DocumentProductGroupService;
-import com.orderfleet.webapp.service.DocumentService;
-import com.orderfleet.webapp.service.DocumentStockLocationDestinationService;
-import com.orderfleet.webapp.service.DocumentStockLocationSourceService;
-import com.orderfleet.webapp.service.EcomProductGroupProductService;
-import com.orderfleet.webapp.service.EcomProductProfileService;
-import com.orderfleet.webapp.service.EmployeeProfileLocationService;
-import com.orderfleet.webapp.service.FormElementService;
-import com.orderfleet.webapp.service.FormFormElementService;
-import com.orderfleet.webapp.service.FormService;
-import com.orderfleet.webapp.service.IncomeExpenseHeadService;
-import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
-import com.orderfleet.webapp.service.KnowledgebaseService;
-import com.orderfleet.webapp.service.LengthTypeService;
-import com.orderfleet.webapp.service.LocationAccountProfileService;
-import com.orderfleet.webapp.service.LocationHierarchyService;
-import com.orderfleet.webapp.service.LocationService;
-import com.orderfleet.webapp.service.OpeningStockService;
-import com.orderfleet.webapp.service.PostDatedVoucherService;
-import com.orderfleet.webapp.service.PriceLevelAccountProductGroupService;
-import com.orderfleet.webapp.service.PriceTrendConfigurationService;
-import com.orderfleet.webapp.service.PriceTrendProductCompetitorService;
-import com.orderfleet.webapp.service.PriceTrendProductGroupService;
-import com.orderfleet.webapp.service.PriceTrendProductService;
-import com.orderfleet.webapp.service.ProductGroupProductService;
-import com.orderfleet.webapp.service.ProductProfileService;
-import com.orderfleet.webapp.service.ReceivablePayableService;
-import com.orderfleet.webapp.service.RootPlanHeaderService;
-import com.orderfleet.webapp.service.RootPlanSubgroupApproveService;
-import com.orderfleet.webapp.service.SalesTargetGroupUserTargetService;
-import com.orderfleet.webapp.service.StockDetailsService;
-import com.orderfleet.webapp.service.SubFormElementService;
-import com.orderfleet.webapp.service.UserActivityService;
-import com.orderfleet.webapp.service.UserDocumentService;
-import com.orderfleet.webapp.service.UserEcomProductGroupService;
-import com.orderfleet.webapp.service.UserFavouriteDocumentService;
-import com.orderfleet.webapp.service.UserKnowledgebaseFileService;
-import com.orderfleet.webapp.service.UserMobileMenuItemGroupService;
-import com.orderfleet.webapp.service.UserPriceLevelService;
-import com.orderfleet.webapp.service.UserProductCategoryService;
-import com.orderfleet.webapp.service.UserProductGroupService;
-import com.orderfleet.webapp.service.UserReceiptTargetService;
-import com.orderfleet.webapp.service.UserRestrictedAttendanceSubgroupService;
-import com.orderfleet.webapp.service.UserStockLocationService;
-import com.orderfleet.webapp.service.VehicleService;
-import com.orderfleet.webapp.service.VoucherNumberGeneratorService;
 import com.orderfleet.webapp.web.rest.StockLocationResource;
 import com.orderfleet.webapp.web.rest.api.dto.DocumentAccountingVoucherColumnDTO;
 import com.orderfleet.webapp.web.rest.api.dto.DocumentInventoryVoucherColumnDTO;
@@ -134,59 +75,6 @@ import com.orderfleet.webapp.web.rest.api.dto.MBLocationHierarchyDTO;
 import com.orderfleet.webapp.web.rest.api.dto.PostDatedVoucherDTO;
 import com.orderfleet.webapp.web.rest.api.dto.RootPlanHeaderUserTaskListDTO;
 import com.orderfleet.webapp.web.rest.api.dto.UserTaskListDTO;
-import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.AccountTypeDTO;
-import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
-import com.orderfleet.webapp.web.rest.dto.ActivityGroupDTO;
-import com.orderfleet.webapp.web.rest.dto.ActivityStageDTO;
-import com.orderfleet.webapp.web.rest.dto.AttendanceStatusSubgroupDTO;
-import com.orderfleet.webapp.web.rest.dto.BankDetailsDTO;
-import com.orderfleet.webapp.web.rest.dto.CompetitorProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.DistanceFareDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentAccountTypeDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentEcomProductGroupDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentPriceLevelDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentPrintDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentProductCategoryDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentProductGroupDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentStockLocationDTO;
-import com.orderfleet.webapp.web.rest.dto.EcomProductGroupDTO;
-import com.orderfleet.webapp.web.rest.dto.EcomProductGroupProductDTO;
-import com.orderfleet.webapp.web.rest.dto.EcomProductProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.FormDTO;
-import com.orderfleet.webapp.web.rest.dto.FormElementDTO;
-import com.orderfleet.webapp.web.rest.dto.IncomeExpenseHeadDTO;
-import com.orderfleet.webapp.web.rest.dto.KnowledgebaseDTO;
-import com.orderfleet.webapp.web.rest.dto.LengthTypeDTO;
-import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.LocationDTO;
-import com.orderfleet.webapp.web.rest.dto.MobileMenuItemDTO;
-import com.orderfleet.webapp.web.rest.dto.OpeningStockDTO;
-import com.orderfleet.webapp.web.rest.dto.PriceLevelDTO;
-import com.orderfleet.webapp.web.rest.dto.PriceTrendConfigurationDTO;
-import com.orderfleet.webapp.web.rest.dto.PriceTrendProductCompetitorDTO;
-import com.orderfleet.webapp.web.rest.dto.PriceTrendProductDTO;
-import com.orderfleet.webapp.web.rest.dto.PriceTrendProductGroupDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductCategoryDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductGroupDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductGroupProductDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
-import com.orderfleet.webapp.web.rest.dto.ReferenceDocumentDto;
-import com.orderfleet.webapp.web.rest.dto.RootPlanSubgroupApproveDTO;
-import com.orderfleet.webapp.web.rest.dto.SalesTargetGroupUserTargetDTO;
-import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
-import com.orderfleet.webapp.web.rest.dto.StockLocationDTO;
-import com.orderfleet.webapp.web.rest.dto.SubFormElementDTO;
-import com.orderfleet.webapp.web.rest.dto.UserDocumentDTO;
-import com.orderfleet.webapp.web.rest.dto.UserFavouriteDocumentDTO;
-import com.orderfleet.webapp.web.rest.dto.UserReceiptTargetDTO;
-import com.orderfleet.webapp.web.rest.dto.UserRestrictedAttendanceSubgroupDTO;
-import com.orderfleet.webapp.web.rest.dto.VehicleDTO;
-import com.orderfleet.webapp.web.rest.dto.VoucherNumberGeneratorDTO;
 import com.orderfleet.webapp.web.rest.util.PaginationUtil;
 
 import net.bytebuddy.description.annotation.AnnotationSource.Empty;
@@ -215,6 +103,9 @@ public class MasterDataController {
 
 	@Inject
 	private FormElementTypeRepository formElementTypeRepository;
+
+	@Inject
+	private AccountProfileAttributesService accountProfileAttributesService;
 
 	@Inject
 	private FormElementService formElementService;
@@ -380,6 +271,8 @@ public class MasterDataController {
 
 	@Inject
 	private PostDatedVoucherService postDatedVoucherService;
+	@Inject
+	private CustomerAttributesService customerAttributesService;
 
 	@Inject
 	private InventoryVoucherHeaderRepository inventoryVoucherHeaderRepository;
@@ -1933,5 +1826,54 @@ public class MasterDataController {
 		 List<DistanceFareDTO> result = distanceFareService.findAllByCompany(); 
 		 return new ResponseEntity<>(result, HttpStatus.OK);	 
 	}
-	
+	@RequestMapping(value = "/customer-attributes", method = RequestMethod.GET)
+	@Timed
+	public ResponseEntity<List<CustomerAttributesDTO>> customerAttributes() {
+		log.debug("Api request to Company Attributes : {}");
+		List<CustomerAttributesDTO> customerAttributesDTOs = customerAttributesService
+				.findAttributesByCompanyId();
+		if (customerAttributesDTOs == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<>(customerAttributesDTOs, HttpStatus.OK);
+		}
+	}
+	@PostMapping("/account-profile-attributes")
+	@Timed
+	public ResponseEntity<List<AccountProfileAttributesDTO>> accountProfileAttributes(@RequestBody AccountProfileAttributesDTO accountProfileAttributesDTO) throws URISyntaxException {
+
+		System.out.println(accountProfileAttributesDTO);
+		log.debug("Api request to Company Attributes: {}", accountProfileAttributesDTO.getAccountProfilePid());
+		List<AccountProfileAttributesDTO> accountProfileAttributesDTOs = accountProfileAttributesService.getAccountProfileAttributes(accountProfileAttributesDTO);
+		if (!accountProfileAttributesDTOs.isEmpty()) {
+			String successMessage = "Account profile attributes successfully retrieved.";
+			System.out.println(successMessage);
+			return new ResponseEntity<>(accountProfileAttributesDTOs, HttpStatus.OK);
+
+		} else {
+			String errorMessage = "Failed to retrieve account profile attributes.";
+			System.out.println(errorMessage);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+//	public <T> void convertToJson(
+//			Object collection,String messagae) {
+//		ObjectMapper objectMapper = getObjectMapper();
+//		try {
+//			log.info(System.lineSeparator());
+//			String jsonString = objectMapper.writeValueAsString(collection);
+//			log.debug(messagae  + jsonString);
+//			log.info(System.lineSeparator());
+//		} catch (JsonProcessingException e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
+
+	public ObjectMapper getObjectMapper(){
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
+		mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		return mapper;
+	}
+
 }

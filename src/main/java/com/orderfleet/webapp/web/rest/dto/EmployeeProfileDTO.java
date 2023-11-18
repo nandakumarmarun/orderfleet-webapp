@@ -65,6 +65,8 @@ public class EmployeeProfileDTO {
 	
 	private String userLogin;
 
+	private Integer batteryPercentage;
+
 	public boolean getActivated() {
 		return activated;
 	}
@@ -226,6 +228,14 @@ public class EmployeeProfileDTO {
 
 	public void setUserLogin(String userLogin) {
 		this.userLogin = userLogin;
+	}
+
+	public Integer getBatteryPercentage() {
+		return batteryPercentage;
+	}
+
+	public void setBatteryPercentage(Integer batteryPercentage) {
+		this.batteryPercentage = batteryPercentage;
 	}
 
 	@Override

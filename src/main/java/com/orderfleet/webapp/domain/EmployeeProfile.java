@@ -118,6 +118,9 @@ public class EmployeeProfile implements Serializable, Cloneable {
 	@Column(name = "activated", nullable = false, columnDefinition = "boolean DEFAULT 'TRUE'")
 	private boolean activated = true;
 
+	@NotNull
+	@Column(name = "battery_percentage", nullable = false, columnDefinition = "integer default 0")
+	private Integer batteryPercentage = 0;
 	public boolean getActivated() {
 		return activated;
 	}
@@ -296,6 +299,14 @@ public class EmployeeProfile implements Serializable, Cloneable {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public Integer getBatteryPercentage() {
+		return batteryPercentage;
+	}
+
+	public void setBatteryPercentage(Integer batteryPercentage) {
+		this.batteryPercentage = batteryPercentage;
 	}
 
 	@Override

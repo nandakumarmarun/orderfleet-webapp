@@ -135,6 +135,10 @@
 							<th>GST Number</th>
 							<th>Activated Status</th>
 							<th>Actions</th>
+							<c:forEach items="${attributes}" var="attribute">
+                            <th> ${attribute.question}</th>
+                            </c:forEach>
+
 						</tr>
 					</thead>
 					<tbody id="tBodyVerifyAccountProfile">

@@ -146,7 +146,8 @@ if (!this.AccountProfile) {
 		}
 
 	};
-
+        var detailButtonVisible = document.getElementById("DetailButtonVisible").value;
+        console.log("buttonVisibility :"+detailButtonVisible);
 	$(document)
 			.ready(
 					function() {
@@ -572,7 +573,46 @@ if (!this.AccountProfile) {
 		});
 
 	}
+	AccountProfile.getAccountProfileAttributes = function(el, pid, type) {
 
+                $.ajax({
+                    url: accountProfileContextPath +'/attributes',
+                    type: 'GET',
+                    data: {
+                        accountProfilePid: pid
+                    },
+                    success: function (response) {
+                        console.log('Attributes Data:', response);
+                       $("#attributesModal").modal('show');
+                       addattributeBody(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            }
+            function addattributeBody(attributes)
+            {
+            $('#tblattributes').html("");
+            if (attributes.length == 0) {
+            			$('#tblattributes')
+            					.html(
+            							"<tr><td colspan='9' align='center'>No data available</td></tr>");
+            			return;
+            		}
+            $
+            .each(
+            attributes,
+            function(index,attribute){
+            $('#tblattributes').append(
+           "<tr><td>"
+           +attribute.attributePid
+           +"</td><td>"
+           +attribute.answerPid
+           +"</td></tr>"
+           );
+           });
+            }
 	function addTableBodyvalues(accountProfiles) {
 
 		$('#tBodyAccountProfile').html("");
@@ -592,67 +632,70 @@ if (!this.AccountProfile) {
 				.each(
 						accountProfiles,
 						function(index, accountProfile) {
+
 							var gstRegistrationType = accountProfile.gstRegistrationType;
 							if (gstRegistrationType == null) {
 								gstRegistrationType = "";
+
 							}
-							$('#tBodyAccountProfile')
-									.append(
-											"<tr><td title='click to view' class='sa'><span style='color: #2C7BD0; cursor: pointer;' onclick='AccountProfile.showModalPopup($(\"#viewModal\"),\""
-													+ accountProfile.pid
-													+ "\",0);'>"
-													+ accountProfile.name
-													+ "</span></td><td>"
-													+ accountProfile.accountTypeName
-													+ "</td><td>"
-													+ accountProfile.closingBalance
-															.toFixed(2)
-													+ "</td><td>"
-													+ accountProfile.address
-													+ "</td><td>"
-													+ (accountProfile.phone1 == null ? ""
-															: accountProfile.phone1)
-													+ "</td><td>"
-													+ (accountProfile.email1 == null ? ""
-															: accountProfile.email1)
-													+ "</td><td>"
-													+ (accountProfile.whatsAppNo == null ? ""
-															: accountProfile.whatsAppNo)
-													+ "</td><td>"
-													+ spanVerify(
-															accountProfile.name,
-															accountProfile.city,
-															accountProfile.address,
-															accountProfile.accountStatus,
-															accountProfile.pid)
-													+ "</td><td>"
-													+ (accountProfile.tinNo == null ? ""
-															: accountProfile.tinNo)
-													+ "</td><td>"
-													+ gstRegistrationType
-													+ "</td><td>"
-													+ convertDateTimeFromServer(accountProfile.createdDate)
-													+ "</td><td>"
-													+ convertDateTimeFromServer(accountProfile.lastModifiedDate)
-													+ "</td><td class='userName'>"
-													+ accountProfile.userName
-													+ "</td><td>"
-													+ (accountProfile.leadToCashStage == null ? ""
-															: accountProfile.leadToCashStage)
-													+ "</td><td>"
-													+ spanActivated(
-															accountProfile.name,
-															accountProfile.city,
-															accountProfile.address,
-															accountProfile.activated,
-															accountProfile.pid)
-													+ "</td><td><i class='btn btn-blue entypo-pencil' title='Edit AccountProfile' onclick='AccountProfile.showModalPopup($(\"#myModal\"),\""
-													+ accountProfile.pid
-													+ "\",1);'></i>&nbsp;<a class='btn btn-info entypo-location' title='Assigned Locations' onclick='AccountProfile.showModalPopup($(\"#locationModal\"),\""
-													+ accountProfile.pid
-													+ "\",3);'></a><br><br><button type='button' class='btn btn-info' onclick='AccountProfile.assignLocations($(\"#assignLocationModal\"),\""
-													+ accountProfile.pid
-													+ "\");'>Assign Location</button></td></tr>");
+							var button ;
+                             if(detailButtonVisible== 'true')
+                              {
+                              console.log("Enter here :"+detailButtonVisible)
+                                button = "<button type='button' class='btn btn-info' onclick='AccountProfile.getAccountProfileAttributes($(\"#attributesModal\"),\""
+                                       + accountProfile.pid
+                                       + "\");'>More details</button>"
+                                }else{
+                                console.log("Enter here else :"+detailButtonVisible)
+                                     button="";
+                                     }
+
+							$('#tBodyAccountProfile').append(
+                                "<tr><td title='click to view' class='sa'><span style='color: #2C7BD0; cursor: pointer;' onclick='AccountProfile.showModalPopup($(\"#viewModal\"),\""
+                                + accountProfile.pid
+                                + "\",0);'>"
+                                + accountProfile.name
+                                + "</span></td><td>"
+                                + accountProfile.accountTypeName
+                                + "</td><td>"
+                                + accountProfile.closingBalance.toFixed(2)
+                                + "</td><td>"
+                                + accountProfile.address
+                                + "</td><td>"
+                                + (accountProfile.phone1 == null ? "" : accountProfile.phone1)
+                                + "</td><td>"
+                                + (accountProfile.email1 == null ? "" : accountProfile.email1)
+                                + "</td><td>"
+                                + (accountProfile.whatsAppNo == null ? "" : accountProfile.whatsAppNo)
+                                + "</td><td>"
+                                + spanVerify(accountProfile.name, accountProfile.city, accountProfile.address, accountProfile.accountStatus, accountProfile.pid)
+                                + "</td><td>"
+                                + (accountProfile.tinNo == null ? "" : accountProfile.tinNo)
+                                + "</td><td>"
+                                + gstRegistrationType
+                                + "</td><td>"
+                                + convertDateTimeFromServer(accountProfile.createdDate)
+                                + "</td><td>"
+                                + convertDateTimeFromServer(accountProfile.lastModifiedDate)
+                                + "</td><td class='userName'>"
+                                + accountProfile.userName
+                                + "</td><td>"
+                                + (accountProfile.leadToCashStage == null ? "" : accountProfile.leadToCashStage)
+                                + "</td><td>"
+                                + spanActivated(accountProfile.name, accountProfile.city, accountProfile.address, accountProfile.activated, accountProfile.pid)
+                                + "</td><td><i class='btn btn-blue entypo-pencil' title='Edit AccountProfile' onclick='AccountProfile.showModalPopup($(\"#myModal\"),\""
+                                + accountProfile.pid
+                                + "\",1);'></i>&nbsp;<a class='btn btn-info entypo-location' title='Assigned Locations' onclick='AccountProfile.showModalPopup($(\"#locationModal\"),\""
+                                + accountProfile.pid
+                                + "\",3);'></a><br><br><button type='button' class='btn btn-info' onclick='AccountProfile.assignLocations($(\"#assignLocationModal\"),\""
+                                + accountProfile.pid
+                                + "\");'>Assign Location</button>"
+                                +"<br>"
+                                +button
+                                + "<br>"
+                                   + "</td></tr>"
+                            );
+
 						});
 	}
 
@@ -1120,6 +1163,10 @@ if (!this.AccountProfile) {
 				locationRadius(id);
 				locationRadius.attr('method', 'PUT');
 				saveLocationRadius();
+				break;
+				case 5:
+				getAccountProfileAttributes(id);
+
 
 			}
 		}

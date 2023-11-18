@@ -118,7 +118,7 @@ public class ExecutiveTaskExecutionDTO {
 
 	private String VehicleRegistrationNumber;
 	
-	private Double batteryPercentage;
+	private Integer batteryPercentage;
 
 	public ExecutiveTaskExecutionDTO() {
 		super();
@@ -622,12 +622,12 @@ public class ExecutiveTaskExecutionDTO {
 		VehicleRegistrationNumber = vehicleRegistrationNumber;
 	}
 
-	
-	public Double getBatteryPercentage() {
+
+	public Integer getBatteryPercentage() {
 		return batteryPercentage;
 	}
 
-	public void setBatteryPercentage(Double batteryPercentage) {
+	public void setBatteryPercentage(Integer batteryPercentage) {
 		this.batteryPercentage = batteryPercentage;
 	}
 

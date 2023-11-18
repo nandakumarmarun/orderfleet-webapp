@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -150,6 +151,8 @@ public class AccountProfileDTO {
 	private String employeeName;
 	
 	private LocalDate minVoucherDate;
+
+	private List<String> answers;
 
 	public String getAitrichCode() {
 		return AitrichCode;
@@ -683,6 +686,14 @@ public class AccountProfileDTO {
 
 	public void setMinVoucherDate(LocalDate minVoucherDate) {
 		this.minVoucherDate = minVoucherDate;
+	}
+
+	public List<String> getAnswers() {
+		return answers;
+	}
+
+	public void setAnswers(List<String> answers) {
+		this.answers = answers;
 	}
 
 	@Override

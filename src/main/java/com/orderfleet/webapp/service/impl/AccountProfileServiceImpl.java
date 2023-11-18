@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
+import org.apache.poi.ss.usermodel.Cell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -19,29 +22,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.AccountType;
-import com.orderfleet.webapp.domain.Company;
-import com.orderfleet.webapp.domain.Location;
-import com.orderfleet.webapp.domain.LocationAccountProfile;
-import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountNameType;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
 import com.orderfleet.webapp.domain.enums.ReceiverSupplierType;
 import com.orderfleet.webapp.domain.enums.StageNameType;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.AccountTypeRepository;
-import com.orderfleet.webapp.repository.CompanyRepository;
-import com.orderfleet.webapp.repository.CounrtyCRepository;
-import com.orderfleet.webapp.repository.DistrictCRepository;
-import com.orderfleet.webapp.repository.EmployeeProfileLocationRepository;
-import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
-import com.orderfleet.webapp.repository.LocationRepository;
-import com.orderfleet.webapp.repository.PriceLevelRepository;
-import com.orderfleet.webapp.repository.StageHeaderRepository;
-import com.orderfleet.webapp.repository.StateCRepository;
-import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.projections.CustomAccountProfiles;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
@@ -101,6 +86,12 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 
 	@Inject
 	private StageHeaderRepository stageHeaderRepo;
+
+	@Inject
+	private AccountProfileAttributesRepository accountProfileAttributesRepository;
+
+	@Inject
+	private CompanyAttributesRepository companyAttributesRepository;
 
 	/**
 	 * Save a accountProfile.
@@ -840,6 +831,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 				+ description);
 
 		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfileList);
+
 		return result;
 	}
 
@@ -1265,6 +1257,41 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 
 		List<AccountProfileDTO> result = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfileList);
 		return result;
+	}
+
+	@Override
+	public void GetAttributeAnswers(List<AccountProfileDTO> accountProfileDTOs) {
+		List<String> accPid = accountProfileDTOs.stream().map(acc -> acc.getPid()).collect(Collectors.toList());
+		System.out.println("Size :" + accPid.size());
+		List<AccountProfileAttributes> accountProfileAttributesList = accountProfileAttributesRepository
+				.findAccountProfileAttributesByAccountProfilePidIn(accPid);
+
+		if (!accountProfileAttributesList.isEmpty()) {
+			List<CompanyAttributes> companyAttributes = companyAttributesRepository.findAllByCompanyId();
+
+			for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
+				List<AccountProfileAttributes> accountProfileAttributes = accountProfileAttributesList.stream().filter(aa -> aa.getAccountProfile().getPid().equals(accountProfileDTO.getPid()))
+						.collect(Collectors.toList());
+				if (accountProfileAttributes.size() > 0) {
+					List<String> answerList = new ArrayList<>();
+					for (CompanyAttributes comp : companyAttributes) {
+						System.out.println("Questions :" + comp.getAttributes().getQuestions());
+						for (AccountProfileAttributes attr : accountProfileAttributes) {
+							if (attr.getAttributesPid().equals(comp.getAttributes().getPid())) {
+								String answer = attr.getAnswers();
+								answerList.add(answer);
+								System.out.println("Answer :" + attr.getAnswers());
+
+							}
+						}
+
+					}
+					accountProfileDTO.setAnswers(answerList);
+				}
+
+			}
+			accountProfileDTOs.forEach(ap -> System.out.println("list :" + ap.getAnswers()));
+		}
 	}
 
 	/**

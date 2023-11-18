@@ -17,6 +17,10 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.domain.CompanyAttributes;
+import com.orderfleet.webapp.repository.CompanyAttributesRepository;
+import com.orderfleet.webapp.service.*;
+import com.orderfleet.webapp.web.rest.dto.CustomerAttributesDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -38,11 +42,6 @@ import com.orderfleet.webapp.repository.EmployeeHierarchyRepository;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.AccountProfileService;
-import com.orderfleet.webapp.service.AccountTypeService;
-import com.orderfleet.webapp.service.EmployeeHierarchyService;
-import com.orderfleet.webapp.service.EmployeeProfileService;
-import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.EmployeeProfileDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
@@ -77,6 +76,12 @@ public class VerifyAccountProfileResource {
 	@Inject
 	private EmployeeHierarchyRepository employeeHierarchyRepository;
 
+	@Inject
+	private CompanyAttributesRepository companyAttributesRepository;
+
+	@Inject
+	private CustomerAttributesService customerAttributesService;
+
 	/**
 	 * GET /verify-account-profile : get all the VerifyAccountProfiles.
 	 *
@@ -106,7 +111,8 @@ public class VerifyAccountProfileResource {
 			}
 			model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
 		}
-
+		List<CustomerAttributesDTO> companyAttributes = customerAttributesService.getAllCompanyAttributes();
+		model.addAttribute("attributes",companyAttributes);
 		return "company/verifyAccountProfile";
 	}
 
@@ -157,6 +163,7 @@ public class VerifyAccountProfileResource {
 							locationAccountProfileService.findAccountProfilesByCurrentUserLocationsAndAccountTypePidIn(
 									Arrays.asList(accountTypePids.split(",")), false));
 				}
+
 				return new ResponseEntity<>(accountProfileDTOs, HttpStatus.OK);
 			}
 		}
@@ -309,7 +316,9 @@ public class VerifyAccountProfileResource {
 				 }
 			 }
 		}
-		
+		if(!accountProfileDTOs.isEmpty()) {
+			accountProfileService.GetAttributeAnswers(accountProfileDTOs);
+		}
 		return accountProfileDTOs;
 	}
 

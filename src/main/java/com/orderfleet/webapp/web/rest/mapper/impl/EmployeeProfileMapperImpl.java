@@ -46,6 +46,7 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
             employeeProfileDTO.setProfileImage( Arrays.copyOf( profileImage, profileImage.length ) );
         }
         employeeProfileDTO.setProfileImageContentType( employeeProfile.getProfileImageContentType() );
+      employeeProfileDTO.setBatteryPercentage(employeeProfile.getBatteryPercentage());
 
         return employeeProfileDTO;
     }
@@ -79,6 +80,7 @@ public class EmployeeProfileMapperImpl extends EmployeeProfileMapper {
           employeeProfileDTO.setProfileImage( Arrays.copyOf( profileImage, profileImage.length ) );
       }
       employeeProfileDTO.setProfileImageContentType( employeeProfile.getProfileImageContentType() );
+      employeeProfileDTO.setBatteryPercentage(employeeProfile.getBatteryPercentage());
 
       return employeeProfileDTO;
   }

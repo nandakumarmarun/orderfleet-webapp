@@ -3,16 +3,10 @@ package com.orderfleet.webapp.web.rest;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -20,15 +14,17 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.service.*;
+import com.orderfleet.webapp.web.rest.dto.*;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.tomcat.jni.Local;
+import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -38,44 +34,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.CountryC;
-import com.orderfleet.webapp.domain.DistrictC;
-import com.orderfleet.webapp.domain.LocationAccountProfile;
-import com.orderfleet.webapp.domain.StateC;
-import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.CounrtyCRepository;
-import com.orderfleet.webapp.repository.DistrictCRepository;
-import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
-import com.orderfleet.webapp.repository.StateCRepository;
-import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.AccountProfileService;
-import com.orderfleet.webapp.service.AccountTypeService;
-import com.orderfleet.webapp.service.EmployeeHierarchyService;
-import com.orderfleet.webapp.service.LocationAccountProfileService;
-import com.orderfleet.webapp.service.LocationService;
-import com.orderfleet.webapp.service.PriceLevelService;
 
-import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.CountryCDTO;
-import com.orderfleet.webapp.web.rest.dto.DistrictCDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
-import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.LocationDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.StateCDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
@@ -125,6 +90,16 @@ public class AccountProfileResource {
 
 	@Inject
 	private LocationService locationService;
+	@Inject
+	private AccountProfileAttributesService accountProfileAttributesService;
+
+	@Inject
+	private CompanyAttributesRepository companyAttributesRepository;
+	@Inject
+	private AccountProfileAttributesRepository accountProfileAttributesRepository;
+
+	@Inject
+	private CustomerAttributesService customerAttributesService;
 
 	/**
 	 * POST /accountProfiles : Create a new accountProfile.
@@ -293,7 +268,14 @@ public class AccountProfileResource {
 		List<DistrictC> districtsList = districtCRepository.findAllDistricts();
 		List<DistrictCDTO> districts = converttodistrictdto(districtsList);
 		model.addAttribute("districts", districts);
-
+		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		List<CompanyAttributes> compAttributes = companyAttributesRepository.findByCompanyId(companyId);
+		boolean detailButton = false;
+		if(compAttributes.size()>0)
+		{
+			detailButton = true;
+		}
+		model.addAttribute("DetailButtonVisible",detailButton);
 		return "company/accountProfiles";
 	}
 
@@ -695,7 +677,7 @@ public class AccountProfileResource {
 
 		List<String> accountProfilePids = accountProfileDTOs.stream().map(AccountProfileDTO::getPid)
 				.collect(Collectors.toList());
-
+		
 		List<Object[]> locationAccountProfileObjects = locationAccountProfileRepository
 				.findAllLocationObjectsByAccountProfilePids(accountProfilePids);
 
@@ -703,21 +685,25 @@ public class AccountProfileResource {
 	}
 
 	private void buildExcelDocument(List<AccountProfileDTO> accountProfileDTOs, List<Object[]> locationAccountProfiles,
-			HttpServletResponse response) {
+									HttpServletResponse response) {
 		log.debug("Downloading Excel report");
 		String excelFileName = "accountProfile" + ".xls";
 		String sheetName = "Sheet1";
 		String[] headerColumns = { "Name", "Alias", "CustomerId", "Location/Territory", "Type", "Closing Balance",
 				"Address", "Phone1", "Email1", "WhatsApp No", "Account Status", "GSTIN", "GST Registration Type",
 				"Created Date", "Last Updated Date", "Created By", "Stage", "Status" };
+		List<CompanyAttributes> companyAttributes = companyAttributesRepository.findAllByCompanyId();
+
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
-			createHeaderRow(worksheet, headerColumns);
-			createReportRows(worksheet, accountProfileDTOs, locationAccountProfiles);
+			Sheet sheet = workbook.getSheetAt(0);
+			createHeaderRow(worksheet, headerColumns,companyAttributes);
+			createReportRows(worksheet, accountProfileDTOs, locationAccountProfiles,companyAttributes);
 			// Resize all columns to fit the content size
 			for (int i = 0; i < headerColumns.length; i++) {
 				worksheet.autoSizeColumn(i);
 			}
+
 			response.setHeader("Content-Disposition", "inline; filename=" + excelFileName);
 			response.setContentType("application/vnd.ms-excel");
 			// Writes the report to the output stream
@@ -729,8 +715,10 @@ public class AccountProfileResource {
 		}
 	}
 
-	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns) {
+	private void createHeaderRow(HSSFSheet worksheet, String[] headerColumns, List<CompanyAttributes> companyAttributes) {
+
 		// Create a Font for styling header cells
+		List<String> Questions = companyAttributes.stream().map(a->a.getAttributes().getQuestions()).collect(Collectors.toList());
 		Font headerFont = worksheet.getWorkbook().createFont();
 		headerFont.setFontName("Arial");
 		headerFont.setBold(true);
@@ -747,10 +735,18 @@ public class AccountProfileResource {
 			cell.setCellValue(headerColumns[i]);
 			cell.setCellStyle(headerCellStyle);
 		}
+
+		int existingColumnCount = headerRow.getLastCellNum();
+		for (int i = 0; i < companyAttributes.size(); i++) {
+			Cell cell = headerRow.createCell(existingColumnCount + i);
+			cell.setCellValue(Questions.get(i));
+			cell.setCellStyle(headerCellStyle);
+		}
 	}
 
 	private void createReportRows(HSSFSheet worksheet, List<AccountProfileDTO> accountProfileDTO,
-			List<Object[]> locationAccountProfiles) {
+								  List<Object[]> locationAccountProfiles, List<CompanyAttributes> companyAttributes) {
+		
 		/*
 		 * CreationHelper helps us create instances of various things like DataFormat,
 		 * Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way
@@ -760,10 +756,17 @@ public class AccountProfileResource {
 		HSSFCellStyle dateCellStyle = worksheet.getWorkbook().createCellStyle();
 		dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm:ss"));
 		// Create Other rows and cells with Sales data
+		List<String> accPid = accountProfileDTO.stream().map(acc -> acc.getPid()).collect(Collectors.toList());
+		List<AccountProfileAttributes> accountProfileAttributesList = accountProfileAttributesRepository
+				.findAccountProfileAttributesByAccountProfilePidIn(accPid);
 		int rowNum = 1;
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss a");
 		for (AccountProfileDTO ap : accountProfileDTO) {
-			HSSFRow row = worksheet.createRow(rowNum++);
+			List<AccountProfileAttributes> accountProfileAttributes = accountProfileAttributesList.stream().filter(aa -> aa.getAccountProfile().getPid().equals(ap.getPid()))
+					.collect(Collectors.toList());
+			System.out.println("Size :"+accountProfileAttributes.size());
+
+			HSSFRow	row = worksheet.createRow(rowNum++);
 			row.createCell(0).setCellValue(ap.getName().replace("#13;#10;", " "));
 			row.createCell(1).setCellValue(ap.getAlias());
 			row.createCell(2).setCellValue(ap.getCustomerId());
@@ -802,7 +805,32 @@ public class AccountProfileResource {
 			row.createCell(16).setCellValue(ap.getLeadToCashStage() == null ? "" : ap.getLeadToCashStage());
 			row.createCell(17).setCellValue(ap.getActivated() ? "Activated" : "Deactivated");
 
+     if(accountProfileAttributes.size()>0)
+         {
+	   int i=0;
+			 for (CompanyAttributes comp : companyAttributes) {
+				 System.out.println("Questions :"+comp.getAttributes().getQuestions());
+	            for(AccountProfileAttributes attr : accountProfileAttributes) {
+				 if(attr.getAttributesPid().equals(comp.getAttributes().getPid()))
+				 {
+				 Cell cell = row.createCell(18 + i);
+				 cell.setCellValue(attr.getAnswers());
+				 System.out.println("Answer :" + attr.getAnswers());
+				 i++;
+			 }
+		 }}
+			}}
 		}
 
+	@GetMapping(value = "/accountProfiles/attributes")
+	@Timed
+	public ResponseEntity<List<AccountProfileAttributesDTO>> getAttributes(@RequestParam String accountProfilePid) {
+		log.info("Web requset to get account attributes :"+accountProfilePid);
+		List<AccountProfileAttributesDTO> accountProfileAttributesDTOs = accountProfileAttributesService.getAccountProfileAttributesByAccountProfilePid(accountProfilePid);
+
+		if (accountProfileAttributesDTOs != null && !accountProfileAttributesDTOs.isEmpty()) {
+			return new ResponseEntity<>(accountProfileAttributesDTOs, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(Collections.EMPTY_LIST, HttpStatus.OK);
 	}
 }

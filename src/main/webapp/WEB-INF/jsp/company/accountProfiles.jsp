@@ -92,7 +92,7 @@
 								</select>
 							</div>  --%>
 
-
+                         <input id="DetailButtonVisible" type="hidden" value='${DetailButtonVisible}'/>
 
 
 				<div class="col-sm-4 ">
@@ -910,7 +910,54 @@
 				</div>
 				<!-- /.Model Container-->
 			</form>
+           <form name="attributes" role="form">
+				<!-- Model Container-->
+				<div class="modal fade container" id="attributesModal">
+					<!-- model Dialog -->
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+								<h4 class="modal-title" id="viewModalLabel">Attributes</h4>
+							</div>
+							<div class="modal-body">
+								<div class="modal-body" style="overflow: auto;">
+									<!-- error message -->
+									<div class="alert alert-danger alert-dismissible" role="alert"
+										style="display: none;">
+										<button type="button" class="close"
+											onclick="$('.alert').hide();" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+										<p></p>
+									</div>
+									<table class="table  table-striped table-bordered">
+										<thead>
+											<tr>
+                                            <td id="lbl_qns">Questions</td>
+                                            <td id="lbl_ans">Answers</td>
+                                      		</tr>
+										</thead>
+										<tbody id="tblattributes">
 
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Cancel</button>
+							</div>
+						</div>
+						<!-- /.modal-content -->
+					</div>
+					<!-- /.modal-dialog -->
+				</div>
+				<!-- /.Model Container-->
+			</form>
 		</div>
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
