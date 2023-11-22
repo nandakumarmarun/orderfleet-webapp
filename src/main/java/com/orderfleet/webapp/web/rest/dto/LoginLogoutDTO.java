@@ -32,7 +32,8 @@ public class LoginLogoutDTO {
 	private BigDecimal towerLatitude;
 	private BigDecimal towerLongitude;
 	private String imageRefNo;
-	private Boolean imageButtonVisible = Boolean.FALSE;;
+	private Boolean imageButtonVisibleAtt = Boolean.FALSE;
+	private Boolean imageButtonVisiblePun = Boolean.FALSE;;
 	private LocalDateTime punchoutServerDate;
 	private LocalDateTime punchoutClientDate;
 	private LocalDate attendanceDay;
@@ -108,7 +109,10 @@ public class LoginLogoutDTO {
 		}
 		
 		if (attendance.getFiles().size() > 0) {
-			this.imageButtonVisible = true;
+			this.imageButtonVisibleAtt = true;
+		}
+		if (punchout.getFiles().size() > 0) {
+			this.imageButtonVisiblePun = true;
 		}
 	}
 
@@ -241,11 +245,11 @@ public class LoginLogoutDTO {
 	}
 
 	public Boolean getImageButtonVisible() {
-		return imageButtonVisible;
+		return imageButtonVisibleAtt;
 	}
 
 	public void setImageButtonVisible(Boolean imageButtonVisible) {
-		this.imageButtonVisible = imageButtonVisible;
+		this.imageButtonVisibleAtt = imageButtonVisible;
 	}
 
 	public LocalDateTime getPunchoutServerDate() {
@@ -359,6 +363,22 @@ public class LoginLogoutDTO {
 		this.mockLocationStatus = mockLocationStatus;
 	}
 
+	public Boolean getImageButtonVisibleAtt() {
+		return imageButtonVisibleAtt;
+	}
+
+	public void setImageButtonVisibleAtt(Boolean imageButtonVisibleAtt) {
+		this.imageButtonVisibleAtt = imageButtonVisibleAtt;
+	}
+
+	public Boolean getImageButtonVisiblePun() {
+		return imageButtonVisiblePun;
+	}
+
+	public void setImageButtonVisiblePun(Boolean imageButtonVisiblePun) {
+		this.imageButtonVisiblePun = imageButtonVisiblePun;
+	}
+
 	@Override
 	public String toString() {
 		return "LoginLogoutDTO [pid=" + pid + ", createdDate=" + createdDate + ", completed=" + completed + ", remarks="
@@ -366,7 +386,7 @@ public class LoginLogoutDTO {
 				+ latitude + ", longitude=" + longitude + ", locationType=" + locationType + ", location=" + location
 				+ ", employeeName=" + employeeName + ", towerLocation=" + towerLocation + ", towerLatitude="
 				+ towerLatitude + ", towerLongitude=" + towerLongitude + ", imageRefNo=" + imageRefNo
-				+ ", imageButtonVisible=" + imageButtonVisible + ", punchoutServerDate=" + punchoutServerDate
+				+ ", imageButtonVisible=" + imageButtonVisibleAtt + ", punchoutServerDate=" + punchoutServerDate
 				+ ", punchoutClientDate=" + punchoutClientDate + ", punchoutRemarks=" + punchoutRemarks + "]";
 	}
 

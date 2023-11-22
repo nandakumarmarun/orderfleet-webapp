@@ -44,6 +44,9 @@ if (!this.TaskPlanToDO) {
     $.ajax({
       url: taskToDoPath + "/load",
       type: "GET",
+      data: {
+        activityPid : $("#dbactivity").val(),
+      },
       success: function (data) {
         $("#tBodyKilometerCalculation").html("");
         if (data.length == 0) {
@@ -55,7 +58,13 @@ if (!this.TaskPlanToDO) {
 
         $("#tBodyTaskToDo").html("");
         $.each(data, function (index, toDoTask) {
-          $("#tBodyTaskToDo").append("<tr><td>" + toDoTask.taskName + "</td><td>" + toDoTask.activityName + "</td></tr>");
+          $("#tBodyTaskToDo").append(
+            "<tr><td>" +
+              toDoTask.taskName +
+              "</td><td>" +
+              toDoTask.activityName +
+              "</td></tr>"
+          );
         });
       },
     });

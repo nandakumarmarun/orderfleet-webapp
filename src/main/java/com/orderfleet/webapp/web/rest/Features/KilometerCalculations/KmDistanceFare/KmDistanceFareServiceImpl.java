@@ -89,8 +89,8 @@ public class KmDistanceFareServiceImpl implements KmDistanceFareService {
        }
 
        Optional<KmSlab> currentSlab =   slabs.stream()
-               .filter(data-> kmDistanceFare.getTotalDistance()>=data.getMinKm()
-                && kmDistanceFare.getTotalDistance() < data.getMaxKm()).findAny();
+               .filter(data-> kmDistanceFare.getTotalDistance()> data.getMinKm()
+                && kmDistanceFare.getTotalDistance() <= data.getMaxKm()).findAny();
 
         if(currentSlab.isPresent()){
             log.debug("Slab Name  : "+ currentSlab.get().getSlabName());

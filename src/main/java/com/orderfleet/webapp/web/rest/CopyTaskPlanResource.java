@@ -128,10 +128,10 @@ public class CopyTaskPlanResource {
 	}
 	
 	@GetMapping(value = "/planned-user-tasks", params = {"userPid", "startDate", "endDate"})
-	public ResponseEntity<Map<LocalDateTime, List<ExecutiveTaskPlanDTO>>> getUserTasksByPlannedDateBetween(@RequestParam(value = "userPid") String userPid, @RequestParam(value = "startDate") LocalDate startDate, @RequestParam(value = "endDate") LocalDate endDate) {
+	public ResponseEntity<Map<LocalDate, List<ExecutiveTaskPlanDTO>>> getUserTasksByPlannedDateBetween(@RequestParam(value = "userPid") String userPid, @RequestParam(value = "startDate") LocalDate startDate, @RequestParam(value = "endDate") LocalDate endDate) {
 		List<ExecutiveTaskPlanDTO> executiveTaskPlanDtos = executiveTaskPlanService.findByUserPidAndPlannedDateBetween(userPid, startDate,endDate);
 		//group plan by date
-		Map<LocalDateTime, List<ExecutiveTaskPlanDTO>> etpGroupByPlannedDate = executiveTaskPlanDtos.stream().collect(Collectors.groupingBy(ExecutiveTaskPlanDTO::getPlannedDate,LinkedHashMap::new, Collectors.toList()));
+		Map<LocalDate, List<ExecutiveTaskPlanDTO>> etpGroupByPlannedDate = executiveTaskPlanDtos.stream().collect(Collectors.groupingBy(ExecutiveTaskPlanDTO::getTaskDate,LinkedHashMap::new, Collectors.toList()));
 		return new ResponseEntity<>(etpGroupByPlannedDate, HttpStatus.OK);
 	}
 

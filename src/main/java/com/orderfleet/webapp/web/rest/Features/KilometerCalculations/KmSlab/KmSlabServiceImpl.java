@@ -5,12 +5,12 @@ import com.orderfleet.webapp.repository.CompanyRepository;
 import com.orderfleet.webapp.repository.KmSlabRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.util.RandomUtil;
-import com.orderfleet.webapp.web.rest.Features.KilometerCalculations.KmSlabUserAssociation.KmSlabUserDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +37,7 @@ public class KmSlabServiceImpl implements KmSlabsService {
         System.out.println("Kilometer Slab : " + kmSlabDTO );
         Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
         KmSlab kmSlab = new KmSlab();
-        kmSlab.setSlabName(kmSlabDTO.getMinKm() + "-" +kmSlabDTO.getMaxKm());
+        kmSlab.setSlabName(kmSlabDTO.getSlabName());
         kmSlab.setPid(PID_PREFIX + RandomUtil.generatePid());
         kmSlab.setAmount(kmSlabDTO.getSlabRate());
         kmSlab.setMinKm(kmSlabDTO.getMinKm());
@@ -45,6 +45,32 @@ public class KmSlabServiceImpl implements KmSlabsService {
         kmSlab.setCompany(company);
         KmSlab result = kmSlabRepository.save(kmSlab);
         return new KmSlabDTO(result);
+    }
+
+    @Override
+    public KmSlabDTO updateKmSlab(KmSlabDTO kmSlabDTO) {
+        Optional<KmSlab> optKmslab =  kmSlabRepository.findByPid(kmSlabDTO.getPid());
+        if(optKmslab.isPresent()){
+            KmSlab kmSlab = optKmslab.get();
+            kmSlab.setSlabName(kmSlabDTO.getSlabName());
+            kmSlab.setAmount(kmSlabDTO.getSlabRate());
+            kmSlab.setMinKm(kmSlabDTO.getMinKm());
+            kmSlab.setMaxKm(kmSlabDTO.getMaxKm());
+            KmSlab result = kmSlabRepository.save(kmSlab);
+            KmSlabDTO kmSlabDTO1 = new KmSlabDTO(result);
+            return kmSlabDTO1;
+        }
+        return null;
+    }
+
+    @Override
+    public KmSlabDTO findByKmSlab(String KmSlabPid) {
+        Optional<KmSlab> optKmslab =  kmSlabRepository.findByPid(KmSlabPid);
+        if(optKmslab.isPresent()){
+            KmSlabDTO kmSlabDTO1 = new KmSlabDTO(optKmslab.get());
+            return kmSlabDTO1;
+        }
+        return null;
     }
 
     @Override

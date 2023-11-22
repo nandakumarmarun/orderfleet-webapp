@@ -124,7 +124,7 @@ if (!this.LoginLogOut) {
                                }
                                else
 
-								if (loginLogOut.imageButtonVisible) {
+								if (loginLogOut.imageButtonVisibleAtt) {
 									content = "<td><button type='button' class='btn btn-info' onclick='LoginLogOut.showModalPopup($(\"#imagesModal\"),\""
 											+ loginLogOut.attendancePid
 											+ "\",0);'>Attendance Images</button></td>";
@@ -132,7 +132,7 @@ if (!this.LoginLogOut) {
 									content = "<td></td>";
 								}
 								
-								if (loginLogOut.imageButtonVisible) {
+								if (loginLogOut.imageButtonVisiblePun) {
 									pcontent = "<td><button type='button' class='btn btn-info' onclick='LoginLogOut.showModalPopupPunchOut($(\"#imagesModal\"),\""
 											+ loginLogOut.punchoutPid
 											+ "\",0);'>Punchout Images</button></td>";

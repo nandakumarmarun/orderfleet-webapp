@@ -14,7 +14,8 @@ if (!this.Slab) {
 
   var createEditForm = $("#userForm");
   var deleteForm = $("#deleteForm");
-  var slabPid = null; 
+  var slabPid = null;
+  
 
   var kmSlabDTO = {
     id: null,
@@ -84,27 +85,31 @@ if (!this.Slab) {
     });
 
     deleteForm.submit(function (e) {
-		console.log("deleteing.....")
+      console.log("deleteing.....");
       // prevent Default functionality
       e.preventDefault();
       // pass the action-url of the form
       deleteUser(e.currentTarget.action);
     });
 
-
     $("#btnSearch").click(function () {
       console.log("searching .........");
       search();
     });
 
-	$("#btnAssignUser").click(function () {
-		console.log("Assign To Users...",slabPid);
-		assignUsers(slabPid);
-	  });
+    $("#btnAssignUser").click(function () {
+      console.log("Assign To Users...", slabPid);
+      assignUsers(slabPid);
+    });
 
+    $("#EditUser").click(function () {
+      console.log("Assign To Users...");
+      UpdatedUser();
+    });
   });
 
   function createUpdateUser(el) {
+    kmSlabDTO.slabName = $("#field_slab_name").val();
     kmSlabDTO.minKm = $("#field_min_user").val();
     kmSlabDTO.maxKm = $("#field_max_user").val();
     kmSlabDTO.slabRate = $("#field_slab_rate").val();
@@ -116,6 +121,47 @@ if (!this.Slab) {
       success: function (data) {
         console.log(data);
         onSaveSuccess(data);
+      },
+      error: function (xhr, error) {
+        onError(xhr, error);
+      },
+    });
+  }
+
+  function UpdatedUser() {
+    console.log(" Updated New User ");
+    kmSlabDTO.slabName = $("#field_slab_name_update").val();
+    kmSlabDTO.minKm = $("#field_min_user_update").val();
+    kmSlabDTO.maxKm = $("#field_max_user_update").val();
+    kmSlabDTO.slabRate = $("#field_slab_rate_update").val();
+    $.ajax({
+      method: "POST",
+      url: userContextPath + "/update",
+      contentType: "application/json; charset=utf-8",
+      data: JSON.stringify(kmSlabDTO),
+      success: function (data) {
+        console.log(data);
+        onSaveSuccess(data);
+      },
+      error: function (xhr, error) {
+        onError(xhr, error);
+      },
+    });
+  }
+
+  function UpdateUser(pid) {
+    $.ajax({
+      method: "GET",
+      url: userContextPath + "/edit",
+      contentType: "application/json; charset=utf-8",
+      data: {
+        Slabpid: pid,
+      },
+      success: function (data) {
+        $("#field_slab_name_update").val(data.slabName);
+        $("#field_min_user_update").val(data.minKm);
+        $("#field_max_user_update").val(data.maxKm);
+        $("#field_slab_rate_update").val(data.slabRate);
       },
       error: function (xhr, error) {
         onError(xhr, error);
@@ -165,15 +211,20 @@ if (!this.Slab) {
     $.each(users, function (index, slab) {
       $("#tBodyUser").append(
         "<tr><td>" +
+          slab.slabName +
+          "</td><td>" +
           slab.minKm +
           "</td><td>" +
           slab.maxKm +
           "</td><td>" +
-           slab.slabRate +
+          slab.slabRate +
           "</td><td class='action'>" +
-          "<button type='button' class='btn btn-primary btnuser' onclick='Slab.showModalPopup($(\"#userAssignModel\"),\"" 
-		  + slab.pid 
-		   +"\",2);'>Assign Users</button>" +
+          "<button type='button' class='btn btn-primary btnuser' onclick='Slab.showModalPopup($(\"#userAssignModel\"),\"" +
+          slab.pid +
+          "\",2);'>Assign Users</button>" +
+          "<button type='button' class='btn btn-primary btnuser' onclick='Slab.showModalPopup($(\"#EditModel\"),\"" +
+          slab.pid +
+          "\",1);'>Edit </button>" +
           "<button type='button' class='btn btn-red btndlt' onclick='Slab.deleteUser(\"" +
           slab.pid +
           "\");'>Delete</button>" +
@@ -198,23 +249,23 @@ if (!this.Slab) {
     // reloading page to see the updated data
     window.location = userContextPath;
   }
-    // $(".error-msg").html("");
-    // var selectedusers = "";
-    // $.each($("input[name='usercheckbox']:checked"), function () {
-    //   selectedusers += $(this).val() + ",";
-    // });
+  // $(".error-msg").html("");
+  // var selectedusers = "";
+  // $.each($("input[name='usercheckbox']:checked"), function () {
+  //   selectedusers += $(this).val() + ",";
+  // });
 
-    // console.log(selectedusers);
-    // if (selectedusers == "") {
-    //   $(".error-msg").html("Please select users");
-    //   return;
-    // }
+  // console.log(selectedusers);
+  // if (selectedusers == "") {
+  //   $(".error-msg").html("Please select users");
+  //   return;
+  // }
 
   function saveAssignedUsers(id) {
-	$("#divUsers input:checkbox").attr('checked', false);
-	$(".error-msg").html("");
-	console.log(id)
-	slabPid = id;
+    $("#divUsers input:checkbox").attr("checked", false);
+    $(".error-msg").html("");
+    console.log(id);
+    slabPid = id;
     $.ajax({
       url: userContextPath + "/km-slab-users",
       type: "GET",
@@ -224,7 +275,10 @@ if (!this.Slab) {
       success: function (assignedUsers) {
         if (assignedUsers) {
           $.each(assignedUsers, function (index, user) {
-            $("#divUsers input:checkbox[value=" + user.userPid + "]").prop("checked",true);
+            $("#divUsers input:checkbox[value=" + user.userPid + "]").prop(
+              "checked",
+              true
+            );
           });
         }
       },
@@ -232,14 +286,14 @@ if (!this.Slab) {
         onError(xhr, error);
       },
     });
-  };
+  }
 
   function assignUsers(slabPid) {
-	console.log(slabPid)
-	$(".error-msg").html("");
+    console.log(slabPid);
+    $(".error-msg").html("");
     var selectedusers = "";
-	
-	$.each($("input[name='userCheckBox']:checked"), function () {
+
+    $.each($("input[name='userCheckBox']:checked"), function () {
       selectedusers += $(this).val() + ",";
     });
 
@@ -248,16 +302,16 @@ if (!this.Slab) {
       type: "POST",
       data: {
         kmSlabPid: slabPid,
-		userPids:selectedusers
+        userPids: selectedusers,
       },
       success: function (assignedUsers) {
-		onSaveSuccess(assignedUsers)
+        onSaveSuccess(assignedUsers);
       },
       error: function (xhr, error) {
         onError(xhr, error);
       },
     });
-  };
+  }
 
   Slab.showModalPopup = function (el, id, action) {
     resetForm();
@@ -267,11 +321,11 @@ if (!this.Slab) {
           showUser(id);
           break;
         case 1:
-          editUser(id);
-          createEditForm.attr("method", "PUT");
+          UpdateUser(id);
+          kmSlabDTO.pid=id;
           break;
         case 2:
-		  console.log(id)
+          console.log(id);
           saveAssignedUsers(id);
           break;
       }

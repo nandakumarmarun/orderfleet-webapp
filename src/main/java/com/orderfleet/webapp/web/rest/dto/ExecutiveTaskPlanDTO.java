@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.web.rest.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -32,7 +33,7 @@ public class ExecutiveTaskPlanDTO {
 	private String userRemarks;
 
 	private LocalDateTime plannedDate;
-
+	private LocalDate TaskDate;
 	@NotNull
 	private String activityPid;
 
@@ -79,8 +80,6 @@ public class ExecutiveTaskPlanDTO {
 	private LocationType locationType;
 	
 	private String variance;
-	
-	
 
 	public ExecutiveTaskPlanDTO() {
 		super();
@@ -89,7 +88,7 @@ public class ExecutiveTaskPlanDTO {
 	public ExecutiveTaskPlanDTO(ExecutiveTaskPlan executiveTaskPlan) {
 		this(executiveTaskPlan.getPid(), executiveTaskPlan.getCreatedDate(), executiveTaskPlan.getCreatedBy(),
 				executiveTaskPlan.getTaskPlanStatus(), executiveTaskPlan.getRemarks(),
-				executiveTaskPlan.getPlannedDate(), executiveTaskPlan.getActivity().getPid(),
+				executiveTaskPlan.getPlannedDate(),executiveTaskPlan.getPlannedDate().toLocalDate(),executiveTaskPlan.getActivity().getPid(),
 				executiveTaskPlan.getActivity().getName(), executiveTaskPlan.getAccountType().getPid(),
 				executiveTaskPlan.getAccountType().getName(), executiveTaskPlan.getAccountProfile().getPid(),
 				executiveTaskPlan.getAccountProfile().getName(),
@@ -101,7 +100,7 @@ public class ExecutiveTaskPlanDTO {
 	}
 
 	public ExecutiveTaskPlanDTO(String pid, LocalDateTime createdDate, String createdBy, TaskPlanStatus taskPlanStatus,
-			String remarks, LocalDateTime plannedDate, String activityPid, String activityName, String accountTypePid,
+			String remarks, LocalDateTime plannedDate,LocalDate taskDate, String activityPid, String activityName, String accountTypePid,
 			String accountTypeName, String accountProfilePid, String accountProfileName, String taskPid,
 			String taskGroupPid, String taskListPid, int sortOrder, String userRemarks,String taskListAlias,BigDecimal accountLatitude,BigDecimal accountLongitude) {
 		super();
@@ -111,6 +110,7 @@ public class ExecutiveTaskPlanDTO {
 		this.taskPlanStatus = taskPlanStatus;
 		this.remarks = remarks;
 		this.plannedDate = plannedDate;
+		this.TaskDate = taskDate;
 		this.activityPid = activityPid;
 		this.activityName = activityName;
 		this.accountTypePid = accountTypePid;
@@ -320,8 +320,6 @@ public class ExecutiveTaskPlanDTO {
 		this.taskListAlias = taskListAlias;
 	}
 
-	
-
 	public LocalDateTime getServerDate() {
 		return serverDate;
 	}
@@ -402,6 +400,14 @@ public class ExecutiveTaskPlanDTO {
 
 	public void setVariance(String variance) {
 		this.variance = variance;
+	}
+
+	public LocalDate getTaskDate() {
+		return TaskDate;
+	}
+
+	public void setTaskDate(LocalDate taskDate) {
+		TaskDate = taskDate;
 	}
 
 	@Override

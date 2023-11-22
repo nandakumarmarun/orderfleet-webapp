@@ -3,6 +3,7 @@ package com.orderfleet.webapp.web.rest.Features.TaskListToDo;
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.Task;
 import com.orderfleet.webapp.domain.TaskList;
+import com.orderfleet.webapp.repository.ActivityRepository;
 import com.orderfleet.webapp.repository.TaskListRepository;
 import com.orderfleet.webapp.repository.TaskRepository;
 import com.orderfleet.webapp.web.rest.TaskListResource;
@@ -15,10 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.net.URISyntaxException;
@@ -40,34 +38,43 @@ public class TaskListToDoResource {
     @Inject
     private TaskRepository taskRepository;
 
+    @Inject
+    private ActivityRepository activityRepository;
+
     @Timed
     @RequestMapping(value = "/task-list-to-do", method = RequestMethod.GET)
     public String getDayPlans(Pageable pageable, Model model) throws URISyntaxException {
         log.debug("Web request to get a page of day plans not Assigned");
+        model.addAttribute("Activites",activityRepository.findAllByCompanyId());
         return "company/DayPlanToDo";
     }
 
 
     @RequestMapping(value = "/task-list-to-do/load", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TaskListToDo>> getAllNotAssigedTasks(){
+    public ResponseEntity<List<TaskListToDo>> getAllNotAssigedTasks(@RequestParam String activityPid){
         log.debug("Entering Task To Do ");
         List<Task> allTasks =  taskRepository.findAllPidsCompanyId();
-        log.debug("tasks  " + allTasks.size());
+        log.debug(" tasks " + allTasks.size());
 
         List<Task> assignedTasks = taskListRepository.findAllByNotInTaskListPid();
         List<TaskListToDo> taskName= new ArrayList<>();
         log.debug("taskList  " + assignedTasks.size());
-        allTasks.forEach(allTaskObj->{
+         allTasks.forEach(allTaskObj->{
+
             Optional<Task> optTask = assignedTasks.stream()
                     .filter(assignedTaskObj->allTaskObj.getId()
                             .equals(assignedTaskObj.getId())).findAny();
+
             if(!optTask.isPresent()){
                 log.debug("taslk");
                 TaskListToDo taskListToDo = new TaskListToDo();
                 taskListToDo.setTaskName(allTaskObj.getAccountProfile().getName());
                 taskListToDo.setActivityName(allTaskObj.getActivity().getName());
-                taskName.add(taskListToDo);
+                if(allTaskObj.getActivity().getPid().equals(activityPid)){
+                    taskName.add(taskListToDo);
+                 }
             }
+
         });
         log.debug("Not Assigned Task Size : "+ taskName.size());
         return new ResponseEntity<>(taskName, HttpStatus.OK);

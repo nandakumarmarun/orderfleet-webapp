@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.Features.KilometerCalculations.KmSlab;
 
 import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.service.CompanyService;
+import com.orderfleet.webapp.service.EmployeeProfileService;
 import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.AccountGroupResource;
 import org.slf4j.Logger;
@@ -38,6 +39,9 @@ public class KmSlabsResource {
     @Inject
     private UserService userService;
 
+    @Inject
+    private EmployeeProfileService employeeProfileService;
+
     /**
      *
      * @param model
@@ -48,6 +52,7 @@ public class KmSlabsResource {
     public String getAllActivities(Model model) throws URISyntaxException {
         model.addAttribute("companies", companyService.findAllCompaniesByActivatedTrue());
         model.addAttribute("users", userService.findAllByCompany());
+        model.addAttribute("employees", employeeProfileService.findAllByCompany());
         log.debug("Web request to get a page of Activities");
         return "company/km-slabs";
     }
@@ -83,10 +88,20 @@ public class KmSlabsResource {
         kmSlabsService.saveKmSlab(kmSlabDTO);
     }
 
-    /**
-     *
-     * @param slabPid
-     */
+    @RequestMapping(value = "/km-slab/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateKmSlabs(@Valid @RequestBody KmSlabDTO kmSlabDTO){
+        log.debug(" Request to Update Kilometer Slabs " + kmSlabDTO.getPid());
+         kmSlabsService.updateKmSlab(kmSlabDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/km-slab/edit", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> findByKmSlabPid(@Valid @RequestParam String Slabpid){
+        log.debug(" Request to Save Kilometer update " + Slabpid);
+        KmSlabDTO Response = kmSlabsService.findByKmSlab(Slabpid);
+        return new ResponseEntity<>(Response, HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/km-slab/delete/{slabPid}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteKmSlabs(@PathVariable String slabPid){

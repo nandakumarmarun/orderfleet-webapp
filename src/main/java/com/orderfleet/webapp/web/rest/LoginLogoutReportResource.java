@@ -317,7 +317,6 @@ public class LoginLogoutReportResource {
 				if (attendanceExists.isPresent()) {
 
 					AttendanceDTO attDto = attendanceExists.get();
-
 					loginlogoutDTO.setAttendancePid(attDto.getPid());
 					loginlogoutDTO.setEmployeeName(employee.getName());
 					loginlogoutDTO.setAttendanceStatus(attDto.getAttendanceStatus().toString());
@@ -326,8 +325,10 @@ public class LoginLogoutReportResource {
 					loginlogoutDTO.setAttendaceOdooMeter(attDto.getOodoMeter());
 					loginlogoutDTO.setVehicleType(attDto.getVehicleType());					
 					loginlogoutDTO.setRemarks(attDto.getRemarks());
-					loginlogoutDTO.setImageButtonVisible(true);
-
+					log.debug(" imagereffrencenumber ATT : " + attDto.getImageRefNo());
+					if(attDto.getImageRefNo() != null && !attDto.getImageRefNo().isEmpty()){
+						loginlogoutDTO.setImageButtonVisibleAtt(true);
+					}
 				} else {
 					loginlogoutDTO.setEmployeeName(employee.getName());
 					loginlogoutDTO.setAttendanceStatus("NOT MARKED");
@@ -345,8 +346,11 @@ public class LoginLogoutReportResource {
 					if(attendanceExists.isPresent()) {
 					loginlogoutDTO.setTotalOdoMeter(pnchDto.getOodoMeter() - attendanceExists.get().getOodoMeter());
 					}
-					
 					loginlogoutDTO.setPunchoutStatus("MARKED");
+					log.debug(" imagereffrencenumber Pun : " + pnchDto.getImageRefNo());
+					if(pnchDto.getImageRefNo() != null && !pnchDto.getImageRefNo().isEmpty() ){
+						loginlogoutDTO.setImageButtonVisiblePun(true);
+					}
 				} else {
 					loginlogoutDTO.setPunchoutStatus("NOT MARKED");
 					loginlogoutDTO.setPunchoutRemarks("");

@@ -34,9 +34,28 @@ tagdir="/WEB-INF/tags/util" prefix="util"%>
         <h2>Non-Assigned Customers Report</h2>
         <div class="row">
           <!-- Profile Info and Notifications -->
+       
           <div class="col-md-12 col-sm-12 clearfix">
             <form role="form" class="form-horizontal form-groups-bordered">
               <div class="form-group">
+                <div class="col-md-3">
+                  <sapn>     </sapn>
+                  <br />
+                   <div class="form-group">
+                     <select
+                       id="dbactivity"
+                       name="companyPid"
+                       class="form-control selectpicker"
+                       data-live-search="true">
+                       <option value="-1">Select Activity</option>
+                       <c:forEach items="${Activites}" var="activity">
+                         <option value="${activity.pid}">
+                           ${activity.name}
+                         </option>
+                       </c:forEach>
+                     </select>
+                   </div>
+                 </div>
                 <div class="col-sm-1">
                   <br />
                   <button id="btnSubmit" type="button" class="btn btn-info">
@@ -48,7 +67,8 @@ tagdir="/WEB-INF/tags/util" prefix="util"%>
                   <button
                     id="btnDownload"
                     type="button"
-                    class="btn btn-success">
+                    class="btn btn-success"
+                  >
                     Download Xls
                   </button>
                 </div>

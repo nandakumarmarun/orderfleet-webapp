@@ -1,7 +1,7 @@
 {
-"release-number" : "1.114.4",
-"release-date" : "18/11/2023",
+"release-number" : "1.114.5",
+"release-date" : "22/11/2023",
 "features" : [
-  "Question Attributes,Battery percentage"
+  "kmslab,tasklist,dayplan"
 ]
 }

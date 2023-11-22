@@ -10,6 +10,10 @@ public interface KmSlabsService {
 
     public KmSlabDTO saveKmSlab(KmSlabDTO kmSlabDTO);
 
+    public KmSlabDTO updateKmSlab(KmSlabDTO kmSlabDTO);
+
+    public KmSlabDTO findByKmSlab(String KmSlabPid);
+
     public void DeleteKmSlab(String pid);
 
 }

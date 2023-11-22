@@ -64,6 +64,7 @@ tagdir="/WEB-INF/tags/util" prefix="util" %>
           <table class="collaptable table table-striped table-bordered">
             <thead>
               <tr>
+                <th>Slab Name</th>
                 <th>MinimumUser</th>
                 <th>MaximumUser</th>
                 <th>SlabRate</th>
@@ -121,6 +122,19 @@ tagdir="/WEB-INF/tags/util" prefix="util" %>
                   </div>
 
                   <div class="modal-body" style="overflow: auto">
+                    <div class="form-group">
+                      <label class="control-label" for="field_min_user"
+                        >Slab Name</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="slabName"
+                        id="field_slab_name"
+                        maxlength="55"
+                        placeholder="Slab Name"
+                      />
+                    </div>
                     <div class="form-group">
                       <label class="control-label" for="field_min_user"
                         >Minimum Kilometer</label
@@ -188,6 +202,121 @@ tagdir="/WEB-INF/tags/util" prefix="util" %>
           </div>
           <!-- /.Model Container-->
         </form>
+          <!-- Model Container-->
+          <div class="modal fade container" id="EditModel">
+            <!-- model Dialog -->
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+
+                  <h4 class="modal-title" id="myModalLabel">Edit slabs</h4>
+                </div>
+
+                <div class="modal-body">
+                  <div
+                    class="alert alert-danger alert-dismissible"
+                    role="alert"
+                    style="display: none"
+                  >
+                    <button
+                      type="button"
+                      class="close"
+                      onclick="$('.alert').hide();"
+                      aria-label="Close"
+                    >
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    <p></p>
+                  </div>
+
+                  <div class="modal-body" style="overflow: auto">
+                    <div class="form-group">
+                      <label class="control-label" for="field_min_user"
+                        >Slab Name</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="slabName"
+                        id="field_slab_name_update"
+                        maxlength="55"
+                        placeholder="Slab Name"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label" for="field_min_user"
+                        >Minimum Kilometer</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="minUser"
+                        id="field_min_user_update"
+                        maxlength="55"
+                        placeholder="Enter Minimum Kilometer"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label class="control-label" for="field_max_user"
+                        >Maximum Kilometer</label
+                      >
+                      <input
+                        autofocus="autofocus"
+                        type="text"
+                        class="form-control"
+                        name="maxUser"
+                        id="field_max_user_update"
+                        maxlength="255"
+                        placeholder="Enter Maximum Kilometer"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label class="control-label" for="field_slab_rate"
+                        >Slab Rate</label
+                      >
+                      <input
+                        autofocus="autofocus"
+                        type="text"
+                        class="form-control"
+                        name="slabRate"
+                        id="field_slab_rate_update"
+                        maxlength="255"
+                        placeholder="Enter Slab Rate"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-default"
+                      data-dismiss="modal"
+                    >
+                      Cancel
+                    </button>
+                    <button id="EditUser" class="btn btn-primary">
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+
 
         <div class="modal fade container" id="userAssignModel">
           <!-- model Dialog -->
@@ -250,20 +379,17 @@ tagdir="/WEB-INF/tags/util" prefix="util" %>
                         </tr>
                       </thead>
                       <tbody id="tBodyUser">
-                        <c:forEach
-                          items="${users}"
-                          var="user"
-                        >
+                        <c:forEach items="${employees}" var="user">
                           <tr>
                             <td>
                               <input
                                 name="userCheckBox"
                                 type="checkbox"
-                                value="${user.pid}"
+                                value="${user.userPid}"
                                 style="display: block"
                               />
                             </td>
-                            <td>${user.firstName}</td>
+                            <td>${user.name}</td>
                           </tr>
                         </c:forEach>
                       </tbody>

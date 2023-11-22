@@ -68,8 +68,8 @@ if (!this.SalesTargetAchievedReport) {
               "</td><td>" +
               response.endPoint +
               "</td><td>" +
-              response.totalDistance +
-              "</td><td>" +
+              response.totalDistance.toFixed(2)
+              +"</td><td>" +
               response.slabName +
               "</td><td>" +
               response.slabRate +
