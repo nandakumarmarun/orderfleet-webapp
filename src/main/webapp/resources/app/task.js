@@ -123,6 +123,7 @@ if (!this.Task) {
 	Task.filterByActivityAndAccountType = function() {
 		var activityPids = [];
 		var accountTypePids = [];
+
 		$("#activity").find('input[type="checkbox"]:checked').each(function() {
 			activityPids.push($(this).val());
 		});
@@ -208,6 +209,7 @@ if (!this.Task) {
 			}
 		});
 	}
+
 	
 	function searchTable(inputVal, table) {
 		table.find('tr').each(function(index, row) {
@@ -335,6 +337,7 @@ if (!this.Task) {
 	}
 	
 	function createUpdateTask(el) {
+	    $('#myFormSubmit').prop('disabled', true);
 		taskModel.name = $('#field_name').val();
 		taskModel.alias = $('#field_alias').val();
 		taskModel.activityPid = $('#field_activity').val();
@@ -350,6 +353,7 @@ if (!this.Task) {
 			data : JSON.stringify(taskModel),
 			success : function(data) {
 				onSaveSuccess(data);
+		        $('#myFormSubmit').prop('disabled', false);
 			},
 			error : function(xhr, error) {
 				onError(xhr, error);

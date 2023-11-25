@@ -6,6 +6,7 @@ import com.orderfleet.webapp.service.UserService;
 import com.orderfleet.webapp.web.rest.AccountGroupResource;
 import com.orderfleet.webapp.web.rest.Features.KilometerCalculations.KmSlab.KmSlabsService;
 import com.orderfleet.webapp.web.rest.Features.KilometerCalculations.KmSlabUserAssociation.KmSlabUserResources;
+import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.YearMonth;
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -66,6 +68,7 @@ public class DistanceFareResources {
         log.debug("Last Date : " + lastDayOfMonth);
         List<KmDistanceFareDTO> kiloKmDistanceFareDTOS = kmDistanceFareService
                 .getDistanceFareAmounts(fromDate,lastDayOfMonth,userPid);
+        kiloKmDistanceFareDTOS.sort(Comparator.comparing(KmDistanceFareDTO::getPlannedDate));
         return ResponseEntity.ok().body(kiloKmDistanceFareDTOS);
     }
 

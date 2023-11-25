@@ -1,7 +1,7 @@
 {
-"release-number" : "1.114.5",
-"release-date" : "22/11/2023",
+"release-number" : "1.114.6",
+"release-date" : "25/11/2023",
 "features" : [
-  "kmslab,tasklist,dayplan"
+  "distance fare sort order,activities company search,documents company search"
 ]
 }
