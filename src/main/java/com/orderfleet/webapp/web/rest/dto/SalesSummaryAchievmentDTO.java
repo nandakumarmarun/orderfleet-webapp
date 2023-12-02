@@ -1,8 +1,11 @@
 package com.orderfleet.webapp.web.rest.dto;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector;
 import com.orderfleet.webapp.domain.SalesSummaryAchievment;
 
 /**
@@ -50,7 +53,22 @@ public class SalesSummaryAchievmentDTO {
 		this.locationPid=salesSummaryAchievment.getLocation().getPid();
 		this.locationName=salesSummaryAchievment.getLocation().getName();
 	}
+List<SalesSummaryAchievmentDTO> DTOList = new ArrayList<>();
+	public List<SalesSummaryAchievmentDTO> convertToDTo(List<SalesSummaryAchievment> salesSummaryAchievments)
+	{
 
+		for (SalesSummaryAchievment salesSummaryAchievment : salesSummaryAchievments) {
+			SalesSummaryAchievmentDTO achievment = new SalesSummaryAchievmentDTO();
+			achievment.setPid(salesSummaryAchievment.getPid());
+			achievment.setSalesTargetGroupPid(salesSummaryAchievment.getSalesTargetGroup().getPid());
+			achievment.setSalesTargetGroupName(salesSummaryAchievment.getSalesTargetGroup().getName());
+			achievment.setAmount(salesSummaryAchievment.getAmount());
+			achievment.setAchievedDate(salesSummaryAchievment.getAchievedDate());
+
+			DTOList.add(achievment);
+		}
+		return DTOList;
+	}
 	public String getPid() {
 		return pid;
 	}
@@ -167,5 +185,7 @@ public class SalesSummaryAchievmentDTO {
 				+ ", userName=" + userName + ", amount=" + amount + ", achievedDate=" + achievedDate + ", locationName="
 				+ locationName + ", employeeName=" + employeeName + "]";
 	}
+
+
 
 }

@@ -176,6 +176,9 @@ public interface ProductProfileService {
 			boolean active, StockAvailabilityStatus status);
 	
 	List<ProductProfileDTO> findAllProductProfilePidByProductProfilePidAndActivated(List<String> profilePids);
-	
-	
+
+
+
+
+	List<String> findByProductCategoryInAndActivatedFalseAndLastModifiedDate(LocalDateTime lastSyncdate);
 }

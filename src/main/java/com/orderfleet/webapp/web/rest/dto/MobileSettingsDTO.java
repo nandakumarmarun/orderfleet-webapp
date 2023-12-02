@@ -8,6 +8,7 @@ import com.orderfleet.webapp.domain.enums.DisplayName;
 import com.orderfleet.webapp.domain.enums.InventoryVoucherUIType;
 import com.orderfleet.webapp.domain.enums.VoucherNumberGenerationType;
 import com.orderfleet.webapp.web.rest.api.dto.ActivityNotificationDTO;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 
 /**
  * a mobile settings.
@@ -143,6 +144,11 @@ public class MobileSettingsDTO {
 	private boolean receiptShareOption;
 	private boolean myPlanSequence;
 
+	private Integer masterDataAutoUpdation;
+	private boolean liveRouting;
+
+
+
 	public MobileSettingsDTO() {
 		super();
 	}
@@ -208,6 +214,12 @@ public class MobileSettingsDTO {
 		this.enablelivetracking = mobileConfigurationDTO.getEnablelivetracking();
 		this.receiptShareOption = mobileConfigurationDTO.getReceiptShareOption();
 		this.myPlanSequence = mobileConfigurationDTO.getMyPlanSequence();
+		this.masterDataAutoUpdation = mobileConfigurationDTO.getMasterDataAutoUpdation();
+
+	}
+
+	public MobileSettingsDTO(UserWiseMobileConfigurationDTO userWiseMobileConfigurationDTO) {
+		this.liveRouting = userWiseMobileConfigurationDTO.isLiveRouting();
 	}
 
 	public List<UserFavouriteDocumentDTO> getFavouriteDocuments() {
@@ -713,5 +725,20 @@ public class MobileSettingsDTO {
 	public void setMyPlanSequence(boolean myPlanSequence) {
 		this.myPlanSequence = myPlanSequence;
 	}
-	
+
+	public Integer getMasterDataAutoUpdation() {
+		return masterDataAutoUpdation;
+	}
+
+	public void setMasterDataAutoUpdation(Integer masterDataAutoUpdation) {
+		this.masterDataAutoUpdation = masterDataAutoUpdation;
+	}
+
+	public boolean isLiveRouting() {
+		return liveRouting;
+	}
+
+	public void setLiveRouting(boolean liveRouting) {
+		this.liveRouting = liveRouting;
+	}
 }

@@ -39,6 +39,9 @@ public interface SalesTargetGroupUserTargetRepository extends JpaRepository<Sale
 	//All Employee
 	List<SalesTargetGroupUserTarget> findBySalesTargetGroupPidInAndUserPidInAndFromDateGreaterThanEqualAndToDateLessThanEqualAndAccountWiseTargetFalse(List<String> salesTargetGroupPids,
 			List<String> userid, LocalDate startDate, LocalDate endDate);
+	List<SalesTargetGroupUserTarget> findBySalesTargetGroupPidInAndUserPidInAndFromDateAndAccountWiseTargetFalse(List<String> salesTargetGroupPids,
+																																 List<String> userid, LocalDate startDate);
+
 	
 	List<SalesTargetGroupUserTarget> findBySalesTargetGroupPidAndUserPidAndFromDateGreaterThanEqualAndToDateLessThanEqualAndAccountWiseTargetFalse(String salesTargetGroupPid,
 			String userPid, LocalDate startDate, LocalDate endDate);

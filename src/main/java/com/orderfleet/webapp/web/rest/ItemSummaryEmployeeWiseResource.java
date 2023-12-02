@@ -127,8 +127,8 @@ public class ItemSummaryEmployeeWiseResource {
 			@RequestParam String order, @RequestParam String categoryPids, @RequestParam String groupPids,
 			@RequestParam("voucherType") VoucherType voucherType, @RequestParam("documentPid") String documentPid,
 			@RequestParam("filterBy") String filterBy,
-			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-			@RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+			@RequestParam(value = "fromDates", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String fromDate,
+			@RequestParam(value = "toDates", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String toDate,
 			@RequestParam String stockLocations, @RequestParam String profilePids,
 			@RequestParam("territoryPids") String territoryPids, @RequestParam("statusSearch") String status,
 			@RequestParam("employeePid") String employeePids, @RequestParam String accountPids) {
@@ -156,8 +156,11 @@ public class ItemSummaryEmployeeWiseResource {
 					monthStartDate, LocalDate.now(), stockLocations, profilePids, territoryPids, employeePids, status,
 					accountPids);
 		} else if (filterBy.equals("CUSTOM")) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+			LocalDate fromDates = LocalDate.parse(fromDate, formatter);
+			LocalDate toDates = LocalDate.parse(toDate, formatter);
 			inventoryVoucherDetailDTOs = getFilterData(sort, order, categoryPids, groupPids, voucherType, documentPid,
-					fromDate, toDate, stockLocations, profilePids, territoryPids, employeePids, status, accountPids);
+					fromDates, toDates, stockLocations, profilePids, territoryPids, employeePids, status, accountPids);
 		}
 		return new ResponseEntity<>(inventoryVoucherDetailDTOs, HttpStatus.OK);
 

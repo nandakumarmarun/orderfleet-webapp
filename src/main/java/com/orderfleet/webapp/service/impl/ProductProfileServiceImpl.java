@@ -829,7 +829,17 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 		List<ProductProfileDTO> result = productProfileMapper.productProfilesToProductProfileDTOs(productProfileList);
 		return result;
 	}
-	
+	@Override
+	public List<String> findByProductCategoryInAndActivatedFalseAndLastModifiedDate(LocalDateTime lastSyncdate) {
+
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findProductProfilesByActivatedFalseAndLastModifiedDate(false, lastSyncdate);
+		List<ProductProfileDTO> result = productProfileMapper
+				.productProfilesToProductProfileDTOs(productProfiles);
+		List<String> productpids = result.stream().map(a -> a.getPid()).collect(Collectors.toList());
+		return productpids;
+	}
+
 	@Override
 	public List<ProductProfileDTO> searchByName(String name) {
 		List<ProductProfile> productProfiles = productProfileRepository.searchByName(name);

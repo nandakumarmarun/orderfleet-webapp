@@ -16,12 +16,40 @@ if (!this.TerritoryWiseSales) {
 		
 		onChangeFunctions();
 		
+//		$("#txtToDate").datepicker({
+//			dateFormat : "dd-mm-yy"
+//		});
+//		$("#txtFromDate").datepicker({
+//			dateFormat : "dd-mm-yy"
+//		});
+
+// set the date selection limit to 3 months
 		$("#txtToDate").datepicker({
-			dateFormat : "dd-mm-yy"
-		});
-		$("#txtFromDate").datepicker({
-			dateFormat : "dd-mm-yy"
-		});
+								 dateFormat: 'mm-dd-yy',
+                                            minDate: 0,
+                                onSelect: function(selectedDate) {
+                                var toDate = new Date(selectedDate);
+                                var fromDate = new Date(toDate);
+                                fromDate.setMonth(toDate.getMonth() - 3);
+                                $("#txtFromDate").datepicker("option", "minDate", fromDate);
+                                $("#txtFromDate").datepicker("option", "maxDate",toDate);
+
+                                                                                        }
+							});
+							$("#txtFromDate").datepicker({
+								dateFormat : "mm-dd-yy",
+								onSelect: function(selectedDate) {
+
+                                                var fromDate = new Date(selectedDate);
+                                                console.log("fromDate :"+fromDate)
+                                                var toDate = new Date(fromDate);
+                                                toDate.setMonth(toDate.getMonth() + 3);
+                                            $("#txtToDate").datepicker("option", "minDate", fromDate);
+                                                $("#txtToDate").datepicker("option", "maxDate",toDate);
+
+                                            }
+							});
+
 		
 		// TerritoryWiseSales.filter()
 		

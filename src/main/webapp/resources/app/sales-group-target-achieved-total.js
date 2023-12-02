@@ -48,6 +48,7 @@ if (!this.SalesTargetAchievedReport) {
 		}
 		var fromDate = $('#txtFromMonth').MonthPicker('GetSelectedMonthYear');
 		var toDate = $('#txtToMonth').MonthPicker('GetSelectedMonthYear');
+		console.log("FromDate :"+fromDate +"To Date :"+ toDate);
 		// validate data
       
 		if(fromDate === null){
@@ -64,7 +65,9 @@ if (!this.SalesTargetAchievedReport) {
 		var [toMonth, toYear] = toDate.split('/');
 		fromDate = new Date(fromYear, fromMonth - 1, 1);
 		toDate = new Date(toYear, toMonth, 0);
-		console.log(productGroupPids);
+		console.log();
+		console.log("Date :"+fromDate +"   :"+toDate +"     :"+convertLocalDateToServer(fromDate));
+		console.log("Date :"+fromDate +"   :"+toDate +"     :"+convertLocalDateToServer(fromDate));
 		$.ajax({
 			url : salesGroupTargetAchievedTotalContextPath + "/load-data",
 			type : 'GET',

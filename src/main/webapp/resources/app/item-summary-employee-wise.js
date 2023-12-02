@@ -44,7 +44,32 @@ if (!this.ItemSummaryEmployeeWise) {
 		$("#sort").css("display", "none");
 		$("#filter").css("display", "block");
 	}
+	//set the date selection to 3 months
+		$("#txtToDate").datepicker({
+								 dateFormat: 'mm-dd-yy',
+                                            minDate: 0,
+                                onSelect: function(selectedDate) {
+                                var toDate = new Date(selectedDate);
+                                var fromDate = new Date(toDate);
+                                fromDate.setMonth(toDate.getMonth() - 3);
+                                $("#txtFromDate").datepicker("option", "minDate", fromDate);
+                                $("#txtFromDate").datepicker("option", "maxDate",toDate);
 
+                                                                                        }
+							});
+							$("#txtFromDate").datepicker({
+								dateFormat : "mm-dd-yy",
+								onSelect: function(selectedDate) {
+
+                                                var fromDate = new Date(selectedDate);
+                                                console.log("fromDate :"+fromDate)
+                                                var toDate = new Date(fromDate);
+                                                toDate.setMonth(toDate.getMonth() + 3);
+                                            $("#txtToDate").datepicker("option", "minDate", fromDate);
+                                                $("#txtToDate").datepicker("option", "maxDate",toDate);
+
+                                            }
+							});
 	function downloadXls() {
 		// When the stripped button is clicked, clone the existing source
 		var clonedTable = $("#tblItemWiseSummary").clone();
@@ -149,8 +174,8 @@ if (!this.ItemSummaryEmployeeWise) {
 						voucherType : $("#dbDocumentType").val(),
 						documentPid : $("#dbDocument").val(),
 						filterBy : $("#dbDateSearch").val(),
-						fromDate : $("#txtFromDate").val(),
-						toDate : $("#txtToDate").val(),
+						fromDates : $("#txtFromDate").val(),
+						toDates : $("#txtToDate").val(),
 						stockLocations : "",
 						profilePids : "",
 						territoryPids : "",
@@ -340,11 +365,19 @@ if (!this.ItemSummaryEmployeeWise) {
 	ItemSummaryEmployeeWise.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");
-		if ($('#dbDateSearch').val() != "CUSTOM") {
-			$('#divDatePickers').css('display', 'none');
-		} else {
-			$('#divDatePickers').css('display', 'initial');
-		}
+		if ($('#dbDateSearch').val() == "CUSTOM") {
+        			$(".custom_date1").addClass('show');
+        			$(".custom_date2").addClass('show');
+        			$(".custom_date1").removeClass('hide');
+        			$(".custom_date2").removeClass('hide');
+        			$('#divDatePickers').css('display', 'initial');
+        		}else {
+        			$(".custom_date1").addClass('hide');
+        			$(".custom_date1").removeClass('show');
+        			$(".custom_date2").addClass('hide');
+        			$(".custom_date2").removeClass('show');
+        			$('#divDatePickers').css('display', 'none');
+        		}
 	}
 
 	function clearAndHideErrorBox() {

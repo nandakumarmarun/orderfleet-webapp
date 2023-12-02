@@ -272,8 +272,6 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.customerCode in ?2 and accountProfile.company.id = ?1 ")
     List<AccountProfile> findAllAccountProfleByCompanyIdAndCustomerCodeIn(Long companyId, List<String> distCode);
 
-
-
-	
-
+   @Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.activated = false and accountProfile.lastModifiedDate > ?2")
+    List<AccountProfile> findAccountProfilesByActivatedFalseAndLastModifiedDate(Long companyId,LocalDateTime lastSyncdate);
 }

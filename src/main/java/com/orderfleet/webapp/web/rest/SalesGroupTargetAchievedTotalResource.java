@@ -137,8 +137,9 @@ public class SalesGroupTargetAchievedTotalResource {
 	public SalesPerformaceDTO performanceTargets(@RequestParam("productGroupPids") List<String> productGroupPids,
 			@RequestParam(value = "fromDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 			@RequestParam(value = "toDate", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-
-		List<User> dashboardUsers = dashboardUserRepository.findUsersByCompanyId();
+log.info("FromDate :"+fromDate);
+log.info("toDate :"+toDate);
+List<User> dashboardUsers = dashboardUserRepository.findUsersByCompanyId();
 
 		List<String> userPids = dashboardUsers.stream().map(user -> user.getPid()).collect(Collectors.toList());
 
@@ -337,6 +338,7 @@ public class SalesGroupTargetAchievedTotalResource {
 		double achievedAmount = 0;
 		if (!salesSummaryAchievmentList.isEmpty()) {
 			for (SalesSummaryAchievment summaryAchievment : salesSummaryAchievmentList) {
+				System.out.println("group :"+summaryAchievment.getSalesTargetGroup().getName()+"amount :"+summaryAchievment.getAmount()+"userId :"+summaryAchievment.getUser().getId());
 				achievedAmount += summaryAchievment.getAmount();
 			}
 		}

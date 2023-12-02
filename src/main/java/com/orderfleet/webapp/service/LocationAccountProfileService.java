@@ -98,5 +98,7 @@ public interface LocationAccountProfileService {
 
 	List<LocationAccountProfile> findByAccountUser(String userPid);
 
-	
+
+
+	List<String> findAllByAccountProfileActivatedFalseAndLocationInAndLastModifiedDate(LocalDateTime lastSyncdate);
 }

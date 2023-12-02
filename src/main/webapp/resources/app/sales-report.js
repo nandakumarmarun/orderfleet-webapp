@@ -30,7 +30,33 @@ if (!this.SalesReport) {
 		// load default
 		SalesReport.filter();
 	});
-	
+
+	// set the date selection limit to 3 months
+			$("#txtToDate").datepicker({
+    								 dateFormat: 'mm-dd-yy',
+                                                minDate: 0,
+                                    onSelect: function(selectedDate) {
+                                    var toDate = new Date(selectedDate);
+                                    var fromDate = new Date(toDate);
+                                    fromDate.setMonth(toDate.getMonth() - 3);
+                                    $("#txtFromDate").datepicker("option", "minDate", fromDate);
+                                    $("#txtFromDate").datepicker("option", "maxDate",toDate);
+
+                                                                                            }
+    							});
+    							$("#txtFromDate").datepicker({
+    								dateFormat : "mm-dd-yy",
+    								onSelect: function(selectedDate) {
+
+                                                    var fromDate = new Date(selectedDate);
+                                                    console.log("fromDate :"+fromDate)
+                                                    var toDate = new Date(fromDate);
+                                                    toDate.setMonth(toDate.getMonth() + 3);
+                                                $("#txtToDate").datepicker("option", "minDate", fromDate);
+                                                    $("#txtToDate").datepicker("option", "maxDate",toDate);
+
+                                                }
+    							});
 	function loadReports(rName) {
 		$('#title').text(rName);
 		$('#tHeadSalesReport').html("");
@@ -91,6 +117,7 @@ if (!this.SalesReport) {
 	function getSalesReport() {
 		$('#tBodySalesReport').html("<tr><td colspan='9' align='center'>Please wait...</td></tr>");
 	    console.log($("#dbDocument").val())
+	    console.log("FromDate :"+$("#txtFromDate").val())
 		$
 				.ajax({
 					url : salesReportContextPath + "/web/sales-report/filter",
@@ -101,8 +128,8 @@ if (!this.SalesReport) {
 						accountPid : $("#dbAccount").val(),
 						voucherType : $("#dbDocumentType").val(),
 						filterBy : $("#dbDateSearch").val(),
-						fromDate : $("#txtFromDate").val(),
-						toDate : $("#txtToDate").val(),
+						fromDates : $("#txtFromDate").val(),
+						toDates : $("#txtToDate").val(),
 						inclSubordinate : $('#inclSubOrdinates').is(":checked")
 					},
 					
@@ -157,8 +184,8 @@ if (!this.SalesReport) {
 				accountPid : $("#dbAccount").val(),
 				filterBy : $("#dbDateSearch").val(),
 				voucherType : $("#dbDocumentType").val(),
-				fromDate : $("#txtFromDate").val(),
-				toDate : $("#txtToDate").val(),
+				fromDates : $("#txtFromDate").val(),
+				toDates : $("#txtToDate").val(),
 				inclSubordinate : $('#inclSubOrdinates').is(":checked")
 			},
 			success : function(products) {
@@ -204,8 +231,8 @@ if (!this.SalesReport) {
 						accountPid : $("#dbAccount").val(),
 						voucherType : $("#dbDocumentType").val(),
 						filterBy : $("#dbDateSearch").val(),
-						fromDate : $("#txtFromDate").val(),
-						toDate : $("#txtToDate").val(),
+						fromDates : $("#txtFromDate").val(),
+						toDates : $("#txtToDate").val(),
 						voucherType : $("#dbDocumentType").val(),
                         inclSubordinate : $('#inclSubOrdinates').is(":checked")
 					},
@@ -260,11 +287,20 @@ if (!this.SalesReport) {
 	SalesReport.showDatePicker = function() {
 		$("#txtFromDate").val("");
 		$("#txtToDate").val("");
-		if ($('#dbDateSearch').val() != "CUSTOM") {
-			$('#divDatePickers').css('display', 'none');
-		} else {
-			$('#divDatePickers').css('display', 'initial');
-		}
+		if ($('#dbDateSearch').val() == "CUSTOM") {
+        			$(".custom_date1").addClass('show');
+        			$(".custom_date2").addClass('show');
+        			$(".custom_date1").removeClass('hide');
+        			$(".custom_date2").removeClass('hide');
+        			$('#divDatePickers').css('display', 'initial');
+        		}else {
+        			$(".custom_date1").addClass('hide');
+        			$(".custom_date1").removeClass('show');
+        			$(".custom_date2").addClass('hide');
+        			$(".custom_date2").removeClass('show');
+        			$('#divDatePickers').css('display', 'none');
+        		}
+
 	}
 
 	function clearAndHideErrorBox() {

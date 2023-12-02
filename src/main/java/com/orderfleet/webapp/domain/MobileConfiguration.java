@@ -208,6 +208,9 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "cart_Max_Size", nullable = false, columnDefinition = "double precision DEFAULT 0")
 	private double cartMaxSize;
 
+	@Column(name = "masterData_Auto_Updation", nullable = false, columnDefinition = "Integer DEFAULT 0")
+	private Integer masterDataAutoUpdation;
+
 	@Column(name = "round_Off_Automation", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean roundOffAutomation;
 
@@ -243,6 +246,7 @@ public class MobileConfiguration implements Serializable {
 	
 	@Column(name = "my_plan_sequence", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean myPlanSequence;
+
 
 	@NotNull
 	@ManyToOne
@@ -757,6 +761,16 @@ public class MobileConfiguration implements Serializable {
 	public void setMyPlanSequence(boolean myPlanSequence) {
 		this.myPlanSequence = myPlanSequence;
 	}
+
+	public Integer getMasterDataAutoUpdation() {
+		return masterDataAutoUpdation;
+	}
+
+	public void setMasterDataAutoUpdation(Integer masterDataAutoUpdation) {
+		this.masterDataAutoUpdation = masterDataAutoUpdation;
+	}
+
+
 
 	@Override
 	public boolean equals(Object o) {

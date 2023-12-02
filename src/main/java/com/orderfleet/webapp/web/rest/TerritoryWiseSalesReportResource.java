@@ -333,7 +333,7 @@ public class TerritoryWiseSalesReportResource {
 		LocalDate fDate = LocalDate.now();
 		LocalDate tDate = LocalDate.now();
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MM-yyyy");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-d-yyyy");
 
 		if (fromDate != null && !fromDate.equals("")) {
 			fDate = LocalDate.parse(fromDate, formatter);

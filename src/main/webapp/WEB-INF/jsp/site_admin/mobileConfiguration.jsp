@@ -96,6 +96,8 @@
 						<th>Enable Live Tracking</th>
 						<th>Receipt Share option </th>
 						<th>My plan sequence</th>
+						<th>Master Data AutoUpdation</th>
+
 						<th>Action</th>
 
 					</tr>
@@ -164,6 +166,8 @@
        			            <td>${mobileConfiguration.enablelivetracking}</td>
        			             <td>${mobileConfiguration.receiptShareOption}</td>
        			              <td>${mobileConfiguration.myPlanSequence}</td>
+       			              <td>${mobileConfiguration.masterDataAutoUpdation}</td>
+
 							<td><button type="button" class="btn btn-info"
 									onclick="MobileConfiguration.edit('${mobileConfiguration.pid}','${mobileConfiguration.companyPid}');">Edit</button>
 								<button type="button" class="btn btn-danger"
@@ -693,6 +697,14 @@
 														id="field_cartMaxSize" maxlength="8" />
 												</div></td>
 										</tr>
+										<tr>
+                                   			<td><div class="form-group">
+                                        		<label class="control-label" for="field_masterDataAutoUpdation">
+                                        		Master Data AutoUpdation</label> <input type="number" step="0.01"
+                                                class="form-control" name="masterDataAutoUpdation"
+                                        		id="field_masterDataAutoUpdation" maxlength="8" />
+                                        	</div></td>
+                                       	</tr>
 										
 
 									</table>

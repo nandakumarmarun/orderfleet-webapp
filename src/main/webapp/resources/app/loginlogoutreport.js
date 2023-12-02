@@ -14,12 +14,40 @@ if (!this.LoginLogOut) {
 		var employeePid = getParameterByName('user-key-pid');
 		getEmployees(employeePid); // common js
 
-		$("#txtToDate").datepicker({
-			dateFormat: "dd-mm-yy"
-		});
-		$("#txtFromDate").datepicker({
-			dateFormat: "dd-mm-yy"
-		});
+//		$("#txtToDate").datepicker({
+//			dateFormat: "dd-mm-yy"
+//		});
+//		$("#txtFromDate").datepicker({
+//			dateFormat: "dd-mm-yy"
+//		});
+
+// limit the selection to 3 months
+$("#txtToDate").datepicker({
+								 dateFormat: 'mm-dd-yy',
+                                            minDate: 0,
+                                onSelect: function(selectedDate) {
+                                var toDate = new Date(selectedDate);
+                                var fromDate = new Date(toDate);
+                                fromDate.setMonth(toDate.getMonth() - 3);
+                                $("#txtFromDate").datepicker("option", "minDate", fromDate);
+                                $("#txtFromDate").datepicker("option", "maxDate",toDate);
+
+                                                                                        }
+							});
+							$("#txtFromDate").datepicker({
+								dateFormat : "mm-dd-yy",
+								onSelect: function(selectedDate) {
+
+                                                var fromDate = new Date(selectedDate);
+                                                console.log("fromDate :"+fromDate)
+                                                var toDate = new Date(fromDate);
+                                                toDate.setMonth(toDate.getMonth() + 3);
+                                            $("#txtToDate").datepicker("option", "minDate", fromDate);
+                                                $("#txtToDate").datepicker("option", "maxDate",toDate);
+
+                                            }
+							});
+
 
 		let empPid = getParameterByName('empPid');
 		if (empPid) {

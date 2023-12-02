@@ -1,6 +1,5 @@
 package com.orderfleet.webapp.web.rest.api;
 
-import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -16,9 +15,10 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
 import com.orderfleet.webapp.service.*;
 import com.orderfleet.webapp.web.rest.dto.*;
 import org.slf4j.Logger;
@@ -29,44 +29,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.ActivityStage;
-import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.DistanceFare;
-import com.orderfleet.webapp.domain.Document;
-import com.orderfleet.webapp.domain.DocumentAccountType;
-import com.orderfleet.webapp.domain.DocumentAccountingVoucherColumn;
-import com.orderfleet.webapp.domain.DocumentForms;
-import com.orderfleet.webapp.domain.DocumentInventoryVoucherColumn;
-import com.orderfleet.webapp.domain.FormElementType;
-import com.orderfleet.webapp.domain.OpeningStock;
-import com.orderfleet.webapp.domain.ReferenceDocument;
-import com.orderfleet.webapp.domain.StockLocation;
-import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.UserStockLocation;
-import com.orderfleet.webapp.domain.VoucherNumberGenerator;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
-import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
-import com.orderfleet.webapp.repository.ActivityStageRepository;
-import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
-import com.orderfleet.webapp.repository.FormElementTypeRepository;
-import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
-import com.orderfleet.webapp.repository.OpeningStockRepository;
-import com.orderfleet.webapp.repository.ProductGroupEcomProductsRepository;
-import com.orderfleet.webapp.repository.ProductGroupProductRepository;
-import com.orderfleet.webapp.repository.ReferenceDocumentRepository;
-import com.orderfleet.webapp.repository.StockLocationRepository;
-import com.orderfleet.webapp.repository.UserDocumentRepository;
-import com.orderfleet.webapp.repository.UserRepository;
-import com.orderfleet.webapp.repository.UserStockLocationRepository;
-import com.orderfleet.webapp.repository.VoucherNumberGeneratorRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.web.rest.StockLocationResource;
 import com.orderfleet.webapp.web.rest.api.dto.DocumentAccountingVoucherColumnDTO;
 import com.orderfleet.webapp.web.rest.api.dto.DocumentInventoryVoucherColumnDTO;
 import com.orderfleet.webapp.web.rest.api.dto.FormFormElementDTO;
@@ -74,10 +43,7 @@ import com.orderfleet.webapp.web.rest.api.dto.KnowledgeBaseFilesDTO;
 import com.orderfleet.webapp.web.rest.api.dto.MBLocationHierarchyDTO;
 import com.orderfleet.webapp.web.rest.api.dto.PostDatedVoucherDTO;
 import com.orderfleet.webapp.web.rest.api.dto.RootPlanHeaderUserTaskListDTO;
-import com.orderfleet.webapp.web.rest.api.dto.UserTaskListDTO;
 import com.orderfleet.webapp.web.rest.util.PaginationUtil;
-
-import net.bytebuddy.description.annotation.AnnotationSource.Empty;
 
 /**
  * REST controller for master data given to android device.
@@ -316,6 +282,9 @@ public class MasterDataController {
 	@Inject
 	private DistanceFareService distanceFareService;
 
+	@Inject
+	private SyncOperationRepository syncOperationRepository;
+
 	/**
 	 * GET /account-types : get all accountTypes.
 	 *
@@ -358,7 +327,9 @@ public class MasterDataController {
 		if (lastSyncdate == null) {
 			locationDTOs = locationService.findAllByUserAndLocationActivated(true);
 		} else {
+			log.info("Territory Last SyncTime :"+lastSyncdate);
 			locationDTOs = locationService.findAllByUserAndLocationActivatedLastModified(true, lastSyncdate);
+			log.info("Size Of Territory :"+locationDTOs.size());
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(locationDTOs);
 	}
@@ -427,6 +398,7 @@ public class MasterDataController {
 			pageAccounts = locationAccountProfileService
 					.findAccountProfilesByUserLocationsAndAccountProfileActivated(page, size);
 		} else {
+			log.info("Deactivated accounts LastSyncDate *************:"+lastSyncdate);
 			pageAccounts = locationAccountProfileService
 					.findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDate(page, size, lastSyncdate);
 		}
@@ -434,12 +406,24 @@ public class MasterDataController {
 				.headers(PaginationUtil.generatePaginationHttpHeaders(pageAccounts, "/api/location-account-profiles"))
 				.body(pageAccounts.getContent());
 	}
-	
-	
-	/**
-	 * GET /lengthTypes:get all length Types.
-	 * This will give all length types of  from focus
-	 */
+
+    @GetMapping("/deactivated-location-account-profiles")
+    @Timed
+    public ResponseEntity<List<String>> getAllDeactivatedAccountProfilesByLocations(
+            @RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) throws URISyntaxException {
+		List<String> accountsPid;
+		log.info("LastSyncDate *************:"+lastSyncdate);
+			accountsPid = locationAccountProfileService
+                    .findAllByAccountProfileActivatedFalseAndLocationInAndLastModifiedDate(lastSyncdate);
+			log.info("Size :"+accountsPid.size());
+        return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(accountsPid);
+    }
+
+
+    /**
+     * GET /lengthTypes:get all length Types.
+     * This will give all length types of  from focus
+     */
 	
 	/**  it will retrun length types from focus**/ 
 	
@@ -599,9 +583,11 @@ public class MasterDataController {
 			productGroupProductDTOs = productGroupProductService
 					.findProductGroupProductsByUserProductGroupIsCurrentUserAndProductGroupActivated(true);
 		} else {
+			log.info("productgroup product time :"+lastSyncdate);
 			productGroupProductDTOs = productGroupProductService
 					.findProductGroupProductsByUserProductGroupIsCurrentUserAndProductGroupActivatedAndModifiedDate(
 							true, lastSyncdate);
+			log.info("size :"+productGroupProductDTOs.size());
 		}
 
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productGroupProductDTOs);
@@ -695,22 +681,26 @@ public class MasterDataController {
 			productProfileDTOs = productProfileService
 					.findProductsByUserProductCategoriesIsCurrentUserAndActivated(page, size);
 		} else {
+			log.debug("LAstSyncDAte************************************* :"+lastSyncdate);
 			productProfileDTOs = productProfileService.findByProductCategoryInAndActivatedTrueAndLastModifiedDate(page,
 					size, lastSyncdate);
 		}
-		
-//		Optional<CompanyConfiguration> optconfig = companyConfigurationRepository
-//				.findByCompanyIdAndName(SecurityUtils.getCurrentUsersCompanyId(), CompanyConfig.DESCRIPTION_TO_NAME);
-//		if (optconfig.isPresent() && !productProfileDTOs.isEmpty()) {
-//			if (Boolean.valueOf(optconfig.get().getValue())) {
-//				productProfileDTOs.forEach(data -> {
-//					String[] name = data.getName().split("~");
-//					data.setName(name[0]);
-//				});
-//			}
-//		}
+
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productProfileDTOs);
 	}
+	@RequestMapping(value = "/deactivated-product-profiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<String>> getAllDeativatedProductProfiles(@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) {
+		log.debug("REST request to get all Deactivated productProfiles:"+lastSyncdate);
+		List<String> productProfilePids = null;
+
+			log.debug("LAstSyncDAte************************************* :"+lastSyncdate);
+			productProfilePids = productProfileService.findByProductCategoryInAndActivatedFalseAndLastModifiedDate(lastSyncdate);
+
+
+		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(productProfilePids);
+	}
+
 
 	/**
 	 * GET /price-levels: get all the price levels.
@@ -727,7 +717,9 @@ public class MasterDataController {
 		if (lastSyncdate == null) {
 			priceLevelDTOs = userPriceLevelService.findPriceLevelsByUserIsCurrentUser();
 		} else {
+			log.info("price level last sync date :"+lastSyncdate);
 			priceLevelDTOs = userPriceLevelService.findPriceLevelsByUserIsCurrentUserAndLastModifiedDate(lastSyncdate);
+		log.info("Size :"+priceLevelDTOs.size());
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(priceLevelDTOs);
 	}
@@ -892,8 +884,10 @@ public class MasterDataController {
 		if (lastSyncdate == null) {
 			documentProductCategoryDTOs = documentProductCategoryService.findByUserDocumentIsCurrentUser();
 		} else {
+			log.info("Product category last sync time :"+lastSyncdate);
 			documentProductCategoryDTOs = documentProductCategoryService
 					.findByUserDocumentIsCurrentUserAndLastModifiedDate(lastSyncdate);
+			log.info("Size :"+documentProductCategoryDTOs.size());
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified())
 				.body(documentProductCategoryDTOs);
@@ -1107,8 +1101,10 @@ public class MasterDataController {
 		if (lastSyncdate == null) {
 			documentPriceLevelDTOs = documentPriceLevelService.findByUserDocumentsIsCurrentUser();
 		} else {
+			log.info("Document pricelevel last sync Time :"+lastSyncdate);
 			documentPriceLevelDTOs = documentPriceLevelService
 					.findByUserDocumentsIsCurrentUserAndLastModifiedDate(lastSyncdate);
+			log.info("size :"+documentPriceLevelDTOs.size());
 		}
 		return ResponseEntity.ok().header("Last-Sync-Date", getResourceLastModified()).body(documentPriceLevelDTOs);
 
@@ -1876,4 +1872,19 @@ public class MasterDataController {
 		return mapper;
 	}
 
+	@RequestMapping(value = "/last-Synctime", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<SyncOperationDTO>> lastModifiedDates(){
+		Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		List<SyncOperation> syncOperations = syncOperationRepository.findAllByCompanyIdAndCompleted(companyId,true);
+		List<SyncOperationDTO> SyncDetails = new ArrayList<>();
+
+		for(SyncOperation syncOperation : syncOperations){
+			SyncOperationDTO syncOperationDTO  = new SyncOperationDTO();
+			syncOperationDTO.setOperationType(syncOperation.getOperationType());
+			syncOperationDTO.setLastSyncCompletedDate(syncOperation.getLastSyncCompletedDate());
+			SyncDetails.add(syncOperationDTO);
+		}
+		return new ResponseEntity<List<SyncOperationDTO>>(SyncDetails,HttpStatus.OK);
+	}
 }

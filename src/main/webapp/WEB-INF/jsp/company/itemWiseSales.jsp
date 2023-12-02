@@ -157,21 +157,32 @@
 									<option value="YESTERDAY">Yesterday</option>
 									<option value="WTD">WTD</option>
 									<option value="MTD">MTD</option>
-									<option value="CUSTOM">CUSTOM</option>
+									<option value="CUSTOM">CUSTOM(Max 3 months)</option>
 								</select>
 							</div>
-							<div id="divDatePickers" style="display: none;">
-								<div class="col-sm-2">
-									From Date <input type="date" class="form-control"
-										id="txtFromDate" placeholder="Select From Date"
-										style="background-color: #fff; width: 139px;" />
-								</div>
-								<div class="col-sm-2">
-									To Date <input type="date" class="form-control" id="txtToDate"
-										placeholder="Select To Date"
-										style="background-color: #fff; width: 139px;" />
-								</div>
-							</div>
+							<div class="col-sm-2 hide custom_date1">
+                            								<br />
+                            								<div class="input-group">
+                            									<input type="text" class="form-control" id="txtFromDate"
+                            										placeholder="Select From Date" style="background-color: #fff;"
+                            										readonly="readonly" />
+
+                            									<div class="input-group-addon">
+                            										<a href="#"><i class="entypo-calendar"></i></a>
+                            									</div>
+                            								</div>
+                            							</div>
+                            							<div class="col-sm-2 hide custom_date2">
+                            								<br />
+                            								<div class="input-group">
+                            									<input type="text" class="form-control" id="txtToDate"
+                            										placeholder="Select To Date" style="background-color: #fff;"
+                            										readonly="readonly" />
+                            									<div class="input-group-addon">
+                            										<a href="#"><i class="entypo-calendar"></i></a>
+                            									</div>
+                            								</div>
+                            							</div>
 							
 							
 							<div class="col-sm-1">

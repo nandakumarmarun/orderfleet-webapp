@@ -95,7 +95,7 @@
 									<option value="YESTERDAY">Yesterday</option>
 									<option value="WTD">WTD</option>
 									<option value="MTD">MTD</option>
-									<option value="CUSTOM">CUSTOM</option>
+									<option value="CUSTOM">CUSTOM(Max 3 months)</option>
 								</select>
 							</div>
 							<div class="col-sm-2 hide custom_date1">

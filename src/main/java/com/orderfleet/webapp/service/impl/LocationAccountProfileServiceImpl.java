@@ -946,4 +946,19 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 	public List<LocationAccountProfile> findByAccountUser(String userPid) {
 		return locationAccountProfileRepository.findByAccountUser(userPid);
 	}
+
+
+
+
+
+	@Override
+	public List<String> findAllByAccountProfileActivatedFalseAndLocationInAndLastModifiedDate(LocalDateTime lastSyncdate) {
+
+		long companyId = SecurityUtils.getCurrentUsersCompanyId();
+		List<AccountProfileDTO> accountDTOs = new ArrayList<>();
+		List<AccountProfile> accountProfiles = accountProfileRepository.findAccountProfilesByActivatedFalseAndLastModifiedDate(companyId,lastSyncdate);
+		accountDTOs = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfiles);
+			List<String> accountPids = accountDTOs.stream().map(a -> a.getPid()).collect(Collectors.toList());
+		return accountPids;
+	}
 }

@@ -85,6 +85,7 @@ public class MobileConfigurationDTO {
 	
 	private boolean receiptShareOption;
 	private boolean myPlanSequence;
+	private Integer masterDataAutoUpdation;
  
 	public MobileConfigurationDTO() {
 		super();
@@ -154,6 +155,8 @@ public class MobileConfigurationDTO {
 		this.enablelivetracking = mobileConfiguration.getEnablelivetracking();
 		this.receiptShareOption = mobileConfiguration.getReceiptShareOption();
 		this.myPlanSequence = mobileConfiguration.getMyPlanSequence();
+		this.masterDataAutoUpdation = mobileConfiguration.getMasterDataAutoUpdation();
+
 	}
 	public String getPid() {
 		return pid;
@@ -650,5 +653,14 @@ public class MobileConfigurationDTO {
 	public void setMyPlanSequence(boolean myPlanSequence) {
 		this.myPlanSequence = myPlanSequence;
 	}
-	
+
+	public Integer getMasterDataAutoUpdation() {
+		return masterDataAutoUpdation;
+	}
+
+
+
+	public void setMasterDataAutoUpdation(Integer masterDataAutoUpdation) {
+		this.masterDataAutoUpdation = masterDataAutoUpdation;
+	}
 }

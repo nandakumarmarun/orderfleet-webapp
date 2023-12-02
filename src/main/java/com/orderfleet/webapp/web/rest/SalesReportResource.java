@@ -214,8 +214,11 @@ public class SalesReportResource {
 	public ResponseEntity<List<InventoryVoucherDetailDTO>> filterInventoryVouchers(@RequestParam String pGroupPid,
 
 			@RequestParam("employeePid") String employeePid, @RequestParam("accountPid") String accountPid,
-			@RequestParam("filterBy") String filterBy, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate,
+			@RequestParam("filterBy") String filterBy, @RequestParam String fromDates, @RequestParam String toDates,
 			@RequestParam boolean inclSubordinate, @RequestParam("voucherType") VoucherType voucherType) {
+		LocalDate fromDate = null;
+		LocalDate toDate = null;
+
 		if (filterBy.equals(SalesReportResource.TODAY)) {
 			fromDate = LocalDate.now();
 			toDate = fromDate;
@@ -233,8 +236,11 @@ public class SalesReportResource {
 			fromDate = monthStartDate;
 
 			toDate = LocalDate.now();
-		} else if (filterBy.equals(SalesReportResource.CUSTOM)) {
-
+		} else if(filterBy.equals(SalesReportResource.CUSTOM))
+		{
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+			fromDate = LocalDate.parse(fromDates, formatter);
+			toDate = LocalDate.parse(toDates, formatter);
 		}
 
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid,
@@ -254,8 +260,11 @@ public class SalesReportResource {
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<String>> filterNotOrderedProducts(@RequestParam String pGroupPid,
 			@RequestParam("employeePid") String employeePid, @RequestParam("accountPid") String accountPid,
-			@RequestParam("filterBy") String filterBy, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate,
+			@RequestParam("filterBy") String filterBy, @RequestParam String fromDates, @RequestParam String toDates,
 			@RequestParam boolean inclSubordinate, @RequestParam("voucherType") VoucherType voucherType) {
+
+		LocalDate fromDate = null;
+		LocalDate toDate = null;
 		if (filterBy.equals(SalesReportResource.TODAY)) {
 			fromDate = LocalDate.now();
 			toDate = LocalDate.now();
@@ -269,6 +278,11 @@ public class SalesReportResource {
 		} else if (filterBy.equals(SalesReportResource.MTD)) {
 			fromDate = LocalDate.now().withDayOfMonth(1);
 			toDate = LocalDate.now();
+		}else if(filterBy.equals(SalesReportResource.CUSTOM))
+		{
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+			fromDate = LocalDate.parse(fromDates, formatter);
+			toDate = LocalDate.parse(toDates, formatter);
 		}
 		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDtos = filterByEmployeeAccountAndDate(employeePid,
 				accountPid, fromDate, toDate, inclSubordinate, voucherType);
@@ -308,9 +322,13 @@ public class SalesReportResource {
 	@Transactional(readOnly = true)
 	public ResponseEntity<SalesReportDTO> filterInventoryVouchersUserwiseGroupSummary(@RequestParam String pGroupNames,
 			@RequestParam("employeePid") String employeePid, @RequestParam("accountPid") String accountPid,
-			@RequestParam("filterBy") String filterBy, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate,
+			@RequestParam("filterBy") String filterBy, @RequestParam String fromDates, @RequestParam String toDates,
 			@RequestParam boolean inclSubordinate, @RequestParam("voucherType") VoucherType voucherType) {
+		LocalDate fromDate = null;
+		LocalDate toDate = null;
+		logger.info("fromDate :"+fromDates);
 		if (filterBy.equals(SalesReportResource.TODAY)) {
+			logger.info("ENtered ...");
 			fromDate = LocalDate.now();
 			toDate = LocalDate.now();
 		} else if (filterBy.equals(SalesReportResource.YESTERDAY)) {
@@ -323,6 +341,11 @@ public class SalesReportResource {
 		} else if (filterBy.equals(SalesReportResource.MTD)) {
 			fromDate = LocalDate.now().withDayOfMonth(1);
 			toDate = LocalDate.now();
+		}else if(filterBy.equals(SalesReportResource.CUSTOM))
+		{
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+			fromDate = LocalDate.parse(fromDates, formatter);
+			toDate = LocalDate.parse(toDates, formatter);
 		}
 		List<String> reportHeaderNames = Arrays.asList(pGroupNames.split("\\s*,\\s*"));
 		if (reportHeaderNames.isEmpty()) {

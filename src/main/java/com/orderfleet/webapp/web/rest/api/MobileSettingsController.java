@@ -2,6 +2,7 @@ package com.orderfleet.webapp.web.rest.api;
 
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -9,11 +10,16 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.domain.User;
+import com.orderfleet.webapp.security.UserPrincipal;
+import com.orderfleet.webapp.service.*;
+import com.orderfleet.webapp.web.rest.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,19 +31,8 @@ import com.orderfleet.webapp.repository.ReceivablePayableColumnConfigRepository;
 import com.orderfleet.webapp.repository.UserActivityRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.ActivityNotificationService;
-import com.orderfleet.webapp.service.DayPlanExecutionConfigService;
-import com.orderfleet.webapp.service.GuidedSellingConfigService;
-import com.orderfleet.webapp.service.MobileConfigurationService;
-import com.orderfleet.webapp.service.UserFavouriteDocumentService;
 import com.orderfleet.webapp.web.rest.api.dto.ActivityNotificationDTO;
 import com.orderfleet.webapp.web.rest.api.dto.UserTargetAchievedDTO;
-import com.orderfleet.webapp.web.rest.dto.DayPlanExecutionConfigDTO;
-import com.orderfleet.webapp.web.rest.dto.GuidedSellingConfigDTO;
-import com.orderfleet.webapp.web.rest.dto.MobileConfigurationDTO;
-import com.orderfleet.webapp.web.rest.dto.MobileSettingsDTO;
-import com.orderfleet.webapp.web.rest.dto.ReceivablePayableColumnConfigDTO;
-import com.orderfleet.webapp.web.rest.dto.UserFavouriteDocumentDTO;
 
 /**
  * REST controller for serve Mobile Settings.
@@ -70,13 +65,15 @@ public class MobileSettingsController {
 	@Inject
 	private ReceivablePayableColumnConfigRepository receivablePayableColumnConfigRepository;
 
+	private  final UserWiseMobileConfigurationService userWiseMobileConfigurationService;
+
 	public MobileSettingsController(DayPlanExecutionConfigService dayPlanExecutionConfigService,
 			GuidedSellingConfigService guidedSellingConfigService,
 			UserFavouriteDocumentService userFavouriteDocumentService,
 			MobileConfigurationService mobileConfigurationService,
 			ActivityNotificationService activityNotificationService, UserRepository userRepository,
 			ExecutiveTaskExecutionRepository executiveTaskExecutionRepository,
-			UserActivityRepository userActivityRepository) {
+			UserActivityRepository userActivityRepository,UserWiseMobileConfigurationService userWiseMobileConfigurationService) {
 		super();
 		this.dayPlanExecutionConfigService = dayPlanExecutionConfigService;
 		this.guidedSellingConfigService = guidedSellingConfigService;
@@ -86,6 +83,7 @@ public class MobileSettingsController {
 		this.userRepository = userRepository;
 		this.executiveTaskExecutionRepository = executiveTaskExecutionRepository;
 		this.userActivityRepository = userActivityRepository;
+		this.userWiseMobileConfigurationService = userWiseMobileConfigurationService;
 	}
 
 	/**
@@ -98,7 +96,7 @@ public class MobileSettingsController {
 	 */
 	@Timed
 	@GetMapping("/mobile-settings")
-	public ResponseEntity<MobileSettingsDTO> getMobileSettings() throws URISyntaxException {
+	public ResponseEntity<MobileSettingsDTO> getMobileSettings(@RequestHeader(required = false, value = "Last-Sync-Date") LocalDateTime lastSyncdate) throws URISyntaxException {
 		log.debug("REST request to get mobile settings");
 		return new ResponseEntity<>(createMobileSettingsObject(), HttpStatus.OK);
 	}
@@ -127,7 +125,17 @@ public class MobileSettingsController {
 			mobileSettingsDTO = new MobileSettingsDTO(mobileConfigurationDTO.get());
 		}
 
-		// set day plan execution pages
+		// set user wise configuration
+		String userName = SecurityUtils.getCurrentUserLogin();
+		log.info("username******************* :"+userName);
+		Optional<User> user= userRepository.findOneByLogin(userName);
+		Optional<UserWiseMobileConfigurationDTO> userWiseMobileConfigurationDTO = userWiseMobileConfigurationService.findOneByUserId(user.get().getId());
+		if(userWiseMobileConfigurationDTO.isPresent())
+		{
+			mobileSettingsDTO = new MobileSettingsDTO(userWiseMobileConfigurationDTO.get());
+			log.info("mobileSetting var :"+mobileSettingsDTO.isLiveRouting());
+		}
+		   // set day plan execution pages
 		List<DayPlanExecutionConfigDTO> dayPlanExecutionConfigs = dayPlanExecutionConfigService
 				.findAllByCompanyIdAndEnabledTrueCurrentUser();
 		mobileSettingsDTO.setDayPlanExecutionConfigs(dayPlanExecutionConfigs);

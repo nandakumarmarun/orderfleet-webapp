@@ -364,13 +364,13 @@ public class InvoiceWiseDuplicateReportResource {
 			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, monthStartDate,
 					LocalDate.now(), inclSubordinate);
 		} else if (filterBy.equals("CUSTOM")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
 			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, fromDateTime, toFateTime,
 					inclSubordinate);
 		} else if (filterBy.equals("SINGLE")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, fromDateTime, fromDateTime,
 					inclSubordinate);
@@ -1077,13 +1077,13 @@ public class InvoiceWiseDuplicateReportResource {
 			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, monthStartDate,
 					LocalDate.now(), inclSubordinate);
 		} else if (filterBy.equals("CUSTOM")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			LocalDate toFateTime = LocalDate.parse(toDate, formatter);
 			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid,fromDateTime,
 					toFateTime, inclSubordinate);
 		} else if (filterBy.equals("SINGLE")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 			LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
 			executiveTaskExecutions = getFilterData(employeePid, documentPid, activityPid, fromDateTime,
 					fromDateTime, inclSubordinate);

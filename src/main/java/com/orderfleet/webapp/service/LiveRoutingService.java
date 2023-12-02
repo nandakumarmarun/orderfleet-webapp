@@ -71,8 +71,9 @@ public class LiveRoutingService {
 		     fblocation.setCompanyName(locationData.getCompanyName());
 		     Optional<Company> company =companyRepository.findByLegalName(locationData.getCompanyName());
 		     fblocation.setCompanyId(company.get().getId());
-		     String created_date =locationData.getDate();
-		     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+		     String created_date =locationData.getCurrentDateTime();
+			 log.info("Date :"+created_date);
+		     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 				LocalDateTime createdDate = LocalDateTime.parse(created_date, formatter);
 		     fblocation.setDate(createdDate);
 		fblocation.setLatitude(locationData.getLatitude());

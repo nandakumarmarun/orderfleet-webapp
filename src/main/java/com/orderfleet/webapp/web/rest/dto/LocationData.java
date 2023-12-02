@@ -6,7 +6,7 @@ public class LocationData {
 
 	    private String companyName;
 
-		private String date;
+		private String currentDateTime;
 
 		private BigDecimal latitude;
 
@@ -15,6 +15,7 @@ public class LocationData {
 		private String key;
 	
 		private Integer battery_percentage;
+		private String Address;
 		
 		public String getCompanyName() {
 			return companyName;
@@ -28,15 +29,24 @@ public class LocationData {
 			return latitude;
 		}
 
-		public String getDate() {
-			return date;
-		}
 
-		public void setDate(String date) {
-			this.date = date;
-		}
+	public String getCurrentDateTime() {
+		return currentDateTime;
+	}
 
-		public void setLatitude(BigDecimal latitude) {
+	public void setCurrentDateTime(String currentDateTime) {
+		this.currentDateTime = currentDateTime;
+	}
+
+	public String getAddress() {
+		return Address;
+	}
+
+	public void setAddress(String address) {
+		Address = address;
+	}
+
+	public void setLatitude(BigDecimal latitude) {
 			this.latitude = latitude;
 		}
 
@@ -65,14 +75,19 @@ public class LocationData {
 		this.battery_percentage = battery_percentage;
 	}
 
+
 	@Override
-		public String toString() {
-			return "LocationData [companyName=" + companyName + ", date=" + date + ", latitude=" + latitude
-					+ ", longitude=" + longitude + ", key=" + key + ", batteryPercentage=" + battery_percentage + "]";
-		}
-
-		
-
+	public String toString() {
+		return "LocationData{" +
+				"companyName='" + companyName + '\'' +
+				", currentDate='" + currentDateTime + '\'' +
+				", latitude=" + latitude +
+				", longitude=" + longitude +
+				", key='" + key + '\'' +
+				", battery_percentage=" + battery_percentage +
+				", Address='" + Address + '\'' +
+				'}';
 	}
+}
 
 

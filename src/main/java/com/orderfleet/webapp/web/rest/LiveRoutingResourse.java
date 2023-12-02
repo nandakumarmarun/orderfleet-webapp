@@ -147,7 +147,7 @@ public class LiveRoutingResourse {
 			HttpEntity<T> entity = new HttpEntity<>(createTokenAuthHeaders());
 
 			ResponseEntity<Map<String, LocationData>> liveRoutingResponse = restTemplate.exchange(
-					FIREBASE_URL + "/" + companyName.replaceAll("%20", " ") + "/" + login + ".json", HttpMethod.GET,
+					FIREBASE_URL + "/" + companyName.replaceAll("%20", " ") + "/" + login + ".json?orderBy=\"$key\"&limitToLast=1", HttpMethod.GET,
 					entity, new ParameterizedTypeReference<Map<String, LocationData>>() {
 					});
 
@@ -156,6 +156,7 @@ public class LiveRoutingResourse {
 			if (liveRoutingResponse.getBody() != null) {
 				Map<String, LocationData> response = liveRoutingResponse.getBody();
 
+				System.out.println("Size :"+response.size());
 				String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
 				List<LiveRoutingResponse> routing = new ArrayList<>();
@@ -166,11 +167,11 @@ public class LiveRoutingResourse {
 
 					fbid.setKey(entries.getKey());
 					fbid.setCompanyName(entries.getValue().getCompanyName());
-					fbid.setDate(entries.getValue().getDate());
+					fbid.setCurrentDateTime(entries.getValue().getCurrentDateTime());
 					fbid.setLatitude(entries.getValue().getLatitude());
 					fbid.setLongitude(entries.getValue().getLongitude());
-					fbid.setBattery_percentage(entries.getValue().getBattery_percentage());
-					
+				fbid.setBattery_percentage(entries.getValue().getBattery_percentage());
+					fbid.setAddress(entries.getValue().getAddress());
 					loc.add(fbid);
 					liveRouting.setLocations(loc);
 					routing.add(liveRouting);
@@ -184,17 +185,17 @@ public class LiveRoutingResourse {
 
 					{
 						ExecutiveTaskExecutionDTO executiveTaskExecutionDTO = new ExecutiveTaskExecutionDTO();
-						String datetime = locations.getDate();
+						String datetime = locations.getCurrentDateTime();
 						String[] splitDate = datetime.split(" ");
 
 						if (formattedDate.equals(splitDate[0])) {
 							executiveTaskExecutionDTO.setLatitude(locations.getLatitude());
 							executiveTaskExecutionDTO.setLongitude(locations.getLongitude());
-							String location = geoLocationService
-									.findAddressFromLatLng(locations.getLatitude() + "," + locations.getLongitude());
-							executiveTaskExecutionDTO.setLocation(location);
-							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-							LocalDateTime createdDate = LocalDateTime.parse(locations.getDate(), formatter);
+//							String location = geoLocationService
+//									.findAddressFromLatLng(locations.getLatitude() + "," + locations.getLongitude());
+							executiveTaskExecutionDTO.setLocation(locations.getAddress());
+							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+							LocalDateTime createdDate = LocalDateTime.parse(locations.getCurrentDateTime(), formatter);
 							executiveTaskExecutionDTO.setDate(createdDate);
 							executiveTaskExecutionDTO.setBatteryPercentage(locations.getBattery_percentage());
 							executiveTaskExecutionDTO.setLocationType(LocationType.GpsLocation);
@@ -211,44 +212,44 @@ public class LiveRoutingResourse {
 
 		});
 
-		for (LiveTrackingDTO ltdto : liveTrackingDTOs) {
-
-			int last = ltdto.getTrackingPoints().size() - 1;
-			if (ltdto.getTrackingPoints().size() != 0) {
-				ExecutiveTaskExecutionDTO dtos = ltdto.getTrackingPoints().get(last);
-				ltdto.getTrackingPoints().remove(dtos);
-
-				LocalDateTime dates = dtos.getDate();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-				String formattedDateTime = dates.format(formatter);
-
-				String[] parts = formattedDateTime.split(" ");
-
-				SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-				Date date1 = format.parse(time1);
-				Date date2 = format.parse(parts[1]);
-				long difference = 0;
-				if(date2.getTime()>=date1.getTime())
-				{
-				difference = date2.getTime()- date1.getTime();
-				}
-				else {
-					difference = date1.getTime()- date2.getTime();
-				}
-				 long minutes = (difference / 1000) / 60;
-				
-				if (minutes < 5) {
-					dtos.setAccountProfileName("CurrentLocation");
-				
-					ltdto.getTrackingPoints().add(dtos);
-				}
-				else {
-					ltdto.getTrackingPoints().add(dtos);
-				}
-
-			}
-		}
+//		for (LiveTrackingDTO ltdto : liveTrackingDTOs) {
+//
+//			int last = ltdto.getTrackingPoints().size() - 1;
+//			if (ltdto.getTrackingPoints().size() != 0) {
+//				ExecutiveTaskExecutionDTO dtos = ltdto.getTrackingPoints().get(last);
+//				ltdto.getTrackingPoints().remove(dtos);
+//
+//				LocalDateTime dates = dtos.getDate();
+//				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//
+//				String formattedDateTime = dates.format(formatter);
+//
+//				String[] parts = formattedDateTime.split(" ");
+//
+//				SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+//				Date date1 = format.parse(time1);
+//				Date date2 = format.parse(parts[1]);
+//				long difference = 0;
+//				if(date2.getTime()>=date1.getTime())
+//				{
+//				difference = date2.getTime()- date1.getTime();
+//				}
+//				else {
+//					difference = date1.getTime()- date2.getTime();
+//				}
+//				 long minutes = (difference / 1000) / 60;
+//
+//				if (minutes < 5) {
+//					dtos.setAccountProfileName("CurrentLocation");
+//
+//					ltdto.getTrackingPoints().add(dtos);
+//				}
+//				else {
+//					ltdto.getTrackingPoints().add(dtos);
+//				}
+//
+//			}
+//		}
 		return liveTrackingDTOs;
 	}
 

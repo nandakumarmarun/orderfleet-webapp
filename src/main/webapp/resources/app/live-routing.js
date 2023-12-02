@@ -115,7 +115,7 @@ function onSelectUser(userPid, obj) {
 	$.each(userDataList, function(index, userData) {
 		if (userData.userPid == userPid) {
 			var trackingPoints = userData.trackingPoints.slice();
-			createUserMapOptionsAndRefreshMap(trackingPoints);
+//			createUserMapOptionsAndRefreshMap(trackingPoints);
 			markPoints(userData.trackingPoints, userData.employeeName);
 			drawRoute(trackingPoints);
 			return;
@@ -222,20 +222,21 @@ function getLocation(obj) {
 	});
 }
 
-function zoomToLocation(lat, lng) {
-	console.log("latitude : " + lat);
-	console.log("longitude : " + lng);
-	if (lat === 0 && lng === 0) {
-		return;
-	}
-	var point = new google.maps.LatLng(lat, lng);
-	map.setZoom(18);
-	map.setCenter(point);
-}
+//function zoomToLocation(lat, lng) {
+//	console.log("latitude : " + lat);
+//	console.log("longitude : " + lng);
+//	if (lat === 0 && lng === 0) {
+//		return;
+//	}
+//	var point = new google.maps.LatLng(lat, lng);
+//	map.setZoom(18);
+//	map.setCenter(point);
+//}
 
 var endPointNumber = 0;
 function markPoints(trackingPoints, employeeName) {
 	endPointNumber = trackingPoints.length;
+	console.log("Size of points :"+endPointNumber)
 	var number = 0;
 	$.each(trackingPoints, function(index, trackingPoint) {
 		number = number + 1;
@@ -288,7 +289,7 @@ function createMarker(trackingPoint, number, employeeName) {
 			if (trackingPoint.accountProfileName == "Attendance") {
 				marker
 						.setIcon(contextPath
-								+ '/resources/assets/images/map/locations.png');
+								+ '/resources/assets/images/map/location.png');
 			} else if(trackingPoint.accountProfileName == "CurrentLocation") {
 				marker
 						.setIcon(contextPath
@@ -297,7 +298,7 @@ function createMarker(trackingPoint, number, employeeName) {
 			else{
 				marker
 				.setIcon(contextPath
-						+ '/resources/assets/images/map/locations.png');
+						+ '/resources/assets/images/map/location.png');
 			}
 		}
 
@@ -396,7 +397,7 @@ function convertTime(createdDate) {
 function drawRoute(points) {
 
 	var array = removeDuplicatesFromPoints(points);
-	console.log("totalPoints............" + array.length)
+	console.log("totalPoints............" + array.length +" Points :"+points)
 	if (array.length > 0) {
 		var totalPoints = array.length;
 		var lastIndex = totalPoints - 1;
@@ -450,7 +451,7 @@ function executeDirectionService(points) {
 
 		});
 	}
-	console.log(pointsArray.length);
+	console.log("size:"+pointsArray.length);
 	var request = {
 		origin : startLatLng,
 		destination : endLatLng,

@@ -95,6 +95,8 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	Page<ProductProfile> findByProductCategoryInAndActivatedTrue(List<ProductCategory> productCategories,
 			Pageable pageable);
 
+	List<ProductProfile> findByProductCategoryInAndActivatedFalse(List<ProductCategory> productCategories);
+
 	@Modifying
 	@Query("update ProductProfile productProfile set productProfile.description = '0' where productProfile.company.id = ?#{principal.companyId}")
 	void updateSDiscription();
@@ -120,6 +122,9 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 	Page<ProductProfile> findByProductCategoryInAndActivatedTrueAndLastModifiedDate(
 			List<ProductCategory> productCategories, boolean activated, LocalDateTime lastModifiedDate,
 			Pageable pageable);
+
+	@Query("select productProfile from ProductProfile productProfile where productProfile.company.id = ?#{principal.companyId} and productProfile.activated = ?1 and productProfile.lastModifiedDate > ?2")
+	List<ProductProfile> findProductProfilesByActivatedFalseAndLastModifiedDate(boolean activated, LocalDateTime lastModifiedDate);
 
 	// mainly used for noor asia company
 	Optional<ProductProfile> findByCompanyIdAndAliasIgnoreCase(Long id, String alias);

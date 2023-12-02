@@ -931,6 +931,7 @@
 												+ documentType + "')").attr(
 										'selected', 'selected');
 							}
+						<!--	Set the date selection limit to 3 months-->
 							$("#txtToDate").datepicker({
 								 dateFormat: 'mm-dd-yy',
                                             minDate: 0,

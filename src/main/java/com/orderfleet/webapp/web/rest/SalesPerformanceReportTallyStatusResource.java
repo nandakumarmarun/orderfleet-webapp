@@ -396,7 +396,7 @@ public class SalesPerformanceReportTallyStatusResource {
 		LocalDate fDate = LocalDate.now();
 		LocalDate tDate = LocalDate.now();
 		if (filterBy.equals(SalesPerformanceReportTallyStatusResource.CUSTOM)) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 			fDate = LocalDate.parse(fromDate, formatter);
 			tDate = LocalDate.parse(toDate, formatter);
 		} else if (filterBy.equals(SalesPerformanceReportTallyStatusResource.YESTERDAY)) {
@@ -690,7 +690,7 @@ public class SalesPerformanceReportTallyStatusResource {
 		LocalDate fDate = LocalDate.now();
 		LocalDate tDate = LocalDate.now();
 		if (filterBy.equals(SalesPerformanceReportTallyStatusResource.CUSTOM)) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 			fDate = LocalDate.parse(fromDate, formatter);
 			tDate = LocalDate.parse(toDate, formatter);
 		} else if (filterBy.equals(SalesPerformanceReportTallyStatusResource.YESTERDAY)) {

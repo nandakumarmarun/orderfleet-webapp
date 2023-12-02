@@ -70,7 +70,8 @@ if (!this.MobileConfiguration) {
 			enablePreviousOrderItems:false,
 			enablelivetracking:false,
 			receiptShareOption  : false,
-			myPlanSequence : false
+			myPlanSequence : false,
+			masterDataAutoUpdation : null
 	};
 
 	$(document).ready(function() {
@@ -216,7 +217,7 @@ if (!this.MobileConfiguration) {
 		":checked");
         mobileConfigurationDTO.myPlanSequence = $("#myPlanSequence").is(
 		":checked");
-		
+		mobileConfigurationDTO.masterDataAutoUpdation = $('#field_masterDataAutoUpdation').val();
 		$.ajax({
 			url : contextPath,
 			method : 'POST',
@@ -357,6 +358,7 @@ if (!this.MobileConfiguration) {
                                     data.receiptShareOption);
                             $('#myPlanSequence').prop("checked",
                                     data.myPlanSequence);
+                            $('#field_masterDataAutoUpdation').val(data.masterDataAutoUpdation);
 						}
 
 					},

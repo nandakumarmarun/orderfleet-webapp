@@ -122,7 +122,7 @@ public class LoginLogoutReportResource {
 			fDate = LocalDate.now().withDayOfMonth(1);
 			tDate = LocalDate.now();
 		} else if (filterBy.equals("CUSTOM")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 			fDate = LocalDate.parse(fromDate, formatter);
 			tDate = LocalDate.parse(toDate, formatter);
 		}
