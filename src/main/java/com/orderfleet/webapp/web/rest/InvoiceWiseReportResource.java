@@ -519,7 +519,7 @@ public class InvoiceWiseReportResource {
 							+ description);
 			}
 		}
-		log.info("Finding executive Task execution Accounting Vouchers...");
+		log.info("Finding executive Task execution Accounting Vouchers");
 		List<Object[]> accountingVouchers = new ArrayList<>();
 		if (exeIds.size() > 0) {
 			if (documentPid.equals("no")) {
