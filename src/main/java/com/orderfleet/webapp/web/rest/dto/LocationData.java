@@ -15,7 +15,7 @@ public class LocationData {
 		private String key;
 	
 		private Integer battery_percentage;
-		private String Address;
+		private String address;
 		
 		public String getCompanyName() {
 			return companyName;
@@ -39,11 +39,11 @@ public class LocationData {
 	}
 
 	public String getAddress() {
-		return Address;
+		return address;
 	}
 
 	public void setAddress(String address) {
-		Address = address;
+		address = address;
 	}
 
 	public void setLatitude(BigDecimal latitude) {
@@ -85,7 +85,7 @@ public class LocationData {
 				", longitude=" + longitude +
 				", key='" + key + '\'' +
 				", battery_percentage=" + battery_percentage +
-				", Address='" + Address + '\'' +
+				", Address='" + address + '\'' +
 				'}';
 	}
 }

@@ -78,7 +78,7 @@ public class LiveRoutingResourse {
 
 	private static final String AUTH_KEY = "AIzaSyB_KOvF4OXz0C6gM7kLE8BrIhgBjs2QLsg";
 
-	private static final String FIREBASE_URL = "https://salesnrich-8ec69-default-rtdb.firebaseio.com/Salesnrich";
+	private static final String FIREBASE_URL = "https://salesnrich-8ec69-default-rtdb.firebaseio.com/SalesNrich";
 
 	@Inject
 	private CompanyRepository companyRepository;
@@ -156,7 +156,7 @@ public class LiveRoutingResourse {
 			if (liveRoutingResponse.getBody() != null) {
 				Map<String, LocationData> response = liveRoutingResponse.getBody();
 
-				System.out.println("Size :"+response.size());
+				System.out.println("Size :"+response.toString());
 				String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
 				List<LiveRoutingResponse> routing = new ArrayList<>();
@@ -170,7 +170,7 @@ public class LiveRoutingResourse {
 					fbid.setCurrentDateTime(entries.getValue().getCurrentDateTime());
 					fbid.setLatitude(entries.getValue().getLatitude());
 					fbid.setLongitude(entries.getValue().getLongitude());
-				fbid.setBattery_percentage(entries.getValue().getBattery_percentage());
+			    	fbid.setBattery_percentage(entries.getValue().getBattery_percentage());
 					fbid.setAddress(entries.getValue().getAddress());
 					loc.add(fbid);
 					liveRouting.setLocations(loc);
