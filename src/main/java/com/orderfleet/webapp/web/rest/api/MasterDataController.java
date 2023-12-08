@@ -20,6 +20,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.repository.*;
 import com.orderfleet.webapp.service.*;
+import com.orderfleet.webapp.web.rest.api.dto.*;
+import com.orderfleet.webapp.web.rest.api.dto.DocumentAccountingVoucherColumnDTO;
+import com.orderfleet.webapp.web.rest.api.dto.DocumentInventoryVoucherColumnDTO;
 import com.orderfleet.webapp.web.rest.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +39,6 @@ import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.web.rest.api.dto.DocumentAccountingVoucherColumnDTO;
-import com.orderfleet.webapp.web.rest.api.dto.DocumentInventoryVoucherColumnDTO;
-import com.orderfleet.webapp.web.rest.api.dto.FormFormElementDTO;
-import com.orderfleet.webapp.web.rest.api.dto.KnowledgeBaseFilesDTO;
-import com.orderfleet.webapp.web.rest.api.dto.MBLocationHierarchyDTO;
-import com.orderfleet.webapp.web.rest.api.dto.PostDatedVoucherDTO;
-import com.orderfleet.webapp.web.rest.api.dto.RootPlanHeaderUserTaskListDTO;
 import com.orderfleet.webapp.web.rest.util.PaginationUtil;
 
 /**
@@ -1887,4 +1883,26 @@ public class MasterDataController {
 		}
 		return new ResponseEntity<List<SyncOperationDTO>>(SyncDetails,HttpStatus.OK);
 	}
+
+	@GetMapping("master-data-count")
+	@Timed
+	public ResponseEntity<MasterCountDTO> getAllMastersSize() throws URISyntaxException {
+		log.info("Web request to get master Count");
+		MasterCountDTO masterCountDTO = new MasterCountDTO();
+		List<AccountProfile> pageAccounts;
+		pageAccounts = locationAccountProfileService
+					.findAccountProfilesSize();
+		List<ProductProfileDTO> productProfileDTOs;
+			productProfileDTOs = productProfileService
+					.findProductsSize();
+
+		List<ActivityDTO> activityDTOs;
+			activityDTOs = userActivityService.findByUserIsCurrentUserAndActivityActivated(true);
+			masterCountDTO.setAccountSize(pageAccounts.size());
+			masterCountDTO.setProductSize(productProfileDTOs.size());
+			masterCountDTO.setActivitySize(activityDTOs.size());
+
+		return new ResponseEntity<MasterCountDTO>(masterCountDTO,HttpStatus.OK);
+	}
+
 }

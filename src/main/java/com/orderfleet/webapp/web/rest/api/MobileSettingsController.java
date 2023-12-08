@@ -132,7 +132,7 @@ public class MobileSettingsController {
 		Optional<UserWiseMobileConfigurationDTO> userWiseMobileConfigurationDTO = userWiseMobileConfigurationService.findOneByUserId(user.get().getId());
 		if(userWiseMobileConfigurationDTO.isPresent())
 		{
-			mobileSettingsDTO = new MobileSettingsDTO(userWiseMobileConfigurationDTO.get());
+			mobileSettingsDTO.setLiveRouting(userWiseMobileConfigurationDTO.get().isLiveRouting());
 			log.info("mobileSetting var :"+mobileSettingsDTO.isLiveRouting());
 		}
 		   // set day plan execution pages

@@ -94,6 +94,7 @@ public interface ProductProfileRepository extends JpaRepository<ProductProfile, 
 
 	Page<ProductProfile> findByProductCategoryInAndActivatedTrue(List<ProductCategory> productCategories,
 			Pageable pageable);
+	List<ProductProfile> findByProductCategoryInAndActivatedTrue(List<ProductCategory> productCategories);
 
 	List<ProductProfile> findByProductCategoryInAndActivatedFalse(List<ProductCategory> productCategories);
 

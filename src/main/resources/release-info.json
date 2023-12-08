@@ -1,7 +1,7 @@
 {
-"release-number" : "1.114.7",
-"release-date" : "02/12/2023",
+"release-number" : "1.115.0",
+"release-date" : "08/12/2023",
 "features" : [
-  "Date filter,Master Data Automation,Live Routing,Modern"
+  "Api for Master Count"
 ]
 }

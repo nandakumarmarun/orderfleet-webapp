@@ -181,4 +181,6 @@ public interface ProductProfileService {
 
 
 	List<String> findByProductCategoryInAndActivatedFalseAndLastModifiedDate(LocalDateTime lastSyncdate);
+
+	List<ProductProfileDTO> findProductsSize();
 }

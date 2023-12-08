@@ -101,4 +101,6 @@ public interface LocationAccountProfileService {
 
 
 	List<String> findAllByAccountProfileActivatedFalseAndLocationInAndLastModifiedDate(LocalDateTime lastSyncdate);
+
+	List<AccountProfile> findAccountProfilesSize();
 }

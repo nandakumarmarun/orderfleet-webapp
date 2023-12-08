@@ -941,4 +941,18 @@ public class ProductProfileServiceImpl implements ProductProfileService {
 		return productProfileDTOs;
 		
 	}
+	@Transactional(readOnly = true)
+	public List<ProductProfileDTO> findProductsSize() {
+		// get user productCategories
+		List<ProductCategory> productCategories = userProductCategoryRepository
+				.findProductCategorysByUserIsCurrentUser();
+		// get productProfiles by user productCategories
+		List<ProductProfile> productProfiles = productProfileRepository
+				.findByProductCategoryInAndActivatedTrue(productCategories);
+		System.out.println(productProfiles);
+		List<ProductProfileDTO> result = productProfiles.stream().map(ProductProfileDTO::new)
+				.collect(Collectors.toList());
+		return result;
+	}
+
 }

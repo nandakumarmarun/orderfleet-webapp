@@ -6,9 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +31,6 @@ import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyConfiguration;
 import com.orderfleet.webapp.domain.Location;
 import com.orderfleet.webapp.domain.LocationAccountProfile;
-import com.orderfleet.webapp.domain.OpeningStock;
-import com.orderfleet.webapp.domain.ProductNameTextSettings;
 import com.orderfleet.webapp.domain.ReceivablePayable;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.repository.AccountNameTextSettingsRepository;
@@ -50,9 +46,7 @@ import com.orderfleet.webapp.service.LocationAccountProfileService;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationAccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.LocationDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
-import com.orderfleet.webapp.web.rest.dto.StockDetailsDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 /**
@@ -960,5 +954,29 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 		accountDTOs = accountProfileMapper.accountProfilesToAccountProfileDTOs(accountProfiles);
 			List<String> accountPids = accountDTOs.stream().map(a -> a.getPid()).collect(Collectors.toList());
 		return accountPids;
+	}
+	public List<AccountProfile> findAccountProfilesSize() {
+
+		// get accounts in employee locations
+		List<AccountProfile> result = new ArrayList<>();
+		List<AccountProfileDTO> accountDTOs = new ArrayList<>();
+		log.info("===============================================================");
+		log.info("get accountProfiles..........");
+
+
+		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByEmployeeProfileIsCurrentUser();
+		long companyId = SecurityUtils.getCurrentUsersCompanyId();
+         log.info("company :"+companyId);
+		if (locationIds.size() > 0) {
+			log.info("Enter heree..");
+			List<LocationAccountProfile> accountProfiles = locationAccountProfileRepository
+					.findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdOrderByIdAsc(
+							locationIds, companyId);
+
+			result = accountProfiles.stream().map(ac ->ac.getAccountProfile()).collect(Collectors.toList());
+
+		}
+		log.info("Size :"+result.size());
+		return result;
 	}
 }
