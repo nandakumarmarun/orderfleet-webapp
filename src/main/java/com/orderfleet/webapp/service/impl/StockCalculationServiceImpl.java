@@ -447,8 +447,6 @@ public class StockCalculationServiceImpl implements StockCalculationService {
         return LiveStock;
     }
 
-
-
     public ObjectMapper getObjectMapper(){
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

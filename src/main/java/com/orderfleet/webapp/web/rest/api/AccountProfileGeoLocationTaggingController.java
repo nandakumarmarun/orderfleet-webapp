@@ -40,12 +40,16 @@ import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 public class AccountProfileGeoLocationTaggingController {
 
 	private final Logger log = LoggerFactory.getLogger(MasterDataController.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
 
 	@Inject
 	private AccountProfileGeoLocationTaggingService accountProfileGeoLocationTaggingService;
+
+
 
 	@RequestMapping(value = "/account-profile-geo-location-tagging", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed

@@ -27,7 +27,8 @@ if (!this.Activity) {
 		hasTelephonicOrder : null,
 		emailTocomplaint : null,
 		locationRadius : null,
-		secondarySalesThroughApi : null
+		secondarySalesThroughApi : null,
+        kmCalculationDisabled : null
 	};
 
 	// Specify the validation rules
@@ -251,7 +252,7 @@ if (!this.Activity) {
 		activityModel.secondarySalesThroughApi = $('#secondarySalesThroughApi').prop(
 		"checked");
 		activityModel.companyPid = $('#field_company').val();
-
+        activityModel.kmCalculationDisabled = $('#kmcalculationdisabled').prop("checked");
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action') + "/save",
@@ -348,6 +349,7 @@ if (!this.Activity) {
 						$("#secondarySalesThroughApi").prop("checked",
 								data.secondarySalesThroughApi);
 						$("#field_company").prop('disabled', true);
+						$('#kmcalculationdisabled').prop('checked', data.kmCalculationDisabled);
 
 						// set pid
 						activityModel.pid = data.pid;

@@ -726,7 +726,7 @@ public class MobileSettingsDTO {
 		this.myPlanSequence = myPlanSequence;
 	}
 
-	public Integer getMasterDataAutoUpdation() {
+	public int getMasterDataAutoUpdation() {
 		return masterDataAutoUpdation;
 	}
 

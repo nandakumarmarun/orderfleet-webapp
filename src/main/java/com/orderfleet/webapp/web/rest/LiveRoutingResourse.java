@@ -182,7 +182,6 @@ public class LiveRoutingResourse {
 				for (LiveRoutingResponse responses : routing) {
 
 					for (LocationData locations : responses.getLocations())
-
 					{
 						ExecutiveTaskExecutionDTO executiveTaskExecutionDTO = new ExecutiveTaskExecutionDTO();
 						String datetime = locations.getCurrentDateTime();

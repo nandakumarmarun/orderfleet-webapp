@@ -148,7 +148,7 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	List<ExecutiveTaskExecution> findAllByCompanyIdUserPidAndDateBetweenOrderByDateAsc(String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate);
 
-	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.user.pid = ?1 and exeTaskExecution.sendDate between ?2 and ?3 Order By exeTaskExecution.sendDate asc")
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.user.pid = ?1 and exeTaskExecution.activity.kmCalculationDisabled = false and exeTaskExecution.sendDate between ?2 and ?3 Order By exeTaskExecution.sendDate asc")
 	List<ExecutiveTaskExecution> findAllByCompanyIdUserPidAndDateBetweenOrderBySendDateAsc(String userPid, LocalDateTime fromDate, LocalDateTime toDate);
 	List<ExecutiveTaskExecution> findTop2ByUserPidAndDateBetweenAndLocationTypeInOrderByDateDesc(String userPid,
 			LocalDateTime fromDate, LocalDateTime toDate, List<LocationType> locationTypes);

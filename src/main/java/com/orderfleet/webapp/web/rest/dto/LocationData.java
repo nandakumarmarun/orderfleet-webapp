@@ -43,7 +43,7 @@ public class LocationData {
 	}
 
 	public void setAddress(String address) {
-		address = address;
+		this.address = address;
 	}
 
 	public void setLatitude(BigDecimal latitude) {

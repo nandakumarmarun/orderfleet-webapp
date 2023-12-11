@@ -120,13 +120,17 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
                         .findByCompanyPidAndName(
                                 user.getCompany().getPid(), CompanyConfig.KILO_CALC);
 
-            if (optDistanceTraveled.isPresent()) {
+            if (optDistanceTraveled.isPresent() ) {
                 if (Boolean.valueOf(optDistanceTraveled.get().getValue())) {
-                    log.info("Update Distance travelled");
+                    log.info("Update Distance travelled : " );
 
                     if(tsTransactionWrapper != null
-                            && tsTransactionWrapper.getExecutiveTaskExecution() != null){
-
+                            && tsTransactionWrapper.getExecutiveTaskExecution() != null
+                            && !tsTransactionWrapper.getExecutiveTaskExecution()
+                            .getActivity().getKmCalculationDisabled())
+                    {
+                        log.info("Activity Kilometer Enabled : " + tsTransactionWrapper.getExecutiveTaskExecution()
+                                .getActivity().getKmCalculationDisabled());
                         Optional<KilometerCalculationDenormalised> OptionalOrigin =
                                 KilometerCalculationDenormalisedRepository
                                         .findTop1ByTaskExecutionPid(
@@ -180,31 +184,41 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
                             KilometerCalculationDenormalised = saveDefaultKilometer(executiveTaskExecution, employee);
                         }
                     }
-                    convertToJson(KilometerCalculationDenormalised , " Saving Executive Task Execution ");
-                    if(executiveTaskExecution.getLongitude() != null
-                            && executiveTaskExecution.getLongitude().doubleValue() != 0
-                            && executiveTaskExecution.getLatitude() != null
-                            && executiveTaskExecution.getLatitude().doubleValue() != 0){
-                        log.debug("Coordinates : " + executiveTaskExecution.getLatitude()+","+executiveTaskExecution.getLongitude());
-                        log.debug(" Calculating  kilometer from  Executive task ");
 
-                        Optional<CompanyConfiguration> optSalbdistnceCalculations = getCompanyConfiguration(user);
+                    if(!tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getKmCalculationDisabled()){
+                        if(executiveTaskExecution.getLongitude() != null
+                                && executiveTaskExecution.getLongitude().doubleValue() != 0
+                                && executiveTaskExecution.getLatitude() != null
+                                && executiveTaskExecution.getLatitude().doubleValue() != 0){
 
-                        if (optSalbdistnceCalculations.isPresent()) {
-                            if (Boolean.valueOf(optSalbdistnceCalculations.get().getValue())) {
-                                getDistanceFare(executiveTaskExecution.getSendDate().toLocalDate(),
-                                        executiveTaskExecution.getUser().getPid(),KilometerCalculationDenormalised);
+                            log.debug("Coordinates : " + executiveTaskExecution.getLatitude()
+                                    +","+executiveTaskExecution.getLongitude());
+                            log.debug(" Calculating  kilometer from  Executive task ");
+
+                            Optional<CompanyConfiguration> optSalbdistnceCalculations = getCompanyConfiguration(user);
+
+                            if (optSalbdistnceCalculations.isPresent()) {
+                                if (Boolean.valueOf(optSalbdistnceCalculations.get().getValue())) {
+                                    getDistanceFare(executiveTaskExecution.getSendDate().toLocalDate(),
+                                            executiveTaskExecution.getUser().getPid(),KilometerCalculationDenormalised);
+                                }
                             }
+                            KilometerCalculationDenormalised.setCalculatd(true);
+                        }else{
+                            log.debug("Not Calculatable " + executiveTaskExecution.getLongitude());
+                            KilometerCalculationDenormalised.setCalculatd(false);
                         }
-
-                        KilometerCalculationDenormalised.setCalculatd(true);
+                        KilometerCalculationDenormalisedRepository.save(KilometerCalculationDenormalised);
                     }else{
-                        log.debug("Not Calculatable " + executiveTaskExecution.getLongitude());
-                        KilometerCalculationDenormalised.setCalculatd(false);
+                        log.debug("Kilometer calculation Property not Supported For this Visit (Activity) "
+                                + tsTransactionWrapper.getExecutiveTaskExecution().getActivity().getName());
                     }
-                    KilometerCalculationDenormalisedRepository.save(KilometerCalculationDenormalised);
                 }
             }
+
+
+
+
     }
 
     private Optional<CompanyConfiguration> getCompanyConfiguration(User user) {

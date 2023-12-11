@@ -121,6 +121,10 @@ public class Activity implements Serializable {
 	@NotNull
 	@Column(name = "secondary_sale_through_api", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean secondarySalesThroughApi;
+
+
+	@Column(name = "km_calculation_Disabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean kmCalculationDisabled;
 	
 	@PreUpdate
 	public void preUpdate() {
@@ -281,6 +285,14 @@ public class Activity implements Serializable {
 
 	public void setSecondarySalesThroughApi(boolean secondarySalesThroughApi) {
 		this.secondarySalesThroughApi = secondarySalesThroughApi;
+	}
+
+	public boolean getKmCalculationDisabled() {
+		return kmCalculationDisabled;
+	}
+
+	public void setKmCalculationDisabled(boolean kmCalculationDisabled) {
+		this.kmCalculationDisabled = kmCalculationDisabled;
 	}
 
 	@Override

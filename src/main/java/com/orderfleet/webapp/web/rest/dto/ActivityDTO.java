@@ -71,7 +71,7 @@ public class ActivityDTO {
 	
 	private boolean secondarySalesThroughApi;
 
-
+	private boolean kmCalculationDisabled;
 
 	private ContactManagement contactManagement;
 
@@ -93,6 +93,7 @@ public class ActivityDTO {
 		this.geoFencing = activity.getGeoFencing();
 		this.hasTelephonicOrder = activity.getHasTelephonicOrder();
 		this.emailTocomplaint = activity.getEmailTocomplaint();
+		this.kmCalculationDisabled = activity.getKmCalculationDisabled();
 
 
 		// eagerly load the association
@@ -342,6 +343,14 @@ public class ActivityDTO {
 		this.secondarySalesThroughApi = secondarySalesThroughApi;
 	}
 
+	public boolean getKmCalculationDisabled() {
+		return kmCalculationDisabled;
+	}
+
+	public void setKmCalculationDisabled(boolean kmCalculationDisabled) {
+		this.kmCalculationDisabled = kmCalculationDisabled;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -366,17 +375,33 @@ public class ActivityDTO {
 
 	@Override
 	public String toString() {
-		return "ActivityDTO [pid=" + pid + ", name=" + name + ", alias=" + alias + ", description=" + description
-				+ ", hasDefaultAccount=" + hasDefaultAccount + ", hasSecondarySales=" + hasSecondarySales
-				+ ", activityAccountTypes=" + activityAccountTypes + ", documents=" + documents + ", planThrouchOnly="
-				+ planThrouchOnly + ", excludeAccountsInPlan=" + excludeAccountsInPlan + ", activated=" + activated
-				+ ", completePlans=" + completePlans + ", saveActivityDuration=" + saveActivityDuration
-				+ ", targetDisplayOnDayplan=" + targetDisplayOnDayplan + ", sortOrder=" + sortOrder
-				+ ", lastModifiedDate=" + lastModifiedDate + ", interimSave=" + interimSave + ", companyPid="
-				+ companyPid + ", companyName=" + companyName + ", geoFencing=" + geoFencing + ", hasTelephonicOrder="
-				+ hasTelephonicOrder + ", contactManagement=" + contactManagement + "]";
+		return "ActivityDTO{" +
+				"pid='" + pid + '\'' +
+				", name='" + name + '\'' +
+				", alias='" + alias + '\'' +
+				", description='" + description + '\'' +
+				", hasDefaultAccount=" + hasDefaultAccount +
+				", hasSecondarySales=" + hasSecondarySales +
+				", activityAccountTypes=" + activityAccountTypes +
+				", documents=" + documents +
+				", planThrouchOnly=" + planThrouchOnly +
+				", excludeAccountsInPlan=" + excludeAccountsInPlan +
+				", activated=" + activated +
+				", completePlans=" + completePlans +
+				", saveActivityDuration=" + saveActivityDuration +
+				", targetDisplayOnDayplan=" + targetDisplayOnDayplan +
+				", emailTocomplaint=" + emailTocomplaint +
+				", sortOrder=" + sortOrder +
+				", lastModifiedDate=" + lastModifiedDate +
+				", interimSave=" + interimSave +
+				", companyPid='" + companyPid + '\'' +
+				", companyName='" + companyName + '\'' +
+				", geoFencing=" + geoFencing +
+				", hasTelephonicOrder=" + hasTelephonicOrder +
+				", locationRadius=" + locationRadius +
+				", secondarySalesThroughApi=" + secondarySalesThroughApi +
+				", kmCalculationDisabled=" + kmCalculationDisabled +
+				", contactManagement=" + contactManagement +
+				'}';
 	}
-
-	
-
 }

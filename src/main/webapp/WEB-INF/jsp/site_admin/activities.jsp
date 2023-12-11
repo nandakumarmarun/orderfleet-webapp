@@ -180,6 +180,12 @@
 										style="width: 4%;" />
 								</div>
 								<div class="form-group">
+                                    <label class="control-label" for="kmCalculationDisabled">
+                                    Kilometer Calculation Disabled </label> <input type="checkbox" class="form-control"
+                                    name="kmcalculationdisabledid" id="kmcalculationdisabled"
+                                    style="width: 4%;"/>
+                                </div>
+								<div class="form-group">
 									<label class="control-label" for="field_locationRadius">Location
 										Radius </label> <input type="number" class="form-control"
 										name="locationRadius" id="field_locationRadius" max="10000"

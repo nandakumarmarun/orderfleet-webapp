@@ -412,6 +412,7 @@ public class ActivityResource {
 	public ResponseEntity<ActivityDTO> createActivityFromAdmin(@Valid @RequestBody ActivityDTO activityDTO)
 			throws URISyntaxException {
 		log.debug("Web request to save Activity : {}", activityDTO);
+		log.debug("kilometer calculation : ", activityDTO.getKmCalculationDisabled());
 		if (activityDTO.getPid() != null) {
 			return ResponseEntity.badRequest().headers(
 					HeaderUtil.createFailureAlert("activity", "idexists", "A new activity cannot already have an ID"))
@@ -424,6 +425,7 @@ public class ActivityResource {
 		}
 		activityDTO.setActivated(true);
 		ActivityDTO result = activityService.saveFormSAdmin(activityDTO);
+		log.debug("saved kilometer calculation  : ", result.getKmCalculationDisabled());
 		return ResponseEntity.created(new URI("/web/activities/" + result.getPid()))
 				.headers(HeaderUtil.createEntityCreationAlert("activity", result.getPid().toString())).body(result);
 	}
