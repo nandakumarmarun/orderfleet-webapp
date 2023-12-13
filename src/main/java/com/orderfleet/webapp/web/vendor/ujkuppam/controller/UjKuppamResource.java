@@ -1,6 +1,9 @@
 package com.orderfleet.webapp.web.vendor.ujkuppam.controller;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orderfleet.webapp.web.rest.UploadUncleJohnResource;
 import com.orderfleet.webapp.web.vendor.ujkuppam.service.UjKuppamAccountService;
 import com.orderfleet.webapp.web.vendor.ujkuppam.service.UjKuppamProductService;
@@ -22,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -160,8 +164,11 @@ public class UjKuppamResource {
                 restTemplate.exchange("http://192.168.2.54/?request=apiNtrich",
                 HttpMethod.POST, dealerEntity, DealerResponseUJ.class);
 
-        log.debug("Response created");
-        log.debug("Size : " + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
+        log.debug(" Response created ");
+        log.debug(" Customer Size : " + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
+        convertToJson(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(), " Customer Data ");
+        log.debug(" Dealer Size : " + dealerResponse.getBody().getDealerUJ().getDealer());
+        convertToJson(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(), " Dealers Data ");
 
         if (accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ() != null
                 && dealerResponse.getBody().getDealerUJ().getDealer() != null) {
@@ -169,23 +176,41 @@ public class UjKuppamResource {
             ujKuppamAccountService.saveUpdateLocations(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
                     dealerResponse.getBody().getDealerUJ().getDealer());
 
-            ujKuppamAccountService
-                    .saveUpdateAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
+            ujKuppamAccountService.saveUpdateAccounts(
+                            accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
 
             ujKuppamAccountService.saveAccountProfileGeoLocation(
                     accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
 
-            ujKuppamAccountService
-                    .saveDealer(dealerResponse.getBody().getDealerUJ().getDealer());
+            ujKuppamAccountService.saveDealer(dealerResponse.getBody().getDealerUJ().getDealer());
 
-            ujKuppamAccountService
-                    .saveDistributorDealerAssociation(dealerResponse.getBody().getDealerUJ().getDealer());
+            ujKuppamAccountService.saveDistributorDealerAssociation(dealerResponse.getBody().getDealerUJ().getDealer());
 
             ujKuppamAccountService
                     .saveUpdateLocationAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
                     dealerResponse.getBody().getDealerUJ().getDealer());
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public <T> void convertToJson(
+            Object collection,String messagae) {
+        ObjectMapper objectMapper = getObjectMapper();
+        try {
+            log.info(System.lineSeparator());
+            String jsonString = objectMapper.writeValueAsString(collection);
+            log.debug(messagae  + jsonString);
+            log.info(System.lineSeparator());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ObjectMapper getObjectMapper(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+        return mapper;
     }
 
 }
