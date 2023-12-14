@@ -32,6 +32,8 @@ import java.util.Map;
 /**
  * REST Controller handling Uncle John Trichy data uploads for product and account profiles.
  * This controller interacts with external APIs to fetch data and updates the local database.
+ *
+ *
  */
 @Controller
 @RequestMapping("/web")
@@ -169,13 +171,10 @@ public class UjTirunelveliResource {
                 HttpMethod.POST, dealerEntity, DealerResponseUJ.class);
 
         log.debug("Response created");
-        log.debug(" Customer Size : " + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
-        convertToJson(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(), " Customer Data ");
-        log.debug(" Dealer Size : " + dealerResponse.getBody().getDealerUJ().getDealer());
-        convertToJson(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(), " Dealers Data ");
-
         if (accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ() != null
                 && dealerResponse.getBody().getDealerUJ().getDealer() != null) {
+            log.debug(" Customer Size : " + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
+            log.debug(" Dealer Size : " + dealerResponse.getBody().getDealerUJ().getDealer());
 
             ujTirunelveliAccountService.saveUpdateLocations(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
                     dealerResponse.getBody().getDealerUJ().getDealer());

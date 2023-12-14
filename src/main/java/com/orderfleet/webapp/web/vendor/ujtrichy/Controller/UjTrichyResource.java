@@ -48,6 +48,7 @@ public class UjTrichyResource {
     /**
      * Displays the upload page for Uncle John Trichy Masters.
      *
+     *
      * @param model The Spring MVC model.
      * @return The name of the HTML template for the upload page.
      */
@@ -63,6 +64,7 @@ public class UjTrichyResource {
     /**
      * Handles the upload of Uncle John Trichy product profiles.
      * Fetches data from an external API and updates the local database.
+     *
      *
      *
      * @return ResponseEntity indicating the success of the operation.
@@ -142,7 +144,7 @@ public class UjTrichyResource {
 
         //Creating Request Entity
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-        log.debug("RequestEntity :" + requestEntity);
+        log.debug("RequestEntity : " + requestEntity);
 
         //Fetching Data From their customer data
         ResponseEntity<AccountProfileResponseUj> accountProfileResponse =
@@ -165,19 +167,18 @@ public class UjTrichyResource {
                 HttpMethod.POST, dealerEntity, DealerResponseUJ.class);
 
         log.debug("Response created");
-        log.debug(" Customer Size : " + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
-        convertToJson(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(), " Customer Data ");
-        log.debug(" Dealer Size : " + dealerResponse.getBody().getDealerUJ().getDealer());
-        convertToJson(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(), " Dealers Data ");
-
         if (accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ() != null
                 && dealerResponse.getBody().getDealerUJ().getDealer() != null) {
+            log.debug(" Customer Size : "   +  accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
+            log.debug(" Dealer Size   : "   +  dealerResponse.getBody().getDealerUJ().getDealer());
 
-            ujTrichyAccountService.saveUpdateLocations(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
+            ujTrichyAccountService.saveUpdateLocations(
+                    accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
                     dealerResponse.getBody().getDealerUJ().getDealer());
 
             ujTrichyAccountService
-                    .saveUpdateAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
+                    .saveUpdateAccounts(
+                            accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
 
             ujTrichyAccountService.saveAccountProfileGeoLocation(
                     accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());

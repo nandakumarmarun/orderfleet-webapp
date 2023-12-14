@@ -164,30 +164,24 @@ public class UjKuppamResource {
                 restTemplate.exchange("http://192.168.2.54/?request=apiNtrich",
                 HttpMethod.POST, dealerEntity, DealerResponseUJ.class);
 
-        log.debug(" Response created ");
-        log.debug(" Customer Size : " + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
-        convertToJson(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(), " Customer Data ");
-        log.debug(" Dealer Size : " + dealerResponse.getBody().getDealerUJ().getDealer());
-        convertToJson(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(), " Dealers Data ");
-
+        log.debug(" Response created");
         if (accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ() != null
                 && dealerResponse.getBody().getDealerUJ().getDealer() != null) {
+            log.debug(" Customer Size : " + accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ().size());
+            log.debug(" Dealer Size   : " + dealerResponse.getBody().getDealerUJ().getDealer());
 
             ujKuppamAccountService.saveUpdateLocations(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
                     dealerResponse.getBody().getDealerUJ().getDealer());
 
-            ujKuppamAccountService.saveUpdateAccounts(
-                            accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
+            ujKuppamAccountService.saveUpdateAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
 
-            ujKuppamAccountService.saveAccountProfileGeoLocation(
-                    accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
+            ujKuppamAccountService.saveAccountProfileGeoLocation(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ());
 
             ujKuppamAccountService.saveDealer(dealerResponse.getBody().getDealerUJ().getDealer());
 
             ujKuppamAccountService.saveDistributorDealerAssociation(dealerResponse.getBody().getDealerUJ().getDealer());
 
-            ujKuppamAccountService
-                    .saveUpdateLocationAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
+            ujKuppamAccountService.saveUpdateLocationAccounts(accountProfileResponse.getBody().getAccountProfileUJ().getAccountUJ(),
                     dealerResponse.getBody().getDealerUJ().getDealer());
         }
         return new ResponseEntity<>(HttpStatus.OK);
