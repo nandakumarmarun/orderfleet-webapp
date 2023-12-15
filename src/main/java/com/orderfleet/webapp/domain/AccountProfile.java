@@ -223,6 +223,11 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Column(name = "geo_tagging_type")
 	private GeoTaggingType geoTaggingType;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "geo_tagging_status")
+	private GeoTaggingStatus geoTaggingStatus;
+
+
 	@Column(name = "geo_tagged_time")
 	private LocalDateTime geoTaggedTime;
 
@@ -612,6 +617,14 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	public void setMailingName(String mailingName) {
 		this.mailingName = mailingName;
+	}
+
+	public GeoTaggingStatus getGeoTaggingStatus() {
+		return geoTaggingStatus;
+	}
+
+	public void setGeoTaggingStatus(GeoTaggingStatus geoTaggingStatus) {
+		this.geoTaggingStatus = geoTaggingStatus;
 	}
 
 	@Override

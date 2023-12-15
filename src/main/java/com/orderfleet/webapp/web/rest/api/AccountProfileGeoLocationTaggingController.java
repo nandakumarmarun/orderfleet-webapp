@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.domain.GeoTaggingStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -100,6 +101,7 @@ if (minutes > 10) {
 					"Account Profile Not exists", "Account Profile not Present")).body(null);
 		}
 		accountProfileGeoLocationTaggingDTO.setGeoTaggingType(GeoTaggingType.MOBILE_TAGGED);
+		accountProfileGeoLocationTaggingDTO.setGeoTaggingStatus(GeoTaggingStatus.NOT_EDITABLE);
 		AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO2 = accountProfileGeoLocationTaggingService
 				.save(accountProfileGeoLocationTaggingDTO);
 

@@ -242,6 +242,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 					if (accountProfileDTO.getGeoTaggingType() != null) {
 						accountProfile.setGeoTaggingType(accountProfileDTO.getGeoTaggingType());
 						accountProfile.setGeoTaggedTime(accountProfileDTO.getGeoTaggedTime());
+						accountProfile.setGeoTaggingStatus(accountProfileDTO.getGeoTaggingStatus());
 						Optional<User> opGeoTagUser = userRepository
 								.findOneByLogin(accountProfileDTO.getGeoTaggedUserLogin() == null ? ""
 										: accountProfileDTO.getGeoTaggedUserLogin());

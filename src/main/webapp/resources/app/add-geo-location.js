@@ -293,6 +293,16 @@ if(lat!=""){
 						.each(
 							accountProfiles,
 							function(index, accountProfile) {
+							var statusButton;
+							if (accountProfile.geoTaggingType == null) {
+                            		statusButton = ""
+                            }
+                           	else{
+                            statusButton =	"<span class='btn btn-warning'  id='"
+                                            + accountProfile.pid
+                            	        	+ "' onClick='AddGeoLocation.changeStatusToEdit(this)' >Change Status</span>";
+
+                           	}
 								$('#tBodyAddGeoLocation')
 									.append(
 										"<tr><td>"
@@ -317,7 +327,9 @@ if(lat!=""){
 										+ accountProfile.location+ "\",\"" + accountProfile.geoTaggedTime + "\",\"" + accountProfile.geoTaggedUserLogin 
 										+ "\",0);'>Location From Geo Tag Mobile</button><button type='button'data-target='#enableMapModal' class='btn btn-success' onclick='AddGeoLocation.oldLatLngValues($(\"#enableMapModal\"),\""
 										+ accountProfile.pid
-										+ "\",this);'>Location From Map</button></td></tr>");
+										+ "\",this);'>Location From Map</button><br>"
+										+ statusButton
+										+"</td></tr>");
 							});
 				},
 				error : function(xhr, error) {
@@ -326,8 +338,25 @@ if(lat!=""){
 			});
 	}
 	
-	
+	AddGeoLocation.changeStatusToEdit = function(obj) {
+    		var pid = $(obj).attr("id");
+    		$.ajax({
+            			url:addGeoLocationContextPath+"/changeStatus",
+            			type:'POST',
+            			data:{
+            				accountProfilePid:pid,
+            			},
+            			success: function(result){
+            			confirm(result.name +" Change the Geo Tag Status to " +result.geoTaggingStatus)
 
+            			},
+            			error:function(xhr, error){
+            				onError(xhr, error);
+            			},
+            		});
+
+
+}
 	AddGeoLocation.filterByAccountType = function() {
 		var accountTypePids = [];
 		var importedStatus = "";

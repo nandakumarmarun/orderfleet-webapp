@@ -16,6 +16,8 @@ import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import com.orderfleet.webapp.domain.GeoTaggingStatus;
+import com.orderfleet.webapp.repository.AccountProfileRepository;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
@@ -78,6 +80,9 @@ public class AddGeoLocationResource {
 	@Inject
 	private EmployeeProfileRepository employeeProfileRepository;
 
+	@Inject
+	private AccountProfileRepository accountProfileRepository;
+
 	@RequestMapping(value = "/add-geo-location", method = RequestMethod.GET)
 	@Timed
 	@Transactional(readOnly = true)
@@ -130,7 +135,6 @@ public class AddGeoLocationResource {
 					
 				}
 				else {
-					
 					account.setEmployeeName(account.getGeoTaggedUserName());
 				}
 				accountProfiles.add(account);
@@ -449,6 +453,7 @@ public class AddGeoLocationResource {
 		accountProfileDTO.setLocation(accountProfileGeoLocationTaggingDTO.getLocation());
 		accountProfileDTO.setGeoTaggingType(GeoTaggingType.WEB_TAGGED_MOBILE);
 		accountProfileDTO.setGeoTaggedTime(LocalDateTime.now());
+		accountProfileDTO.setGeoTaggingStatus(GeoTaggingStatus.NOT_EDITABLE);
 		accountProfileDTO.setGeoTaggedUserLogin(SecurityUtils.getCurrentUserLogin());
 		accountProfileDTO = accountProfileService.update(accountProfileDTO);
 		return new ResponseEntity<AccountProfileDTO>(accountProfileDTO, HttpStatus.OK);
@@ -470,5 +475,22 @@ public class AddGeoLocationResource {
 		accountProfileDTO = accountProfileService.update(accountProfileDTO);
 		return new ResponseEntity<>(accountProfileDTO, HttpStatus.OK);
 
+	}
+
+	@RequestMapping(value = "/add-geo-location/changeStatus", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<AccountProfileDTO> changeStatusToEdit(@RequestParam("accountProfilePid") String accountProfilePid) {
+		  log.info("web request to change status");
+		  Optional<AccountProfile> accountProfile = accountProfileRepository.findTop1ByPidOrderByLastModifiedDateDesc(accountProfilePid);
+		  accountProfile.get().setGeoTaggingStatus(GeoTaggingStatus.EDITABLE);
+		  accountProfileRepository.save(accountProfile.get());
+//          Optional<AccountProfileGeoLocationTagging> accountProfileGeoLocationTagging =  accountProfileGeoLocationTaggingRepository.
+//		  findTop1ByAccountProfilePidOrderBySendDateDesc(accountProfilePid);
+//		  accountProfileGeoLocationTagging.get().setGeoTaggingStatus(GeoTaggingStatus.EDITABLE);
+//	      accountProfileGeoLocationTaggingRepository.save(accountProfileGeoLocationTagging.get());
+//	      AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO = new AccountProfileGeoLocationTaggingDTO(accountProfileGeoLocationTagging.get().getAccountProfile().getName(),accountProfileGeoLocationTagging.get().getGeoTaggingStatus());
+//	      log.info("accountProfile :"+accountProfileGeoLocationTaggingDTO.getAccountprofileName());
+		AccountProfileDTO accountProfileDTO = new AccountProfileDTO(accountProfile.get().getName(),accountProfile.get().getGeoTaggingStatus());
+		  return new ResponseEntity<>(accountProfileDTO,HttpStatus.OK);
 	}
 }

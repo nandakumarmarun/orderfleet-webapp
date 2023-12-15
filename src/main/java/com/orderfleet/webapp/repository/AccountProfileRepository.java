@@ -274,4 +274,6 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
    @Query("select accountProfile from AccountProfile accountProfile where accountProfile.company.id = ?1 and accountProfile.activated = false and accountProfile.lastModifiedDate > ?2")
     List<AccountProfile> findAccountProfilesByActivatedFalseAndLastModifiedDate(Long companyId,LocalDateTime lastSyncdate);
+
+    Optional<AccountProfile> findTop1ByPidOrderByLastModifiedDateDesc(String accountProfilePid);
 }

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.orderfleet.webapp.domain.AccountProfileGeoLocationTagging;
+import com.orderfleet.webapp.domain.GeoTaggingStatus;
 import com.orderfleet.webapp.domain.enums.GeoTaggingType;
 
 
@@ -18,6 +19,8 @@ public class AccountProfileGeoLocationTaggingDTO {
 	private String pid;
 	
 	private String accountProfilePid;
+
+	private String accountprofileName;
 	
 	private String userFirstName;
 	
@@ -30,6 +33,8 @@ public class AccountProfileGeoLocationTaggingDTO {
 	private LocalDateTime sendDate;
 	
 	private GeoTaggingType geoTaggingType;
+
+	private GeoTaggingStatus geoTaggingStatus;
 
 	
 	public AccountProfileGeoLocationTaggingDTO() {
@@ -48,8 +53,8 @@ public class AccountProfileGeoLocationTaggingDTO {
 		this.sendDate = accountProfileGeoLocationTagging.getSendDate();
 	}
 	
-	public AccountProfileGeoLocationTaggingDTO(String pid, String accountProfilePid, BigDecimal longitude, BigDecimal latitude,
-			String location, LocalDateTime sendDate,String userFirstName) {
+	public AccountProfileGeoLocationTaggingDTO(String pid, String accountProfilePid,BigDecimal longitude, BigDecimal latitude,
+			String location, LocalDateTime sendDate,String userFirstName,GeoTaggingStatus geoTaggingStatus) {
 		super();
 		this.pid=pid;
 		this.accountProfilePid = accountProfilePid;
@@ -58,10 +63,11 @@ public class AccountProfileGeoLocationTaggingDTO {
 		this.location = location;
 		this.sendDate = sendDate;
 		this.userFirstName = userFirstName;
+		this.geoTaggingStatus = geoTaggingStatus;
 	}
 
-	
-	
+
+
 	public String getPid() {
 		return pid;
 	}
@@ -129,13 +135,39 @@ public class AccountProfileGeoLocationTaggingDTO {
 		this.geoTaggingType = geoTaggingType;
 	}
 
+	public GeoTaggingStatus getGeoTaggingStatus() {
+		return geoTaggingStatus;
+	}
+
+	public void setGeoTaggingStatus(GeoTaggingStatus geoTaggingStatus) {
+		this.geoTaggingStatus = geoTaggingStatus;
+	}
+
+	public String getAccountprofileName() {
+		return accountprofileName;
+	}
+
+	public void setAccountprofileName(String accountprofileName) {
+		this.accountprofileName = accountprofileName;
+	}
 
 	@Override
 	public String toString() {
-		return "AccountProfileGeoLocationTaggingDTO [pid=" + pid + ", accountProfilePid=" + accountProfilePid
-				+ ", longitude=" + longitude + ", latitude=" + latitude + ", location=" + location + ", sendDate="
-				+ sendDate + "]";
+		return "AccountProfileGeoLocationTaggingDTO{" +
+				"pid='" + pid + '\'' +
+				", accountProfilePid='" + accountProfilePid + '\'' +
+				", userFirstName='" + userFirstName + '\'' +
+				", longitude=" + longitude +
+				", latitude=" + latitude +
+				", location='" + location + '\'' +
+				", sendDate=" + sendDate +
+				", geoTaggingType=" + geoTaggingType +
+				", geoTaggingStatus=" + geoTaggingStatus +
+				'}';
 	}
-	
-	
+
+
 }
+	
+
+

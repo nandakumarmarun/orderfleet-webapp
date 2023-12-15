@@ -10,6 +10,7 @@ import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.orderfleet.webapp.domain.GeoTaggingStatus;
 import org.hibernate.validator.constraints.Email;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -154,6 +155,8 @@ public class AccountProfileDTO {
 
 	private List<String> answers;
 
+	private GeoTaggingStatus geoTaggingStatus;
+
 	public String getAitrichCode() {
 		return AitrichCode;
 	}
@@ -228,10 +231,15 @@ public class AccountProfileDTO {
 		this.activated = accountProfile.getActivated();
 		this.lastModifiedDate = accountProfile.getLastModifiedDate();
 		this.createdDate = accountProfile.getCreatedDate();
-		
 		this.closingBalance = accountProfile.getClosingBalance();
-		
+		this.geoTaggingStatus = accountProfile.getGeoTaggingStatus();
 	}
+
+	public AccountProfileDTO(String name, GeoTaggingStatus geoTaggingStatus) {
+		this.name = name;
+		this.geoTaggingStatus = geoTaggingStatus;
+	}
+
 	public Long getAlterId() {
 		return alterId;
 	}
@@ -694,6 +702,14 @@ public class AccountProfileDTO {
 
 	public void setAnswers(List<String> answers) {
 		this.answers = answers;
+	}
+
+	public GeoTaggingStatus getGeoTaggingStatus() {
+		return geoTaggingStatus;
+	}
+
+	public void setGeoTaggingStatus(GeoTaggingStatus geoTaggingStatus) {
+		this.geoTaggingStatus = geoTaggingStatus;
 	}
 
 	@Override
