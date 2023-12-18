@@ -484,12 +484,6 @@ public class AddGeoLocationResource {
 		  Optional<AccountProfile> accountProfile = accountProfileRepository.findTop1ByPidOrderByLastModifiedDateDesc(accountProfilePid);
 		  accountProfile.get().setGeoTaggingStatus(GeoTaggingStatus.EDITABLE);
 		  accountProfileRepository.save(accountProfile.get());
-//          Optional<AccountProfileGeoLocationTagging> accountProfileGeoLocationTagging =  accountProfileGeoLocationTaggingRepository.
-//		  findTop1ByAccountProfilePidOrderBySendDateDesc(accountProfilePid);
-//		  accountProfileGeoLocationTagging.get().setGeoTaggingStatus(GeoTaggingStatus.EDITABLE);
-//	      accountProfileGeoLocationTaggingRepository.save(accountProfileGeoLocationTagging.get());
-//	      AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO = new AccountProfileGeoLocationTaggingDTO(accountProfileGeoLocationTagging.get().getAccountProfile().getName(),accountProfileGeoLocationTagging.get().getGeoTaggingStatus());
-//	      log.info("accountProfile :"+accountProfileGeoLocationTaggingDTO.getAccountprofileName());
 		AccountProfileDTO accountProfileDTO = new AccountProfileDTO(accountProfile.get().getName(),accountProfile.get().getGeoTaggingStatus());
 		  return new ResponseEntity<>(accountProfileDTO,HttpStatus.OK);
 	}

@@ -62,6 +62,7 @@ public class AccountProfileMapperImpl extends AccountProfileMapper {
 		accountProfileDTO.setGeoTaggedTime(accountProfile.getGeoTaggedTime());
 		accountProfileDTO.setGeoTaggingType(accountProfile.getGeoTaggingType());
 		accountProfileDTO.setGstRegistrationType(accountProfile.getGstRegistrationType());
+		accountProfileDTO.setGeoTaggingStatus(accountProfile.getGeoTaggingStatus());
 		if (accountProfile.getImportStatus() != null) {
 			accountProfileDTO.setImportStatus(accountProfile.getImportStatus());
 		}
@@ -126,6 +127,7 @@ public class AccountProfileMapperImpl extends AccountProfileMapper {
 		accountProfileDTO.setGeoTaggedTime(accountProfile.getGeoTaggedTime());
 		accountProfileDTO.setGeoTaggingType(accountProfile.getGeoTaggingType());
 		accountProfileDTO.setGstRegistrationType(accountProfile.getGstRegistrationType());
+		accountProfileDTO.setGeoTaggingStatus(accountProfile.getGeoTaggingStatus());
 		if (accountProfile.getImportStatus() != null) {
 			accountProfileDTO.setImportStatus(accountProfile.getImportStatus());
 		}

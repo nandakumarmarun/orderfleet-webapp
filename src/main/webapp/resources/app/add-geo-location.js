@@ -295,14 +295,20 @@ if(lat!=""){
 							function(index, accountProfile) {
 							var statusButton;
 							if (accountProfile.geoTaggingType == null) {
-                            		statusButton = ""
-                            }
+                                 statusButton = ""
+                                  }
                            	else{
-                            statusButton =	"<span class='btn btn-warning'  id='"
+                           	if(accountProfile.geoTaggingStatus == "NOT_EDITABLE"){
+                           	console.log("Enter here 1:"+accountProfile.name)
+                            statusButton =	"<button class='btn btn-success'  id='"
                                             + accountProfile.pid
-                            	        	+ "' onClick='AddGeoLocation.changeStatusToEdit(this)' >Change Status</span>";
-
-                           	}
+                            	        	+ "' onClick='AddGeoLocation.changeStatusToEdit(this)' >Change status to Editable</button>";}
+                             	else if(accountProfile.geoTaggingStatus == "EDITABLE")
+                            	      	{
+                            	      	console.log("Enter here :"+accountProfile.name)
+                                     statusButton =	"<button type='button' class='btn btn-orange'>Status changed to Editable</button>";
+                            	        	}
+   	}
 								$('#tBodyAddGeoLocation')
 									.append(
 										"<tr><td>"
@@ -321,14 +327,16 @@ if(lat!=""){
 										+ "</td><td>"
 										+ (accountProfile.geoTaggingType == null ?"":"<b>Type:</b>"+accountProfile.geoTaggingType 
 												+"<br><b>Date:</b>"+ formatDate(accountProfile.geoTaggedTime,'MMM DD YYYY, h:mm:ss a') 
-												+"<br><b>User:</b>"+ accountProfile.geoTaggedUserLogin)	
+												+"<br><b>User:</b>"+ accountProfile.geoTaggedUserLogin)
+
+
 										+ "</td><td><button type='button' class='btn btn-blue' onclick='AddGeoLocation.showModalPopup($(\"#viewModal\"),\""
 										+ accountProfile.pid + "\",\"" + accountProfile.latitude + "\",\"" + accountProfile.longitude + "\",\""
 										+ accountProfile.location+ "\",\"" + accountProfile.geoTaggedTime + "\",\"" + accountProfile.geoTaggedUserLogin 
 										+ "\",0);'>Location From Geo Tag Mobile</button><button type='button'data-target='#enableMapModal' class='btn btn-success' onclick='AddGeoLocation.oldLatLngValues($(\"#enableMapModal\"),\""
 										+ accountProfile.pid
 										+ "\",this);'>Location From Map</button><br>"
-										+ statusButton
+										+statusButton
 										+"</td></tr>");
 							});
 				},
@@ -348,7 +356,7 @@ if(lat!=""){
             			},
             			success: function(result){
             			confirm(result.name +" Change the Geo Tag Status to " +result.geoTaggingStatus)
-
+                           onSaveSuccess(result);
             			},
             			error:function(xhr, error){
             				onError(xhr, error);
