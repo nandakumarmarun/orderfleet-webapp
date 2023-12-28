@@ -1,7 +1,7 @@
 {
-"release-number" : "1.115.2",
-"release-date" : "15/12/2023",
+"release-number" : "1.115.3",
+"release-date" : "28/12/2023",
 "features" : [
-  "Geo tagging Status setting"
+  "kilometerDate,Scale Up geotaging Location size,MobileconfigurationBugFix"
 ]
 }

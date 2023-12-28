@@ -89,8 +89,8 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Column(name = "city", length = 255, nullable = false)
 	private String city;
 
-	@Size(max = 255)
-	@Column(name = "location", length = 255)
+	@Size(max = 600)
+	@Column(name = "location", length = 600)
 	private String location;
 
 	@Size(max = 255)

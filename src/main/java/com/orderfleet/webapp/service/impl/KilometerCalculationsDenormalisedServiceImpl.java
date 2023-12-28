@@ -502,8 +502,8 @@ public class KilometerCalculationsDenormalisedServiceImpl implements KilometerCa
             kilometerCalculationDTO.setEmployeeName(kcd.getEmployeeName());
             kilometerCalculationDTO.setEmployeePid(kcd.getEmployeePid());
             kilometerCalculationDTO.setLocation(kcd.getLocation());
-            kilometerCalculationDTO.setPunchingDate(kcd.getCreatedDate().toLocalDate().toString());
-            kilometerCalculationDTO.setPunchingTime(kcd.getCreatedDate().toLocalTime().toString());
+            kilometerCalculationDTO.setPunchingDate(kcd.getPunchingDate().toLocalDate().toString());
+            kilometerCalculationDTO.setPunchingTime(kcd.getPunchingDate().toLocalTime().toString());
             kilometerCalculationDTO.setCreatedDate(kcd.getCreatedDate());
             kilometerCalculationDTO.setDate(kcd.getExeCreatedDate().toLocalDate());
             kilometerCalculationDTO.setAccountProfileName(kcd.getAccountProfileName());

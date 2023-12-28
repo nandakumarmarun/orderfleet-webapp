@@ -70,8 +70,8 @@ public class AccountProfileGeoLocationTagging implements Serializable{
 	@Column(name = "longitude", precision = 10, scale = 8)
 	private BigDecimal longitude;
 	
-	@Size(max = 255)
-	@Column(name = "location", length = 255)
+	@Size(max = 600)
+	@Column(name = "location", length = 600)
 	private String location;
 
 	public Long getId() {

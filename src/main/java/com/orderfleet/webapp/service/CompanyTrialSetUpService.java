@@ -924,6 +924,7 @@ public class CompanyTrialSetUpService {
 		mobileConfiguration.setBluetoothPaperType(BluetoothPaperType.SMALL);
 		mobileConfiguration.setMultipleProduct(false);
 		mobileConfiguration.setShowAccountBalanceInReceiptAmount(false);
+		mobileConfiguration.setMasterDataAutoUpdation(0);
 
 		mobileConfigurationRepository.save(mobileConfiguration);
 	}

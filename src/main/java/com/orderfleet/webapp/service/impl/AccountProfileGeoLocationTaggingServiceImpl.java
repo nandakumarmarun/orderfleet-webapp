@@ -86,7 +86,7 @@ public class AccountProfileGeoLocationTaggingServiceImpl implements AccountProfi
 		
 		User user=userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 		Company company=companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
-		
+		logger.debug(" Location Size : "+ accountProfileGeoLocationTaggingDTO.getLocation().length());
 		AccountProfileGeoLocationTagging accountProfileGeoLocationTagging=new AccountProfileGeoLocationTagging();
 		accountProfileGeoLocationTagging.setPid(AccountProfileGeoLocationTaggingService.PID_PREFIX+RandomUtil.generatePid());
 		accountProfileGeoLocationTagging.setAccountProfile(accountProfile);

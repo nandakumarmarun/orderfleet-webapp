@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.web.rest.api;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,6 +10,9 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orderfleet.webapp.domain.GeoTaggingStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,58 +60,77 @@ public class AccountProfileGeoLocationTaggingController {
 	@Timed
 	public ResponseEntity<AccountProfileGeoLocationTaggingDTO> saveAccountProfileGeoLocation(
 			@RequestBody AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO) {
-		System.out.println(accountProfileGeoLocationTaggingDTO);
+		convertToJson(accountProfileGeoLocationTaggingDTO);
 		if (accountProfileGeoLocationTaggingDTO.getLatitude() == null) {
-			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfileGeoLocationTagging",
-					"latitude is null", "latitude has no value")).body(null);
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(
+					"accountProfileGeoLocationTagging",
+					"latitude is null",
+					"latitude has no value")).body(null);
 		}
-		if (accountProfileGeoLocationTaggingDTO.getLongitude() == null) {
-			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfileGeoLocationTagging",
-					"longitude is null", "longitude has no value")).body(null);
-		}
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get one by pid";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		Optional<AccountProfile> existingAccountProfile = accountProfileRepository
-				.findOneByPid(accountProfileGeoLocationTaggingDTO.getAccountProfilePid());
 
-        String flag = "Normal";
-LocalDateTime endLCTime = LocalDateTime.now();
-String endTime = endLCTime.format(DATE_TIME_FORMAT);
-String endDate = startLCTime.format(DATE_FORMAT);
-Duration duration = Duration.between(startLCTime, endLCTime);
-long minutes = duration.toMinutes();
-if (minutes <= 1 && minutes >= 0) {
-	flag = "Fast";
-}
-if (minutes > 1 && minutes <= 2) {
-	flag = "Normal";
-}
-if (minutes > 2 && minutes <= 10) {
-	flag = "Slow";
-}
-if (minutes > 10) {
-	flag = "Dead Slow";
-}
-        logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-		+ description);
-		if (!existingAccountProfile.isPresent()) {
-			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("accountProfile",
-					"Account Profile Not exists", "Account Profile not Present")).body(null);
+		if (accountProfileGeoLocationTaggingDTO.getLongitude() == null) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(
+					"accountProfileGeoLocationTagging",
+					"longitude is null",
+					"longitude has no value")).body(null);
 		}
+
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get one by pid";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
+		Optional<AccountProfile> existingAccountProfile =
+				accountProfileRepository.findOneByPid(
+						accountProfileGeoLocationTaggingDTO.getAccountProfilePid());
+
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+        logger.info(id + "," + endDate + "," + startTime + "," + endTime + ","
+				+ minutes + ",END," + flag + "," + description);
+
+		if (!existingAccountProfile.isPresent()) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(
+					"accountProfile",
+					"Account Profile Not exists",
+					"Account Profile not Present")).body(null);
+		}
+
 		accountProfileGeoLocationTaggingDTO.setGeoTaggingType(GeoTaggingType.MOBILE_TAGGED);
 		accountProfileGeoLocationTaggingDTO.setGeoTaggingStatus(GeoTaggingStatus.NOT_EDITABLE);
-		AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO2 = accountProfileGeoLocationTaggingService
-				.save(accountProfileGeoLocationTaggingDTO);
+		AccountProfileGeoLocationTaggingDTO accountProfileGeoLocationTaggingDTO2 =
+				accountProfileGeoLocationTaggingService
+						.save(accountProfileGeoLocationTaggingDTO);
 
-		return new ResponseEntity<AccountProfileGeoLocationTaggingDTO>(accountProfileGeoLocationTaggingDTO2,
+		if(accountProfileGeoLocationTaggingDTO2 != null){
+			log.debug("Account Profile GeoLocation Tagging Success");
+			convertToJson(accountProfileGeoLocationTaggingDTO);
+		}else{
+			log.debug("Account Profile GeoLocation Tagging Failed");
+		}
+		return new ResponseEntity<AccountProfileGeoLocationTaggingDTO>(
+				accountProfileGeoLocationTaggingDTO2,
 				HttpStatus.OK);
-
 	}
 
 	// Get Account Profile Geo Tagging
@@ -155,5 +178,22 @@ if (minutes > 10) {
 
 		return new ResponseEntity<List<AccountProfileGeoLocationTaggingDTO>>(geoLocationTaggingDTOs, HttpStatus.OK);
 
+	}
+
+	public ObjectMapper getObjectMapper(){
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
+		mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		return mapper;
+	}
+
+	public <T> void convertToJson(Object collection) {
+		ObjectMapper objectMapper = getObjectMapper();
+		try {
+			String jsonString = objectMapper.writeValueAsString(collection);
+			log.debug("Geo location Tagging : " + jsonString);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
