@@ -75,6 +75,7 @@ public class MobileConfigurationDTO {
 	private double  cartMaxSize;
 	private boolean roundOffAutomation;
 	private boolean ptenQuotationLayout;
+	private boolean devaQuotationLayout;
 	private boolean showDistanceFare;
 	private boolean multipleProduct;
 	private boolean showAccountBalanceInReceiptAmount;
@@ -156,6 +157,7 @@ public class MobileConfigurationDTO {
 		this.receiptShareOption = mobileConfiguration.getReceiptShareOption();
 		this.myPlanSequence = mobileConfiguration.getMyPlanSequence();
 		this.masterDataAutoUpdation = mobileConfiguration.getMasterDataAutoUpdation();
+		this.devaQuotationLayout = mobileConfiguration.isDevaQuotationLayout();
 
 	}
 	public String getPid() {
@@ -662,5 +664,13 @@ public class MobileConfigurationDTO {
 
 	public void setMasterDataAutoUpdation(Integer masterDataAutoUpdation) {
 		this.masterDataAutoUpdation = masterDataAutoUpdation;
+	}
+
+	public boolean isDevaQuotationLayout() {
+		return devaQuotationLayout;
+	}
+
+	public void setDevaQuotationLayout(boolean devaQuotationLayout) {
+		this.devaQuotationLayout = devaQuotationLayout;
 	}
 }

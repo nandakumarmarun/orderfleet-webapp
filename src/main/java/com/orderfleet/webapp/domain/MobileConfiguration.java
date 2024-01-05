@@ -247,7 +247,8 @@ public class MobileConfiguration implements Serializable {
 	@Column(name = "my_plan_sequence", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean myPlanSequence;
 
-
+	@Column(name = "deva_Quotation_Layout", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean devaQuotationLayout;
 	@NotNull
 	@ManyToOne
 	private Company company;
@@ -770,7 +771,13 @@ public class MobileConfiguration implements Serializable {
 		this.masterDataAutoUpdation = masterDataAutoUpdation;
 	}
 
+	public boolean isDevaQuotationLayout() {
+		return devaQuotationLayout;
+	}
 
+	public void setDevaQuotationLayout(boolean devaQuotationLayout) {
+		this.devaQuotationLayout = devaQuotationLayout;
+	}
 
 	@Override
 	public boolean equals(Object o) {

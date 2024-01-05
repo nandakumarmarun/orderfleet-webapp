@@ -64,6 +64,7 @@ if (!this.MobileConfiguration) {
 			cartMaxSize : null,
 			roundOffAutomation : false,
 			ptenQuotationLayout:false,
+			devaQuotationLayout:false,
 			multipleProduct:false,
 			showAccountBalanceInReceiptAmount:false,
 			enableOutstandingAmountDeduction:false,
@@ -201,6 +202,8 @@ if (!this.MobileConfiguration) {
 		":checked");
 		mobileConfigurationDTO.ptenQuotationLayout = $("#ptenQuotationLayout").is(
 		":checked");
+		mobileConfigurationDTO.devaQuotationLayout = $("#devaQuotationLayout").is(
+        		":checked");
 		mobileConfigurationDTO.showDistanceFare = $("#showDistanceFare").is(
 		":checked");
 		mobileConfigurationDTO.multipleProduct = $("#multipleProduct").is(
@@ -340,6 +343,8 @@ if (!this.MobileConfiguration) {
 									data.roundOffAutomation);
 							$('#ptenQuotationLayout').prop("checked",
 									data.ptenQuotationLayout);
+									$('#devaQuotationLayout').prop("checked",
+                                    data.devaQuotationLayout);
 							$('#showDistanceFare').prop("checked",
 									data.showDistanceFare);
 							$('#bluetoothPeperType').val(

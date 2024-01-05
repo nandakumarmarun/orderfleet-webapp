@@ -128,6 +128,8 @@ public class MobileSettingsDTO {
      private boolean roundOffAutomation;
      
      private boolean ptenQuotationLayout;
+
+	private boolean devaQuotationLayout;
      
      private boolean showDistanceFare;
      
@@ -215,7 +217,16 @@ public class MobileSettingsDTO {
 		this.receiptShareOption = mobileConfigurationDTO.getReceiptShareOption();
 		this.myPlanSequence = mobileConfigurationDTO.getMyPlanSequence();
 		this.masterDataAutoUpdation = mobileConfigurationDTO.getMasterDataAutoUpdation();
+		this.devaQuotationLayout = mobileConfigurationDTO.isDevaQuotationLayout();
 
+	}
+
+	public boolean isDevaQuotationLayout() {
+		return devaQuotationLayout;
+	}
+
+	public void setDevaQuotationLayout(boolean devaQuotationLayout) {
+		this.devaQuotationLayout = devaQuotationLayout;
 	}
 
 	public MobileSettingsDTO(UserWiseMobileConfigurationDTO userWiseMobileConfigurationDTO) {

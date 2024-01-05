@@ -220,6 +220,16 @@
 										<td><input type="number" id="districtColumnNumber"
 											maxlength="2" placeholder="District Column Number" /></td>
 									</tr>
+									<tr>
+                               				<td>Latitude</td>
+                                    		<td><input type="number" id="latitudeColumnNumber"
+                                    		maxlength="20" placeholder="Latitude Column Number" /></td>
+                                   	</tr>
+                                   	<tr>
+                                          	<td>Longitude</td>
+                                           	<td><input type="number" id="longitudeColumnNumber"
+                                           	maxlength="20" placeholder="Longitude Column Number" /></td>
+                                    	</tr>
 								</table>
 							</div>
 						</div>

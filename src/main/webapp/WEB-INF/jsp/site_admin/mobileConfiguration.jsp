@@ -87,6 +87,7 @@
 						<th>Max Cart Size</th>
 						<th>Round Off Automation</th>
 						<th>P-Ten Quotation Layout</th>
+						<th>Deva Quotation Layout</th>
 						<th>Show Distance Fare</th>
 						<th>Bluetooth Paper Type</th>
 						<th>MultipleProduct</th>
@@ -97,6 +98,7 @@
 						<th>Receipt Share option </th>
 						<th>My plan sequence</th>
 						<th>Master Data AutoUpdation</th>
+
 
 						<th>Action</th>
 
@@ -157,6 +159,7 @@
 							<td>${mobileConfiguration.cartMaxSize}</td>
 							<td>${mobileConfiguration.roundOffAutomation}</td>
 							<td>${mobileConfiguration.ptenQuotationLayout}</td>
+							<td>${mobileConfiguration.devaQuotationLayout}</td>
        			            <td>${mobileConfiguration.showDistanceFare}</td>
        			            <td>${mobileConfiguration.bluetoothPaperType}</td>
        			            <td>${mobileConfiguration.multipleProduct}</td>
@@ -530,6 +533,13 @@
 														type='checkbox' class="form-control" />
 												</div></td>
 										</tr>
+										<tr>
+                                       	<td><div class="form-group">
+                                        <label class="control-label">Deva Quotation Layout
+                                    	</label> <input id="devaQuotationLayout" name='devaQuotationLayout'
+                                       	type='checkbox' class="form-control" />
+                                       	</div></td>
+                                        										</tr>
 										<tr>
 											<td><div class="form-group">
 													<label class="control-label">Show Distance Fare

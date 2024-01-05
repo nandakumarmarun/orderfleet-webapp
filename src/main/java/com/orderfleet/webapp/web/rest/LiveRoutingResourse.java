@@ -198,7 +198,7 @@ public class LiveRoutingResourse {
 							executiveTaskExecutionDTO.setDate(createdDate);
 							executiveTaskExecutionDTO.setBatteryPercentage(locations.getBattery_percentage());
 							executiveTaskExecutionDTO.setLocationType(LocationType.GpsLocation);
-							executiveTaskExecutionDTO.setAccountProfileName("Route");
+							executiveTaskExecutionDTO.setAccountProfileName("Last Known Location");
 							trackingPoints.add(executiveTaskExecutionDTO);
 						}
 					}

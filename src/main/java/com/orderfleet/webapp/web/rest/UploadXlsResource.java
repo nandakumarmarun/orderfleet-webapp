@@ -1,8 +1,6 @@
 
 package com.orderfleet.webapp.web.rest;
 
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
-
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -21,6 +19,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.service.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -40,53 +41,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.AccountType;
-import com.orderfleet.webapp.domain.Company;
-import com.orderfleet.webapp.domain.CountryC;
-import com.orderfleet.webapp.domain.DistrictC;
-import com.orderfleet.webapp.domain.Division;
-import com.orderfleet.webapp.domain.Location;
-import com.orderfleet.webapp.domain.LocationAccountProfile;
-import com.orderfleet.webapp.domain.OpeningStock;
-import com.orderfleet.webapp.domain.PriceLevel;
-import com.orderfleet.webapp.domain.ProductCategory;
-import com.orderfleet.webapp.domain.ProductGroup;
-import com.orderfleet.webapp.domain.ProductGroupProduct;
-import com.orderfleet.webapp.domain.ProductProfile;
-import com.orderfleet.webapp.domain.ReceivablePayable;
-import com.orderfleet.webapp.domain.StateC;
-import com.orderfleet.webapp.domain.StockLocation;
-import com.orderfleet.webapp.domain.Units;
-import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.ReceivablePayableType;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.AccountTypeRepository;
-import com.orderfleet.webapp.repository.CompanyRepository;
-import com.orderfleet.webapp.repository.CounrtyCRepository;
-import com.orderfleet.webapp.repository.DistrictCRepository;
-import com.orderfleet.webapp.repository.DivisionRepository;
-import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
-import com.orderfleet.webapp.repository.LocationRepository;
-import com.orderfleet.webapp.repository.OpeningStockRepository;
-import com.orderfleet.webapp.repository.PriceLevelRepository;
-import com.orderfleet.webapp.repository.ProductCategoryRepository;
-import com.orderfleet.webapp.repository.ProductGroupProductRepository;
-import com.orderfleet.webapp.repository.ProductGroupRepository;
-import com.orderfleet.webapp.repository.ProductProfileRepository;
-import com.orderfleet.webapp.repository.ReceivablePayableRepository;
-import com.orderfleet.webapp.repository.StateCRepository;
-import com.orderfleet.webapp.repository.StockLocationRepository;
-import com.orderfleet.webapp.repository.UnitsRepository;
-import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.integration.BulkOperationRepositoryCustom;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.AccountProfileService;
-import com.orderfleet.webapp.service.CompanyService;
-import com.orderfleet.webapp.service.OpeningStockService;
-import com.orderfleet.webapp.service.ProductProfileService;
-import com.orderfleet.webapp.service.ReceivablePayableService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 
 /**
@@ -164,6 +122,9 @@ public class UploadXlsResource {
 
 	@Inject
 	private ReceivablePayableRepository receivablePayableRepository;
+
+	@Inject
+	private AccountProfileGeoLocationTaggingRepository accountProfileGeoLocationTaggingRepository;
 
 	@RequestMapping(value = "/upload-xls", method = RequestMethod.GET)
 	@Timed
@@ -265,15 +226,12 @@ public class UploadXlsResource {
 			MultipartFile multipartFile = request.getFile(itrator.next());
 			System.out.println(allAccountNumbers.toString());
 			int NameNumber = Integer.parseInt(allAccountNumbers[0]);
-
 			int addressNumber = Integer.parseInt(allAccountNumbers[1]);
 			int cityNumber = Integer.parseInt(allAccountNumbers[2]);
 			int locationNumber = Integer.parseInt(allAccountNumbers[3]);
 			int pinNumber = Integer.parseInt(allAccountNumbers[4]);
 			int phone1Number = Integer.parseInt(allAccountNumbers[5]);
-
 			int eMail1Number = Integer.parseInt(allAccountNumbers[6]);
-
 			int descriptionNumber = Integer.parseInt(allAccountNumbers[7]);
 			int contactPersonNumber = Integer.parseInt(allAccountNumbers[8]);
 			int accountTypeNumber = Integer.parseInt(allAccountNumbers[9]);
@@ -284,13 +242,13 @@ public class UploadXlsResource {
 			int creditLimitNumber = Integer.parseInt(allAccountNumbers[14]);
 			int priceLevelNumber = Integer.parseInt(allAccountNumbers[15]);
 			int tinNoNumber = Integer.parseInt(allAccountNumbers[16]);
-
 			int customerIdNumber = Integer.parseInt(allAccountNumbers[17]);
 			int customerCodeNumber = Integer.parseInt(allAccountNumbers[18]);
 			int countryNumber = Integer.parseInt(allAccountNumbers[19]);
 			int stateNumber = Integer.parseInt(allAccountNumbers[20]);
 			int districtNumber = Integer.parseInt(allAccountNumbers[21]);
-
+			int latitudeNumber = Integer.parseInt(allAccountNumbers[22]);
+			int longitudeNumber = Integer.parseInt(allAccountNumbers[23]);
 			int rowNumber = 0;
 			Workbook workbook = WorkbookFactory.create(multipartFile.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
@@ -645,6 +603,35 @@ public class UploadXlsResource {
 							}
 						}
 					}
+
+					if (latitudeNumber != -1) {
+						Cell cell = row.getCell(latitudeNumber);
+						if (cell == null) {
+							accProfile.setLatitude(null);
+						} else {
+							BigDecimal latitude = null;
+//							 celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(latitudeNumber).getCellType() == 0) {
+								latitude = BigDecimal.valueOf(row.getCell(latitudeNumber).getNumericCellValue());
+							}
+
+							accProfile.setLatitude(latitude);
+						}
+					}
+					if (longitudeNumber != -1) {
+						Cell cell = row.getCell(longitudeNumber);
+						if (cell == null) {
+							accProfile.setLongitude(null);
+						} else {
+							BigDecimal longitude = null;
+//							 celltype=0==>Numeric && celltype=1==>String
+							if (row.getCell(longitudeNumber).getCellType() == 0) {
+								longitude = BigDecimal.valueOf(row.getCell(longitudeNumber).getNumericCellValue());
+							}
+
+							accProfile.setLongitude(longitude);
+						}
+					}
 					if (saveUpdateAccountProfiles.stream().filter(acp -> acp.getName().equals(accountProofileName))
 							.findAny().isPresent()) {
 						duplicateCount++;
@@ -662,6 +649,8 @@ public class UploadXlsResource {
 			log.info("Saving AccountProfile Success..... ");
 
 			List<AccountProfile> newAccountProfiles = accountProfileRepository.findAllByCompanyId(company.getId());
+
+			addGeolocationToAccounts(newAccountProfiles,company,user);
 			Set<LocationAccountProfile> newLocationAccountProfiles = new HashSet<>();
 			log.info("Saving LocationAccountProfile..");
 
@@ -736,6 +725,8 @@ public class UploadXlsResource {
 		log.info("Excel Account Profile Uploaded successfully..................");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+
 
 	@SuppressWarnings("deprecation")
 	@RequestMapping(value = "/upload-xls/saveProductXls", method = RequestMethod.POST)
@@ -1364,6 +1355,42 @@ public class UploadXlsResource {
 			e.printStackTrace();
 		}
 		log.info("Excel Invoice Details Uploaded successfully..................");
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	public ResponseEntity<Void> addGeolocationToAccounts(List<AccountProfile> newAccountProfiles, Company company, User user)
+	{
+		List<AccountProfileGeoLocationTagging> geotag = accountProfileGeoLocationTaggingRepository
+				.findAllByCompanyId(company.getId());
+
+		List<AccountProfileGeoLocationTagging> newAssociaton = new ArrayList<>();
+
+		for (AccountProfile accProfile : newAccountProfiles) {
+			if (accProfile.getLatitude() != null && accProfile.getLongitude() != null) {
+				AccountProfileGeoLocationTagging apglt = new AccountProfileGeoLocationTagging();
+				Optional<AccountProfileGeoLocationTagging> accGeotag = geotag.stream()
+						.filter(acc -> acc.getAccountProfile().getPid().equals(accProfile.getPid()))
+						.findAny();
+
+				if (accGeotag.isPresent()) {
+					continue;
+				} else {
+					apglt.setPid(AccountProfileGeoLocationTaggingService.PID_PREFIX + RandomUtil.generatePid());
+					apglt.setAccountProfile(accProfile);
+					apglt.setLatitude(accProfile.getLatitude());
+					apglt.setLongitude(accProfile.getLongitude());
+					apglt.setLocation(accProfile.getLocation());
+					apglt.setSendDate(LocalDateTime.now());
+					apglt.setCompany(company);
+					apglt.setCreatedDate(LocalDateTime.now());
+					apglt.setUser(user);
+					newAssociaton.add(apglt);
+				}
+			}
+		}
+		System.out.println("Geolocation size :" + newAssociaton.size());
+		if (newAssociaton.size() != 0) {
+			accountProfileGeoLocationTaggingRepository.save(newAssociaton);
+		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

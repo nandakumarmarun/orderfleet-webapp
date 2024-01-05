@@ -105,6 +105,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 		configuration.setReceiptShareOption(mobileConfigurationDTO.getReceiptShareOption());
 		configuration.setMyPlanSequence(mobileConfigurationDTO.getMyPlanSequence());
 		configuration.setMasterDataAutoUpdation(mobileConfigurationDTO.getMasterDataAutoUpdation());
+		configuration.setDevaQuotationLayout(mobileConfigurationDTO.isDevaQuotationLayout());
 
 		configuration = mobileConfigurationRepository.save(configuration);
 		MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);
@@ -175,6 +176,7 @@ public class MobileConfigurationServiceImpl implements MobileConfigurationServic
 			configuration.setReceiptShareOption(mobileConfigurationDTO.getReceiptShareOption());
 			configuration.setMyPlanSequence(mobileConfigurationDTO.getMyPlanSequence());
 			configuration.setMasterDataAutoUpdation(mobileConfigurationDTO.getMasterDataAutoUpdation());
+			configuration.setDevaQuotationLayout(mobileConfigurationDTO.isDevaQuotationLayout());
 
 			configuration = mobileConfigurationRepository.save(configuration);
 			MobileConfigurationDTO result = new MobileConfigurationDTO(configuration);

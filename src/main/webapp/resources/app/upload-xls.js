@@ -67,7 +67,9 @@ if (!this.xlsFileUploader) {
 		var countryNumber = $("#countryColumnNumber").val();
 		var stateNumber = $("#stateColumnNumber").val();
 		var districtNumber = $("#districtColumnNumber").val();
-
+		var latitudeNumber = $("#latitudeColumnNumber").val();
+		var longitudeNumber = $("#longitudeColumnNumber").val();
+console.log("number:"+longitudeNumber)
 		if (nameNumber == '') {
 			$('#alertMessage').html("please assign name column number");
 			$('#alertBox').modal("show");
@@ -141,6 +143,14 @@ if (!this.xlsFileUploader) {
 		if (districtNumber == '') {
 			districtNumber = -1;
 		}
+		if(latitudeNumber == '')
+		{
+		latitudeNumber = -1;
+		}
+		if(longitudeNumber == '')
+		{
+		longitudeNumber = -1;
+		}
 		accountNumbers = nameNumber + "," + addressNumber + "," + cityNumber
 				+ "," + locationNumber + "," + pinNumber + "," + phone1Number
 				+ "," + eMail1Number + "," + descriptionNumber + ","
@@ -150,7 +160,7 @@ if (!this.xlsFileUploader) {
 				+ creditLimitNumber + "," + priceLevelNumber + ","
 				+ tinNoNumber + "," + customerIdNumber + ","
 				+ customerCodeNumber + "," + countryNumber + "," + stateNumber
-				+ "," + districtNumber;
+				+ "," + districtNumber + "," + latitudeNumber + "," + longitudeNumber;
 
 		console.log("Column numbers " + accountNumbers);
 		if (accountNumbers == '') {

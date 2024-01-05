@@ -169,7 +169,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="input-group col-sm-2">
+							<div class="input-group col-sm-6">
 								<div class="col-sm-3">
 									<br />
 									<button type="button" class="btn btn-info entypo-search"
