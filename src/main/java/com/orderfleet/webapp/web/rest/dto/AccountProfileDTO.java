@@ -157,6 +157,7 @@ public class AccountProfileDTO {
 
 	private GeoTaggingStatus geoTaggingStatus;
 
+
 	public String getAitrichCode() {
 		return AitrichCode;
 	}
@@ -233,6 +234,9 @@ public class AccountProfileDTO {
 		this.createdDate = accountProfile.getCreatedDate();
 		this.closingBalance = accountProfile.getClosingBalance();
 		this.geoTaggingStatus = accountProfile.getGeoTaggingStatus();
+		this.stateName = accountProfile.getStateName();
+		this.countryName = accountProfile.getCountryName();
+		this.districtName = accountProfile.getDistrictName();
 	}
 
 	public AccountProfileDTO(String name, GeoTaggingStatus geoTaggingStatus) {

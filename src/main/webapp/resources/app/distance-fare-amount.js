@@ -32,7 +32,21 @@ if (!this.SalesTargetAchievedReport) {
     $("#applyBtn").click(function () {
       loadSalesTargetAchievedReport();
     });
+    $('#btnDownload').on('click', function() {
+    			var tblAccountProfile = $("#tblAccountProfile tbody");
+    			if (tblAccountProfile.children().length == 0) {
+    				alert("no values available");
+    				return;
+    			}
+    			if (tblAccountProfile[0].textContent == "No data available") {
+    				alert("no values available");
+    				return;
+    			}
+
+    			downloadXls();
+    		});
   });
+
 
   function loadSalesTargetAchievedReport() {
     $("#tblSalesTargetAchievedReport").css("display", "none");
@@ -79,7 +93,26 @@ if (!this.SalesTargetAchievedReport) {
       },
     });
   }
+function downloadXls() {
+		// When the stripped button is clicked, clone the existing source
+		var clonedTable = $("#tblAccountProfile").clone();
+		// Strip your empty characters from the cloned table (hidden didn't seem
+		// to work since the cloned table isn't visible)
+		clonedTable.find('[style*="display: none"]').remove();
 
+		var excelName = "KilometerDistanceFare";
+
+		clonedTable.table2excel({
+			// exclude CSS class
+			// exclude : ".odd .even",
+			// name : "Dynamic Document Form",
+			filename : excelName, // do not include extension
+		// fileext : ".xls",
+		// exclude_img : true,
+		// exclude_links : true,
+		// exclude_inputs : true
+		});
+	}
   function convertLocalDateToServer(date) {
     if (date) {
       return moment(date).format("YYYY-MM-DD");

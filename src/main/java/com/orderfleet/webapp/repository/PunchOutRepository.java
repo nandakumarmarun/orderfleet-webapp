@@ -58,4 +58,7 @@ public interface PunchOutRepository extends JpaRepository<PunchOut, Long> {
 
 	@Query("select pncout from PunchOut pncout where pncout.company.id = ?1 and pncout.user.pid = ?2 and pncout.punchOutDate between ?3 and ?4 Order By pncout.punchOutDate desc")
 	List<PunchOut> findAllByCompanyIdUserPid(long companyId, String userPid, LocalDateTime fromDate, LocalDateTime toDate);
+
+	@Query("select pncout from PunchOut pncout where pncout.company.id = ?1 and pncout.user.pid = ?2 and pncout.punchOutDate between ?3 and ?4 Order By pncout.punchOutDate asc")
+	Optional<PunchOut> findAllByCompanyIdUserPidAndPunchOutDateBetween(long companyId, String userPid, LocalDateTime fromDate, LocalDateTime toDate);
 }

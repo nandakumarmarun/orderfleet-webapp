@@ -65,7 +65,7 @@ public class TransferAccountResource {
         // Fetch account profiles (assuming this is part of your use case)
         Page<AccountProfileDTO> accountProfiles = accountProfileService.findAllByCompany(pageable);
 
-        List<Location> locations = locationRepository.findAllByCompanyId();
+        List<Location> locations = locationRepository.findAllByCompanyIdAndActivated();
 
         // Add the combined data to the model
         model.addAttribute("locations", locations);
@@ -174,7 +174,7 @@ public class TransferAccountResource {
     @GetMapping("/transferAccounts/getLocationByUser")
     @Timed
     public ResponseEntity<List<Location>> getLocationByUser(@RequestParam String userPid) {
-        log.debug("Web request to get locations by user: {}", userPid);
+        log.debug("Web request to get locations by userPid: {}", userPid);
 
         // Fetch locations based on the selected user
         List<Location> locations = locationAccountProfileRepository.findLocationByAccountProfileUser(userPid);

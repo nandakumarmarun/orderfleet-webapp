@@ -5,7 +5,7 @@
 
 		<head>
 			<jsp:include page="../fragments/m_head.jsp"></jsp:include>
-			<title>SalesNrich | Sales Target Vs Achieved Report</title>
+			<title>SalesNrich | Kilometer Distance Fare</title>
 
 			<!-- jQuery UI-->
 			<spring:url value="/resources/assets/css/jquery-ui.css" var="jqueryUiCss"></spring:url>
@@ -63,6 +63,10 @@
 									<div class="col-sm-1">
 										<button id="applyBtn" type="button" class="btn btn-info">Apply</button>
 									</div>
+
+									<div class="col-sm-1">
+                                   <button id="btnDownload" type="button" class="btn btn-success">Download Xls</button>
+                                    							</div>
 								</div>
 							</form>
 						</div>
@@ -93,7 +97,9 @@
 					<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
 				</div>
 			</div>
-
+            <spring:url value="/resources/assets/js/jquery.table2excel.min.js"
+	     	var="table2excelMin"></spring:url>
+         	<script type="text/javascript" src="${table2excelMin}"></script>
 			<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
 			<spring:url value="/resources/assets/js/MonthPicker.js" var="monthPicker"></spring:url>
 			<script type="text/javascript" src="${monthPicker}"></script>

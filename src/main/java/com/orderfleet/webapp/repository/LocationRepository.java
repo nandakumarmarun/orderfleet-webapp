@@ -42,11 +42,11 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	@Query("select location from Location location where location.company.id = ?#{principal.companyId}")
 	Page<Location> findAllByCompanyId(Pageable pageable);
 
-	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.id not in (select locationHierarchy.location.id from LocationHierarchy locationHierarchy where locationHierarchy.company.id = ?#{principal.companyId} and locationHierarchy.activated=true)")
+	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.activated = true and location.id not in (select locationHierarchy.location.id from LocationHierarchy locationHierarchy where locationHierarchy.company.id = ?#{principal.companyId} and locationHierarchy.activated=true)")
 	List<Location> findByCompanyIdAndIdNotIn();
 	
 
-	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.id  in (select locationHierarchy.location.id from LocationHierarchy locationHierarchy where locationHierarchy.company.id = ?#{principal.companyId} and locationHierarchy.activated=true)")
+	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.activated=true and location.id  in (select locationHierarchy.location.id from LocationHierarchy locationHierarchy where locationHierarchy.company.id = ?#{principal.companyId} and locationHierarchy.activated=true)")
 	List<Location> findByCompanyIdAndIdIn();
 
 	List<Location> findAllByCompanyPid(String companyPid);
@@ -92,5 +92,8 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 
 	@Query("select location.pid from Location location where location.company.id= ?#{principal.companyId}")
 	List<String> findAllPidsByCompany();
+
+	@Query("select location from Location location where location.company.id = ?#{principal.companyId} and location.activated = true")
+	List<Location> findAllByCompanyIdAndActivated();
 
 }

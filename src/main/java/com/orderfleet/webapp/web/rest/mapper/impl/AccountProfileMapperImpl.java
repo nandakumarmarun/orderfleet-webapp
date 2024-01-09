@@ -218,6 +218,9 @@ public class AccountProfileMapperImpl extends AccountProfileMapper {
 		accountProfile.setTinNo(accountProfileDTO.getTinNo());
 		accountProfile.setTrimChar(accountProfileDTO.getTrimChar());
 		accountProfile.setWhatsAppNo(accountProfileDTO.getWhatsAppNo());
+		accountProfile.setCountryName(accountProfileDTO.getCountryName());
+		accountProfile.setStateName(accountProfileDTO.getStateName());
+		accountProfile.setDistrictName(accountProfileDTO.getDistrictName());
 
 		return accountProfile;
 	}

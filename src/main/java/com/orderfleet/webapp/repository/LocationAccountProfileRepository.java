@@ -30,7 +30,7 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	@Query(value = "DELETE FROM tbl_location_account_profile WHERE account_profile_id = ?1 AND location_id = ?2", nativeQuery = true)
 	void deleteByAccountProfileIdAndLocationId(long accountProfileId, long locationId);
 
-	@Query("SELECT lap.location FROM LocationAccountProfile lap JOIN lap.accountProfile ap JOIN ap.user u WHERE u.pid = ?1")
+	@Query("SELECT lap.location FROM LocationAccountProfile lap JOIN lap.accountProfile ap JOIN ap.user u WHERE u.pid = ?1 and lap.location.activated = true")
 	List<Location> findLocationByAccountProfileUser(String userPid);
 
 

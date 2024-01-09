@@ -216,6 +216,9 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Column(name = "country_name")
 	private String countryName;
 
+	@Column(name = "district_name")
+	private String districtName;
+
 	@Column(name = "mailing_name")
 	private String mailingName;
 
@@ -625,6 +628,14 @@ public class AccountProfile implements Serializable, Cloneable {
 
 	public void setGeoTaggingStatus(GeoTaggingStatus geoTaggingStatus) {
 		this.geoTaggingStatus = geoTaggingStatus;
+	}
+
+	public String getDistrictName() {
+		return districtName;
+	}
+
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
 	}
 
 	@Override
