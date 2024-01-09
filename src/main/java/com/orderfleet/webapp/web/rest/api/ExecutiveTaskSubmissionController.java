@@ -200,6 +200,9 @@ public class ExecutiveTaskSubmissionController {
 	@Inject
 	private KilometerCalculationsDenormalisationService kilometerCalculationsDenormalisationService;
 
+	@Inject
+	private  InvoiceDetailsDenormalizedService invoiceDetailsDenormalizedService;
+
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
 	 *
@@ -640,6 +643,7 @@ public class ExecutiveTaskSubmissionController {
 						executiveTaskSubmissionDTO);
 			}
 
+
 			if(tsTransactionWrapper != null && tsTransactionWrapper.getExecutiveTaskExecution() != null) {
 				log.debug("Calculating Distance");
 				kilometerCalculationsDenormalisationService.calculateDistanceOnCall(tsTransactionWrapper,user);
@@ -684,6 +688,7 @@ public class ExecutiveTaskSubmissionController {
 				sendEmailToComplaint(executiveTaskSubmissionDTO);
 			}
 
+
 			//Update Stock Data
 			if (tsTransactionWrapper != null && tsTransactionWrapper.getInventoryVouchers() != null) {
 				Optional<CompanyConfiguration> optStockCalculations = companyConfigurationRepository
@@ -694,7 +699,11 @@ public class ExecutiveTaskSubmissionController {
 				}
 
 			}
-
+			if(tsTransactionWrapper != null)
+			{
+				log.info("Requset to Save order in denormalized table");
+        invoiceDetailsDenormalizedService.SaveExecutivetaskExecutionWithInventory(tsTransactionWrapper,user);
+			}
 
 			taskSubmissionResponse.setStatus("Success");
 			taskSubmissionResponse.setMessage("Activity submitted successfully...");

@@ -188,25 +188,10 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	@Query("SELECT dd.documentNumberServer,dd.document.pid,dd.createdDate from DynamicDocumentHeader dd where dd.company.pid = ?1 and dd.createdBy.pid = ?2 and dd.document.pid IN(?3)")
 	List<Object[]> getAllDocumentNumberForEachDocument(String companyPid, String userPid, List<String> documentPids);
 
-	// @Query("select
-	// dDocument.pid,dDocument.documentNumberLocal,dDocument.documentNumberServer,dDocument.document.pid,"
-	// +
-	// "dDocument.document.name,dDocument.createdDate,dDocument.documentDate,dDocument.employee.pid,dDocument.employee.name,"
-	// +
-	// "dDocument.createdBy.firstName,dDocument.createdBy.pid,dDocument.executiveTaskExecution.activity.name,"
-	// +
-	// "dDocument.executiveTaskExecution.accountProfile.name,dDocument.employee.phone,dDocument.executiveTaskExecution.accountProfile.address,"
-	// +
-	// "dDocument.executiveTaskExecution.accountProfile.phone,dDocument.executiveTaskExecution.accountProfile.email,"
-	// +
-	// "dDocument.status from DynamicDocumentHeader dDocument where
-	// dDocument.company.id = ?#{principal.companyId} and "+
-	// "dDocument.document.id in ?1 and dDocument.accountProfile.pid = ?2")
-	// List<Object[]> findAllByAccountProfilePidAndDocumentIn(Set<Long> documentPids
-	// ,String accountProfilePid);
 
 	@Query("select dynamicDocumentHeader from DynamicDocumentHeader dynamicDocumentHeader where dynamicDocumentHeader.company.id = ?#{principal.companyId}  and dynamicDocumentHeader.createdDate between ?1 and ?2 Order By dynamicDocumentHeader.documentDate desc")
 	List<DynamicDocumentHeader> findAllByCompanyIdAndDateBetweenOrderByDocumentDateDesc(
 			LocalDateTime fromDate, LocalDateTime toDate);
-
+	@Query("select dDocument from DynamicDocumentHeader dDocument where dDocument.executiveTaskExecution.id IN ?1")
+	List<DynamicDocumentHeader> findAllByExecutiveTaskExecutionIdIn(Set<Long> exeids);
 }

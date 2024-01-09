@@ -333,4 +333,6 @@ public interface AccountingVoucherHeaderRepository extends JpaRepository<Account
 	
 	@Query("select accVoucher from AccountingVoucherHeader accVoucher  where accVoucher.executiveTaskExecution.id IN ?1 ")
     List<AccountingVoucherHeader> findByExecutiveTaskExecutionIdIn(List<Long> eteIds);
+	@Query("select accVoucher from AccountingVoucherHeader accVoucher  where accVoucher.executiveTaskExecution.id IN ?1 ")
+	List<AccountingVoucherHeader> findAllByExecutiveTaskExecutionIdIn(Set<Long> exeids);
 }

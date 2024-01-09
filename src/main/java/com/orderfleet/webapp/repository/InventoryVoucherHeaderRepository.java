@@ -871,5 +871,6 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId}  and inventoryVoucher.createdDate between ?1 and ?2 Order By inventoryVoucher.documentDate desc")
 	List<InventoryVoucherHeader> findAllByCompanyIdAndDateBetweenOrderByDocumentDateDesc(
 			LocalDateTime fromDate, LocalDateTime toDate);
-
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.executiveTaskExecution.id in ?1 ")
+	List<InventoryVoucherHeader> findAllByExecutiveTaskExecutionIdIn(Set<Long> exeids);
 }
