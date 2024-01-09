@@ -409,7 +409,7 @@ public class AttendanceController {
 				long companyId = user.getCompany().getId();
 				log.debug("companyId : " +  user.getCompany().getId());
 				Optional<PunchOut> optionalAttendance = punchOutRepository
-						.findAllByCompanyIdUserPidAndCreatedDateBetween(
+						.findAllByCompanyIdUserPidAndPunchOutDateBetween(
 								companyId,
 								user.getPid(),
 								fromDate,
@@ -517,7 +517,7 @@ public class AttendanceController {
 				log.debug("companyId : " + user.getCompany().getId());
 
 				return	punchOutRepository
-						.findAllByCompanyIdUserPidAndCreatedDateBetween(
+						.findAllByCompanyIdUserPidAndPunchOutDateBetween(
 								companyId, user.getPid(),
 								fromDate, toDate)
 						.map(data -> new ResponseEntity<>(true, HttpStatus.OK))
