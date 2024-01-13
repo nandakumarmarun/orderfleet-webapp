@@ -3,13 +3,7 @@ package com.orderfleet.webapp.web.vendor.uncleJhon.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -322,8 +316,8 @@ public class AccountProfileUncleJhonUploadService {
 			}
 
 			accountProfileRepository.save(saveUpdateAccountProfiles);
-		
 
+			accountProfileService.autoTaskCreationForAccountProfiles( company);
 		}
 
 	}

@@ -1,4 +1,4 @@
-//connect stompClient web socket
+ //connect stompClient web socket
 var stompClient = null;
 function connect() {
 	if (stompClient != null) {

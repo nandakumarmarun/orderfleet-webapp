@@ -183,6 +183,12 @@
                                 	name="kmcalculationdisabled" id="kmcalculationdisabled"
                                 	style="width: 4%;" />
                                 </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="autoTaskCreation">
+                                    Auto Task Creation </label> <input type="checkbox" class="form-control"
+                                    name="autoTaskCreationid" id="autotaskcreation"
+                                    style="width: 4%;"/>
+                                </div>
 								<div class="form-group">
 									<label class="control-label" for="field_locationRadius">Location
 										Radius </label> <input type="number" class="form-control"

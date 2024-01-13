@@ -291,7 +291,7 @@ public class UjTirunelveliAccountService {
 
             accountProfileRepository.save(saveUpdateAccountProfiles);
 
-
+            accountProfileService.autoTaskCreationForAccountProfiles( company);
         }
 
     }

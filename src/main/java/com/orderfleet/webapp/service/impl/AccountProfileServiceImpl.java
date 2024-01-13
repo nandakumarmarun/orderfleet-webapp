@@ -1,24 +1,24 @@
 package com.orderfleet.webapp.service.impl;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.service.TaskService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +50,10 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private AccountProfileRepository accountProfileRepository;
+
+
+	@Inject
+	private ActivityRepository activityRepository;
 
 	@Inject
 	private CompanyRepository companyRepository;
@@ -93,6 +97,10 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 	@Inject
 	private CompanyAttributesRepository companyAttributesRepository;
 
+
+	@Inject
+	private TaskRepository taskRepository;
+
 	/**
 	 * Save a accountProfile.
 	 *
@@ -122,6 +130,32 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 		accountProfile.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
 		accountProfile.setAccountStatus(accountProfileDTO.getAccountStatus());
 		accountProfile = accountProfileRepository.save(accountProfile);
+
+
+		/**
+		 * create account profile as task
+		 */
+		long accountTypeId = accountProfile.getAccountType().getId();
+		List<Activity> activities = activityRepository.findALlByAccountTypeId(accountTypeId);
+		logger.info("activities.........................");
+		for (Activity activity : activities) {
+			if(activity.getAutoTaskCreation()){
+				log.debug("activity is : "+activity.getName());
+				logger.info("auto task creation enabled...........");
+				//convert to task
+				Task task = new Task();
+
+				task.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
+				task.setAccountProfile(accountProfile);
+				task.setActivity(activity);
+				task.setAccountType(accountProfile.getAccountType());
+				task.setPid(TaskService.PID_PREFIX + RandomUtil.generatePid());
+
+				taskRepository.save(task);
+				log.debug("task : "+task);
+				logger.info("task saved........................");
+			}
+		}
 		AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
 		return result;
 	}
@@ -1896,4 +1930,60 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 		return result;
 	}
 
+	/**
+	 * Asynchronously creates tasks automatically for account profiles based on configured activities.
+	 *
+	 * @param company The company for which tasks are created.
+	 *
+	 * @auther  Rakhi Vineeth
+	 * @since 1.116.2
+	 */
+	@Override
+	@Async
+	public void autoTaskCreationForAccountProfiles(Company company) {
+		log.debug("to create tasks automatically for accountProfiles ");
+
+		Set<Task> tasks = new HashSet<>();
+		List<Activity> activitiesm = activityRepository.findAllByCompanyIdAutoTaskCreation(company.getId());
+
+		List<Task> tasks1 = taskRepository.findAllByCompanyId(company.getId());
+		LocalDateTime fromDate = LocalDate.now().atStartOfDay();
+		LocalDateTime toDate = LocalDateTime.now();
+
+		List<AccountProfile> accountProfiles1 = accountProfileRepository.findAllByCreatedDateToday(fromDate, toDate);
+
+		for (AccountProfile accountProfile : accountProfiles1) {
+			long accountTypeId = accountProfile.getAccountType().getId();
+			List<Activity> activities = activitiesm.stream()
+					.filter(activity -> activity.getActivityAccountTypes()
+							.contains(accountProfile.getAccountType()))
+					.collect(Collectors.toList());
+
+			for (Activity activity : activities) {
+				if (activity.getAutoTaskCreation()) {
+					Optional<Task> optionalTask = tasks1.stream()
+							.filter(task -> task.getAccountProfile().getId().equals(accountProfile.getId())
+									&& task.getAccountType().getId().equals(accountProfile.getAccountType().getId())
+									&& task.getActivity().getId().equals(activity.getId())).findAny();
+
+					Task task = new Task();
+					if (!(optionalTask.isPresent())) {
+						//convert to task
+						task.setCompany(company);
+						task.setAccountProfile(accountProfile);
+						task.setActivity(activity);
+						task.setRemarks("");
+						task.setAccountType(accountProfile.getAccountType());
+						task.setPid(TaskService.PID_PREFIX + RandomUtil.generatePid());
+
+						tasks.add(task);
+						//			log.debug("task : "+task);
+						logger.info("task saved........................");
+					}
+
+				}
+			}
+		}
+		taskRepository.save(tasks);
+	}
 }

@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.service.TaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -25,23 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.Company;
-import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.File;
-import com.orderfleet.webapp.domain.LocationAccountProfile;
-import com.orderfleet.webapp.domain.NewlyEditedAccountProfile;
-import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DataSourceType;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
-import com.orderfleet.webapp.repository.CompanyRepository;
-import com.orderfleet.webapp.repository.LocationAccountProfileRepository;
-import com.orderfleet.webapp.repository.LocationRepository;
-import com.orderfleet.webapp.repository.NewlyEditedAccountProfileRepository;
-import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.FileManagerService;
@@ -52,6 +41,8 @@ import com.orderfleet.webapp.web.rest.CompanyPerformanceConfigResource;
 import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
+
+import javax.inject.Inject;
 
 /**
  * REST controller for managing AccountProfile (Company's customer).
@@ -69,6 +60,8 @@ public class AccountProfileController {
 
 	private final LocationRepository locationRepository;
 
+	private final ActivityRepository activityRepository;
+
 	private final LocationAccountProfileRepository locationAccountProfileRepository;
 
 	private final AccountProfileMapper accountProfileMapper;
@@ -85,13 +78,17 @@ public class AccountProfileController {
 
 	private final NewlyEditedAccountProfileRepository newlyEditedAccountProfileRepository;
 
+
+	private final TaskRepository taskRepository;
+
 	public AccountProfileController(AccountProfileRepository accountProfileRepository,
 			LocationRepository locationRepository, LocationAccountProfileRepository locationAccountProfileRepository,
 			AccountProfileMapper accountProfileMapper, CompanyRepository companyRepository,
 			UserRepository userRepository, FileManagerService fileManagerService,
 			CompanyConfigurationRepository companyConfigurationRepository,
 			NewlyEditedAccountProfileService newlyEditedAccountProfileService,
-			NewlyEditedAccountProfileRepository newlyEditedAccountProfileRepository) {
+			NewlyEditedAccountProfileRepository newlyEditedAccountProfileRepository,
+									ActivityRepository activityRepository, TaskRepository taskRepository) {
 		super();
 		this.accountProfileRepository = accountProfileRepository;
 		this.locationRepository = locationRepository;
@@ -103,6 +100,9 @@ public class AccountProfileController {
 		this.companyConfigurationRepository = companyConfigurationRepository;
 		this.newlyEditedAccountProfileService = newlyEditedAccountProfileService;
 		this.newlyEditedAccountProfileRepository = newlyEditedAccountProfileRepository;
+		this.activityRepository = activityRepository;
+		this.taskRepository = taskRepository;
+
 
 	}
 
@@ -290,6 +290,29 @@ public class AccountProfileController {
 		log.debug("Saving new account profile from mobile user {} with account name {} and accountPid {}",
 				user.getLogin(), newAccountProfile.getName(), newAccountProfile.getPid());
 		AccountProfile accountProfile = accountProfileRepository.save(newAccountProfile);
+
+		/**
+		 * create account profile as task
+		 */
+		long accountTypeId = accountProfile.getAccountType().getId();
+		List<Activity> activities = activityRepository.findALlByAccountTypeId(accountTypeId);
+		for (Activity activity : activities) {
+			if(activity.getAutoTaskCreation()){
+				//convert to task
+				Task task = new Task();
+
+				task.setCompany(company);
+				task.setAccountProfile(accountProfile);
+				task.setActivity(activity);
+				task.setAccountType(accountProfile.getAccountType());
+				task.setPid(TaskService.PID_PREFIX + RandomUtil.generatePid());
+
+				taskRepository.save(task);
+	//			log.debug("task : "+task);
+				logger.info("task saved........................");
+			}
+		}
+
 
 		// test to remove
 		// System.out.println("==============//// 1. Total AP :

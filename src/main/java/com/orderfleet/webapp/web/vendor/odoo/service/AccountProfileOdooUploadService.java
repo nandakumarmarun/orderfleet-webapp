@@ -3,11 +3,7 @@ package com.orderfleet.webapp.web.vendor.odoo.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -306,6 +302,9 @@ public class AccountProfileOdooUploadService {
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
 		accountProfileRepository.save(saveUpdateAccountProfiles);
+
+		accountProfileService.autoTaskCreationForAccountProfiles(company);
+
 		// bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 
 		// saveUpdateLocationAccountProfiles(locationAccountProfileDtos);

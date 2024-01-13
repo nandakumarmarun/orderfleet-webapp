@@ -50,6 +50,7 @@ public class ActivityMapperImpl extends ActivityMapper {
 		activityDTO.setLocationRadius(activity.getLocationRadius());
 		activityDTO.setSecondarySalesThroughApi(activity.getSecondarySalesThroughApi());
 		activityDTO.setKmCalculationDisabled(activity.getKmCalculationDisabled());
+		activityDTO.setAutoTaskCreation(activity.getAutoTaskCreation());
 		return activityDTO;
 	}
 
@@ -134,6 +135,7 @@ public class ActivityMapperImpl extends ActivityMapper {
 		activity.setTargetDisplayOnDayplan(activityDTO.getTargetDisplayOnDayplan());
 		activity.setEmailTocomplaint(activityDTO.getEmailTocomplaint());
 		activity.setKmCalculationDisabled(activityDTO.getKmCalculationDisabled());
+		activity.setAutoTaskCreation(activityDTO.getAutoTaskCreation());
 		if(activityDTO.getLocationRadius()!= null)
 		{
         activity.setLocationRadius(activityDTO.getLocationRadius());

@@ -289,6 +289,8 @@ public class PallikkuppamAccountsUploadService {
 			log.debug(Thread + "Saving Account Profiles");
 			try{
 				accountProfileRepository.save(saveUpdateAccountProfiles);
+
+				accountProfileService.autoTaskCreationForAccountProfiles( company);
 			}
 			catch(Exception e){
 				log.debug("Exception Catched : " +e.getMessage());

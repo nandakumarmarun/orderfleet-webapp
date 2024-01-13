@@ -125,6 +125,9 @@ public class Activity implements Serializable {
 
 	@Column(name = "km_calculation_Disabled", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean kmCalculationDisabled;
+
+	@Column(name = "auto_task_creation", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean autoTaskCreation;
 	
 	@PreUpdate
 	public void preUpdate() {
@@ -295,6 +298,14 @@ public class Activity implements Serializable {
 		this.kmCalculationDisabled = kmCalculationDisabled;
 	}
 
+	public boolean getAutoTaskCreation() {
+		return autoTaskCreation;
+	}
+
+	public void setAutoTaskCreation(boolean autoTaskCreation) {
+		this.autoTaskCreation = autoTaskCreation;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -326,6 +337,6 @@ public class Activity implements Serializable {
 				+ "]";
 	}
 
-	
+
 
 }

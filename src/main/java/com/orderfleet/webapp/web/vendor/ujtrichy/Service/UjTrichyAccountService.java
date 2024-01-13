@@ -292,6 +292,7 @@ public class UjTrichyAccountService {
 
             accountProfileRepository.save(saveUpdateAccountProfiles);
 
+            accountProfileService.autoTaskCreationForAccountProfiles( company);
 
         }
 

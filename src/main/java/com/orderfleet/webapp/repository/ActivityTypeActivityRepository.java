@@ -13,6 +13,7 @@ public interface ActivityTypeActivityRepository extends JpaRepository<ActivityTy
 
 	@Query("select activityTypeActivity.activity from ActivityTypeActivity activityTypeActivity where activityTypeActivity.company.id = ?#{principal.companyId} and activityTypeActivity.activityType.pid = ?1")
 	List<Activity> findActivityByActivityTypePid(String activitytypePid);
+
 	
 	@Transactional
 	void deleteByActivityTypePid(String pid);

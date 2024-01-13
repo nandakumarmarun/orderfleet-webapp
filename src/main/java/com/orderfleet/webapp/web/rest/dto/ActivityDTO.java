@@ -73,6 +73,7 @@ public class ActivityDTO {
 
 	private boolean kmCalculationDisabled;
 
+	private boolean autoTaskCreation;
 	private ContactManagement contactManagement;
 
 	public ActivityDTO() {
@@ -94,6 +95,7 @@ public class ActivityDTO {
 		this.hasTelephonicOrder = activity.getHasTelephonicOrder();
 		this.emailTocomplaint = activity.getEmailTocomplaint();
 		this.kmCalculationDisabled = activity.getKmCalculationDisabled();
+		this.autoTaskCreation = activity.getAutoTaskCreation();
 
 
 		// eagerly load the association
@@ -351,6 +353,14 @@ public class ActivityDTO {
 		this.kmCalculationDisabled = kmCalculationDisabled;
 	}
 
+	public boolean getAutoTaskCreation() {
+		return autoTaskCreation;
+	}
+
+	public void setAutoTaskCreation(boolean autoTaskCreation) {
+		this.autoTaskCreation = autoTaskCreation;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -401,6 +411,7 @@ public class ActivityDTO {
 				", locationRadius=" + locationRadius +
 				", secondarySalesThroughApi=" + secondarySalesThroughApi +
 				", kmCalculationDisabled=" + kmCalculationDisabled +
+				", autoTaskCreation=" + autoTaskCreation+
 				", contactManagement=" + contactManagement +
 				'}';
 	}

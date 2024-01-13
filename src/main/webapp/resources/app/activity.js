@@ -28,6 +28,7 @@ if (!this.Activity) {
 		locationRadius : null,
 		secondarySalesThroughApi : null,
 		kmCalculationDisabled : null,
+		autoTaskCreation : null,
 	};
 
 	// Specify the validation rules
@@ -175,6 +176,7 @@ if (!this.Activity) {
 		activityModel.secondarySalesThroughApi = $('#secondarySalesThroughApi').prop(
 		"checked");
 		activityModel.kmCalculationDisabled = $('#kmcalculationdisabled').prop("checked");
+		activityModel.autoTaskCreation = $('#autotaskcreation').prop("checked");
 		$.ajax({
 			method : $(el).attr('method'),
 			url : $(el).attr('action'),
@@ -272,6 +274,7 @@ if (!this.Activity) {
 						$("#secondarySalesThroughApi").prop("checked",
 								data.secondarySalesThroughApi);
 						$('#kmcalculationdisabled').prop('checked', data.kmCalculationDisabled);
+						$('#autotaskcreation').prop('checked',data.autoTaskCreation);
 						// set pid
 						activityModel.pid = data.pid;
 					},

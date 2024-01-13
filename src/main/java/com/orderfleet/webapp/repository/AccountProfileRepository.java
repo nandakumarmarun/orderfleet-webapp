@@ -1,6 +1,7 @@
 package com.orderfleet.webapp.repository;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -276,4 +277,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
     List<AccountProfile> findAccountProfilesByActivatedFalseAndLastModifiedDate(Long companyId,LocalDateTime lastSyncdate);
 
     Optional<AccountProfile> findTop1ByPidOrderByLastModifiedDateDesc(String accountProfilePid);
+
+	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.createdDate between ?1 and ?2")
+	List<AccountProfile> findAllByCreatedDateToday(LocalDateTime fromdate, LocalDateTime todate);
 }

@@ -291,7 +291,7 @@ public class UjKuppamAccountService {
 
             accountProfileRepository.save(saveUpdateAccountProfiles);
 
-
+            accountProfileService.autoTaskCreationForAccountProfiles(company);
         }
 
     }

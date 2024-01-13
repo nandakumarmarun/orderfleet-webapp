@@ -4,12 +4,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -88,7 +83,7 @@ import com.orderfleet.webapp.web.rest.mapper.TaxMasterMapper;
 
 @Service
 public class TPalterIdservicesManagementService {
-	private final Logger log = LoggerFactory.getLogger(TPAccountProfileManagementService.class);
+	private final Logger log = LoggerFactory.getLogger(TPalterIdservicesManagementService.class);
 	
 	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	
@@ -133,6 +128,8 @@ public class TPalterIdservicesManagementService {
 	boolean flag= false;
 	
 	boolean flagac= false;
+
+	boolean accproflag=false;
 	
 	@Autowired
 	private AlterIdMasterService alterIdMasterService;
@@ -1473,8 +1470,24 @@ public class TPalterIdservicesManagementService {
 			}
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
+
+
+
+
 		log.info("Saving...accountProfileDTOs.Account Profiles" + saveUpdateAccountProfiles.size());
-		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+
+		try {
+			bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+		}catch (Exception e){
+			accproflag=true;
+			e.printStackTrace();
+		}
+		finally {
+			if (accproflag==false) {
+				accountProfileService.autoTaskCreationForAccountProfiles( company);
+			}
+		}
+
 		
 		Long Listcount = accountProfileDTOs.parallelStream().filter(accountProfileDTO -> accountProfileDTO.getAlterId() == null).count();
 	    System.out.println("accountProfileDTOnullcount"+Listcount);

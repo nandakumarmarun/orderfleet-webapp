@@ -148,6 +148,9 @@ public class AccountProfileServiceHcreation {
                 saveUpdateAccountProfiles.add(accountProfile);
             }
             bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+
+        accountProfileService.autoTaskCreationForAccountProfiles(company);
+
             saveUpdateLocationAccountProfiles(locationAccountProfiles);
             long end = System.nanoTime();
             double elapsedTime = (end - start) / 1000000.0;

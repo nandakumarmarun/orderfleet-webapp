@@ -321,6 +321,7 @@ public class AccountProfileUploadServiceCochinDistributors {
 			// }
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
+		accountProfileService.autoTaskCreationForAccountProfiles(company);
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;

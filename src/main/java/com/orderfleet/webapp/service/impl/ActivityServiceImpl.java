@@ -431,6 +431,7 @@ public class ActivityServiceImpl implements ActivityService {
 			activity.setLocationRadius(activityDTO.getLocationRadius());
 			activity.setSecondarySalesThroughApi(activityDTO.getSecondarySalesThroughApi());
 			activity.setKmCalculationDisabled(activityDTO.getKmCalculationDisabled());
+			activity.setAutoTaskCreation(activityDTO.getAutoTaskCreation());
 			activity = activityRepository.save(activity);
 			ActivityDTO result = activityMapper.activityToActivityDTO(activity);
 			return result;

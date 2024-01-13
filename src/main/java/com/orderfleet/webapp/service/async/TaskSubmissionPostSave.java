@@ -1028,6 +1028,7 @@ public class TaskSubmissionPostSave {
 		log.info("create and assign task..........................");
 		List<TaskSetting> taskSettingList = taskSettingRepository.findByActivityPidAndDocumentPidAndActivityEvent(
 				executiveTaskExecution.getActivity().getPid(), document.getPid(), ActivityEvent.ONCREATE);
+
 		for (TaskSetting taskSetting : taskSettingList) {
 			processTaskScript(taskSetting, executiveTaskExecution, document, refTransactionPid, refTransDocumentNumber,
 					datePickerFormElements, inventoryVoucherDetailDTOs, accountingVoucherDetailDTOs,
@@ -1247,7 +1248,14 @@ public class TaskSubmissionPostSave {
 			ExecutiveTaskExecution executiveTaskExecution, Document document, String refTransactionPid,
 			String refTransDocumentNumber, List<FilledFormDetail> datePickerFormElements) {
 		// create task
+		List<Task> tasks1= taskRepository.findAllByCompanyId(executiveTaskExecution.getCompany().getId());
+
+		Optional<Task> optionalTask = tasks1.stream()
+				.filter(task ->  task.getAccountProfile().getId().equals(executiveTaskExecution.getAccountProfile().getId())
+						&& task.getAccountType().getId().equals(executiveTaskExecution.getAccountProfile().getAccountType().getId())
+						&& task.getActivity().getId().equals(taskSetting.getTaskActivity().getId())).findAny();
 		Task task = new Task();
+		if(!(optionalTask.isPresent())) {
 		task.setAccountProfile(executiveTaskExecution.getAccountProfile());
 		task.setAccountType(executiveTaskExecution.getAccountType());
 		task.setActivity(taskSetting.getTaskActivity());
@@ -1255,7 +1263,9 @@ public class TaskSubmissionPostSave {
 		task.setPid(TaskService.PID_PREFIX + RandomUtil.generatePid());
 		task.setRemarks(executiveTaskExecution.getRemarks());
 		log.info("Saving task -- " + task.toString());
-		task = taskRepository.save(task);
+		task = taskRepository.save(task);}else{
+			task=optionalTask.get();
+		}
 
 		// save task reference document
 		TaskReferenceDocument taskReferenceDocument = new TaskReferenceDocument();
@@ -1266,7 +1276,7 @@ public class TaskSubmissionPostSave {
 		taskReferenceDocument.setRefTransactionPid(refTransactionPid);
 		taskReferenceDocument.setRefTransDocumentNumber(refTransDocumentNumber);
 		taskReferenceDocument.setTask(task);
-		log.info("Saving taskReference - " + taskReferenceDocument.toString());
+
 		taskReferenceDocumentRepository.save(taskReferenceDocument);
 
 		if (!taskUserSetting.getApprovers().isEmpty()) {

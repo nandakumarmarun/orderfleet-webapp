@@ -278,6 +278,7 @@ public class AccountProfileUncleJhonHalasuruUploadService {
 				saveUpdateAccountProfiles.add(accountProfile);
 			}
 			accountProfileRepository.save(saveUpdateAccountProfiles);
+			accountProfileService.autoTaskCreationForAccountProfiles( company);
 		}
 	}
 

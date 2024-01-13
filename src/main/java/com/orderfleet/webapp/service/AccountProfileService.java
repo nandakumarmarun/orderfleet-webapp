@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import com.orderfleet.webapp.domain.Company;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -180,4 +182,6 @@ public interface AccountProfileService {
 	List<AccountProfileDTO> findAllByCompanyAndAccountImportStatusAndActivatedLimitCount(boolean imports);
 
     void GetAttributeAnswers(List<AccountProfileDTO> accountProfileDTOs);
+	void autoTaskCreationForAccountProfiles( Company company);
+
 }

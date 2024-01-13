@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,6 +95,9 @@ public class MasterDataUploadService {
 	
 	@Inject
 	private PriceLevelRepository priceLevelRepository;
+
+	@Inject
+	private AccountProfileService accountProfileService;
 	
 
 	public void saveOrUpdateStockLocation(List<StockLocationVendorDTO> stockLocationDtos, Company company) {

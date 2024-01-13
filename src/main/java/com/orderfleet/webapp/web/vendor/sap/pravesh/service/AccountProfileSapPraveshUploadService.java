@@ -4,11 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -278,6 +274,9 @@ public class AccountProfileSapPraveshUploadService {
 			saveUpdateLocationHierarchy(locationDtos);
 		}
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+
+
+		accountProfileService.autoTaskCreationForAccountProfiles(company);
 
 		saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
 

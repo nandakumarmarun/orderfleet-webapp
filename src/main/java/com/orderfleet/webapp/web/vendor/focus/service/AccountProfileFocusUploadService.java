@@ -4,11 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -320,6 +316,9 @@ public class AccountProfileFocusUploadService {
 			}
 
 			bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+
+			accountProfileService.autoTaskCreationForAccountProfiles( company);
+
 			routeCodeRepository.save(routecodeList);
 			saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
 		}

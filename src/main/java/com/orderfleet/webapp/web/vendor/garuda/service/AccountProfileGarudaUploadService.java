@@ -4,11 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -226,6 +222,9 @@ public class AccountProfileGarudaUploadService {
 		saveUpdateLocationAccountProfiles(locationAccountProfileDtos);
 		
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+
+		accountProfileService.autoTaskCreationForAccountProfiles( company);
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
 		log.info("Sync completed in {} ms", elapsedTime);

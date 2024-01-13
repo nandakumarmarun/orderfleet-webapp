@@ -8,7 +8,7 @@
 <html lang="en">
 <head>
     <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-    <title>SalesNrich | Mobile Battery Percentage</title>
+    <title>SalesNrich | Internet Speed</title>
     <style type="text/css">
         .error {
             color: red;
@@ -26,7 +26,7 @@
     <div class="main-content">
         <jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
         <hr />
-        <h2>Mobile Battery Percentage</h2>
+        <h2>Internet Speed</h2>
         <hr />
         <div class="row">
             <!-- Profile Info and Notifications -->
@@ -71,7 +71,7 @@
                             <div class="col-sm-3">
                                 <button type="button" class="btn btn-info entypo-search"
                                         style="font-size: 18px"
-                                        onclick="BatteryPercentage.filter()" title="Apply"></button>
+                                        onclick="InternetSpeed.filter()" title="Apply"></button>
                             </div>
                         </div>
                     </div>
@@ -83,19 +83,20 @@
         <table class="table  table-striped table-bordered">
             <thead>
             <tr>
-                <th>Name</th>
                 <th>User Name</th>
-                <th>Battery Percentage</th>
+                <th>Upload Speed</th>
+                <th>Download Speed</th>
+                <th>Current Date & Time</th>
             </tr>
             </thead>
-            <tbody  id="tbodyemployeeMobileBattery">
+            <tbody  id="tbodyemployeeInternetSpeed">
             </tbody>
         </table>
         <hr />
         <!-- Footer -->
         <jsp:include page="../fragments/m_footer.jsp"></jsp:include>
-        <spring:url value="/web/mobile-battery-percentage"
-                    var="urlMobileBatteryPercentage"></spring:url>
+        <spring:url value="/web/internetSpeed"
+                    var="urlInternetSpeed"></spring:url>
 
 
     </div>
@@ -105,22 +106,22 @@
             var="jstreeJS"></spring:url>
 <spring:url value="/resources/app/report-common-js-file.js"
             var="reportcommonjsfileJS"></spring:url>
-<spring:url value="/resources/app/mobile-battery-percentage.js"
-            var="mobileBatteryPercentage"></spring:url>
+<spring:url value="/resources/app/internet-speed.js"
+            var="internetSpeed"></spring:url>
 <spring:url value="/resources/app/employee-location.js"
             var="employeeProfileLocation"></spring:url>
 
 
 <script type="text/javascript" src="${jstreeJS}"></script>
 <script type="text/javascript" src="${reportcommonjsfileJS}"></script>
-<script type="text/javascript" src="${mobileBatteryPercentage}"></script>
+<script type="text/javascript" src="${internetSpeed}"></script>
 <script type="text/javascript" src="${employeeProfileLocation}"></script>
 
 <script type="text/javascript">
     $(document).ready(function() {
         var employeePid = getParameterByName('user-key-pid');
         getEmployees(employeePid);
-        EmployeeProfileLocation.filter();
+        InternetSpeed.filter();
     });
 </script>
 
