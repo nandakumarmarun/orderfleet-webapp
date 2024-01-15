@@ -306,7 +306,7 @@ public class AccountProfileController {
 				task.setActivity(activity);
 				task.setAccountType(accountProfile.getAccountType());
 				task.setPid(TaskService.PID_PREFIX + RandomUtil.generatePid());
-
+				task.setRemarks("");
 				taskRepository.save(task);
 	//			log.debug("task : "+task);
 				logger.info("task saved........................");

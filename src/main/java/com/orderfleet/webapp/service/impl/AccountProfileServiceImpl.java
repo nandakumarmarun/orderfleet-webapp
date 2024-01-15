@@ -149,6 +149,7 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 				task.setAccountProfile(accountProfile);
 				task.setActivity(activity);
 				task.setAccountType(accountProfile.getAccountType());
+				task.setRemarks("");
 				task.setPid(TaskService.PID_PREFIX + RandomUtil.generatePid());
 
 				taskRepository.save(task);
