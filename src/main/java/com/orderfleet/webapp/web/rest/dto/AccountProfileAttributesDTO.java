@@ -17,6 +17,16 @@ public class AccountProfileAttributesDTO {
 
     private List<CompanyAttributes> companyAttributes;
 
+    private String documentPid;
+
+    public String getDocumentPid() {
+        return documentPid;
+    }
+
+    public void setDocumentPid(String documentPid) {
+        this.documentPid = documentPid;
+    }
+
     public String getAccountProfilePid() {
         return accountProfilePid;
     }

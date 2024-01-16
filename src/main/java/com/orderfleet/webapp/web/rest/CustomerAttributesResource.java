@@ -2,12 +2,11 @@ package com.orderfleet.webapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
-import com.orderfleet.webapp.domain.Attributes;
-import com.orderfleet.webapp.domain.Company;
-import com.orderfleet.webapp.domain.CompanyAttributes;
+import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.repository.AttributesRepository;
 import com.orderfleet.webapp.repository.CompanyAttributesRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.security.AuthoritiesConstants;
 import com.orderfleet.webapp.service.CompanyService;
 import com.orderfleet.webapp.service.CustomerAttributesService;
@@ -51,7 +50,10 @@ public class CustomerAttributesResource {
     @Autowired
     CustomerAttributesService customerAttributesService;
     @Autowired
-    CompanyAttributesRepository customerAttributesRepository;
+    CompanyAttributesRepository companyAttributesRepository;
+
+    @Autowired
+    DocumentRepository documentRepository ;
     @Autowired
     CompanyService companyService;
     @Autowired
@@ -65,8 +67,9 @@ public class CustomerAttributesResource {
 
         List<Attributes> customerAttributes = attributesRepository.findAll();
         List<Company> companies = companyRepository.findAllCompaniesByActivatedTrue();
-        List<CompanyAttributes> companyAttributes = customerAttributesRepository.findAll();
+        List<CompanyAttributes> companyAttributes = companyAttributesRepository.findAll();
         List<CustomerAttributesDTO> customerAttributesDTOs = new ArrayList<>();
+        List<Document>documents=documentRepository.findAll();
 
         for (Attributes attribute : customerAttributes) {
             CustomerAttributesDTO customerAttributesDTO = new CustomerAttributesDTO();
@@ -93,6 +96,7 @@ public class CustomerAttributesResource {
 
         model.addAttribute("companies", companies);
         model.addAttribute("customerAttributes", customerAttributesDTOs);
+        model.addAttribute("Documents", documents);
 
         return new ModelAndView("site_admin/customerAttributes");
     }
@@ -128,57 +132,58 @@ public class CustomerAttributesResource {
 
         return ResponseEntity.ok().body(allAttributes); // Return the list of all attributes
     }
+    @GetMapping("/customer-attributes/getDocumentByCompany")
+    @Timed
+    public ResponseEntity<List<Document>> getDocumentByCompany(@RequestParam String companyPid) {
+        log.debug("Web request to get Documents by company: {}", companyPid);
 
+        // Fetch locations based on the selected user
+        List<Document> documents = documentRepository.findAllDocumentsByCompanyPid(companyPid);
+
+        return new ResponseEntity<>(documents, HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/customer-attributes/update", method = RequestMethod.POST)
     @Transactional
     public ResponseEntity<String> updateCustomerAttributes(
+            @RequestParam(name = "documentPid") String documentPid,
             @RequestParam(name = "companyPid") String companyPid,
             @RequestParam(name = "selectedQuestions") List<String> selectedQuestions,
             @RequestParam(name = "sortOrder") List<Long> sortOrder
     ) {
-        log.debug(companyPid);
         try {
-            Company company = companyRepository.findOneByPid(companyPid).orElse(null);
-            if (company == null) {
-                return new ResponseEntity<>("Company not found.", HttpStatus.NOT_FOUND);
-            }
-            customerAttributesRepository.deleteByCompanyPid(companyPid);
-
-
-
-            // Iterate through selected questions and save in the table
-            for (int i = 0; i < selectedQuestions.size(); i++) {
-                String attributesPid = selectedQuestions.get(i);
-                Attributes attributes = attributesRepository.findOneByPid(attributesPid).orElse(null);
-
-                if (attributes != null) {
-                    // Create a new CompanyAttributes instance for the selected attributes
-                    CompanyAttributes companyAttributes = new CompanyAttributes();
-                    companyAttributes.setAttributes(attributes);
-                    companyAttributes.setCompany(company);
-                    companyAttributes.setSortOrder(sortOrder.get(i));
-
-                    // Save the CompanyAttributes to the repository
-                    customerAttributesRepository.save(companyAttributes);
-
-                }
+            if (documentPid.equalsIgnoreCase("all")) {
+                // Update all questions for all documents
+                customerAttributesService.updateAttributesForAllDocuments(companyPid,selectedQuestions,sortOrder);
+            } else {
+                // Update questions for a specific document
+                customerAttributesService.updateAttributes(documentPid, companyPid, selectedQuestions, sortOrder);
             }
 
             return new ResponseEntity<>("Completed.", HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>("Company not found.", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            // Handle any errors or exceptions
             return new ResponseEntity<>("Failed: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
-    @RequestMapping(value = "/customer-attributes/get-attributes-by-company", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/customer-attributes/get-attributes-by-document", method = RequestMethod.GET)
     @Timed
-    public ResponseEntity<List<CustomerAttributesDTO>> customerAttributes(@RequestParam String companyPid) {
-        log.debug("REST request to Company Attributes : {}", companyPid);
-                List<CustomerAttributesDTO> customerAttributesDTOs = customerAttributesService
-                        .findAttributesByCompanyPid(companyPid);
+    public ResponseEntity<List<CustomerAttributesDTO>> customerAttributes(@RequestParam String documentPid,@RequestParam String companyPid) {
+        log.debug("REST request to Company Attributes : {}", documentPid);
+        List<CustomerAttributesDTO> customerAttributesDTOs;
+
+        if (documentPid.equalsIgnoreCase("all")) {
+            customerAttributesDTOs = customerAttributesService.getAllAttributesByCompany(companyPid);
+            log.debug("all",customerAttributesDTOs);
+        } else {
+            customerAttributesDTOs = customerAttributesService.findAttributesByDocumentPid(documentPid);
+            log.debug("document",customerAttributesDTOs);
+        }
+
         return new ResponseEntity<>(customerAttributesDTOs, HttpStatus.OK);
     }
 }

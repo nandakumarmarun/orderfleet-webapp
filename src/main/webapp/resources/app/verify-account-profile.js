@@ -117,7 +117,7 @@ if (!this.VerifyAccountProfile) {
 		};
 	
 	
-	
+
 
 	$(document).ready(function() {
 		$('#btnSearch').click(function() {
@@ -338,9 +338,9 @@ if (!this.VerifyAccountProfile) {
                    		.each(
                                    	accountProfile.answers,
                                         function(index,answer) {
-                                          answers+= "<td>"+answer+"</td>"
-                                               });
-                                              }
+                                          answers+= "<td>"+answer+"</td>"   });
+                                          }
+
 
 					$('#tBodyVerifyAccountProfile')
 						.append(
@@ -371,16 +371,15 @@ if (!this.VerifyAccountProfile) {
 							+ "</td><td>"
 							+ accountProfile.activated
 							+ "</td><td>"
-
                             +"<i class='btn btn-blue entypo-pencil' title='Edit AccountProfile' onclick='VerifyAccountProfile.showModalPopup($(\"#myModal\"),\""
-													+ accountProfile.pid
-													+ "\",1);'"
+                           	+ accountProfile.pid
+                               + "\",1);'"
 							+"</td></td>"
-							+answers
-							+"</tr>");
+							+ answers
+							+"</td></tr>");
 				});
 	}
-	
+
 	
 	VerifyAccountProfile.showModalPopup = function(el, id, action) {
 		resetForm();

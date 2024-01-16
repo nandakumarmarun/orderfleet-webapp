@@ -693,12 +693,16 @@ public class AccountProfileResource {
 				"Address", "Phone1", "Email1", "WhatsApp No", "Account Status", "GSTIN", "GST Registration Type",
 				"Created Date", "Last Updated Date", "Created By", "Stage", "Status" };
 		List<CompanyAttributes> companyAttributes = companyAttributesRepository.findAllByCompanyId();
+		Map<Long, CompanyAttributes> uniqueMap = companyAttributes.stream()
+				.collect(Collectors.groupingBy(ComAttr-> ComAttr.getAttributes().getId(),
+						Collectors.collectingAndThen(Collectors.toList(), list -> list.get(0))));
 
+		List<CompanyAttributes>	companyAttributesList = new ArrayList<>(uniqueMap.values());
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
 			HSSFSheet worksheet = workbook.createSheet(sheetName);
 			Sheet sheet = workbook.getSheetAt(0);
-			createHeaderRow(worksheet, headerColumns,companyAttributes);
-			createReportRows(worksheet, accountProfileDTOs, locationAccountProfiles,companyAttributes);
+			createHeaderRow(worksheet, headerColumns,companyAttributesList);
+			createReportRows(worksheet, accountProfileDTOs, locationAccountProfiles,companyAttributesList);
 			// Resize all columns to fit the content size
 			for (int i = 0; i < headerColumns.length; i++) {
 				worksheet.autoSizeColumn(i);
@@ -764,7 +768,6 @@ public class AccountProfileResource {
 		for (AccountProfileDTO ap : accountProfileDTO) {
 			List<AccountProfileAttributes> accountProfileAttributes = accountProfileAttributesList.stream().filter(aa -> aa.getAccountProfile().getPid().equals(ap.getPid()))
 					.collect(Collectors.toList());
-			System.out.println("Size :"+accountProfileAttributes.size());
 
 			HSSFRow	row = worksheet.createRow(rowNum++);
 			row.createCell(0).setCellValue(ap.getName().replace("#13;#10;", " "));
@@ -809,16 +812,19 @@ public class AccountProfileResource {
          {
 	   int i=0;
 			 for (CompanyAttributes comp : companyAttributes) {
-				 System.out.println("Questions :"+comp.getAttributes().getQuestions());
-	            for(AccountProfileAttributes attr : accountProfileAttributes) {
+
+
+			   for(AccountProfileAttributes attr : accountProfileAttributes) {
+
 				 if(attr.getAttributesPid().equals(comp.getAttributes().getPid()))
 				 {
-				 Cell cell = row.createCell(18 + i);
-				 cell.setCellValue(attr.getAnswers());
-				 System.out.println("Answer :" + attr.getAnswers());
-				 i++;
+					 Cell cell = row.createCell(18 + i);
+				   cell.setCellValue(attr.getAnswers());
 			 }
-		 }}
+
+		 }
+			 i++;
+			 }
 			}}
 		}
 

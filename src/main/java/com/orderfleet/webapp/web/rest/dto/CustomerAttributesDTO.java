@@ -4,11 +4,31 @@ public class CustomerAttributesDTO {
 
     private Long id;
     private String attributePid;
+
+    private Long attributedId;
     private String question;
     private String companyPid;
     private String companyName;
     private Long sortOrder;
     private String type;
+    private String documentPid;
+    private String documentName;
+
+    public String getDocumentPid() {
+        return documentPid;
+    }
+
+    public void setDocumentPid(String documentPid) {
+        this.documentPid = documentPid;
+    }
+
+    public String getDocumentName() {
+        return documentName;
+    }
+
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
+    }
 
     public Long getId() {
         return id;
@@ -64,6 +84,14 @@ public class CustomerAttributesDTO {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Long getAttributedId() {
+        return attributedId;
+    }
+
+    public void setAttributedId(Long attributedId) {
+        this.attributedId = attributedId;
     }
 
     @Override

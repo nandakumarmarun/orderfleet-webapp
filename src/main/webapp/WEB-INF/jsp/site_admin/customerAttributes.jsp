@@ -26,15 +26,27 @@
             <br>
   <div class="row">
                  <div class="form-group col-sm-2">
-                     <label for="dbCompany">Company:</label>
-                     <select id="dbCompany" name="companyPid" class="form-control selectpicker" data-live-search="true">
-                         <option value="-1">Select Company</option>
-                         <c:forEach items="${companies}" var="company">
-                             <option value="${company.pid}">${company.legalName}</option>
-                         </c:forEach>
-                     </select>
+                       <label for="dbCompany">Company:</label>
+                                                                            <select id="dbCompany" name="companyPid" class="form-control selectpicker" onchange="window.customerAttributes.getDocument()" data-live-search="true">
+                                                                                <option value="-1">Select Company</option>
+                                                                                <c:forEach items="${companies}" var="company">
+                                                                                    <option value="${company.pid}">${company.legalName}</option>
+                                                                                </c:forEach>
+                                                                            </select>
+                                                                            </select>
                  </div>
-                 </div>
+                  <div class="form-group col-sm-2">
+                                      <label for="dbDocument">Document:</label>
+                                      <select id="dbDocument" name="documentPid" class="form-control " data-live-search="true">
+                                          <option value="all">Select Document</option>
+
+                                      </select>
+                                  </div>
+</div>
+
+
+
+
                  <div class="row col-xs-12">
                  				<div class="pull-right">
                  				<button type="button" class="btn btn-info"

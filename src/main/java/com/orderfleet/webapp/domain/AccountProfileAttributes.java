@@ -36,7 +36,16 @@ public class AccountProfileAttributes implements Serializable, Cloneable {
 
     @Column(name = "sort_order", length = 235)
     private Long sortOrder;
+    @Column(name="documentPid",length = 255)
+    private String documentPid;
 
+    public String getDocumentPid() {
+        return documentPid;
+    }
+
+    public void setDocumentPid(String documentPid) {
+        this.documentPid = documentPid;
+    }
 
     public Long getId() {
         return id;
@@ -101,7 +110,10 @@ public class AccountProfileAttributes implements Serializable, Cloneable {
                 ", company=" + company +
                 ", accountProfile=" + accountProfile +
                 ", attributesPid='" + attributesPid + '\'' +
+                ", attributesName='" + attributesName + '\'' +
                 ", answers='" + answers + '\'' +
+                ", sortOrder=" + sortOrder +
+                ", documentPid='" + documentPid + '\'' +
                 '}';
     }
 

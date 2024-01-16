@@ -28,8 +28,6 @@ console.log(customerAttributesContextPath);
 
         var customerAttributesDTO = {
 
-
-
             question: attributeName,
             type: attributeType
 
@@ -67,12 +65,10 @@ $(document).ready(function() {
                     });
     });
 
-
-
-
 });
 $('#updateButton').on('click', function () {
     var companyPid = $('#dbCompany').val();
+    var documentPid=$('#dbDocument').val();
 
     if (companyPid === '-1') {
         alert("Please select a Company for update");
@@ -81,6 +77,7 @@ $('#updateButton').on('click', function () {
 
     var formData = new FormData();
     formData.append('companyPid', companyPid);
+    formData.append('documentPid', documentPid);
 
     var selectedQuestions = [];
     var sortOrders = [];
@@ -141,55 +138,104 @@ $('#selectAll').click(function () {
     $('.selectRow').prop('checked', isChecked);
 });
 
+ window.customerAttributes.getDocument = function () {
 
+     var selectedCompanyPid = $("#dbCompany").val();
+
+     selectedCompanyPid  = String(selectedCompanyPid ); // Convert to string explicitly
+console.log(selectedCompanyPid);
+
+
+     $.ajax({
+         type: "GET",
+         url: customerAttributesContextPath + "/getDocumentByCompany",
+         data: {
+             companyPid: selectedCompanyPid
+
+         },
+
+         success: function (response) {
+         console.log(response);
+             var documentDropdown = $("#dbDocument");
+documentDropdown.empty().append('<option value="all">All Documents</option>');
+
+             var uniquePids = [];
+             var uniqueDocuments = [];
+             response.forEach(function (item) {
+                 if (!uniquePids.includes(item.pid)) {
+                     uniquePids.push(item.pid);
+                     uniqueDocuments.push(item);
+                 }
+             });
+
+             // Append filtered options to the dropdown
+             uniqueDocuments.forEach(function (item) {
+                 documentDropdown.append('<option value="' + item.pid + '">' + item.name + '</option>');
+             });
+             documentDropdown.trigger('change');
+         },
+         error: function (e) {
+             console.log("Error fetching document: " + e);
+         }
+     });
+
+ };
+  $(document).ready(function () {
+          window.customerAttributes.getDocument();
+      });
 
 function refreshFunction() {
 location.reload();
 }
-$('#dbCompany').change(function() {
-    var companyPid = $(this).val(); // Get the selected company PID
-    console.log(companyPid);
+$('#dbDocument').change(function () {
+     var documentPid = $(this).val();
+     var companyPid = $('#dbCompany').val();
+if (documentPid === "all") {
+        // Handle the "All Documents" case
+        console.log("All Documents selected");
+        // Add your logic here
+    } else {
+        // Handle other document selections
+        console.log("Selected document: " + documentPid);
+        // Add your logic here
+    }
+     // Clear checkboxes and error message
+     $("#tBodyCustomerAttributes input:checkbox").prop('checked', false);
+     $(".error-msg").html("");
+     $("#tBodyCustomerAttributes input:text").val('');
 
-    // Clear checkboxes and error message
-    $("#tBodyCustomerAttributes input:checkbox").prop('checked', false);
-    $(".error-msg").html("");
-    $("#tBodyCustomerAttributes input:text").val('');
+     // Make an AJAX request to fetch the assigned attributes for the selected document
+     $.ajax({
+         type: 'GET',
+         url: customerAttributesContextPath + '/get-attributes-by-document',
+         data: {
+             documentPid: documentPid,
+             companyPid: companyPid
+         },
+         success: function (customerAttributes) {
+             console.log(customerAttributes);
 
-    // Make an AJAX request to fetch the assigned attributes for the selected company
-    $.ajax({
-        type: 'GET',
-        url: customerAttributesContextPath + '/get-attributes-by-company',
-        data: {
-            companyPid: companyPid
-        },
-        success: function(customerAttributes) {
-            console.log(customerAttributes);
+             if (customerAttributes) {
+                 $.each(customerAttributes, function (index, attribute) {
+                     $("#tBodyCustomerAttributes input:checkbox[value='" + attribute.attributePid + "']").prop("checked", true);
+                     var inputBox = $("#tBodyCustomerAttributes input:text[id='" + attribute.attributePid + "']");
+                     inputBox.val('').val(attribute.sortOrder);
+                 });
+             }
 
-            if (customerAttributes) {
-
-  $.each(customerAttributes, function(index, attribute) {
-                                        console.log(attribute);
-
-                                        $("#tBodyCustomerAttributes input:checkbox[value='" + attribute.attributePid + "']").prop("checked", true);
-                                        console.log(attribute.attributePid);
-                                        console.log(attribute.sortOrder);
-
-                                        var inputBox = $("#tBodyCustomerAttributes input:text[id='" + attribute.attributePid + "']");
-                                        inputBox.val('').val(attribute.sortOrder);
-                                    });
-
-            }
              filterTable();
-        },
+         },
 
-        error: function(jqXHR, textStatus, errorThrown) {
-            // Handle the error
-            console.error('Error:', errorThrown);
-        }
-    });
-});
+         error: function (jqXHR, textStatus, errorThrown) {
+             // Handle the error
+             console.error('Error:', errorThrown);
+         }
+     });
+ });
 
-// JavaScript code for index.jsp
+
+
+
 
 // Function to filter table based on radio button selection
 function filterTable() {
@@ -219,11 +265,11 @@ function filterTable() {
     });
 }
 
-// Other JavaScript code...
+
 $("input[name='filter']").change(function() {
     filterTable();
 });
-// Additional JavaScript code...
+
 
 
 

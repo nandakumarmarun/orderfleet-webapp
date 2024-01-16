@@ -181,7 +181,7 @@ public interface AccountProfileService {
 
 	List<AccountProfileDTO> findAllByCompanyAndAccountImportStatusAndActivatedLimitCount(boolean imports);
 
-    void GetAttributeAnswers(List<AccountProfileDTO> accountProfileDTOs);
 	void autoTaskCreationForAccountProfiles( Company company);
+	void GetAttributeAnswers(List<AccountProfileDTO> accountProfileDTOs);
 
 }

@@ -3,10 +3,12 @@ package com.orderfleet.webapp.service.impl;
 import com.orderfleet.webapp.domain.Attributes;
 import com.orderfleet.webapp.domain.Company;
 import com.orderfleet.webapp.domain.CompanyAttributes;
+import com.orderfleet.webapp.domain.Document;
 import com.orderfleet.webapp.repository.AttributesRepository;
 import com.orderfleet.webapp.repository.CompanyAttributesRepository;
 import com.orderfleet.webapp.repository.CompanyRepository;
 
+import com.orderfleet.webapp.repository.DocumentRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.CompanyService;
@@ -43,6 +45,9 @@ public class CustomerAttributesServiceImpl implements CustomerAttributesService 
     Attributes attributes;
     @Autowired
     AttributesRepository attributesRepository;
+
+    @Autowired
+    DocumentRepository documentRepository;
     @Override
     public CustomerAttributesDTO save(CustomerAttributesDTO customerAttributesDTO) {
         System.out.println("Enters the service implementation");
@@ -57,17 +62,30 @@ public class CustomerAttributesServiceImpl implements CustomerAttributesService 
         return convertAttributesToDTO(savedAttributes);
     }
 
-    @Override
-    public List<CustomerAttributesDTO> findAttributesByCompanyId() {
+    public List<CustomerAttributesDTO> findAttributesByCompanyIdAndDocumentPid() {
         log.debug("Request to get all Attributes under a company");
-        Long companyId= SecurityUtils.getCurrentUsersCompanyId();
-        List<CompanyAttributes> companyAttributesList = companyAttributesRepository.findAttributesByCompanyId(companyId);
-        log.debug("the result is ; {}",companyAttributesList);
 
-        List<CustomerAttributesDTO> result = convertCompanyAttributesToCustomerAttributesDTO(companyAttributesList);
-        log.debug("the result is ; {}",result);
+        // Retrieve the current user's company ID
+        Long companyId = SecurityUtils.getCurrentUsersCompanyId();
+
+        // Fetch the list of documents associated with the company
+        List<Document> documents = documentRepository.findAllByCompanyId();
+
+        // Initialize a list to store the resulting DTOs
+        List<CustomerAttributesDTO> result = documents.stream()
+                .flatMap(document -> {
+                    List<CompanyAttributes> companyAttributesList = companyAttributesRepository.findAttributesByCompanyIdAndDocumentPid(companyId, document.getPid());
+                    log.debug("Attributes for document {} are: {}", document.getPid(), companyAttributesList);
+
+                    // Convert company attributes to DTO (Data Transfer Object) and return as a stream
+                    return convertCompanyAttributesToCustomerAttributesDTO(companyAttributesList).stream();
+                })
+                .collect(Collectors.toList());
+
+        log.debug("Final result is: {}", result);
         return result;
     }
+
 
     @Override
     public List<CustomerAttributesDTO> getAllCompanyAttributes() {
@@ -77,6 +95,7 @@ public class CustomerAttributesServiceImpl implements CustomerAttributesService 
         for(CompanyAttributes compAttr :companyAttributes)
         {
             CustomerAttributesDTO customerAttributesDTO= new CustomerAttributesDTO();
+            customerAttributesDTO.setAttributedId(compAttr.getAttributes().getId());
             customerAttributesDTO.setAttributePid(compAttr.getAttributes().getPid());
             customerAttributesDTO.setQuestion(compAttr.getAttributes().getQuestions());
             customerAttributesDTO.setSortOrder(compAttr.getSortOrder());
@@ -87,15 +106,18 @@ public class CustomerAttributesServiceImpl implements CustomerAttributesService 
     }
 
     @Override
-    public List<CustomerAttributesDTO> findAttributesByCompanyPid(String companyPid) {
-        log.debug("Request to get all Attributes under a company");
-        List<CompanyAttributes> companyAttributesList = companyAttributesRepository.findAttributesByCompanyPid(companyPid);
-        log.debug("the result is ; {}",companyAttributesList);
+    public List<CustomerAttributesDTO> findAttributesByDocumentPid(String documentPid) {
+        log.debug("Request to get all Attributes under a document");
+
+        List<CompanyAttributes> companyAttributesList= companyAttributesRepository.findAttributesByDocumentPid(documentPid);
+            log.debug("the result is: {}", companyAttributesList);
+
 
         List<CustomerAttributesDTO> result = convertCompanyAttributesToCustomerAttributesDTO(companyAttributesList);
-        log.debug("the result is ; {}",result);
+        log.debug("the result is: {}", result);
         return result;
     }
+
     @Override
     public List<CustomerAttributesDTO> getAllAttributes() {
         List<Attributes> attributesList = attributesRepository.findAll();
@@ -168,6 +190,8 @@ public class CustomerAttributesServiceImpl implements CustomerAttributesService 
                 customerAttributesDTO.setAttributePid(companyAttributes.getAttributes().getPid());
                 customerAttributesDTO.setQuestion(companyAttributes.getAttributes().getQuestions());
                 customerAttributesDTO.setType(companyAttributes.getAttributes().getType());
+                customerAttributesDTO.setDocumentPid(companyAttributes.getDocumentPid());
+                customerAttributesDTO.setDocumentName(companyAttributes.getDocumentName());
 
 
                 // Additional conditions or checks
@@ -181,6 +205,79 @@ public class CustomerAttributesServiceImpl implements CustomerAttributesService 
                 customerAttributesDTOs.add(customerAttributesDTO);
             }
         }
+        return customerAttributesDTOs;
+    }
+    @Override
+    @Transactional
+    public void updateAttributes(String documentPid,String companyPid, List<String> selectedQuestions, List<Long> sortOrder) {
+
+        Company company=companyRepository.findOneByPid(companyPid)
+                .orElseThrow(() -> new EntityNotFoundException("Company not found."));
+Document document= documentRepository.findOneByPid(documentPid).get();
+        companyAttributesRepository.deleteByDocumentPid(documentPid);
+
+        for (int i = 0; i < selectedQuestions.size(); i++) {
+            String attributesPid = selectedQuestions.get(i);
+            Attributes attributes = attributesRepository.findOneByPid(attributesPid).orElse(null);
+
+            if (attributes != null) {
+                CompanyAttributes companyAttributes = new CompanyAttributes();
+                companyAttributes.setAttributes(attributes);
+                companyAttributes.setCompany(company);
+                companyAttributes.setDocumentId(document.getId());
+                companyAttributes.setDocumentName(document.getName());
+                companyAttributes.setDocumentPid(documentPid);
+                companyAttributes.setSortOrder(sortOrder.get(i));
+
+                companyAttributesRepository.save(companyAttributes);
+            }
+        }
+    }
+
+    @Override
+    public void updateAttributesForAllDocuments(String companyPid, List<String> selectedQuestions, List<Long> sortOrder) {
+        Company company = companyRepository.findOneByPid(companyPid)
+                .orElseThrow(() -> new EntityNotFoundException("Company not found."));
+
+        List<Document> allDocuments = documentRepository.findAllDocumentsByCompanyPid(companyPid);
+
+        for (Document document : allDocuments) {
+            companyAttributesRepository.deleteByDocumentPid(document.getPid());
+
+            for (int i = 0; i < selectedQuestions.size(); i++) {
+                String attributesPid = selectedQuestions.get(i);
+                Attributes attributes = attributesRepository.findOneByPid(attributesPid).orElse(null);
+
+                if (attributes != null) {
+                    CompanyAttributes companyAttributes = new CompanyAttributes();
+                    companyAttributes.setAttributes(attributes);
+                    companyAttributes.setCompany(company);
+                    companyAttributes.setDocumentId(document.getId());
+                    companyAttributes.setDocumentName(document.getName());
+                    companyAttributes.setDocumentPid(document.getPid());
+                    companyAttributes.setSortOrder(sortOrder.get(i));
+
+                    companyAttributesRepository.save(companyAttributes);
+                }
+            }
+        }
+    }
+    public List<CustomerAttributesDTO> getAllAttributesByCompany(String companyPid) {
+        // Fetch all company attributes for the given companyPid
+        List<CompanyAttributes> companyAttributesList = companyAttributesRepository.findAttributesByCompanyPid(companyPid);
+
+        // Convert the list of entities to a list of DTOs manually
+        List<CustomerAttributesDTO> customerAttributesDTOs = new ArrayList<>();
+        for (CompanyAttributes companyAttributes : companyAttributesList) {
+            CustomerAttributesDTO dto = new CustomerAttributesDTO();
+            dto.setAttributePid(companyAttributes.getAttributes().getPid());
+            dto.setSortOrder(companyAttributes.getSortOrder());
+            dto.setType(companyAttributes.getAttributes().getType());
+            // Map other properties as needed
+
+            customerAttributesDTOs.add(dto);
+        }
+
         return customerAttributesDTOs;
     }
 

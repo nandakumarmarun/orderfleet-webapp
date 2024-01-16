@@ -7,12 +7,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -112,7 +108,13 @@ public class VerifyAccountProfileResource {
 			model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
 		}
 		List<CustomerAttributesDTO> companyAttributes = customerAttributesService.getAllCompanyAttributes();
-		model.addAttribute("attributes",companyAttributes);
+		Map<Long, CustomerAttributesDTO> uniqueMap = companyAttributes.stream()
+				.collect(Collectors.groupingBy(ComAttr-> ComAttr.getAttributedId(),
+						Collectors.collectingAndThen(Collectors.toList(), list -> list.get(0))));
+
+		List<CustomerAttributesDTO>	companyAttributesList = new ArrayList<>(uniqueMap.values());
+		model.addAttribute("attributes",companyAttributesList);
+
 		return "company/verifyAccountProfile";
 	}
 
@@ -185,11 +187,14 @@ public class VerifyAccountProfileResource {
 	@Timed
 	public ResponseEntity<AccountProfileDTO> getAccountProfile(@PathVariable String pid) {
 		log.debug("Web request to get AccountProfile by pid : {}", pid);
+
 		return accountProfileService.findOneByPid(pid)
-				.map(accountProfileDTO -> new ResponseEntity<>(accountProfileDTO, HttpStatus.OK))
+				.map(accountProfileDTO-> new ResponseEntity<>(accountProfileDTO, HttpStatus.OK))
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+
 	}
-	
+
 	@RequestMapping(value = "/verify-account-profile", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<AccountProfileDTO> updateAccountProfile(

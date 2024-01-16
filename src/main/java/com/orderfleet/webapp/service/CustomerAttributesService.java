@@ -12,8 +12,12 @@ public interface CustomerAttributesService {
     CustomerAttributesDTO save (CustomerAttributesDTO customerAttributesDTO);
 
     List<CustomerAttributesDTO> getAllAttributes();
-    List<CustomerAttributesDTO> findAttributesByCompanyPid(String companyPid);
-    List<CustomerAttributesDTO> findAttributesByCompanyId();
+    List<CustomerAttributesDTO> findAttributesByDocumentPid(String companyPid);
+    List<CustomerAttributesDTO> findAttributesByCompanyIdAndDocumentPid();
 
     List<CustomerAttributesDTO> getAllCompanyAttributes();
+   void updateAttributes(String documentPid,String companyPid, List<String> selectedQuestions, List<Long> sortOrder);
+   void  updateAttributesForAllDocuments(String companyPid, List<String> selectedQuestions, List<Long> sortOrder);
+    List<CustomerAttributesDTO> getAllAttributesByCompany(String companyPid);
 }
+

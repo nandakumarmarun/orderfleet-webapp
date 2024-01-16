@@ -28,6 +28,12 @@ public class CompanyAttributes implements Serializable {
     private Attributes attributes;
     @Column(name="sort_order")
     private Long sortOrder;
+    @Column(name="document_id")
+    private Long documentId;
+    @Column(name="document_pid")
+    private String documentPid;
+    @Column(name="document_name")
+    private String documentName;
 
 
 
@@ -63,6 +69,30 @@ public class CompanyAttributes implements Serializable {
         this.sortOrder = sortOrder;
     }
 
+    public Long getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(Long documentId) {
+        this.documentId = documentId;
+    }
+
+    public String getDocumentPid() {
+        return documentPid;
+    }
+
+    public void setDocumentPid(String documentPid) {
+        this.documentPid = documentPid;
+    }
+
+    public String getDocumentName() {
+        return documentName;
+    }
+
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
+    }
+
     @Override
     public String toString() {
         return "CompanyAttributes{" +
@@ -70,6 +100,9 @@ public class CompanyAttributes implements Serializable {
                 ", company=" + company +
                 ", attributes=" + attributes +
                 ", sortOrder=" + sortOrder +
+                ", documentId=" + documentId +
+                ", documentPid='" + documentPid + '\'' +
+                ", documentName='" + documentName + '\'' +
                 '}';
     }
 }

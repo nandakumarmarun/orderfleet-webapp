@@ -1823,7 +1823,7 @@ public class MasterDataController {
 	public ResponseEntity<List<CustomerAttributesDTO>> customerAttributes() {
 		log.debug("Api request to Company Attributes : {}");
 		List<CustomerAttributesDTO> customerAttributesDTOs = customerAttributesService
-				.findAttributesByCompanyId();
+				.findAttributesByCompanyIdAndDocumentPid();
 		if (customerAttributesDTOs == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {

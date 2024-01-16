@@ -1295,41 +1295,6 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 		return result;
 	}
 
-	@Override
-	public void GetAttributeAnswers(List<AccountProfileDTO> accountProfileDTOs) {
-		List<String> accPid = accountProfileDTOs.stream().map(acc -> acc.getPid()).collect(Collectors.toList());
-		System.out.println("Size :" + accPid.size());
-		List<AccountProfileAttributes> accountProfileAttributesList = accountProfileAttributesRepository
-				.findAccountProfileAttributesByAccountProfilePidIn(accPid);
-
-		if (!accountProfileAttributesList.isEmpty()) {
-			List<CompanyAttributes> companyAttributes = companyAttributesRepository.findAllByCompanyId();
-
-			for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
-				List<AccountProfileAttributes> accountProfileAttributes = accountProfileAttributesList.stream().filter(aa -> aa.getAccountProfile().getPid().equals(accountProfileDTO.getPid()))
-						.collect(Collectors.toList());
-				if (accountProfileAttributes.size() > 0) {
-					List<String> answerList = new ArrayList<>();
-					for (CompanyAttributes comp : companyAttributes) {
-						System.out.println("Questions :" + comp.getAttributes().getQuestions());
-						for (AccountProfileAttributes attr : accountProfileAttributes) {
-							if (attr.getAttributesPid().equals(comp.getAttributes().getPid())) {
-								String answer = attr.getAnswers();
-								answerList.add(answer);
-								System.out.println("Answer :" + attr.getAnswers());
-
-							}
-						}
-
-					}
-					accountProfileDTO.setAnswers(answerList);
-				}
-
-			}
-			accountProfileDTOs.forEach(ap -> System.out.println("list :" + ap.getAnswers()));
-		}
-	}
-
 	/**
 	 * Get one accountProfile by name.
 	 *
@@ -1986,5 +1951,48 @@ public class AccountProfileServiceImpl implements AccountProfileService {
 			}
 		}
 		taskRepository.save(tasks);
+	}
+
+	@Override
+	public void GetAttributeAnswers(List<AccountProfileDTO> accountProfileDTOs) {
+		List<String> accPid = accountProfileDTOs.stream().map(acc -> acc.getPid()).collect(Collectors.toList());
+		List<AccountProfileAttributes> accountProfileAttributesList = accountProfileAttributesRepository
+				.findAccountProfileAttributesByAccountProfilePidIn(accPid);
+
+		if (!accountProfileAttributesList.isEmpty()) {
+			List<CompanyAttributes> companyAttributes = companyAttributesRepository.findAllByCompanyId();
+			Map<Long, CompanyAttributes> uniqueMap = companyAttributes.stream()
+					.collect(Collectors.groupingBy(ComAttr-> ComAttr.getAttributes().getId(),
+							Collectors.collectingAndThen(Collectors.toList(), list -> list.get(0))));
+
+			List<CompanyAttributes>	companyAttributesList = new ArrayList<>(uniqueMap.values());
+
+			for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
+				List<AccountProfileAttributes> accountProfileAttributes = accountProfileAttributesList.stream().filter(aa -> aa.getAccountProfile().getPid().equals(accountProfileDTO.getPid()))
+						.collect(Collectors.toList());
+				if (accountProfileAttributes.size() > 0) {
+					List<String> answerList = new ArrayList<>();
+					for (CompanyAttributes comp : companyAttributesList) {
+						int i=0;
+
+						for (AccountProfileAttributes attr : accountProfileAttributes) {
+
+							if (attr.getAttributesPid().equals(comp.getAttributes().getPid())) {
+								i++;
+								String answer = attr.getAnswers();
+								answerList.add(answer);
+							}
+						}
+						if(i==0)
+						{
+							answerList.add("");
+						}
+						accountProfileDTO.setAnswers(answerList);}
+
+				}
+
+			}
+
+		}
 	}
 }

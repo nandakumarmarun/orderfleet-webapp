@@ -43,45 +43,49 @@ public class AccountProfileAttributesServiceImpl implements AccountProfileAttrib
     public List<AccountProfileAttributesDTO> getAccountProfileAttributes(AccountProfileAttributesDTO accountProfileAttributesDTO) {
         String accountProfilePid = accountProfileAttributesDTO.getAccountProfilePid();
         List<AccountProfileAttributesDTO> savedAccountProfileAttributes = new ArrayList<>();
-        AccountProfileAttributesDTO savedDTO = new AccountProfileAttributesDTO();
-        Map<String, String> questionPidAnswerMap = accountProfileAttributesDTO.getQuestionAndAnswers();
 
-        Set<String> qstnPid = questionPidAnswerMap.keySet();
-        List<Attributes> attributes = attributesRepository.findByAttributePidIn(qstnPid);
-        List<CompanyAttributes> companyAttributes = companyAttributesRepository.findCompanyAttributesByAttributesPidIn(qstnPid);
         if (accountProfilePid != null) {
-            // Fetch AccountProfile based on the accountProfilePid
             Optional<AccountProfile> optionalAccountProfile = accountProfileRepository.findOneByPid(accountProfilePid);
 
             if (optionalAccountProfile.isPresent()) {
                 AccountProfile accountProfile = optionalAccountProfile.get();
+                Set<String> qstnPid = accountProfileAttributesDTO.getQuestionAndAnswers().keySet();
+                List<Attributes> attributes = attributesRepository.findByAttributePidIn(qstnPid);
+                List<CompanyAttributes> companyAttributes = companyAttributesRepository.findCompanyAttributesByAttributesPidIn(qstnPid);
 
+                AccountProfileAttributesDTO savedDTO = new AccountProfileAttributesDTO();
                 savedDTO.setAccountProfilePid(accountProfilePid);
-                savedDTO.setQuestionAndAnswers(questionPidAnswerMap);
+                savedDTO.setQuestionAndAnswers(accountProfileAttributesDTO.getQuestionAndAnswers());
                 savedAccountProfileAttributes.add(savedDTO);
 
-
-                for (Map.Entry<String, String> entry : questionPidAnswerMap.entrySet()) {
+                for (Map.Entry<String, String> entry : accountProfileAttributesDTO.getQuestionAndAnswers().entrySet()) {
                     String questionPid = entry.getKey();
                     String answer = entry.getValue();
                     System.out.println("Question Pid: " + questionPid);
                     System.out.println("Answer: " + answer);
-                    if (questionPid != null && answer != null) {
-                        for (Attributes attribute : attributes) {
-                            if (attribute.getPid().equals(questionPid)) {
-                                for (CompanyAttributes compAttr : companyAttributes) {
-                                    if (compAttr.getAttributes().getPid().equals(questionPid)) {
-                                        AccountProfileAttributes accountProfileAttributes = new AccountProfileAttributes();
-                                        accountProfileAttributes.setAccountProfile(accountProfile);
-                                        accountProfileAttributes.setCompany(accountProfile.getCompany());
-                                        accountProfileAttributes.setAttributesPid(questionPid);
-                                        accountProfileAttributes.setAttributesName(attribute.getQuestions());
-                                        accountProfileAttributes.setAnswers(answer);
-                                        accountProfileAttributes.setSortOrder(compAttr.getSortOrder());
-                                        accountProfileAttributesRepository.save(accountProfileAttributes);
-                                    }
-                                }
-                            }
+
+                    Attributes matchingAttribute = attributes.stream()
+                            .filter(attribute -> attribute.getPid().equals(questionPid))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (matchingAttribute != null) {
+                        CompanyAttributes matchingCompanyAttribute = companyAttributes.stream()
+                                .filter(compAttr -> compAttr.getAttributes().getPid().equals(questionPid))
+                                .findFirst()
+                                .orElse(null);
+
+                        if (matchingCompanyAttribute != null) {
+                            AccountProfileAttributes accountProfileAttributes = new AccountProfileAttributes();
+                            accountProfileAttributes.setAccountProfile(accountProfile);
+                            accountProfileAttributes.setCompany(accountProfile.getCompany());
+                            accountProfileAttributes.setAttributesPid(questionPid);
+                            accountProfileAttributes.setAttributesName(matchingAttribute.getQuestions());
+                            accountProfileAttributes.setAnswers(answer);
+                            accountProfileAttributes.setSortOrder(matchingCompanyAttribute.getSortOrder());
+                            accountProfileAttributes.setDocumentPid(matchingCompanyAttribute.getDocumentPid());
+
+                            accountProfileAttributesRepository.save(accountProfileAttributes);
                         }
                     }
                 }
@@ -89,6 +93,7 @@ public class AccountProfileAttributesServiceImpl implements AccountProfileAttrib
         }
         return savedAccountProfileAttributes;
     }
+
 
     @Override
     public List<AccountProfileAttributesDTO> getAccountProfileAttributesByAccountProfilePid(String accountProfilePid) {
