@@ -744,6 +744,8 @@ public class CompanyConfigurationResource {
 			crmEnableCompany.setName(CompanyConfig.CRM_ENABLE);
 			crmEnableCompany.setValue(crmEnable);
 		}
+		companyConfigurationRepository.save(crmEnableCompany);
+
 		if (optoutstandingDateSorting.isPresent()) {
 			outstandingDateSortingCompany= optoutstandingDateSorting.get();
 			outstandingDateSortingCompany.setValue(outstandingDateSorting);

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.orderfleet.webapp.web.rest.api.dto.PunchingUserDTO;
 import com.orderfleet.webapp.web.rest.api.dto.UserDTO;
+import com.orderfleet.webapp.web.rest.api.dto.UserTargetMonthDTO;
 import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
 import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
 import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
@@ -112,6 +113,17 @@ public class EventProducer {
         }
     }
 
+    public void UserTargetMonthStreamPublish(UserTargetMonthDTO userTargetMonthDTO) {
+        ObjectMapper objectMapper = getObjectMapper();
+        try {
+            String jsonUserTargetMonthDTO = objectMapper.writeValueAsString(userTargetMonthDTO);
+            String jsonSnrichUserTargetEvent = objectMapper.writeValueAsString(new Events("SnrUserTargets",jsonUserTargetMonthDTO));
+            kafkaTemplate.send(topic,jsonSnrichUserTargetEvent);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void accountingVoucherPublish(AccountingVoucherHeaderDTO accountingVoucherHeaderDTO) {
         ObjectMapper objectMapper = getObjectMapper();
@@ -121,7 +133,7 @@ public class EventProducer {
             String jsonSnrichAccountingVoucherEvent = objectMapper.writeValueAsString(new Events("SnrichAccountingVoucher",jsonAccountingVoucherHeaderDTO));
             kafkaTemplate.send(topic,jsonSnrichAccountingVoucherEvent);
         } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
     }

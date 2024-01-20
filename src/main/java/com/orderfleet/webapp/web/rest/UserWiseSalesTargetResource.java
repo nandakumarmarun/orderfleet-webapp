@@ -2,13 +2,25 @@ package com.orderfleet.webapp.web.rest;
 
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.async.event.EventProducer;
+import com.orderfleet.webapp.domain.Attendance;
+import com.orderfleet.webapp.domain.Company;
+import com.orderfleet.webapp.domain.CompanyConfiguration;
+import com.orderfleet.webapp.domain.enums.CompanyConfig;
+import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
+import com.orderfleet.webapp.repository.CompanyRepository;
+import com.orderfleet.webapp.security.SecurityUtils;
+import com.orderfleet.webapp.web.rest.api.dto.PunchingUserDTO;
+import com.orderfleet.webapp.web.rest.api.dto.UserTargetMonthDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -48,6 +60,15 @@ public class UserWiseSalesTargetResource {
 
 	@Inject
 	private UserWiseSalesTargetRepository userWiseSalesTargetRepository;
+
+	@Inject
+	private  EventProducer eventProducer;
+
+	@Inject
+	private CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private CompanyRepository companyRepository;
 
 	@Timed
 	@RequestMapping(value = "/user-wise-monthly-sales-targets", method = RequestMethod.GET)
@@ -104,16 +125,30 @@ public class UserWiseSalesTargetResource {
 		return null;
 	}
 
-	@RequestMapping(value = "/user-wise-monthly-sales-targets/monthly-user-wise-sales-targets", method = RequestMethod.POST)
+
+	@RequestMapping(value = "/user-wise-monthly-sales-targets/monthly-user-wise-sales-targets",
+			method = RequestMethod.POST)
 	public @ResponseBody UserWiseSalesMonthlyTargetDTO saveMonthlyActivityTargets(
 			@RequestBody UserWiseSalesMonthlyTargetDTO monthlyTargetDTO) {
-		log.debug("Web request to save monthly Sales Targets {}" + monthlyTargetDTO);
 
-		Optional<EmployeeProfileDTO> employeeProfileDTO = employeeProfileService
-				.findOneByPid(monthlyTargetDTO.getUserPid());
+		log.debug("new Web request to save monthly Sales Targets {}" + monthlyTargetDTO);
+
+		Optional<EmployeeProfileDTO>
+				employeeProfileDTO =
+				employeeProfileService
+						.findOneByPid(monthlyTargetDTO.getUserPid());
+
+		Company company = companyRepository
+				.findOne(SecurityUtils.getCurrentUsersCompanyId());
+
+		String companyPid = company.getPid();
+
 		if (employeeProfileDTO.isPresent()) {
+
 			monthlyTargetDTO.setUserPid(employeeProfileDTO.get().getPid());
+
 			if (monthlyTargetDTO.getUserWiseSalesTargetPid().equals("null")) {
+
 				String[] monthAndYearArray = monthlyTargetDTO.getMonthAndYear().split("/");
 				int month = Integer.valueOf(monthAndYearArray[0]);
 				int year = Integer.valueOf(monthAndYearArray[1]);
@@ -121,19 +156,75 @@ public class UserWiseSalesTargetResource {
 
 				LocalDate firstDateMonth = yearMonth.atDay(1);
 				LocalDate lastDateMonth = yearMonth.atEndOfMonth();
-				UserWiseSalesTargetDTO result = userWiseSalesTargetService.saveMonthlyTarget(monthlyTargetDTO,
-						firstDateMonth, lastDateMonth);
+
+				UserWiseSalesTargetDTO result =
+						userWiseSalesTargetService
+								.saveMonthlyTarget(monthlyTargetDTO,
+										firstDateMonth, lastDateMonth);
+
 				monthlyTargetDTO.setUserWiseSalesTargetPid(result.getPid());
+
+				Optional<CompanyConfiguration> optCrm =
+						companyConfigurationRepository
+								.findByCompanyPidAndName(
+										companyPid, CompanyConfig.CRM_ENABLE);
+
+				if (optCrm.isPresent() && Boolean.valueOf(optCrm.get().getValue())) {
+					UserTargetToModc(monthlyTargetDTO.getVolume(),
+							employeeProfileDTO.get(),firstDateMonth);
+				}
+
 			} else {
-				userWiseSalesTargetRepository.findOneByPid(monthlyTargetDTO.getUserWiseSalesTargetPid())
-						.ifPresent(activityUserTarget -> {
+
+				userWiseSalesTargetRepository
+						.findOneByPid(monthlyTargetDTO
+								.getUserWiseSalesTargetPid())
+						.ifPresent(activityUserTarget ->
+						{
 							activityUserTarget.setAmount(monthlyTargetDTO.getAmount());
 							activityUserTarget.setVolume(monthlyTargetDTO.getVolume());
 							userWiseSalesTargetRepository.save(activityUserTarget);
+
+							Optional<CompanyConfiguration> optCrm =
+									companyConfigurationRepository
+											.findByCompanyPidAndName(
+													companyPid, CompanyConfig.CRM_ENABLE);
+
+							if (optCrm.isPresent()
+									&& Boolean.valueOf(optCrm.get().getValue())) {
+
+								UserTargetToModc(
+										monthlyTargetDTO.getVolume(),
+										employeeProfileDTO.get(),
+										activityUserTarget.getFromDate());
+							}
+
 						});
 			}
 		}
 		return monthlyTargetDTO;
+	}
+
+	private void UserTargetToModc(
+			double TragetData,
+			EmployeeProfileDTO employeeProfileDTO ,	LocalDate firstDateMonth) {
+		List<UserTargetMonthDTO> userTargetMonthDTOs = new ArrayList<>();
+		UserTargetMonthDTO userTargetMonthDTO = new UserTargetMonthDTO();
+		userTargetMonthDTO.setCompanyId(SecurityUtils.getCurrentUsersCompanyId().toString());
+		userTargetMonthDTO.setUserPid(employeeProfileDTO.getUserPid());
+		userTargetMonthDTO.setUserName(employeeProfileDTO.getName());
+		userTargetMonthDTO.setEmployeeName(employeeProfileDTO.getUserFirstName());
+		userTargetMonthDTO.setEmployeePid(employeeProfileDTO.getPid());
+		userTargetMonthDTO.setUserTarget(TragetData);
+		userTargetMonthDTO.setCurrentMonth(firstDateMonth);
+		userTargetMonthDTOs.add(userTargetMonthDTO);
+		log.debug("Before streaming : " + LocalDateTime.now());
+		if (!userTargetMonthDTOs.isEmpty()){
+			userTargetMonthDTOs.forEach(
+					Edto -> eventProducer.UserTargetMonthStreamPublish(Edto));
+		}
+		log.debug("List Size  : " +userTargetMonthDTOs.size());
+		log.debug("After streaming : " + LocalDateTime.now());
 	}
 
 }
