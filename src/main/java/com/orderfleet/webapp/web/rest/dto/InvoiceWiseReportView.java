@@ -94,6 +94,8 @@ public class InvoiceWiseReportView {
 	
 	private Boolean imageButtonVisible = Boolean.FALSE;
 
+	private String timeBetweenOrder;
+
 	public InvoiceWiseReportView() {
 		super();
 	}
@@ -149,7 +151,7 @@ public class InvoiceWiseReportView {
 			BigDecimal towerLatitude, BigDecimal towerLongitude, String employeeName, String towerLocation,
 			double totalRecieptAmount, double totalSalesOrderAmount, LocalDateTime punchInDate,
 			boolean mockLocationStatus, boolean withCustomer, String description, String vehicleRegistrationNumber,
-			String vehiclename,boolean imageButtonVisible) {
+			String vehiclename,boolean imageButtonVisible,String timeBetweenOrder) {
 		super();
 		this.pid = pid;
 		this.createdDate = createdDate;
@@ -192,7 +194,16 @@ public class InvoiceWiseReportView {
 		this.vehicleRegistrationNumber = vehicleRegistrationNumber;
 		this.vehiclename = vehiclename;
 		this.imageButtonVisible = imageButtonVisible;
+		this.timeBetweenOrder = timeBetweenOrder;
 		
+	}
+
+	public String getTimeBetweenOrder() {
+		return timeBetweenOrder;
+	}
+
+	public void setTimeBetweenOrder(String timeBetweenOrder) {
+		this.timeBetweenOrder = timeBetweenOrder;
 	}
 
 	public String getVehicleRegistrationNumber() {

@@ -317,6 +317,7 @@ public class InvoiceDetailsToDenormalizedTable {
                                                                  invoiceDetails.setFormName(filledForm.getForm().getName());
                                                                  invoiceDetails.setFormElementPid(filledFormDetail.getFormElement().getPid());
                                                                  invoiceDetails.setFormElementName(filledFormDetail.getFormElement().getName());
+                                                                 invoiceDetails.setFormElementType(filledFormDetail.getFormElement().getFormElementType().getName());
                                                                  invoiceDetails.setValue(filledFormDetail.getValue());
                                                                  invoiceDetailsDenormalizedList.add(invoiceDetails);
                                                              }

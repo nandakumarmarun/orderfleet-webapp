@@ -664,6 +664,9 @@ public interface InventoryVoucherHeaderRepository extends JpaRepository<Inventor
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.pid = ?1 Order By inventoryVoucher.createdDate desc")
 	List<InventoryVoucherHeader> findInventoryVoucherHeaderByPid(String inventoryVoucherHeaderPid);
 
+	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher LEFT JOIN FETCH inventoryVoucher.inventoryVoucherDetails where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.pid = ?1 and inventoryVoucher.executiveTaskExecution.accountProfile.pid = ?2 Order By inventoryVoucher.createdDate desc")
+	List<InventoryVoucherHeader> findInventoryVoucherHeaderByPidAndAccountProfilePid(String inventoryVoucherHeaderPid,String accountPid);
+
 	@Query("select inventoryVoucher from InventoryVoucherHeader inventoryVoucher where inventoryVoucher.company.id = ?#{principal.companyId} and inventoryVoucher.referenceDocumentNumber = ?1")
 	List<InventoryVoucherHeader> findInventoryVoucherHeaderByDocumennumber(String rfrdocument);
 

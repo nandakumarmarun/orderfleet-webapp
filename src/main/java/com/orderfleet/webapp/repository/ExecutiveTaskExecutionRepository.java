@@ -332,4 +332,6 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	List<ExecutiveTaskExecution> findAllByCompanyIdUserIdInAndDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?2 and ?3 ")
 	List<ExecutiveTaskExecution> findAllByCompanyIdAndCreatedDateBetween(LocalDateTime fDate, LocalDateTime tDate);
+
+	ExecutiveTaskExecution findTop1ByUserPidAndAccountProfilePidOrderByCreatedDateDesc( String userId,String accountPid);
 }

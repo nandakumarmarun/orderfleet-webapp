@@ -7,18 +7,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.web.rest.api.dto.*;
+import com.orderfleet.webapp.web.rest.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,58 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.AccountingVoucherHeader;
-import com.orderfleet.webapp.domain.Attendance;
-import com.orderfleet.webapp.domain.Document;
-import com.orderfleet.webapp.domain.DynamicDocumentHeader;
-import com.orderfleet.webapp.domain.Form;
-import com.orderfleet.webapp.domain.FormElement;
-import com.orderfleet.webapp.domain.FormElementValue;
-import com.orderfleet.webapp.domain.FormFormElement;
-import com.orderfleet.webapp.domain.InventoryVoucherHeader;
-import com.orderfleet.webapp.domain.StockLocation;
-import com.orderfleet.webapp.domain.User;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.PaymentMode;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
-import com.orderfleet.webapp.repository.AttendanceRepository;
-import com.orderfleet.webapp.repository.DocumentRepository;
-import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
-import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
-import com.orderfleet.webapp.repository.FormElementRepository;
-import com.orderfleet.webapp.repository.FormElementValueRepository;
-import com.orderfleet.webapp.repository.FormRepository;
-import com.orderfleet.webapp.repository.InventoryVoucherDetailRepository;
-import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
-import com.orderfleet.webapp.repository.OpeningStockRepository;
-import com.orderfleet.webapp.repository.ProductGroupProductRepository;
-import com.orderfleet.webapp.repository.ProductProfileRepository;
-import com.orderfleet.webapp.repository.UserDocumentRepository;
-import com.orderfleet.webapp.repository.UserProductGroupRepository;
-import com.orderfleet.webapp.repository.UserRepository;
-import com.orderfleet.webapp.repository.UserStockLocationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.DocumentFormsService;
 import com.orderfleet.webapp.service.FormFormElementService;
-import com.orderfleet.webapp.web.rest.api.dto.DocumentDashboardDTO;
-import com.orderfleet.webapp.web.rest.api.dto.FormFormElementDTO;
-import com.orderfleet.webapp.web.rest.api.dto.LoadProductListDTO;
-import com.orderfleet.webapp.web.rest.api.dto.LoadServerExeTaskDTO;
-import com.orderfleet.webapp.web.rest.api.dto.LoadServerSentItemDTO;
-import com.orderfleet.webapp.web.rest.api.dto.SalesOrderAllocationDTO;
-import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.AccountingVoucherDetailDTO;
-import com.orderfleet.webapp.web.rest.dto.AccountingVoucherHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.AttendanceDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
-import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.ProductProfileDTO;
 import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 
 @RestController
@@ -150,6 +100,9 @@ public class LoadServerItemsToMobileController {
 
 	@Inject
 	private UserProductGroupRepository userProductGroupRepository;
+
+	@Inject
+	private InvoiceDetailsDenormalizedRepository invoiceDetailsDenormalizedRepository;
 
 	@GetMapping("/load-server-attendence")
 	public ResponseEntity<List<AttendanceDTO>> sentAttendenceDownload() {
@@ -419,7 +372,7 @@ public class LoadServerItemsToMobileController {
 	@GetMapping("/load-server-sent-items-document")
 	public ResponseEntity<LoadServerSentItemDTO> sentDocumentItemDownload(@RequestParam String exeTaskPid) {
 
-		log.info("Request to load server sent items document...");
+		log.info("Request to load server sent items document..."+exeTaskPid);
 
 		LoadServerSentItemDTO loadServerSentItemDTO = new LoadServerSentItemDTO();
 
@@ -436,7 +389,7 @@ public class LoadServerItemsToMobileController {
 	public ResponseEntity<LoadServerSentItemDTO> sentItemsDetailDownload(@RequestParam String pid,
 			@RequestParam String documentPid) {
 
-		log.info("Request to load server sent items details...");
+		log.info("Request to load server sent items details..."+pid);
 
 		LoadServerSentItemDTO loadServerSentItemDTO = new LoadServerSentItemDTO();
 
@@ -1761,26 +1714,26 @@ public class LoadServerItemsToMobileController {
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountingVoucherHeader> inventoryVoucherHeaders = accountingVoucherHeaderRepository
 				.findAccountingVoucherHeaderByPid(accountingVoucherHeaderPid);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+		String flag = "Normal";
+		LocalDateTime endLCTime = LocalDateTime.now();
+		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+		String endDate = startLCTime.format(DATE_FORMAT);
+		Duration duration = Duration.between(startLCTime, endLCTime);
+		long minutes = duration.toMinutes();
+		if (minutes <= 1 && minutes >= 0) {
+			flag = "Fast";
+		}
+		if (minutes > 1 && minutes <= 2) {
+			flag = "Normal";
+		}
+		if (minutes > 2 && minutes <= 10) {
+			flag = "Slow";
+		}
+		if (minutes > 10) {
+			flag = "Dead Slow";
+		}
+		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				+ description);
 		for (AccountingVoucherHeader accountinVoucherHeader : inventoryVoucherHeaders) {
 			accountingVoucherHeaderDTOs.add(new AccountingVoucherHeaderDTO(accountinVoucherHeader));
 		}
@@ -1791,7 +1744,6 @@ public class LoadServerItemsToMobileController {
 		log.info("Accounting Voucher Size= " + distinctElements.size());
 		return distinctElements;
 	}
-
 	private List<DynamicDocumentHeaderDTO> getDocumentDynamicItemsDetails(String dynamicDocumentHeaderPid) {
 		List<DynamicDocumentHeaderDTO> dynamicDocumentHeaderDTOs = new ArrayList<>();
 		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
@@ -1835,4 +1787,41 @@ public class LoadServerItemsToMobileController {
 		return dynamicDocumentHeaderDTOs;
 	}
 
-}
+	@GetMapping("/load-server-sent-items-account")
+	public ResponseEntity<LeadsTrackerDTO> lastSentItemsByAccountPid(@RequestParam(required = false) String accountPid) {
+		Optional<User> user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		String documentPid ="DOC-FR6o7ZHGSo1703759915397";
+		String userId;
+		InvoiceDetailsDenormalized executiveTask = new InvoiceDetailsDenormalized();
+		if (user.isPresent()) {
+			userId = user.get().getPid();
+			System.out.println("Start time:"+LocalDateTime.now());
+			executiveTask = invoiceDetailsDenormalizedRepository.findTop1ByUserPidAndAccountProfilePidAndDocumentPidOrderByCreatedDateDesc(userId,accountPid,documentPid);
+			System.out.println("End Time:"+LocalDateTime.now());
+		}
+		System.out.println("size:"+executiveTask);
+		System.out.println("Execution Pid :"+executiveTask.getExecutionPid()+" document no local :"+executiveTask.getDocumentNumberLocal());
+       List<InvoiceDetailsDenormalized> invoiceDetailsDenormalizeds = invoiceDetailsDenormalizedRepository.findAllByExecutionPid(executiveTask.getExecutionPid());
+
+		LeadsTrackerDTO leadsTrackerDTO = new LeadsTrackerDTO();
+		leadsTrackerDTO.setAccountPid(executiveTask.getAccountProfilePid());
+		leadsTrackerDTO.setDocumentPid(executiveTask.getDocumentPid());
+		leadsTrackerDTO.setDynamicDocHeaderPid(executiveTask.getDynamicPid());
+		leadsTrackerDTO.setCreatedDate(executiveTask.getCreatedDate().toString());
+		List<FilledFormDetailDTO> filledFormDetailDTOS = new ArrayList<>();
+		for(InvoiceDetailsDenormalized invoiceDetails :invoiceDetailsDenormalizeds)
+		{
+
+			FilledFormDetailDTO filledFormDetailDTO = new FilledFormDetailDTO();
+			filledFormDetailDTO.setFormElementName(invoiceDetails.getFormElementName());
+			filledFormDetailDTO.setFormElementPid(invoiceDetails.getFormElementPid());
+			filledFormDetailDTO.setFormElementType(invoiceDetails.getFormElementType());
+			filledFormDetailDTO.setValue(invoiceDetails.getValue());
+			filledFormDetailDTOS.add(filledFormDetailDTO);
+			leadsTrackerDTO.setFilledFormDetailDTO(filledFormDetailDTOS);
+
+		}
+		return new ResponseEntity<>(leadsTrackerDTO,HttpStatus.OK);
+	}
+
+	}

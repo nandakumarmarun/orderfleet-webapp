@@ -329,6 +329,7 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
                                     .findOneByPid(formDetail.getFormElement().getPid()).get();
                             inventoryDetails.setFormElementName(formElement.getName());
                             inventoryDetails.setFormElementPid(formElement.getPid());
+                            inventoryDetails.setFormElementType(formElement.getFormElementType().getName());
                             inventoryDetails.setValue(formDetail.getValue());
                             if (formDetail.getValue() == null || formDetail.getValue().isEmpty()) {
                                 inventoryDetails.setValue(formElement.getDefaultValue());

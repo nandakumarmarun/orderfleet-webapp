@@ -107,6 +107,9 @@ public interface EmployeeProfileRepository extends JpaRepository<EmployeeProfile
 	@Query("select employeeProfile.user.id from EmployeeProfile employeeProfile where employeeProfile.pid = ?1")
 	Long findUserIdByEmployeePid(String employeePid);
 
+	@Query("select employeeProfile.user.id from EmployeeProfile employeeProfile where employeeProfile.pid = ?1")
+	List<Long> findAllUserIdByEmployeePid(String employeePid);
+
 	@Query("select employeeProfile.pid from EmployeeProfile employeeProfile where employeeProfile.id in ?1")
 	List<String> findEmployeeByIdsIn(List<Long> employeeIds);
 

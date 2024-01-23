@@ -190,12 +190,15 @@ public class InvoiceDetailsDenormalized {
     private boolean mockLocationStatus;
 
     private String receiptRemarks;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "document_type", nullable = false)
     private DocumentType documentType;
     private boolean withCustomer;
     @NotNull
     private Long companyId;
 
     private String formElementPid;
+    private String formElementType;
 
     private Long userId;
 
@@ -915,4 +918,11 @@ public class InvoiceDetailsDenormalized {
         this.dynamicPid = dynamicPid;
     }
 
+    public String getFormElementType() {
+        return formElementType;
+    }
+
+    public void setFormElementType(String formElementType) {
+        this.formElementType = formElementType;
+    }
 }

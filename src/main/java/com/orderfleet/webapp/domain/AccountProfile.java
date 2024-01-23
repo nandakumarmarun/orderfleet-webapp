@@ -113,8 +113,8 @@ public class AccountProfile implements Serializable, Cloneable {
 	@Column(name = "longitude", precision = 11, scale = 8)
 	private BigDecimal longitude;
 
-	@Size(max = 20)
-	@Column(name = "phone_1", length = 20)
+	@Size(max = 25)
+	@Column(name = "phone_1", length = 25)
 	private String phone1;
 
 	@Size(max = 20)
