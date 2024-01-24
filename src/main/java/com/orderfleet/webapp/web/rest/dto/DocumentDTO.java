@@ -115,6 +115,8 @@ public class DocumentDTO implements Cloneable {
 	private String footerImageContentType;
 	
 	private boolean enableHeaderPrintOut;
+
+	private boolean resetLeadTrackerData;
 	
 	
 
@@ -162,6 +164,7 @@ public class DocumentDTO implements Cloneable {
 		this.footerImageContentType = document.getFooterImageContentType();
 		this.discountPercentage =document.getDiscountPercentage();
 		this.enableHeaderPrintOut = document.getEnableHeaderPrintOut();
+		this.resetLeadTrackerData = document.isResetLeadTrackerData();
 	}
 
 	public DocumentDTO(Document document, boolean activityDocRequired, int activityDocSortOrder) {
@@ -204,6 +207,15 @@ public class DocumentDTO implements Cloneable {
 		this.discountScaleBar =document.getDiscountScaleBar();
 		this.discountPercentage =document.getDiscountPercentage();
 		this.enableHeaderPrintOut = document.getEnableHeaderPrintOut();
+		this.resetLeadTrackerData = document.isResetLeadTrackerData();
+	}
+
+	public boolean isResetLeadTrackerData() {
+		return resetLeadTrackerData;
+	}
+
+	public void setResetLeadTrackerData(boolean resetLeadTrackerData) {
+		this.resetLeadTrackerData = resetLeadTrackerData;
 	}
 
 	public String getTermsAndConditions() {

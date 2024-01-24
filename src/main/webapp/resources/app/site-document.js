@@ -47,7 +47,8 @@ if (!this.Document) {
 		headerImage : null,
 		headerImageContentType : null,
 		footerImage : null,
-		footerImageContentType : null
+		footerImageContentType : null,
+		resetLeadTrackerData : false
 		
 
 	};
@@ -344,6 +345,7 @@ if (!this.Document) {
 		documentModel.preventNegativeStock = $('#field_preventNegativeStock').prop('checked');
 		
 		documentModel.enableHeaderPrintOut= $('#field_enableHeaderPrintOut').prop('checked');
+		documentModel.resetLeadTrackerData = $('#field_resetLeadTrackerData').prop('checked');
 
 		$.ajax({
 			method : $(el).attr('method'),
@@ -454,6 +456,9 @@ if (!this.Document) {
 						
 						$("#field_enableHeaderPrintOut").prop("checked",
 								data.enableHeaderPrintOut);
+						$("#field_resetLeadTrackerData").prop("checked",
+                                								data.resetLeadTrackerData);
+
 						if (data.headerImage != null) {
 							$('#previewHeaderImage')
 									.attr(

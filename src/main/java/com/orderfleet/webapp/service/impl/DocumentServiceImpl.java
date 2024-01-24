@@ -155,6 +155,7 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setSmsApiEnable(documentDTO.getSmsApiEnable());
 			document.setPreventNegativeStock(documentDTO.getPreventNegativeStock());
 			document.setEnableHeaderPrintOut(documentDTO.getEnableHeaderPrintOut());
+			document.setResetLeadTrackerData(documentDTO.isResetLeadTrackerData());
 			if (documentDTO.getHeaderImage() != null) {
 				document.setHeaderImage(documentDTO.getHeaderImage());
 				document.setHeaderImageContentType(documentDTO.getHeaderImageContentType());

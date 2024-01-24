@@ -177,6 +177,11 @@ public class Document implements Serializable, Cloneable {
 	@Column(name = "enable_header_printOut", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
 	private boolean enableHeaderPrintOut;
 
+	@Column(name = "reset_leadTracker_data", nullable = false, columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean resetLeadTrackerData;
+
+
+
 	@PreUpdate
 	public void preUpdate() {
 		this.lastModifiedDate = LocalDateTime.now();
@@ -484,6 +489,14 @@ public class Document implements Serializable, Cloneable {
 
 	public void setEnableHeaderPrintOut(boolean enableHeaderPrintOut) {
 		this.enableHeaderPrintOut = enableHeaderPrintOut;
+	}
+
+	public boolean isResetLeadTrackerData() {
+		return resetLeadTrackerData;
+	}
+
+	public void setResetLeadTrackerData(boolean resetLeadTrackerData) {
+		this.resetLeadTrackerData = resetLeadTrackerData;
 	}
 
 	@Override

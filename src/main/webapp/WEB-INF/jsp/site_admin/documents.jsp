@@ -303,6 +303,11 @@
 											id="field_enableHeaderPrintOut" /> &nbsp;<span>Enable Header PrintOut</span>
 										</label>
 									</div>
+									<div class="form-group" id="resetLeadTrackerData">
+                                   	<label for="resetLeadTrackerData"> <input type="checkbox"
+                                	id="field_resetLeadTrackerData" /> &nbsp;<span>Reset LeadTracker Data</span>
+                                    </label>
+                               	</div>
 								</div>
 							</div>
 							<div class="modal-footer">
@@ -419,7 +424,14 @@
 											</dt>
 											<dd>
 											<span id="lbl_enableHeaderPrintOut"></span>
-										</dd>	
+										</dd>
+										<hr />
+                                   		<dt>
+                                      	<span>Reset LeadTracker Data</span>
+                                       	</dt>
+                                        <dd>
+                                         <span id="lbl_resetLeadTrackerData"></span>
+                                            </dd>
 									</dl>
 								</div>
 							</div>
