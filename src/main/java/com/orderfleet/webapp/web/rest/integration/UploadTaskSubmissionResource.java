@@ -161,9 +161,9 @@ public class UploadTaskSubmissionResource {
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		Optional<AccountProfile> optionalAP = accountProfileRepository.findByCompanyIdAndNameIgnoreCase(
+			Optional<AccountProfile> optionalAP = accountProfileRepository.findByCompanyIdAndPid(
 				SecurityUtils.getCurrentUsersCompanyId(),
-				executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO().getAccountProfileName());
+				executiveTaskSubmissionDTO.getExecutiveTaskExecutionDTO().getAccountProfilePid());
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -266,6 +266,8 @@ public class UploadTaskSubmissionResource {
 		syncOperationRepository.save(syncOperation);
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
+
+
 
 	/**
 	 * saving executiveTaskSubmission from ThirdParty

@@ -51,7 +51,7 @@ public class ReceivablePayableEditResource {
 	/**
 	 * GET /receivable-payables : get receivable-payables.
 	 *
-	 * @param pageable
+	 * @param model
 	 *            the pagination information
 	 * @return the ResponseEntity with status 200 (OK) in body
 	 */
@@ -90,7 +90,7 @@ public class ReceivablePayableEditResource {
 	@Timed
 	public ResponseEntity<ReceivablePayableDTO> createReceivablePayable(
 			@Valid @RequestBody ReceivablePayableDTO receivablePayableDTO) throws URISyntaxException {
-		log.debug("Web request to save Receivable Payable : {}", receivablePayableDTO.getAccountName());
+		log.debug("Web request to save Receivable Payable : {}", receivablePayableDTO.getAccountName() + " : " + receivablePayableDTO.getAccountPid());
 		receivablePayableDTO.setBillOverDue(00L);
 		ReceivablePayableDTO result = receivablePayableService.save(receivablePayableDTO);
 		return ResponseEntity.created(new URI("/web/receivable-payables-edit/" + result.getPid()))

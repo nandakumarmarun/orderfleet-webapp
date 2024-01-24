@@ -50,23 +50,30 @@ public class AccountProfileExcelAone {
 	@Inject
 	private DocumentUserWiseUpdateController documentUserWiseUpdateController;
 
-	@RequestMapping(value = "/account-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<String> bulkSaveAccountProfiles(
-			@Valid @RequestBody List<AccountProfileDTO> accountProfileDTOs) {
-		log.debug("REST request to save AccountProfiles : {}", accountProfileDTOs.size());
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.ACCOUNT_PROFILE).map(so -> {
-					// update sync status
-					so.setCompleted(false);
-					so.setLastSyncStartedDate(LocalDateTime.now());
-					syncOperationRepository.save(so);
-					// save/update
-					accountProfileUploadService.saveUpdateAccountProfiles(accountProfileDTOs, so);
-					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
-				}).orElse(new ResponseEntity<>("Account-Profile sync operation not registered for this company",
-						HttpStatus.BAD_REQUEST));
-	}
+
+
+//	/**
+//	 * @deprecated
+//	 * @param accountProfileDTOs
+//	 * @return
+//	 */
+//	@RequestMapping(value = "/account-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//	@Timed
+//	public ResponseEntity<String> bulkSaveAccountProfiles(
+//			@Valid @RequestBody List<AccountProfileDTO> accountProfileDTOs) {
+//		log.debug("REST request to save AccountProfiles : {}", accountProfileDTOs.size());
+//		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+//				SyncOperationType.ACCOUNT_PROFILE).map(so -> {
+//					// update sync status
+//					so.setCompleted(false);
+//					so.setLastSyncStartedDate(LocalDateTime.now());
+//					syncOperationRepository.save(so);
+//					// save/update
+//					accountProfileUploadService.saveUpdateAccountProfiles(accountProfileDTOs, so);
+//					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+//				}).orElse(new ResponseEntity<>("Account-Profile sync operation not registered for this company",
+//						HttpStatus.BAD_REQUEST));
+//	}
 
 	@RequestMapping(value = "/locations.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -111,25 +118,25 @@ public class AccountProfileExcelAone {
 						HttpStatus.BAD_REQUEST));
 	}
 
-	@RequestMapping(value = "/location-account-profile.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
-	public ResponseEntity<String> bulkSaveLocationAccountProfiles(
-			@Valid @RequestBody List<LocationAccountProfileDTO> locationAccountProfileDTOs) {
-		log.debug("REST request to save location-accountprofiles : {}", locationAccountProfileDTOs.size());
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.LOCATION_ACCOUNT_PROFILE).map(so -> {
-
-					// update sync status
-					so.setCompleted(false);
-					so.setLastSyncStartedDate(LocalDateTime.now());
-					syncOperationRepository.save(so);
-					// save/update
-					accountProfileUploadService.saveUpdateLocationAccountProfiles(locationAccountProfileDTOs, so);
-					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
-				})
-				.orElse(new ResponseEntity<>("Location-Account-Profile sync operation not registered for this company",
-						HttpStatus.BAD_REQUEST));
-	}
+//	@RequestMapping(value = "/location-account-profile.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//	@Timed
+//	public ResponseEntity<String> bulkSaveLocationAccountProfiles(
+//			@Valid @RequestBody List<LocationAccountProfileDTO> locationAccountProfileDTOs) {
+//		log.debug("REST request to save location-accountprofiles : {}", locationAccountProfileDTOs.size());
+//		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+//				SyncOperationType.LOCATION_ACCOUNT_PROFILE).map(so -> {
+//
+//					// update sync status
+//					so.setCompleted(false);
+//					so.setLastSyncStartedDate(LocalDateTime.now());
+//					syncOperationRepository.save(so);
+//					// save/update
+//					accountProfileUploadService.saveUpdateLocationAccountProfiles(locationAccountProfileDTOs, so);
+//					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+//				})
+//				.orElse(new ResponseEntity<>("Location-Account-Profile sync operation not registered for this company",
+//						HttpStatus.BAD_REQUEST));
+//	}
 
 	@RequestMapping(value = "/receivable-payable.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -152,7 +159,7 @@ public class AccountProfileExcelAone {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					accountProfileUploadService.saveUpdateReceivablePayables(receivablePayableDTOs, so);
+//					accountProfileUploadService.saveUpdateReceivablePayables(receivablePayableDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Receivable-Payable sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
@@ -206,8 +213,8 @@ public class AccountProfileExcelAone {
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
 					// save/update
-					accountProfileUploadService
-							.saveUpdatePriceLevelAccountProductGroups(priceLevelAccountProductGroupDTOs, so);
+//					accountProfileUploadService
+//							.saveUpdatePriceLevelAccountProductGroups(priceLevelAccountProductGroupDTOs, so);
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				})
 				.orElse(new ResponseEntity<>(

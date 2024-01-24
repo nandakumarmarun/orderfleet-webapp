@@ -67,8 +67,9 @@ import com.orderfleet.webapp.web.rest.dto.ReceivablePayableDTO;
 @Service
 public class AccountProfileCsvUploadService {
 
+	public static final String PID_PREFIX = PriceLevelAccountProductGroupService.PID_PREFIX;
 	private final Logger log = LoggerFactory.getLogger(AccountProfileCsvUploadService.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	private final BulkOperationRepositoryCustom bulkOperationRepositoryCustom;
 
 	private final SyncOperationRepository syncOperationRepository;
@@ -129,102 +130,78 @@ public class AccountProfileCsvUploadService {
 	}
 
 	@Transactional
-	public void saveUpdateAccountProfiles(final List<AccountProfileDTO> accountProfileDTOs,
+	public void saveUpdateAccountProfiles(
+			final List<AccountProfileDTO> accountProfileDTOs,
 			final SyncOperation syncOperation) {
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
-		final User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 		final Long companyId = company.getId();
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
-		// All product must have a division/category, if not, set a default one
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "AT_QUERY_109" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get first by compId";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		AccountType defaultAccountType = accountTypeRepository.findFirstByCompanyIdOrderByIdAsc(company.getId());
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
-		// find all exist account profiles
-		List<String> apAlias = accountProfileDTOs.stream().map(apDto -> apDto.getAlias().toUpperCase())
-				.collect(Collectors.toList());
-		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id1 = "AP_QUERY_124" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description1 ="get by compId and alias ignore case";
-		LocalDateTime startLCTime1 = LocalDateTime.now();
-		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-		String startDate1 = startLCTime1.format(DATE_FORMAT1);
-		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndAliasIgnoreCaseIn(companyId,
-				apAlias);
-		String flag1 = "Normal";
-		LocalDateTime endLCTime1 = LocalDateTime.now();
-		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-		String endDate1 = startLCTime1.format(DATE_FORMAT1);
-		Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-		long minutes1 = duration1.toMinutes();
-		if (minutes1 <= 1 && minutes1 >= 0) {
-			flag1 = "Fast";
-		}
-		if (minutes1 > 1 && minutes1 <= 2) {
-			flag1 = "Normal";
-		}
-		if (minutes1 > 2 && minutes1 <= 10) {
-			flag1 = "Slow";
-		}
-		if (minutes1 > 10) {
-			flag1 = "Dead Slow";
-		}
-                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-				+ description1);
 
-		// all pricelevels
-		List<PriceLevel> tempPriceLevel = priceLevelRepository.findByCompanyId(companyId);
+		final User user = userRepository
+				.findOneByLogin(
+						SecurityUtils.getCurrentUserLogin()).get();
+
+		AccountType defaultAccountType =
+				accountTypeRepository
+						.findFirstByCompanyIdOrderByIdAsc(company.getId());
+
+		List<String> apAlias =
+				accountProfileDTOs
+						.stream()
+						.map(apDto -> apDto.getAlias()
+								.toUpperCase())
+				.collect(Collectors.toList());
+
+		List<AccountProfile> accountProfiles =
+				accountProfileRepository
+						.findByCompanyIdAndAliasIgnoreCaseIn(
+								companyId,
+								apAlias);
+
+		List<PriceLevel> tempPriceLevel =
+				priceLevelRepository
+						.findByCompanyId(companyId);
 
 		for (AccountProfileDTO apDto : accountProfileDTOs) {
-			// check exist by name, only one exist with a name
-			Optional<AccountProfile> optionalAP = accountProfiles.stream()
-					.filter(pc -> pc.getAlias().equalsIgnoreCase(apDto.getAlias())).findAny();
+
+			Optional<AccountProfile> optionalAP =
+					accountProfiles
+							.stream()
+							.filter(pc -> pc.getAlias()
+									.equalsIgnoreCase(apDto.getAlias()))
+							.findAny();
+
 			AccountProfile accountProfile;
+
 			if (optionalAP.isPresent()) {
 				accountProfile = optionalAP.get();
-				// if not update, skip this iteration. Not implemented now
-				// if (!accountProfile.getThirdpartyUpdate()) { continue; }
 			} else {
 				accountProfile = new AccountProfile();
-				accountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
+				String pid = AccountProfileService.PID_PREFIX + RandomUtil.generatePid();
+				accountProfile.setPid(pid);
 				accountProfile.setAlias(apDto.getAlias());
 				accountProfile.setUser(user);
 				accountProfile.setCompany(company);
+				accountProfile.setCustomerId(apDto.getAlias());
 				accountProfile.setAccountStatus(AccountStatus.Unverified);
 				accountProfile.setDataSourceType(DataSourceType.TALLY);
 				accountProfile.setImportStatus(true);
-
 			}
+
 			accountProfile.setTrimChar(apDto.getTrimChar());
 			accountProfile.setName(apDto.getName());
+			accountProfile.setCustomerId(apDto.getAlias());
+			accountProfile.setTinNo(apDto.getTinNo());
+			accountProfile.setPin(apDto.getPin());
+			accountProfile.setDescription(apDto.getDescription());
+			accountProfile.setActivated(apDto.getActivated());
+			accountProfile.setAddress(apDto.getAddress());
+			accountProfile.setCity(apDto.getCity());
+			accountProfile.setContactPerson(apDto.getContactPerson());
+			accountProfile.setDataSourceType(DataSourceType.TALLY);
+			accountProfile.setDefaultDiscountPercentage(apDto.getDefaultDiscountPercentage());
+
 			if (isValidPhone(apDto.getPhone1())) {
 				accountProfile.setPhone1(apDto.getPhone1());
 			}
@@ -234,26 +211,25 @@ public class AccountProfileCsvUploadService {
 			if (isValidEmail(apDto.getEmail1())) {
 				accountProfile.setEmail1(apDto.getEmail1());
 			}
-			accountProfile.setTinNo(apDto.getTinNo());
-			accountProfile.setPin(apDto.getPin());
-			accountProfile.setDescription(apDto.getDescription());
-			accountProfile.setActivated(apDto.getActivated());
-			accountProfile.setAddress(apDto.getAddress());
-			accountProfile.setCity(apDto.getCity());
-			accountProfile.setContactPerson(apDto.getContactPerson());
-			accountProfile.setDefaultDiscountPercentage(apDto.getDefaultDiscountPercentage());
-			if (apDto.getDefaultPriceLevelName() != null && !apDto.getDefaultPriceLevelName().equalsIgnoreCase("")) {
-				// price level
-				Optional<PriceLevel> optionalPriceLevel = tempPriceLevel.stream()
-						.filter(pl -> apDto.getDefaultPriceLevelName().equals(pl.getName())).findAny();
+
+			if (apDto.getDefaultPriceLevelName() != null
+					&& !apDto.getDefaultPriceLevelName()
+					.equalsIgnoreCase("")) {
+
+				Optional<PriceLevel> optionalPriceLevel =
+						tempPriceLevel
+								.stream()
+								.filter(pl -> apDto.getDefaultPriceLevelName()
+										.equals(pl.getName()))
+								.findAny();
 
 				if (optionalPriceLevel.isPresent()) {
 					accountProfile.setDefaultPriceLevel(optionalPriceLevel.get());
 				} else {
-					// create new price level
 					if (apDto.getDefaultPriceLevelName().length() > 0) {
 						PriceLevel priceLevel = new PriceLevel();
-						priceLevel.setPid(PriceLevelService.PID_PREFIX + RandomUtil.generatePid());
+						String pid = PriceLevelService.PID_PREFIX + RandomUtil.generatePid();
+						priceLevel.setPid(pid);
 						priceLevel.setName(apDto.getDefaultPriceLevelName());
 						priceLevel.setActivated(true);
 						priceLevel.setCompany(company);
@@ -263,30 +239,22 @@ public class AccountProfileCsvUploadService {
 					}
 				}
 			}
-			// account type
-			//log.info("APAT "+ accountProfile.getAccountType());
+
 			if (accountProfile.getAccountType() == null) {
 				accountProfile.setAccountType(defaultAccountType);
 			}
-
-			// Optional<AccountType> optionalAccountType = accountTypes.stream()
-			// .filter(atn ->
-			// apDto.getAccountTypeName().equals(atn.getName())).findAny();
-			// if (optionalAccountType.isPresent()) {
-			// accountProfile.setAccountType(optionalAccountType.get());
-			// } else {
-			// accountProfile.setAccountType(defaultAccountType);
-			// }
-			accountProfile.setDataSourceType(DataSourceType.TALLY);
 			saveUpdateAccountProfiles.add(accountProfile);
 		}
-		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
 
-		accountProfileService.autoTaskCreationForAccountProfiles( company);
+		bulkOperationRepositoryCustom
+				.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+				
+		accountProfileService
+				.autoTaskCreationForAccountProfiles(company);
 
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
+
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
@@ -525,47 +493,19 @@ public class AccountProfileCsvUploadService {
 
 	@Transactional
 	@Async
-	public void saveUpdateAccountProfileClosingBalances(final List<AccountProfileDTO> accountProfileDTOs,
+	public void saveUpdateAccountProfileClosingBalances(
+			final List<AccountProfileDTO> accountProfileDTOs,
 			final SyncOperation syncOperation) {
+
 		long start = System.nanoTime();
 		Long companyId = syncOperation.getCompany().getId();
 		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
-		// find all exist account profiles
-		List<String> apNames = accountProfileDTOs.stream().map(a -> a.getName().toUpperCase())
-				.collect(Collectors.toList());
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "AP_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description ="get by compId and name ingore case";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				apNames);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+
+		List<AccountProfile> accountProfiles =
+				accountProfileRepository
+						.findByCompanyId(companyId);
 
 		for (AccountProfileDTO apDto : accountProfileDTOs) {
-			// check exist by name, only one exist with a name
 			Optional<AccountProfile> optionalAP = accountProfiles.stream()
 					.filter(pc -> pc.getName().equals(apDto.getName())).findAny();
 			AccountProfile accountProfile;
@@ -575,40 +515,12 @@ public class AccountProfileCsvUploadService {
 				saveUpdateAccountProfiles.add(accountProfile);
 			}
 		}
-		// updateing closing balance to zero
-		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id1 = "AP_QUERY_125" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description1 ="Updating the account closing balance zero by compId";
-		LocalDateTime startLCTime1 = LocalDateTime.now();
-		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-		String startDate1 = startLCTime1.format(DATE_FORMAT1);
-		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+
 		accountProfileRepository.updateAccountProfileClosingBalanceZeroByCompanyId(companyId);
-		 String flag1 = "Normal";
-			LocalDateTime endLCTime1 = LocalDateTime.now();
-			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-			String endDate1 = startLCTime1.format(DATE_FORMAT1);
-			Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-			long minutes1 = duration1.toMinutes();
-			if (minutes1 <= 1 && minutes1 >= 0) {
-				flag1 = "Fast";
-			}
-			if (minutes1 > 1 && minutes1 <= 2) {
-				flag1 = "Normal";
-			}
-			if (minutes1 > 2 && minutes1 <= 10) {
-				flag1 = "Slow";
-			}
-			if (minutes1 > 10) {
-				flag1 = "Dead Slow";
-			}
-	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-					+ description1);
 		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);
@@ -619,91 +531,99 @@ public class AccountProfileCsvUploadService {
 	@Transactional
 	@Async
 	public void saveUpdatePriceLevelAccountProductGroups(
-			List<PriceLevelAccountProductGroupDTO> priceLevelAccountProductGroupDTOs, SyncOperation syncOperation) {
+			List<PriceLevelAccountProductGroupDTO> priceLevelAccountProductGroupDTOs,
+			SyncOperation syncOperation) {
+
 		long start = System.nanoTime();
 		final Company company = syncOperation.getCompany();
 		List<PriceLevelAccountProductGroup> savePriceLevelAccountProductGroup = new ArrayList<>();
-		// find all exist account profiles
-		List<String> apNames = priceLevelAccountProductGroupDTOs.stream().map(rp -> rp.getAccountName().toUpperCase())
-				.collect(Collectors.toList());
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "AP_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get by compId and name ingore case";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<AccountProfile> accountProfiles = accountProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), apNames);
-		 String flag = "Normal";
-			LocalDateTime endLCTime = LocalDateTime.now();
-			String endTime = endLCTime.format(DATE_TIME_FORMAT);
-			String endDate = startLCTime.format(DATE_FORMAT);
-			Duration duration = Duration.between(startLCTime, endLCTime);
-			long minutes = duration.toMinutes();
-			if (minutes <= 1 && minutes >= 0) {
-				flag = "Fast";
-			}
-			if (minutes > 1 && minutes <= 2) {
-				flag = "Normal";
-			}
-			if (minutes > 2 && minutes <= 10) {
-				flag = "Slow";
-			}
-			if (minutes > 10) {
-				flag = "Dead Slow";
-			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-					+ description);
+
+		List<AccountProfile> accountProfiles =
+				accountProfileRepository
+						.findByCompanyId(company.getId());
 
 		// find all exist product groups
-		List<String> pgNames = priceLevelAccountProductGroupDTOs.stream()
-				.map(rp -> rp.getProductGroupName().toUpperCase()).collect(Collectors.toList());
-		List<ProductGroup> productGroups = productGroupRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),
-				pgNames);
+		List<String> pgNames =
+				priceLevelAccountProductGroupDTOs
+						.stream()
+						.map(rp -> rp.getProductGroupName()
+								.toUpperCase())
+						.collect(Collectors.toList());
 
-		// find all exist price levels
-		List<String> plNames = priceLevelAccountProductGroupDTOs.stream()
-				.map(rp -> rp.getPriceLevelName().toUpperCase()).collect(Collectors.toList());
-		List<PriceLevel> priceLevels = priceLevelRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),
-				plNames);
+		List<ProductGroup> productGroups =
+				productGroupRepository
+						.findByCompanyIdAndNameIgnoreCaseIn(
+								company.getId(), pgNames);
 
-		// delete all receivable payable
+		List<String> plNames =
+				priceLevelAccountProductGroupDTOs
+						.stream()
+						.map(rp -> rp.getPriceLevelName()
+								.toUpperCase()).collect(Collectors.toList());
+
+		List<PriceLevel> priceLevels =
+				priceLevelRepository
+						.findByCompanyIdAndNameIgnoreCaseIn(
+								company.getId(), plNames);
+
+
 		receivablePayableRepository.deleteByCompanyId(company.getId());
+
 		for (PriceLevelAccountProductGroupDTO papg : priceLevelAccountProductGroupDTOs) {
-			// only save if account profile exist
 
-			Optional<AccountProfile> accpro = accountProfiles.stream()
-					.filter(a -> a.getName().equals(papg.getAccountName())).findAny();
+			Optional<AccountProfile> accpro =
+					accountProfiles
+							.stream()
+							.filter(a -> a.getName()
+									.equals(papg.getAccountName()))
+							.findAny();
 
-			Optional<ProductGroup> prodgrp = productGroups.stream()
-					.filter(a -> a.getName().equals(papg.getProductGroupName())).findAny();
+			Optional<ProductGroup> prodgrp =
+					productGroups
+							.stream()
+							.filter(a -> a.getName()
+									.equals(papg.getProductGroupName()))
+							.findAny();
 
-			Optional<PriceLevel> prilvl = priceLevels.stream().filter(a -> a.getName().equals(papg.getPriceLevelName()))
+			Optional<PriceLevel> prilvl =
+					priceLevels
+							.stream()
+							.filter(a -> a.getName()
+									.equals(papg.getPriceLevelName()))
 					.findAny();
 
 			if (accpro.isPresent() && prodgrp.isPresent() && prilvl.isPresent()) {
 
-				Optional<PriceLevelAccountProductGroup> pLevelAccountPGroup = priceLevelAccountProductGroupRepository
-						.findOneByAccountProfilePidAndProductGroupPidAndPriceLevelPid(company.getId(),
-								accpro.get().getPid(), prodgrp.get().getPid(), prilvl.get().getPid());
+				Optional<PriceLevelAccountProductGroup> pLevelAccountPGroup =
+						priceLevelAccountProductGroupRepository
+								.findOneByAccountProfilePidAndProductGroupPidAndPriceLevelPid(
+										company.getId(),
+										accpro.get().getPid(),
+										prodgrp.get().getPid(),
+										prilvl.get().getPid());
+
 				if (!pLevelAccountPGroup.isPresent()) {
 					PriceLevelAccountProductGroup priceLevelAccountProductGroup = new PriceLevelAccountProductGroup();
 					priceLevelAccountProductGroup.setAccountProfile(accpro.get());
 					priceLevelAccountProductGroup.setCompany(company);
-					priceLevelAccountProductGroup
-							.setPid(PriceLevelAccountProductGroupService.PID_PREFIX + RandomUtil.generatePid());
+					String pid = PID_PREFIX + RandomUtil.generatePid();
+					priceLevelAccountProductGroup.setPid(pid);
 					priceLevelAccountProductGroup.setPriceLevel(prilvl.get());
 					priceLevelAccountProductGroup.setProductGroup(prodgrp.get());
 					savePriceLevelAccountProductGroup.add(priceLevelAccountProductGroup);
 				}
 			}
 		}
-		bulkOperationRepositoryCustom.bulkPriceLevelAccountProductGroups(savePriceLevelAccountProductGroup);
+
+		bulkOperationRepositoryCustom
+				.bulkPriceLevelAccountProductGroups(
+						savePriceLevelAccountProductGroup);
+
+
 		long end = System.nanoTime();
 		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
+
+
 		syncOperation.setCompleted(true);
 		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
 		syncOperation.setLastSyncTime(elapsedTime);

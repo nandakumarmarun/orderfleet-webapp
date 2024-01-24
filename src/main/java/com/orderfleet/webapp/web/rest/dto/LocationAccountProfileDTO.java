@@ -12,6 +12,7 @@ public class LocationAccountProfileDTO {
 	private String locationPid;
 	private String locationName;
 	private LocalDateTime lastModifiedDate;
+	private String customer_id;
 
 	public LocationAccountProfileDTO() {
 		super();
@@ -83,4 +84,11 @@ public class LocationAccountProfileDTO {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
+	public String getCustomer_id() {
+		return customer_id;
+	}
+
+	public void setCustomer_id(String customer_id) {
+		this.customer_id = customer_id;
+	}
 }

@@ -30,6 +30,8 @@ import com.orderfleet.webapp.repository.projections.CustomAccountProfiles;
  */
 public interface AccountProfileRepository extends JpaRepository<AccountProfile, Long> {
 
+	Optional<AccountProfile> findByCompanyIdAndPid(Long id, String name);
+
 	Optional<AccountProfile> findByCompanyIdAndNameIgnoreCase(Long id, String name);
 
 	Optional<AccountProfile> findOneByPid(String pid);
@@ -280,4 +282,7 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 
 	@Query("select accountProfile from AccountProfile accountProfile where accountProfile.createdDate between ?1 and ?2")
 	List<AccountProfile> findAllByCreatedDateToday(LocalDateTime fromdate, LocalDateTime todate);
+	
+	@Query("select Max(accountProfile.id) from AccountProfile accountProfile")
+	long findMaximumId();
 }

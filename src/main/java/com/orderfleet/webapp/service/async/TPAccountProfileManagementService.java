@@ -207,8 +207,7 @@ public class TPAccountProfileManagementService {
 		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 		String startDate1 = startLCTime1.format(DATE_FORMAT1);
 		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				apNames);
+		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyId(companyId);
 		String flag1 = "Normal";
 		LocalDateTime endLCTime1 = LocalDateTime.now();
 		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
@@ -1679,7 +1678,7 @@ public class TPAccountProfileManagementService {
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountProfile> accountProfiles = accountProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), apNames);
+				.findByCompanyId(company.getId());
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -1933,8 +1932,7 @@ public class TPAccountProfileManagementService {
 		String startTime = startLCTime.format(DATE_TIME_FORMAT);
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				apNames);
+		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyId(companyId);
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -2238,7 +2236,7 @@ public class TPAccountProfileManagementService {
 		List<String> apNames = priceLevelAccountProductGroupDTOs.stream().map(rp -> rp.getAccountName().toUpperCase())
 				.collect(Collectors.toList());
 		List<AccountProfile> accountProfiles = accountProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), apNames);
+				.findByCompanyId(company.getId());
 
 		// find all exist product groups
 		List<String> pgNames = priceLevelAccountProductGroupDTOs.stream()

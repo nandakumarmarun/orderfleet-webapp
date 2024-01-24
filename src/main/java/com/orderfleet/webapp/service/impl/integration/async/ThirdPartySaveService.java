@@ -182,17 +182,17 @@ public class ThirdPartySaveService {
 
 		Company company = companyRepository.findOne(companyId);
 
-		log.debug("REST request to save or update TallyIntegrationStatus...... company name  : "
-				+ company.getLegalName());
+		log.debug("REST request to save or update Tally Integration Status" + company.getLegalName());
 
 		for (AccountProfileDTO accountProfileDTO : accountProfileDTOs) {
-
 			if (accountProfileDTO.getName() != null) {
-
 				if (accountProfileDTO.getDefaultPriceLevelName() != null
-						&& !accountProfileDTO.getDefaultPriceLevelName().equalsIgnoreCase("")) {
-					Optional<PriceLevelDTO> priceLevelDTO = pricelevelservice.findByCompanyIdName(companyId,
-							accountProfileDTO.getDefaultPriceLevelName());
+						&& !accountProfileDTO.getDefaultPriceLevelName()
+						.equalsIgnoreCase("")) {
+					Optional<PriceLevelDTO> priceLevelDTO =
+							pricelevelservice
+									.findByCompanyIdName(companyId,
+											accountProfileDTO.getDefaultPriceLevelName());
 					if (priceLevelDTO.isPresent()) {
 						accountProfileDTO.setDefaultPriceLevelPid(priceLevelDTO.get().getPid());
 					} else {
@@ -223,8 +223,9 @@ public class ThirdPartySaveService {
 				}
 				if (accountTypeDTO != null) {
 					accountProfileDTO.setAccountTypePid(accountTypeDTO.getPid());
-					Optional<AccountProfileDTO> accountProfile = accountProfileService.findByCompanyIdAndName(companyId,
-							accountProfileDTO.getName());
+					Optional<AccountProfileDTO> accountProfile =
+							accountProfileService.findByCompanyIdAndName(companyId,accountProfileDTO.getName());
+
 					if (accountProfile.isPresent()) {
 						accountProfileDTO.setPid(accountProfile.get().getPid());
 						accountProfileDTO.setAccountTypePid(accountProfile.get().getAccountTypePid());
@@ -241,8 +242,7 @@ public class ThirdPartySaveService {
 		tallyIntegrationStatusService.updateIntegratedStatus(companyId, TallyIntegrationStatusType.ACCOUNT_PROFILE,
 				true);
 		log.debug("successfully updated TallyIntegrationStatus......");
-		log.info("Elapsed time in save: AccountProfiles : "
-				+ TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) + " minutes");
+		log.info("Elapsed time in save: AccountProfiles : " + TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) + " minutes");
 	}
 
 	/**
@@ -330,9 +330,11 @@ public class ThirdPartySaveService {
 						String startTime = startLCTime.format(DATE_TIME_FORMAT);
 						String startDate = startLCTime.format(DATE_FORMAT);
 						logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-					Optional<AccountProfile> accountProfile = accountProfileRepository
-							.findByCompanyIdAndNameIgnoreCase(company.getId(), accountProfileDTO.getName());
-					 String flag = "Normal";
+
+						Optional<AccountProfile> accountProfile = accountProfileRepository
+							.findByCompanyIdAndPid(company.getId(), accountProfileDTO.getPid());
+
+						String flag = "Normal";
 						LocalDateTime endLCTime = LocalDateTime.now();
 						String endTime = endLCTime.format(DATE_TIME_FORMAT);
 						String endDate = startLCTime.format(DATE_FORMAT);
@@ -350,7 +352,8 @@ public class ThirdPartySaveService {
 						if (minutes > 10) {
 							flag = "Dead Slow";
 						}
-				                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+				                logger.info(id + "," + endDate + "," + startTime + ","
+										+ endTime + "," + minutes + ",END," + flag + ","
 								+ description);
 					if (accountProfile.isPresent()) {
 						newAccountProfiles.add(accountProfile.get());
@@ -372,7 +375,7 @@ public class ThirdPartySaveService {
 			}
 		}
 
-		log.debug("successfully saved location account profile ........  company name  : " + company.getLegalName());
+		log.debug("successfully saved location account profile ........ company name  : " + company.getLegalName());
 		tallyIntegrationStatusService.updateIntegratedStatus(companyId,
 				TallyIntegrationStatusType.LOCATION_ACCOUNT_PROFILE, true);
 		log.debug("successfully updated TallyIntegrationStatus......");

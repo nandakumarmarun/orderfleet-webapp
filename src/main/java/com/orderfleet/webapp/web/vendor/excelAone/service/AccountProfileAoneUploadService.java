@@ -479,267 +479,266 @@ public class AccountProfileAoneUploadService {
 		log.info("Sync completed in {} ms", elapsedTime);
 	}
 
-	@Transactional
-	@Async
-	public void saveUpdateReceivablePayables(final List<ReceivablePayableDTO> receivablePayableDTOs,
-			final SyncOperation syncOperation) {
-		long start = System.nanoTime();
-		final Company company = syncOperation.getCompany();
-		Set<ReceivablePayable> saveReceivablePayable = new HashSet<>();
-		// find all exist account profiles
-		List<String> apNames = receivablePayableDTOs.stream().map(rp -> rp.getAccountName().toUpperCase())
-				.collect(Collectors.toList());
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "AP_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get by compId and name ingore case";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<AccountProfile> accountProfiles = accountProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), apNames);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+//	@Transactional
+//	@Async
+//	public void saveUpdateReceivablePayables(final List<ReceivablePayableDTO> receivablePayableDTOs,
+//			final SyncOperation syncOperation) {
+//		long start = System.nanoTime();
+//		final Company company = syncOperation.getCompany();
+//		Set<ReceivablePayable> saveReceivablePayable = new HashSet<>();
+//		// find all exist account profiles
+//		List<String> apNames = receivablePayableDTOs.stream().map(rp -> rp.getAccountName().toUpperCase())
+//				.collect(Collectors.toList());
+//		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+//		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//		String id = "AP_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+//		String description = "get by compId and name ingore case";
+//		LocalDateTime startLCTime = LocalDateTime.now();
+//		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+//		String startDate = startLCTime.format(DATE_FORMAT);
+//		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+//		List<AccountProfile> accountProfiles = accountProfileRepository
+//				.findByCompanyId(company.getId());
+//		String flag = "Normal";
+//		LocalDateTime endLCTime = LocalDateTime.now();
+//		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+//		String endDate = startLCTime.format(DATE_FORMAT);
+//		Duration duration = Duration.between(startLCTime, endLCTime);
+//		long minutes = duration.toMinutes();
+//		if (minutes <= 1 && minutes >= 0) {
+//			flag = "Fast";
+//		}
+//		if (minutes > 1 && minutes <= 2) {
+//			flag = "Normal";
+//		}
+//		if (minutes > 2 && minutes <= 10) {
+//			flag = "Slow";
+//		}
+//		if (minutes > 10) {
+//			flag = "Dead Slow";
+//		}
+//		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+//				+ description);
+//
+//		// delete all receivable payable
+//		receivablePayableRepository.deleteByCompanyId(company.getId());
+//		for (ReceivablePayableDTO rpDto : receivablePayableDTOs) {
+//			// only save if account profile exist
+//			accountProfiles.stream().filter(a -> a.getName().equals(rpDto.getAccountName())).findAny().ifPresent(ap -> {
+//				ReceivablePayable receivablePayable = new ReceivablePayable();
+//				if (receivablePayable.getReceivablePayableType() == null) {
+//					receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
+//				}
+//				receivablePayable.setReceivablePayableType(rpDto.getReceivablePayableType());
+//				receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
+//				receivablePayable.setAccountProfile(ap);
+//				receivablePayable.setCompany(company);
+//				receivablePayable.setBillOverDue(Long.valueOf(rpDto.getBillOverDue()));
+//				receivablePayable.setReferenceDocumentAmount(rpDto.getReferenceDocumentAmount());
+//				receivablePayable.setReferenceDocumentBalanceAmount(rpDto.getReferenceDocumentBalanceAmount());
+//				receivablePayable.setReferenceDocumentDate(rpDto.getReferenceDocumentDate());
+//				receivablePayable.setReferenceDocumentNumber(rpDto.getReferenceDocumentNumber());
+//				receivablePayable.setReferenceDocumentType(rpDto.getReferenceDocumentType());
+//				receivablePayable.setRemarks(rpDto.getRemarks());
+//				saveReceivablePayable.add(receivablePayable);
+//			});
+//		}
+//		bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);
+//		long end = System.nanoTime();
+//		double elapsedTime = (end - start) / 1000000.0;
+//		// update sync table
+//		syncOperation.setCompleted(true);
+//		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+//		syncOperation.setLastSyncTime(elapsedTime);
+//		syncOperationRepository.save(syncOperation);
+//		log.info("Sync completed in {} ms", elapsedTime);
+//	}
 
-		// delete all receivable payable
-		receivablePayableRepository.deleteByCompanyId(company.getId());
-		for (ReceivablePayableDTO rpDto : receivablePayableDTOs) {
-			// only save if account profile exist
-			accountProfiles.stream().filter(a -> a.getName().equals(rpDto.getAccountName())).findAny().ifPresent(ap -> {
-				ReceivablePayable receivablePayable = new ReceivablePayable();
-				if (receivablePayable.getReceivablePayableType() == null) {
-					receivablePayable.setReceivablePayableType(ReceivablePayableType.Receivable);
-				}
-				receivablePayable.setReceivablePayableType(rpDto.getReceivablePayableType());
-				receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
-				receivablePayable.setAccountProfile(ap);
-				receivablePayable.setCompany(company);
-				receivablePayable.setBillOverDue(Long.valueOf(rpDto.getBillOverDue()));
-				receivablePayable.setReferenceDocumentAmount(rpDto.getReferenceDocumentAmount());
-				receivablePayable.setReferenceDocumentBalanceAmount(rpDto.getReferenceDocumentBalanceAmount());
-				receivablePayable.setReferenceDocumentDate(rpDto.getReferenceDocumentDate());
-				receivablePayable.setReferenceDocumentNumber(rpDto.getReferenceDocumentNumber());
-				receivablePayable.setReferenceDocumentType(rpDto.getReferenceDocumentType());
-				receivablePayable.setRemarks(rpDto.getRemarks());
-				saveReceivablePayable.add(receivablePayable);
-			});
-		}
-		bulkOperationRepositoryCustom.bulkSaveReceivablePayables(saveReceivablePayable);
-		long end = System.nanoTime();
-		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
-		syncOperation.setCompleted(true);
-		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
-		syncOperation.setLastSyncTime(elapsedTime);
-		syncOperationRepository.save(syncOperation);
-		log.info("Sync completed in {} ms", elapsedTime);
-	}
+//	@Transactional
+//	@Async
+//	public void saveUpdateAccountProfileClosingBalances(final List<AccountProfileDTO> accountProfileDTOs,
+//			final SyncOperation syncOperation) {
+//		long start = System.nanoTime();
+//		Long companyId = syncOperation.getCompany().getId();
+//		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
+//		// find all exist account profiles
+//		List<String> apNames = accountProfileDTOs.stream().map(a -> a.getName().toUpperCase())
+//				.collect(Collectors.toList());
+//		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+//		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//		String id = "AP_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+//		String description = "get by compId and name ingore case";
+//		LocalDateTime startLCTime = LocalDateTime.now();
+//		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+//		String startDate = startLCTime.format(DATE_FORMAT);
+//		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+//		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyId(companyId);
+//		String flag = "Normal";
+//		LocalDateTime endLCTime = LocalDateTime.now();
+//		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+//		String endDate = startLCTime.format(DATE_FORMAT);
+//		Duration duration = Duration.between(startLCTime, endLCTime);
+//		long minutes = duration.toMinutes();
+//		if (minutes <= 1 && minutes >= 0) {
+//			flag = "Fast";
+//		}
+//		if (minutes > 1 && minutes <= 2) {
+//			flag = "Normal";
+//		}
+//		if (minutes > 2 && minutes <= 10) {
+//			flag = "Slow";
+//		}
+//		if (minutes > 10) {
+//			flag = "Dead Slow";
+//		}
+//		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+//				+ description);
+//
+//		for (AccountProfileDTO apDto : accountProfileDTOs) {
+//			// check exist by name, only one exist with a name
+//			Optional<AccountProfile> optionalAP = accountProfiles.stream()
+//					.filter(pc -> pc.getName().equals(apDto.getName())).findAny();
+//			AccountProfile accountProfile;
+//			if (optionalAP.isPresent()) {
+//				accountProfile = optionalAP.get();
+//				accountProfile.setClosingBalance(apDto.getClosingBalance());
+//				saveUpdateAccountProfiles.add(accountProfile);
+//			}
+//		}
+//		// updateing closing balance to zero
+//		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
+//		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//		String id1 = "AP_QUERY_125" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+//		String description1 = "Updating the account closing balance zero by compId";
+//		LocalDateTime startLCTime1 = LocalDateTime.now();
+//		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
+//		String startDate1 = startLCTime1.format(DATE_FORMAT1);
+//		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
+//		accountProfileRepository.updateAccountProfileClosingBalanceZeroByCompanyId(companyId);
+//		String flag1 = "Normal";
+//		LocalDateTime endLCTime1 = LocalDateTime.now();
+//		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
+//		String endDate1 = startLCTime1.format(DATE_FORMAT1);
+//		Duration duration1 = Duration.between(startLCTime1, endLCTime1);
+//		long minutes1 = duration1.toMinutes();
+//		if (minutes1 <= 1 && minutes1 >= 0) {
+//			flag1 = "Fast";
+//		}
+//		if (minutes1 > 1 && minutes1 <= 2) {
+//			flag1 = "Normal";
+//		}
+//		if (minutes1 > 2 && minutes1 <= 10) {
+//			flag1 = "Slow";
+//		}
+//		if (minutes1 > 10) {
+//			flag1 = "Dead Slow";
+//		}
+//		logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
+//				+ description1);
+//		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
+//		long end = System.nanoTime();
+//		double elapsedTime = (end - start) / 1000000.0;
+//		// update sync table
+//		syncOperation.setCompleted(true);
+//		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+//		syncOperation.setLastSyncTime(elapsedTime);
+//		syncOperationRepository.save(syncOperation);
+//		log.info("Sync completed in {} ms", elapsedTime);
+//	}
 
-	@Transactional
-	@Async
-	public void saveUpdateAccountProfileClosingBalances(final List<AccountProfileDTO> accountProfileDTOs,
-			final SyncOperation syncOperation) {
-		long start = System.nanoTime();
-		Long companyId = syncOperation.getCompany().getId();
-		Set<AccountProfile> saveUpdateAccountProfiles = new HashSet<>();
-		// find all exist account profiles
-		List<String> apNames = accountProfileDTOs.stream().map(a -> a.getName().toUpperCase())
-				.collect(Collectors.toList());
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "AP_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get by compId and name ingore case";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				apNames);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
-
-		for (AccountProfileDTO apDto : accountProfileDTOs) {
-			// check exist by name, only one exist with a name
-			Optional<AccountProfile> optionalAP = accountProfiles.stream()
-					.filter(pc -> pc.getName().equals(apDto.getName())).findAny();
-			AccountProfile accountProfile;
-			if (optionalAP.isPresent()) {
-				accountProfile = optionalAP.get();
-				accountProfile.setClosingBalance(apDto.getClosingBalance());
-				saveUpdateAccountProfiles.add(accountProfile);
-			}
-		}
-		// updateing closing balance to zero
-		DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id1 = "AP_QUERY_125" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description1 = "Updating the account closing balance zero by compId";
-		LocalDateTime startLCTime1 = LocalDateTime.now();
-		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-		String startDate1 = startLCTime1.format(DATE_FORMAT1);
-		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-		accountProfileRepository.updateAccountProfileClosingBalanceZeroByCompanyId(companyId);
-		String flag1 = "Normal";
-		LocalDateTime endLCTime1 = LocalDateTime.now();
-		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-		String endDate1 = startLCTime1.format(DATE_FORMAT1);
-		Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-		long minutes1 = duration1.toMinutes();
-		if (minutes1 <= 1 && minutes1 >= 0) {
-			flag1 = "Fast";
-		}
-		if (minutes1 > 1 && minutes1 <= 2) {
-			flag1 = "Normal";
-		}
-		if (minutes1 > 2 && minutes1 <= 10) {
-			flag1 = "Slow";
-		}
-		if (minutes1 > 10) {
-			flag1 = "Dead Slow";
-		}
-		logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
-				+ description1);
-		bulkOperationRepositoryCustom.bulkSaveAccountProfile(saveUpdateAccountProfiles);
-		long end = System.nanoTime();
-		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
-		syncOperation.setCompleted(true);
-		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
-		syncOperation.setLastSyncTime(elapsedTime);
-		syncOperationRepository.save(syncOperation);
-		log.info("Sync completed in {} ms", elapsedTime);
-	}
-
-	@Transactional
-	@Async
-	public void saveUpdatePriceLevelAccountProductGroups(
-			List<PriceLevelAccountProductGroupDTO> priceLevelAccountProductGroupDTOs, SyncOperation syncOperation) {
-		long start = System.nanoTime();
-		final Company company = syncOperation.getCompany();
-		List<PriceLevelAccountProductGroup> savePriceLevelAccountProductGroup = new ArrayList<>();
-		// find all exist account profiles
-		List<String> apNames = priceLevelAccountProductGroupDTOs.stream().map(rp -> rp.getAccountName().toUpperCase())
-				.collect(Collectors.toList());
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "AP_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get by compId and name ingore case";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<AccountProfile> accountProfiles = accountProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), apNames);
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
-		// find all exist product groups
-		List<String> pgNames = priceLevelAccountProductGroupDTOs.stream()
-				.map(rp -> rp.getProductGroupName().toUpperCase()).collect(Collectors.toList());
-		List<ProductGroup> productGroups = productGroupRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),
-				pgNames);
-
-		// find all exist price levels
-		List<String> plNames = priceLevelAccountProductGroupDTOs.stream()
-				.map(rp -> rp.getPriceLevelName().toUpperCase()).collect(Collectors.toList());
-		List<PriceLevel> priceLevels = priceLevelRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),
-				plNames);
-
-		// delete all receivable payable
-		receivablePayableRepository.deleteByCompanyId(company.getId());
-		for (PriceLevelAccountProductGroupDTO papg : priceLevelAccountProductGroupDTOs) {
-			// only save if account profile exist
-
-			Optional<AccountProfile> accpro = accountProfiles.stream()
-					.filter(a -> a.getName().equals(papg.getAccountName())).findAny();
-
-			Optional<ProductGroup> prodgrp = productGroups.stream()
-					.filter(a -> a.getName().equals(papg.getProductGroupName())).findAny();
-
-			Optional<PriceLevel> prilvl = priceLevels.stream().filter(a -> a.getName().equals(papg.getPriceLevelName()))
-					.findAny();
-
-			if (accpro.isPresent() && prodgrp.isPresent() && prilvl.isPresent()) {
-
-				Optional<PriceLevelAccountProductGroup> pLevelAccountPGroup = priceLevelAccountProductGroupRepository
-						.findOneByAccountProfilePidAndProductGroupPidAndPriceLevelPid(company.getId(),
-								accpro.get().getPid(), prodgrp.get().getPid(), prilvl.get().getPid());
-				if (!pLevelAccountPGroup.isPresent()) {
-					PriceLevelAccountProductGroup priceLevelAccountProductGroup = new PriceLevelAccountProductGroup();
-					priceLevelAccountProductGroup.setAccountProfile(accpro.get());
-					priceLevelAccountProductGroup.setCompany(company);
-					priceLevelAccountProductGroup
-							.setPid(PriceLevelAccountProductGroupService.PID_PREFIX + RandomUtil.generatePid());
-					priceLevelAccountProductGroup.setPriceLevel(prilvl.get());
-					priceLevelAccountProductGroup.setProductGroup(prodgrp.get());
-					savePriceLevelAccountProductGroup.add(priceLevelAccountProductGroup);
-				}
-			}
-		}
-		bulkOperationRepositoryCustom.bulkPriceLevelAccountProductGroups(savePriceLevelAccountProductGroup);
-		long end = System.nanoTime();
-		double elapsedTime = (end - start) / 1000000.0;
-		// update sync table
-		syncOperation.setCompleted(true);
-		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
-		syncOperation.setLastSyncTime(elapsedTime);
-		syncOperationRepository.save(syncOperation);
-		log.info("Sync completed in {} ms", elapsedTime);
-	}
+//	@Transactional
+//	@Async
+//	public void saveUpdatePriceLevelAccountProductGroups(
+//			List<PriceLevelAccountProductGroupDTO> priceLevelAccountProductGroupDTOs, SyncOperation syncOperation) {
+//		long start = System.nanoTime();
+//		final Company company = syncOperation.getCompany();
+//		List<PriceLevelAccountProductGroup> savePriceLevelAccountProductGroup = new ArrayList<>();
+//		// find all exist account profiles
+//		List<String> apNames = priceLevelAccountProductGroupDTOs.stream().map(rp -> rp.getAccountName().toUpperCase())
+//				.collect(Collectors.toList());
+//		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+//		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//		String id = "AP_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+//		String description = "get by compId and name ingore case";
+//		LocalDateTime startLCTime = LocalDateTime.now();
+//		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+//		String startDate = startLCTime.format(DATE_FORMAT);
+//		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+//		List<AccountProfile> accountProfiles = accountProfileRepository
+//				.findByCompanyId(company.getId());
+//		String flag = "Normal";
+//		LocalDateTime endLCTime = LocalDateTime.now();
+//		String endTime = endLCTime.format(DATE_TIME_FORMAT);
+//		String endDate = startLCTime.format(DATE_FORMAT);
+//		Duration duration = Duration.between(startLCTime, endLCTime);
+//		long minutes = duration.toMinutes();
+//		if (minutes <= 1 && minutes >= 0) {
+//			flag = "Fast";
+//		}
+//		if (minutes > 1 && minutes <= 2) {
+//			flag = "Normal";
+//		}
+//		if (minutes > 2 && minutes <= 10) {
+//			flag = "Slow";
+//		}
+//		if (minutes > 10) {
+//			flag = "Dead Slow";
+//		}
+//		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+//				+ description);
+//		// find all exist product groups
+//		List<String> pgNames = priceLevelAccountProductGroupDTOs.stream()
+//				.map(rp -> rp.getProductGroupName().toUpperCase()).collect(Collectors.toList());
+//		List<ProductGroup> productGroups = productGroupRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),
+//				pgNames);
+//
+//		// find all exist price levels
+//		List<String> plNames = priceLevelAccountProductGroupDTOs.stream()
+//				.map(rp -> rp.getPriceLevelName().toUpperCase()).collect(Collectors.toList());
+//		List<PriceLevel> priceLevels = priceLevelRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),
+//				plNames);
+//
+//		// delete all receivable payable
+//		receivablePayableRepository.deleteByCompanyId(company.getId());
+//		for (PriceLevelAccountProductGroupDTO papg : priceLevelAccountProductGroupDTOs) {
+//			// only save if account profile exist
+//
+//			Optional<AccountProfile> accpro = accountProfiles.stream()
+//					.filter(a -> a.getName().equals(papg.getAccountName())).findAny();
+//
+//			Optional<ProductGroup> prodgrp = productGroups.stream()
+//					.filter(a -> a.getName().equals(papg.getProductGroupName())).findAny();
+//
+//			Optional<PriceLevel> prilvl = priceLevels.stream().filter(a -> a.getName().equals(papg.getPriceLevelName()))
+//					.findAny();
+//
+//			if (accpro.isPresent() && prodgrp.isPresent() && prilvl.isPresent()) {
+//
+//				Optional<PriceLevelAccountProductGroup> pLevelAccountPGroup = priceLevelAccountProductGroupRepository
+//						.findOneByAccountProfilePidAndProductGroupPidAndPriceLevelPid(company.getId(),
+//								accpro.get().getPid(), prodgrp.get().getPid(), prilvl.get().getPid());
+//				if (!pLevelAccountPGroup.isPresent()) {
+//					PriceLevelAccountProductGroup priceLevelAccountProductGroup = new PriceLevelAccountProductGroup();
+//					priceLevelAccountProductGroup.setAccountProfile(accpro.get());
+//					priceLevelAccountProductGroup.setCompany(company);
+//					priceLevelAccountProductGroup
+//							.setPid(PriceLevelAccountProductGroupService.PID_PREFIX + RandomUtil.generatePid());
+//					priceLevelAccountProductGroup.setPriceLevel(prilvl.get());
+//					priceLevelAccountProductGroup.setProductGroup(prodgrp.get());
+//					savePriceLevelAccountProductGroup.add(priceLevelAccountProductGroup);
+//				}
+//			}
+//		}
+//		bulkOperationRepositoryCustom.bulkPriceLevelAccountProductGroups(savePriceLevelAccountProductGroup);
+//		long end = System.nanoTime();
+//		double elapsedTime = (end - start) / 1000000.0;
+//		// update sync table
+//		syncOperation.setCompleted(true);
+//		syncOperation.setLastSyncCompletedDate(LocalDateTime.now());
+//		syncOperation.setLastSyncTime(elapsedTime);
+//		syncOperationRepository.save(syncOperation);
+//		log.info("Sync completed in {} ms", elapsedTime);
+//	}
 
 	private static boolean isValidEmail(String email) {
 		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z"

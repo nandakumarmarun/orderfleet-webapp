@@ -114,128 +114,76 @@ public class AccountProfileController {
 	 * @return the ResponseEntity with status 201 (Created) and with body the new
 	 *         accountProfileDTO
 	 */
-	@RequestMapping(value = "/account-profile/{pid}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/account-profile/{pid}",
+			method = RequestMethod.POST,
+			produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<AccountProfileDTO> createExecutiveTaskPlan(@RequestBody AccountProfileDTO accountProfileDTO,
+	public ResponseEntity<AccountProfileDTO> createExecutiveTaskPlan(
+			@RequestBody AccountProfileDTO accountProfileDTO,
 			@PathVariable String pid) {
-		log.debug("Rest request to save AccountProfile : {} under location with pid {}", accountProfileDTO, pid);
-		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String id = "AP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-		String description = "get by compId and name Ignore case";
-		LocalDateTime startLCTime = LocalDateTime.now();
-		String startTime = startLCTime.format(DATE_TIME_FORMAT);
-		String startDate = startLCTime.format(DATE_FORMAT);
-		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		Optional<AccountProfile> exisitingAccountProfile = accountProfileRepository.findByCompanyIdAndNameIgnoreCase(
-				SecurityUtils.getCurrentUsersCompanyId(), accountProfileDTO.getName());
-		String flag = "Normal";
-		LocalDateTime endLCTime = LocalDateTime.now();
-		String endTime = endLCTime.format(DATE_TIME_FORMAT);
-		String endDate = startLCTime.format(DATE_FORMAT);
-		Duration duration = Duration.between(startLCTime, endLCTime);
-		long minutes = duration.toMinutes();
-		if (minutes <= 1 && minutes >= 0) {
-			flag = "Fast";
-		}
-		if (minutes > 1 && minutes <= 2) {
-			flag = "Normal";
-		}
-		if (minutes > 2 && minutes <= 10) {
-			flag = "Slow";
-		}
-		if (minutes > 10) {
-			flag = "Dead Slow";
-		}
-		logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
-				+ description);
+
+		Optional<AccountProfile> exisitingAccountProfile =
+				accountProfileRepository.
+						findByCompanyIdAndNameIgnoreCase(
+								SecurityUtils.getCurrentUsersCompanyId(),
+								accountProfileDTO.getName());
 
 		if (exisitingAccountProfile.isPresent()
-				&& (accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty())) {
+				&& (accountProfileDTO.getPid() == null
+				|| accountProfileDTO.getPid().isEmpty())) {
 			return ResponseEntity.badRequest().headers(
-					HeaderUtil.createFailureAlert("accountProfile", "nameexists", "Account Profile already in use"))
+					HeaderUtil.createFailureAlert(
+							"accountProfile",
+							"nameexists",
+							"Account Profile already in use"))
 					.body(null);
-		} else if ((exisitingAccountProfile.isPresent() && !accountProfileDTO.getPid().isEmpty())) {
-			if (!exisitingAccountProfile.get().getPid().equals(accountProfileDTO.getPid())) {
+		} else if ((exisitingAccountProfile.isPresent()
+				&& !accountProfileDTO.getPid().isEmpty())) {
+			if (!exisitingAccountProfile.get().getPid()
+					.equals(accountProfileDTO.getPid())) {
+
 				return ResponseEntity.badRequest().headers(
-						HeaderUtil.createFailureAlert("accountProfile", "nameexists", "Account Profile already in use"))
+						HeaderUtil.createFailureAlert(
+								"accountProfile",
+								"nameexists",
+								"Account Profile already in use"))
 						.body(null);
 			}
 		}
+
 		if (!locationRepository.findOneByPid(pid).isPresent()) {
 			return ResponseEntity.badRequest()
-					.headers(HeaderUtil.createFailureAlert("location", "location not found", "location not found"))
+					.headers(HeaderUtil.createFailureAlert(
+							"location",
+							"location not found",
+							"location not found"))
 					.body(null);
 		}
+
 		Company company = companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId());
 		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 
-		AccountProfile newAccountProfile = accountProfileMapper.accountProfileDTOToAccountProfile(accountProfileDTO);
-		if (accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty()) {
+		AccountProfile newAccountProfile =
+				accountProfileMapper
+						.accountProfileDTOToAccountProfile(
+								accountProfileDTO);
+
+		if (accountProfileDTO.getPid() == null
+				|| accountProfileDTO.getPid().isEmpty()) {
+
 			newAccountProfile.setAccountStatus(AccountStatus.Unverified);
 			newAccountProfile.setPid(AccountProfileService.PID_PREFIX + RandomUtil.generatePid());
-			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id1 = "AP_QUERY_102" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description1 = "get one by pid";
-			LocalDateTime startLCTime1 = LocalDateTime.now();
-			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
-			String startDate1 = startLCTime1.format(DATE_FORMAT1);
-			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-			Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository.findByCompanyPidAndName(
-					companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()).getPid(),
-					CompanyConfig.NEW_CUSTOMER_ALIAS);
-			String flag1 = "Normal";
-			LocalDateTime endLCTime1 = LocalDateTime.now();
-			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
-			String endDate1 = startLCTime1.format(DATE_FORMAT1);
-			Duration duration1 = Duration.between(startLCTime1, endLCTime1);
-			long minutes1 = duration1.toMinutes();
-			if (minutes1 <= 1 && minutes1 >= 0) {
-				flag1 = "Fast";
-			}
-			if (minutes1 > 1 && minutes1 <= 2) {
-				flag1 = "Normal";
-			}
-			if (minutes1 > 2 && minutes1 <= 10) {
-				flag1 = "Slow";
-			}
-			if (minutes1 > 10) {
-				flag1 = "Dead Slow";
-			}
-			logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1
-					+ "," + description1);
 
-			DateTimeFormatter DATE_TIME_FORMAT11 = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT11 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id11 = "AP_QUERY_129" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description11 = "get all by comp data source type and create date";
-			LocalDateTime startLCTime11 = LocalDateTime.now();
-			String startTime11 = startLCTime11.format(DATE_TIME_FORMAT11);
-			String startDate11 = startLCTime11.format(DATE_FORMAT11);
-			logger.info(id11 + "," + startDate11 + "," + startTime11 + ",_ ,0 ,START,_," + description11);
-			List<AccountProfile> listAccountProfiles = accountProfileRepository
-					.findAllByCompanyAndDataSourceTypeAndCreatedDate(DataSourceType.MOBILE);
-			String flag11 = "Normal";
-			LocalDateTime endLCTime11 = LocalDateTime.now();
-			String endTime11 = endLCTime11.format(DATE_TIME_FORMAT11);
-			String endDate11 = startLCTime11.format(DATE_FORMAT11);
-			Duration duration11 = Duration.between(startLCTime11, endLCTime11);
-			long minutes11 = duration11.toMinutes();
-			if (minutes11 <= 1 && minutes11 >= 0) {
-				flag11 = "Fast";
-			}
-			if (minutes11 > 1 && minutes11 <= 2) {
-				flag11 = "Normal";
-			}
-			if (minutes11 > 2 && minutes11 <= 10) {
-				flag11 = "Slow";
-			}
-			if (minutes11 > 10) {
-				flag11 = "Dead Slow";
-			}
-			logger.info(id11 + "," + endDate11 + "," + startTime11 + "," + endTime11 + "," + minutes11 + ",END,"
-					+ flag11 + "," + description11);
+			Optional<CompanyConfiguration> optNewCustomerAlias = companyConfigurationRepository
+					.findByCompanyPidAndName(
+							companyRepository.findOne(
+									SecurityUtils.getCurrentUsersCompanyId()).getPid(),
+							CompanyConfig.NEW_CUSTOMER_ALIAS);
+
+			List<AccountProfile> listAccountProfiles =
+					accountProfileRepository
+							.findAllByCompanyAndDataSourceTypeAndCreatedDate(
+									DataSourceType.MOBILE);
 
 			String customerId = "N" + company.getId();
 
@@ -243,8 +191,9 @@ public class AccountProfileController {
 				long count = 0;
 				long id111 = listAccountProfiles.get(0).getId();
 				count++;
-				long cId = id111 + count;
-
+				long maxid =  accountProfileRepository.findMaximumId();
+				logger.debug("Maximum Id : " + maxid);
+				long cId = maxid + count;
 				customerId = String.valueOf(cId);
 			}
 
@@ -252,16 +201,12 @@ public class AccountProfileController {
 
 			if (optNewCustomerAlias.isPresent()) {
 				if (optNewCustomerAlias.get().getValue().equalsIgnoreCase("true")) {
-
 					if (listAccountProfiles.size() > 0) {
 						String alias = listAccountProfiles.get(0).getAlias();
 						if (alias.startsWith("N_")) {
 							String[] stringArray = alias.split("_");
-
 							int i = Integer.parseInt(stringArray[1]);
-
 							i++;
-
 							newAccountProfile.setAlias("N_" + i);
 						} else {
 							newAccountProfile.setAlias("N_1");
@@ -271,36 +216,35 @@ public class AccountProfileController {
 					}
 				} else {
 					newAccountProfile.setAlias("N_1");
-
 				}
-
 			} else {
 				newAccountProfile.setAlias("N_1");
-
 			}
-
-		} else {
-			newAccountProfile.setId(exisitingAccountProfile.get().getId());
 		}
-		// set company
+
 		newAccountProfile.setDataSourceType(DataSourceType.MOBILE);
 		newAccountProfile.setCompany(company);
 		newAccountProfile.setUser(user);
 
-		log.debug("Saving new account profile from mobile user {} with account name {} and accountPid {}",
-				user.getLogin(), newAccountProfile.getName(), newAccountProfile.getPid());
+		log.debug("Saving new account profile from" +
+						" mobile user {}" +
+						" with account name {}" +
+						" and accountPid {}",
+				user.getLogin(),
+				newAccountProfile.getName(),
+				newAccountProfile.getPid());
+
 		AccountProfile accountProfile = accountProfileRepository.save(newAccountProfile);
 
-		/**
-		 * create account profile as task
-		 */
+		//create account profile as task
 		long accountTypeId = accountProfile.getAccountType().getId();
-		List<Activity> activities = activityRepository.findALlByAccountTypeId(accountTypeId);
+		List<Activity> activities =
+				activityRepository
+						.findALlByAccountTypeId(accountTypeId);
 		for (Activity activity : activities) {
 			if(activity.getAutoTaskCreation()){
 				//convert to task
 				Task task = new Task();
-
 				task.setCompany(company);
 				task.setAccountProfile(accountProfile);
 				task.setActivity(activity);
@@ -308,33 +252,26 @@ public class AccountProfileController {
 				task.setPid(TaskService.PID_PREFIX + RandomUtil.generatePid());
 				task.setRemarks("");
 				taskRepository.save(task);
-	//			log.debug("task : "+task);
-				logger.info("task saved........................");
+				logger.info("task saved...");
 			}
 		}
 
-
-		// test to remove
-		// System.out.println("==============//// 1. Total AP :
-		// "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
-
 		// Associate account profile to territory
-		if (accountProfileDTO.getPid() == null || accountProfileDTO.getPid().isEmpty()) {
-			locationRepository.findOneByPid(pid).ifPresent(loc -> {
-				LocationAccountProfile locationAccount = new LocationAccountProfile(loc, accountProfile, company);
+		if (accountProfileDTO.getPid() == null
+				|| accountProfileDTO.getPid().isEmpty()) {
+			locationRepository.findOneByPid(pid)
+					.ifPresent(loc -> {
+						LocationAccountProfile locationAccount =
+								new LocationAccountProfile(loc, accountProfile, company);
 				locationAccountProfileRepository.save(locationAccount);
-				// test to remove
-				// System.out.println("==============//// 2. Total AP :
-				// "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
 			});
-			// test to remove
-			// System.out.println("==============//// 3. Total AP :
-			// "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
 		}
-		// test to remove
-		// System.out.println("==============//// 4. Total AP :
-		// "+locationAccountProfileRepository.findAllByCompanyId(company.getId()).size());
-		AccountProfileDTO result = accountProfileMapper.accountProfileToAccountProfileDTO(accountProfile);
+
+		AccountProfileDTO result =
+				accountProfileMapper
+						.accountProfileToAccountProfileDTO(
+						accountProfile);
+
 		return new ResponseEntity<>(result, HttpStatus.CREATED);
 	}
 

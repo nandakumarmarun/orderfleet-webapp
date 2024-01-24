@@ -65,9 +65,12 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 				String startTime = startLCTime.format(DATE_TIME_FORMAT);
 				String startDate = startLCTime.format(DATE_FORMAT);
 				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-			Optional<AccountProfile> accountProfile = accountProfileRepository.findByCompanyIdAndNameIgnoreCase
-															(company.getId() , dto.getAccountProfileName());
-			 String flag = "Normal";
+
+				Optional<AccountProfile> accountProfile =
+					accountProfileRepository
+							.findOneByPid(dto.getAccountProfilePid());
+
+				String flag = "Normal";
 				LocalDateTime endLCTime = LocalDateTime.now();
 				String endTime = endLCTime.format(DATE_TIME_FORMAT);
 				String endDate = startLCTime.format(DATE_FORMAT);
@@ -120,7 +123,7 @@ public class PostDatedVoucherServiceImpl implements PostDatedVoucherService {
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountProfile> accountProfiles = 
-				accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(company.getId(),names);
+				accountProfileRepository.findByCompanyId(company.getId());
 		 String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);

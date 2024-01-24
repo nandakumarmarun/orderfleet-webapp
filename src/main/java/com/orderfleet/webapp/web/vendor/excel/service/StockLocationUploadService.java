@@ -332,8 +332,7 @@ public class StockLocationUploadService {
 		final Company company = syncOperation.getCompany();
 		Set<ReceivablePayable> saveReceivablePayable = new HashSet<>();
 		// find all exist account profiles
-		List<String> apNames = receivablePayableDTOs.stream().map(rp -> rp.getAccountName().toUpperCase())
-				.collect(Collectors.toList());
+	;
 		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String id = "AP_QUERY_123" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
@@ -343,7 +342,7 @@ public class StockLocationUploadService {
 		String startDate = startLCTime.format(DATE_FORMAT);
 		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountProfile> accountProfiles = accountProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), apNames);
+				.findByCompanyId(company.getId());
 		 String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -417,8 +416,8 @@ public class StockLocationUploadService {
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				apNames);
+		List<AccountProfile> accountProfiles =
+				accountProfileRepository.findByCompanyId(companyId);
 		  String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -511,7 +510,7 @@ public class StockLocationUploadService {
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
 		List<AccountProfile> accountProfiles = accountProfileRepository
-				.findByCompanyIdAndNameIgnoreCaseIn(company.getId(), apNames);
+				.findByCompanyId(company.getId());
 		String flag = "Normal";
 		LocalDateTime endLCTime = LocalDateTime.now();
 		String endTime = endLCTime.format(DATE_TIME_FORMAT);

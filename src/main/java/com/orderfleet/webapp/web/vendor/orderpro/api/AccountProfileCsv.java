@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ import com.orderfleet.webapp.web.vendor.orderpro.service.ReceivablePayableExcelU
 public class AccountProfileCsv {
 
 	private final Logger log = LoggerFactory.getLogger(AccountProfileCsv.class);
-	  private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
+	private final Logger logger = LoggerFactory.getLogger("QueryFormatting");
 	@Inject
 	private SyncOperationRepository syncOperationRepository;
 
@@ -58,18 +59,39 @@ public class AccountProfileCsv {
 	@Inject
 	private ReceivablePayableExcelUploadService receivablePayableExcelUploadService;
 
-	@RequestMapping(value = "/account-profiles.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	/**
+	 * This API handles the bulk saving
+	 * or updating of account profiles.
+	 *  API Url :
+	 *   - /api/orderpro/v1/account-profiles.json
+	 *
+	 * @param accountProfileDTOs
+	 * @param request
+	 *
+	 * Since 1.111.0
+	 *
+	 *
+	 */
+	@RequestMapping(value = "/account-profiles.json",
+			method = RequestMethod.POST,
+			produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<String> bulkSaveAccountProfiles(
-			@Valid @RequestBody List<AccountProfileDTO> accountProfileDTOs) {
-		log.debug("REST request to save AccountProfiles : {}", accountProfileDTOs.size());
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.ACCOUNT_PROFILE).map(so -> {
+			@Valid @RequestBody List<AccountProfileDTO> accountProfileDTOs,
+			HttpServletRequest request) {
+		log.info("Received request to bulk save account profiles...");
+		return syncOperationRepository
+				.findOneByCompanyIdAndOperationType(
+						SecurityUtils.getCurrentUsersCompanyId(),
+						SyncOperationType.ACCOUNT_PROFILE)
+				.map(so -> {
 					// update sync status
+					log.debug("Sync operation found. Updating sync status...");
 					so.setCompleted(false);
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
-					// save/update
+
 					DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
 					DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 					String id = "AP_QUERY_103" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
@@ -78,8 +100,10 @@ public class AccountProfileCsv {
 					String startTime = startLCTime.format(DATE_TIME_FORMAT);
 					String startDate = startLCTime.format(DATE_FORMAT);
 					logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
 					List<AccountProfile> existingAccountProfiles = accountProfileRepository
 							.findAllByCompanyId(SecurityUtils.getCurrentUsersCompanyId());
+
 					String flag = "Normal";
 					LocalDateTime endLCTime = LocalDateTime.now();
 					String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -98,21 +122,35 @@ public class AccountProfileCsv {
 					if (minutes > 10) {
 						flag = "Dead Slow";
 					}
-			                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			                logger.info(id + "," + endDate + "," + startTime + ","
+									+ endTime + "," + minutes + ",END," + flag + ","
 							+ description);
 
-					accountProfileCsvUploadService.saveUpdateAccountProfiles(accountProfileDTOs, so);
+					accountProfileCsvUploadService
+							.saveUpdateAccountProfiles(
+									accountProfileDTOs, so);
+
 					for (AccountProfile accountProfile : existingAccountProfiles) {
-						accountProfileDTOs.removeIf(aProfile -> aProfile.getAlias().equals(accountProfile.getAlias()));
+						accountProfileDTOs.removeIf(
+								aProfile -> aProfile.getAlias()
+										.equals(accountProfile.getAlias()));
 					}
-					List<String> newAccountProfileAlias = accountProfileDTOs.stream()
-							.map(aProfile -> aProfile.getAlias()).collect(Collectors.toList());
-					System.out.println("-----------------"+newAccountProfileAlias.size());
-					accountProfileCsvUploadService.locationAccountProfileAssociation(newAccountProfileAlias, so.getCompany());
+
+					List<String> newAccountProfileAlias =
+							accountProfileDTOs
+									.stream()
+									.map(aProfile -> aProfile.getAlias())
+									.collect(Collectors.toList());
+
+					accountProfileCsvUploadService
+							.locationAccountProfileAssociation(
+									newAccountProfileAlias, so.getCompany());
+
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				}).orElse(new ResponseEntity<>("Account-Profile sync operation not registered for this company",
 						HttpStatus.BAD_REQUEST));
 	}
+
 
 	@RequestMapping(value = "/locations.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -251,21 +289,34 @@ public class AccountProfileCsv {
 	public ResponseEntity<String> bulkSaveAccountProfileClosingBalances(
 			@Valid @RequestBody List<AccountProfileDTO> accountProfileDTOs) {
 		log.debug("REST request to save account profiles closing balance : {}", accountProfileDTOs.size());
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
-				SyncOperationType.ACCOUNT_PROFILE_CLOSING_BALANCE).map(so -> {
-					Optional<SyncOperation> opSyncAP = syncOperationRepository.findOneByCompanyIdAndOperationType(
-							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.ACCOUNT_PROFILE);
+		return syncOperationRepository
+				.findOneByCompanyIdAndOperationType(
+						SecurityUtils.getCurrentUsersCompanyId(),
+				SyncOperationType.ACCOUNT_PROFILE_CLOSING_BALANCE)
+				.map(so -> {
+					Optional<SyncOperation> opSyncAP =
+							syncOperationRepository
+									.findOneByCompanyIdAndOperationType(
+											SecurityUtils.getCurrentUsersCompanyId(),
+											SyncOperationType.ACCOUNT_PROFILE);
+
 					if (!opSyncAP.get().getCompleted()) {
-						return new ResponseEntity<>("account-profile save processing try after some time.",
+						return new ResponseEntity<>(
+								"account-profile save processing try after some time.",
 								HttpStatus.BAD_REQUEST);
 					}
-					// update sync status
+
 					so.setCompleted(false);
 					so.setLastSyncStartedDate(LocalDateTime.now());
 					syncOperationRepository.save(so);
-					// save/update
-					accountProfileCsvUploadService.saveUpdateAccountProfileClosingBalances(accountProfileDTOs, so);
-					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
+
+					accountProfileCsvUploadService
+							.saveUpdateAccountProfileClosingBalances(
+									accountProfileDTOs, so);
+
+					return new ResponseEntity<>(
+							"Uploaded",
+							HttpStatus.OK);
 				})
 				.orElse(new ResponseEntity<>(
 						"account profile closing balance sync operation not registered for this company",
@@ -278,14 +329,20 @@ public class AccountProfileCsv {
 			@Valid @RequestBody List<PriceLevelAccountProductGroupDTO> priceLevelAccountProductGroupDTOs) {
 		log.debug("REST request to save priceLevel Account ProductGroupDTOs : {}",
 				priceLevelAccountProductGroupDTOs.size());
-		return syncOperationRepository.findOneByCompanyIdAndOperationType(SecurityUtils.getCurrentUsersCompanyId(),
+		return syncOperationRepository
+				.findOneByCompanyIdAndOperationType(
+						SecurityUtils.getCurrentUsersCompanyId(),
 				SyncOperationType.PRICELEVEL_ACCOUNT_PRODUCTGROUP).map(so -> {
 
-					Optional<SyncOperation> opSyncAP = syncOperationRepository.findOneByCompanyIdAndOperationType(
-							SecurityUtils.getCurrentUsersCompanyId(), SyncOperationType.ACCOUNT_PROFILE);
+					Optional<SyncOperation> opSyncAP =
+							syncOperationRepository
+									.findOneByCompanyIdAndOperationType(
+									SecurityUtils.getCurrentUsersCompanyId(),
+									SyncOperationType.ACCOUNT_PROFILE);
 
 					if (!opSyncAP.get().getCompleted()) {
-						return new ResponseEntity<>("account-profile save processing try after some time.",
+						return new ResponseEntity<>(
+								"account-profile save processing try after some time.",
 								HttpStatus.BAD_REQUEST);
 					}
 
@@ -295,7 +352,9 @@ public class AccountProfileCsv {
 					syncOperationRepository.save(so);
 					// save/update
 					accountProfileCsvUploadService
-							.saveUpdatePriceLevelAccountProductGroups(priceLevelAccountProductGroupDTOs, so);
+							.saveUpdatePriceLevelAccountProductGroups(
+									priceLevelAccountProductGroupDTOs, so);
+
 					return new ResponseEntity<>("Uploaded", HttpStatus.OK);
 				})
 				.orElse(new ResponseEntity<>(

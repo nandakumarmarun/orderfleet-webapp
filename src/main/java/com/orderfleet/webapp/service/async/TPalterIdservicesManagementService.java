@@ -1097,8 +1097,7 @@ public class TPalterIdservicesManagementService {
 		String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 		String startDate1 = startLCTime1.format(DATE_FORMAT1);
 		logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyIdAndNameIgnoreCaseIn(companyId,
-				apNames);
+		List<AccountProfile> accountProfiles = accountProfileRepository.findByCompanyId(companyId);
 		String flag1 = "Normal";
 		LocalDateTime endLCTime1 = LocalDateTime.now();
 		String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);

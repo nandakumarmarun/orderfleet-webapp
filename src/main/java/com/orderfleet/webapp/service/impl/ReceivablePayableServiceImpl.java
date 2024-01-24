@@ -66,7 +66,6 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 
 	/**
 	 * Save a receivablePayable.
-	 * 
 	 * @param receivablePayableDTO the entity to save
 	 * @return the persisted entity
 	 */
@@ -75,30 +74,36 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 		log.debug("Request to save ReceivablePayable : {}", receivablePayableDTO);
 
 		ReceivablePayable receivablePayable = new ReceivablePayable();
-		// set pid
 		receivablePayable.setPid(ReceivablePayableService.PID_PREFIX + RandomUtil.generatePid());
-
 		receivablePayable.setBillOverDue(Long.valueOf(receivablePayableDTO.getBillOverDue()));
 		receivablePayable.setReceivablePayableType(receivablePayableDTO.getReceivablePayableType());
 		receivablePayable.setReferenceDocumentAmount(receivablePayableDTO.getReferenceDocumentAmount());
-		receivablePayable.setReferenceDocumentBalanceAmount(receivablePayableDTO.getReferenceDocumentBalanceAmount());
+		receivablePayable.setReferenceDocumentBalanceAmount(
+				receivablePayableDTO.getReferenceDocumentBalanceAmount());
 		receivablePayable.setReferenceDocumentDate(receivablePayableDTO.getReferenceDocumentDate());
 		receivablePayable.setReferenceDocumentNumber(receivablePayableDTO.getReferenceDocumentNumber());
 		receivablePayable.setReferenceDocumentType(receivablePayableDTO.getReferenceDocumentType());
-		// ReceivablePayable receivablePayable =
-		// receivablePayableMapper.receivablePayableDTOToReceivablePayable(receivablePayableDTO);
+
 		// set company
-		 DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
-			DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			String id = "AP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
-			String description ="get by compId and name Ignore case";
-			LocalDateTime startLCTime = LocalDateTime.now();
-			String startTime = startLCTime.format(DATE_TIME_FORMAT);
-			String startDate = startLCTime.format(DATE_FORMAT);
-			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-		Optional<AccountProfile> accountProfile = accountProfileRepository.findByCompanyIdAndNameIgnoreCase(
-				SecurityUtils.getCurrentUsersCompanyId(), receivablePayableDTO.getAccountName());
-		 String flag = "Normal";
+		DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
+		DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String id = "AP_QUERY_101" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
+		String description ="get by compId and name Ignore case";
+		LocalDateTime startLCTime = LocalDateTime.now();
+		String startTime = startLCTime.format(DATE_TIME_FORMAT);
+		String startDate = startLCTime.format(DATE_FORMAT);
+		logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
+
+		logger.debug("Account Pid : " + receivablePayableDTO.getAccountPid()
+				+ " : " + receivablePayableDTO.getAccountName());
+
+			Optional<AccountProfile> accountProfile =
+					accountProfileRepository
+							.findByCompanyIdAndPid(
+									SecurityUtils.getCurrentUsersCompanyId(),
+									receivablePayableDTO.getAccountPid());
+
+			String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
 			String endDate = startLCTime.format(DATE_FORMAT);
@@ -116,24 +121,28 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+			logger.info(id + "," + endDate + "," + startTime + ","
+					+ endTime + "," + minutes + ",END," + flag + ","
 					+ description);
-		if (accountProfile.isPresent()) {
-			receivablePayable.setAccountProfile(accountProfile.get());
-			receivablePayable.setCompany(companyRepository.findOne(SecurityUtils.getCurrentUsersCompanyId()));
-			receivablePayable = receivablePayableRepository.save(receivablePayable);
-			ReceivablePayableDTO result = new ReceivablePayableDTO(receivablePayable);
-			return result;
-		} else {
-			return receivablePayableDTO;
-		}
+
+			if (accountProfile.isPresent()) {
+				receivablePayable.setAccountProfile(accountProfile.get());
+				receivablePayable.setCompany(companyRepository
+						.findOne(SecurityUtils.getCurrentUsersCompanyId()));
+				receivablePayable = receivablePayableRepository.save(receivablePayable);
+				ReceivablePayableDTO result = new ReceivablePayableDTO(receivablePayable);
+				return result;
+			} else {
+				return receivablePayableDTO;
+			}
 	}
 
 	/**
-	 * Update a receivablePayable.
-	 * 
+	 * @deprecated : Update a receivablePayable.
+	 *
 	 * @param receivablePayableDTO the entity to update
 	 * @return the persisted entity
+	 *
 	 */
 	@Override
 	public ReceivablePayableDTO update(ReceivablePayableDTO receivablePayableDTO) {
@@ -157,8 +166,10 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 				String startTime = startLCTime.format(DATE_TIME_FORMAT);
 				String startDate = startLCTime.format(DATE_FORMAT);
 				logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-			receivablePayable.setAccountProfile(accountProfileRepository.findByCompanyIdAndNameIgnoreCase(
-					SecurityUtils.getCurrentUsersCompanyId(), receivablePayableDTO.getAccountName()).get());
+
+				receivablePayable.setAccountProfile(accountProfileRepository.findByCompanyIdAndPid(
+					SecurityUtils.getCurrentUsersCompanyId(), receivablePayableDTO.getAccountPid()).get());
+
 			String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -187,7 +198,6 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 
 	/**
 	 * Get all the receivablePayables.
-	 * 
 	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
@@ -366,9 +376,15 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 		receivablePayable.setReferenceDocumentNumber(receivablePayableDTO.getReferenceDocumentNumber());
 		receivablePayable.setReferenceDocumentType(receivablePayableDTO.getReferenceDocumentType());
 		receivablePayable.setRemarks(receivablePayableDTO.getRemarks());
-		// set company
-		Optional<AccountProfile> accountProfile = accountProfileRepository.findByCompanyIdAndNameIgnoreCase(companyId,
-				receivablePayableDTO.getAccountName());
+
+		 /**
+		 * @deprecated
+		 */
+		Optional<AccountProfile> accountProfile =
+				accountProfileRepository
+						.findByCompanyIdAndNameIgnoreCase(companyId,
+								receivablePayableDTO.getAccountName());
+
 		ReceivablePayableDTO result = new ReceivablePayableDTO();
 		if (accountProfile.isPresent()) {
 			receivablePayable.setAccountProfile(accountProfile.get());
@@ -378,6 +394,8 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 		}
 		return result;
 	}
+
+
 
 	/**
 	 * Get all the receivablePayable.
@@ -460,8 +478,7 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 		return receivablePayableRepository.findOneByPid(receivablePayableDTO.getPid()).map(receivablePayable -> {
 			receivablePayable.setReceivablePayableType(receivablePayableDTO.getReceivablePayableType());
 			receivablePayable.setReferenceDocumentAmount(receivablePayableDTO.getReferenceDocumentAmount());
-			receivablePayable
-					.setReferenceDocumentBalanceAmount(receivablePayableDTO.getReferenceDocumentBalanceAmount());
+			receivablePayable.setReferenceDocumentBalanceAmount(receivablePayableDTO.getReferenceDocumentBalanceAmount());
 			receivablePayable.setReferenceDocumentDate(receivablePayableDTO.getReferenceDocumentDate());
 			receivablePayable.setReferenceDocumentNumber(receivablePayableDTO.getReferenceDocumentNumber());
 			DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss a");
@@ -472,8 +489,14 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 			String startTime = startLCTime.format(DATE_TIME_FORMAT);
 			String startDate = startLCTime.format(DATE_FORMAT);
 			logger.info(id + "," + startDate + "," + startTime + ",_ ,0 ,START,_," + description);
-			receivablePayable.setAccountProfile(accountProfileRepository.findByCompanyIdAndNameIgnoreCase(
-					SecurityUtils.getCurrentUsersCompanyId(), receivablePayableDTO.getAccountName()).get());
+
+			logger.debug("Account Pid : " + receivablePayableDTO.getAccountPid());
+
+			receivablePayable.setAccountProfile(accountProfileRepository
+					.findByCompanyIdAndPid(
+							SecurityUtils.getCurrentUsersCompanyId(),
+							receivablePayableDTO.getAccountPid()).get());
+
 			String flag = "Normal";
 			LocalDateTime endLCTime = LocalDateTime.now();
 			String endTime = endLCTime.format(DATE_TIME_FORMAT);
@@ -492,13 +515,16 @@ public class ReceivablePayableServiceImpl implements ReceivablePayableService {
 			if (minutes > 10) {
 				flag = "Dead Slow";
 			}
-	                logger.info(id + "," + endDate + "," + startTime + "," + endTime + "," + minutes + ",END," + flag + ","
+	                logger.info(id + "," + endDate + "," + startTime
+							+ "," + endTime + "," + minutes + ",END," + flag + ","
 					+ description);
+
 			receivablePayable = receivablePayableRepository.save(receivablePayable);
 			ReceivablePayableDTO result = new ReceivablePayableDTO(receivablePayable);
 			return result;
 		}).orElse(null);
 	}
+
 
 	@Override
 	public Integer dueUpdate() {

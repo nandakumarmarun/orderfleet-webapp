@@ -11,7 +11,7 @@ public interface AlterIdMasterService {
 	/**
 	 * Save a alteridMasterDto.
 	 *
-	 * @param alterIdmaster the entity to save
+	 * @param alteridMasterDTO the entity to save
 	 * @return the persisted entity
 	 */
 
@@ -20,7 +20,7 @@ public interface AlterIdMasterService {
 	/**
 	 * Get id alteridmaster
 	 * 
-	 * @param id the id of the entity
+	 * @param masterName,companyId the id of the entity
 	 * @return the entity
 	 */
 
