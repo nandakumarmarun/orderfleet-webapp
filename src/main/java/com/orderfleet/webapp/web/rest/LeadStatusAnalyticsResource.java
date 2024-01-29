@@ -32,9 +32,7 @@ import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -176,8 +174,7 @@ public class LeadStatusAnalyticsResource {
             leadStatusDTO.setPid(value.getPid());
             leadStatusDTO.setEmployeeName(value.getEmployeeName());
             leadStatusDTO.setAccountName(value.getAccountProfileName());
-            leadStatusDTO.setCreatedDate(value.getCreatedDate().toLocalDate());
-            leadStatusDTO.setCreatedTime(value.getCreatedDate().toLocalTime());
+            leadStatusDTO.setCreatedDate(value.getCreatedDate());
             leadStatusDTO.setDocumentName(value.getDocumentName());
             for(InvoiceDetailsDenormalized invoice :invoiceDetailsList)
             {
@@ -299,8 +296,7 @@ public class LeadStatusAnalyticsResource {
                 leadStatusDTO.setPid(invoice.getPid());
                 leadStatusDTO.setEmployeeName(invoice.getEmployeeName());
                 leadStatusDTO.setAccountName(invoice.getAccountProfileName());
-                leadStatusDTO.setCreatedDate(invoice.getCreatedDate().toLocalDate());
-                leadStatusDTO.setCreatedTime(invoice.getCreatedDate().toLocalTime());
+                leadStatusDTO.setCreatedDate(invoice.getCreatedDate());
                 leadStatusDTO.setDocumentName(invoice.getDocumentName());
 
                 if(invoice.getFormElementName().equalsIgnoreCase("Lead Status"))
@@ -342,7 +338,7 @@ public class LeadStatusAnalyticsResource {
         String excelFileName = "LeadStatus" + ".xls";
         String sheetName = "Sheet1";
 
-        String[] headerColumns = { "Employee","Account Profile","Date"," Time","Document Name","Lead Status","Deal Volume","Won Volume",
+        String[] headerColumns = { "Employee","Account Profile","Document Name","Date"," Time","Lead Status","Deal Volume","Won Volume",
                 "Lost Volume","Balance Deal Volume"};
         try (HSSFWorkbook workbook = new HSSFWorkbook()) {
             HSSFSheet worksheet = workbook.createSheet(sheetName);
@@ -385,21 +381,21 @@ public class LeadStatusAnalyticsResource {
 
             if(invoice.getCreatedDate()!=null)
             {
-                LocalDate localDate = invoice.getCreatedDate();
-//                Instant i = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-//                Date date = Date.from(i);
+                LocalDateTime localDate = invoice.getCreatedDate();
+                Instant i = localDate.atZone(ZoneId.systemDefault()).toInstant();
+                Date date = Date.from(i);
                 HSSFCell punchDateCell = row.createCell(3);
-                punchDateCell.setCellValue(String.valueOf(localDate));
+                punchDateCell.setCellValue(date);
                 punchDateCell.setCellStyle(dateCellStyle);
             }
 
-            if(invoice.getCreatedTime()!=null)
+            if(invoice.getCreatedDate()!=null)
             {
-                LocalTime localTime = invoice.getCreatedTime();
-//                Instant it = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-//                Date date = Date.from(it);
+                LocalDateTime localTime = invoice.getCreatedDate();
+                Instant it = localTime.atZone(ZoneId.systemDefault()).toInstant();
+                Date date = Date.from(it);
                 HSSFCell punchTimeCell = row.createCell(4);
-                punchTimeCell.setCellValue(String.valueOf(localTime));
+                punchTimeCell.setCellValue(date);
                 punchTimeCell.setCellStyle(timeCellStyle);
             }
 

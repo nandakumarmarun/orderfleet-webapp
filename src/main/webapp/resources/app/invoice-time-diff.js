@@ -93,9 +93,14 @@ if (!this.InvoiceTimeDiff) {
 										function(index, invoiceWiseReport) {
 
 											var locationName = invoiceWiseReport.location;
+                                         if (invoiceWiseReport.location == "No Location"
+													&& invoiceWiseReport.latitude != 0) {
+												locationName = "<span class='btn btn-success'  id='"
+														+ invoiceWiseReport.pid
+														+ "' onClick='InvoiceTimeDiff.getLocation(this)' >get location</span>";
+											}
 
-
-
+                                         var locationIcon = locationIcons(invoiceWiseReport);
 											var mockLocation = "";
 
 											if (invoiceWiseReport.mockLocationStatus) {
@@ -142,8 +147,15 @@ if (!this.InvoiceTimeDiff) {
 																	+ formatDate(
 																			invoiceWiseReport.createdDate,
 																			'MMM DD YYYY, h:mm:ss a')
-
-																     +"</td><td>"
+																     + "</td><td><label>GPS Location : </label> <i>"
+                                                                     + locationName
+                                                                     + locationIcon
+                                                                   	+ "</i><br><label>Customer Location : </label><i id='lbl_"
+                                                                    + invoiceWiseReport.pid
+                                                                    + "'> "
+                                                                    + (invoiceWiseReport.accountProfileLocation == null ? ""
+                                                                    	: invoiceWiseReport.accountProfileLocation)
+                                                                     + "</i></td>"
 																	+ mockLocation
 																	+ "</td>"
 																	+ "<td>"

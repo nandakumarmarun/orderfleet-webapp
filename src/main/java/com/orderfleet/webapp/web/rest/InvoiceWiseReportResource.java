@@ -964,7 +964,6 @@ public class InvoiceWiseReportResource {
 		long hours = 00;
 		long minutes = 00;
 		long seconds = 00;
-		long milliseconds=00;
 		if (startTime != null && endTime != null) {
 			long years = startTime.until(endTime, ChronoUnit.YEARS);
 			startTime = startTime.plusYears(years);
@@ -984,10 +983,10 @@ public class InvoiceWiseReportResource {
 			seconds = startTime.until(endTime, ChronoUnit.SECONDS);
 			startTime = startTime.plusSeconds(seconds);
 			
-			milliseconds =startTime.until(endTime, ChronoUnit.MILLIS);
+			
 		}
 		
-		return hours + " : " + minutes + " : " + seconds + ":"+milliseconds;
+		return hours + " : " + minutes + " : " + seconds;
 
 	}
 

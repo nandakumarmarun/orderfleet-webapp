@@ -112,7 +112,7 @@
                                	</div>
 
                                 <div class="col-sm-3">
-	<button type="button" class="btn btn-success" id="downloadRawXls" onclick="LeadStatusAnalytics.filterRawData()">Apply&Download RawData</button>
+	<button type="button" class="btn btn-success" id="downloadRawXls" onclick="LeadStatusAnalytics.filterRawData()">Download RawData</button>
                                	</div>
 
 							</div>

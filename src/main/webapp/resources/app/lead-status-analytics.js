@@ -86,9 +86,11 @@ function downloadXls() {
 																	+ "</td><td>"
 																	+ invoiceWiseReport.accountName
 																	+ "</td><td>"
-																	+ invoiceWiseReport.createdDate
+																	+ formatDate(
+                                                                     invoiceWiseReport.createdDate,
+                                                                    'MMM DD YYYY')
 										                            +"</td><td>"
-																	+ invoiceWiseReport.createdTime
+																	+ formatDate(invoiceWiseReport.createdDate, 'h:mm:ss a')
 																	+ "</td><td>"
 																    + invoiceWiseReport.documentName
 																	 +"</td><td>"

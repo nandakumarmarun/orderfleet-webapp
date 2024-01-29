@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
+import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.repository.EmployeeProfileRepository;
 import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
 import com.orderfleet.webapp.repository.UserActivityRepository;
@@ -22,12 +23,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -68,6 +67,9 @@ public class InvoiceTimeDiffResource {
 
     @Inject
     private EmployeeProfileService employeeProfileService;
+
+    @Inject
+    private GeoLocationService geoLocationService;
 
     @RequestMapping(value = "/invoice-time-diff", method = RequestMethod.GET)
     @Timed
@@ -159,12 +161,12 @@ public class InvoiceTimeDiffResource {
             // accountProfilePids = getAccountPids(userIds);
             // if all accounts selected avoid account wise query
             executiveTaskExecutions = executiveTaskExecutionRepository
-                    .getByCreatedDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
+                    .getByCreatedDateBetweenAndActivityPidInAndUserIdsIn(fromDate, toDate, activityPids, userIds);
         } else {
             // if a specific account is selected load data based on that particular account
             accountProfilePids = Arrays.asList(accountPid);
             executiveTaskExecutions = executiveTaskExecutionRepository
-                    .getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
+                    .getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidsIn(fromDate, toDate, activityPids, userIds,
                             accountProfilePids);
         }
         System.out.println("Size of executiveTaskExecutions:"+executiveTaskExecutions.size());
@@ -179,10 +181,11 @@ public class InvoiceTimeDiffResource {
             if (employeeProfile != null) {
                 invoiceWiseReportView.setEmployeeName(employeeProfile.getName());
             }
+            invoiceWiseReportView.setLocation(executiveTaskExecution.getLocation());
             String timeSpend = findTimeSpend(executiveTaskExecution.getPunchInDate(),
                         executiveTaskExecution.getSendDate());
                 invoiceWiseReportView.setTimeSpend(timeSpend);
-                String timebetweenOrders = findTimeSpendBetweenOrder(x,y);
+                String timebetweenOrders = findTimeSpendBetweenOrder(y,x);
            invoiceWiseReportView.setTimeBetweenOrder(timebetweenOrders);
                  y = x;
 
@@ -195,9 +198,9 @@ public class InvoiceTimeDiffResource {
         long hours = 00;
         long minutes = 00;
         long seconds = 00;
-        long milliseconds = 00;
+
         if(endTime==null){
-            return 00 + " : " + 00 + " : " + 00 + ":" + 000;
+            return 00 + " : " + 00 + " : " + 00 ;
         }
         if (startTime != null && endTime != null) {
             long years = startTime.until(endTime, ChronoUnit.YEARS);
@@ -218,10 +221,10 @@ public class InvoiceTimeDiffResource {
             seconds = startTime.until(endTime, ChronoUnit.SECONDS);
             startTime = startTime.plusSeconds(seconds);
 
-            milliseconds = startTime.until(endTime, ChronoUnit.MILLIS);
+
         }
 
-        return hours + " : " + minutes + " : " + seconds + ":" + milliseconds;
+        return hours + " : " + minutes + " : " + seconds;
 
     }
 
@@ -230,7 +233,7 @@ public class InvoiceTimeDiffResource {
             long hours = 00;
             long minutes = 00;
             long seconds = 00;
-            long milliseconds = 00;
+
             if (startTime != null && endTime != null) {
                 long years = startTime.until(endTime, ChronoUnit.YEARS);
                 startTime = startTime.plusYears(years);
@@ -250,10 +253,10 @@ public class InvoiceTimeDiffResource {
                 seconds = startTime.until(endTime, ChronoUnit.SECONDS);
                 startTime = startTime.plusSeconds(seconds);
 
-                milliseconds = startTime.until(endTime, ChronoUnit.MILLIS);
+
             }
 
-            return hours + " : " + minutes + " : " + seconds + ":" + milliseconds;
+            return hours + " : " + minutes + " : " + seconds;
 
         }
             private List<String> getActivityPids(String activityPid, List<Long> userIds) {
@@ -289,5 +292,29 @@ public class InvoiceTimeDiffResource {
         activityPids = activityDTOs.stream().map(act -> act.getPid()).collect(Collectors.toList());
         return activityPids;
 
+    }
+    @RequestMapping(value = "/invoice-time-diff/updateLocation/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<InvoiceWiseReportView> updateLocationExecutiveTaskExecutions(@PathVariable String pid) {
+        Optional<ExecutiveTaskExecution> opExecutiveeExecution = executiveTaskExecutionRepository.findOneByPid(pid);
+
+        InvoiceWiseReportView executionView = new InvoiceWiseReportView();
+        if (opExecutiveeExecution.isPresent()) {
+            ExecutiveTaskExecution execution = opExecutiveeExecution.get();
+            if (execution.getLatitude() != BigDecimal.ZERO) {
+                log.debug("lat != 0");
+                String location = geoLocationService
+                        .findAddressFromLatLng(execution.getLatitude() + "," + execution.getLongitude());
+                log.debug("Location : " + location);
+                execution.setLocation(location);
+            } else {
+                log.debug("No Location");
+                execution.setLocation("No Location");
+            }
+
+            execution = executiveTaskExecutionRepository.save(execution);
+            executionView = new InvoiceWiseReportView(execution);
+        }
+        return new ResponseEntity<>(executionView, HttpStatus.OK);
     }
 }

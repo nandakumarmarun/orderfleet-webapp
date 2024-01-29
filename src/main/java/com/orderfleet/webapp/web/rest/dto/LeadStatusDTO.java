@@ -8,8 +8,7 @@ public class LeadStatusDTO {
 
     private String employeeName;
     private String accountName;
-    private LocalDate createdDate;
-    private LocalTime createdTime;
+    private LocalDateTime createdDate;
     private String leadStatus;
     private String dealVolume;
     private String wonVolume;
@@ -22,11 +21,11 @@ public class LeadStatusDTO {
     public LeadStatusDTO() {
     }
 
-    public LeadStatusDTO(String employeeName, String accountName, LocalDate createdDate, LocalTime createdTime, String leadStatus, String dealVolume, String wonVolume, String lostVolume, String balanceDealVolume, String documentName, String pid) {
+    public LeadStatusDTO(String employeeName, String accountName, LocalDateTime createdDate, String leadStatus, String dealVolume, String wonVolume, String lostVolume, String balanceDealVolume, String documentName, String pid) {
         this.employeeName = employeeName;
         this.accountName = accountName;
         this.createdDate = createdDate;
-        this.createdTime = createdTime;
+
         this.leadStatus = leadStatus;
         this.dealVolume = dealVolume;
         this.wonVolume = wonVolume;
@@ -52,21 +51,14 @@ public class LeadStatusDTO {
         this.accountName = accountName;
     }
 
-    public LocalDate getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(LocalDate createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public LocalTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalTime createdTime) {
-        this.createdTime = createdTime;
-    }
 
     public String getLeadStatus() {
         return leadStatus;
@@ -130,7 +122,6 @@ public class LeadStatusDTO {
                 "employeeName='" + employeeName + '\'' +
                 ", accountName='" + accountName + '\'' +
                 ", createdDate=" + createdDate +
-                ", createdTime=" + createdTime +
                 ", leadStatus='" + leadStatus + '\'' +
                 ", dealVolume=" + dealVolume +
                 ", wonVolume=" + wonVolume +

@@ -47,7 +47,7 @@
 						<div class="col-sm-2">
                         		Employee<select id="dbEmployee" name="employeePid"
                         			class="form-control">
-                        			<option value="no">select employee</option>
+                        			<option value="no">Select Employee</option>
                         				<c:forEach items="${employees}" var="employee">
                              	<option value="${employee.pid}">${employee.name}</option>
                         				</c:forEach>
@@ -170,8 +170,9 @@
 							<th>Punch In</th>
 							<th>Client Date</th>
 							<th>Time b\w Transaction</th>
-							<th>Time Spend (hh:mm:ss:mmm)</th>
+							<th>Time Spend (hh:mm:ss)</th>
 							<th>Server Date</th>
+							<th>GPS Location</th>
 							<th>Enable/ Disable</th>
 
 							<th>Remarks</th>

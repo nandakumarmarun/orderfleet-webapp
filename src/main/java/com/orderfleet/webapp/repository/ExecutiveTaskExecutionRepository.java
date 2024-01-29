@@ -332,6 +332,15 @@ public interface ExecutiveTaskExecutionRepository extends JpaRepository<Executiv
 	List<ExecutiveTaskExecution> findAllByCompanyIdUserIdInAndDateBetween(List<Long> userIds, LocalDateTime fromDate, LocalDateTime toDate);
 	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?2 and ?3 ")
 	List<ExecutiveTaskExecution> findAllByCompanyIdAndCreatedDateBetween(LocalDateTime fDate, LocalDateTime tDate);
-
 	ExecutiveTaskExecution findTop1ByUserPidAndAccountProfilePidOrderByCreatedDateDesc( String userId,String accountPid);
+
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity.pid in ?3 and exeTaskExecution.user.id in ?4  Order By exeTaskExecution.createdDate asc")
+	List<ExecutiveTaskExecution> getByCreatedDateBetweenAndActivityPidInAndUserIdsIn(LocalDateTime fromDate,
+																					LocalDateTime toDate, List<String> activityPids, List<Long> userIds);
+
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.company.id = ?#{principal.companyId} and exeTaskExecution.createdDate between ?1 and ?2 and exeTaskExecution.activity.pid in ?3 and exeTaskExecution.user.id in ?4 and exeTaskExecution.accountProfile.pid in ?5 Order By exeTaskExecution.createdDate asc")
+	List<ExecutiveTaskExecution> getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidsIn(LocalDateTime fromDate,
+																								   LocalDateTime toDate, List<String> activityPids, List<Long> userIds, List<String> accountPids);
+	@Query("select exeTaskExecution from ExecutiveTaskExecution exeTaskExecution where exeTaskExecution.invoiceStatus = false and exeTaskExecution.createdDate between ?1 and ?2 Order By exeTaskExecution.createdDate asc")
+	List<ExecutiveTaskExecution> findAllExecutiveTaskExecutionByInvoiceStatusFalseAndCreatedDateBetween(LocalDateTime fromDate,LocalDateTime toDate);
 }
