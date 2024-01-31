@@ -190,8 +190,8 @@ public class CustomerAttributesServiceImpl implements CustomerAttributesService 
                 customerAttributesDTO.setAttributePid(companyAttributes.getAttributes().getPid());
                 customerAttributesDTO.setQuestion(companyAttributes.getAttributes().getQuestions());
                 customerAttributesDTO.setType(companyAttributes.getAttributes().getType());
-                customerAttributesDTO.setDocumentPid(companyAttributes.getDocumentPid());
-                customerAttributesDTO.setDocumentName(companyAttributes.getDocumentName());
+                customerAttributesDTO.setCustomerDocumentPid(companyAttributes.getDocumentPid());
+                customerAttributesDTO.setCustomerDocumentName(companyAttributes.getDocumentName());
 
 
                 // Additional conditions or checks

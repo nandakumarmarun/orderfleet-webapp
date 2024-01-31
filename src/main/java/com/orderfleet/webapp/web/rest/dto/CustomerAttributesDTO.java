@@ -11,23 +11,23 @@ public class CustomerAttributesDTO {
     private String companyName;
     private Long sortOrder;
     private String type;
-    private String documentPid;
-    private String documentName;
+    private String customerDocumentPid;
+    private String customerDocumentName;
 
-    public String getDocumentPid() {
-        return documentPid;
+    public String getCustomerDocumentPid() {
+        return customerDocumentPid;
     }
 
-    public void setDocumentPid(String documentPid) {
-        this.documentPid = documentPid;
+    public void setCustomerDocumentPid(String customerDocumentPid) {
+        this.customerDocumentPid = customerDocumentPid;
     }
 
-    public String getDocumentName() {
-        return documentName;
+    public String getCustomerDocumentName() {
+        return customerDocumentName;
     }
 
-    public void setDocumentName(String documentName) {
-        this.documentName = documentName;
+    public void setCustomerDocumentName(String customerDocumentName) {
+        this.customerDocumentName = customerDocumentName;
     }
 
     public Long getId() {
