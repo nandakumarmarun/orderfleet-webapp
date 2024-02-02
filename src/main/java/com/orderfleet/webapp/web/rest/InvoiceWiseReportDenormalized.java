@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
-import java.time.Duration;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -118,6 +118,9 @@ public class InvoiceWiseReportDenormalized {
 
     @Inject
     private InvoiceDetailsDenormalizedRepository invoiceInventoryDetailsRepository;
+
+    @Inject
+    private DocumentRepository documentRepository;
 
     @RequestMapping(value = "/invoice-reports-denormalized", method = RequestMethod.GET)
     @Timed
@@ -234,24 +237,35 @@ public class InvoiceWiseReportDenormalized {
         } else {
             activityPids = Arrays.asList(activityPid);
         }
+        List<String> docpids = new ArrayList<>();
+        if(documentPid.equalsIgnoreCase("no"))
+        {
+             docpids = documentRepository.findAllByCompanyId().stream()
+                     .map(doc->doc.getPid()).collect(Collectors.toList());
+        }
+        else{
+            docpids.add(documentPid);
+        }
         List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = new ArrayList<>();
         log.info("Finding executive Task execution from denormalized table");
         if (accountPid.equalsIgnoreCase("no")) {
 
             invoiceDetailsDenormalized = invoiceInventoryDetailsRepository
-                    .getByCreatedDateBetweenAndActivityPidInAndUserIdIn(fromDate, toDate, activityPids, userIds);
+                    .getByCreatedDateBetweenAndActivityPidInAndUserIdInAndDocumentPidIn(fromDate, toDate, activityPids, userIds,docpids);
         } else {
             // if a specific account is selected load data based on that particular account
             accountProfilePids = Arrays.asList(accountPid);
             invoiceDetailsDenormalized = invoiceInventoryDetailsRepository
-                    .getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids, userIds,
-                            accountProfilePids);
+                    .getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidInAndDocumentPidIn(fromDate, toDate, activityPids, userIds,
+                            accountProfilePids,docpids);
         }
         log.info("SIze of data ********************:" + invoiceDetailsDenormalized.size());
+        Set<BigInteger> filledForms = filledFormRepository.findfilledForms();
+
         List<InvoiceDetailsDenormalized> invoiceDetailsDenormalizedList = new ArrayList<>();
         if (invoiceDetailsDenormalized.size() > 0) {
             Map<String, InvoiceDetailsDenormalized> uniqueMap = invoiceDetailsDenormalized.stream()
-                    .collect(Collectors.groupingBy(InvoiceDetailsDenormalized :: getExecutionPid,
+                    .collect(Collectors.groupingBy(InvoiceDetailsDenormalized :: getDocumentNumberLocal,
                             Collectors.collectingAndThen(Collectors.toList(), list -> list.get(0))));
 
             invoiceDetailsDenormalizedList = new ArrayList<>(uniqueMap.values());
@@ -262,6 +276,7 @@ public class InvoiceWiseReportDenormalized {
         for (InvoiceDetailsDenormalized invoices : invoiceDetailsDenormalizedList) {
             InvoiceReportList invoiceReport = new InvoiceReportList();
             invoiceReport.setExecutionPid(invoices.getExecutionPid());
+            invoiceReport.setDynamicPid(invoices.getDynamicPid());
             invoiceReport.setPid(invoices.getPid());
             invoiceReport.setEmployeeName(invoices.getEmployeeName());
             invoiceReport.setAccountProfileName(invoices.getAccountProfileName());
@@ -269,7 +284,6 @@ public class InvoiceWiseReportDenormalized {
             invoiceReport.setPunchIn(invoices.getPunchInDate());
             invoiceReport.setClientDate(invoices.getSendDate());
             invoiceReport.setCreatedDate(invoices.getCreatedDate());
-
             invoiceReport.setTimeSpend(findTimeSpends(invoices.getSendDate(), invoices.getCreatedDate()));
             invoiceReport.setLocation(invoices.getLocation());
             invoiceReport.setLocationType(invoices.getLocationType());
@@ -277,13 +291,25 @@ public class InvoiceWiseReportDenormalized {
             invoiceReport.setWithCustomer(invoices.isWithCustomer());
             invoiceReport.setMockLocationStatus(invoices.isMockLocationStatus());
             invoiceReport.setSalesOrderTotalAmount(invoices.getSalesOrderTotalAmount());
-
             invoiceReport.setReceiptAmount(invoices.getReceiptAmount());
             invoiceReport.setVehicleNumber(invoices.getVehicleNumber());
             invoiceReport.setRemarks(invoices.getRemarks());
             invoiceReport.setDocumentName(invoices.getDocumentName());
             invoiceReport.setDocumentTotal(invoices.getDocumentTotal());
             invoiceReport.setDocumentType(invoices.getDocumentType());
+            invoiceReport.setFilledformId(invoices.getFilledFormId());
+            invoiceReport.setImagerefNo(invoices.getImageRefNo());
+            invoiceReport.setDocumentVolume(invoices.getDocumentVolume());
+            boolean imageFound = false;
+            if(invoices.getFilledFormId()!= null) {
+                Optional<BigInteger> opFilledForms = filledForms.stream()
+                        .filter(ff -> ff.equals(BigInteger.valueOf(invoices.getFilledFormId()))).findAny();
+                if (opFilledForms.isPresent()) {
+                    System.out.println("Filled Form present");
+                    imageFound = true;
+                    invoiceReport.setImageFound(imageFound);
+                }
+            }
             invoiceReportLists.add(invoiceReport);
         }
 
@@ -504,7 +530,7 @@ public class InvoiceWiseReportDenormalized {
     @RequestMapping(value = "/invoice-reports-denormalized/getInventoryDetails/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<SalesOrderDTOs> getInventoryVouchers(@PathVariable String pid) {
-        List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = invoiceInventoryDetailsRepository.findAllByExecutionPid(pid);
+        List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = invoiceInventoryDetailsRepository.findAllByExecutionPidAndDocumentType(pid, DocumentType.INVENTORY_VOUCHER);
         log.info("SIze of data :" + invoiceDetailsDenormalized.size());
         SalesOrderDTOs salesorder = new SalesOrderDTOs();
         for (InvoiceDetailsDenormalized invoice : invoiceDetailsDenormalized) {
@@ -540,7 +566,7 @@ public class InvoiceWiseReportDenormalized {
     @RequestMapping(value = "/invoice-reports-denormalized/accounting-details/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<ReceiptDTOs> getAccountingVouchers(@PathVariable String pid) {
-        List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = invoiceInventoryDetailsRepository.findAllByExecutionPid(pid);
+        List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = invoiceInventoryDetailsRepository.findAllByExecutionPidAndDocumentType(pid, DocumentType.ACCOUNTING_VOUCHER);
 
         ReceiptDTOs receiptDTOs = new ReceiptDTOs();
         for (InvoiceDetailsDenormalized invoiceDetails : invoiceDetailsDenormalized) {
@@ -548,7 +574,7 @@ public class InvoiceWiseReportDenormalized {
             receiptDTOs.setUserName(invoiceDetails.getUserName());
             receiptDTOs.setAccountProfileName(invoiceDetails.getAccountProfileName());
             receiptDTOs.setDocumentName(invoiceDetails.getDocumentName());
-            receiptDTOs.setDocumentDate(invoiceDetails.getDocumentDate());
+            receiptDTOs.setCreatedDate(invoiceDetails.getCreatedDate());
             receiptDTOs.setTotalAmount(invoiceDetails.getTotalAmount());
             receiptDTOs.setOutstandingAmount(invoiceDetails.getOutstandingAmount());
             receiptDTOs.setRemarks(invoiceDetails.getRemarks());
@@ -582,7 +608,7 @@ public class InvoiceWiseReportDenormalized {
     @RequestMapping(value = "/invoice-reports-denormalized/dynamic-documents-details/{pid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<DynamicDocumentDTO> getDynamicDocuments(@PathVariable String pid) {
-        List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = invoiceInventoryDetailsRepository.findAllByExecutionPid(pid);
+        List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = invoiceInventoryDetailsRepository.findAllByExecutionPidAndDocumentType(pid, DocumentType.DYNAMIC_DOCUMENT);
              DynamicDocumentDTO documentDTO = new DynamicDocumentDTO();
         for(InvoiceDetailsDenormalized invoiceDetails :invoiceDetailsDenormalized)
         {

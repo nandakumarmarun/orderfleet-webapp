@@ -4,12 +4,17 @@ import com.codahale.metrics.annotation.Timed;
 import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.scheduler.ExternalApiScheduledTasks;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.InvoiceDetailsDenormalizedService;
 import com.orderfleet.webapp.service.util.RandomUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +28,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("/api")
+@Service
 public class InvoiceDetailsToDenormalizedTable {
+
+    private static final Logger log = LoggerFactory.getLogger(InvoiceDetailsToDenormalizedTable.class);
     @Inject
     private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
     @Inject
@@ -49,22 +55,10 @@ public class InvoiceDetailsToDenormalizedTable {
     @Inject
     private InvoiceDetailsDenormalizedRepository invoiceDetailsDenormalizedRepository;
 
-    @RequestMapping(value = "/invoice-to-denormalized", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @Timed
-    public ResponseEntity<HttpStatus> filterExecutiveTaskExecutionsDenormalized(@RequestParam String fromDate, @RequestParam String toDate)
-           {
+    @Transactional
+    public ResponseEntity<HttpStatus> filterExecutiveTaskExecutionsDenormalized(List<ExecutiveTaskExecution> executiveTaskExecutions) {
 
-               DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
-               LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-               LocalDateTime fDate = fromDateTime.atTime(0, 0);
-               LocalDate toDateTime = LocalDate.parse(toDate,formatter);
-               LocalDateTime tDate = toDateTime.atTime(23,59);
-
-             List<ExecutiveTaskExecution> executiveTaskExecutions = executiveTaskExecutionRepository.findAllByCompanyIdAndCreatedDateBetween(fDate,tDate);
-             System.out.println("Size of executions :"+executiveTaskExecutions.size());
-             Set<Long> exeids =  executiveTaskExecutions.stream().map(exe->exe.getId()).collect(Collectors.toSet());
-
+          Set<Long> exeids = executiveTaskExecutions.stream().map(exe->exe.getId()).collect(Collectors.toSet());
             List<InventoryVoucherHeader> inventoryVoucherHeaders = new ArrayList<>();
               if(exeids.size()>0){
                 inventoryVoucherHeaders =  inventoryVoucherHeaderRepository.findAllByExecutiveTaskExecutionIdIn(exeids);
@@ -108,8 +102,10 @@ public class InvoiceDetailsToDenormalizedTable {
                {
                    filledFormDetails = filledFormDetailRepository.findByFilledFormPidIn(filledformPid);
                }
-
-               List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = invoiceDetailsDenormalizedRepository.findAllByCompanyId();
+        LocalDate fDate = LocalDate.now();
+        LocalDateTime fromDate = fDate.atTime(0, 0);
+        LocalDateTime toDate = fDate.atTime(23, 59);
+               List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = invoiceDetailsDenormalizedRepository.findAllByCreatedDateBetween(fromDate,toDate);
                   System.out.println("Size of Invoice:"+invoiceDetailsDenormalized.size());
                   List<InvoiceDetailsDenormalized> invoiceDetailsDenormalizedList = new ArrayList<>();
                 for(ExecutiveTaskExecution executiveTaskExecution :executiveTaskExecutions)
@@ -261,65 +257,65 @@ public class InvoiceDetailsToDenormalizedTable {
                               }
                           }
                       }
-                                     if(dynamicDocumentHeaders.size()>0)
-                                     {
-                                         for(DynamicDocumentHeader dynamicDocumentHeader:dynamicDocumentHeaders)
-                                         {
-                                             if(dynamicDocumentHeader.getExecutiveTaskExecution().getPid().equalsIgnoreCase(executiveTaskExecution.getPid()))
-                                             {
-                                                 for(FilledForm filledForm:filledForms)
-                                                 {
-                                                     if(filledForm.getDynamicDocumentHeader().getPid().equalsIgnoreCase(dynamicDocumentHeader.getPid()))
-                                                     {
-                                                         for(FilledFormDetail filledFormDetail:filledFormDetails)
-                                                         {
-                                                             if(filledFormDetail.getFilledForm().getPid().equalsIgnoreCase(filledForm.getPid()))
-                                                             {
-                                                                 InvoiceDetailsDenormalized invoiceDetails = new InvoiceDetailsDenormalized();
+                      if(dynamicDocumentHeaders.size()>0)
+                      {
+                          for(DynamicDocumentHeader dynamicDocumentHeader:dynamicDocumentHeaders)
+                          {
+                              if(dynamicDocumentHeader.getExecutiveTaskExecution().getPid().equalsIgnoreCase(executiveTaskExecution.getPid()))
+                              {
+                                  for(FilledForm filledForm:filledForms)
+                                  {
+                                      if(filledForm.getDynamicDocumentHeader().getPid().equalsIgnoreCase(dynamicDocumentHeader.getPid()))
+                                      {
+                                          for(FilledFormDetail filledFormDetail:filledFormDetails)
+                                          {
+                                              if(filledFormDetail.getFilledForm().getPid().equalsIgnoreCase(filledForm.getPid()))
+                                              {
+                                                  InvoiceDetailsDenormalized invoiceDetails = new InvoiceDetailsDenormalized();
                                                                  //Execution Data
-                                                                 invoiceDetails.setPid(InvoiceDetailsDenormalizedService.PID_PREFIX + RandomUtil.generatePid());
-                                                                 invoiceDetails.setExecutionPid(executiveTaskExecution.getPid());
-                                                                 invoiceDetails.setAccountProfilePid(executiveTaskExecution.getAccountProfile().getPid());
-                                                                 invoiceDetails.setAccountProfileName(executiveTaskExecution.getAccountProfile().getName());
-                                                                 invoiceDetails.setActivityPid(executiveTaskExecution.getActivity().getPid());
-                                                                 invoiceDetails.setActivityName(executiveTaskExecution.getActivity().getName());
-                                                                 invoiceDetails.setPunchInDate(executiveTaskExecution.getPunchInDate());
-                                                                 invoiceDetails.setSendDate(executiveTaskExecution.getSendDate());
-                                                                 invoiceDetails.setCreatedDate(executiveTaskExecution.getCreatedDate());
-                                                                 invoiceDetails.setLocation(executiveTaskExecution.getLocation());
-                                                                 invoiceDetails.setTowerLocation(executiveTaskExecution.getTowerLocation());
-                                                                 invoiceDetails.setWithCustomer(executiveTaskExecution.getWithCustomer());
-                                                                 invoiceDetails.setLocationType(executiveTaskExecution.getLocationType());
-                                                                 invoiceDetails.setMockLocationStatus(executiveTaskExecution.getMockLocationStatus());
-                                                                 invoiceDetails.setVehicleNumber(executiveTaskExecution.getVehicleNumber());
-                                                                 invoiceDetails.setRemarks(executiveTaskExecution.getRemarks());
-                                                                 invoiceDetails.setUserPid(executiveTaskExecution.getUser().getPid());
-                                                                 invoiceDetails.setUserName(executiveTaskExecution.getUser().getFirstName());
-                                                                 invoiceDetails.setUserId(executiveTaskExecution.getUser().getId());
-                                                                 invoiceDetails.setCompanyPid(executiveTaskExecution.getCompany().getPid());
-                                                                 invoiceDetails.setCompanyName(executiveTaskExecution.getCompany().getLegalName());
-                                                                 invoiceDetails.setAccountTypeName(executiveTaskExecution.getAccountType().getName());
-                                                                 invoiceDetails.setAccountTypePid(executiveTaskExecution.getAccountType().getPid());
-                                                                 invoiceDetails.setDate(executiveTaskExecution.getDate());
-                                                                 invoiceDetails.setCompanyId(executiveTaskExecution.getCompany().getId());
-                                                                 invoiceDetails.setAccountPhNo(executiveTaskExecution.getAccountProfile().getPhone1());
-                                                                 //Dynamic data
-                                                                 invoiceDetails.setDynamicPid(dynamicDocumentHeader.getPid());
-                                                                 invoiceDetails.setDocumentNumberServer(dynamicDocumentHeader.getDocumentNumberServer());
-                                                                 invoiceDetails.setDocumentNumberLocal(dynamicDocumentHeader.getDocumentNumberLocal());
-                                                                 invoiceDetails.setDocumentType(DocumentType.DYNAMIC_DOCUMENT);
-                                                                 invoiceDetails.setEmployeePid(dynamicDocumentHeader.getEmployee().getPid());
-                                                                 invoiceDetails.setEmployeeName(dynamicDocumentHeader.getEmployee().getName());
-                                                                 invoiceDetails.setDocumentName(dynamicDocumentHeader.getDocument().getName());
-                                                                 invoiceDetails.setDocumentPid(dynamicDocumentHeader.getDocument().getPid());
-                                                                 invoiceDetails.setDocumentDate(dynamicDocumentHeader.getDocumentDate());
-                                                                 invoiceDetails.setCreatedBy(dynamicDocumentHeader.getCreatedBy().getFirstName());
-                                                                 invoiceDetails.setFormName(filledForm.getForm().getName());
-                                                                 invoiceDetails.setFormElementPid(filledFormDetail.getFormElement().getPid());
-                                                                 invoiceDetails.setFormElementName(filledFormDetail.getFormElement().getName());
-                                                                 invoiceDetails.setFormElementType(filledFormDetail.getFormElement().getFormElementType().getName());
-                                                                 invoiceDetails.setValue(filledFormDetail.getValue());
-                                                                 invoiceDetailsDenormalizedList.add(invoiceDetails);
+                                                  invoiceDetails.setPid(InvoiceDetailsDenormalizedService.PID_PREFIX + RandomUtil.generatePid());
+                                                  invoiceDetails.setExecutionPid(executiveTaskExecution.getPid());
+                                                  invoiceDetails.setAccountProfilePid(executiveTaskExecution.getAccountProfile().getPid());
+                                                  invoiceDetails.setAccountProfileName(executiveTaskExecution.getAccountProfile().getName());
+                                                  invoiceDetails.setActivityPid(executiveTaskExecution.getActivity().getPid());
+                                                  invoiceDetails.setActivityName(executiveTaskExecution.getActivity().getName());
+                                                  invoiceDetails.setPunchInDate(executiveTaskExecution.getPunchInDate());
+                                                  invoiceDetails.setSendDate(executiveTaskExecution.getSendDate());
+                                                  invoiceDetails.setCreatedDate(executiveTaskExecution.getCreatedDate());
+                                                  invoiceDetails.setLocation(executiveTaskExecution.getLocation());
+                                                  invoiceDetails.setTowerLocation(executiveTaskExecution.getTowerLocation());
+                                                  invoiceDetails.setWithCustomer(executiveTaskExecution.getWithCustomer());
+                                                  invoiceDetails.setLocationType(executiveTaskExecution.getLocationType());
+                                                  invoiceDetails.setMockLocationStatus(executiveTaskExecution.getMockLocationStatus());
+                                                  invoiceDetails.setVehicleNumber(executiveTaskExecution.getVehicleNumber());
+                                                  invoiceDetails.setRemarks(executiveTaskExecution.getRemarks());
+                                                  invoiceDetails.setUserPid(executiveTaskExecution.getUser().getPid());
+                                                  invoiceDetails.setUserName(executiveTaskExecution.getUser().getFirstName());
+                                                  invoiceDetails.setUserId(executiveTaskExecution.getUser().getId());
+                                                  invoiceDetails.setCompanyPid(executiveTaskExecution.getCompany().getPid());
+                                                  invoiceDetails.setCompanyName(executiveTaskExecution.getCompany().getLegalName());
+                                                  invoiceDetails.setAccountTypeName(executiveTaskExecution.getAccountType().getName());
+                                                  invoiceDetails.setAccountTypePid(executiveTaskExecution.getAccountType().getPid());
+                                                  invoiceDetails.setDate(executiveTaskExecution.getDate());
+                                                  invoiceDetails.setCompanyId(executiveTaskExecution.getCompany().getId());
+                                                  invoiceDetails.setAccountPhNo(executiveTaskExecution.getAccountProfile().getPhone1());
+                                                  //Dynamic data
+                                                  invoiceDetails.setDynamicPid(dynamicDocumentHeader.getPid());
+                                                  invoiceDetails.setDocumentNumberServer(dynamicDocumentHeader.getDocumentNumberServer());
+                                                  invoiceDetails.setDocumentNumberLocal(dynamicDocumentHeader.getDocumentNumberLocal());
+                                                  invoiceDetails.setDocumentType(DocumentType.DYNAMIC_DOCUMENT);
+                                                  invoiceDetails.setEmployeePid(dynamicDocumentHeader.getEmployee().getPid());
+                                                  invoiceDetails.setEmployeeName(dynamicDocumentHeader.getEmployee().getName());
+                                                  invoiceDetails.setDocumentName(dynamicDocumentHeader.getDocument().getName());
+                                                  invoiceDetails.setDocumentPid(dynamicDocumentHeader.getDocument().getPid());
+                                                  invoiceDetails.setDocumentDate(dynamicDocumentHeader.getDocumentDate());
+                                                  invoiceDetails.setCreatedBy(dynamicDocumentHeader.getCreatedBy().getFirstName());
+                                                  invoiceDetails.setFormName(filledForm.getForm().getName());
+                                                  invoiceDetails.setFormElementPid(filledFormDetail.getFormElement().getPid());
+                                                  invoiceDetails.setFormElementName(filledFormDetail.getFormElement().getName());
+                                                  invoiceDetails.setFormElementType(filledFormDetail.getFormElement().getFormElementType().getName());
+                                                  invoiceDetails.setValue(filledFormDetail.getValue());
+                                                  invoiceDetailsDenormalizedList.add(invoiceDetails);
                                                              }
                                                          }
                                                      }
@@ -327,10 +323,20 @@ public class InvoiceDetailsToDenormalizedTable {
                                              }
                                          }
                                      }
+                      log.info(" Succesfully Saved to denormalized table");
+                  }
+                  else {
+                      log.info("Already exist....");
                   }
                 }
         invoiceDetailsDenormalizedRepository.save(invoiceDetailsDenormalizedList);
-        System.out.println("Saved to denormalized table");
+
+       for(ExecutiveTaskExecution execution :executiveTaskExecutions)
+       {
+           execution.setInvoiceStatus(true);
+           ExecutiveTaskExecution executiondata = executiveTaskExecutionRepository.save(execution);
+
+       }
                return ResponseEntity.ok(HttpStatus.OK);
            }
 }

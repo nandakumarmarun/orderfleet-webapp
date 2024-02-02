@@ -192,7 +192,7 @@ public interface DynamicDocumentHeaderRepository extends JpaRepository<DynamicDo
 	@Query("select dynamicDocumentHeader from DynamicDocumentHeader dynamicDocumentHeader where dynamicDocumentHeader.company.id = ?#{principal.companyId}  and dynamicDocumentHeader.createdDate between ?1 and ?2 Order By dynamicDocumentHeader.documentDate desc")
 	List<DynamicDocumentHeader> findAllByCompanyIdAndDateBetweenOrderByDocumentDateDesc(
 			LocalDateTime fromDate, LocalDateTime toDate);
-	@Query("select dDocument from DynamicDocumentHeader dDocument  where dDocument.company.id = ?#{principal.companyId} and dDocument.executiveTaskExecution.id IN ?1")
+	@Query("select dDocument from DynamicDocumentHeader dDocument  where dDocument.executiveTaskExecution.id IN ?1")
 	List<DynamicDocumentHeader> findAllByExecutiveTaskExecutionIdIn(Set<Long> exeids);
 
 //	@Query("select dDocument from DynamicDocumentHeader dDocument LEFT JOIN FETCH dDocument.filledForms where dDocument.company.id = ?#{principal.companyId} and dDocument.executiveTaskExecution.pid = ?1")

@@ -189,6 +189,17 @@ public class ExecutiveTaskExecution implements Serializable {
 	@Column(name = "vehicle_Number")
 	private String vehicleNumber;
 
+	@Column(name = "invoice_status", columnDefinition = "boolean DEFAULT 'FALSE'")
+	private boolean invoiceStatus;
+
+	public boolean isInvoiceStatus() {
+		return invoiceStatus;
+	}
+
+	public void setInvoiceStatus(boolean invoiceStatus) {
+		this.invoiceStatus = invoiceStatus;
+	}
+
 	public Long getId() {
 		return id;
 	}

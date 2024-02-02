@@ -86,6 +86,8 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
     private FormRepository formRepository;
     @Inject
     private FormElementRepository formElementRepository;
+    @Inject
+    private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
     @Override
     @Async
     public void SaveExecutivetaskExecutionWithInventory(ExecutiveTaskSubmissionTransactionWrapper executiveTaskSubmissionDTO, User user) {
@@ -117,7 +119,7 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
 
 
         if(inventoryVoucherDTOs != null) {
-            log.info("Request to Save Inventory Details");
+            log.info("Request to Save Inventory Details :"+executionDTO.getId());
             for (InventoryVoucherHeader inventoryVoucher : inventoryVoucherDTOs) {
                 for (InventoryVoucherDetail voucherDetail : inventoryVoucher.getInventoryVoucherDetails()) {
                     InvoiceDetailsDenormalized inventoryDetails = new InvoiceDetailsDenormalized();
@@ -196,7 +198,7 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
             }
         }
         if(accountingVoucherHeaders != null) {
-            log.info("request to save Accounting Details");
+            log.info("request to save Accounting Details :"+executionDTO.getId());
             for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
                 for (AccountingVoucherDetail voucherDetail : accountingVoucherHeader.getAccountingVoucherDetails()) {
                     InvoiceDetailsDenormalized inventoryDetails = new InvoiceDetailsDenormalized();
@@ -278,7 +280,7 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
             }
         }
         if(dynamicDocumentHeaders != null) {
-            log.info("Request to save Dynamic Details");
+            log.info("Request to save Dynamic Details :"+executionDTO.getId());
             for (DynamicDocumentHeader docHeader : dynamicDocumentHeaders) {
                 for (FilledForm filledForm : docHeader.getFilledForms()) {
                     for (FilledFormDetail formDetail : filledForm.getFilledFormDetails()) {
@@ -323,6 +325,9 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
                             if (docHeader.getEmployee() != null) {
                                 inventoryDetails.setEmployeeName(employeeProfile.getName());
                             }
+                            inventoryDetails.setFilledFormPid(filledForm.getPid());
+                            inventoryDetails.setImageRefNo(filledForm.getImageRefNo());
+                            inventoryDetails.setFilledFormId(filledForm.getId());
                             Form form = formRepository.findOneByPid(filledForm.getForm().getPid()).get();
                             inventoryDetails.setFormName(form.getName());
                             FormElement formElement = formElementRepository
@@ -342,5 +347,10 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
 
         invoiceInventoryDetailsRepository.save(inventoryDetailsList);
         log.info("Successfully saved.........................");
+        executiveTaskExecutionRepository.findOneByPid(executionDTO.getPid()).map(exec ->{
+            exec.setInvoiceStatus(true);
+            ExecutiveTaskExecution executiondata = executiveTaskExecutionRepository.save(exec);
+            return executiondata;
+        }).orElse(null);
     }
 }

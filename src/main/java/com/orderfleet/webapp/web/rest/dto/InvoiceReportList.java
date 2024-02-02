@@ -31,6 +31,13 @@ public class InvoiceReportList {
        private String executionPid;
        private String pid;
 
+       private String imagerefNo;
+       private Long filledformId;
+       private boolean imageFound;
+
+       private String dynamicPid;
+      private double documentVolume;
+
 
 
 
@@ -66,6 +73,46 @@ public class InvoiceReportList {
     public InvoiceReportList(ExecutiveTaskExecution execution) {
             this.location = execution.getLocation();
             this.towerLocation= execution.getTowerLocation();
+    }
+
+    public double getDocumentVolume() {
+        return documentVolume;
+    }
+
+    public void setDocumentVolume(double documentVolume) {
+        this.documentVolume = documentVolume;
+    }
+
+    public String getDynamicPid() {
+        return dynamicPid;
+    }
+
+    public void setDynamicPid(String dynamicPid) {
+        this.dynamicPid = dynamicPid;
+    }
+
+    public String getImagerefNo() {
+        return imagerefNo;
+    }
+
+    public void setImagerefNo(String imagerefNo) {
+        this.imagerefNo = imagerefNo;
+    }
+
+    public Long getFilledformId() {
+        return filledformId;
+    }
+
+    public void setFilledformId(Long filledformId) {
+        this.filledformId = filledformId;
+    }
+
+    public boolean isImageFound() {
+        return imageFound;
+    }
+
+    public void setImageFound(boolean imageFound) {
+        this.imageFound = imageFound;
     }
 
     public String getExecutionPid() {

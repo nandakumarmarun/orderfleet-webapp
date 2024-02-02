@@ -636,7 +636,15 @@ public class ExecutiveTaskSubmissionController {
 			}
 			ExecutiveTaskSubmissionTransactionWrapper tsTransactionWrapper = executiveTaskSubmissionService
 					.executiveTaskSubmission(executiveTaskSubmissionDTO);
-
+             try {
+	         if (tsTransactionWrapper != null) {
+	           	log.info("Requset to Save order in denormalized table");
+		      invoiceDetailsDenormalizedService.SaveExecutivetaskExecutionWithInventory(tsTransactionWrapper, user);
+			 }
+            }catch (Exception e)
+            {
+            log.error("Exception in saving denormalized table :"+e.getMessage());
+			}
 			if (tsTransactionWrapper != null) {
 				taskSubmissionResponse = tsTransactionWrapper.getTaskSubmissionResponse();
 				taskSubmissionPostSave.doPostSaveExecutivetaskSubmission(tsTransactionWrapper,
@@ -699,11 +707,7 @@ public class ExecutiveTaskSubmissionController {
 				}
 
 			}
-			if(tsTransactionWrapper != null)
-			{
-				log.info("Requset to Save order in denormalized table");
-        invoiceDetailsDenormalizedService.SaveExecutivetaskExecutionWithInventory(tsTransactionWrapper,user);
-			}
+
 
 			taskSubmissionResponse.setStatus("Success");
 			taskSubmissionResponse.setMessage("Activity submitted successfully...");

@@ -3,14 +3,16 @@ package com.orderfleet.webapp.scheduler;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
+import com.orderfleet.webapp.web.rest.InvoiceDetailsToDenormalizedTable;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +21,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.orderfleet.webapp.config.Constants;
-import com.orderfleet.webapp.domain.Company;
-import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.CompanyIntegrationModule;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
 import com.orderfleet.webapp.repository.CompanyIntegrationModuleRepository;
@@ -47,6 +46,12 @@ public class ExternalApiScheduledTasks {
 	
 	@Inject
 	private CompanyConfigurationRepository companyConfigurationRepository;
+
+	@Inject
+	private ExecutiveTaskExecutionRepository executiveTaskExecutionRepository;
+
+	@Inject
+	private InvoiceDetailsToDenormalizedTable invoiceDetailsToDenormalizedTable;
 	
 	//run on 11pm every day
 	@Scheduled(cron = "0 0 23 * * ?")
@@ -116,4 +121,18 @@ public class ExternalApiScheduledTasks {
 		}
 		}
     }
+	//run on 11pm every day
+	@Scheduled(cron = "0 0 23 * * ?")
+	public void scheduleInvoiceTransferToDenormalized() throws URISyntaxException, IOException, JSONException, ParseException {
+		log.info("Transferring failed Data  to denormalized table");
+		LocalDate fDate = LocalDate.now();
+		LocalDateTime fromDate = fDate.atTime(0, 0);
+		LocalDateTime toDate = fDate.atTime(23, 59);
+		List<ExecutiveTaskExecution> executiveTaskExecutions  = executiveTaskExecutionRepository.findAllExecutiveTaskExecutionByInvoiceStatusFalseAndCreatedDateBetween(fromDate,toDate);
+      if(executiveTaskExecutions.size()>0) {
+		  invoiceDetailsToDenormalizedTable.filterExecutiveTaskExecutionsDenormalized(executiveTaskExecutions);
+	  }
+         log.info("Data successfully Transferred:"+executiveTaskExecutions.size());
+		}
+
 }

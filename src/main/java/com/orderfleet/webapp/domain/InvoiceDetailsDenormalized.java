@@ -206,6 +206,13 @@ public class InvoiceDetailsDenormalized {
     private String accountingPid;
     private String dynamicPid;
 
+    @Column(name = "imageRefNo")
+    private String imageRefNo;
+
+    private String filledFormPid;
+
+    private Long filledFormId;
+
     public InvoiceDetailsDenormalized() {
     }
 
@@ -282,6 +289,30 @@ public class InvoiceDetailsDenormalized {
         this.documentType = documentType;
         this.withCustomer = withCustomer;
         this.userId = userId;
+    }
+
+    public Long getFilledFormId() {
+        return filledFormId;
+    }
+
+    public void setFilledFormId(Long filledFormId) {
+        this.filledFormId = filledFormId;
+    }
+
+    public String getImageRefNo() {
+        return imageRefNo;
+    }
+
+    public void setImageRefNo(String imageRefNo) {
+        this.imageRefNo = imageRefNo;
+    }
+
+    public String getFilledFormPid() {
+        return filledFormPid;
+    }
+
+    public void setFilledFormPid(String filledFormPid) {
+        this.filledFormPid = filledFormPid;
     }
 
     public Long getCompanyId() {

@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -1433,7 +1434,9 @@ public class MasterDataController {
 	}
 
 	private String getResourceLastModified() {
-		return LocalDateTime.now().toString();
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime nowWithoutMillis = now.truncatedTo(ChronoUnit.SECONDS);
+		return nowWithoutMillis.toString();
 	}
 
 	@Timed

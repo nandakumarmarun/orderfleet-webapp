@@ -205,12 +205,12 @@ console.log("Success.....");
 																	+ "</td><td>"
 																	+ withCustomer
 																	+ "</td><td>"
-																	+ (invoiceWiseReport.salesOrderTotalAmount == null ? "" :invoiceWiseReport.salesOrderTotalAmount)
+																	+ (invoiceWiseReport.salesOrderTotalAmount == null ? 0 :invoiceWiseReport.salesOrderTotalAmount)
 																	+ "</td>"
 																	+ "<td>"
-																	+ (invoiceWiseReport.receiptAmount == null ? "" :invoiceWiseReport.receiptAmount)
+																	+ (invoiceWiseReport.receiptAmount == null ? 0 :invoiceWiseReport.receiptAmount)
 																	+ "</td><td>"
-																	+ (invoiceWiseReport.vehicleNumber == null ? ""
+																	+ (invoiceWiseReport.vehicleNumber == null ? "No Vehicle"
 																			: invoiceWiseReport.vehicleNumber)
 																	+ "</td><td>"
 																	+ (invoiceWiseReport.remarks == null ? ""
@@ -219,6 +219,18 @@ console.log("Success.....");
 
 
 
+//
+                                   if (invoiceWiseReport.documentType == "INVENTORY_VOUCHER")
+                                    {
+										transactionAmount += (invoiceWiseReport.documentTotal == null ? 0 : invoiceWiseReport.documentTotal);
+										transactionVolume += (invoiceWiseReport.documentVolume == null ? 0 :invoiceWiseReport.documentVolume);
+									} else if (invoiceWiseReport.documentType == "ACCOUNTING_VOUCHER") {
+										totalPayments += invoiceWiseReport.receiptAmount;
+												}
+
+
+																var dynamicvalue = "";
+																if (invoiceWiseReport.documentType != "DYNAMIC_DOCUMENT") {
 																	$(
 																			'#tBodyInvoiceWiseReport')
 																			.append(
@@ -236,6 +248,34 @@ console.log("Success.....");
 																							+ "\");'>View Details</button>"
 
 																							+ "</td></tr>");
+																} else {
+																	var elmViewImage = "";
+																	if (invoiceWiseReport.imageFound) {
+																		elmViewImage = "<td><button type='button' class='btn btn-blue' onclick='InvoiceWiseReport.showModalPopup($(\"#imagesModal\"),\""
+																				+ invoiceWiseReport.dynamicPid
+																				+ "\",0);'>View Images</button></td>";
+																	}
+																	$(
+																			'#tBodyInvoiceWiseReport')
+																			.append(
+																					"<tr style='background: rgba(225, 225, 225, 0.66);' data-id='"
+																							+ invoiceWiseReport.executionPid
+																							+ "1' data-parent='"
+																							+ invoiceWiseReport.pid
+																							+ "'><td>&nbsp;</td><td colspan='3'>"
+																							+ invoiceWiseReport.documentName
+																							+ "</td><td>"
+																							+ dynamicvalue
+																							+ "</td><td><button type='button' class='btn btn-white' onclick='InvoiceWiseReport.viewDetails(\""
+																							+ invoiceWiseReport.executionPid
+																							+ "\",\""
+																							+ invoiceWiseReport.documentType
+																							+ "\");'>View Details</button>"
+
+																							+ "</td>"
+																							+ elmViewImage
+																							+ "</tr>");
+																}
 
 
 										});
@@ -418,7 +458,52 @@ console.log("Success.....");
 		}
 		el.modal('show');
 	}
+function showDynamicDocumentImages(pid) {
+		$('#divInvoiceWiseReportImages')
+				.html(
+						'<img src="/resources/assets/images/content-ajax-loader.gif" style="display: block; margin: auto;">');
+		$
+				.ajax({
+					url : location.protocol + '//' + location.host
+							+ "/web/dynamic-documents/images/" + pid,
+					type : 'GET',
+					success : function(filledFormFiles) {
+						$('#divInvoiceWiseReportImages').html("");
+						if (filledFormFiles.length == 0) {
+							var table = '<table class="table  table-striped table-bordered"><tr><td style="font-weight: bold;">Image Not Found</td></tr></table>';
+							$('#divInvoiceWiseReportImages').append(table);
+						}
+						$
+								.each(
+										filledFormFiles,
+										function(index, filledFormFile) {
 
+											var table = '<table class="table  table-striped table-bordered"><tr><td style="font-weight: bold;">'
+													+ filledFormFile.formName
+													+ '</td></tr>';
+											$
+													.each(
+															filledFormFile.files,
+															function(index,
+																	file) {
+																table += '<tr><th>'
+																		+ file.fileName
+																		+ '</th></tr>';
+																table += '<tr><td><img width="100%" src="data:image/png;base64,'
+																		+ file.content
+																		+ '"/></td></tr>';
+															});
+											table += '</table>';
+											$('#divInvoiceWiseReportImages')
+													.append(table);
+
+										});
+					},
+					error : function(xhr, error) {
+						onError(xhr, error);
+					}
+				});
+	}
 	function showInventoryVoucher(pid) {
 	console.log("Pid :"+pid)
 		$
@@ -528,7 +613,7 @@ console.log("Success.....");
 								(data.documentName == null ? ""
 										: data.documentName));
 						$('#lbl_createdDateAc').text(
-								formatDate(data.documentDate,
+								formatDate(data.createdDate,
 										'MMM DD YYYY, h:mm:ss a'));
 						$('#lbl_totalAmountAc').text(
 								(data.totalAmount == null ? ""
@@ -627,8 +712,8 @@ console.log("Success.....");
 								(data.accountName == null ? ""
 										: data.accountName));
 						$('#lbl_accountph').text(
-								(data.accountPhNo == null ? ""
-										: data.accountPhNo));
+								(data.accountPhone == null ? ""
+										: data.accountPhone));
 						$('#lbl_document').text(
 								(data.documentName == null ? ""
 										: data.documentName));

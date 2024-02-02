@@ -19,7 +19,7 @@ public class ReceiptDTOs {
 
     private String accountProfileName;
     private String userName;
-    private LocalDateTime documentDate;
+    private LocalDateTime createdDate;
 
     private double totalAmount;
     private double outstandingAmount;
@@ -32,7 +32,7 @@ public class ReceiptDTOs {
     public ReceiptDTOs() {
     }
 
-    public ReceiptDTOs(List<AccountingData> accountingData, String pid, String executionPid, String accountingPid, String documentPid, String documentName, long documentId, String accountProfileName, String userName, LocalDateTime documentDate, double totalAmount, double outstandingAmount, String documentNumberServer, String remarks) {
+    public ReceiptDTOs(List<AccountingData> accountingData, String pid, String executionPid, String accountingPid, String documentPid, String documentName, long documentId, String accountProfileName, String userName, LocalDateTime createdDate, double totalAmount, double outstandingAmount, String documentNumberServer, String remarks) {
         this.accountingData = accountingData;
         this.pid = pid;
         this.executionPid = executionPid;
@@ -42,7 +42,7 @@ public class ReceiptDTOs {
         this.documentId = documentId;
         this.accountProfileName = accountProfileName;
         this.userName = userName;
-        this.documentDate = documentDate;
+        this.createdDate = createdDate;
         this.totalAmount = totalAmount;
         this.outstandingAmount = outstandingAmount;
         this.documentNumberServer = documentNumberServer;
@@ -121,12 +121,12 @@ public class ReceiptDTOs {
         this.userName = userName;
     }
 
-    public LocalDateTime getDocumentDate() {
-        return documentDate;
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
     }
 
-    public void setDocumentDate(LocalDateTime documentDate) {
-        this.documentDate = documentDate;
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
     }
 
     public double getTotalAmount() {
