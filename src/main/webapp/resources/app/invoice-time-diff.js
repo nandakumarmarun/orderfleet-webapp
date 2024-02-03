@@ -38,6 +38,15 @@ if (!this.InvoiceTimeDiff) {
 	};
 
 	$(document).ready(function() {
+
+	$('#downloadXls').on('click', function() {
+            			var tblSale = $("#tblInvoiceWiseReport tbody");
+            			if (tblSale.children().length == 0) {
+            				alert("no values available");
+            				return;
+            			}
+            			downloadXls();
+            		});
 		
 		let filterBy = getParameterByName('filterBy');
 		if (filterBy) {
@@ -48,7 +57,14 @@ if (!this.InvoiceTimeDiff) {
 		$('.selectpicker').selectpicker();
 	});
 
-	
+	function downloadXls() {
+    		// Avoid last column in each row
+    //		$("#tblVerifyAccountProfile th:last-child, #tblVerifyAccountProfile td:last-child").hide();
+    		var excelName = "TransactionREport";
+    		var table2excel = new Table2Excel();
+    		    table2excel.export(document.getElementById('tblInvoiceWiseReport'),excelName);
+    		$("#tblInvoiceWiseReport th:last-child, #tblInvoiceWiseReport td:last-child").show();
+    	}
 
 	InvoiceTimeDiff.filter = function() {
 		if ($('#dbDateSearch').val() == "SINGLE") {

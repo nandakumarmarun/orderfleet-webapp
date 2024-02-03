@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.web.rest.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -40,34 +43,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.AccountingVoucherHeader;
-import com.orderfleet.webapp.domain.Activity;
-import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.EmployeeProfile;
-import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
-import com.orderfleet.webapp.domain.InventoryVoucherHeader;
-import com.orderfleet.webapp.domain.Location;
-import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.UserActivity;
 import com.orderfleet.webapp.domain.enums.AccountStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.geolocation.api.GeoLocationService;
 import com.orderfleet.webapp.geolocation.model.TowerLocation;
-import com.orderfleet.webapp.repository.AccountProfileRepository;
-import com.orderfleet.webapp.repository.AccountingVoucherHeaderRepository;
-import com.orderfleet.webapp.repository.CompanyConfigurationRepository;
-import com.orderfleet.webapp.repository.DashboardUserRepository;
-import com.orderfleet.webapp.repository.DynamicDocumentHeaderRepository;
-import com.orderfleet.webapp.repository.EmployeeProfileRepository;
-import com.orderfleet.webapp.repository.ExecutiveTaskExecutionRepository;
-import com.orderfleet.webapp.repository.FilledFormRepository;
-import com.orderfleet.webapp.repository.InventoryVoucherHeaderRepository;
-import com.orderfleet.webapp.repository.LocationRepository;
-import com.orderfleet.webapp.repository.UserActivityRepository;
-import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.AccountProfileService;
 import com.orderfleet.webapp.service.AccountTypeService;
@@ -81,14 +62,6 @@ import com.orderfleet.webapp.service.LocationService;
 import com.orderfleet.webapp.service.PriceLevelService;
 import com.orderfleet.webapp.service.UserActivityService;
 import com.orderfleet.webapp.service.UserDocumentService;
-import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
-import com.orderfleet.webapp.web.rest.dto.ActivityDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
-import com.orderfleet.webapp.web.rest.dto.DocumentFormDTO;
-import com.orderfleet.webapp.web.rest.dto.DynamicDocumentHeaderDTO;
-import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportDetailView;
-import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
-import com.orderfleet.webapp.web.rest.dto.LocationDTO;
 import com.orderfleet.webapp.web.rest.util.HeaderUtil;
 
 /**
@@ -182,6 +155,9 @@ public class InvoiceWiseLocationReportResource {
 
 	@Inject
 	private LocationRepository locationRepository;
+
+	@Inject
+	private InvoiceDetailsDenormalizedRepository invoiceDetailsDenormalizedRepository;
 
 	/**
 	 * GET /invoice-wise-location-reports : get all the executive task executions.
@@ -792,187 +768,6 @@ public class InvoiceWiseLocationReportResource {
 
 	}
 
-	// private List<InvoiceWiseReportView> getFilterData1(String
-	// employeePid,
-	// String documentPid, String activityPid,
-	// String accountPid, LocalDate fDate, LocalDate tDate) {
-	//
-	// String userPid = "no";
-	// if (!employeePid.equals("no") && !employeePid.equals("Dashboard
-	// Employee")) {
-	// Optional<EmployeeProfileDTO> opEmployee =
-	// employeeProfileService.findOneByPid(employeePid);
-	// if (opEmployee.isPresent()) {
-	// userPid = opEmployee.get().getUserPid();
-	// }
-	// }
-	//
-	// List<Long> userIds = getUserIdsUnderCurrentUser(employeePid);
-	//
-	// LocalDateTime fromDate = fDate.atTime(0, 0);
-	// LocalDateTime toDate = tDate.atTime(23, 59);
-	// List<ExecutiveTaskExecution> executiveTaskExecutions = new ArrayList<>();
-	// if (userPid.equals("no") && activityPid.equals("no") &&
-	// accountPid.equals("no")) {
-	//
-	// // user under current user
-	// if (userIds.isEmpty()) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdAndDateBetweenOrderByDateDesc(fromDate, toDate);
-	// } else {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByUserIdInAndDateBetweenOrderByDateDesc(userIds, fromDate,
-	// toDate);
-	// }
-	// } else if (!userPid.equals("no") && !activityPid.equals("no") &&
-	// !accountPid.equals("no")) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdUserPidActivityPidAccountPidAndDateBetweenOrderByDateDesc(userPid,
-	// activityPid,
-	// accountPid, fromDate, toDate);
-	// } else if (!userPid.equals("no") && activityPid.equals("no") &&
-	// accountPid.equals("no")) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdUserPidAndDateBetweenOrderByDateDesc(userPid,
-	// fromDate,
-	// toDate);
-	//
-	// } else if (!activityPid.equals("no") && userPid.equals("no") &&
-	// accountPid.equals("no")) {
-	// // user under current user
-	// if (userIds.isEmpty()) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdActivityPidAndDateBetweenOrderByDateDesc(activityPid,
-	// fromDate, toDate);
-	// } else {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByUserIdInActivityPidAndDateBetweenOrderByDateDesc(userIds,
-	// activityPid, fromDate,
-	// toDate);
-	// }
-	// } else if (!accountPid.equals("no") && userPid.equals("no") &&
-	// activityPid.equals("no")) {
-	// // user under current user
-	// if (userIds.isEmpty()) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdAccountPidAndDateBetweenOrderByDateDesc(accountPid,
-	// fromDate, toDate);
-	// } else {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByUserIdInAccountPidAndDateBetweenOrderByDateDesc(userIds,
-	// accountPid, fromDate,
-	// toDate);
-	// }
-	// } else if (!userPid.equals("no") && !activityPid.equals("no") &&
-	// accountPid.equals("no")) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdUserPidActivityPidAndDateBetweenOrderByDateDesc(userPid,
-	// activityPid, fromDate,
-	// toDate);
-	// } else if (!userPid.equals("no") && !accountPid.equals("no") &&
-	// activityPid.equals("no")) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdUserPidAccountPidAndDateBetweenOrderByDateDesc(userPid,
-	// accountPid, fromDate,
-	// toDate);
-	// } else if (!accountPid.equals("no") && !activityPid.equals("no") &&
-	// userPid.equals("no")) {
-	// // user under current user
-	// if (userIds.isEmpty()) {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByCompanyIdActivityPidAccountPidAndDateBetweenOrderByDateDesc(activityPid,
-	// accountPid,
-	// fromDate, toDate);
-	// } else {
-	// executiveTaskExecutions = executiveTaskExecutionRepository
-	// .findAllByUserIdInActivityPidAccountPidAndDateBetweenOrderByDateDesc(userIds,
-	// activityPid,
-	// accountPid, fromDate, toDate);
-	// }
-	// }
-	// List<InvoiceWiseReportView> invoiceWiseReportViews = new
-	// ArrayList<>();
-	// for (ExecutiveTaskExecution executiveTaskExecution :
-	// executiveTaskExecutions)
-	// {
-	// InvoiceWiseReportView invoiceWiseReportView = new
-	// InvoiceWiseReportView(
-	// executiveTaskExecution);
-	// EmployeeProfileDTO employeeProfileDTO = employeeProfileService
-	// .findEmployeeProfileByUserLogin(executiveTaskExecution.getUser().getLogin());
-	// if (employeeProfileDTO != null) {
-	// invoiceWiseReportView.setEmployeeName(employeeProfileDTO.getName());
-	// String timeSpend = findTimeSpend(executiveTaskExecution.getStartTime(),
-	// executiveTaskExecution.getEndTime());
-	// invoiceWiseReportView.setTimeSpend(timeSpend);
-	// List<InvoiceWiseReportDetailView> executiveTaskExecutionDetailViews
-	// =
-	// new ArrayList<InvoiceWiseReportDetailView>();
-	// List<Object[]> inventoryVouchers = new ArrayList<>();
-	// if (documentPid.equals("no")) {
-	// inventoryVouchers = inventoryVoucherHeaderRepository
-	// .findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
-	// } else {
-	// inventoryVouchers = inventoryVoucherHeaderRepository
-	// .findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(),
-	// documentPid);
-	// }
-	// for (Object[] obj : inventoryVouchers) {
-	// InvoiceWiseReportDetailView executiveTaskExecutionDetailView = new
-	// InvoiceWiseReportDetailView(
-	// obj[0].toString(), obj[1].toString(), Double.valueOf(obj[2].toString()),
-	// obj[3].toString());
-	// executiveTaskExecutionDetailView.setDocumentVolume(Double.valueOf(obj[4].toString()));
-	// executiveTaskExecutionDetailViews.add(executiveTaskExecutionDetailView);
-	// }
-	//
-	// List<Object[]> accountingVouchers = new ArrayList<>();
-	// if (documentPid.equals("no")) {
-	// accountingVouchers = accountingVoucherHeaderRepository
-	// .findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
-	// } else {
-	// accountingVouchers = accountingVoucherHeaderRepository
-	// .findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(),
-	// documentPid);
-	// }
-	// for (Object[] obj : accountingVouchers) {
-	// executiveTaskExecutionDetailViews.add(new
-	// InvoiceWiseReportDetailView(obj[0].toString(),
-	// obj[1].toString(), Double.valueOf(obj[2].toString()),
-	// obj[3].toString()));
-	// }
-	//
-	// List<Object[]> dynamicDocuments = new ArrayList<>();
-	// if (documentPid.equals("no")) {
-	// dynamicDocuments = dynamicDocumentHeaderRepository
-	// .findByExecutiveTaskExecutionId(executiveTaskExecution.getId());
-	// } else {
-	// dynamicDocuments = dynamicDocumentHeaderRepository
-	// .findByExecutiveTaskExecutionIdAndDocumentPid(executiveTaskExecution.getId(),
-	// documentPid);
-	// }
-	// for (Object[] obj : dynamicDocuments) {
-	// boolean imageFound = false;
-	// // check image saved
-	// if (filledFormRepository.existsByHeaderPidIfFiles(obj[0].toString())) {
-	// imageFound = true;
-	// }
-	// executiveTaskExecutionDetailViews.add(new
-	// InvoiceWiseReportDetailView(obj[0].toString(),
-	// obj[1].toString(), obj[2].toString(), imageFound));
-	// }
-	// // if condition for document wise filter
-	// if (!documentPid.equals("no") &&
-	// executiveTaskExecutionDetailViews.isEmpty())
-	// {
-	// } else {
-	// invoiceWiseReportView.setInvoiceWiseReportDetailViews(executiveTaskExecutionDetailViews);
-	// invoiceWiseReportViews.add(invoiceWiseReportView);
-	// }
-	// }
-	// }
-	// return invoiceWiseReportViews;
-	// }
 
 	private List<Long> getUserIdsUnderCurrentUser(String employeePid, boolean inclSubordinate) {
 		List<Long> userIds = Collections.emptyList();
@@ -1395,12 +1190,12 @@ public class InvoiceWiseLocationReportResource {
 	@ResponseBody
 	@Timed
 	@Transactional(readOnly = true)
-	public ResponseEntity<List<AccountProfile>> filterSkippedCustomers(
+	public ResponseEntity<List<SkippedAccountDTO>> filterSkippedCustomers(
 			@RequestParam("documentPid") String documentPid, @RequestParam("employeePid") String employeePid,
 			@RequestParam("activityPid") String activityPid, @RequestParam("locationPid") String locationPid,
 			@RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
 			@RequestParam boolean inclSubordinate) {
-		List<AccountProfile> accountProfile = new ArrayList<>();
+		List<SkippedAccountDTO> accountProfile = new ArrayList<>();
 		if (filterBy.equals("TODAY")) {
 			accountProfile = getSkippedData(employeePid, documentPid, activityPid, locationPid, LocalDate.now(),
 					LocalDate.now(), inclSubordinate);
@@ -1432,12 +1227,12 @@ public class InvoiceWiseLocationReportResource {
 		return new ResponseEntity<>(accountProfile, HttpStatus.OK);
 	}
 
-	private List<AccountProfile> getSkippedData(String employeePid, String documentPid, String activityPid,
+	private List<SkippedAccountDTO> getSkippedData(String employeePid, String documentPid, String activityPid,
 			String locationPid, LocalDate fDate, LocalDate tDate, boolean inclSubordinate) {
 		// TODO Auto-generated method stub
 		LocalDateTime fromDate = fDate.atTime(0, 0);
 		LocalDateTime toDate = tDate.atTime(23, 59);
-
+		Optional<Location> location = locationRepository.findOneByPid(locationPid);
 		List<String> activityPids;
 		List<String> locationPids;
 		List<String> accountProfilePids;
@@ -1465,15 +1260,15 @@ public class InvoiceWiseLocationReportResource {
 
 			accountProfilePids = accountProfiles.stream().map(AccountProfileDTO::getPid).collect(Collectors.toList());
 			
-			
+			List<InvoiceDetailsDenormalized> invoiceDetails = new ArrayList<>();
 
 			if (accountProfilePids.size() > 0) {
 
-				executiveTaskExecutions = executiveTaskExecutionRepository
+				invoiceDetails = invoiceDetailsDenormalizedRepository
 						.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids,
 								userIds, accountProfilePids);
 			}
-			List<String> accountPid = executiveTaskExecutions.stream().map(data ->data.getAccountProfile().getPid()).collect(Collectors.toList());
+			List<String> accountPid = invoiceDetails.stream().map(data ->data.getAccountProfilePid()).collect(Collectors.toList());
 			
 			
 			
@@ -1483,8 +1278,23 @@ public class InvoiceWiseLocationReportResource {
 			
 			
 			List<AccountProfile> accounts =accountProfileRepository.findAllByAccountProfilePids(skippedList);
+			List<SkippedAccountDTO> skippedAccountDTOList =  new ArrayList<>();
+			for(AccountProfile account :accounts)
+			{
+				SkippedAccountDTO accountDTO= new SkippedAccountDTO();
+				accountDTO.setAccountType(account.getAccountType().getName());
+				accountDTO.setLocation(location.get().getName());
+				accountDTO.setAccountProfileName(account.getName());
+				accountDTO.setAddress(account.getAddress());
+				accountDTO.setGeotagLocation(account.getLocation());
+				accountDTO.setClosingBalance(account.getClosingBalance());
+				accountDTO.setDistrict(account.getDistrictName());
+				accountDTO.setPhoneNo(account.getPhone1());
+				accountDTO.setEmail(account.getEmail1());
+				skippedAccountDTOList.add(accountDTO);
+			}
 			
 		
-			return accounts;
+			return skippedAccountDTOList;
 	}
 }

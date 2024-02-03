@@ -1,5 +1,6 @@
 package com.orderfleet.webapp.repository;
 
+import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
 import com.orderfleet.webapp.domain.InvoiceDetailsDenormalized;
 import com.orderfleet.webapp.domain.enums.DocumentType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +17,7 @@ public interface InvoiceDetailsDenormalizedRepository extends JpaRepository<Invo
     List<InvoiceDetailsDenormalized> findAllByCompanyId();
     @Query("select invoiceDetails from InvoiceDetailsDenormalized invoiceDetails where invoiceDetails.companyId = ?#{principal.companyId} and invoiceDetails.createdDate between ?1 and ?2 and invoiceDetails.activityPid in ?3 and invoiceDetails.userId in ?4 and invoiceDetails.documentPid in ?5 Order By invoiceDetails.createdDate desc")
     List<InvoiceDetailsDenormalized> getByCreatedDateBetweenAndActivityPidInAndUserIdInAndDocumentPidIn(LocalDateTime fromDate, LocalDateTime toDate, List<String> activityPids, List<Long> userIds,List<String> docPids);
-    @Query("select invoiceDetails from InvoiceDetailsDenormalized invoiceDetails where invoiceDetails.companyId = ?#{principal.companyId} and invoiceDetails.createdDate between ?1 and ?2 and invoiceDetails.activityPid in ?3 and invoiceDetails.userId in ?4 and invoiceDetails.accountProfilePid in ?5 Order By invoiceDetails.createdDate desc")
+    @Query("select invoiceDetails from InvoiceDetailsDenormalized invoiceDetails where invoiceDetails.companyId = ?#{principal.companyId} and invoiceDetails.createdDate between ?1 and ?2 and invoiceDetails.activityPid in ?3 and invoiceDetails.userId in ?4 and invoiceDetails.accountProfilePid in ?5 and invoiceDetails.documentPid in ?6 Order By invoiceDetails.createdDate desc")
     List<InvoiceDetailsDenormalized> getByCreatedDateBetweenAndActivityPidInAndUserIdInAndAccountPidInAndDocumentPidIn(LocalDateTime fromDate, LocalDateTime toDate, List<String> activityPids, List<Long> userIds, List<String> accountProfilePids,List<String> docpids);
     @Query("select invoiceDetails from InvoiceDetailsDenormalized invoiceDetails where invoiceDetails.companyId  = ?#{principal.companyId} and invoiceDetails.executionPid = ?1")
     List<InvoiceDetailsDenormalized> findAllByExecutionPid(String pid);
@@ -33,4 +34,7 @@ public interface InvoiceDetailsDenormalizedRepository extends JpaRepository<Invo
 
     @Query("select invoiceDetails from InvoiceDetailsDenormalized invoiceDetails where invoiceDetails.companyId  = ?#{principal.companyId} and invoiceDetails.executionPid = ?1 and invoiceDetails.documentType = ?2")
     List<InvoiceDetailsDenormalized> findAllByExecutionPidAndDocumentType(String pid, DocumentType docType);
+    @Query("select invoiceDetails from InvoiceDetailsDenormalized invoiceDetails where invoiceDetails.companyId = ?#{principal.companyId} and invoiceDetails.createdDate between ?1 and ?2 and invoiceDetails.activityPid in ?3 and invoiceDetails.userId in ?4 and invoiceDetails.accountProfilePid in ?5 Order By invoiceDetails.createdDate desc")
+
+    List<InvoiceDetailsDenormalized> getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(LocalDateTime fromDate, LocalDateTime toDate, List<String> activityPids, List<Long> userIds, List<String> accountProfilePids);
 }

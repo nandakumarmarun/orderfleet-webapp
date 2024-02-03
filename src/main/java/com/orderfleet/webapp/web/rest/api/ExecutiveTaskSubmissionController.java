@@ -638,7 +638,7 @@ public class ExecutiveTaskSubmissionController {
 					.executiveTaskSubmission(executiveTaskSubmissionDTO);
              try {
 	         if (tsTransactionWrapper != null) {
-	           	log.info("Requset to Save order in denormalized table");
+	           	log.info("Request to Save order in denormalized table :"+company.getLegalName());
 		      invoiceDetailsDenormalizedService.SaveExecutivetaskExecutionWithInventory(tsTransactionWrapper, user);
 			 }
             }catch (Exception e)

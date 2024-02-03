@@ -142,13 +142,17 @@
 									</div>
 								</div>
 							</div>
-							<div class="input-group col-sm-2">
+							<div class="input-group col-sm-6">
 								<div class="col-sm-3">
 									<br />
 									<button type="button" class="btn btn-info entypo-search"
 										style="font-size: 18px" onclick="InvoiceTimeDiff.filter()"
 										title="Apply"></button>
 								</div>
+								<br>
+                                	 <div class="col-sm-3">
+                                         	<button type="button" class="btn btn-success" id="downloadXls">Download</button>
+                                               	</div>
 
 							</div>
 						</div>
@@ -205,6 +209,13 @@
 
 	<spring:url value="/resources/assets/js/moment.js" var="momentJs"></spring:url>
 	<script type="text/javascript" src="${momentJs}"></script>
+	<spring:url value="/resources/assets/js/tableexport/xlsx.core.min.js"
+        		var="jsXlsx"></spring:url>
+        	<spring:url value="/resources/assets/js/tableexport/FileSaver.min.js"
+        		var="fileSaver"></spring:url>
+    <spring:url value="/resources/assets/js/table2excel.js"
+    		var="table2excel"></spring:url>
+    	<script type="text/javascript" src="${table2excel}"></script>
 
 	<script type="text/javascript">
 

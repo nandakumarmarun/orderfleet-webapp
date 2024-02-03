@@ -91,7 +91,7 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
     @Override
     @Async
     public void SaveExecutivetaskExecutionWithInventory(ExecutiveTaskSubmissionTransactionWrapper executiveTaskSubmissionDTO, User user) {
-       log.info("Enter here to save inventory invoice Details................");
+       log.info("Enter here to save invoice Details................:"+user.getFirstName() +" "+user.getCompany().getLegalName());
         Company company = user.getCompany();
         EmployeeProfile employeeProfile = employeeProfileRepository.findEmployeeProfileByUser(user);
         List<InventoryVoucherHeader> inventoryVoucherDTOs = executiveTaskSubmissionDTO.getInventoryVouchers();
@@ -119,7 +119,7 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
 
 
         if(inventoryVoucherDTOs != null) {
-            log.info("Request to Save Inventory Details :"+executionDTO.getId());
+            log.info("Request to Save Inventory Details :"+company.getLegalName());
             for (InventoryVoucherHeader inventoryVoucher : inventoryVoucherDTOs) {
                 for (InventoryVoucherDetail voucherDetail : inventoryVoucher.getInventoryVoucherDetails()) {
                     InvoiceDetailsDenormalized inventoryDetails = new InvoiceDetailsDenormalized();
@@ -196,9 +196,10 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
                     inventoryDetailsList.add(inventoryDetails);
                 }
             }
+            log.info("Enter the Inventory Details To Denormalized Table");
         }
         if(accountingVoucherHeaders != null) {
-            log.info("request to save Accounting Details :"+executionDTO.getId());
+            log.info("Request to save Accounting Details :"+company.getLegalName());
             for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
                 for (AccountingVoucherDetail voucherDetail : accountingVoucherHeader.getAccountingVoucherDetails()) {
                     InvoiceDetailsDenormalized inventoryDetails = new InvoiceDetailsDenormalized();
@@ -278,9 +279,10 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
                     inventoryDetailsList.add(inventoryDetails);
                 }
             }
+            log.info("Enter the accounting Details to Denormalized table");
         }
         if(dynamicDocumentHeaders != null) {
-            log.info("Request to save Dynamic Details :"+executionDTO.getId());
+            log.info("Request to save Dynamic Details :"+company.getLegalName());
             for (DynamicDocumentHeader docHeader : dynamicDocumentHeaders) {
                 for (FilledForm filledForm : docHeader.getFilledForms()) {
                     for (FilledFormDetail formDetail : filledForm.getFilledFormDetails()) {
@@ -343,13 +345,15 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
                         }
                     }
                 }
+            log.info("Enter Dynamic Details to the Denormalized Table");
             }
 
         invoiceInventoryDetailsRepository.save(inventoryDetailsList);
-        log.info("Successfully saved.........................");
+        log.info("Successfully saved order details.........................");
         executiveTaskExecutionRepository.findOneByPid(executionDTO.getPid()).map(exec ->{
             exec.setInvoiceStatus(true);
             ExecutiveTaskExecution executiondata = executiveTaskExecutionRepository.save(exec);
+            log.info("Save The status to execution table :"+ executiondata.isInvoiceStatus());
             return executiondata;
         }).orElse(null);
     }
