@@ -121,8 +121,8 @@ public class ExternalApiScheduledTasks {
 		}
 		}
     }
-	//run on 11pm every day
-	@Scheduled(cron = "0 0 23 * * ?")
+	//run on 11:59 pm every day
+	@Scheduled(cron = "0 59 23 * * * ")
 	public void scheduleInvoiceTransferToDenormalized() throws URISyntaxException, IOException, JSONException, ParseException {
 		log.info("Transferring failed Data  to denormalized table");
 		LocalDate fDate = LocalDate.now();

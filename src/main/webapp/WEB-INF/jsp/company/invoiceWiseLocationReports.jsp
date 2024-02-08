@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../fragments/m_head.jsp"></jsp:include>
-<title>SalesNrich | Invoice Wise Location Reports</title>
+<title>SalesNrich | Skipped Customers</title>
 <spring:url value="/resources/assets/css/jquery-ui.css"
 	var="jqueryUiCss"></spring:url>
 <link href="${jqueryUiCss}" rel="stylesheet">
@@ -26,7 +26,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Activities\Transactions (Location Wise)</h2>
+			<h2>Skipped Customers</h2>
 			<div class="clearfix"></div>
 			<hr />
 			<div class="row">

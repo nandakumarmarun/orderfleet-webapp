@@ -334,7 +334,7 @@ public class InvoiceDetailsToDenormalizedTable {
        for(ExecutiveTaskExecution execution :executiveTaskExecutions)
        {
            execution.setInvoiceStatus(true);
-           ExecutiveTaskExecution executiondata = executiveTaskExecutionRepository.save(execution);
+           executiveTaskExecutionRepository.save(execution);
 
        }
                return ResponseEntity.ok(HttpStatus.OK);
