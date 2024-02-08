@@ -210,7 +210,7 @@ public class UserDeviceDTO {
 				+ userLoginName + ", userPid=" + userPid + ", userFirstName=" + userFirstName + ", userPhone="
 				+ userPhone + ", createdDate=" + createdDate + ", activated=" + activated + ", lastModifiedDate="
 				+ lastModifiedDate + ", lastAcessedLogin=" + lastAcessedLogin + ", lastAcessedDeviceKey="
-				+ lastAcessedDeviceKey + "]";
+				+ lastAcessedDeviceKey + ", employeeName=" + employeeName +"]";
 	}
 
 }

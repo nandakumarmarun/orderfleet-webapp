@@ -42,6 +42,7 @@
 			<table class="table  table-striped table-bordered">
 				<thead>
 					<tr>
+					    <th>Employee Name</th>
 						<th>First Name</th>
 						<th>Login name</th>
 						<th>Actions</th>
@@ -51,6 +52,7 @@
 					<c:forEach items="${userDevices}" var="userDevice"
 						varStatus="loopStatus">
 						<tr class="${loopStatus.index % 2 == 0 ? 'odd' : 'even'}">
+						    <td>${userDevice.employeeName}</td>
 							<td>${userDevice.userFirstName}</td>
 							<td>${userDevice.userLoginName}</td>
 							<td>

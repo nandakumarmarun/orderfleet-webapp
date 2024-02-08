@@ -41,13 +41,13 @@
 
 					<button type="button" class="btn btn-orange" id="btnDownload"
 						title="download xlsx">
-						<i class="entypo-download"></i> download
+						<i class="entypo-download"></i> Download
 					</button>
 
 					<button type="button" class="btn btn-info"
 						onclick="$(this).next('input').val('');$('#ofModalSearch').modal('show', {backdrop: 'static'});"
 						title="filter">
-						<i class="glyphicon glyphicon-filter"></i> filter
+						<i class="glyphicon glyphicon-filter"></i> Filter
 					</button>
 				</div>
 
