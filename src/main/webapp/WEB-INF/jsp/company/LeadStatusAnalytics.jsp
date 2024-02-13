@@ -26,7 +26,7 @@
 		<div class="main-content">
 			<jsp:include page="../fragments/m_header_main.jsp"></jsp:include>
 			<hr />
-			<h2>Invoice with LeadStatus </h2>
+			<h2>LeadStatus </h2>
 			<div class="clearfix"></div>
 			<hr />
 			<div class="row">

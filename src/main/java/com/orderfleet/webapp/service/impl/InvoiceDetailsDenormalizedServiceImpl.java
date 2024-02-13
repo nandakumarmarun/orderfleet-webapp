@@ -1,17 +1,11 @@
 package com.orderfleet.webapp.service.impl;
 
 import com.orderfleet.webapp.domain.*;
-import com.orderfleet.webapp.domain.enums.ActivityStatus;
-import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
-import com.orderfleet.webapp.domain.enums.LocationType;
 import com.orderfleet.webapp.repository.*;
 import com.orderfleet.webapp.service.InvoiceDetailsDenormalizedService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionTransactionWrapper;
-import com.orderfleet.webapp.web.rest.dto.ExecutiveTaskExecutionDTO;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherDetailDTO;
-import com.orderfleet.webapp.web.rest.dto.InventoryVoucherHeaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -19,14 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -349,12 +336,10 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
             }
 
         invoiceInventoryDetailsRepository.save(inventoryDetailsList);
-        log.info("Successfully saved order details.........................");
-        executiveTaskExecutionRepository.findOneByPid(executionDTO.getPid()).map(exec ->{
-            exec.setInvoiceStatus(true);
-            ExecutiveTaskExecution executiondata = executiveTaskExecutionRepository.save(exec);
-            log.info("Save The status to execution table :"+ executiondata.isInvoiceStatus());
-            return executiondata;
-        }).orElse(null);
+        log.info("Successfully saved order details.........................:"+executionDTO.getPid());
+        Optional<ExecutiveTaskExecution> executionData = executiveTaskExecutionRepository.findOneByPid(executionDTO.getPid());
+            executionData.get().setInvoiceStatus(true);
+        executiveTaskExecutionRepository.save(executionData.get());
+        log.info("Save The status to execution table :"+ executionData.get().isInvoiceStatus());
     }
 }

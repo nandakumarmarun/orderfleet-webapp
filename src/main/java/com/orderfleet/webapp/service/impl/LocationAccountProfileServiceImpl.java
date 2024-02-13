@@ -507,7 +507,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 
 		Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByEmployeeProfileIsCurrentUser();
 		long companyId = SecurityUtils.getCurrentUsersCompanyId();
-
+        log.info("Login CompanyId :"+companyId);
 		// get accounts in employee locations
 		List<AccountProfile> result = new ArrayList<>();
 		List<AccountProfileDTO> accountDTOs = new ArrayList<>();
@@ -521,6 +521,7 @@ public class LocationAccountProfileServiceImpl implements LocationAccountProfile
 							locationIds, companyId, lastSyncdate, new PageRequest(page, count));
 			result = accountProfiles.getContent().stream().map(la -> la.getAccountProfile())
 					.collect(Collectors.toList());
+			log.info("Accounts Size :"+result.size());
 			accountDTOs = accountProfileMapper.accountProfilesToAccountProfileDTOs(result);
 
 			minDateOfOutStanding(accountDTOs);
