@@ -229,7 +229,7 @@ if (!this.Document) {
 		documentModel.smsApiEnable = $('#field_smsApiEnable').prop('checked');
 		documentModel.preventNegativeStock = $('#field_preventNegativeStock').prop('checked');
 		documentModel.enableHeaderPrintOut = $('#field_enableHeaderPrintOut').prop('checked');
-		documentModel.resetLeadTrackerData = $('field_resetLeadTrackerData').prop('checked');
+		documentModel.resetLeadTrackerData = $('#field_resetLeadTrackerData').prop('checked');
 		console.log(documentModel);
 		$.ajax({
 			method : $(el).attr('method'),
