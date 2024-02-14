@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import com.orderfleet.webapp.domain.*;
+import com.orderfleet.webapp.service.*;
 import org.apache.catalina.security.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,38 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.annotation.JsonFormat.Value;
-import com.orderfleet.webapp.domain.AccountProfile;
-import com.orderfleet.webapp.domain.AccountingVoucherAllocation;
-import com.orderfleet.webapp.domain.AccountingVoucherDetail;
-import com.orderfleet.webapp.domain.AccountingVoucherHeader;
-import com.orderfleet.webapp.domain.AccountingVoucherHeaderHistory;
-import com.orderfleet.webapp.domain.ActivityUserTarget;
-import com.orderfleet.webapp.domain.Bank;
-import com.orderfleet.webapp.domain.Company;
-import com.orderfleet.webapp.domain.CompanyConfiguration;
-import com.orderfleet.webapp.domain.Document;
-import com.orderfleet.webapp.domain.DocumentApproval;
-import com.orderfleet.webapp.domain.DynamicDocumentHeader;
-import com.orderfleet.webapp.domain.DynamicDocumentHeaderHistory;
-import com.orderfleet.webapp.domain.EmployeeProfile;
-import com.orderfleet.webapp.domain.ExecutiveTaskExecution;
-import com.orderfleet.webapp.domain.ExecutiveTaskPlan;
-import com.orderfleet.webapp.domain.FilledForm;
-import com.orderfleet.webapp.domain.FilledFormDetail;
-import com.orderfleet.webapp.domain.FormElement;
-import com.orderfleet.webapp.domain.IncomeExpenseHead;
-import com.orderfleet.webapp.domain.InventoryVoucherBatchDetail;
-import com.orderfleet.webapp.domain.InventoryVoucherDetail;
-import com.orderfleet.webapp.domain.InventoryVoucherHeader;
-import com.orderfleet.webapp.domain.InventoryVoucherHeaderHistory;
-import com.orderfleet.webapp.domain.OrderStatus;
-import com.orderfleet.webapp.domain.PriceLevel;
-import com.orderfleet.webapp.domain.ProductProfile;
-import com.orderfleet.webapp.domain.ReceivablePayable;
-import com.orderfleet.webapp.domain.SalesLedger;
-import com.orderfleet.webapp.domain.StockLocation;
-import com.orderfleet.webapp.domain.User;
-import com.orderfleet.webapp.domain.UserVehicleAssociation;
 import com.orderfleet.webapp.domain.enums.ActivityStatus;
 import com.orderfleet.webapp.domain.enums.CompanyConfig;
 import com.orderfleet.webapp.domain.enums.DocumentType;
@@ -106,12 +76,6 @@ import com.orderfleet.webapp.repository.StockLocationRepository;
 import com.orderfleet.webapp.repository.UserRepository;
 import com.orderfleet.webapp.repository.UserVehicleAssociationRepository;
 import com.orderfleet.webapp.security.SecurityUtils;
-import com.orderfleet.webapp.service.AccountingVoucherHeaderService;
-import com.orderfleet.webapp.service.DynamicDocumentHeaderService;
-import com.orderfleet.webapp.service.ExecutiveTaskExecutionService;
-import com.orderfleet.webapp.service.ExecutiveTaskSubmissionService;
-import com.orderfleet.webapp.service.FilledFormService;
-import com.orderfleet.webapp.service.InventoryVoucherHeaderService;
 import com.orderfleet.webapp.service.util.RandomUtil;
 import com.orderfleet.webapp.web.rest.api.ExecutiveTaskSubmissionController;
 import com.orderfleet.webapp.web.rest.api.dto.ExecutiveTaskSubmissionDTO;
@@ -244,7 +208,6 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 	
 	@Inject
 	private UserVehicleAssociationRepository userVehicleAssociationRepository;
-
 	@Override
 	public ExecutiveTaskSubmissionTransactionWrapper executiveTaskSubmission(
 			ExecutiveTaskSubmissionDTO executiveTaskSubmissionDTO) {
@@ -264,7 +227,6 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 			UserVehicleAssociation userVehicleAssociation = userVehicleAssociationOpt.get();
 			executionDTO.setVehicleRegistrationNumber(userVehicleAssociation.getVehicle().getRegistrationNumber());
 		}
-	
 		// save Executive Task Execution
 		ExecutiveTaskExecution executiveTaskExecution = saveExecutiveTaskExecution(company, user, executionDTO);
 		

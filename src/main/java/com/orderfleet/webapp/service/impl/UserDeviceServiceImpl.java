@@ -183,6 +183,14 @@ public class UserDeviceServiceImpl implements UserDeviceService {
 		log.debug("Request to get all UserDevices");
 		List<UserDevice> userDeviceList = userDeviceRepository.findAllByCompanyIdAndActivatedTrue();
 		List<UserDeviceDTO> result = userDeviceList.stream().map(UserDeviceDTO::new).collect(Collectors.toList());
+		for(UserDeviceDTO userDeviceDTO : result) {
+			for (UserDevice userDevice : userDeviceList){
+				if(userDeviceDTO.getUserPid().equals(userDevice.getUser().getPid())){
+					EmployeeProfile employeeProfile=employeeProfileRepository.findEmployeeProfileByUser(userDevice.getUser());
+					userDeviceDTO.setEmployeeName(employeeProfile.getName());
+				}
+			}
+		}
 		return result;
 	}
 
