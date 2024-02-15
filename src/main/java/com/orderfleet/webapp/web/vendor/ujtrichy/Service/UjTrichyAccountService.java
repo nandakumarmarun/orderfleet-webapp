@@ -147,28 +147,31 @@ public class UjTrichyAccountService {
         log.info(Thread + "Saving Dealer Locations");
 
         for (Dealer DealLoc : dealer) {
-            Location location;
-            Optional<Location> optionalLoc =
-                    locations
-                            .stream()
-                            .filter(p -> p.getLocationId()
-                                    .equalsIgnoreCase(DealLoc.getTown().trim()))
-                            .findAny();
+            Location location = null;
+            if(DealLoc.getTown()!= null) {
+                Optional<Location> optionalLoc =
+                        locations
+                                .stream()
+                                .filter(p -> p.getLocationId()
+                                        .equalsIgnoreCase(DealLoc.getTown().trim()))
+                                .findAny();
 
 
-            if (optionalLoc.isPresent()) {
-                location = optionalLoc.get();
-            } else {
-                location = new Location();
-                location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
-                location.setCompany(company);
-                location.setLocationId(DealLoc.getTown().trim());
+                if (optionalLoc.isPresent()) {
+                    location = optionalLoc.get();
+                } else {
+                    location = new Location();
+                    location.setPid(LocationService.PID_PREFIX + RandomUtil.generatePid());
+                    location.setCompany(company);
+                    location.setLocationId(DealLoc.getTown().trim());
+                }
+
+                location.setName(DealLoc.getTown().trim());
+                location.setAlias(DealLoc.getTown());
+                location.setActivated(true);
+                location.setDescription(FACTORY_NAME);
+                saveUpdateLocations.add(location);
             }
-            location.setName(DealLoc.getTown().trim());
-            location.setAlias(DealLoc.getTown());
-            location.setActivated(true);
-            location.setDescription(FACTORY_NAME);
-            saveUpdateLocations.add(location);
         }
 
         distinctloc = saveUpdateLocations
