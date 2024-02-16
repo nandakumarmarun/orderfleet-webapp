@@ -15,6 +15,10 @@ public class BarChartDTO {
 		this.value = value;
 	}
 
+
+	public BarChartDTO() {
+	}
+
 	public String getName() {
 		return name;
 	}

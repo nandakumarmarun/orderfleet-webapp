@@ -79,6 +79,7 @@ if (!this.CompanyConfiguration) {
     var enableOutStanding = $("#enableOutStanding").is(":checked");
     var enableKiloCalc = $("#enablekiloCalc").is(":checked");
     var enableDistanceSalbCalc = $("#enableDistanceSlabCalc").is(":checked");
+    var enableNewDashboard = $("#enableNewDashboard").is(":checked");
     console.log("crmEnbaled", CrmEnable);
     /* var findLocation = $('#findLocation').is(":checked"); */
     $.ajax({
@@ -123,6 +124,7 @@ if (!this.CompanyConfiguration) {
         enableOutStanding: enableOutStanding,
         kilometerCalculationsenbled: enableKiloCalc,
         enableDistanceSlabCalc: enableDistanceSalbCalc,
+        enableNewDashbord :enableNewDashboard
       },
       success: function (data) {
         onSaveSuccess(data);
@@ -194,10 +196,8 @@ if (!this.CompanyConfiguration) {
         );
         $("#enableOutStanding").prop("checked", data.enableOutStanding);
         $("#enablekiloCalc").prop("checked", data.kilometercalculationsenable);
-        $("#enableDistanceSlabCalc").prop(
-          "checked",
-          data.enableDistanceSlabCalc
-        );
+        $("#enableDistanceSlabCalc").prop("checked",  data.enableDistanceSlabCalc);
+        $("#enableNewDashboard").prop("checked",  data.enableNewDashboard);
       },
       error: function (xhr, error) {
         onError(xhr, error);

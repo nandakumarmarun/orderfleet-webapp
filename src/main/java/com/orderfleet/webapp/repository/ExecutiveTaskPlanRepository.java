@@ -111,4 +111,6 @@ public interface ExecutiveTaskPlanRepository extends JpaRepository<ExecutiveTask
 			toDate);
 
 	List<ExecutiveTaskPlan> findByUserPidAndTaskPid(String userPid, String taskPid);
+
+	List<ExecutiveTaskPlan> findAllByCompanyIdAndUserIdInAndPlannedDateBetween(long CompanyId,List<Long> userId,LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

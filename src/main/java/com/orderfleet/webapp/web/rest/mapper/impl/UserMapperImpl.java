@@ -23,6 +23,7 @@ public class UserMapperImpl extends UserMapper {
 
         UserDTO userDTO = new UserDTO();
 
+        userDTO.setId(user.getId());
         userDTO.setPid( user.getPid() );
         userDTO.setLogin( user.getLogin() );
         userDTO.setFirstName( user.getFirstName() );

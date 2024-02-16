@@ -53,6 +53,8 @@ public class CompanyConfigDTO {
 
 	private boolean enableDistanceSlabCalc;
 
+	private boolean enableNewDashboard;
+
 	public CompanyConfigDTO() {
 		super();
 	}
@@ -375,5 +377,14 @@ public class CompanyConfigDTO {
 
 	public void setEnableDistanceSlabCalc(boolean enableDistanceSlabCalc) {
 		this.enableDistanceSlabCalc = enableDistanceSlabCalc;
+	}
+
+
+	public boolean getEnableNewDashboard() {
+		return enableNewDashboard;
+	}
+
+	public void setEnableNewDashboard(boolean enableNewDashboard) {
+		this.enableNewDashboard = enableNewDashboard;
 	}
 }

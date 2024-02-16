@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orderfleet.webapp.async.event.EventProducer;
 import com.orderfleet.webapp.service.*;
+import com.orderfleet.webapp.web.rest.Features.dashboraddenormalised.DashboardDenormalizedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -202,6 +203,9 @@ public class ExecutiveTaskSubmissionController {
 
 	@Inject
 	private  InvoiceDetailsDenormalizedService invoiceDetailsDenormalizedService;
+
+	@Inject
+	private DashboardDenormalizedService dashboardDenormalizedService;
 
 	/**
 	 * POST /executive-task-execution : Create a new executiveTaskExecution.
@@ -706,6 +710,21 @@ public class ExecutiveTaskSubmissionController {
 					stockDataUpload(company, tsTransactionWrapper, stockCalculationService);
 				}
 
+			}
+			if(tsTransactionWrapper != null)
+			{
+				log.info("Requset to Save order in denormalized table");
+        invoiceDetailsDenormalizedService.SaveExecutivetaskExecutionWithInventory(tsTransactionWrapper,user);
+			}
+
+
+			if(tsTransactionWrapper != null)
+			{
+				CompletableFuture.supplyAsync(() -> {
+					log.debug("inside completable future ");
+					dashboardDenormalizedService.SaveExecutivetaskExecutionDocument(tsTransactionWrapper,user);
+					return "submitted successfully...";
+				});
 			}
 
 

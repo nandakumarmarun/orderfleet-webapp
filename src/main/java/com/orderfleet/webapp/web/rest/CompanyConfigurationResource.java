@@ -232,6 +232,10 @@ public class CompanyConfigurationResource {
 					mcDto.setEnableDistanceSlabCalc(Boolean.valueOf(cc.getValue()));
 					anyValueExist = true;
 				}
+				if (cc.getName().equals(CompanyConfig.ENABLE_NEW_DASH_BOARD)) {
+					mcDto.setEnableNewDashboard(Boolean.valueOf(cc.getValue()));
+					anyValueExist = true;
+				}
 
 				/*
 				 * if (cc.getName().equals(CompanyConfig.FIND_LOCATION)) {
@@ -266,7 +270,8 @@ public class CompanyConfigurationResource {
 			@RequestParam String employeeCreateBtn, @RequestParam String modernSpecialConfig,
 			@RequestParam String salesorderstatus, @RequestParam String updateReciept,@RequestParam String sendToFocus,
 			@RequestParam String sendEmailAutomaticaly,@RequestParam String crmEnable,@RequestParam String outstandingDateSorting,
-														   @RequestParam String enableStockCalculations,@RequestParam String enableOutStanding,@RequestParam String kilometerCalculationsenbled,@RequestParam String enableDistanceSlabCalc) throws URISyntaxException {
+														   @RequestParam String enableStockCalculations,@RequestParam String enableOutStanding,@RequestParam String kilometerCalculationsenbled,@RequestParam String enableDistanceSlabCalc,
+														   @RequestParam String enableNewDashbord) throws URISyntaxException {
 		log.debug("Web request to save Company Configuration ");
 		/* ,@RequestParam String findLocation */
 		Company company = null;
@@ -350,6 +355,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.KILO_CALC);
 		Optional<CompanyConfiguration> optEnabledisatnceslabcalc = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_DISATNCE_SLAB_CALC);
+		Optional<CompanyConfiguration> optEnableNewDashboard = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_NEW_DASH_BOARD);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -393,6 +400,7 @@ public class CompanyConfigurationResource {
 		CompanyConfiguration enableOutstandingCompany = null;
 		CompanyConfiguration enableKiloCalcCompany = null;
 		CompanyConfiguration enableDistanceSlabCalcCompnay = null;
+		CompanyConfiguration enableNewDashboradCompany = null;
 		/* CompanyConfiguration findLocationCompany = null; */
 
 		if (optDistanceTraveled.isPresent()) {
@@ -802,6 +810,18 @@ public class CompanyConfigurationResource {
 		}
 		companyConfigurationRepository.save(enableDistanceSlabCalcCompnay);
 
+
+		if (optEnableNewDashboard.isPresent()) {
+			enableNewDashboradCompany= optEnableNewDashboard.get();
+			enableNewDashboradCompany.setValue(enableNewDashbord);
+		} else {
+			enableNewDashboradCompany = new CompanyConfiguration();
+			enableNewDashboradCompany.setCompany(company);
+			enableNewDashboradCompany.setName(CompanyConfig.ENABLE_NEW_DASH_BOARD);
+			enableNewDashboradCompany.setValue(enableNewDashbord);
+		}
+		companyConfigurationRepository.save(enableNewDashboradCompany);
+
 		/*
 		 * if (optFindLocation.isPresent()) { findLocationCompany =
 		 * optFindLocation.get(); findLocationCompany.setValue(findLocation); } else {
@@ -942,6 +962,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.KILO_CALC);
 		Optional<CompanyConfiguration> optEnableDisatnceSlabCalc= companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_DISATNCE_SLAB_CALC);
+		Optional<CompanyConfiguration> optEnableNewDashboard = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_NEW_DASH_BOARD);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1071,6 +1093,9 @@ public class CompanyConfigurationResource {
 		if (optEnableDisatnceSlabCalc.isPresent()) {
 			companyConfigurationDTO.setEnableDistanceSlabCalc(Boolean.valueOf(optEnableDisatnceSlabCalc.get().getValue()));
 		}
+		if (optEnableNewDashboard.isPresent()) {
+			companyConfigurationDTO.setEnableNewDashboard(Boolean.valueOf(optEnableNewDashboard.get().getValue()));
+		}
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationDTO.setFindLocation(Boolean.valueOf(optFindLocation.get()
@@ -1197,6 +1222,8 @@ public class CompanyConfigurationResource {
 				.findByCompanyPidAndName(companyPid, CompanyConfig.KILO_CALC);
 		Optional<CompanyConfiguration> optEnabledistanceSlabCalc = companyConfigurationRepository
 				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_DISATNCE_SLAB_CALC);
+		Optional<CompanyConfiguration> optEnableNewDashboard = companyConfigurationRepository
+				.findByCompanyPidAndName(companyPid, CompanyConfig.ENABLE_NEW_DASH_BOARD);
 		/*
 		 * Optional<CompanyConfiguration> optFindLocation =
 		 * companyConfigurationRepository .findByCompanyPidAndName(companyPid,
@@ -1356,7 +1383,10 @@ public class CompanyConfigurationResource {
 		if(optEnabledistanceSlabCalc.isPresent()){
 			companyConfigurationRepository.deleteByCompanyIdAndName(optEnabledistanceSlabCalc.get().getId(), CompanyConfig.ENABLE_DISATNCE_SLAB_CALC);
 		}
-		
+		if (optEnableNewDashboard.isPresent()) {
+			companyConfigurationRepository.deleteByCompanyIdAndName(optEnabledistanceSlabCalc.get().getId(), CompanyConfig.ENABLE_NEW_DASH_BOARD);
+		}
+
 		/*
 		 * if (optFindLocation.isPresent()) {
 		 * companyConfigurationRepository.deleteByCompanyIdAndName(optFindLocation.get()

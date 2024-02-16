@@ -1,7 +1,7 @@
 {
-"release-number" : "1.117.5",
-"release-date" : "14/02/2024",
+"release-number" : "1.118.1",
+"release-date" : "16/02/2024",
 "features" : [
-  "psteels Activities/Transaction Report"
+  "dashBord Denormlisation"
 ]
 }

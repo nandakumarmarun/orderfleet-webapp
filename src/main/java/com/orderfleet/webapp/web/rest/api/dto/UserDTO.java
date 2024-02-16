@@ -22,6 +22,7 @@ import com.orderfleet.webapp.domain.enums.DashboardUIType;
  */
 public class UserDTO {
 
+	private long id;
 	private String pid;
 
 	// for tab to validate licence key
@@ -364,6 +365,14 @@ public class UserDTO {
 
 	public void setEnableModcFeature(boolean enableModcFeature) {
 		this.enableModcFeature = enableModcFeature;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.orderfleet.webapp.repository;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -313,5 +314,8 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 
 	@Query("select locationAccountProfile.accountProfile.id from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.id in  ?1 and locationAccountProfile.accountProfile.activated = 'true'")
 	Set<Long> findAccountProfileIdsByUserLocationsOrderByAccountProfilesNameAndActivated(Set<Long> locationIds);
+
+	@Query("select locationAccountProfile from LocationAccountProfile locationAccountProfile  where locationAccountProfile.accountProfile.pid = ?1")
+	List<LocationAccountProfile> findAllLocationByAccountProfilePids(String accountProfilePid );
 
 }

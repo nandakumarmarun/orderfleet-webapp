@@ -75,6 +75,7 @@
 											<th>EnableOutStanding</th>
 											<th>EnableKiloCalc</th>
 											<th>Enable Distance Slab Calculation</th>
+											<th>Enable New DashBoard</th>
 											<th>Action</th>
 										</tr>
 									</thead>
@@ -120,6 +121,7 @@
 												<th>${companyConfiguration.enableOutStanding}</th>
 												<th>${companyConfiguration.kilometercalculationsenable}</th>
 												<th>${companyConfiguration.enableDistanceSlabCalc}</th>
+												<th>${companyConfiguration.enableNewDashboard}</th>
 												<td><button type="button" class="btn btn-danger"
 														onclick="CompanyConfiguration.deletes('${companyConfiguration.companyPid}');">Delete</button>
 												</td>
@@ -570,8 +572,15 @@
 																	</div>
 																</td>
 															</tr>
-
-
+															<tr>
+                                                            	<td>
+                                                            		<div class="form-group">
+                                                            			<label class="control-label">Enable New DashBoard </label>
+                                                            			<input id="enableNewDashboard" name='checksenableNewDashboard'
+                                                            			type='checkbox' class="form-control" />
+                                                            		</div>
+                                                            	</td>
+                                                            </tr>
 														</table>
 													</div>
 												</div>

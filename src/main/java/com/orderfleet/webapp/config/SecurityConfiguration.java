@@ -203,7 +203,7 @@ public class SecurityConfiguration {
             .and()
     	        .formLogin()
     	        .loginPage("/login")
-    	        .defaultSuccessUrl("/web/home")
+    	        .defaultSuccessUrl("/web/load-dashboard")
     	        .failureUrl("/login?error")
     	        .usernameParameter("username")
     	        .passwordParameter("password")

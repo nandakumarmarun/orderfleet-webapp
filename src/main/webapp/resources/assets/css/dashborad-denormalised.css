@@ -1,0 +1,66 @@
+.body {
+    margin-bottom: 10px;
+}
+
+.tile-card,
+.tile-card .tile-card-data,
+.tile-card .tile-card-data .tile-card-item-header,
+.tile-card .tile-card-data .tile-card-item-body,
+.tile-card .tile-card-data .tile-card-item-header .header-item,
+.tile-card .tile-card-data .tile-card-item-body .body-item
+{
+  float: left;
+  width: 100%;
+}
+
+p {
+  float: left;
+  width: 32%;
+  text-align: center;
+}
+
+.tile-card {
+     background: #0b0d7e;
+     background-clip: padding-box;
+     color: #fff;
+     box-shadow: 5px 5px 5px rgb(84, 84, 84);
+     padding: 5px;
+     margin-bottom: 10px;
+     border-radius:5px;
+}
+
+.tile-blue{
+     background: #08adef;
+}
+
+.tile-orenge{
+     background: #f54242;
+}
+
+.tile-magentha{
+      background: #5f06bd;
+ }
+
+.tile-card-header{
+padding:5px
+}
+
+.tile-card-header a{
+ color: #fff;
+}
+
+.fillter-row{
+margin-bottom :10px
+}
+
+.attendence-panel{
+margin-Top:10px;
+margin-bottom :10px;
+}
+
+.chart-label-new{
+     padding: 5px;
+     background: #e53252;
+     border-radius: 5px;
+     box-shadow: 5px 5px 5px gray;
+}
