@@ -711,11 +711,7 @@ public class ExecutiveTaskSubmissionController {
 				}
 
 			}
-			if(tsTransactionWrapper != null)
-			{
-				log.info("Requset to Save order in denormalized table");
-        invoiceDetailsDenormalizedService.SaveExecutivetaskExecutionWithInventory(tsTransactionWrapper,user);
-			}
+
 
 
 			if(tsTransactionWrapper != null)
