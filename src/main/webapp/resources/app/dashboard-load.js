@@ -415,7 +415,7 @@ function getAttendanceThumbsHtml(userData) {
   if (userData.attendanceStatus == "true") {
     attendance = "up";
     attendanceTitle = "present";
-  } else if (userData.attendanceStatus == "False") {
+  } else if (userData.attendanceStatus == "false") {
     attendance = "down";
     attendanceTitle = "absent";
   }

@@ -136,6 +136,9 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 	List<Attendance> findAllByCompanyIdAndAttendanceStatusAndPlannedDateBetweenOrderByCreatedDateDesc(
 			long companyId,AttendanceStatus attendanceStatus, LocalDateTime clientFromDate, LocalDateTime clientToDate);
 
+	List<Attendance> findAllByCompanyIdAndPlannedDateBetweenOrderByCreatedDateDesc(
+			long companyId, LocalDateTime clientFromDate, LocalDateTime clientToDate);
+
 		/*
 	 * @Query("select planned_date,attendance_status,remarks from tbl_attendance WHERE company_id = ?#{principal.companyId} and  user_id = ?1 ORDER BY  DESC top 61"
 	 * ) List<Object[]> getAttendanceByUserandUptoLimitDesc(Long userId);

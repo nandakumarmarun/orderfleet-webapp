@@ -37,6 +37,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -669,24 +670,37 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
 
         dashboardSummaryDto.setScheduled(scheduled);
 
-        List<DashboardNew> fillteredList = dashboardNewList.parallelStream()
+        List<DashboardNew> distinctList = dashboardNewList.parallelStream()
                 .filter(data-> activityIds.contains(data.getActivityId()))
                 .collect(Collectors.toList());
 
+        List<DashboardNew>fillteredList  = distinctList.parallelStream()
+                .collect(Collectors.toConcurrentMap(
+                        DashboardNew::getExePid,
+                        Function.identity(),
+                        (existing, replacement) -> existing
+                ))
+                .values()
+                .parallelStream()
+                .collect(Collectors.toList());
+
         if(dashboardItem.getTaskPlanType() == TaskPlanType.PLANNED){
-            long sum = fillteredList.parallelStream()
-                    .mapToLong(DashboardNew::getPlanedCount)
-                    .sum();
+//            long sum = fillteredList.parallelStream()
+//                    .mapToLong(DashboardNew::getPlanedCount)
+//                    .sum();
+            long sum = fillteredList.size();
             dashboardSummaryDto.setAchieved(sum);
         }else if(dashboardItem.getTaskPlanType() == TaskPlanType.UN_PLANNED){
-            long sum = fillteredList.parallelStream()
-                    .mapToLong(DashboardNew::getUnplannedCount)
-                    .sum();
+//            long sum = fillteredList.parallelStream()
+//                    .mapToLong(DashboardNew::getUnplannedCount)
+//                    .sum();
+            long sum = fillteredList.size();
             dashboardSummaryDto.setAchieved(sum);
         }else if(dashboardItem.getTaskPlanType() == TaskPlanType.BOTH){
-            long sum = fillteredList.parallelStream()
-                    .mapToLong(DashboardNew::getSubmissionCount)
-                    .sum();
+//            long sum = fillteredList.parallelStream()
+//                    .mapToLong(DashboardNew::getSubmissionCount)
+//                    .sum();
+            long sum = fillteredList.size();
             dashboardSummaryDto.setAchieved(sum);
         }
         return dashboardSummaryDto;
@@ -701,6 +715,7 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
 
         DashboardSummaryDTO dashboardSummaryDto = getDashboardSummaryDTO(dashboardItem);
 
+
         long scheduled = executiveTaskPlans.parallelStream()
                 .filter(data-> activityIds.contains(data.getActivity().getId()))
                 .filter(data->data.getUser().getId().equals(userId))
@@ -708,25 +723,40 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
 
         dashboardSummaryDto.setScheduled(scheduled);
 
-        List<DashboardNew> fillteredList = dashboardNewList.parallelStream()
+
+
+        List<DashboardNew> distinctList  = dashboardNewList.parallelStream()
                 .filter(data-> activityIds.contains(data.getActivityId()))
                 .filter(data->data.getUserId().equals(userId))
                 .collect(Collectors.toList());
 
+        List<DashboardNew>fillteredList  = distinctList.parallelStream()
+                .collect(Collectors.toConcurrentMap(
+                        DashboardNew::getExePid,
+                        Function.identity(),
+                        (existing, replacement) -> existing
+                ))
+                .values()
+                .parallelStream()
+                .collect(Collectors.toList());
+
         if(dashboardItem.getTaskPlanType() == TaskPlanType.PLANNED){
-            long sum = fillteredList.parallelStream()
-                    .mapToLong(DashboardNew::getPlanedCount)
-                    .sum();
+//            long sum = fillteredList.parallelStream()
+//                    .mapToLong(DashboardNew::getPlanedCount)
+//                    .sum();
+            long sum = fillteredList.size();
             dashboardSummaryDto.setAchieved(sum);
         }else if(dashboardItem.getTaskPlanType() == TaskPlanType.UN_PLANNED){
-            long sum = fillteredList.parallelStream()
-                    .mapToLong(DashboardNew::getUnplannedCount)
-                    .sum();
+//            long sum = fillteredList.parallelStream()
+//                    .mapToLong(DashboardNew::getUnplannedCount)
+//                    .sum();
+            long sum = fillteredList.size();
             dashboardSummaryDto.setAchieved(sum);
         }else if(dashboardItem.getTaskPlanType() == TaskPlanType.BOTH){
-            long sum = fillteredList.parallelStream()
-                    .mapToLong(DashboardNew::getSubmissionCount)
-                    .sum();
+//            long sum = fillteredList.parallelStream()
+//                    .mapToLong(DashboardNew::getSubmissionCount)
+//                    .sum();
+            long sum = fillteredList.size();
             dashboardSummaryDto.setAchieved(sum);
         }
         return dashboardSummaryDto;
@@ -795,9 +825,10 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
     private DashboardSummaryDTO  singleUserDocumentWiseDaySummeryFilter(
             List<DashboardNew> dashboardNewList,
             List<Long> documentIds,
-            DashboardItem dashboardItem,long userId) {
+            DashboardItem dashboardItem,long userId,DashboardNew dashboardLast) {
 
         DashboardSummaryDTO dashboardSummaryDto = getDashboardSummaryDTO(dashboardItem);
+
         List<DashboardNew> fillteredList = new ArrayList<>();
 
         if(dashboardItem.getDocumentType().equals(DocumentType.INVENTORY_VOUCHER)){
@@ -848,6 +879,12 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                     .sum();
             dashboardSummaryDto.setAmount(amount);
             dashboardSummaryDto.setCount(sum);
+        }
+        if(documentIds.contains(dashboardLast.getDocumentId())
+                && dashboardLast.getUserId().equals(userId)
+                && dashboardSummaryDto.getCount() != 0){
+            log.debug("present : "+ dashboardItem.getName());
+            dashboardSummaryDto.setNumberCircle(true);
         }
         return dashboardSummaryDto;
     }
@@ -976,7 +1013,6 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
     }
 
 
-
     @Override
     public List<DashboardUserDataDTO<DashboardSummaryDTO>> loadUserSummaryData(
             LocalDateTime from, LocalDateTime to,Long parentLocationId,User user) {
@@ -993,9 +1029,8 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                 employeeProfileRepository.findAllByCompanyId(user.getCompany().getId());
 
         List<Attendance> presentUsers = attendanceRepository
-                .findAllByCompanyIdAndAttendanceStatusAndPlannedDateBetweenOrderByCreatedDateDesc(
+                .findAllByCompanyIdAndPlannedDateBetweenOrderByCreatedDateDesc(
                         user.getCompany().getId(),
-                        AttendanceStatus.PRESENT,
                         from,
                         to);
 
@@ -1017,11 +1052,21 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
             Optional<Attendance> attendanceOptional = presentUsers.parallelStream()
                     .filter(data -> data.getUser().getId().equals(userDTO.getId())).findAny();
             if(attendanceOptional.isPresent()){
-                dashboardUserData.setAttendanceMarked(true);
-                dashboardUserData.setAttendanceStatus("true");
-                dashboardUserData.setRemarks(attendanceOptional.get().getRemarks());
-                dashboardUserData.setRemarks(attendanceOptional.get().getRemarks());
-                dashboardUserData.setPlannedDate(attendanceOptional.get().getPlannedDate());
+                log.debug("is present : " + attendanceOptional.isPresent());
+                log.debug("status : " + attendanceOptional.get().getAttendanceStatus());
+                if(attendanceOptional.get().getAttendanceStatus().equals(AttendanceStatus.PRESENT)){
+                    dashboardUserData.setAttendanceMarked(true);
+                    dashboardUserData.setAttendanceStatus("true");
+                    dashboardUserData.setRemarks(attendanceOptional.get().getRemarks());
+                    dashboardUserData.setRemarks(attendanceOptional.get().getRemarks());
+                    dashboardUserData.setPlannedDate(attendanceOptional.get().getPlannedDate());
+                }else if(attendanceOptional.get().getAttendanceStatus().equals(AttendanceStatus.LEAVE)){
+                    log.debug("present");
+                    dashboardUserData.setAttendanceMarked(true);
+                    dashboardUserData.setAttendanceStatus("false");
+                    dashboardUserData.setRemarks(attendanceOptional.get().getRemarks());
+                    dashboardUserData.setPlannedDate(attendanceOptional.get().getPlannedDate());
+                }
             }else{
                 dashboardUserData.setAttendanceMarked(false);
                 dashboardUserData.setRemarks("");
@@ -1144,7 +1189,10 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
         List<DashboardSummaryDTO> daySummaryDatas = new ArrayList<>();
         List<Long> userIds = new ArrayList<>();
         userIds.add(userId);
-
+        DashboardNew dashboardLast = null;
+        if(dashboardDataDayWiseList.size()>0){
+             dashboardLast = dashboardDataDayWiseList.get(dashboardDataDayWiseList.size()-1);
+        }
         for (DashboardItem dashboardItem : dashboardItems) {
 
             if (dashboardItem.getDashboardItemType().equals(DashboardItemType.ACTIVITY)) {
@@ -1154,7 +1202,6 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                                 .parallelStream().map(
                                         p -> p.getId())
                                 .collect(Collectors.toList());
-
 
                 daySummaryDatas.add(singleUseractivityWiseSummeryFilter(scheduledUserTasksDayWiseList,
                         dashboardDataDayWiseList, dashboardItem, activityIds,userId));
@@ -1166,8 +1213,11 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                                         p -> p.getId())
                                 .collect(Collectors.toList());
 
-                daySummaryDatas.add(singleUserDocumentWiseDaySummeryFilter(
-                        dashboardDataDayWiseList,documentIds,dashboardItem,userId));
+
+                if(dashboardLast != null){
+                    daySummaryDatas.add(singleUserDocumentWiseDaySummeryFilter(
+                            dashboardDataDayWiseList,documentIds,dashboardItem,userId,dashboardLast));
+                }
             }
             else if(dashboardItem.getDashboardItemType().equals(DashboardItemType.TARGET)){
                 DashboardSummaryDTO dashboardSummaryDto = new DashboardSummaryDTO();
