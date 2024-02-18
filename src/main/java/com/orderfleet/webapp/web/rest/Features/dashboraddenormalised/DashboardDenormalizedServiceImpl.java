@@ -159,15 +159,12 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
              byExePid = byExePids.stream().filter(data->data.getExePid().equals(executionDTO.getPid())).findAny();
          }
         if (dynamicDocumentHeaders != null) {
+            List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileRepository.findAllLocationByAccountProfilePids(executionDTO.getAccountProfile().getPid());
+            Optional<LocationAccountProfile> locationAccountProfile1 = locationAccountProfiles.stream().findFirst();
             for (DynamicDocumentHeader docHeader : dynamicDocumentHeaders) {
                         DashboardNew dashboardNew = new DashboardNew();
 
                         LocationAccountProfile locationAccountProfile = null;
-
-                        List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileRepository.findAllLocationByAccountProfilePids(executionDTO.getAccountProfile().getPid());
-
-                        Optional<LocationAccountProfile> locationAccountProfile1 = locationAccountProfiles.stream().findFirst();
-
                         if(locationAccountProfile1.isPresent()){
                             locationAccountProfile= locationAccountProfile1.get();
                         }
@@ -325,11 +322,17 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
         }
 
         if (accountingVoucherHeaders != null) {
+            List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileRepository.findAllLocationByAccountProfilePids(executionDTO.getAccountProfile().getPid());
+            Optional<LocationAccountProfile> locationAccountProfile1 = locationAccountProfiles.stream().findFirst();
             for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
                     DashboardNew dashboardNew = new DashboardNew();
-                    LocationAccountProfile locationAccountProfile = locationAccountProfileRepository.findByAccountProfile(executionDTO.getAccountProfile());
 
-                    Optional<DashboardNew> dashboardNew1 = dashboardDenormalizedRepository.findByDateUserDocActivityCompanyTerritory(LocalDate.from(accountingVoucherHeader.getDocumentDate())
+                LocationAccountProfile locationAccountProfile = null;
+                if(locationAccountProfile1.isPresent()){
+                    locationAccountProfile= locationAccountProfile1.get();
+                }
+
+                Optional<DashboardNew> dashboardNew1 = dashboardDenormalizedRepository.findByDateUserDocActivityCompanyTerritory(LocalDate.from(accountingVoucherHeader.getDocumentDate())
                             , user.getId(), accountingVoucherHeader.getDocument().getId(), executionDTO.getActivity().getId()
                             , executionDTO.getCompany().getId(), locationAccountProfile.getLocation().getId());
 
@@ -490,11 +493,20 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
             byExePid = byExePids.stream().filter(data->data.getExePid().equals(executionDTO.getPid())).findAny();
         }
 
+        List<LocationAccountProfile> locationAccountProfiles = locationAccountProfileRepository.findAllLocationByAccountProfilePids(executionDTO.getAccountProfile().getPid());
+
         if (inventoryVoucherHeaders != null) {
             for (InventoryVoucherHeader inventoryVoucher : inventoryVoucherHeaders) {
                     DashboardNew dashboardNew = new DashboardNew();
 
-                    LocationAccountProfile locationAccountProfile = locationAccountProfileRepository.findByAccountProfile(executionDTO.getAccountProfile());
+                LocationAccountProfile locationAccountProfile = null;
+
+
+                Optional<LocationAccountProfile> locationAccountProfile1 = locationAccountProfiles.stream().findFirst();
+
+                if(locationAccountProfile1.isPresent()){
+                    locationAccountProfile= locationAccountProfile1.get();
+                }
 
                     Optional<DashboardNew> dashboardNew1 = dashboardDenormalizedRepository
                             .findByDateUserDocActivityCompanyTerritory(
