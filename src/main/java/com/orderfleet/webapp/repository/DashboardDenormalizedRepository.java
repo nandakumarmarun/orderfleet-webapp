@@ -35,5 +35,6 @@ public interface DashboardDenormalizedRepository extends JpaRepository<Dashboard
     @Query("select dashboardNew from DashboardNew  dashboardNew where companyId = ?1 and dashboardNew.userId in ?2 and dashboardNew.date between ?3 and ?4")
     List<DashboardNew> findAllByCompanyIdAndActivityIdsInAndUserIdsinAndDate(long companyId,List<Long>userIds,LocalDate from,LocalDate to);
 
+    List<DashboardNew> findAllByExePid(String exepid) ;
 
 }

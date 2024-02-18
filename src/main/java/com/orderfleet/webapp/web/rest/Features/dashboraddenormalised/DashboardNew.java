@@ -56,6 +56,18 @@ public class DashboardNew {
     private long unplannedCount;
 
     @NotNull
+    @Column(name = "submission_count_activity" , nullable = false, columnDefinition = "double precision DEFAULT 0")
+    private long submissionCountAcitivity;
+
+    @NotNull
+    @Column(name = "planned_count_activity" , nullable = false, columnDefinition = "double precision DEFAULT 0")
+    private long planedCountAcitivity;
+
+    @NotNull
+    @Column(name = "unplanned_count_activity" , nullable = false, columnDefinition = "double precision DEFAULT 0")
+    private long unplannedCountAcitivity;
+
+    @NotNull
     @Column(name = "sheduled_count" , nullable = false, columnDefinition = "double precision DEFAULT 0")
     private double sheduled;
 
@@ -434,5 +446,30 @@ public class DashboardNew {
 
     public void setLastCustomerLocation(String lastCustomerLocation) {
         LastCustomerLocation = lastCustomerLocation;
+    }
+
+    public long getPlanedCountAcitivity() {
+        return planedCountAcitivity;
+    }
+
+    public void setPlanedCountAcitivity(long planedCountAcitivity) {
+        this.planedCountAcitivity = planedCountAcitivity;
+    }
+
+    public long getUnplannedCountAcitivity() {
+        return unplannedCountAcitivity;
+    }
+
+    public void setUnplannedCountAcitivity(long unplannedCountAcitivity) {
+        this.unplannedCountAcitivity = unplannedCountAcitivity;
+    }
+
+
+    public long getSubmissionCountAcitivity() {
+        return submissionCountAcitivity;
+    }
+
+    public void setSubmissionCountAcitivity(long submissionCountAcitivity) {
+        this.submissionCountAcitivity = submissionCountAcitivity;
     }
 }

@@ -153,6 +153,11 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
             User user, EmployeeProfile employeeProfile,
             List<DynamicDocumentHeader> dynamicDocumentHeaders,
             ExecutiveTaskExecution executionDTO) {
+         List<DashboardNew> byExePids = dashboardDenormalizedRepository.findAllByExePid(executionDTO.getPid());
+        Optional<DashboardNew> byExePid = null;
+         if(byExePids != null){
+             byExePid = byExePids.stream().filter(data->data.getExePid().equals(executionDTO.getPid())).findAny();
+         }
         if (dynamicDocumentHeaders != null) {
             for (DynamicDocumentHeader docHeader : dynamicDocumentHeaders) {
                         DashboardNew dashboardNew = new DashboardNew();
@@ -214,12 +219,30 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                             dashboardNew.setSubmissionCount(1);
                             dashboardNew.setAmount(0);
 
+                             if(!byExePid.isPresent() || byExePid == null ){
+                                 dashboardNew.setSubmissionCountAcitivity(1);
+                             }else{
+                                 dashboardNew.setSubmissionCountAcitivity(0);
+                             }
+
                             if(executionDTO.getExecutiveTaskPlan() == null){
                                 dashboardNew.setUnplannedCount(1);
                                 dashboardNew.setUnplannedAmount(0);
+
+                                if(!byExePid.isPresent() ||byExePid == null ){
+                                    dashboardNew.setUnplannedCountAcitivity(1);
+                                }else{
+                                    dashboardNew.setUnplannedCountAcitivity(0);
+                                }
+
                             }else{
                                 dashboardNew.setPlanedCount(1);
                                 dashboardNew.setPlannedAmount(0);
+                                if(!byExePid.isPresent()){
+                                    dashboardNew.setPlanedCountAcitivity(1);
+                                }else{
+                                    dashboardNew.setPlanedCountAcitivity(0);
+                                }
                             }
 
                             dashboardNew.setBatteryPercentage(employeeProfile.getBatteryPercentage());
@@ -233,6 +256,11 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
 
                                     dashboardNew.setSubmissionCount(dashboardNew.getSubmissionCount() + 1);
                                     dashboardNew.setUnplannedCount(dashboardNew.getUnplannedCount() + 1);
+
+                                    if(!byExePid.isPresent() || byExePid == null ){
+                                        dashboardNew.setSubmissionCountAcitivity(dashboardNew.getSubmissionCountAcitivity() + 1);
+                                        dashboardNew.setUnplannedCountAcitivity(dashboardNew.getUnplannedCountAcitivity()+ 1);
+                                    }
 
                                     dashboardNew.setModifiedDate(docHeader.getDocumentDate());
                                     dashboardNew.setLocationType(executionDTO.getLocationType());
@@ -253,7 +281,12 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                                     dashboardNew = dashboardNew1.get();
 
                                     dashboardNew.setSubmissionCount(dashboardNew.getSubmissionCount() + 1);
-                                    dashboardNew.setPlanedCount(dashboardNew.getUnplannedCount() + 1);
+                                    dashboardNew.setPlanedCount(dashboardNew.getPlanedCount() + 1);
+
+                                    if(!byExePid.isPresent() || byExePid == null  ){
+                                        dashboardNew.setSubmissionCountAcitivity(dashboardNew.getSubmissionCountAcitivity() + 1);
+                                        dashboardNew.setPlanedCountAcitivity(dashboardNew.getPlanedCountAcitivity()+ 1);
+                                    }
 
                                     dashboardNew.setModifiedDate(docHeader.getDocumentDate());
                                     dashboardNew.setLocationType(executionDTO.getLocationType());
@@ -284,6 +317,13 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
             User user, EmployeeProfile employeeProfile,
             List<AccountingVoucherHeader> accountingVoucherHeaders,
             ExecutiveTaskExecution executionDTO) {
+
+        List<DashboardNew> byExePids = dashboardDenormalizedRepository.findAllByExePid(executionDTO.getPid());
+        Optional<DashboardNew> byExePid = null;
+        if(byExePids != null){
+            byExePid = byExePids.stream().filter(data->data.getExePid().equals(executionDTO.getPid())).findAny();
+        }
+
         if (accountingVoucherHeaders != null) {
             for (AccountingVoucherHeader accountingVoucherHeader : accountingVoucherHeaders) {
                     DashboardNew dashboardNew = new DashboardNew();
@@ -337,12 +377,33 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                         dashboardNew.setLastCustomerLocation(accountingVoucherHeader.getAccountProfile().getLocation());
                         dashboardNew.setLocation(executionDTO.getLocation());
 
+
+                        if(!byExePid.isPresent() ||byExePid == null  ){
+                            dashboardNew.setSubmissionCountAcitivity(1);
+                        }else{
+                            dashboardNew.setSubmissionCountAcitivity(0);
+                        }
+
                         if(executionDTO.getExecutiveTaskPlan() == null){
                             dashboardNew.setUnplannedCount(1);
                             dashboardNew.setUnplannedAmount(accountingVoucherHeader.getTotalAmount());
+
+                            if(!byExePid.isPresent() || byExePid == null  ){
+                                dashboardNew.setUnplannedCountAcitivity(1);
+                            }else{
+                                dashboardNew.setUnplannedCountAcitivity(0);
+                            }
                         }else{
                             dashboardNew.setPlanedCount(1);
                             dashboardNew.setPlannedAmount(accountingVoucherHeader.getTotalAmount());
+
+                            if(!byExePid.isPresent() || byExePid == null ){
+                                dashboardNew.setPlanedCountAcitivity(1);
+                            }else{
+                                dashboardNew.setPlanedCountAcitivity(0);
+                            }
+
+
                         }
 
                         DashboardNew result = dashboardDenormalizedRepository.save(dashboardNew);
@@ -354,6 +415,11 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                                 dashboardNew = dashboardNew1.get();
                                 dashboardNew.setSubmissionCount(dashboardNew.getSubmissionCount() + 1);
                                 dashboardNew.setUnplannedCount(dashboardNew.getUnplannedCount() + 1);
+
+                                if(!byExePid.isPresent() ||byExePid == null  ){
+                                    dashboardNew.setSubmissionCountAcitivity(dashboardNew.getSubmissionCountAcitivity() + 1);
+                                    dashboardNew.setUnplannedCountAcitivity(dashboardNew.getUnplannedCountAcitivity()+ 1);
+                                }
 
                                 dashboardNew.setAmount(dashboardNew.getAmount() + accountingVoucherHeader.getTotalAmount());
                                 dashboardNew.setUnplannedAmount(dashboardNew.getUnplannedAmount() + accountingVoucherHeader.getTotalAmount());
@@ -377,7 +443,12 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
 
                                 dashboardNew = dashboardNew1.get();
                                 dashboardNew.setSubmissionCount(dashboardNew.getSubmissionCount() + 1);
-                                dashboardNew.setPlanedCount(dashboardNew.getUnplannedCount() + 1);
+                                dashboardNew.setPlanedCount(dashboardNew.getPlanedCount() + 1);
+
+                                if(!byExePid.isPresent() ||byExePid == null  ){
+                                    dashboardNew.setSubmissionCountAcitivity(dashboardNew.getSubmissionCountAcitivity() + 1);
+                                    dashboardNew.setPlanedCountAcitivity(dashboardNew.getPlanedCountAcitivity()+ 1);
+                                }
 
                                 dashboardNew.setAmount(dashboardNew.getAmount());
                                 dashboardNew.setPlannedAmount(dashboardNew.getPlannedAmount() + accountingVoucherHeader.getTotalAmount());
@@ -412,6 +483,13 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
             User user, EmployeeProfile employeeProfile,
             List<InventoryVoucherHeader> inventoryVoucherHeaders,
             ExecutiveTaskExecution executionDTO) {
+
+        List<DashboardNew> byExePids = dashboardDenormalizedRepository.findAllByExePid(executionDTO.getPid());
+        Optional<DashboardNew> byExePid = null;
+        if(byExePids != null){
+            byExePid = byExePids.stream().filter(data->data.getExePid().equals(executionDTO.getPid())).findAny();
+        }
+
         if (inventoryVoucherHeaders != null) {
             for (InventoryVoucherHeader inventoryVoucher : inventoryVoucherHeaders) {
                     DashboardNew dashboardNew = new DashboardNew();
@@ -471,13 +549,32 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                         dashboardNew.setLastCustomerLocation(inventoryVoucher.getReceiverAccount().getLocation());
                         dashboardNew.setLocation(executionDTO.getLocation());
 
+                        if(!byExePid.isPresent() || byExePid == null ){
+                            dashboardNew.setSubmissionCountAcitivity(1);
+                        }else{
+                            dashboardNew.setSubmissionCountAcitivity(0);
+                        }
 
                         if(executionDTO.getExecutiveTaskPlan() == null){
                             dashboardNew.setUnplannedCount(1);
                             dashboardNew.setUnplannedAmount(inventoryVoucher.getDocumentTotal());
+
+                            if(!byExePid.isPresent() || byExePid == null ){
+                                dashboardNew.setUnplannedCountAcitivity(1);
+                            }else{
+                                dashboardNew.setUnplannedCountAcitivity(0);
+                            }
+
                         }else{
                             dashboardNew.setPlanedCount(1);
                             dashboardNew.setPlannedAmount(inventoryVoucher.getDocumentTotal());
+
+                            if(!byExePid.isPresent() || byExePid == null ){
+                                dashboardNew.setPlanedCountAcitivity(1);
+                            }else{
+                                dashboardNew.setPlanedCountAcitivity(0);
+                            }
+
                         }
 
                         DashboardNew result = dashboardDenormalizedRepository.save(dashboardNew);
@@ -489,6 +586,11 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
 
                                 dashboardNew.setSubmissionCount(dashboardNew.getSubmissionCount() + 1);
                                 dashboardNew.setUnplannedCount(dashboardNew.getUnplannedCount() + 1);
+
+                                if(!byExePid.isPresent() || byExePid == null ){
+                                    dashboardNew.setSubmissionCountAcitivity(dashboardNew.getSubmissionCountAcitivity() + 1);
+                                    dashboardNew.setUnplannedCountAcitivity(dashboardNew.getUnplannedCountAcitivity()+ 1);
+                                }
 
                                 dashboardNew.setAmount(dashboardNew.getAmount() + inventoryVoucher.getDocumentTotal());
                                 dashboardNew.setUnplannedAmount(dashboardNew.getUnplannedAmount() + inventoryVoucher.getDocumentTotal());
@@ -509,7 +611,12 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                             }else{
                                 dashboardNew = dashboardNew1.get();
                                 dashboardNew.setSubmissionCount(dashboardNew.getSubmissionCount() + 1);
-                                dashboardNew.setPlanedCount(dashboardNew.getUnplannedCount() + 1);
+                                dashboardNew.setPlanedCount(dashboardNew.getPlanedCount() + 1);
+
+                                if(!byExePid.isPresent() || byExePid == null ){
+                                    dashboardNew.setSubmissionCountAcitivity(dashboardNew.getSubmissionCountAcitivity() + 1);
+                                    dashboardNew.setPlanedCountAcitivity(dashboardNew.getPlanedCountAcitivity()+ 1);
+                                }
 
                                 dashboardNew.setAmount(dashboardNew.getAmount());
                                 dashboardNew.setPlannedAmount(dashboardNew.getPlannedAmount() + inventoryVoucher.getDocumentTotal());
@@ -552,6 +659,9 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
         log.debug("week Start : "+String.valueOf(weekStartDate));
         LocalDateTime monthStartDate = from.withDayOfMonth(1);
         log.debug("month Start Date : "+String.valueOf(monthStartDate));
+
+        log.debug("End Date : "+String.valueOf(to));
+
 
         List<DashboardItem> dashboardItems =
                 dashboardItemUserRepository
@@ -626,7 +736,7 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                         dashboardWeekList,documentIds,dashboardItem));
 
                 monthSummaryDatas.add(documentWiseDaySummeryFilter(
-                        dashboardWeekList,documentIds,dashboardItem));
+                        dashboardMonthList,documentIds,dashboardItem));
             }else if(dashboardItem.getDashboardItemType().equals(DashboardItemType.TARGET)){
                 DashboardSummaryDTO dashboardSummaryDto = new DashboardSummaryDTO();
                 dashboardSummaryDto.setDashboardItemPid(dashboardItem.getPid());
@@ -685,22 +795,19 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                 .collect(Collectors.toList());
 
         if(dashboardItem.getTaskPlanType() == TaskPlanType.PLANNED){
-//            long sum = fillteredList.parallelStream()
-//                    .mapToLong(DashboardNew::getPlanedCount)
-//                    .sum();
-            long sum = fillteredList.size();
+            long sum = fillteredList.parallelStream()
+                    .mapToLong(DashboardNew::getPlanedCountAcitivity)
+                    .sum();
             dashboardSummaryDto.setAchieved(sum);
         }else if(dashboardItem.getTaskPlanType() == TaskPlanType.UN_PLANNED){
-//            long sum = fillteredList.parallelStream()
-//                    .mapToLong(DashboardNew::getUnplannedCount)
-//                    .sum();
-            long sum = fillteredList.size();
+            long sum = fillteredList.parallelStream()
+                    .mapToLong(DashboardNew::getUnplannedCountAcitivity)
+                    .sum();
             dashboardSummaryDto.setAchieved(sum);
         }else if(dashboardItem.getTaskPlanType() == TaskPlanType.BOTH){
-//            long sum = fillteredList.parallelStream()
-//                    .mapToLong(DashboardNew::getSubmissionCount)
-//                    .sum();
-            long sum = fillteredList.size();
+            long sum = fillteredList.parallelStream()
+                    .mapToLong(DashboardNew::getSubmissionCountAcitivity)
+                    .sum();
             dashboardSummaryDto.setAchieved(sum);
         }
         return dashboardSummaryDto;
@@ -741,22 +848,19 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                 .collect(Collectors.toList());
 
         if(dashboardItem.getTaskPlanType() == TaskPlanType.PLANNED){
-//            long sum = fillteredList.parallelStream()
-//                    .mapToLong(DashboardNew::getPlanedCount)
-//                    .sum();
-            long sum = fillteredList.size();
+            long sum = fillteredList.parallelStream()
+                    .mapToLong(DashboardNew::getPlanedCountAcitivity)
+                    .sum();
             dashboardSummaryDto.setAchieved(sum);
         }else if(dashboardItem.getTaskPlanType() == TaskPlanType.UN_PLANNED){
-//            long sum = fillteredList.parallelStream()
-//                    .mapToLong(DashboardNew::getUnplannedCount)
-//                    .sum();
-            long sum = fillteredList.size();
+            long sum = fillteredList.parallelStream()
+                    .mapToLong(DashboardNew::getUnplannedCountAcitivity)
+                    .sum();
             dashboardSummaryDto.setAchieved(sum);
         }else if(dashboardItem.getTaskPlanType() == TaskPlanType.BOTH){
-//            long sum = fillteredList.parallelStream()
-//                    .mapToLong(DashboardNew::getSubmissionCount)
-//                    .sum();
-            long sum = fillteredList.size();
+            long sum = fillteredList.parallelStream()
+                    .mapToLong(DashboardNew::getSubmissionCountAcitivity)
+                    .sum();
             dashboardSummaryDto.setAchieved(sum);
         }
         return dashboardSummaryDto;
@@ -880,11 +984,13 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
             dashboardSummaryDto.setAmount(amount);
             dashboardSummaryDto.setCount(sum);
         }
-        if(documentIds.contains(dashboardLast.getDocumentId())
-                && dashboardLast.getUserId().equals(userId)
-                && dashboardSummaryDto.getCount() != 0){
-            log.debug("present : "+ dashboardItem.getName());
-            dashboardSummaryDto.setNumberCircle(true);
+        if(dashboardLast != null){
+            if(documentIds.contains(dashboardLast.getDocumentId())
+                    && dashboardLast.getUserId().equals(userId)
+                    && dashboardSummaryDto.getCount() != 0){
+                log.debug("present : "+ dashboardItem.getName());
+                dashboardSummaryDto.setNumberCircle(true);
+            }
         }
         return dashboardSummaryDto;
     }
@@ -1214,10 +1320,8 @@ public class DashboardDenormalizedServiceImpl implements DashboardDenormalizedSe
                                 .collect(Collectors.toList());
 
 
-                if(dashboardLast != null){
-                    daySummaryDatas.add(singleUserDocumentWiseDaySummeryFilter(
+                daySummaryDatas.add(singleUserDocumentWiseDaySummeryFilter(
                             dashboardDataDayWiseList,documentIds,dashboardItem,userId,dashboardLast));
-                }
             }
             else if(dashboardItem.getDashboardItemType().equals(DashboardItemType.TARGET)){
                 DashboardSummaryDTO dashboardSummaryDto = new DashboardSummaryDTO();
