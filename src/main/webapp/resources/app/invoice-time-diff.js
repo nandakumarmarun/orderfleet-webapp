@@ -47,12 +47,6 @@ if (!this.InvoiceTimeDiff) {
             			}
             			downloadXls();
             		});
-		
-		let filterBy = getParameterByName('filterBy');
-		if (filterBy) {
-			$('#dbDateSearch').val(filterBy);
-
-		}
 
 		$('.selectpicker').selectpicker();
 	});
@@ -77,6 +71,10 @@ if (!this.InvoiceTimeDiff) {
 				return;
 			}
 		}
+		if ($("#dbEmployee").val() == "no") {
+                			alert("Please Select Employee")
+                			return;
+                		}
 
 		$('#tBodyInvoiceWiseReport').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");

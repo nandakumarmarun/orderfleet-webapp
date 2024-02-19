@@ -1262,17 +1262,24 @@ public class InvoiceWiseLocationReportResource {
 			
 			List<InvoiceDetailsDenormalized> invoiceDetails = new ArrayList<>();
 
-			if (accountProfilePids.size() > 0) {
+//			if (accountProfilePids.size() > 0) {
+//
+//				invoiceDetails = invoiceDetailsDenormalizedRepository
+//						.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids,
+//								userIds, accountProfilePids);
+//			}
+//			List<String> accountPid = invoiceDetails.stream().map(data ->data.getAccountProfilePid()).collect(Collectors.toList());
+		if (accountProfilePids.size() > 0) {
 
-				invoiceDetails = invoiceDetailsDenormalizedRepository
-						.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids,
-								userIds, accountProfilePids);
-			}
-			List<String> accountPid = invoiceDetails.stream().map(data ->data.getAccountProfilePid()).collect(Collectors.toList());
-			
-			
-			
-			List<String> skippedList = new ArrayList<String>(accountProfilePids);
+			executiveTaskExecutions = executiveTaskExecutionRepository
+					.getByDateBetweenAndActivityPidInAndUserIdInAndAccountPidIn(fromDate, toDate, activityPids,
+							userIds, accountProfilePids);
+		}
+		List<String> accountPid = executiveTaskExecutions.stream().map(data ->data.getAccountProfile().getPid()).collect(Collectors.toList());
+
+
+
+		List<String> skippedList = new ArrayList<String>(accountProfilePids);
 			skippedList.removeAll(accountPid);
 		
 			

@@ -108,6 +108,10 @@ if (!this.InvoiceWiseLocationReport) {
 				return;
 			}
 		}
+		if ($("#dbLocation").val() == "no") {
+        			alert("Please Select Location")
+        			return;
+        		}
 
 		$('#tBodyInvoiceWiseLocationReport').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");

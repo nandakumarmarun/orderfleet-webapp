@@ -86,7 +86,7 @@
 							<div class="col-sm-2">
 								Location <select id="dbLocation" name="locationPid"
 									class="form-control selectpicker" data-live-search="true">
-									<option value="-1">Select Location</option>
+									<option value="no">Select Location</option>
 									<c:forEach items="${locations}" var="location">
 										<option value="${location.pid}">${location.name}</option>
 									</c:forEach>

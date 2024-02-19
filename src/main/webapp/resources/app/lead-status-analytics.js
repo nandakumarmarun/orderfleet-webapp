@@ -21,12 +21,10 @@ if (!this.LeadStatusAnalytics) {
         			}
         			downloadXls();
         		});
-		let filterBy = getParameterByName('filterBy');
-		if (filterBy) {
-			$('#dbDateSearch').val(filterBy);
+
             LeadStatusAnalytics.filter();
-		}
-	$('.selectpicker').selectpicker();
+
+     	$('.selectpicker').selectpicker();
 	});
 
 function downloadXls() {
