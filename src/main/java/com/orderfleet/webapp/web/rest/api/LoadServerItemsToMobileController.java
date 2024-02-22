@@ -12,12 +12,14 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.Sets;
 import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.repository.*;
 import com.orderfleet.webapp.web.rest.api.dto.*;
 import com.orderfleet.webapp.web.rest.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -1795,12 +1797,10 @@ public class LoadServerItemsToMobileController {
 		InvoiceDetailsDenormalized executiveTask = new InvoiceDetailsDenormalized();
 		if (user.isPresent()) {
 			userId = user.get().getPid();
-			System.out.println("Start time:"+LocalDateTime.now());
 			executiveTask = invoiceDetailsDenormalizedRepository.findTop1ByUserPidAndAccountProfilePidAndDocumentPidOrderByCreatedDateDesc(userId,accountPid,documentPid);
-			System.out.println("End Time:"+LocalDateTime.now());
+
 		}
-		System.out.println("size:"+executiveTask);
-		System.out.println("Execution Pid :"+executiveTask.getExecutionPid()+" document no local :"+executiveTask.getDocumentNumberLocal());
+
        List<InvoiceDetailsDenormalized> invoiceDetailsDenormalizeds = invoiceDetailsDenormalizedRepository.findAllByExecutionPid(executiveTask.getExecutionPid());
 
 		LeadsTrackerDTO leadsTrackerDTO = new LeadsTrackerDTO();
@@ -1822,6 +1822,43 @@ public class LoadServerItemsToMobileController {
 
 		}
 		return new ResponseEntity<>(leadsTrackerDTO,HttpStatus.OK);
+	}
+	@GetMapping("/load-server-sent-items-quotation")
+	public ResponseEntity<List<InventoryVoucherDetailDTO>>lastQuotationItemByAccountPid(@RequestParam(required = false)String accountPid)
+	{
+		Optional<User> user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+		String documentPid ="DOC-h5F7XBjJVJ1680081655944";
+		String userId;
+		InvoiceDetailsDenormalized executiveTask = new InvoiceDetailsDenormalized();
+		if (user.isPresent()) {
+			userId = user.get().getPid();
+			executiveTask = invoiceDetailsDenormalizedRepository.findTop1ByUserPidAndAccountProfilePidAndDocumentPidOrderByCreatedDateDesc(userId,accountPid,documentPid);
+
+		}
+
+		List<InvoiceDetailsDenormalized> invoiceDetailsDenormalizeds = invoiceDetailsDenormalizedRepository.findAllByExecutionPid(executiveTask.getExecutionPid());
+
+		List<InventoryVoucherDetailDTO> inventoryVoucherDetailDTOS = new ArrayList<>();
+		for(InvoiceDetailsDenormalized invoiceDetails :invoiceDetailsDenormalizeds)
+		{
+			InventoryVoucherDetailDTO inventoryDetailDTO = new InventoryVoucherDetailDTO();
+			inventoryDetailDTO.setProductPid(invoiceDetails.getProductPid());
+			inventoryDetailDTO.setProductName(invoiceDetails.getProductName());
+			inventoryDetailDTO.setQuantity(invoiceDetails.getQuantity());
+			inventoryDetailDTO.setSellingRate(invoiceDetails.getSellingRate());
+			inventoryDetailDTO.setRowTotal(invoiceDetails.getRowTotal());
+			inventoryDetailDTO.setDiscountAmount(invoiceDetails.getDiscountAmount());
+			inventoryDetailDTO.setLengthType(invoiceDetails.getLengthType());
+			inventoryDetailDTO.setLengthInInch(invoiceDetails.getLengthInInch());
+			inventoryDetailDTO.setLengthInMeter(invoiceDetails.getLengthInMeter());
+			inventoryDetailDTO.setLengthInFeet(invoiceDetails.getLengthInFeet());
+			inventoryVoucherDetailDTOS.add(inventoryDetailDTO);
+
+		}
+
+       log.info("Size of detail :"+inventoryVoucherDetailDTOS.size());
+
+		return new ResponseEntity<>(inventoryVoucherDetailDTOS,HttpStatus.OK);
 	}
 
 	}

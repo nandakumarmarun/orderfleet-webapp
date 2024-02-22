@@ -1,7 +1,7 @@
 {
-"release-number" : "1.118.5",
-"release-date" : "19/02/2024",
+"release-number" : "1.119.0",
+"release-date" : "22/02/2024",
 "features" : [
-  "Changes in Report"
+  "Quotation api"
 ]
 }

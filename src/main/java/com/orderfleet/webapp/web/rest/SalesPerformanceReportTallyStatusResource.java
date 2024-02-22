@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
@@ -215,6 +216,16 @@ public class SalesPerformanceReportTallyStatusResource {
 			for (BigInteger apId : apIds) {
 				accountProfileIds.add(apId.longValue());
 			}
+			Set<Long> firstHalfSet = accountProfileIds
+					.parallelStream()
+					.limit(accountProfileIds.size() / 2)
+					.collect(Collectors.toSet());
+
+			Set<Long> secondHalfSet = accountProfileIds
+					.parallelStream()
+					.skip(accountProfileIds.size() / 2)
+					.collect(Collectors.toSet());
+
 			DateTimeFormatter DATE_TIME_FORMAT1 = DateTimeFormatter.ofPattern("hh:mm:ss a");
 			DateTimeFormatter DATE_FORMAT1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			String id1 = "AP_QUERY_137" + "_" + SecurityUtils.getCurrentUserLogin() + "_" + LocalDateTime.now();
@@ -223,8 +234,18 @@ public class SalesPerformanceReportTallyStatusResource {
 			String startTime1 = startLCTime1.format(DATE_TIME_FORMAT1);
 			String startDate1 = startLCTime1.format(DATE_FORMAT1);
 			logger.info(id1 + "," + startDate1 + "," + startTime1 + ",_ ,0 ,START,_," + description1);
-			List<AccountProfile> accountProfiles = accountProfileRepository
-					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+//			List<AccountProfile> accountProfiles = accountProfileRepository
+//					.findAllByCompanyIdAndIdsIn(accountProfileIds);
+			List<AccountProfile> accountProfiles1 = new ArrayList<>();
+			List<AccountProfile> accountProfiles2 = new ArrayList<>();
+			if (!firstHalfSet.isEmpty()) {
+				accountProfiles1 = accountProfileRepository
+						.findAllByCompanyIdAndIdsIn(firstHalfSet);
+			}
+			if (!secondHalfSet.isEmpty()) {
+				accountProfiles2 = accountProfileRepository
+						.findAllByCompanyIdAndIdsIn(secondHalfSet);
+			}
 			String flag1 = "Normal";
 			LocalDateTime endLCTime1 = LocalDateTime.now();
 			String endTime1 = endLCTime1.format(DATE_TIME_FORMAT1);
@@ -245,6 +266,9 @@ public class SalesPerformanceReportTallyStatusResource {
 			}
 	                logger.info(id1 + "," + endDate1 + "," + startTime1 + "," + endTime1 + "," + minutes1 + ",END," + flag1 + ","
 					+ description1);
+			List<AccountProfile> accountProfiles = Stream.concat(accountProfiles1.stream(), accountProfiles2.stream())
+					.collect(Collectors.toList());
+
 			// remove duplicates
 			List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
 

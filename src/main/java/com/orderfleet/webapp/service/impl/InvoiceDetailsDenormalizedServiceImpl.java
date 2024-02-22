@@ -150,6 +150,7 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
                     inventoryDetails.setDocumentVolume(inventoryVoucher.getDocumentVolume());
                     inventoryDetails.setDocDiscountAmount(inventoryVoucher.getDocDiscountAmount());
                     inventoryDetails.setDocDiscountPercentage(inventoryVoucher.getDocDiscountPercentage());
+                    inventoryDetails.setImageRefNo(inventoryVoucher.getImageRefNo());
 
                     if (inventoryVoucher.getEmployee() != null) {
                         EmployeeProfile employeeProfile1 = employeeProfileRepository.findEmployeeProfileByPid(inventoryVoucher.getEmployee().getPid());
@@ -173,12 +174,18 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
                     }
                     inventoryDetails.setQuantity(voucherDetail.getQuantity());
                     inventoryDetails.setFreeQuantity(voucherDetail.getFreeQuantity());
+                    inventoryDetails.setProductPid(opProductProfile.get().getPid());
                     inventoryDetails.setProductName(opProductProfile.get().getName());
                     inventoryDetails.setProductRemarks(opProductProfile.get().getRemarks());
                     inventoryDetails.setSellingRate(voucherDetail.getSellingRate());
                     inventoryDetails.setTaxPercentage(voucherDetail.getTaxPercentage());
                     inventoryDetails.setDiscountPercentage(voucherDetail.getDiscountPercentage());
                     inventoryDetails.setDiscountAmount(voucherDetail.getDiscountAmount());
+                    inventoryDetails.setRowTotal(voucherDetail.getRowTotal());
+                    inventoryDetails.setLengthType(voucherDetail.getLengthType());
+                    inventoryDetails.setLengthInInch(voucherDetail.getLengthInInch());
+                    inventoryDetails.setLengthInMeter(voucherDetail.getLengthInMeter());
+                    inventoryDetails.setLengthInFeet(voucherDetail.getLengthInFeet());
 
                     inventoryDetailsList.add(inventoryDetails);
                 }

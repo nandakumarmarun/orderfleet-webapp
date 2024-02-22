@@ -213,11 +213,28 @@ public class InvoiceDetailsDenormalized {
 
     private Long filledFormId;
 
+    @Column(name = "length_type")
+    private String lengthType;
+
+    @Column(name = "length_In_Inch", nullable = false, columnDefinition = "double precision DEFAULT 0")
+    private double lengthInInch;
+
+    @Column(name = "length_In_Meter", nullable = false, columnDefinition = "double precision DEFAULT 0")
+    private double lengthInMeter;
+
+    @Column(name = "length_In_Feet", nullable = false, columnDefinition = "double precision DEFAULT 0")
+    private double lengthInFeet;
+
+    @Column(name = "row_total", nullable = false, columnDefinition = "double precision DEFAULT 0")
+    private double rowTotal;
+
+    @Column(name = "productPid")
+    private String productPid;
+
     public InvoiceDetailsDenormalized() {
     }
 
-    public InvoiceDetailsDenormalized(Long id, String pid, String executionPid, String userPid, String userName, String employeePid, LocationType locationType, String towerLocation, Double salesOrderTotalAmount, Double receiptAmount, String vehicleNumber, String remarks, LocalDateTime createdDate, LocalDateTime date, LocalDateTime sendDate, String activityName, String accountTypeName, String accountTypePid, String accountProfileName, String accountProfilePid, String accountPhNo, String companyName, String companyPid, LocalDateTime punchInDate, String location, String documentNumberLocal, String processStatus, LocalDateTime documentDate, String documentName, String receiverAccountName, String supplierAccountName, String createdBy, String employeeName, double documentTotal, double documentVolume, double docDiscountAmount, double docDiscountPercentage, LocalDateTime updatedDate, String productName, String productRemarks, double quantity, double freeQuantity, double sellingRate, double taxPercentage, double discountPercentage, double discountAmount, double totalAmount, double outstandingAmount, PaymentMode mode, double amount,
-                                     Long userId, String instrumentNumber, LocalDateTime instrumentDate, String bankName, String bankPid, String byAccountName, String byAccountPid, String toAccountName, String toAccountPid, String voucherNumber, LocalDateTime voucherDate, String referenceNumber, String provisionalReceiptNo, IncomeExpenseHead incomeExpenseHead, String formName, String value, String formElement,String formElementPid, boolean mockLocationStatus, String receiptRemarks, DocumentType documentType,String activityPid,String documentPid,boolean withCustomer) {
+    public InvoiceDetailsDenormalized(Long id, String pid, String executionPid, String userPid, String userName, String employeePid, LocationType locationType, String towerLocation, Double salesOrderTotalAmount, Double receiptAmount, String vehicleNumber, String remarks, LocalDateTime createdDate, LocalDateTime date, LocalDateTime sendDate, String activityName, String activityPid, String accountTypeName, String accountTypePid, String accountProfileName, String accountProfilePid, String accountPhNo, String companyName, String companyPid, LocalDateTime punchInDate, String location, String documentNumberLocal, String documentNumberServer, String processStatus, LocalDateTime documentDate, String documentName, String documentPid, String receiverAccountName, String supplierAccountName, String createdBy, String employeeName, double documentTotal, double documentVolume, double docDiscountAmount, double docDiscountPercentage, LocalDateTime updatedDate, String productName, String productRemarks, double quantity, double freeQuantity, double sellingRate, double taxPercentage, double discountPercentage, double discountAmount, double totalAmount, double outstandingAmount, PaymentMode mode, double amount, String instrumentNumber, LocalDateTime instrumentDate, String bankName, String bankPid, String byAccountName, String byAccountPid, String toAccountName, String toAccountPid, String voucherNumber, LocalDateTime voucherDate, String referenceNumber, String provisionalReceiptNo, IncomeExpenseHead incomeExpenseHead, String formName, String value, String formElementName, boolean mockLocationStatus, String receiptRemarks, DocumentType documentType, boolean withCustomer, Long companyId, String formElementPid, String formElementType, Long userId, String inventoryPid, String accountingPid, String dynamicPid, String imageRefNo, String filledFormPid, Long filledFormId, String lengthType, double lengthInInch, double lengthInMeter, double lengthInFeet, double rowTotal, String productPid) {
         this.id = id;
         this.pid = pid;
         this.executionPid = executionPid;
@@ -234,6 +251,7 @@ public class InvoiceDetailsDenormalized {
         this.date = date;
         this.sendDate = sendDate;
         this.activityName = activityName;
+        this.activityPid = activityPid;
         this.accountTypeName = accountTypeName;
         this.accountTypePid = accountTypePid;
         this.accountProfileName = accountProfileName;
@@ -244,9 +262,11 @@ public class InvoiceDetailsDenormalized {
         this.punchInDate = punchInDate;
         this.location = location;
         this.documentNumberLocal = documentNumberLocal;
+        this.documentNumberServer = documentNumberServer;
         this.processStatus = processStatus;
         this.documentDate = documentDate;
         this.documentName = documentName;
+        this.documentPid = documentPid;
         this.receiverAccountName = receiverAccountName;
         this.supplierAccountName = supplierAccountName;
         this.createdBy = createdBy;
@@ -283,44 +303,27 @@ public class InvoiceDetailsDenormalized {
         this.incomeExpenseHead = incomeExpenseHead;
         this.formName = formName;
         this.value = value;
-        this.formElementName = formElement;
+        this.formElementName = formElementName;
         this.mockLocationStatus = mockLocationStatus;
         this.receiptRemarks = receiptRemarks;
         this.documentType = documentType;
         this.withCustomer = withCustomer;
-        this.userId = userId;
-    }
-
-    public Long getFilledFormId() {
-        return filledFormId;
-    }
-
-    public void setFilledFormId(Long filledFormId) {
-        this.filledFormId = filledFormId;
-    }
-
-    public String getImageRefNo() {
-        return imageRefNo;
-    }
-
-    public void setImageRefNo(String imageRefNo) {
-        this.imageRefNo = imageRefNo;
-    }
-
-    public String getFilledFormPid() {
-        return filledFormPid;
-    }
-
-    public void setFilledFormPid(String filledFormPid) {
-        this.filledFormPid = filledFormPid;
-    }
-
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
         this.companyId = companyId;
+        this.formElementPid = formElementPid;
+        this.formElementType = formElementType;
+        this.userId = userId;
+        this.inventoryPid = inventoryPid;
+        this.accountingPid = accountingPid;
+        this.dynamicPid = dynamicPid;
+        this.imageRefNo = imageRefNo;
+        this.filledFormPid = filledFormPid;
+        this.filledFormId = filledFormId;
+        this.lengthType = lengthType;
+        this.lengthInInch = lengthInInch;
+        this.lengthInMeter = lengthInMeter;
+        this.lengthInFeet = lengthInFeet;
+        this.rowTotal = rowTotal;
+        this.productPid = productPid;
     }
 
     public Long getId() {
@@ -408,7 +411,7 @@ public class InvoiceDetailsDenormalized {
     }
 
     public void setVehicleNumber(String vehicleNumber) {
-        vehicleNumber = vehicleNumber;
+        this.vehicleNumber = vehicleNumber;
     }
 
     public String getRemarks() {
@@ -449,6 +452,14 @@ public class InvoiceDetailsDenormalized {
 
     public void setActivityName(String activityName) {
         this.activityName = activityName;
+    }
+
+    public String getActivityPid() {
+        return activityPid;
+    }
+
+    public void setActivityPid(String activityPid) {
+        this.activityPid = activityPid;
     }
 
     public String getAccountTypeName() {
@@ -531,6 +542,14 @@ public class InvoiceDetailsDenormalized {
         this.documentNumberLocal = documentNumberLocal;
     }
 
+    public String getDocumentNumberServer() {
+        return documentNumberServer;
+    }
+
+    public void setDocumentNumberServer(String documentNumberServer) {
+        this.documentNumberServer = documentNumberServer;
+    }
+
     public String getProcessStatus() {
         return processStatus;
     }
@@ -553,6 +572,14 @@ public class InvoiceDetailsDenormalized {
 
     public void setDocumentName(String documentName) {
         this.documentName = documentName;
+    }
+
+    public String getDocumentPid() {
+        return documentPid;
+    }
+
+    public void setDocumentPid(String documentPid) {
+        this.documentPid = documentPid;
     }
 
     public String getReceiverAccountName() {
@@ -843,6 +870,13 @@ public class InvoiceDetailsDenormalized {
         this.value = value;
     }
 
+    public String getFormElementName() {
+        return formElementName;
+    }
+
+    public void setFormElementName(String formElementName) {
+        this.formElementName = formElementName;
+    }
 
     public boolean isMockLocationStatus() {
         return mockLocationStatus;
@@ -868,23 +902,6 @@ public class InvoiceDetailsDenormalized {
         this.documentType = documentType;
     }
 
-
-    public void setActivityPid(String activityPid) {
-        this.activityPid = activityPid;
-    }
-
-    public String getDocumentPid() {
-        return documentPid;
-    }
-
-    public void setDocumentPid(String documentPid) {
-        this.documentPid = documentPid;
-    }
-
-    public String getActivityPid() {
-        return activityPid;
-    }
-
     public boolean isWithCustomer() {
         return withCustomer;
     }
@@ -893,20 +910,12 @@ public class InvoiceDetailsDenormalized {
         this.withCustomer = withCustomer;
     }
 
-    public String getDocumentNumberServer() {
-        return documentNumberServer;
+    public Long getCompanyId() {
+        return companyId;
     }
 
-    public void setDocumentNumberServer(String documentNumberServer) {
-        this.documentNumberServer = documentNumberServer;
-    }
-
-    public String getFormElementName() {
-        return formElementName;
-    }
-
-    public void setFormElementName(String formElementName) {
-        this.formElementName = formElementName;
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 
     public String getFormElementPid() {
@@ -915,6 +924,14 @@ public class InvoiceDetailsDenormalized {
 
     public void setFormElementPid(String formElementPid) {
         this.formElementPid = formElementPid;
+    }
+
+    public String getFormElementType() {
+        return formElementType;
+    }
+
+    public void setFormElementType(String formElementType) {
+        this.formElementType = formElementType;
     }
 
     public Long getUserId() {
@@ -949,11 +966,75 @@ public class InvoiceDetailsDenormalized {
         this.dynamicPid = dynamicPid;
     }
 
-    public String getFormElementType() {
-        return formElementType;
+    public String getImageRefNo() {
+        return imageRefNo;
     }
 
-    public void setFormElementType(String formElementType) {
-        this.formElementType = formElementType;
+    public void setImageRefNo(String imageRefNo) {
+        this.imageRefNo = imageRefNo;
+    }
+
+    public String getFilledFormPid() {
+        return filledFormPid;
+    }
+
+    public void setFilledFormPid(String filledFormPid) {
+        this.filledFormPid = filledFormPid;
+    }
+
+    public Long getFilledFormId() {
+        return filledFormId;
+    }
+
+    public void setFilledFormId(Long filledFormId) {
+        this.filledFormId = filledFormId;
+    }
+
+    public String getLengthType() {
+        return lengthType;
+    }
+
+    public void setLengthType(String lengthType) {
+        this.lengthType = lengthType;
+    }
+
+    public double getLengthInInch() {
+        return lengthInInch;
+    }
+
+    public void setLengthInInch(double lengthInInch) {
+        this.lengthInInch = lengthInInch;
+    }
+
+    public double getLengthInMeter() {
+        return lengthInMeter;
+    }
+
+    public void setLengthInMeter(double lengthInMeter) {
+        this.lengthInMeter = lengthInMeter;
+    }
+
+    public double getLengthInFeet() {
+        return lengthInFeet;
+    }
+
+    public void setLengthInFeet(double lengthInFeet) {
+        this.lengthInFeet = lengthInFeet;
+    }
+
+    public double getRowTotal() {
+        return rowTotal;
+    }
+
+    public void setRowTotal(double rowTotal) {
+        this.rowTotal = rowTotal;
+    }
+
+    public String getProductPid() {
+        return productPid;
+    }
+
+    public void setProductPid(String productPid) {
+        this.productPid = productPid;
     }
 }
