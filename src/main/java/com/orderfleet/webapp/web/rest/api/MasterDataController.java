@@ -395,7 +395,7 @@ public class MasterDataController {
 			pageAccounts = locationAccountProfileService
 					.findAccountProfilesByUserLocationsAndAccountProfileActivated(page, size);
 		} else {
-			log.info("Deactivated accounts LastSyncDate *************:"+lastSyncdate);
+			log.info(" accounts LastSyncDate *************:"+lastSyncdate);
 			pageAccounts = locationAccountProfileService
 					.findAllByAccountProfileActivatedTrueAndLocationInAndLastModifiedDate(page, size, lastSyncdate);
 		}

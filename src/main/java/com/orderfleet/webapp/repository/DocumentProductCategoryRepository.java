@@ -28,7 +28,7 @@ public interface DocumentProductCategoryRepository extends JpaRepository<Documen
 
 	List<DocumentProductCategory> findAllByCompanyPid(String companyPid);
 
-	@Query("select documentProductCategory from DocumentProductCategory documentProductCategory where documentProductCategory.company.id = ?#{principal.companyId} and  documentProductCategory.document in ?1 and (documentProductCategory.lastModifiedDate > ?2) or (documentProductCategory.document.lastModifiedDate > ?2)")
+	@Query("select documentProductCategory from DocumentProductCategory documentProductCategory where documentProductCategory.company.id = ?#{principal.companyId} and  documentProductCategory.document in ?1 and (documentProductCategory.lastModifiedDate > ?2 or documentProductCategory.document.lastModifiedDate > ?2)")
 	List<DocumentProductCategory> findByDocumentInAndLastModifiedandLastModifiedDate(List<Document> documents,LocalDateTime lastModifiedDate);
 	
 	void deleteByCompanyId(Long companyId);

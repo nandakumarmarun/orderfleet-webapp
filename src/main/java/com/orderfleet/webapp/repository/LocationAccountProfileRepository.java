@@ -154,7 +154,7 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 			+ "loc.name as locationName, lap.last_modified_date as lastModifiedDate from tbl_location_account_profile lap "
 			+ "join tbl_account_profile ap on lap.account_profile_id = ap.id join tbl_location loc on lap.location_id = loc.id "
 			+ "where lap.company_id = ?#{principal.companyId} and lap.location_id in ?1 and ap.activated=true and "
-			+ "(lap.last_modified_date > ?2) OR (ap.last_modified_date > ?2) OR (loc.last_modified_date > ?2) ORDER BY lap.id LIMIT ?3 OFFSET ?4", nativeQuery = true)
+			+ "(lap.last_modified_date > ?2  OR ap.last_modified_date > ?2 OR loc.last_modified_date > ?2) ORDER BY lap.id LIMIT ?3 OFFSET ?4", nativeQuery = true)
 	List<Object[]> findByLocationInAndAccountProfileActivatedPaginated(Set<Long> locationIds,
 			LocalDateTime lastModifiedDate, int limit, int offset);
 
@@ -290,7 +290,7 @@ public interface LocationAccountProfileRepository extends JpaRepository<Location
 	List<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdOrderByIdAsc(
 			Set<Long> locationIds, long companyId);
 
-	@Query("select distinct locationAccountProfile from LocationAccountProfile locationAccountProfile where locationAccountProfile.location.id in ?1 and locationAccountProfile.accountProfile.activated=true and locationAccountProfile.company.id=?2 and (locationAccountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.accountProfile.lastModifiedDate > ?3) OR (locationAccountProfile.location.lastModifiedDate > ?3) order by locationAccountProfile.id asc")
+   @Query(" SELECT DISTINCT lap FROM LocationAccountProfile lap WHERE lap.location.id IN ?1 AND lap.accountProfile.activated = true AND lap.company.id = ?2 AND (lap.lastModifiedDate > ?3 OR lap.accountProfile.lastModifiedDate > ?3 OR lap.location.lastModifiedDate > ?3)ORDER BY lap.id ASC")
 	Page<LocationAccountProfile> findDistinctAccountProfileByAccountProfileActivatedTrueAndLocationIdInAndCompanyIdAndLastModifiedDateOrderByIdAsc(
 			Set<Long> locationIds, long companyId, LocalDateTime lastSyncdate, Pageable pageable);
 

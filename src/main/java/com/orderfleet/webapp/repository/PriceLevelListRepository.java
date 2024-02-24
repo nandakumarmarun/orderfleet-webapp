@@ -49,7 +49,7 @@ public interface PriceLevelListRepository extends JpaRepository<PriceLevelList, 
 
 	List<PriceLevelList> findByCompanyIdAndPriceLevelNameIgnoreCaseIn(Long id, Set<String> pllNames);
 
-	@Query("select pLevelList from PriceLevelList pLevelList where pLevelList.company.id = ?#{principal.companyId} and pLevelList.priceLevel.pid = ?1 and (pLevelList.lastModifiedDate > ?2) or (pLevelList.priceLevel.lastModifiedDate > ?2)")
+	@Query("select pLevelList from PriceLevelList pLevelList where pLevelList.company.id = ?#{principal.companyId} and pLevelList.priceLevel.pid = ?1 and (pLevelList.lastModifiedDate > ?2 or pLevelList.priceLevel.lastModifiedDate > ?2)")
 	List<PriceLevelList> findAllByCompanyIdAndPriceLevelPidAndpriceLevelLastModifiedDate(String priceLevelPid,
 			LocalDateTime lastModifiedDate);
 

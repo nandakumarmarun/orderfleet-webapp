@@ -119,7 +119,7 @@ public interface ProductGroupProductRepository extends JpaRepository<ProductGrou
 	Optional<ProductGroupProduct> findByCompanyIdAndProductGroupNameIgnoreCaseAndProductNameIgnoreCase(Long companyId,
 			String pgName, String pName);
 
-	@Query("select productGroupProduct from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid in ?1 and productGroupProduct.productGroup.activated = ?2 and productGroupProduct.product.activated = ?2 and (productGroupProduct.lastModifiedDate > ?3) or (productGroupProduct.productGroup.lastModifiedDate > ?3)")
+	@Query("select productGroupProduct from ProductGroupProduct productGroupProduct where productGroupProduct.productGroup.pid in ?1 and productGroupProduct.productGroup.activated = ?2 and productGroupProduct.product.activated = ?2 and (productGroupProduct.lastModifiedDate > ?3  or productGroupProduct.productGroup.lastModifiedDate > ?3)")
 	List<ProductGroupProduct> findByProductGroupPidInAndActivatedAndLastModifiedDateAndProductGroupLastModified(
 			List<String> productGroupPids, boolean activated, LocalDateTime lastModifiedDate);
 
