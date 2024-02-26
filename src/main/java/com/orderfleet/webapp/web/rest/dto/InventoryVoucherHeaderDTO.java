@@ -155,6 +155,8 @@ public class InventoryVoucherHeaderDTO {
 
 	private String companyName;
 
+	private Double count;
+
 	public InventoryVoucherHeaderDTO() {
 		super();
 	}
@@ -267,6 +269,7 @@ public class InventoryVoucherHeaderDTO {
 				: inventoryVoucherHeader.getReceiverAccount().getCustomerId();
 		
 		this.companyId = inventoryVoucherHeader.getCompany().getId();
+		this.count = inventoryVoucherHeader.getCount();
 	}
 
 	public InventoryVoucherHeaderDTO(Company company, InventoryVoucherHeader inventoryVoucherHeader) {
@@ -994,6 +997,14 @@ public class InventoryVoucherHeaderDTO {
 
 	public void setCompanyId(Long companyId) {
 		this.companyId = companyId;
+	}
+
+	public Double getCount() {
+		return count;
+	}
+
+	public void setCount(Double count) {
+		this.count = count;
 	}
 
 	@Override

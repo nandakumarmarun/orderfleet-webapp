@@ -1842,6 +1842,7 @@ public class LoadServerItemsToMobileController {
 		for(InvoiceDetailsDenormalized invoiceDetails :invoiceDetailsDenormalizeds)
 		{
 			InventoryVoucherDetailDTO inventoryDetailDTO = new InventoryVoucherDetailDTO();
+			inventoryDetailDTO.setCount(executiveTask.getCount());
 			inventoryDetailDTO.setProductPid(invoiceDetails.getProductPid());
 			inventoryDetailDTO.setProductName(invoiceDetails.getProductName());
 			inventoryDetailDTO.setQuantity(invoiceDetails.getQuantity());

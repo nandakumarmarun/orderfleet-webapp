@@ -237,6 +237,9 @@ public class InventoryVoucherHeader implements Serializable {
 	@Column(name = "imageRefNo")
 	private String imageRefNo;
 
+	@Column(name = "count",  columnDefinition = "double precision DEFAULT 0")
+	private Double count;
+
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "tbl_invetory_voucher_file", joinColumns = {
@@ -652,4 +655,11 @@ public class InventoryVoucherHeader implements Serializable {
 		this.salesOrderStatus = salesOrderStatus;
 	}
 
+	public Double getCount() {
+		return count;
+	}
+
+	public void setCount(Double count) {
+		this.count = count;
+	}
 }

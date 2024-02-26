@@ -230,11 +230,33 @@ public class InvoiceDetailsDenormalized {
 
     @Column(name = "productPid")
     private String productPid;
+    @Column(name = "count", columnDefinition = "double precision DEFAULT 0")
+    private Double count;
 
     public InvoiceDetailsDenormalized() {
     }
 
-    public InvoiceDetailsDenormalized(Long id, String pid, String executionPid, String userPid, String userName, String employeePid, LocationType locationType, String towerLocation, Double salesOrderTotalAmount, Double receiptAmount, String vehicleNumber, String remarks, LocalDateTime createdDate, LocalDateTime date, LocalDateTime sendDate, String activityName, String activityPid, String accountTypeName, String accountTypePid, String accountProfileName, String accountProfilePid, String accountPhNo, String companyName, String companyPid, LocalDateTime punchInDate, String location, String documentNumberLocal, String documentNumberServer, String processStatus, LocalDateTime documentDate, String documentName, String documentPid, String receiverAccountName, String supplierAccountName, String createdBy, String employeeName, double documentTotal, double documentVolume, double docDiscountAmount, double docDiscountPercentage, LocalDateTime updatedDate, String productName, String productRemarks, double quantity, double freeQuantity, double sellingRate, double taxPercentage, double discountPercentage, double discountAmount, double totalAmount, double outstandingAmount, PaymentMode mode, double amount, String instrumentNumber, LocalDateTime instrumentDate, String bankName, String bankPid, String byAccountName, String byAccountPid, String toAccountName, String toAccountPid, String voucherNumber, LocalDateTime voucherDate, String referenceNumber, String provisionalReceiptNo, IncomeExpenseHead incomeExpenseHead, String formName, String value, String formElementName, boolean mockLocationStatus, String receiptRemarks, DocumentType documentType, boolean withCustomer, Long companyId, String formElementPid, String formElementType, Long userId, String inventoryPid, String accountingPid, String dynamicPid, String imageRefNo, String filledFormPid, Long filledFormId, String lengthType, double lengthInInch, double lengthInMeter, double lengthInFeet, double rowTotal, String productPid) {
+    public InvoiceDetailsDenormalized(Long id, String pid, String executionPid, String userPid, String userName,
+                                      String employeePid, LocationType locationType, String towerLocation,
+                                      Double salesOrderTotalAmount, Double receiptAmount, String vehicleNumber,
+                                      String remarks, LocalDateTime createdDate, LocalDateTime date, LocalDateTime sendDate,
+                                      String activityName, String activityPid, String accountTypeName, String accountTypePid,
+                                      String accountProfileName, String accountProfilePid, String accountPhNo, String companyName,
+                                      String companyPid, LocalDateTime punchInDate, String location, String documentNumberLocal,
+                                      String documentNumberServer, String processStatus, LocalDateTime documentDate, String documentName,
+                                      String documentPid, String receiverAccountName, String supplierAccountName, String createdBy,
+                                      String employeeName, double documentTotal, double documentVolume, double docDiscountAmount,
+                                      double docDiscountPercentage, LocalDateTime updatedDate, String productName, String productRemarks,
+                                      double quantity, double freeQuantity, double sellingRate, double taxPercentage, double discountPercentage,
+                                      double discountAmount, double totalAmount, double outstandingAmount, PaymentMode mode, double amount,
+                                      String instrumentNumber, LocalDateTime instrumentDate, String bankName, String bankPid, String byAccountName,
+                                      String byAccountPid, String toAccountName, String toAccountPid, String voucherNumber, LocalDateTime voucherDate,
+                                      String referenceNumber, String provisionalReceiptNo, IncomeExpenseHead incomeExpenseHead, String formName,
+                                      String value, String formElementName, boolean mockLocationStatus, String receiptRemarks, DocumentType documentType,
+                                      boolean withCustomer, Long companyId, String formElementPid, String formElementType, Long userId,
+                                      String inventoryPid, String accountingPid, String dynamicPid, String imageRefNo, String filledFormPid,
+                                      Long filledFormId, String lengthType, double lengthInInch, double lengthInMeter, double lengthInFeet,
+                                      double rowTotal, String productPid,Double count) {
         this.id = id;
         this.pid = pid;
         this.executionPid = executionPid;
@@ -324,6 +346,7 @@ public class InvoiceDetailsDenormalized {
         this.lengthInFeet = lengthInFeet;
         this.rowTotal = rowTotal;
         this.productPid = productPid;
+        this.count = count;
     }
 
     public Long getId() {
@@ -1036,5 +1059,13 @@ public class InvoiceDetailsDenormalized {
 
     public void setProductPid(String productPid) {
         this.productPid = productPid;
+    }
+
+    public Double getCount() {
+        return count;
+    }
+
+    public void setCount(Double count) {
+        this.count = count;
     }
 }

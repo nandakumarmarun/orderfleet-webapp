@@ -152,6 +152,7 @@ public class InventoryVoucherDetailDTO {
 	private double lengthInMeter;
 	
 	private double lengthInFeet;
+	private Double count;
 	
 	
 	
@@ -772,6 +773,14 @@ public class InventoryVoucherDetailDTO {
 
 	public void setReferenceInvoiceNo(String referenceInvoiceNo) {
 		this.referenceInvoiceNo = referenceInvoiceNo;
+	}
+
+	public Double getCount() {
+		return count;
+	}
+
+	public void setCount(Double count) {
+		this.count = count;
 	}
 
 	@Override

@@ -151,6 +151,7 @@ public class InvoiceDetailsDenormalizedServiceImpl implements InvoiceDetailsDeno
                     inventoryDetails.setDocDiscountAmount(inventoryVoucher.getDocDiscountAmount());
                     inventoryDetails.setDocDiscountPercentage(inventoryVoucher.getDocDiscountPercentage());
                     inventoryDetails.setImageRefNo(inventoryVoucher.getImageRefNo());
+                    inventoryDetails.setCount(inventoryVoucher.getCount());
 
                     if (inventoryVoucher.getEmployee() != null) {
                         EmployeeProfile employeeProfile1 = employeeProfileRepository.findEmployeeProfileByPid(inventoryVoucher.getEmployee().getPid());

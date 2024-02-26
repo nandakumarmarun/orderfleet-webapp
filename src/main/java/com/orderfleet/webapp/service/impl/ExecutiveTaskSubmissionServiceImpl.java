@@ -547,7 +547,7 @@ public class ExecutiveTaskSubmissionServiceImpl implements ExecutiveTaskSubmissi
 				inventoryVoucherHeader.setDocumentVolume(inventoryVoucherDTO.getDocumentVolume());
 				inventoryVoucherHeader.setDocDiscountAmount(inventoryVoucherDTO.getDocDiscountAmount());
 				inventoryVoucherHeader.setDocDiscountPercentage(inventoryVoucherDTO.getDocDiscountPercentage());
-
+                inventoryVoucherHeader.setCount(inventoryVoucherDTO.getCount());
 				inventoryVoucherHeader.setRoundedOff(inventoryVoucherDTO.getRoundedOff());
 				inventoryVoucherHeader.setReferenceInvoiceNumber(inventoryVoucherDTO.getReferenceInvoiceNumber() != null
 						? inventoryVoucherDTO.getReferenceInvoiceNumber()
