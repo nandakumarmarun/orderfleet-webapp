@@ -44,16 +44,43 @@
 							</div>
 						</div>
 						<div class="form-group">
-						<div class="col-sm-2">
-                        		Employee<select id="dbEmployee" name="employeePid"
-                        			class="form-control">
-                        			<option value="no">All employee</option>
-                        				<c:forEach items="${employees}" var="employee">
-                             	<option value="${employee.pid}">${employee.name}</option>
-                        				</c:forEach>
+					  <div class="col-sm-3">
+                        			Employee
+                        		<div class=" input-group">
+                        	    <span
+                        		class='input-group-addon btn  dropdown-toggle glyphicon glyphicon-filter'
+                        		data-toggle='dropdown' aria-haspopup='true'
+                        		aria-expanded='false' title='filter employee'></span>
+                        	    <div class='dropdown-menu dropdown-menu-left'
+                        		style='background-color: #F0F0F0'>
+                        		<div>
+                        			<a class='btn btn-default dropdown-item'
+                        			style='width: 100%; text-align: left;'
+                        			onclick='GetDashboardEmployees(this,"Dashboard Employee","All Dashboard Employee")'>Dashboard
+                        			Employee</a>
+                        		</div>
+                        	    <div>
+                        		<a class='btn btn-default dropdown-item'
+                        		style='width: 100%; text-align: left;'
+                        		onclick='GetAllEmployees(this,"no","All Employee")'>All Employee</a>
+                        		</div>
+                        		</div>
+                        		<select id="dbEmployee" name="employeePid"
+                        		class="form-control">
+                        		<option value="Dashboard Employee">All Dashboard
+                        		Employees</option>
                         		</select>
-                      	</div>
-
+                        		</div>
+                        		</div>
+                             <div class="col-sm-2">
+								Document <select id="dbDocument" name="documentPid"
+									class="form-control">
+									<option value="no">Select Document</option>
+									<c:forEach items="${dynamicdocuments}" var="document">
+										<option value="${document.pid}">${document.name}</option>
+									</c:forEach>
+								</select>
+							</div>
 							<div class="col-sm-2">
 								Account <select id="dbAccount" name="accountPid"
 									class="form-control">
@@ -182,6 +209,8 @@
 		$(document)
 				.ready(
 						function() {
+						var employeePid = getParameterByName('user-key-pid');
+                        							getEmployees(employeePid);
 						<!--	Set the date selection limit to 3 months-->
 							$("#txtToDate").datepicker({
 								 dateFormat: 'mm-dd-yy',

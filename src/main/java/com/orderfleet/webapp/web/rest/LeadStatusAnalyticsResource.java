@@ -2,18 +2,16 @@ package com.orderfleet.webapp.web.rest;
 
 import com.codahale.metrics.CachedGauge;
 import com.codahale.metrics.annotation.Timed;
-import com.orderfleet.webapp.domain.Activity;
-import com.orderfleet.webapp.domain.EmployeeProfile;
-import com.orderfleet.webapp.domain.InvoiceDetailsDenormalized;
-import com.orderfleet.webapp.domain.UserActivity;
+import com.orderfleet.webapp.domain.*;
 import com.orderfleet.webapp.domain.enums.DocumentType;
-import com.orderfleet.webapp.repository.DocumentRepository;
-import com.orderfleet.webapp.repository.EmployeeProfileRepository;
-import com.orderfleet.webapp.repository.InvoiceDetailsDenormalizedRepository;
+import com.orderfleet.webapp.repository.*;
+import com.orderfleet.webapp.security.SecurityUtils;
 import com.orderfleet.webapp.service.*;
+import com.orderfleet.webapp.web.rest.dto.AccountProfileDTO;
 import com.orderfleet.webapp.web.rest.dto.DocumentDTO;
 import com.orderfleet.webapp.web.rest.dto.InvoiceWiseReportView;
 import com.orderfleet.webapp.web.rest.dto.LeadStatusDTO;
+import com.orderfleet.webapp.web.rest.mapper.AccountProfileMapper;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -43,7 +41,7 @@ import java.util.stream.Collectors;
 @Controller
 public class LeadStatusAnalyticsResource {
 
-    private final  Logger log  = LoggerFactory.getLogger(LeadStatusAnalyticsResource.class);
+    private final Logger log = LoggerFactory.getLogger(LeadStatusAnalyticsResource.class);
 
     @Inject
     private EmployeeHierarchyService employeeHierarchyService;
@@ -68,6 +66,21 @@ public class LeadStatusAnalyticsResource {
     @Inject
     private DocumentRepository documentRepository;
 
+    @Inject
+    private UserRepository userRepository;
+    @Inject
+    private DashboardUserRepository dashboardUserRepository;
+
+    @Inject
+    private  EmployeeProfileLocationRepository employeeProfileLocationRepository;
+    @Inject
+    private LocationAccountProfileRepository locationAccountProfileRepository;
+    @Inject
+    private AccountProfileRepository accountProfileRepository;
+
+    @Inject
+    private AccountProfileMapper accountProfileMapper;
+
 
     @RequestMapping(value = "/lead-status-analytics", method = RequestMethod.GET)
     @Timed
@@ -75,30 +88,45 @@ public class LeadStatusAnalyticsResource {
     public String getAllLeadStatus(Pageable pageable, Model model) {
         // user under current user
         List<Long> userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-
+        log.info("SIze ...:" + userIds.size());
+        model.addAttribute("dynamicdocuments", documentService.findAllByDocumentType(DocumentType.DYNAMIC_DOCUMENT));
 
         if (userIds.isEmpty()) {
-            model.addAttribute("employees", employeeProfileService.findAllByCompany());
-            model.addAttribute("accounts", accountProfileService.findAllByCompanyAndActivated(true));
+            model.addAttribute("accounts", accountProfileService.findAllByCompany());
 
         } else {
+//            model.addAttribute("accounts", locationAccountProfileService.findAccountProfilesByCurrentUserLocations());
             model.addAttribute("employees", employeeProfileService.findAllEmployeeByUserIdsIn(userIds));
-            model.addAttribute("accounts", locationAccountProfileService.findAccountProfilesByCurrentUserLocations());
+
+            Long currentUserId = userRepository.getIdByLogin(SecurityUtils.getCurrentUserLogin());
+            userIds.add(currentUserId);
+            Set<Long> locationIds = employeeProfileLocationRepository.findLocationIdsByUserIdIn(userIds);
+            Set<Long> accountProfileIds = locationAccountProfileRepository
+                    .findAccountProfileIdsByUserLocationsOrderByAccountProfilesNameAndActivated(locationIds);
+            List<AccountProfile> accountProfiles = accountProfileRepository
+                    .findAllByCompanyIdAndIdsIn(accountProfileIds);
+            List<AccountProfile> result = accountProfiles.parallelStream().distinct().collect(Collectors.toList());
+
+            List<AccountProfileDTO> accountProfileDTOs = accountProfileMapper
+                    .accountProfilesToAccountProfileDTOs(result);
+
+            model.addAttribute("accounts", accountProfileDTOs);
         }
         return "company/LeadStatusAnalytics";
     }
+
     @RequestMapping(value = "/lead-status-analytics/filter", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Timed
     @Transactional(readOnly = true)
     public ResponseEntity<List<LeadStatusDTO>> filterExecutiveTaskExecutions(
-             @RequestParam("employeePid") String employeePid,
-           @RequestParam("accountPid") String accountPid,
+            @RequestParam("employeePid") String employeePid,
+            @RequestParam("accountPid") String accountPid, @RequestParam("documentPid") String documentPid,
             @RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
             @RequestParam boolean inclSubordinate) {
+        log.info("Web request to filter Lead Status");
 
         List<LeadStatusDTO> executiveTaskExecutions = new ArrayList<>();
-        String documentPid ="DOC-FR6o7ZHGSo1703759915397";
         if (filterBy.equals("TODAY")) {
             executiveTaskExecutions = getFilterData(employeePid, documentPid, accountPid, LocalDate.now(),
                     LocalDate.now(), inclSubordinate);
@@ -113,18 +141,18 @@ public class LeadStatusAnalyticsResource {
                     LocalDate.now(), inclSubordinate);
         } else if (filterBy.equals("MTD")) {
             LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-            executiveTaskExecutions = getFilterData(employeePid, documentPid,accountPid, monthStartDate,
+            executiveTaskExecutions = getFilterData(employeePid, documentPid, accountPid, monthStartDate,
                     LocalDate.now(), inclSubordinate);
         } else if (filterBy.equals("CUSTOM")) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
             LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
             LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-            executiveTaskExecutions = getFilterData(employeePid, documentPid,accountPid, fromDateTime,
+            executiveTaskExecutions = getFilterData(employeePid, documentPid, accountPid, fromDateTime,
                     toFateTime, inclSubordinate);
         } else if (filterBy.equals("SINGLE")) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
             LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-            executiveTaskExecutions = getFilterData(employeePid, documentPid,accountPid, fromDateTime,
+            executiveTaskExecutions = getFilterData(employeePid, documentPid, accountPid, fromDateTime,
                     fromDateTime, inclSubordinate);
         }
         return new ResponseEntity<>(executiveTaskExecutions, HttpStatus.OK);
@@ -134,7 +162,7 @@ public class LeadStatusAnalyticsResource {
 
         LocalDateTime fromDate = fDate.atTime(0, 0);
         LocalDateTime toDate = tDate.atTime(23, 59);
-
+        log.info("Employeepid :" + employeePid);
         List<Long> userIds = getUserIdsUnderCurrentUser(employeePid, inclSubordinate);
 
         if (userIds.isEmpty()) {
@@ -143,12 +171,11 @@ public class LeadStatusAnalyticsResource {
 
         List<InvoiceDetailsDenormalized> invoiceDetailsDenormalizedList = new ArrayList<>();
         if (accountPid.equalsIgnoreCase("no")) {
-            invoiceDetailsDenormalizedList = invoiceDetailsDenormalizedRepository.getByCreatedDateDocumentPidAndUserIdsIn(fromDate,toDate,documentPid,userIds);
+            invoiceDetailsDenormalizedList = invoiceDetailsDenormalizedRepository.getByCreatedDateDocumentPidAndUserIdsIn(fromDate, toDate, documentPid, userIds);
+        } else {
+            invoiceDetailsDenormalizedList = invoiceDetailsDenormalizedRepository.getByCreatedDateDocumentPidAndAccountPidAndUserIdsIn(fromDate, toDate, documentPid, accountPid, userIds);
         }
-        else {
-            invoiceDetailsDenormalizedList = invoiceDetailsDenormalizedRepository.getByCreatedDateDocumentPidAndAccountPidAndUserIdsIn(fromDate,toDate,documentPid,accountPid,userIds);
-        }
-        log.info("Size of Invoice :"+invoiceDetailsDenormalizedList.size());
+        log.info("Size of Invoice :" + invoiceDetailsDenormalizedList.size());
 
         Map<String, List<InvoiceDetailsDenormalized>> groupedByName = invoiceDetailsDenormalizedList.stream()
                 .collect(Collectors.groupingBy(InvoiceDetailsDenormalized::getAccountProfilePid));
@@ -162,53 +189,47 @@ public class LeadStatusAnalyticsResource {
                                 .orElse(null)
                 ));
         List<LeadStatusDTO> leadStatusDTOList = new ArrayList<>();
-        List<InvoiceDetailsDenormalized> invoiceDetailsList= new ArrayList<>();
+        List<InvoiceDetailsDenormalized> invoiceDetailsList = new ArrayList<>();
         for (Map.Entry<String, InvoiceDetailsDenormalized> entry : lastCreatedByAccount.entrySet()) {
             String key = entry.getKey();
-            log.info("Name:"+key);
+            log.info("Name:" + key);
             InvoiceDetailsDenormalized value = entry.getValue();
-            invoiceDetailsList = invoiceDetailsDenormalizedRepository.findAllByAccountProfilePidAndExecutionPidAndDocumentPid(key,value.getExecutionPid(),value.getDocumentPid());
+            invoiceDetailsList = invoiceDetailsDenormalizedRepository.findAllByAccountProfilePidAndExecutionPidAndDocumentPid(key, value.getExecutionPid(), value.getDocumentPid());
 
-          log.info("Size with date :"+invoiceDetailsList.size());
+            log.info("Size with date :" + invoiceDetailsList.size());
             LeadStatusDTO leadStatusDTO = new LeadStatusDTO();
             leadStatusDTO.setPid(value.getPid());
             leadStatusDTO.setEmployeeName(value.getEmployeeName());
             leadStatusDTO.setAccountName(value.getAccountProfileName());
             leadStatusDTO.setCreatedDate(value.getCreatedDate());
             leadStatusDTO.setDocumentName(value.getDocumentName());
-            for(InvoiceDetailsDenormalized invoice :invoiceDetailsList)
-            {
-                System.out.println("Form name :"+invoice.getFormElementName());
-                if(invoice.getFormElementName().equalsIgnoreCase("Lead Status"))
-                {
-                    leadStatusDTO.setLeadStatus(invoice.getValue()!= null ? invoice.getValue() : "");
+            for (InvoiceDetailsDenormalized invoice : invoiceDetailsList) {
+                System.out.println("Form name :" + invoice.getFormElementName());
+                if (invoice.getFormElementName().equalsIgnoreCase("Lead Status")) {
+                    leadStatusDTO.setLeadStatus(invoice.getValue() != null ? invoice.getValue() : "");
                 }
 
-                    if(invoice.getFormElementName().equalsIgnoreCase("Deal Volume"))
-                    {
-                        leadStatusDTO.setDealVolume(invoice.getValue()!= null ? invoice.getValue() : "");
-                    }
+                if (invoice.getFormElementName().equalsIgnoreCase("Deal Volume")) {
+                    leadStatusDTO.setDealVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                }
 
-                    if(invoice.getFormElementName().equalsIgnoreCase("Won volume"))
-                    {
-                        leadStatusDTO.setWonVolume(invoice.getValue()!= null ? invoice.getValue() : "");
-                    }
+                if (invoice.getFormElementName().equalsIgnoreCase("Won volume")) {
+                    leadStatusDTO.setWonVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                }
 
 
-                    if(invoice.getFormElementName().equalsIgnoreCase("Lost volume"))
-                    {
-                        leadStatusDTO.setLostVolume(invoice.getValue()!= null ? invoice.getValue() : "");
-                    }
-                if(invoice.getFormElementName().equalsIgnoreCase("Balance Deal Volume"))
-                {
-                    leadStatusDTO.setBalanceDealVolume(invoice.getValue()!= null ? invoice.getValue() : "");
+                if (invoice.getFormElementName().equalsIgnoreCase("Lost volume")) {
+                    leadStatusDTO.setLostVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                }
+                if (invoice.getFormElementName().equalsIgnoreCase("Balance Deal Volume")) {
+                    leadStatusDTO.setBalanceDealVolume(invoice.getValue() != null ? invoice.getValue() : "");
                 }
 
 
             }
             leadStatusDTOList.add(leadStatusDTO);
         }
-
+        leadStatusDTOList.sort(Comparator.comparing(LeadStatusDTO::getCreatedDate).reversed());
         return leadStatusDTOList;
 
     }
@@ -217,14 +238,14 @@ public class LeadStatusAnalyticsResource {
     @ResponseBody
     @Timed
     @Transactional(readOnly = true)
-    public void downloadExecutiveTaskExecutions(
-            @RequestParam("employeePid") String employeePid,
+    public <documentPid> void downloadExecutiveTaskExecutions(
+            @RequestParam("employeePid") String employeePid, @RequestParam("documentPid") String documentPid,
             @RequestParam("accountPid") String accountPid,
             @RequestParam("filterBy") String filterBy, @RequestParam String fromDate, @RequestParam String toDate,
             @RequestParam boolean inclSubordinate, HttpServletResponse response) {
 
         List<LeadStatusDTO> executiveTaskExecutions = new ArrayList<>();
-        String documentPid ="DOC-FR6o7ZHGSo1703759915397";
+
         if (filterBy.equals("TODAY")) {
             executiveTaskExecutions = getFilterData(employeePid, documentPid, accountPid, LocalDate.now(),
                     LocalDate.now(), inclSubordinate);
@@ -239,18 +260,18 @@ public class LeadStatusAnalyticsResource {
                     LocalDate.now(), inclSubordinate);
         } else if (filterBy.equals("MTD")) {
             LocalDate monthStartDate = LocalDate.now().withDayOfMonth(1);
-            executiveTaskExecutions = getFilterRawData(employeePid, documentPid,accountPid, monthStartDate,
+            executiveTaskExecutions = getFilterRawData(employeePid, documentPid, accountPid, monthStartDate,
                     LocalDate.now(), inclSubordinate);
         } else if (filterBy.equals("CUSTOM")) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
             LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
             LocalDate toFateTime = LocalDate.parse(toDate, formatter);
-            executiveTaskExecutions = getFilterRawData(employeePid, documentPid,accountPid, fromDateTime,
+            executiveTaskExecutions = getFilterRawData(employeePid, documentPid, accountPid, fromDateTime,
                     toFateTime, inclSubordinate);
         } else if (filterBy.equals("SINGLE")) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
             LocalDate fromDateTime = LocalDate.parse(fromDate, formatter);
-            executiveTaskExecutions = getFilterRawData(employeePid, documentPid,accountPid, fromDateTime,
+            executiveTaskExecutions = getFilterRawData(employeePid, documentPid, accountPid, fromDateTime,
                     fromDateTime, inclSubordinate);
         }
 
@@ -270,72 +291,56 @@ public class LeadStatusAnalyticsResource {
 
         List<InvoiceDetailsDenormalized> invoiceDetailsDenormalizedList = new ArrayList<>();
         if (accountPid.equalsIgnoreCase("no")) {
-            invoiceDetailsDenormalizedList = invoiceDetailsDenormalizedRepository.getByCreatedDateDocumentPidAndUserIdsIn(fromDate,toDate,documentPid,userIds);
+            invoiceDetailsDenormalizedList = invoiceDetailsDenormalizedRepository.getByCreatedDateDocumentPidAndUserIdsIn(fromDate, toDate, documentPid, userIds);
+        } else {
+            invoiceDetailsDenormalizedList = invoiceDetailsDenormalizedRepository.getByCreatedDateDocumentPidAndAccountPidAndUserIdsIn(fromDate, toDate, documentPid, accountPid, userIds);
         }
-        else {
-            invoiceDetailsDenormalizedList = invoiceDetailsDenormalizedRepository.getByCreatedDateDocumentPidAndAccountPidAndUserIdsIn(fromDate,toDate,documentPid,accountPid,userIds);
-        }
-        log.info("Size of Invoice :"+invoiceDetailsDenormalizedList.size());
-
-        Map<String, List<InvoiceDetailsDenormalized>> groupedByName = invoiceDetailsDenormalizedList.stream()
-                .collect(Collectors.groupingBy(InvoiceDetailsDenormalized::getAccountProfilePid));
+        log.info("Size of Invoice :" + invoiceDetailsDenormalizedList.size());
 
         // Get the persons with the greatest created date for each group
-
         List<LeadStatusDTO> leadStatusDTOList = new ArrayList<>();
-        List<InvoiceDetailsDenormalized> invoiceDetailsList= new ArrayList<>();
-        for (Map.Entry<String, List<InvoiceDetailsDenormalized> >entry : groupedByName.entrySet()) {
+
+        Map<String, InvoiceDetailsDenormalized> uniqueMap = invoiceDetailsDenormalizedList.stream()
+                .collect(Collectors.groupingBy(InvoiceDetailsDenormalized::getDocumentNumberLocal,
+                        Collectors.collectingAndThen(Collectors.toList(), list -> list.get(0))));
+        for (Map.Entry<String, InvoiceDetailsDenormalized> entry : uniqueMap.entrySet()) {
             String key = entry.getKey();
-            log.info("Name:"+key);
-            List<InvoiceDetailsDenormalized> value = entry.getValue();
+            log.info("Name:" + key);
+            InvoiceDetailsDenormalized invoices = entry.getValue();
+            LeadStatusDTO leadStatusDTO = new LeadStatusDTO();
+            leadStatusDTO.setPid(invoices.getPid());
+            leadStatusDTO.setEmployeeName(invoices.getEmployeeName());
+            leadStatusDTO.setAccountName(invoices.getAccountProfileName());
+            leadStatusDTO.setCreatedDate(invoices.getCreatedDate());
+            leadStatusDTO.setDocumentName(invoices.getDocumentName());
+            List<InvoiceDetailsDenormalized> invoiceDetailsDenormalized = invoiceDetailsDenormalizedRepository.findAllByExecutionPid(invoices.getExecutionPid());
+            for (InvoiceDetailsDenormalized invoice : invoiceDetailsDenormalized) {
 
-
-            for(InvoiceDetailsDenormalized invoice :value)
-            {
-                LeadStatusDTO leadStatusDTO = new LeadStatusDTO();
-                leadStatusDTO.setPid(invoice.getPid());
-                leadStatusDTO.setEmployeeName(invoice.getEmployeeName());
-                leadStatusDTO.setAccountName(invoice.getAccountProfileName());
-                leadStatusDTO.setCreatedDate(invoice.getCreatedDate());
-                leadStatusDTO.setDocumentName(invoice.getDocumentName());
-
-                if(invoice.getFormElementName().equalsIgnoreCase("Lead Status"))
-                {
-                    leadStatusDTO.setLeadStatus(invoice.getValue()!= null ? invoice.getValue() : "");
+                if (invoice.getFormElementName().equalsIgnoreCase("Lead Status")) {
+                    leadStatusDTO.setLeadStatus(invoice.getValue() != null ? invoice.getValue() : "");
                 }
-
-                if(invoice.getFormElementName().equalsIgnoreCase("Deal Volume"))
-                {
-                    leadStatusDTO.setDealVolume(invoice.getValue()!= null ? invoice.getValue() : "");
+                if (invoice.getFormElementName().equalsIgnoreCase("Deal Volume")) {
+                    leadStatusDTO.setDealVolume(invoice.getValue() != null ? invoice.getValue() : "");
                 }
-
-                if(invoice.getFormElementName().equalsIgnoreCase("Won volume"))
-                {
-                    leadStatusDTO.setWonVolume(invoice.getValue()!= null ? invoice.getValue() :"" );
+                if (invoice.getFormElementName().equalsIgnoreCase("Won volume")) {
+                    leadStatusDTO.setWonVolume(invoice.getValue() != null ? invoice.getValue() : "");
                 }
-
-
-                if(invoice.getFormElementName().equalsIgnoreCase("Lost volume"))
-                {
-                    leadStatusDTO.setLostVolume(invoice.getValue()!= null ? invoice.getValue() : "");
+                if (invoice.getFormElementName().equalsIgnoreCase("Lost volume")) {
+                    leadStatusDTO.setLostVolume(invoice.getValue() != null ? invoice.getValue() : "");
                 }
-                if(invoice.getFormElementName().equalsIgnoreCase("Balance Deal Volume"))
-                {
-                    leadStatusDTO.setBalanceDealVolume(invoice.getValue()!= null ? invoice.getValue() : "");
+                if (invoice.getFormElementName().equalsIgnoreCase("Balance Deal Volume")) {
+                    leadStatusDTO.setBalanceDealVolume(invoice.getValue() != null ? invoice.getValue() : "");
                 }
-                leadStatusDTOList.add(leadStatusDTO);
-
-
             }
+            leadStatusDTOList.add(leadStatusDTO);
+
         }
-
+        leadStatusDTOList.sort(Comparator.comparing(LeadStatusDTO::getCreatedDate).reversed());
         return leadStatusDTOList;
-
     }
-
     private void buildExcelDocument(List<LeadStatusDTO> executiveTaskExecutions, HttpServletResponse response) {
         log.debug("Downloading Excel report");
-        String excelFileName = "LeadStatus" + ".xls";
+        String excelFileName = "LeadStatusRawData" + ".xls";
         String sheetName = "Sheet1";
 
         String[] headerColumns = { "Employee","Account Profile","Document Name","Date"," Time","Lead Status","Deal Volume","Won Volume",
@@ -430,9 +435,39 @@ public class LeadStatusAnalyticsResource {
 
     private List<Long> getUserIdsUnderCurrentUser(String employeePid, boolean inclSubordinate) {
         List<Long> userIds = Collections.emptyList();
-        if ( employeePid.equals("no")) {
+        if (employeePid.equals("Dashboard Employee") || employeePid.equals("no")) {
             userIds = employeeHierarchyService.getCurrentUsersSubordinateIds();
-
+            if (employeePid.equals("Dashboard Employee")) {
+//				List<User> dashboardUsers = dashboardUserRepository.findUsersByCompanyId();
+//				List<Long> dashboardUserIds = dashboardUsers.stream().map(User::getId).collect(Collectors.toList());
+                Set<Long> dashboardUserIds = dashboardUserRepository.findUserIdsByCompanyId();
+                Set<Long> uniqueIds = new HashSet<>();
+                log.info("dashboard user ids empty: " + dashboardUserIds.isEmpty());
+                if (!dashboardUserIds.isEmpty()) {
+                    log.info(" user ids empty: " + userIds.isEmpty());
+                    log.info("userids :" + userIds.toString());
+                    if (!userIds.isEmpty()) {
+                        for (Long uid : userIds) {
+                            for (Long sid : dashboardUserIds) {
+                                if (uid != null && uid.equals(sid)) {
+                                    uniqueIds.add(sid);
+                                }
+                            }
+                        }
+                    } else {
+                        userIds = new ArrayList<>(dashboardUserIds);
+                    }
+                }
+                if (!uniqueIds.isEmpty()) {
+                    userIds = new ArrayList<>(uniqueIds);
+                }
+            } else {
+                if (userIds.isEmpty()) {
+                    // List<User> users = userRepository.findAllByCompanyId();
+                    // userIds = users.stream().map(User::getId).collect(Collectors.toList());
+                    userIds = userRepository.findAllUserIdsByCompanyId();
+                }
+            }
         } else {
             if (inclSubordinate) {
                 userIds = employeeHierarchyService.getEmployeeSubordinateIds(employeePid);
@@ -455,4 +490,5 @@ public class LeadStatusAnalyticsResource {
 
         return userIds;
     }
+
 }

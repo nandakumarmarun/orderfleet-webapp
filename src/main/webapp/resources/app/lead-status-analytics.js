@@ -11,7 +11,9 @@ if (!this.LeadStatusAnalytics) {
 	var leadStatusAnalyticsContextPath = location.protocol + '//' + location.host
 			+ location.pathname;
 
-
+var dashboardEmployees = [];
+	var otherEmployees = [];
+	var allEmployeesMap = new Object();
 	$(document).ready(function() {
 		$('#downloadXls').on('click', function() {
         			var tblSale = $("#tblLeadStatusAnalytics tbody");
@@ -22,7 +24,7 @@ if (!this.LeadStatusAnalytics) {
         			downloadXls();
         		});
 
-            LeadStatusAnalytics.filter();
+
 
      	$('.selectpicker').selectpicker();
 	});
@@ -47,6 +49,10 @@ function downloadXls() {
 				return;
 			}
 		}
+			if ($("#dbDocument").val() == "no") {
+                			alert("Please Select a document")
+                			return;
+                		}
 
 		$('#tBodyLeadStatusAnalytics').html(
 				"<tr><td colspan='9' align='center'>Please wait...</td></tr>");
@@ -56,6 +62,7 @@ function downloadXls() {
 					type : 'GET',
 					data : {
 						employeePid : $('#dbEmployee').val(),
+						documentPid : $("#dbDocument").val(),
 						accountPid : $("#dbAccount").val(),
 						filterBy : $("#dbDateSearch").val(),
 						fromDate : $("#txtFromDate").val(),
@@ -92,7 +99,7 @@ function downloadXls() {
 																	+ "</td><td>"
 																    + invoiceWiseReport.documentName
 																	 +"</td><td>"
-																	 +invoiceWiseReport.leadStatus
+																	 +(invoiceWiseReport.leadStatus == null ? "": invoiceWiseReport.leadStatus)
 																     +"</td><td>"
 																	 +(invoiceWiseReport.dealVolume == null ?"":invoiceWiseReport.dealVolume)
 																	  +"</td><td>"
@@ -116,13 +123,14 @@ function downloadXls() {
 LeadStatusAnalytics.filterRawData = function(){
 
 	    var	employeePid = $('#dbEmployee').val();
+	    var documentPid = $("#dbDocument").val();
         var accountPid = $("#dbAccount").val();
         var	filterBy = $("#dbDateSearch").val();
         var	fromDate = $("#txtFromDate").val();
         var	toDate = $("#txtToDate").val();
         var	inclSubordinate = $('#inclSubOrdinates').is(":checked");
 
-      window.location.href =  leadStatusAnalyticsContextPath+"/downloadRawData?&employeePid="+employeePid+
+      window.location.href =  leadStatusAnalyticsContextPath+"/downloadRawData?&employeePid="+employeePid+'&documentPid='+documentPid+
                                              '&accountPid='+accountPid+'&filterBy='+filterBy+'&fromDate='+fromDate+'&toDate='+toDate+'&inclSubordinate='+inclSubordinate;
 
 console.log("Success.....");
