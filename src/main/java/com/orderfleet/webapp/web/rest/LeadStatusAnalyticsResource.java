@@ -210,19 +210,19 @@ public class LeadStatusAnalyticsResource {
                 }
 
                 if (invoice.getFormElementName().equalsIgnoreCase("Deal Volume")) {
-                    leadStatusDTO.setDealVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                    leadStatusDTO.setDealVolume(invoice.getValue() != null ? Double.parseDouble(invoice.getValue()) : 0);
                 }
 
                 if (invoice.getFormElementName().equalsIgnoreCase("Won volume")) {
-                    leadStatusDTO.setWonVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                    leadStatusDTO.setWonVolume(invoice.getValue() != null ? Double.parseDouble(invoice.getValue()) : 0);
                 }
 
 
                 if (invoice.getFormElementName().equalsIgnoreCase("Lost volume")) {
-                    leadStatusDTO.setLostVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                    leadStatusDTO.setLostVolume(invoice.getValue() != null ?Double.parseDouble( invoice.getValue()) : 0);
                 }
                 if (invoice.getFormElementName().equalsIgnoreCase("Balance Deal Volume")) {
-                    leadStatusDTO.setBalanceDealVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                    leadStatusDTO.setBalanceDealVolume(invoice.getValue() != null ? Double.parseDouble(invoice.getValue()) : 0);
                 }
 
 
@@ -320,16 +320,16 @@ public class LeadStatusAnalyticsResource {
                     leadStatusDTO.setLeadStatus(invoice.getValue() != null ? invoice.getValue() : "");
                 }
                 if (invoice.getFormElementName().equalsIgnoreCase("Deal Volume")) {
-                    leadStatusDTO.setDealVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                    leadStatusDTO.setDealVolume(invoice.getValue() != null ? Double.parseDouble(invoice.getValue() ): 0);
                 }
                 if (invoice.getFormElementName().equalsIgnoreCase("Won volume")) {
-                    leadStatusDTO.setWonVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                    leadStatusDTO.setWonVolume(invoice.getValue() != null ? Double.parseDouble(invoice.getValue() ): 0);
                 }
                 if (invoice.getFormElementName().equalsIgnoreCase("Lost volume")) {
-                    leadStatusDTO.setLostVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                    leadStatusDTO.setLostVolume(invoice.getValue() != null ? Double.parseDouble(invoice.getValue()) : 0);
                 }
                 if (invoice.getFormElementName().equalsIgnoreCase("Balance Deal Volume")) {
-                    leadStatusDTO.setBalanceDealVolume(invoice.getValue() != null ? invoice.getValue() : "");
+                    leadStatusDTO.setBalanceDealVolume(invoice.getValue() != null ? Double.parseDouble(invoice.getValue()) : 0);
                 }
             }
             leadStatusDTOList.add(leadStatusDTO);
@@ -405,10 +405,10 @@ public class LeadStatusAnalyticsResource {
             }
 
             row.createCell(5).setCellValue(invoice.getLeadStatus());
-            row.createCell(6).setCellValue(invoice.getDealVolume() != null ? invoice.getDealVolume() : "");
-            row.createCell(7).setCellValue(invoice.getWonVolume() != null ? invoice.getWonVolume() :"");
-            row.createCell(8).setCellValue(invoice.getLostVolume() != null ? invoice.getLostVolume() : "");
-            row.createCell(9).setCellValue(invoice.getBalanceDealVolume()!= null ? invoice.getBalanceDealVolume() : "");
+            row.createCell(6).setCellValue(invoice.getDealVolume() != null ? String.valueOf(invoice.getDealVolume()) : "");
+            row.createCell(7).setCellValue(invoice.getWonVolume() != null ? String.valueOf(invoice.getWonVolume()) :"");
+            row.createCell(8).setCellValue(invoice.getLostVolume() != null ?String.valueOf(invoice.getLostVolume()) : "");
+            row.createCell(9).setCellValue(invoice.getBalanceDealVolume()!= null ? String.valueOf(invoice.getBalanceDealVolume()) : "");
 
         }
     }

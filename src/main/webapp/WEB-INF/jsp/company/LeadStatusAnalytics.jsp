@@ -133,13 +133,20 @@
 										style="font-size: 18px" onclick="LeadStatusAnalytics.filter()"
 										title="Apply"></button>
 								</div>
+								<div class="col-sm-3">
+                                <br/>
+
+                            	<button id="myBtn" type="button" >
+                                 <img src="/resources/assets/images/graphs.png" alt="description-of-image" />
+                                      </button>
+								</div>
 								<br>
 								 <div class="col-sm-3">
                               	<button type="button" class="btn btn-success" id="downloadXls">Download</button>
                                	</div>
 
                                 <div class="col-sm-3">
-	<button type="button" class="btn btn-success" id="downloadRawXls" onclick="LeadStatusAnalytics.filterRawData()">Download RawData</button>
+	                     <button type="button" class="btn btn-success" id="downloadRawXls" onclick="LeadStatusAnalytics.filterRawData()">Download RawData</button>
                                	</div>
 
 							</div>
@@ -176,14 +183,47 @@
 		<hr />
 	<!-- Footer -->
 			<jsp:include page="../fragments/m_footer.jsp"></jsp:include>
-			<spring:url value="/web/lead-status-analytics"
-				var="urlLeadStatusAnalytics"></spring:url>
+
+
+        <div class="modal fade container" id="myModal">
+					<!-- model Dialog -->
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+								<h4 class="modal-title" id="myModalLabel">Lead status analytics
+								</h4>
+							</div>
+							<div class="modal-body" style="height: 500px; overflow: auto;">
+								<div class="alert alert-danger alert-dismissible" role="alert"
+									style="display: none;">
+									<button type="button" class="close"
+										onclick="$('.alert').hide();" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+									<p></p>
+								</div>
+								 <div id="chartContainer"></div>
+								 </div>
+                                	<div class="modal-footer">
+                                	<button type="button" class="btn btn-default"
+                            		data-dismiss="modal">Cancel</button>
+                                 	</div>
+                                 	</div>
+                                	<!-- /.modal-content -->
+                                	</div>
+                                 	<!-- /.modal-dialog -->
+                                 	</div>
 		</div>
 	</div>
 	<jsp:include page="../fragments/m_bottom_script.jsp"></jsp:include>
     <script type="text/javascript" src="${jsXlsx}"></script>
 	<script type="text/javascript" src="${fileSaver}"></script>
-
+<spring:url value="/web/lead-status-analytics"
+				var="urlLeadStatusAnalytics"></spring:url>
 
 	<spring:url value="/resources/app/report-common-js-file.js"
 		var="reportcommonjsfileJS"></spring:url>
@@ -192,6 +232,13 @@
 	<spring:url value="/resources/app/lead-status-analytics.js"
 		var="leadStatusAnalyticsJS"></spring:url>
 	<script type="text/javascript" src="${leadStatusAnalyticsJS}"></script>
+
+
+    	<spring:url value="/resources/assets/plugin/canvasjs/canvasjs.min.js"
+    		var="canvasjsMinJs"></spring:url>
+    	<script type="text/javascript" src="${canvasjsMinJs}"></script>
+
+
 
 	<spring:url value="/resources/assets/js/moment.js" var="momentJs"></spring:url>
 	<script type="text/javascript" src="${momentJs}"></script>

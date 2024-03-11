@@ -10,10 +10,10 @@ public class LeadStatusDTO {
     private String accountName;
     private LocalDateTime createdDate;
     private String leadStatus;
-    private String dealVolume;
-    private String wonVolume;
-    private String lostVolume;
-    private String balanceDealVolume;
+    private Double dealVolume;
+    private Double wonVolume;
+    private Double lostVolume;
+    private Double balanceDealVolume;
     private String documentName;
 
     private  String pid;
@@ -21,7 +21,7 @@ public class LeadStatusDTO {
     public LeadStatusDTO() {
     }
 
-    public LeadStatusDTO(String employeeName, String accountName, LocalDateTime createdDate, String leadStatus, String dealVolume, String wonVolume, String lostVolume, String balanceDealVolume, String documentName, String pid) {
+    public LeadStatusDTO(String employeeName, String accountName, LocalDateTime createdDate, String leadStatus, Double dealVolume, Double wonVolume, Double lostVolume, Double balanceDealVolume, String documentName, String pid) {
         this.employeeName = employeeName;
         this.accountName = accountName;
         this.createdDate = createdDate;
@@ -68,35 +68,35 @@ public class LeadStatusDTO {
         this.leadStatus = leadStatus;
     }
 
-    public String getDealVolume() {
+    public Double getDealVolume() {
         return dealVolume;
     }
 
-    public void setDealVolume(String dealVolume) {
+    public void setDealVolume(Double dealVolume) {
         this.dealVolume = dealVolume;
     }
 
-    public String getWonVolume() {
+    public Double getWonVolume() {
         return wonVolume;
     }
 
-    public void setWonVolume(String wonVolume) {
+    public void setWonVolume(Double wonVolume) {
         this.wonVolume = wonVolume;
     }
 
-    public String getLostVolume() {
+    public Double getLostVolume() {
         return lostVolume;
     }
 
-    public void setLostVolume(String lostVolume) {
+    public void setLostVolume(Double lostVolume) {
         this.lostVolume = lostVolume;
     }
 
-    public String getBalanceDealVolume() {
+    public Double getBalanceDealVolume() {
         return balanceDealVolume;
     }
 
-    public void setBalanceDealVolume(String balanceDealVolume) {
+    public void setBalanceDealVolume(Double balanceDealVolume) {
         this.balanceDealVolume = balanceDealVolume;
     }
 

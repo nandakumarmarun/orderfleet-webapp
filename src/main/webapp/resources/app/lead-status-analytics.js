@@ -77,13 +77,19 @@ function downloadXls() {
 											"<tr><td colspan='9' align='center'>No data available</td></tr>");
 							return;
 						}
+						var totalDealVolume = 0;
+						var totalWonVolume =0;
+						var totalLostVolume =0;
+						var totalBalVolume = 0;
 
 						$
 								.each(
 										invoiceWiseReports,
 										function(index, invoiceWiseReport) {
-
-
+                                               totalDealVolume += invoiceWiseReport.dealVolume;
+                                               totalWonVolume += invoiceWiseReport.wonVolume;
+                                                totalLostVolume += invoiceWiseReport.lostVolume;
+                                                totalBalVolume += invoiceWiseReport.balanceDealVolume;
 											$('#tBodyLeadStatusAnalytics')
 													.append(
 															        "<tr><td>"
@@ -111,15 +117,37 @@ function downloadXls() {
 																    	+ "</td></tr>");
 
 
-
-
-
 										});
-
-
+									var btn = document.getElementById("myBtn")
+										btn.onclick = function(){
+                                    $('#myModal').modal('show');
+                     generateChart(totalDealVolume,totalWonVolume,totalLostVolume,totalBalVolume)}
 					}
 				});
 }
+function generateChart(a,b,c,d) {
+    var chart = new CanvasJS.Chart("chartContainer", {
+
+        animationEnabled: true,
+        theme: "light2",
+        title:{
+            text: "Lead Status Analytics(MT)"
+        },
+
+        data: [{
+            type: "column",
+            dataPoints: [
+                { y: a, label: "Open MT" },
+                { y: b,  label: "Won MT" },
+                { y: c,  label: "Lost MT" },
+                { y: d,  label: "Balance MT" },
+
+            ]
+        }]
+    });
+chart.render();
+}
+
 LeadStatusAnalytics.filterRawData = function(){
 
 	    var	employeePid = $('#dbEmployee').val();
