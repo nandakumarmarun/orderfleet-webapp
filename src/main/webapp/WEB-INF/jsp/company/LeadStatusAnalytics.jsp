@@ -194,7 +194,7 @@
 									aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
-								<h4 class="modal-title" id="myModalLabel">Lead status analytics
+								<h4 class="modal-title" id="myModalLabel">
 								</h4>
 							</div>
 							<div class="modal-body" style="height: 500px; overflow: auto;">

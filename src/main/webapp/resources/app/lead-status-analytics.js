@@ -81,6 +81,9 @@ function downloadXls() {
 						var totalWonVolume =0;
 						var totalLostVolume =0;
 						var totalBalVolume = 0;
+						var openCount =0;
+						var wonCount = 0;
+						var lostCount =0;
 
 						$
 								.each(
@@ -90,6 +93,19 @@ function downloadXls() {
                                                totalWonVolume += invoiceWiseReport.wonVolume;
                                                 totalLostVolume += invoiceWiseReport.lostVolume;
                                                 totalBalVolume += invoiceWiseReport.balanceDealVolume;
+                                                if(invoiceWiseReport.leadStatus=='Open')
+                                                {
+                                                 openCount += 1;
+                                                }
+                                                 if(invoiceWiseReport.leadStatus=='Won')
+                                                {
+                                                 wonCount += 1;
+                                                }
+                                                if(invoiceWiseReport.leadStatus=='Lost')
+                                               {
+                                                lostCount += 1;
+                                                }
+
 											$('#tBodyLeadStatusAnalytics')
 													.append(
 															        "<tr><td>"
@@ -118,14 +134,17 @@ function downloadXls() {
 
 
 										});
+
+
 									var btn = document.getElementById("myBtn")
 										btn.onclick = function(){
                                     $('#myModal').modal('show');
-                     generateChart(totalDealVolume,totalWonVolume,totalLostVolume,totalBalVolume)}
+                     generateChart(totalDealVolume,totalWonVolume,totalLostVolume,totalBalVolume,openCount,wonCount,lostCount)
+                     }
 					}
 				});
 }
-function generateChart(a,b,c,d) {
+function generateChart(a,b,c,d,e,f,g) {
     var chart = new CanvasJS.Chart("chartContainer", {
 
         animationEnabled: true,
@@ -133,9 +152,15 @@ function generateChart(a,b,c,d) {
         title:{
             text: "Lead Status Analytics(MT)"
         },
-
+        legend: {
+        		cursor:"pointer",
+        	},
         data: [{
             type: "column",
+            name: "Volume In MT",
+              legendText: "volume in MT",
+              indexLabel: "{y}",
+              showInLegend: true,
             dataPoints: [
                 { y: a, label: "Open MT" },
                 { y: b,  label: "Won MT" },
@@ -143,11 +168,24 @@ function generateChart(a,b,c,d) {
                 { y: d,  label: "Balance MT" },
 
             ]
-        }]
+        },
+        {
+        		type: "column",
+        		name: "Lead Status Count",
+        		legendText: "Lead Count",
+                 indexLabel: "{y}",
+                 showInLegend: true,
+        		dataPoints:[
+        			{ y: e, label: "Open " },
+                    { y: f,  label: "Won " },
+                    { y: g,  label: "Lost " },
+
+        		]
+    }]
     });
 chart.render();
-}
 
+}
 LeadStatusAnalytics.filterRawData = function(){
 
 	    var	employeePid = $('#dbEmployee').val();
